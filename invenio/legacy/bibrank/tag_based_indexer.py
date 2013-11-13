@@ -35,7 +35,7 @@ from invenio.bibrank_citation_indexer import get_citation_weight, print_missing,
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
      wash_table_column_name, get_table_update_time
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
 from invenio.bibindex_engine import create_range_list
 from invenio.intbitset import intbitset

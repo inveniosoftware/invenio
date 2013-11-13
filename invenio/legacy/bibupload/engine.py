@@ -79,7 +79,7 @@ from invenio.legacy.bibrecord import create_records, \
                               records_identical
 from invenio.search_engine import get_record
 from invenio.utils.date import convert_datestruct_to_datetext
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.bibcatalog import bibcatalog_system
 from invenio.intbitset import intbitset
 from invenio.utils.url import make_user_agent_string

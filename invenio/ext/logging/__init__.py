@@ -16,8 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-    invenio.ext.logger
-    --------------------------------------
+    invenio.ext.logging
+    -------------------
 
     This module adds and configures custom logger.
 """
@@ -26,18 +26,20 @@ import os
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
 
+from .wrappers import *
+
 
 def setup_app(app):
     """Adds new Rotating File Handler to application."""
     try:
         os.makedirs(os.path.join(app.instance_path,
                                  app.config.get('CFG_LOGDIR', '')))
-    except:
+    except Exception:
         pass
 
     file_log_name = os.path.join(app.instance_path,
                                  app.config.get('CFG_LOGDIR', ''),
-                                 app.import_name + '.log')
+                                 app.logger_name + '.log')
 
     handler = RotatingFileHandler(file_log_name)
     handler.setFormatter(Formatter(

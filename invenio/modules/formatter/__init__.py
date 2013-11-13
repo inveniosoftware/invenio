@@ -41,8 +41,8 @@ import sys
 import zlib
 
 from invenio.base.globals import cfg
-from invenio.errorlib import register_exception
 from invenio.messages import wash_language
+from invenio.ext.logging import register_exception
 from invenio.ext.template import render_template_to_string
 
 # Functions to format a single record

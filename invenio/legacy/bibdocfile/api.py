@@ -86,7 +86,7 @@ if sys.hexversion < 0x2040000:
 
 from invenio.shellutils import escape_shell_arg
 from invenio.dbquery import run_sql, DatabaseError
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.legacy.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
     encode_for_xml

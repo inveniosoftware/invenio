@@ -25,7 +25,7 @@ import time
 from invenio.modules.formatter.engine import \
      BibFormatObject, \
      format_with_format_template
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_SITE

@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_PATH_CONVERT, \
      CFG_SITE_LANG
 from invenio.bibdocfile import decompose_file
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats, get_file_converter_logger
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 from invenio.dbquery import run_sql

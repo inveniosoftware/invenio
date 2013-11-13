@@ -36,7 +36,7 @@ from invenio.utils.apache import \
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.utils.datastructures import flatten_multidict
 ## TODO for future reimplementation of stream_file
 #from invenio.bibdocfile import StreamFileException

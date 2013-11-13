@@ -76,7 +76,7 @@ from invenio.access_control_firerole import acc_firerole_check_user, load_role_d
 from invenio.access_control_config import SUPERADMINROLE, CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.base.i18n import gettext_set_language, wash_languages, wash_language
 from invenio.ext.email import send_email
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import InvenioWebAccessExternalAuthError
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \

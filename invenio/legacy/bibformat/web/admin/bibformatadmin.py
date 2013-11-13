@@ -34,7 +34,7 @@ from invenio.utils.url import wash_url_argument, redirect_to_url
 from invenio.search_engine import search_pattern, \
                            create_basic_search_units
 from invenio.modules.formatter.config import InvenioBibFormatError, InvenioBibFormatWarning
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_SITE_LANG, CFG_SITE_NAME, CFG_SITE_SECURE_URL
 
 def index(req, ln=CFG_SITE_LANG):

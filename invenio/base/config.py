@@ -17,7 +17,7 @@ EXTENSIONS = [
     'invenio.ext.assets',
     'invenio.ext.template',
     'invenio.ext.admin',
-    'invenio.ext.logger',
+    'invenio.ext.logging',
     'invenio.ext.gravatar',
     'invenio.ext.menu:MenuAlchemy',
     'invenio.ext.breadcrumb:BreadcrumbAlchemy',

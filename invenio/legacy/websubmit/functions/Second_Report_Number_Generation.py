@@ -35,7 +35,7 @@ import os
 import time
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.legacy.websubmit.functions.Report_Number_Generation import create_reference
 
 

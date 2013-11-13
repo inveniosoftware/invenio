@@ -30,7 +30,7 @@ from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       InvenioWebSessionWarning
 from invenio.webuser import nickname_valid_p, get_user_info
 from invenio.webmessage import perform_request_send
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 import invenio.webgroup_dblayer as db
 from invenio.dbquery import IntegrityError
 try:

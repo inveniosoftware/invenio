@@ -77,7 +77,7 @@ from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
     CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM, \
     CFG_BIBDOCFILE_DESIRED_CONVERSIONS
 
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 def get_file_converter_logger():
     return getLogger("InvenioWebSubmitFileConverterLogger")

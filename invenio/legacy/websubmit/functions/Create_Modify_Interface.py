@@ -28,7 +28,7 @@ import pprint
 from invenio.dbquery import run_sql
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 from invenio.legacy.websubmit.functions.Retrieve_Data import Get_Field
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
     """Read a field's value from its corresponding text file in 'cur_dir' (if it exists) into memory.

@@ -20,7 +20,7 @@ import re
 import redis
 
 from invenio.legacy.bibrecord import create_record
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.ext.sqlalchemy import db
 
 

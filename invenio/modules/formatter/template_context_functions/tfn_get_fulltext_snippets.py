@@ -20,7 +20,7 @@
 """Template context function to get fulltext snippets via Solr."""
 
 from invenio.config import CFG_WEBSEARCH_FULLTEXT_SNIPPETS
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.modules.formatter.utils import get_pdf_snippets
 from invenio.search_engine_utils import get_fulltext_terms_from_search_pattern
 from invenio.modules.search.cache import get_pattern_from_cache

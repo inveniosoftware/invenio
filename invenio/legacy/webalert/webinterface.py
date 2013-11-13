@@ -29,7 +29,7 @@ from invenio.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd
 from invenio.webstat import register_customevent
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.webuser import collect_user_info
 
 from invenio.base.i18n import gettext_set_language

@@ -32,7 +32,7 @@ from invenio.modules.formatter.engine import BibFormatObject, get_format_element
 from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS, CFG_BIBFORMAT_BFX_TEMPLATES_PATH
 from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE
 from invenio.bibformat_bfx_engine_config import InvenioBibFormatBfxError, InvenioBibFormatBfxWarning
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_LANG
 

@@ -29,7 +29,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_LANG, \

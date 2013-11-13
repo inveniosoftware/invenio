@@ -27,7 +27,7 @@ from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
 from invenio.utils.url import redirect_to_url
 from invenio.modules.redirector.api import get_redirection_data
 from invenio.webuser import collect_user_info
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 class WebInterfaceGotoPages(WebInterfaceDirectory):
     def _lookup(self, component, path):

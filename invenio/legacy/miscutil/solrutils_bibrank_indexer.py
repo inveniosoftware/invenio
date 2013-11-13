@@ -31,7 +31,7 @@ from invenio.search_engine import record_exists
 from invenio.bibdocfile import BibRecDocs
 from invenio.solrutils_bibindex_indexer import replace_invalid_solr_characters
 from invenio.bibindex_engine import create_range_list
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.bibrank_bridge_utils import get_tags, get_field_content_in_utf8
 
 

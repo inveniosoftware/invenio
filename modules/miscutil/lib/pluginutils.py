@@ -355,7 +355,7 @@ class PluginContainer(object):
             }
         except Exception:
             if self._register_exception:
-                from invenio.errorlib import register_exception
+                from invenio.ext.logging import register_exception
                 register_exception()
             self._plugin_map[plugin_name] = {
                 'plugin': None,

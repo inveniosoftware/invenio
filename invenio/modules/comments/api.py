@@ -60,7 +60,7 @@ from invenio.utils.date import convert_datetext_to_dategui, \
                               datetext_default, \
                               convert_datestruct_to_datetext
 from invenio.ext.email import send_email
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.base.i18n import wash_language, gettext_set_language
 from invenio.utils.url import wash_url_argument
 from .config import CFG_WEBCOMMENT_ACTION_CODE, \

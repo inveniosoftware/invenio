@@ -39,8 +39,8 @@ from invenio.bibknowledge import get_kb_mappings
 from invenio.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \
                      task_get_task_param
-from invenio.errorlib import register_exception
-from invenio.bibindex_engine_utils import get_field_tags
+from invenio.ext.logging import register_exception
+from invenio.bibindex_engine import get_field_tags
 
 
 INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')

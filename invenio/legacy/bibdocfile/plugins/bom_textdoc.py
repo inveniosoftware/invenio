@@ -22,7 +22,7 @@
 from invenio.bibdocfile import BibDoc, InvenioBibDocFileError
 from invenio.dbquery import run_sql
 from datetime import datetime
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 import os
 
 class BibTextDoc(BibDoc):

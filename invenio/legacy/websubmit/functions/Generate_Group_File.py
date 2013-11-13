@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 
 CFG_WEBSUBMIT_GROUP_FILE_NAME = "Group"

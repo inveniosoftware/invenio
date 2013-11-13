@@ -36,7 +36,7 @@ from invenio.config import CFG_CERN_SITE, \
                            CFG_SITE_RECORD
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.search_engine import print_record
 from invenio.ext.email import send_email
 

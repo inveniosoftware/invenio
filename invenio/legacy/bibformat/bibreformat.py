@@ -602,7 +602,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
             try:
                 raise Exception('Invalid output format.')
             except Exception:
-                from invenio.errorlib import register_exception
+                from invenio.ext.logging import register_exception
                 register_exception(prefix="The given output format '%s' is not available or is invalid. Please try again" % invalid_format, alert_admin=True)
                 return
         else:  # every given format is available

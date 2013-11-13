@@ -52,7 +52,7 @@ from invenio.search_engine import \
 from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.websearchadminlib import get_detailed_page_tabs
 import invenio.template
 bibdocfile_templates = invenio.template.load('bibdocfile')

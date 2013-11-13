@@ -677,7 +677,7 @@ def create_AWS_request_url(base_url, argd, _amazon_secret_access_key,
             try:
                 raise Exception("Module hashlib not installed. Please install it.")
             except:
-                from invenio.errorlib import register_exception
+                from invenio.ext.logging import register_exception
                 register_exception(stream='warning', alert_admin=True, subject='Cannot create AWS signature')
                 return ""
         else:
@@ -769,7 +769,7 @@ def create_Indico_request_url(base_url, indico_what, indico_loc, indico_id, indi
         try:
             raise Exception("Module hashlib not installed. Please install it.")
         except:
-            from invenio.errorlib import register_exception
+            from invenio.ext.logging import register_exception
             register_exception(stream='warning', alert_admin=True, subject='Cannot create AWS signature')
     if not items:
         return url

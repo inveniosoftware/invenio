@@ -38,7 +38,7 @@ except:
 # wrap warnings (usually from sql queries) to log the traceback
 # of their origin for debugging
 try:
-    from invenio.errorlib import wrap_warn
+    from invenio.ext.logging import wrap_warn
     wrap_warn()
 except:
     pass

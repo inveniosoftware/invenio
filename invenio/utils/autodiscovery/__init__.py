@@ -117,7 +117,7 @@ def import_related_module(package, pkg_path, related_name, ignore_exceptions=Fal
     except Exception as e:
         if ignore_exceptions:
             #FIXME remove invenio dependency
-            from invenio.errorlib import register_exception
+            from invenio.ext.logging import register_exception
             register_exception()
         else:
             raise e

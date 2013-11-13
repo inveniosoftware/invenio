@@ -69,7 +69,7 @@ from invenio.webbasket_dblayer import get_basket_name, \
 from invenio.utils.url import get_referer, redirect_to_url, make_canonical_urlargd
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webstat import register_customevent
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.webuser import collect_user_info
 from invenio.modules.comments.api import check_user_can_attach_file_to_comments
 from invenio.access_control_engine import acc_authorize_action

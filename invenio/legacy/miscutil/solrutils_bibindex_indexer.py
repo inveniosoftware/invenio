@@ -24,7 +24,7 @@ Solr utilities.
 
 from invenio.config import CFG_SOLR_URL
 from invenio.solrutils_config import CFG_SOLR_INVALID_CHAR_RANGES
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 
 if CFG_SOLR_URL:

@@ -38,7 +38,7 @@ from invenio.webjournal_utils import \
      get_journal_articles, \
      get_current_issue
 from invenio.base.i18n import gettext_set_language
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
            link_category_headers='yes', display_categories='', hide_when_only_new_records="no"):

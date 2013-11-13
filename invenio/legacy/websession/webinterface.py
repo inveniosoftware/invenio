@@ -56,7 +56,7 @@ from invenio import webgroup
 from invenio import webgroup_dblayer
 from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.ext.email import send_email
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
     mail_cookie_create_pw_reset, mail_cookie_check_role, \

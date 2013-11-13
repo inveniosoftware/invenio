@@ -54,7 +54,7 @@ from invenio.config import \
      CFG_BIBSCHED_MAX_ARCHIVED_ROWS_DISPLAY
 from invenio.dbquery import run_sql, real_escape_string
 from invenio.utils.text import wrap_text_in_a_box
-from invenio.errorlib import register_exception, register_emergency
+from invenio.ext.logging import register_exception, register_emergency
 from invenio.shellutils import run_shell_command
 
 CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING',

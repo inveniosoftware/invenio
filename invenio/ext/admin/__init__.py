@@ -88,5 +88,5 @@ def setup_app(app):
             try:
                 register_func(app, admin)
             except Exception:
-                from invenio.errorlib import register_exception
+                from invenio.ext.logging import register_exception
                 register_exception()

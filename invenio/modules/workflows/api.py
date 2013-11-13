@@ -37,7 +37,7 @@ class WorkerBackend(object):
             return import_string('invenio.modules.workflows.workers.%s:%s' % (
                 cfg['CFG_BIBWORKFLOW_WORKER'], cfg['CFG_BIBWORKFLOW_WORKER']))
         except:
-            from invenio.errorlib import register_exception
+            from invenio.ext.logging import register_exception
             ## Let's report about broken plugins
             register_exception(alert_admin=True)
 

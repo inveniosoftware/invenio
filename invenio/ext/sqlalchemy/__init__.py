@@ -123,7 +123,7 @@ def autocommit_on_checkin(dbapi_con, con_record):
     except:
         pass
         #FIXME
-        #from invenio.errorlib import register_exception
+        #from invenio.ext.logging import register_exception
         #register_exception()
 
 ## Possibly register globally.

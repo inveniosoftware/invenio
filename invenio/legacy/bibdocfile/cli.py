@@ -34,7 +34,7 @@ from logging import getLogger, debug, DEBUG
 from optparse import OptionParser, OptionGroup, OptionValueError
 from tempfile import mkstemp
 
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_SITE_URL, CFG_BIBDOCFILE_FILEDIR, \
     CFG_SITE_RECORD, CFG_TMPSHAREDDIR
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioBibDocFileError, \

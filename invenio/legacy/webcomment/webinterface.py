@@ -66,7 +66,7 @@ from invenio.search_engine import create_navtrail_links, \
 from invenio.utils.url import redirect_to_url, \
                              make_canonical_urlargd
 from invenio.htmlutils import get_mathjax_header
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.base.i18n import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts

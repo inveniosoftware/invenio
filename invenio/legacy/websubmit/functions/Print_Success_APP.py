@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 import os
 import cgi
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 def Print_Success_APP(parameters, curdir, form, user_info=None):
     """Return a message to be displayed by the referee's browser after (s)he

@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 import os
 import sys
 
-from invenio.errorlib import register_exception, get_pretty_traceback
+from invenio.ext.logging import register_exception, get_pretty_traceback
 from invenio.config import CFG_SITE_URL, CFG_LOGDIR
 from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \

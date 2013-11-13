@@ -29,7 +29,7 @@ import invenio.webuser
 from invenio.shellutils import escape_shell_arg
 from invenio.bibcatalog_system import BibCatalogSystem
 from invenio.ext.email import send_email
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 EMAIL_SUBMIT_CONFIGURED = False
 import invenio.config

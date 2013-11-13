@@ -25,7 +25,7 @@ import os
 from logging import StreamHandler, DEBUG
 from cStringIO import StringIO
 
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_SITE_URL, CFG_PREFIX, CFG_TMPDIR, CFG_PATH_PDFTK
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, \

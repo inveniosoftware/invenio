@@ -34,7 +34,7 @@ from invenio.config import CFG_TMPSHAREDDIR
 from invenio.dbquery import run_sql
 from invenio.modules.deposit.models import Deposition, Agent, \
     DepositionDraftCacheManager
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 try:
     from invenio.pidstore_model import PersistentIdentifier
     HAS_PIDSUPPORT = True
