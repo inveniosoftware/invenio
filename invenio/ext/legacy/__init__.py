@@ -70,7 +70,7 @@ def setup_app(app):
     @app.errorhandler(404)
     def page_not_found(error):
         try:
-            from invenio.webinterface_handler_wsgi import \
+            from invenio.legacy.wsgi import \
                 application as legacy_application
             response = legacy_application(request.environ, g.start_response)
             if not isinstance(response, BaseResponse):
@@ -88,7 +88,7 @@ def setup_app(app):
         NOTE: It changes order of url page lookup. First, the invenio_handler
         will be called and on 404 error the mp_legacy_publisher is called.
         """
-        from invenio.webinterface_handler_wsgi import \
+        from invenio.legacy.wsgi import \
             is_mp_legacy_publisher_path, mp_legacy_publisher, \
             application as legacy_application
         possible_module, possible_handler = is_mp_legacy_publisher_path(

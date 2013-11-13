@@ -85,7 +85,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.shellutils import escape_shell_arg
-from invenio.dbquery import run_sql, DatabaseError
+from invenio.legacy.dbquery import run_sql, DatabaseError
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \

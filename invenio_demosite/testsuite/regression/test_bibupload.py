@@ -48,7 +48,7 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDI
      CFG_BIBUPLOAD_REFERENCE_TAG, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE
 from invenio.utils.json import json
-from invenio.dbquery import run_sql, get_table_status_info
+from invenio.legacy.dbquery import run_sql, get_table_status_info
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite, test_web_page_content
 
 from invenio.base.wrappers import lazy_import

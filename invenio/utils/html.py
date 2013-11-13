@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """HTML utilities."""
 
-__revision__ = "$Id$"
+from __future__ import absolute_import
 
 from HTMLParser import HTMLParser
 from werkzeug.local import LocalProxy
@@ -28,19 +28,8 @@ default_ln = lambda ln: cfg('CFG_SITE_LANG') if ln is None else ln
 import re
 import cgi
 import os
-import sys
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-        CFG_JSON_AVAILABLE = True
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        CFG_JSON_AVAILABLE = False
-        json = None
-else:
-    import json
-    CFG_JSON_AVAILABLE = True
+import json
+
 try:
     from BeautifulSoup import BeautifulSoup
     CFG_BEAUTIFULSOUP_INSTALLED = True
@@ -209,14 +198,7 @@ def escape_javascript_string(text, escape_for_html=True, escape_quote_for_html=F
     elif escape_CDATA:
         text = text.replace(']]>', ']]]]><![CDATA[>')
 
-    if CFG_JSON_AVAILABLE:
-        text = json.dumps(text)[1:-1].replace("'", "\\'")
-    else:
-        # Try to emulate
-        def escape_chars(matchobj):
-            return CFG_JS_CHARS_MAPPINGS[matchobj.group(0)]
-
-        text = RE_ESCAPE_JS_CHARS.sub(escape_chars, text)
+    text = json.dumps(text)[1:-1].replace("'", "\\'")
 
     if not escape_for_html and escape_script_tag_with_quote:
         text = RE_CLOSING_SCRIPT_TAG.sub('''</scr%(q)s+%(q)sipt>''' % {'q': escape_script_tag_with_quote}, text)
@@ -229,7 +211,7 @@ class HTMLWasher(HTMLParser):
     details on parameters.
 
     Usage::
-       from invenio.htmlutils import HTMLWasher
+       from invenio.utils.html import HTMLWasher
        washer = HTMLWasher()
        escaped_text = washer.wash(unescaped_text)
 
@@ -772,7 +754,7 @@ class MLClass(object):
     """
     Swiss army knife to generate XML or HTML strings a la carte.
 
-    >>> from invenio.htmlutils import X, H
+    >>> from invenio.utils.html import X, H
     >>> X.foo()()
     ... '<foo />'
     >>> X.foo(bar='baz')()

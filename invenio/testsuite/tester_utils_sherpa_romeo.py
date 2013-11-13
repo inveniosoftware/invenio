@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.sherpa_romeo import SherpaRomeoSearch
+from invenio.utils.sherpa_romeo import SherpaRomeoSearch
 """
 Test Cases
 

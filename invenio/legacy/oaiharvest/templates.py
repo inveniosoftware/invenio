@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 import cgi
 import datetime
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_CERN_SITE
-from invenio.htmlutils import nmtoken_from_string
+from invenio.utils.html import nmtoken_from_string
 from invenio.utils.url import create_html_link
 from invenio.base.i18n import gettext_set_language
 

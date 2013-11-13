@@ -27,12 +27,12 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_LANG
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webpage import page
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.search_engine import collection_restricted_p
-from invenio.webuser import collect_user_info, page_not_authorized
+from invenio.legacy.webuser import collect_user_info, page_not_authorized
 from invenio.utils.url import redirect_to_url
 
 from invenio.webstat import perform_request_index, \

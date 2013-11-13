@@ -29,8 +29,8 @@ def wash_urlargd(form, content):
     content. Content is a dictionary containing the field names as a
     key, and a tuple (type, default) as value.
 
-    'type' can be list, unicode, invenio.webinterface_handler_wsgi_utils.StringField, int, tuple, or
-    invenio.webinterface_handler_wsgi_utils.Field (for
+    'type' can be list, unicode, invenio.legacy.wsgi.utils.StringField, int, tuple, or
+    invenio.legacy.wsgi.utils.Field (for
     file uploads).
 
     The specification automatically includes the 'ln' field, which is

@@ -50,7 +50,7 @@ class TestWebDepositUtils(InvenioTestCase):
     #
     def login_user(self, username='admin'):
         from invenio.websession_model import User
-        from invenio.webuser_flask import login_user, current_user
+        from invenio.ext.login import login_user, current_user
         user_id = User.query.filter_by(nickname=username).one().id
         login_user(user_id)
         assert user_id == current_user.get_id()
@@ -61,7 +61,7 @@ class TestWebDepositUtils(InvenioTestCase):
     #
     def test_deposit_files(self):
         from flask import current_app, url_for
-        from invenio.webdeposit_load_deposition_types import \
+        from invenio.modules.deposit.loader import \
             deposition_metadata
         from invenio.modules.workflows.models import Workflow
         from invenio.webdeposit_utils import create_workflow, deposit_files, \
@@ -101,7 +101,7 @@ class TestWebDepositUtils(InvenioTestCase):
             assert filemeta['content_type'] == 'application/pdf'
 
     def test_workflow_creation(self):
-        from invenio.webdeposit_load_deposition_types import \
+        from invenio.modules.deposit.loader import \
             deposition_metadata
         from invenio.modules.workflows.models import Workflow
         from invenio.webdeposit_workflow import DepositionWorkflow
@@ -159,7 +159,7 @@ class TestWebDepositUtils(InvenioTestCase):
         self.assertTrue(workflow is None)
 
     def test_form_functions(self):
-        from invenio.webdeposit_load_deposition_types import \
+        from invenio.modules.deposit.loader import \
             deposition_metadata
         from invenio.modules.deposit import forms
         from invenio.webdeposit_workflow import DepositionWorkflow
@@ -257,7 +257,7 @@ class TestWebDepositUtils(InvenioTestCase):
 
         from invenio.webdeposit_utils import get_form, create_workflow, \
             set_form_status, CFG_DRAFT_STATUS
-        from invenio.webdeposit_load_deposition_types import \
+        from invenio.modules.deposit.loader import \
             deposition_metadata
         from invenio.webdeposit_workflow_utils import \
             create_record_from_marc

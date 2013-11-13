@@ -27,7 +27,7 @@ import invenio.bibauthorid_config as bconfig
 import numpy
 import cPickle
 from cPickle import UnpicklingError
-from invenio.htmlutils import X
+from invenio.utils.html import X
 
 import os
 import gc
@@ -48,7 +48,7 @@ from invenio.bibauthorid_name_utils import create_normalized_name
 from invenio.bibauthorid_general_utils import bibauthor_print
 from invenio.bibauthorid_general_utils import update_status \
                                     , update_status_final
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 try:
     from collections import defaultdict

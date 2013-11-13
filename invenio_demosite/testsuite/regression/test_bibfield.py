@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_TMPDIR
 from invenio.bibfield import get_record, create_record, create_records
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 

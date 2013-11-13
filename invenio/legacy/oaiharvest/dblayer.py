@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 class HistoryEntry:
     date_harvested = None

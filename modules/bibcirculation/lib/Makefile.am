@@ -27,7 +27,6 @@ pylib_DATA = bibcirculation.py \
              bibcirculation_regression_tests.py \
              bibcirculation_templates.py \
              bibcirculation_utils.py \
-             bibcirculation_webinterface.py \
              bibcirculationadmin_webinterface.py \
              bibcirculationadminlib.py
 

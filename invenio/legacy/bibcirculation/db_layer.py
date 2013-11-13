@@ -34,7 +34,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.bibcirculation_config import \
     CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
     CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, \

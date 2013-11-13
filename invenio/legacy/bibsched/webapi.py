@@ -19,7 +19,7 @@
 """Invenio BibSched live view engine implementation"""
 
 from invenio.config import CFG_SITE_URL, CFG_BINDIR, CFG_PREFIX
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 import os
 import subprocess

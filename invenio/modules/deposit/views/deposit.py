@@ -38,13 +38,13 @@ from werkzeug.utils import secure_filename
 from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
 from invenio.ext.menu import register_menu
 from invenio.base.i18n import _
-from invenio.modules.deposit import forms
-from invenio.webdeposit_signals import template_context_created
-from invenio.modules.deposit.models import Deposition, DepositionType, \
+from .. import forms
+from ..signals import template_context_created
+from ..models import Deposition, DepositionType, \
     DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
     DraftDoesNotExists, FormDoesNotExists, DepositionNotDeletable, \
     DepositionDraftCacheManager
-from invenio.webdeposit_storage import ChunkedDepositionStorage, \
+from ..storage import ChunkedDepositionStorage, \
     DepositionStorage, ExternalFile, UploadError
 
 blueprint = Blueprint('webdeposit', __name__, url_prefix='/deposit',

@@ -28,10 +28,10 @@ from invenio.webbasket_config import \
                        CFG_WEBBASKET_ACTIONS, \
                        CFG_WEBBASKET_SHARE_LEVELS, \
                        CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS
-from invenio.webmessage_mailutils import email_quoted_txt2html, \
+from invenio.utils.mail import email_quoted_txt2html, \
                                          email_quote_txt, \
                                          escape_email_quoted_text
-from invenio.htmlutils import get_html_text_editor
+from invenio.utils.html import get_html_text_editor
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
@@ -39,7 +39,7 @@ from invenio.config import \
      CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, \
      CFG_WEBBASKET_USE_RICH_TEXT_EDITOR, \
      CFG_SITE_RECORD
-from invenio.webuser import get_user_info
+from invenio.legacy.webuser import get_user_info
 from invenio.utils.date import convert_datetext_to_dategui
 from invenio.webbasket_dblayer import get_basket_ids_and_names
 

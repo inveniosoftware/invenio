@@ -25,7 +25,7 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 class WebDepositFormTest(InvenioTestCase):
     def setUp(self):
-        from invenio.webdeposit_form import WebDepositForm
+        from invenio.modules.deposit.form import WebDepositForm
         from invenio.modules.deposit import fields
         from werkzeug import MultiDict
 
@@ -126,7 +126,7 @@ class WebDepositFormTest(InvenioTestCase):
 
     def test_getting_jsondata(self):
         from invenio.modules.deposit import fields
-        from invenio.webdeposit_form import WebDepositForm
+        from invenio.modules.deposit.form import WebDepositForm
         from datetime import date
 
         class RelatedDatesForm(WebDepositForm):
@@ -347,7 +347,7 @@ class WebDepositFormTest(InvenioTestCase):
 
     def test_nested(self):
         from invenio.modules.deposit import fields
-        from invenio.webdeposit_form import WebDepositForm
+        from invenio.modules.deposit.form import WebDepositForm
 
         class NestedNestedForm(WebDepositForm):
             id = fields.TextField()

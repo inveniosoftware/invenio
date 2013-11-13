@@ -29,7 +29,7 @@ acc_firerole_check_user = lazy_import('invenio.access_control_firerole:acc_firer
 compile_role_definition = lazy_import('invenio.access_control_firerole:compile_role_definition')
 deserialize = lazy_import('invenio.access_control_firerole:deserialize')
 serialize = lazy_import('invenio.access_control_firerole:serialize')
-collect_user_info = lazy_import('invenio.webuser:collect_user_info')
+collect_user_info = lazy_import('invenio.legacy.webuser:collect_user_info')
 
 
 class AccessControlFireRoleTest(InvenioTestCase):

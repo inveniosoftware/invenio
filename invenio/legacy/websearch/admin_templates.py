@@ -23,7 +23,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
+from invenio.utils.mail import email_quoted_txt2html, email_quote_txt
 from invenio.modules.messages.config import \
     CFG_WEBMESSAGE_STATUS_CODE, \
     CFG_WEBMESSAGE_SEPARATOR, \
@@ -35,10 +35,10 @@ from invenio.utils.date import convert_datetext_to_dategui, \
                               create_month_selectbox, \
                               create_year_selectbox
 from invenio.utils.url import create_html_link, create_url
-from invenio.htmlutils import escape_html
+from invenio.utils.html import escape_html
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.base.i18n import gettext_set_language
-from invenio.webuser import get_user_info
+from invenio.legacy.webuser import get_user_info
 
 
 class Template:

@@ -73,7 +73,7 @@ from invenio.webjournal_utils import \
      get_journal_index_to_refresh_on_release, \
      issue_is_later_than, \
      WEBJOURNAL_OPENER
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibrecord import \
      create_record, \
      print_rec

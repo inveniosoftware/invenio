@@ -29,7 +29,7 @@ from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL
 from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 class WebSessionWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSession web pages whether they are up or not."""

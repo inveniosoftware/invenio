@@ -27,7 +27,7 @@ import sys
 from invenio.base.factory import with_app_context
 
 try:
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     from invenio.config import \
          CFG_SITE_URL,\
          CFG_TMPDIR,\

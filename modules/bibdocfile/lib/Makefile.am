@@ -22,7 +22,6 @@ bibdocfileplugins_DATA = bom_*.py
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibdocfile_config.py file.py \
-             bibdocfile_webinterface.py \
              bibdocfile_templates.py \
              bibdocfile_managedocfiles.py \
              bibdocfile.py \

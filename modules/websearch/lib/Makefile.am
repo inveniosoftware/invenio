@@ -21,7 +21,6 @@ pylib_DATA = \
 	websearchadminlib.py \
 	websearch_flask_tests.py \
 	websearch_templates.py \
-	websearch_webinterface.py \
 	websearch_regression_tests.py \
 	websearch_web_tests.py \
 	search_engine.py \
@@ -41,8 +40,7 @@ pylib_DATA = \
 	websearch_external_collections_searcher.py \
 	websearch_external_collections_templates.py \
 	websearch_external_collections_unit_tests.py \
-	websearch_external_collections_utils.py \
-	websearch_admin_forms.py
+	websearch_external_collections_utils.py
 
 EXTRA_DIST = $(pylib_DATA)
 

@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.websubmitadmin_config import *
 from random import randint
 

@@ -36,7 +36,7 @@ from invenio.config import \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS, \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.utils.url import string_to_numeric_char_reference
 from invenio.utils.text import encode_for_xml
 from invenio.shellutils import run_shell_command

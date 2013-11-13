@@ -40,7 +40,7 @@ from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID
 from invenio.webpage import pageheaderonly
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import redirect_to_url
 from invenio.utils.json import json_unicode_to_utf8
 

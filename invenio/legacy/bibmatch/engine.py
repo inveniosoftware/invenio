@@ -50,7 +50,7 @@ from invenio.legacy.bibrecord import create_records, \
 from invenio import bibconvert
 from invenio.search_engine import get_fieldcodes
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file
 from invenio.bibmatch_validator import validate_matches, transform_record_to_marc, \
                                        validate_tag

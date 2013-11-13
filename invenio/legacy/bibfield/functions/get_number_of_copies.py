@@ -26,7 +26,7 @@ def get_number_of_copies(recid):
 
     @return: Number of copies
     """
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     if recid:
         try:
             return run_sql('SELECT COUNT(*) FROM crcITEM WHERE id_bibrec=%s', (recid,))[0][0]

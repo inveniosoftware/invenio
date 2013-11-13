@@ -22,7 +22,7 @@
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.utils.url import wash_url_argument
 from invenio.base.i18n import gettext_set_language, wash_language
-from invenio.webuser import collect_user_info
+from invenio.legacy.webuser import collect_user_info
 from invenio.weblinkback_dblayer import get_all_linkbacks, \
                                         approve_linkback,\
                                         reject_linkback, \

@@ -28,9 +28,9 @@ import cgi
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_LANGS
 from invenio.base.i18n import gettext_set_language
 from invenio.webpage import page
-from invenio.webuser import getUid
+from invenio.legacy.webuser import getUid
 from invenio.webdoc import get_webdoc_parts, get_webdoc_topics
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import redirect_to_url
 
 class WebInterfaceDocumentationPages(WebInterfaceDirectory):

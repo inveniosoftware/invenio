@@ -18,7 +18,7 @@
 SUBDIRS = widgets elements
 
 pylibdir = $(libdir)/python/invenio
-pylib_DATA = webjournal_webinterface.py webjournal_utils.py \
+pylib_DATA = webjournal_utils.py \
              webjournal_config.py webjournal.py webjournal_washer.py \
              webjournal_templates.py webjournaladminlib.py \
              webjournal_unit_tests.py webjournal_regression_tests.py \

@@ -23,7 +23,7 @@ from invenio.config import CFG_SITE_SECURE_URL
 from invenio.testsuite import make_test_suite, \
                               run_test_suite, \
                               InvenioWebTestCase
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 
 class InvenioWebCommentWebTest(InvenioWebTestCase):

@@ -17,16 +17,9 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = webmessage.py \
-             webmessage_templates.py \
-             webmessage_dblayer.py \
-             webmessage_mailutils.py \
+pylib_DATA = \
              webmessage_flask_tests.py \
-             webmessage_forms.py \
-             webmessage_query.py \
-             webmessage_webinterface.py \
              webmessage_regression_tests.py \
-             webmessage_unit_tests.py \
              webmessage_web_tests.py
 
 EXTRA_DIST = $(pylib_DATA)

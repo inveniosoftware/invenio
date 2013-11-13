@@ -24,9 +24,9 @@ This module binds together Invenio's modules and maps them to
 their corresponding URLs (ie, /search to the websearch modules,...)
 """
 
-from invenio.webinterface_handler import create_handler
+from invenio.ext.legacy.handler import create_handler
 from invenio.ext.logging import register_exception
-from invenio.webinterface_handler import WebInterfaceDirectory
+from invenio.ext.legacy.handler import WebInterfaceDirectory
 from invenio.utils import apache
 from invenio.config import CFG_DEVEL_SITE, CFG_OPENAIRE_SITE
 
@@ -61,79 +61,79 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
     index = __call__
 
 try:
-    from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages
+    from invenio.legacy.websearch.webinterface import WebInterfaceSearchInterfacePages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceSearchInterfacePages = WebInterfaceDumbPages
 
 try:
-    from invenio.websearch_webinterface import WebInterfaceRSSFeedServicePages
+    from invenio.legacy.websearch.webinterface import WebInterfaceRSSFeedServicePages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceRSSFeedServicePages = WebInterfaceDumbPages
 
 try:
-    from invenio.websearch_webinterface import WebInterfaceUnAPIPages
+    from invenio.legacy.websearch.webinterface import WebInterfaceUnAPIPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceUnAPIPages = WebInterfaceDumbPages
 
 try:
-    from invenio.bibdocfile_webinterface import bibdocfile_legacy_getfile
+    from invenio.legacy.bibdocfile.webinterface import bibdocfile_legacy_getfile
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     bibdocfile_legacy_getfile = WebInterfaceDumbPages
 
 try:
-    from invenio.websubmit_webinterface import WebInterfaceSubmitPages
+    from invenio.legacy.websubmit.webinterface import WebInterfaceSubmitPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceSubmitPages = WebInterfaceDumbPages
 
 try:
-    from invenio.websession_webinterface import WebInterfaceYourAccountPages
+    from invenio.legacy.websession.webinterface import WebInterfaceYourAccountPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourAccountPages = WebInterfaceDumbPages
 
 try:
-    from invenio.websession_webinterface import WebInterfaceYourTicketsPages
+    from invenio.legacy.websession.webinterface import WebInterfaceYourTicketsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourTicketsPages = WebInterfaceDumbPages
 
 try:
-    from invenio.websession_webinterface import WebInterfaceYourGroupsPages
+    from invenio.legacy.websession.webinterface import WebInterfaceYourGroupsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourGroupsPages = WebInterfaceDumbPages
 
 try:
-    from invenio.webalert_webinterface import WebInterfaceYourAlertsPages
+    from invenio.legacy.webalert.webinterface import WebInterfaceYourAlertsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourAlertsPages = WebInterfaceDumbPages
 
 try:
-    from invenio.webbasket_webinterface import WebInterfaceYourBasketsPages
+    from invenio.legacy.webbasket.webinterface import WebInterfaceYourBasketsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourBasketsPages = WebInterfaceDumbPages
 
 try:
-    from invenio.webcomment_webinterface import WebInterfaceCommentsPages
+    from invenio.legacy.webcomment.webinterface import WebInterfaceCommentsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceCommentsPages = WebInterfaceDumbPages
 
 try:
-    from invenio.weblinkback_webinterface import WebInterfaceRecentLinkbacksPages
+    from invenio.legacy.weblinkback.webinterface import WebInterfaceRecentLinkbacksPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceRecentLinkbacksPages = WebInterfaceDumbPages
 
 try:
-    from invenio.webmessage_webinterface import WebInterfaceYourMessagesPages
+    from invenio.legacy.webmessage.webinterface import WebInterfaceYourMessagesPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourMessagesPages = WebInterfaceDumbPages
@@ -151,24 +151,24 @@ except:
     WebInterfaceOAIProviderPages = WebInterfaceDumbPages
 
 try:
-    from invenio.webstat_webinterface import WebInterfaceStatsPages
+    from invenio.legacy.webstat.webinterface import WebInterfaceStatsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceStatsPages = WebInterfaceDumbPages
 try:
-    from invenio.bibcirculation_webinterface import WebInterfaceYourLoansPages
+    from invenio.legacy.bibcirculation.webinterface import WebInterfaceYourLoansPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourLoansPages = WebInterfaceDumbPages
 
 try:
-    from invenio.bibcirculation_webinterface import WebInterfaceILLPages
+    from invenio.legacy.bibcirculation.webinterface import WebInterfaceILLPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceILLPages = WebInterfaceDumbPages
 
 try:
-    from invenio.webjournal_webinterface import WebInterfaceJournalPages
+    from invenio.legacy.webjournal.webinterface import WebInterfaceJournalPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceJournalPages = WebInterfaceDumbPages
@@ -187,7 +187,7 @@ except:
     WebInterfaceFieldExporterPages = WebInterfaceDumbPages
 
 try:
-    from invenio.bibknowledge_webinterface import WebInterfaceBibKnowledgePages
+    from invenio.legacy.bibknowledge.webinterface import WebInterfaceBibKnowledgePages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibKnowledgePages = WebInterfaceDumbPages
@@ -200,7 +200,7 @@ except:
     WebInterfaceBatchUploaderPages = WebInterfaceDumbPages
 
 try:
-    from invenio.bibsword_webinterface import \
+    from invenio.legacy.bibsword.webinterface import \
          WebInterfaceSword
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
@@ -214,7 +214,7 @@ except:
     WebInterfacePingPages = WebInterfaceDumbPages
 
 try:
-    from invenio.bibauthorid_webinterface import WebInterfaceBibAuthorIDPages
+    from invenio.legacy.bibauthorid.webinterface import WebInterfaceBibAuthorIDPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibAuthorIDPages = WebInterfaceDumbPages
@@ -227,27 +227,27 @@ except:
     WebInterfaceBibCirculationAdminPages = WebInterfaceDumbPages
 
 try:
-    from invenio.bibsched_webinterface import \
+    from invenio.legacy.bibsched.webinterface import \
          WebInterfaceBibSchedPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibSchedPages = WebInterfaceDumbPages
 
 try:
-    from invenio.webauthorprofile_webinterface import WebAuthorPages
+    from invenio.legacy.webauthorprofile.webinterface import WebAuthorPages
     WebInterfaceWebAuthorPages = WebAuthorPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceWebAuthorPages = WebInterfaceDumbPages
 
 try:
-    from invenio.docextract_webinterface import WebInterfaceDocExtract
+    from invenio.legacy.docextract.webinterface import WebInterfaceDocExtract
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceDocExtract = WebInterfaceDumbPages
 
 try:
-    from invenio.webcomment_webinterface import WebInterfaceYourCommentsPages
+    from invenio.legacy.webcomment.webinterface import WebInterfaceYourCommentsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourAlertsPages = WebInterfaceDumbPages

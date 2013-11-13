@@ -32,7 +32,7 @@ from invenio.ext.principal import permission_required
 from invenio.base.i18n import language_list_long
 
 # imports the necessary forms
-from invenio.websearch_admin_forms import CollectionForm, TranslationsForm
+from ..admin_forms import CollectionForm, TranslationsForm
 
 not_guest = lambda: not current_user.is_guest
 

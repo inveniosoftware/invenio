@@ -43,7 +43,7 @@ import ConfigParser
 
 from invenio.utils.url import make_invenio_opener
 from invenio.config import CFG_ETCDIR
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 BIBRANK_OPENER = make_invenio_opener('BibRank')
 

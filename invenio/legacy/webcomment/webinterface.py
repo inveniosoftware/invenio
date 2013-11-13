@@ -58,17 +58,17 @@ from invenio.config import \
      CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
      CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
      CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
+from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
      get_colID
 from invenio.utils.url import redirect_to_url, \
                              make_canonical_urlargd
-from invenio.htmlutils import get_mathjax_header
+from invenio.utils.html import get_mathjax_header
 from invenio.ext.logging import register_exception
 from invenio.base.i18n import gettext_set_language
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import \

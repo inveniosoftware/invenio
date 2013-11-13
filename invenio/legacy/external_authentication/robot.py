@@ -193,7 +193,7 @@ class ExternalAuthRobot(ExternalAuth):
         to properly login the user, and verify that the data are actually
         both well formed and signed correctly.
         """
-        from invenio.webinterface_handler import wash_urlargd
+        from invenio.ext.legacy.handler import wash_urlargd
         args = wash_urlargd(req.form, {
             'assertion': (str, ''),
             'robot': (str, ''),

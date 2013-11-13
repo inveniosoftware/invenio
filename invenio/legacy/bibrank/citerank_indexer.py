@@ -43,7 +43,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.dbquery import run_sql, serialize_via_marshal, \
+from invenio.legacy.dbquery import run_sql, serialize_via_marshal, \
         deserialize_via_marshal
 from invenio.bibtask import write_message
 from invenio.config import CFG_ETCDIR

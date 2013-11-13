@@ -35,7 +35,7 @@ from invenio.access_control_admin import \
     CFG_SUPERADMINROLE_ID, acc_get_role_users, \
     acc_get_roles_emails
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
-from invenio.webuser import collect_user_info
+from invenio.legacy.webuser import collect_user_info
 from invenio.access_control_firerole import load_role_definition, acc_firerole_extract_emails
 from flask.ext.login import current_user
 

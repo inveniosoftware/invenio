@@ -33,12 +33,12 @@ else:
 
 from invenio.config import CFG_SITE_URL
 from invenio.access_control_engine import acc_authorize_action
-from invenio.webinterface_handler import WebInterfaceDirectory
+from invenio.ext.legacy.handler import WebInterfaceDirectory
 from invenio.bibrankadminlib import tupletotable
 from invenio.webpage import page
 from invenio.bibsched_webapi import get_javascript, get_bibsched_tasks, \
                                     get_bibsched_mode, get_css, get_motd_msg
-from invenio.webuser import page_not_authorized
+from invenio.legacy.webuser import page_not_authorized
 
 import time
 

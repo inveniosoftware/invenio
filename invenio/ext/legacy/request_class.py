@@ -37,6 +37,6 @@ class LegacyRequest(Request):
 
     def get_legacy_request(self):
         """Returns an instance of SimulatedModPythonRequest."""
-        from invenio.webinterface_handler_wsgi import SimulatedModPythonRequest
+        from invenio.legacy.wsgi import SimulatedModPythonRequest
         return SimulatedModPythonRequest(self.environ,
                                          self.dummy_start_response)

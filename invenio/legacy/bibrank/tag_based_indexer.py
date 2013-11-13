@@ -33,7 +33,7 @@ from invenio.config import \
 from invenio.search_engine import perform_request_search
 from invenio.bibrank_citation_indexer import get_citation_weight, print_missing, get_cit_dict, insert_into_cit_db
 from invenio.bibrank_downloads_indexer import *
-from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
+from invenio.legacy.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
      wash_table_column_name, get_table_update_time
 from invenio.ext.logging import register_exception
 from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required

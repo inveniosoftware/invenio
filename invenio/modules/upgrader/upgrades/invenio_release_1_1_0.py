@@ -36,7 +36,7 @@ To create a new upgrade recipe just run:
 
 import warnings
 import logging
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 DB_VERSION = None
 

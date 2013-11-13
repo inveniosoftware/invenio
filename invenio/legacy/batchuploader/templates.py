@@ -26,10 +26,10 @@ from invenio.bibrankadminlib import addadminbox
 from invenio.bibrankadminlib import tupletotable
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.url import auto_version_url
-from invenio.htmlutils import escape_html
+from invenio.utils.html import escape_html
 
 
 class Template:

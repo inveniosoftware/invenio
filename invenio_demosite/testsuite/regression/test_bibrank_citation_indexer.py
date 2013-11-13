@@ -23,7 +23,7 @@ import ConfigParser
 
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.config import CFG_ETCDIR
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 
 def load_config():

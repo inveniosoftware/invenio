@@ -187,7 +187,7 @@ def setup_app(app):
 
     @app.template_filter('quoted_txt2html')
     def _quoted_txt2html(*args, **kwargs):
-        from invenio.webmessage_mailutils import email_quoted_txt2html
+        from invenio.utils.mail import email_quoted_txt2html
         return email_quoted_txt2html(*args, **kwargs)
 
     @app.template_filter('invenio_format_date')

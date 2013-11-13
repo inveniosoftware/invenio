@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.xmlDict import XmlDictConfig, ElementTree
+from invenio.utils.xmlDict import XmlDictConfig, ElementTree
 import urllib2
 from werkzeug.contrib.cache import RedisCache
 from invenio.ext.cache import cache

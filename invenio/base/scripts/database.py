@@ -176,7 +176,7 @@ def create(default_data=True):
     def cfv_after_create(target, connection, **kw):
         print
         print ">>> Modifing table structure..."
-        from invenio.dbquery import run_sql
+        from invenio.legacy.dbquery import run_sql
         run_sql('ALTER TABLE collection_field_fieldvalue DROP PRIMARY KEY')
         run_sql('ALTER TABLE collection_field_fieldvalue ADD INDEX id_collection(id_collection)')
         run_sql('ALTER TABLE collection_field_fieldvalue CHANGE id_fieldvalue id_fieldvalue mediumint(9) unsigned')
@@ -339,7 +339,7 @@ def mysql_info(separator=None, line_format=None):
     if db.engine.name != 'mysql':
         raise Exception('Database engine is not mysql.')
 
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     out = []
     for key, val in run_sql("SHOW VARIABLES LIKE 'version%'") + \
             run_sql("SHOW VARIABLES LIKE 'charact%'") + \

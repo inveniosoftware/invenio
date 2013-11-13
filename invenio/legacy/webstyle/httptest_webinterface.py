@@ -29,7 +29,7 @@ import cgi
 
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR
 from invenio.webpage import page
-from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
+from invenio.ext.legacy.handler import WebInterfaceDirectory, wash_urlargd
 from invenio.utils.url import redirect_to_url
 
 class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
@@ -90,7 +90,7 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         """
         This is to test L{handle_file_post} function.
         """
-        from invenio.webinterface_handler_wsgi_utils import handle_file_post
+        from invenio.legacy.wsgi.utils import handle_file_post
         from invenio.bibdocfile import stream_file
         argd = wash_urlargd(form, {"save": (str, "")})
         if req.method != 'POST':
@@ -105,7 +105,7 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         """
         This specifically for batchuploader with the oracle-friendly patch
         """
-        from invenio.webinterface_handler_wsgi_utils import handle_file_post
+        from invenio.legacy.wsgi.utils import handle_file_post
         from invenio.bibdocfile import stream_file
         argd = wash_urlargd(form, {"save": (str, ""), "results": (str, "")})
         if req.method != 'POST':

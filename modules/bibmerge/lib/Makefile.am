@@ -21,7 +21,6 @@ pylib_DATA = \
         bibmerge_differ.py \
         bibmerge_merger.py \
         bibmerge_templates.py \
-        bibmerge_webinterface.py \
         bibmerge_engine.py
 
 jsdir=$(localstatedir)/www/js

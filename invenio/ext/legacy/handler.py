@@ -47,9 +47,9 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, \
 from invenio.base.i18n import wash_language
 from invenio.utils.url import redirect_to_url
 from invenio.ext.logging import register_exception
-from invenio.webuser import get_preferred_user_language, isGuestUser, \
+from invenio.legacy.webuser import get_preferred_user_language, isGuestUser, \
     getUid, isUserSuperAdmin, collect_user_info, setUid
-from invenio.webinterface_handler_wsgi_utils import StringField
+from invenio.legacy.wsgi.utils import StringField
 from invenio.modules import apikeys as web_api_key
 
 
@@ -369,8 +369,8 @@ def wash_urlargd(form, content):
     content. Content is a dictionary containing the field names as a
     key, and a tuple (type, default) as value.
 
-    'type' can be list, str, invenio.webinterface_handler_wsgi_utils.StringField, int, tuple, or
-    invenio.webinterface_handler_wsgi_utils.Field (for
+    'type' can be list, str, invenio.legacy.wsgi.utils.StringField, int, tuple, or
+    invenio.legacy.wsgi.utils.Field (for
     file uploads).
 
     The specification automatically includes the 'ln' field, which is

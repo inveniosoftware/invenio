@@ -85,16 +85,16 @@ from invenio.config import \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_WILDCARD_LIMIT, \
      CFG_SITE_RECORD
-from invenio.dbquery import Error
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.legacy.dbquery import Error
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
-from invenio.htmlutils import get_mathjax_header
-from invenio.htmlutils import nmtoken_from_string
-from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
+from invenio.utils.html import get_mathjax_header
+from invenio.utils.html import nmtoken_from_string
+from invenio.legacy.webuser import getUid, page_not_authorized, get_user_preferences, \
     collect_user_info, logoutUser, isUserSuperAdmin
-from invenio.webcomment_webinterface import WebInterfaceCommentsPages
-from invenio.weblinkback_webinterface import WebInterfaceRecordLinkbacksPages
-from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
+from invenio.legacy.webcomment.webinterface import WebInterfaceCommentsPages
+from invenio.legacy.weblinkback.webinterface import WebInterfaceRecordLinkbacksPages
+from invenio.legacy.bibcirculation.webinterface import WebInterfaceHoldingsPages
 from invenio.webpage import page, pageheaderonly, create_error_box
 from invenio.base.i18n import gettext_set_language
 from invenio.search_engine import check_user_can_view_record, \
@@ -129,10 +129,10 @@ from invenio.bibrank_citation_searcher import get_cited_by_list
 from invenio.bibrank_downloads_indexer import get_download_weight_total
 from invenio.search_engine_summarizer import summarize_records
 from invenio.ext.logging import register_exception
-from invenio.bibedit_webinterface import WebInterfaceEditPages
+from invenio.legacy.bibedit.webinterface import WebInterfaceEditPages
 from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
-from invenio.bibmerge_webinterface import WebInterfaceMergePages
-from invenio.bibdocfile_webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
+from invenio.legacy.bibmerge.webinterface import WebInterfaceMergePages
+from invenio.legacy.bibdocfile.webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
 from invenio.search_engine import get_record
 from invenio.shellutils import mymkdir
 

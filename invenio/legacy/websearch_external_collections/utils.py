@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 import sys
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 def get_verbose_print(req, prefix, cur_verbosity_level):
     """Return a function used to print verbose message."""

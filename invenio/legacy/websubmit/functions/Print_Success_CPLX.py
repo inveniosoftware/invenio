@@ -24,7 +24,7 @@
 import os
 import re
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 def Print_Success_CPLX(parameters, curdir, form, user_info=None):
     global rn

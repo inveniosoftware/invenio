@@ -19,7 +19,7 @@
 
 from wtforms import TextField
 from invenio.modules.deposit.field_base import WebDepositField
-from invenio.webdeposit_autocomplete_utils import orcid_authors
+from ..autocomplete_utils import orcid_authors
 
 __all__ = ['AuthorField']
 

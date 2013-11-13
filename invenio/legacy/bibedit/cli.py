@@ -48,7 +48,7 @@ __revision__ = "$Id$"
 
 import sys
 import zlib
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.intbitset import intbitset
 from invenio.bibedit_utils import get_marcxml_of_revision_id, \
     get_record_revision_ids, get_xml_comparison, record_locked_by_other_user, \

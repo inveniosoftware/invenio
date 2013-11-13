@@ -36,7 +36,6 @@ pylib_DATA = \
 	bibauthorid_merge.py \
 	bibauthorid_rabbit.py \
 	bibauthorid_string_utils.py \
-	bibauthorid_webinterface.py \
 	bibauthorid_backinterface.py \
 	bibauthorid_config.py \
 	bibauthorid_general_utils.py \

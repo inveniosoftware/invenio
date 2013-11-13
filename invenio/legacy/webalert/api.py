@@ -23,8 +23,8 @@ import cgi
 import time
 
 from invenio.config import CFG_SITE_LANG
-from invenio.dbquery import run_sql
-from invenio.webuser import isGuestUser
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.webuser import isGuestUser
 from invenio.ext.logging import register_exception
 from invenio.webaccount import warning_guest_user
 from invenio.webbasket import create_personal_baskets_selection_box

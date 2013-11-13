@@ -48,9 +48,9 @@ from invenio.config import CFG_TMPSHAREDDIR, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROC
 from time import strftime
 from invenio.bibtask import task_low_level_submission
 
-from invenio.webuser import collect_user_info, isUserSuperAdmin
+from invenio.legacy.webuser import collect_user_info, isUserSuperAdmin
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmarc
 

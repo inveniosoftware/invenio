@@ -19,7 +19,7 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 def Create_Recid(parameters, curdir, form, user_info=None):
     """

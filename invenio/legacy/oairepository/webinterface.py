@@ -28,7 +28,7 @@ from invenio import oai_repository_server
 from invenio.ext.logging import register_exception
 from invenio.config import CFG_CACHEDIR, CFG_OAI_SLEEP, CFG_DEVEL_SITE, \
     CFG_ETCDIR
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 
 CFG_VALIDATE_RESPONSES = False
 OAI_PMH_VALIDATOR = None

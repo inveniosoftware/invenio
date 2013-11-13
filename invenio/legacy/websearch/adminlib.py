@@ -53,7 +53,7 @@ from invenio.bibrankadminlib import \
      addadminbox, \
      tupletotable, \
      createhiddenform
-from invenio.dbquery import \
+from invenio.legacy.dbquery import \
      run_sql, \
      get_table_update_time
 from invenio.websearch_external_collections import \

@@ -25,7 +25,7 @@ import invenio.websearchadminlib as wsc
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, adderrorbox, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME
-from invenio.webuser import getUid, page_not_authorized
+from invenio.legacy.webuser import getUid, page_not_authorized
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.url import wash_url_argument
 

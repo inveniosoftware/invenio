@@ -33,8 +33,8 @@ from cgi import escape
 from invenio.utils.date import strftime
 from time import gmtime, ctime
 from invenio.access_control_admin import acc_find_user_role_actions
-from invenio.webuser import collect_user_info, getUid
-from invenio.webuser import isUserSuperAdmin
+from invenio.legacy.webuser import collect_user_info, getUid
+from invenio.legacy.webuser import isUserSuperAdmin
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_get_role_id, acc_get_user_roles
 from invenio.external_authentication_robot import ExternalAuthRobot

@@ -53,7 +53,7 @@ class ExternalOpenID(ExternalAuth):
         @type password: str
 
         @param req: request
-        @type req: invenio.webinterface_handler_wsgi.SimulatedModPythonRequest
+        @type req: invenio.legacy.wsgi.SimulatedModPythonRequest
 
         @rtype: str|NoneType, str|NoneType
         """
@@ -98,7 +98,7 @@ class ExternalOpenID(ExternalAuth):
         @type password: str
 
         @param req: request
-        @type req: invenio.webinterface_handler_wsgi.SimulatedModPythonRequest
+        @type req: invenio.legacy.wsgi.SimulatedModPythonRequest
 
         @rtype: str|NoneType
         """
@@ -170,9 +170,9 @@ class ExternalOpenID(ExternalAuth):
         Constructs the response returned from the OpenID provider
 
         @param req: request
-        @type req: invenio.webinterface_handler_wsgi.SimulatedModPythonRequest
+        @type req: invenio.legacy.wsgi.SimulatedModPythonRequest
         """
-        from invenio.webinterface_handler import wash_urlargd
+        from invenio.ext.legacy.handler import wash_urlargd
         from openid.consumer import consumer
 
         content = {}

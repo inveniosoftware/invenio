@@ -25,7 +25,7 @@ __lastupdated__ = """$Date$"""
 import os
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR
-from invenio.webuser import page_not_authorized, collect_user_info
+from invenio.legacy.webuser import page_not_authorized, collect_user_info
 from invenio.bibsword_client import perform_display_sub_status, \
                                     perform_display_server_list, \
                                     perform_display_collection_list, \
@@ -36,7 +36,7 @@ from invenio.bibsword_client import perform_display_sub_status, \
                                     list_remote_servers
 from invenio.webpage import page
 from invenio.base.i18n import gettext_set_language
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.legacy.websubmit.functions.Get_Recid import \
                                            get_existing_records_for_reportnumber
 from invenio.search_engine_utils import get_fieldvalues

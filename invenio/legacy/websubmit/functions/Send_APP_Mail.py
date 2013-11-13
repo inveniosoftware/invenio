@@ -39,7 +39,7 @@ from invenio.config import CFG_SITE_NAME, \
      CFG_CERN_SITE, \
      CFG_SITE_RECORD
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.ext.logging import register_exception
 from invenio.search_engine import print_record

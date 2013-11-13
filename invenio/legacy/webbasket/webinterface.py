@@ -31,7 +31,7 @@ from invenio.config import CFG_SITE_SECURE_URL, \
                            CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_SITE_LANG
 from invenio.base.i18n import gettext_set_language
 from invenio.webpage import page
-from invenio.webuser import getUid, page_not_authorized, isGuestUser
+from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webbasket import \
      check_user_can_comment, \
      check_sufficient_rights, \
@@ -67,13 +67,13 @@ from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
 from invenio.webbasket_dblayer import get_basket_name, \
      get_max_user_rights_on_basket
 from invenio.utils.url import get_referer, redirect_to_url, make_canonical_urlargd
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webstat import register_customevent
 from invenio.ext.logging import register_exception
-from invenio.webuser import collect_user_info
+from invenio.legacy.webuser import collect_user_info
 from invenio.modules.comments.api import check_user_can_attach_file_to_comments
 from invenio.access_control_engine import acc_authorize_action
-from invenio.htmlutils import is_html_text_editor_installed
+from invenio.utils.html import is_html_text_editor_installed
 from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
 from invenio.bibdocfile import stream_file
 

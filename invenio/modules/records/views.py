@@ -195,7 +195,7 @@ def citations(recid):
 @blueprint.route('/<int:recid>/keywords', methods=['GET', 'POST'])
 @request_record
 def keywords(recid):
-    from invenio.bibclassify_webinterface import record_get_keywords
+    from invenio.legacy.bibclassify.webinterface import record_get_keywords
     found, keywords, record = record_get_keywords(recid)
     return render_template('records/keywords.html',
                            found=found,

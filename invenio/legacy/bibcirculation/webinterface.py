@@ -36,7 +36,7 @@ from invenio.config import CFG_SITE_LANG, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
                            CFG_SITE_RECORD, \
                            CFG_CERN_SITE
-from invenio.webuser import getUid, page_not_authorized, isGuestUser, \
+from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, \
                             collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.ext.email import send_email
@@ -47,7 +47,7 @@ from invenio.search_engine import create_navtrail_links, \
 from invenio.utils.url import redirect_to_url, \
                              make_canonical_urlargd
 from invenio.base.i18n import gettext_set_language
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action

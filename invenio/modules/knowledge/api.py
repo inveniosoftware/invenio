@@ -23,11 +23,10 @@ Provide API-callable functions for knowledge base management (using kb's).
 
 import os
 import re
+import json
 
-from invenio import bibknowledge_dblayer
-from invenio.utils.json import json
-from invenio.modules.formatter.config  import CFG_BIBFORMAT_ELEMENTS_PATH
-from invenio.config import CFG_WEBDIR
+from . import dblayer as bibknowledge_dblayer
+from invenio.base.globals import cfg
 
 processor_type = 0
 try:
@@ -248,10 +247,10 @@ def get_elements_that_use_kb(name):
 
     format_elements = {}
     #Retrieve all elements in files
-    files = os.listdir(CFG_BIBFORMAT_ELEMENTS_PATH)
+    files = os.listdir(cfg['CFG_BIBFORMAT_ELEMENTS_PATH'])
     for filename in files:
         if filename.endswith(".py"):
-            path = CFG_BIBFORMAT_ELEMENTS_PATH + os.sep + filename
+            path = cfg['CFG_BIBFORMAT_ELEMENTS_PATH'] + os.sep + filename
             formatf = open(path, 'r')
             code = formatf.read()
             formatf.close()
@@ -510,7 +509,7 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     if not kb_id:
         return []
     #get the rdf file..
-    rdfname = CFG_WEBDIR+"/kbfiles/"+str(kb_id)+".rdf"
+    rdfname = cfg['CFG_WEBDIR'] + "/kbfiles/" + str(kb_id) + ".rdf"
     if not os.path.exists(rdfname):
         return []
     #parse the doc with static xslt

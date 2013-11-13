@@ -735,7 +735,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibsched/doc/hacking/Makefile \
      modules/bibsched/lib/Makefile \
      modules/bibsched/lib/tasklets/Makefile \
-     modules/bibupload/Makefile \
      modules/bibsort/Makefile \
      modules/bibsort/bin/Makefile \
      modules/bibsort/lib/Makefile \
@@ -753,8 +752,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibsword/doc/hacking/Makefile \
      modules/bibsword/lib/Makefile \
      modules/bibsword/etc/Makefile \
-     modules/bibupload/bin/Makefile \
-     modules/bibupload/bin/batchuploader \
+     modules/bibupload/Makefile \
      modules/bibupload/doc/Makefile \
      modules/bibupload/doc/admin/Makefile \
      modules/bibupload/doc/hacking/Makefile \
@@ -847,8 +845,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/webmessage/doc/Makefile \
      modules/webmessage/doc/admin/Makefile \
      modules/webmessage/doc/hacking/Makefile \
-     modules/webmessage/etc/Makefile \
-     modules/webmessage/etc/templates/Makefile \
      modules/webmessage/lib/Makefile \
      modules/webmessage/web/Makefile \
      modules/websearch/Makefile \
@@ -913,12 +909,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/docextract/doc/admin/Makefile \
      modules/docextract/doc/hacking/Makefile \
      modules/webdeposit/Makefile \
-     modules/webdeposit/etc/Makefile \
-     modules/webdeposit/etc/templates/Makefile \
      modules/webdeposit/lib/Makefile \
-     modules/webdeposit/lib/deposition_fields/Makefile \
-     modules/webdeposit/lib/deposition_forms/Makefile \
-     modules/webdeposit/lib/deposition_types/Makefile \
      modules/bibworkflow/Makefile \
      modules/bibworkflow/bin/Makefile \
      modules/bibworkflow/doc/Makefile \

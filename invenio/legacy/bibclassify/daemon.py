@@ -37,7 +37,7 @@ from invenio import bibclassify_engine
 from invenio import bibclassify_webinterface
 
 from invenio import bibtask
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.intbitset import intbitset
 from invenio.search_engine import get_collection_reclist
 from invenio.bibdocfile import BibRecDocs

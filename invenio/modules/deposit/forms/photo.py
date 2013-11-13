@@ -17,11 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.webdeposit_form import WebDepositForm as Form
+from invenio.modules.deposit.form import WebDepositForm as Form
 from invenio.base.i18n import _
 # Import custom fields
 from invenio.modules.deposit import fields
-from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
+from ..field_widgets import date_widget, plupload_widget, \
                                              bootstrap_submit
 
 __all__ = ['PhotoForm']

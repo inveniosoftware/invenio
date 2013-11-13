@@ -23,7 +23,7 @@ __revision__ = \
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_CERN_SITE
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 from invenio.search_engine_utils import get_fieldvalues
 

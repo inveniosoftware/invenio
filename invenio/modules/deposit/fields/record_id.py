@@ -19,7 +19,7 @@
 
 from wtforms import TextField
 from invenio.modules.deposit.field_base import WebDepositField
-from invenio.webdeposit_processor_utils import record_id_process
+from ..processor_utils import record_id_process
 
 __all__ = ['RecordIDField']
 

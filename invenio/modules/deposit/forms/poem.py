@@ -19,8 +19,8 @@
 
 from wtforms.validators import Required
 from invenio.base.i18n import _
-from invenio.webdeposit_form import WebDepositForm as Form
-from invenio.webdeposit_field_widgets import bootstrap_submit
+from invenio.modules.deposit.form import WebDepositForm as Form
+from ..field_widgets import bootstrap_submit
 
 # Import custom fields
 from invenio.modules.deposit import fields

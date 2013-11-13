@@ -19,9 +19,9 @@
 
 from wtforms import TextField
 from invenio.modules.deposit.field_base import WebDepositField
-from invenio.webdeposit_validation_utils import doi_syntax_validator
-from invenio.webdeposit_filter_utils import strip_prefixes, strip_string
-from invenio.webdeposit_processor_utils import datacite_lookup
+from ..validation_utils import doi_syntax_validator
+from ..filter_utils import strip_prefixes, strip_string
+from ..processor_utils import datacite_lookup
 
 __all__ = ['DOIField']
 

@@ -71,7 +71,7 @@ pass them in a tuple.  Usually the params must use the string format (<code>%s<c
 
 <blockquote>
 <pre>
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 [...]
 res = run_sql("SELECT id FROM collection WHERE name=%s", (c,))
 if res:
@@ -85,7 +85,7 @@ function <code>real_escape_string()</code>:
 
 <blockquote>
 <pre>
-from invenio.dbquery import run_sql, real_escape_string
+from invenio.legacy.dbquery import run_sql, real_escape_string
 [...]
 res = run_sql("SELECT id FROM collection WHERE name='%s'" % real_escape_string(c), None)
 if res:
@@ -101,7 +101,7 @@ the client code should catch and handle.  An example:
 
 <blockquote>
 <pre>
-from invenio.dbquery import run_sql, OperationalError
+from invenio.legacy.dbquery import run_sql, OperationalError
 [...]
 query = "select citation_data from rnkCITATIONDATA"
 try:

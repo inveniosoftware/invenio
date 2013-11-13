@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio import bibknowledgeadmin
 from invenio.config import CFG_SITE_LANG
 

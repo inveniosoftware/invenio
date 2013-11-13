@@ -45,7 +45,7 @@ from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioBibDocFileError, \
 from invenio.intbitset import intbitset
 from invenio.search_engine import perform_request_search
 from invenio.utils.text import wrap_text_in_a_box, wait_for_user
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission
 from invenio.utils.text import encode_for_xml
 from invenio.websubmit_file_converter import can_perform_ocr

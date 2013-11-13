@@ -33,7 +33,7 @@ import gzip
 import time
 
 from invenio.search_engine import get_collection_reclist
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR, \
     CFG_SITE_RECORD, CFG_SITE_LANGS
 from invenio.intbitset import intbitset

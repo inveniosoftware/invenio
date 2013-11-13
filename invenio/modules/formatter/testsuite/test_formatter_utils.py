@@ -22,8 +22,8 @@
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.base.wrappers import lazy_import
 
-words_start_with_patterns = lazy_import('invenio.bibformat_utils:words_start_with_patterns')
-cut_out_snippet_core_creation = lazy_import('invenio.bibformat_utils:cut_out_snippet_core_creation')
+words_start_with_patterns = lazy_import('invenio.modules.formatter.utils:words_start_with_patterns')
+cut_out_snippet_core_creation = lazy_import('invenio.modules.formatter.utils:cut_out_snippet_core_creation')
 
 
 class WordsStartsWithPatternTest(InvenioTestCase):

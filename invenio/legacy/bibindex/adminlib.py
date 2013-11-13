@@ -29,7 +29,7 @@ from invenio.bibrankadminlib import write_outcome, modify_translations, \
         get_def_name, get_name, get_languages, addadminbox, tupletotable, \
         createhiddenform
 from invenio.access_control_engine import acc_authorize_action
-from invenio.dbquery import run_sql, get_table_status_info, wash_table_column_name
+from invenio.legacy.dbquery import run_sql, get_table_status_info, wash_table_column_name
 from invenio.bibindex_engine_stemmer import get_stemming_language_map
 import invenio.template
 from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE, \

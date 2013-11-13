@@ -23,7 +23,7 @@ Validation functions
 
 import re
 from wtforms.validators import ValidationError, StopValidation, Regexp
-from invenio import pidutils
+from invenio.utils import persistentid as pidutils
 from invenio.base.globals import cfg
 
 #

@@ -31,7 +31,7 @@ from invenio.legacy.websubmit.functions.Shared_Functions import get_dictionary_f
      createRelatedFormats
 from invenio.ext.logging import register_exception
 from invenio.config import CFG_BINDIR
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.shellutils import run_shell_command
 
 def Move_Files_to_Storage(parameters, curdir, form, user_info=None):

@@ -65,14 +65,14 @@ from invenio.config import \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import gettext_set_language
 from invenio.base.globals import cfg
 from invenio.utils.url import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
-from invenio.htmlutils import nmtoken_from_string
-from invenio.webinterface_handler import wash_urlargd
+from invenio.utils.html import nmtoken_from_string
+from invenio.ext.legacy.handler import wash_urlargd
 from invenio.bibrank_citation_searcher import get_cited_by_count
-from invenio.webuser import session_param_get
+from invenio.legacy.webuser import session_param_get
 
 from invenio.intbitset import intbitset
 

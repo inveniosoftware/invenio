@@ -24,8 +24,8 @@ Exposes document extration facilities to the world
 
 from tempfile import NamedTemporaryFile
 
-from invenio.webinterface_handler import WebInterfaceDirectory
-from invenio.webuser import collect_user_info
+from invenio.ext.legacy.handler import WebInterfaceDirectory
+from invenio.legacy.webuser import collect_user_info
 from invenio.webpage import page
 from invenio.config import CFG_TMPSHAREDDIR, CFG_ETCDIR
 from invenio.refextract_api import extract_references_from_file_xml, \

@@ -317,7 +317,7 @@ for example you can access it by:
 
 <pre>
    $ python -c "from zlib import decompress; \\
-                from invenio.dbquery import run_sql; \\
+                from invenio.legacy.dbquery import run_sql; \\
                 print decompress(run_sql('SELECT value FROM bibfmt \\
                 WHERE id_bibrec=1234 AND format=\'xm\'')[0][0])"
 </pre>

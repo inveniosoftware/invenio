@@ -32,7 +32,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ETCDIR, \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
-from invenio.dbquery import run_sql, deserialize_via_marshal, wash_table_column_name
+from invenio.legacy.dbquery import run_sql, deserialize_via_marshal, wash_table_column_name
 from invenio.ext.logging import register_exception
 from invenio.webpage import adderrorbox
 from invenio.bibindex_engine_stemmer import stem

@@ -33,7 +33,7 @@ from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               get_authenticated_mechanize_browser, \
                               InvenioTestCase
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 class WebAccessWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebAccess web pages whether they are up or not."""

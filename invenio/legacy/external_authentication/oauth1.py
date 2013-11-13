@@ -26,7 +26,7 @@ __revision__ = \
     "$Id$"
 
 from invenio.utils.container import get_substructure
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.external_authentication import ExternalAuth
 
 class ExternalOAuth1(ExternalAuth):
@@ -54,13 +54,13 @@ class ExternalOAuth1(ExternalAuth):
         @type password: str
 
         @param req: request
-        @type req: invenio.webinterface_handler_wsgi.SimulatedModPythonRequest
+        @type req: invenio.legacy.wsgi.SimulatedModPythonRequest
 
         @rtype: str|NoneType, str|NoneType
         """
         from invenio.access_control_config import CFG_OAUTH1_CONFIGURATIONS
         from invenio.access_control_config import CFG_OAUTH1_PROVIDERS
-        from invenio.webinterface_handler import wash_urlargd
+        from invenio.ext.legacy.handler import wash_urlargd
         from rauth.service import OAuth1Service
 
         self.__init_req(req)
@@ -179,7 +179,7 @@ class ExternalOAuth1(ExternalAuth):
         @type password: str
 
         @param req: Isn't used in this function
-        @type req: invenio.webinterface_handler_wsgi.SimulatedModPythonRequest
+        @type req: invenio.legacy.wsgi.SimulatedModPythonRequest
 
         @rtype: str or NoneType
         """

@@ -24,18 +24,18 @@ from flask import render_template, request, flash, redirect, url_for, Blueprint
 from flask.ext.login import current_user, login_required
 from sqlalchemy.sql import operators
 
-from invenio import webmessage_dblayer as dbplayer
-from invenio import webmessage_query as dbquery
-from invenio.base.decorators import wash_arguments, templated, sorted_by, filtered_by
+from invenio.base.decorators import (wash_arguments, templated, sorted_by,
+                                     filtered_by)
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
-from invenio.ext.breadcrumb import register_breadcrumb
 from invenio.ext.menu import register_menu
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
-from invenio.webmessage_forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
 
+from . import dbplayer
+from . import query as dbquery
+from .forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
 from .models import MsgMESSAGE, UserMsgMESSAGE, email_alert_register
 
 
@@ -101,7 +101,7 @@ def menu():
 @register_menu(blueprint, 'main.messages', MessagesMenu(), order=-3,
                visible_when=not_guest)
 def index(sort=False, filter=None):
-    from invenio.webmessage import is_no_quota_user
+    from invenio.legacy.webmessage.api import is_no_quota_user
     uid = current_user.get_id()
 
     dbquery.update_user_inbox_for_reminders(uid)
@@ -125,7 +125,7 @@ def index(sort=False, filter=None):
 @permission_required('usemessages')
 @wash_arguments({'msg_reply_id': (int, 0)})
 def add(msg_reply_id):
-    from invenio.webmessage_mailutils import email_quote_txt
+    from invenio.utils.mail import email_quote_txt
     uid = current_user.get_id()
     if msg_reply_id:
         if (dbplayer.check_user_owns_message(uid, msg_reply_id) == 0):

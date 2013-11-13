@@ -38,10 +38,10 @@ from invenio.modules.workflows.models import BibWorkflowObject, Workflow
 from invenio.bibworkflow_engine import BibWorkflowEngine
 from invenio.modules.workflows.api import continue_oid
 
-from invenio.modules.deposit import forms
-from invenio.webdeposit_form import CFG_FIELD_FLAGS, DataExporter
-from invenio.webdeposit_signals import file_uploaded
-from invenio.webdeposit_storage import Storage
+from . import forms
+from .form import CFG_FIELD_FLAGS, DataExporter
+from .signals import file_uploaded
+from .storage import Storage
 
 
 #
@@ -214,7 +214,7 @@ class DepositionType(object):
     @classmethod
     def all(cls):
         """ Get a dictionary of deposition types """
-        from invenio.webdeposit_load_deposition_types import deposition_types
+        from .loader import deposition_types
         return deposition_types
 
     @classmethod
@@ -237,7 +237,7 @@ class DepositionType(object):
     @classmethod
     def get_default(cls):
         """ Get a list of deposition type names """
-        from invenio.webdeposit_load_deposition_types import deposition_default
+        from .loader import deposition_default
         return deposition_default
 
 
@@ -1018,7 +1018,7 @@ class Agent(FactoryMixin):
 
     def from_request_context(self):
         from flask import request
-        from invenio.webuser_flask import current_user
+        from invenio.ext.login import current_user
         self.ip_address = request.remote_addr
         self.user_id = current_user.get_id()
         self.email_address = current_user.info.get('email', '')

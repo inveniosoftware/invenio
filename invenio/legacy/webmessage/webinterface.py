@@ -24,8 +24,8 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_URL, CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
-from invenio.webmessage import perform_request_display_msg, \
+from invenio.legacy.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
+from invenio.legacy.webmessage.api import perform_request_display_msg, \
                                perform_request_write, \
                                perform_request_send, \
                                perform_request_write_with_search, \
@@ -33,12 +33,12 @@ from invenio.webmessage import perform_request_display_msg, \
                                perform_request_delete_all, \
                                get_navtrail
 from invenio.modules.messages.config import CFG_WEBMESSAGE_RESULTS_FIELD
-from invenio.webmessage_mailutils import escape_email_quoted_text
+from invenio.utils.mail import escape_email_quoted_text
 from invenio.webpage import page
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd
-from invenio.htmlutils import escape_html
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.utils.html import escape_html
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 
 class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
     """Defines the set of /yourmessages pages."""

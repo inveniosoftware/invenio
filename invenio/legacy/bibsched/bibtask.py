@@ -60,7 +60,7 @@ import random
 
 from socket import gethostname
 
-from invenio.dbquery import run_sql, _db_login
+from invenio.legacy.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_LOGDIR, \
     CFG_BIBSCHED_PROCESS_USER, CFG_TMPDIR, CFG_SITE_SUPPORT_EMAIL
@@ -68,7 +68,7 @@ from invenio.ext.logging import register_exception
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTHENTICATION
-from invenio.webuser import get_user_preferences, get_email
+from invenio.legacy.webuser import get_user_preferences, get_email
 from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBTASK_DEFAULT_TASK_SETTINGS, CFG_BIBTASK_FIXEDTIMETASKS
 from invenio.utils.date import parse_runtime_limit

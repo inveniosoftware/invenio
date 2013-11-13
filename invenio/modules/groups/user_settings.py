@@ -23,7 +23,7 @@ from flask import Blueprint, session, make_response, g, render_template, \
                   request, flash, jsonify, redirect, url_for, current_app
 from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
 from invenio.base.i18n import _
-from invenio.webinterface_handler import wash_urlargd
+from invenio.ext.legacy.handler import wash_urlargd
 from invenio.config import CFG_SITE_LANG
 from invenio.access_control_config import \
      CFG_EXTERNAL_AUTH_USING_SSO, \

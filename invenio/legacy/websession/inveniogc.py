@@ -28,7 +28,7 @@ import datetime
 import time
 import os
 try:
-    from invenio.dbquery import run_sql, wash_table_column_name
+    from invenio.legacy.dbquery import run_sql, wash_table_column_name
     from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
          CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
          CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS

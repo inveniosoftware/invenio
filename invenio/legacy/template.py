@@ -101,8 +101,13 @@ def load(module=''):
     local = {}
     # load the right template based on the CFG_WEBSTYLE_TEMPLATE_SKIN and the specified module
     if CFG_WEBSTYLE_TEMPLATE_SKIN == "default":
-        mymodule = __import__("invenio.%s_templates" % (module), local, local,
-                              ["invenio.templates.%s" % (module)])
+        try:
+            mymodule = __import__("invenio.%s_templates" % (module), local,
+                                  local, ["invenio.templates.%s" % (module)])
+        except ImportError:
+            mymodule = __import__("invenio.legacy.%s.templates" % (module),
+                                  local, local,
+                                  ["invenio.templates.%s" % (module)])
     else:
         try:
             mymodule = __import__("invenio.%s_templates_%s" % (module, CFG_WEBSTYLE_TEMPLATE_SKIN), local, local,

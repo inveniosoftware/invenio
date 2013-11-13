@@ -27,7 +27,6 @@ pylib_DATA = bibedit_config.py \
              bibedit_templates.py \
              bibeditcli.py \
              bibedit_utils.py \
-             bibedit_webinterface.py \
              bibedit_web_tests.py \
              bibeditmulti_templates.py \
              bibeditmulti_webinterface.py \

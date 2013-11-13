@@ -76,7 +76,7 @@ Auto-complete
 """
 
 from wtforms import Field
-from invenio.webdeposit_form import CFG_FIELD_FLAGS
+from .form import CFG_FIELD_FLAGS
 
 
 __all__ = ['WebDepositField']

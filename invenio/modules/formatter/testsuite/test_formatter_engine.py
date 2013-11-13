@@ -31,9 +31,9 @@ from invenio.base.globals import cfg
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-bibformat = lazy_import('invenio.bibformat')
+bibformat = lazy_import('invenio.modules.formatter')
 bibformat_engine = lazy_import('invenio.modules.formatter.engine')
-bibformat_utils = lazy_import('invenio.bibformat_utils')
+bibformat_utils = lazy_import('invenio.modules.formatter.utils')
 bibformat_config = lazy_import('invenio.modules.formatter.config')
 bibformatadminlib = lazy_import('invenio.bibformatadminlib')
 format_templates = lazy_import('invenio.modules.formatter.testsuite.format_templates')

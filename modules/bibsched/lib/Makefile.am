@@ -25,8 +25,7 @@ pylib_DATA = \
 	bibtaskex.py \
 	bibtask_config.py \
 	bibtasklet.py \
-	bibsched_webapi.py \
-	bibsched_webinterface.py
+	bibsched_webapi.py
 
 jsdir=$(localstatedir)/www/js
 

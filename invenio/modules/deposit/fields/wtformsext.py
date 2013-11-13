@@ -288,7 +288,7 @@ class DynamicFieldList(FieldList):
     fields.
     """
     def __init__(self, *args, **kwargs):
-        from invenio.webdeposit_field_widgets import DynamicListWidget
+        from ..field_widgets import DynamicListWidget
         self.widget = kwargs.pop('widget', DynamicListWidget())
         self.empty_index = kwargs.pop('empty_index', '__index__')
         self.add_label = kwargs.pop('add_label', None)

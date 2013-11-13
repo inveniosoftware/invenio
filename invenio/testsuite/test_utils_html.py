@@ -21,13 +21,13 @@
 
 __revision__ = "$Id$"
 
-
-from invenio.htmlutils import HTMLWasher, nmtoken_from_string, \
+from invenio.utils.html import HTMLWasher, nmtoken_from_string, \
      remove_html_markup, create_html_select, \
      CFG_TIDY_INSTALLED, \
      CFG_BEAUTIFULSOUP_INSTALLED, tidy_html, \
      escape_javascript_string
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+
 
 class XSSEscapingTest(InvenioTestCase):
     """Test functions related to the prevention of XSS attacks."""
@@ -81,6 +81,7 @@ class XSSEscapingTest(InvenioTestCase):
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          '<a href="">link</a>')
 
+
 class CharactersEscapingTest(InvenioTestCase):
     """Test functions related to escaping reserved or forbidden characters """
 
@@ -95,6 +96,7 @@ class CharactersEscapingTest(InvenioTestCase):
         nmtoken = nmtoken_from_string(ascii_str)
         for char in nmtoken:
             self.assert_(char in ['.', '-', '_', ':'] or char.isalnum())
+
 
 class JavascriptCharactersEscapingTest(InvenioTestCase):
     """Test functions related to escaping Javascript characters for use in various context """
@@ -111,10 +113,10 @@ class JavascriptCharactersEscapingTest(InvenioTestCase):
     def test_newline_nojson(self):
         """htmlutils - test if newlines are properly escaped for Javascript strings without JSON module. """
         # Trick jsonutils into thinking json module is not available.
-        import invenio.htmlutils
-        invenio.htmlutils.CFG_JSON_AVAILABLE = False
+        import invenio.utils.html
+        invenio.utils.html.CFG_JSON_AVAILABLE = False
         self.test_newline()
-        invenio.htmlutils.CFG_JSON_AVAILABLE = True
+        invenio.utils.html.CFG_JSON_AVAILABLE = True
 
     def test_escape_javascript_string_for_html(self):
         """htmlutils - escaping strings for Javascript, for use in HTML"""
@@ -130,10 +132,10 @@ class JavascriptCharactersEscapingTest(InvenioTestCase):
     def test_escape_javascript_string_for_html_nojson(self):
         """htmlutils - escaping strings for Javascript, for use in HTML, without JSON module."""
         # Same output if we did not have JSON installed
-        import invenio.htmlutils
-        invenio.htmlutils.CFG_JSON_AVAILABLE = False
+        import invenio.utils.html
+        invenio.utils.html.CFG_JSON_AVAILABLE = False
         self.test_escape_javascript_string_for_html()
-        invenio.htmlutils.CFG_JSON_AVAILABLE = True
+        invenio.utils.html.CFG_JSON_AVAILABLE = True
 
     def test_escape_javascript_string_for_html_in_cdata(self):
         """htmlutils - escaping strings for Javascript, for use in HTML, in CDATA sections"""
@@ -144,10 +146,10 @@ class JavascriptCharactersEscapingTest(InvenioTestCase):
 
     def test_escape_javascript_string_for_html_in_cdata_nojson(self):
         """htmlutils - escaping strings for Javascript, for use in HTML, in CDATA sections, without JSON module."""
-        import invenio.htmlutils
-        invenio.htmlutils.CFG_JSON_AVAILABLE = False
+        import invenio.utils.html
+        invenio.utils.html.CFG_JSON_AVAILABLE = False
         self.test_escape_javascript_string_for_html_in_cdata()
-        invenio.htmlutils.CFG_JSON_AVAILABLE = True
+        invenio.utils.html.CFG_JSON_AVAILABLE = True
 
     def test_escape_javascript_string_for_javascript_or_json(self):
         """htmlutils - escaping strings for Javascript, for use in "pure" Javscript or JSON output"""
@@ -158,10 +160,10 @@ class JavascriptCharactersEscapingTest(InvenioTestCase):
 
     def test_escape_javascript_string_for_javascript_or_json_nojson(self):
         """htmlutils - escaping strings for Javascript, for use in "pure" Javscript or JSON output, without JSON module."""
-        import invenio.htmlutils
-        invenio.htmlutils.CFG_JSON_AVAILABLE = False
+        import invenio.utils.html
+        invenio.utils.html.CFG_JSON_AVAILABLE = False
         self.test_escape_javascript_string_for_javascript_or_json()
-        invenio.htmlutils.CFG_JSON_AVAILABLE = True
+        invenio.utils.html.CFG_JSON_AVAILABLE = True
 
     def test_escape_closing_script_tag(self):
         """htmlutils - escaping closing </script> tag"""
@@ -186,6 +188,7 @@ class JavascriptCharactersEscapingTest(InvenioTestCase):
         output_string = """&quot;Your <em>\\'Silver Shoes\\'</em> will carry you over the desert,&quot;\\r replied Glinda."""
         self.assertEqual(escape_javascript_string(input_string, escape_for_html=False, escape_quote_for_html=True),
                          output_string)
+
 
 class HTMLWashingTest(InvenioTestCase):
     """Test functions related to general washing of HTML source"""
@@ -228,6 +231,7 @@ class HTMLWashingTest(InvenioTestCase):
         test_str = '<style><!-- .myclass {color:#f00} --></style><span class="myclass">styled text</span>'
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          'styled text')
+
 
 class HTMLTidyingTest(InvenioTestCase):
     """Test functions related to tidying up HTML source"""
@@ -287,6 +291,7 @@ class HTMLTidyingTest(InvenioTestCase):
         self.assertEqual(res.replace('\n', '').replace(' ', ''),
                          self.html_buffer_1.replace('\n', '').replace(' ', ''))
 
+
 class HTMLMarkupRemovalTest(InvenioTestCase):
     """Test functions related to removing HTML markup."""
 
@@ -303,6 +308,7 @@ class HTMLMarkupRemovalTest(InvenioTestCase):
         test_expected = 'This is XtestX.'
         self.assertEqual(remove_html_markup(test_input, 'X'),
                          test_expected)
+
 
 class HTMLAutomaticLinksTransformation(InvenioTestCase):
     """Test functions related to transforming links into HTML context"""
@@ -342,6 +348,7 @@ class HTMLAutomaticLinksTransformation(InvenioTestCase):
         self.assertEqual(self.washer.wash(html_buffer=body_input,
                                           automatic_link_transformation=True),
                          body_expected)
+
 
 class HTMLCreation(InvenioTestCase):
     """Test functions related to creation of HTML markup."""

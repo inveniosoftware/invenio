@@ -142,7 +142,7 @@ def api_key_required(f):
     @wraps(f)
     def auth_key(*args, **kwargs):
         if 'apikey' in request.values:
-            from invenio.webuser_flask import login_user
+            from invenio.ext.login import login_user
             user_id = WebAPIKey.acc_get_uid_from_request()
             if user_id == -1:
                 abort(401)

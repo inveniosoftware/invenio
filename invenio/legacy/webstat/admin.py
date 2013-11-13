@@ -23,7 +23,7 @@ __lastupdated__ = "$Date$"
 import sys
 
 from invenio import webstat
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.bibtask import task_init, task_get_option, task_set_option, \
                             task_has_option, task_update_progress, write_message
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH

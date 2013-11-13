@@ -26,7 +26,7 @@ import time
 from invenio.config import CFG_SOLR_URL
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
                             task_sleep_now_if_required
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.search_engine import record_exists
 from invenio.bibdocfile import BibRecDocs
 from invenio.solrutils_bibindex_indexer import replace_invalid_solr_characters

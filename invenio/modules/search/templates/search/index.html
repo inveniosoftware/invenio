@@ -115,7 +115,7 @@
         {% for recid in collection.reclist[-10:]|reverse %}
         <div class="row-fluid">
           <div class="span12">
-            {{ format_record(recid, of, ln=g.ln, brief_links=False)|safe }}
+            {{ format_record(recid, of, ln=g.ln)|safe }}
             {{ '<hr/>'|safe if not loop.last }}
           </div>
         </div>

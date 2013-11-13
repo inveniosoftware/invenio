@@ -26,7 +26,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import \
      acc_delete_user_role, \
@@ -41,7 +41,7 @@ from invenio.access_control_admin import \
      acc_get_all_roles, \
      acc_get_role_users
 from invenio.webpage import page, error_page
-from invenio.webuser import getUid, list_registered_users, page_not_authorized
+from invenio.legacy.webuser import getUid, list_registered_users, page_not_authorized
 from invenio.base.i18n import wash_language
 
 def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",

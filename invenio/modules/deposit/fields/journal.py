@@ -19,8 +19,8 @@
 
 from wtforms import TextField
 from invenio.modules.deposit.field_base import WebDepositField
-from invenio.webdeposit_autocomplete_utils import sherpa_romeo_journals
-from invenio.webdeposit_processor_utils import sherpa_romeo_journal_process
+from ..autocomplete_utils import sherpa_romeo_journals
+from ..processor_utils import sherpa_romeo_journal_process
 
 __all__ = ['JournalField']
 
@@ -38,7 +38,7 @@ class JournalField(WebDepositField, TextField):
 
 
 # from wtforms import TextField
-# from invenio.bibknowledge import get_kb_mappings
+# from invenio.modules.knowledge.api import get_kb_mappings
 # from invenio.modules.deposit.field_base import WebDepositField
 
 # __all__ = ['JournalField']

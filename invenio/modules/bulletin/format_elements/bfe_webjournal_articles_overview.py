@@ -30,7 +30,7 @@ try:
 except ImportError:
     PIL_imported = False
 from invenio.modules.formatter.engine import BibFormatObject
-from invenio.htmlutils import HTMLWasher, remove_html_markup
+from invenio.utils.html import HTMLWasher, remove_html_markup
 from invenio.base.i18n import gettext_set_language
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \

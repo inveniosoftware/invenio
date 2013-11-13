@@ -68,7 +68,7 @@ try:
     from flask import session
 except ImportError:
     pass
-from invenio.dbquery import run_sql, OperationalError, \
+from invenio.legacy.dbquery import run_sql, OperationalError, \
     serialize_via_marshal, deserialize_via_marshal
 from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation

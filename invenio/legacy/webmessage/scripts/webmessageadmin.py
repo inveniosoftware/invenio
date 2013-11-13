@@ -28,8 +28,8 @@ try:
     import sys
     from invenio.flaskshell import *
     from invenio.config import CFG_SITE_SUPPORT_EMAIL
-    from invenio.webmessage_dblayer import clean_messages
-    from invenio.dbquery import run_sql
+    from invenio.modules.messages.dblayer import clean_messages
+    from invenio.legacy.dbquery import run_sql
 
 except ImportError, e:
     print "Error: %s" % e

@@ -42,7 +42,7 @@ from invenio.bibsword_client_dblayer import get_remote_server_auth, \
                                             update_submission_status, \
                                             select_submitted_record_infos, \
                                             delete_from_swr_clientdata
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.bibsword_config import CFG_SUBMISSION_STATUS_SUBMITTED, \
                                     CFG_SUBMISSION_STATUS_PUBLISHED, \
                                     CFG_SUBMISSION_STATUS_REMOVED

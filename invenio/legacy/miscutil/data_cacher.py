@@ -22,7 +22,7 @@ Tool for caching important infos, which are slow to rebuild, but that
 rarely change.
 """
 
-from invenio.dbquery import run_sql, get_table_update_time
+from invenio.legacy.dbquery import run_sql, get_table_update_time
 import time
 
 class InvenioDataCacherError(Exception):

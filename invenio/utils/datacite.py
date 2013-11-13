@@ -82,7 +82,7 @@ if not HAS_SSL:
 
 import urllib2
 import re
-from invenio.xmlDict import XmlDictConfig, ElementTree
+from invenio.utils.xmlDict import XmlDictConfig, ElementTree
 
 # Uncomment to enable debugging of HTTP connection and uncomment line in
 # DataCiteRequest.request()

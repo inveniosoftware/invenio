@@ -42,7 +42,7 @@ class BibknowledgeRegressionTests(InvenioTestCase):
 
         Mostly just creates the dynamic kb used later.
         """
-        from invenio.bibknowledge import add_dynamic_kb, get_kb_name
+        from invenio.modules.knowledge.api import add_dynamic_kb, get_kb_name
         new_kb_id = add_dynamic_kb(self._name_a_db(), "100__a", searchwith="245__:*%*")
         self.dyn_kbname = get_kb_name(new_kb_id)
 
@@ -62,20 +62,20 @@ class BibknowledgeRegressionTests(InvenioTestCase):
 
     def test_EJOURNALS_exists(self):
         """bibknowledge - test that EJOURNALS kb is there"""
-        from invenio.bibknowledge import kb_exists
+        from invenio.modules.knowledge.api import kb_exists
         isthere = kb_exists("EJOURNALS")
         self.assertEqual(True, isthere)
 
     def test_kbs_info(self):
         """bibknowledge - get_kbs_info returns EJOURNALS info"""
-        from invenio.bibknowledge import get_kbs_info
+        from invenio.modules.knowledge.api import get_kbs_info
         myinfolist = get_kbs_info("", "EJOURNALS")
         myinfo = myinfolist[0]
         self.assertEqual(myinfo["name"],"EJOURNALS")
 
     def test_EJOURNALS_keys(self):
         """bibknowledge - test left/right rules (key lookups)"""
-        from invenio.bibknowledge import get_kbr_values, get_kbr_keys
+        from invenio.modules.knowledge.api import get_kbr_values, get_kbr_keys
         mykeys = get_kbr_keys("EJOURNALS", "Acta")
         self.assertEqual(2, len(mykeys))
         mykeys = get_kbr_values("EJOURNALS", '', searchtype='e')
@@ -87,13 +87,13 @@ class BibknowledgeRegressionTests(InvenioTestCase):
 
     def test_EJOURNALS_values(self):
         """bibknowledge - test a left/right rule (value lookup)"""
-        from invenio.bibknowledge import get_kbr_values
+        from invenio.modules.knowledge.api import get_kbr_values
         vals = get_kbr_values("EJOURNALS", "Astron.")
         self.assertEqual(29, len(vals))
 
     def test_get_EJOURNALS_kba_values(self):
         """bibknowledge - test recovering just values"""
-        from invenio.bibknowledge import get_kba_values
+        from invenio.modules.knowledge.api import get_kba_values
         mylist = get_kba_values("EJOURNALS")
         self.assertEqual(327, len(mylist))
 
@@ -106,14 +106,14 @@ class BibknowledgeRegressionTests(InvenioTestCase):
 
     def test_EJOURNALS_get_as_json(self):
         """bibknowledge - get key-value mappings as json list"""
-        from invenio.bibknowledge import get_kb_mappings_json
+        from invenio.modules.knowledge.api import get_kb_mappings_json
         api_returns = get_kb_mappings_json('EJOURNALS', 'AAS', 'AAS', 's')
         expected = '[{"value": "AAS Photo Bull.", "label": "AAS Photo Bull."}]'
         self.assertEqual(expected, api_returns)
 
     def test_add_get_remove(self):
         """bibknowledge - test creating a kb, adding a mapping, removing it, removing kb"""
-        from invenio.bibknowledge import add_kb, get_kb_name, \
+        from invenio.modules.knowledge.api import add_kb, get_kb_name, \
             kb_mapping_exists, remove_kb_mapping, delete_kb, kb_exists, \
             add_kb_mapping
         new_kb_id = add_kb()
@@ -132,7 +132,7 @@ class BibknowledgeRegressionTests(InvenioTestCase):
         """bibknowledge - test a taxonomy (must run as bibsched user)"""
         import mechanize
         from os import remove
-        from invenio.bibknowledge import get_kbt_items_for_bibedit, add_kb, \
+        from invenio.modules.knowledge.api import get_kbt_items_for_bibedit, add_kb, \
             get_kb_name, delete_kb, kb_exists
         username = "balthasar"
         password = "b123althasar"
@@ -178,7 +178,7 @@ class BibknowledgeRegressionTests(InvenioTestCase):
 
     def test_get_kbd_values(self):
         """bibknowledge - search a "find x by y" kb"""
-        from invenio.bibknowledge import get_kbd_values
+        from invenio.modules.knowledge.api import get_kbd_values
         vals = get_kbd_values(self.dyn_kbname, "Rodentia")
         self.assertEqual(1, len(vals))
         self.assertEqual(vals[0], 'Charles Darwin')
@@ -197,7 +197,7 @@ class BibknowledgeRegressionTests(InvenioTestCase):
 
     def test_kbd_retrieval_as_json(self):
         """bibknowledge - retrieve dynamic kb as json list"""
-        from invenio.bibknowledge import get_kbd_values_json
+        from invenio.modules.knowledge.api import get_kbd_values_json
         api_returns = get_kbd_values_json(self.dyn_kbname, 'Rodentia')
         expected = '["Charles Darwin"]'
         self.assertEqual(expected, api_returns)
@@ -210,14 +210,14 @@ class BibknowledgeRegressionTests(InvenioTestCase):
 
     def test_kb_for_bibedit(self):
         """bibknowledge - test a bibedit-style *very* dynamic kb"""
-        from invenio.bibknowledge import get_kbd_values_for_bibedit
+        from invenio.modules.knowledge.api import get_kbd_values_for_bibedit
         myvalues = get_kbd_values_for_bibedit("100__a", searchwith="Ellis", expression="100__a:*%*")
         self.assertEqual(1, len(myvalues))
 
     def test_kb_attribute_update(self):
         """bibknowledge - attribute modifications persist in database"""
-        from invenio.bibknowledge import update_kb_attributes, get_kb_id
-        from invenio.bibknowledge_dblayer import get_kb_description
+        from invenio.modules.knowledge.api import update_kb_attributes, get_kb_id
+        from invenio.modules.knowledge.dblayer import get_kb_description
         # NB: Tested here because with the exception of get_kb_description,
         #     these are exported by module bibknowledge. This mostly is
         #     exercising bibknowledge_dblayer, though.
@@ -238,7 +238,7 @@ class BibknowledgeRegressionTests(InvenioTestCase):
 
     def tearDown(self):
         """bbibknowledge test cleanup"""
-        from invenio.bibknowledge import delete_kb
+        from invenio.modules.knowledge.api import delete_kb
         delete_kb(self.dyn_kbname)
 
 

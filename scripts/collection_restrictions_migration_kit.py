@@ -28,7 +28,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.access_control_admin import acc_add_authorization, acc_add_role, \
     acc_get_action_id
 from invenio.access_control_firerole import compile_role_definition, serialize
