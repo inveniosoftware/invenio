@@ -385,9 +385,9 @@ def encode_video(input_file, output_file,
         if vcodec is not None:
             insert('-vcodec', vcodec)
         if abitrate is not None:
-            insert('-ab', str(abitrate))
+            insert('-b:a', str(abitrate))
         if vbitrate is not None:
-            insert('-b', str(vbitrate))
+            insert('-b:v', str(vbitrate))
 
         ## If a resolution is given
         if resolution:
