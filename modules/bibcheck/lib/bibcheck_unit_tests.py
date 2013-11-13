@@ -184,6 +184,14 @@ class BibCheckAmendableRecordTest(unittest.TestCase):
             set(self.record.iterfields(["9%%%%u"]))
         )
 
+    def test_is_dummy(self):
+        """ Test the is_dummy method """
+        dummy_record = {
+            '001': [([], ' ', ' ', '1', 1)]
+        }
+        record = AmendableRecord(dummy_record)
+        self.assertTrue(record.is_dummy())
+
 TEST_SUITE = make_test_suite(
         BibCheckRulesParseTest,
         BibCheckAmendableRecordTest

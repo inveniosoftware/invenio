@@ -234,6 +234,11 @@ class AmendableRecord(dict):
             if tag in self:
                 yield tag
 
+    def is_dummy(self):
+        return len(list(self.iterfield("001%%_"))) == 1 and \
+            len(self.keys()) == 1
+
+
 def task_parse_options(key, val, *_):
     """ Must be defined for bibtask to create a task """
 
@@ -401,7 +406,8 @@ def check_record(rule, record):
     plugins = task_get_option("plugins")
     record.set_rule(rule)
     plugin = plugins[rule["check"]]
-    return plugin["check_record"](record, **rule["checker_params"])
+    if not record.is_dummy():
+        return plugin["check_record"](record, **rule["checker_params"])
 
 def check_records(rule, records):
     """
