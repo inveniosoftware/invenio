@@ -658,7 +658,7 @@ def surname_compatibility(sa, sb):
     ml = float(max(len(sa),len(sb)))
     name_comparison_print('|--- dist:%s, ml:%s' % (dist,ml))
 
-    if dist/ml > MAX_ALLOWED_SURNAME_DISTANCE_PERCENT:
+    if ml==0 or dist/ml > MAX_ALLOWED_SURNAME_DISTANCE_PERCENT:
         return 0.0
     else:
         return 1.-float(dist)/max(len(sa),len(sb))
