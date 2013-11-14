@@ -20,6 +20,7 @@
 """
 BibFieldParser Unit tests.
 """
+#FIXME: Not working now! A new version of the config parser its out there!
 
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 

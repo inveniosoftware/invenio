@@ -562,7 +562,7 @@ def cli_cmd_reset_recjson_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
     will adapt the database to either store or not store the recjson
     format."""
-    from invenio.bibfield_manager import main
+    from invenio.legacy.bibfield.bibfield_manager import main
 
     warn('inveniocfg --reset-recjson-cache is deprecated. Using instead: inveniomanage bibfield reset')
 
@@ -789,7 +789,7 @@ def cli_cmd_load_webstat_conf(conf):
 
 
 def cli_cmd_load_bibfield_config(conf):
-    from invenio.bibfield_manager import main
+    from invenio.legacy.bibfield.bibfield_manager import main
 
     warn('inveniocfg --load-bibfield-conf is deprecated. Using instead: inveniomanage bibfield config load')
 

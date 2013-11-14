@@ -29,7 +29,7 @@ from flask.ext.login import current_user
 
 from invenio.bibtask import task_low_level_submission, \
     bibtask_allocate_sequenceid
-from invenio.bibfield_jsonreader import JsonReader
+from invenio.legacy.bibfield.bibfield_jsonreader import JsonReader
 from invenio.config import CFG_TMPSHAREDDIR
 from invenio.legacy.dbquery import run_sql
 from invenio.modules.deposit.models import Deposition, Agent, \

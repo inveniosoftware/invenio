@@ -75,7 +75,7 @@ def request_record(f):
             flash(auth_msg, 'error')
             abort(apache.HTTP_UNAUTHORIZED)
 
-        from invenio.bibfield import get_record
+        from invenio.legacy.bibfield import get_record
         from invenio.search_engine import record_exists, get_merged_recid
         # check if the current record has been deleted
         # and has been merged, case in which the deleted record

@@ -15,19 +15,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = functions
-
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibfield.py \
-             bibfield_regression_tests.py \
-             bibfield_config_engine.py \
+pylib_DATA = bibfield_regression_tests.py \
              bibfield_config_engine_unit_tests.py \
-             bibfield_jsonreader.py \
-             bibfield_manager.py \
-             bibfield_marcreader.py \
              bibfield_marcreader_regression_tests.py \
-             bibfield_utils.py \
              bibfield_utils_unit_tests.py
 
 EXTRA_DIST = $(pylib_DATA)

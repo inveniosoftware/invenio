@@ -33,7 +33,7 @@ from werkzeug.utils import import_string
 from invenio.utils.datastructures import LaziestDict
 
 CFG_BIBFIELD_FUNCTIONS = LaziestDict(lambda key: import_string(
-    'invenio.bibfield_functions.%s:%s' % (key, key)))
+    'invenio.legacy.bibfield.functions.%s:%s' % (key, key)))
 
 
 class BibFieldException(Exception):

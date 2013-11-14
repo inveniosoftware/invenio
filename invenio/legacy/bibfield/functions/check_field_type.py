@@ -20,7 +20,7 @@
 from werkzeug.utils import import_string
 from invenio.utils.datastructures import LaziestDict
 
-CFG_BIBFIELD_TYPES = LaziestDict(lambda key: import_string('invenio.bibfield_functions.%s:%s' % (key, key)))
+CFG_BIBFIELD_TYPES = LaziestDict(lambda key: import_string('invenio.legacy.bibfield.functions.%s:%s' % (key, key)))
 
 
 def check_field_type(record, field, field_type, subfield=None, continuable=True):
@@ -43,8 +43,8 @@ def check_field_type(record, field, field_type, subfield=None, continuable=True)
     if not key in record:
         return
 
-    from invenio.bibfield_utils import InvenioBibFieldContinuableError, \
-                                       InvenioBibFieldError
+    from invenio.legacy.bibfield.bibfield_utils import InvenioBibFieldContinuableError, \
+            InvenioBibFieldError
 
     error = continuable and InvenioBibFieldContinuableError or InvenioBibFieldError
 

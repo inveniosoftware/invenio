@@ -80,7 +80,7 @@ def reset_rec_cache(output_format, get_record, split_by=1000):
 @change_command_name
 def reset_recjson(split_by=1000):
     """Reset record json structure cache."""
-    from invenio.bibfield_manager import reset
+    from invenio.legacy.bibfield.bibfield_manager import reset
     reset(split_by)
 
 

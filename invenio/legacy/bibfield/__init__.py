@@ -38,14 +38,14 @@ from invenio.legacy.dbquery import run_sql
 from invenio.ext.logging import register_exception
 from invenio.base.signals import record_after_update
 
-from invenio.bibfield_jsonreader import JsonReader
-from invenio.bibfield_utils import BlobWrapper, BibFieldDict
+from .bibfield_jsonreader import JsonReader
+from .bibfield_utils import BlobWrapper, BibFieldDict
 
 # Lazy loader of bibfield readers
 
 def reader_discover(key):
     try:
-        candidate = import_string('invenio.bibfield_%sreader:readers' % (key, ))
+        candidate = import_string('invenio.legacy.bibfield.bibfield_%sreader:readers' % (key, ))
         if issubclass(candidate, JsonReader):
             return candidate
     except:

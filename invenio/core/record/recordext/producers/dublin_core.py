@@ -24,7 +24,7 @@ def produce(self, fields=None):
     @param tags: list of tags to include in the output, if None or
                 empty list all available tags will be included.
     """
-    from invenio.bibfield_utils import get_producer_rules
+    from invenio.legacy.bibfield.bibfield_utils import get_producer_rules
 
     if not fields:
         fields = self.keys()
