@@ -40,7 +40,7 @@ CFG_SITE_RECORD = 'record'
 from .config import CFG_WEBCOMMENT_ACTION_CODE
 
 blueprint = Blueprint('comments', __name__, url_prefix="/" + CFG_SITE_RECORD,
-                      template_folder='templates')
+                      template_folder='templates', static_folder='static')
 
 from invenio.modules.records.views import request_record
 

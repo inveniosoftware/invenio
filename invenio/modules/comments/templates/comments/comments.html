@@ -20,6 +20,9 @@
   {% extends "records/base.html" %}
 {%- endif -%}
 
+{% css url_for('comments.static', filename='css/comments/comments.css'), '10-comments' %}
+{% js url_for('comments.static', filename='js/comments/collapse.js'), '10-comments' %}
+
 {% block record_content %}
   <div class="page-header">
     {{ format_record(recid, 'hs', ln=g.ln)|safe }}
@@ -45,14 +48,6 @@
 
   {%- if comments -%}
 
-  <style>
-  .comments .collapsed i.icon-chevron-down {
-    background-position: -456px -72px!important;
-  }
-
-  .comments hr { margin: 0px;}
-  </style>
-
   <ul class="comments unstyled">
   {%- for c in comments recursive -%}
   <li name="{{ c.id }}">
@@ -60,7 +55,7 @@
        style="margin-right: 5px;"
        data-toggle="collapse"
        data-target="#collapse-{{ c.id }}"
-       href="{{ url_for('comments.toggle', recid=recid, id=c.id) }}">
+       href="{#{ url_for('comments.toggle', recid=recid, id=c.id) }#}">
       <i class="icon-chevron-down"></i>
     </a>
 
@@ -156,36 +151,6 @@
 
   <div style="clear:both"/></div>
   <hr/>
-
-<script>
-$(document).ready(function() {
-// Support for AJAX loaded modal window.
-// Focuses on first input textbox after it loads the window.
-$('[data-toggle="modal"]').click(function(e) {
-  e.preventDefault();
-  var href = $(this).attr('href');
-  if (href.indexOf('#') == 0) {
-    $(href).modal('open');
-  } else {
-    $.get(href, function(data) {
-      $('<div class="modal" >' + data + '</div>').modal();
-    }).success(function() { $('input:text:visible:first').focus(); });
-  }
-});
-
-$('.collapse').on('show', function() {
-  $.get($(this).attr('data-action'))
-})
-
-$('.collapse').on('hide', function() {
-  $.get($(this).attr('data-action'))
-})
-
-$('a.collapse-comment').on('click', function(e) { e.preventDefault() })
-
-});
-</script>
-
 
   {%- if record.user_comment_subscritions|length -%}
 
