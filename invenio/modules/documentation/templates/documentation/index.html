@@ -1,0 +1,27 @@
+{%- extends "page.html" %}
+
+{%- block _title %}
+    {# document.title #}
+{%- endblock %}
+
+{% block css %}
+    {{ super() }}
+    {# document.css|safe #}
+{% endblock %}
+
+{%- block js %}
+    {{ super() }}
+    {# document.js|safe #}
+{%- endblock %}
+
+{%- block relbar %}
+    {{ document.relbar|safe }}
+{%- endblock %}
+
+{%- block body %}
+    {{ document.body|safe }}
+{%- endblock %}
+
+{%- block sidebar %}
+    {{ document.sidebar|safe }}
+{%- endblock %}

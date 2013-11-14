@@ -1,91 +1,122 @@
-.. _developers-extensions:
+.. _developers-templates:
 
-Extensions
-==========
+Templates
+=========
 
-What are extension and what is their purpose? Small piece of code that
-should ease the integration of a third party library. As such many of
-extensions have been already developed and one can find them in the
-`Flask Extension Registry`_. Everyone should check first if there is
-a usable extensions before developing new one according to
-`Flask Extension Development`_ guideline that will help you get your
-extension running.
+`Jinja2`_ is a modern and designer friendly templating language for Python.
+We will summarize adoption of Jinja2 web framework and describe best
+practices for writing easily reusable and extendable templates.
 
-.. _Flask Extension Registry: http://flask.pocoo.org/extensions/
-.. _Flask Extension Development: http://flask.pocoo.org/docs/extensiondev/
-
-Pluging an Existing Extension
------------------------------
-
-Extensions are all located in a package called ``flask_something``
-where "something" is the name of the extension you want to bridge.
-So for example if you plan to add support for an extension named
-`login`, you would name your extension's package ``invenio.ext.login``.
-
-Alternatively, if the extension reads only configuration from
-``current_app.config``, you can just list in ``EXTENSIONS`` option
-as ``flask.ext.something:Something``, where ``Something`` has to accept
-application object as first argument::
-
-    class Something(object):
-        def __init__(self, app, optional=None):
-            pass
-
-But how do extensions look like themselves?  An extension has to ensure
-that it works with multiple Flask application instances at once.
+.. note:: Please follow these simple rules when creating new templates, to
+    allow different Invenio installations (CDS, Inspire, ZENODO, ...) to
+    easily customize templates and keep in sync with updates to templates.
+    Using the rules will greatly reduce the amount of copy/pasting the
+    installations will have to do.
 
 
-Code structure
---------------
+* ``<module>/views.py``::
 
-So let's get started with creating such a extension bridge.  The bridge
-we want to create here will provide very basic support for `Flask Login`_.
-
-First we create the following folder structure::
-
-    invenio/ext/login/
-        __init__.py
-        legacy_user.py
-        README
-
-Here's the contents of the most important files:
-
-* ``__init__.py`` contains :func:`~invenio.ext.login.setup_app` function::
-
-    from .legacy_user import UserInfo
-
-    def setup_app(app):
-        """Setup login extension."""
-
-        # Let's create login manager.
-        _login_manager = LoginManager(app)
-        _login_manager.login_view = app.config.get('CFG_LOGIN_VIEW',
-                                                   'webaccount.login')
-        _login_manager.anonymous_user = UserInfo
-
-        @_login_manager.user_loader
-        def _load_user(uid):
-            """
-            Function should not raise an exception if uid is not valid
-            or User was not found in database.
-            """
-            return UserInfo(int(uid))
-
-        return app
-
-* ``legacy_user.py`` contains implementation ``UserMixin`` object::
-
-    from flask.ext.login import UserMixin
-    from werkzeug.datastructures import CallbackDict, CombinedMultiDict
-
-    class UserInfo(CombinedMultiDict, UserMixin):
-        """
-        This provides legacy implementations for the methods that Flask-Login
-        and Invenio 1.x expects user objects to have.
-        """
-
-        def __init__(self, uid=None, force=False):
-            ...
+    # ... some where in the blueprint code:
+    render_template(['<module>_<name>.html'], ctx)
 
 
-.. _Flask Login: https://flask-login.readthedocs.org/en/latest/
+* ``<module>/templates/<module>/<name>_base.html``::
+
+    {#
+     # The base template usually extends from the main Invenio template, or perhaps
+     # from a module specific main template. It contains nearly all the HTML code.
+     #}
+    {% extends "page.html" %}
+
+
+    {#
+     # Macros
+     #  * Make template blocks more clear so you don't clutter up a lot of HTML with
+     #    rendering logic - e.g. you wouldn't put your Python code in one big
+     #    function, instead you split it up into small functions with clearly
+     #    defined responsibilities.
+     #  * Macros can be parameterized.
+     #}
+    {%- macro action_bar(show_delete=True) %}
+        {# Macros can be overwritten in child template, but only calls within the
+         # child template will call the new macro. Hence, if you just want to
+         # overwrite the action_bar macro in <module>_<name>.html, you must also
+         # copy/paste the form_header and form_footer blocks where it's used,
+         # otherwise the old macro will be used. To avoid this problem, please
+         # instead just include a template inside the macro. This allow anther
+         # Invenio installation to overwrite just this part
+         #}
+        {% include "<module>_<name>_action_bar.html"%}
+    { endmarco %}
+
+    {%- macro render_field(thisfield, with_label=True) %}
+        {% include "<module>_<name>_render_field.html"%}
+    {%- endmarco %}
+
+    {#
+     # Blocks
+     #  * Think of template-blocks, as the API other Invenio installations will
+     #    use to customize the Invenio layout. An Invenio installation can override
+     #    blocks defined in your templates so that they keep their own changes
+     #    to a minimum, and don't copy/paste large parts of the template code.
+     #  * Use blocks liberally - to allow customizations of your template.
+     #  * Add the template block name to the {% endblock <name> %} to increase
+     #    readability of template code.
+     #}
+    {% block body %}
+    <div>
+        {%- block form_header scoped %}{{action_bar()}}{% endblock form_header%}
+        {%- block form_title scoped %}<h1>{{ form._title }}</h1>{% endblock form_title %}
+        {%- block form_body scoped %}
+            <fieldset>
+            {%- for field in fields %}
+                {#
+                 # Use the "scoped" parameter, to make variables available inside
+                 # the block. E.g. without the loop variable will not be available
+                 # inside the block.
+                 #}
+                {%- block field_body scoped %}
+                    {{ render_field(field) }}
+                    {% if loop.last %}<hr />{% endif %}
+                {%- endblock field_body %}
+            {%- endfor %}
+            </fieldset>
+        {% endblock form_body %}
+        {% block form_footer scoped %}{{action_bar(show_delete=False)}}{% endblock form_footer %}
+    </div>
+    {% endblock body %}
+
+
+
+* ``<module>/templates/<module>/<name>.html``::
+
+    {#
+     # The template actually being rendered by the blueprint. It only extends the
+     # base template. Doing it this way, allow an Invenio installation to overwrite
+     # just the blocks they need, instead of having to implement the entire
+     # template.
+     #}
+    {% extends "<module>_<name>_base.html" %}
+
+
+
+* ``<mypackage>/templates/<module>/<name>.html``::
+
+    {#
+     # Here's an example of an Invenio installation which just overwrites the
+     # necessary template block.
+     #}
+    {% extends "<module>_<name>_base.html" %}
+
+    {%- block field_body %}
+        {%- if field.name == 'awesomefield' %}
+            {{ render_field(field, class="awesomeness") }}
+        {% else %}
+            {{ render_field(field) }}
+        {%- endif %}
+        {% if loop.last %}<hr />{% endif %}
+    {%- endblock field_body %}
+
+
+.. _Flask: http://flask.pocoo.org/
+.. _Jinja2: http://jinja.pocoo.org/2/

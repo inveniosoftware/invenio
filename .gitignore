@@ -12,6 +12,8 @@ config.nice
 config.guess
 config.sub
 docs/_build
+docs/db
+docs/static
 dist
 install-sh
 missing

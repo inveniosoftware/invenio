@@ -1,2 +1,4 @@
 include requirements*.txt
-recursive-include invenio *.xml *.tpl *.html *.js *.css *.cfg
+recursive-include docs *.xml *.xsl *.tpl *.html *.js *.css *.cfg *.bft *.rst
+recursive-include invenio *.xml *.xsl *.tpl *.html *.js *.css *.cfg *.bft *.rst
+recursive-include invenio_atlantis *.xml *.xsl *.tpl *.html *.js *.css *.cfg *.bft *.rst
