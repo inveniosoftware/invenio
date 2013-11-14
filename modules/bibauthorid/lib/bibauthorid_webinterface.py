@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from invenio.bibauthorid_webapi import get_canonical_id_from_person_id
+from invenio.bibauthorid_webapi import get_canonical_id_from_person_id, add_cname_to_hepname_record
 
 """ Bibauthorid Web Interface Logic and URL handler. """
 
@@ -3089,7 +3089,13 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         except:
             return self._fail(req, apache.HTTP_NOT_FOUND)
 
-        webapi.connect_author_with_hepname(cname, hepname)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        if not self._is_admin(pinfo):
+            webapi.connect_author_with_hepname(cname, hepname)
+        else:
+            uid = getUid(req)
+            add_cname_to_hepname_record(cname, hepname, uid)
 
 
     def suggest_orcid(self, req, form):

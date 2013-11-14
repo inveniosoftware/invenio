@@ -246,19 +246,19 @@ class Test_name_comparison(unittest.TestCase):
         cn = surname_compatibility
         self.assertEqual(cn('Surname','Surname'), 1.0)
         self.assertEqual(cn('Surname','Verynotthesame'), 0.0)
-        self.assertGreater(cn('Surname', 'Surnam'), 0.5)
-        self.assertLess(cn('Surname','Surnam' ), 1.0)
-        self.assertGreater(cn('Surname', 'Curname'), 0.5)
-        self.assertGreater(cn('test','tast'), 0.5)
+        self.assertTrue(cn('Surname', 'Surnam') > 0.5)
+        self.assertTrue(cn('Surname','Surnam' ) < 1.0)
+        self.assertTrue(cn('Surname', 'Curname') > 0.5)
+        self.assertTrue(cn('test','tast') > 0.5)
 
     def test_initials_compatibility(self):
         cn = initials_compatibility
         self.assertEqual(cn(['a','b','c'],['a','b','c']), 1.0)
         self.assertEqual(cn(['a','b','c'],['d','e','f']), 0.0)
-        self.assertGreater(cn(['a','b'], ['a','c']), 0.25)
-        self.assertLess(cn(['a','b'], ['a','c']), 0.5)
-        self.assertGreater(cn(['a','b'], ['c','a']), 0.25)
-        self.assertLess(cn(['a','b'], ['c','a']), 0.5)
+        self.assertTrue(cn(['a','b'], ['a','c']) > 0.25)
+        self.assertTrue(cn(['a','b'], ['a','c']) < 0.5)
+        self.assertTrue(cn(['a','b'], ['c','a']) > 0.25)
+        self.assertTrue(cn(['a','b'], ['c','a']) < 0.5)
 
     def test_value_ranges(self):
         cn = compare_names
