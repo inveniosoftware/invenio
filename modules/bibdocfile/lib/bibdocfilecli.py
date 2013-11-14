@@ -49,6 +49,7 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission
 from invenio.textutils import encode_for_xml
 from invenio.websubmit_file_converter import can_perform_ocr
+from invenio.shellutils import retry_mkstemp
 
 def _xml_mksubfield(key, subfield, fft):
     return fft.get(key, None) is not None and '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(str(fft[key]))) or ''
@@ -578,22 +579,6 @@ Examples:
 def print_info(docid, info):
     """Nicely print info about a docid."""
     print '%i:%s' % (docid, info)
-
-def retry_mkstemp(suffix, prefix, directory, max_retries=3):
-    for retry_count in range(1, max_retries + 1):
-        try:
-            tmp_file_fd, tmp_file_name = mkstemp(suffix=suffix,
-                                                 prefix=prefix,
-                                                 dir=directory)
-        except OSError, e:
-            if e.errno == 19 and retry_count <= max_retries:
-                # AFS Glitch?
-                time.sleep(30)
-            else:
-                raise
-        else:
-            break
-    return tmp_file_fd, tmp_file_name
 
 def bibupload_ffts(ffts, append=False, do_debug=False, interactive=True):
     """Given an ffts dictionary it creates the xml and submit it."""

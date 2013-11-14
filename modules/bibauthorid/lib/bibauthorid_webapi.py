@@ -21,6 +21,8 @@ Bibauthorid_webapi
 Point of access to the documents clustering facility.
 Provides utilities to safely interact with stored data.
 '''
+import os
+from itertools import chain
 from copy import deepcopy
 
 import invenio.bibauthorid_config as bconfig
@@ -37,21 +39,22 @@ from invenio.dateutils import strftime
 from time import time, gmtime, ctime
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.webuser import collect_user_info, get_session, getUid, email_valid_p
-from invenio.webuser import isUserSuperAdmin
+from invenio.webuser import isUserSuperAdmin, get_nickname
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_get_role_id, acc_get_user_roles
 from invenio.external_authentication_robot import ExternalAuthRobot
 from invenio.external_authentication_robot import load_robot_keys
 from invenio.config import CFG_INSPIRE_SITE, CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL, \
     CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS, CFG_WEBAUTHORPROFILE_MAX_HEP_CHOICES, \
-    CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL
+    CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
+    CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG
 from invenio.config import CFG_SITE_URL
 from invenio.mailutils import send_email
 from invenio.bibauthorid_name_utils import most_relevant_name
 from invenio.bibauthorid_general_utils import is_arxiv_id_or_doi
-
-from itertools import chain
-
+from invenio.shellutils import retry_mkstemp
+from invenio.bibrecord import record_xml_output, record_add_field
+from invenio.bibtask import task_low_level_submission
 from invenio.bibauthorid_dbinterface import get_external_ids_of_author, add_arxiv_papers_to_author, get_arxiv_papers_of_author  #pylint: disable-msg=W0614
 
 
@@ -2881,6 +2884,24 @@ def get_stored_incomplete_autoclaim_tickets(req):
     temp_storage = session['personinfo']['incomplete_autoclaimed_tickets_storage']
     return temp_storage
 
+def add_cname_to_hepname_record(cname, recid, uid=None):
+    """
+    Schedule a BibUpload that will append the given personid to the specified record.
+    """
+    rec = {}
+    record_add_field(rec, '001', controlfield_value=str(recid))
+    record_add_field(rec,
+                     tag=CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3],
+                     ind1=CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4],
+                     ind2=CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5],
+                     subfields=[
+                        (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6], str(cname)),
+                        (CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6], 'BAI')])
+    tmp_file_fd, tmp_file_name = retry_mkstemp(suffix='.xml', prefix="bibauthorid-%s" % recid)
+    tmp_file = os.fdopen(tmp_file_fd, "w")
+    tmp_file.write(record_xml_output(rec))
+    tmp_file.close()
+    task_low_level_submission('bibupload', get_nickname(uid) or "", "-a", tmp_file_name, "-P5", "-N", "bibauthorid")
 
 def connect_author_with_hepname(cname, hepname):
     subject = "HepNames record match: %s %s" % (cname, hepname)
