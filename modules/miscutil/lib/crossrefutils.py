@@ -21,6 +21,7 @@
 
 import urllib, urllib2
 from xml.dom.minidom import parse
+from time import sleep
 
 from invenio.config import CFG_ETCDIR, CFG_CROSSREF_USERNAME, \
  CFG_CROSSREF_PASSWORD, CFG_CROSSREF_EMAIL
@@ -130,7 +131,7 @@ def get_doi_for_records(records):
 
     dois = {}
     if len(pipes) > 0:
-        for batchpipes in batch(pipes, 20):
+        for batchpipes in batch(pipes, 10):
             params = {
                 "usr": CFG_CROSSREF_USERNAME,
                 "pwd": CFG_CROSSREF_PASSWORD,
@@ -139,7 +140,17 @@ def get_doi_for_records(records):
             }
             url = "http://doi.crossref.org/servlet/query"
             data = urllib.urlencode(params)
-            document = parse(urllib2.urlopen(url, data))
+
+            retry_attempt = 0
+
+            while retry_attempt < 10:
+                try:
+                    document = parse(urllib2.urlopen(url, data))
+                    break
+                except urllib2.HTTPError, e:
+                    sleep(5)
+                    retry_attempt += 1
+
             results = document.getElementsByTagName("doi_record")
 
             for result in results:
@@ -147,6 +158,9 @@ def get_doi_for_records(records):
                 doi_tags = result.getElementsByTagName("doi")
                 if len(doi_tags) == 1:
                     dois[record_id] = doi_tags[0].firstChild.nodeValue
+
+            # Avoid sending too many requests
+            sleep(0.5)
     return dois
 
 
