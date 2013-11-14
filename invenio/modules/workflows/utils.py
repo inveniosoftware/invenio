@@ -53,7 +53,7 @@ def create_objects(path_to_file):
 
 
 def get_workflow_definition(name):
-    from invenio.bibworkflow_load_workflows import workflows
+    from invenio.modules.workflows.loader import workflows
     if name in workflows:
         return workflows[name]
     else:
