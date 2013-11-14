@@ -25,7 +25,7 @@ from flask import render_template, request, flash, redirect, url_for, \
 from flask.ext.login import current_user, login_required
 
 #from invenio import websession_config
-#from invenio import webuser
+#from invenio.legacy import webuser
 webuser = object
 from .forms import LoginForm, RegisterForm, LostPasswordForm
 from .models import User
