@@ -35,8 +35,8 @@ def check_field_existence(record, field, min_value, max_value=None, subfield=Non
     @note: This checker also modify the record if the field is not repeatable,
     meaning that min_value=1 or min_value=0,max_value=1
     """
-    from invenio.bibfield_utils import InvenioBibFieldContinuableError, \
-                                       InvenioBibFieldError
+    from invenio.legacy.bibfield.bibfield_utils import InvenioBibFieldContinuableError, \
+            InvenioBibFieldError
 
     error = continuable and InvenioBibFieldContinuableError or InvenioBibFieldError
 

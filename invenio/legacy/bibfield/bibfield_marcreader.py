@@ -24,8 +24,8 @@
 __revision__ = "$Id$"
 
 
-from invenio.bibfield_jsonreader import JsonReader
-from invenio.bibfield_utils import CoolDict, CoolList
+from .bibfield_jsonreader import JsonReader
+from .bibfield_utils import CoolDict, CoolList
 
 
 class MarcReader(JsonReader):

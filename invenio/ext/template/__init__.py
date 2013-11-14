@@ -94,7 +94,7 @@ def inject_utils():
         from invenio.base.before_request_functions import guess_language
         guess_language()
     try:
-        from invenio.bibfield import get_record  # should not be global due to bibfield_config
+        from invenio.legacy.bibfield import get_record  # should not be global due to bibfield_config
     except:
         get_record = lambda *args, **kwargs: None
     # from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE

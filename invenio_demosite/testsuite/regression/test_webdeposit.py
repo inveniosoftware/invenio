@@ -261,7 +261,7 @@ class TestWebDepositUtils(InvenioTestCase):
             deposition_metadata
         from invenio.webdeposit_workflow_utils import \
             create_record_from_marc
-        from invenio.bibfield import get_record
+        from invenio.legacy.bibfield import get_record
 
         user_id = self.login_user()
         for deposition_type in deposition_metadata.keys():

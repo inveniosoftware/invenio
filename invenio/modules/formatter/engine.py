@@ -570,7 +570,7 @@ def format_with_format_template(format_template_filename, bfo,
         evaluated_format = '<!-- empty -->'
         #try:
         from functools import wraps
-        from invenio.bibfield import \
+        from invenio.legacy.bibfield import \
             create_record as bibfield_create_record, \
             get_record as bibfield_get_record
         from invenio.search_engine import print_record

@@ -39,9 +39,9 @@ if sys.version_info < (2,5):
 
 from werkzeug import cached_property
 
-from invenio.bibfield_utils import BibFieldDict, \
-                                   InvenioBibFieldContinuableError, \
-                                   InvenioBibFieldError
+from .bibfield_utils import BibFieldDict, \
+                            InvenioBibFieldContinuableError, \
+                            InvenioBibFieldError
 from invenio.core.record.definitions import field_definitions
 from invenio.base.utils import import_submodules_from_packages
 

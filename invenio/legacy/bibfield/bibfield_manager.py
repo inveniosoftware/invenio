@@ -34,15 +34,16 @@ manager.add_command("cache", bibfield_cache)
 def load():
     """Loads BibField config."""
     print ">>> Going to load BibField config..."
-    from invenio.bibfield_config_engine import BibFieldParser
-    BibFieldParser().write_to_file()
+    print ">>> Deprecated: use rediscli flushdb until a new version is ready"
+    # from invenio.bibfield_config_engine import BibFieldParser
+    # BibFieldParser().write_to_file()
     print ">>> BibField config load successfully."
 
 
 @bibfield_cache.command
 def reset(split_by=1000):
     """Reset record json structure cache."""
-    from invenio.bibfield import get_record
+    from . import get_record
     from invenio.base.scripts.cache import reset_rec_cache
     reset_rec_cache('recjson', get_record, split_by=split_by)
 
