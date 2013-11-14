@@ -105,8 +105,8 @@ def retrieve_data_from_record(recid):
                 id_prefix = subfield_value.split("-")[0]
                 if id_prefix in IDENTIFIERS_MAPPING:
                     identifiers.append([subfield_value, IDENTIFIERS_MAPPING[id_prefix]])
-                else:
-                    identifiers.append(['', DEFAULT_IDENTIFIER])
+        if not identifiers:
+            identifiers.append(['', DEFAULT_IDENTIFIER])
         if not affiliations:
             affiliations.append([UNKNOWN_AFFILIATION, DEFAULT_AFFILIATION_TYPE])
             unique_affiliations.append(UNKNOWN_AFFILIATION)
