@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_CERN_SITE, \
      CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
      CFG_OPENAIRE_SITE
-from invenio import webuser
+from invenio.legacy import webuser
 from invenio.webpage import page
 from invenio import webaccount
 from invenio import webbasket
