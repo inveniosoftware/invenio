@@ -153,7 +153,7 @@ def _build_wrapper(recid):
     schema = 'recstruct'
 
     if master_format == 'marc':
-        from invenio.search_engine import get_record as se_get_record
+        from invenio.legacy.search_engine import get_record as se_get_record
         blob = se_get_record(recid)
     else:
         return None

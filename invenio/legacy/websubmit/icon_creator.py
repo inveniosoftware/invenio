@@ -48,7 +48,7 @@ from invenio.config import \
      CFG_PATH_PS2PDF, \
      CFG_PATH_PDFTK, \
      CFG_PATH_CONVERT
-from invenio.shellutils import escape_shell_arg
+from invenio.utils.shell import escape_shell_arg
 from invenio.legacy.websubmit.config import InvenioWebSubmitIconCreatorError
 
 CFG_ALLOWED_FILE_EXTENSIONS = ["pdf", "gif", "jpg", \

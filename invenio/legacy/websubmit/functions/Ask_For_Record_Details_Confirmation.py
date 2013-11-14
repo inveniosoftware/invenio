@@ -27,7 +27,7 @@ from invenio.config import CFG_SITE_ADMIN_EMAIL
 from invenio.legacy.websubmit.config import \
      InvenioWebSubmitFunctionStop, \
      InvenioWebSubmitFunctionError
-from invenio.search_engine import print_record, record_exists
+from invenio.legacy.search_engine import print_record, record_exists
 
 ## Details of record to display to the user for confirmation:
 CFG_DOCUMENT_DETAILS_MESSAGE = """

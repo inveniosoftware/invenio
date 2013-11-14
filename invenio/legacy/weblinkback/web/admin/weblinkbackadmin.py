@@ -20,8 +20,8 @@
 """WebLinkback - Administrative Interface"""
 
 from invenio.base.i18n import wash_language, gettext_set_language
-from invenio.access_control_engine import acc_authorize_action
-from invenio.webpage import page
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.legacy.webpage import page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.weblinkbackadminlib import get_navtrail, \

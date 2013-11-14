@@ -595,7 +595,7 @@ def build_and_run_js_unit_test_suite():
         Find all JS files installed in Invenio lib directory and run
         them on the JsTestDriver server
         """
-        from invenio.shellutils import run_shell_command
+        from invenio.utils.shell import run_shell_command
         errors_found = 0
         for candidate in os.listdir(CFG_WEBDIR + "/js"):
             base, ext = os.path.splitext(candidate)

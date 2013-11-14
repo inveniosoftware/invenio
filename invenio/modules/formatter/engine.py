@@ -67,7 +67,7 @@ from invenio.legacy.bibrecord import \
      record_get_field_value, \
      record_get_field_values, \
      record_xml_output
-from invenio.bibformat_xslt_engine import format
+from invenio.modules.formatter.engines.xslt import format
 from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import \
      language_list_long, \
@@ -91,7 +91,7 @@ from invenio.utils.html import \
 from invenio.modules.knowledge.api import get_kbr_values
 from invenio.ext.template import render_template_to_string
 from HTMLParser import HTMLParseError
-from invenio.shellutils import escape_shell_arg
+from invenio.utils.shell import escape_shell_arg
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -573,7 +573,7 @@ def format_with_format_template(format_template_filename, bfo,
         from invenio.legacy.bibfield import \
             create_record as bibfield_create_record, \
             get_record as bibfield_get_record
-        from invenio.search_engine import print_record
+        from invenio.legacy.search_engine import print_record
         from flask.ext.login import current_user
         from invenio.base.helpers import unicodifier
 
@@ -1923,7 +1923,7 @@ class BibFormatObject:
 
         @return: the record structure as defined by BibRecord library
         """
-        from invenio.search_engine import get_record
+        from invenio.legacy.search_engine import get_record
 
         # Create record if necessary
         if self.record is None:

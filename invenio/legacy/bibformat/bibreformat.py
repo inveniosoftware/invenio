@@ -34,13 +34,13 @@ try:
          CFG_BINDIR
 
     from invenio.intbitset import intbitset
-    from invenio.search_engine import perform_request_search, search_pattern
-    from invenio.search_engine import print_record
-    from invenio.bibrank_citation_searcher import get_cited_by
-    from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
+    from invenio.legacy.search_engine import perform_request_search, search_pattern
+    from invenio.legacy.search_engine import print_record
+    from invenio.legacy.bibrank.citation_searcher import get_cited_by
+    from invenio.legacy.bibrank.citation_indexer import get_bibrankmethod_lastupdate
     from invenio.modules.formatter import format_record
     from invenio.modules.formatter.config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
-    from invenio.shellutils import split_cli_ids_arg
+    from invenio.utils.shell import split_cli_ids_arg
     from invenio.bibtask import task_init, write_message, task_set_option, \
             task_get_option, task_update_progress, task_has_option, \
             task_low_level_submission, task_sleep_now_if_required, \
@@ -223,7 +223,7 @@ def check_validity_input_formats(input_formats):
     @return: if there is any invalid input format it returns this value
     @rtype: string
     """
-    from invenio.search_engine import get_available_output_formats
+    from invenio.legacy.search_engine import get_available_output_formats
     valid_formats = get_available_output_formats()
 
     # let's to extract the values of the available formats

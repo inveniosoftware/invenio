@@ -30,7 +30,7 @@ from invenio.modules.messages.config import \
     CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
 from invenio.utils.date import datetext_default, \
                               convert_datestruct_to_datetext
-from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 
 def check_user_owns_message(uid, msgid):
     """
@@ -471,7 +471,7 @@ def check_quota(nb_messages):
     @return: a dictionary of users over-quota
     """
     from invenio.legacy.webuser import collect_user_info
-    from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
+    from invenio.modules.access.control import acc_is_user_in_role, acc_get_role_id
     no_quota_role_ids = [acc_get_role_id(role) for role in CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA]
     res = {}
     for uid, n in run_sql("SELECT id_user_to, COUNT(id_user_to) FROM user_msgMESSAGE GROUP BY id_user_to HAVING COUNT(id_user_to) > %s", (nb_messages, )):

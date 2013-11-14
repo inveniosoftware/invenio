@@ -21,8 +21,8 @@ from invenio.intbitset import intbitset
 
 def template_context_function(recids, *args, **kwargs):
     """
-    @see invenio.search_engine_summarizer:summarize_records
+    @see invenio.legacy.search_engine.summarizer:summarize_records
     """
-    from invenio.search_engine_summarizer import summarize_records
+    from invenio.legacy.search_engine.summarizer import summarize_records
     return summarize_records(intbitset(recids)
         if not isinstance(recids, intbitset) else recids, *args, **kwargs)

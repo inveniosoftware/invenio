@@ -32,8 +32,8 @@ from invenio.webbasket_dblayer import check_user_owns_baskets
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.date import convert_datestruct_to_datetext, convert_datetext_to_dategui
 
-import invenio.template
-webalert_templates = invenio.template.load('webalert')
+import invenio.legacy.template
+webalert_templates = invenio.legacy.template.load('webalert')
 
 ### IMPLEMENTATION
 

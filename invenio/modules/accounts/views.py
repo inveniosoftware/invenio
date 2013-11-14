@@ -78,7 +78,7 @@ def login(nickname=None, password=None, login_method=None, action='',
         return abort(401)  # page is not authorized
 
     if action:
-        from invenio.access_control_mailcookie import \
+        from invenio.modules.access.mailcookie import \
             InvenioWebAccessMailCookieError, \
             mail_cookie_check_authorize_action
         try:
@@ -91,7 +91,7 @@ def login(nickname=None, password=None, login_method=None, action='',
                      csrf_enabled=False)
     try:
         user = None
-        from invenio.access_control_config import \
+        from invenio.modules.access.local_config import \
             CFG_EXTERNAL_AUTH_USING_SSO
         if not CFG_EXTERNAL_AUTH_USING_SSO:
             if login_method == 'Local':
@@ -209,7 +209,7 @@ def register():
 def logout():
     logout_user()
 
-    from invenio.access_control_config import \
+    from invenio.modules.access.local_config import \
         CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
 

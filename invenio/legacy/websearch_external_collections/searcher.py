@@ -27,8 +27,8 @@ import urllib
 import cgi
 
 from invenio.config import CFG_SITE_LANG
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIONS, CFG_EXTERNAL_COLLECTION_MAXRESULTS
-from invenio.websearch_external_collections_parser import CDSIndicoCollectionResutsParser, \
+from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIONS, CFG_EXTERNAL_COLLECTION_MAXRESULTS
+from invenio.legacy.websearch_external_collections.websearch_external_collections_parser import CDSIndicoCollectionResutsParser, \
     GoogleExternalCollectionResultsParser, \
     KISSExternalCollectionResultsParser, GoogleScholarExternalCollectionResultsParser, \
     GoogleBooksExternalCollectionResultsParser, KISSBooksExternalCollectionResultsParser, \

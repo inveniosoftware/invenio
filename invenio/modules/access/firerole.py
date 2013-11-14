@@ -36,10 +36,10 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.access_control_config import InvenioWebAccessFireroleError
+from .errors import InvenioWebAccessFireroleError
+from invenio.base.globals import cfg
 from invenio.legacy.dbquery import run_sql, blob_to_string
-from invenio.config import CFG_CERN_SITE
-from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
+from invenio.modules.access.local_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER, CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
 from invenio.ext.logging import register_exception
 
@@ -169,7 +169,7 @@ def acc_firerole_extract_emails(firerole_def_obj):
                 for reg_p, expr in expressions_list:
                     if reg_p:
                         continue
-                    if CFG_CERN_SITE and expr.endswith(' [CERN]'):
+                    if cfg['CFG_CERN_SITE'] and expr.endswith(' [CERN]'):
                         authorized_emails.add(expr[:-len(' [CERN]')].lower().strip() + '@cern.ch')
                     emails = run_sql("SELECT user.email FROM usergroup JOIN user_usergroup ON usergroup.id=user_usergroup.id_usergroup JOIN user ON user.id=user_usergroup.id_user WHERE usergroup.name=%s", (expr, ))
                     for email in emails:

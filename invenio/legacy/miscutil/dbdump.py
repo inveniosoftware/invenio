@@ -56,7 +56,7 @@ from invenio.legacy.dbquery import CFG_DATABASE_HOST, \
 from invenio.bibtask import task_init, write_message, task_set_option, \
                             task_get_option, task_update_progress, \
                             task_get_task_param
-from invenio.shellutils import run_shell_command, escape_shell_arg
+from invenio.utils.shell import run_shell_command, escape_shell_arg
 
 
 def _delete_old_dumps(dirname, filename, number_to_keep):

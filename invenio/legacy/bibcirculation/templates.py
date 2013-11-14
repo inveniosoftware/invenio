@@ -27,7 +27,7 @@ from time import localtime
 import invenio.utils.date as dateutils
 from invenio.utils.url import create_html_link
 from invenio.base.i18n import gettext_set_language
-from invenio.search_engine import get_fieldvalues
+from invenio.legacy.search_engine import get_fieldvalues
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_CERN_SITE, CFG_SITE_SECURE_URL, CFG_SITE_RECORD, \
      CFG_SITE_NAME

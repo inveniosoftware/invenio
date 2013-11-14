@@ -17,12 +17,7 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = access_control_engine.py \
-             access_control_config.py \
-             access_control_admin.py \
-             access_control_mailcookie.py \
-             access_control_firerole.py \
-             access_control_firerole_unit_tests.py \
+pylib_DATA = \
              webaccessadmin_lib.py \
              external_authentication_cern.py \
              external_authentication.py \

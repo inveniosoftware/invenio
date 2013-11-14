@@ -130,7 +130,7 @@ def word_similarity_xapian(pattern, hitset, params, verbose, field, ranked_resul
     if pattern:
         xapian_init_databases()
         pattern = " ".join(map(str, pattern))
-        from invenio.search_engine import create_basic_search_units
+        from invenio.legacy.search_engine import create_basic_search_units
         search_units = create_basic_search_units(None, pattern, field)
 
     if verbose > 0:

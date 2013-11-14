@@ -74,7 +74,7 @@ from MySQLdb.converters import conversions
 from MySQLdb import escape, escape_string
 from invenio.config import CFG_PREFIX, CFG_TMPDIR
 from invenio.legacy.dbquery import run_sql
-from invenio.shellutils import run_shell_command
+from invenio.utils.shell import run_shell_command
 
 CFG_WEBSUBMIT_DUMPER_DEFAULT_METHOD = "NAMES"
 CFG_WEBSUBMIT_DUMPER_DB_SCHEMA_VERSION = 1

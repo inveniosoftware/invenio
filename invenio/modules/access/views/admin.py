@@ -28,7 +28,7 @@ from invenio.base.decorators import templated, sorted_by
 from invenio.ext.menu import register_menu
 from invenio.ext.breadcrumb import register_breadcrumb
 from invenio.ext.principal import permission_required
-#from invenio.access_control_config import \
+#from invenio.modules.access.local_config import \
 #FIXME
 WEBACCESSACTION = 'cfgwebaccess'
 

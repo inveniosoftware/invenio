@@ -25,11 +25,11 @@ from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
 from invenio.base.i18n import _
 from invenio.ext.legacy.handler import wash_urlargd
 from invenio.config import CFG_SITE_LANG
-from invenio.access_control_config import \
+from invenio.modules.access.local_config import \
      CFG_EXTERNAL_AUTH_USING_SSO, \
      CFG_EXTERNAL_AUTH_LOGOUT_SSO
 
-from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       CFG_WEBSESSION_USERGROUP_STATUS, \
       CFG_WEBSESSION_GROUP_JOIN_POLICY, \
       InvenioWebSessionError, \

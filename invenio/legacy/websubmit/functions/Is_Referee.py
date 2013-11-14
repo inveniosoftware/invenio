@@ -19,7 +19,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.legacy.dbquery import run_sql
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionStop
 
 def Is_Referee(parameters, curdir, form, user_info=None):

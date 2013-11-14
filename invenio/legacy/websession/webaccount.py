@@ -31,18 +31,18 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      CFG_SITE_RECORD
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.local_config import CFG_EXTERNAL_AUTHENTICATION, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTH_DEFAULT
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.webuser import getUid, get_user_preferences, \
         collect_user_info
-from invenio.access_control_admin import acc_find_user_role_actions
+from invenio.modules.access.control import acc_find_user_role_actions
 from invenio.base.i18n import gettext_set_language
-from invenio.external_authentication import InvenioWebAccessExternalAuthError
+from invenio.modules.access.external_authentication import InvenioWebAccessExternalAuthError
 
-import invenio.template
-websession_templates = invenio.template.load('websession')
+import invenio.legacy.template
+websession_templates = invenio.legacy.template.load('websession')
 
 from invenio.modules import apikeys as web_api_key
 
@@ -457,7 +457,7 @@ def external_user_warning(uid):
 
     @rtype: ''|'email_auto_generated'
     """
-    from invenio.access_control_config import CFG_TEMP_EMAIL_ADDRESS
+    from invenio.modules.access.local_config import CFG_TEMP_EMAIL_ADDRESS
 
     query = """
         SELECT      email

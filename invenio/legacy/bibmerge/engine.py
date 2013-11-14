@@ -25,9 +25,9 @@ from invenio.bibmerge_merger import merge_field_group, replace_field, \
                                     add_field, delete_field, merge_field, \
                                     add_subfield, replace_subfield, \
                                     delete_subfield, copy_R2_to_R1, merge_record
-from invenio.search_engine import print_record, perform_request_search, \
+from invenio.legacy.search_engine import print_record, perform_request_search, \
         record_exists
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.bibedit_utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_cache_file_contents, \
     get_cache_mtime, latest_record_revision, record_locked_by_other_user, \
@@ -40,8 +40,8 @@ from invenio.legacy.bibrecord import create_record, record_xml_output, record_ad
                               record_order_subfields
 from invenio.bibedit_config import CFG_BIBEDIT_TO_MERGE_SUFFIX
 
-import invenio.template
-bibmerge_templates = invenio.template.load('bibmerge')
+import invenio.legacy.template
+bibmerge_templates = invenio.legacy.template.load('bibmerge')
 
 def perform_request_init():
     """Handle the initial request.

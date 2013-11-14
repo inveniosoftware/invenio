@@ -30,7 +30,7 @@ from invenio.config import CFG_SITE_SECURE_URL, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
                            CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_SITE_LANG
 from invenio.base.i18n import gettext_set_language
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webbasket import \
      check_user_can_comment, \
@@ -72,7 +72,7 @@ from invenio.webstat import register_customevent
 from invenio.ext.logging import register_exception
 from invenio.legacy.webuser import collect_user_info
 from invenio.modules.comments.api import check_user_can_attach_file_to_comments
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.utils.html import is_html_text_editor_installed
 from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
 from invenio.bibdocfile import stream_file

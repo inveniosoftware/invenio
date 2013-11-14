@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.webpage import page, error_page
+from invenio.legacy.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.legacy.webuser import getUid, page_not_authorized
 from invenio.utils.url import wash_url_argument

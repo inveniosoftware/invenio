@@ -28,7 +28,7 @@ import errno
 
 from invenio.config import CFG_WEBSUBMIT_COUNTERSDIR
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
-from invenio.shellutils import mymkdir
+from invenio.utils.shell import mymkdir
 
 def Report_Number_Generation(parameters, curdir, form, user_info=None):
     """

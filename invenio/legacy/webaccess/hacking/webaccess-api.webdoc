@@ -65,7 +65,7 @@ Contents:
 
 >>> # import the functions from module
 >>> # change this to your local settings...
->>> from invenio.access_control_engine import *
+>>> from invenio.modules.access.engine import *
 >>> # authorize user 109 for action WebSearch_search with collection="LHC"
 >>> acc_authorize_action(109, 'cfgwebsearch', collection="LHC")
       (0, "User authorized")

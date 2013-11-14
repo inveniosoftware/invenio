@@ -31,7 +31,7 @@ from invenio.base.i18n import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap, wrap_records
 from invenio.utils.url import create_html_link
 
-from invenio.search_engine import guess_primary_collection_of_a_record, get_coll_ancestors
+from invenio.legacy.search_engine import guess_primary_collection_of_a_record, get_coll_ancestors
 
 class Template:
     def tmpl_errorMsg(self, ln, error_msg, rest = ""):

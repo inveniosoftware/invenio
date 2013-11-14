@@ -25,8 +25,8 @@ Server. It's useful as a reference on how goto plugins could be implemented.
 import time
 import re
 
-from invenio.search_engine import perform_request_search
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.search_engine import perform_request_search
+from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.bibdocfile import BibRecDocs
 
 def make_cern_ssr_docname(lang, edition, modif=0):

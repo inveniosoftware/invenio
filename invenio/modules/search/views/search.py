@@ -91,8 +91,8 @@ def check_collection(method=None, name_getter=collection_name_from_request,
             return abort(404)
 
         if collection.is_restricted:
-            from invenio.access_control_engine import acc_authorize_action
-            from invenio.access_control_config import VIEWRESTRCOLL
+            from invenio.modules.access.engine import acc_authorize_action
+            from invenio.modules.access.local_config import VIEWRESTRCOLL
             (auth_code, auth_msg) = acc_authorize_action(uid, VIEWRESTRCOLL,
                                                          collection=collection.name)
             if auth_code:
@@ -212,11 +212,11 @@ def _create_neareset_term_box(argd_orig):
             del argd_orig['rg']
         if f == '' and ':' in p:
             fx, px = p.split(':', 1)
-            from invenio.search_engine import get_field_name
+            from invenio.legacy.search_engine import get_field_name
             if get_field_name(fx) != "":
                 f, p = fx, px
 
-        from invenio.search_engine import create_nearest_terms_box
+        from invenio.legacy.search_engine import create_nearest_terms_box
         return create_nearest_terms_box(argd_orig,
             p=p, f=f.lower(), ln=g.ln, intro_text_p=True)
     except:
@@ -228,7 +228,7 @@ def sort_and_rank_records(recids, so=None, rm=None, p=''):
     if so:
         output.reverse()
     elif rm:
-        from invenio.bibrank_record_sorter import rank_records
+        from invenio.legacy.bibrank.record_sorter import rank_records
         ranked = rank_records(rm, 0, output, p.split())
         if ranked[0]:
             output = ranked[0]
@@ -275,7 +275,7 @@ def collection_breadcrumbs(collection, endpoint=None):
 @check_collection(default_collection=True)
 def browse(collection, p, f, of, so, rm, rg, jrec):
 
-    from invenio.search_engine import browse_pattern_phrases
+    from invenio.legacy.search_engine import browse_pattern_phrases
     from invenio.legacy.websearch.webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)
 
@@ -315,7 +315,7 @@ websearch_before_browse.connect(receivers.websearch_before_browse_handler)
                  'rm': (unicode, None)})
 @check_collection(default_collection=True)
 def rss(collection, p, jrec, so, rm):
-    from invenio.search_engine import perform_request_search
+    from invenio.legacy.search_engine import perform_request_search
     of = 'xr'
     from invenio.legacy.websearch.webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)
@@ -349,7 +349,7 @@ def search(collection, p, of, so, rm):
     """
     Renders search pages.
     """
-    from invenio.search_engine import perform_request_search
+    from invenio.legacy.search_engine import perform_request_search
 
     if 'action_browse' in request.args \
             or request.args.get('action', '') == 'browse':

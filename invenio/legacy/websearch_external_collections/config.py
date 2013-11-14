@@ -28,8 +28,8 @@ from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT, \
 
 # if we want to define a parser for an external collection directly using the following dictionary
 # we have to import them here instead of the searcher
-from invenio.websearch_external_collections_parser import InvenioHTMLExternalCollectionResultsParser
-from invenio.websearch_external_collections_parser import InvenioXMLExternalCollectionResultsParser
+from invenio.legacy.websearch_external_collections.websearch_external_collections_parser import InvenioHTMLExternalCollectionResultsParser
+from invenio.legacy.websearch_external_collections.websearch_external_collections_parser import InvenioXMLExternalCollectionResultsParser
 
 
 CFG_EXTERNAL_COLLECTION_TIMEOUT = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT

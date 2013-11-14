@@ -73,7 +73,7 @@ class TestPluginContainer(InvenioTestCase):
 
     def test_plugin_container_wrapping_external_authentications(self):
         """pluginutils - wrapping external authentications"""
-        from invenio.external_authentication import ExternalAuth
+        from invenio.modules.access.external_authentication import ExternalAuth
 
         def plugin_builder(plugin_name, plugin_code):
             for name in dir(plugin_code):

@@ -23,7 +23,7 @@ import getopt
 import re
 import time
 
-from invenio.shellutils import run_shell_command, Timeout, run_process_with_timeout
+from invenio.utils.shell import run_shell_command, Timeout, run_process_with_timeout
 from invenio.invenio_connector import InvenioConnector
 from invenio.utils.text import wrap_text_in_a_box, \
                               wait_for_user

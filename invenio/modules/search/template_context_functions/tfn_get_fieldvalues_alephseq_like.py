@@ -20,7 +20,7 @@
 
 def template_context_function(*args, **kwargs):
     """
-    @see invenio.search_engine_utils:get_fieldvalues_alephseq_like
+    @see invenio.legacy.bibrecord:get_fieldvalues_alephseq_like
     """
-    from invenio.search_engine_utils import get_fieldvalues_alephseq_like
+    from invenio.legacy.bibrecord import get_fieldvalues_alephseq_like
     return get_fieldvalues_alephseq_like(*args, **kwargs)

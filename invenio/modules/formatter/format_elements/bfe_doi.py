@@ -19,7 +19,7 @@
 """BibFormat element - Prints DOIs
 """
 
-from invenio.search_engine import get_field_tags
+from invenio.legacy.search_engine import get_field_tags
 from cgi import escape
 
 def format_element(bfo, tag="909C4", label="", separator="<br/> ", description_location=""):

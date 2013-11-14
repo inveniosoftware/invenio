@@ -18,8 +18,8 @@
 
 import ConfigParser
 import re
-from invenio.bibrank_bridge_config import CFG_BIBRANK_WRD_CFG_PATH
-from invenio.search_engine import get_fieldvalues
+from invenio.legacy.bibrank.bridge_config import CFG_BIBRANK_WRD_CFG_PATH
+from invenio.legacy.search_engine import get_fieldvalues
 from invenio.bibindexadminlib import get_fld_id, get_fld_tags
 
 

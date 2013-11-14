@@ -25,16 +25,12 @@ pylib_DATA = __init__.py \
              dbquery_regression_tests.py \
              dbquery_unit_tests.py \
              errorlib_regression_tests.py \
-             errorlib_unit_tests.py \
              errorlib_webinterface.py \
              flaskshell.py \
-             intbitset_helper.py \
-             intbitset_unit_tests.py \
              invenio_connector.py \
              invenio_connector_regression_tests.py \
              inveniocfg_unit_tests.py \
              inveniomanage_unit_tests.py \
-             messages_unit_tests.py \
              miscutil_model.py \
              plotextractor.py \
              plotextractor_config.py \
@@ -51,7 +47,6 @@ pylib_DATA = __init__.py \
              sequtils.py \
              sequtils_cnum.py \
              sequtils_regression_tests.py \
-             shellutils.py \
              sherpa_romeo_testing.py \
              solrutils_bibindex_indexer.py \
              solrutils_bibindex_searcher.py \
@@ -73,19 +68,11 @@ noinst_DATA = testimport.py \
 
 tmpdir = $(prefix)/var/tmp
 
-tmp_DATA = intbitset_example.int
-
 EXTRA_DIST = $(pylib_DATA) \
              $(tmp_DATA) \
              testimport.py \
              kwalitee.py \
              pep8.py \
-             intbitset.pyx \
-             intbitset.c \
-             intbitset.h \
-             intbitset_impl.c \
-             intbitset_setup.py \
-             intbitset.pyx \
              solrutils \
              solrutils/schema.xml \
              solrutils/java_sources.txt \
@@ -103,12 +90,8 @@ EXTRA_DIST = $(pylib_DATA) \
              solrutils/org/invenio_software/solr/StringFieldCollector.java \
              solrutils/solrconfig.xml
 
-all:
-	$(PYTHON) $(srcdir)/intbitset_setup.py build_ext
-
 install-data-hook:
 	$(PYTHON) $(srcdir)/testimport.py ${prefix}
-	@find ${srcdir} -name intbitset.so -exec cp {} ${pylibdir} \;
 
 CLEANFILES = *~ *.tmp *.pyc
 

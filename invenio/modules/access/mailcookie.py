@@ -32,7 +32,7 @@ derive from the base class and add specific bits.
 import sys
 
 from invenio.legacy.dbquery import run_sql
-from invenio.access_control_admin import acc_get_role_id, acc_add_user_role
+from invenio.modules.access.control import acc_get_role_id, acc_add_user_role
 from invenio.utils.hash import md5
 from datetime import datetime, timedelta
 from random import random

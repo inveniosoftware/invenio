@@ -39,9 +39,9 @@ from invenio.config import \
      CFG_CERN_SITE
 from invenio.utils import apache
 from invenio.legacy.dbquery import run_sql
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_role
-from invenio.webpage import warning_page
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.control import acc_is_role
+from invenio.legacy.webpage import warning_page
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, \
                             isGuestUser
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
@@ -53,15 +53,15 @@ from invenio.ext.logging import register_exception
 from invenio.utils.html import is_html_text_editor_installed
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
 from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
-import invenio.template
-websubmit_templates = invenio.template.load('websubmit')
+import invenio.legacy.template
+websubmit_templates = invenio.legacy.template.load('websubmit')
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.utils.json import json, CFG_JSON_AVAILABLE
-import invenio.template
+import invenio.legacy.template
 from flask import session
 
-webstyle_templates = invenio.template.load('webstyle')
-websearch_templates = invenio.template.load('websearch')
+webstyle_templates = invenio.legacy.template.load('webstyle')
+websearch_templates = invenio.legacy.template.load('websearch')
 
 from invenio.legacy.websubmit.engine import home, action, interface, endaction, makeCataloguesTable
 

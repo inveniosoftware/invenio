@@ -49,7 +49,7 @@ from invenio.utils.date import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.modules.formatter import format_record
 from bs4 import BeautifulSoup
-from invenio import template
+from invenio.legacy import template
 websearch_templates = template.load('websearch')
 
 
@@ -489,7 +489,7 @@ URI: http://%(host)s%(page)s
         @param referencenum: show (this) number of references in the references tab
         @param discussionnum: show (this) number of comments/reviews in the discussion tab
         """
-        from invenio.search_engine import \
+        from invenio.legacy.search_engine import \
              get_restricted_collections_for_recid, \
              is_record_in_any_collection
 

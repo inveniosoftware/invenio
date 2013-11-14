@@ -26,7 +26,7 @@ This is a subclass of BibCatalogSystem
 import datetime
 from time import mktime
 import invenio.legacy.webuser
-from invenio.shellutils import escape_shell_arg
+from invenio.utils.shell import escape_shell_arg
 from invenio.bibcatalog_system import BibCatalogSystem
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception

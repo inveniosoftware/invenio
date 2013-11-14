@@ -20,7 +20,7 @@
 """
 import os, cgi
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
-from invenio.search_engine import get_fieldvalues, record_exists
+from invenio.legacy.search_engine import get_fieldvalues, record_exists
 from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
 from invenio.legacy.websubmit.functions.Get_Recid import is_record_matching_pattern
 

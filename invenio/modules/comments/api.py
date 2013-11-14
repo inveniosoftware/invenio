@@ -66,17 +66,17 @@ from invenio.utils.url import wash_url_argument
 from .config import CFG_WEBCOMMENT_ACTION_CODE, \
      InvenioWebCommentError, \
      InvenioWebCommentWarning
-from invenio.access_control_engine import acc_authorize_action
-from invenio.search_engine import \
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.legacy.search_engine import \
      guess_primary_collection_of_a_record, \
      check_user_can_view_record, \
      get_collection_reclist, \
      get_colID
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.utils.htmlwasher import EmailWasher
 try:
-    import invenio.template
-    webcomment_templates = invenio.template.load('webcomment')
+    import invenio.legacy.template
+    webcomment_templates = invenio.legacy.template.load('webcomment')
 except:
     pass
 
@@ -436,7 +436,7 @@ def get_collection_moderators(collection):
     """
     Return the list of comment moderators for the given collection.
     """
-    from invenio.access_control_engine import acc_get_authorized_emails
+    from invenio.modules.access.engine import acc_get_authorized_emails
 
     res =  list(acc_get_authorized_emails('moderatecomments', collection=collection))
     if not res:
@@ -1843,7 +1843,7 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
 
     if type(recID) is int:
         if recID > 0:
-            from invenio.search_engine import record_exists
+            from invenio.legacy.search_engine import record_exists
             success = record_exists(recID)
             if success == 1:
                 return (1,"")

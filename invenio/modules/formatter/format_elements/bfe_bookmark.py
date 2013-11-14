@@ -25,7 +25,7 @@
 import cgi
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
-from invenio.search_engine import record_public_p
+from invenio.legacy.search_engine import record_public_p
 from invenio.utils.html import escape_javascript_string
 from invenio.modules.formatter.format_elements.bfe_sciencewise import create_sciencewise_url, \
     get_arxiv_reportnumber

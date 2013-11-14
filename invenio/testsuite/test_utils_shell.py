@@ -26,7 +26,7 @@ import time
 import os
 
 
-from invenio.shellutils import escape_shell_arg, run_shell_command, \
+from invenio.utils.shell import escape_shell_arg, run_shell_command, \
     run_process_with_timeout, Timeout, split_cli_ids_arg
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 

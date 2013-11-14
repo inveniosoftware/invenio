@@ -31,7 +31,7 @@ from invenio.config import CFG_VERSION, \
                            CFG_SITE_SECURE_URL, \
                            CFG_BIBCATALOG_SYSTEM, \
                            CFG_REFEXTRACT_TICKET_QUEUE
-from invenio.search_engine import perform_request_search
+from invenio.legacy.search_engine import perform_request_search
 # Help message is the usage() print out of how to use Refextract
 from invenio.refextract_cli import HELP_MESSAGE, DESCRIPTION
 from invenio.refextract_api import update_references, \

@@ -124,13 +124,13 @@ def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
         file_cmd_out = filename_out
     else:
         cmd_out_fd, file_cmd_out = \
-                    tempfile.mkstemp("invenio-shellutils-cmd-out")
+                    tempfile.mkstemp("invenio.utils.shell-cmd-out")
     if filename_err:
         cmd_err_fd = os.open(filename_err, os.O_CREAT, 0644)
         file_cmd_err = filename_err
     else:
         cmd_err_fd, file_cmd_err = \
-                    tempfile.mkstemp("invenio-shellutils-cmd-err")
+                    tempfile.mkstemp("invenio.utils.shell-cmd-err")
     # run command:
     cmd_exit_code = os.system("%s > %s 2> %s" % (cmd,
                                                  file_cmd_out,

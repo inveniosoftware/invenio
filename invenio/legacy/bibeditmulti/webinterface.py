@@ -24,12 +24,12 @@ __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
 from invenio.utils.json import json, json_unicode_to_utf8
 from invenio.ext.legacy.handler import WebInterfaceDirectory, \
                                          wash_urlargd
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.base.i18n import gettext_set_language
 from invenio import bibeditmulti_engine as multi_edit_engine
 
 from invenio.legacy.webuser import page_not_authorized
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 
 class _ActionTypes:
     """Define the available action types"""

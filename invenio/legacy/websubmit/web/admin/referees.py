@@ -27,8 +27,8 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_URL
 from invenio.legacy.dbquery import run_sql
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import \
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.control import \
      acc_delete_user_role, \
      acc_get_role_id, \
      acc_add_role, \
@@ -40,7 +40,7 @@ from invenio.access_control_admin import \
      acc_get_action_id, \
      acc_get_all_roles, \
      acc_get_role_users
-from invenio.webpage import page, error_page
+from invenio.legacy.webpage import page, error_page
 from invenio.legacy.webuser import getUid, list_registered_users, page_not_authorized
 from invenio.base.i18n import wash_language
 

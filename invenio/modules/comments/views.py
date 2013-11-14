@@ -65,7 +65,7 @@ class CommentRights(object):
         self.id_collection = 0  # FIXME
 
     def authorize_action(self, *args, **kwargs):
-        from invenio.access_control_engine import acc_authorize_action
+        from invenio.modules.access.engine import acc_authorize_action
         return acc_authorize_action(*args, **kwargs)
 
     def can_perform_action(self, action=None):
@@ -174,8 +174,8 @@ def add_review(recid):
 @blueprint.route('/<int:recid>/comments', methods=['GET', 'POST'])
 @request_record
 def comments(recid):
-    from invenio.access_control_config import VIEWRESTRCOLL
-    from invenio.access_control_mailcookie import \
+    from invenio.modules.access.local_config import VIEWRESTRCOLL
+    from invenio.modules.access.mailcookie import \
         mail_cookie_create_authorize_action
     from .api import check_user_can_view_comments
     auth_code, auth_msg = check_user_can_view_comments(current_user, recid)
@@ -201,8 +201,8 @@ def comments(recid):
 @blueprint.route('/<int:recid>/reviews', methods=['GET', 'POST'])
 @request_record
 def reviews(recid):
-    from invenio.access_control_config import VIEWRESTRCOLL
-    from invenio.access_control_mailcookie import \
+    from invenio.modules.access.local_config import VIEWRESTRCOLL
+    from invenio.modules.access.mailcookie import \
         mail_cookie_create_authorize_action
     from .api import check_user_can_view_comments
     auth_code, auth_msg = check_user_can_view_comments(current_user, recid)

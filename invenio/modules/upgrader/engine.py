@@ -107,7 +107,7 @@ import sys
 import warnings
 
 from invenio.legacy.dbquery import run_sql
-from invenio import template as webstyle_template_module
+from invenio.legacy import template as webstyle_template_module
 
 UPGRADE_TEMPLATE = """# -*- coding: utf-8 -*-
 ##

@@ -35,8 +35,8 @@ from invenio.legacy.webuser import \
      create_adminactivities_menu, \
      getUid
 
-import invenio.template
-webstyle_templates = invenio.template.load('webstyle')
+import invenio.legacy.template
+webstyle_templates = invenio.legacy.template.load('webstyle')
 
 from xml.dom.minidom import getDOMImplementation
 

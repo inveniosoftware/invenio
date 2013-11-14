@@ -34,7 +34,7 @@ from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 from invenio.legacy.dbquery import run_sql
 from invenio.bibsched import server_pid
 from invenio.base.i18n import gettext_set_language
-from invenio.search_engine import get_record
+from invenio.legacy.search_engine import get_record
 from invenio.legacy.bibrecord import record_get_field_values, record_get_field_value
 
 def createRelatedFormats(fullpath, overwrite=True, debug=False):

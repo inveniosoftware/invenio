@@ -135,7 +135,7 @@ def validate_bibrec_exists(dummy_form, field):
 def validate_user_can_see_bibrec(dummy_form, field):
     """ Check if user has rights to view bibrec """
     if field.data:
-        from invenio.search_engine import check_user_can_view_record
+        from invenio.legacy.search_engine import check_user_can_view_record
 
         (auth_code, msg) = check_user_can_view_record(current_user, field.data)
 

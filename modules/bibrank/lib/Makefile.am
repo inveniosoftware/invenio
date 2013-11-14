@@ -17,33 +17,14 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibrankadminlib.py \
-             bibrank_tag_based_indexer.py \
-             bibrank_tag_based_indexer_unit_tests.py \
-             bibrank_word_indexer.py \
-             bibrank_word_searcher.py \
-             bibrank_record_sorter.py \
+pylib_DATA = bibrank_tag_based_indexer_unit_tests.py \
              bibrank_record_sorter_unit_tests.py \
-             bibrank_downloads_indexer.py \
              bibrank_downloads_indexer_unit_tests.py \
-             bibrank_downloads_similarity.py \
-             bibrank_grapher.py \
-             bibrank_downloads_grapher.py \
-             bibrank_citation_grapher.py \
-             bibrank_citation_indexer.py \
              bibrank_citation_indexer_regression_tests.py \
-             bibrank_citation_searcher.py \
              bibrank_citation_searcher_unit_tests.py \
              bibrank_regression_tests.py \
-             bibrank.py \
-             bibrank_bridge_config.py \
-             bibrank_bridge_utils.py \
              bibrankadmin_regression_tests.py \
-             bibrankgkb.py \
-             bibrank_citerank_indexer.py \
              bibrank_citerank_indexer_unit_tests.py \
-             bibrank_selfcites_indexer.py \
-             bibrank_selfcites_task.py \
              bibrank_selfcites_unit_tests.py \
              bibrank_selfcites_regression_tests.py
 

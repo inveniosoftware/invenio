@@ -35,17 +35,17 @@ from invenio.config import CFG_SITE_LANG
 from invenio.legacy.dbquery import run_sql, OperationalError, ProgrammingError
 from invenio.base.i18n import gettext_set_language
 
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
-from invenio.websearch_external_collections_searcher import external_collections_dictionary
-from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
-from invenio.websearch_external_collections_templates import print_results, print_timeout
-from invenio.websearch_external_collections_utils import get_collection_id, get_collection_descendants, \
+from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.legacy.websearch_external_collections.websearch_external_collections_searcher import external_collections_dictionary
+from invenio.legacy.websearch_external_collections.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
+from invenio.legacy.websearch_external_collections.templates import print_results, print_timeout
+from invenio.legacy.websearch_external_collections.websearch_external_collections_utils import get_collection_id, get_collection_descendants, \
     warning, get_verbose_print
 
-import invenio.template
+import invenio.legacy.template
 
 # Global variables
-template = invenio.template.load('websearch_external_collections')
+template = invenio.legacy.template.load('websearch_external_collections')
 external_collections_state = None
 dico_collection_external_searches = None
 dico_collection_seealso = None
@@ -56,7 +56,7 @@ dico_collection_seealso = None
 def print_external_results_overview(req, current_collection, pattern_list, field,
         external_collection, verbosity_level=0, lang=CFG_SITE_LANG, print_overview=True):
     """Print the external collection overview box. Return the selected external collections and parsed query"""
-    from invenio.search_engine import create_basic_search_units
+    from invenio.legacy.search_engine import create_basic_search_units
     assert req
     vprint = get_verbose_print(req, 'External collection (print_external_results_overview): ', verbosity_level)
 
@@ -366,7 +366,7 @@ def calculate_hosted_collections_search_params(req,
     """Calculate the searching parameters for the selected hosted collections
     i.e. the actual hosted search engines and the basic search units"""
 
-    from invenio.search_engine import create_basic_search_units
+    from invenio.legacy.search_engine import create_basic_search_units
     assert req
     vprint = get_verbose_print(req, 'Hosted collections (calculate_hosted_collections_search_params): ', verbosity_level)
 

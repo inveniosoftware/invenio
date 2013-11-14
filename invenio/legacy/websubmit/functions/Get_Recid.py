@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 from os import access, rename, F_OK, R_OK
 import re
-from invenio.search_engine import \
+from invenio.legacy.search_engine import \
      record_exists, \
      search_pattern, \
      get_field_tags

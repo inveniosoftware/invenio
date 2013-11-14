@@ -227,7 +227,7 @@ via both a high-level and low-level API interface.
    Examples: (retrieving record IDs)
 
       >>> # import the function:
-      >>> from invenio.search_engine import perform_request_search
+      >>> from invenio.legacy.search_engine import perform_request_search
       >>> # get all hits in a collection:
       >>> perform_request_search(cc="ATLAS Communications")
       >>> # search for the word `of' in Theses and Books:
@@ -313,7 +313,7 @@ via both a high-level and low-level API interface.
    Examples:
 
       >>> # import the function:
-      >>> from invenio.search_engine import search_pattern
+      >>> from invenio.legacy.search_engine import search_pattern
       >>> # search for muon or kaon in any field:
       >>> search_pattern(p="muon or kaon").tolist()
       >>> # the following finds nothing by default...
@@ -353,7 +353,7 @@ via both a high-level and low-level API interface.
    Examples:
 
       >>> # import the function:
-      >>> from invenio.search_engine import search_unit
+      >>> from invenio.legacy.search_engine import search_unit
       >>> # search moi in any field:
       >>> search_unit(p="moi").tolist()
       >>> # this one will not match:

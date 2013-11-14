@@ -25,10 +25,10 @@ __revision__ = "$Id$"
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-acc_firerole_check_user = lazy_import('invenio.access_control_firerole:acc_firerole_check_user')
-compile_role_definition = lazy_import('invenio.access_control_firerole:compile_role_definition')
-deserialize = lazy_import('invenio.access_control_firerole:deserialize')
-serialize = lazy_import('invenio.access_control_firerole:serialize')
+acc_firerole_check_user = lazy_import('invenio.modules.access.firerole:acc_firerole_check_user')
+compile_role_definition = lazy_import('invenio.modules.access.firerole:compile_role_definition')
+deserialize = lazy_import('invenio.modules.access.firerole:deserialize')
+serialize = lazy_import('invenio.modules.access.firerole:serialize')
 collect_user_info = lazy_import('invenio.legacy.webuser:collect_user_info')
 
 
@@ -44,7 +44,7 @@ class AccessControlFireRoleTest(InvenioTestCase):
 
     def test_compile_role_definition_empty(self):
         """firerole - compiling empty role definitions"""
-        from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER
+        from invenio.modules.access.local_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER
         self.assertEqual(compile_role_definition(None),
                          deserialize(CFG_ACC_EMPTY_ROLE_DEFINITION_SER))
 
@@ -100,7 +100,7 @@ class AccessControlFireRoleTest(InvenioTestCase):
 
     def test_compile_role_definition_with_date(self):
         """firerole - compiling date based role definitions"""
-        from invenio.access_control_config import InvenioWebAccessFireroleError
+        from invenio.modules.access.errors import InvenioWebAccessFireroleError
 
         self.failUnless(serialize(compile_role_definition(
             "allow from '2010-11-11'")))
@@ -113,7 +113,7 @@ class AccessControlFireRoleTest(InvenioTestCase):
 
     def test_compile_role_definition_wrong(self):
         """firerole - compiling wrong role definitions"""
-        from invenio.access_control_config import InvenioWebAccessFireroleError
+        from invenio.modules.access.errors import InvenioWebAccessFireroleError
 
         self.assertRaises(InvenioWebAccessFireroleError,
             compile_role_definition, "allow al")

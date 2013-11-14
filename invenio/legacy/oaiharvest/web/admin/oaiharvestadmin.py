@@ -26,11 +26,11 @@ import urllib
 
 import invenio.oai_harvest_admin as oha
 from invenio.utils.json import json
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.legacy.dbquery import Error
 from invenio.legacy.webuser import getUid, page_not_authorized
-from invenio.bibrankadminlib import check_user
+from invenio.legacy.bibrank.adminlib import check_user
 from invenio.oai_harvest_dblayer import get_holdingpen_day_size
 from invenio.oai_harvest_admin import perform_request_gethpdayfragment
 

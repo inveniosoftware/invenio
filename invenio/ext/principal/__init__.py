@@ -41,7 +41,7 @@ class AccAuthorizeActionPermission(Permission):
         super(self.__class__, self).__init__()
 
     def allows(self, identity):
-        from invenio.access_control_engine import acc_authorize_action
+        from invenio.modules.access.engine import acc_authorize_action
         auth, message = acc_authorize_action(
             identity.id, self.action, **dict(
                 (k, v() if callable(v) else v)

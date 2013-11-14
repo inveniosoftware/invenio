@@ -25,7 +25,7 @@ bibauthorid_config
 """
 
 try:
-    from invenio.access_control_config import SUPERADMINROLE
+    from invenio.modules.access.local_config import SUPERADMINROLE
 except ImportError:
     SUPERADMINROLE = "Superadmin"
 

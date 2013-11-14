@@ -254,7 +254,7 @@ class TimeIssueFunctions(InvenioTestCase):
 
     def test_article_in_unreleased_issue(self):
         """webjournal - check access to unreleased article"""
-        from invenio.search_engine import record_public_p
+        from invenio.legacy.search_engine import record_public_p
 
         # Record is not public
         self.assertEqual(record_public_p(112), False)
@@ -278,7 +278,7 @@ class TimeIssueFunctions(InvenioTestCase):
 
     def test_restricted_article_in_released_issue(self):
         """webjournal - check access to restricted article in released issue"""
-        from invenio.search_engine import record_public_p
+        from invenio.legacy.search_engine import record_public_p
 
         # Record is not public
         self.assertEqual(record_public_p(112), False)

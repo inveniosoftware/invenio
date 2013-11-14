@@ -71,15 +71,15 @@ from invenio.base.globals import cfg
 from invenio.utils.url import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
 from invenio.utils.html import nmtoken_from_string
 from invenio.ext.legacy.handler import wash_urlargd
-from invenio.bibrank_citation_searcher import get_cited_by_count
+from invenio.legacy.bibrank.citation_searcher import get_cited_by_count
 from invenio.legacy.webuser import session_param_get
 
 from invenio.intbitset import intbitset
 
-from invenio.websearch_external_collections import external_collection_get_state, get_external_collection_engine
-from invenio.websearch_external_collections_utils import get_collection_id
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.websearch_external_collections import external_collection_get_state, get_external_collection_engine
+from invenio.legacy.websearch_external_collections.websearch_external_collections_utils import get_collection_id
+from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+from invenio.legacy.bibrecord import get_fieldvalues
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
@@ -280,7 +280,7 @@ class Template:
                 isbn10 += str(checksum)
             return (isbn13, isbn10)
 
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         doi = ''
         pmid = ''
         bibcode = ''
@@ -3282,7 +3282,7 @@ class Template:
            RECID_SCORE_LIST is a list of (recID1, score1), (recID2, score2), etc.
         """
 
-        from invenio.search_engine import print_record, record_public_p
+        from invenio.legacy.search_engine import print_record, record_public_p
 
         recID_score_list_to_be_printed = []
 
@@ -3803,7 +3803,7 @@ class Template:
 
           - 'ln' *string* - The language to display
         """
-        from invenio.search_engine import get_record
+        from invenio.legacy.search_engine import get_record
         from invenio.legacy.bibrecord import field_get_subfield_values
         from invenio.legacy.bibrecord import record_get_field_instances
         _ = gettext_set_language(ln)
@@ -4085,7 +4085,7 @@ class Template:
            authors - a list of authors that have collaborated with authorname
            names_dict - a dict of {name: frequency}
         """
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         from operator import itemgetter
         _ = gettext_set_language(ln)
         ib_pubs = intbitset(pubs)

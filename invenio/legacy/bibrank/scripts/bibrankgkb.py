@@ -37,7 +37,7 @@ Usage: bibrankgkb %s [options]
 __revision__ = "$Id$"
 
 try:
-    from invenio.bibrankgkb import main
+    from invenio.legacy.bibrank.gkb import main
 except ImportError, e:
     print "Error: %s" % e
     import sys

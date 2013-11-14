@@ -26,6 +26,6 @@ def get_cited_by_count(recid):
 
     @return: Number of records citing given record
     """
-    from invenio.bibrank_citation_searcher import get_cited_by_count
+    from invenio.legacy.bibrank.citation_searcher import get_cited_by_count
     if recid:
         return get_cited_by_count(recid)

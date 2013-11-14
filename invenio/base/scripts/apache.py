@@ -32,7 +32,7 @@ def version(separator='\n'):
     list if no success.
     """
     from invenio.legacy.inveniocfg import _grep_version_from_executable
-    from invenio.shellutils import run_shell_command
+    from invenio.utils.shell import run_shell_command
     out = []
     dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
     for apache in cmd_out.split("\n"):
@@ -58,7 +58,7 @@ def create_config(force=False, no_ssl=True):
     from jinja2 import TemplateNotFound
     from invenio.ext.template import render_template_to_string
     from invenio.utils.text import wrap_text_in_a_box
-    from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
+    from invenio.modules.access.local_config import CFG_EXTERNAL_AUTH_USING_SSO
 
     CFG_PREFIX = current_app.config.get('CFG_PREFIX', '')
 

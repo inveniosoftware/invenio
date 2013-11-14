@@ -23,7 +23,7 @@ __lastupdated__ = """$Date$"""
 
 from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_NAME, \
   CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_SITE_NAME_INTL
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio import webalert
 from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
@@ -33,8 +33,8 @@ from invenio.ext.logging import register_exception
 from invenio.legacy.webuser import collect_user_info
 
 from invenio.base.i18n import gettext_set_language
-import invenio.template
-webalert_templates = invenio.template.load('webalert')
+import invenio.legacy.template
+webalert_templates = invenio.legacy.template.load('webalert')
 
 class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
     """Defines the set of /youralerts pages."""

@@ -28,7 +28,7 @@ from datetime import datetime
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
-from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
+from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
         CFG_SITE_URL, \
         CFG_PREFIX, \
@@ -452,8 +452,8 @@ class BibDocFilesTest(InvenioTestCase):
         #check
         self.assertEqual(my_new_bibdocfile.check(), True)
         #display
-        import invenio.template
-        tmpl = invenio.template.load("bibdocfile")
+        import invenio.legacy.template
+        tmpl = invenio.legacy.template.load("bibdocfile")
         value = tmpl.tmpl_display_bibdocfile(my_new_bibdocfile, ln='en')
         assert 'files/img_test.jpg?version=1">' in value
         #hidden?

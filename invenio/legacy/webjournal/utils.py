@@ -43,7 +43,7 @@ from invenio.config import \
      CFG_CERN_SITE
 from invenio.legacy.dbquery import run_sql
 from invenio.modules.formatter.engine import BibFormatObject
-from invenio.search_engine import search_pattern, record_exists
+from invenio.legacy.search_engine import search_pattern, record_exists
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.logging import register_exception
 from invenio.utils.url import make_invenio_opener
@@ -667,7 +667,7 @@ def get_journal_collection_to_refresh_on_release(journal_name):
     Returns the list of collection to update (WebColl) upon release of
     an issue.
     """
-    from invenio.search_engine import collection_reclist_cache
+    from invenio.legacy.search_engine import collection_reclist_cache
     config_strings = get_xml_from_config(["update_on_release/collection"], journal_name)
     return [coll for coll in config_strings.get('update_on_release/collection', []) if \
             collection_reclist_cache.cache.has_key(coll)]

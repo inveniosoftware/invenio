@@ -43,26 +43,26 @@ from invenio.config import \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
 from invenio.base.i18n import gettext_set_language, language_list_long
-from invenio.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
+from invenio.legacy.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
 from invenio.legacy.dbquery import run_sql, Error, get_table_update_time
-from invenio.bibrank_record_sorter import get_bibrank_methods
+from invenio.legacy.bibrank.record_sorter import get_bibrank_methods
 from invenio.utils.date import convert_datestruct_to_dategui, strftime
 from invenio.modules.formatter import format_record
-from invenio.shellutils import mymkdir
+from invenio.utils.shell import mymkdir
 from invenio.intbitset import intbitset
-from invenio.websearch_external_collections import \
+from invenio.legacy.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \
      external_collection_sort_engine_by_name
 from invenio.bibtask import task_init, task_get_option, task_set_option, \
     write_message, task_has_option, task_update_progress, \
     task_sleep_now_if_required
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
 
-from invenio.websearch_external_collections_searcher import external_collections_dictionary
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
-from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS
+from invenio.legacy.websearch_external_collections.websearch_external_collections_searcher import external_collections_dictionary
+from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS
 
 from invenio.base.signals import webcoll_after_webpage_cache_update
 

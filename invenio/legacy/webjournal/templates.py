@@ -29,7 +29,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_RECORD
 from invenio.base.i18n import gettext_set_language
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.webjournal_utils import \
      get_number_of_articles_for_issue, \
      get_release_datetime, \

@@ -27,7 +27,7 @@ import sys
 from time import strftime, localtime
 
 from invenio.config import CFG_OAI_ID_PREFIX, CFG_ETCDIR
-from invenio.search_engine import perform_request_search
+from invenio.legacy.search_engine import perform_request_search
 
 CFG_BIBCONVERT_KB_PATH = "%s%sbibconvert%sKB" % (CFG_ETCDIR, os.sep, os.sep)
 

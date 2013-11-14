@@ -91,7 +91,7 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
     @rtype: string
     """
     ln = ln or cfg['CFG_SITE_LANG']
-    from invenio.search_engine import record_exists
+    from invenio.legacy.search_engine import record_exists
     if search_pattern is None:
         search_pattern = []
 
@@ -173,8 +173,8 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                            (recID, of),
                            alert_admin=True)
         #Failsafe execution mode
-        import invenio.template
-        websearch_templates = invenio.template.load('websearch')
+        import invenio.legacy.template
+        websearch_templates = invenio.legacy.template.load('websearch')
         if verbose == 9:
             out += """\n<br/><span class="quicknote">
             An error occured while formatting record %i. (%s)
@@ -481,7 +481,7 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=None,
             #by default
             return recxml
         else:
-            from invenio.access_control_engine import acc_authorize_action
+            from invenio.modules.access.engine import acc_authorize_action
             if (acc_authorize_action(user_info, 'runbibedit')[0] == 0):
                 #no need to filter
                 return recxml

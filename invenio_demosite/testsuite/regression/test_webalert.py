@@ -82,7 +82,7 @@ class WebAlertFilteringRestrictedRecords(InvenioTestCase):
         webalert - prepare test alerts
         """
         from invenio import alert_engine
-        from invenio.search_engine import get_creation_date
+        from invenio.legacy.search_engine import get_creation_date
 
         # TODO: test alerts for baskets too
         self.added_query_ids = []

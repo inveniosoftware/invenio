@@ -50,7 +50,7 @@ CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR = \
                         "%s/websubmit/file_stamper_templates" % CFG_ETCDIR
 from invenio.config import CFG_PATH_PDFTK
 from invenio.config import CFG_PATH_PDF2PS
-from invenio.shellutils import escape_shell_arg
+from invenio.utils.shell import escape_shell_arg
 from invenio.legacy.websubmit.config import InvenioWebSubmitFileStamperError
 
 

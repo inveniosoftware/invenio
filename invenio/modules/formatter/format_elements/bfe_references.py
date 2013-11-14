@@ -28,7 +28,7 @@ def format_element(bfo, reference_prefix, reference_suffix):
     @param reference_suffix: a suffix displayed after each reference
     """
     from invenio.config import CFG_SITE_URL, CFG_ADS_SITE
-    from invenio.search_engine import get_mysql_recid_from_aleph_sysno, \
+    from invenio.legacy.search_engine import get_mysql_recid_from_aleph_sysno, \
          print_record
 
     if CFG_ADS_SITE:

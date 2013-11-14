@@ -29,9 +29,9 @@ from xml.dom import minidom, Node
 from xml.sax import saxutils
 
 from invenio.modules.formatter.engine import BibFormatObject, get_format_element, eval_format_element
-from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS, CFG_BIBFORMAT_BFX_TEMPLATES_PATH
-from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE
-from invenio.bibformat_bfx_engine_config import InvenioBibFormatBfxError, InvenioBibFormatBfxWarning
+from invenio.modules.formatter.engines.bfx_config import CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS, CFG_BIBFORMAT_BFX_TEMPLATES_PATH
+from invenio.modules.formatter.engines.bfx_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE
+from invenio.modules.formatter.engines.bfx_config import InvenioBibFormatBfxError, InvenioBibFormatBfxWarning
 from invenio.ext.logging import register_exception
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_LANG
@@ -1131,7 +1131,7 @@ def copy(old_record, address=''):
     Copy a record by filtering all parts of the old record specified by address
     (A better name for the function is filter.)
     @param old_record: the initial record
-    @param address: an address; for examples see bibformat_bfx_engine_config.
+    @param address: an address; for examples see modules.formatter.engines.bfx_config.
            If no address is specified, return the initial record.
     @return: the filtered record
     '''

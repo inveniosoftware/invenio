@@ -34,14 +34,14 @@ from itertools import chain
 import ConfigParser
 
 from invenio.modules.formatter.utils import parse_tag
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibrank_citation_indexer import tagify
+from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.legacy.bibrank.citation_indexer import tagify
 from invenio.config import CFG_ETCDIR, \
                            CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
                            CFG_BIBRANK_SELFCITES_PRECOMPUTE
 from invenio.legacy.dbquery import run_sql
 from invenio.bibauthorid_searchinterface import get_personids_from_bibrec
-from invenio.bibrank_citation_searcher import get_cited_by
+from invenio.legacy.bibrank.citation_searcher import get_cited_by
 
 
 def load_config_file(key):

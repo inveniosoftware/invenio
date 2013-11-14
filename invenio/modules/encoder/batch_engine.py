@@ -32,7 +32,7 @@ from invenio.bibtask import (
                              task_low_level_submission
                              )
 from invenio.bibdocfile import BibRecDocs, compose_file, compose_format, decompose_file
-from invenio.search_engine import (
+from invenio.legacy.search_engine import (
                                    record_exists,
                                    get_collection_reclist,
                                    search_pattern,
@@ -58,7 +58,7 @@ from invenio.modules.encoder.config import (
 from invenio.ext.email import send_email
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.webuser import emailUnique, get_user_preferences
-from invenio.bibformat_xslt_engine import format
+from invenio.modules.formatter.engines.xslt import format
 from invenio.utils.json import json, json_decode_file
 import invenio.config
 

@@ -34,14 +34,14 @@ from invenio.bibtask import task_set_option, \
                             task_sleep_now_if_required, \
                             task_update_progress
 from invenio.legacy.dbquery import run_sql
-from invenio.shellutils import split_cli_ids_arg
-from invenio.bibrank_selfcites_indexer import update_self_cites_tables, \
+from invenio.utils.shell import split_cli_ids_arg
+from invenio.legacy.bibrank.selfcites_indexer import update_self_cites_tables, \
                                               compute_friends_self_citations, \
                                               compute_simple_self_citations, \
                                               get_authors_tags
-from invenio.bibrank_citation_searcher import get_refers_to
+from invenio.legacy.bibrank.citation_searcher import get_refers_to
 from invenio.bibauthorid_daemon import get_user_log as bibauthorid_user_log
-from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
+from invenio.legacy.bibrank.citation_indexer import get_bibrankmethod_lastupdate
 
 HELP_MESSAGE = """
   Scheduled (daemon) self cites options:

@@ -68,14 +68,14 @@ from invenio.utils.text import wash_for_xml
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
     get_info_of_record_revision
-from invenio.search_engine import print_record, record_exists, get_colID, \
+from invenio.legacy.search_engine import print_record, record_exists, get_colID, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.webuser import get_user_info, getUid, get_email
 from invenio.legacy.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.refextract_api import extract_references_from_record_xml, \
                                    extract_references_from_string_xml, \
                                    extract_references_from_url_xml

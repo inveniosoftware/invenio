@@ -24,7 +24,7 @@ __lastupdated__ = """$Date$"""
 from invenio.websubmitadmin_engine import *
 from invenio.config import CFG_SITE_LANG
 from invenio.legacy.webuser import getUid, page_not_authorized
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.base.i18n import wash_language, gettext_set_language
 
 def index(req, ln=CFG_SITE_LANG):

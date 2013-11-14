@@ -28,15 +28,15 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.access_control_admin import \
+from invenio.modules.access.control import \
     acc_find_possible_roles,\
     acc_is_user_in_role, \
     acc_is_user_in_any_role, \
     CFG_SUPERADMINROLE_ID, acc_get_role_users, \
     acc_get_roles_emails
-from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
+from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
 from invenio.legacy.webuser import collect_user_info
-from invenio.access_control_firerole import load_role_definition, acc_firerole_extract_emails
+from invenio.modules.access.firerole import load_role_definition, acc_firerole_extract_emails
 from flask.ext.login import current_user
 
 

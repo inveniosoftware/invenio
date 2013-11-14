@@ -22,18 +22,9 @@ __revision__ = \
 
 # pylint: disable=C0301
 
-#from invenio import config
-from flask import current_app
-config = current_app.config
-from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG, \
-     CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE, \
-     CFG_OPENAIRE_SITE, CFG_SITE_RECORD, CFG_INSPIRE_SITE, \
-     CFG_SITE_ADMIN_EMAIL
-from invenio.base.i18n import gettext_set_language
-
-class InvenioWebAccessFireroleError(Exception):
-    """Just an Exception to discover if it's a FireRole problem"""
-    pass
+from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_RECORD, CFG_SITE_ADMIN_EMAIL
+from invenio.base.i18n import _
+from invenio.base.globals import cfg as config
 
 # VALUES TO BE EXPORTED
 # CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
@@ -72,15 +63,17 @@ CFG_ACC_EMPTY_ROLE_DEFINITION_SER = None
 
 # List of tags containing (multiple) emails of users who should authorize
 # to access the corresponding record regardless of collection restrictions.
-if CFG_CERN_SITE:
-    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['859__f', '270__m']
-else:
-    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['8560_f']
+#if CFG_CERN_SITE:
+#    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['859__f', '270__m']
+#else:
 
-if CFG_CERN_SITE:
-    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS = ['506__m']
-else:
-    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS = []
+CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['8560_f']
+
+#if CFG_CERN_SITE:
+#    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS = ['506__m']
+#else:
+
+CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS = []
 
 # Use external source for access control?
 
@@ -95,42 +88,51 @@ else:
 # CFG_EXTERNAL_AUTH_LOGOUT_SSO -- if CFG_EXTERNAL_AUTH_USING_SSO was not None
 # set this to the URL that should be contacted to perform an SSO logout
 
-from invenio.external_authentication_robot import ExternalAuthRobot
-if CFG_CERN_SITE:
-    from invenio import external_authentication_sso as ea_sso
-    CFG_EXTERNAL_AUTH_USING_SSO = "CERN"
-    CFG_EXTERNAL_AUTH_DEFAULT = CFG_EXTERNAL_AUTH_USING_SSO
-    CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
-    CFG_EXTERNAL_AUTHENTICATION = {
-        CFG_EXTERNAL_AUTH_USING_SSO : ea_sso.ExternalAuthSSO(),
-    }
-elif CFG_OPENAIRE_SITE:
-    CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
-    CFG_EXTERNAL_AUTH_USING_SSO = False
-    CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
-    CFG_EXTERNAL_AUTHENTICATION = {
+CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
+CFG_EXTERNAL_AUTH_USING_SSO = False
+CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+CFG_EXTERNAL_AUTHENTICATION = {
     "Local": None,
-    "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, external_id_attribute_name="id"),
-    }
-elif CFG_INSPIRE_SITE:
-    # INSPIRE specific robot configuration
-    CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
-    CFG_EXTERNAL_AUTH_USING_SSO = False
-    CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
-    CFG_EXTERNAL_AUTHENTICATION = {
-    "Local": None,
-    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=2, external_id_attribute_name='personid'),
-    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=2, external_id_attribute_name='personid')
-    }
-else:
-    CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
-    CFG_EXTERNAL_AUTH_USING_SSO = False
-    CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
-    CFG_EXTERNAL_AUTHENTICATION = {
-    "Local": None,
-    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
-    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
-    }
+    #"Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
+    #"ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
+}
+
+# from invenio.modules.access.external_authentication_robot import ExternalAuthRobot
+# if CFG_CERN_SITE:
+#     from invenio import external_authentication_sso as ea_sso
+#     CFG_EXTERNAL_AUTH_USING_SSO = "CERN"
+#     CFG_EXTERNAL_AUTH_DEFAULT = CFG_EXTERNAL_AUTH_USING_SSO
+#     CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
+#     CFG_EXTERNAL_AUTHENTICATION = {
+#         CFG_EXTERNAL_AUTH_USING_SSO : ea_sso.ExternalAuthSSO(),
+#     }
+# elif CFG_OPENAIRE_SITE:
+#     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
+#     CFG_EXTERNAL_AUTH_USING_SSO = False
+#     CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+#     CFG_EXTERNAL_AUTHENTICATION = {
+#     "Local": None,
+#     "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, external_id_attribute_name="id"),
+#     }
+# elif CFG_INSPIRE_SITE:
+#     # INSPIRE specific robot configuration
+#     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
+#     CFG_EXTERNAL_AUTH_USING_SSO = False
+#     CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+#     CFG_EXTERNAL_AUTHENTICATION = {
+#     "Local": None,
+#     "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=2, external_id_attribute_name='personid'),
+#     "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=2, external_id_attribute_name='personid')
+#     }
+# else:
+#     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
+#     CFG_EXTERNAL_AUTH_USING_SSO = False
+#     CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+#     CFG_EXTERNAL_AUTHENTICATION = {
+#     "Local": None,
+#     "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
+#     "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
+#     }
 
 # CFG_TEMP_EMAIL_ADDRESS
 # Temporary email address for logging in with an OpenID/OAuth provider which
@@ -446,19 +448,19 @@ if config['CFG_OAUTH2_CONFIGURATIONS']:
 # If OpenID authentication is enabled, add 'openid' to login methods
 CFG_OPENID_AUTHENTICATION = bool(CFG_OPENID_PROVIDERS)
 if CFG_OPENID_AUTHENTICATION:
-    from invenio.external_authentication_openid import ExternalOpenID
+    from invenio.modules.access.external_authentication_openid import ExternalOpenID
     CFG_EXTERNAL_AUTHENTICATION['openid'] = ExternalOpenID(enforce_external_nicknames=True)
 
 # If OAuth1 authentication is enabled, add 'oauth1' to login methods.
 CFG_OAUTH1_AUTHENTICATION = bool(CFG_OAUTH1_PROVIDERS)
 if CFG_OAUTH1_PROVIDERS:
-    from invenio.external_authentication_oauth1 import ExternalOAuth1
+    from invenio.modules.access.external_authentication_oauth1 import ExternalOAuth1
     CFG_EXTERNAL_AUTHENTICATION['oauth1'] = ExternalOAuth1(enforce_external_nicknames=True)
 
 # If OAuth2 authentication is enabled, add 'oauth2' to login methods.
 CFG_OAUTH2_AUTHENTICATION = bool(CFG_OAUTH2_PROVIDERS)
 if CFG_OAUTH2_AUTHENTICATION:
-    from invenio.external_authentication_oauth2 import ExternalOAuth2
+    from invenio.modules.access.external_authentication_oauth2 import ExternalOAuth2
     CFG_EXTERNAL_AUTHENTICATION['oauth2'] = ExternalOAuth2(enforce_external_nicknames=True)
 
 
@@ -614,99 +616,96 @@ DEF_AUTHS = (('basketusers', 'usebaskets', {}),
              )
 
 # Demo site authorizations
-#              role          action        arguments
+#    role          action        arguments
 DEF_DEMO_AUTHS = (
-             ('photocurator', 'runwebcoll', {'collection': 'Pictures'}),
-             ('restrictedpicturesviewer', 'viewrestrdoc', {'status': 'restricted_picture'}),
-             ('thesesviewer', VIEWRESTRCOLL, {'collection': 'Theses'}),
-             ('thesesviewer', VIEWRESTRCOLL, {'collection': 'Drafts'}),
-             ('ALEPHviewer', VIEWRESTRCOLL, {'collection': 'ALEPH Theses'}),
-             ('ALEPHviewer', VIEWRESTRCOLL, {'collection': 'ALEPH Internal Notes'}),
-             ('ISOLDEnotesviewer', VIEWRESTRCOLL, {'collection': 'ISOLDE Internal Notes'}),
-             ('referee_DEMOBOO_*', 'referee', {'doctype': 'DEMOBOO', 'categ': '*'}),
-             ('curator', 'cfgbibknowledge', {}),
-             ('curator', 'runbibedit', {}),
-             ('curator', 'runbibeditmulti', {}),
-             ('curator', 'runbibmerge', {}),
-             ('swordcurator', 'runbibswordclient', {}),
-             ('thesescurator', 'runbibedit', {'collection': 'Theses'}),
-             ('thesescurator', VIEWRESTRCOLL, {'collection': 'Theses'}),
-             ('photocurator', 'runbibedit', {'collection': 'Pictures'}),
-             ('referee_DEMOBOO_*', 'runbibedit', {'collection': 'Books'}),
-             ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'SBI', 'categ': '*'}),
-             ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'MBI', 'categ': '*'}),
-             ('submit_DEMOJRN_*', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'no'}),
-             ('atlantiseditor', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'yes'}),
-             ('referee_DEMOBOO_*', 'runbatchuploader', {'collection': 'Books'}),
-             ('poetrycommentreader', 'viewcomment', {'collection': 'Poetry'}),
-             ('atlantiseditor', VIEWRESTRCOLL, {'collection': 'Atlantis Times Drafts'}),
-             ('anyuser', 'submit', {'doctype': 'DEMOART', 'act': 'SBI', 'categ': 'ARTICLE'}),
-            )
-
-#_ = gettext_set_language(CFG_SITE_LANG)
-_ = lambda x: x
+    ('photocurator', 'runwebcoll', {'collection': 'Pictures'}),
+    ('restrictedpicturesviewer', 'viewrestrdoc', {'status': 'restricted_picture'}),
+    ('thesesviewer', VIEWRESTRCOLL, {'collection': 'Theses'}),
+    ('thesesviewer', VIEWRESTRCOLL, {'collection': 'Drafts'}),
+    ('ALEPHviewer', VIEWRESTRCOLL, {'collection': 'ALEPH Theses'}),
+    ('ALEPHviewer', VIEWRESTRCOLL, {'collection': 'ALEPH Internal Notes'}),
+    ('ISOLDEnotesviewer', VIEWRESTRCOLL, {'collection': 'ISOLDE Internal Notes'}),
+    ('referee_DEMOBOO_*', 'referee', {'doctype': 'DEMOBOO', 'categ': '*'}),
+    ('curator', 'cfgbibknowledge', {}),
+    ('curator', 'runbibedit', {}),
+    ('curator', 'runbibeditmulti', {}),
+    ('curator', 'runbibmerge', {}),
+    ('swordcurator', 'runbibswordclient', {}),
+    ('thesescurator', 'runbibedit', {'collection': 'Theses'}),
+    ('thesescurator', VIEWRESTRCOLL, {'collection': 'Theses'}),
+    ('photocurator', 'runbibedit', {'collection': 'Pictures'}),
+    ('referee_DEMOBOO_*', 'runbibedit', {'collection': 'Books'}),
+    ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'SBI', 'categ': '*'}),
+    ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'MBI', 'categ': '*'}),
+    ('submit_DEMOJRN_*', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'no'}),
+    ('atlantiseditor', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'yes'}),
+    ('referee_DEMOBOO_*', 'runbatchuploader', {'collection': 'Books'}),
+    ('poetrycommentreader', 'viewcomment', {'collection': 'Poetry'}),
+    ('atlantiseditor', VIEWRESTRCOLL, {'collection': 'Atlantis Times Drafts'}),
+    ('anyuser', 'submit', {'doctype': 'DEMOART', 'act': 'SBI', 'categ': 'ARTICLE'}),
+)
 
 # Activities (i.e. actions) for which exists an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {
-    'runbibedit' : (_("Run Record Editor"), "%s/%s/edit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibeditmulti' : (_("Run Multi-Record Editor"), "%s/%s/multiedit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibdocfile' : (_("Run Document File Manager"), "%s/%s/managedocfiles?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibmerge' : (_("Run Record Merger"), "%s/%s/merge/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibswordclient' : (_("Run BibSword client"), "%s/bibsword/?ln=%%s" % CFG_SITE_URL),
-    'cfgbibknowledge' : (_("Configure BibKnowledge"), "%s/kb?ln=%%s" % CFG_SITE_URL),
-    'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgoaiharvest' : (_("Configure OAI Harvest"), "%s/admin/oaiharvest/oaiharvestadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/oairepository/oairepositoryadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgbibindex' : (_("Configure BibIndex"), "%s/admin/bibindex/bibindexadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgbibrank' : (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgweblinkback' : (_("Configure WebLinkback"), "%s/admin/weblinkback/weblinkbackadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebsearch' : (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebsubmit' : (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebjournal' : (_("Configure WebJournal"), "%s/admin/webjournal/webjournaladmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgbibsort' : (_("Configure BibSort"), "%s/admin/bibsort/bibsortadmin.py?ln=%%s" % CFG_SITE_URL),
-    'runbibcirculation' : (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
-    'runbatchuploader' : (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
-    'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/person/search?ln=%%s" % CFG_SITE_URL)
+    'runbibedit': (_("Run Record Editor"), "%s/%s/edit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
+    'runbibeditmulti': (_("Run Multi-Record Editor"), "%s/%s/multiedit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
+    'runbibdocfile': (_("Run Document File Manager"), "%s/%s/managedocfiles?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
+    'runbibmerge': (_("Run Record Merger"), "%s/%s/merge/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
+    'runbibswordclient': (_("Run BibSword client"), "%s/bibsword/?ln=%%s" % CFG_SITE_URL),
+    'cfgbibknowledge': (_("Configure BibKnowledge"), "%s/kb?ln=%%s" % CFG_SITE_URL),
+    'cfgbibformat': (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgoaiharvest': (_("Configure OAI Harvest"), "%s/admin/oaiharvest/oaiharvestadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgoairepository': (_("Configure OAI Repository"), "%s/admin/oairepository/oairepositoryadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibindex': (_("Configure BibIndex"), "%s/admin/bibindex/bibindexadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibrank': (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebaccess': (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebcomment': (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgweblinkback': (_("Configure WebLinkback"), "%s/admin/weblinkback/weblinkbackadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebsearch': (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebsubmit': (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebjournal': (_("Configure WebJournal"), "%s/admin/webjournal/webjournaladmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibsort': (_("Configure BibSort"), "%s/admin/bibsort/bibsortadmin.py?ln=%%s" % CFG_SITE_URL),
+    'runbibcirculation': (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
+    'runbatchuploader': (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
+    'claimpaper_claim_others_papers': (_("Run Person/Author Manager"), "%s/person/search?ln=%%s" % CFG_SITE_URL)
 }
 
 CFG_WEBACCESS_MSGS = {
-                                0: 'Try to <a href="%s/youraccount/login?referer=%%s">login</a> with another account.' % (CFG_SITE_SECURE_URL),
-                                1: '<br />If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL),
-                                2: '<br />If you have any questions, please write to <a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL),
-                                3: 'Guest users are not allowed, please <a href="%s/youraccount/login">login</a>.' % CFG_SITE_SECURE_URL,
-                                4: 'The site is temporarily closed for maintenance.  Please come back soon.',
-                                5: 'Authorization failure',
-                                6: '%s temporarily closed' % CFG_SITE_NAME,
-                                7: 'This functionality is temporarily closed due to server maintenance. Please use only the search engine in the meantime.',
-                                8: 'Functionality temporarily closed'
-        }
+    0: 'Try to <a href="%s/youraccount/login?referer=%%s">login</a> with another account.' % (CFG_SITE_SECURE_URL),
+    1: '<br />If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL),
+    2: '<br />If you have any questions, please write to <a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL),
+    3: 'Guest users are not allowed, please <a href="%s/youraccount/login">login</a>.' % CFG_SITE_SECURE_URL,
+    4: 'The site is temporarily closed for maintenance.  Please come back soon.',
+    5: 'Authorization failure',
+    6: '%s temporarily closed' % CFG_SITE_NAME,
+    7: 'This functionality is temporarily closed due to server maintenance. Please use only the search engine in the meantime.',
+    8: 'Functionality temporarily closed'
+}
 
 CFG_WEBACCESS_WARNING_MSGS = {
-                                0: 'Authorization granted',
-                                1: 'You are not authorized to perform this action.',
-                                2: 'You are not authorized to perform any action.',
-                                3: 'The action %s does not exist.',
-                                4: 'Unexpected error occurred.',
-                                5: 'Missing mandatory keyword argument(s) for this action.',
-                                6: 'Guest accounts are not authorized to perform this action.',
-                                7: 'Not enough arguments, user ID and action name required.',
-                                8: 'Incorrect keyword argument(s) for this action.',
-                                9: """Account '%s' is not yet activated.""",
-                               10: """You were not authorized by the authentication method '%s'.""",
-                               11: """The selected login method '%s' is not the default method for this account, please try another one.""",
-                               12: """Selected login method '%s' does not exist.""",
-                               13: """Could not register '%s' account.""",
-                               14: """Could not login using '%s', because this user is unknown.""",
-                               15: """Could not login using your '%s' account, because you have introduced a wrong password.""",
-                               16: """External authentication troubles using '%s' (maybe temporary network problems).""",
-                               17: """You have not yet confirmed the email address for the '%s' authentication method.""",
-                               18: """The administrator has not yet activated your account for the '%s' authentication method.""",
-                               19: """The site is having troubles in sending you an email for confirming your email address. The error has been logged and will be taken care of as soon as possible.""",
-                               20: """No roles are authorized to perform action %s with the given parameters.""",
-                               21: """Verification cancelled""",
-                               22: """Verification failed. Please try again or use another provider to login""",
-                               23: """Verification failed. It is probably because the configuration isn't set properly. Please contact with the <a href="mailto:%s">administator</a>""" % CFG_SITE_ADMIN_EMAIL
-        }
+    0: 'Authorization granted',
+    1: 'You are not authorized to perform this action.',
+    2: 'You are not authorized to perform any action.',
+    3: 'The action %s does not exist.',
+    4: 'Unexpected error occurred.',
+    5: 'Missing mandatory keyword argument(s) for this action.',
+    6: 'Guest accounts are not authorized to perform this action.',
+    7: 'Not enough arguments, user ID and action name required.',
+    8: 'Incorrect keyword argument(s) for this action.',
+    9: """Account '%s' is not yet activated.""",
+    10: """You were not authorized by the authentication method '%s'.""",
+    11: """The selected login method '%s' is not the default method for this account, please try another one.""",
+    12: """Selected login method '%s' does not exist.""",
+    13: """Could not register '%s' account.""",
+    14: """Could not login using '%s', because this user is unknown.""",
+    15: """Could not login using your '%s' account, because you have introduced a wrong password.""",
+    16: """External authentication troubles using '%s' (maybe temporary network problems).""",
+    17: """You have not yet confirmed the email address for the '%s' authentication method.""",
+    18: """The administrator has not yet activated your account for the '%s' authentication method.""",
+    19: """The site is having troubles in sending you an email for confirming your email address. The error has been logged and will be taken care of as soon as possible.""",
+    20: """No roles are authorized to perform action %s with the given parameters.""",
+    21: """Verification cancelled""",
+    22: """Verification failed. Please try again or use another provider to login""",
+    23: """Verification failed. It is probably because the configuration isn't set properly. Please contact with the <a href="mailto:%s">administator</a>""" % CFG_SITE_ADMIN_EMAIL
+}
 

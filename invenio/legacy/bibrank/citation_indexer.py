@@ -32,8 +32,8 @@ from invenio.legacy.dbquery import run_sql, serialize_via_marshal, \
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
-from invenio.search_engine import search_pattern, search_unit
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.search_engine import search_pattern, search_unit
+from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.modules.formatter.utils import parse_tag
 from invenio.modules.knowledge.api import get_kb_mappings
 from invenio.bibtask import write_message, task_get_option, \

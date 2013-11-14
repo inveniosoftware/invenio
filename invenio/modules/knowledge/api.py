@@ -344,7 +344,7 @@ def get_kbd_values(kbname, searchwith=""):
     @param kbname:     name of the knowledge base
     @param searchwith: a term to search with
     """
-    from invenio import search_engine
+    import invenio.legacy.search_engine
 
     #first check that the kb in question is dynamic
     kbid = bibknowledge_dblayer.get_kb_id(kbname)

@@ -57,7 +57,8 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
         pattern_tag, pattern_lang, \
         translation_pattern, \
         ln_pattern, get_format_templates
-    from invenio.bibformatadminlib import update_output_format_rules
+    from invenio.legacy.bibformat.adminlib import \
+        update_output_format_rules
 
     only_template = re.compile(only_template_re) \
         if only_template_re is not None else None

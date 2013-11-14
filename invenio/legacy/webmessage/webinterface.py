@@ -34,7 +34,7 @@ from invenio.legacy.webmessage.api import perform_request_display_msg, \
                                get_navtrail
 from invenio.modules.messages.config import CFG_WEBMESSAGE_RESULTS_FIELD
 from invenio.utils.mail import escape_email_quoted_text
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd
 from invenio.utils.html import escape_html

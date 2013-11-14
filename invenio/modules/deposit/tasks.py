@@ -47,7 +47,7 @@ def authorize_user(action, **params):
     Check if current user is authorized to perform the action.
     """
     def _authorize_user(obj, dummy_eng):
-        from invenio.access_control_engine import acc_authorize_action
+        from invenio.modules.access.engine import acc_authorize_action
 
         auth, message = acc_authorize_action(
             current_user.get_id(),

@@ -34,8 +34,8 @@ from cPickle import dumps
 from zlib import decompress, compress
 
 from invenio.utils.json import json, json_unicode_to_utf8
-from invenio.shellutils import mymkdir
-from invenio.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
+from invenio.utils.shell import mymkdir
+from invenio.modules.access.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.utils.hash import sha1
 
@@ -350,7 +350,7 @@ class ExternalAuthRobot(ExternalAuth):
         @return: the URL to login as the user.
         @rtype: string
         """
-        from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
+        from invenio.modules.access.local_config import CFG_EXTERNAL_AUTHENTICATION
         from invenio.utils.url import create_url
         if assertion is None:
             assertion = {}

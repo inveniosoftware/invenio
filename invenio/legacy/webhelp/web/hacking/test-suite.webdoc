@@ -136,7 +136,7 @@ named identically as the lib file it tests, but with the suffix
 An example for testing search engine query parameter washing function:
 <blockquote>
 <pre>
-$ cat /opt/invenio/lib/python/invenio/search_engine_unit_tests.py
+$ cat /opt/invenio/lib/python/invenio.legacy.search_engine_unit_tests.py
 [...]
 import search_engine
 import unittest
@@ -166,7 +166,7 @@ the tests available in this file:
 
 <blockquote>
 <pre>
-$ cat /opt/invenio/lib/python/invenio/search_engine_unit_tests.py
+$ cat /opt/invenio/lib/python/invenio.legacy.search_engine_unit_tests.py
 [...]
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestStripAccents,
@@ -186,7 +186,7 @@ If you are interested in running tests only on a certain file (say
 
 <blockquote>
 <pre>
-$ python /opt/invenio/lib/python/invenio/search_engine_unit_tests.py
+$ python /opt/invenio/lib/python/invenio.legacy.search_engine_unit_tests.py
 </pre>
 </blockquote>
 </p>
@@ -243,7 +243,7 @@ bibindex engine list union ... ok
 FAIL: search engine washing of query patterns
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/opt/invenio/lib/python/invenio/search_engine_unit_tests.py", line 25, in test_wash_pattern
+  File "/opt/invenio/lib/python/invenio.legacy.search_engine_unit_tests.py", line 25, in test_wash_pattern
     self.assertEqual("ell*", search_engine.wash_pattern('ell*'))
   File "/usr/lib/python2.3/unittest.py", line 302, in failUnlessEqual
     raise self.failureException, \

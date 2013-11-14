@@ -95,9 +95,9 @@ from invenio.legacy.webuser import getUid, page_not_authorized, get_user_prefere
 from invenio.legacy.webcomment.webinterface import WebInterfaceCommentsPages
 from invenio.legacy.weblinkback.webinterface import WebInterfaceRecordLinkbacksPages
 from invenio.legacy.bibcirculation.webinterface import WebInterfaceHoldingsPages
-from invenio.webpage import page, pageheaderonly, create_error_box
+from invenio.legacy.webpage import page, pageheaderonly, create_error_box
 from invenio.base.i18n import gettext_set_language
-from invenio.search_engine import check_user_can_view_record, \
+from invenio.legacy.search_engine import check_user_can_view_record, \
      collection_reclist_cache, \
      collection_restricted_p, \
      create_similarly_named_authors_link_box, \
@@ -115,29 +115,29 @@ from invenio.search_engine import check_user_can_view_record, \
      get_coll_normalised_name, \
      EM_REPOSITORY
 from invenio.websearch_webcoll import perform_display_collection
-from invenio.search_engine_utils import get_fieldvalues, \
+from invenio.legacy.bibrecord import get_fieldvalues, \
      get_fieldvalues_alephseq_like
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_config import VIEWRESTRCOLL
-from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.local_config import VIEWRESTRCOLL
+from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
 from invenio.modules.formatter import format_records
 from invenio.modules.formatter.engine import get_output_formats
 from invenio.websearch_webcoll import get_collection
 from invenio.intbitset import intbitset
 from invenio.bibupload import find_record_from_sysno
-from invenio.bibrank_citation_searcher import get_cited_by_list
-from invenio.bibrank_downloads_indexer import get_download_weight_total
-from invenio.search_engine_summarizer import summarize_records
+from invenio.legacy.bibrank.citation_searcher import get_cited_by_list
+from invenio.legacy.bibrank.downloads_indexer import get_download_weight_total
+from invenio.legacy.search_engine.summarizer import summarize_records
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibedit.webinterface import WebInterfaceEditPages
 from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
 from invenio.legacy.bibmerge.webinterface import WebInterfaceMergePages
 from invenio.legacy.bibdocfile.webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
-from invenio.search_engine import get_record
-from invenio.shellutils import mymkdir
+from invenio.legacy.search_engine import get_record
+from invenio.utils.shell import mymkdir
 
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
 
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
@@ -302,7 +302,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
                 text=auth_msg, \
                 navmenuid='search')
 
-        from invenio.search_engine import record_exists, get_merged_recid
+        from invenio.legacy.search_engine import record_exists, get_merged_recid
         # check if the current record has been deleted
         # and has been merged, case in which the deleted record
         # will be redirect to the new one

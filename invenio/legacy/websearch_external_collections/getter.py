@@ -51,7 +51,7 @@ import sys
 import StringIO
 import time
 import urlparse
-#from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+#from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
 CFG_EXTERNAL_COLLECTION_TIMEOUT = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
 

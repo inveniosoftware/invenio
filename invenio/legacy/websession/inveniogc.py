@@ -34,7 +34,7 @@ try:
          CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
          write_message, write_messages
-    from invenio.access_control_mailcookie import mail_cookie_gc
+    from invenio.modules.access.mailcookie import mail_cookie_gc
     from invenio.bibdocfile import BibDoc
     from invenio.bibsched import gc_tasks
     from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX

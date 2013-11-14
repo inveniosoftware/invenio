@@ -27,7 +27,7 @@ import ConfigParser
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ETCDIR
-from invenio.search_engine import perform_request_search, wash_index_term
+from invenio.legacy.search_engine import perform_request_search, wash_index_term
 from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
 from invenio.bibindex_engine_stopwords import is_stopword

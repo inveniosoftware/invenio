@@ -84,7 +84,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.shellutils import escape_shell_arg
+from invenio.utils.shell import escape_shell_arg
 from invenio.legacy.dbquery import run_sql, DatabaseError
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibrecord import record_get_field_instances, \
@@ -92,10 +92,10 @@ from invenio.legacy.bibrecord import record_get_field_instances, \
     encode_for_xml
 from invenio.utils.url import create_url, make_user_agent_string
 from invenio.utils.text import nice_size
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
-from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user
-from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.control import acc_is_user_in_role, acc_get_role_id
+from invenio.modules.access.firerole import compile_role_definition, acc_firerole_check_user
+from invenio.modules.access.local_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import CFG_SITE_URL, \
     CFG_WEBDIR, CFG_BIBDOCFILE_FILEDIR,\
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
@@ -116,9 +116,9 @@ from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
 from invenio.base.utils import import_submodules_from_packages
 from invenio.utils.hash import md5
 
-import invenio.template
+import invenio.legacy.template
 
-bibdocfile_templates = invenio.template.load('bibdocfile')
+bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 ## The above flag controls whether HTTP range requests are supported or not
 ## when serving static files via Python. This is disabled by default as
 ## it currently breaks support for opening PDF files on Windows platforms
@@ -718,7 +718,7 @@ class BibRecDocs(object):
         @return: True if the correxsponding record has been deleted.
         @rtype: bool
         """
-        from invenio.search_engine import record_exists
+        from invenio.legacy.search_engine import record_exists
         return record_exists(self.id) == -1
 
     def get_xml_8564(self):
@@ -729,7 +729,7 @@ class BibRecDocs(object):
         @return: the MARCXML representation.
         @rtype: string
         """
-        from invenio.search_engine import get_record
+        from invenio.legacy.search_engine import get_record
         out = ''
         record = get_record(self.id)
         fields = record_get_field_instances(record, '856', '4', ' ')
@@ -2137,7 +2137,7 @@ class BibDoc(object):
         from the MARCXML stored in the database.
         """
         ## Let's get the record
-        from invenio.search_engine import get_record
+        from invenio.legacy.search_engine import get_record
         if record is None:
             record = get_record(self.id)
 
