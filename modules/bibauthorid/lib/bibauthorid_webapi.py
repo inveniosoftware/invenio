@@ -27,18 +27,18 @@ import invenio.bibauthorid_frontinterface as dbapi
 import invenio.bibauthorid_name_utils as nameapi
 import invenio.webauthorprofile_interface as webauthorapi
 
-import invenio.search_engine as search_engine
-from invenio.search_engine import perform_request_search
+import invenio.legacy.search_engine as search_engine
+from invenio.legacy.search_engine import perform_request_search
 from cgi import escape
 from invenio.utils.date import strftime
 from time import gmtime, ctime
-from invenio.access_control_admin import acc_find_user_role_actions
+from invenio.modules.access.control import acc_find_user_role_actions
 from invenio.legacy.webuser import collect_user_info, getUid
 from invenio.legacy.webuser import isUserSuperAdmin
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_get_role_id, acc_get_user_roles
-from invenio.external_authentication_robot import ExternalAuthRobot
-from invenio.external_authentication_robot import load_robot_keys
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.control import acc_get_role_id, acc_get_user_roles
+from invenio.modules.access.external_authentication_robot import ExternalAuthRobot
+from invenio.modules.access.external_authentication_robot import load_robot_keys
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.config import CFG_SITE_URL
 from invenio.ext.email import send_email

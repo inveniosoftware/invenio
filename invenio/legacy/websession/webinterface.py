@@ -42,13 +42,13 @@ from invenio.config import \
      CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
      CFG_OPENAIRE_SITE
 from invenio.legacy import webuser
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio import webaccount
 from invenio import webbasket
 from invenio import webalert
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.webmessage.api import account_new_mail
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd
@@ -57,12 +57,12 @@ from invenio import webgroup_dblayer
 from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
-from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
+from invenio.modules.access.mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
     mail_cookie_create_pw_reset, mail_cookie_check_role, \
     mail_cookie_check_mail_activation, InvenioWebAccessMailCookieError, \
     InvenioWebAccessMailCookieDeletedError, mail_cookie_check_authorize_action
-from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, \
+from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS, \
     CFG_EXTERNAL_AUTH_USING_SSO, CFG_EXTERNAL_AUTH_LOGOUT_SSO, \
     CFG_EXTERNAL_AUTHENTICATION, CFG_EXTERNAL_AUTH_SSO_REFRESH, \
     CFG_OPENID_CONFIGURATIONS, CFG_OAUTH2_CONFIGURATIONS, \
@@ -74,9 +74,9 @@ from invenio.session import get_session
 from invenio.modules import apikeys as web_api_key
 
 
-import invenio.template
-websession_templates = invenio.template.load('websession')
-bibcatalog_templates = invenio.template.load('bibcatalog')
+import invenio.legacy.template
+websession_templates = invenio.legacy.template.load('websession')
+bibcatalog_templates = invenio.legacy.template.load('bibcatalog')
 
 
 
@@ -752,7 +752,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         """
         Implement authentication method for external service providers.
         """
-        from invenio.external_authentication import InvenioWebAccessExternalAuthError
+        from invenio.modules.access.external_authentication import InvenioWebAccessExternalAuthError
         args = wash_urlargd(form, {
             'login_method': (str, None),
             'remember_me' : (str, ''),

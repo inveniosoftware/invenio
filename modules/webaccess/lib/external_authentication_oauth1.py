@@ -27,7 +27,7 @@ __revision__ = \
 
 from invenio.utils.container import get_substructure
 from invenio.legacy.dbquery import run_sql
-from invenio.external_authentication import ExternalAuth
+from invenio.modules.access.external_authentication import ExternalAuth
 
 class ExternalOAuth1(ExternalAuth):
     """
@@ -58,8 +58,8 @@ class ExternalOAuth1(ExternalAuth):
 
         @rtype: str|NoneType, str|NoneType
         """
-        from invenio.access_control_config import CFG_OAUTH1_CONFIGURATIONS
-        from invenio.access_control_config import CFG_OAUTH1_PROVIDERS
+        from invenio.modules.access.local_config import CFG_OAUTH1_CONFIGURATIONS
+        from invenio.modules.access.local_config import CFG_OAUTH1_PROVIDERS
         from invenio.ext.legacy.handler import wash_urlargd
         from rauth.service import OAuth1Service
 
@@ -183,7 +183,7 @@ class ExternalOAuth1(ExternalAuth):
 
         @rtype: str or NoneType
         """
-        from invenio.access_control_config import CFG_OAUTH1_CONFIGURATIONS
+        from invenio.modules.access.local_config import CFG_OAUTH1_CONFIGURATIONS
 
         if req.g['oauth1_provider_name']:
             path = None
@@ -208,7 +208,7 @@ class ExternalOAuth1(ExternalAuth):
 
         @rtype str|NoneType, str|NoneType
         """
-        from invenio.access_control_config import CFG_OAUTH1_CONFIGURATIONS
+        from invenio.modules.access.local_config import CFG_OAUTH1_CONFIGURATIONS
 
         identity = None
         email = None

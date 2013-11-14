@@ -46,10 +46,10 @@ default_breadcrumb_root(blueprint, '.')
 def request_record(f):
     @wraps(f)
     def decorated(recid, *args, **kwargs):
-        from invenio.access_control_mailcookie import \
+        from invenio.modules.access.mailcookie import \
             mail_cookie_create_authorize_action
-        from invenio.access_control_config import VIEWRESTRCOLL
-        from invenio.search_engine import guess_primary_collection_of_a_record, \
+        from invenio.modules.access.local_config import VIEWRESTRCOLL
+        from invenio.legacy.search_engine import guess_primary_collection_of_a_record, \
             check_user_can_view_record
         from invenio.websearchadminlib import get_detailed_page_tabs,\
             get_detailed_page_tabs_counts
@@ -76,7 +76,7 @@ def request_record(f):
             abort(apache.HTTP_UNAUTHORIZED)
 
         from invenio.legacy.bibfield import get_record
-        from invenio.search_engine import record_exists, get_merged_recid
+        from invenio.legacy.search_engine import record_exists, get_merged_recid
         # check if the current record has been deleted
         # and has been merged, case in which the deleted record
         # will be redirect to the new one
@@ -124,7 +124,7 @@ def request_record(f):
                 return dict(headerLinkbackTrackbackLink=get_trackback_auto_discovery_tag(recid))
 
         def _format_record(recid, of='hd', user_info=current_user, *args, **kwargs):
-            from invenio.search_engine import print_record
+            from invenio.legacy.search_engine import print_record
             return print_record(recid, format=of, user_info=user_info, *args, **kwargs)
 
         @register_template_context_processor
@@ -149,7 +149,7 @@ def request_record(f):
 @wash_arguments({'of': (unicode, 'hd')})
 @request_record
 def metadata(recid, of='hd'):
-    from invenio.bibrank_downloads_similarity import register_page_view_event
+    from invenio.legacy.bibrank.downloads_similarity import register_page_view_event
     from invenio.modules.formatter import get_output_format_content_type
     register_page_view_event(recid, current_user.get_id(), str(request.remote_addr))
     if get_output_format_content_type(of) != 'text/html':
@@ -180,7 +180,7 @@ def files(recid):
 @blueprint.route('/<int:recid>/citations', methods=['GET', 'POST'])
 @request_record
 def citations(recid):
-    from invenio.bibrank_citation_searcher import calculate_cited_by_list,\
+    from invenio.legacy.bibrank.citation_searcher import calculate_cited_by_list,\
         get_self_cited_by, calculate_co_cited_with_list
     citations = dict(
         citinglist=calculate_cited_by_list(recid),
@@ -205,8 +205,8 @@ def keywords(recid):
 @blueprint.route('/<int:recid>/usage', methods=['GET', 'POST'])
 @request_record
 def usage(recid):
-    from invenio.bibrank_downloads_similarity import calculate_reading_similarity_list
-    from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
+    from invenio.legacy.bibrank.downloads_similarity import calculate_reading_similarity_list
+    from invenio.legacy.bibrank.downloads_grapher import create_download_history_graph_and_box
     viewsimilarity = calculate_reading_similarity_list(recid, "pageviews")
     downloadsimilarity = calculate_reading_similarity_list(recid, "downloads")
     downloadgraph = create_download_history_graph_and_box(recid)

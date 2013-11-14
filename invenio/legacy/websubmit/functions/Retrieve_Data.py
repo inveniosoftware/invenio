@@ -27,7 +27,7 @@ __revision__ = "$Id$"
 
 import string
 
-from invenio.search_engine import print_record
+from invenio.legacy.search_engine import print_record
 
 def Get_Field(fieldname,bibrec):
     """

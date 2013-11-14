@@ -36,7 +36,7 @@ from invenio.legacy.webuser import collect_user_info
 from invenio.ext.email import send_email
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.bibrecord import record_get_field_value
-from invenio.search_engine import get_record
+from invenio.legacy.search_engine import get_record
 
 # Bibcirculation imports
 import invenio.bibcirculation_dblayer as db
@@ -60,8 +60,8 @@ from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
                                     CFG_BIBCIRCULATION_PROPOSAL_STATUS_NEW, \
                                     AMZ_BOOK_PUBLICATION_DATE_TAG, \
                                     CFG_BIBCIRCULATION_DEFAULT_LIBRARY_ID
-import invenio.template
-bc_templates = invenio.template.load('bibcirculation')
+import invenio.legacy.template
+bc_templates = invenio.legacy.template.load('bibcirculation')
 
 
 def perform_borrower_loans(uid, barcode, borrower_id,

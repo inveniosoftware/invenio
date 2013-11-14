@@ -50,7 +50,7 @@ from invenio.bibtask import task_low_level_submission, write_message, task_updat
 from invenio.bibdocfile import check_valid_url
 
 ## WebSearch to search for previous tweets
-from invenio.search_engine import perform_request_search, get_fieldvalues
+from invenio.legacy.search_engine import perform_request_search, get_fieldvalues
 
 _TWITTER_API = twitter.Api()
 

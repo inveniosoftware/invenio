@@ -88,10 +88,10 @@ from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
     CFG_INSPIRE_SITE
-from invenio.search_engine import record_exists, perform_request_search
+from invenio.legacy.search_engine import record_exists, perform_request_search
 from invenio.legacy.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.utils.html import get_mathjax_header
 from invenio.utils.text import wash_for_xml, show_diff
 from invenio.modules.knowledge.api import get_kbd_values_for_bibedit, get_kbr_values, \
@@ -108,8 +108,8 @@ from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 
 from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 
-import invenio.template
-bibedit_templates = invenio.template.load('bibedit')
+import invenio.legacy.template
+bibedit_templates = invenio.legacy.template.load('bibedit')
 
 re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 

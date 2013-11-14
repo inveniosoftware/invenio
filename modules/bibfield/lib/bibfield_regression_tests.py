@@ -54,7 +54,7 @@ class BibFieldRecordFieldValuesTest(InvenioTestCase):
     def test_compare_field_values_with_bibrecord_values(self):
         """bibfield - same value as in bibrecord"""
         from invenio.legacy.bibrecord import record_get_field_values
-        from invenio.search_engine import get_record as search_engine_get_record
+        from invenio.legacy.search_engine import get_record as search_engine_get_record
         record = get_record(1)
         bibrecord_value = record_get_field_values(search_engine_get_record(1), '245', ' ', ' ', 'a')[0]
         self.assertEqual(bibrecord_value, record['title.title'])
@@ -268,7 +268,7 @@ class BibFieldLegacyTests(InvenioTestCase):
 
     def test_get_legacy_recstruct(self):
         """bibfield - legacy functions"""
-        from invenio.search_engine import get_record as search_engine_get_record
+        from invenio.legacy.search_engine import get_record as search_engine_get_record
         from invenio.legacy.bibrecord import record_get_field_value
 
         bibfield_recstruct = get_record(8).get_legacy_recstruct()

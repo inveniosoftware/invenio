@@ -274,7 +274,7 @@ class Template:
 
 
         out += '</ol>'
-        from invenio.bibrankadminlib import addadminbox
+        from invenio.legacy.bibrank.adminlib import addadminbox
         return addadminbox('<b>%s</b>'% _("Menu"), [out])
 
 

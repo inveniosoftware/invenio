@@ -27,9 +27,9 @@
 from invenio.config import CFG_SITE_URL
 from invenio.bibdocfile import BibRecDocs
 from invenio.intbitset import intbitset
-from invenio.search_engine import perform_request_search 
-from invenio.bibrank_record_sorter import rank_records
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.search_engine import perform_request_search 
+from invenio.legacy.bibrank.record_sorter import rank_records
+from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.modules.encoder.utils import timecode_to_seconds
 import random
 

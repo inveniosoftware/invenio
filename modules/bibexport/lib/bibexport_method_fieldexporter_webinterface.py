@@ -25,7 +25,7 @@ __revision__ = "$Id: webmessage_webinterface.py,v 1.13 2008/03/12 16:48:08 tibor
 __lastupdated__ = """$Date: 2008/03/12 16:48:08 $"""
 
 import re
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.ext.legacy.handler import WebInterfaceDirectory, \
                                          wash_urlargd
 from invenio.utils.url import redirect_to_url
@@ -58,7 +58,7 @@ from invenio.bibexport_method_fieldexporter_dblayer import Job, \
                                                            JobResult
 from invenio.legacy.webuser import collect_user_info, \
                             page_not_authorized
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 
 class WebInterfaceFieldExporterPages(WebInterfaceDirectory):
     """Defines the set of /fieldexporter pages."""

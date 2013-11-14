@@ -59,8 +59,8 @@ from invenio.config import \
      CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
      CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
-from invenio.webpage import page, pageheaderonly, pagefooteronly
-from invenio.search_engine import create_navtrail_links, \
+from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
+from invenio.legacy.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
      get_colID
 from invenio.utils.url import redirect_to_url, \
@@ -70,8 +70,8 @@ from invenio.ext.logging import register_exception
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
-from invenio.access_control_config import VIEWRESTRCOLL
-from invenio.access_control_mailcookie import \
+from invenio.modules.access.local_config import VIEWRESTRCOLL
+from invenio.modules.access.mailcookie import \
      mail_cookie_create_authorize_action, \
      mail_cookie_create_common, \
      mail_cookie_check_common, \
@@ -80,9 +80,9 @@ from invenio.access_control_mailcookie import \
 from invenio.modules.comments.config import \
      InvenioWebCommentError, \
      InvenioWebCommentWarning
-import invenio.template
-webstyle_templates = invenio.template.load('webstyle')
-websearch_templates = invenio.template.load('websearch')
+import invenio.legacy.template
+webstyle_templates = invenio.legacy.template.load('webstyle')
+websearch_templates = invenio.legacy.template.load('websearch')
 import os
 from invenio.utils import apache
 from invenio.bibdocfile import \

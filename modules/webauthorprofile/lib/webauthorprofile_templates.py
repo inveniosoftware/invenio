@@ -50,14 +50,14 @@ from invenio.base.i18n import gettext_set_language
 
 from invenio.intbitset import intbitset
 
-from invenio.search_engine import perform_request_search
+from invenio.legacy.search_engine import perform_request_search
 from invenio.utils.url import create_html_link
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
 
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
 
 def wrap_author_name_in_quotes_if_needed(author_name):
     """

@@ -405,7 +405,7 @@ def remove_temporary_emails(emails):
 
     @rtype: str
     """
-    from invenio.access_control_config import CFG_TEMP_EMAIL_ADDRESS
+    from invenio.modules.access.local_config import CFG_TEMP_EMAIL_ADDRESS
     if not isinstance(emails, (str, unicode)):
         emails = ','.join(emails)
 

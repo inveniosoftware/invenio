@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL
 from invenio.utils.url import create_html_link
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 
 def format_element(bfo, remote_server_id, link_label="Push via Sword"):
     """

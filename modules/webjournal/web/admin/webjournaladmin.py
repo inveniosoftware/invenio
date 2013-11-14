@@ -22,8 +22,8 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import invenio.webjournaladminlib as wjn
-from invenio.access_control_engine import acc_authorize_action
-from invenio.webpage import page, error_page
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.legacy.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.legacy.webuser import getUid, page_not_authorized
 from invenio.base.i18n import wash_language, gettext_set_language

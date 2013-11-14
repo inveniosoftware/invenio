@@ -176,7 +176,7 @@ from invenio.base.factory import with_app_context
 
 @with_app_context()
 def create_external_word_similarity_ranker_tests():
-    from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
+    from invenio.legacy.bibrank.bridge_utils import get_external_word_similarity_ranker
     if not get_external_word_similarity_ranker():
         TESTS.append(BibRankWordSimilarityRankingTest)
 

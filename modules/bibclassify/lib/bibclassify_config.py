@@ -255,7 +255,7 @@ log = get_logger('bibclassify')
 STANDALONE = False
 ## Standalone mode has been removed.
 #try:
-#    from invenio import search_engine
+#    import invenio.legacy.search_engine
 #except:
 #    STANDALONE = True
 #    log.warning('Bibclassify is running in a standalone mode, access to database is not supported')

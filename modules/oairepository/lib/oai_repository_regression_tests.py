@@ -39,7 +39,7 @@ from invenio.testsuite import make_test_suite, run_test_suite, \
                               InvenioTestCase
 
 oai_repository_server = lazy_import('invenio.oai_repository_server')
-search_engine = lazy_import('invenio.search_engine')
+search_engine = lazy_import('invenio.legacy.search_engine')
 
 
 class OAIRepositoryTouchSetTest(InvenioTestCase):

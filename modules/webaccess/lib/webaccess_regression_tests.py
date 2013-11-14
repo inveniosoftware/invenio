@@ -86,8 +86,8 @@ class WebAccessFireRoleTest(InvenioTestCase):
 
     def setUp(self):
         """Create a fake role."""
-        from invenio.access_control_admin import acc_add_role
-        from invenio.access_control_firerole import compile_role_definition, \
+        from invenio.modules.access.control import acc_add_role
+        from invenio.modules.access.firerole import compile_role_definition, \
             serialize
         self.role_name = 'test'
         self.role_description = 'test role'
@@ -99,13 +99,13 @@ class WebAccessFireRoleTest(InvenioTestCase):
 
     def tearDown(self):
         """Drop the fake role."""
-        from invenio.access_control_admin import acc_delete_role
+        from invenio.modules.access.control import acc_delete_role
         acc_delete_role(self.role_id)
 
     def test_webaccess_firerole_serialization(self):
         """webaccess - firerole role definition correctly serialized"""
-        from invenio.access_control_admin import acc_get_role_definition
-        from invenio.access_control_firerole import compile_role_definition, \
+        from invenio.modules.access.control import acc_get_role_definition
+        from invenio.modules.access.firerole import compile_role_definition, \
             deserialize
         def_ser = compile_role_definition(self.role_definition)
         tmp_def_ser = acc_get_role_definition(self.role_id)
@@ -144,7 +144,7 @@ if CFG_DEVEL_SITE:
                 run_sql("DELETE FROM userEXT WHERE id=%s", (nickname, ))
 
         def setUp(self):
-            from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
+            from invenio.modules.access.local_config import CFG_EXTERNAL_AUTHENTICATION
             self.robot_login_methods = dict([(method_name, CFG_EXTERNAL_AUTHENTICATION[method_name]) for method_name in CFG_EXTERNAL_AUTHENTICATION if CFG_EXTERNAL_AUTHENTICATION[method_name] and CFG_EXTERNAL_AUTHENTICATION[method_name].robot_login_method_p()])
             self.a_robot = "regression-test"
             self.a_password = "123"
@@ -154,16 +154,16 @@ if CFG_DEVEL_SITE:
             self.another_nickname = "baz"
             self.some_groups = ["a group for regression test", "another group for regression test"]
             self.myip = urlopen(CFG_SITE_URL + "/httptest/whatismyip").read()
-            from invenio.external_authentication_robot import update_robot_key
+            from invenio.modules.access.external_authentication_robot import update_robot_key
             for method_name in self.robot_login_methods:
                 update_robot_key(method_name, self.a_robot, self.a_password)
-            from invenio.external_authentication_robot import load_robot_keys
+            from invenio.modules.access.external_authentication_robot import load_robot_keys
 
         def tearDown(self):
-            from invenio.external_authentication_robot import update_robot_key
+            from invenio.modules.access.external_authentication_robot import update_robot_key
             #for method_name in self.robot_login_methods:
                 #update_robot_key(method_name, self.a_robot)
-            from invenio.external_authentication_robot import load_robot_keys
+            from invenio.modules.access.external_authentication_robot import load_robot_keys
             self._erase_example_user_and_groups()
 
         def test_normal_robot_login_method(self):

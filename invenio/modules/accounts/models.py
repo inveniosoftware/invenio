@@ -28,7 +28,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 
 def get_default_user_preferences():
-    from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
+    from invenio.modules.access.local_config import CFG_EXTERNAL_AUTHENTICATION, \
         CFG_EXTERNAL_AUTH_DEFAULT
 
     user_preference = {

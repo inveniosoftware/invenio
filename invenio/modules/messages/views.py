@@ -33,7 +33,7 @@ from invenio.ext.menu import register_menu
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 
-from . import dbplayer
+from . import dblayer
 from . import query as dbquery
 from .forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
 from .models import MsgMESSAGE, UserMsgMESSAGE, email_alert_register
@@ -128,7 +128,7 @@ def add(msg_reply_id):
     from invenio.utils.mail import email_quote_txt
     uid = current_user.get_id()
     if msg_reply_id:
-        if (dbplayer.check_user_owns_message(uid, msg_reply_id) == 0):
+        if (dblayer.check_user_owns_message(uid, msg_reply_id) == 0):
             flash(_('Sorry, this message in not in your mailbox.'), "error")
             return redirect(url_for('.index'))
         else:
@@ -156,7 +156,7 @@ def add(msg_reply_id):
         form.populate_obj(m)
         m.id_user_from = uid
         m.sent_date = datetime.now()
-        quotas = dbplayer.check_quota(cfg['CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES'] - 1)
+        quotas = dblayer.check_quota(cfg['CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES'] - 1)
         users = filter(lambda x: quotas.has_key(x.id), m.recipients)
         #m.recipients = m.recipients.difference(users))
         for u in users:

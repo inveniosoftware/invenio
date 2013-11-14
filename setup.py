@@ -52,6 +52,7 @@ Links
 """
 from __future__ import print_function
 from setuptools import Command, setup, find_packages
+from distutils.extension import Extension
 
 import os
 

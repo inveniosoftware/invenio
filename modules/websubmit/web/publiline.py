@@ -45,22 +45,22 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_RECORD
 from invenio.legacy.dbquery import run_sql, Error, OperationalError
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
-from invenio.webpage import page, error_page
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.control import acc_get_role_users, acc_get_role_id
+from invenio.legacy.webpage import page, error_page
 from invenio.legacy.webuser import getUid, get_email, page_not_authorized, collect_user_info
 from invenio.base.i18n import gettext_set_language, wash_language
 #from invenio.legacy.websubmit.config import *
-from invenio.search_engine import search_pattern, check_user_can_view_record
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.search_engine import search_pattern, check_user_can_view_record
+from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.websubmit.functions.Retrieve_Data import Get_Field
 from invenio.ext.email import send_email
 from invenio.utils.url import wash_url_argument
-from invenio.webgroup_dblayer import get_group_infos, insert_new_group, insert_new_member, delete_member
+from invenio.legacy.websession.dblayer import get_group_infos, insert_new_group, insert_new_member, delete_member
 from invenio.webaccessadmin_lib import cleanstring_email
-from invenio.access_control_config import MAXSELECTUSERS
-from invenio.access_control_admin import acc_get_user_email
-from invenio.access_control_engine import acc_get_authorized_emails
+from invenio.modules.access.local_config import MAXSELECTUSERS
+from invenio.modules.access.control import acc_get_user_email
+from invenio.modules.access.engine import acc_get_authorized_emails
 from invenio.legacy.webmessage.api import perform_request_send
 import invenio.webbasket_dblayer as basketdb
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, CFG_WEBBASKET_CATEGORIES, CFG_WEBBASKET_SHARE_LEVELS_ORDERED
@@ -69,8 +69,8 @@ from invenio.legacy.bibrecord import create_records, record_get_field_value, rec
 
 execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % CFG_PYLIBDIR)
 
-import invenio.template
-websubmit_templates = invenio.template.load('websubmit')
+import invenio.legacy.template
+websubmit_templates = invenio.legacy.template.load('websubmit')
 
 CFG_WEBSUBMIT_PENDING_DIR = "%s/pending" % CFG_WEBSUBMIT_STORAGEDIR
 CFG_WEBSUBMIT_DUMMY_MARC_XML_REC = "dummy_marcxml_rec"

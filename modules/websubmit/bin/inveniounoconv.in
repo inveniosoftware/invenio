@@ -635,7 +635,7 @@ class Options:
             sys.exit(0)
 
         if self.kill:
-            from invenio.shellutils import run_shell_command
+            from invenio.utils.shell import run_shell_command
             run_shell_command('killall %s', [os.path.basename(office.binary)])
             time.sleep(1)
             run_shell_command('killall -9 %s', [os.path.basename(office.binary)])

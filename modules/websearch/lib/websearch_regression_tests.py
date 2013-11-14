@@ -49,7 +49,7 @@ from invenio.testsuite import make_test_suite, \
                               get_authenticated_mechanize_browser
 from invenio.utils.url import same_urls_p
 from invenio.legacy.dbquery import run_sql
-from invenio.search_engine_query_parser_unit_tests import DATEUTIL_AVAILABLE
+from invenio.legacy.search_engine.query_parser_unit_tests import DATEUTIL_AVAILABLE
 
 reindex_word_tables_into_testtables = lazy_import('invenio.bibindex_regression_tests:reindex_word_tables_into_testtables')
 
@@ -906,7 +906,7 @@ class WebSearchTestWildcardLimit(InvenioTestCase):
 
     def test_wildcard_limit_correctly_passed_when_not_set(self):
         """websearch - wildcard limit is correctly passed when default"""
-        from invenio.search_engine import search_pattern
+        from invenio.legacy.search_engine import search_pattern
         self.assertEqual(search_pattern(p='e*', f='author'),
                          search_pattern(p='e*', f='author', wl=1000))
 
@@ -918,7 +918,7 @@ class WebSearchTestWildcardLimit(InvenioTestCase):
 
     def test_wildcard_limit_correctly_not_active(self):
         """websearch - wildcard limit is not active when there is no wildcard query"""
-        from invenio.search_engine import search_pattern
+        from invenio.legacy.search_engine import search_pattern
         self.assertEqual(search_pattern(p='ellis', f='author'),
                          search_pattern(p='ellis', f='author', wl=1))
 
@@ -1164,13 +1164,13 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_for_failed_query(self):
         """websearch - search engine Python API for failed query"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([],
                          perform_request_search(p='aoeuidhtns'))
 
     def test_search_engine_python_api_for_successful_query(self):
         """websearch - search engine Python API for successful query"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
                          perform_request_search(p='ellis'))
 
@@ -1183,13 +1183,13 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_web_api_ignore_paging_parameter(self):
         """websearch - search engine Python API for successful query, ignore paging parameters"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
                          perform_request_search(p='ellis', rg=5, jrec=3))
 
     def test_search_engine_python_api_respect_sorting_parameter(self):
         """websearch - search engine Python API for successful query, respect sorting parameters"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([77, 84, 85],
                          perform_request_search(p='klebanov'))
         self.assertEqual([77, 85, 84],
@@ -1197,7 +1197,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_respect_ranking_parameter(self):
         """websearch - search engine Python API for successful query, respect ranking parameters"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([77, 84, 85],
                          perform_request_search(p='klebanov'))
         self.assertEqual([85, 77, 84],
@@ -1205,7 +1205,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_for_existing_record(self):
         """websearch - search engine Python API for existing record"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([8],
                          perform_request_search(recid=8))
 
@@ -1218,7 +1218,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_for_nonexisting_record(self):
         """websearch - search engine Python API for non-existing record"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([],
                          perform_request_search(recid=16777215))
 
@@ -1231,26 +1231,26 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_for_nonexisting_collection(self):
         """websearch - search engine Python API for non-existing collection"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([],
                          perform_request_search(c='Foo'))
 
     def test_search_engine_python_api_for_range_of_records(self):
         """websearch - search engine Python API for range of records"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([1, 2, 3, 4, 5, 6, 7, 8, 9],
                          perform_request_search(recid=1, recidb=10))
 
     def test_search_engine_python_api_ranked_by_citation(self):
         """websearch - search engine Python API for citation ranking"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([82, 83, 87, 89],
                 perform_request_search(p='recid:81', rm='citation'))
 
     def test_search_engine_python_api_textmarc_full(self):
         """websearch - search engine Python API for Text MARC output, full"""
-        from invenio.search_engine import perform_request_search
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.search_engine import perform_request_search
+        from invenio.legacy.bibrecord import get_fieldvalues
         import cStringIO
         tmp = cStringIO.StringIO()
         perform_request_search(req=tmp, p='higgs', of='tm')
@@ -1377,7 +1377,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_textmarc_field_filtered(self):
         """websearch - search engine Python API for Text MARC output, field-filtered"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         import cStringIO
         tmp = cStringIO.StringIO()
         perform_request_search(req=tmp, p='higgs', of='tm', ot=['100', '700'])
@@ -1393,14 +1393,14 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
     def test_search_engine_python_api_for_intersect_results_with_one_collrec(self):
         """websearch - search engine Python API for intersect results with one collrec"""
         from invenio.intbitset import intbitset
-        from invenio.search_engine import intersect_results_with_collrecs
+        from invenio.legacy.search_engine import intersect_results_with_collrecs
         self.assertEqual({'Books & Reports': intbitset([19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34])},
                          intersect_results_with_collrecs(None, intbitset(range(0,110)), ['Books & Reports'], 0, 'id', 0, 'en', False))
 
     def test_search_engine_python_api_for_intersect_results_with_several_collrecs(self):
         """websearch - search engine Python API for intersect results with several collrecs"""
         from invenio.intbitset import intbitset
-        from invenio.search_engine import intersect_results_with_collrecs
+        from invenio.legacy.search_engine import intersect_results_with_collrecs
         self.assertEqual({'Books': intbitset([21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]),
                           'Reports': intbitset([19, 20]),
                           'Theses': intbitset([35, 36, 37, 38, 39, 40, 41, 42, 105])},
@@ -1408,7 +1408,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_textmarc_field_filtered_hidden_guest(self):
         """websearch - search engine Python API for Text MARC output, field-filtered, hidden field, no guest access"""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         import cStringIO
         tmp = cStringIO.StringIO()
         perform_request_search(req=tmp, p='higgs', of='tm', ot=['100', '595'])
@@ -1421,8 +1421,8 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_xmlmarc_full(self):
         """websearch - search engine Python API for XMLMARC output, full"""
-        from invenio.search_engine import perform_request_search
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.search_engine import perform_request_search
+        from invenio.legacy.bibrecord import get_fieldvalues
         import cStringIO
         tmp = cStringIO.StringIO()
         perform_request_search(req=tmp, p='higgs', of='xm')
@@ -1864,7 +1864,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
     def test_search_engine_python_api_xmlmarc_field_filtered(self):
         """websearch - search engine Python API for XMLMARC output, field-filtered"""
         # we are testing example from /help/hacking/search-engine-api
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         import cStringIO
         tmp = cStringIO.StringIO()
         perform_request_search(req=tmp, p='higgs', of='xm', ot=['100', '700'])
@@ -1902,7 +1902,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
     def test_search_engine_python_api_xmlmarc_field_filtered_hidden_guest(self):
         """websearch - search engine Python API for XMLMARC output, field-filtered, hidden field, no guest access"""
         # we are testing example from /help/hacking/search-engine-api
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         import cStringIO
         tmp = cStringIO.StringIO()
         perform_request_search(req=tmp, p='higgs', of='xm', ot=['100', '595'])
@@ -2042,7 +2042,7 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
 
     def test_search_engine_web_api_textmarc_full(self):
         """websearch - search engine Web API for Text MARC output, full"""
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm',
                                                expected_text="""\
@@ -2213,7 +2213,7 @@ Zaffaroni, A
 
     def test_search_engine_web_api_xmlmarc_full(self):
         """websearch - search engine Web API for XMLMARC output, full"""
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm',
                                                expected_text="""\
@@ -2772,7 +2772,7 @@ class WebSearchRecordWebAPITest(InvenioTestCase):
 
     def test_record_web_api_textmarc_full(self):
         """websearch - /record Web API for TextMARC output, full"""
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/record/85?of=tm',
                                                expected_text="""\
@@ -2835,7 +2835,7 @@ class WebSearchRecordWebAPITest(InvenioTestCase):
 
     def test_record_web_api_xmlmarc_full(self):
         """websearch - /record Web API for XMLMARC output, full"""
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/record/85?of=xm',
                                                expected_text="""\
@@ -3276,13 +3276,13 @@ class WebSearchRestrictedCollectionTest(InvenioTestCase):
 
     def test_collection_restricted_p(self):
         """websearch - collection_restricted_p"""
-        from invenio.search_engine import collection_restricted_p
+        from invenio.legacy.search_engine import collection_restricted_p
         self.failUnless(collection_restricted_p('Theses'), True)
         self.failIf(collection_restricted_p('Books & Reports'))
 
     def test_get_permitted_restricted_collections(self):
         """websearch - get_permitted_restricted_collections"""
-        from invenio.search_engine import get_permitted_restricted_collections
+        from invenio.legacy.search_engine import get_permitted_restricted_collections
         from invenio.legacy.webuser import get_uid_from_email, collect_user_info
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))), ['Theses', 'Drafts'])
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('hyde@cds.cern.ch'))), [])
@@ -3672,7 +3672,7 @@ class WebSearchRestrictedWebJournalFilesTest(InvenioTestCase):
     """
     def test_restricted_files_guest(self):
         """websearch - files of unreleased articles are not available to guest"""
-        from invenio.search_engine import record_public_p
+        from invenio.legacy.search_engine import record_public_p
         # Record is not public...
         self.assertEqual(record_public_p(112), False)
 
@@ -3684,7 +3684,7 @@ class WebSearchRestrictedWebJournalFilesTest(InvenioTestCase):
 
     def test_restricted_files_editor(self):
         """websearch - files of unreleased articles are available to editor"""
-        from invenio.search_engine import record_public_p
+        from invenio.legacy.search_engine import record_public_p
         # Record is not public...
         self.assertEqual(record_public_p(112), False)
 
@@ -3700,7 +3700,7 @@ class WebSearchRestrictedWebJournalFilesTest(InvenioTestCase):
 
     def test_public_files_guest(self):
         """websearch - files of released articles are available to guest"""
-        from invenio.search_engine import record_public_p
+        from invenio.legacy.search_engine import record_public_p
         # Record is not public...
         self.assertEqual(record_public_p(111), False)
 
@@ -3714,7 +3714,7 @@ class WebSearchRestrictedWebJournalFilesTest(InvenioTestCase):
 
     def test_really_restricted_files_guest(self):
         """websearch - restricted files of released articles are not available to guest"""
-        from invenio.search_engine import record_public_p
+        from invenio.legacy.search_engine import record_public_p
         # Record is not public...
         self.assertEqual(record_public_p(111), False)
 
@@ -4142,7 +4142,7 @@ class WebSearchSummarizerTest(InvenioTestCase):
 
     def test_most_popular_field_values_singletag(self):
         """websearch - most popular field values, simple tag"""
-        from invenio.search_engine import get_most_popular_field_values
+        from invenio.legacy.search_engine import get_most_popular_field_values
         self.assertEqual([('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 7),
                          ('DRAFT', 2), ('POETRY', 2), ('REPORT', 2), ('ALEPHPAPER', 1), ('ATLANTISTIMESNEWS', 1),
                          ('ISOLDEPAPER', 1)],
@@ -4150,26 +4150,26 @@ class WebSearchSummarizerTest(InvenioTestCase):
 
     def test_most_popular_field_values_singletag_multiexclusion(self):
         """websearch - most popular field values, simple tag, multiple exclusions"""
-        from invenio.search_engine import get_most_popular_field_values
+        from invenio.legacy.search_engine import get_most_popular_field_values
         self.assertEqual([('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('DRAFT', 2), ('REPORT', 2),
                           ('ALEPHPAPER', 1), ('ATLANTISTIMESNEWS', 1), ('ISOLDEPAPER', 1)],
                          get_most_popular_field_values(range(0,100), '980__a', ('THESIS', 'PICTURE', 'POETRY')))
 
     def test_most_popular_field_values_multitag(self):
         """websearch - most popular field values, multiple tags"""
-        from invenio.search_engine import get_most_popular_field_values
+        from invenio.legacy.search_engine import get_most_popular_field_values
         self.assertEqual([('Ellis, J', 3), ('Enqvist, K', 1), ('Ibanez, L E', 1), ('Nanopoulos, D V', 1), ('Ross, G G', 1)],
                          get_most_popular_field_values((9, 14, 18), ('100__a', '700__a')))
 
     def test_most_popular_field_values_multitag_singleexclusion(self):
         """websearch - most popular field values, multiple tags, single exclusion"""
-        from invenio.search_engine import get_most_popular_field_values
+        from invenio.legacy.search_engine import get_most_popular_field_values
         self.assertEqual([('Enqvist, K', 1), ('Ibanez, L E', 1), ('Nanopoulos, D V', 1), ('Ross, G G', 1)],
                          get_most_popular_field_values((9, 14, 18), ('100__a', '700__a'), ('Ellis, J')))
 
     def test_most_popular_field_values_multitag_countrepetitive(self):
         """websearch - most popular field values, multiple tags, counting repetitive occurrences"""
-        from invenio.search_engine import get_most_popular_field_values
+        from invenio.legacy.search_engine import get_most_popular_field_values
         self.assertEqual([('THESIS', 2), ('REPORT', 1)],
                          get_most_popular_field_values((41,), ('690C_a', '980__a'), count_repetitive_values=True))
         self.assertEqual([('REPORT', 1), ('THESIS', 1)],
@@ -4206,12 +4206,12 @@ class WebSearchRecordCollectionGuessTest(InvenioTestCase):
 
     def test_guess_primary_collection_of_a_record(self):
         """websearch - guess_primary_collection_of_a_record"""
-        from invenio.search_engine import guess_primary_collection_of_a_record
+        from invenio.legacy.search_engine import guess_primary_collection_of_a_record
         self.assertEqual(guess_primary_collection_of_a_record(96), 'Articles')
 
     def test_guess_collection_of_a_record(self):
         """websearch - guess_collection_of_a_record"""
-        from invenio.search_engine import guess_collection_of_a_record
+        from invenio.legacy.search_engine import guess_collection_of_a_record
         self.assertEqual(guess_collection_of_a_record(96), 'Articles')
         self.assertEqual(guess_collection_of_a_record(96, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Articles')
         self.assertEqual(guess_collection_of_a_record(12, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
@@ -4222,18 +4222,18 @@ class WebSearchGetFieldValuesTest(InvenioTestCase):
 
     def test_get_fieldvalues_001(self):
         """websearch - get_fieldvalues() for bibxxx-agnostic tags"""
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         self.assertEqual(get_fieldvalues(10, '001___'), ['10'])
 
     def test_get_fieldvalues_980(self):
         """websearch - get_fieldvalues() for bibxxx-powered tags"""
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         self.assertEqual(get_fieldvalues(18, '700__a'), ['Enqvist, K', 'Nanopoulos, D V'])
         self.assertEqual(get_fieldvalues(18, '909C1u'), ['CERN'])
 
     def test_get_fieldvalues_wildcard(self):
         """websearch - get_fieldvalues() for tag wildcards"""
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         self.assertEqual(get_fieldvalues(18, '%'), [])
         self.assertEqual(get_fieldvalues(18, '7%'), [])
         self.assertEqual(get_fieldvalues(18, '700%'), ['Enqvist, K', 'Nanopoulos, D V'])
@@ -4241,7 +4241,7 @@ class WebSearchGetFieldValuesTest(InvenioTestCase):
 
     def test_get_fieldvalues_recIDs(self):
         """websearch - get_fieldvalues() for list of recIDs"""
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         self.assertEqual(get_fieldvalues([], '001___'), [])
         self.assertEqual(get_fieldvalues([], '700__a'), [])
         self.assertEqual(get_fieldvalues([10, 13], '001___'), ['10', '13'])
@@ -4250,7 +4250,7 @@ class WebSearchGetFieldValuesTest(InvenioTestCase):
 
     def test_get_fieldvalues_repetitive(self):
         """websearch - get_fieldvalues() for repetitive values"""
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         self.assertEqual(get_fieldvalues([17, 18], '909C1u'),
                          ['CERN', 'CERN'])
         self.assertEqual(get_fieldvalues([17, 18], '909C1u', repetitive_values=True),
@@ -4468,22 +4468,22 @@ class WebSearchDateQueryTest(InvenioTestCase):
 
     def test_search_unit_hits_for_datecreated_previous_millenia(self):
         """websearch - search_unit with datecreated returns >0 hits for docs in the last 1000 years"""
-        from invenio.search_engine import search_unit
+        from invenio.legacy.search_engine import search_unit
         self.assertNotEqual(self.empty, search_unit('1000-01-01->9999-12-31', 'datecreated'))
 
     def test_search_unit_hits_for_datemodified_previous_millenia(self):
         """websearch - search_unit with datemodified returns >0 hits for docs in the last 1000 years"""
-        from invenio.search_engine import search_unit
+        from invenio.legacy.search_engine import search_unit
         self.assertNotEqual(self.empty, search_unit('1000-01-01->9999-12-31', 'datemodified'))
 
     def test_search_unit_in_bibrec_for_datecreated_previous_millenia(self):
         """websearch - search_unit_in_bibrec with creationdate gets >0 hits for past 1000 years"""
-        from invenio.search_engine import search_unit_in_bibrec
+        from invenio.legacy.search_engine import search_unit_in_bibrec
         self.assertNotEqual(self.empty, search_unit_in_bibrec("1000-01-01", "9999-12-31", 'creationdate'))
 
     def test_search_unit_in_bibrec_for_datecreated_next_millenia(self):
         """websearch - search_unit_in_bibrec with creationdate gets 0 hits for after year 3000"""
-        from invenio.search_engine import search_unit_in_bibrec
+        from invenio.legacy.search_engine import search_unit_in_bibrec
         self.assertEqual(self.empty, search_unit_in_bibrec("3000-01-01", "9999-12-31", 'creationdate'))
 
 
@@ -4543,7 +4543,7 @@ class WebSearchWashCollectionsTest(InvenioTestCase):
 
     def test_wash_coll_when_coll_restricted(self):
         """websearch - washing of restricted daughter collections"""
-        from invenio.search_engine import wash_colls
+        from invenio.legacy.search_engine import wash_colls
         self.assertEqual(
             sorted(wash_colls(cc='', c=['Books & Reports', 'Theses'])[1]),
             ['Books & Reports', 'Theses'])
@@ -4634,7 +4634,7 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
     """Tests the perform request search API after refactoring."""
 
     def _run_test(self, test_args, expected_results):
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         params = {}
 
         params.update(map(lambda y: (y[0], ',' in y[1] and ', ' not in y[1] and y[1].split(',') or y[1]), map(lambda x: x.split('=', 1), test_args.split(';'))))
@@ -4693,7 +4693,7 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
         # FIXME_TICKET_1174
         # self._run_test('p=el*;rm=citation', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 92, 97, 100, 103, 18, 74, 91, 94, 81])
 
-        from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
+        from invenio.legacy.bibrank.bridge_utils import get_external_word_similarity_ranker
 
         if not get_external_word_similarity_ranker():
             self._run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109, 127, 128])
@@ -4741,7 +4741,7 @@ class WebSearchGetRecordTests(InvenioTestCase):
 
     def test_get_record(self):
         """bibformat - test print_record and get_record of empty record"""
-        from invenio.search_engine import print_record, get_record
+        from invenio.legacy.search_engine import print_record, get_record
         self.assertEqual(print_record(self.recid, 'xm'), '    <record>\n        <controlfield tag="001">%s</controlfield>\n    </record>\n\n    ' % self.recid)
         self.assertEqual(get_record(self.recid), {'001': [([], ' ', ' ', str(self.recid), 1)]})
 

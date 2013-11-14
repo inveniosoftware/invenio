@@ -23,7 +23,6 @@ pylib_DATA = \
 	websearch_templates.py \
 	websearch_regression_tests.py \
 	websearch_web_tests.py \
-	search_engine.py \
 	search_engine_unit_tests.py \
 	search_engine_utils.py \
 	search_engine_query_parser.py \
@@ -31,7 +30,6 @@ pylib_DATA = \
 	websearch_webcoll.py \
 	websearchadmin_regression_tests.py \
 	websearch_external_collections.py \
-	search_engine_summarizer.py \
 	search_engine_summarizer_unit_tests.py \
 	websearch_external_collections_config.py \
 	websearch_external_collections_getter.py \

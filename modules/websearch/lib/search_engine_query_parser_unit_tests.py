@@ -29,9 +29,9 @@ if DATEUTIL_AVAILABLE:
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-search_engine_query_parser = lazy_import('invenio.search_engine_query_parser')
-create_basic_search_units = lazy_import('invenio.search_engine:create_basic_search_units')
-perform_request_search = lazy_import('invenio.search_engine:perform_request_search')
+search_engine_query_parser = lazy_import('invenio.legacy.search_engine.query_parser')
+create_basic_search_units = lazy_import('invenio.legacy.search_engine:create_basic_search_units')
+perform_request_search = lazy_import('invenio.legacy.search_engine:perform_request_search')
 
 
 class TestParserUtilityFunctions(InvenioTestCase):

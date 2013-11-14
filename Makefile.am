@@ -615,7 +615,7 @@ update-v0.99.8-tables: # from v0.99.8 to v1.0.0-rc0
 	echo "ALTER TABLE bskRECORDCOMMENT ADD INDEX (reply_order_cached_data(40));" | ${prefix}/bin/dbexec
 	echo -e 'from invenio.webcommentadminlib import migrate_comments_populate_threads_index;\
 	migrate_comments_populate_threads_index()' | $(PYTHON)
-	echo -e 'from invenio.access_control_firerole import repair_role_definitions;\
+	echo -e 'from invenio.modules.access.firerole import repair_role_definitions;\
 	repair_role_definitions()' | $(PYTHON)
 
 CLEANFILES = *~ *.pyc *.tmp

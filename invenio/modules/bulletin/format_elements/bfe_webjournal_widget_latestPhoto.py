@@ -20,7 +20,7 @@
 WebJournal widget - display photos from given collections
 """
 from invenio.modules.formatter.engine import BibFormatObject
-from invenio.search_engine import perform_request_search
+from invenio.legacy.search_engine import perform_request_search
 from invenio.config import CFG_CERN_SITE, CFG_SITE_URL, CFG_SITE_RECORD
 
 def format_element(bfo, collections, max_photos="3", separator="<br/>"):

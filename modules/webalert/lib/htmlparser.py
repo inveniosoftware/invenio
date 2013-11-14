@@ -56,10 +56,10 @@ def wrap_records(text):
     return '\n'.join(result_lines)
 
 class RecordHTMLParser(HTMLParser):
-    """A parser for the HTML returned by invenio.search_engine.print_record.
+    """A parser for the HTML returned by invenio.legacy.search_engine.print_record.
 
     The parser provides methods to transform the HTML returned by
-    invenio.search_engine.print_record into plain text, with some
+    invenio.legacy.search_engine.print_record into plain text, with some
     minor formatting.
     """
 

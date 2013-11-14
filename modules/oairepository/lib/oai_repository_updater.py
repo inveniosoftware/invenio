@@ -44,7 +44,7 @@ from invenio.config import \
      CFG_TMPDIR
 from invenio.oai_repository_config import CFG_OAI_REPOSITORY_MARCXML_SIZE, \
      CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
-from invenio.search_engine import perform_request_search, get_record, search_unit_in_bibxxx
+from invenio.legacy.search_engine import perform_request_search, get_record, search_unit_in_bibxxx
 from invenio.intbitset import intbitset
 from invenio.legacy.dbquery import run_sql
 from invenio.bibtask import \

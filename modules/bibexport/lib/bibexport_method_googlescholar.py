@@ -51,7 +51,7 @@ this:
 
 from invenio.config import CFG_WEBDIR, CFG_CERN_SITE
 from invenio.bibtask import write_message
-from invenio.search_engine import perform_request_search, print_record
+from invenio.legacy.search_engine import perform_request_search, print_record
 import os
 import gzip
 import datetime

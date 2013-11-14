@@ -71,7 +71,7 @@ from invenio.ext.logging import register_exception
 from invenio.plotextractor_getter import harvest_single, make_single_directory
 from invenio.plotextractor_converter import untar
 from invenio.plotextractor import process_single, get_defaults
-from invenio.shellutils import run_shell_command, Timeout
+from invenio.utils.shell import run_shell_command, Timeout
 from invenio.utils.text import translate_latex2unicode
 from invenio.bibedit_utils import record_find_matching_fields
 from invenio.bibcatalog import bibcatalog_system

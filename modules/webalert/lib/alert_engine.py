@@ -38,7 +38,7 @@ from invenio.config import \
      CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 from invenio.webbasket_dblayer import get_basket_owner_id, add_to_basket
 from invenio.webbasket import format_external_records
-from invenio.search_engine import perform_request_search, wash_colls, \
+from invenio.legacy.search_engine import perform_request_search, wash_colls, \
      get_coll_sons, is_hosted_collection, get_coll_normalised_name, \
      check_user_can_view_record
 from invenio.ext.legacy.handler import wash_urlargd
@@ -48,15 +48,15 @@ from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
 from invenio.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL
 
-from invenio.websearch_external_collections_config import \
+from invenio.legacy.websearch_external_collections.websearch_external_collections_config import \
 CFG_EXTERNAL_COLLECTION_TIMEOUT, \
 CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS
-from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
-from invenio.websearch_external_collections_utils import get_collection_id
+from invenio.legacy.websearch_external_collections.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
+from invenio.legacy.websearch_external_collections.websearch_external_collections_utils import get_collection_id
 
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
-webalert_templates = invenio.template.load('webalert')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
+webalert_templates = invenio.legacy.template.load('webalert')
 
 def update_date_lastrun(alert):
     """Update the last time this alert was ran in the database."""
@@ -489,9 +489,9 @@ def calculate_external_search_params(pattern_list, field, hosted_colls):
     """Function that calculates the basic search units given the search pattern.
     Also returns a set of hosted collections engines."""
 
-    from invenio.search_engine import create_basic_search_units
-    from invenio.websearch_external_collections import bind_patterns
-    from invenio.websearch_external_collections import select_hosted_search_engines as select_external_search_engines
+    from invenio.legacy.search_engine import create_basic_search_units
+    from invenio.legacy.websearch_external_collections import bind_patterns
+    from invenio.legacy.websearch_external_collections import select_hosted_search_engines as select_external_search_engines
 
     pattern = bind_patterns(pattern_list)
     basic_search_units = create_basic_search_units(None, pattern, field)

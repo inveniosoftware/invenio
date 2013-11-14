@@ -28,7 +28,7 @@ __lastupdated__ = """$Date$"""
 import cgi
 
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.ext.legacy.handler import WebInterfaceDirectory, wash_urlargd
 from invenio.utils.url import redirect_to_url
 

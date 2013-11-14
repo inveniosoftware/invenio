@@ -53,14 +53,14 @@ from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite, 
 
 from invenio.base.wrappers import lazy_import
 from invenio.utils.hash import md5
-from invenio.shellutils import run_shell_command
+from invenio.utils.shell import run_shell_command
 
 BibRecDocs = lazy_import('invenio.bibdocfile:BibRecDocs')
 BibRelation = lazy_import('invenio.bibdocfile:BibRelation')
 MoreInfo = lazy_import('invenio.bibdocfile:MoreInfo')
 bibupload = lazy_import('invenio.bibupload')
-print_record = lazy_import('invenio.search_engine:print_record')
-get_record = lazy_import('invenio.search_engine:get_record')
+print_record = lazy_import('invenio.legacy.search_engine:print_record')
+get_record = lazy_import('invenio.legacy.search_engine:get_record')
 create_record = lazy_import('invenio.legacy.bibrecord:create_record')
 records_identical = lazy_import('invenio.legacy.bibrecord:records_identical')
 encode_for_xml = lazy_import('invenio.utils.text:encode_for_xml')
@@ -4044,7 +4044,7 @@ allow any</subfield>
     def test_exotic_format_fft_append(self):
         """bibupload - exotic format FFT append"""
         # define the test case:
-        from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
+        from invenio.modules.access.local_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
         testfile = os.path.join(CFG_TMPDIR, 'test.ps.Z')
         open(testfile, 'w').write('TEST')
         email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
@@ -4261,7 +4261,7 @@ allow any</subfield>
     def test_simple_fft_insert_with_restriction(self):
         """bibupload - simple FFT insert with restriction"""
         # define the test case:
-        from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
+        from invenio.modules.access.local_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
         email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
         email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
         email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]
@@ -5543,7 +5543,7 @@ allow any</subfield>
     def test_revert_fft_correct(self):
         """bibupload - revert FFT correct"""
         # define the test case:
-        from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
+        from invenio.modules.access.local_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
         email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
         email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
         email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]
@@ -5673,7 +5673,7 @@ allow any</subfield>
     def test_simple_fft_replace(self):
         """bibupload - simple FFT replace"""
         # define the test case:
-        from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
+        from invenio.modules.access.local_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
         email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
         email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
         email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]

@@ -40,25 +40,26 @@ from invenio.config import \
     CFG_SITE_SUPPORT_EMAIL, \
     CFG_SITE_ADMIN_EMAIL, \
     CFG_SITE_SECURE_URL
-import invenio.access_control_engine as acce
+import invenio.modules.access.engine as acce
 import invenio.access_control_admin as acca
 from invenio.ext.email import send_email
-from invenio.bibrankadminlib import addadminbox, tupletotable, \
+from invenio.legacy.bibrank.adminlib import addadminbox, tupletotable, \
         tupletotable_onlyselected, addcheckboxes, createhiddenform
-from invenio.access_control_firerole import compile_role_definition, \
+from invenio.modules.access.firerole import compile_role_definition, \
     serialize
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.dbquery import run_sql, OperationalError, wash_table_column_name
-from invenio.webpage import page
+from invenio.legacy.webpage import page
 from invenio.legacy.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
 from invenio.legacy.webuser import email_valid_p, get_user_preferences, \
     set_user_preferences, update_Uid
 from invenio.utils.url import redirect_to_url, wash_url_argument
-from invenio.access_control_config import \
+from invenio.modules.access.local_config import \
     WEBACCESSACTION, MAXPAGEUSERS, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTHENTICATION, DELEGATEADDUSERROLE, \
-    CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, InvenioWebAccessFireroleError, \
+    CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
     MAXSELECTUSERS, CFG_EXTERNAL_AUTH_DEFAULT
+from invenio.modules.access.errors import InvenioWebAccessFireroleError
 from cgi import escape
 
 def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG_SITE_LANG):
@@ -159,7 +160,7 @@ def perform_managerobotlogin(req, robot_name='', new_pwd1='', new_pwd2='', login
     nickname = wash_url_argument(nickname, 'str')
     url_only = wash_url_argument(url_only, 'int')
     json_assertion = wash_url_argument(json_assertion, 'str')
-    from invenio.external_authentication_robot import update_robot_key, load_robot_keys, json
+    from invenio.modules.access.external_authentication_robot import update_robot_key, load_robot_keys, json
     (auth_code, auth_message) = acce.acc_authorize_action(req, 'cfgrobotkeys', login_method='*', robot='*')
     if auth_code != 0: return mustloginpage(req, auth_message)
 

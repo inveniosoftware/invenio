@@ -22,8 +22,8 @@
 __revision__ = "$Id$"
 
 import cgi
-from invenio.bibrankadminlib import addadminbox
-from invenio.bibrankadminlib import tupletotable
+from invenio.legacy.bibrank.adminlib import addadminbox
+from invenio.legacy.bibrank.adminlib import tupletotable
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.legacy.dbquery import run_sql

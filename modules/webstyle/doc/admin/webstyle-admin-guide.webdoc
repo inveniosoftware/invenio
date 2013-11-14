@@ -168,7 +168,7 @@ following content:</p>
 <blockquote>
 <pre>
 from invenio.config import CFG_SITE_LANG
-from invenio.webstyle_templates import Template as DefaultTemplate
+from invenio.legacy.webstyle.templates import Template as DefaultTemplate
 
 class Template(DefaultTemplate):
     """Ithaca style templates."""

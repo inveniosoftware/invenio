@@ -31,7 +31,7 @@ import cgi
 import re
 
 from invenio.legacy.dbquery import run_sql, Error
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.legacy.webuser import collect_user_info, page_not_authorized
 from invenio.config import CFG_BINDIR, CFG_TMPSHAREDDIR, CFG_LOGDIR, \
                             CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
@@ -44,7 +44,7 @@ from invenio.utils.text import encode_for_xml
 from invenio.bibtask import task_low_level_submission
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file
-from invenio.shellutils import run_shell_command
+from invenio.utils.shell import run_shell_command
 from invenio.bibupload import xml_marc_to_records, bibupload
 
 import invenio.bibupload as bibupload_module
@@ -236,7 +236,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
     from invenio.bibdocfile import BibRecDocs, file_strip_ext
     from invenio.utils.hash import md5
     import shutil
-    from invenio.search_engine import perform_request_search, \
+    from invenio.legacy.search_engine import perform_request_search, \
                                       search_pattern, \
                                       guess_collection_of_a_record
     _ = gettext_set_language(ln)
@@ -582,7 +582,7 @@ def _detect_collections_from_marcxml_file(recs):
     for these recIDs.
     """
     from invenio.legacy.bibrecord import record_get_field_values
-    from invenio.search_engine import guess_collection_of_a_record
+    from invenio.legacy.search_engine import guess_collection_of_a_record
     from invenio.bibupload import find_record_from_sysno, \
                                   find_records_from_extoaiid, \
                                   find_record_from_oaiid

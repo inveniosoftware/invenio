@@ -37,7 +37,7 @@ If you have a MARCXML representation of the record to be handled, you can use th
 If you want to handle a record stored in the system and you know the record ID, then you can easily exploit Invenio search_engine API to obtain the corresponding marcxml::
 
     from invenio.bibrecord import create_record
-    from invenio.search_engine import print_record
+    from invenio.legacy.search_engine import print_record
     marcxml = print_record(rec_id, 'xm')
     record = create_record(marcxml)[0]
 
@@ -47,7 +47,7 @@ Having an internal representation of a record you can manipulate it by means of 
 At the end, if you want the MARCXML representation of the record you can use record_xml_output::
 
    from invenio.bibrecord import create_record
-   from invenio.search_engine import print_record
+   from invenio.legacy.search_engine import print_record
    marcxml = print_record(rec_id, 'xm')
    record = create_record(marcxml)[0]
    # ... manipulation ...
@@ -70,6 +70,7 @@ is to read the unit test cases that are located in bibrecord_tests.py and bibupl
 ### IMPORT INTERESTING MODULES AND XML PARSERS
 
 import re
+import string
 import sys
 from cStringIO import StringIO
 
@@ -85,6 +86,10 @@ from invenio.legacy.bibrecord.bibrecord_config import CFG_MARC21_DTD, \
     CFG_BIBRECORD_DEFAULT_CORRECT, CFG_BIBRECORD_PARSERS_AVAILABLE, \
     InvenioBibRecordParserError, InvenioBibRecordFieldError
 from invenio.utils.text import encode_for_xml
+from invenio.legacy.dbquery import run_sql
+
+
+from invenio.intbitset import intbitset
 
 # Some values used for the RXP parsing.
 TAG, ATTRS, CHILDREN = 0, 1, 2
@@ -1412,6 +1417,159 @@ def validate_record_field_positions_global(record):
             if field[4] in all_fields:
                 return ("Duplicate global field position '%d' in tag '%s'" %
                     (field[4], tag))
+
+def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True, split_by=0):
+    """
+    Return list of field values for field TAG for the given record ID
+    or list of record IDs.  (RECIDS can be both an integer or a list
+    of integers.)
+
+    If REPETITIVE_VALUES is set to True, then return all values even
+    if they are doubled.  If set to False, then return unique values
+    only.
+    """
+    out = []
+    try:
+        recIDs = int(recIDs)
+    except:
+        pass
+    if isinstance(recIDs, (int, long)):
+        recIDs = [recIDs,]
+    if not isinstance(recIDs, (list, tuple, intbitset)):
+        return []
+    if len(recIDs) == 0:
+        return []
+    if tag == "001___":
+        # We have asked for tag 001 (=recID) that is not stored in bibXXx
+        # tables.
+        out = [str(recID) for recID in recIDs]
+    else:
+        # we are going to look inside bibXXx tables
+        digits = tag[0:2]
+        try:
+            intdigits = int(digits)
+            if intdigits < 0 or intdigits > 99:
+                raise ValueError
+        except ValueError:
+            # invalid tag value asked for
+            return []
+        bx = "bib%sx" % digits
+        bibx = "bibrec_bib%sx" % digits
+        if not repetitive_values:
+            queryselect = "DISTINCT(bx.value)"
+        else:
+            queryselect = "bx.value"
+
+        if sort:
+            sort_sql = "ORDER BY bibx.field_number, bx.tag ASC"
+        else:
+            sort_sql = ""
+
+        def get_res(recIDs):
+            query = "SELECT %s FROM %s AS bx, %s AS bibx " \
+                    "WHERE bibx.id_bibrec IN (%s) AND bx.id=bibx.id_bibxxx AND " \
+                    "bx.tag LIKE %%s %s" % \
+                    (queryselect, bx, bibx, ("%s,"*len(recIDs))[:-1], sort_sql)
+            return [i[0] for i in run_sql(query, tuple(recIDs) + (tag,))]
+
+        #print not sort and split_by>0 and len(recIDs)>split_by
+        if sort or split_by<=0 or len(recIDs)<=split_by:
+            return get_res(recIDs)
+        else:
+            return [i for res in map(get_res, zip(*[iter(recIDs)]*split_by)) for i in res]
+
+    return out
+
+def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
+    """Return buffer of ALEPH sequential-like textual format with fields found
+       in the list TAGS_IN for record RECID.
+
+       If can_see_hidden is True, just print everything.  Otherwise hide fields
+       from CFG_BIBFORMAT_HIDDEN_TAGS.
+    """
+
+    out = ""
+    if type(tags_in) is not list:
+        tags_in = [tags_in,]
+    if len(tags_in) == 1 and len(tags_in[0]) == 6:
+        ## case A: one concrete subfield asked, so print its value if found
+        ##         (use with care: can mislead if field has multiple occurrences)
+        out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
+    else:
+        ## case B: print our "text MARC" format; works safely all the time
+        # find out which tags to output:
+        dict_of_tags_out = {}
+        if not tags_in:
+            for i in range(0, 10):
+                for j in range(0, 10):
+                    dict_of_tags_out["%d%d%%" % (i, j)] = 1
+        else:
+            for tag in tags_in:
+                if len(tag) == 0:
+                    for i in range(0, 10):
+                        for j in range(0, 10):
+                            dict_of_tags_out["%d%d%%" % (i, j)] = 1
+                elif len(tag) == 1:
+                    for j in range(0, 10):
+                        dict_of_tags_out["%s%d%%" % (tag, j)] = 1
+                elif len(tag) < 5:
+                    dict_of_tags_out["%s%%" % tag] = 1
+                elif tag >= 6:
+                    dict_of_tags_out[tag[0:5]] = 1
+        tags_out = dict_of_tags_out.keys()
+        tags_out.sort()
+        # search all bibXXx tables as needed:
+        for tag in tags_out:
+            digits = tag[0:2]
+            try:
+                intdigits = int(digits)
+                if intdigits < 0 or intdigits > 99:
+                    raise ValueError
+            except ValueError:
+                # invalid tag value asked for
+                continue
+            if tag.startswith("001") or tag.startswith("00%"):
+                if out:
+                    out += "\n"
+                out += "%09d %s %d" % (recID, "001__", recID)
+            bx = "bib%sx" % digits
+            bibx = "bibrec_bib%sx" % digits
+            query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
+                    "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s"\
+                    "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
+            res = run_sql(query, (recID, str(tag)+'%'))
+            # go through fields:
+            field_number_old = -999
+            field_old = ""
+            for row in res:
+                field, value, field_number = row[0], row[1], row[2]
+                ind1, ind2 = field[3], field[4]
+                printme = True
+                #check the stuff in hiddenfields
+                if not can_see_hidden:
+                    for htag in cfg['CFG_BIBFORMAT_HIDDEN_TAGS']:
+                        ltag = len(htag)
+                        samelenfield = field[0:ltag]
+                        if samelenfield == htag:
+                            printme = False
+                if ind1 == "_":
+                    ind1 = ""
+                if ind2 == "_":
+                    ind2 = ""
+                # print field tag
+                if printme:
+                    if field_number != field_number_old or field[:-1] != field_old[:-1]:
+                        if out:
+                            out += "\n"
+                        out += "%09d %s " % (recID, field[:5])
+                        field_number_old = field_number
+                        field_old = field
+                    # print subfield value
+                    if field[0:2] == "00" and field[-1:] == "_":
+                        out += value
+                    else:
+                        out += "$$%s%s" % (field[-1:], value)
+    return out
 
 def _record_sort_by_indicators(record):
     """Sorts the fields inside the record by indicators."""

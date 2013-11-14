@@ -38,16 +38,16 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_RECORD, \
                            CFG_WEBLINKBACK_TRACKBACK_ENABLED
-from invenio.search_engine import guess_primary_collection_of_a_record, \
+from invenio.legacy.search_engine import guess_primary_collection_of_a_record, \
                                   create_navtrail_links, \
                                   get_colID
-from invenio.webpage import pageheaderonly, pagefooteronly
+from invenio.legacy.webpage import pageheaderonly, pagefooteronly
 from invenio.websearchadminlib import get_detailed_page_tabs
-from invenio.access_control_engine import acc_authorize_action
-import invenio.template
-webstyle_templates = invenio.template.load('webstyle')
-websearch_templates = invenio.template.load('websearch')
-weblinkback_templates = invenio.template.load('weblinkback')
+from invenio.modules.access.engine import acc_authorize_action
+import invenio.legacy.template
+webstyle_templates = invenio.legacy.template.load('webstyle')
+websearch_templates = invenio.legacy.template.load('websearch')
+weblinkback_templates = invenio.legacy.template.load('weblinkback')
 
 
 class WebInterfaceRecordLinkbacksPages(WebInterfaceDirectory):

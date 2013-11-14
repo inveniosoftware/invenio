@@ -48,7 +48,7 @@ except ImportError:
     CFG_CAN_DO_OCR = False
 
 from invenio.utils.text import wrap_text_in_a_box
-from invenio.shellutils import run_process_with_timeout, run_shell_command
+from invenio.utils.shell import run_process_with_timeout, run_shell_command
 from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
     CFG_PATH_ANY2DJVU, \
     CFG_PATH_PDFINFO, \

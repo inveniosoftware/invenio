@@ -43,9 +43,9 @@ from invenio.weblinkback_dblayer import create_linkback, \
                                         set_url_broken, \
                                         increment_broken_count, \
                                         remove_linkback
-from invenio.search_engine import check_user_can_view_record, \
+from invenio.legacy.search_engine import check_user_can_view_record, \
                                   guess_primary_collection_of_a_record
-from invenio.access_control_engine import acc_authorize_action, \
+from invenio.modules.access.engine import acc_authorize_action, \
                                           acc_get_authorized_emails
 from invenio.legacy.webuser import collect_user_info
 from invenio.ext.email import send_email

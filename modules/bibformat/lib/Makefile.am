@@ -17,12 +17,9 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibformat_templates.py \
-             bibformatadminlib.py \
-             bibformat_manager.py \
+pylib_DATA = \
              bibformatadmin_regression_tests.py \
-             bibformat_bfx_engine.py bibformat_bfx_engine_config.py \
-             bibformat_regression_tests.py bibformat_xslt_engine.py bibreformat.py \
+             bibformat_regression_tests.py \
 			 bibformat_web_tests.py
 
 EXTRA_DIST = $(pylib_DATA)

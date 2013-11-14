@@ -22,7 +22,7 @@
 from invenio.config import CFG_WEBSEARCH_FULLTEXT_SNIPPETS
 from invenio.ext.logging import register_exception
 from invenio.modules.formatter.utils import get_pdf_snippets
-from invenio.search_engine_utils import get_fulltext_terms_from_search_pattern
+from invenio.legacy.search_engine import get_fulltext_terms_from_search_pattern
 from invenio.modules.search.cache import get_pattern_from_cache
 
 def template_context_function(id_bibrec, pattern, qid, current_user):

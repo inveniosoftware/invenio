@@ -26,12 +26,12 @@ import MySQLdb
 from invenio import bibformatadminlib
 from invenio.modules.formatter import engine as bibformat_engine
 import invenio.modules.formatter.api as bibformat_dblayer
-from invenio.bibrankadminlib import check_user
-from invenio.webpage import page, error_page
+from invenio.legacy.bibrank.adminlib import check_user
+from invenio.legacy.webpage import page, error_page
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.base.i18n import wash_language, gettext_set_language
 from invenio.utils.url import wash_url_argument, redirect_to_url
-from invenio.search_engine import search_pattern, \
+from invenio.legacy.search_engine import search_pattern, \
                            create_basic_search_units
 from invenio.modules.formatter.config import InvenioBibFormatError, InvenioBibFormatWarning
 from invenio.ext.logging import register_exception
@@ -1101,7 +1101,7 @@ def download_dreamweaver_floater(req):
     @param req: the request object
     @return: the palette code to be used within Dreamweaver
     """
-    #bibformat_templates = invenio.template.load('bibformat')
+    #bibformat_templates = invenio.legacy.template.load('bibformat')
     req.content_type = 'text/html'
     req.headers_out["Content-Disposition"] = "attachment; filename=BibFormat_floater.html"
     req.send_http_header()
@@ -1125,7 +1125,7 @@ def dialog_box(req, url="", ln=CFG_SITE_LANG, navtrail="",
     @return: a dialog page
     """
     import invenio
-    bibformat_templates = invenio.template.load('bibformat')
+    bibformat_templates = invenio.legacy.template.load('bibformat')
 
     return page(title="",
                 body = bibformat_templates.tmpl_admin_dialog_box(url,

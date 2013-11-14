@@ -47,7 +47,7 @@ def get_current_user_records_that_can_be_displayed(qid):
         'CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT')
     @search_results_cache.memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
     def get_records_for_user(qid, uid):
-        from invenio.search_engine import get_records_that_can_be_displayed
+        from invenio.legacy.search_engine import get_records_that_can_be_displayed
         key = get_search_results_cache_key_from_qid(qid)
         data = search_results_cache.get(key)
         if data is None:
@@ -164,7 +164,7 @@ class FacetBuilder(object):
         return self.get_recids_intbitset(qid).tolist()
 
     def get_facets_for_query(self, qid, limit=20, parent=None):
-        from invenio.search_engine import get_most_popular_field_values,\
+        from invenio.legacy.search_engine import get_most_popular_field_values,\
             get_field_tags
         return get_most_popular_field_values(self.get_recids(qid),
                                              get_field_tags(self.name)
@@ -172,7 +172,7 @@ class FacetBuilder(object):
 
     #@blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT / 2)
     def get_value_recids(self, value):
-        from invenio.search_engine import search_pattern
+        from invenio.legacy.search_engine import search_pattern
         if isinstance(value, unicode):
             value = value.encode('utf8')
         p = '"' + str(value) + '"'

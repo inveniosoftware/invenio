@@ -40,7 +40,7 @@ from invenio.bibauthorid_config import AID_ENABLED, CLAIMPAPER_ADMIN_ROLE, CLAIM
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, CFG_INSPIRE_SITE #, CFG_SITE_SECURE_URL
 
-from invenio.webpage import page, pageheaderonly, pagefooteronly
+from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
 from invenio.base.i18n import gettext_set_language #, wash_language
 from invenio.template import load
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
@@ -48,9 +48,9 @@ from invenio.utils.url import redirect_to_url
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, set_user_preferences, \
                             email_valid_p, emailUnique, get_email_from_username, get_uid_from_email, \
                             isUserSuperAdmin
-from invenio.access_control_admin import acc_find_user_role_actions, acc_get_user_roles, acc_get_role_id
-from invenio.search_engine import perform_request_search
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.modules.access.control import acc_find_user_role_actions, acc_get_user_roles, acc_get_role_id
+from invenio.legacy.search_engine import perform_request_search
+from invenio.legacy.bibrecord import get_fieldvalues
 
 import invenio.bibauthorid_webapi as webapi
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string

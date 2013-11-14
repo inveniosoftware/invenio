@@ -59,7 +59,7 @@ class WebGroupTest(InvenioTestCase):
     def test_synchronize_external_groups(self):
         """webgroup - synchronizing one user external groups"""
         from invenio.webgroup import synchronize_external_groups
-        from invenio.webgroup_dblayer import get_external_groups
+        from invenio.legacy.websession.dblayer import get_external_groups
         synchronize_external_groups(self.uid, {'group1' : 'descr1', 'group2' : 'descr2'}, self.login_method)
         groups = get_external_groups(self.uid)
         groups_names = [name[1] for name in groups]
@@ -85,7 +85,7 @@ class WebGroupTest(InvenioTestCase):
     def test_synchronize_all_external_groups(self):
         """webgroup - synchronizing all external groups"""
         from invenio.webgroup import synchronize_all_external_groups
-        from invenio.webgroup_dblayer import get_external_groups, \
+        from invenio.legacy.websession.dblayer import get_external_groups, \
             get_all_login_method_groups
         synchronize_all_external_groups({'group1' : ('descr1', [self.email, self.email2])}, self.login_method)
         groups = get_external_groups(self.uid2)

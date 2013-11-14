@@ -52,7 +52,7 @@ class Bibrec(db.Model):
         """
            Return True if record is marked as deleted.
         """
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         # record exists; now check whether it isn't marked as deleted:
         dbcollids = get_fieldvalues(self.id, "980__%")
 
@@ -63,7 +63,7 @@ class Bibrec(db.Model):
     @staticmethod
     def _next_merged_recid(recid):
         """ Returns the ID of record merged with record with ID = recid """
-        from invenio.search_engine_utils import get_fieldvalues
+        from invenio.legacy.bibrecord import get_fieldvalues
         merged_recid = None
         for val in get_fieldvalues(recid, "970__d"):
             try:
@@ -105,7 +105,7 @@ class Bibrec(db.Model):
     @cached_property
     def is_restricted(self):
         """Returns True is record is restricted."""
-        from invenio.search_engine import get_restricted_collections_for_recid
+        from invenio.legacy.search_engine import get_restricted_collections_for_recid
 
         if get_restricted_collections_for_recid(self.id,
                                                 recreate_cache_if_needed=False):
@@ -117,7 +117,7 @@ class Bibrec(db.Model):
     @cached_property
     def is_processed(self):
         """Returns True is recods is processed (not in any collection)."""
-        from invenio.search_engine import is_record_in_any_collection
+        from invenio.legacy.search_engine import is_record_in_any_collection
         return not is_record_in_any_collection(self.id,
                                                recreate_cache_if_needed=False)
 

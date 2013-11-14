@@ -38,7 +38,7 @@ __revision__ = "$Id"
 
 import subprocess
 import re
-from invenio import search_engine
+import invenio.legacy.search_engine
 from invenio.legacy import bibrecord
 from invenio.modules import formatter as bibformat
 
@@ -56,7 +56,7 @@ from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmar
 
 from invenio.bibedit_utils import record_locked_by_queue
 
-from invenio import template
+from invenio.legacy import template
 multiedit_templates = template.load('bibeditmulti')
 
 # base command for subfields

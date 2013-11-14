@@ -18,7 +18,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.search_engine import get_creation_date
+from invenio.legacy.search_engine import get_creation_date
 
 def format_element(bfo, format='%Y-%m-%d', date_format='%Y-%m-%d'):
     '''

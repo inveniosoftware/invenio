@@ -81,7 +81,7 @@ programs via a high-level API and a mid-mid level API.
    Examples:
 
       >>> # import the function:
-      >>> from invenio.bibrank_record_sorter import rank_records
+      >>> from invenio.legacy.bibrank.record_sorter import rank_records
       >>> # rank all records with the words 'higgs boson' according to the method "wrd"
       >>> rank_records('wrd', 0, a_hitset, ['higgs', 'boson'], 0)
       >>> # find similar records to the record 12345, hitset is here ignored because of 'similar records'
@@ -123,7 +123,7 @@ programs via a high-level API and a mid-mid level API.
    Examples:
 
       >>> # import the function:
-      >>> from invenio.bibrank_record_sorter import find_similar
+      >>> from invenio.legacy.bibrank.record_sorter import find_similar
       >>> # find records similar to 12345, hitset must be full
       >>> find_similar('wrd', 12345, hitset, 0, 0)
       >>> # rank records according to a method called jif, using the single_tag...based method.

@@ -30,12 +30,12 @@ from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.ext.logging import register_exception
 from invenio.legacy.webuser import get_user_info, collect_user_info, \
                             isUserAdmin
-from invenio.access_control_engine import acc_authorize_action, \
+from invenio.modules.access.engine import acc_authorize_action, \
      acc_get_authorized_emails
-from invenio.search_engine import perform_request_search
+from invenio.legacy.search_engine import perform_request_search
 
-import invenio.template
-webcomment_templates = invenio.template.load('webcomment')
+import invenio.legacy.template
+webcomment_templates = invenio.legacy.template.load('webcomment')
 
 def getnavtrail(previous = '', ln=CFG_SITE_LANG):
     """Get the navtrail"""
@@ -105,7 +105,7 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
     """
     _ = gettext_set_language(ln)
 
-    from invenio.search_engine import record_exists
+    from invenio.legacy.search_engine import record_exists
 
     warnings = []
 

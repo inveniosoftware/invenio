@@ -49,7 +49,7 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      InvenioWebBasketWarning
 from invenio.utils.url import get_referer
 from invenio.legacy.webuser import isGuestUser, collect_user_info
-from invenio.search_engine import \
+from invenio.legacy.search_engine import \
      record_exists, \
      get_merged_recid, \
      check_user_can_view_record, \
@@ -58,16 +58,16 @@ from invenio.search_engine import \
 #from invenio.webcomment import check_user_can_attach_file_to_comments
 import invenio.webbasket_dblayer as db
 try:
-    import invenio.template
-    webbasket_templates = invenio.template.load('webbasket')
+    import invenio.legacy.template
+    webbasket_templates = invenio.legacy.template.load('webbasket')
 except ImportError:
     pass
-from invenio.websearch_external_collections_utils import get_collection_name_by_id
-from invenio.websearch_external_collections import select_hosted_search_engines
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
-from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
+from invenio.legacy.websearch_external_collections.websearch_external_collections_utils import get_collection_name_by_id
+from invenio.legacy.websearch_external_collections import select_hosted_search_engines
+from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.legacy.websearch_external_collections.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 from invenio.ext.logging import register_exception
-from invenio.search_engine import search_unit
+from invenio.legacy.search_engine import search_unit
 from invenio.utils.html import remove_html_markup, unescape
 
 ########################################

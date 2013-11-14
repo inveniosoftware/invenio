@@ -21,8 +21,6 @@ wsgiwebdir=$(localstatedir)/www-wsgi/
 pylib_DATA = webdoc.py \
              webdoc_unit_tests.py \
              webdoc_webinterface.py \
-             webpage.py \
-             template.py \
              webstyle_templates.py \
              webstyle_regression_tests.py \
              webinterface_unit_tests.py \

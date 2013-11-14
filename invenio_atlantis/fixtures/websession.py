@@ -20,7 +20,7 @@
 
 from fixture import DataSet
 from invenio.config import CFG_SITE_ADMIN_EMAIL
-from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS, \
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_USERGROUP_STATUS, \
     CFG_WEBSESSION_GROUP_JOIN_POLICY
 
 

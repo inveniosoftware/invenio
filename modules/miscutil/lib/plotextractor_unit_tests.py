@@ -31,7 +31,7 @@ intelligently_find_filenames = lazy_import('invenio.plotextractor:intelligently_
 put_it_together = lazy_import('invenio.plotextractor:put_it_together')
 get_converted_image_name = lazy_import('invenio.plotextractor_output_utils:get_converted_image_name')
 remove_dups = lazy_import('invenio.plotextractor_output_utils:remove_dups')
-run_shell_command = lazy_import('invenio.shellutils:run_shell_command')
+run_shell_command = lazy_import('invenio.utils.shell:run_shell_command')
 
 
 class PutItTogetherTest(InvenioTestCase):

@@ -26,7 +26,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_TMPDIR, \
      CFG_SITE_URL
-import invenio.access_control_engine as access_manager
+import invenio.modules.access.engine as access_manager
 from invenio.utils.url import create_html_link
 from invenio.legacy.dbquery import run_sql
 from invenio.oai_repository_updater import parse_set_definition
@@ -34,9 +34,9 @@ from invenio.base.i18n import gettext_set_language
 from invenio.ext.logging import register_exception
 from invenio.oai_repository_config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 
-import invenio.template
-oaiharvest_templates = invenio.template.load('oai_harvest')
-webstyle_templates = invenio.template.load('webstyle')
+import invenio.legacy.template
+oaiharvest_templates = invenio.legacy.template.load('oai_harvest')
+webstyle_templates = invenio.legacy.template.load('webstyle')
 
 tmppath = CFG_TMPDIR + '/oairepositoryadmin.' + str(os.getpid())
 guideurl = "help/admin/oairepository-admin-guide"

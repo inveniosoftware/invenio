@@ -48,6 +48,7 @@ from invenio.bibindexadminlib import get_idx_remove_html_markup, \
                                      get_idx_remove_stopwords
 from invenio.bibdocfile import BibRecDocs
 from invenio.search_engine import perform_request_search, \
+from invenio.legacy.search_engine import perform_request_search, \
      get_index_stemming_language, \
      get_synonym_terms, \
      search_pattern, \
@@ -60,7 +61,7 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.ext.logging import register_exception
-from invenio.bibrankadminlib import get_def_name
+from invenio.legacy.bibrank.adminlib import get_def_name
 from invenio.solrutils_bibindex_indexer import solr_commit
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_TAG, \
@@ -82,7 +83,7 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     run_sql_drop_silently, \
     get_min_last_updated, \
     remove_inexistent_indexes
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.bibfield import get_record
 from invenio.memoiseutils import Memoise
 

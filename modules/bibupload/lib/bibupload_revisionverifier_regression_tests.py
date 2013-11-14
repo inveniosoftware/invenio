@@ -24,8 +24,8 @@ Contains Test Cases for Revision Verifier module used along with BibUpload.
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, nottest
 
-get_record = lazy_import('invenio.search_engine:get_record')
-print_record = lazy_import('invenio.search_engine:print_record')
+get_record = lazy_import('invenio.legacy.search_engine:get_record')
+print_record = lazy_import('invenio.legacy.search_engine:print_record')
 bibupload = lazy_import('invenio.bibupload:bibupload')
 xml_marc_to_records = lazy_import('invenio.bibupload:xml_marc_to_records')
 

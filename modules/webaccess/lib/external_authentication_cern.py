@@ -27,9 +27,9 @@ import socket
 import re
 
 from invenio.ext.logging import register_exception
-from invenio.external_authentication import ExternalAuth, \
+from invenio.modules.access.external_authentication import ExternalAuth, \
         InvenioWebAccessExternalAuthError
-from invenio.external_authentication_cern_wrapper import AuthCernWrapper
+from invenio.modules.access.external_authentication_cern_wrapper import AuthCernWrapper
 
 
 # Tunable list of settings to be hidden

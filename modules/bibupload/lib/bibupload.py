@@ -77,7 +77,7 @@ from invenio.legacy.bibrecord import create_records, \
                               record_extract_dois, \
                               record_has_field,\
                               records_identical
-from invenio.search_engine import get_record
+from invenio.legacy.search_engine import get_record
 from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.ext.logging import register_exception
 from invenio.bibcatalog import bibcatalog_system
@@ -93,7 +93,7 @@ from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     bibdocfile_url_p, CFG_BIBDOCFILE_AVAILABLE_FLAGS, guess_format_from_url, \
     BibRelation, MoreInfo
 
-from invenio.search_engine import search_pattern
+from invenio.legacy.search_engine import search_pattern
 
 from invenio.bibupload_revisionverifier import RevisionVerifier, \
                                                InvenioBibUploadConflictingRevisionsError, \
@@ -2858,7 +2858,7 @@ def bibupload_records(records, opt_mode=None, opt_notimechange=0,
                     results_for_callback['results'].append({'recid': error[1], 'success': False, 'error_message': error[2]})
             elif error[0] == 0:
                 if callback_url:
-                    from invenio.search_engine import print_record
+                    from invenio.legacy.search_engine import print_record
                     results_for_callback['results'].append({'recid': error[1], 'success': True, "marcxml": print_record(error[1], 'xm'), 'url': "%s/%s/%s" % (CFG_SITE_URL, CFG_SITE_RECORD, error[1])})
             else:
                 if callback_url:

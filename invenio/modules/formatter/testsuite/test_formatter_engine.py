@@ -35,7 +35,7 @@ bibformat = lazy_import('invenio.modules.formatter')
 bibformat_engine = lazy_import('invenio.modules.formatter.engine')
 bibformat_utils = lazy_import('invenio.modules.formatter.utils')
 bibformat_config = lazy_import('invenio.modules.formatter.config')
-bibformatadminlib = lazy_import('invenio.bibformatadminlib')
+bibformatadminlib = lazy_import('invenio.legacy.bibformat.adminlib')
 format_templates = lazy_import('invenio.modules.formatter.testsuite.format_templates')
 format_elements = lazy_import('invenio.modules.formatter.testsuite.format_elements')
 

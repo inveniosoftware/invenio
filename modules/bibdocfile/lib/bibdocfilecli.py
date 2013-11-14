@@ -43,7 +43,7 @@ from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioBibDocFileError, \
     bibdocfile_url_to_bibdoc, decompose_bibdocfile_url, CFG_BIBDOCFILE_AVAILABLE_FLAGS
 
 from invenio.intbitset import intbitset
-from invenio.search_engine import perform_request_search
+from invenio.legacy.search_engine import perform_request_search
 from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 from invenio.legacy.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission

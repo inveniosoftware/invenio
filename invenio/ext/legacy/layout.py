@@ -36,7 +36,7 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
     _exports = ['']
     def __call__(self, req, form):
         try:
-            from invenio.webpage import page
+            from invenio.legacy.webpage import page
         except ImportError:
             page = lambda * args: args[1]
         req.status = apache.HTTP_INTERNAL_SERVER_ERROR
@@ -91,19 +91,19 @@ except:
     WebInterfaceSubmitPages = WebInterfaceDumbPages
 
 try:
-    from invenio.legacy.websession.webinterface import WebInterfaceYourAccountPages
+    from invenio.legacy.websession.websesion_webinterface import WebInterfaceYourAccountPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourAccountPages = WebInterfaceDumbPages
 
 try:
-    from invenio.legacy.websession.webinterface import WebInterfaceYourTicketsPages
+    from invenio.legacy.websession.websesion_webinterface import WebInterfaceYourTicketsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourTicketsPages = WebInterfaceDumbPages
 
 try:
-    from invenio.legacy.websession.webinterface import WebInterfaceYourGroupsPages
+    from invenio.legacy.websession.websesion_webinterface import WebInterfaceYourGroupsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourGroupsPages = WebInterfaceDumbPages

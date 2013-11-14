@@ -527,7 +527,7 @@ class BibFieldMarcReaderRecstruct(InvenioTestCase):
 
     def test_rectruct_to_cool_struct_preparation(self):
         """BibField -intermediate structure from recjson"""
-        from invenio.search_engine import get_record as search_engine_get_record
+        from invenio.legacy.search_engine import get_record as search_engine_get_record
         bibrecord = search_engine_get_record(13)
         blob = BlobWrapper(blob=bibrecord, master_format='marc', schema='recstruct')
         r = MarcReader(blob)
@@ -538,7 +538,7 @@ class BibFieldMarcReaderRecstruct(InvenioTestCase):
 
     def test_recjson_creation_from_recstruct(self):
         """BibField - recjson from recstruct"""
-        from invenio.search_engine import get_record as search_engine_get_record
+        from invenio.legacy.search_engine import get_record as search_engine_get_record
         bibrecord = search_engine_get_record(7)
         blob = BlobWrapper(blob=bibrecord, master_format='marc', schema='recstruct')
         r = MarcReader(blob)

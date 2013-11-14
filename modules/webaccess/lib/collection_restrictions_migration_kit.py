@@ -29,10 +29,10 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.legacy.dbquery import run_sql
-from invenio.access_control_admin import acc_add_authorization, acc_add_role, \
+from invenio.modules.access.control import acc_add_authorization, acc_add_role, \
     acc_get_action_id
-from invenio.access_control_firerole import compile_role_definition, serialize
-from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.modules.access.firerole import compile_role_definition, serialize
+from invenio.modules.access.local_config import VIEWRESTRCOLL
 
 CFG_PROPOSED_ROLE_NAME = "%s group"
 CFG_PROPOSED_ROLE_DESCRIPTION = "Group to access the following restricted collection(s): %s."

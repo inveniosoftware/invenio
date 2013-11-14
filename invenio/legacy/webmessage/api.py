@@ -34,10 +34,10 @@ from invenio.base.i18n import gettext_set_language
 from invenio.utils.date import datetext_default, get_datetext
 from invenio.utils.html import escape_html
 from invenio.legacy.webuser import collect_user_info, list_users_in_roles
-from invenio.access_control_admin import acc_get_role_id, acc_is_user_in_role
+from invenio.modules.access.control import acc_get_role_id, acc_is_user_in_role
 try:
-    import invenio.template
-    webmessage_templates = invenio.template.load('webmessage')
+    import invenio.legacy.template
+    webmessage_templates = invenio.legacy.template.load('webmessage')
 except:
     pass
 from invenio.ext.logging import register_exception

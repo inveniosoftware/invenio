@@ -24,7 +24,7 @@ including 'breaking news'.
 import time
 import os
 
-from invenio.search_engine import search_pattern, record_exists
+from invenio.legacy.search_engine import search_pattern, record_exists
 from invenio.modules.formatter.engine import BibFormatObject
 from invenio.config import \
      CFG_SITE_URL, \

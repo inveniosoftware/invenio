@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_SITE_RECORD
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.email import send_email
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.webjournal_config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
      InvenioWebJournalReleaseUpdateError, \
@@ -79,9 +79,9 @@ from invenio.legacy.bibrecord import \
      print_rec
 from invenio.modules.formatter import format_record
 from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
-from invenio.search_engine import get_all_collections_of_a_record
-import invenio.template
-wjt = invenio.template.load('webjournal')
+from invenio.legacy.search_engine import get_all_collections_of_a_record
+import invenio.legacy.template
+wjt = invenio.legacy.template.load('webjournal')
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""

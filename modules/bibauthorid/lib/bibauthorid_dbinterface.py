@@ -38,8 +38,8 @@ from invenio.bibauthorid_general_utils import bai_all as all
 from itertools import groupby, count, ifilter, chain, imap
 from operator import itemgetter
 
-from invenio.search_engine import perform_request_search
-from invenio.access_control_engine import acc_authorize_action
+from invenio.legacy.search_engine import perform_request_search
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL
 
 from invenio.bibauthorid_name_utils import split_name_parts

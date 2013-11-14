@@ -42,7 +42,7 @@ from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
     CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, CFG_SITE_URL, CFG_SITE_SECURE_URL, \
     CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS, \
     CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS
-from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
     CFG_WEBSESSION_ENABLE_LOCKING
 #from invenio.session_flask import InvenioSession as FlaskInvenioSession

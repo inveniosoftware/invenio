@@ -39,7 +39,7 @@ from invenio.webauthorprofile_corefunctions import get_pubs, get_person_names_di
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID
-from invenio.webpage import pageheaderonly
+from invenio.legacy.webpage import pageheaderonly
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import redirect_to_url
 from invenio.utils.json import json_unicode_to_utf8
@@ -47,12 +47,12 @@ from invenio.utils.json import json_unicode_to_utf8
 import datetime
 
 
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
-webauthorprofile_templates = invenio.template.load('webauthorprofile')
-bibauthorid_template = invenio.template.load('bibauthorid')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
+webauthorprofile_templates = invenio.legacy.template.load('webauthorprofile')
+bibauthorid_template = invenio.legacy.template.load('bibauthorid')
 
-from invenio.search_engine import page_end
+from invenio.legacy.search_engine import page_end
 JSON_OK = False
 
 if sys.hexversion < 0x2060000:

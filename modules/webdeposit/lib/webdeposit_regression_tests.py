@@ -49,7 +49,7 @@ class TestWebDepositUtils(InvenioTestCase):
     # Utility methods
     #
     def login_user(self, username='admin'):
-        from invenio.websession_model import User
+        from invenio.legacy.websession_model import User
         from invenio.ext.login import login_user, current_user
         user_id = User.query.filter_by(nickname=username).one().id
         login_user(user_id)
@@ -248,7 +248,7 @@ class TestWebDepositUtils(InvenioTestCase):
         from wtforms import TextAreaField
         from datetime import datetime
 
-        from invenio.search_engine import record_exists
+        from invenio.legacy.search_engine import record_exists
         from invenio.cache import cache
         from invenio.config import CFG_PREFIX
         from invenio.modules.workflows.models import Workflow

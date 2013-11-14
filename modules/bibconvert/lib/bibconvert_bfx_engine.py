@@ -57,7 +57,7 @@ except ImportError:
 ##        * import Ft.Xml.XPath
 ##        * import Ft.Xml.Xslt
 
-from invenio import bibformat_bfx_engine
+from invenio.modules.formatter.engines import bfx as bibformat_bfx_engine
 from invenio.config import CFG_ETCDIR
 
 CFG_BFX_TEMPLATES_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR, os.sep, os.sep)

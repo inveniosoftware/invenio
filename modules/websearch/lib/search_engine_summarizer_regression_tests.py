@@ -27,11 +27,11 @@ class WebSearchSummarizerTests(InvenioTestCase):
     """Test utility functions for search engine summarizer."""
 
     def test_basic(self):
-        from invenio.search_engine_summarizer import summarize_records
+        from invenio.legacy.search_engine.summarizer import summarize_records
         summarize_records(intbitset(range(1, 100)), 'hcs', 'en')
 
     def test_xml(self):
-        from invenio.search_engine_summarizer import summarize_records
+        from invenio.legacy.search_engine.summarizer import summarize_records
         summarize_records(intbitset(range(1, 100)), 'xcs', 'en')
 
 

@@ -38,9 +38,9 @@ from invenio.config import CFG_SITE_LANG, \
                            CFG_CERN_SITE
 from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, \
                             collect_user_info
-from invenio.webpage import page, pageheaderonly, pagefooteronly
+from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
 from invenio.ext.email import send_email
-from invenio.search_engine import create_navtrail_links, \
+from invenio.legacy.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
      get_colID, check_user_can_view_record, \
      record_exists, get_fieldvalues
@@ -49,9 +49,9 @@ from invenio.utils.url import redirect_to_url, \
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs
-from invenio.access_control_config import VIEWRESTRCOLL
-from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
-import invenio.template
+from invenio.modules.access.local_config import VIEWRESTRCOLL
+from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
+import invenio.legacy.template
 
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_utils import book_title_from_MARC, search_user
@@ -71,9 +71,9 @@ from invenio.bibcirculation_config import CFG_BIBCIRCULATION_ILLS_EMAIL, \
                                           CFG_BIBCIRCULATION_ACQ_STATUS_NEW, \
                                           AMZ_ACQUISITION_IDENTIFIER_TAG
 
-webstyle_templates = invenio.template.load('webstyle')
-websearch_templates = invenio.template.load('websearch')
-bc_templates = invenio.template.load('bibcirculation')
+webstyle_templates = invenio.legacy.template.load('webstyle')
+websearch_templates = invenio.legacy.template.load('websearch')
+bc_templates = invenio.legacy.template.load('bibcirculation')
 
 class WebInterfaceYourLoansPages(WebInterfaceDirectory):
     """Defines the set of /yourloans pages."""

@@ -33,11 +33,11 @@ from invenio.bibdocfile_config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTY
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS, \
      CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
 from invenio.utils import apache
-from invenio.access_control_config import VIEWRESTRCOLL
-from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_role
-from invenio.webpage import page, pageheaderonly, \
+from invenio.modules.access.local_config import VIEWRESTRCOLL
+from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.control import acc_is_role
+from invenio.legacy.webpage import page, pageheaderonly, \
     pagefooteronly, warning_page, write_warning
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, isUserSuperAdmin, \
                             isGuestUser
@@ -45,7 +45,7 @@ from invenio import webjournal_utils
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language
-from invenio.search_engine import \
+from invenio.legacy.search_engine import \
      guess_primary_collection_of_a_record, get_colID, record_exists, \
      create_navtrail_links, check_user_can_view_record, record_empty, \
      is_user_owner_of_record
@@ -54,11 +54,11 @@ from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     get_subformat_from_format
 from invenio.ext.logging import register_exception
 from invenio.websearchadminlib import get_detailed_page_tabs
-import invenio.template
-bibdocfile_templates = invenio.template.load('bibdocfile')
-webstyle_templates = invenio.template.load('webstyle')
-websubmit_templates = invenio.template.load('websubmit')
-websearch_templates = invenio.template.load('websearch')
+import invenio.legacy.template
+bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
+webstyle_templates = invenio.legacy.template.load('webstyle')
+websubmit_templates = invenio.legacy.template.load('websubmit')
+websearch_templates = invenio.legacy.template.load('websearch')
 
 from invenio.bibdocfile_managedocfiles import \
      create_file_upload_interface, \
@@ -66,7 +66,7 @@ from invenio.bibdocfile_managedocfiles import \
      get_upload_file_interface_css, \
      move_uploaded_files_to_storage
 
-bibdocfile_templates = invenio.template.load('bibdocfile')
+bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 
 
 class WebInterfaceFilesPages(WebInterfaceDirectory):

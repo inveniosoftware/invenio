@@ -51,11 +51,11 @@ def main():
     """Main function that analyzes command line input and calls whatever
     is appropriate. """
 
-    from invenio.access_control_firerole import repair_role_definitions
+    from invenio.modules.access.firerole import repair_role_definitions
     import invenio.access_control_admin as acca
     from invenio.base.globals import cfg
     from invenio.bibtask import authenticate
-    from invenio.access_control_config import DEF_DEMO_USER_ROLES, \
+    from invenio.modules.access.local_config import DEF_DEMO_USER_ROLES, \
         DEF_DEMO_ROLES, DEF_DEMO_AUTHS
 
     ## parse command line:

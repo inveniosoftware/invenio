@@ -26,8 +26,8 @@ try:
     import sys
     from invenio.flaskshell import *
     from invenio.config import *
-    from invenio.access_control_engine import acc_authorize_action
-    from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
+    from invenio.modules.access.engine import acc_authorize_action
+    from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS
 except ImportError, e:
     print "Error: %s" % e
     import sys

@@ -52,7 +52,7 @@ from os.path import exists, join
 
 from invenio.legacy.bibrecord import record_xml_output, record_add_field
 from invenio.modules.formatter.api import get_tag_from_name
-from invenio.search_engine import search_pattern, get_fieldvalues
+from invenio.legacy.search_engine import search_pattern, get_fieldvalues
 from invenio.config import CFG_TMPDIR
 from invenio.bibtask import task_low_level_submission
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError

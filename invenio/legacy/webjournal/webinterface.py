@@ -25,7 +25,7 @@ __lastupdated__ = """$Date$"""
 
 import urllib
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
@@ -65,8 +65,8 @@ from invenio.webjournal import \
      perform_request_search
 from invenio.webstat import register_customevent
 
-import invenio.template
-webjournal_templates = invenio.template.load('webjournal')
+import invenio.legacy.template
+webjournal_templates = invenio.legacy.template.load('webjournal')
 
 class WebInterfaceJournalPages(WebInterfaceDirectory):
     """Defines the set of /journal pages."""

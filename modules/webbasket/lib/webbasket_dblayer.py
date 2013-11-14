@@ -34,8 +34,8 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH
 from invenio.config import CFG_SITE_URL
 from invenio.utils.date import convert_datestruct_to_datetext
-from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
-from invenio.search_engine import get_fieldvalues
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
+from invenio.legacy.search_engine import get_fieldvalues
 
 ########################### Table of contents ################################
 #

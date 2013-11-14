@@ -113,7 +113,7 @@ def remove_from_dicts(dicts, recid):
 class TestCitationIndexer(InvenioTestCase):
     """Testing citation indexer."""
     def test_basic(self):
-        from invenio.bibrank_citation_indexer import process_chunk
+        from invenio.legacy.bibrank.citation_indexer import process_chunk
         dicts = {
             'cites_weight': {},
             'cites': {},
@@ -128,7 +128,7 @@ class TestCitationIndexer(InvenioTestCase):
 
     def test_adding_record(self):
         "tests adding a record"
-        from invenio.bibrank_citation_indexer import process_chunk
+        from invenio.legacy.bibrank.citation_indexer import process_chunk
         dicts = EXPECTED_DICTS.copy()
         remove_from_dicts(dicts, 92)
         process_chunk([92], CONFIG, dicts)
@@ -136,7 +136,7 @@ class TestCitationIndexer(InvenioTestCase):
 
     def test_catchup(self):
         "tests adding a record"
-        from invenio.bibrank_citation_indexer import process_chunk
+        from invenio.legacy.bibrank.citation_indexer import process_chunk
         dicts = EXPECTED_DICTS.copy()
         dicts['cites'][95].remove(77)
         dicts['refs'][77].remove(95)
@@ -145,7 +145,7 @@ class TestCitationIndexer(InvenioTestCase):
 
     def test_removed_refs(self):
         "test the cascading of removed refs"
-        from invenio.bibrank_citation_indexer import process_chunk
+        from invenio.legacy.bibrank.citation_indexer import process_chunk
         dicts = EXPECTED_DICTS.copy()
         dicts['cites'].setdefault(1, []).append(3)
         dicts['cites'].setdefault(2, []).append(3)
@@ -155,7 +155,7 @@ class TestCitationIndexer(InvenioTestCase):
 
     def test_removed_cites(self):
         "test the cascading of removed cites"
-        from invenio.bibrank_citation_indexer import process_chunk
+        from invenio.legacy.bibrank.citation_indexer import process_chunk
         dicts = EXPECTED_DICTS.copy()
         dicts['cites'].setdefault(1, []).append(3)
         dicts['cites'].setdefault(2, []).append(3)
@@ -173,7 +173,7 @@ class TestCitationIndexerWarnings(InvenioTestCase):
         return run_sql("SELECT COUNT(*) FROM rnkCITATIONDATAERR")[0][0]
 
     def test_insert(self):
-        from invenio.bibrank_citation_indexer import store_citation_warning
+        from invenio.legacy.bibrank.citation_indexer import store_citation_warning
         self.cleanup()
         before = self.count()
         store_citation_warning('multiple-matches', 'Test Ref 1')

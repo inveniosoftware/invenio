@@ -27,5 +27,5 @@ from invenio.base.factory import with_app_context
 
 @with_app_context()
 def main():
-    from invenio.bibreformat import main as bibreformat_main
+    from invenio.legacy.bibreformat import main as bibreformat_main
     return bibreformat_main()
