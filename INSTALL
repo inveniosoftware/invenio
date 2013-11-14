@@ -47,7 +47,7 @@ Contents
           $ sudo aptitude install sbcl cmucl pylint pychecker pyflakes \
               python-profiler python-epydoc libapache2-mod-xsendfile \
               openoffice.org python-utidylib python-beautifulsoup \
-              python-unidecode
+              python-unidecode libhdf5-dev
 
         (Note that if you use pip to manage your Python dependencies
         instead of operating system packages, please see the section
@@ -151,6 +151,9 @@ Contents
           - (optional) unidecode, for ASCII representation of Unicode
              text:
              <https://pypi.python.org/pypi/Unidecode>
+          - (optional) libhdf5-7, libhdf5-dev, python-h5py, in order to
+             run author disambiguation.
+             <https://code.google.com/p/h5py/>
 
         Note that if you are using pip to install and manage your
         Python dependencies, then you can run:
