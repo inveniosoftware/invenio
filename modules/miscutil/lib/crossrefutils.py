@@ -87,56 +87,66 @@ def get_doi_for_records(records):
     @params records: List of records
     @returns dict {record_id : doi}
     """
+    from itertools import islice, chain
+
+    def batch(iterable, size):
+        sourceiter = iter(iterable)
+        while True:
+            batchiter = islice(sourceiter, size)
+            yield chain([batchiter.next()], batchiter)
+
     pipes = []
     for record in records:
         data = [
             "", # ISSN
-            "", # TITLE (909C4p, 773__p)
-            "", # AUTHOR (First word of 100__a)
-            "", # VOLUME (773__v, 909C4v)
-            "", # ISSUE (703__n, 909C4n)
-            "", # PAGE (703__c, 909C4c)
-            "", # YEAR  (909C4y 703__y)
+            "", # JOURNAL TITLE (773__p)
+            "", # AUTHOR (Family name of 100__a)
+            "", # VOLUME (773__v)
+            "", # ISSUE (773__n)
+            "", # PAGE (773__c)
+            "", # YEAR  (773__y)
             "", # RESOURCE TYPE
             "", # KEY
             ""  # DOI
         ]
 
-        full_author = record_get_field_value(record, "100", "", "", "a").split()
+        full_author = record_get_field_value(record, "100", "", "", "a").split(",")
         if len(full_author) > 0:
             data[2] = full_author[0]
 
         data[8] = str(record["001"][0][3])
 
         for subfield, position in ("p", 1), ("v", 3), ("n", 4), ("c", 5), ("y", 6):
-            for tag, ind1, ind2 in ("909", "C", "4"), ("703", "", ""):
+            for tag, ind1, ind2 in [("773", "", "")]:
                 val = record_get_field_value(record, tag, ind1, ind2, subfield)
                 if val:
                     data[position] = val
                     break
 
-        if not data[2] or not data[5]:
-            continue # We need Publication title and page
+        if not data[1] or not data[3] or not data[5]:
+            continue  # We need journal title, volume and page
 
         pipes.append("|".join(data))
 
     dois = {}
     if len(pipes) > 0:
-        params = {
-            "usr": CFG_CROSSREF_EMAIL,
-            "format": "unixref",
-            "qdata": "\n".join(pipes)
-        }
-        url = "http://doi.crossref.org/servlet/query"
-        data = urllib.urlencode(params)
-        document = parse(urllib2.urlopen(url, data))
-        results = document.getElementsByTagName("doi_record")
+        for batchpipes in batch(pipes, 20):
+            params = {
+                "usr": CFG_CROSSREF_USERNAME,
+                "pwd": CFG_CROSSREF_PASSWORD,
+                "format": "unixref",
+                "qdata": "\n".join(batchpipes)
+            }
+            url = "http://doi.crossref.org/servlet/query"
+            data = urllib.urlencode(params)
+            document = parse(urllib2.urlopen(url, data))
+            results = document.getElementsByTagName("doi_record")
 
-        for result in results:
-            record_id = result.getAttribute("key")
-            doi_tags = result.getElementsByTagName("doi")
-            if len(doi_tags) == 1:
-                dois[record_id] = doi_tags[0].firstChild.nodeValue
+            for result in results:
+                record_id = result.getAttribute("key")
+                doi_tags = result.getElementsByTagName("doi")
+                if len(doi_tags) == 1:
+                    dois[record_id] = doi_tags[0].firstChild.nodeValue
     return dois
 
 
