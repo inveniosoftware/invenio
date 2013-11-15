@@ -147,7 +147,7 @@ def get_doi_for_records(records):
                 try:
                     document = parse(urllib2.urlopen(url, data))
                     break
-                except urllib2.HTTPError, e:
+                except (urllib2.URLError, urllib2.HTTPError):
                     sleep(5)
                     retry_attempt += 1
 
