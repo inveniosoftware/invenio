@@ -29,7 +29,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from invenio.ext.sqlalchemy import db
 from invenio.base.globals import cfg
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION
-from invenio.bibworkflow_utils import determineDataType, redis_create_search_entry
+from invenio.bibworkflow_utils import redis_create_search_entry
 from .logger import (get_logger,
                      BibWorkflowLogHandler)
 
@@ -214,8 +214,7 @@ class BibWorkflowObject(db.Model):
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
     status = db.Column(db.String(255), default="", nullable=False)
-    data_type = db.Column(db.String(50), default=determineDataType,
-                          nullable=False)
+    data_type = db.Column(db.String(100), nullable=True)
     uri = db.Column(db.String(500), default="")
     id_user = db.Column(db.Integer, default=0, nullable=False)
     child_logs = db.relationship("BibWorkflowObjectLog")

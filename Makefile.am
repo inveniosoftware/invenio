@@ -188,11 +188,13 @@ install-jquery-plugins:
 	 cp ColVis/media/js/ColVis.js ${prefix}/var/www/js/ColVis.js && \
 	 cp ColVis/media/images/*.png ${prefix}/var/www/img/) && \
 	cd ${prefix}/var/www/js && \
-	rm -rf /tmp/invenio-dt-bootstrap && \
-	wget https://google-code-prettify.googlecode.com/files/prettify-small-4-Mar-2013.tar.bz2 && \
-	tar -xf prettify-small-4-Mar-2013.tar.bz2 && \
-	cp google-code-prettify/prettify.css ${prefix}/var/www/css/ && \
-	rm prettify-small-4-Mar-2013.tar.bz2 && \
+	rm -rf /tmp/invenio-dt-bootstrap/plugins && \
+	mkdir /tmp/invenio-dt-bootstrap/plugins && \
+	(cd /tmp/invenio-dt-bootstrap/plugins && \
+	 git clone 'https://github.com/LeaVerou/prism' && \
+	 cp prism/themes/prism.css ${prefix}/var/www/css/prism.css && \
+	 cp prism/prism.js ${prefix}/var/www/js/prism.js) && \
+	rm -rf /tmp/invenio-dt-bootstrap/plugins && \
 	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
 	unzip jquery.tablesorter.zip -d tablesorter && \
 	rm jquery.tablesorter.zip && \
