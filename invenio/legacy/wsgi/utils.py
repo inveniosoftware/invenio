@@ -830,7 +830,7 @@ def handle_file_post(req, allowed_mimetypes=None):
     and it's mimetype as provided by the request.
     @rtype: (string, string)
     """
-    from invenio.bibdocfile import decompose_file, md5
+    from invenio.legacy.bibdocfile.api import decompose_file, md5
     ## We retrieve the length
     clen = req.headers_in["Content-Length"]
     if clen is None:

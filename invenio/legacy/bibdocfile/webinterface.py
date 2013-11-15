@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_SITE_RECORD
-from invenio.bibdocfile_config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES, \
+from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES, \
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC, \
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS, \
      CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
@@ -49,18 +49,18 @@ from invenio.legacy.search_engine import \
      guess_primary_collection_of_a_record, get_colID, record_exists, \
      create_navtrail_links, check_user_can_view_record, record_empty, \
      is_user_owner_of_record
-from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
+from invenio.legacy.bibdocfile.api import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
 from invenio.ext.logging import register_exception
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 webstyle_templates = invenio.legacy.template.load('webstyle')
 websubmit_templates = invenio.legacy.template.load('websubmit')
 websearch_templates = invenio.legacy.template.load('websearch')
 
-from invenio.bibdocfile_managedocfiles import \
+from invenio.legacy.bibdocfile.managedocfiles import \
      create_file_upload_interface, \
      get_upload_file_interface_javascript, \
      get_upload_file_interface_css, \

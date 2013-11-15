@@ -20,8 +20,8 @@
 """
 aidPersonID maintenance algorithms.
 """
-from invenio.bibauthorid_name_utils import split_name_parts
-from invenio.bibauthorid_name_utils import create_normalized_name
+from invenio.legacy.bibauthorid.name_utils import split_name_parts
+from invenio.legacy.bibauthorid.name_utils import create_normalized_name
 from invenio.bibauthorid_backinterface import get_name_by_bibrecref
 from invenio.bibauthorid_backinterface import copy_personids                       #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_backinterface import compare_personid_tables              #emitting #pylint: disable-msg=W0611

@@ -26,13 +26,13 @@
 #from cgi import escape
 #from urllib import quote
 #
-import invenio.bibauthorid_config as bconfig
+import invenio.legacy.bibauthorid.config as bconfig
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.modules.formatter import format_record
 from invenio.legacy.bibrecord import get_fieldvalues
-from invenio.bibauthorid_config import EXTERNAL_SYSTEMS_LIST
+from invenio.legacy.bibauthorid.config import EXTERNAL_SYSTEMS_LIST
 from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id, get_person_names_from_id
 from invenio.bibauthorid_webapi import get_personiID_external_ids
 from invenio.bibauthorid_frontinterface import get_uid_from_personid

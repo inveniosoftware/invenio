@@ -23,6 +23,7 @@ Test unit for the miscutil/mailutils module.
 
 import os
 import sys
+import pkg_resources
 from base64 import encodestring
 from StringIO import StringIO
 from flask import current_app
@@ -146,9 +147,11 @@ To: to@example.com"""
         """
         Test sending html message with an image.
         """
-        from invenio.config import CFG_WEBDIR
         html_images = {
-            'img1': os.path.join(CFG_WEBDIR, 'img', 'journal_water_dog.gif')
+            'img1': pkg_resources.resource_filename(
+                'invenio.base',
+                os.path.join('static', 'img', 'journal_water_dog.gif')
+            )
         }
         send_email('from@example.com', ['to@example.com'],
                    subject='Subject', content='Content Text',
@@ -165,9 +168,11 @@ To: to@example.com"""
         """
         Test sending email with an attachment.
         """
-        from invenio.config import CFG_WEBDIR
         attachments = [
-            os.path.join(CFG_WEBDIR, 'img', 'journal_header.png')
+            pkg_resources.resource_filename(
+                'invenio.base',
+                os.path.join('static', 'img', 'journal_header.png')
+            )
         ]
         send_email('from@example.com', ['to@example.com'],
                    subject='Subject', content='Content Text',

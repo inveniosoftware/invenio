@@ -121,40 +121,11 @@ class Template:
     tmpl_default_locale = "en_US" # which locale to use by default, useful in case of failure
 
     # Type of the allowed parameters for the web interface for search results
-    search_results_default_urlargd = {
-        'cc': (str, CFG_SITE_NAME),
-        'c': (list, []),
-        'p': (str, ""), 'f': (str, ""),
-        'rg': (int, CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS),
-        'sf': (str, ""),
-        'so': (str, "d"),
-        'sp': (str, ""),
-        'rm': (str, ""),
-        'of': (str, "hb"),
-        'ot': (list, []),
-        'em': (str,""),
-        'aas': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
-        'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
-        'p1': (str, ""), 'f1': (str, ""), 'm1': (str, ""), 'op1':(str, ""),
-        'p2': (str, ""), 'f2': (str, ""), 'm2': (str, ""), 'op2':(str, ""),
-        'p3': (str, ""), 'f3': (str, ""), 'm3': (str, ""),
-        'sc': (int, 0),
-        'jrec': (int, 0),
-        'recid': (int, -1), 'recidb': (int, -1), 'sysno': (str, ""),
-        'id': (int, -1), 'idb': (int, -1), 'sysnb': (str, ""),
-        'action': (str, "search"),
-        'action_search': (str, ""),
-        'action_browse': (str, ""),
-        'd1': (str, ""),
-        'd1y': (int, 0), 'd1m': (int, 0), 'd1d': (int, 0),
-        'd2': (str, ""),
-        'd2y': (int, 0), 'd2m': (int, 0), 'd2d': (int, 0),
-        'dt': (str, ""),
-        'ap': (int, 1),
-        'verbose': (int, 0),
-        'ec': (list, []),
-        'wl': (int, CFG_WEBSEARCH_WILDCARD_LIMIT),
-        }
+    @property
+    def search_results_default_urlargd(self):
+        from invenio.modules.search.washers import \
+            search_results_default_urlargd
+        return search_results_default_urlargd
 
     # ...and for search interfaces
     search_interface_default_urlargd = {

@@ -29,11 +29,11 @@ from invenio.config import \
      CFG_ETCDIR
 from invenio.legacy.search_engine import perform_request_search, wash_index_term
 from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
-from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
-from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.bibindex_engine import beautify_range_list, \
+from invenio.legacy.bibindex.engine_stemmer import is_stemmer_available_for_language, stem
+from invenio.legacy.bibindex.engine_stopwords import is_stopword
+from invenio.legacy.bibindex.engine import beautify_range_list, \
     kill_sleepy_mysql_threads, create_range_list
-from invenio.bibtask import write_message, task_get_option, task_update_progress, \
+from invenio.legacy.bibsched.bibtask import write_message, task_get_option, task_update_progress, \
     task_update_status, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.ext.logging import register_exception

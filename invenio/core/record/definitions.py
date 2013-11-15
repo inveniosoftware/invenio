@@ -28,7 +28,8 @@ __all__ = ['field_definitions', 'legacy_field_matchings', 'model_definitions']
 def _rebuild_cache():
     print ">>> Recreating the cache for fields!"
     from invenio.core.record.config_engine import FieldParser
-    field_definitions, legacy_field_matchings = FieldParser().create()
+    field_definitions, legacy_field_matchings = FieldParser(
+        'recordext.fields').create()
     cache.set('RECORD_FIELD_DEFINITIONS', field_definitions)
     cache.set('LEGACY_FIELD_MATCHINGS', legacy_field_matchings)
     return field_definitions, legacy_field_matchings
@@ -53,7 +54,7 @@ def _model_definitions():
     if model_definitions is None:
         print ">>> Recreating the cache for models"
         from invenio.core.record.config_engine import ModelParser
-        model_definitions = ModelParser().create()
+        model_definitions = ModelParser('recordext.models').create()
         cache.set('RECORD_MODEL_DEFINITIONS', model_definitions)
     return model_definitions
 

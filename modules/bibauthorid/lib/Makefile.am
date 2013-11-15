@@ -26,20 +26,14 @@ pylib_DATA = \
 	bibauthorid_scheduler.py \
 	bibauthorid_tortoise.py \
 	bibauthorid_cluster_set.py \
-	bibauthorid_dbinterface.py \
 	bibauthorid_matrix_optimization.py \
 	bibauthorid_prob_matrix.py \
-	bibauthorid_searchinterface.py \
 	bibauthorid_webapi.py \
 	bibauthorid_comparison.py \
 	bibauthorid_frontinterface.py \
 	bibauthorid_merge.py \
 	bibauthorid_rabbit.py \
-	bibauthorid_string_utils.py \
 	bibauthorid_backinterface.py \
-	bibauthorid_config.py \
-	bibauthorid_general_utils.py \
-	bibauthorid_name_utils.py \
 	bibauthorid_recipes.py \
 	bibauthorid_templates.py \
 	bibauthorid_wedge.py \

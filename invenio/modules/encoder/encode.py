@@ -19,7 +19,7 @@
 
 """BibEncode encoding submodule"""
 
-from invenio.bibtask import (
+from invenio.legacy.bibsched.bibtask import (
                              write_message,
                              task_update_progress,
                              )

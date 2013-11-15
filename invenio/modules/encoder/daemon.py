@@ -24,7 +24,7 @@ import re
 import shutil
 from invenio.utils.json import json_decode_file
 from invenio.modules.encoder.utils import generate_timestamp, getval
-from invenio.bibtask import (
+from invenio.legacy.bibsched.bibtask import (
                              task_low_level_submission,
                              task_get_task_param,
                              write_message,

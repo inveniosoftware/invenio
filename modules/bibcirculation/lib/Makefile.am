@@ -19,16 +19,7 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibcirculation.py \
-             bibcirculation_cern_ldap.py \
-             bibcirculation_config.py \
-             bibcirculation_daemon.py \
-             bibcirculation_dblayer.py \
-             bibcirculation_regression_tests.py \
-             bibcirculation_templates.py \
-             bibcirculation_utils.py \
-             bibcirculationadmin_webinterface.py \
-             bibcirculationadminlib.py
+pylib_DATA = bibcirculation_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

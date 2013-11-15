@@ -47,7 +47,7 @@ from invenio.oai_repository_config import CFG_OAI_REPOSITORY_MARCXML_SIZE, \
 from invenio.legacy.search_engine import perform_request_search, get_record, search_unit_in_bibxxx
 from invenio.intbitset import intbitset
 from invenio.legacy.dbquery import run_sql
-from invenio.bibtask import \
+from invenio.legacy.bibsched.bibtask import \
      task_get_option, \
      task_set_option, \
      write_message, \

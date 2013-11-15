@@ -24,13 +24,13 @@ from invenio.modules.access.engine import acc_authorize_action
 from invenio.legacy.webpage import page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info
-from invenio.weblinkbackadminlib import get_navtrail, \
+from invenio.legacy.weblinkback.adminlib import get_navtrail, \
                                         perform_request_index, \
                                         perform_request_display_list, \
                                         perform_request_display_linkbacks, \
                                         perform_moderate_linkback, \
                                         perform_moderate_url
-from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_ACTION_RETURN_CODE
 
 

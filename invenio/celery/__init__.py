@@ -31,6 +31,7 @@ from celery.datastructures import DictAttribute
 from celery.loaders.base import BaseLoader
 
 from invenio.base.utils import autodiscover_celery_tasks
+from invenio.base.factory import with_app_context
 
 
 class InvenioLoader(BaseLoader):
@@ -108,6 +109,7 @@ class InvenioLoader(BaseLoader):
     def on_worker_process_init(self):
         self.close_database()
 
+    @with_app_context()
     def read_configuration(self):
         """ Read configuration defined in invenio.celery.config """
         usercfg = self._import_config_module('invenio.celery.config')

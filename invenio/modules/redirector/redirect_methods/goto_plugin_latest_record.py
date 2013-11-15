@@ -24,7 +24,7 @@ Demostrative PURL implementing a redirection to the very last record
 
 from invenio.config import CFG_SITE_NAME, CFG_SITE_RECORD
 from invenio.legacy.search_engine import perform_request_search
-from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
+from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 
 def goto(cc=CFG_SITE_NAME, p='', f='', sf='', so='d', docname='', format=''):
     """

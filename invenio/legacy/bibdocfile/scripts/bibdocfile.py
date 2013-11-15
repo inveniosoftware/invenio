@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011, 2013 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,16 +17,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-BibDocFile CLI tool.
-"""
-
-__revision__ = "$Id$"
-
 from invenio.base.factory import with_app_context
 
 
 @with_app_context()
 def main():
-    from invenio.bibdocfilecli import main as bibdocfilecli_main
-    return bibdocfilecli_main()
+    from invenio.legacy.bibdocfile.cli import main as bibdocfile_main
+    return bibdocfile_main()

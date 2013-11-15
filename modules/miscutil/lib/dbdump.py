@@ -53,7 +53,7 @@ from invenio.legacy.dbquery import CFG_DATABASE_HOST, \
                             CFG_DATABASE_USER, \
                             CFG_DATABASE_PASS, \
                             CFG_DATABASE_NAME
-from invenio.bibtask import task_init, write_message, task_set_option, \
+from invenio.legacy.bibsched.bibtask import task_init, write_message, task_set_option, \
                             task_get_option, task_update_progress, \
                             task_get_task_param
 from invenio.utils.shell import run_shell_command, escape_shell_arg

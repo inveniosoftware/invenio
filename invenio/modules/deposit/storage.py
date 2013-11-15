@@ -43,7 +43,7 @@ class ExternalFile(object):
     the storage layer
     """
     def __init__(self, url, filename):
-        from invenio.bibdocfile import open_url, \
+        from invenio.legacy.bibdocfile.api import open_url, \
             InvenioBibdocfileUnauthorizedURL
         try:
             self._file = open_url(url, headers={})

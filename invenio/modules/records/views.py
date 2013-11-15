@@ -51,7 +51,7 @@ def request_record(f):
         from invenio.modules.access.local_config import VIEWRESTRCOLL
         from invenio.legacy.search_engine import guess_primary_collection_of_a_record, \
             check_user_can_view_record
-        from invenio.websearchadminlib import get_detailed_page_tabs,\
+        from invenio.legacy.websearch.adminlib import get_detailed_page_tabs,\
             get_detailed_page_tabs_counts
         # ensure recid to be integer
         recid = int(recid)
@@ -120,7 +120,7 @@ def request_record(f):
         if cfg.get('CFG_WEBLINKBACK_TRACKBACK_ENABLED'):
             @register_template_context_processor
             def trackback_context():
-                from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
+                from invenio.legacy.weblinkback.templates import get_trackback_auto_discovery_tag
                 return dict(headerLinkbackTrackbackLink=get_trackback_auto_discovery_tag(recid))
 
         def _format_record(recid, of='hd', user_info=current_user, *args, **kwargs):

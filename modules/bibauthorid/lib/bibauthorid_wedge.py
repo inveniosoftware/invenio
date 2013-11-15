@@ -17,11 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio import bibauthorid_config as bconfig
+from invenio.legacy.bibauthorid import config as bconfig
 from itertools import izip, starmap
 from operator import mul
 from invenio.bibauthorid_backinterface import Bib_matrix
-from invenio.bibauthorid_general_utils import update_status \
+from invenio.legacy.bibauthorid.general_utils import update_status \
                                     , update_status_final \
                                     , bibauthor_print \
                                     , wedge_print
@@ -408,7 +408,7 @@ def join(cl1, cl2):
 
 
 def export_to_dot(cs, fname, graph_info, extra_edge=None):
-    from invenio.bibauthorid_dbinterface import get_name_by_bibrecref
+    from invenio.legacy.bibauthorid.dbinterface import get_name_by_bibrecref
 
     fptr = open(fname, "w")
     fptr.write("graph wedgy {\n")

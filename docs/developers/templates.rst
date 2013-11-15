@@ -17,7 +17,7 @@ practices for writing easily reusable and extendable templates.
 * ``<module>/views.py``::
 
     # ... some where in the blueprint code:
-    render_template(['<module>_<name>.html'], ctx)
+    render_template(['<module>/<name>.html'], ctx)
 
 
 * ``<module>/templates/<module>/<name>_base.html``::
@@ -40,17 +40,17 @@ practices for writing easily reusable and extendable templates.
     {%- macro action_bar(show_delete=True) %}
         {# Macros can be overwritten in child template, but only calls within the
          # child template will call the new macro. Hence, if you just want to
-         # overwrite the action_bar macro in <module>_<name>.html, you must also
+         # overwrite the action_bar macro in <module>/<name>.html, you must also
          # copy/paste the form_header and form_footer blocks where it's used,
          # otherwise the old macro will be used. To avoid this problem, please
          # instead just include a template inside the macro. This allow anther
          # Invenio installation to overwrite just this part
          #}
-        {% include "<module>_<name>_action_bar.html"%}
+        {% include "<module>/<name>_action_bar.html"%}
     { endmarco %}
 
     {%- macro render_field(thisfield, with_label=True) %}
-        {% include "<module>_<name>_render_field.html"%}
+        {% include "<module>/<name>_render_field.html"%}
     {%- endmarco %}
 
     {#
@@ -96,7 +96,7 @@ practices for writing easily reusable and extendable templates.
      # just the blocks they need, instead of having to implement the entire
      # template.
      #}
-    {% extends "<module>_<name>_base.html" %}
+    {% extends "<module>/<name>_base.html" %}
 
 
 
@@ -106,7 +106,7 @@ practices for writing easily reusable and extendable templates.
      # Here's an example of an Invenio installation which just overwrites the
      # necessary template block.
      #}
-    {% extends "<module>_<name>_base.html" %}
+    {% extends "<module>/<name>_base.html" %}
 
     {%- block field_body %}
         {%- if field.name == 'awesomefield' %}

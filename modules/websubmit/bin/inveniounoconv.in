@@ -47,7 +47,7 @@ import signal
 import errno
 
 from invenio.flaskshell import *
-from invenio.websubmit_file_converter import CFG_OPENOFFICE_TMPDIR
+from invenio.legacy.websubmit.file_converter import CFG_OPENOFFICE_TMPDIR
 
 CFG_SOFFICE_PID = os.path.join(CFG_OPENOFFICE_TMPDIR, 'soffice.pid')
 

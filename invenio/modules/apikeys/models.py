@@ -178,7 +178,7 @@ class WebAPIKey(db.Model):
         @return: If everything goes well it returns the user's uid, if not -1
         """
 
-        from invenio.webstat import register_customevent
+        from invenio.legacy.webstat.api import register_customevent
         from flask import request
         api_key = signature = timestamp = None
 

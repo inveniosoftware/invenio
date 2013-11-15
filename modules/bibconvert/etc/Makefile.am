@@ -17,8 +17,7 @@
 
 kbdir = $(sysconfdir)/bibconvert/KB
 kb_DATA = entdec-to-latin1.kb entdec-to-utf8.kb \
-          enthex-to-latin1.kb enthex-to-utf8.kb \
-          latex-to-unicode.kb
+          enthex-to-latin1.kb enthex-to-utf8.kb
 
 bfxdir = $(sysconfdir)/bibconvert/config
 bfx_DATA = oaidc2marcxml.bfx

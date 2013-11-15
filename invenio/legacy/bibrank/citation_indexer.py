@@ -36,11 +36,11 @@ from invenio.legacy.search_engine import search_pattern, search_unit
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.modules.formatter.utils import parse_tag
 from invenio.modules.knowledge.api import get_kb_mappings
-from invenio.bibtask import write_message, task_get_option, \
+from invenio.legacy.bibsched.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \
                      task_get_task_param
 from invenio.ext.logging import register_exception
-from invenio.bibindex_engine import get_field_tags
+from invenio.legacy.bibindex.engine import get_field_tags
 
 
 INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')

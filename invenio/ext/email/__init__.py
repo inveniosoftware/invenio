@@ -114,7 +114,7 @@ def scheduled_send_email(fromaddr,
                         receivers are separated by ',')
     @return: the scheduled bibtasklet
     """
-    from invenio.bibtask import task_low_level_submission
+    from invenio.legacy.bibsched.bibtask import task_low_level_submission
     if not isinstance(toaddr, (unicode, str)):
         toaddr = ','.join(toaddr)
     if not isinstance(replytoaddr, (unicode, str)):
@@ -347,7 +347,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
                                 from_email=fromaddr, headers=headers, **kwargs)
 
     if attachments:
-        from invenio.bibdocfile import _mimes, guess_format_from_url
+        from invenio.legacy.bibdocfile.api import _mimes, guess_format_from_url
         #old_msg_root = msg_root
         #msg_root = MIMEMultipart()
         #msg_root.attach(old_msg_root)

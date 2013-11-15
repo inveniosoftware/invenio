@@ -30,7 +30,7 @@ def get_files_from_bibdoc(recid):
     if not recid or recid < 0:
         return []
 
-    from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
+    from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
     files = []
     try:
         bibrecdocs = BibRecDocs(int(recid))

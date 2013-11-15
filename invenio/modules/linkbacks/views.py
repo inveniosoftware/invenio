@@ -28,7 +28,7 @@ from .models import LnkENTRY
 from invenio.config import CFG_SITE_RECORD, \
                            CFG_WEBLINKBACK_TRACKBACK_ENABLED
 
-from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, \
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_TYPE, \
                                        CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME, \
                                        CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME, \
@@ -64,7 +64,7 @@ def index(recid):
                  'id': (unicode, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
                  'source': (unicode, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME)})
 def sendtrackback(recid, url, title, excerpt, blog_name, id, source):
-    from invenio.weblinkback import perform_sendtrackback, perform_sendtrackback_disabled
+    from invenio.legacy.weblinkback.api import perform_sendtrackback, perform_sendtrackback_disabled
     mime_type = 'text/xml; charset=utf-8'
     if CFG_WEBLINKBACK_TRACKBACK_ENABLED:
         xml_response, status = perform_sendtrackback(recid, url, title, excerpt, blog_name, id, source, current_user)

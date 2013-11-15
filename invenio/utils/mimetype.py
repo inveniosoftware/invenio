@@ -200,7 +200,7 @@ def guess_extension(amimetype, normalize=False):
     if ext and normalize:
         ## Normalize some common magic mis-interpreation
         ext = {'.asc': '.txt', '.obj': '.bin'}.get(ext, ext)
-        from invenio.bibdocfile_normalizer import normalize_format
+        from invenio.legacy.bibdocfile.api_normalizer import normalize_format
         return normalize_format(ext)
     return ext
 

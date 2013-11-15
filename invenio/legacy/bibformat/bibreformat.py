@@ -41,7 +41,7 @@ try:
     from invenio.modules.formatter import format_record
     from invenio.modules.formatter.config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
     from invenio.utils.shell import split_cli_ids_arg
-    from invenio.bibtask import task_init, write_message, task_set_option, \
+    from invenio.legacy.bibsched.bibtask import task_init, write_message, task_set_option, \
             task_get_option, task_update_progress, task_has_option, \
             task_low_level_submission, task_sleep_now_if_required, \
             task_get_task_param
@@ -280,7 +280,7 @@ def iterate_over_new(list, fmt):
     for recID in list:
         t1 = os.times()[4]
         start_date = time.strftime('%Y-%m-%d %H:%M:%S')
-        write_message(format_record(recID, fmt, on_the_fly=True))
+        format_record(recID, fmt, on_the_fly=True)
         formatted_record = zlib.compress(format_record(recID, fmt, on_the_fly=True))
         run_sql('REPLACE LOW_PRIORITY INTO bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s)',
                 (recID, fmt, start_date, formatted_record))

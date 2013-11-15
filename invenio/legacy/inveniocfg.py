@@ -527,7 +527,7 @@ def cli_cmd_reset_recstruct_cache(conf):
     from invenio.intbitset import intbitset
     from invenio.legacy.dbquery import run_sql, serialize_via_marshal
     from invenio.legacy.search_engine import get_record
-    from invenio.bibsched import server_pid, pidfile
+    from invenio.legacy.bibsched.scripts.bibsched import server_pid, pidfile
     enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
     enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
     pid = server_pid(ping_the_process=False)
@@ -657,8 +657,8 @@ def cli_check_openoffice(conf):
     If OpenOffice.org integration is enabled, checks whether the system is
     properly configured.
     """
-    from invenio.bibtask import check_running_process_user
-    from invenio.websubmit_file_converter import can_unoconv, get_file_converter_logger
+    from invenio.legacy.bibsched.bibtask import check_running_process_user
+    from invenio.legacy.websubmit.file_converter import can_unoconv, get_file_converter_logger
     logger = get_file_converter_logger()
     for handler in logger.handlers:
         logger.removeHandler(handler)

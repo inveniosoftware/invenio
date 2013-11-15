@@ -18,7 +18,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibdocfile import \
+from invenio.legacy.bibdocfile.api import \
      BibRecDocs, \
      decompose_file, \
      InvenioBibDocFileError, \

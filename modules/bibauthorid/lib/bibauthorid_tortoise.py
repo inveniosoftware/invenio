@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio import bibauthorid_config as bconfig
+from invenio.legacy.bibauthorid import config as bconfig
 from datetime import datetime
 import os
 #import cPickle as SER
@@ -37,15 +37,15 @@ except:
     from invenio.utils.container import defaultdict
 
 from itertools import groupby, chain, repeat
-from invenio.bibauthorid_general_utils import update_status, update_status_final, override_stdout_config
+from invenio.legacy.bibauthorid.general_utils import update_status, update_status_final, override_stdout_config
 
 from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_marktables
 from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_personid
 from invenio.bibauthorid_wedge import wedge
-from invenio.bibauthorid_name_utils import generate_last_name_cluster_str
+from invenio.legacy.bibauthorid.name_utils import generate_last_name_cluster_str
 from invenio.bibauthorid_backinterface import empty_results_table
 from invenio.bibauthorid_backinterface import remove_result_cluster
-from invenio.bibauthorid_general_utils import bibauthor_print
+from invenio.legacy.bibauthorid.general_utils import bibauthor_print
 from invenio.bibauthorid_prob_matrix import prepare_matirx
 from invenio.bibauthorid_scheduler import schedule, matrix_coefs
 from invenio.bibauthorid_least_squares import to_function as create_approx_func
@@ -54,7 +54,7 @@ from math import isnan
 import multiprocessing as mp
 
 #python2.4 compatibility
-from invenio.bibauthorid_general_utils import bai_all as all
+from invenio.legacy.bibauthorid.general_utils import bai_all as all
 
 '''
     There are three main entry points to tortoise

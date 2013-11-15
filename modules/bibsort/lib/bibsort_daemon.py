@@ -60,7 +60,7 @@ from invenio.legacy.dbquery import run_sql, Error
 from invenio.config import CFG_ETCDIR
 from invenio.bibsort_engine import run_bibsort_update, \
                             run_bibsort_rebalance
-from invenio.bibtask import task_init, write_message, \
+from invenio.legacy.bibsched.bibtask import task_init, write_message, \
     task_set_option, task_get_option
 
 

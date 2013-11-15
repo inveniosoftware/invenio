@@ -46,11 +46,11 @@ import re
 from urllib import quote
 from cgi import escape
 
-from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
+from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 from invenio.config import CFG_BINDIR, CFG_SITE_URL
 from invenio.legacy.dbquery import run_sql
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
-from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
+from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 
 def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
     """

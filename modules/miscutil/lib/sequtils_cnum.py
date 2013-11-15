@@ -19,7 +19,7 @@
 
 from invenio.sequtils import SequenceGenerator
 
-from invenio.bibedit_utils import get_bibrecord
+from invenio.legacy.bibedit.utils import get_bibrecord
 from invenio.legacy.bibrecord import record_get_field_value, create_record
 from invenio.legacy.search_engine import perform_request_search
 

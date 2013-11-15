@@ -91,7 +91,7 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         This is to test L{handle_file_post} function.
         """
         from invenio.legacy.wsgi.utils import handle_file_post
-        from invenio.bibdocfile import stream_file
+        from invenio.legacy.bibdocfile.api import stream_file
         argd = wash_urlargd(form, {"save": (str, "")})
         if req.method != 'POST':
             body = """<p>Please send a file via POST.</p>"""
@@ -106,7 +106,7 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         This specifically for batchuploader with the oracle-friendly patch
         """
         from invenio.legacy.wsgi.utils import handle_file_post
-        from invenio.bibdocfile import stream_file
+        from invenio.legacy.bibdocfile.api import stream_file
         argd = wash_urlargd(form, {"save": (str, ""), "results": (str, "")})
         if req.method != 'POST':
             body = """<p>Please send a FORM via POST.</p>"""

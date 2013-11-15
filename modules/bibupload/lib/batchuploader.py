@@ -37,7 +37,7 @@ from invenio.config import CFG_TMPSHAREDDIR, \
                            CFG_BATCHUPLOADER_DAEMON_DIR, \
                            CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY, \
                            CFG_PREFIX
-from invenio.bibtask import task_init, task_set_option, \
+from invenio.legacy.bibsched.bibtask import task_init, task_set_option, \
      task_get_option, task_update_progress, task_low_level_submission, \
      write_message, task_sleep_now_if_required
 from invenio.batchuploader_engine import document_upload

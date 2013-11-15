@@ -28,7 +28,7 @@ __revision__ = "$Id$"
 from pprint import pprint
 import os
 
-from invenio.bibtask import (task_init,
+from invenio.legacy.bibsched.bibtask import (task_init,
                              write_message,
                              task_set_option,
                              task_get_option,

@@ -27,7 +27,7 @@ from tempfile import mkstemp
 from flask import current_app, abort
 from flask.ext.login import current_user
 
-from invenio.bibtask import task_low_level_submission, \
+from invenio.legacy.bibsched.bibtask import task_low_level_submission, \
     bibtask_allocate_sequenceid
 from invenio.legacy.bibfield.bibfield_jsonreader import JsonReader
 from invenio.config import CFG_TMPSHAREDDIR

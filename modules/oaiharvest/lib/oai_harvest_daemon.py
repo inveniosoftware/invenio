@@ -51,7 +51,7 @@ from invenio.config import \
      CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN
 from invenio.oai_harvest_config import InvenioOAIHarvestWarning
 from invenio.legacy.dbquery import run_sql
-from invenio.bibtask import \
+from invenio.legacy.bibsched.bibtask import \
      task_get_task_param, \
      task_get_option, \
      task_set_option, \
@@ -73,8 +73,8 @@ from invenio.plotextractor_converter import untar
 from invenio.plotextractor import process_single, get_defaults
 from invenio.utils.shell import run_shell_command, Timeout
 from invenio.utils.text import translate_latex2unicode
-from invenio.bibedit_utils import record_find_matching_fields
-from invenio.bibcatalog import bibcatalog_system
+from invenio.legacy.bibedit.utils import record_find_matching_fields
+from invenio.legacy.bibcatalog.api import bibcatalog_system
 import invenio.template
 oaiharvest_templates = invenio.template.load('oai_harvest')
 from invenio.ext.legacy.handler_flask import with_app_context

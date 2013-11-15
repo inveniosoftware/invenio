@@ -34,6 +34,7 @@ from ..facet_builders import get_current_user_records_that_can_be_displayed, \
     faceted_results_filter, FacetLoader
 from ..forms import EasySearchForm
 from ..models import Collection
+from ..washers import wash_search_urlargd
 from invenio.ext.menu import register_menu
 from invenio.base.signals import websearch_before_browse, websearch_before_search
 from invenio.modules.index import models as BibIndex
@@ -276,7 +277,6 @@ def collection_breadcrumbs(collection, endpoint=None):
 def browse(collection, p, f, of, so, rm, rg, jrec):
 
     from invenio.legacy.search_engine import browse_pattern_phrases
-    from invenio.legacy.websearch.webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)
 
     colls = [collection.name] + request.args.getlist('c')
@@ -317,7 +317,6 @@ websearch_before_browse.connect(receivers.websearch_before_browse_handler)
 def rss(collection, p, jrec, so, rm):
     from invenio.legacy.search_engine import perform_request_search
     of = 'xr'
-    from invenio.legacy.websearch.webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)
     argd['of'] = 'id'
 
@@ -359,7 +358,6 @@ def search(collection, p, of, so, rm):
             and len(request.args.getlist('c')) == 1:
         return redirect(url_for('.collection', name=request.args.get('c')))
 
-    from invenio.legacy.websearch.webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)
     argd['of'] = 'id'
 
@@ -473,7 +471,7 @@ def autocomplete(field, q):
 
     @return: list of values matching query.
     """
-    from invenio.bibindex_engine import get_index_id_from_index_name
+    from invenio.legacy.bibindex.engine import get_index_id_from_index_name
     IdxPHRASE = BibIndex.__getattribute__('IdxPHRASE%02dF' %
                                           get_index_id_from_index_name(field))
 

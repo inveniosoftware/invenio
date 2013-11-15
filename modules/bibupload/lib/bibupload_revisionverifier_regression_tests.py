@@ -32,14 +32,14 @@ xml_marc_to_records = lazy_import('invenio.bibupload:xml_marc_to_records')
 record_get_field_value = lazy_import('invenio.legacy.bibrecord:record_get_field_value')
 record_xml_output = lazy_import('invenio.legacy.bibrecord:record_xml_output')
 
-from invenio.bibupload_revisionverifier \
+from invenio.legacy.bibupload.revisionverifier \
                         import RevisionVerifier, \
                                InvenioBibUploadConflictingRevisionsError, \
                                InvenioBibUploadMissing005Error, \
                                InvenioBibUploadUnchangedRecordError, \
                                InvenioBibUploadInvalidRevisionError
 
-from invenio.bibupload_regression_tests import GenericBibUploadTest, \
+from invenio.legacy.bibupload.engine_regression_tests import GenericBibUploadTest, \
                                                compare_xmbuffers
 
 from invenio.testutils import make_test_suite, run_test_suite, nottest

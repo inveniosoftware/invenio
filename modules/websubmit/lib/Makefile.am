@@ -23,14 +23,11 @@ pylib_DATA = \
              websubmit_dblayer.py \
              websubmit_templates.py \
              websubmit_regression_tests.py \
-             websubmitadmin_config.py \
-             websubmitadmin_dblayer.py \
              websubmitadmin_engine.py \
              websubmitadmin_templates.py \
              websubmitadmin_regression_tests.py \
              websubmit_file_stamper.py \
              websubmit_icon_creator.py \
-             websubmit_file_converter.py \
              hocrlib.py \
              websubmit_file_metadata.py \
              websubmit_web_tests.py \

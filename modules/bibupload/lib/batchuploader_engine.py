@@ -41,13 +41,13 @@ from invenio.config import CFG_BINDIR, CFG_TMPSHAREDDIR, CFG_LOGDIR, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS, \
                             CFG_PREFIX, CFG_SITE_LANG
 from invenio.utils.text import encode_for_xml
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file
 from invenio.utils.shell import run_shell_command
-from invenio.bibupload import xml_marc_to_records, bibupload
+from invenio.legacy.bibupload.engine import xml_marc_to_records, bibupload
 
-import invenio.bibupload as bibupload_module
+import invenio.legacy.bibupload as bibupload_module
 
 from invenio.legacy.bibrecord import create_records, \
                               record_strip_empty_volatile_subfields, \
@@ -233,7 +233,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             3 - File already exists
     """
     import sys
-    from invenio.bibdocfile import BibRecDocs, file_strip_ext
+    from invenio.legacy.bibdocfile.api import BibRecDocs, file_strip_ext
     from invenio.utils.hash import md5
     import shutil
     from invenio.legacy.search_engine import perform_request_search, \
@@ -432,7 +432,7 @@ def perform_basic_upload_checks(xml_record):
     an exit status 1, to prevent batchupload from crashing while alarming
     the user wabout the issue
     """
-    from invenio.bibupload import writing_rights_p
+    from invenio.legacy.bibupload.engine import writing_rights_p
 
     errors = []
     if not writing_rights_p():
@@ -583,7 +583,7 @@ def _detect_collections_from_marcxml_file(recs):
     """
     from invenio.legacy.bibrecord import record_get_field_values
     from invenio.legacy.search_engine import guess_collection_of_a_record
-    from invenio.bibupload import find_record_from_sysno, \
+    from invenio.legacy.bibupload.engine import find_record_from_sysno, \
                                   find_records_from_extoaiid, \
                                   find_record_from_oaiid
 

@@ -52,9 +52,10 @@ def main():
     is appropriate. """
 
     from invenio.modules.access.firerole import repair_role_definitions
-    import invenio.access_control_admin as acca
+    from invenio.modules.access.control import (acc_add_default_settings,
+                                                acc_reset_default_settings)
     from invenio.base.globals import cfg
-    from invenio.bibtask import authenticate
+    from invenio.legacy.bibsched.bibtask import authenticate
     from invenio.modules.access.local_config import DEF_DEMO_USER_ROLES, \
         DEF_DEMO_ROLES, DEF_DEMO_AUTHS
 
@@ -93,16 +94,16 @@ def main():
             #        authorization_msg="WebAccess Administration",
             #        authorization_action="cfgwebaccess")
             if options['reset'] and options['demo']:
-                acca.acc_reset_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                acc_reset_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
                 print "Reset default demo site settings."
             elif options['reset']:
-                acca.acc_reset_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']])
+                acc_reset_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']])
                 print "Reset default settings."
             elif options['add'] and options['demo']:
-                acca.acc_add_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                acc_add_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
                 print "Added default demo site settings."
             elif options['add']:
-                acca.acc_add_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']])
+                acc_add_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']])
                 print "Added default settings."
             if options['compile']:
                 repair_role_definitions()

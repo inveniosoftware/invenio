@@ -30,7 +30,7 @@ class MemoiseTest(InvenioTestCase):
     def test_memoise_fib(self):
         """memoiseutils - test fib() memoisation"""
         from invenio.utils.memoise import Memoise
-        from invenio.bibtaskex import fib
+        from invenio.legacy.bibsched.bibtaskex import fib
         fib_memoised = Memoise(fib)
         self.assertEqual(fib(17), fib_memoised(17))
 

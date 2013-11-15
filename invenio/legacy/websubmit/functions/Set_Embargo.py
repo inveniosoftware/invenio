@@ -18,7 +18,7 @@
 import os
 import time
 
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 
 def Set_Embargo(parameters, curdir, form):
     """set the embargo on all the documents of a given record.

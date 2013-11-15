@@ -50,7 +50,7 @@ import sys
 import zlib
 from invenio.legacy.dbquery import run_sql
 from invenio.intbitset import intbitset
-from invenio.bibedit_utils import get_marcxml_of_revision_id, \
+from invenio.legacy.bibedit.utils import get_marcxml_of_revision_id, \
     get_record_revision_ids, get_xml_comparison, record_locked_by_other_user, \
     record_locked_by_queue, revision_format_valid_p, save_xml_record, \
     split_revid, get_info_of_revision_id, get_record_revisions

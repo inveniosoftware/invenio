@@ -48,14 +48,14 @@ from invenio.utils.url import redirect_to_url, \
                              make_canonical_urlargd
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
 import invenio.legacy.template
 
-import invenio.bibcirculation_dblayer as db
-from invenio.bibcirculation_utils import book_title_from_MARC, search_user
-from invenio.bibcirculation import perform_new_request, \
+import invenio.legacy.bibcirculation.db_layer as db
+from invenio.legacy.bibcirculation.utils import book_title_from_MARC, search_user
+from invenio.legacy.bibcirculation.api import perform_new_request, \
                                    perform_new_request_send, \
                                    perform_book_proposal_send, \
                                    perform_get_holdings_information, \
@@ -64,9 +64,9 @@ from invenio.bibcirculation import perform_new_request, \
                                    ill_register_request, \
                                    ill_request_with_recid, \
                                    ill_register_request_with_recid
-from invenio.bibcirculationadminlib import is_adminuser, \
+from invenio.legacy.bibcirculation.adminlib import is_adminuser, \
                                            load_template
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_ILLS_EMAIL, \
+from invenio.legacy.bibcirculation.config import CFG_BIBCIRCULATION_ILLS_EMAIL, \
                                           CFG_BIBCIRCULATION_ILL_STATUS_NEW, \
                                           CFG_BIBCIRCULATION_ACQ_STATUS_NEW, \
                                           AMZ_ACQUISITION_IDENTIFIER_TAG

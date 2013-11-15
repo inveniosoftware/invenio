@@ -33,7 +33,7 @@ option_default_data = manager.option('--no-data', action='store_false',
 
 
 @option_default_data
-def populate(packages=['invenio_atlantis'], default_data=True):
+def populate(packages=['invenio_demosite'], default_data=True):
     """Load demo records.  Useful for testing purposes."""
     if not default_data:
         print '>>> Default data has been skiped (--no-data).'
@@ -71,7 +71,7 @@ def populate(packages=['invenio_atlantis'], default_data=True):
 
 
 @manager.command
-def create(packages=['invenio_atlantis']):
+def create(packages=['invenio_demosite']):
     """Populate database with demo site data."""
 
     from invenio.ext.sqlalchemy import db

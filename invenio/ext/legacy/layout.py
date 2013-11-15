@@ -220,7 +220,7 @@ except:
     WebInterfaceBibAuthorIDPages = WebInterfaceDumbPages
 
 try:
-    from invenio.bibcirculationadmin_webinterface import \
+    from invenio.legacy.bibcirculation.admin_webinterface import \
          WebInterfaceBibCirculationAdminPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')

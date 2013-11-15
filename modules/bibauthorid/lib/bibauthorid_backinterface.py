@@ -28,7 +28,7 @@ from operator import itemgetter
 
 #Well this is bad, BUT otherwise there must 100+ lines
 #of the form from dbinterface import ...  # emitting
-from invenio.bibauthorid_dbinterface import * #pylint:  disable-msg=W0614
+from invenio.legacy.bibauthorid.dbinterface import * #pylint:  disable-msg=W0614
 
 import invenio.bibauthorid_dbinterface as dbinter
 

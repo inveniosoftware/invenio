@@ -18,20 +18,20 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import re
-from invenio import bibauthorid_config as bconfig
+from invenio.legacy.bibauthorid import config as bconfig
 from itertools import starmap
 from operator import mul, itemgetter
-from invenio.bibauthorid_name_utils import compare_names
-from invenio.bibauthorid_dbinterface import get_name_by_bibrecref
-from invenio.bibauthorid_dbinterface import get_grouped_records
-from invenio.bibauthorid_dbinterface import get_all_authors
-from invenio.bibauthorid_dbinterface import get_collaboration
-from invenio.bibauthorid_dbinterface import resolve_affiliation
+from invenio.legacy.bibauthorid.name_utils import compare_names
+from invenio.legacy.bibauthorid.dbinterface import get_name_by_bibrecref
+from invenio.legacy.bibauthorid.dbinterface import get_grouped_records
+from invenio.legacy.bibauthorid.dbinterface import get_all_authors
+from invenio.legacy.bibauthorid.dbinterface import get_collaboration
+from invenio.legacy.bibauthorid.dbinterface import resolve_affiliation
 from invenio.bibauthorid_backinterface import get_key_words
 #from invenio.legacy.bibrank.citation_searcher import get_citation_dict
 #metadat_comparison_print commented everywhere to increase performances,
 #import and calls left here to make future debug easier.
-from invenio.bibauthorid_general_utils import metadata_comparison_print
+from invenio.legacy.bibauthorid.general_utils import metadata_comparison_print
 
 
 # This module is not thread safe!

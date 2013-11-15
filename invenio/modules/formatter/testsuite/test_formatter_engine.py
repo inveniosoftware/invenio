@@ -38,6 +38,7 @@ bibformat_config = lazy_import('invenio.modules.formatter.config')
 bibformatadminlib = lazy_import('invenio.legacy.bibformat.adminlib')
 format_templates = lazy_import('invenio.modules.formatter.testsuite.format_templates')
 format_elements = lazy_import('invenio.modules.formatter.testsuite.format_elements')
+output_formats = lazy_import('invenio.modules.formatter.testsuite.output_formats')
 
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = 'invenio.modules.formatter.testsuite'
 
@@ -252,7 +253,7 @@ class OutputFormatTest(InvenioTestCase):
 
     def setUp(self):
         self.old_outputs_path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = cfg['CFG_TMPDIR']
+        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = output_formats.__path__[0]
 
     def tearDown(self):
         bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
@@ -710,7 +711,7 @@ class FormatTest(InvenioTestCase):
         <controlfield tag="001">555</controlfield>
         </record>'''
         self.old_outputs_path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = cfg['CFG_TMPDIR']
+        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = output_formats.__path__[0]
         self.old_elements_path = cfg['CFG_BIBFORMAT_ELEMENTS_PATH']
         cfg['CFG_BIBFORMAT_ELEMENTS_PATH'] = format_elements.__path__[0]
         self.old_import_path = cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH']

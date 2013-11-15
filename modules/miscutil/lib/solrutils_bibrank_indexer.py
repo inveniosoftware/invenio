@@ -24,13 +24,13 @@ Solr utilities.
 
 import time
 from invenio.config import CFG_SOLR_URL
-from invenio.bibtask import write_message, task_get_option, task_update_progress, \
+from invenio.legacy.bibsched.bibtask import write_message, task_get_option, task_update_progress, \
                             task_sleep_now_if_required
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.search_engine import record_exists
-from invenio.bibdocfile import BibRecDocs
-from invenio.solrutils_bibindex_indexer import replace_invalid_solr_characters
-from invenio.bibindex_engine import create_range_list
+from invenio.legacy.bibdocfile.api import BibRecDocs
+from invenio.legacy.miscutil.solrutils_bibindex_indexer import replace_invalid_solr_characters
+from invenio.legacy.bibindex.engine import create_range_list
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibrank.bridge_utils import get_tags, get_field_content_in_utf8
 

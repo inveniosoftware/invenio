@@ -26,12 +26,12 @@ from invenio.bibauthorid_backinterface import get_all_papers_of_pids
 from invenio.bibauthorid_backinterface import get_bib10x, get_bib70x
 from invenio.bibauthorid_backinterface import get_all_modified_names_from_personid
 from invenio.bibauthorid_backinterface import get_signatures_from_bibrefs
-from invenio.bibauthorid_name_utils import generate_last_name_cluster_str
-from invenio.bibauthorid_general_utils import  bibauthor_print
+from invenio.legacy.bibauthorid.name_utils import generate_last_name_cluster_str
+from invenio.legacy.bibauthorid.general_utils import  bibauthor_print
 
 
 #python2.4 compatibility
-from invenio.bibauthorid_general_utils import bai_all as all
+from invenio.legacy.bibauthorid.general_utils import bai_all as all
 
 class Blob(object):
     def __init__(self, personid_records):

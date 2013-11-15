@@ -17,18 +17,13 @@
 
 bibdocfilepluginsdir = $(libdir)/python/invenio/bibdocfile_plugins
 
-bibdocfileplugins_DATA = bom_*.py
+bibdocfileplugins_DATA =
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibdocfile_config.py file.py \
-             bibdocfile_templates.py \
-             bibdocfile_managedocfiles.py \
-             bibdocfile.py \
-             bibdocfilecli.py \
-             bibdocfile_regression_tests.py
+pylib_DATA = bibdocfile_regression_tests.py
 
-noinst_DATA = fulltext_files_migration_kit.py icon_migration_kit.py
+noinst_DATA =
 
 EXTRA_DIST = $(pylib_DATA) $(noinst_DATA) $(bibdocfileplugins)
 

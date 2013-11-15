@@ -27,7 +27,7 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 split_in_days = lazy_import('invenio.weblinkback:split_in_days')
 
-from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, CFG_WEBLINKBACK_STATUS
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_TYPE, CFG_WEBLINKBACK_STATUS
 
 
 class TestSplitLinkbacksInInsertionDayGroups(InvenioTestCase):

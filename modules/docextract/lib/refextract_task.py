@@ -25,7 +25,7 @@ Sends references to parse through bibsched
 
 import sys
 
-from invenio.bibtask import task_init, task_set_option, \
+from invenio.legacy.bibsched.bibtask import task_init, task_set_option, \
                             task_get_option, write_message
 from invenio.config import CFG_VERSION, \
                            CFG_SITE_SECURE_URL, \
@@ -38,8 +38,8 @@ from invenio.refextract_api import update_references, \
                                    FullTextNotAvailable, \
                                    RecordHasReferences
 from invenio.docextract_task import task_run_core_wrapper, split_ids
-from invenio.bibcatalog_system_rt import BibCatalogSystemRT
-from invenio.bibedit_utils import get_bibrecord
+from invenio.legacy.bibcatalog.system_rt import BibCatalogSystemRT
+from invenio.legacy.bibedit.utils import get_bibrecord
 from invenio.legacy.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
 

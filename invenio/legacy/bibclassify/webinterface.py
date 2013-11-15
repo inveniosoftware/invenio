@@ -28,13 +28,13 @@ import time
 from invenio import bibupload
 
 from invenio.base.i18n import gettext_set_language
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.ext.legacy.handler import WebInterfaceDirectory
 from invenio.legacy.webpage import pageheaderonly, pagefooteronly
 from invenio.legacy.search_engine import get_colID, \
     guess_primary_collection_of_a_record, create_navtrail_links, \
     perform_request_search, get_record, print_record
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 from invenio.template import load
 from invenio.ext.legacy.handler import wash_urlargd
 from invenio.legacy.webuser import collect_user_info
