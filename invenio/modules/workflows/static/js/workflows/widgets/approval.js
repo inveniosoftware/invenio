@@ -25,35 +25,6 @@ $(document).ready(function(){
 
     $(".message").hide();
 
-    window.data_preview = function(format){
-        console.log(bwoid);
-        jQuery.ajax({
-            url: "/admin/holdingpen/entry_data_preview?oid="+bwoid+"&recformat="+format,
-            success: function(json){
-                if(format == 'xm' || format == 'marcxml'){
-                    if( json === ""){
-                        json = "Preview not available";
-                    }
-                    $('div[id="object_preview'+bwoid+'"]').remove();
-                    $('pre[id=data_preview'+ bwoid +']').remove();
-                    if( $('pre[id=data_preview'+ bwoid +']').length === 0 ){
-                        $('div[id="object_preview_container'+bwoid+'"]').append("<pre id=data_preview"+bwoid+" name='object_preview'></pre>");
-                    }
-                    $('pre[id=data_preview'+ bwoid +']').html(json);
-
-                }else{
-                    if( json === ""){
-                        json = "Preview not available";
-                    }
-                    $('pre[id=data_preview'+ bwoid +']').remove();
-                    $('div[id="object_preview'+bwoid+'"]').remove();
-                    $('div[id="object_preview_container'+bwoid+'"]').append("<div id='object_preview"+bwoid+"'></div>");
-                    $('div[id="object_preview'+bwoid+'"]').html(json);
-                }
-            }
-        });
-    };
-
     $('.theform #submitButton').click( function(event) {
         event.preventDefault();
 
@@ -85,13 +56,4 @@ $(document).ready(function(){
         
     });
 
-    window.setbwoid = function(id){
-        bwoid = id;
-        data_preview(datapreview);
-    };
-
-    window.setDataPreview = function(dp){
-        datapreview = dp;
-        data_preview(datapreview);
-    };
 });

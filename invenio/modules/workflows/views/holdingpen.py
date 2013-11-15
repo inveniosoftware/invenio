@@ -242,13 +242,16 @@ def details(bwobject_id):
 
     extracted_data = extract_data(bwobject)
 
+    # FIXME: need to determine right format
+    recformat = "hd"
+
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
                            bwparent=extracted_data['bwparent'],
                            info=extracted_data['info'],
                            log=extracted_data['logtext'],
                            data_preview=_entry_data_preview(
-                               bwobject.get_data()),
+                               bwobject.get_data(), recformat),
                            workflow_func=extracted_data['workflow_func'],
                            workflow=extracted_data['w_metadata'])
 
@@ -306,7 +309,7 @@ def delete_from_db(bwobject_id):
 
 
 def _delete_from_db(bwobject_id):
-    from invenio.sqlalchemyutils import db
+    from invenio.ext.sqlalchemy import db
 
     # delete every BibWorkflowObject version from the db
     BibWorkflowObject.query.get(bwobject_id).delete()
@@ -373,8 +376,14 @@ def entry_data_preview(oid, recformat):
     """
     Presents the data in a human readble form or in xml code
     """
+    from flask import jsonify, Markup
     bwobject = BibWorkflowObject.query.get(int(oid))
-    return _entry_data_preview(bwobject.get_data(), recformat)
+    formatted_data = _entry_data_preview(bwobject.get_data(), recformat)
+    if recformat in ("xm", "xml", "marcxml"):
+        data = Markup.escape(formatted_data)
+    else:
+        data = formatted_data
+    return jsonify(data=data)
 
 
 def get_info(bwobject):
@@ -397,13 +406,12 @@ def _entry_data_preview(data, recformat='hd'):
     """
     Formats the data using format_record
     """
-    if recformat == 'hd' or recformat == 'xm':
-        data = format_record(recID=None, of=recformat, xml_record=data)
-    if data is "" or data is None:
-        data = 'Could not render data'
+    if recformat != 'xm':
+        return format_record(recID=None, of=recformat, xml_record=data)
     else:
-        pass
-    return data
+        from xml.dom.minidom import parseString
+        pretty_data = parseString(data)
+        return pretty_data.toprettyxml()
 
 
 def extract_data(bwobject):
