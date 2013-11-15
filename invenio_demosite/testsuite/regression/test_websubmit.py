@@ -136,7 +136,7 @@ class WebSubmitXSSVulnerabilityTest(InvenioTestCase):
 
 @with_app_context()
 def WebSubmitFileConverterTestGenerator():
-    from invenio.websubmit_file_converter import get_conversion_map, can_convert
+    from invenio.legacy.websubmit.file_converter import get_conversion_map, can_convert
     if can_convert('.odt', '.txt'):
         ## Special test for unoconv/LibreOffice
         yield WebSubmitFileConverterTest(os.path.join(CFG_PREFIX, 'lib', 'webtest', 'invenio', 'test.odt'), '.odt', '.txt')
@@ -168,7 +168,7 @@ class WebSubmitFileConverterTest(InvenioTestCase):
         self.input_file = input_file
 
     def setUp(self):
-        from invenio.websubmit_file_converter import get_file_converter_logger
+        from invenio.legacy.websubmit.file_converter import get_file_converter_logger
         logger = get_file_converter_logger()
         self.log = StringIO()
         logger.setLevel(DEBUG)
@@ -183,7 +183,7 @@ class WebSubmitFileConverterTest(InvenioTestCase):
         return """websubmit - test %s to %s conversion""" % (self.from_format, self.to_format)
 
     def _run_test(self):
-        from invenio.websubmit_file_converter import InvenioWebSubmitFileConverterError, convert_file
+        from invenio.legacy.websubmit.file_converter import InvenioWebSubmitFileConverterError, convert_file
         try:
             tmpdir_snapshot1 = set(os.listdir(CFG_TMPDIR))
             output_file = convert_file(self.input_file, output_format=self.to_format)

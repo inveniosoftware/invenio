@@ -36,7 +36,7 @@ from invenio.modules.access.engine import acc_authorize_action
 from invenio.ext.legacy.handler import WebInterfaceDirectory
 from invenio.legacy.bibrank.adminlib import tupletotable
 from invenio.legacy.webpage import page
-from invenio.bibsched_webapi import get_javascript, get_bibsched_tasks, \
+from invenio.legacy.bibsched.webapi import get_javascript, get_bibsched_tasks, \
                                     get_bibsched_mode, get_css, get_motd_msg
 from invenio.legacy.webuser import page_not_authorized
 

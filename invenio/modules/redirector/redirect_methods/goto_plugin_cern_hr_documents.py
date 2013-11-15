@@ -27,7 +27,7 @@ import re
 
 from invenio.legacy.search_engine import perform_request_search
 from invenio.legacy.bibrecord import get_fieldvalues
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 
 def make_cern_ssr_docname(lang, edition, modif=0):
     if modif:

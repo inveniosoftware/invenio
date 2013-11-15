@@ -20,7 +20,7 @@
 """
 
 import cgi
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.utils.url import create_html_link
 
 def format_element(bfo, separator=" ", style='', img_style='', text_style='font-size:small',

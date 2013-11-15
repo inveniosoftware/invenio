@@ -17,12 +17,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio import bibauthorid_config as bconfig
+from invenio.legacy.bibauthorid import config as bconfig
 from invenio.bibauthorid_comparison import compare_bibrefrecs
 from invenio.bibauthorid_comparison import clear_all_caches as clear_comparison_caches
 from invenio.bibauthorid_backinterface import Bib_matrix
 from invenio.bibauthorid_backinterface import filter_modified_record_ids
-from invenio.bibauthorid_general_utils import bibauthor_print \
+from invenio.legacy.bibauthorid.general_utils import bibauthor_print \
                                     , update_status \
                                     , update_status_final \
                                     , is_eq

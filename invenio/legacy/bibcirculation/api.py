@@ -39,9 +39,9 @@ from invenio.legacy.bibrecord import record_get_field_value
 from invenio.legacy.search_engine import get_record
 
 # Bibcirculation imports
-import invenio.bibcirculation_dblayer as db
-from invenio.bibcirculationadminlib import load_template
-from invenio.bibcirculation_utils import book_title_from_MARC, \
+import invenio.legacy.bibcirculation.db_layer as db
+from invenio.legacy.bibcirculation.adminlib import load_template
+from invenio.legacy.bibcirculation.utils import book_title_from_MARC, \
      book_information_from_MARC, \
      create_ill_record, \
      tag_all_requests_as_done, \
@@ -49,8 +49,8 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
      generate_new_due_date, \
      update_requests_statuses, \
      search_user
-from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
+from invenio.legacy.bibcirculation.cern_ldap import get_user_info_from_ldap
+from invenio.legacy.bibcirculation.config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
                                     CFG_BIBCIRCULATION_LOANS_EMAIL, \
                                     CFG_BIBCIRCULATION_ITEM_STATUS_UNDER_REVIEW, \
                                     CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING, \

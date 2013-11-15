@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 import re
 import os
 import urllib
-from invenio.bibdocfile import decompose_file
+from invenio.legacy.bibdocfile.api import decompose_file
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \

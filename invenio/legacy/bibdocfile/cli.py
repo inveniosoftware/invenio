@@ -34,10 +34,12 @@ from logging import getLogger, debug, DEBUG
 from optparse import OptionParser, OptionGroup, OptionValueError
 from tempfile import mkstemp
 
+from invenio.base.factory import with_app_context
+
 from invenio.ext.logging import register_exception
 from invenio.config import CFG_SITE_URL, CFG_BIBDOCFILE_FILEDIR, \
     CFG_SITE_RECORD, CFG_TMPSHAREDDIR
-from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioBibDocFileError, \
+from invenio.legacy.bibdocfile.api import BibRecDocs, BibDoc, InvenioBibDocFileError, \
     nice_size, check_valid_url, clean_url, get_docname_from_url, \
     guess_format_from_url, KEEP_OLD_VALUE, decompose_bibdocfile_fullpath, \
     bibdocfile_url_to_bibdoc, decompose_bibdocfile_url, CFG_BIBDOCFILE_AVAILABLE_FLAGS
@@ -46,9 +48,9 @@ from invenio.intbitset import intbitset
 from invenio.legacy.search_engine import perform_request_search
 from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 from invenio.legacy.dbquery import run_sql
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.utils.text import encode_for_xml
-from invenio.websubmit_file_converter import can_perform_ocr
+from invenio.legacy.websubmit.file_converter import can_perform_ocr
 
 def _xml_mksubfield(key, subfield, fft):
     return fft.get(key, None) is not None and '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(str(fft[key]))) or ''
@@ -1175,6 +1177,8 @@ def cli_unhide(options):
             bibdoc.unset_flag('HIDDEN', docformat, version)
     return cli_fix_marc(options, to_be_fixed)
 
+
+@with_app_context()
 def main():
     parser = prepare_option_parser()
     (options, args) = parser.parse_args()
@@ -1254,6 +1258,3 @@ def main():
         register_exception()
         print >> sys.stderr, 'ERROR: %s' % e
         sys.exit(1)
-
-if __name__ == '__main__':
-    main()

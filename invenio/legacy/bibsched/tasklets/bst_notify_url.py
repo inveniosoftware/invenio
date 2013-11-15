@@ -29,7 +29,7 @@ import time
 from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME
-from invenio.bibtask import write_message, \
+from invenio.legacy.bibsched.bibtask import write_message, \
      task_sleep_now_if_required
 from invenio.ext.email import send_email
 

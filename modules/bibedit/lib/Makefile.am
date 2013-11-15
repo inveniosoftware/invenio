@@ -19,14 +19,11 @@ pylibdir = $(libdir)/python/invenio
 webdir=$(localstatedir)/www/img
 jsdir=$(localstatedir)/www/js
 
-pylib_DATA = bibedit_config.py \
-             bibedit_dblayer.py \
-             bibedit_engine.py \
+pylib_DATA = \
              bibedit_unit_tests.py \
              bibedit_regression_tests.py \
              bibedit_templates.py \
              bibeditcli.py \
-             bibedit_utils.py \
              bibedit_web_tests.py \
              bibeditmulti_templates.py \
              bibeditmulti_webinterface.py \

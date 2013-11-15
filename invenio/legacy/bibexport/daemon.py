@@ -42,7 +42,7 @@ from ConfigParser import ConfigParser
 
 from invenio.config import CFG_ETCDIR
 from invenio.legacy.dbquery import run_sql
-from invenio.bibtask import task_init, write_message, task_set_option, \
+from invenio.legacy.bibsched.bibtask import task_init, write_message, task_set_option, \
        task_get_option, task_has_option, task_get_task_param
 
 def _detect_jobs_to_run(string_of_jobnames=None):

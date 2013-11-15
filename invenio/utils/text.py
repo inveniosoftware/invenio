@@ -27,6 +27,7 @@ import sys
 import re
 import textwrap
 import htmlentitydefs
+import pkg_resources
 from invenio.base.globals import cfg
 try:
     import chardet
@@ -138,6 +139,11 @@ re_latex_uppercase_u = re.compile("\\\\[\"H'`~^vu=k]\\{?U\\}?")
 re_latex_uppercase_y = re.compile("\\\\[\"']\\{?Y\\}?")
 re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
 re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
+
+
+def get_kb_filename(filename='latex-to-unicode.kb'):
+    return pkg_resources.resource_filename('invenio.utils.data', filename)
+
 
 def indent_text(text,
                 nb_tabs=0,
@@ -532,7 +538,7 @@ def translate_latex2unicode(text, kb_file=None):
     @rtype: unicode
     """
     if kb_file is None:
-        kb_file = "%s/bibconvert/KB/latex-to-unicode.kb" % (cfg['CFG_ETCDIR'],)
+        kb_file = get_kb_filename()
     # First decode input text to Unicode
     try:
         text = decode_to_unicode(text)
@@ -565,7 +571,7 @@ def _load_latex2unicode_constants(kb_file=None):
     @rtype: dict
     """
     if kb_file is None:
-        kb_file = "%s/bibconvert/KB/latex-to-unicode.kb" % (cfg['CFG_ETCDIR'],)
+        kb_file = get_kb_filename()
 
     try:
         data = open(kb_file)

@@ -37,7 +37,7 @@ from invenio.ext.breadcrumb import register_breadcrumb
 from invenio.ext.principal import permission_required
 #from invenio.config import CFG_SITE_RECORD
 CFG_SITE_RECORD = 'record'
-from .config import CFG_WEBCOMMENT_ACTION_CODE
+from invenio.base.globals import cfg
 
 blueprint = Blueprint('comments', __name__, url_prefix="/" + CFG_SITE_RECORD,
                       template_folder='templates', static_folder='static')
@@ -73,9 +73,9 @@ class CommentRights(object):
             if self.uid > 0 else \
             CmtACTIONHISTORY.client_host == socket.inet_aton(request.remote_addr)
 
-        if action in CFG_WEBCOMMENT_ACTION_CODE:
+        if action in cfg['CFG_WEBCOMMENT_ACTION_CODE']:
             cond = db.and_(cond, CmtACTIONHISTORY.action_code ==
-                           CFG_WEBCOMMENT_ACTION_CODE[action])
+                           cfg['CFG_WEBCOMMENT_ACTION_CODE'][action])
 
         return CmtACTIONHISTORY.query.filter(
             CmtACTIONHISTORY.id_cmtRECORDCOMMENT == self.id, cond).\
@@ -232,7 +232,7 @@ def report(recid, id):
             nb_abuse_reports=CmtRECORDCOMMENT.nb_abuse_reports + 1),
             synchronize_session='fetch')
 
-        log_comment_action(CFG_WEBCOMMENT_ACTION_CODE['REPORT_ABUSE'], id, recid)
+        log_comment_action(cfg['CFG_WEBCOMMENT_ACTION_CODE']['REPORT_ABUSE'], id, recid)
         flash(_('Comment has been reported.'), 'success')
     else:
         flash(_('Comment has been already reported.'), 'error')
@@ -252,7 +252,7 @@ def vote(recid, id, value):
                 nb_votes_yes=CmtRECORDCOMMENT.nb_votes_yes + value),
                 synchronize_session='fetch')
 
-        log_comment_action(CFG_WEBCOMMENT_ACTION_CODE['VOTE'], id, recid)
+        log_comment_action(cfg['CFG_WEBCOMMENT_ACTION_CODE']['VOTE'], id, recid)
         flash(_('Thank you for your vote.'), 'success')
     else:
         flash(_('You can not vote for this comment.'), 'error')

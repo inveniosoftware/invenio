@@ -37,8 +37,8 @@ from invenio.bibmatch_config import CFG_BIBMATCH_VALIDATION_MATCHING_MODES, \
                                     CFG_BIBMATCH_LOGGER
 from invenio.legacy.bibrecord import create_records, record_get_field_values
 from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import get_sysno_from_record, create_marc_record
-from invenio.bibauthorid_name_utils import compare_names
-from invenio.bibauthorid_name_utils import string_partition
+from invenio.legacy.bibauthorid.name_utils import compare_names
+from invenio.legacy.bibauthorid.name_utils import string_partition
 from invenio.utils.text import translate_to_ascii
 
 re_valid_tag = re.compile("^[0-9]{3}[a-zA-Z0-9_%]{0,3}$")

@@ -24,7 +24,7 @@ Dependencies: extractor
 __plugin_version__ = "WebSubmit File Metadata Plugin API 1.0"
 
 import extractor
-from invenio.bibdocfile import decompose_file
+from invenio.legacy.bibdocfile.api import decompose_file
 
 def can_read_local(inputfile):
     """

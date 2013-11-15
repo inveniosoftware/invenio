@@ -20,14 +20,14 @@
 from itertools import cycle, imap, chain, izip
 from operator import itemgetter
 
-from invenio.bibtask import task_sleep_now_if_required
-from invenio import bibauthorid_config as bconfig
+from invenio.legacy.bibsched.bibtask import task_sleep_now_if_required
+from invenio.legacy.bibauthorid import config as bconfig
 
 from invenio.bibauthorid_comparison import cached_sym
-from invenio.bibauthorid_name_utils import compare_names as comp_names
-from invenio.bibauthorid_name_utils import split_name_parts
-from invenio.bibauthorid_name_utils import create_normalized_name
-from invenio.bibauthorid_general_utils import update_status \
+from invenio.legacy.bibauthorid.name_utils import compare_names as comp_names
+from invenio.legacy.bibauthorid.name_utils import split_name_parts
+from invenio.legacy.bibauthorid.name_utils import create_normalized_name
+from invenio.legacy.bibauthorid.general_utils import update_status \
                                     , update_status_final
 from invenio.bibauthorid_matrix_optimization import maximized_mapping
 from invenio.bibauthorid_backinterface import get_all_valid_bibrecs

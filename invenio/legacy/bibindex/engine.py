@@ -47,7 +47,6 @@ from invenio.bibindexadminlib import get_idx_remove_html_markup, \
                                      get_idx_remove_latex_markup, \
                                      get_idx_remove_stopwords
 from invenio.bibdocfile import BibRecDocs
-from invenio.search_engine import perform_request_search, \
 from invenio.legacy.search_engine import perform_request_search, \
      get_index_stemming_language, \
      get_synonym_terms, \
@@ -55,8 +54,8 @@ from invenio.legacy.search_engine import perform_request_search, \
      search_unit_in_bibrec
 from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
      deserialize_via_marshal, wash_table_column_name
-from invenio.bibindex_engine_washer import wash_index_term
-from invenio.bibtask import task_init, write_message, get_datetime, \
+from invenio.legacy.bibindex.engine_washer import wash_index_term
+from invenio.legacy.bibsched.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
@@ -176,7 +175,7 @@ def get_author_canonical_ids_for_recid(recID):
     Return list of author canonical IDs (e.g. `J.Ellis.1') for the
     given record.  Done by consulting BibAuthorID module.
     """
-    from invenio.bibauthorid_dbinterface import get_persons_from_recids
+    from invenio.legacy.bibauthorid.dbinterface import get_persons_from_recids
     lwords = []
     res = get_persons_from_recids([recID])
     if res is None:

@@ -23,7 +23,7 @@ import traceback
 
 from datetime import datetime
 from itertools import chain
-from invenio.bibtask import task_get_option, write_message, \
+from invenio.legacy.bibsched.bibtask import task_get_option, write_message, \
                             task_sleep_now_if_required, \
                             task_update_progress
 from invenio.legacy.dbquery import run_sql

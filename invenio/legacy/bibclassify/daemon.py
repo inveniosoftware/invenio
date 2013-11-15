@@ -40,7 +40,7 @@ from invenio import bibtask
 from invenio.legacy.dbquery import run_sql
 from invenio.intbitset import intbitset
 from invenio.legacy.search_engine import get_collection_reclist
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 
 # Global variables allowing to retain the progress of the task.
 _INDEX = 0

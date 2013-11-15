@@ -19,13 +19,8 @@ SUBDIRS = tasklets
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = \
-	bibsched.py \
-	bibtask.py \
-	bibtaskex.py \
-	bibtask_config.py \
-	bibtasklet.py \
-	bibsched_webapi.py
+pylib_DATA =
+
 
 jsdir=$(localstatedir)/www/js
 

@@ -20,7 +20,7 @@ import uuid
 from tempfile import mkstemp
 
 from invenio.legacy.bibrecord import record_xml_output
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.config import CFG_TMPSHAREDDIR
 
 

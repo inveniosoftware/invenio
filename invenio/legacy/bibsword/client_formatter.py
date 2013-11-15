@@ -24,7 +24,7 @@ import os
 from tempfile import mkstemp
 from xml.dom import minidom
 from invenio.config import CFG_TMPDIR
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.bibsword_config import CFG_MARC_REPORT_NUMBER, \
                                     CFG_MARC_TITLE, \
                                     CFG_MARC_AUTHOR_NAME, \
@@ -46,7 +46,7 @@ from invenio.bibsword_config import CFG_MARC_REPORT_NUMBER, \
                                     CFG_SUBMISSION_STATUS_PUBLISHED, \
                                     CFG_SUBMISSION_STATUS_ONHOLD, \
                                     CFG_SUBMISSION_STATUS_REMOVED
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.modules.formatter.engine import BibFormatObject
 
 #-------------------------------------------------------------------------------

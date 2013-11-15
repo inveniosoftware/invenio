@@ -23,7 +23,7 @@ Bibauthorid Daemon
 """
 
 import sys
-from invenio import bibauthorid_config as bconfig
+from invenio.legacy.bibauthorid import config as bconfig
 from invenio import bibtask
 
 from invenio.bibauthorid_backinterface import get_recently_modified_record_ids
@@ -36,7 +36,7 @@ from invenio.bibauthorid_backinterface import get_all_valid_bibrecs
 
 
 #python 2.4 compatibility
-from invenio.bibauthorid_general_utils import bai_any as any
+from invenio.legacy.bibauthorid.general_utils import bai_any as any
 
 def bibauthorid_daemon():
     """Constructs the Bibauthorid bibtask."""

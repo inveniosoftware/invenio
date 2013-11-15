@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 try:
     from invenio.flaskshell import *
-    from invenio.webstatadmin import main
+    from invenio.legacy.webstat.admin import main
 except ImportError, e:
     print "Error: %s" % e
     import sys

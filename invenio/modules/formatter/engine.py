@@ -237,6 +237,8 @@ class LazyTemplateContextFunctionsCache(object):
 
         elem = {}
         for m in modules:
+            if m is None:
+                continue
             name = m.__name__.split('.')[-1]
             register_func = getattr(m, 'format_element',
                                     getattr(m, 'format', None))

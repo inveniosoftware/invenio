@@ -36,7 +36,7 @@ from invenio.refextract_config import \
             CFG_REFEXTRACT_XML_COLLECTION_OPEN, \
             CFG_REFEXTRACT_XML_COLLECTION_CLOSE
 from invenio.docextract_utils import write_message, setup_loggers
-from invenio.bibtask import task_update_progress
+from invenio.legacy.bibsched.bibtask import task_update_progress
 from invenio.refextract_api import extract_references_from_file_xml, \
                                    extract_references_from_string_xml
 

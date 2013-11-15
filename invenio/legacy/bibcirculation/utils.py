@@ -29,13 +29,13 @@ import time
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.utils.url import make_invenio_opener
 from invenio.legacy.search_engine import get_field_tags
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.utils.text import encode_for_xml
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR, CFG_SITE_LANG
 
-import invenio.bibcirculation_dblayer as db
-from invenio.bibcirculation_config import \
+import invenio.legacy.bibcirculation.db_layer as db
+from invenio.legacy.bibcirculation.config import \
                                 CFG_BIBCIRCULATION_WORKING_DAYS, \
                                 CFG_BIBCIRCULATION_HOLIDAYS, \
                                 CFG_CERN_SITE, \
@@ -71,7 +71,7 @@ def search_user(column, string):
                     result = ()
 
             if result == ():
-                from invenio.bibcirculation_cern_ldap \
+                from invenio.legacy.bibcirculation.cern_ldap \
                      import get_user_info_from_ldap
 
                 ldap_info = 'busy'
@@ -131,7 +131,7 @@ def search_user(column, string):
 
 def update_user_info_from_ldap(user_id):
 
-    from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+    from invenio.legacy.bibcirculation.cern_ldap import get_user_info_from_ldap
 
     ccid = db.get_borrower_ccid(user_id)
     ldap_info = get_user_info_from_ldap(ccid=ccid)

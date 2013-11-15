@@ -26,11 +26,11 @@ from flask.ext.login import current_user
 
 from invenio.utils.json import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
 from invenio.modules.access.engine import acc_authorize_action
-from invenio.bibedit_engine import perform_request_ajax, perform_request_init, \
+from invenio.legacy.bibedit.engine import perform_request_ajax, perform_request_init, \
     perform_request_newticket, perform_request_compare, \
     perform_request_init_template_interface, \
     perform_request_ajax_template_interface
-from invenio.bibedit_utils import user_can_edit_record_collection
+from invenio.legacy.bibedit.utils import user_can_edit_record_collection
 from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_RECORD
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.url import redirect_to_url

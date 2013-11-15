@@ -29,7 +29,7 @@ from datetime import datetime
 
 from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
                            CFG_ETCDIR
-from invenio.bibtask import task_set_option, \
+from invenio.legacy.bibsched.bibtask import task_set_option, \
                             task_get_option, write_message, \
                             task_sleep_now_if_required, \
                             task_update_progress

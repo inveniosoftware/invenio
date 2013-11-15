@@ -32,7 +32,7 @@ from invenio.config import CFG_TMPDIR, CFG_SITE_URL, \
                            CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT, \
                            CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT, \
                            CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.plotextractor_getter import get_list_of_all_matching_files, \
                                          parse_and_download, \
                                          make_single_directory, \

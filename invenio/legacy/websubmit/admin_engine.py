@@ -23,14 +23,14 @@ import re
 from os.path import split, basename, isfile
 from os import access, F_OK, R_OK, getpid, rename, unlink
 from time import strftime, localtime
-from invenio.websubmitadmin_dblayer import *
-from invenio.websubmitadmin_config import *
+from invenio.legacy.websubmit.admin_dblayer import *
+from invenio.legacy.websubmit.admin_config import *
 from invenio.legacy.websubmit.config import CFG_RESERVED_SUBMISSION_FILENAMES
 from invenio.modules.access.control import acc_get_all_roles, acc_get_role_users, acc_delete_user_role
 from invenio.config import CFG_SITE_LANG, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.ext.logging import register_exception
-from invenio.websubmitadmin_config import InvenioWebSubmitWarning
+from invenio.legacy.websubmit.admin_config import InvenioWebSubmitWarning
 from invenio.base.i18n import gettext_set_language
 
 import invenio.legacy.template

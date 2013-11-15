@@ -22,7 +22,7 @@ Point of access to the documents clustering facility.
 Provides utilities to safely interact with stored data.
 '''
 
-import invenio.bibauthorid_config as bconfig
+import invenio.legacy.bibauthorid.config as bconfig
 import invenio.bibauthorid_frontinterface as dbapi
 import invenio.bibauthorid_name_utils as nameapi
 import invenio.webauthorprofile_interface as webauthorapi
@@ -45,7 +45,7 @@ from invenio.ext.email import send_email
 
 from operator import add
 
-from invenio.bibauthorid_dbinterface import get_personiID_external_ids    #pylint: disable-msg=W0614
+from invenio.legacy.bibauthorid.dbinterface import get_personiID_external_ids    #pylint: disable-msg=W0614
 from flask import session
 
 def get_person_redirect_link(pid):

@@ -23,7 +23,7 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_RECORD, \
                            CFG_SITE_ADMIN_EMAIL, \
                            CFG_SITE_LANG
-from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, \
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_TYPE, \
                                        CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME, \
                                        CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME, \
@@ -33,7 +33,7 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, \
                                        CFG_WEBLINKBACK_BROKEN_COUNT, \
                                        CFG_WEBLINKBACK_LATEST_FACTOR, \
                                        CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL
-from invenio.weblinkback_dblayer import create_linkback, \
+from invenio.legacy.weblinkback.db_layer import create_linkback, \
                                         get_url_list, \
                                         get_all_linkbacks, \
                                         get_approved_latest_added_linkbacks, \

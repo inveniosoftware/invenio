@@ -220,7 +220,7 @@ def _create_record_model_parser():
         checker ::= "checker:" INDENT checker_function+ UNDENT
 
     Note: Unlike the field configuration files where you can specify more than
-    one field inside each file for the record models only one definition is 
+    one field inside each file for the record models only one definition is
     allowed by file.
     """
     indentStack = [1]
@@ -258,10 +258,9 @@ def _create_record_model_parser():
 
 class FieldParser(object):
     """Field definitions parser"""
-    def __init__(self):
+    def __init__(self, name):
         #Autodiscover .cfg files
-        self.files = autodiscover_non_python_files('.*\.cfg',
-                'recordext.fields')
+        self.files = autodiscover_non_python_files('.*\.cfg', name)
         self.field_definitions = {}
         self.legacy_field_matchings = {}
         self.__inherit_rules = []
@@ -623,10 +622,9 @@ class FieldParser(object):
 
 class ModelParser(object):
     """Record model parser"""
-    def __init__(self):
+    def __init__(self, name):
         #Autodiscover .cfg files
-        self.files = autodiscover_non_python_files('.*\.cfg',
-                'recordext.models')
+        self.files = autodiscover_non_python_files('.*\.cfg', name)
         self.model_definitions = {}
 
     def create(self):

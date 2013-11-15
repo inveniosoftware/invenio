@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 try:
     from invenio.flaskshell import *
-    from invenio.bibsched import main
+    from invenio.legacy.bibsched.scripts.bibsched import main
 except ImportError, e:
     print "Error: %s" % e
     import sys

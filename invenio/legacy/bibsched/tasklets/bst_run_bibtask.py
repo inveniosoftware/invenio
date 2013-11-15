@@ -22,7 +22,7 @@
 Allows a task to immediately run another task after it.
 """
 
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 
 def bst_run_bibtask(taskname, user, **args):
     """

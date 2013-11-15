@@ -27,7 +27,7 @@ import datetime
 from time import mktime
 import invenio.legacy.webuser
 from invenio.utils.shell import escape_shell_arg
-from invenio.bibcatalog_system import BibCatalogSystem
+from invenio.legacy.bibcatalog.system import BibCatalogSystem
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
 

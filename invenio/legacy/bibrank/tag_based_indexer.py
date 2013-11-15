@@ -36,8 +36,8 @@ from invenio.legacy.bibrank.downloads_indexer import *
 from invenio.legacy.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
      wash_table_column_name, get_table_update_time
 from invenio.ext.logging import register_exception
-from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
-from invenio.bibindex_engine import create_range_list
+from invenio.legacy.bibsched.bibtask import task_get_option, write_message, task_sleep_now_if_required
+from invenio.legacy.bibindex.engine import create_range_list
 from invenio.intbitset import intbitset
 
 options = {}

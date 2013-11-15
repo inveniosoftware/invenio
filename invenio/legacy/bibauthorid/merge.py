@@ -20,7 +20,7 @@
 from operator import itemgetter
 from itertools import groupby, chain, imap, izip
 
-from invenio.bibauthorid_general_utils import update_status \
+from invenio.legacy.bibauthorid.general_utils import update_status \
                                     , update_status_final
 from invenio.bibauthorid_matrix_optimization import maximized_mapping
 from invenio.bibauthorid_backinterface import update_personID_canonical_names

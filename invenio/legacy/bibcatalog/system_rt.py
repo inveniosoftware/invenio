@@ -25,7 +25,7 @@ This is a subclass of BibCatalogSystem
 import os
 import invenio.legacy.webuser
 from invenio.utils.shell import run_shell_command, escape_shell_arg
-from invenio.bibcatalog_system import BibCatalogSystem, get_bibcat_from_prefs
+from invenio.legacy.bibcatalog.system import BibCatalogSystem, get_bibcat_from_prefs
 
 from invenio.config import CFG_BIBCATALOG_SYSTEM, \
                            CFG_BIBCATALOG_SYSTEM_RT_CLI, \

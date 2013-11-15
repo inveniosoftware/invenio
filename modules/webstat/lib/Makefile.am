@@ -17,44 +17,40 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = webstat.py \
-			 webstat_config.py \
-             webstat_templates.py \
-             webstat_engine.py \
-             webstatadmin.py \
-             webstat_regression_tests.py
+pylib_DATA = webstat_regression_tests.py
 
 lispimagedir = $(libdir)/lisp/invenio
-lispimage_DATA = webstat.clisp.mem webstat.cmucl.core webstat.sbcl.core
+lispimage_DATA = 
+#webstat.clisp.mem webstat.cmucl.core webstat.sbcl.core
 
-FILESLISP   = load.lisp \
-              webstatlib.lisp
+FILESLISP   =
 EXTRA_DIST = $(pylib_DATA) $(FILESLISP)
 CLEANFILES = $(lispimage_DATA) *~ *.tmp *.pyc *.fas *.fasl *.lib *.x86f *.mem *.core
 
-webstat.clisp.mem: $(FILESLISP)
-	if [ -x "${CLISP}" ]; then \
-             (cwd=`pwd`; cd $(srcdir) && \
-             ${CLISP} -q -x "(progn (load \"load.lisp\")(saveinitmem \"$${cwd}/webstat.clisp.mem\"))"); \
-        else \
-            echo "Warning: cannot find CLISP, hoping you have CMUCL or SBCL instead."; \
-            touch webstat.clisp.mem; \
-        fi
-
-webstat.cmucl.core: $(FILESLISP)
-	if [ -x "${CMUCL}" ]; then \
-            (cwd=`pwd`; cd $(srcdir) && \
-             ${CMUCL} -quiet -batch -eval "(progn (load \"load.lisp\")(ext:save-lisp \"$${cwd}/webstat.cmucl.core\"))"); \
-        else \
-            echo "Warning: cannot find CMUCL, hoping you have CLISP or SBCL instead."; \
-            touch webstat.cmucl.core; \
-        fi
-
-webstat.sbcl.core: $(FILESLISP)
-	if [ -x "${SBCL}" ]; then \
-           (cwd=`pwd`; cd $(srcdir) && \
-            ${SBCL} --noinform --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"$${cwd}/webstat.sbcl.core\"))"); \
-        else \
-            echo "Warning: cannot find SBCL, hoping you have CLISP or CMUCL instead."; \
-            touch webstat.sbcl.core; \
-        fi
+#TODO: update this!
+# webstat.clisp.mem: $(FILESLISP)
+# 	if [ -x "${CLISP}" ]; then \
+#              (cwd=`pwd`; cd $(srcdir) && \
+#              ${CLISP} -q -x "(progn (load \"load.lisp\")(saveinitmem \"$${cwd}/webstat.clisp.mem\"))"); \
+#         else \
+#             echo "Warning: cannot find CLISP, hoping you have CMUCL or SBCL instead."; \
+#             touch webstat.clisp.mem; \
+#         fi
+# 
+# webstat.cmucl.core: $(FILESLISP)
+# 	if [ -x "${CMUCL}" ]; then \
+#             (cwd=`pwd`; cd $(srcdir) && \
+#              ${CMUCL} -quiet -batch -eval "(progn (load \"load.lisp\")(ext:save-lisp \"$${cwd}/webstat.cmucl.core\"))"); \
+#         else \
+#             echo "Warning: cannot find CMUCL, hoping you have CLISP or SBCL instead."; \
+#             touch webstat.cmucl.core; \
+#         fi
+# 
+# webstat.sbcl.core: $(FILESLISP)
+# 	if [ -x "${SBCL}" ]; then \
+#            (cwd=`pwd`; cd $(srcdir) && \
+#             ${SBCL} --noinform --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"$${cwd}/webstat.sbcl.core\"))"); \
+#         else \
+#             echo "Warning: cannot find SBCL, hoping you have CLISP or CMUCL instead."; \
+#             touch webstat.sbcl.core; \
+#         fi

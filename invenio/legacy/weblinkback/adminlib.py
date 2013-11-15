@@ -23,7 +23,7 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.utils.url import wash_url_argument
 from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.legacy.webuser import collect_user_info
-from invenio.weblinkback_dblayer import get_all_linkbacks, \
+from invenio.legacy.weblinkback.db_layer import get_all_linkbacks, \
                                         approve_linkback,\
                                         reject_linkback, \
                                         remove_url, \
@@ -31,7 +31,7 @@ from invenio.weblinkback_dblayer import get_all_linkbacks, \
                                         url_exists, \
                                         get_urls,\
                                         get_url_title
-from invenio.weblinkback_config import CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME, \
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME, \
                                        CFG_WEBLINKBACK_ADMIN_MODERATION_ACTION, \
                                        CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_ACTION_RETURN_CODE

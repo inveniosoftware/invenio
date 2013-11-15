@@ -32,11 +32,11 @@ try:
     from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
          CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
          CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
-    from invenio.bibtask import task_init, task_set_option, task_get_option, \
+    from invenio.legacy.bibsched.bibtask import task_init, task_set_option, task_get_option, \
          write_message, write_messages
     from invenio.modules.access.mailcookie import mail_cookie_gc
-    from invenio.bibdocfile import BibDoc
-    from invenio.bibsched import gc_tasks
+    from invenio.legacy.bibdocfile.api import BibDoc
+    from invenio.legacy.bibsched.scripts.bibsched import gc_tasks
     from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
     from invenio.utils.date import convert_datestruct_to_datetext
 except ImportError, e:

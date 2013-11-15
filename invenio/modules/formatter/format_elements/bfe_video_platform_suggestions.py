@@ -25,7 +25,7 @@
 """
 
 from invenio.config import CFG_SITE_URL
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.intbitset import intbitset
 from invenio.legacy.search_engine import perform_request_search 
 from invenio.legacy.bibrank.record_sorter import rank_records

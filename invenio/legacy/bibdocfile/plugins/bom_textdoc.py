@@ -19,7 +19,7 @@
 """BibObject Module providing BibObject prividing features for documents containing text (not necessarily as the main part of the content)"""
 
 
-from invenio.bibdocfile import BibDoc, InvenioBibDocFileError
+from invenio.legacy.bibdocfile.api import BibDoc, InvenioBibDocFileError
 from invenio.legacy.dbquery import run_sql
 from datetime import datetime
 from invenio.ext.logging import register_exception
@@ -74,7 +74,7 @@ class BibTextDoc(BibDoc):
         @note: the text is extracted and cached for later use. Use L{get_text}
             to retrieve it.
         """
-        from invenio.websubmit_file_converter import get_best_format_to_extract_text_from, convert_file, InvenioWebSubmitFileConverterError
+        from invenio.legacy.websubmit.file_converter import get_best_format_to_extract_text_from, convert_file, InvenioWebSubmitFileConverterError
         if version is None:
             version = self.get_latest_version()
         docfiles = self.list_version_files(version)

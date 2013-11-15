@@ -68,14 +68,14 @@ from invenio.webbasket_dblayer import get_basket_name, \
      get_max_user_rights_on_basket
 from invenio.utils.url import get_referer, redirect_to_url, make_canonical_urlargd
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
-from invenio.webstat import register_customevent
+from invenio.legacy.webstat.api import register_customevent
 from invenio.ext.logging import register_exception
 from invenio.legacy.webuser import collect_user_info
 from invenio.modules.comments.api import check_user_can_attach_file_to_comments
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.utils.html import is_html_text_editor_installed
 from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
-from invenio.bibdocfile import stream_file
+from invenio.legacy.bibdocfile.api import stream_file
 
 class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
     """Handle upload and access to files for comments in WebBasket.

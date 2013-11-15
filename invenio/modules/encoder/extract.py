@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 from invenio.modules.encoder.config import (
                             CFG_BIBENCODE_FFMPEG_EXTRACT_COMMAND,
                             )
-from invenio.bibtask import (
+from invenio.legacy.bibsched.bibtask import (
                              task_update_progress,
                              write_message
                              )

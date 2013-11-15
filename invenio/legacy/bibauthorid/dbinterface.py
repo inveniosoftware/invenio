@@ -23,7 +23,7 @@
     use the data base. It should have an interface for
     all other files in the module.
 '''
-import invenio.bibauthorid_config as bconfig
+import invenio.legacy.bibauthorid.config as bconfig
 import numpy
 import cPickle
 from cPickle import UnpicklingError
@@ -33,7 +33,7 @@ import os
 import gc
 
 #python2.4 compatibility
-from invenio.bibauthorid_general_utils import bai_all as all
+from invenio.legacy.bibauthorid.general_utils import bai_all as all
 
 from itertools import groupby, count, ifilter, chain, imap
 from operator import itemgetter
@@ -42,11 +42,11 @@ from invenio.legacy.search_engine import perform_request_search
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL
 
-from invenio.bibauthorid_name_utils import split_name_parts
-from invenio.bibauthorid_name_utils import create_canonical_name
-from invenio.bibauthorid_name_utils import create_normalized_name
-from invenio.bibauthorid_general_utils import bibauthor_print
-from invenio.bibauthorid_general_utils import update_status \
+from invenio.legacy.bibauthorid.name_utils import split_name_parts
+from invenio.legacy.bibauthorid.name_utils import create_canonical_name
+from invenio.legacy.bibauthorid.name_utils import create_normalized_name
+from invenio.legacy.bibauthorid.general_utils import bibauthor_print
+from invenio.legacy.bibauthorid.general_utils import update_status \
                                     , update_status_final
 from invenio.legacy.dbquery import run_sql
 

@@ -24,7 +24,7 @@ Xapian utilities.
 
 from invenio.config import CFG_XAPIAN_ENABLED
 from invenio.intbitset import intbitset
-from invenio.xapianutils_config import INDEXES, XAPIAN_DIR
+from invenio.legacy.miscutil.xapianutils_config import INDEXES, XAPIAN_DIR
 
 
 if CFG_XAPIAN_ENABLED:

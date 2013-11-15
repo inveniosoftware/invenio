@@ -34,17 +34,17 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_LANG, \
      CFG_WEBSTAT_BIBCIRCULATION_START_YEAR
-from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
+from invenio.legacy.webstat.config import CFG_WEBSTAT_CONFIG_PATH
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
 from invenio.legacy.search_engine import get_coll_i18nname, \
     wash_index_term
 from invenio.legacy.dbquery import run_sql, wash_table_column_name, ProgrammingError
-from invenio.bibsched import is_task_scheduled, \
+from invenio.legacy.bibsched.scripts.bibsched import is_task_scheduled, \
     get_task_ids_by_descending_date, \
     get_task_options
 
 # Imports handling key events and error log
-from invenio.webstat_engine import get_keyevent_trend_collection_population, \
+from invenio.legacy.webstat.engine import get_keyevent_trend_collection_population, \
     get_keyevent_trend_new_records, \
     get_keyevent_trend_search_frequency, \
     get_keyevent_trend_search_type_distribution, \
@@ -91,23 +91,23 @@ from invenio.webstat_engine import get_keyevent_trend_collection_population, \
     get_record_last_modification
 
 # Imports handling custom events
-from invenio.webstat_engine import get_customevent_table, \
+from invenio.legacy.webstat.engine import get_customevent_table, \
     get_customevent_trend, \
     get_customevent_dump
 
 # Imports handling custom report
-from invenio.webstat_engine import get_custom_summary_data, \
+from invenio.legacy.webstat.engine import get_custom_summary_data, \
     _get_tag_name, \
     create_custom_summary_graph
 
 # Imports for handling outputting
-from invenio.webstat_engine import create_graph_trend, \
+from invenio.legacy.webstat.engine import create_graph_trend, \
     create_graph_dump, \
     create_graph_table, \
     get_numeric_stats
 
 # Imports for handling exports
-from invenio.webstat_engine import export_to_python, \
+from invenio.legacy.webstat.engine import export_to_python, \
     export_to_csv, \
     export_to_file
 

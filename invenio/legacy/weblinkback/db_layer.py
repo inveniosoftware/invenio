@@ -20,7 +20,7 @@
 """WebLinkback - Database Layer"""
 
 from invenio.legacy.dbquery import run_sql
-from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME, \
                                        CFG_WEBLINKBACK_DEFAULT_USER, \
                                        CFG_WEBLINKBACK_PAGE_TITLE_STATUS

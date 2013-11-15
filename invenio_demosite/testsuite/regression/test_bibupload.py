@@ -272,7 +272,7 @@ class GenericBibUploadTest(InvenioTestCase):
     setUp and tearDown methods.
     """
     def setUp(self):
-        from invenio.bibtask import task_set_task_param, setup_loggers
+        from invenio.legacy.bibsched.bibtask import task_set_task_param, setup_loggers
         self.verbose = 0
         setup_loggers()
         task_set_task_param('verbose', self.verbose)
@@ -768,7 +768,7 @@ class BibUploadCallbackURLTest(GenericBibUploadTest):
     if CFG_DEVEL_SITE:
         def test_simple_insert_callback_url(self):
             """bibupload - --callback-url with simple insert"""
-            from invenio.bibtask import task_low_level_submission
+            from invenio.legacy.bibsched.bibtask import task_low_level_submission
             taskid = task_low_level_submission('bibupload', 'test', '-i', self.testfile_path, '--callback-url', CFG_SITE_URL + '/httptest/post2?%s' % urlencode({"save": self.resultfile_path}), '-v0')
             run_shell_command(CFG_BINDIR + '/bibupload %s', [str(taskid)])
             results = json.loads(open(self.resultfile_path).read())
@@ -1902,7 +1902,7 @@ class BibUploadReplaceModeTest(GenericBibUploadTest):
 
     def test_record_replace_force_non_existing(self):
         """bibupload - replace mode, force non existing recid"""
-        from invenio.bibtask import task_set_option
+        from invenio.legacy.bibsched.bibtask import task_set_option
         # replace some tags:
         the_recid = self.last_recid + 1
         testrec1_xm = """
@@ -3680,14 +3680,14 @@ class BibUploadPretendTest(GenericBibUploadTest):
     Testing bibupload --pretend correctness.
     """
     def setUp(self):
-        from invenio.bibtask import task_set_task_param
+        from invenio.legacy.bibsched.bibtask import task_set_task_param
         GenericBibUploadTest.setUp(self)
         self.demo_data = bibupload.xml_marc_to_records(open(os.path.join(CFG_TMPDIR, 'demobibdata.xml')).read())[0]
         self.before = self._get_tables_fingerprint()
         task_set_task_param('pretend', True)
 
     def tearDown(self):
-        from invenio.bibtask import task_set_task_param
+        from invenio.legacy.bibsched.bibtask import task_set_task_param
         GenericBibUploadTest.tearDown(self)
         task_set_task_param('pretend', False)
 
@@ -3761,7 +3761,7 @@ class BibUploadHoldingPenTest(GenericBibUploadTest):
     Testing the Holding Pen usage.
     """
     def setUp(self):
-        from invenio.bibtask import task_set_task_param, setup_loggers
+        from invenio.legacy.bibsched.bibtask import task_set_task_param, setup_loggers
         GenericBibUploadTest.setUp(self)
         self.verbose = 9
         setup_loggers()

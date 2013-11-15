@@ -22,7 +22,7 @@ webauthorprofile_cli
     This module provides a command-line interface for WebAuthorProfile.
 """
 
-from invenio import bibauthorid_config as bconfig
+from invenio.legacy.bibauthorid import config as bconfig
 
 
 def main():

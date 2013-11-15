@@ -26,7 +26,7 @@ __lastupdated__ = """$Date: 2008/06/13 15:35:13 $"""
 
 __revision__ = "$Id: search_engine_query_parser.py,v 1.12 2008/06/13 15:35:13 rivanov Exp $"
 
-from invenio.bibtask import write_message
+from invenio.legacy.bibsched.bibtask import write_message
 
 # imports used in FieldExporter class
 import invenio.legacy.search_engine

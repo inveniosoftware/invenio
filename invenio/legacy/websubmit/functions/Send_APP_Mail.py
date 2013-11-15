@@ -44,7 +44,7 @@ from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.ext.logging import register_exception
 from invenio.legacy.search_engine import print_record
 from invenio.ext.email import scheduled_send_email
-from invenio.bibtask import bibtask_allocate_sequenceid
+from invenio.legacy.bibsched.bibtask import bibtask_allocate_sequenceid
 
 
 ## The field in which to search for the record submitter/owner's email address:

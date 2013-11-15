@@ -35,7 +35,7 @@ from invenio.webauthorprofile_corefunctions import get_pubs, get_person_names_di
     get_collabtuples, get_person_oldest_date, expire_all_cache_for_person
 
 
-#from invenio.bibauthorid_config import EXTERNAL_CLAIMED_RECORDS_KEY
+#from invenio.legacy.bibauthorid.config import EXTERNAL_CLAIMED_RECORDS_KEY
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID

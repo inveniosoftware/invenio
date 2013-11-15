@@ -28,7 +28,7 @@ def get_bibdoc(recid):
     if not recid or recid < 0:
         return None
 
-    from invenio.bibdocfile import BibDoc, InvenioBibDocFileError
+    from invenio.legacy.bibdocfile.api import BibDoc, InvenioBibDocFileError
     try:
         return BibDoc(int(recid))
     except InvenioBibDocFileError:

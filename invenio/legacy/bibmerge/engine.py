@@ -28,7 +28,7 @@ from invenio.bibmerge_merger import merge_field_group, replace_field, \
 from invenio.legacy.search_engine import print_record, perform_request_search, \
         record_exists
 from invenio.legacy.bibrecord import get_fieldvalues
-from invenio.bibedit_utils import cache_exists, cache_expired, \
+from invenio.legacy.bibedit.utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_cache_file_contents, \
     get_cache_mtime, latest_record_revision, record_locked_by_other_user, \
     record_locked_by_queue, save_xml_record, touch_cache_file, \
@@ -38,7 +38,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
 from invenio.utils.html import remove_html_markup
 from invenio.legacy.bibrecord import create_record, record_xml_output, record_add_field, \
                               record_order_subfields
-from invenio.bibedit_config import CFG_BIBEDIT_TO_MERGE_SUFFIX
+from invenio.legacy.bibedit.config import CFG_BIBEDIT_TO_MERGE_SUFFIX
 
 import invenio.legacy.template
 bibmerge_templates = invenio.legacy.template.load('bibmerge')

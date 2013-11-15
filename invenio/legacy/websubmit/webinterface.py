@@ -47,7 +47,7 @@ from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_inf
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language
-from invenio.bibdocfile import stream_file, \
+from invenio.legacy.bibdocfile.api import stream_file, \
     decompose_file, propose_next_docname
 from invenio.ext.logging import register_exception
 from invenio.utils.html import is_html_text_editor_installed
@@ -55,7 +55,7 @@ from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCrea
 from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
 import invenio.legacy.template
 websubmit_templates = invenio.legacy.template.load('websubmit')
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 from invenio.utils.json import json, CFG_JSON_AVAILABLE
 import invenio.legacy.template
 from flask import session

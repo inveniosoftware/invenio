@@ -89,11 +89,11 @@ def drop(yes_i_know=False):
     from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
-    from invenio.webstat import destroy_customevents
+    from invenio.legacy.webstat.api import destroy_customevents
     from invenio.legacy.inveniocfg import test_db_connection
     from invenio.base.utils import autodiscover_models
     from invenio.ext.sqlalchemy import db
-    from invenio.bibdocfile import _make_base_dir
+    from invenio.legacy.bibdocfile.api import _make_base_dir
 
     ## Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy your database tables and related data on filesystem!"""))

@@ -3,5 +3,9 @@
 }
 
 .comments hr {
-    margin: 0px;
+    margin: 8px;
+}
+
+.comments li {
+    min-height: 10px;
 }

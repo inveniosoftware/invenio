@@ -28,7 +28,7 @@ from invenio import webalert
 from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd
-from invenio.webstat import register_customevent
+from invenio.legacy.webstat.api import register_customevent
 from invenio.ext.logging import register_exception
 from invenio.legacy.webuser import collect_user_info
 

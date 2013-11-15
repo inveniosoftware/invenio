@@ -40,7 +40,7 @@ from invenio.config import CFG_ETCDIR, \
                            CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
                            CFG_BIBRANK_SELFCITES_PRECOMPUTE
 from invenio.legacy.dbquery import run_sql
-from invenio.bibauthorid_searchinterface import get_personids_from_bibrec
+from invenio.legacy.bibauthorid.searchinterface import get_personids_from_bibrec
 from invenio.legacy.bibrank.citation_searcher import get_cited_by
 
 

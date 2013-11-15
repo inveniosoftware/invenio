@@ -50,5 +50,5 @@ from invenio.base.factory import with_app_context
 
 @with_app_context()
 def main():
-    from invenio.bibupload import main as bibupload_main
+    from invenio.legacy.bibupload.engine import main as bibupload_main
     return bibupload_main()

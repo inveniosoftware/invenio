@@ -17,7 +17,7 @@
 
 import os
 
-from invenio.bibtask import \
+from invenio.legacy.bibsched.bibtask import \
      task_low_level_submission, \
      bibtask_allocate_sequenceid
 from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile

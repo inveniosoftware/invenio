@@ -23,14 +23,14 @@
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.legacy.webuser import getUid, collect_user_info, page_not_authorized
-from invenio.weblinkback import check_user_can_view_linkbacks, \
+from invenio.legacy.weblinkback.api import check_user_can_view_linkbacks, \
                                 perform_sendtrackback, \
                                 perform_request_display_record_linbacks, \
                                 perform_request_display_approved_latest_added_linkbacks_to_accessible_records, \
                                 perform_sendtrackback_disabled
-from invenio.weblinkback_dblayer import approve_linkback, \
+from invenio.legacy.weblinkback.db_layer import approve_linkback, \
                                         reject_linkback
-from invenio.weblinkback_config import CFG_WEBLINKBACK_LATEST_COUNT_DEFAULT, \
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_LATEST_COUNT_DEFAULT, \
                                        CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd
 from invenio.config import CFG_SITE_URL, \
@@ -42,7 +42,7 @@ from invenio.legacy.search_engine import guess_primary_collection_of_a_record, \
                                   create_navtrail_links, \
                                   get_colID
 from invenio.legacy.webpage import pageheaderonly, pagefooteronly
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 from invenio.modules.access.engine import acc_authorize_action
 import invenio.legacy.template
 webstyle_templates = invenio.legacy.template.load('webstyle')

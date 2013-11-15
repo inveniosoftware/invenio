@@ -111,7 +111,7 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES
 
-from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
+from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.base.utils import import_submodules_from_packages
 from invenio.utils.hash import md5
@@ -1518,7 +1518,7 @@ class BibRecDocs(object):
                 if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
                     re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
                     perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
-                    from invenio.bibtask import write_message
+                    from invenio.legacy.bibsched.bibtask import write_message
                     write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
                     bibdoc.extract_text(perform_ocr=perform_ocr)
                 texts.append(bibdoc.get_text())
@@ -4009,7 +4009,7 @@ class MoreInfo(object):
             ( column, where_str, )
 
         if DBG_LOG_QUERIES:
-            from invenio.bibtask import write_message
+            from invenio.legacy.bibsched.bibtask import write_message
             write_message("Executing query: " + query_str + "   ARGS: " + repr(where_args))
             print "Executing query: " + query_str + "   ARGS: " + repr(where_args)
 
@@ -4053,7 +4053,7 @@ class MoreInfo(object):
                           (columns_str, values_str)
 
             if DBG_LOG_QUERIES:
-                from invenio.bibtask import write_message
+                from invenio.legacy.bibsched.bibtask import write_message
                 write_message("Executing query: " + query_str + " ARGS: " + repr(query_args))
                 print "Executing query: " + query_str + " ARGS: " + repr(query_args)
 
@@ -4065,7 +4065,7 @@ class MoreInfo(object):
             query_args =  [str(serialised_val)] + where_args
 
             if DBG_LOG_QUERIES:
-                from invenio.bibtask import write_message
+                from invenio.legacy.bibsched.bibtask import write_message
                 write_message("Executing query: " + query_str + " ARGS: " + repr(query_args))
                 print "Executing query: " + query_str + " ARGS: " + repr(query_args)
 
@@ -4082,7 +4082,7 @@ class MoreInfo(object):
         res = run_sql(query_str, where_args)
 
         if DBG_LOG_QUERIES:
-            from invenio.bibtask import write_message
+            from invenio.legacy.bibsched.bibtask import write_message
             write_message("Executing query: " + query_str  + "  ARGS: " + repr(where_args) + "WITH THE RESULT: " + str(res))
             s_ = ""
             if res:
@@ -4101,7 +4101,7 @@ class MoreInfo(object):
         where_str, where_args = self._generate_where_query_args(namespace = namespace, data_key = key)
         query_str = "DELETE FROM bibdocmoreinfo WHERE " + where_str
         if DBG_LOG_QUERIES:
-            from invenio.bibtask import write_message
+            from invenio.legacy.bibsched.bibtask import write_message
             write_message("Executing query: " + query_str + "   ARGS: " + repr(where_args))
             print "Executing query: " + query_str + "   ARGS: " + repr(where_args)
         run_sql(query_str, where_args)
@@ -4197,7 +4197,7 @@ class MoreInfo(object):
             query_str = "DELETE FROM bibdocmoreinfo WHERE %s" % (where_str, )
 
             if DBG_LOG_QUERIES:
-                from invenio.bibtask import write_message
+                from invenio.legacy.bibsched.bibtask import write_message
                 write_message("Executing query: " + query_str + "   ARGS: " + repr(query_args))
                 print "Executing query: " + query_str + "   ARGS: " + repr(query_args)
             run_sql(query_str, query_args)
@@ -4271,7 +4271,7 @@ class BibDocMoreInfo(MoreInfo):
         if 'flags' not in self:
             self['flags'] = {}
         if DBG_LOG_QUERIES:
-            from invenio.bibtask import write_message
+            from invenio.legacy.bibsched.bibtask import write_message
             write_message("Creating BibDocMoreInfo :" + repr(self["comments"]))
             print "Creating BibdocMoreInfo :" + repr(self["comments"])
 

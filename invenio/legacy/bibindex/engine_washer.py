@@ -18,8 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import re
-from invenio.bibindex_engine_stemmer import stem
-from invenio.bibindex_engine_stopwords import is_stopword
+from invenio.legacy.bibindex.engine_stemmer import stem
+from invenio.legacy.bibindex.engine_stopwords import is_stopword
 from invenio.config import CFG_BIBINDEX_MIN_WORD_LENGTH, \
      CFG_ETCDIR
 

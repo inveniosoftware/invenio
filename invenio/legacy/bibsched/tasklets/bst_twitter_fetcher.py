@@ -44,10 +44,10 @@ from invenio.config import CFG_TMPDIR
 from invenio.legacy.bibrecord import record_add_field, record_xml_output
 
 ## BibTask -> to manipulate Bibliographic Tasks
-from invenio.bibtask import task_low_level_submission, write_message, task_update_progress
+from invenio.legacy.bibsched.bibtask import task_low_level_submission, write_message, task_update_progress
 
 ## BibDocFile to manipulate documents
-from invenio.bibdocfile import check_valid_url
+from invenio.legacy.bibdocfile.api import check_valid_url
 
 ## WebSearch to search for previous tweets
 from invenio.legacy.search_engine import perform_request_search, get_fieldvalues

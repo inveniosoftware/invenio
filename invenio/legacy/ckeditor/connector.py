@@ -24,7 +24,7 @@ This is heavily borrowed from FCKeditor 'upload.py' sample connector.
 """
 import os
 import re
-from invenio.bibdocfile import decompose_file, propose_next_docname
+from invenio.legacy.bibdocfile.api import decompose_file, propose_next_docname
 
 allowed_extensions = {}
 allowed_extensions['File'] = ['7z','aiff','asf','avi','bmp','csv','doc','fla','flv','gif','gz','gzip','jpeg','jpg','mid','mov','mp3','mp4','mpc','mpeg','mpg','ods','odt','pdf','png','ppt','pxd','qt','ram','rar','rm','rmi','rmvb','rtf','sdc','sitd','swf','sxc','sxw','tar','tgz','tif','tiff','txt','vsd','wav','wma','wmv','xls','xml','zip']

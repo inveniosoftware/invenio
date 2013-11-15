@@ -36,7 +36,7 @@ from invenio.modules import formatter as bibformat
 from invenio.utils.json import CFG_JSON_AVAILABLE
 from invenio.utils.url import auto_version_url
 from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
-from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
+from invenio.legacy.bibedit.config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION, \
@@ -55,13 +55,13 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
-from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
+from invenio.legacy.bibedit.db_layer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
     get_record_last_modification_date, get_record_revision_author, \
     get_marcxml_of_record_revision, delete_related_holdingpen_changes, \
     get_record_revisions
 
-from invenio.bibedit_utils import cache_exists, cache_expired, \
+from invenio.legacy.bibedit.utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_bibrecord, \
     get_cache_file_contents, get_cache_mtime, get_record_templates, \
     get_record_template, latest_record_revision, record_locked_by_other_user, \
@@ -90,7 +90,7 @@ from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_INSPIRE_SITE
 from invenio.legacy.search_engine import record_exists, perform_request_search
 from invenio.legacy.webuser import session_param_get, session_param_set
-from invenio.bibcatalog import bibcatalog_system
+from invenio.legacy.bibcatalog.api import bibcatalog_system
 from invenio.legacy.webpage import page
 from invenio.utils.html import get_mathjax_header
 from invenio.utils.text import wash_for_xml, show_diff
@@ -99,12 +99,12 @@ from invenio.modules.knowledge.api import get_kbd_values_for_bibedit, get_kbr_va
 
 from invenio.batchuploader_engine import perform_upload_check
 
-from invenio.bibcirculation_dblayer import get_number_copies, has_copies
-from invenio.bibcirculation_utils import create_item_details_url
+from invenio.legacy.bibcirculation.db_layer import get_number_copies, has_copies
+from invenio.legacy.bibcirculation.utils import create_item_details_url
 
 from invenio.refextract_api import FullTextNotAvailable
 from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmarc
-from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
+from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 
 from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 

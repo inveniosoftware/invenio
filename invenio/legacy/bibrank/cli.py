@@ -77,25 +77,26 @@ import ConfigParser
 from invenio.config import CFG_ETCDIR
 from invenio.legacy.dbquery import run_sql
 from invenio.ext.logging import register_exception
-from invenio.bibtask import task_init, write_message, task_get_option, \
+from invenio.legacy.bibsched.bibtask import task_init, write_message, task_get_option, \
     task_set_option, get_datetime, task_update_status, \
     task_sleep_now_if_required
+from invenio.base.factory import with_app_context
 
 # pylint: disable=W0611
 # Disabling unused import pylint check, since these are needed to get
 # imported here, and are called later dynamically.
-from invenio.bibrank_tag_based_indexer import \
+from invenio.legacy.bibrank.tag_based_indexer import \
      single_tag_rank_method, \
      citation, \
      download_weight_filtering_user, \
      download_weight_total, \
      file_similarity_by_times_downloaded, \
      index_term_count
-from invenio.bibrank_word_indexer import word_similarity #@UnusedImport
-from invenio.bibrank_citerank_indexer import citerank #@UnusedImport
+from invenio.legacy.bibrank.word_indexer import word_similarity #@UnusedImport
+from invenio.legacy.bibrank.citerank_indexer import citerank #@UnusedImport
 from invenio.solrutils_bibrank_indexer import word_similarity_solr #@UnusedImport
 from invenio.xapianutils_bibrank_indexer import word_similarity_xapian #@UnusedImport
-from invenio.bibrank_selfcites_task import process_updates as selfcites
+from invenio.legacy.bibrank.selfcites_task import process_updates as selfcites
 # pylint: enable=W0611
 
 
@@ -173,6 +174,7 @@ def task_run_core():
 
     return True
 
+@with_app_context()
 def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action='runbibrank',
@@ -290,6 +292,3 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
     else:
         return False
     return True
-
-if __name__ == "__main__":
-    main()

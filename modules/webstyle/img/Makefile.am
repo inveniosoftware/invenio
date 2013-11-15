@@ -120,11 +120,9 @@ img_DATA = add-small.png \
            journal_content.png \
            journal_footer.png \
            journal_footer2.png \
-           journal_header.png \
            journal_hms_beagle.gif \
            journal_new.png \
            journal_virgin_forest.gif \
-           journal_water_dog.gif \
            keep_sso_connection_alive.gif \
            last-right-part-trans.gif \
            left-part-topless-trans.gif \

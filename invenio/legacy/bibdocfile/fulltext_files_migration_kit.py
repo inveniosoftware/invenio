@@ -27,7 +27,7 @@ from invenio.intbitset import intbitset
 from invenio.utils.text import wrap_text_in_a_box
 from invenio.config import CFG_LOGDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.legacy.dbquery import run_sql, OperationalError
-from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
+from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 from datetime import datetime
 
 def retrieve_fulltext_recids():

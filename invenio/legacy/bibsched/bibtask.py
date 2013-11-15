@@ -69,12 +69,12 @@ from invenio.ext.logging import register_exception
 from invenio.modules.access.local_config import CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTHENTICATION
 from invenio.legacy.webuser import get_user_preferences, get_email
-from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
+from invenio.legacy.bibsched.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBTASK_DEFAULT_TASK_SETTINGS, CFG_BIBTASK_FIXEDTIMETASKS
 from invenio.utils.date import parse_runtime_limit
 from invenio.utils.shell import escape_shell_arg
 from invenio.ext.email import send_email
-from invenio.bibsched import bibsched_set_host, \
+from invenio.legacy.bibsched.scripts.bibsched import bibsched_set_host, \
                              bibsched_get_host
 
 
@@ -913,7 +913,7 @@ def _task_run(task_run_fnc):
     False in case of errors.
     Return True in case of success and False in case of failure."""
 
-    from invenio.bibtasklet import _TASKLETS
+    from invenio.legacy.bibsched.bibtasklet import _TASKLETS
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
     check_running_process_user()
     try:

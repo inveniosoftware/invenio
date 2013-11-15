@@ -22,7 +22,7 @@ evaluated by javascript and the video source is dynamically injected in the
 HTML5 video element.
 """
 
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 
 def format_element(bfo):
     """ Format element function to create the select and option elements

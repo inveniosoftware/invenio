@@ -22,7 +22,7 @@
 * The list includes the codec/container, subformat/resolution and file size
 """
 
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 
 html_skeleton_popup = """<!-- DOWNLOAD POPUP -->
 <div id="video_download_popup_box">

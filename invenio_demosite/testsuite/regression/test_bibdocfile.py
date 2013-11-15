@@ -47,7 +47,7 @@ guess_format_from_url = lazy_import('invenio.bibdocfile:guess_format_from_url')
 class BibDocFsInfoTest(InvenioTestCase):
     """Regression tests about the table bibdocfsinfo"""
     def setUp(self):
-        from invenio.bibdocfile import BibRecDocs
+        from invenio.legacy.bibdocfile.api import BibRecDocs
         self.my_bibrecdoc = BibRecDocs(2)
         self.unique_name = self.my_bibrecdoc.propose_unique_docname('file')
         self.my_bibdoc = self.my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', docname=self.unique_name)
@@ -165,7 +165,7 @@ class BibRecDocsTest(InvenioTestCase):
 
     def test_BibRecDocs(self):
         """bibdocfile - BibRecDocs functions"""
-        from invenio.bibdocfile import BibRecDocs
+        from invenio.legacy.bibdocfile.api import BibRecDocs
         my_bibrecdoc = BibRecDocs(2)
         #add bibdoc
         my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg')
@@ -204,7 +204,7 @@ class BibRecDocsTest(InvenioTestCase):
         self.assertEqual(my_bibrecdoc.check_duplicate_docnames(), True)
 
     def tearDown(self):
-        from invenio.bibdocfile import BibRecDocs
+        from invenio.legacy.bibdocfile.api import BibRecDocs
         my_bibrecdoc = BibRecDocs(2)
         #delete
         my_bibrecdoc.delete_bibdoc('img_test')
@@ -216,7 +216,7 @@ class BibDocsTest(InvenioTestCase):
 
     def test_BibDocs(self):
         """bibdocfile - BibDocs functions"""
-        from invenio.bibdocfile import BibRecDocs
+        from invenio.legacy.bibdocfile.api import BibRecDocs
         #add file
         my_bibrecdoc = BibRecDocs(2)
         timestamp1 = datetime(*(time.strptime("2011-10-09 08:07:06", "%Y-%m-%d %H:%M:%S")[:6]))
@@ -342,7 +342,7 @@ class BibDocsTest(InvenioTestCase):
         self.failUnless(my_bibrecdoc.get_bibdoc_names())
 
     def tearDown(self):
-        from invenio.bibdocfile import BibRecDocs
+        from invenio.legacy.bibdocfile.api import BibRecDocs
         my_bibrecdoc = BibRecDocs(2)
         #delete
         my_bibrecdoc.delete_bibdoc('img_test')
@@ -358,7 +358,7 @@ class BibRelationTest(InvenioTestCase):
         We create two relations differing only on the BibDoc version
         number and verify that they are indeed differen (store different data)
         """
-        from invenio.bibdocfile import BibRelation
+        from invenio.legacy.bibdocfile.api import BibRelation
         rel1 = BibRelation.create(bibdoc1_id = 10, bibdoc2_id=12,
                                   bibdoc1_ver = 1, bibdoc2_ver = 1,
                                   rel_type = "some_rel")
@@ -408,7 +408,7 @@ class BibDocFilesTest(InvenioTestCase):
     def test_BibDocFiles(self):
         """bibdocfile - BibDocFile functions """
         #add bibdoc
-        from invenio.bibdocfile import BibRecDocs
+        from invenio.legacy.bibdocfile.api import BibRecDocs
         my_bibrecdoc = BibRecDocs(2)
         timestamp = datetime(*(time.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")[:6]))
         my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg', modification_date=timestamp)
@@ -468,7 +468,7 @@ class CheckBibDocAuthorizationTest(InvenioTestCase):
     """Regression tests for check_bibdoc_authorization function."""
     def test_check_bibdoc_authorization(self):
         """bibdocfile - check_bibdoc_authorization function"""
-        from invenio.bibdocfile import check_bibdoc_authorization
+        from invenio.legacy.bibdocfile.api import check_bibdoc_authorization
         from invenio.legacy.webuser import collect_user_info, get_uid_from_email
         jekyll = collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))
         self.assertEqual(check_bibdoc_authorization(jekyll, 'role:thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
@@ -488,7 +488,7 @@ class BibDocFileURLTest(InvenioTestCase):
     """Regression tests for bibdocfile_url_p function."""
     def test_bibdocfile_url_p(self):
         """bibdocfile - check bibdocfile_url_p() functionality"""
-        from invenio.bibdocfile import bibdocfile_url_p
+        from invenio.legacy.bibdocfile.api import bibdocfile_url_p
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/98/files/9709037.pdf' % CFG_SITE_RECORD))
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/098/files/9709037.pdf' % CFG_SITE_RECORD))
 
@@ -600,7 +600,7 @@ class BibDocFileMd5FolderTests(InvenioTestCase):
     if CFG_PATH_MD5SUM:
         def test_md5_algorithms(self):
             """bibdocfile - compare md5 algorithms"""
-            from invenio.bibdocfile import calculate_md5, \
+            from invenio.legacy.bibdocfile.api import calculate_md5, \
                 calculate_md5_external
             filepath = os.path.join(self.path, 'test.txt')
             open(filepath, "w").write("test")

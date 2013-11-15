@@ -52,7 +52,7 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE
 
 from invenio.utils.json import json, CFG_JSON_AVAILABLE
-from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
+from invenio.legacy.bibupload.config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
     CFG_BIBUPLOAD_SPECIAL_TAGS, \
     CFG_BIBUPLOAD_DELETE_CODE, \
     CFG_BIBUPLOAD_DELETE_VALUE, \
@@ -80,14 +80,14 @@ from invenio.legacy.bibrecord import create_records, \
 from invenio.legacy.search_engine import get_record
 from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.ext.logging import register_exception
-from invenio.bibcatalog import bibcatalog_system
+from invenio.legacy.bibcatalog.api import bibcatalog_system
 from invenio.intbitset import intbitset
 from invenio.utils.url import make_user_agent_string
 from invenio.config import CFG_BIBDOCFILE_FILEDIR
-from invenio.bibtask import task_init, write_message, \
+from invenio.legacy.bibsched.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress, task_sleep_now_if_required, fix_argv_paths
-from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
+from invenio.legacy.bibdocfile.api import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, check_valid_url, download_url, \
     KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioBibDocFileError, \
     bibdocfile_url_p, CFG_BIBDOCFILE_AVAILABLE_FLAGS, guess_format_from_url, \
@@ -95,7 +95,7 @@ from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
 
 from invenio.legacy.search_engine import search_pattern
 
-from invenio.bibupload_revisionverifier import RevisionVerifier, \
+from invenio.legacy.bibupload.revisionverifier import RevisionVerifier, \
                                                InvenioBibUploadConflictingRevisionsError, \
                                                InvenioBibUploadInvalidRevisionError, \
                                                InvenioBibUploadMissing005Error, \

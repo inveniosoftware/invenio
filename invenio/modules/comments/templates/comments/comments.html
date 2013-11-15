@@ -60,18 +60,21 @@
     </a>
 
     <h4>
-    {{ c.title }}
-    <small>
-      {%- if c.nb_votes_total > 0 -%}
-        {%- set votes = c.nb_votes_yes-(c.nb_votes_total-c.nb_votes_yes) -%}
-        {%- if votes > 0 -%}
-        / <span class="badge badge-success">+{{ votes }}</span>
-        {%- elif votes < 0 -%}
-        / <span class="badge badge-important">{{ votes }}</span>
+        {{ c.title }}
+        <small>
+          {%- if c.nb_votes_total > 0 -%}
+            {%- set votes = c.nb_votes_yes-(c.nb_votes_total-c.nb_votes_yes) -%}
+            {%- if votes > 0 -%}
+            / <span class="badge badge-success">+{{ votes }}</span>
+            {%- elif votes < 0 -%}
+            / <span class="badge badge-important">{{ votes }}</span>
+            {%- endif -%}
+          {%- endif -%}
+          <a class="pull-right" title="{{ _('Permalink to this comment') }}" href="#{{ c.id }}">¶</a>
+        </small>
+        {%- if not c.title -%}
+            &nbsp;
         {%- endif -%}
-      {%- endif -%}
-      <a class="pull-right" title="{{ _('Permalink to this comment') }}" href="#{{ c.id }}">¶</a>
-    </small>
     </h4>
     <div id="collapse-{{ c.id }}"
          data-action="{{ url_for('comments.toggle', recid=recid, id=c.id) }}"

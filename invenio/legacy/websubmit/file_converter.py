@@ -249,7 +249,7 @@ def get_best_format_to_extract_text_from(filelist, best_formats=CFG_BIBDOCFILE_B
     Return among the filelist the best file whose format is best suited for
     extracting text.
     """
-    from invenio.bibdocfile import decompose_file, normalize_format
+    from invenio.legacy.bibdocfile.api import decompose_file, normalize_format
     best_formats = [normalize_format(aformat) for aformat in best_formats if can_convert(aformat, '.txt')]
     for aformat in best_formats:
         for filename in filelist:
@@ -262,7 +262,7 @@ def get_missing_formats(filelist, desired_conversion=None):
     """Given a list of files it will return a dictionary of the form:
     file1 : missing formats to generate from it...
     """
-    from invenio.bibdocfile import normalize_format, decompose_file
+    from invenio.legacy.bibdocfile.api import normalize_format, decompose_file
 
     def normalize_desired_conversion():
         ret = {}
@@ -291,7 +291,7 @@ def get_missing_formats(filelist, desired_conversion=None):
 
 def can_convert(input_format, output_format, max_intermediate_conversions=4):
     """Return the chain of conversion to transform input_format into output_format, if any."""
-    from invenio.bibdocfile import normalize_format
+    from invenio.legacy.bibdocfile.api import normalize_format
     if max_intermediate_conversions <= 0:
         return []
     input_format = normalize_format(input_format)
@@ -476,7 +476,7 @@ def convert_file(input_file, output_file=None, output_format=None, **params):
     @param params other paramaters to pass to the particular converter
     @return [string] the final output_file
     """
-    from invenio.bibdocfile import decompose_file, normalize_format
+    from invenio.legacy.bibdocfile.api import decompose_file, normalize_format
     if output_format is None:
         if output_file is None:
             raise ValueError("At least output_file or format should be specified.")
@@ -561,7 +561,7 @@ def _unregister_unoconv():
 
 def unoconv(input_file, output_file=None, output_format='txt', pdfopt=True, **dummy):
     """Use unconv to convert among OpenOffice understood documents."""
-    from invenio.bibdocfile import normalize_format
+    from invenio.legacy.bibdocfile.api import normalize_format
 
     ## NOTE: in case we switch back keeping LibreOffice running, uncomment
     ## the following line.
@@ -575,7 +575,7 @@ def unoconv(input_file, output_file=None, output_format='txt', pdfopt=True, **du
         try:
             ## We copy the input file and we make it available to OpenOffice
             ## with the user nobody
-            from invenio.bibdocfile import decompose_file
+            from invenio.legacy.bibdocfile.api import decompose_file
             input_format = decompose_file(input_file, skip_version=True)[2]
             fd, tmpinputfile = tempfile.mkstemp(dir=CFG_TMPDIR, suffix=normalize_format(input_format))
             os.close(fd)
@@ -633,7 +633,7 @@ def get_unoconv_installation_guideline(err):
     """Return the Libre/OpenOffice installation guideline (embedding the
     current error message).
     """
-    from invenio.bibtask import guess_apache_process_user
+    from invenio.legacy.bibsched.bibtask import guess_apache_process_user
     return wrap_text_in_a_box("""\
 OpenOffice.org can't properly create files in the OpenOffice.org temporary
 directory %(tmpdir)s, as the user %(nobody)s (as configured in
@@ -709,7 +709,7 @@ def any2djvu(input_file, output_file=None, resolution=400, ocr=True, input_forma
     Note: due to the bottleneck of using a centralized server, it is very
     slow and is not suitable for interactive usage (e.g. WebSubmit functions)
     """
-    from invenio.bibdocfile import decompose_file
+    from invenio.legacy.bibdocfile.api import decompose_file
     input_file, output_file, working_dir = prepare_io(input_file, output_file, '.djvu')
 
     ocr = ocr and "1" or "0"
@@ -1297,7 +1297,7 @@ def gunzip(input_file, output_file=None, **dummy):
     """
     Uncompress a file.
     """
-    from invenio.bibdocfile import decompose_file
+    from invenio.legacy.bibdocfile.api import decompose_file
     input_ext = decompose_file(input_file, skip_version=True)[2]
     if input_ext.endswith('.gz'):
         input_ext = input_ext[:-len('.gz')]
@@ -1310,7 +1310,7 @@ def gunzip(input_file, output_file=None, **dummy):
 
 def prepare_io(input_file, output_file=None, output_ext=None, need_working_dir=True):
     """Clean input_file and the output_file."""
-    from invenio.bibdocfile import decompose_file, normalize_format
+    from invenio.legacy.bibdocfile.api import decompose_file, normalize_format
     output_ext = normalize_format(output_ext)
     get_file_converter_logger().debug('Preparing IO for input=%s, output=%s, output_ext=%s' % (input_file, output_file, output_ext))
     if output_ext is None:
@@ -1393,7 +1393,7 @@ def main_cli():
     """
     main function when the library behaves as a normal CLI tool.
     """
-    from invenio.bibdocfile import normalize_format
+    from invenio.legacy.bibdocfile.api import normalize_format
     parser = OptionParser()
     parser.add_option("-c", "--convert", dest="input_name",
                   help="convert the specified FILE", metavar="FILE")

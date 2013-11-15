@@ -57,7 +57,7 @@ class WebStyleWSGIUtilsTests(InvenioTestCase):
     if CFG_DEVEL_SITE:
         def test_posting_file(self):
             """webstyle - direct posting of a file"""
-            from invenio.bibdocfile import calculate_md5
+            from invenio.legacy.bibdocfile.api import calculate_md5
             path = os.path.join(CFG_PREFIX, 'lib', 'webtest', 'invenio', 'test.gif')
             body = open(path).read()
             md5 = calculate_md5(path)

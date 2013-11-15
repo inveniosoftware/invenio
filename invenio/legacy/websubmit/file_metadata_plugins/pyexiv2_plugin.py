@@ -29,7 +29,7 @@ import httplib
 import tempfile
 import shutil
 import pyexiv2
-from invenio.bibdocfile import decompose_file
+from invenio.legacy.bibdocfile.api import decompose_file
 from invenio.config import CFG_TMPDIR
 from invenio.legacy.websubmit.config import InvenioWebSubmitFileMetadataRuntimeError
 

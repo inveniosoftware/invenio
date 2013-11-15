@@ -33,7 +33,9 @@ from socket import gethostname
 from subprocess import Popen
 import signal
 
-from invenio.bibtask_config import \
+from invenio.base.factory import with_app_context
+
+from invenio.legacy.bibsched.bibtask_config import \
     CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBTASK_MONOTASKS, \
     CFG_BIBTASK_FIXEDTIMETASKS
@@ -1761,8 +1763,9 @@ def stop(verbose=True, debug=False):
     Log("BibSched and all BibTasks stopped")
 
 
+@with_app_context()
 def main():
-    from invenio.bibtask import check_running_process_user
+    from invenio.legacy.bibsched.bibtask import check_running_process_user
     check_running_process_user()
 
     verbose = True

@@ -33,8 +33,8 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_SITE_NAME
 from invenio.base.i18n import gettext_set_language
 
-import invenio.bibcirculation_dblayer as db
-from invenio.bibcirculation_utils import get_book_cover, \
+import invenio.legacy.bibcirculation.db_layer as db
+from invenio.legacy.bibcirculation.utils import get_book_cover, \
       book_information_from_MARC, \
       book_title_from_MARC, \
       renew_loan_for_X_days, \
@@ -42,7 +42,7 @@ from invenio.bibcirculation_utils import get_book_cover, \
       all_copies_are_missing, \
       is_periodical, \
       looks_like_dictionary
-from invenio.bibcirculation_config import \
+from invenio.legacy.bibcirculation.config import \
     CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD, \
     CFG_BIBCIRCULATION_COLLECTION, \
     CFG_BIBCIRCULATION_LIBRARY_TYPE, \
@@ -289,7 +289,7 @@ class Template:
         @param holdings_info: book's information (all copies)
         @type holdings_info: list
         """
-        from invenio.bibcirculationadminlib import is_adminuser
+        from invenio.legacy.bibcirculation.adminlib import is_adminuser
 
         (auth_code, _auth_message) = is_adminuser(req)
 

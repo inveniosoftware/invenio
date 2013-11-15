@@ -23,13 +23,13 @@ bibauthorid_name_utils
 '''
 
 import re
-import invenio.bibauthorid_config as bconfig
-from invenio.bibauthorid_string_utils import string_partition
+import invenio.legacy.bibauthorid.config as bconfig
+from invenio.legacy.bibauthorid.string_utils import string_partition
 from copy import deepcopy
 
 from invenio.utils.text import translate_to_ascii
 
-from invenio.bibauthorid_general_utils import name_comparison_print
+from invenio.legacy.bibauthorid.general_utils import name_comparison_print
 
 try:
     from invenio.config import CFG_ETCDIR

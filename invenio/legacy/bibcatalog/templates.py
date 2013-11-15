@@ -17,7 +17,7 @@
 
 """Invenio BibCatalog HTML generator."""
 
-from invenio.bibcatalog import bibcatalog_system
+from invenio.legacy.bibcatalog.api import bibcatalog_system
 from invenio.base.i18n import wash_language, gettext_set_language
 from invenio.config import CFG_SITE_LANG
 from invenio.legacy.webstyle.templates import Template as DefaultTemplate

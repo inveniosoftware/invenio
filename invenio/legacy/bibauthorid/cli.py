@@ -22,7 +22,7 @@ bibauthorid_cli
     This module provides a command-line interface for BibAuthorID.
 """
 
-from invenio.bibauthorid_general_utils import bibauthor_print
+from invenio.legacy.bibauthorid.general_utils import bibauthor_print
 
 def main():
     """Main function """

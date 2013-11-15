@@ -22,8 +22,8 @@ import math
 import re
 
 from invenio.legacy.dbquery import run_sql, deserialize_via_marshal
-from invenio.bibindex_engine_stemmer import stem
-from invenio.bibindex_engine_stopwords import is_stopword
+from invenio.legacy.bibindex.engine_stemmer import stem
+from invenio.legacy.bibindex.engine_stopwords import is_stopword
 
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose, methods):

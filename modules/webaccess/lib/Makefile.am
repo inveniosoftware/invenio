@@ -20,7 +20,6 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = \
              webaccessadmin_lib.py \
              external_authentication_cern.py \
-             external_authentication.py \
              external_authentication_ldap.py \
              external_authentication_cern_wrapper.py \
              external_authentication_cern_unit_tests.py \

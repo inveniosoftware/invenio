@@ -21,8 +21,8 @@ from invenio.base.factory import with_app_context
 @with_app_context()
 def main():
     """Main that construct all the bibtask."""
-    from invenio.bibtask import task_init
-    from invenio.websearch_webcoll import (
+    from invenio.legacy.bibsched.bibtask import task_init
+    from invenio.legacy.websearch.webcoll import (
         task_submit_elaborate_specific_parameter, task_submit_check_options,
         task_run_core, __revision__)
 

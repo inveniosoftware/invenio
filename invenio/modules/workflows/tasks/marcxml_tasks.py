@@ -75,7 +75,7 @@ def download_fulltext(obj, eng):
     """
     Will download the fulltext document
     """
-    from invenio.bibdocfile import download_url
+    from invenio.legacy.bibdocfile.api import download_url
 
     obj.extra_data["last_task_name"] = 'Download Fulltext'
     try:
@@ -126,7 +126,7 @@ print_record.__description__ = "Prints the record data to engine log"
 
 def upload_record(mode="ir"):
     def _upload_record(obj, eng):
-        from invenio.bibtask import task_low_level_submission
+        from invenio.legacy.bibsched.bibtask import task_low_level_submission
 
         obj.extra_data["last_task_name"] = 'Upload Record'
 

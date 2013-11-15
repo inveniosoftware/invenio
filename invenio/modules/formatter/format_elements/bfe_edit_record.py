@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 from invenio.utils.url import create_html_link
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
-from invenio.bibedit_utils import user_can_edit_record_collection
+from invenio.legacy.bibedit.utils import user_can_edit_record_collection
 
 def format_element(bfo, style):
     """

@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 try:
     from invenio.flaskshell import *
-    from invenio.bibcirculation_daemon import main
+    from invenio.legacy.bibcirculation.daemon import main
 except ImportError, e:
     print "Error: %s" % e
     import sys

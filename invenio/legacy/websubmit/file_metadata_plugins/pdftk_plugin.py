@@ -27,7 +27,7 @@ import os
 import shutil
 import tempfile
 from invenio.utils.shell import run_shell_command
-from invenio.bibdocfile import decompose_file
+from invenio.legacy.bibdocfile.api import decompose_file
 from invenio.config import CFG_PATH_PDFTK, CFG_TMPDIR
 from invenio.legacy.websubmit.config import InvenioWebSubmitFileMetadataRuntimeError
 

@@ -46,7 +46,7 @@ from invenio.config import CFG_TMPSHAREDDIR, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROC
                            CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING,\
                            CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME
 from time import strftime
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 
 from invenio.legacy.webuser import collect_user_info, isUserSuperAdmin
 
@@ -54,7 +54,7 @@ from invenio.legacy.dbquery import run_sql
 
 from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmarc
 
-from invenio.bibedit_utils import record_locked_by_queue
+from invenio.legacy.bibedit.utils import record_locked_by_queue
 
 from invenio.legacy import template
 multiedit_templates = template.load('bibeditmulti')

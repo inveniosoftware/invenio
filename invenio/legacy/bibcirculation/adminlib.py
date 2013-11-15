@@ -47,7 +47,7 @@ from invenio.config import \
 import invenio.modules.access.engine as acce
 from invenio.legacy.webpage import page
 from invenio.legacy.webuser import getUid, page_not_authorized
-from invenio.webstat import register_customevent
+from invenio.legacy.webstat.api import register_customevent
 from invenio.ext.logging import register_exception
 from invenio.ext.email import send_email
 from invenio.legacy.search_engine import perform_request_search, record_exists
@@ -75,11 +75,11 @@ from invenio.config import \
     CFG_BIBCIRCULATION_PROPOSAL_STATUS_RECEIVED
 
 # Bibcirculation imports
-from invenio.bibcirculation_config import \
+from invenio.legacy.bibcirculation.config import \
      CFG_BIBCIRCULATION_TEMPLATES, CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
      CFG_BIBCIRCULATION_LOANS_EMAIL, CFG_BIBCIRCULATION_ILLS_EMAIL, \
      CFG_BIBCIRCULATION_PROPOSAL_TYPE, CFG_BIBCIRCULATION_ACQ_STATUS
-from invenio.bibcirculation_utils import book_title_from_MARC, \
+from invenio.legacy.bibcirculation.utils import book_title_from_MARC, \
       update_status_if_expired, \
       renew_loan_for_X_days, \
       print_pending_hold_requests_information, \
@@ -95,7 +95,7 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
       has_date_format, \
       generate_tmp_barcode, \
       looks_like_dictionary
-import invenio.bibcirculation_dblayer as db
+import invenio.legacy.bibcirculation.db_layer as db
 import invenio.legacy.template
 bc_templates = invenio.legacy.template.load('bibcirculation')
 

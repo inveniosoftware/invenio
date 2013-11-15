@@ -50,7 +50,7 @@ from invenio.webjournal_utils import \
      header_pattern2, \
      para_pattern
 from invenio.utils.url import create_html_link
-from invenio.bibdocfile import decompose_file
+from invenio.legacy.bibdocfile.api import decompose_file
 
 def format_element(bfo, number_of_featured_articles="1",
            number_of_articles_with_image="3", new_articles_first='yes',

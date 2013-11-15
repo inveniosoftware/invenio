@@ -20,7 +20,7 @@
 import operator
 from itertools import izip, starmap, repeat
 #python2.4 compatibility
-from invenio.bibauthorid_general_utils import bai_all as all
+from invenio.legacy.bibauthorid.general_utils import bai_all as all
 
 def approximate(xs, ys, power):
     assert len(xs) == len(ys)

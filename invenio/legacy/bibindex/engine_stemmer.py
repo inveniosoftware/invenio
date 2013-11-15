@@ -23,7 +23,7 @@ BibIndex stemmer facility based on the Porter Stemming Algorithm.
 __revision__ = "$Id$"
 
 from thread import get_ident
-from invenio.bibindex_engine_stemmer_greek import GreekStemmer
+from invenio.legacy.bibindex.engine_stemmer_greek import GreekStemmer
 
 _stemmers = {}
 

@@ -35,7 +35,7 @@
 __revision__ = "$Id$"
 
 from invenio.legacy.dbquery import run_sql
-from invenio.bibcirculation_config import \
+from invenio.legacy.bibcirculation.config import \
     CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
     CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, \
     CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, \
@@ -111,7 +111,7 @@ def new_hold_request(borrower_id, recid, barcode, date_from, date_to, status):
 
 def has_loan_request(borrower_id, recid, ill=0):
 
-    from invenio.bibcirculation_utils import looks_like_dictionary
+    from invenio.legacy.bibcirculation.utils import looks_like_dictionary
 
     if ill == 0:
         return run_sql("""
@@ -1164,7 +1164,7 @@ def get_item_purchases(status, recid):
     Purchases of a particular item to be displayed in the item info page.
     """
 
-    from invenio.bibcirculation_utils import looks_like_dictionary
+    from invenio.legacy.bibcirculation.utils import looks_like_dictionary
 
     status1 = ''
     status2 = ''

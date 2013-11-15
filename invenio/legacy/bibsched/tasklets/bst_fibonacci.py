@@ -24,7 +24,7 @@ Demonstrates BibTaskLet <-> BibTask <-> BibSched connectivity
 
 import sys
 import time
-from invenio.bibtask import write_message, task_set_option, \
+from invenio.legacy.bibsched.bibtask import write_message, task_set_option, \
         task_get_option, task_update_progress, task_has_option, \
         task_get_task_param, task_sleep_now_if_required
 

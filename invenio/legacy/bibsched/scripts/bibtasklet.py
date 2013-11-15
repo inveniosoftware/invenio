@@ -27,7 +27,8 @@ __revision__ = "$Id$"
 
 import sys
 from werkzeug.utils import find_modules, import_string
-from invenio.bibtask import task_init, write_message, task_set_option, \
+from invenio.base.factory import with_app_context
+from invenio.legacy.bibsched.bibtask import task_init, write_message, task_set_option, \
     task_get_option, task_update_progress
 from invenio.utils.autodiscovery.helpers import get_callable_documentation
 from invenio.utils.autodiscovery.checkers import check_arguments_compatibility
@@ -41,7 +42,7 @@ def _load_tasklets():
     """
     tasklets = {}
     #FIXME
-    packages = [import_string('invenio.bibsched_tasklets'), ] #import_module_from_packages('bibsched_tasklets')
+    packages = [import_string('invenio.legacy.bibsched.tasklets'), ] #import_module_from_packages('bibsched_tasklets')
     for module in packages:
         for tasklet in find_modules(module.__name__):
             try:
@@ -143,7 +144,7 @@ def task_run_core():
         return ret
     return True
 
-
+@with_app_context
 def main():
     """
     Main body of bibtasklet.

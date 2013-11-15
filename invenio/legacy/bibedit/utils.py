@@ -43,11 +43,11 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
+from invenio.legacy.bibedit.config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
     CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_CACHEDIR
-from invenio.bibedit_dblayer import get_record_last_modification_date, \
+from invenio.legacy.bibedit.db_layer import get_record_last_modification_date, \
     delete_hp_change
 from invenio.legacy.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
@@ -57,7 +57,7 @@ from invenio.legacy.bibrecord import create_record, create_records, \
     field_get_subfield_values, record_delete_fields, record_add_fields, \
     record_get_field_values, print_rec, record_modify_subfield, \
     record_modify_controlfield
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, \
@@ -65,7 +65,7 @@ from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE, CFG_INSPIRE_SITE
 from invenio.utils.date import convert_datetext_to_dategui
 from invenio.utils.text import wash_for_xml
-from invenio.bibedit_dblayer import get_bibupload_task_opts, \
+from invenio.legacy.bibedit.db_layer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
     get_info_of_record_revision
 from invenio.legacy.search_engine import print_record, record_exists, get_colID, \
@@ -74,13 +74,13 @@ from invenio.legacy.search_engine import print_record, record_exists, get_colID,
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.webuser import get_user_info, getUid, get_email
 from invenio.legacy.dbquery import run_sql
-from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.refextract_api import extract_references_from_record_xml, \
                                    extract_references_from_string_xml, \
                                    extract_references_from_url_xml
 from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file, ParseError
-from invenio.bibauthorid_name_utils import split_name_parts, \
+from invenio.legacy.bibauthorid.name_utils import split_name_parts, \
                                         create_normalized_name
 from invenio.modules.knowledge.api import get_kbr_values
 

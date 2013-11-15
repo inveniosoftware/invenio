@@ -74,7 +74,7 @@ ReplyToTicket
 4. Using the API
 
 
-from invenio.bibcatalog import bibcatalog_system
+from invenio.legacy.bibcatalog.api import bibcatalog_system
 
 if bibcatalog_system is not None:
 	uid = 1 #or whatever..

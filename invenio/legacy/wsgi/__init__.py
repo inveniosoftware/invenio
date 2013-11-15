@@ -39,7 +39,7 @@ from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
 from invenio.ext.logging import register_exception
 from invenio.utils.datastructures import flatten_multidict
 ## TODO for future reimplementation of stream_file
-#from invenio.bibdocfile import StreamFileException
+#from invenio.legacy.bibdocfile.api import StreamFileException
 from flask import request, after_this_request
 
 

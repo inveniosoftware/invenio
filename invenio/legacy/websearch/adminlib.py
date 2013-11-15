@@ -67,7 +67,7 @@ from invenio.legacy.websearch_external_collections.websearch_external_collection
 from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_STATES_NAME
 #from invenio.modules.formatter.format_elements import bfe_references
 #from invenio.modules.formatter.engine import BibFormatObject
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.base.i18n import gettext_set_language
 #from invenio.legacy.bibrank.citation_searcher import get_cited_by
 from invenio.modules.access.control import acc_get_action_id

@@ -94,13 +94,13 @@ from invenio.legacy.bibrecord import get_fieldvalues, get_fieldvalues_alephseq_l
 from invenio.legacy.bibrecord import create_record, record_xml_output
 from invenio.legacy.bibrank.record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.legacy.bibrank.downloads_similarity import register_page_view_event, calculate_reading_similarity_list
-from invenio.bibindex_engine_stemmer import stem
+from invenio.legacy.bibindex.engine_stemmer import stem
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 from invenio.bibindex_tokenizers.BibIndexCJKTokenizer import BibIndexCJKTokenizer, is_there_any_CJK_character_in_text
-from invenio.bibindex_engine_utils import author_name_requires_phrase_search
-from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
-from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
-from invenio.bibindex_engine_utils import get_idx_indexer
+from invenio.legacy.bibindex.engine_utils import author_name_requires_phrase_search
+from invenio.legacy.bibindex.engine_washer import wash_index_term, lower_index_term, wash_author_name
+from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
+from invenio.legacy.bibindex.adminlib import get_idx_indexer
 from invenio.modules.formatter import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.modules.formatter.config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.legacy.bibrank.downloads_grapher import create_download_history_graph_and_box
@@ -111,7 +111,7 @@ from invenio.modules.access.control import acc_get_action_id
 from invenio.modules.access.local_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS, \
     CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
-from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.intbitset import intbitset
 from invenio.legacy.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
 from invenio.modules.access.engine import acc_authorize_action
@@ -140,8 +140,8 @@ from invenio.legacy.search_engine.query_parser import SearchQueryParenthesisedPa
     SpiresToInvenioSyntaxConverter
 
 from invenio.utils import apache
-from invenio.solrutils_bibindex_searcher import solr_get_bitset
-from invenio.xapianutils_bibindex_searcher import xapian_get_bitset
+from invenio.legacy.miscutil.solrutils_bibindex_searcher import solr_get_bitset
+from invenio.legacy.miscutil.xapianutils_bibindex_searcher import xapian_get_bitset
 
 
 try:
@@ -2025,7 +2025,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         t1 = os.times()[4]
     basic_search_units_hitsets = []
     #prepare hiddenfield-related..
-    myhiddens = cgf['CFG_BIBFORMAT_HIDDEN_TAGS']
+    myhiddens = cfg['CFG_BIBFORMAT_HIDDEN_TAGS']
     can_see_hidden = False
     if req:
         user_info = collect_user_info(req)

@@ -35,15 +35,15 @@ from invenio.config import \
 from invenio.legacy.dbquery import run_sql, deserialize_via_marshal, wash_table_column_name
 from invenio.ext.logging import register_exception
 from invenio.legacy.webpage import adderrorbox
-from invenio.bibindex_engine_stemmer import stem
-from invenio.bibindex_engine_stopwords import is_stopword
+from invenio.legacy.bibindex.engine_stemmer import stem
+from invenio.legacy.bibindex.engine_stopwords import is_stopword
 from invenio.legacy.bibrank.citation_searcher import get_cited_by, get_cited_by_weight
 from invenio.intbitset import intbitset
 from invenio.legacy.bibrank.word_searcher import find_similar
 # Do not remove these lines, it is necessary for func_object = globals().get(function)
 from invenio.legacy.bibrank.word_searcher import word_similarity
-from invenio.solrutils_bibrank_searcher import word_similarity_solr
-from invenio.xapianutils_bibrank_searcher import word_similarity_xapian
+from invenio.legacy.miscutil.solrutils_bibrank_searcher import word_similarity_solr
+from invenio.legacy.miscutil.xapianutils_bibrank_searcher import word_similarity_xapian
 
 
 def compare_on_val(first, second):

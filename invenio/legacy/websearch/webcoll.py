@@ -54,7 +54,7 @@ from invenio.legacy.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \
      external_collection_sort_engine_by_name
-from invenio.bibtask import task_init, task_get_option, task_set_option, \
+from invenio.legacy.bibsched.bibtask import task_init, task_get_option, task_set_option, \
     write_message, task_has_option, task_update_progress, \
     task_sleep_now_if_required
 import invenio.legacy.template

@@ -17,9 +17,8 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibcatalog.py bibcatalog_templates.py bibcatalog_system.py \
-			 bibcatalog_system_rt.py bibcatalog_system_rt_unit_tests.py \
-             bibcatalog_system_email.py bibcatalog_system_email_unit_tests.py
+pylib_DATA = bibcatalog_system_rt_unit_tests.py \
+             bibcatalog_system_email_unit_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

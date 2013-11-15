@@ -17,9 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibtask import write_message
-from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE
-from invenio.weblinkback import update_linkbacks, \
+from invenio.legacy.bibsched.bibtask import write_message
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_TYPE
+from invenio.legacy.weblinkback.api import update_linkbacks, \
                                 delete_linkbacks_on_blacklist, \
                                 send_pending_linkbacks_notification
 

@@ -63,7 +63,7 @@ from invenio.webjournal import \
      perform_request_contact, \
      perform_request_popup, \
      perform_request_search
-from invenio.webstat import register_customevent
+from invenio.legacy.webstat.api import register_customevent
 
 import invenio.legacy.template
 webjournal_templates = invenio.legacy.template.load('webjournal')
