@@ -116,6 +116,7 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE, \
     CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
+    CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING, \
     CFG_BIBCATALOG_SYSTEM
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
@@ -385,6 +386,8 @@ def normalize_format(docformat, allow_subformat=True):
     @return: the normalized format.
     @rtype; string
     """
+    if not docformat:
+        return ''
     if allow_subformat:
         subformat = docformat[docformat.rfind(';'):]
         docformat = docformat[:docformat.rfind(';')]
@@ -423,11 +426,10 @@ def guess_format_from_url(url):
             elif CFG_HAS_MAGIC == 2:
                 mimetype = _magic_wrapper(local_path, mime=True, mime_encoding=False)
             if CFG_HAS_MAGIC:
-                ext = _mimes.guess_extension(mimetype)
-                if ext:
-                    ## Normalize some common magic mis-interpreation
-                    ext = {'.asc': '.txt', '.obj': '.bin'}.get(ext, ext)
-                    return normalize_format(ext)
+                if mimetype in CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING:
+                    return normalize_format(CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING[mimetype])
+                else:
+                    return normalize_format(_mimes.guess_extension(mimetype))
         except Exception:
             pass
 
@@ -3899,11 +3901,12 @@ def get_format_from_http_response(response):
             ## We actually ignore these mimetypes since they are the
             ## defaults often returned by Apache in case the mimetype
             ## was not known
-            ext = _mimes.guess_extension(content_type)
-            if ext:
-                ## Normalize some common magic mis-interpreation
-                ext = {'.asc': '.txt', '.obj': '.bin'}.get(ext, ext)
-                docformat = normalize_format(ext)
+            if content_type in CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING:
+                docformat = normalize_format(CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING[content_type])
+            else:
+                ext = _mimes.guess_extension(content_type)
+                if ext:
+                    docformat = normalize_format(ext)
 
     return docformat
 

@@ -183,6 +183,7 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_OAUTH1_CONFIGURATIONS',
                        'CFG_OAUTH2_CONFIGURATIONS',
                        'CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES',
+                       'CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING',
                        'CFG_BIBSCHED_NON_CONCURRENT_TASKS',
                        'CFG_BIBSCHED_INCOMPATIBLE_TASKS']:
         try:
