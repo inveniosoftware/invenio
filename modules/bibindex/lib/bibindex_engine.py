@@ -79,7 +79,9 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     get_virtual_index_building_blocks, \
     get_index_id_from_index_name, \
     get_index_name_from_index_id, \
-    run_sql_drop_silently
+    run_sql_drop_silently, \
+    get_min_last_updated, \
+    remove_inexistent_indexes
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibfield import get_record
 from invenio.memoiseutils import Memoise
@@ -457,15 +459,18 @@ def truncate_index_table(index_name):
         run_sql("TRUNCATE idxPHRASE%02dF" % index_id) # kwalitee: disable=sql
         run_sql("TRUNCATE idxPHRASE%02dR" % index_id) # kwalitee: disable=sql
 
-def update_index_last_updated(index_id, starting_time=None):
+
+def update_index_last_updated(indexes, starting_time=None):
     """Update last_updated column of the index table in the database.
-    Puts starting time there so that if the task was interrupted for record download,
-    the records will be reindexed next time."""
+       Puts starting time there so that if the task was interrupted for record download,
+       the records will be reindexed next time.
+       @param indexes: list of indexes names
+    """
     if starting_time is None:
         return None
-    write_message("updating last_updated to %s..." % starting_time, verbose=9)
-    return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
-                    (starting_time, index_id,))
+    for index_name in indexes:
+        write_message("updating last_updated to %s...for %s index" % (starting_time, index_name), verbose=9)
+        run_sql("UPDATE idxINDEX SET last_updated=%s WHERE name=%s", (starting_time, index_name,))
 
 
 def get_percentage_completed(num_done, num_total):
@@ -503,10 +508,9 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
     modification_dates = dict([(date, tmp_dates[date] or datetime(1000,1,1,1,1,1)) for date in tmp_dates])
     tmp_all_indexes = get_all_indexes(virtual=False)
 
+    indexes = remove_inexistent_indexes(indexes, leave_virtual=False)
     if not indexes:
-        indexes = tmp_all_indexes
-    else:
-        indexes = indexes.split(",")
+        return {}
 
     def _should_reindex_for_revision(index_name, revision_date):
         try:
@@ -525,11 +529,12 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
             records_for_indexes[index] = all_recIDs
         return records_for_indexes
 
+    min_last_updated = get_min_last_updated(indexes)[0][0] or datetime(1000,1,1,1,1,1)
     indexes_to_change = _fill_dict_of_indexes_with_empty_sets()
     recIDs_info = []
     for recIDs_range in recIDs:
         query = """SELECT id_bibrec,job_date,affected_fields FROM hstRECORD WHERE
-                   id_bibrec BETWEEN %s AND %s""" % (recIDs_range[0], recIDs_range[1])
+                   id_bibrec BETWEEN %s AND %s AND job_date > '%s'""" % (recIDs_range[0], recIDs_range[1], min_last_updated)
         res = run_sql(query)
         if res:
             recIDs_info.extend(res)
@@ -1651,17 +1656,17 @@ def get_not_updated_recIDs(modified_dates, indexes, force_all=False):
     return list(sorted(found_recIDs))
 
 
-def get_recIDs_from_cli():
+def get_recIDs_from_cli(indexes=[]):
     """
         Gets recIDs ranges from CLI for indexing when
         user specified 'id' or 'collection' option or
-        search for modified recIDs when they're not specified.
+        search for modified recIDs for provided indexes
+        when recIDs are not specified.
+        @param indexes: it's a list of specified indexes, which
+            can be obtained from CLI with use of:
+            get_indexes_from_cli() function.
+        @type indexes: list of strings
     """
-    indexes = task_get_option("windex")
-    if not indexes:
-        indexes = get_all_indexes()
-    else:
-        indexes = indexes.split(",")
     # need to first update idxINDEX table to find proper recIDs for reindexing
     if task_get_option("reindex"):
         for index_name in indexes:
@@ -1686,18 +1691,32 @@ def get_recIDs_from_cli():
     return []
 
 
+def get_indexes_from_cli():
+    """
+        Gets indexes from CLI and checks if they are
+        valid. If indexes weren't specified function
+        will return all known indexes.
+    """
+    indexes = task_get_option("windex")
+    if not indexes:
+        indexes = get_all_indexes()
+    else:
+        indexes = indexes.split(",")
+        indexes = remove_inexistent_indexes(indexes, leave_virtual=True)
+    return indexes
+
+
 def remove_dependent_index(virtual_indexes, dependent_index):
     """
         Removes dependent index from virtual indexes.
-        @param virtual_indexes: names of virtual_indexes separated by comma
-        @type virtual_indexes: string
+        @param virtual_indexes: names of virtual_indexes
+        @type virtual_indexes: list of strings
         @param dependent_index: name of dependent index
         @type dependent_index: string
     """
     if not virtual_indexes:
         write_message("You should specify a name of a virtual index...")
-    else:
-        virtual_indexes = virtual_indexes.split(",")
+
     id_dependent = get_index_id_from_index_name(dependent_index)
     wordTables = get_word_tables(virtual_indexes)
     for index_id, index_name, index_tags in wordTables:
@@ -1741,15 +1760,18 @@ def remove_dependent_index(virtual_indexes, dependent_index):
 
 
 def task_run_core():
-    """Runs the task by fetching arguments from the BibSched task queue.  This is
-    what BibSched will be invoking via daemon call.
-    The task prints Fibonacci numbers for up to NUM on the stdout, and some
-    messages on stderr.
-    Return 1 in case of success and 0 in case of failure."""
+    """Runs the task by fetching arguments from the BibSched task queue.
+       This is what BibSched will be invoking via daemon call.
+    """
     global _last_word_table
 
+    indexes = get_indexes_from_cli()
+    if len(indexes) == 0:
+        write_message("Specified indexes can't be found.")
+        return True
+
+    # check tables consistency
     if task_get_option("cmd") == "check":
-        indexes = task_get_option("windex") and task_get_option("windex").split(",") or get_all_indexes()
         wordTables = get_word_tables(indexes)
         for index_id, index_name, index_tags in wordTables:
             wordTable = WordTable(index_name=index_name,
@@ -1788,15 +1810,16 @@ def task_run_core():
             task_sleep_now_if_required(can_stop_too=True)
         _last_word_table = None
         return True
+
     #virtual index: remove dependent index
     if task_get_option("remove-dependent-index"):
-        remove_dependent_index(task_get_option("windex"),
+        remove_dependent_index(indexes,
                                task_get_option("remove-dependent-index"))
         return True
 
     #initialization for Words,Pairs,Phrases
-    recIDs_range = get_recIDs_from_cli()
-    recIDs_for_index = find_affected_records_for_index(task_get_option("windex"),
+    recIDs_range = get_recIDs_from_cli(indexes)
+    recIDs_for_index = find_affected_records_for_index(indexes,
                                                        recIDs_range,
                                                        (task_get_option("force") or \
                                                        task_get_option("reindex") or \
@@ -1920,8 +1943,7 @@ def task_run_core():
                 final_recIDs = beautify_range_list(create_range_list(recIDs_for_index[index_name]))
                 wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
                 if not task_get_option("id") and not task_get_option("collection"):
-                    # let us update last_updated timestamp info, if run via automatic mode:
-                    update_index_last_updated(index_id, task_get_task_param('task_starting_time'))
+                    update_index_last_updated([index_name], task_get_task_param('task_starting_time'))
                 task_sleep_now_if_required(can_stop_too=True)
             elif task_get_option("cmd") == "repair":
                 wordTable.repair(task_get_option("flush"))
@@ -1943,8 +1965,15 @@ def task_run_core():
 
         if task_get_option("reindex"):
             swap_temporary_reindex_tables(index_id, reindex_prefix)
-            update_index_last_updated(index_id, task_get_task_param('task_starting_time'))
+            update_index_last_updated([index_name], task_get_task_param('task_starting_time'))
         task_sleep_now_if_required(can_stop_too=True)
+
+    # update modification date also for indexes that were up to date
+    if not task_get_option("id") and not task_get_option("collection") and \
+       task_get_option("cmd") == "add":
+        up_to_date = set(indexes) - set(recIDs_for_index.keys())
+        update_index_last_updated(list(up_to_date), task_get_task_param('task_starting_time'))
+
 
     _last_word_table = None
     return True

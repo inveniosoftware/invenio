@@ -58,7 +58,7 @@ from invenio.bibrecord import record_get_field_value, \
 from invenio.bibsort_engine import get_max_recid
 
 
-def reindex_for_type_with_bibsched(index_name, force_all=False):
+def reindex_for_type_with_bibsched(index_name, force_all=False, *other_options):
     """Runs bibindex for the specified index and returns the task_id.
        @param index_name: name of the index to reindex
        @param force_all: if it's True function will reindex all records
@@ -66,6 +66,7 @@ def reindex_for_type_with_bibsched(index_name, force_all=False):
     """
     program = os.path.join(CFG_BINDIR, 'bibindex')
     args = ['bibindex', 'bibindex_regression_tests', '-w', index_name, '-u', 'admin']
+    args.extend(other_options)
     if force_all:
         args.append("--force")
     task_id = task_low_level_submission(*args)
@@ -161,9 +162,9 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
     if recids:
         wordTable.add_recIDs(recids, 10000)
     else:
-        recIDs_for_index = find_affected_records_for_index(index_name,
-                                               [[1, get_max_recid()]],
-                                                                 True)
+        recIDs_for_index = find_affected_records_for_index([index_name],
+                                                 [[1, get_max_recid()]],
+                                                                   True)
         bib_recIDs = get_recIDs_by_date_bibliographic([], index_name)
         auth_recIDs = get_recIDs_by_date_authority([], index_name)
         final_recIDs = bib_recIDs | auth_recIDs
@@ -950,44 +951,49 @@ class BibIndexFindingAffectedIndexes(unittest.TestCase):
 
     def test_find_proper_indexes(self):
         """bibindex - checks if affected indexes are found correctly"""
-        records_for_indexes = find_affected_records_for_index([], [[1,20]])
+        records_for_indexes = find_affected_records_for_index(get_all_indexes(virtual=False),
+                                                              [[1,20]])
         self.assertEqual(sorted(['miscellaneous', 'fulltext', 'caption', 'journal', 'reportnumber', 'year']),
                          sorted(records_for_indexes.keys()))
 
     def test_find_proper_recrods_for_miscellaneous_index(self):
         """bibindex - checks if affected recids are found correctly for miscellaneous index"""
-        records_for_indexes = find_affected_records_for_index([], [[1,20]])
+        records_for_indexes = find_affected_records_for_index(get_all_indexes(virtual=False),
+                                                              [[1,20]])
         self.assertEqual(records_for_indexes['miscellaneous'], [10,12])
 
     def test_find_proper_records_for_year_index(self):
         """bibindex - checks if affected recids are found correctly for year index"""
-        records_for_indexes = find_affected_records_for_index("", [[1,20]])
+        records_for_indexes = find_affected_records_for_index(get_all_indexes(virtual=False),
+                                                              [[1,20]])
         self.assertEqual(records_for_indexes['year'], [10,12])
 
     def test_find_proper_records_for_caption_index(self):
         """bibindex - checks if affected recids are found correctly for caption index"""
-        records_for_indexes = find_affected_records_for_index("", [[1,100]])
+        records_for_indexes = find_affected_records_for_index(get_all_indexes(virtual=False),
+                                                              [[1,100]])
         self.assertEqual(records_for_indexes['caption'], [10,12, 55, 98])
 
     def test_find_proper_records_for_journal_index(self):
         """bibindex - checks if affected recids are found correctly for journal index"""
-        records_for_indexes = find_affected_records_for_index("", [[1,100]])
+        records_for_indexes = find_affected_records_for_index(get_all_indexes(virtual=False),
+                                                              [[1,100]])
         self.assertEqual(records_for_indexes['journal'], [10])
 
     def test_find_proper_records_specified_only_year(self):
         """bibindex - checks if affected recids are found correctly for year index if we specify only year index as input"""
-        records_for_indexes = find_affected_records_for_index("year", [[1, 100]])
+        records_for_indexes = find_affected_records_for_index(["year"], [[1, 100]])
         self.assertEqual(records_for_indexes["year"], [10, 12, 55])
 
     def test_find_proper_records_force_all(self):
         """bibindex - checks if all recids will be assigned to all specified indexes"""
-        records_for_indexes = find_affected_records_for_index("year,title", [[10, 15]], True)
+        records_for_indexes = find_affected_records_for_index(["year", "title"], [[10, 15]], True)
         self.assertEqual(records_for_indexes["year"], records_for_indexes["title"])
         self.assertEqual(records_for_indexes["year"], [10, 11, 12, 13, 14, 15])
 
     def test_find_proper_records_nothing_for_title_index(self):
         """bibindex - checks if nothing was found for title index in range of records: 1 - 20"""
-        records_for_indexes = find_affected_records_for_index("title", [[1, 20]])
+        records_for_indexes = find_affected_records_for_index(["title"], [[1, 20]])
         self.assertRaises(KeyError, lambda :records_for_indexes["title"])
 
 
@@ -1005,7 +1011,8 @@ class BibIndexIndexingAffectedIndexes(unittest.TestCase):
         if not self.started:
             self.records.append(insert_record_one_and_second_revision())
             self.records.append(insert_record_two_and_second_revision())
-            records_for_indexes = find_affected_records_for_index([], [self.records])
+            records_for_indexes = find_affected_records_for_index(get_all_indexes(virtual=False),
+                                                                  [self.records])
             wtabs = get_word_tables(records_for_indexes.keys())
             for index_id, index_name, index_tags in wtabs:
                 wordTable = WordTable(index_name=index_name,
@@ -1393,6 +1400,30 @@ class BibIndexVirtualIndexRemovalTest(unittest.TestCase):
         self.assertEqual(['151', '357','1985', 'Phys. Lett., B 151 (1985) 357', 'Phys. Lett., B'],
                          deserialize_via_marshal(res[0][0]))
 
+class BibIndexCLICallTest(unittest.TestCase):
+    """Tests if calls to bibindex from CLI (bibsched deamon) are run correctly"""
+
+    def test_correct_message_for_wrong_index_names(self):
+        """bibindex - checks if correct message for wrong index appears"""
+        index_name = "titlexrg"
+        task_id = reindex_for_type_with_bibsched(index_name, force_all=True)
+        filename = os.path.join(CFG_LOGDIR, 'bibsched_task_' + str(task_id) + '.log')
+        fl = open(filename)
+        text = fl.read() # small file
+        fl.close()
+        self.assertTrue(text.find("Specified indexes can't be found.") >= 0)
+
+    def test_correct_message_for_up_to_date_indexes(self):
+        """bibindex - checks if correct message for index up to date appears"""
+        index_name = "abstract"
+        task_id = reindex_for_type_with_bibsched(index_name)
+        filename = os.path.join(CFG_LOGDIR, 'bibsched_task_' + str(task_id) + '.log')
+        fl = open(filename)
+        text = fl.read() # small file
+        fl.close()
+        self.assertTrue(text.find("Selected indexes/recIDs are up to date.") >= 0)
+
+
 
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
@@ -1410,7 +1441,8 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexFindingTagsForIndexes,
                              BibIndexGlobalIndexContentTest,
                              BibIndexVirtualIndexAlsoChangesTest,
-                             BibIndexVirtualIndexRemovalTest)
+                             BibIndexVirtualIndexRemovalTest,
+                             BibIndexCLICallTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
