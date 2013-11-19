@@ -233,6 +233,12 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
                 marknum = int(m_ref_line_marker.group('marknum'))
             except IndexError:
                 marknum = None
+            except ValueError:
+                # If the mark is a unicode character category [Nd],
+                # it is not always convertible to int by int()
+                # We can't use its numerical value, but we still accept it
+                # as numeration
+                pass
 
             new_line_detected = False
             if marknum is None or current_ref + 1 == marknum:
