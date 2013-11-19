@@ -294,7 +294,7 @@ def OAI_Request(server, script, params, method="POST", secure=False,
                 conn.request("GET", script + "?" + params, headers=headers)
             elif method == "POST":
                 conn.request("POST", script, params, headers)
-        except socket.gaierror, (err, str_e):
+        except socket.gaierror, e:
             # We'll retry in a few seconds
             nb_seconds_retry = 30
             sys.stderr.write("An error occured when trying to request %s: %s\nWill retry in %i seconds\n" % (server, e, nb_seconds_retry))
@@ -354,9 +354,11 @@ def OAI_Request(server, script, params, method="POST", secure=False,
                 user = raw_input()
                 password = getpass.getpass()
             except EOFError, e:
+                sys.stderr.write(str(e))
                 sys.stderr.write("\n")
                 sys.exit(1)
             except KeyboardInterrupt, e:
+                sys.stderr.write(str(e))
                 sys.stderr.write("\n")
                 sys.exit(1)
             headers["Authorization"] = "Basic " + base64.encodestring(user + ":" + password).strip()
