@@ -43,7 +43,7 @@ class BibFieldRecordFieldValuesTest(InvenioTestCase):
         """bibfield - access to normal fields"""
         record = get_record(12)
         self.assertTrue(record.get('asdas') is None)
-        self.assertEqual('12', record['recid'])
+        self.assertEqual(12, record['recid'])
         self.assertTrue('recid' in record.get_persistent_identifiers())
         self.assertEqual(record['recid'], record.get('recid'))
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record['title.title'])
@@ -77,6 +77,9 @@ class BibFieldRecordFieldValuesTest(InvenioTestCase):
         record.update_field_cache('_number_of_copies')
         self.assertEqual(2, record['_number_of_copies'])
         self.assertEqual(2, record['number_of_copies'])
+        self.assertEqual(0, record['_number_of_citations'])
+        record = get_record(81)
+        self.assertEqual(4, record['_number_of_citations'])
 
     def test_get_using_format_string(self):
         """
@@ -305,7 +308,7 @@ class BibFieldProducerTests(InvenioTestCase):
         record = get_record(1)
         produced_marc = record.produce_json_for_marc()
 
-        self.assertTrue({'001': '1'} in produced_marc)
+        self.assertTrue({'001': 1} in produced_marc)
 
     def test_produce_json_for_dublin_core(self):
         """bibfield - produce json dublin core"""
