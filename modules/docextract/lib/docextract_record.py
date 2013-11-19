@@ -35,7 +35,7 @@ def parse_tag(tag):
     try:
         ind1 = tag[3]
     except IndexError:
-        ind1 = " "
+        ind1 = "%"
 
     if ind1 == '_':
         ind1 = ' '
@@ -43,7 +43,7 @@ def parse_tag(tag):
     try:
         ind2 = tag[4]
     except IndexError:
-        ind2 = " "
+        ind2 = "%"
 
     if ind2 == '_':
         ind2 = ' '
@@ -115,7 +115,39 @@ class BibRecord(object):
         self.record[tag] = fields
 
     def __getitem__(self, tag):
-        return self.record[tag]
+        return self.find_fields(tag)
+
+    def __delitem__(self, tag):
+        assert len(tag) >= 3
+        if len(tag) == 3:
+            # Case '100', it's easy to delete all fields
+            del self.record[tag]
+        else:
+            tag_code, ind1, ind2, subfield_code = parse_tag(tag)
+
+            if subfield_code is None:
+                # Case '100__', we filter out all fields that match
+                # the indicators
+                self.record[tag_code] = [f for f in self.record[tag_code]
+                                         if ind1 != '%' and f.ind1 != ind1
+                                         or ind2 != '%' and f.ind2 != ind2]
+            else:
+                # Case '100__a', we filter out matching subfields
+                for field in self.find_fields(tag):
+                    field.subfields = [s for s in field.subfields
+                                       if s.code != subfield_code]
+
+                # Cleanup empty fields
+                self.record[tag_code] = [f for f in self.record[tag_code]
+                                         if f.subfields]
+
+            # Cleanup empty list
+            if not self.record[tag_code]:
+                del self.record[tag_code]
+
+
+    def __len__(self):
+        return sum(len(fields) for fields in self.record.itervalues())
 
     def get(self, tag, default):
         try:
@@ -241,6 +273,41 @@ class BibRecordField(object):
 
     def __hash__(self):
         return hash((self.ind1, self.ind2, tuple(self.subfields)))
+
+    def __len__(self):
+        return len(self.subfields)
+
+    def __getitem__(self, code):
+        """Returns all the values of the subfields with given code
+
+        @see get_subfield_values()
+        """
+        return self.get_subfield_values(code)
+
+    def __setitem__(self, code, value):
+        """Replaces the value of a single subfield element
+
+        e.g. MARC:
+        999C5 $ahello1$ahello2$bhello3
+        record['999'][0].find_subfields('a')
+        Returns ['hello1', 'hello2']
+        """
+        subfields = self.find_subfields(code)
+        assert len(subfields) == 1
+        subfields[0].value = value
+
+    def __delitem__(self, code):
+        self.subfields = [s for s in self.subfields if s.code != code]
+
+    def find_subfields(self, code):
+        """Returns all the values of the subfields with given code
+
+        e.g. MARC:
+        999C5 $ahello1$ahello2$bhello3
+        record['999'][0].find_subfields('a')
+        Returns ['hello1', 'hello2']
+        """
+        return [s for s in self.subfields if s.code == code]
 
     def get_subfield_values(self, code):
         return [s.value for s in self.subfields if s.code == code]

@@ -26,6 +26,7 @@ from invenio.search_engine import perform_request_search
 from invenio.bibrecord import print_rec
 from invenio.testutils import XmlTest
 from invenio.dbquery import run_sql
+from invenio.testutils import make_test_suite, run_test_suite
 
 
 class BibRecordTest(XmlTest):
@@ -94,15 +95,9 @@ class BibRecordTest(XmlTest):
 
             self.assertEqual(record, original_record)
 
-    def test_add_subfield(self):
-        xml = """<record>
-            <datafield tag="100" ind1=" " ind2=" ">
-                <subfield code="a">our title</subfield>
-            </datafield>
-        </record>"""
-        expected_record = create_record(xml)
-        print expected_record
-        record = BibRecord()
-        record.add_subfield('100__a', 'our title')
-        print record
-        self.assertEqual(record, expected_record)
+
+TEST_SUITE = make_test_suite(BibRecordTest)
+
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE, warn_user=True)
