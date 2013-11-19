@@ -125,7 +125,15 @@ def remove_old_graph_if_needed(filename):
     if not os.path.isfile(filename):
         return True
 
-    time_diff = time.time() - os.stat(filename).st_mtime
+    try:
+        mtime = os.stat(filename).st_mtime
+    except OSError, e:
+        # File does not exist is ok
+        if e.errno != 2:
+            raise
+        return True
+
+    time_diff = time.time() - mtime
     if time_diff > 3600*24:
         try:
             os.unlink(filename)
@@ -134,6 +142,7 @@ def remove_old_graph_if_needed(filename):
             if e.errno != 2:
                 raise
         return True
+
     return False
 
 
