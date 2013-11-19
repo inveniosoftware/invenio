@@ -467,7 +467,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
                                             verbose=verbose)
     ############################# END ##################################
         try:
-            raise InvenioBibFormatError(_('No template could be found for output format %s.') % of)
+            raise InvenioBibFormatError(_('No template could be found for output format %(code)s.', code=of))
         except InvenioBibFormatError, exc:
             register_exception(req=bfo.req)
 
@@ -668,7 +668,9 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
                        '</span>'
         if format_element is None:
             try:
-                raise InvenioBibFormatError(_('Could not find format element named %s.') % function_name)
+                raise InvenioBibFormatError(
+                    _('Could not find format element named %(function_name)s.',
+                      function_name=function_name))
             except InvenioBibFormatError, exc:
                 register_exception(req=bfo.req)
 
@@ -764,7 +766,9 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
         except Exception, e:
             name = format_element['attrs']['name']
             try:
-                raise InvenioBibFormatError(_('Error when evaluating format element %s with parameters %s.') % (name, str(params)))
+                raise InvenioBibFormatError(_(
+                    'Error when evaluating format element %(format_element)s with parameters %(parameters)s.',
+                    format_element=name, parameters=str(params)))
             except InvenioBibFormatError, exc:
                 register_exception(req=bfo.req)
                 errors.append(exc.message)
@@ -1167,7 +1171,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
 
         else:
             try:
-                raise InvenioBibFormatError(_('Format element %s could not be found.') % element_name)
+                raise InvenioBibFormatError(_('Format element %(element_name)s could not be found.', element_name=element_name))
             except InvenioBibFormatError, exc:
                 register_exception()
 
@@ -1191,7 +1195,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             format_element['code'] = function_format
         except KeyError:
             try:
-                raise InvenioBibFormatError(_('Format element %s has no function named "format".') % element_name)
+                raise InvenioBibFormatError(_('Format element %(element_name)s has no function named "format".', element_name=element_name))
             except InvenioBibFormatError, exc:
                 register_exception()
                 errors.append(exc.message)
@@ -1519,7 +1523,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
 
     if filename is None:
         try:
-            raise InvenioBibFormatError(_('Output format with code %s could not be found.') % code)
+            raise InvenioBibFormatError(_('Output format with code %(code)s could not be found.', code=code))
         except InvenioBibFormatError, exc:
             register_exception()
 
@@ -1736,7 +1740,7 @@ def resolve_output_format_filename(code, verbose=0):
 
     # No output format with that name found
     try:
-        raise InvenioBibFormatError(_('Could not find output format named %s.') % code)
+        raise InvenioBibFormatError(_('Could not find output format named %(code)s.', code=code))
     except InvenioBibFormatError, exc:
         register_exception()
 

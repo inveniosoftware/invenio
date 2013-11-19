@@ -28,3 +28,4 @@ qrcode
 PIL
 fs==0.4.0
 libmagic==1.0
+Babel==1.3

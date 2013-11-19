@@ -17,20 +17,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
     invenio.ext.template
-    ------------------
+    --------------------
 
     This module provides additional extensions and filters for `jinja2` module
     used in Invenio.
 """
 
 
-import types
 from .bccache import BytecodeCacheWithConfig
 from .context_processor import setup_app as context_processor_setup_app
 from flask import g, request, current_app, _request_ctx_stack, url_for
 from jinja2 import FileSystemLoader, ChoiceLoader
-
-from invenio.utils.datastructures import LazyDict
 
 ENV_PREFIX = '_collected_'
 
@@ -72,6 +69,7 @@ def inject_utils():
     from werkzeug.routing import BuildError
 
     from invenio.base.i18n import is_language_rtl
+    from flask.ext.babel import get_translations
     from flask.ext.login import current_user
     from invenio.utils.url import create_url, get_canonical_and_alternates_urls
 
@@ -90,25 +88,25 @@ def inject_utils():
         request.environ['PATH_INFO'])
     alternate_urls = dict((ln.replace('_', '-'), alternate_url)
                           for ln, alternate_url in alternate_urls.iteritems())
-    if not hasattr(g, '_'):
-        from invenio.base.before_request_functions import guess_language
-        guess_language()
     try:
         from invenio.legacy.bibfield import get_record  # should not be global due to bibfield_config
     except:
         get_record = lambda *args, **kwargs: None
     # from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
-    return dict(_=lambda *args, **kwargs: g._(*args, **kwargs),
-                current_user=user,
-                get_css_bundle=current_app.jinja_env.get_css_bundle,
-                get_js_bundle=current_app.jinja_env.get_js_bundle,
-                is_language_rtl=is_language_rtl,
-                canonical_url=canonical_url,
-                alternate_urls=alternate_urls,
-                get_record=get_record,
-                url_for=invenio_url_for,
-                #**TEMPLATE_CONTEXT_FUNCTIONS_CACHE.template_context_functions
-                )
+    return dict(
+        #FIXME use just gettext when all strings use named arguments
+        _=lambda s, *args, **kwargs: get_translations().gettext(
+            s.encode('utf8'), *args, **kwargs).decode('utf8'),
+        current_user=user,
+        get_css_bundle=current_app.jinja_env.get_css_bundle,
+        get_js_bundle=current_app.jinja_env.get_js_bundle,
+        is_language_rtl=is_language_rtl,
+        canonical_url=canonical_url,
+        alternate_urls=alternate_urls,
+        get_record=get_record,
+        url_for=invenio_url_for,
+        #**TEMPLATE_CONTEXT_FUNCTIONS_CACHE.template_context_functions
+        )
 
 
 def setup_app(app):

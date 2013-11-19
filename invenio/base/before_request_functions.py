@@ -23,56 +23,6 @@
     one wants to attach to the application at the global level.
 """
 
-from flask import request, session, g, current_app
-from flask.ext.login import current_user
-
-
-def guess_language():
-    """
-    Computes the language needed to return the answer to the client.
-
-    This information will then be available in the session['ln'] and in g.ln.
-
-    Additionally under g._ an already configured internationalization function
-    will be available (configured to return unicode objects).
-    """
-    #FIXME
-    from invenio.base.i18n import wash_language, gettext_set_language
-    required_ln = None
-    passed_ln = request.values.get('ln', type=str)
-    if passed_ln:
-        ## If ln is specified explictly as a GET or POST argument
-        ## let's take it!
-        required_ln = wash_language(passed_ln)
-        if passed_ln != required_ln:
-            ## But only if it was a valid language
-            required_ln = None
-    if required_ln:
-        ## Ok it was. We store it in the session.
-        session["ln"] = required_ln
-    if not "ln" in session:
-        ## If there is no language saved into the session...
-        user_language = current_user.get("language")
-        if user_language:
-            ## ... and the user is logged in, we try to take it from its
-            ## settings.
-            session["ln"] = user_language
-        else:
-            ## Otherwise we try to guess it from its request headers
-            for value, quality in request.accept_languages:
-                value = str(value)
-                ln = wash_language(value)
-                if ln == value or ln[:2] == value[:2]:
-                    session["ln"] = ln
-                    break
-            else:
-                ## Too bad! We stick to the default :-)
-                session["ln"] = current_app.config.get('CFG_SITE_LANG')
-    ## Well, let's make it global now
-    g.ln = session["ln"]
-    g._ = gettext_set_language(g.ln, use_unicode=True)
-
-
 def setup_app(app):
     """Attaches functions to before request handler."""
-    app.before_request(guess_language)
+    pass
