@@ -6,6 +6,7 @@ EXTENSIONS = [
     'invenio.ext.confighacks',
     'invenio.ext.jinja2hacks',
     'invenio.ext.debug_toolbar',
+    'invenio.ext.babel',
     'invenio.ext.sqlalchemy',
     'invenio.ext.sslify',
     'invenio.ext.cache',

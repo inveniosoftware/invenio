@@ -38,27 +38,14 @@ __revision__ = "$Id$"
 
 import gettext
 from flask import current_app
+from flask.ext.babel import gettext, lazy_gettext
 from werkzeug.local import LocalProxy
-from invenio.utils.datastructures import LazyDict
 
 CFG_SITE_LANG = LocalProxy(lambda: current_app.config.get('CFG_SITE_LANG'))
 CFG_SITE_LANGS = LocalProxy(lambda: current_app.config.get('CFG_SITE_LANGS'))
 
 ## Placemark for the i18n function
-_ = lambda x: x
-
-
-def _lang_gt_d():
-    """Returns translation functions."""
-    CFG_LOCALEDIR = current_app.config.get('CFG_LOCALEDIR')
-    CFG_SITE_LANGS = current_app.config.get('CFG_SITE_LANGS')
-    out = {}
-    for _alang in CFG_SITE_LANGS:
-        out[_alang] = gettext.translation('invenio', CFG_LOCALEDIR,
-                                          languages=[_alang], fallback=True)
-    return out
-
-_LANG_GT_D = LazyDict(_lang_gt_d)
+_ = lazy_gettext
 
 
 def gettext_set_language(ln, use_unicode=False):
@@ -67,11 +54,13 @@ def gettext_set_language(ln, use_unicode=False):
     Usage::
         _ = gettext_set_language(ln)
     """
-    if use_unicode:
-        def unicode_gettext_wrapper(*args, **kwargs):
-            return _LANG_GT_D[ln].gettext(*args, **kwargs).decode('utf-8')
-        return unicode_gettext_wrapper
-    return _LANG_GT_D[ln].gettext
+    from invenio.ext.babel import set_locale
+    with set_locale(ln):
+        #if use_unicode:
+        #    def unicode_gettext_wrapper(*args, **kwargs):
+        #        return gettext(*args, **kwargs).decode('utf-8')
+        #    return unicode_gettext_wrapper
+        return gettext
 
 
 def wash_language(ln):

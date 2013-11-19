@@ -20,14 +20,12 @@
 """WebMessage Forms"""
 
 from string import strip
-from datetime import datetime
 
+from invenio.base.globals import cfg
 from invenio.modules.messages.config import CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User, Usergroup
-from invenio.modules.messages.models import MsgMESSAGE, UserMsgMESSAGE
 from invenio.base.i18n import _
-from flask.ext.wtf import Form
 from invenio.utils.forms import InvenioBaseForm, FilterForm, DateTimePickerWidget, FilterTextField
 from wtforms import DateTimeField, BooleanField, TextField, TextAreaField, \
                     PasswordField, RadioField, validators
@@ -50,7 +48,7 @@ def validate_user_nicks(form, field):
         diff = test.difference(comp)
         if len(diff)>0:
             raise validators.ValidationError(
-                _('Not valid users: %s') % (', '.join(diff)))
+                _('Not valid users: %{diff}s', diff=', '.join(diff)))
 
 
 def validate_group_names(form, field):
@@ -71,9 +69,15 @@ class AddMsgMESSAGEForm(InvenioBaseForm):
     sent_to_group_names = TextField(_('Groups'), [validate_group_names])
     subject = TextField(_('Subject'))
     body = TextAreaField(_('Message'), [
-        validators.length(0, CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,
-        message = _("Your message is too long, please edit it. Maximum size allowed is %i characters.") % \
-                (CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,))])
+        validators.length(
+            0, CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,
+             message = _(
+                "Your message is too long, please edit it. "
+                "Maximum size allowed is %{length}i characters.",
+                length=CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE
+            )
+        )
+    ])
     received_date = DateTimeField(_('Send later'), [validators.optional()],
                                   widget=DateTimePickerWidget())
 

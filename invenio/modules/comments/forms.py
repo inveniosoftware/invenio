@@ -29,10 +29,15 @@ class AddCmtRECORDCOMMENTForm(InvenioBaseForm):
     """Defines form for writing new comment."""
     title = TextField(_('Title'))
     body = TextAreaField(_('Message'), [
-        validators.length(0, 10000,
-        message = _("Your message is too long, please edit it. Maximum size allowed is %i characters.") % \
-                (10000, ))])
-
+        validators.length(
+            0, 10000,
+            message = _(
+                "Your message is too long, please edit it. "
+                "Maximum size allowed is %{length}i characters.",
+                length=10000
+            )
+        )
+    ])
     in_reply_to_id_cmtRECORDCOMMENT = HiddenField()
 
 
