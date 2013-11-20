@@ -70,12 +70,12 @@ CFG_PATH_FFMPEG = @FFMPEG@
 CFG_PATH_FFPROBE = @FFPROBE@
 CFG_PATH_MEDIAINFO = @MEDIAINFO@
 
-## CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE -- path to the stopwords file.  You
-## probably don't want to change this path, although you may want to
+## CFG_BIBRANK_PATH_TO_STOPWORDS_FILE -- path to the default stopwords file.
+## You probably don't want to change this path, although you may want to
 ## change the content of that file.  Note that the file is used by the
 ## rank engine internally, so it should be given even if stopword
 ## removal in the indexes is not used.
-CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE = @prefix@/etc/bibrank/stopwords.kb
+CFG_BIBRANK_PATH_TO_STOPWORDS_FILE = @prefix@/etc/bibrank/stopwords.kb
 
 ## helper style of variables for WebSubmit:
 CFG_WEBSUBMIT_COUNTERSDIR = @localstatedir@/data/submit/counters

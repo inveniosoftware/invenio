@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ running from configure.ac.
 """
 
 ## minimally recommended/required versions:
-CFG_MIN_PYTHON_VERSION = (2, 4)
+CFG_MIN_PYTHON_VERSION = (2, 6)
 CFG_MAX_PYTHON_VERSION = (2, 9, 9999)
 CFG_MIN_MYSQLDB_VERSION = "1.2.1_p2"
 

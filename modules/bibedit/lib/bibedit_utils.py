@@ -55,7 +55,8 @@ from invenio.bibrecord import create_record, create_records, \
     record_order_subfields, record_get_field_instances, \
     record_add_field, field_get_subfield_codes, field_add_subfield, \
     field_get_subfield_values, record_delete_fields, record_add_fields, \
-    record_get_field_values, print_rec, record_modify_subfield
+    record_get_field_values, print_rec, record_modify_subfield, \
+    record_modify_controlfield
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -542,6 +543,21 @@ def split_revid(revid, dateformat=''):
         elif dateformat == 'dategui':
             revdate = convert_datetext_to_dategui(datetext, secs=True)
     return recid, revdate
+
+
+def modify_record_timestamp(revision_xml, last_revision_ts):
+    """ Modify tag 005 to add the revision passed as parameter.
+    @param revision_xml: marcxml representation of the record to modify
+    @type revision_xml: string
+    @param last_revision_ts: timestamp to add to 005 tag
+    @type last_revision_ts: string
+
+    @return: marcxml with 005 tag modified
+    """
+    recstruct = create_record(revision_xml)[0]
+    record_modify_controlfield(recstruct, "005", last_revision_ts,
+                                field_position_local=0)
+    return record_xml_output(recstruct)
 
 
 def get_xml_comparison(header1, header2, xml1, xml2):

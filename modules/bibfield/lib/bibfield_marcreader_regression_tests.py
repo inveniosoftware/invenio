@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -35,7 +35,7 @@ class BibFieldMarcReaderMarcXML(InvenioTestCase):
     """
 
     def test_marcxml_to_cool_struct_preparation(self):
-        """docstring for test_marcxml_to_cool_struct_preparation"""
+        """Bibfield - intermediate structure from marc xml"""
         #First record from demobibcfg.xml
         xml = """
             <record>
@@ -120,7 +120,7 @@ class BibFieldMarcReaderMarcXML(InvenioTestCase):
         self.assertTrue('100__' in r.rec_tree)
 
     def test_rec_json_creation_from_marcxml(self):
-        """docstring for test_rec_json_creation_from_marcxml"""
+        """BibField - recjson from marcxml"""
         xml = """
             <record>
                 <datafield tag="037" ind1=" " ind2=" ">
@@ -459,7 +459,7 @@ class BibFieldMarcReaderMarcXML(InvenioTestCase):
         self.assertTrue(len(r['reference']) == 36)
 
     def test_rec_json_creation_from_marcxml_file(self):
-        """docstring for test_rec_json_creation_from_marcxml_file"""
+        """BibField - recjson from marcxml file"""
         import os
         import tempfile
         from invenio.config import CFG_TMPDIR
@@ -526,7 +526,7 @@ class BibFieldMarcReaderRecstruct(InvenioTestCase):
     """
 
     def test_rectruct_to_cool_struct_preparation(self):
-        """docstring for test_rectruct_to_cool_struct_preparation"""
+        """BibField -intermediate structure from recjson"""
         from invenio.search_engine import get_record as search_engine_get_record
         bibrecord = search_engine_get_record(13)
         blob = BlobWrapper(blob=bibrecord, master_format='marc', schema='recstruct')
@@ -537,7 +537,7 @@ class BibFieldMarcReaderRecstruct(InvenioTestCase):
         self.assertTrue('100__' in r.rec_tree)
 
     def test_recjson_creation_from_recstruct(self):
-        """docstring for test_recjson_creation_from_recstruc"""
+        """BibField - recjson from recstruct"""
         from invenio.search_engine import get_record as search_engine_get_record
         bibrecord = search_engine_get_record(7)
         blob = BlobWrapper(blob=bibrecord, master_format='marc', schema='recstruct')
@@ -550,7 +550,77 @@ class BibFieldMarcReaderRecstruct(InvenioTestCase):
         self.assertTrue('collection.primary' in r)
         self.assertTrue(r['collection.primary'] == 'PICTURE')
 
-TEST_SUITE = make_test_suite(BibFieldMarcReaderMarcXML, BibFieldMarcReaderRecstruct)
+
+class BibFieldCheckRecord(InvenioTestCase):
+    """
+
+    """
+
+    def test_check_error_reporting(self):
+        """BibField - check error reporting"""
+        xml = """
+              <record>
+                <datafield tag="020" ind1=" " ind2=" ">
+                  <subfield code="a">2225350574</subfield>
+                </datafield>
+                <datafield tag="041" ind1=" " ind2=" ">
+                  <subfield code="a">fre</subfield>
+                </datafield>
+                <datafield tag="080" ind1=" " ind2=" ">
+                  <subfield code="a">518.5:62.01</subfield>
+                </datafield>
+                <datafield tag="100" ind1=" " ind2=" ">
+                  <subfield code="a">Dasse, Michel</subfield>
+                </datafield>
+                <datafield tag="245" ind1=" " ind2=" ">
+                  <subfield code="a">Analyse informatique</subfield>
+                </datafield>
+                <datafield tag="245" ind1=" " ind2=" ">
+                  <subfield code="n">t.1</subfield>
+                  <subfield code="p">Les preliminaires</subfield>
+                </datafield>
+                <datafield tag="260" ind1=" " ind2=" ">
+                  <subfield code="a">Paris</subfield>
+                  <subfield code="b">Masson</subfield>
+                  <subfield code="c">1972</subfield>
+                </datafield>
+                <datafield tag="490" ind1=" " ind2=" ">
+                  <subfield code="a">Informatique</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="0">
+                  <subfield code="y">1972</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="0">
+                  <subfield code="b">21</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="1">
+                  <subfield code="c">1990-01-27</subfield>
+                  <subfield code="l">00</subfield>
+                  <subfield code="m">2002-04-12</subfield>
+                  <subfield code="o">BATCH</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="S">
+                  <subfield code="s">m</subfield>
+                  <subfield code="w">198604</subfield>
+                </datafield>
+                <datafield tag="980" ind1=" " ind2=" ">
+                  <subfield code="a">BOOK</subfield>
+                </datafield>
+              </record>
+              """
+        blob = BlobWrapper(blob=xml, master_format='marc', schema="xml")
+        r = MarcReader(blob, check=True)
+
+        self.assertTrue('title' in r)
+        self.assertEquals(len(r['title']), 2)
+        self.assertEquals(len(r.fatal_errors), 1)
+
+        r.rec_json['title'] = r.rec_json['title'][0]
+        r.check_record(reset = True)
+
+TEST_SUITE = make_test_suite(BibFieldMarcReaderMarcXML,
+                             BibFieldMarcReaderRecstruct,
+                             BibFieldCheckRecord)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

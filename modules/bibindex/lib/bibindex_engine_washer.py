@@ -20,11 +20,13 @@
 import re
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.config import CFG_BIBINDEX_MIN_WORD_LENGTH
+from invenio.config import CFG_BIBINDEX_MIN_WORD_LENGTH, \
+     CFG_ETCDIR
 
 re_pattern_fuzzy_author_dots = re.compile(r'[\.\-]+')
 re_pattern_fuzzy_author_spaces = re.compile(r'\s+')
 re_pattern_author_canonical_id = re.compile(r'\.[0-9]+$')
+
 
 re_unicode_lowercase_a = re.compile(unicode(r"(?u)[áàäâãå]", "utf-8"))
 re_unicode_lowercase_ae = re.compile(unicode(r"(?u)[æ]", "utf-8"))
@@ -86,19 +88,44 @@ def remove_latex_markup(phrase):
     ret_phrase += phrase[index:]
     return ret_phrase
 
-def apply_stemming_and_stopwords_and_length_check(word, stemming_language):
-    """Return WORD after applying stemming and stopword and length checks.
-       See the config file in order to influence these.
+
+def apply_stemming(word, stemming_language):
+    """Returns word after applying stemming (if stemming language is set).
+       You can change your stemming language in database.
+
+       @param word: word to be checked
+       @type word: str
+       @param stemming_language: abbreviation of language or None
+       @type stemming_language: str
     """
-    # now check against stopwords:
-    if is_stopword(word):
-        return ""
-    # finally check the word length:
-    if len(word) < CFG_BIBINDEX_MIN_WORD_LENGTH:
-        return ""
-    # stem word, when configured so:
     if stemming_language:
         word = stem(word, stemming_language)
+    return word
+
+
+def remove_stopwords(word, stopwords_kb = False):
+    """Returns word after stopword check.
+       One must specify the name of the knowledge base.
+
+       @param word: word to be checked
+       @type word: str
+       @param stopwords_kb: name of the stopwords knowledge base
+       @type word: str
+    """
+    if stopwords_kb:
+        stopwords_path = CFG_ETCDIR + "/bibrank/" + stopwords_kb
+        if is_stopword(word, stopwords_path):
+            return ""
+    return word
+
+def length_check(word):
+    """Returns word after length check.
+
+       @param word: word to be checked
+       @type word: str
+    """
+    if len(word) < CFG_BIBINDEX_MIN_WORD_LENGTH:
+        return ""
     return word
 
 def wash_index_term(term, max_char_length=50, lower_term=True):

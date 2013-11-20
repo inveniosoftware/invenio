@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,45 +16,50 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""bibindex_engine_tokenizer_tests - unit tests for bibindex_engine_tokenizer
+"""bibindex_engine_tokenizer_tests - unit tests for tokenizers
 
 There should always be at least one test class for each class in b_e_t.
 """
 
+from invenio.importutils import lazy_import
 from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-from invenio import bibindex_engine_tokenizer as tokenizer_lib
+load_tokenizers = lazy_import('invenio.bibindex_engine_utils:load_tokenizers')
+
+_TOKENIZERS = None
 
 
-class TestFuzzyNameTokenizerScanning(InvenioTestCase):
+
+class TestAuthorTokenizerScanning(InvenioTestCase):
     """Test BibIndex name tokenization"""
 
     def setUp(self):
-        self.tokenizer = tokenizer_lib.BibIndexFuzzyNameTokenizer()
-        self.scan = self.tokenizer.scan
+        _TOKENIZERS = load_tokenizers()
+        self.tokenizer = _TOKENIZERS["BibIndexAuthorTokenizer"]()
+        self.scan = self.tokenizer.scan_string_for_phrases
 
     def test_bifnt_scan_single(self):
-        """BibIndexFuzzyNameTokenizer - scanning single names like 'Dido'"""
+        """BibIndexAuthorTokenizer - scanning single names like 'Dido'"""
         teststr = "Dido"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'], 'lastnames': ['Dido'], 'nonlastnames': [], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_simple_western_forward(self):
-        """BibIndexFuzzyNameTokenizer - scanning simple Western-style: first last"""
+        """BibIndexAuthorTokenizer - scanning simple Western-style: first last"""
         teststr = "Ringo Starr"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'], 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_simple_western_reverse(self):
-        """BibIndexFuzzyNameTokenizer - scanning simple Western-style: last, first"""
+        """BibIndexAuthorTokenizer - scanning simple Western-style: last, first"""
         teststr = "Starr, Ringo"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'], 'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': [], 'raw' : teststr}
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_forward(self):
-        """BibIndexFuzzyNameTokenizer - scanning multiword: first middle last"""
+        """BibIndexAuthorTokenizer - scanning multiword: first middle last"""
         teststr = "Michael Edward Peskin"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -62,7 +67,7 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_dotcrammed(self):
-        """BibIndexFuzzyNameTokenizer - scanning multiword: f.m. last"""
+        """BibIndexAuthorTokenizer - scanning multiword: f.m. last"""
         teststr = "M.E. Peskin"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -70,7 +75,7 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_dotcrammed_reversed(self):
-        """BibIndexFuzzyNameTokenizer - scanning multiword: last, f.m."""
+        """BibIndexAuthorTokenizer - scanning multiword: last, f.m."""
         teststr = "Peskin, M.E."
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -78,7 +83,7 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_dashcrammed(self):
-        """BibIndexFuzzyNameTokenizer - scanning multiword: first-middle last"""
+        """BibIndexAuthorTokenizer - scanning multiword: first-middle last"""
         teststr = "Jean-Luc Picard"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -86,7 +91,7 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_multiname_dashcrammed_reversed(self):
-        """BibIndexFuzzyNameTokenizer - scanning multiword: last, first-middle"""
+        """BibIndexAuthorTokenizer - scanning multiword: last, first-middle"""
         teststr = "Picard, Jean-Luc"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -94,7 +99,7 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_compound_lastname_dashes(self):
-        """BibIndexFuzzyNameTokenizer - scanning multiword: first middle last-last"""
+        """BibIndexAuthorTokenizer - scanning multiword: first middle last-last"""
         teststr = "Cantina Octavia Jones-Smith"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -102,7 +107,7 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_compound_lastname_dashes_reverse(self):
-        """BibIndexFuzzyNameTokenizer - scanning multiword: last-last, first middle"""
+        """BibIndexAuthorTokenizer - scanning multiword: last-last, first middle"""
         teststr = "Jones-Smith, Cantina Octavia"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -110,7 +115,7 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_compound_lastname_reverse(self):
-        """BibIndexFuzzyNameTokenizer - scanning compound last: last last, first"""
+        """BibIndexAuthorTokenizer - scanning compound last: last last, first"""
         teststr = "Alvarez Gaume, Joachim"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -118,7 +123,7 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_titled(self):
-        """BibIndexFuzzyNameTokenizer - scanning title-bearing: last, first, title"""
+        """BibIndexAuthorTokenizer - scanning title-bearing: last, first, title"""
         teststr = "Epstein, Brian, The Fifth Beatle"
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -126,7 +131,7 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_scan_wildly_interesting(self):
-        """BibIndexFuzzyNameTokenizer - scanning last last last, first first, title, title"""
+        """BibIndexAuthorTokenizer - scanning last last last, first first, title, title"""
         teststr = "Ibanez y Gracia, Maria Luisa, II., ed."
         output = self.scan(teststr)
         anticipated = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
@@ -134,15 +139,16 @@ class TestFuzzyNameTokenizerScanning(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
 
-class TestFuzzyNameTokenizerTokens(InvenioTestCase):
+class TestAuthorTokenizerTokens(InvenioTestCase):
     """Test BibIndex name variant token generation from scanned and tagged sets"""
 
     def setUp(self):
-        self.tokenizer = tokenizer_lib.BibIndexFuzzyNameTokenizer()
-        self.get_index_tokens = self.tokenizer.parse_scanned
+        _TOKENIZERS = load_tokenizers()
+        self.tokenizer = _TOKENIZERS["BibIndexAuthorTokenizer"]()
+        self.get_index_tokens = self.tokenizer.parse_scanned_for_phrases
 
     def test_bifnt_tokenize_single(self):
-        """BibIndexFuzzyNameTokenizer - tokens for single-word name
+        """BibIndexAuthorTokenizer - tokens for single-word name
 
         Ronaldo
         """
@@ -153,7 +159,7 @@ class TestFuzzyNameTokenizerTokens(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_simple_forward(self):
-        """BibIndexFuzzyNameTokenizer - tokens for first last
+        """BibIndexAuthorTokenizer - tokens for first last
 
         Ringo Starr
         """
@@ -164,7 +170,7 @@ class TestFuzzyNameTokenizerTokens(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_simple_reverse(self):
-        """BibIndexFuzzyNameTokenizer - tokens for last, first
+        """BibIndexAuthorTokenizer - tokens for last, first
 
         Starr, Ringo
         """
@@ -175,7 +181,7 @@ class TestFuzzyNameTokenizerTokens(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_twoname_forward(self):
-        """BibIndexFuzzyNameTokenizer - tokens for first middle last
+        """BibIndexAuthorTokenizer - tokens for first middle last
 
         Michael Edward Peskin
         """
@@ -190,7 +196,7 @@ class TestFuzzyNameTokenizerTokens(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_compound_last(self):
-        """BibIndexFuzzyNameTokenizer - tokens for last last, first
+        """BibIndexAuthorTokenizer - tokens for last last, first
 
         Alvarez Gaume, Joachim
         """
@@ -203,7 +209,7 @@ class TestFuzzyNameTokenizerTokens(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_titled(self):
-        """BibIndexFuzzyNameTokenizer - tokens for last, first, title
+        """BibIndexAuthorTokenizer - tokens for last, first, title
 
         Epstein, Brian, The Fifth Beatle
         """
@@ -216,7 +222,7 @@ class TestFuzzyNameTokenizerTokens(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_wildly_interesting(self):
-        """BibIndexFuzzyNameTokenizer - tokens for last last last, first first, title, title
+        """BibIndexAuthorTokenizer - tokens for last last last, first first, title, title
 
         Ibanez y Gracia, Maria Luisa, II, (ed.)
         """
@@ -250,7 +256,7 @@ class TestFuzzyNameTokenizerTokens(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_multimiddle_forward(self):
-        """BibIndexFuzzyNameTokenizer - tokens for first middle middle last
+        """BibIndexAuthorTokenizer - tokens for first middle middle last
 
         W K H Panofsky
         """
@@ -264,54 +270,100 @@ class TestFuzzyNameTokenizerTokens(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
     def test_tokenize(self):
-        """BibIndexFuzzyNameTokenizer - check tokenize()
+        """BibIndexAuthorTokenizer - check tokenize_for_phrases()
 
         Ringo Starr
         """
         teststr = "Ringo Starr"
-        output = self.tokenizer.tokenize(teststr)
+        output = self.tokenizer.tokenize_for_phrases(teststr)
         anticipated = ['R Starr', 'Ringo Starr', 'Starr, R', 'Starr, Ringo']
         self.assertEqual(output, anticipated)
 
 
 
-class TestExactNameTokenizer(InvenioTestCase):
+class TestExactAuthorTokenizer(InvenioTestCase):
     """Test exact author name tokenizer."""
 
     def setUp(self):
         """setup"""
-        self.tokenizer = tokenizer_lib.BibIndexExactNameTokenizer()
+        _TOKENIZERS = load_tokenizers()
+        self.tokenizer = _TOKENIZERS["BibIndexExactAuthorTokenizer"]()
+        self.tokenize = self.tokenizer.tokenize_for_phrases
 
     def test_exact_author_name_tokenizer_bare(self):
         """BibIndexExactNameTokenizer - bare name"""
-        self.assertEqual(self.tokenizer.tokenize('John Doe'),
+        self.assertEqual(self.tokenize('John Doe'),
                          ['John Doe'])
 
     def test_exact_author_name_tokenizer_dots(self):
         """BibIndexExactNameTokenizer - name with dots"""
-        self.assertEqual(self.tokenizer.tokenize('J. Doe'),
+        self.assertEqual(self.tokenize('J. Doe'),
                          ['J Doe'])
-        self.assertEqual(self.tokenizer.tokenize('J.R. Doe'),
+        self.assertEqual(self.tokenize('J.R. Doe'),
                          ['J R Doe'])
-        self.assertEqual(self.tokenizer.tokenize('J. R. Doe'),
+        self.assertEqual(self.tokenize('J. R. Doe'),
                          ['J R Doe'])
 
     def test_exact_author_name_tokenizer_trailing_dots(self):
         """BibIndexExactNameTokenizer - name with trailing dots"""
-        self.assertEqual(self.tokenizer.tokenize('Doe, J'),
+        self.assertEqual(self.tokenize('Doe, J'),
                          ['Doe, J'])
-        self.assertEqual(self.tokenizer.tokenize('Doe, J.'),
+        self.assertEqual(self.tokenize('Doe, J.'),
                          ['Doe, J'])
 
     def test_exact_author_name_tokenizer_hyphens(self):
         """BibIndexExactNameTokenizer - name with hyphens"""
-        self.assertEqual(self.tokenizer.tokenize('Doe, Jean-Pierre'),
+        self.assertEqual(self.tokenize('Doe, Jean-Pierre'),
                          ['Doe, Jean Pierre'])
 
 
-TEST_SUITE = make_test_suite(TestFuzzyNameTokenizerScanning,
-                             TestFuzzyNameTokenizerTokens,
-                             TestExactNameTokenizer,)
+
+class TestCJKTokenizer(InvenioTestCase):
+    """Tests for CJK Tokenizer which splits CJK words into characters and treats
+       every single character as a word"""
+
+
+    @classmethod
+    def setUp(self):
+        _TOKENIZERS = load_tokenizers()
+        self.tokenizer = _TOKENIZERS["BibIndexCJKTokenizer"]()
+
+    def test_tokenize_for_words_phrase_galaxy(self):
+        """tokenizing phrase: galaxy s4据信"""
+        phrase = "galaxy s4据信"
+        result = self.tokenizer.tokenize_for_words(phrase)
+        self.assertEqual(sorted(['galaxy','s4','据','信']), sorted(result))
+
+    def test_tokenize_for_words_phrase_with_special_punctuation(self):
+        """tokenizing phrase: 马英九：台湾民"""
+        phrase = u"马英九：台湾民"
+        result = self.tokenizer.tokenize_for_words(phrase)
+        self.assertEqual(sorted(['马','英','九','台','湾','民']), sorted(result))
+
+    def test_tokenize_for_words_phrase_with_special_punctuation_two(self):
+        """tokenizing phrase: 色的“刀子嘴”"""
+        phrase = u"色的“刀子嘴”"
+        result = self.tokenizer.tokenize_for_words(phrase)
+        self.assertEqual(sorted(['色','的','刀','子','嘴']), sorted(result))
+
+    def test_tokenize_for_words_simple_phrase(self):
+        """tokenizing phrase: 春眠暁覚"""
+        self.assertEqual(sorted(self.tokenizer.tokenize_for_words(u'春眠暁覚')), sorted(['春', '眠', '暁', '覚']))
+
+    def test_tokenize_for_words_mixed_phrase(self):
+        """tokenizing phrase: 春眠暁ABC覚"""
+        self.assertEqual(sorted(self.tokenizer.tokenize_for_words(u'春眠暁ABC覚')), sorted(['春', '眠', '暁', 'abc', '覚']))
+
+    def test_tokenize_for_words_phrase_with_comma(self):
+        """tokenizing phrase: 春眠暁, 暁"""
+        phrase = u"春眠暁, 暁"
+        self.assertEqual(sorted(self.tokenizer.tokenize_for_words(phrase)), sorted(['春','眠','暁']))
+
+
+TEST_SUITE = make_test_suite(TestAuthorTokenizerScanning,
+                             TestAuthorTokenizerTokens,
+                             TestExactAuthorTokenizer,
+                             TestCJKTokenizer)
 
 
 if __name__ == '__main__':

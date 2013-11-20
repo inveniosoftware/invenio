@@ -29,7 +29,9 @@ from datetime import datetime
 
 from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
-from invenio.bibindex_engine import CFG_JOURNAL_PUBINFO_STANDARD_FORM
+from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 from invenio.search_engine import search_pattern, search_unit
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibformat_utils import parse_tag
@@ -38,8 +40,7 @@ from invenio.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \
                      task_get_task_param
 from invenio.errorlib import register_exception
-from invenio.bibindex_engine import get_field_tags
-from invenio.bibindex_engine import CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
+from invenio.bibindex_engine_utils import get_field_tags
 
 
 INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')

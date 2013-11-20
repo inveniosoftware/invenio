@@ -21,3 +21,9 @@ msgpack-python==0.3.0
 pyparsing==1.5.6
 git+git://github.com/romanchyla/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6
 requests==1.2.1
+PyPDF2
+rauth
+unidecode
+python-openid
+qrcode
+PIL

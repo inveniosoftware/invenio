@@ -37,7 +37,7 @@ Contents
               python-libxml2 python-libxslt1 gnuplot poppler-utils \
               gs-common clisp gettext libapache2-mod-wsgi unzip \
               pdftk html2text giflib-tools \
-              pstotext netpbm python-chardet
+              pstotext netpbm
 
         You also need to install following packages from PyPi
 	by running:
@@ -53,6 +53,10 @@ Contents
           $ sudo aptitude install sbcl cmucl pylint pychecker pyflakes \
               python-profiler python-epydoc libapache2-mod-xsendfile \
               openoffice.org python-utidylib python-beautifulsoup
+
+        (Note that if you use pip to manage your Python dependencies
+        instead of operating system packages, please see the section
+        (d) below on how to use pip instead of aptitude.)
 
         Moreover, you should install some Message Transfer Agent (MTA)
         such as Postfix so that Invenio can email notification
@@ -93,7 +97,7 @@ Contents
           <http://httpd.apache.org/>
           <http://tn123.ath.cx/mod_xsendfile/>
 
-     d) Python v2.4 or above:
+     d) Python v2.6 or above:
           <http://python.org/>
         as well as the following Python modules:
           - (mandatory) MySQLdb (version >= 1.2.1_p2; see below)
@@ -110,11 +114,6 @@ Contents
              <http://lxml.de/>
           - (recommended) libxml2-python, for XML/XLST processing:
              <ftp://xmlsoft.org/libxml2/python/>
-          - (recommended) simplejson, for AJAX apps:
-             <http://undefined.org/python/#simplejson>
-             Note that if you are using Python-2.6, you don't need to
-             install simplejson, because the module is already included
-             in the main Python distribution.
           - (recommended) Gnuplot.Py, for producing graphs:
              <http://gnuplot-py.sourceforge.net/>
           - (recommended) Snowball Stemmer, for stemming:
@@ -138,9 +137,6 @@ Contents
              <http://wwwsearch.sourceforge.net/mechanize/>
           - (optional) python-mock, mocking library for the test suite:
              <http://www.voidspace.org.uk/python/mock/>
-          - (optional) hashlib, needed only for Python-2.4 and only
-             if you would like to use AWS connectivity:
-             <http://pypi.python.org/pypi/hashlib>
           - (optional) utidylib, for HTML washing:
              <http://utidylib.berlios.de/>
           - (optional) Beautiful Soup, for HTML washing:
@@ -154,20 +150,22 @@ Contents
           - (optional) Python Rauth if you want to enable OAuth 1.0/2.0
              support for authentication (depends on Python-2.6 or later):
              <http://packages.python.org/rauth/>
+          - (optional) unidecode, for ASCII representation of Unicode
+             text:
+             <https://pypi.python.org/pypi/Unidecode>
 
-        Note: MySQLdb version 1.2.1_p2 or higher is recommended.  If
-              you are using an older version of MySQLdb, you may get
-              into problems with character encoding.
+        Note that if you are using pip to install and manage your
+        Python dependencies, then you can run:
+
+          $ sudo pip install -r requirements.txt
+          $ sudo pip install -r requirements-extras.txt
+
+        to install all manadatory, recommended, and optional packages
+        mentioned above.
 
      e) mod_wsgi Apache module.  Versions 3.x and above are
         recommended.
           <http://code.google.com/p/modwsgi/>
-
-        Note: if you are using Python 2.4 or earlier, then you should
-              also install the wsgiref Python module, available from:
-              <http://pypi.python.org/pypi/wsgiref/> (As of Python 2.5
-              this module is included in standard Python
-              distribution.)
 
      f) If you want to be able to extract references from PDF fulltext
         files, then you need to install pdftotext version 3 at least.
@@ -436,7 +434,7 @@ Contents
                  directory but to the prefix mentioned in this
                  configuration line.
 
-              --with-python=/opt/python/bin/python2.4
+              --with-python=/opt/python/bin/python2.7
 
                  Optionally, specify a path to some specific Python
                  binary.  This is useful if you have more than one

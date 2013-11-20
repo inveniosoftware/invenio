@@ -128,9 +128,8 @@ contributed to the project:
   - Thomas McCauley <thomas.mccauley@cern.ch>
     Improvements to Invenio Connector.
 
-The Flask SSLify plugin was adapted from the original version developed
-by Kenneth Reitz <_@kennethreitz.com>.
-<https://github.com/kennethreitz/flask-sslify>
+  - Mehdi Zahedi <mehdizahedin@gmail.com>
+    Contributions to the Persian (Farsi) translation.
 
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
@@ -218,5 +217,9 @@ Python 2.4 backport of defaultdict was taken from NLTK
 contributed by Yoav Goldberg <yoav.goldberg@gmail.com>, new version by
 Jason Kirtland from Python cookbook.
 <http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/523034>
+
+The Flask SSLify plugin was adapted from the original version developed
+by Kenneth Reitz <_@kennethreitz.com>.
+<https://github.com/kennethreitz/flask-sslify>
 
 - end of file -

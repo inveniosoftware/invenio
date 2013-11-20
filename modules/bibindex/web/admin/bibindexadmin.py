@@ -270,6 +270,187 @@ def modifyindexstemming(req, idxID, ln=CFG_SITE_LANG, idxSTEM='', callback='yes'
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
+def modifyindexer(req, idxID, ln=CFG_SITE_LANG, indexer='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyindexer(idxID=idxID,
+                                                   ln=ln,
+                                                   indexer=indexer,
+                                                   callback=callback,
+                                                   confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def modifydependentindexes(req, idxID, ln=CFG_SITE_LANG, newIDs=[], callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Virtual Index",
+                    body=bic.perform_modifydependentindexes(idxID=idxID,
+                                                            ln=ln,
+                                                            newIDs=newIDs,
+                                                            callback=callback,
+                                                            confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def modifysynonymkb(req, idxID, ln=CFG_SITE_LANG, idxKB='', idxMATCH='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail()
+    navtrail_previous_links += """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a>""" % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifysynonymkb(idxID=idxID,
+                                                     ln=ln,
+                                                     idxKB=idxKB,
+                                                     idxMATCH=idxMATCH,
+                                                     callback=callback,
+                                                     confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def modifystopwords(req, idxID, ln=CFG_SITE_LANG, idxSTOPWORDS='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail()
+    navtrail_previous_links += """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifystopwords(idxID=idxID,
+                                                     ln=ln,
+                                                     idxSTOPWORDS=idxSTOPWORDS,
+                                                     callback=callback,
+                                                     confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def modifyremovehtml(req, idxID, ln=CFG_SITE_LANG, idxHTML='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail()
+    navtrail_previous_links += """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyremovehtml(idxID=idxID,
+                                                      ln=ln,
+                                                      idxHTML=idxHTML,
+                                                      callback=callback,
+                                                      confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def modifyremovelatex(req, idxID, ln=CFG_SITE_LANG, idxLATEX='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail()
+    navtrail_previous_links += """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyremovelatex(idxID=idxID,
+                                                       ln=ln,
+                                                       idxLATEX=idxLATEX,
+                                                       callback=callback,
+                                                       confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def modifytokenizer(req, idxID, ln=CFG_SITE_LANG, idxTOK='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail()
+    navtrail_previous_links += """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifytokenizer(idxID=idxID,
+                                                     ln=ln,
+                                                     idxTOK=idxTOK,
+                                                     callback=callback,
+                                                     confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
 def modifytag(req, fldID, tagID, ln=CFG_SITE_LANG, name='', value='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (CFG_SITE_URL)
 
@@ -332,6 +513,28 @@ def deleteindex(req, idxID, ln=CFG_SITE_LANG, confirm=0):
                     body=bic.perform_deleteindex(idxID=idxID,
                                                  ln=ln,
                                                  confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+def deletevirtualindex(req, idxID, ln=CFG_SITE_LANG, confirm=0):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req, 'cfgbibindex')
+    if not auth[0]:
+        return page(title="Manage Indexes",
+                    body=bic.perform_deletevirtualindex(idxID=idxID,
+                                                        ln=ln,
+                                                        confirm=confirm),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -436,6 +639,32 @@ def editindex(req, idxID, ln=CFG_SITE_LANG, mtype='', callback='yes', confirm=-1
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
+def editvirtualindex(req, idxID, ln=CFG_SITE_LANG, mtype='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit virtual index",
+                    body=bic.perform_editvirtualindex(idxID=idxID,
+                                                      ln=ln,
+                                                      mtype=mtype,
+                                                      callback=callback,
+                                                      confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
 def modifyindextranslations(req, idxID, ln=CFG_SITE_LANG, sel_type='', trans = [], confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
 
@@ -523,6 +752,31 @@ def addindex(req, ln=CFG_SITE_LANG, idxNAME='', callback="yes", confirm=-1):
                                               idxNAME=idxNAME,
                                               callback=callback,
                                               confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    req=req,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def addvirtualindex(req, ln=CFG_SITE_LANG, idxNEWVID='', idxNEWPID='', callback="yes", confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Manage Indexes",
+                    body=bic.perform_addvirtualindex(ln=ln,
+                                                     idxNEWVID=idxNEWVID,
+                                                     idxNEWPID=idxNEWPID,
+                                                     callback=callback,
+                                                     confirm=confirm),
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links,

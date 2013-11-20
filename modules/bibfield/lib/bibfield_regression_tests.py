@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,7 +44,7 @@ class BibFieldRecordFieldValuesTest(InvenioTestCase):
         self.assertEqual(record['recid'], record.get('recid'))
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record['title.title'])
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record['title']['title'])
-        self.assertEqual(None, record['title.subtitle'])
+        self.assertFalse('title.subtitle' in record)
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record.get('title.title'))
         self.assertEqual('Mangano', record['authors[0].last_name'])
         self.assertEqual('M L', record['authors[0].first_name'])
@@ -92,6 +92,14 @@ class BibFieldRecordFieldValuesTest(InvenioTestCase):
         self.assertEqual('ALEPH EXPERIMENT: CANDIDATE OF HIGGS BOSON PRODUCTION',
                          record.get('title.title', formatfunction=dummy))
 
+    def test_get_record_using_field_filter(self):
+        """bibfield - get record filtering fields"""
+        authors = get_record(12, fields=('authors',))
+        self.assertEquals(len(authors['authors']), 19)
+        mainauthor_title = get_record(12, fields=('authors[0]', 'title'))
+        self.assertTrue('authors[0].full_name' in mainauthor_title)
+        self.assertTrue('title' in mainauthor_title)
+
 
 class BibFieldCreateRecordTests(InvenioTestCase):
     """
@@ -107,7 +115,7 @@ class BibFieldCreateRecordTests(InvenioTestCase):
 
     def test_records_created(self):
         """ bibfield - demo file how many records are created """
-        self.assertEqual(113, len(self.recs))
+        self.assertEqual(141, len(self.recs))
 
     def test_create_record_with_collection_tag(self):
         """ bibfield - create_record() for single record in collection"""
@@ -133,6 +141,121 @@ class BibFieldCreateRecordTests(InvenioTestCase):
         records = create_records(blob_error0)
         self.assertEqual(len(records), 0)
 
+    def test_fft_url_tags(self):
+        """bibfield - FFT versus URL"""
+        marc_blob = """
+              <record>
+                <datafield tag="037" ind1=" " ind2=" ">
+                  <subfield code="a">CERN-HI-6206002</subfield>
+                </datafield>
+                <datafield tag="041" ind1=" " ind2=" ">
+                  <subfield code="a">eng</subfield>
+                </datafield>
+                <datafield tag="245" ind1=" " ind2=" ">
+                  <subfield code="a">At CERN in 1962</subfield>
+                  <subfield code="s">eight Nobel prizewinners</subfield>
+                </datafield>
+                <datafield tag="260" ind1=" " ind2=" ">
+                  <subfield code="c">1962</subfield>
+                </datafield>
+                <datafield tag="506" ind1="1" ind2=" ">
+                  <subfield code="a">jekyll_only</subfield>
+                </datafield>
+                <datafield tag="521" ind1=" " ind2=" ">
+                  <subfield code="a">In 1962, CERN hosted the 11th International Conference on High Energy Physics. Among the distinguished visitors were eight Nobel prizewinners.Left to right: Cecil F. Powell, Isidor I. Rabi, Werner Heisenberg, Edwin M. McMillan, Emile Segre, Tsung Dao Lee, Chen Ning Yang and Robert Hofstadter.</subfield>
+                </datafield>
+                <datafield tag="590" ind1=" " ind2=" ">
+                  <subfield code="a">En 1962, le CERN est l'hote de la onzieme Conference Internationale de Physique des Hautes Energies. Parmi les visiteurs eminents se trouvaient huit laureats du prix Nobel.De gauche a droite: Cecil F. Powell, Isidor I. Rabi, Werner Heisenberg, Edwin M. McMillan, Emile Segre, Tsung Dao Lee, Chen Ning Yang et Robert Hofstadter.</subfield>
+                </datafield>
+                <datafield tag="595" ind1=" " ind2=" ">
+                  <subfield code="a">Press</subfield>
+                </datafield>
+                <datafield tag="650" ind1="1" ind2="7">
+                  <subfield code="2">SzGeCERN</subfield>
+                  <subfield code="a">Personalities and History of CERN</subfield>
+                </datafield>
+                <datafield tag="653" ind1="1" ind2=" ">
+                  <subfield code="a">Nobel laureate</subfield>
+                </datafield>
+                <datafield tag="FFT" ind1=" " ind2=" ">
+                  <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/6206002.jpg</subfield>
+                  <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/6206002.gif</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="0">
+                  <subfield code="o">0000736PHOPHO</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="0">
+                  <subfield code="y">1962</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="0">
+                  <subfield code="b">81</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="1">
+                  <subfield code="c">1998-07-23</subfield>
+                  <subfield code="l">50</subfield>
+                  <subfield code="m">2002-07-15</subfield>
+                  <subfield code="o">CM</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1950/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1950 : Cecil Frank Powell</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1944/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1944 : Isidor Isaac Rabi</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1932/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1932 : Werner Karl Heisenberg</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/chemistry/laureates/1951/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Chemistry 1951 : Edwin Mattison McMillan</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1959/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1959 : Emilio Gino Segre</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1957/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1957 : Chen Ning Yang and Tsung-Dao Lee</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1961/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1961 : Robert Hofstadter</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="P">
+                  <subfield code="s">6206002 (1962)</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="S">
+                  <subfield code="s">n</subfield>
+                  <subfield code="w">199830</subfield>
+                </datafield>
+                <datafield tag="980" ind1=" " ind2=" ">
+                  <subfield code="a">PICTURE</subfield>
+                </datafield>
+              </record>"""
+        rec = create_record(marc_blob, master_format='marc', schema='xml')
+        self.assertTrue('fft' in rec)
+        self.assertTrue(len(rec['fft']) == 1)
+        self.assertTrue(rec['fft[0].path'] == "http://invenio-software.org/download/invenio-demo-site-files/6206002.jpg")
+        self.assertTrue('url' in rec)
+        self.assertTrue(len(rec['url']) == 7)
+        self.assertTrue(rec['url[0].url'] == "http://www.nobel.se/physics/laureates/1950/index.html")
+
+    def test_bibdoc_integration(self):
+        """bibfield - bibdoc integration"""
+        rec = get_record(7)
+
+        self.assertTrue('_files' in rec)
+        self.assertEquals(len(rec['files']), 2)
+        image = rec['files'][1]
+        self.assertEquals(image['eformat'], '.jpeg')
+        self.assertEquals(image['name'], '9806033')
+
+        bibdoc = rec['bibdocs'].list_latest_files()[1]
+        self.assertEquals(image['name'], bibdoc.name)
+
 
 class BibFieldLegacyTests(InvenioTestCase):
     """
@@ -146,11 +269,49 @@ class BibFieldLegacyTests(InvenioTestCase):
     def test_get_legacy_recstruct(self):
         """bibfield - legacy functions"""
         from invenio.search_engine import get_record as search_engine_get_record
+        from invenio.bibrecord import record_get_field_value
+
         bibfield_recstruct = get_record(8).get_legacy_recstruct()
         bibrecord = search_engine_get_record(8)
 
-        self.assertEqual(bibfield_recstruct['100'][0][0], bibrecord['100'][0][0])
+        self.assertEqual(record_get_field_value(bibfield_recstruct, '100', code='a'),
+                         record_get_field_value(bibrecord, '100', code='a'))
         self.assertEqual(len(bibfield_recstruct['999']), len(bibrecord['999']))
+
+    def test_guess_legacy_field_names(self):
+        """bibfied - guess legacy fields"""
+        from invenio.bibfield import guess_legacy_field_names
+
+        legacy_fields = guess_legacy_field_names(('100__a', '245'))
+        self.assertEqual(legacy_fields['100__a'][0], 'authors[0].full_name')
+        self.assertEqual(legacy_fields['245'][0], 'title')
+
+        legacy_fields = guess_legacy_field_names('001', 'marc')
+        self.assertEqual(legacy_fields['001'][0], 'recid')
+
+        self.assertEquals(guess_legacy_field_names('foo', 'marc'), {'foo': []})
+        self.assertEquals(guess_legacy_field_names('foo', 'bar'), {'foo': []})
+
+
+class BibFieldProducerTests(InvenioTestCase):
+    """
+    Low level output tests
+    """
+
+    def test_produce_json_for_marc(self):
+        """bibfield - produce json marc"""
+        record = get_record(1)
+        produced_marc = record.produce_json_for_marc()
+
+        self.assertTrue({'001': '1'} in produced_marc)
+
+    def test_produce_json_for_dublin_core(self):
+        """bibfield - produce json dublin core"""
+        record = get_record(1)
+        date = record.get('version_id').strftime('%Y-%m-%dT%H:%M:%SZ')
+        produced_dc = record.produce_json_for_dc()
+
+        self.assertTrue({'dc:date': date} in produced_dc)
 
 
 TEST_SUITE = make_test_suite(BibFieldRecordFieldValuesTest,

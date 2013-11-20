@@ -24,8 +24,9 @@ BibIndex indexing engine configuration parameters.
 __revision__ = \
     "$Id$"
 
+import os
 ## configuration parameters read from the general config file:
-from invenio.config import CFG_VERSION
+from invenio.config import CFG_VERSION, CFG_PYLIBDIR
 ## version number:
 BIBINDEX_ENGINE_VERSION = "Invenio/%s bibindex/%s" % (CFG_VERSION, CFG_VERSION)
 
@@ -35,3 +36,21 @@ CFG_MAX_MYSQL_THREADS = 50 # how many threads (connections) we
                            # consider as still safe
 CFG_MYSQL_THREAD_TIMEOUT = 20 # we'll kill threads that were sleeping
                               # for more than X seconds
+
+
+
+CFG_BIBINDEX_SYNONYM_MATCH_TYPE = { 'None': '-None-',
+                                    'exact': 'exact',
+                                    'leading_to_comma': 'leading_to_comma',
+                                    'leading_to_number': 'leading_to_number'}
+CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR = ","
+CFG_BIBINDEX_INDEX_TABLE_TYPE = { 'Words': 'Words',
+                                'Pairs': 'Pairs',
+                                'Phrases': 'Phrases' }
+
+CFG_BIBINDEX_TOKENIZERS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibindex_tokenizers')
+
+CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR = "%s adding records #%d-#%d started"
+
+CFG_BIBINDEX_UPDATE_MESSAGE = "Searching for records which should be reindexed..."
+

@@ -60,6 +60,19 @@ def get_kbs_info(kbtypeparam="", searchkbname=""):
             out.append(mydict)
     return out
 
+
+def get_all_kb_names():
+    """Returns all knowledge base names
+       @return list of names
+    """
+    out = []
+    res = run_sql("""SELECT name FROM knwKB""")
+    for row in res:
+        out.append(row[0])
+    return out
+
+
+
 def get_kb_id(kb_name):
     """Returns the id of the kb with given name"""
     res = run_sql("""SELECT id FROM knwKB WHERE name LIKE %s""",

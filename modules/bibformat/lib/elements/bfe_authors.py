@@ -25,6 +25,12 @@ from urllib import quote
 from cgi import escape
 from invenio.config import CFG_SITE_URL
 from invenio.messages import gettext_set_language
+from invenio.bibauthority_config import \
+    CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME, \
+    CFG_BIBAUTHORITY_TYPE_NAMES, \
+    CFG_BIBAUTHORITY_PREFIX_SEP
+from invenio.bibauthority_engine import \
+    get_low_level_recIDs_from_control_no
 
 def format_element(bfo, limit, separator=' ; ',
            extension='[...]',
@@ -56,11 +62,25 @@ def format_element(bfo, limit, separator=' ; ',
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
     authors = []
-    authors_1 = bfo.fields('100__')
-    authors_2 = bfo.fields('700__')
+    authors_1 = bfo.fields('100__', repeatable_subfields_p=True)
+    authors_2 = bfo.fields('700__', repeatable_subfields_p=True)
 
     authors.extend(authors_1)
     authors.extend(authors_2)
+
+    # make unique string per key
+    for author in authors:
+        if 'a' in author:
+            author['a'] = author['a'][0]
+        if 'u' in author:
+            author['u'] = author['u'][0]
+        pattern = '%s' + CFG_BIBAUTHORITY_PREFIX_SEP + "("
+        for control_no in author.get('0', []):
+            if pattern % (CFG_BIBAUTHORITY_TYPE_NAMES["INSTITUTION"]) in control_no:
+                author['u0'] = control_no # overwrite if multiples
+            elif pattern % (CFG_BIBAUTHORITY_TYPE_NAMES["AUTHOR"]) in control_no:
+                author['a0'] = control_no # overwrite if multiples
+
 
     if relator_code_pattern:
         p = re.compile(relator_code_pattern)
@@ -91,13 +111,31 @@ def format_element(bfo, limit, separator=' ; ',
                                   '&amp;f=author&amp;p=' + quote(author['a']) + \
                                   '">' + escape(author['a']) + '</a>'
                 else:
+                    auth_coll_param = ''
+                    if 'a0' in author:
+                        recIDs = get_low_level_recIDs_from_control_no(author['a0'])
+                        if len(recIDs):
+                            auth_coll_param = '&amp;c=' + \
+                                              CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
                     author['a'] = '<a href="' + CFG_SITE_URL + \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
+                                   auth_coll_param + \
                                   '&amp;ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'
 
         if author.has_key('u'):
             if print_affiliations == "yes":
+                if 'u0' in author:
+                    recIDs = get_low_level_recIDs_from_control_no(author['u0'])
+                    # if there is more than 1 recID, clicking on link and
+                    # thus displaying the authority record's page should
+                    # contain a warning that there are multiple authority
+                    # records with the same control number
+                    if len(recIDs):
+                        author['u'] = '<a href="' + CFG_SITE_URL + '/record/' + \
+                                      str(recIDs[0]) + \
+                                      '?ln=' + bfo.lang + \
+                                      '">' + author['u'] + '</a>'
                 author['u'] = affiliation_prefix + author['u'] + \
                               affiliation_suffix
 

@@ -254,12 +254,13 @@ def try_url_download(url):
     return True
 
 def force_webcoll(recid):
+    from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
     from invenio import bibindex_engine
     reload(bibindex_engine)
     from invenio import websearch_webcoll
     reload(websearch_webcoll)
-    index_id, index_name, index_tags = bibindex_engine.get_word_tables("collection")[0]
-    bibindex_engine.WordTable(index_name, index_id, index_tags, "idxWORD%02dF", default_get_words_fnc=bibindex_engine.get_words_from_phrase, tag_to_words_fnc_map={'8564_u': bibindex_engine.get_words_from_fulltext}).add_recIDs([[recid, recid]], 1)
+    index_id, index_name, index_tags = bibindex_engine.get_word_tables(["collection"])[0]
+    bibindex_engine.WordTable(index_name, index_id, index_tags, "idxWORD%02dF", wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"], tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"}).add_recIDs([[recid, recid]], 1)
     #sleep 1s to make sure all tables are ready
     time.sleep(1)
     c = websearch_webcoll.Collection()
@@ -3690,32 +3691,30 @@ class BibUploadPretendTest(GenericBibUploadTest):
         GenericBibUploadTest.tearDown(self)
         task_set_task_param('pretend', False)
 
+    @staticmethod
     def _get_tables_fingerprint():
         """
         Take lenght and last modification time of all the tables that
         might be touched by bibupload and return them in a nice structure.
         """
         fingerprint = {}
-        tables = ['bibrec', 'bibdoc', 'bibrec_bibdoc', 'bibdoc_bibdoc', 'bibfmt', 'hstDOCUMENT', 'hstRECORD']
+        tables = ['bibrec', 'bibdoc', 'bibrec_bibdoc', 'bibdoc_bibdoc', 'bibfmt', 'hstDOCUMENT', 'hstRECORD', 'bibHOLDINGPEN', 'bibdocmoreinfo', 'bibdocfsinfo']
         for i in xrange(100):
             tables.append('bib%02dx' % i)
             tables.append('bibrec_bib%02dx' % i)
         for table in tables:
             fingerprint[table] = get_table_status_info(table)
         return fingerprint
-    _get_tables_fingerprint = staticmethod(_get_tables_fingerprint)
 
+    @staticmethod
     def _checks_tables_fingerprints(before, after):
         """
         Checks differences in table_fingerprints.
         """
-        err = True
         for table in before.keys():
             if before[table] != after[table]:
-                print >> sys.stderr, "Table %s has been modified: before was [%s], after was [%s]" % (table, pprint.pformat(before[table]), pprint.pformat(after[table]))
-                err = False
-        return err
-    _checks_tables_fingerprints = staticmethod(_checks_tables_fingerprints)
+                raise StandardError("Table %s has been modified: before was [%s], after was [%s]" % (table, pprint.pformat(before[table]), pprint.pformat(after[table])))
+        return True
 
     def test_pretend_insert(self):
         """bibupload - pretend insert"""

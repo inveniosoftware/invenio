@@ -98,10 +98,12 @@ from invenio.bibrecord import create_record, record_xml_output
 from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
-from invenio.bibindex_engine_tokenizer import wash_author_name, author_name_requires_phrase_search, \
-     BibIndexPairTokenizer
+from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
+from invenio.bibindex_tokenizers.BibIndexCJKTokenizer import BibIndexCJKTokenizer, is_there_any_CJK_character_in_text
+from invenio.bibindex_engine_utils import author_name_requires_phrase_search
 from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
-from invenio.bibindexadminlib import get_idx_indexer
+from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
+from invenio.bibindex_engine_utils import get_idx_indexer
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
@@ -427,6 +429,44 @@ def get_index_stemming_language(index_id, recreate_cache_if_needed=True):
         index_stemming_cache.recreate_cache_if_needed()
     return index_stemming_cache.cache[index_id]
 
+
+class FieldTokenizerDataCacher(DataCacher):
+    """
+    Provides cache for tokenizer information for fields corresponding to indexes.
+    This class is not to be used directly; use function
+    get_field_tokenizer_type() instead.
+    """
+    def __init__(self):
+        def cache_filler():
+            try:
+                res = run_sql("""SELECT fld.code, ind.tokenizer FROM idxINDEX AS ind, field AS fld, idxINDEX_field AS indfld WHERE ind.id = indfld.id_idxINDEX AND indfld.id_field = fld.id""")
+            except DatabaseError:
+                # database problems, return empty cache
+                return {}
+            return dict(res)
+
+        def timestamp_verifier():
+            return get_table_update_time('idxINDEX')
+
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
+
+try:
+    field_tokenizer_cache.is_ok_p
+except Exception:
+    field_tokenizer_cache = FieldTokenizerDataCacher()
+
+def get_field_tokenizer_type(field_name, recreate_cache_if_needed=True):
+    """Return tokenizer type for given field corresponding to an index if applicable."""
+    if recreate_cache_if_needed:
+        field_tokenizer_cache.recreate_cache_if_needed()
+    tokenizer = None
+    try:
+        tokenizer = field_tokenizer_cache.cache[field_name]
+    except KeyError:
+        return None
+    return tokenizer
+
+
 class CollectionRecListDataCacher(DataCacher):
     """
     Provides cache for collection reclist hitsets.  This class is not
@@ -747,7 +787,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         if f and p[0] == '"' and p[-1] == '"':
             ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search
             opfts.append(['+', p[1:-1], f, 'a'])
-        elif f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor') and author_name_requires_phrase_search(p):
+        elif f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor', 'authorityauthor') and author_name_requires_phrase_search(p):
             ## B1 - do we search in author, and does 'p' contain space/comma/dot/etc?
             ## => doing washed ACC search
             opfts.append(['+', p, f, 'a'])
@@ -883,6 +923,9 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         # we are doing plain text output:
         req.content_type = "text/plain"
         req.send_http_header()
+    elif of == "intbitset":
+        req.content_type = "application/octet-stream"
+        req.send_http_header()
     elif of == "id":
         pass # nothing to do, we shall only return list of recIDs
     elif content_type == 'text/html':
@@ -982,6 +1025,8 @@ def page_end(req, of="hb", ln=CFG_SITE_LANG, em=""):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
     if of == "id":
         return [] # empty recID list
+    if of == "intbitset":
+        return intbitset()
     if not req:
         return # we were called from CLI
     if of.startswith('h'):
@@ -1552,12 +1597,12 @@ def get_synonym_terms(term, kbr_name, match_type, use_memoise=False):
     term_for_lookup = term
     term_remainder = ''
     ## but maybe match different term:
-    if match_type == 'leading_to_comma':
+    if match_type == CFG_BIBINDEX_SYNONYM_MATCH_TYPE['leading_to_comma']:
         mmm = re.match(r'^(.*?)(\s*,.*)$', term)
         if mmm:
             term_for_lookup = mmm.group(1)
             term_remainder = mmm.group(2)
-    elif match_type == 'leading_to_number':
+    elif match_type == CFG_BIBINDEX_SYNONYM_MATCH_TYPE['leading_to_number']:
         mmm = re.match(r'^(.*?)(\s*\d.*)$', term)
         if mmm:
             term_for_lookup = mmm.group(1)
@@ -2240,6 +2285,15 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     if not p: # sanity checking
         return hitset
 
+    tokenizer = get_field_tokenizer_type(f)
+    hitset_cjk = intbitset()
+    if tokenizer == "BibIndexCJKTokenizer":
+        if is_there_any_CJK_character_in_text(p):
+            cjk_tok = BibIndexCJKTokenizer()
+            chars = cjk_tok.tokenize_for_words(p)
+            for char in chars:
+                hitset_cjk |= search_unit_in_bibwords(char, f, m, wl)
+
     ## eventually look up runtime synonyms:
     hitset_synonyms = intbitset()
     if CFG_WEBSEARCH_SYNONYM_KBRS.has_key(f):
@@ -2321,6 +2375,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
 
     ## merge synonym results and return total:
     hitset |= hitset_synonyms
+    hitset |= hitset_cjk
     return hitset
 
 
@@ -2346,7 +2401,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
         return intbitset() # word index f does not exist
 
     # wash 'word' argument and run query:
-    if f == 'authorcount' and word.endswith('+'):
+    if f.endswith('count') and word.endswith('+'):
         # field count query of the form N+ so transform N+ to N->99999:
         word = word[:-1] + '->99999'
     word = string.replace(word, '*', '%') # we now use '*' as the truncation character
@@ -2361,7 +2416,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
             word1 = stem(word1, stemming_language)
         word0_washed = wash_index_term(word0)
         word1_washed = wash_index_term(word1)
-        if f == 'authorcount':
+        if f.endswith('count'):
             # field count query; convert to integers in order
             # to have numerical behaviour for 'BETWEEN n1 AND n2' query
             try:
@@ -2425,7 +2480,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
     if not index_id:
         return intbitset()
     stemming_language = get_index_stemming_language(index_id)
-    pairs_tokenizer = BibIndexPairTokenizer(stemming_language)
+    pairs_tokenizer = BibIndexDefaultTokenizer(stemming_language)
     idxpair_table_washed = wash_table_column_name("idxPAIR%02dF" % index_id)
 
     if p.startswith("%") and p.endswith("%"):
@@ -2438,8 +2493,8 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
     ps = string.split(p, "->", 1)
     if len(ps) == 2 and not (ps[0].endswith(' ') or ps[1].startswith(' ')):
         #so we are dealing with a span query
-        pairs_left = pairs_tokenizer.tokenize(ps[0])
-        pairs_right = pairs_tokenizer.tokenize(ps[1])
+        pairs_left = pairs_tokenizer.tokenize_for_pairs(ps[0])
+        pairs_right = pairs_tokenizer.tokenize_for_pairs(ps[1])
         if not pairs_left or not pairs_right:
             # we are not actually dealing with pairs but with words
             return search_unit_in_bibwords(original_pattern, f, type, wl)
@@ -2465,7 +2520,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
         #tokenizing p will remove the '%', so we have to make sure it stays
         replacement = 'xxxxxxxxxx' #hopefuly this will not clash with anything in the future
         p = string.replace(p, '%', replacement)
-        pairs = pairs_tokenizer.tokenize(p)
+        pairs = pairs_tokenizer.tokenize_for_pairs(p)
         if not pairs:
             # we are not actually dealing with pairs but with words
             return search_unit_in_bibwords(original_pattern, f, type, wl)
@@ -2479,7 +2534,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
         do_exact_search = False
     else:
         #normal query
-        pairs = pairs_tokenizer.tokenize(p)
+        pairs = pairs_tokenizer.tokenize_for_pairs(p)
         if not pairs:
             # we are not actually dealing with pairs but with words
             return search_unit_in_bibwords(original_pattern, f, type, wl)
@@ -2538,7 +2593,7 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
     """Searches for phrase 'p' inside idxPHRASE*F table for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
     # call word search method in some cases:
-    if f == 'authorcount':
+    if f.endswith('count'):
         return search_unit_in_bibwords(p, f, wl=wl)
     set = intbitset() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
@@ -2574,7 +2629,7 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
                 query_params = (p,)
 
     # special washing for fuzzy author index:
-    if f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+    if f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor', 'authorityauthor'):
         query_params_washed = ()
         for query_param in query_params:
             query_params_washed += (wash_author_name(query_param),)
@@ -2610,7 +2665,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
 
     # call word search method in some cases:
-    if f == 'journal' or f == 'authorcount':
+    if f == 'journal' or f.endswith('count'):
         return search_unit_in_bibwords(p, f, wl=wl)
     p_orig = p # saving for eventual future 'no match' reporting
     limit_reached = 0 # flag for knowing if the query limit has been reached
@@ -3882,7 +3937,7 @@ for sorting_method in sorting_methods:
         cache_sorted_data[sorting_method] = BibSortDataCacher(sorting_method)
 
 
-def get_tags_form_sort_fields(sort_fields):
+def get_tags_from_sort_fields(sort_fields):
     """Given a list of sort_fields, return the tags associated with it and
     also the name of the field that has no tags associated, to be able to
     display a message to the user."""
@@ -3962,7 +4017,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                 #use BibSort
                 return sort_records_bibsort(req, recIDs, sort_method, sort_field, sort_order, verbose, of, ln, rg, jrec)
     #deduce sorting MARC tag out of the 'sort_field' argument:
-    tags, error_field = get_tags_form_sort_fields(sort_fields)
+    tags, error_field = get_tags_from_sort_fields(sort_fields)
     if error_field:
         if use_sorting_buckets:
             return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
@@ -4081,7 +4136,7 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
     if not tags:
         # tags have not been camputed yet
         sort_fields = string.split(sort_field, ",")
-        tags, error_field = get_tags_form_sort_fields(sort_fields)
+        tags, error_field = get_tags_from_sort_fields(sort_fields)
         if error_field:
             if of.startswith('h'):
                 write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
@@ -4450,9 +4505,47 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
-                        from invenio import bibclassify_webinterface
+                        from invenio.bibclassify_webinterface import \
+                            record_get_keywords, write_keywords_body, \
+                            generate_keywords
+                        from invenio.webinterface_handler import wash_urlargd
+                        form = req.form
+                        argd = wash_urlargd(form, {
+                            'generate': (str, 'no'),
+                            'sort': (str, 'occurrences'),
+                            'type': (str, 'tagcloud'),
+                            'numbering': (str, 'off'),
+                            })
                         recid = recIDs[irec]
-                        bibclassify_webinterface.main_page(req, recid, tabs, ln, webstyle_templates)
+
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
+                                                                                   tabs,
+                                                                                   ln))
+                        content = websearch_templates.tmpl_record_plots(recID=recid,
+                                                                         ln=ln)
+                        req.write(content)
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
+                                                                                      tabs,
+                                                                                      ln))
+
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
+                            tabs, ln, citationnum=citedbynum, referencenum=references))
+
+                        if argd['generate'] == 'yes':
+                            # The user asked to generate the keywords.
+                            keywords = generate_keywords(req, recid, argd)
+                        else:
+                            # Get the keywords contained in the MARC.
+                            keywords = record_get_keywords(recid, argd)
+
+                        if argd['sort'] == 'related' and not keywords:
+                            req.write('You may want to run BibIndex.')
+
+                        # Output the keywords or the generate button.
+                        write_keywords_body(keywords, req, recid, argd)
+
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
+                            tabs, ln))
                     elif tab == 'plots':
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
                                                                                    tabs,
@@ -5096,7 +5189,9 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                HTML output (and "hb" for HTML brief, "hd" for HTML
                detailed), "x" means XML output, "t" means plain text
                output, "id" means no output at all but to return list
-               of recIDs found.  (Suitable for high-level API.)
+               of recIDs found, "intbitset" means to return an intbitset
+               representation of the recIDs found (no sorting or ranking
+               will be performed).  (Suitable for high-level API.)
 
           ot - output only these MARC tags (e.g. "100,700,909C0b").
                Useful if only some fields are to be shown in the
@@ -5292,6 +5387,8 @@ def prs_wash_arguments_colls(kwargs=None, of=None, req=None, cc=None, c=None, sc
             return ''
         elif of == "id":
             return []
+        elif of == "intbitset":
+            return intbitset()
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5450,8 +5547,12 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
     if record_exists(recid):
         if recidb <= recid: # sanity check
             recidb = recid + 1
-        if of == "id":
-            return [recidx for recidx in range(recid, recidb) if record_exists(recidx)]
+        if of in ["id", "intbitset"]:
+            result = [recidx for recidx in range(recid, recidb) if record_exists(recidx)]
+            if of == "intbitset":
+                return intbitset(result)
+            else:
+                return result
         else:
             print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose,
                           tab=tab, sf=sf, so=so, sp=sp, rm=rm, em=em)
@@ -5461,6 +5562,8 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
     else: # record does not exist
         if of == "id":
             return []
+        elif of == "intbitset":
+            return intbitset()
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5529,6 +5632,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                 write_warning(_("Requested record does not seem to exist."), req=req)
         if of == "id":
             return []
+        if of == "intbitset":
+            return intbitset()
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5553,6 +5658,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                               search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm, em=em)
             elif of == "id":
                 return results_similar_recIDs
+            elif of == "intbitset":
+                return intbitset(results_similar_recIDs)
             elif of.startswith("x"):
                 print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
                               results_similar_relevances, results_similar_relevances_prologue,
@@ -5566,6 +5673,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                     write_warning(results_similar_comments, req=req)
                 if of == "id":
                     return []
+                elif of == "intbitset":
+                    return intbitset()
                 elif of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
@@ -5593,6 +5702,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
             write_warning(_("Requested record does not seem to exist."), req=req)
         if of == "id":
             return []
+        elif of == "intbitset":
+            return intbitset()
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5613,6 +5724,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
                               sf=sf, so=so, sp=sp, rm=rm, em=em)
             elif of == "id":
                 return results_cocited_recIDs
+            elif of == "intbitset":
+                return intbitset(results_cocited_recIDs)
             elif of.startswith("x"):
                 print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose,
                               sf=sf, so=so, sp=sp, rm=rm, em=em)
@@ -5622,6 +5735,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
                     write_warning("nothing found", req=req)
                 if of == "id":
                     return []
+                elif of == "intbitset":
+                    return intbitset()
                 elif of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
@@ -6017,7 +6132,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                     write_warning(results_final_relevances_prologue, req=req)
                     write_warning(results_final_relevances_epilogue, req=req)
             elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
-                results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg=None, jrec=None)
+                results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
 
             if len(results_final_recIDs) < CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
                 results_final_colls.append(results_final_recIDs)
@@ -6273,7 +6388,10 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             if coll not in colls_to_search:
                 colls_to_search.append(coll)
         # print results overview:
-        if of == "id":
+        if of == "intbitset":
+            #return the result as an intbitset
+            return results_final_for_all_selected_colls
+        elif of == "id":
             # we have been asked to return list of recIDs
             recIDs = list(results_final_for_all_selected_colls)
             if rm: # do we have to rank?

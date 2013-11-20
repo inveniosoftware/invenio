@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-def check_field_existence(record, field, min_value, max_value=None, subfield=None):
+def check_field_existence(record, field, min_value, max_value=None, subfield=None, continuable=True):
     """
     Checks field.subfield existence inside the record according to max and min values
 
@@ -35,44 +35,47 @@ def check_field_existence(record, field, min_value, max_value=None, subfield=Non
     @note: This checker also modify the record if the field is not repeatable,
     meaning that min_value=1 or min_value=0,max_value=1
     """
-    from invenio.bibfield_utils import BibFieldCheckerException
+    from invenio.bibfield_utils import InvenioBibFieldContinuableError, \
+                                       InvenioBibFieldError
+
+    error = continuable and InvenioBibFieldContinuableError or InvenioBibFieldError
 
     field = '[n]' in field and field[:-3] or field
     key = subfield and "%s.%s" % (field, subfield) or field
 
     if min_value == 0:  # (0,1), (0,'n'), (0,n)
         if not max_value:
-            raise BibFieldCheckerException("Minimun value = 0 and no max value for '%s'" % (key,))
+            raise error("Minimun value = 0 and no max value for '%s'" % (key,))
         if key in record:
             value = record[key]
             if max_value == 1 and isinstance(value, list) and len(value) != 1:
-                raise BibFieldCheckerException("Field '%s' is not repeatable" % (key,))
+                raise error("Field '%s' is not repeatable" % (key,))
             elif max_value != 'n':
                 if isinstance(value, list) and len(value) > max_value:
-                    raise BibFieldCheckerException("Field '%s' is repeatable only %s times" % (key, max_value))
+                    raise error("Field '%s' is repeatable only %s times" % (key, max_value))
     elif min_value == 1:  # (1,-) (1,'n'), (1, n)
         if not key in record:
-            raise BibFieldCheckerException("Field '%s' is mandatory" % (key,))
+            raise error("Field '%s' is mandatory" % (key,))
         value = record[key]
         if not value:
-            raise BibFieldCheckerException("Field '%s' is mandatory" % (key,))
+            raise error("Field '%s' is mandatory" % (key,))
         if not max_value:
             if isinstance(value, list) and len(value) != 1:
-                raise BibFieldCheckerException("Field '%s' is mandatory and not repeatable" % (key,))
+                raise error("Field '%s' is mandatory and not repeatable" % (key,))
         elif max_value != 'n':
             if isinstance(value, list) and len(value) > max_value:
-                raise BibFieldCheckerException("Field '%s' is mandatory and repeatable only %s times" % (key, max_value))
+                raise error("Field '%s' is mandatory and repeatable only %s times" % (key, max_value))
     else:
         if not key in record:
-            raise BibFieldCheckerException("Field '%s' must be present inside the record %s times" % (key, min_value))
+            raise error("Field '%s' must be present inside the record %s times" % (key, min_value))
         value = record[key]
         if not value:
-            raise BibFieldCheckerException("Field '%s' must be present inside the record %s times" % (key, min_value))
+            raise error("Field '%s' must be present inside the record %s times" % (key, min_value))
         if not max_value:
             if not isinstance(value, list) or len(value) != min_value:
-                raise BibFieldCheckerException("Field '%s' must be present inside the record %s times" % (key, min_value))
+                raise error("Field '%s' must be present inside the record %s times" % (key, min_value))
         else:
             if max_value != 'n' and (not isinstance(value, list) or len(value) < min_value or len(value) > max_value):
-                raise BibFieldCheckerException("Field '%s' must be present inside the record between %s and %s times" % (key, min_value, max_value))
+                raise error("Field '%s' must be present inside the record between %s and %s times" % (key, min_value, max_value))
             elif not isinstance(value, list) or len(value) < min_value:
-                raise BibFieldCheckerException("Field '%s' must be present inside the record between %s and 'n' times" % (key, min_value))
+                raise error("Field '%s' must be present inside the record between %s and 'n' times" % (key, min_value))

@@ -25,7 +25,7 @@ import cgi
 from invenio.bibformat_elements.bfe_server_info import format_element as server_info
 from invenio.bibformat_elements.bfe_client_info import format_element as client_info
 from invenio.htmlutils import create_tag
-from invenio.bibindex_engine import get_field_tags
+from invenio.bibindex_engine_utils import get_field_tags
 from invenio.config import CFG_WEBSEARCH_ENABLE_GOOGLESCHOLAR, CFG_WEBSEARCH_ENABLE_OPENGRAPH
 
 def format_element(bfo, name, tag_name='', tag='', kb='', kb_default_output='', var='', protocol='googlescholar'):

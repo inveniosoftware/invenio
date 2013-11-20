@@ -59,7 +59,7 @@ def check_term(term, col_size, term_rec, max_occ, min_occ, termlength):
     termlength - the minimum length of the terms allowed"""
 
     try:
-        if is_stopword(term, 1) or (len(term) <= termlength) or ((float(term_rec) / float(col_size)) >= max_occ) or ((float(term_rec) / float(col_size)) <= min_occ):
+        if is_stopword(term) or (len(term) <= termlength) or ((float(term_rec) / float(col_size)) >= max_occ) or ((float(term_rec) / float(col_size)) <= min_occ):
             return ""
         if int(term):
             return ""

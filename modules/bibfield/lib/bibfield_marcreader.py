@@ -34,7 +34,7 @@ class MarcReader(JsonReader):
     """
 
     @staticmethod
-    def split_blob(blob):
+    def split_blob(blob, schema):
         """
         Splits the blob using <record.*?>.*?</record> as pattern.
 

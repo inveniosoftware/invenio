@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -46,7 +46,23 @@ class IdxINDEX(db.Model):
     stemming_language = db.Column(db.String(10), nullable=False,
                 server_default='')
     indexer = db.Column(db.String(10), nullable=False, server_default='native')
+    synonym_kbrs = db.Column(db.String(255), nullable=False, server_default='')
+    remove_stopwords = db.Column(db.String(255), nullable=False, server_default='')
+    remove_html_markup = db.Column(db.String(10), nullable=False, server_default='')
+    remove_latex_markup = db.Column(db.String(10), nullable=False, server_default='')
+    tokenizer = db.Column(db.String(50), nullable=False, server_default='')
 
+class IdxINDEXIdxINDEX(db.Model):
+    """Represents an IdxINDEXIdxINDEX record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxINDEX_idxINDEX'
+    id_virtual = db.Column(db.MediumInteger(9, unsigned=True),
+                           db.ForeignKey(IdxINDEX.id), nullable=False,
+                           server_default='0', primary_key=True)
+    id_normal = db.Column(db.MediumInteger(9, unsigned=True),
+                          db.ForeignKey(IdxINDEX.id), nullable=False,
+                          server_default='0', primary_key=True)
 
 class IdxINDEXNAME(db.Model):
     """Represents a IdxINDEXNAME record."""
@@ -577,6 +593,188 @@ class IdxPAIR19R(db.Model):
                 server_default='CURRENT',
                 primary_key=True)
 
+class IdxPAIR20F(db.Model):
+    """Represents a IdxPAIR20F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR20F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPAIR20R(db.Model):
+    """Represents a IdxPAIR20R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR20R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPAIR21F(db.Model):
+    """Represents a IdxPAIR21F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR21F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPAIR21R(db.Model):
+    """Represents a IdxPAIR21R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR21R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPAIR22F(db.Model):
+    """Represents a IdxPAIR22F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR22F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPAIR22R(db.Model):
+    """Represents a IdxPAIR22R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR22R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPAIR23F(db.Model):
+    """Represents a IdxPAIR23F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR23F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPAIR23R(db.Model):
+    """Represents a IdxPAIR23R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR23R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPAIR24F(db.Model):
+    """Represents a IdxPAIR24F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR24F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPAIR24R(db.Model):
+    """Represents a IdxPAIR24R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR24R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPAIR25F(db.Model):
+    """Represents a IdxPAIR25F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR25F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPAIR25R(db.Model):
+    """Represents a IdxPAIR25R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR25R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPAIR26F(db.Model):
+    """Represents a IdxPAIR26F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR26F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPAIR26R(db.Model):
+    """Represents a IdxPAIR26R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPAIR26R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
 class IdxPHRASE01F(db.Model):
     """Represents a IdxPHRASE01F record."""
     def __init__(self):
@@ -1062,6 +1260,188 @@ class IdxPHRASE19R(db.Model):
     def __init__(self):
         pass
     __tablename__ = 'idxPHRASE19R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPHRASE20F(db.Model):
+    """Represents a IdxPHRASE20F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE20F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPHRASE20R(db.Model):
+    """Represents a IdxPHRASE20R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE20R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPHRASE21F(db.Model):
+    """Represents a IdxPHRASE21F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE21F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPHRASE21R(db.Model):
+    """Represents a IdxPHRASE21R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE21R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPHRASE22F(db.Model):
+    """Represents a IdxPHRASE22F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE22F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPHRASE22R(db.Model):
+    """Represents a IdxPHRASE22R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE22R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPHRASE23F(db.Model):
+    """Represents a IdxPHRASE23F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE23F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPHRASE23R(db.Model):
+    """Represents a IdxPHRASE23R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE23R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPHRASE24F(db.Model):
+    """Represents a IdxPHRASE24F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE24F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPHRASE24R(db.Model):
+    """Represents a IdxPHRASE24R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE24R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPHRASE25F(db.Model):
+    """Represents a IdxPHRASE25F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE25F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPHRASE25R(db.Model):
+    """Represents a IdxPHRASE25R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE25R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxPHRASE26F(db.Model):
+    """Represents a IdxPHRASE26F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE26F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(100), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxPHRASE26R(db.Model):
+    """Represents a IdxPHRASE26R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxPHRASE26R'
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
@@ -1565,8 +1945,191 @@ class IdxWORD19R(db.Model):
                 server_default='CURRENT',
                 primary_key=True)
 
+class IdxWORD20F(db.Model):
+    """Represents a IdxWORD20F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD20F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(50), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxWORD20R(db.Model):
+    """Represents a IdxWORD20R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD20R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxWORD21F(db.Model):
+    """Represents a IdxWORD21F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD21F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(50), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxWORD21R(db.Model):
+    """Represents a IdxWORD21R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD21R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxWORD22F(db.Model):
+    """Represents a IdxWORD22F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD22F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(50), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxWORD22R(db.Model):
+    """Represents a IdxWORD22R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD22R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxWORD23F(db.Model):
+    """Represents a IdxWORD23F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD23F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(50), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxWORD23R(db.Model):
+    """Represents a IdxWORD23R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD23R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxWORD24F(db.Model):
+    """Represents a IdxWORD24F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD24F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(50), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxWORD24R(db.Model):
+    """Represents a IdxWORD24R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD24R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxWORD25F(db.Model):
+    """Represents a IdxWORD25F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD25F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(50), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxWORD25R(db.Model):
+    """Represents a IdxWORD25R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD25R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
+class IdxWORD26F(db.Model):
+    """Represents a IdxWORD26F record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD26F'
+    id = db.Column(db.MediumInteger(9, unsigned=True),
+                primary_key=True,
+                autoincrement=True)
+    term = db.Column(db.String(50), nullable=True,
+                unique=True)
+    hitlist = db.Column(db.iLargeBinary, nullable=True)
+
+class IdxWORD26R(db.Model):
+    """Represents a IdxWORD26R record."""
+    def __init__(self):
+        pass
+    __tablename__ = 'idxWORD26R'
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True)
+    termlist = db.Column(db.iLargeBinary, nullable=True)
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+                nullable=False,
+                server_default='CURRENT',
+                primary_key=True)
+
 
 __all__ = ['IdxINDEX',
+           'IdxINDEXIdxINDEX',
            'IdxINDEXNAME',
            'IdxINDEXField',
            'IdxPAIR01F',
@@ -1607,6 +2170,20 @@ __all__ = ['IdxINDEX',
            'IdxPAIR18R',
            'IdxPAIR19F',
            'IdxPAIR19R',
+           'IdxPAIR20F',
+           'IdxPAIR20R',
+           'IdxPAIR21F',
+           'IdxPAIR21R',
+           'IdxPAIR22F',
+           'IdxPAIR22R',
+           'IdxPAIR23F',
+           'IdxPAIR23R',
+           'IdxPAIR24F',
+           'IdxPAIR24R',
+           'IdxPAIR25F',
+           'IdxPAIR25R',
+           'IdxPAIR26F',
+           'IdxPAIR26R',
            'IdxPHRASE01F',
            'IdxPHRASE01R',
            'IdxPHRASE02F',
@@ -1645,6 +2222,20 @@ __all__ = ['IdxINDEX',
            'IdxPHRASE18R',
            'IdxPHRASE19F',
            'IdxPHRASE19R',
+           'IdxPHRASE20F',
+           'IdxPHRASE20R',
+           'IdxPHRASE21F',
+           'IdxPHRASE21R',
+           'IdxPHRASE22F',
+           'IdxPHRASE22R',
+           'IdxPHRASE23F',
+           'IdxPHRASE23R',
+           'IdxPHRASE24F',
+           'IdxPHRASE24R',
+           'IdxPHRASE25F',
+           'IdxPHRASE25R',
+           'IdxPHRASE26F',
+           'IdxPHRASE26R',
            'IdxWORD01F',
            'IdxWORD01R',
            'IdxWORD02F',
@@ -1682,4 +2273,18 @@ __all__ = ['IdxINDEX',
            'IdxWORD18F',
            'IdxWORD18R',
            'IdxWORD19F',
-           'IdxWORD19R']
+           'IdxWORD19R',
+           'IdxWORD20F',
+           'IdxWORD20R',
+           'IdxWORD21F',
+           'IdxWORD21R',
+           'IdxWORD22F',
+           'IdxWORD22R',
+           'IdxWORD23F',
+           'IdxWORD23R',
+           'IdxWORD24F',
+           'IdxWORD24R',
+           'IdxWORD25F',
+           'IdxWORD25R',
+           'IdxWORD26F',
+           'IdxWORD26R']

@@ -569,6 +569,13 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibauthorid/etc/Makefile \
      modules/bibauthorid/etc/name_authority_files/Makefile \
      modules/bibauthorid/web/Makefile \
+     modules/bibauthority/Makefile \
+     modules/bibauthority/bin/Makefile \
+     modules/bibauthority/doc/Makefile \
+     modules/bibauthority/doc/admin/Makefile \
+     modules/bibauthority/doc/hacking/Makefile \
+     modules/bibauthority/lib/Makefile \
+     modules/bibauthority/web/Makefile \
      modules/bibcatalog/Makefile \
      modules/bibcatalog/doc/Makefile \
      modules/bibcatalog/doc/admin/Makefile \
@@ -694,6 +701,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibindex/doc/admin/Makefile \
      modules/bibindex/doc/hacking/Makefile \
      modules/bibindex/lib/Makefile \
+     modules/bibindex/lib/tokenizers/Makefile \
      modules/bibindex/web/Makefile \
      modules/bibindex/web/admin/Makefile \
      modules/bibknowledge/Makefile \

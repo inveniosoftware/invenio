@@ -37,7 +37,7 @@ class BibFieldParserUnitTests(InvenioTestCase):
         self.config_rules = parser.config_rules
 
     def test_bibfield_rules_parser(self):
-        """Checks if the configuration rules are well built"""
+        """BibField - configuration rules building process"""
         self.assertTrue(len(self.config_rules) >= 20)
         #Check imports
         self.assertTrue('authors' in self.config_rules)

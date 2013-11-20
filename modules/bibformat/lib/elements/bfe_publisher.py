@@ -20,6 +20,10 @@
 """
 __revision__ = "$Id$"
 
+from invenio.config import CFG_SITE_URL
+
+from invenio.bibauthority_engine import get_low_level_recIDs_from_control_no
+
 def format_element(bfo):
     """
     Prints the publisher name
@@ -28,6 +32,23 @@ def format_element(bfo):
     """
 
     publisher = bfo.field('260__b')
+    control_no = bfo.field('260__0')
 
     if publisher != "sine nomine":
+        if control_no:
+            recIDs = get_low_level_recIDs_from_control_no(control_no)
+            if len(recIDs):
+                publisher = '<a href="' + CFG_SITE_URL + '/record/' + \
+                            str(recIDs[0]) + \
+                            '?ln=' + bfo.lang + \
+                            '">' + publisher + '</a>'
         return publisher
+
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0
+

@@ -60,8 +60,16 @@ except:
 import sys
 sys.stdout = sys.stderr
 
-from invenio.webinterface_handler_flask import create_invenio_flask_app
-application = create_invenio_flask_app()
+try:
+    from invenio.webinterface_handler_flask import create_invenio_flask_app
+    application = create_invenio_flask_app()
+finally:
+    ## mod_wsgi uses one thread to import the .wsgi file
+    ## and a second one to instantiate the application.
+    ## Therefore we need to close redundant conenctions that
+    ## are allocated on the 1st thread.
+    from invenio.dbquery import close_connection
+    close_connection()
 
 if 'werkzeug-debugger' in getattr(config, 'CFG_DEVEL_TOOLS', []):
     from werkzeug.debug import DebuggedApplication

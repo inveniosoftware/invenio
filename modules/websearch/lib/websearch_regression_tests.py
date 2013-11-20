@@ -51,6 +51,8 @@ from invenio.urlutils import same_urls_p
 from invenio.dbquery import run_sql
 from invenio.search_engine_query_parser_unit_tests import DATEUTIL_AVAILABLE
 
+reindex_word_tables_into_testtables = lazy_import('invenio.bibindex_regression_tests:reindex_word_tables_into_testtables')
+
 if 'fr' in CFG_SITE_LANGS:
     lang_french_configured = True
 else:
@@ -352,7 +354,7 @@ class WebSearchTestRecord(InvenioTestCase):
                                                (CFG_SITE_RECORD, CFG_SITE_LANG)))
         self.assertEqual([],
                          test_web_page_content(make_url('/%s/1/export/hx' % CFG_SITE_RECORD),
-                                               expected_text='title        = "ALEPH experiment'))
+                                               expected_text='title         = "{ALEPH experiment'))
         self.assertEqual([],
                          test_web_page_content(make_url('/%s/1/export/t?ot=245' % CFG_SITE_RECORD),
                                                expected_text='245__ $$aALEPH experiment'))
@@ -854,6 +856,50 @@ class WebSearchTestSearch(InvenioTestCase):
                                            unexpected_text=unexpected_text))
         return
 
+
+class WebSearchCJKTokenizedSearchTest(InvenioTestCase):
+    """
+        Reindexes record 104 (the one with chinese poetry) with use of BibIndexCJKTokenizer.
+        After tests it reindexes record 104 back with BibIndexDefaultTokenizer.
+        Checks if one can find record 104 specifying only one or two CJK characters.
+    """
+
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        if not self.reindexed:
+            self.last_updated = reindex_word_tables_into_testtables('title',
+                                                                [[104,104]],
+                                                                      False,
+                                        {'tokenizer':'BibIndexCJKTokenizer',
+                                         'last_updated':'0000-00-00 00:00:00'})
+            self.reindexed = True
+
+    @classmethod
+    def tearDown(self):
+        self.test_counter += 1
+        if self.test_counter == 2:
+            reindex_word_tables_into_testtables(
+                'title',
+                [[104,104]],
+                False,
+                {'tokenizer':'BibIndexDefaultTokenizer',
+                 'last_updated':self.last_updated})
+
+
+    def test_title_cjk_tokenized_two_characters(self):
+        """CJKTokenizer - test for finding chinese poetry with two CJK characters"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=title%3A敬亭&f=&of=id',
+                                                   expected_text='[104]'))
+
+    def test_title_cjk_tokenized_single_character(self):
+        """CJKTokenizer - test for finding chinese poetry with one CJK character"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=title%3A亭&f=&of=id',
+                                                   expected_text='[104]'))
+
+
 class WebSearchTestWildcardLimit(InvenioTestCase):
     """Checks if the wildcard limit is correctly passed and that
     users without autorization can not exploit it"""
@@ -948,13 +994,14 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellisz&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=fabbro&f=author",
-                                               expected_link_label='fabbro'))
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=eisenhandler&f=author",
+                                               expected_link_label='eisenhandler'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3Afabbro",
-                                               expected_link_label='fabbro'))
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3Aeisenhandler",
+                                               expected_link_label='eisenhandler'))
+
 
     def test_nearest_terms_box_in_query_with_invalid_index(self):
         """ websearch - nearest terms box for queries with invalid indexes specified """
@@ -1127,7 +1174,12 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
                          perform_request_search(p='ellis'))
 
-    def test_search_engine_python_api_ignore_paging_parameter(self):
+    def test_search_engine_python_api_for_successful_query_format_intbitset(self):
+        """websearch - search engine Python API for successful query, output format intbitset"""
+        self.assertEqual(intbitset([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]),
+                         perform_request_search(p='ellis', of='intbitset'))
+
+    def test_search_engine_web_api_ignore_paging_parameter(self):
         """websearch - search engine Python API for successful query, ignore paging parameters"""
         from invenio.search_engine import perform_request_search
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
@@ -1155,11 +1207,21 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
         self.assertEqual([8],
                          perform_request_search(recid=8))
 
+    def test_search_engine_python_api_for_existing_record_format_intbitset(self):
+        """websearch - search engine Python API for existing record, output format intbitset"""
+        self.assertEqual(intbitset([8]),
+                         perform_request_search(recid=8, of='intbitset'))
+
     def test_search_engine_python_api_for_nonexisting_record(self):
         """websearch - search engine Python API for non-existing record"""
         from invenio.search_engine import perform_request_search
         self.assertEqual([],
                          perform_request_search(recid=16777215))
+
+    def test_search_engine_python_api_for_nonexisting_record_format_intbitset(self):
+        """websearch - search engine Python API for non-existing record, output format intbitset"""
+        self.assertEqual(intbitset(),
+                         perform_request_search(recid=16777215, of='intbitset'))
 
     def test_search_engine_python_api_for_nonexisting_collection(self):
         """websearch - search engine Python API for non-existing collection"""
@@ -1863,6 +1925,12 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
 </collection>""")
 
+
+    def test_search_engine_python_api_long_author_with_quotes(self):
+        """websearch - search engine Python API for p=author:"Abbot, R B"'""" \
+        """this test was written along with a bug report, needs fixing."""
+        self.assertEqual([16], perform_request_search(p='author:"Abbott, R B"'))
+
 class WebSearchSearchEngineWebAPITest(InvenioTestCase):
     """Check typical search engine Web API calls on the demo data."""
 
@@ -1872,6 +1940,11 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=aoeuidhtns&of=id',
                                                expected_text="[]"))
 
+    def test_search_engine_web_api_for_failed_query_format_intbitset(self):
+        """websearch - search engine Web API for failed query, output format intbitset"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=aoeuidhtns&of=intbitset',
+                                               expected_text=intbitset().fastdump()))
 
     def test_search_engine_web_api_for_successful_query(self):
         """websearch - search engine Web API for successful query"""
@@ -1901,6 +1974,10 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&sf=909C4v',
                                                username="admin",
                                                expected_text="[77, 85, 84]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=intbitset&sf=909C4v',
+                                               username="admin",
+                                               expected_text=intbitset([77, 84, 85]).fastdump()))
 
     def test_search_engine_web_api_respect_ranking_parameter(self):
         """websearch - search engine Web API for successful query, respect ranking parameters"""
@@ -1918,6 +1995,10 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&rm=citation',
                                                username="admin",
                                                expected_text="[85, 77, 84]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=intbitset&rm=citation',
+                                               username="admin",
+                                               expected_text=intbitset([77, 84, 85]).fastdump()))
 
     def test_search_engine_web_api_for_existing_record(self):
         """websearch - search engine Web API for existing record"""
@@ -2099,6 +2180,10 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,595',
                                                username='admin',
                                                expected_text="""\
+000000107 595__ $$aNo authors
+000000107 595__ $$aCERN-EP
+000000107 595__ $$aOA
+000000107 595__ $$aSIS:200740 PR/LKR not found (from SLAC, INSPEC)
 000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
 000000085 595__ $$aLANL EDS
 000000085 595__ $$aSIS LANLPUBL2004
@@ -2628,6 +2713,18 @@ Zaffaroni, A
 <collection xmlns="http://www.loc.gov/MARC21/slim">
 <record>
   <controlfield tag="001">107</controlfield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">No authors</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">CERN-EP</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">OA</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS:200740 PR/LKR not found (from SLAC, INSPEC)</subfield>
+  </datafield>
 </record>
 <record>
   <controlfield tag="001">85</controlfield>
@@ -3728,7 +3825,7 @@ class WebSearchSortResultsTest(InvenioTestCase):
     def test_sort_results_default(self):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=3',
                                                expected_text="CMS animation of the high-energy collisions"))
 
     def test_sort_results_ascending(self):
@@ -4264,7 +4361,7 @@ class WebSearchSpanQueryTest(InvenioTestCase):
         """websearch - span query in special author index"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis,%20K%22-%3E%22Ellis,%20RZ%22&of=id&ap=0',
-                                               expected_text='[8, 11, 13, 17, 47]'))
+                                               expected_text='[8, 9, 11, 12, 13, 14, 17, 18, 47]'))
 
 
 class WebSearchReferstoCitedbyTest(InvenioTestCase):
@@ -4348,7 +4445,7 @@ class WebSearchSPIRESSyntaxTest(InvenioTestCase):
             # should return every document in the system
             self.assertEqual([],
                              test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id',
-                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113]'))
+                                                  expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113, 127, 128]'))
 
 
 class WebSearchDateQueryTest(InvenioTestCase):
@@ -4411,7 +4508,7 @@ class WebSearchSynonymQueryTest(InvenioTestCase):
                                                expected_text="[52, 59]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2+decay&of=id',
-                                               expected_text="[52, 59]"))
+                                               expected_text="[59]"))
 
     def test_journal_beta_title(self):
         """websearch - index-time synonym search, beta in title"""
@@ -4429,7 +4526,7 @@ class WebSearchSynonymQueryTest(InvenioTestCase):
                                                expected_text="[52, 59]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2&of=id',
-                                               expected_text="[52, 59]"))
+                                               expected_text="[59]"))
 
 class WebSearchWashCollectionsTest(InvenioTestCase):
     """Test if the collection argument is washed correctly"""
@@ -4464,13 +4561,64 @@ class WebSearchAuthorCountQueryTest(InvenioTestCase):
         """websearch - author count, span query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=authorcount%3A9-%3E16&of=id',
-                                               expected_text="[69, 71]"))
+                                               expected_text="[69, 71, 127]"))
 
     def test_journal_authorcount_plus(self):
         """websearch - author count, plus query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=50%2B&f=authorcount&of=id',
                                                expected_text="[10, 17]"))
+
+
+class WebSearchItemCountQueryTest(InvenioTestCase):
+    """Test of queries using itemcount field/index"""
+
+    def test_itemcount_plus(self):
+        """websearch - item count, search for more than one item, using 'plus'"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=2%2B&f=itemcount&of=id',
+                                               expected_text="[31, 32, 34]"))
+
+    def test_itemcount_span(self):
+        """websearch - item count, search for more than one item, using 'span'"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=2->10&f=itemcount&of=id',
+                                               expected_text="[31, 32, 34]"))
+
+    def test_itemcount_phrase(self):
+        """websearch - item count, search for records with exactly two items, phrase"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%222%22&f=itemcount&of=id',
+                                               expected_text="[31, 34]"))
+
+    def test_itemcount_records_with_two_items(self):
+        """websearch - item count, search for records with exactly two items"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=2&f=itemcount&of=id',
+                                               expected_text="[31, 34]"))
+
+
+class WebSearchFiletypeQueryTest(InvenioTestCase):
+    """Test of queries using filetype fields."""
+
+    def test_mpg_filetype(self):
+        """websearch - file type, query for tif extension"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=mpg&f=filetype&of=id',
+                                               expected_text="[113]"))
+
+    def test_tif_filetype_and_word_study(self):
+        """websearch - file type, query for tif extension and word 'study'"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=study+filetype%3Atif&of=id',
+                                               expected_text="[71]"))
+
+    def test_pdf_filetype_and_phrase(self):
+        """websearch - file type, query for pdf extension and phrase 'parameter test'"""
+        self.assertEqual([],
+                  test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=filetype%3Apdf+parameter+test&of=id',
+                                        expected_text="[50, 93]"))
+
 
 class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
     """Tests the perform request search API after refactoring."""
@@ -4538,18 +4686,18 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
         from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
 
         if not get_external_word_similarity_ranker():
-            self._run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109])
+            self._run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109, 127, 128])
 
-        self._run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 2, 14, 9, 11, 30, 109, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
+        self._run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 127, 58, 2, 14, 9, 128, 11, 30, 109, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
 
         self._run_test('p=boson;rm=citation', [1, 47, 50, 107, 108, 77, 95])
 
         if not get_external_word_similarity_ranker():
             self._run_test('p=boson;rm=wrd', [108, 77, 47, 50, 95, 1, 107])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [9, 12, 14, 18])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=a;p2=john;f2=author;m2=o', [])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=a;p2=john;f2=author;m2=o', [9, 12, 14, 18])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=a;p2=john;f2=author;m2=e', [])
 
@@ -4559,9 +4707,9 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=o;p2=john;f2=author;m2=e', [])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [8, 10, 11, 13, 16, 17, 47])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [8, 10, 11, 13, 16, 17, 47])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=n;p2=john;f2=author;m2=e', [])
 
@@ -4714,10 +4862,14 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSynonymQueryTest,
                              WebSearchWashCollectionsTest,
                              WebSearchAuthorCountQueryTest,
+                             WebSearchFiletypeQueryTest,
                              WebSearchPerformRequestSearchRefactoringTest,
                              WebSearchGetRecordTests,
                              WebSearchExactTitleIndexTest,
-                             WebSearchUserSettingsTest)
+                             WebSearchUserSettingsTest,
+                             WebSearchCJKTokenizedSearchTest,
+                             WebSearchItemCountQueryTest)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

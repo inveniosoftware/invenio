@@ -27,7 +27,7 @@ from invenio.testutils import make_test_suite, \
 
 class InvenioBibFormatWebTest(InvenioWebTestCase):
     """BibFormat web tests."""
-    
+
     def test_format_many_authors(self):
         """bibformat - web test format many authors"""
 
@@ -42,7 +42,9 @@ class InvenioBibFormatWebTest(InvenioWebTestCase):
         self.page_source_test(expected_text='Show all 315 authors')
         self.find_element_by_link_text_with_timeout("Show all 315 authors")
         self.browser.find_element_by_link_text("Show all 315 authors").click()
-        self.page_source_test(expected_text=['Zobernig, G', 'Hide']) 
+        self.page_source_test(expected_text=['Zobernig, G', 'Hide'])
+
+
 
 TEST_SUITE = make_test_suite(InvenioBibFormatWebTest, )
 

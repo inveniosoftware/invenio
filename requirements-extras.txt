@@ -9,3 +9,8 @@ pep8
 selenium
 winpdb
 mock
+ipython
+cython
+nose
+nosexcover
+flake8

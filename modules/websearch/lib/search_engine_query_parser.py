@@ -25,7 +25,7 @@ import re
 import string
 from datetime import datetime
 
-from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer as FNT
+from invenio.bibindex_tokenizers.BibIndexAuthorTokenizer import BibIndexAuthorTokenizer as FNT
 from invenio.dateutils import GOT_DATEUTIL
 if GOT_DATEUTIL:
     from invenio.dateutils import du_parser, du_delta, relativedelta
@@ -1109,7 +1109,7 @@ class SpiresToInvenioSyntaxConverter:
             result += query[current_position : match.start() ]
             if match.group('secondorderop'):
                 result += match.group('secondorderop')
-            scanned_name = NameScanner.scan(match.group('name'))
+            scanned_name = NameScanner.scan_string_for_phrases(match.group('name'))
             author_atoms = self._create_author_search_pattern_from_fuzzy_name_dict(scanned_name)
             if match.group('first'):
                 author_atoms = author_atoms.replace('author:', 'firstauthor:')

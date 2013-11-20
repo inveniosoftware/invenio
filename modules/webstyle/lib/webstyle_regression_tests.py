@@ -114,7 +114,7 @@ class WebStyleGotoTests(InvenioTestCase):
         """webstyle - test redirecting to latest article via goto_plugin_latest_record"""
         from invenio.goto_engine import register_redirection
         register_redirection('latest_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles'})
-        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article'), CFG_SITE_URL + '/record/108')
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article'), CFG_SITE_URL + '/record/128')
 
     @nottest
     def FIXME_TICKET_1293_test_latest_pdf_article_redirection(self):

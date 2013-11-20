@@ -74,7 +74,8 @@ class CrcLIBRARY(db.Model):
                 server_default='')
     phone = db.Column(db.String(30), nullable=False,
                 server_default='')
-    type = db.Column(db.String(30), nullable=True)
+    type = db.Column(db.String(30), nullable=False,
+                server_default='main')
     notes = db.Column(db.Text, nullable=True)
 
 class CrcITEM(db.Model):

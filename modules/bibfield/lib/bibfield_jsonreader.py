@@ -23,6 +23,7 @@ BibField Json Reader
 
 __revision__ = "$Id$"
 
+import os
 import re
 
 import sys
@@ -38,7 +39,12 @@ if sys.version_info < (2,5):
                 return True
         return False
 
-from invenio.bibfield_utils import BibFieldDict, BibFieldCheckerException
+from invenio.config import CFG_PYLIBDIR
+from invenio.pluginutils import PluginContainer
+
+from invenio.bibfield_utils import BibFieldDict, \
+                                   InvenioBibFieldContinuableError, \
+                                   InvenioBibFieldError
 from invenio.bibfield_config import config_rules
 
 
@@ -50,16 +56,13 @@ class JsonReader(BibFieldDict):
     so no conversion is needed.
     """
 
-    def __init__(self, blob_wrapper=None):
+    def __init__(self, blob_wrapper=None, check = False):
         """
         blob -> _prepare_blob(...) -> rec_tree -> _translate(...) -> rec_json -> check_record(...)
         """
         super(JsonReader, self).__init__()
         self.blob_wrapper = blob_wrapper
         self.rec_tree = None  # all record information represented as a tree (intermediate structure)
-
-        self._missing_cfg = []
-        self._warning_messages = []
 
         self.__parsed = []
 
@@ -72,13 +75,14 @@ class JsonReader(BibFieldDict):
             self._prepare_blob()
             self._translate()
             self._post_process_json()
-            self.check_record()
+            if check:
+                self.check_record()
             self.is_init_phase = False
         else:
             self['__master_format'] = 'json'
 
     @staticmethod
-    def split_blob(blob):
+    def split_blob(blob, schema):
         """
         In case of several records inside the blob this method specify how to split
         then and work one by one afterwards
@@ -95,21 +99,20 @@ class JsonReader(BibFieldDict):
     def is_empty(self):
         """
         One record is empty if there is nothing stored inside rec_json or there is
-        only '__master_format'
+        only '__key'
         """
-        if not self.rec_json:
-            return True
-        if self.keys() == ['__master_format']:
+        if self.rec_json is None or len(self.rec_json.keys()) == 0:
             return True
         if all(key.startswith('_') for key in self.keys()):
             return True
         return False
 
-    def check_record(self):
+    def check_record(self, reset=True):
         """
         Using the checking rules defined inside bibfied configurations files checks
         if the record is well build. If not it stores the problems inside
-        self._warning_messages
+        self['__error_messages'] splitting then by continuable errors and fatal/non-continuable
+        errors
         """
         def check_rules(checker_functions, key):
             """docstring for check_rule"""
@@ -117,8 +120,14 @@ class JsonReader(BibFieldDict):
                 if 'all' in checker_function[0] or self['__master_format'] in checker_function[0]:
                     try:
                         self._try_to_eval("%s(self,'%s',%s)" % (checker_function[1], key, checker_function[2]))
-                    except BibFieldCheckerException, err:
-                        self._warning_messages.append(str(err))
+                    except InvenioBibFieldContinuableError, err:
+                        self['__error_messages']['cerror'].append('Checking CError - ' + str(err))
+                    except InvenioBibFieldError, err:
+                        self['__error_messages']['error'].append('Checking Error - ' + str(err))
+
+        if reset or '__error_messages.error' not in self or  '__error_messages.cerror' not in self:
+            self.rec_json['__error_messages'] = {'error': [], 'cerror': []}
+
         for key in self.keys():
             try:
                 check_rules(config_rules[key]['checker'], key)
@@ -128,81 +137,58 @@ class JsonReader(BibFieldDict):
             except KeyError:
                 continue
 
+    @property
+    def fatal_errors(self):
+        """@return All the fatal/non-continuable errors that check_record has found"""
+        return self.get('__error_messages.error', [])
+
+    @property
+    def continuable_errors(self):
+        """@return All the continuable errors that check_record has found"""
+        return self.get('__error_messages.cerror', [])
+
     def legacy_export_as_marc(self):
         """
         It creates a valid marcxml using the legacy rules defined in the config
         file
         """
+        from collections import Iterable
         def encode_for_marcxml(value):
             from invenio.textutils import encode_for_xml
+            if isinstance(value, unicode):
+                value = value.encode('utf8')
             return encode_for_xml(str(value))
 
-        formatstring_controlfield = '<controlfield tag="{tag}">{content}</controlfield>'
-        formatstring_datafield = '<datafield tag="{tag}" ind1="{ind1}" ind2="{ind2}">{content}</datafield>'
-
-        def create_marc_representation(key, value, legacy_rules):
-            """
-            Helper function to create the marc representation of one field
-
-            #FIXME: refactor this spaghetti code
-            """
-            output = ''
+        export = '<record>'
+        marc_dicts = self.produce_json_for_marc()
+        for marc_dict in marc_dicts:
             content = ''
             tag = ''
             ind1 = ''
             ind2 = ''
-
-            if not value:
-                return ''
-
-            for legacy_rule in legacy_rules:
-                if not '%' in legacy_rule[0]:
-                    if len(legacy_rule[0]) == 3 and legacy_rule[0].startswith('00'):
+            for key, value in marc_dict.iteritems():
+                if isinstance(value, basestring) or not isinstance(value, Iterable):
+                    value = [value]
+                for v in value:
+                    if v is None:
+                        continue
+                    if key.startswith('00') and len(key) == 3:
                         # Control Field (No indicators no subfields)
-                        formatstring = None
-                        if legacy_rule[0] == '005':
-                            #Especial format for date only for 005 tag
-                            formatstring = "%Y%m%d%H%M%S.0"
-                        output += '<controlfield tag="%s">%s</controlfield>' % (legacy_rule[0],
-                                                                                self.get(key,
-                                                                                         default='',
-                                                                                         formatstring=formatstring,
-                                                                                         formatfunction=encode_for_marcxml)
-                                                                                )
-                    elif len(legacy_rule[0]) == 6:
-                        #Data Field
-                        if not (tag == legacy_rule[0][:3] and ind1 == legacy_rule[0][3].replace('_', '') and ind2 == legacy_rule[0][4].replace('_', '')):
-                            tag = legacy_rule[0][:3]
-                            ind1 = legacy_rule[0][3].replace('_', '')
-                            ind2 = legacy_rule[0][4].replace('_', '')
+                        export += '<controlfield tag="%s">%s</controlfield>\n' % (key, encode_for_marcxml(v))
+                    elif len(key) == 6:
+                        if not (tag == key[:3] and ind1 == key[3].replace('_', '') and ind2 == key[4].replace('_', '')):
+                            tag = key[:3]
+                            ind1 = key[3].replace('_', '')
+                            ind2 = key[4].replace('_', '')
                             if content:
-                                output += '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>' % (tag, ind1, ind2, content)
+                                export += '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>\n' % (tag, ind1, ind2, content)
                                 content = ''
-                        try:
-                            tmp = value.get(legacy_rule[-1])
-                            if tmp:
-                                tmp = encode_for_marcxml(tmp)
-                            else:
-                                continue
-                        except AttributeError:
-                            tmp = encode_for_marcxml(value)
+                        content += '<subfield code="%s">%s</subfield>' % (key[5], encode_for_marcxml(v))
+                    else:
+                        pass
 
-                        content += '<subfield code="%s">%s</subfield>' % (legacy_rule[0][5], tmp)
             if content:
-                output += '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>' % (tag, ind1, ind2, content)
-            return output
-
-        export = '<record>'
-
-        for key in [k for k in config_rules.iterkeys() if k in self]:
-            values = self[key.replace('[n]', '[1:]')]
-            if not isinstance(values, list):
-                values = [values]
-            for value in values:
-                try:
-                    export += create_marc_representation(key, value, sum([rule['legacy'] for rule in config_rules[key]['rules']['marc']], ()))
-                except (TypeError, KeyError):
-                    break
+                export += '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>\n' % (tag, ind1, ind2, content)
 
         export += '</record>'
         return export
@@ -249,7 +235,6 @@ class JsonReader(BibFieldDict):
                 self._unpack_rule(json_id, field_name)
 
     def _get_elements_from_rec_tree(self, regex_rules):
-        """docstring for _get_elements_from_rec_tree"""
         for regex_rule in regex_rules:
             for element in self.rec_tree[re.compile(regex_rule)]:
                 yield element
@@ -277,7 +262,6 @@ class JsonReader(BibFieldDict):
             return self._apply_virtual_rule(field_name, rule_def['aliases'], rule_def['rules'], rule_def['type'])
 
     def _apply_rule(self, field_name, aliases, rule):
-        """docstring for _apply_rule"""
         if 'entire_record' in rule['source_tag'] or any(key in self.rec_tree for key in rule['source_tag']):
             if rule['parse_first']:
                 for json_id in self._try_to_eval(rule['parse_first']):
@@ -291,10 +275,27 @@ class JsonReader(BibFieldDict):
             else:
                 for elements in self._get_elements_from_rec_tree(rule['source_tag']):
                     if isinstance(elements, list):
+                        returned_value = False
                         for element in elements:
-                            self[field_name] = self._try_to_eval(rule['value'], value=element)
+                            if rule['only_if_master_value'] and not all(self._try_to_eval(rule['only_if_master_value'], value=element)):
+                                returned_value = returned_value or False
+                            else:
+                                try:
+                                    self[field_name] = self._try_to_eval(rule['value'], value=element)
+                                    returned_value = returned_value or True
+                                except Exception, e:
+                                    self['__error_messages.error[n]'] = 'Rule Error - Unable to apply rule for field %s - %s' % (field_name, str(e))
+                                    returned_value = returned_value or False
                     else:
-                        self[field_name] = self._try_to_eval(rule['value'], value=elements)
+                        if rule['only_if_master_value'] and not all(self._try_to_eval(rule['only_if_master_value'], value=elements)):
+                            return False
+                        else:
+                            try:
+                                self[field_name] = self._try_to_eval(rule['value'], value=elements)
+                            except Exception, e:
+                                self['__error_messages.error[n]'] = 'Rule Error - Unable to apply rule for field %s - %s' % (field_name, str(e))
+                                returned_value = returned_value or False
+
             for alias in aliases:
                 self['__aliases'][alias] = field_name
             return True
@@ -311,12 +312,20 @@ class JsonReader(BibFieldDict):
             return False
         #Apply rule
         if rule_type == 'derived':
-            self[field_name] = self._try_to_eval(rule['value'])
+            try:
+                self[field_name] = self._try_to_eval(rule['value'])
+            except Exception, e:
+                self['__error_messages.cerror[n]'] = 'Virtual Rule CError - Unable to evaluate %s - %s' % (field_name, str(e))
         else:
-            self[field_name] = [self._try_to_eval(rule['value']), rule['value']]
-
-        if rule['do_not_cache']:
-            self['__do_not_cache'].append(field_name)
+            self['__calculated_functions'][field_name] = rule['value']
+            if rule['do_not_cache']:
+                self['__do_not_cache'].append(field_name)
+                self[field_name] = None
+            else:
+                try:
+                    self[field_name] = self._try_to_eval(rule['value'])
+                except Exception, e:
+                    self['__error_messages.cerror[n]'] = 'Virtual Rule CError - Unable to evaluate %s - %s' % (field_name, str(e))
 
         for alias in aliases:
             self['__aliases'][alias] = field_name
@@ -328,7 +337,26 @@ class JsonReader(BibFieldDict):
         If needed this method will post process the json structure, e.g. pruning
         the json to delete None values
         """
-        pass
+        def remove_none_values(d):
+            if d is None or not isinstance(d, dict):
+                return
+            for key, value in d.items():
+                if value is None:
+                    del d[key]
+                if isinstance(value, dict):
+                    remove_none_values(value)
+                if isinstance(value, list):
+                    for element in value:
+                        if element is None:
+                            value.remove(element)
+                        else:
+                            remove_none_values(element)
+        remove_none_values(self.rec_json)
+
+
+
+for key, value in PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'bibfield_functions', 'produce_json_for_*.py')).iteritems():
+    setattr(JsonReader, key, value)
 
 ## Compulsory plugin interface
 readers = JsonReader

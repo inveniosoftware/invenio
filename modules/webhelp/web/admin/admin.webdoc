@@ -215,6 +215,23 @@ data are uploaded in Invenio, you may want to modify them via
 </td>
 </tr>
 
+
+<tr>
+<td>
+  <strong>BibAuthority Admin</strong>
+</td>
+<td>
+  Enables you to configure Authority Control in Invenio.
+</td>
+<td>
+  None
+</td>
+<td>
+  <a href="bibauthority-admin-guide">Authority Record Admin Guide</a>
+</td>
+</tr>
+
+
 </table>
 
 <h3>Data provision related modules</h3>

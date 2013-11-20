@@ -62,6 +62,11 @@ INSERT INTO collection VALUES (30, 'ISOLDE Papers', '980:"ISOLDEPAPER"', NULL, N
 INSERT INTO collection VALUES (31, 'ISOLDE Internal Notes', '980:"ISOLDENOTE"', NULL, NULL);
 INSERT INTO collection VALUES (32, 'Drafts', '980:"DRAFT"', NULL, NULL);
 INSERT INTO collection VALUES (33,'Videos','980:"VIDEO"',NULL,NULL);
+INSERT INTO collection VALUES (34, 'Authority Records', 'collection:AUTHORITY', null, null);
+INSERT INTO collection VALUES (35, 'Authority Author', 'collection:AUTHOR', null, null);
+INSERT INTO collection VALUES (36, 'Authority Institution', 'collection:INSTITUTION', null, null);
+INSERT INTO collection VALUES (37, 'Authority Journal', 'collection:JOURNAL', null, null);
+INSERT INTO collection VALUES (38, 'Authority Subject', 'collection:SUBJECT', null, null);
 
 INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
@@ -102,6 +107,7 @@ INSERT INTO collectionname VALUES (2,'rw','ln','Preprints');
 INSERT INTO collectionname VALUES (2,'ka','ln','პრეპრინტები');
 INSERT INTO collectionname VALUES (2,'lt','ln','Rankraščiai');
 INSERT INTO collectionname VALUES (2,'ar','ln','مسودات');
+INSERT INTO collectionname VALUES (2,'fa','ln','پیش چاپ ها');
 
 INSERT INTO collectionname VALUES (3,'en','ln','Books');
 INSERT INTO collectionname VALUES (3,'fr','ln','Livres');
@@ -131,6 +137,7 @@ INSERT INTO collectionname VALUES (3,'rw','ln','Ibitabo');
 INSERT INTO collectionname VALUES (3,'ka','ln','წიგნები');
 INSERT INTO collectionname VALUES (3,'lt','ln','Knygos');
 INSERT INTO collectionname VALUES (3,'ar','ln','كتب');
+INSERT INTO collectionname VALUES (3,'fa','ln','کتاب ها');
 
 INSERT INTO collectionname VALUES (4,'en','ln','Theses');
 INSERT INTO collectionname VALUES (4,'fr','ln','Thèses');
@@ -160,6 +167,7 @@ INSERT INTO collectionname VALUES (4,'rw','ln','Igitabo ky\'ubushakashatsi'); --
 INSERT INTO collectionname VALUES (4,'ka','ln','თეზისები');
 INSERT INTO collectionname VALUES (4,'lt','ln','Disertacijos');
 INSERT INTO collectionname VALUES (4,'ar','ln','أطروحات');
+INSERT INTO collectionname VALUES (4,'fa','ln','پایان نامه ها');
 
 INSERT INTO collectionname VALUES (5,'en','ln','Reports');
 INSERT INTO collectionname VALUES (5,'fr','ln','Rapports');
@@ -189,6 +197,7 @@ INSERT INTO collectionname VALUES (5,'rw','ln','Raporo');
 INSERT INTO collectionname VALUES (5,'ka','ln','რეპორტები');
 INSERT INTO collectionname VALUES (5,'lt','ln','Pranešimai');
 INSERT INTO collectionname VALUES (5,'ar','ln','تقارير');
+INSERT INTO collectionname VALUES (5,'fa','ln','گزارش ها');
 
 INSERT INTO collectionname VALUES (6,'en','ln','Articles');
 INSERT INTO collectionname VALUES (6,'fr','ln','Articles');
@@ -218,6 +227,7 @@ INSERT INTO collectionname VALUES (6,'rw','ln','Ikinyamakuru ky\'ubushakashatsi'
 INSERT INTO collectionname VALUES (6,'ka','ln','სტატიები');
 INSERT INTO collectionname VALUES (6,'lt','ln','Straipsniai');
 INSERT INTO collectionname VALUES (6,'ar','ln','مقالات');
+INSERT INTO collectionname VALUES (6,'fa','ln','مقاله ها');
 
 INSERT INTO collectionname VALUES (8,'en','ln','Pictures');
 INSERT INTO collectionname VALUES (8,'fr','ln','Photos');
@@ -247,6 +257,7 @@ INSERT INTO collectionname VALUES (8,'rw','ln','Ifoto');
 INSERT INTO collectionname VALUES (8,'ka','ln','სურათები');
 INSERT INTO collectionname VALUES (8,'lt','ln','Paveikslėliai');
 INSERT INTO collectionname VALUES (8,'ar','ln','صور');
+INSERT INTO collectionname VALUES (8,'fa','ln','تصویرها');
 
 INSERT INTO collectionname VALUES (9,'en','ln','CERN Divisions');
 INSERT INTO collectionname VALUES (9,'fr','ln','Divisions du CERN');
@@ -276,6 +287,7 @@ INSERT INTO collectionname VALUES (9,'rw','ln','Ishami ya CERN');
 INSERT INTO collectionname VALUES (9,'ka','ln','ცერნის განყოფილებები');
 INSERT INTO collectionname VALUES (9,'lt','ln','CERN Padaliniai');
 INSERT INTO collectionname VALUES (9,'ar','ln','أقسام المنظمة الأوربية للبحوث النووية');
+INSERT INTO collectionname VALUES (9,'fa','ln','بخش های سازمان پژوهش های هسته ای اروپا');
 
 INSERT INTO collectionname VALUES (10,'en','ln','CERN Experiments');
 INSERT INTO collectionname VALUES (10,'fr','ln','Expériences du CERN');
@@ -305,6 +317,7 @@ INSERT INTO collectionname VALUES (10,'rw','ln','Ubushakashatsi bwa CERN');
 INSERT INTO collectionname VALUES (10,'ka','ln','ცერნის ექსპერემენტები');
 INSERT INTO collectionname VALUES (10,'lt','ln','CERN Eksperimentai');
 INSERT INTO collectionname VALUES (10,'ar','ln','تجارب المنظمة الأوربية للبحوث النووية');
+INSERT INTO collectionname VALUES (10,'fa','ln','آزمایش های سازمان پژوهش های هسته ای اروپا');
 
 INSERT INTO collectionname VALUES (11,'en','ln','Theoretical Physics (TH)');
 INSERT INTO collectionname VALUES (11,'fr','ln','Physique Théorique (TH)');
@@ -334,6 +347,7 @@ INSERT INTO collectionname VALUES (11,'rw','ln','Theoretical Physics (TH)');
 INSERT INTO collectionname VALUES (11,'ka','ln','თეორიული ფიზიკა (თფ)');
 INSERT INTO collectionname VALUES (11,'lt','ln','Teorinė fizika (TH)');
 INSERT INTO collectionname VALUES (11,'ar','ln','الفيزياء النظرية');
+INSERT INTO collectionname VALUES (11,'fa','ln','فیزیک نظری');
 
 INSERT INTO collectionname VALUES (12,'en','ln','Experimental Physics (EP)');
 INSERT INTO collectionname VALUES (12,'fr','ln','Physique Expérimentale (EP)');
@@ -363,6 +377,7 @@ INSERT INTO collectionname VALUES (12,'rw','ln','Experimental Physics (EP)');
 INSERT INTO collectionname VALUES (12,'ka','ln','ექსპერიმენტული ფიზიკა (ეფ)');
 INSERT INTO collectionname VALUES (12,'lt','ln','Eksperimentinė fizika (EP)');
 INSERT INTO collectionname VALUES (12,'ar','ln','الفيزياء التجريبية');
+INSERT INTO collectionname VALUES (12,'fa','ln','فیزیک تجربی');
 
 INSERT INTO collectionname VALUES (13,'en','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'fr','ln','ISOLDE');
@@ -392,6 +407,7 @@ INSERT INTO collectionname VALUES (13,'rw','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'ka','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'lt','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'ar','ln','ISOLDE');
+INSERT INTO collectionname VALUES (13,'fa','ln','ISOLDE');
 
 INSERT INTO collectionname VALUES (14,'en','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'fr','ln','ALEPH');
@@ -421,6 +437,7 @@ INSERT INTO collectionname VALUES (14,'rw','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'ka','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'lt','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'ar','ln','ALEPH');
+INSERT INTO collectionname VALUES (14,'fa','ln','ALEPH');
 
 INSERT INTO collectionname VALUES (15,'en','ln','Articles & Preprints');
 INSERT INTO collectionname VALUES (15,'fr','ln','Articles et Prétirages');
@@ -450,6 +467,7 @@ INSERT INTO collectionname VALUES (15,'rw','ln','Ibinyamakuru');
 INSERT INTO collectionname VALUES (15,'ka','ln','სტატიები და პრეპრინტები');
 INSERT INTO collectionname VALUES (15,'lt','ln','Straipsniai ir Rankraščiai');
 INSERT INTO collectionname VALUES (15,'ar','ln','مقالات & مسودات');
+INSERT INTO collectionname VALUES (15,'fa','ln','مقاله ها و پیش چاپ ها');
 
 INSERT INTO collectionname VALUES (16,'en','ln','Books & Reports');
 INSERT INTO collectionname VALUES (16,'fr','ln','Livres et Rapports');
@@ -479,6 +497,7 @@ INSERT INTO collectionname VALUES (16,'rw','ln','Ibitabo & Raporo');
 INSERT INTO collectionname VALUES (16,'ka','ln','წიგნები და მოხსენებები');
 INSERT INTO collectionname VALUES (16,'lt','ln','Knygos ir Pranešimai');
 INSERT INTO collectionname VALUES (16,'ar','ln','كتب & تقارير');
+INSERT INTO collectionname VALUES (16,'fa','ln','کتاب ها و گزارش ها');
 
 INSERT INTO collectionname VALUES (17,'en','ln','Multimedia & Arts');
 INSERT INTO collectionname VALUES (17,'fr','ln','Multimédia et Arts');
@@ -508,6 +527,7 @@ INSERT INTO collectionname VALUES (17,'rw','ln','Multimedia & Arts');
 INSERT INTO collectionname VALUES (17,'ka','ln','მულტიმედია და ხელოვნება');
 INSERT INTO collectionname VALUES (17,'lt','ln','Multimedija ir Menas');
 INSERT INTO collectionname VALUES (17,'ar','ln','وسائط متعددة & فنون');
+INSERT INTO collectionname VALUES (17,'fa','ln','چندرسانه ای و هنرها');
 
 INSERT INTO collectionname VALUES (18,'en','ln','Poetry');
 INSERT INTO collectionname VALUES (18,'fr','ln','Poésie');
@@ -537,6 +557,7 @@ INSERT INTO collectionname VALUES (18,'rw','ln','Umuvugo');
 INSERT INTO collectionname VALUES (18,'ka','ln','პოეზია');
 INSERT INTO collectionname VALUES (18,'lt','ln','Poezija');
 INSERT INTO collectionname VALUES (18,'ar','ln','شعر');
+INSERT INTO collectionname VALUES (18,'fa','ln','شعر');
 
 INSERT INTO collectionname VALUES (19,'en','ln','Atlantis Times News');
 INSERT INTO collectionname VALUES (19,'fr','ln','Atlantis Times Actualités');
@@ -577,7 +598,25 @@ INSERT INTO collectionname VALUES (33,'en','ln','Videos');
 INSERT INTO collectionname VALUES (33,'fr','ln','Vidéos');
 INSERT INTO collectionname VALUES (33,'it','ln','Filmati');
 
+INSERT INTO collectionname VALUES (34,'en','ln','Authority Records');
+INSERT INTO collectionname VALUES (34,'fr','ln','Notices d''autorité');
+INSERT INTO collectionname VALUES (34,'pl','ln','Rekordy kontrolne');
 
+INSERT INTO collectionname VALUES (35,'en','ln','Authors');
+INSERT INTO collectionname VALUES (35,'fr','ln','Auteurs');
+INSERT INTO collectionname VALUES (35,'pl','ln','Autorzy');
+
+INSERT INTO collectionname VALUES (36,'en','ln','Institutions');
+INSERT INTO collectionname VALUES (36,'fr','ln','Institutions');
+INSERT INTO collectionname VALUES (36,'pl','ln','Instytucje');
+
+INSERT INTO collectionname VALUES (37,'en','ln','Journals');
+INSERT INTO collectionname VALUES (37,'fr','ln','Journals');
+INSERT INTO collectionname VALUES (37,'pl','ln','Czasopisma');
+
+INSERT INTO collectionname VALUES (38,'en','ln','Subjects');
+INSERT INTO collectionname VALUES (38,'fr','ln','Sujets');
+INSERT INTO collectionname VALUES (38,'pl','ln','Tematy');
 
 INSERT INTO collection_collection VALUES (1,15,'r',60);
 INSERT INTO collection_collection VALUES (1,16,'r',40);
@@ -609,8 +648,11 @@ INSERT INTO collection_collection VALUES (13,30,'r',20);
 INSERT INTO collection_collection VALUES (14,27,'r',20);
 INSERT INTO collection_collection VALUES (14,28,'r',10);
 INSERT INTO collection_collection VALUES (14,29,'r',10);
-
-
+INSERT INTO collection_collection VALUES (1,34,'v',5);
+INSERT INTO collection_collection VALUES (34,35,'r',4);
+INSERT INTO collection_collection VALUES (34,36,'r',3);
+INSERT INTO collection_collection VALUES (34,37,'r',2);
+INSERT INTO collection_collection VALUES (34,38,'r',1);
 
 INSERT INTO collection_example VALUES (1,1,1);
 INSERT INTO collection_example VALUES (1,5,2);
@@ -783,6 +825,14 @@ INSERT INTO collection_field_fieldvalue VALUES (3,2,NULL,'soo',40,0);
 INSERT INTO collection_field_fieldvalue VALUES (3,3,NULL,'soo',30,0);
 INSERT INTO collection_field_fieldvalue VALUES (3,15,NULL,'soo',20,0);
 INSERT INTO collection_field_fieldvalue VALUES (3,12,NULL,'soo',10,0);
+INSERT INTO collection_field_fieldvalue VALUES (34,33,NULL,'sew',4,0);
+INSERT INTO collection_field_fieldvalue VALUES (34,34,NULL,'sew',3,0);
+INSERT INTO collection_field_fieldvalue VALUES (34,35,NULL,'sew',2,0);
+INSERT INTO collection_field_fieldvalue VALUES (34,36,NULL,'sew',1,0);
+INSERT INTO collection_field_fieldvalue VALUES (35,33,NULL,'sew',1,0);
+INSERT INTO collection_field_fieldvalue VALUES (36,34,NULL,'sew',1,0);
+INSERT INTO collection_field_fieldvalue VALUES (37,35,NULL,'sew',1,0);
+INSERT INTO collection_field_fieldvalue VALUES (38,36,NULL,'sew',1,0);
 
 INSERT INTO collection_format VALUES (6,1,100);
 INSERT INTO collection_format VALUES (6,2,90);
@@ -924,6 +974,8 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (30,93,'en','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (31,94,'en','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (32,95,'en','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,96,'fa','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,97,'fa','rt',90);
 
 INSERT INTO collectiondetailedrecordpagetabs(id_collection,tabs) VALUES(33,'');
 
@@ -1074,6 +1126,8 @@ INSERT INTO portalbox VALUES (92,'ABOUT ALEPH Theses','The ALEPH Theses collecti
 INSERT INTO portalbox VALUES (93,'ABOUT ISOLDE Papers','The ISOLDE Papers collection is a temporary collection that is being used for testing.');
 INSERT INTO portalbox VALUES (94,'ABOUT ISOLDE Internal Notes','The ISOLDE Internal Notes collection is a temporary restricted and hidden collection that is being used for testing.');
 INSERT INTO portalbox VALUES (95,'ABOUT Drafts','The Drafts collection is a temporary restricted collection that is being used for testing.');
+INSERT INTO portalbox VALUES (96,'درباره این سایت', 'به سایت نمایشی سی دی اس اینونیو،نرم افزار رایگان سرویس دهنده مدارک ساخته شده در سرن، خوش آمدید.‑لطفا برای کشف تمام ویژگی های این سایت نمایشی به صورت کامل، راحت باشید.');
+INSERT INTO portalbox VALUES (97,'نیز نگاه کنید','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 
 INSERT INTO sbmCOLLECTION VALUES (36,'Document Types');
 
@@ -2406,8 +2460,8 @@ INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-SA-3.0','http:/
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-ND-3.0','http://creativecommons.org/licenses/by-nc-nd/3.0/', '7');
 
 -- crcLIBRARY demo data:
-INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', '');
-INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis HEP Library', 'CH-1211 Geneva 21', 'atlantis.hep@cds.cern.ch', '1234567', '');
+INSERT INTO crcLIBRARY (name, address, email, phone, type, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', 'main', '');
+INSERT INTO crcLIBRARY (name, address, email, phone, type, notes) VALUES ('Atlantis HEP Library', 'CH-1211 Geneva 21', 'atlantis.hep@cds.cern.ch', '1234567', 'external', '');
 
 -- crcITEM demo data:
 INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
@@ -2504,7 +2558,7 @@ INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
                 VALUES ('Balthasar Montague', 'balthasar.montague@cds.cern.ch', '78644', '20-M-349', '2008-07-21 00:00:00', '');
 
 -- switch on stemming for some indexes:
-UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext');
+UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext', 'miscellaneous');
 
 -- exporting demo:
 INSERT INTO expJOB (jobname) VALUES ('sitemap');

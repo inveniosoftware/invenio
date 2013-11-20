@@ -63,6 +63,7 @@ CFG_BIBENCODE_FFMPEG_CONFIGURATION_REQUIRED = (
                 '--enable-version3',
                 '--enable-nonfree',
                 '--enable-libfaac',
+                ## '--enable-libfdk-aac',
                 '--enable-libtheora',
                 '--enable-libvorbis',
                 '--enable-libvpx',

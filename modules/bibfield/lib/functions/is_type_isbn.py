@@ -54,4 +54,7 @@ def is_type_isbn13(val):
 
 def is_type_isbn(val):
     """ Test if argument is an ISBN-10 or ISBN-13 number """
-    return is_type_isbn10(val) or is_type_isbn13(val)
+    try:
+        return is_type_isbn10(val) or is_type_isbn13(val)
+    except:
+        return False

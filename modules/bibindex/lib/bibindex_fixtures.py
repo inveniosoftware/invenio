@@ -30,6 +30,11 @@ class IdxINDEXData(DataSet):
         id = 1
         indexer = u'native'
         name = u'global'
+        synonym_kbrs = u'INDEX-SYNONYM-TITLE,exact'
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_2:
         last_updated = None
@@ -38,6 +43,11 @@ class IdxINDEXData(DataSet):
         id = 2
         indexer = u'native'
         name = u'collection'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_3:
         last_updated = None
@@ -46,6 +56,11 @@ class IdxINDEXData(DataSet):
         id = 3
         indexer = u'native'
         name = u'abstract'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_4:
         last_updated = None
@@ -54,6 +69,11 @@ class IdxINDEXData(DataSet):
         id = 4
         indexer = u'native'
         name = u'author'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexAuthorTokenizer'
 
     class IdxINDEX_5:
         last_updated = None
@@ -62,6 +82,11 @@ class IdxINDEXData(DataSet):
         id = 5
         indexer = u'native'
         name = u'keyword'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_6:
         last_updated = None
@@ -70,6 +95,11 @@ class IdxINDEXData(DataSet):
         id = 6
         indexer = u'native'
         name = u'reference'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_7:
         last_updated = None
@@ -78,6 +108,11 @@ class IdxINDEXData(DataSet):
         id = 7
         indexer = u'native'
         name = u'reportnumber'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_8:
         last_updated = None
@@ -86,6 +121,11 @@ class IdxINDEXData(DataSet):
         id = 8
         indexer = u'native'
         name = u'title'
+        synonym_kbrs = u'INDEX-SYNONYM-TITLE,exact'
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_9:
         last_updated = None
@@ -94,6 +134,11 @@ class IdxINDEXData(DataSet):
         id = 9
         indexer = u'native'
         name = u'fulltext'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexFulltextTokenizer'
 
     class IdxINDEX_10:
         last_updated = None
@@ -102,6 +147,11 @@ class IdxINDEXData(DataSet):
         id = 10
         indexer = u'native'
         name = u'year'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexYearTokenizer'
 
     class IdxINDEX_11:
         last_updated = None
@@ -110,6 +160,11 @@ class IdxINDEXData(DataSet):
         id = 11
         indexer = u'native'
         name = u'journal'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexJournalTokenizer'
 
     class IdxINDEX_12:
         last_updated = None
@@ -118,6 +173,11 @@ class IdxINDEXData(DataSet):
         id = 12
         indexer = u'native'
         name = u'collaboration'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_13:
         last_updated = None
@@ -126,6 +186,11 @@ class IdxINDEXData(DataSet):
         id = 13
         indexer = u'native'
         name = u'affiliation'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_14:
         last_updated = None
@@ -134,6 +199,11 @@ class IdxINDEXData(DataSet):
         id = 14
         indexer = u'native'
         name = u'exactauthor'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_15:
         last_updated = None
@@ -142,6 +212,11 @@ class IdxINDEXData(DataSet):
         id = 15
         indexer = u'native'
         name = u'caption'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
     class IdxINDEX_16:
         last_updated = None
@@ -150,6 +225,11 @@ class IdxINDEXData(DataSet):
         id = 16
         indexer = u'native'
         name = u'firstauthor'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexAuthorTokenizer'
 
     class IdxINDEX_17:
         last_updated = None
@@ -158,6 +238,11 @@ class IdxINDEXData(DataSet):
         id = 17
         indexer = u'native'
         name = u'exactfirstauthor'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexExactAuthorTokenizer'
 
     class IdxINDEX_18:
         last_updated = None
@@ -166,6 +251,11 @@ class IdxINDEXData(DataSet):
         id = 18
         indexer = u'native'
         name = u'authorcount'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexAuthorCountTokenizer'
 
     class IdxINDEX_19:
         last_updated = None
@@ -174,6 +264,102 @@ class IdxINDEXData(DataSet):
         id = 19
         indexer = u'native'
         name = u'exacttitle'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
+
+    class IdxINDEX_20:
+        last_updated = None
+        description = u'This index contains words/phrases from author authority records.'
+        stemming_language = u''
+        id = 20
+        indexer = u'native'
+        name = u'authorityauthor'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexAuthorTokenizer'
+
+    class IdxINDEX_21:
+        last_updated = None
+        description = u'This index contains words/phrases from institution authority records.'
+        stemming_language = u''
+        id = 21
+        indexer = u'native'
+        name = u'authorityinstitution'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
+
+    class IdxINDEX_22:
+        last_updated = None
+        description = u'This index contains words/phrases from journal authority records.'
+        stemming_language = u''
+        id = 22
+        indexer = u'native'
+        name = u'authorityjournal'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
+
+    class IdxINDEX_23:
+        last_updated = None
+        description = u'This index contains words/phrases from subject authority records.'
+        stemming_language = u''
+        id = 23
+        indexer = u'native'
+        name = u'authoritysubject'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
+
+    class IdxINDEX_24:
+        last_updated = None
+        description = u'This index contains number of copies of items in the library.'
+        stemming_language = u''
+        id = 24
+        indexer = u'native'
+        name = u'itemcount'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexItemCountTokenizer'
+
+    class IdxINDEX_25:
+        last_updated = None
+        description = u'This index contains extensions of files connected to records.'
+        stemming_language = u''
+        id = 25
+        indexer = u'native'
+        name = u'filetype'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexFiletypeTokenizer'
+
+    class IdxINDEX_26:
+        last_updated = None
+        description = u'This index contains words/phrases from miscellaneous fields.'
+        stemming_language = u''
+        id = 26
+        indexer = u'native'
+        name = u'miscellaneous'
+        synonym_kbrs = u''
+        remove_stopwords = u'No'
+        remove_html_markup = u'No'
+        remove_latex_markup = u'No'
+        tokenizer = u'BibIndexDefaultTokenizer'
 
 
 class IdxINDEXFieldData(DataSet):
@@ -291,3 +477,92 @@ class IdxINDEXFieldData(DataSet):
         regexp_punctuation = u'[.,:;?!"]'
         id_idxINDEX = IdxINDEXData.IdxINDEX_9.ref('id')
         id_field = FieldData.Field_9.ref('id')
+
+    class IdxINDEXField_20_33:
+        regexp_alphanumeric_separators = u''
+        regexp_punctuation = u'[.,:;?!"]'
+        id_idxINDEX = IdxINDEXData.IdxINDEX_20.ref('id')
+        id_field = FieldData.Field_33.ref('id')
+
+    class IdxINDEXField_21_34:
+        regexp_alphanumeric_separators = u''
+        regexp_punctuation = u'[.,:;?!"]'
+        id_idxINDEX = IdxINDEXData.IdxINDEX_21.ref('id')
+        id_field = FieldData.Field_34.ref('id')
+
+    class IdxINDEXField_22_35:
+        regexp_alphanumeric_separators = u''
+        regexp_punctuation = u'[.,:;?!"]'
+        id_idxINDEX = IdxINDEXData.IdxINDEX_22.ref('id')
+        id_field = FieldData.Field_35.ref('id')
+
+    class IdxINDEXField_23_36:
+        regexp_alphanumeric_separators = u''
+        regexp_punctuation = u'[.,:;?!"]'
+        id_idxINDEX = IdxINDEXData.IdxINDEX_23.ref('id')
+        id_field = FieldData.Field_36.ref('id')
+
+    class IdxINDEXField_24_37:
+        regexp_alphanumeric_separators = u''
+        regexp_punctuation = u'[.,:;?!"]'
+        id_idxINDEX = IdxINDEXData.IdxINDEX_24.ref('id')
+        id_field = FieldData.Field_37.ref('id')
+
+    class IdxINDEXField_25_38:
+        regexp_alphanumeric_separators = u''
+        regexp_punctuation = u'[.,:;?!"]'
+        id_idxINDEX = IdxINDEXData.IdxINDEX_25.ref('id')
+        id_field = FieldData.Field_38.ref('id')
+
+    class IdxINDEXField_26_39:
+        regexp_alphanumeric_separators = u''
+        regexp_punctuation = u'[.,:;?!"]'
+        id_idxINDEX = IdxINDEXData.IdxINDEX_26.ref('id')
+        id_field = FieldData.Field_39.ref('id')
+
+
+class IdxINDEXIdxINDEXData(DataSet):
+
+    class IdxINDEXIdxINDEX_1_2:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_2.ref('id')
+
+    class IdxINDEXIdxINDEX_1_3:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_3.ref('id')
+
+    class IdxINDEXIdxINDEX_1_5:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_5.ref('id')
+
+    class IdxINDEXIdxINDEX_1_7:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_7.ref('id')
+
+    class IdxINDEXIdxINDEX_1_8:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_8.ref('id')
+
+    class IdxINDEXIdxINDEX_1_10:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_10.ref('id')
+
+    class IdxINDEXIdxINDEX_1_11:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_11.ref('id')
+
+    class IdxINDEXIdxINDEX_1_12:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_12.ref('id')
+
+    class IdxINDEXIdxINDEX_1_13:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_13.ref('id')
+
+    class IdxINDEXIdxINDEX_1_19:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_19.ref('id')
+
+    class IdxINDEXIdxINDEX_1_26:
+        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
+        id_normal = IdxINDEXData.IdxINDEX_26.ref('id')
