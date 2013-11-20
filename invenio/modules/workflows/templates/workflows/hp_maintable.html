@@ -12,23 +12,25 @@
 {% js url_for('static', filename='js/dataTables.bootstrap.js'), '30-datatables' %}
 {% js url_for('workflows.static', filename='js/workflows/hp_maintable.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/widgets/approval.js'), '50-workflows' %}
+{% js url_for('static', filename='js/mustache.js'), '30-datatables' %}
 
 {% block javascript %}
     {{ super() }}
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var url_load_table = "{{ url_for('holdingpen.load_table')|safe }}";
-            var url_batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
-            var url_resolve_widget = "{{ url_for('holdingpen.resolve_widget') }}";
-            var url_delete_single = "{{ url_for('holdingpen.delete_from_db') }}";
-            var url_refresh = "{{ url_for('holdingpen.refresh') }}";
-            var url_widget = "{{ url_for('holdingpen.show_widget') }}";
-            var url_details = "{{ url_for('holdingpen.details')|safe }}";
-            var url_batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
+            url = new Object();
+            url.load_table = "{{ url_for('holdingpen.load_table')|safe }}";
+            url.batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
+            url.resolve_widget = "{{ url_for('holdingpen.resolve_widget') }}";
+            url.delete_single = "{{ url_for('holdingpen.delete_from_db') }}";
+            url.refresh = "{{ url_for('holdingpen.refresh') }}";
+            url.widget = "{{ url_for('holdingpen.show_widget') }}";
+            url.details = "{{ url_for('holdingpen.details')|safe }}";
+            url.batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
 
-            init_maintable(url_load_table, url_batch_widget, url_resolve_widget,
-                           url_delete_single, url_refresh, url_widget, url_details);
+            init_urls(url);
+            init_urls_approval(url);
         });
     </script>
 {% endblock javascript %}
@@ -36,63 +38,51 @@
 {% block hpbody %}
     <div id="alert-message"></div>
 
-    <h1>Records in Holding Pen</h1>
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
 
-    <div class="row">
-        <div class="col-md-6 pull-left">
-            <ul class="nav nav-pills">
-                <li class="active">
-                    <a href="#">Home</a>
-                </li>
-                <li><a href="#">Assigned to me</a></li>
-                <li class="dropdown">
-                    <a class="dropdown-toggle"
-                    data-toggle="dropdown"
-                    href="#">
-                        Pending Tasks
-                        <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                    {% set i = 0 %}
-                    {% for task in widget_list.iterkeys() %}
-                        <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{task}}: {{widget_list[task][0]}}</a></li>
-                        {% set i = i+1 %}
-                    {% endfor %}
-                    </ul>
-                </li>
-            </ul>
-        </div>
-        <div id="multi-approval" class="col-md-3 pull-left">
-        </div>
-        <div class="span1 pull-right">
-            <button id="refresh_button" class="btn btn-primary">Refresh!</button>
-        </div>
-        <div class="span2 pull-right">
-            <a id="batch_btn" class="btn btn-info pull-right" href="#"><i class="icon-wrenchwhite icon-wrench"></i>Group Widget</a>
-        </div>        
-    </div>
-    <div class="tag-area row">
-    </div> 
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+            <li class="active">
+                <a href="#">Home</a>
+            </li>
+           <!--  <li><a href="#">Assigned to me</a></li> -->
+            <p class="navbar-text" style="margin-right:0px; color:light gray;">Show Records by:</p>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Actions<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                {% set i = 0 %}
+                {% for task in widget_list.iterkeys() %}
+                    <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{task}}: {{widget_list[task][0]}}</a></li>
+                    {% set i = i+1 %}
+                {% endfor %}
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Status<b class="caret"></b></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a id="version-halted" class="version-selection" name="Halted">Halted</a></li>
+                    <li><a id="version-final" class="version-selection" name="Final">Final</a></li>
+                    <li><a id="version-running" class="version-selection" name="Running">Running</a></li>
+                </ul>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+          <li><button id="refresh_button" type="button" class="btn btn-default navbar-btn">Refresh!</button></li>    
+        </ul>
+      </div>
+    </nav>
 
-    <div id="confirmationModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">Please Confirm</h3>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete the selected records?</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-        <a class="btn btn-danger" href="#" data-dismiss="modal" onclick="disapproveRecords()">Delete Records</a>
-      </div>
+    <div id="tag-area" class="row">
     </div>
-    
+
     <div class="container">
-        <div class="row-fluid">
+        <div class="row">
             <table id="example" cellpadding="0" cellspacing="0" border="0" class="table table-bordered">
                 <thead>
                     <tr>
+                        <th><input id="select-all" type="checkbox"></th>
                         <th>Id</th>
                         <th>Title</th>
                         <th>Source</th>
@@ -107,6 +97,7 @@
                 </thead>
                 <tbody>
                     <tr>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>

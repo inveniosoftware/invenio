@@ -17,8 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from ..hp_field_widgets import (bootstrap_accept,
-                                bootstrap_reject)
+from ..hp_field_widgets import (bootstrap_accept, bootstrap_accept_mini,
+                                bootstrap_reject, bootstrap_reject_mini)
 
 from wtforms import SubmitField, Form
 
@@ -28,7 +28,10 @@ __all__ = ['approval_widget']
 class approval_widget(Form):
     reject = SubmitField(label='Reject', widget=bootstrap_reject)
     accept = SubmitField(label='Accept', widget=bootstrap_accept)
-    widget_title = "Approve Record"
+
+    class mini_widget(Form):
+        reject = SubmitField(label='Reject', widget=bootstrap_reject_mini)
+        accept = SubmitField(label='Accept', widget=bootstrap_accept_mini)
 
     def render(self, bwobject_list, bwparent_list, info_list,
                logtext_list, w_metadata_list,

@@ -23,13 +23,14 @@
 {%- endblock javascript %}
 
 {% block hpbody %}
-    <div class"row-fluid">
-        <div class="col-md-3 pull-left"><a href="{{url_for('holdingpen.maintable')}}"><i class="icon-hand-left"></i> Back to Main Table</a></div>
-        <div class="span4"><h1>Approval Widget</h1></div>
+    <div class="row">
+        <div class="col-md-4 pull-left"><a href="{{url_for('holdingpen.maintable')}}"><span class="glyphicon glyphicon-hand-left"></span> Back to Main Table</a></div>
+        <div class="col-md-4"><h1>Approval Widget</h1></div>
     </div>
 
+    
     <div class="container">
-        <div id="goodbye-msg" class="span12 text-center">
+        <div id="goodbye-msg" class="col-md-12 text-center">
         </div>
         {% for i in range(obj_number) %}
         {% set bwobject = bwobject_list[i] %}
@@ -45,18 +46,21 @@
                         <button class="btn btn-xs btn-primary active" name="hd" onclick="setDataPreview('hd', {{bwobject.id}})">HTML</button>
                         <button class="btn btn-xs btn-primary" name="marcxml" onclick="setDataPreview('xm', {{bwobject.id}})">MARCXML</button>
                         <button class="btn btn-xs btn-primary" name="xm" onclick="setDataPreview('tm', {{bwobject.id}})">MARC</button>
+                        <!-- <button class="preview btn btn-xs btn-primary active" name="hd">HTML</button>
+                        <button class="preview btn btn-xs btn-primary" name="xm">MARCXML</button>
+                        <button class="preview btn btn-xs btn-primary" name="tm">MARC</button> -->
                     </div>
-                    <div class="btn-group pull" name="data_version" data-toggle="buttons">
-                        <button type="radio" class="btn btn-xs active" name="initial" onclick="setbwoid({{bwparent.id}})">Initial</button>
+                    <div class="btn-group pull" name="data_version" data-toggle="buttons-radio">
+                        <button class="btn btn-xs active" name="initial" onclick="setbwoid({{bwparent.id}})">Initial</button>
                         {% if bwobject.version == 1 %}
-                            <button type="radio" class="btn btn-xs" name="error" onclick="setbwoid({{bwobject.id}})">Error</button>
+                            <button class="btn btn-xs" name="error" onclick="setbwoid({{bwobject.id}})">Error</button>
                         {% else %}
-                            <button type="radio" class="btn btn-xs disabled" name="error">Error</button>
+                            <button class="btn btn-xs disabled" name="error">Error</button>
                         {% endif %}
                         {% if bwobject.version == 2 %}
-                            <button type="radio" class="btn btn-xs" name="final" onclick="setbwoid({{bwobject.id}})">Final</button>
+                            <button class="btn btn-xs" name="final" onclick="setbwoid({{bwobject.id}})">Final</button>
                         {% else %}
-                            <button type="radio" class="btn btn-xs disabled" name="final">Final</button>
+                            <button class="btn btn-mini disabled" name="final">Final</button>
                         {% endif %}
                     </div>
                     <div id="object_preview_container{{bwobject.id}}" class="object_preview_container">

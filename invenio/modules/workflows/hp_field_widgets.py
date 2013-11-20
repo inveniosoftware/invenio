@@ -23,7 +23,7 @@ from wtforms.widgets import html_params, HTMLString
 def bootstrap_submit(field):
     html = u'<input %s >' \
            % html_params(id="submitButton",
-                         class_="btn btn-primary btn-large",
+                         class_="btn btn-primary btn-lg",
                          name="submitButton",
                          type="submit",
                          value=field.label.text,)
@@ -42,6 +42,18 @@ def bootstrap_accept(field):
                          value=field.label.text,)
     return HTMLString(u''.join(html))
 
+def bootstrap_accept_mini(field):
+    """
+    Mini Accept button for hp
+    """
+    html = u'<input %s >' \
+           % html_params(id="submitButtonMini",
+                         class_="btn btn-success btn-xs",
+                         name="submitButton",
+                         type="submit",
+                         value=field.label.text,
+                         onclick="mini_approval('Accept', event);",)
+    return HTMLString(u''.join(html))
 
 def bootstrap_reject(field):
     """
@@ -53,4 +65,17 @@ def bootstrap_reject(field):
                          name="submitButton",
                          type="submit",
                          value=field.label.text,)
+    return HTMLString(u''.join(html))
+
+def bootstrap_reject_mini(field):
+    """
+    Mini Reject button for hp
+    """
+    html = u'<input %s >' \
+           % html_params(id="submitButtonMini",
+                         class_="btn btn-danger btn-xs",
+                         name="submitButton",
+                         type="submit",
+                         value=field.label.text,
+                         onclick="mini_approval('Reject', event);",)
     return HTMLString(u''.join(html))

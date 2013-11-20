@@ -24,15 +24,16 @@ __all__ = ['bibmatch_widget']
 
 class bibmatch_widget(Form):
     accept = SubmitField(label='Accept', widget=bootstrap_accept)
-    widget_title = "Bibmatch Widget"
 
-    def render(self, bwobject, *args, **kwargs):
+    def render(self, bwobject_list, *args, **kwargs):
         from ..models import BibWorkflowObject
         from ..views.holdingpen import _entry_data_preview
 
         # setting up bibmatch widget
+        bwobject = bwobject_list[0]
+
         try:
-            matches = bwobject.extra_data['tasks_results']['match_record']
+            matches = bwobject.get_extra_data()['tasks_results']['match_record']
         except:
             pass
 
