@@ -1043,7 +1043,7 @@ function transformRecord(record){
 
     position = 0;
 
-    indices = indicesList.sort();
+    indices = indicesList;
     for (i in indices){
       for (fieldInd in result[fieldId][indices[i]]){
         result[fieldId][indices[i]][fieldInd][1] = position;
@@ -1108,10 +1108,15 @@ function findSameFields(tag, indicators, fields1, fields2) {
       else {
           for (var fieldIndex2 in fields2) {
               // check if field to compare with is already inside sameFields dictionary
+              fieldIsPaired = false;
               for (var key in sameFields) {
-                if (sameFields[key] == fieldIndex2)
-                  continue;
+                if (sameFields[key] == fieldIndex2){
+                  fieldIsPaired = true;
+                  break;
+                }
               }
+              if (fieldIsPaired)
+                continue;
               var isSame = true;
               // if fields have different amount of subfields are not same
               if ( fields1[fieldIndex1][0].length != fields2[fieldIndex2][0].length ) {
@@ -1166,7 +1171,8 @@ function compareFields(tag, indicators, fieldIndex, field1, field2){
     else
     {
       // the subfield exists in both the records
-      if (field1[sfIndex][0] != field2[sfIndex][0]){
+      if (field1[sfIndex][0] != field2[sfIndex][0] || ((field1[sfIndex][0] == field2[sfIndex][0]) &&
+         (field1[sfIndex][1].substring(0,9) == "VOLATILE:") && (field2[sfIndex][1].substring(0,9) != "VOLATILE:"))){
       //  Differrent subfield codes: a structural change ... we replace the entire field
         return [{"change_type" : "field_changed",
            "tag" : tag,
@@ -1263,8 +1269,10 @@ function compareTag(tag, indicators, fields1, fields2){
         continue;
       var fieldIndex = -1;
       for (var key in sameFields) {
-          if (sameFields[key] == fieldIndex2)
+          if (sameFields[key] == fieldIndex2){
             fieldIndex = key;
+            break;
+          }
       }
       // if field is contained as value in sameFields ignore it
       if (fieldIndex != -1) {

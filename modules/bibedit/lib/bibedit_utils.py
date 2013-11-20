@@ -804,6 +804,7 @@ def merge_record_with_template(rec, template_name):
                             field_add_subfield(field_instance, code,
                                                field_get_subfield_values(template_field_instance,
                                                code)[0])
+    record_order_subfields(rec)
     return rec
 
 #################### Reference extraction ####################
