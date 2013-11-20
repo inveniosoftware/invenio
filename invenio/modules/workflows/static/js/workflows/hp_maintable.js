@@ -26,63 +26,35 @@ var tagList = [];
 var recordsToApprove = [];
 var defaultcss='#example tbody tr.even:hover, #example tbody tr.odd:hover {background-color: #FFFFCC;}';
 
-var url_load_table;
-var url_batch_widget;
-var url_resolve_widget;
-var url_delete_single;
-var url_refresh;
-var url_widget;
-var url_details;
+url = new Object();
 
-
-function init_maintable(url_load_table_, url_batch_widget_, url_resolve_widget_, url_delete_single_,
-                        url_refresh_, url_widget_, url_details_) {
-    url_load_table = url_load_table_;
-    url_batch_widget = url_batch_widget_;
-    url_resolve_widget = url_resolve_widget_;
-    url_delete_single = url_delete_single_;
-    url_refresh = url_refresh_;
-    url_widget = url_widget_;
-    url_details = url_details_;
+function init_urls(url_) {
+    url.load_table = url_.load_table;
+    url.batch_widget = url_.batch_widget;
+    url.resolve_widget = url_.resolve_widget;
+    url.delete_single = url_.delete_single;
+    url.refresh = url_.refresh;
+    url.widget = url_.widget;
+    url.details = url_.details;
 
     init_datatable();
 }
-
+    
 function init_datatable(){
-    oTable = $('#example').dataTable( {
-        "sDom": 'lfC<"clear">rtip',
+    oTable = $('#example').dataTable({
+        "sDom": 'lf<"clear">rtip',
         "bJQueryUI": true,
         "bProcessing": true,
         "bServerSide": true,
         "bDestroy": true,
-        "sAjaxSource": url_load_table,
+        "sAjaxSource": url.load_table,
         "oColVis": {
             "buttonText": "Select Columns",
             "bRestore": true,
             "sAlign": "left",
             "iOverlayFade": 1
         },
-        "aoColumnDefs": [
-            {"mRender": function (data) {return '<abbr class="timeago" title="'+data.substring(data.indexOf('#')+1)+'">'+data.substring(0,data.indexOf('#'))+'</abbr>';}, "aTargets": [6]},
-            {"mRender": function (data) {if (data == 1) {return '<span class="label label-success">Final</span>';}
-                                         else if (data == 2) {return '<span class="label label-warning">Halted</span>';}
-                                         else if (data == 3) {return '<span class="label label-info">Running</span>';}}, "aTargets": [7]},
-            {"mRender": function (data) {return '<a href=' + url_details + '?bwobject_id=' + data + '>'
-                                                 + 'Details' + '</a>';}, "aTargets": [8]},
-            {"mRender": function (data, type, full) {var w_name = data.substring(0,data.indexOf('#'));
-                                                     if ( w_name != 'None'){
-                                                        var widget_link = '<a href=' + url_widget + '?bwobject_id='
-                                                            + full[0] + '&widget=' + data.substring(0,data.indexOf('#')) + '>' + data.substring(data.indexOf('#')+1) + '</a>';
-                                                        if (w_name == 'approval_widget'){
-                                                                widget_link += '</br>' +
-                                                                '<button type="button" class="btn btn-danger btn-mini"><a id="reject-mini" href="javascript:void(0)" class="mini-approval-btn" onclick="mini_approval(this.id,'+full[0]+')">Reject</a></button>' +
-                                                                '<button type="button" class="btn btn-success btn-mini"><a id="accept-mini" href="javascript:void(0)" class="mini-approval-btn" onclick="mini_approval(this.id,'+full[0]+')">Accept</a></button>';
-                                                        }
-                                                        return widget_link;
-                                                     }
-                                                     else
-                                                        {return 'N/A';}}, "aTargets": [9]}
-        ],
+        "aoColumnDefs":[{'bSortable': false, 'aTargets': [0]}],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
             rememberSelected(nRow);
             oSettings = oTable.fnSettings();
@@ -90,14 +62,17 @@ function init_datatable(){
                 selectRow(nRow, e, oSettings);
             });
         }
-    } );
+    });
+    oSettings = oTable.fnSettings();
+    return oTable;
+    // $('#version-halted').click();
 }
 
 $('#batch_btn').on('click', function() {
     if (rowList.length >= 1){
         var rowList_out = JSON.stringify(rowList);
         console.log(rowList_out);
-        window.location = url_batch_widget + "?bwolist=" + rowList_out;
+        window.location = url.batch_widget + "?bwolist=" + rowList_out;
         $(this).prop("disabled", true);
         return false;
     }
@@ -105,9 +80,9 @@ $('#batch_btn').on('click', function() {
 
 $('#refresh_button').on('click', function() {
     jQuery.ajax({
-        url: url_refresh,
+        url: url.refresh,
         success: function(json){
-
+            
         }
     });
     oTable.fnDraw(false);
@@ -115,12 +90,16 @@ $('#refresh_button').on('click', function() {
 
 // DataTables row selection functions
 //***********************************
+$("#select-all").on("click", function(){
+    selectAll();
+})
+
 function hoverRow(row) {
     row.style.background = "#FFFFEE";
 }
 
 function unhoverRow(row) {
-    if($.inArray(row.cells[0].innerText, rowList) > -1){
+    if($.inArray(selectCellByTitle(row, 'Id').innerText, rowList) > -1){
         row.style.background = "#ffa";
     }
     else{
@@ -150,10 +129,12 @@ function selectRange(row){
         for (i=fromPos; i<=toPos; i++){
             j = i % 10;
             if($.inArray(i, rowIndexList) <= -1){
-                if (oSettings.aoData[oSettings.aiDisplay[j]].nTr.cells[9].innerText != 'N/A'){
+                if (selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[j]].nTr, 'Actions').innerText != 'N/A'){
                     rowIndexList.push(i);
-                    rowList.push(oSettings.aoData[oSettings.aiDisplay[j]].nTr.cells[0].innerText);
+                    rowList.push(selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[j]].nTr, 'Id').innerText);
                     oSettings.aoData[oSettings.aiDisplay[j]].nTr.style.background = "#ffa";
+                    checkbox = selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[j]].nTr, "").childNodes[1];
+                    checkbox.checked = true;
                 }
             }
         }
@@ -162,10 +143,13 @@ function selectRange(row){
         for (i=fromPos; i>=toPos; i--){
             j = i % 10;
             if($.inArray(i, rowIndexList) <= -1){
-                if (oSettings.aoData[oSettings.aiDisplay[j]].nTr.cells[9].innerText != 'N/A'){
+                console.log(oSettings.aoData[oSettings.aiDisplay[j]].nTr);
+                if (selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[j]].nTr, 'Actions').innerText != 'N/A'){
                     rowIndexList.push(i);
-                    rowList.push(oSettings.aoData[oSettings.aiDisplay[j]].nTr.cells[0].innerText);
+                    rowList.push(selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[j]].nTr, 'Id').innerText);
                     oSettings.aoData[oSettings.aiDisplay[j]].nTr.style.background = "#ffa";
+                    checkbox = selectCellByTitle(oSettings.aiDisplay[j].nTr, "").childNodes[1];
+                    checkbox.checked = false;
                 }
             }
         }
@@ -174,14 +158,15 @@ function selectRange(row){
 }
 
 function selectAll(){
-    var toPos = oSettings._iDisplayLength - 1;
+    console.log("selecting all");
+    var toPos = oSettings._iDisplayEnd - 1;
     var fromPos = 0;
 
     for (var i=fromPos; i<=toPos; i++){
-        if($.inArray(oSettings.aoData[oSettings.aiDisplay[i]].nTr.cells[0].innerText, rowList) <= -1){
-            if (oSettings.aoData[oSettings.aiDisplay[i]].nTr.cells[9].innerText != 'N/A'){
+        if($.inArray(selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[i]].nTr, 'Id').innerText, rowList) <= -1){
+            if (selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[i]].nTr, 'Actions').innerText != 'N/A'){
                 rowIndexList.push(i);
-                rowList.push(oSettings.aoData[oSettings.aiDisplay[i]].nTr.cells[0].innerText);
+                rowList.push(selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[i]].nTr, 'Id').innerText);
                 oSettings.aoData[oSettings.aiDisplay[i]].nTr.style.background = "#ffa";
             }
         }
@@ -190,8 +175,9 @@ function selectAll(){
 
 function rememberSelected(row) {
     selectedRow = row;
-    if($.inArray(row.cells[0].innerText, rowList) > -1){
+    if($.inArray($.trim(selectCellByTitle(row, 'Id').innerText), rowList) > -1){
         selectedRow.style.background = "#ffa";
+        selectedRow.cells[0].childNodes[1].checked = true;
     }
 }
 
@@ -205,9 +191,9 @@ window.addEventListener("keydown", function(e){
             currentRowIndex = rowIndexList[rowIndexList.length-1];
             if (currentRowIndex < 9){
                 rowToAdd = currentRowIndex + 1;
-                if($.inArray(oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr.cells[0].innerText, rowList) <= -1){
+                if($.inArray(selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr, 'Id').innerText, rowList) <= -1){
                     rowIndexList.push(rowToAdd);
-                    rowList.push(oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr.cells[0].innerText);
+                    rowList.push(selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr, 'Id').innerText);
                     oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr.style.background = "#ffa";
                 }
             }
@@ -227,9 +213,9 @@ window.addEventListener("keydown", function(e){
             currentRowIndex = rowIndexList[rowIndexList.length-1];
             if (currentRowIndex > 0){
                 rowToAdd = currentRowIndex - 1;
-                if($.inArray(oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr.cells[0].innerText, rowList) <= -1){
+                if($.inArray(selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr, 'Id').innerText, rowList) <= -1){
                     rowIndexList.push(rowToAdd);
-                    rowList.push(oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr.cells[0].innerText);
+                    rowList.push(selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr, 'Id').innerText);
                     oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr.style.background = "#ffa";
                 }
             }
@@ -253,7 +239,7 @@ window.addEventListener("keydown", function(e){
         removeSelection();
     }
     else if (e.keyCode == 13 && hoveredRow != -1){
-        oSettings.aoData[oSettings.aiDisplay[hoveredRow]].nTr.cells[8].click();
+        selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[hoveredRow]].nTr, 'Details').click();
     }
     else if(e.keyCode == 46){
         if (rowList.length >= 1){
@@ -265,29 +251,48 @@ window.addEventListener("keydown", function(e){
     }
 });
 
+function selectCellByTitle(row, title){
+    for(var i=0; i<oSettings.aoHeader[0].length; i++){
+        var trimmed_title = $.trim(oSettings.aoHeader[0][i].cell.innerText);
+        if(trimmed_title === title){
+            return row.cells[i];
+        }
+    }
+}
+
 function selectRow(row, e, oSettings) {
     selectedRow = row;
     if( e.shiftKey === true ){
         selectRange(row);
     }
     else{
-        if($.inArray(row.cells[0].innerText, rowList) <= -1){
-            if (row.cells[9].innerText != 'N/A'){
-                rowList.push(row.cells[0].innerText);
+        var widget_name = selectCellByTitle(row, 'Actions').innerText;    
+        widget_name = widget_name.substring(0, widget_name.length-4);
+        
+        if($.inArray(selectCellByTitle(row, 'Id').innerText, rowList) <= -1){
+            if (selectCellByTitle(row, 'Actions').innerText != 'N/A'){
+                rowList.push(selectCellByTitle(row, 'Id').innerText);
                 rowIndexList.push(row._DT_RowIndex+oSettings._iDisplayStart);
                 selectedRow.style.background = "#ffa";
-                if(row.cells[9].childNodes[0].innerText === 'Approve Record'){
-                    recordsToApprove.push(row.cells[0].innerText);
+                
+                if(widget_name === 'Approve Record'){
+                    recordsToApprove.push(selectCellByTitle(row, 'Id').innerText);
                 }
+                checkbox = selectCellByTitle(row, "").childNodes[1];
+                console.log(checkbox);
+                checkbox.checked = true;
             }
         }
         else{
-            rowList.splice(rowList.indexOf(row.cells[0].innerText), 1);
+            rowList.splice(rowList.indexOf(selectCellByTitle(row, 'Id').innerText), 1);
             rowIndexList.splice(rowIndexList.indexOf(row._DT_RowIndex+oSettings._iDisplayStart), 1);
             selectedRow.style.background = "white";
-            if(row.cells[9].childNodes[0].innerText === 'Approve Record'){
-                recordsToApprove.splice(recordsToApprove.indexOf(row.cells[0].innerText), 1);
+            
+            if(widget_name === 'Approve Record'){
+                recordsToApprove.splice(recordsToApprove.indexOf(selectCellByTitle(row, 'Id').innerText), 1);
             }
+            checkbox = selectCellByTitle(row, "").childNodes[1];
+            checkbox.checked = false;
         }
     }
     checkRecordsToApprove();
@@ -305,9 +310,9 @@ function deselectAll(){
 }
 
 $(document).keyup(function(e){
-    if (e.keyCode == 27) {  // esc
+    if (e.keyCode == 27) {  // esc           
         deselectAll();
-    }
+    }   
 });
 //***********************************
 
@@ -316,21 +321,44 @@ $(document).keyup(function(e){
 $('.task-btn').on('click', function(){
     if($.inArray($(this)[0].name, tagList) <= -1){
         var widget_name = $(this)[0].name;
-        $('.tag-area').html('');
-        $('.tag-area').append('<div class="alert alert-info tag-alert span1">'+widget_name+'<a class="close-btn" data-dismiss="alert" name='+widget_name+' onclick="closeTag(this)">&times;</a></div>');
-        tagList = [];
-
+        $('#tag-area').append('<div class="alert alert-info tag-alert col-md-1">'+widget_name+'<a id="'+widget_name+'class="close-btn" data-dismiss="alert" name='+widget_name+' onclick="closeTag(this.parentElement)">&times;</a></div>');
         tagList.push($(this)[0].name);
+        oTable.fnFilter($(this)[0].name);
+
     }
-    oTable.fnFilter($(this)[0].name);
+    else{
+        closeTag($('#'+widget_name));
+        oTable.fnFilter( '^$', 4, true, false );
+        $('#refresh_button').click();
+    }   
+    // requestNewObjects();
+});
+
+$('.version-selection').on('click', function(){
+    console.log($(this)[0].name);
+    console.log(tagList);
+
+    if($.inArray($(this)[0].name, tagList) <= -1){
+        console.log("TAG NOT IN TAGLIST");
+        $('#tag-area').append('<div id="tag-version-'+$(this)[0].name+'" name="'+$(this)[0].name+'" class="alert alert-info tag-alert col-md-1">'+$(this)[0].name+'<a class="close-btn pull-right" data-dismiss="alert" onclick="closeTag(this.parentElement)">&times;</a></div>');
+        tagList.push($(this)[0].name);
+    } 
+    else{
+        closeTag($('#tag-version-'+$(this)[0].name)[0]);
+    }    
+    requestNewObjects();
 });
 
 function closeTag(obj){
-    tagList = [];
-    $('.tag-area').html('');
-    oTable.fnFilter('');
-    // tagList.splice(tagList.indexOf(obj.name), 1);
-    console.log(tagList);
+    // console.log(tagList);
+    // console.log(obj);
+    // console.log(obj.name);
+    var tag_name = obj.innerText.substr(0,obj.innerText.length-1);
+    console.log(tag_name);
+    tagList.splice(tagList.indexOf(obj.name), 1);
+    
+    obj.remove();
+    requestNewObjects();
 };
 //***********************************
 
@@ -348,6 +376,26 @@ function fnGetSelected( oTableLocal ){
     return aReturn;
 }
 
+function requestNewObjects(){
+    var version_showing = new Object;
+    // var widget_showing = new Object;
+
+    version_showing['final'] = ($.inArray('Final', tagList) <= -1) ? false : true;
+    version_showing['halted'] = ($.inArray('Halted', tagList) <= -1) ? false : true;
+    version_showing['running'] = ($.inArray('Running', tagList) <= -1) ? false : true;
+
+    $.ajax({
+        type : "POST",
+        url : url.load_table,
+        data: JSON.stringify(version_showing),
+        contentType: 'application/json;charset=UTF-8',
+        traditional: true,
+        success: function(result) {
+            $('#refresh_button').click();
+        }
+    });
+}
+
 function isInt(n) {
    return typeof n === 'number' && n % 1 === 0;
 }
@@ -361,3 +409,5 @@ function bootstrap_alert(message) {
     $('#alert-message').html('<span class="alert"><a class="close" data-dismiss="alert"> ×</a><span>'+message+'</span></span>');
 }
 //***********************************
+
+

@@ -38,7 +38,7 @@ function action_buttons (url_restart_record, url_restart_record_prev, url_contin
             url: url_restart_record_prev,
             data: bwo_id,
             success: function(json){
-                bootstrap_alert('Object restarted from previous task');
+                bootstrap_alert('Object restarted from previous task');        
             }
         });
     });
@@ -50,23 +50,25 @@ function action_buttons (url_restart_record, url_restart_record_prev, url_contin
             url: url_continue,
             data: bwo_id,
             success: function(json){
-                bootstrap_alert('Object continued from next task');
+                bootstrap_alert('Object continued from next task');        
             }
         });
     });
 }
 
-function bootstrap_alert(message) {
-    $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>');
-}
+// function bootstrap_alert(message) {
+//     $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>');
+// }
 
-window.setTimeout(function() {
-    $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
-    });
-}, 2000);
+// window.setTimeout(function() {
+//     $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
+//     });
+// }, 2000);
 
 if ( window.addEventListener ) {
     $("div.btn-group[name='data_version']").bind('click', function(event){
         version = event.target.name;
     });
 }
+
+// bwoid = getURLParameter('bwobject_id');

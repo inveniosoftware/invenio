@@ -34,95 +34,70 @@
 {% endblock javascript %}
 
 {% block hpbody %}
-    <div class="row-fluid">
-        <div class="col-md-3 pull-left"><a href="{{url_for('holdingpen.maintable')}}"><i class="icon-hand-left"></i> Back to Main Table</a></div>
-        <div class="span4"><h1>Record Details</h1></div>
-    </div>
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">  
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+            <li><a href="{{url_for('holdingpen.maintable')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> Back</a>
+            </li>
+            <li class="active">
+                <a href="#">Details</a>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions<b class="caret"></b></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-repeat"></i>Restart</button></li>
+                    <li><button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-backward"></i>Restart Task</button></li>
+                    <li><button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-forward"></i>Skip Task</button></li>
+                    <li><a id="delete_btn" class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#confirmationModal" role="button"><i class="icon-trash"></i>Delete</a></li>
+                </ul>
+            </li>
 
-    <div id = "alert_placeholder"></div>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-9">
-                <div class="btn-group" name="object_preview_btn" data-toggle="buttons-radio">
-                    <button type="radio" class="preview btn btn-xs btn-primary active" name="hd">HTML</button>
-                    <button type="radio" class="preview btn btn-xs btn-primary" name="xm">MARCXML</button>
-                    <button type="radio" class="preview btn btn-xs btn-primary" name="tm">MARC</button>
-                </div>
-                <div class="btn-group pull" name="data_version" data-toggle="buttons">
-                    <button type="radio" class="btn btn-xs active" name="initial" onclick="">Initial</button>
-                    {% if bwobject.version == 1 %}
-                        <button type="radio" class="btn btn-xs" name="final" onclick="">Final</button>
-                    {% else %}
-                        <button class="btn btn-xs disabled" name="final">Final</button>                 
-                    {% endif %}
-                    {% if bwobject.version == 2 %}
-                        <button class="btn btn-xs" name="error" onclick="">Error</button>
-                    {% else %}
-                        <button class="btn btn-xs disabled" name="error">Error</button>
-                    {% endif %}
-                </div>
-
-                {% if 'message' in bwobject.get_extra_data() and
-                    bwobject.get_extra_data()['widget'] != None %}
-                    <div id="usermessage" class="alert">
-                        {{bwobject.get_extra_data()['message']}}
-                        <a class="close" data-dismiss="alert">×</a>
+            <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+              <div class="modal-dialog">  
+                <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      <h3 id="myModalLabel">Please Confirm</h3>
                     </div>
-                {% endif %}
-
-                {% if bwobject.version == 1 %}
-                    <div id="successmessage" class="alert alert-success">
-                        Record ran workflow successfully.
-                        <a class="close" data-dismiss="alert">×</a>
+                    <div class="modal-body">
+                      <p>Are you sure you want to delete record #{{bwobject.id}}</p>
                     </div>
-                {% endif %}
-
-                <div id="object_preview_container{{bwobject.id}}">
-                    {{ data_preview|safe }}
+                    <div class="modal-footer">
+                      <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                      <a class="btn btn-danger" href="{{ url_for('holdingpen.delete_from_db', bwobject_id=bwobject.id) }}" >Delete Record</a>
+                    </div>
                 </div>
+              </div>
             </div>
-            
+
+        </ul>
+        <ul class="nav navbar-nav pull-right">
+            <li>
+                {% if bwobject.get_extra_data()['widget'] %}
+                <a href="{{ url_for('holdingpen.show_widget', bwobject_id=bwobject.id, widget=info['widget']) }}" ><i class="icon-wrenchwhite icon-wrench"></i>Widget</a>
+                {% else %}
+                
+                {% endif %}
+            </li>
+        </ul>    
+      </div>
+    </nav>
+
+    <div class="container" style="padding-left:0px;">
+        <div class="row">
             <div class="col-md-3">
-                <div id="action-area" class="alert">
-                    <b>Actions</b>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {% if bwobject.get_extra_data()['widget'] %}
-                            <a class="btn btn-info btn-sm" href="{{ url_for('holdingpen.show_widget', bwobject_id=bwobject.id, widget=info['widget']) }}" ><i class="icon-wrenchwhite icon-wrench"></i>Widget</a></br>
-                            {% else %}
-                            <a class="btn btn-info btn-sm disabled"><i class="glyphicon glyphicon-wrench"></i>Widget</a></br>
-                            {% endif %}
-
-                        </div>
-
-                        <div id="static-actions" class="col-md-6">
-                            <button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="glyphicon glyphicon-repeat"></i>Restart</button></br>
-                            <button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="glyphicon glyphicon-step-backward"></i>Restart Task</button></br>
-                            <button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="glyphicon glyphicon-step-forward"></i>Skip Task</button></br>
-                            <a id="delete_btn" href="#confirmationModal" role="button" class="btn btn-sm btn-block btn-danger" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i>Delete</a>
-
-                            <div id="confirmationModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                              <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                                <h3 id="myModalLabel">Please Confirm</h3>
-                              </div>
-                              <div class="modal-body">
-                                <p>Are you sure you want to delete record #{{bwobject.id}}</p>
-                              </div>
-                              <div class="modal-footer">
-                                <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-                                <a class="btn btn-danger" href="{{ url_for('holdingpen.delete_from_db', bwobject_id=bwobject.id) }}" >Delete Record</a>
-                              </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                
                 <div class="well">
-                    <div class="muted"><b>Workflow Definition:</b></div>
-                    <b>{{workflow.name}}</b>
-                    {{ utils.function_display(workflow_func, bwobject.get_extra_data()['last_task_name'], bwobject.version) }}
+                    <div class="muted">Workflow: <b>{{workflow.name}}</b></div>
+                    <span type="button" class="pull-right" style="cursor:pointer" data-toggle="collapse" data-target="#workflow-definition"><span class="caret"></span></span>
+                    <div id="workflow-definition" class="collapse">
+                        <table class="table table-striped">
+                            <tbody>
+                                <div class="muted"><b>Workflow Tasks:</b></div>
+                                {{ utils.function_display(workflow_func, bwobject.get_extra_data()['last_task_name'], bwobject.version) }}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="well">
@@ -130,13 +105,13 @@
                     {% if bwobject.get_extra_data()['error_msg'] != "" %}
                         {{ info['last task name'] }} {{ bwobject.get_extra_data()['error_msg'] }}
                         <div class="text-right">
-                            <h6 id="show-more" class="text-right"><a href="#moreinfoModal" role="button" data-toggle="modal" class="float-right">Show More</a>
+                            <h6 id="show-more" class="text-right"><a href="#moreinfoModal" role="button" data-toggle="modal" class="pull-right">Show More</a>
                             </h6>
                         </div>
                     {% else %}
                         There were no errors.
                     {% endif %}
-
+                    
                     <div id="moreinfoModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                       <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -154,23 +129,68 @@
                 </div>
 
                 <div class="well">
-                    <div class="muted"><b>Record Metadata:</b></div></br>
-                    <table class="table table-striped">
-                        <tbody>
-                            {% for key, value in info.items() %}
-                                <b>{{ key }}</b> = {{ value }}
-                                <hr>
-                            {% endfor %}
+                    <div class="muted"><b>Record Metadata</b>
+                        <span type="button" class="pull-right" style="cursor:pointer" data-toggle="collapse" data-target="#record-metadata-table"><span class="caret"></span></span>
+                    </div>
+                </br>
+                    <div id="record-metadata-table" class="collapse">
+                        <table class="table table-striped">
+                            <tbody>
+                                {% for key, value in info.items() %}
+                                    <b>{{ key }}</b> = {{ value }}
+                                    <hr>
+                                {% endfor %}
 
-                            {% if bwobject.version == 1 %}
-                                <span class="badge badge-success">Final</span>
-                            {% elif bwobject.version == 2 %}
-                                <span class="badge badge-warning">Halted</span>
-                            {% else %}
-                                <span class="badge badge-info">Initial</span>
-                            {% endif %}
-                        </tbody>
-                    </table>
+                                {% if bwobject.version == 1 %}
+                                    <span class="badge badge-success">Final</span>
+                                {% elif bwobject.version == 2 %}
+                                    <span class="badge badge-warning">Halted</span>
+                                {% else %}
+                                    <span class="badge badge-info">Initial</span>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                Show as:
+                <div class="btn-group" name="object_preview_btn" data-toggle="buttons-radio">
+                    <button class="preview btn btn-xs btn-primary active" name="hd">HTML</button>
+                    <button class="preview btn btn-xs btn-primary" name="xm">MARCXML</button>
+                    <button class="preview btn btn-xs btn-primary" name="tm">MARC</button>
+                </div>
+                <!-- <div class="btn-group pull" name="data_version" data-toggle="buttons-radio">
+                    <button class="btn btn-xs active" name="initial" onclick="">Initial</button>
+                    {% if bwobject.version == 1 %}
+                        <button class="btn btn-xs" name="final" onclick="">Final</button>
+                    {% else %}
+                        <button class="btn btn-xs disabled" name="final">Final</button>                        
+                    {% endif %}
+                    {% if bwobject.version == 2 %}
+                        <button class="btn btn-xs" name="error" onclick="">Error</button>
+                    {% else %}
+                        <button class="btn btn-xs disabled" name="error">Error</button>
+                    {% endif %}
+                </div> -->
+
+                {% if 'message' in bwobject.get_extra_data() and 
+                    bwobject.get_extra_data()['widget'] != None %}
+                    <div id="usermessage" class="alert alert-warning alert-dismissable">
+                        {{bwobject.get_extra_data()['message']}}
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    </div>
+                {% endif %}
+
+                {% if bwobject.version == 1 %}
+                    <div id="successmessage" class="alert alert-success">
+                        Record ran workflow successfully.
+                        <a class="close" data-dismiss="alert">×</a>
+                    </div>
+                {% endif %}
+
+                <div id="object_preview_container{{bwobject.id}}">
+                    {{ data_preview|safe }}
                 </div>
             </div>
         </div>

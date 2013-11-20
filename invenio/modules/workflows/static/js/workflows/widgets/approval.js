@@ -21,10 +21,10 @@ var bwoid;
 var datapreview = "hd";
 var number_of_objs = $(".theform").length;
 var current_number = number_of_objs-1;
-var url_preview;
+url = new Object();
 
-function set_url_preview(url_prv){
-    url_preview = url_prv;
+function init_urls_approval(url_){
+    url = url_;
 }
 
 function checkRecordsToApprove(){
@@ -38,9 +38,10 @@ function checkRecordsToApprove(){
 }
 
 function disapproveRecords(){
+    console.log("deleting");
     deleteRecords(recordsToApprove);
     recordsToApprove = [];
-    // TODO:
+    // TODO: 
     // the bug here will occur when there are records with other widgets
     // than approval.
     emptyLists();
@@ -63,7 +64,7 @@ function approveAll() {
         for(i=0; i<recordsToApprove.length; i++){
             jQuery.ajax({
                 type: "POST",
-                url: url_resolve_widget,
+                url: url.resolve_widget,
                 data: {'bwobject_id': recordsToApprove[i],
                        'widget': 'approval_widget',
                        'decision': 'Accept'},
@@ -77,20 +78,19 @@ function approveAll() {
     });
 };
 
-function mini_approval(decision, bwobject_id){
-    url_data = (decision === 'accept-mini') ? 'Accept' : 'Reject';
-    console.log(url_data);
+function mini_approval(decision, event){
+    var bwobject_id = event.currentTarget.parentElement.parentElement.cells[1].innerText;
 
     jQuery.ajax({
         type: "POST",
-        url: url_resolve_widget,
+        url: url.resolve_widget,
         data: {'bwobject_id': bwobject_id,
                'widget': "approval_widget",
-               'decision': url_data},
+               'decision': decision},
         success: function(json){
             deselectAll();
             recordsToApprove = [];
-            $('#refresh_button').click();
+            $('#refresh_button').click();     
             checkRecordsToApprove();
         }
     });
@@ -98,11 +98,11 @@ function mini_approval(decision, bwobject_id){
 };
 
 function deleteRecords(bwolist){
-    console.log(bwolist);
     for(i=0; i<recordsToApprove.length; i++){
+        console.log(bwolist[i]);
         jQuery.ajax({
-            url: url_delete_single,
-            data: {'bwolist': bwolist[i]},
+            url: url.delete_single,
+            data: {'bwobject_id': bwolist[i]},
             success: function(){
                 $('#refresh_button').click();
             }
@@ -151,4 +151,41 @@ $(document).ready(function(){
         console.log(url_preview);
         data_preview(url_preview, bwoid, datapreview);
     }
+
+    $('#submitButtonMini').click( function (event){
+        console.log(event);
+    });
+
+    $('body').append(
+        '<div id="confirmationModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
+            '<div class="modal-header">'+
+                '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'+
+                '<h3 id="myModalLabel">Please Confirm</h3>'+
+            '</div>'+
+            '<div class="modal-body">'+
+                '<p>Are you sure you want to delete the selected records?</p>'+
+            '</div>'+
+            '<div class="modal-footer">'+
+                '<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>'+
+                '<a class="btn btn-danger" href="#" data-dismiss="modal" onclick="disapproveRecords()">Delete Records</a>'+
+            '</div>'+
+        '</div>');
+    // $.ajax({
+    //     url: "hp_maintable.html",
+    //     success: function (data) { $('body').append(
+    //         '<div id="confirmationModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
+    //             '<div class="modal-header">'+
+    //                 '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'+
+    //                 '<h3 id="myModalLabel">Please Confirm</h3>'+
+    //             '</div>'+
+    //             '<div class="modal-body">'+
+    //                 '<p>Are you sure you want to delete the selected records?</p>'+
+    //             '</div>'+
+    //             '<div class="modal-footer">'+
+    //                 '<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>'+
+    //                 '<a class="btn btn-danger" href="#" data-dismiss="modal" onclick="disapproveRecords()">Delete Records</a>'+
+    //             '</div>'+
+    //         '</div>'); },
+    //     dataType: 'html'
+    // });
 });

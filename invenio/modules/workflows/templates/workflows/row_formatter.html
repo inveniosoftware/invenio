@@ -1,0 +1,46 @@
+#checkbox$
+<input type="checkbox">
+#id$
+{{record.id}}
+#title$
+{% if record.get_extra_data()['redis_search'].has_key('title') %}{{ record.get_extra_data()['redis_search']['title'] }}
+{% else %}None
+{% endif %}
+#source$
+{% if record.get_extra_data()['redis_search'].has_key('source') %}{{ record.get_extra_data()['redis_search']['source'] }}
+{% else %}None
+{% endif %}
+#category$
+{% if record.get_extra_data()['redis_search'].has_key('category') %}{{ record.get_extra_data()['redis_search']['category'] }}
+{% else %}None
+{% endif %}
+#workflow_id$
+{{record.id_workflow}}
+#owner$
+{% if record.get_extra_data()['owner'] == None %}None{% endif %}
+#pretty_date$
+{{ pretty_date(record.created)}}
+#version$
+{% if record.version == 1 %}<span class="label label-success">Final</span>
+{% elif record.version == 2 %}<span class="label label-warning">Halted</span>
+{% else %}<span class="label label-info">Running</span>
+{% endif %}
+#details$
+{% if widget == None %}
+	<a href="{{url_for('holdingpen.details', bwobject_id=record.id)}}">Details</a>
+{% else %}
+{% set widget_instance = widget() %}
+	<a href="{{url_for('holdingpen.show_widget', bwobject_id=record.id, widget=widget_instance.__class__.__name__)}}">Details</a>
+{% endif %}
+#widget$
+{% if widget != None %}
+	{% set widget = widget() %}
+	{% if mini_widget != None %}
+		{% set mini_widget = mini_widget() %}
+		{% for field in mini_widget %}
+	    	{{ field }}
+		{% endfor %}
+	{% endif %}
+{% else %}
+N/A
+{% endif %}
