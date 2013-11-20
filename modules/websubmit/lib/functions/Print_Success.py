@@ -19,8 +19,8 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.config import CFG_SITE_NAME
-from invenio.websubmit_functions.Shared_Functions import get_nice_bibsched_related_message, txt2html
+from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.websubmit_functions.Shared_Functions import get_nice_bibsched_related_message, txt2html, ParamFromFile
 
 # FIXME: cannot import Request_Print(), is defined in websubmit_engine.py
 
@@ -49,6 +49,7 @@ def Print_Success(parameters, curdir, form, user_info=None):
     edsrn = parameters['edsrn']
     newrnin = parameters['newrnin']
     status = parameters['status']
+    sysno=ParamFromFile("%s/%s" % (curdir,'SN')).strip()
     fp = open("%s/%s" % (curdir,edsrn),"r")
     rn = fp.read()
     fp.close()
@@ -61,6 +62,9 @@ def Print_Success(parameters, curdir, form, user_info=None):
         additional_rn = ""
     t=t+Request_Print("A",  "<br /><br /><b>Submission Complete!</b><br /><br />")
     t=t+Request_Print("A",  "Your document has the following reference(s): <b>%s%s</b><br /><br />" % (rn,additional_rn))
+    if sysno:
+        url = '%s/%s/%s' % (CFG_SITE_URL, CFG_SITE_RECORD, sysno)
+        t=t+Request_Print('A',  'Your document has the following URL: <b><a href="%s">%s</a></b><br /><br />' % (url, url))
     if status == "APPROVAL":
         t=t+Request_Print("A",  "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision regarding your document.<br /><br />\n")
     if status == "ADDED":
