@@ -165,9 +165,7 @@ def load_table():
 
     # sSearch will be used for searching later
     a_search = request.args.get('sSearch')
-    for widget in widgets:
-        if widget == a_search:
-            a_search = widget
+
     i_sortcol_0 = request.args.get('iSortCol_0')
     s_sortdir_0 = request.args.get('sSortDir_0')
 
@@ -216,13 +214,15 @@ def load_table():
             category = bwo.get_extra_data()['redis_search']['category']
         else:
             category = None
+        if not bwo.get_extra_data()['owner']:
+            owner = "None"
         table_data['aaData'].append(
             [str(bwo.id),
              title,
              source,
              category,
              str(bwo.id_workflow),
-             str(bwo.get_extra_data()['owner']),
+             owner,
              str(pretty_date(bwo.created))+'#'+str(bwo.created),
              bwo.version,
              str(bwo.id),
@@ -304,18 +304,19 @@ def delete_from_db(bwobject_id):
     Deletes all available versions of the object from the db
     """
     # FIXME: Temp hack until redis is hooked up
-    import invenio.modules.workflows.containers
+    # import invenio.modules.workflows.containers
     _delete_from_db(bwobject_id)
-    reload(invenio.modules.workflows.containers)
+    # reload invenio.modules.workflows.containers
     flash('Record Deleted')
-    return redirect(url_for('holdingpen.index'))
+    return 'Record Deleted'
+    # return redirect(url_for('holdingpen.index'))
 
 
 def _delete_from_db(bwobject_id):
     from invenio.ext.sqlalchemy import db
-
     # delete every BibWorkflowObject version from the db
-    BibWorkflowObject.query.get(bwobject_id).delete()
+    # TODO: THIS NEEDS FIXING
+    BibWorkflowObject.query.filter(BibWorkflowObject.id == bwobject_id).delete()
     db.session.commit()
 
 
@@ -380,7 +381,9 @@ def entry_data_preview(oid, recformat):
     Presents the data in a human readble form or in xml code
     """
     from flask import jsonify, Markup
+
     bwobject = BibWorkflowObject.query.get(int(oid))
+
     formatted_data = _entry_data_preview(bwobject.get_data(), recformat)
     if recformat in ("xm", "xml", "marcxml"):
         data = Markup.escape(formatted_data)
@@ -427,8 +430,8 @@ def extract_data(bwobject):
     extracted_data['bwparent'] = \
         BibWorkflowObject.query.get(bwobject.id_parent)
 
+    # TODO: read the logstuff from the db
     extracted_data['loginfo'] = ""
-
     extracted_data['logtext'] = {}
 
     for log in extracted_data['loginfo']:

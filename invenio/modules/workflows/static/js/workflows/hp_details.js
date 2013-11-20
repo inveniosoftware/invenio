@@ -16,26 +16,15 @@
 // along with Invenio; if not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-function getURLParameter(name) {
-  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
-}
 
-$(document).ready(function(){
-
-    var url_base = "/admin/holdingpen";
-    var url_restart_record = url_base + "/restart_record";
-    var url_restart_record_prev = url_base + "/restart_record_prev";
-    var url_continue = url_base + "/continue_record";
-
-    function bootstrap_alert(message) {
-        $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>');
-    }
+function action_buttons (url_restart_record, url_restart_record_prev, url_continue) {
 
     $('#restart_button').on('click', function() {
         bwo_id = $(this).attr('name');
         console.log(bwo_id);
         jQuery.ajax({
-            url: url_restart_record + "?bwobject_id=" + bwo_id,
+            url: url_restart_record,
+            data: bwo_id,
             success: function(json){
                 bootstrap_alert('Object restarted');
             }
@@ -46,7 +35,8 @@ $(document).ready(function(){
         bwo_id = $(this).attr('name');
         console.log(bwo_id);
         jQuery.ajax({
-            url: url_restart_record_prev + "?bwobject_id=" + bwo_id,
+            url: url_restart_record_prev,
+            data: bwo_id,
             success: function(json){
                 bootstrap_alert('Object restarted from previous task');
             }
@@ -57,24 +47,26 @@ $(document).ready(function(){
         bwo_id = $(this).attr('name');
         console.log(bwo_id);
         jQuery.ajax({
-            url: url_continue + "?bwobject_id=" + bwo_id,
+            url: url_continue,
+            data: bwo_id,
             success: function(json){
                 bootstrap_alert('Object continued from next task');
             }
         });
     });
+}
 
-    window.setTimeout(function() {
-        $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
-        });
-    }, 2000);
+function bootstrap_alert(message) {
+    $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>');
+}
 
-    if ( window.addEventListener ) {
-        $("div.btn-group[name='data_version']").bind('click', function(event){
-            version = event.target.name;
-        });
-    }
+window.setTimeout(function() {
+    $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
+    });
+}, 2000);
 
-    bwoid = getURLParameter('bwobject_id');
-
-});
+if ( window.addEventListener ) {
+    $("div.btn-group[name='data_version']").bind('click', function(event){
+        version = event.target.name;
+    });
+}

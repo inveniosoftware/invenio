@@ -1,22 +1,39 @@
 {% extends "workflows/hp_layout.html" %}
-{% block hpbody %}
+{% import 'workflows/hp_utils.html' as utils %}
 
-{%- block header%}
+{% block header%}
     {{ super() }}
     {% css url_for('static', filename='css/ColVis.css') %}
     {% css url_for('static', filename='css/dataTables.bootstrap.css') %}
-{%- endblock header %}
+{% endblock header %}
 
-{%- block javascript %}
+{% js url_for('static', filename='js/jquery.dataTables.min.js'), '30-datatables' %}
+{% js url_for('static', filename='js/ColVis.js'), '30-datatables' %}
+{% js url_for('static', filename='js/dataTables.bootstrap.js'), '30-datatables' %}
+{% js url_for('workflows.static', filename='js/workflows/hp_maintable.js'), '50-workflows' %}
+{% js url_for('workflows.static', filename='js/workflows/widgets/approval.js'), '50-workflows' %}
+
+{% block javascript %}
     {{ super() }}
-    {%- block holdingpen_assets %}
-      {% js url_for('static', filename='js/jquery.dataTables.min.js'), '30-datatables' %}
-      {% js url_for('static', filename='js/ColVis.js'), '30-datatables' %}
-      {% js url_for('static', filename='js/dataTables.bootstrap.js'), '30-datatables' %}
-      {% js url_for('workflows.static', filename='js/workflows/hp_maintable.js'), '50-workflows' %}
-    {%- endblock holdingpen_assets %}
-{%- endblock javascript %}
 
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var url_load_table = "{{ url_for('holdingpen.load_table')|safe }}";
+            var url_batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
+            var url_resolve_widget = "{{ url_for('holdingpen.resolve_widget') }}";
+            var url_delete_single = "{{ url_for('holdingpen.delete_from_db') }}";
+            var url_refresh = "{{ url_for('holdingpen.refresh') }}";
+            var url_widget = "{{ url_for('holdingpen.show_widget') }}";
+            var url_details = "{{ url_for('holdingpen.details')|safe }}";
+            var url_batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
+
+            init_maintable(url_load_table, url_batch_widget, url_resolve_widget,
+                           url_delete_single, url_refresh, url_widget, url_details);
+        });
+    </script>
+{% endblock javascript %}
+
+{% block hpbody %}
     <div id="alert-message"></div>
 
     <h1>Records in Holding Pen</h1>
@@ -45,15 +62,31 @@
                 </li>
             </ul>
         </div>
-        <div class="span3 pull-left">
+        <div id="multi-approval" class="span3 pull-left">
+        </div>
+        <div class="span1 pull-right">
             <button id="refresh_button" class="btn btn-primary">Refresh!</button>
         </div>
-        <div class="span3 pull-right">
+        <div class="span2 pull-right">
             <a id="batch_btn" class="btn btn-info pull-right" href="#"><i class="icon-wrenchwhite icon-wrench"></i>Group Widget</a>
         </div>        
     </div>
     <div class="tag-area row">
     </div> 
+
+    <div id="confirmationModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Please Confirm</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the selected records?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <a class="btn btn-danger" href="#" data-dismiss="modal" onclick="disapproveRecords()">Delete Records</a>
+      </div>
+    </div>
     
     <div class="container">
         <div class="row-fluid">

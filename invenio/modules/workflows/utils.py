@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 ## This file is part of Invenio.
 ## Copyright (C) 2012, 2013 CERN.
 ##
@@ -225,6 +225,6 @@ def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
     return bwolist
 
 
-def parse_bwids(bwlist):
+def parse_bwids(bwolist):
     import ast
-    return [item.encode('ascii') for item in ast.literal_eval(bwlist)]
+    return list(ast.literal_eval(bwolist))
