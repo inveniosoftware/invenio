@@ -23,20 +23,98 @@ var rowList = [];
 var rowIndexList = [];
 var hoveredRow = -1;
 var tagList = [];
+var recordsToApprove = [];
 var defaultcss='#example tbody tr.even:hover, #example tbody tr.odd:hover {background-color: #FFFFCC;}';
 
-var url_base = "/admin/holdingpen";
-var url_delete_multi = url_base + "/delete_multi";
-var url_load_table = url_base + "/load_table";
-var url_details = url_base + "/details";
-var url_widget = url_base + "/widget";
-var url_refresh = url_base + "/refresh";
-var url_batch_widget = url_base + "/batch_widget";
+var url_load_table;
+var url_batch_widget;
+var url_resolve_widget;
+var url_delete_single;
+var url_refresh;
+var url_widget;
+var url_details;
 
-function isInt(n) {
-   return typeof n === 'number' && n % 1 === 0;
+
+function init_maintable(url_load_table_, url_batch_widget_, url_resolve_widget_, url_delete_single_,
+                        url_refresh_, url_widget_, url_details_) {
+    url_load_table = url_load_table_;
+    url_batch_widget = url_batch_widget_;
+    url_resolve_widget = url_resolve_widget_;
+    url_delete_single = url_delete_single_;
+    url_refresh = url_refresh_;
+    url_widget = url_widget_;
+    url_details = url_details_;
+
+    init_datatable();
 }
 
+function init_datatable(){
+    oTable = $('#example').dataTable( {
+        "sDom": 'lfC<"clear">rtip',
+        "bJQueryUI": true,
+        "bProcessing": true,
+        "bServerSide": true,
+        "bDestroy": true,
+        "sAjaxSource": url_load_table,
+        "oColVis": {
+            "buttonText": "Select Columns",
+            "bRestore": true,
+            "sAlign": "left",
+            "iOverlayFade": 1
+        },
+        "aoColumnDefs": [
+            {"mRender": function (data) {return '<abbr class="timeago" title="'+data.substring(data.indexOf('#')+1)+'">'+data.substring(0,data.indexOf('#'))+'</abbr>';}, "aTargets": [6]},
+            {"mRender": function (data) {if (data == 1) {return '<span class="label label-success">Final</span>';}
+                                         else if (data == 2) {return '<span class="label label-warning">Halted</span>';}
+                                         else if (data == 3) {return '<span class="label label-info">Running</span>';}}, "aTargets": [7]},
+            {"mRender": function (data) {return '<a href=' + url_details + '?bwobject_id=' + data + '>'
+                                                 + 'Details' + '</a>';}, "aTargets": [8]},
+            {"mRender": function (data, type, full) {var w_name = data.substring(0,data.indexOf('#'));
+                                                     if ( w_name != 'None'){
+                                                        var widget_link = '<a href=' + url_widget + '?bwobject_id='
+                                                            + full[0] + '&widget=' + data.substring(0,data.indexOf('#')) + '>' + data.substring(data.indexOf('#')+1) + '</a>';
+                                                        if (w_name == 'approval_widget'){
+                                                                widget_link += '</br>' +
+                                                                '<button type="button" class="btn btn-danger btn-mini"><a id="reject-mini" href="javascript:void(0)" class="mini-approval-btn" onclick="mini_approval(this.id,'+full[0]+')">Reject</a></button>' +
+                                                                '<button type="button" class="btn btn-success btn-mini"><a id="accept-mini" href="javascript:void(0)" class="mini-approval-btn" onclick="mini_approval(this.id,'+full[0]+')">Accept</a></button>';
+                                                        }
+                                                        return widget_link;
+                                                     }
+                                                     else
+                                                        {return 'N/A';}}, "aTargets": [9]}
+        ],
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            rememberSelected(nRow);
+            oSettings = oTable.fnSettings();
+            nRow.addEventListener("click", function(e) {
+                selectRow(nRow, e, oSettings);
+            });
+        }
+    } );
+}
+
+$('#batch_btn').on('click', function() {
+    if (rowList.length >= 1){
+        var rowList_out = JSON.stringify(rowList);
+        console.log(rowList_out);
+        window.location = url_batch_widget + "?bwolist=" + rowList_out;
+        $(this).prop("disabled", true);
+        return false;
+    }
+});
+
+$('#refresh_button').on('click', function() {
+    jQuery.ajax({
+        url: url_refresh,
+        success: function(json){
+
+        }
+    });
+    oTable.fnDraw(false);
+});
+
+// DataTables row selection functions
+//***********************************
 function hoverRow(row) {
     row.style.background = "#FFFFEE";
 }
@@ -180,20 +258,12 @@ window.addEventListener("keydown", function(e){
     else if(e.keyCode == 46){
         if (rowList.length >= 1){
             var rowList_out = JSON.stringify(rowList);
-            console.log(rowList_out);
-            jQuery.ajax({
-                url: url_delete_multi + "?bwolist=" + rowList_out,
-                success: function(){
-                    // console.log(url);
-                }
-            });
+            deleteRecords(rowList_out);
             rowList = [];
             rowIndexList = [];
-            $('#refresh_button').click();
         }
     }
 });
-
 
 function selectRow(row, e, oSettings) {
     selectedRow = row;
@@ -202,21 +272,29 @@ function selectRow(row, e, oSettings) {
     }
     else{
         if($.inArray(row.cells[0].innerText, rowList) <= -1){
-            console.log(row.cells[9].innerText);
             if (row.cells[9].innerText != 'N/A'){
                 rowList.push(row.cells[0].innerText);
                 rowIndexList.push(row._DT_RowIndex+oSettings._iDisplayStart);
                 selectedRow.style.background = "#ffa";
+                if(row.cells[9].childNodes[0].innerText === 'Approve Record'){
+                    recordsToApprove.push(row.cells[0].innerText);
+                }
             }
         }
         else{
             rowList.splice(rowList.indexOf(row.cells[0].innerText), 1);
             rowIndexList.splice(rowIndexList.indexOf(row._DT_RowIndex+oSettings._iDisplayStart), 1);
             selectedRow.style.background = "white";
+            if(row.cells[9].childNodes[0].innerText === 'Approve Record'){
+                recordsToApprove.splice(recordsToApprove.indexOf(row.cells[0].innerText), 1);
+            }
         }
     }
+    checkRecordsToApprove();
+
     console.log(rowList);
     console.log(rowIndexList);
+    console.log(recordsToApprove);
 }
 
 function deselectAll(){
@@ -226,86 +304,25 @@ function deselectAll(){
     window.getSelection().removeAllRanges();
 }
 
-$(document).ready(function() {
-
-    oTable = $('#example').dataTable( {
-        // "sDom": '<"H"Clrf<"clear">>t<"F"ip>',
-        "sDom": 'lfC<"clear">rtip',
-        "bJQueryUI": true,
-        "bProcessing": true,
-        "bServerSide": true,
-        "bDestroy": true,
-        "sAjaxSource": url_load_table,
-        "oColVis": {
-            "buttonText": "Select Columns",
-            "bRestore": true,
-            "sAlign": "left",
-            "iOverlayFade": 1
-        },
-        "aoColumnDefs": [
-            {"mRender": function (data) {if (data == "{}") {return "None";}}, "aTargets": [5]},
-            {"mRender": function (data) {return '<abbr class="timeago" title="'+data.substring(data.indexOf('#')+1)+'">'+data.substring(0,data.indexOf('#'))+'</abbr>';}, "aTargets": [6]},
-            {"mRender": function (data) {if (data == 1) {return '<span class="label label-success">Final</span>';}
-                                         else if (data == 2) {return '<span class="label label-warning">Halted</span>';}
-                                         else if (data == 3) {return '<span class="label label-info">Running</span>';}}, "aTargets": [7]},
-            {"mRender": function (data) {return '<a href=' + url_details + '?bwobject_id=' + data + '>'
-                                                 + 'Details' + '</a>';}, "aTargets": [8]},
-            {"mRender": function (data, type, full) {if (data.substring(0,data.indexOf('#')) != 'None') {return '<a href=' + url_widget + '?bwobject_id='
-                                                            + full[0] + '&widget=' + data.substring(0,data.indexOf('#')) + '>' + data.substring(data.indexOf('#')+1) + '</a>';}
-                                                     else {return 'N/A';}}, "aTargets": [9]}
-        ],
-        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            rememberSelected(nRow);
-            oSettings = oTable.fnSettings();
-            nRow.addEventListener("click", function(e) {
-                selectRow(nRow, e, oSettings);
-            });
-        }
-        
-    } );
-
-    function bootstrap_alert(message) {
-        $('#alert-message').html('<span class="alert"><a class="close" data-dismiss="alert"> ×</a><span>'+message+'</span></span>');
+$(document).keyup(function(e){
+    if (e.keyCode == 27) {  // esc
+        deselectAll();
     }
+});
+//***********************************
 
-    $('#refresh_button').on('click', function() {
-        jQuery.ajax({
-            url: url_refresh,
-            success: function(json){
-                
-            }
-        });
-        oTable.fnDraw(false);
-    });
+// Tags functions
+//***********************************
+$('.task-btn').on('click', function(){
+    if($.inArray($(this)[0].name, tagList) <= -1){
+        var widget_name = $(this)[0].name;
+        $('.tag-area').html('');
+        $('.tag-area').append('<div class="alert alert-info tag-alert span1">'+widget_name+'<a class="close-btn" data-dismiss="alert" name='+widget_name+' onclick="closeTag(this)">&times;</a></div>');
+        tagList = [];
 
-    $('#batch_btn').on('click', function() {
-        if (rowList.length >= 1){
-            var rowList_out = JSON.stringify(rowList);
-            console.log(rowList_out);
-            window.location = url_batch_widget + "?bwolist=" + rowList_out;
-            $(this).prop("disabled", true);
-            return false;
-        }
-    });
-
-    $('.task-btn').on('click', function(){
-        if($.inArray($(this)[0].name, tagList) <= -1){
-            var widget_name = $(this)[0].name;
-            $('.tag-area').html('');
-            $('.tag-area').append('<div class="alert alert-info tag-alert span1">'+widget_name+'<a class="close-btn" data-dismiss="alert" name='+widget_name+' onclick="closeTag(this)">&times;</a></div>');
-            tagList = [];
-
-            tagList.push($(this)[0].name);
-        }
-        console.log($(this)[0].name);
-        oTable.fnFilter($(this)[0].name);
-    });
-
-    $(document).keyup(function(e){
-        if (e.keyCode == 27) {  // esc           
-            deselectAll();
-        }   
-    });
+        tagList.push($(this)[0].name);
+    }
+    oTable.fnFilter($(this)[0].name);
 });
 
 function closeTag(obj){
@@ -315,7 +332,10 @@ function closeTag(obj){
     // tagList.splice(tagList.indexOf(obj.name), 1);
     console.log(tagList);
 };
+//***********************************
 
+//Utility functions
+//***********************************
 function fnGetSelected( oTableLocal ){
     var aReturn = [];
     var aTrs = oTableLocal.fnGetNodes();
@@ -327,3 +347,17 @@ function fnGetSelected( oTableLocal ){
     }
     return aReturn;
 }
+
+function isInt(n) {
+   return typeof n === 'number' && n % 1 === 0;
+}
+
+function emptyLists(){
+    rowList = [];
+    rowIndexList = [];
+}
+
+function bootstrap_alert(message) {
+    $('#alert-message').html('<span class="alert"><a class="close" data-dismiss="alert"> ×</a><span>'+message+'</span></span>');
+}
+//***********************************

@@ -61,18 +61,17 @@ class approval_widget(Form):
         from ..models import BibWorkflowObject
         from invenio.sqlalchemyutils import db
 
-        bwobject = BibWorkflowObject.query.filter(
-            BibWorkflowObject.id == bwobject_id).first()
+        bwobject = BibWorkflowObject.query.get(bwobject_id)
 
-        if 'Accept' in request.form:
+        if request.form['decision'] == 'Accept':
             extra_data_dict = bwobject.get_extra_data()
             extra_data_dict['widget'] = None
             bwobject.set_extra_data(extra_data_dict)
             db.session.commit()
             continue_oid_delayed(bwobject_id)
-
             flash('Record Accepted')
-        elif 'Reject' in request.form:
+            
+        elif request.form['decision'] == 'Reject':
             _delete_from_db(bwobject_id)
             flash('Record Rejected')
 

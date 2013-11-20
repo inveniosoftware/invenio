@@ -37,29 +37,29 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None,
         if len(sSearch) < 4:
             pass
         else:
-            bwobject_list2 = []
+            bwobject_list_tmp = []
             for bwo in bwobject_list:
                 extra_data = bwo.get_extra_data()
                 if bwo.id_parent == sSearch:
-                    bwobject_list2.append(bwo)
+                    bwobject_list_tmp.append(bwo)
                 elif bwo.id_user == sSearch:
-                    bwobject_list2.append(bwo)
-                elif sSearch in bwo.id_workflow:
-                    bwobject_list2.append(bwo)
-                elif sSearch in extra_data['widget']:
-                    bwobject_list2.append(bwo)
-                elif sSearch in extra_data['last_task_name']:
-                    bwobject_list2.append(bwo)
+                    bwobject_list_tmp.append(bwo)
+                elif bwo.id_workflow == sSearch:
+                    bwobject_list_tmp.append(bwo)
+                elif extra_data['widget'] == sSearch:
+                    bwobject_list_tmp.append(bwo)
+                elif extra_data['last_task_name'] == sSearch:
+                    bwobject_list_tmp.append(bwo)
                 try:
                     if sSearch in extra_data['redis_search']['category']:
-                        bwobject_list2.append(bwo)
+                        bwobject_list_tmp.append(bwo)
                     elif sSearch in extra_data['redis_search']['source']:
-                        bwobject_list2.append(bwo)
+                        bwobject_list_tmp.append(bwo)
                     elif sSearch in extra_data['redis_search']['title']:
-                        bwobject_list2.append(bwo)
+                        bwobject_list_tmp.append(bwo)
                 except KeyError:
                     pass
-            bwobject_list = bwobject_list2
+            bwobject_list = bwobject_list_tmp
 
     if iSortCol_0 == -6:
         column = 'created'

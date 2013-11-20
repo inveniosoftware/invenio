@@ -6,24 +6,29 @@
     {% css url_for('static', filename='css/prism.css') %}
 {% endblock header %}
 
+{% js url_for('static', filename='js/prism.js'), '40-workflows' %}
+{% js url_for('workflows.static', filename='js/workflows/hp_details.js'), '50-workflows' %}
+{% js url_for('workflows.static', filename='js/workflows/hp_datapreview.js'), '50-workflows' %}
+
 {% block javascript %}
     {{ super() }}
-    {% js url_for('static', filename='js/prism.js'), '40-workflows' %}
-    {% js url_for('workflows.static', filename='js/workflows/hp_details.js'), '50-workflows' %}
-    {% js url_for('workflows.static', filename='js/workflows/hp_datapreview.js'), '50-workflows' %}
     
     <script type="text/javascript">
         $(document).ready(function(){
             var bwoid = "{{bwobject.id}}";
             var format = "hd";
             var url_preview = "{{ url_for('holdingpen.entry_data_preview') }}";
-            
+            var url_restart_record = "{{ url_for('holdingpen.restart_record') }}";
+            var url_restart_record_prev = "{{ url_for('holdingpen.restart_record_prev') }}";
+            var url_continue_record = "{{ url_for('holdingpen.continue_record') }}";
+
             $('button.preview').click(function() {
                 format = $(this).attr('name');
                 data_preview(url_preview, bwoid, format);
             });
 
             data_preview(url_preview, bwoid, format);
+            action_buttons(url_restart_record, url_restart_record_prev, url_continue_record);
         });
     </script>
 {% endblock javascript %}
@@ -31,7 +36,7 @@
 {% block hpbody %}
     <div class="row-fluid">
         <div class="span3 pull-left"><a href="{{url_for('holdingpen.maintable')}}"><i class="icon-hand-left"></i> Back to Main Table</a></div>
-        <div class="span3"><h1>Record Details</h1></div>
+        <div class="span4"><h1>Record Details</h1></div>
     </div>
 
     <div id = "alert_placeholder"></div>
@@ -170,6 +175,4 @@
             </div>
         </div>
     </div>
-
-
 {% endblock %}
