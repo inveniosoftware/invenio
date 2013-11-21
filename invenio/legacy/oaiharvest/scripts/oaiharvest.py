@@ -45,8 +45,11 @@ Examples:
 from invenio.base.factory import with_app_context
 
 
-
 @with_app_context()
 def main():
-    from invenio.legacy.oaiharvest.daemon import main as daemon_main
-    return daemon_main()
+    from invenio.oai_harvest_daemon import main as oai_main
+    return oai_main()
+
+### okay, here we go:
+if __name__ == '__main__':
+    main()

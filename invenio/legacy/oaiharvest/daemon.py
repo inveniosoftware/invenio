@@ -29,7 +29,6 @@ __revision__ = "$Id$"
 import sys
 import getopt
 import getpass
-import re
 import time
 import urlparse
 
@@ -37,7 +36,8 @@ from invenio.config import (CFG_OAI_FAILED_HARVESTING_STOP_QUEUE,
                             CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN,
                             CFG_SITE_SUPPORT_EMAIL
                             )
-from . import getter as oai_harvest_getter
+from . import getter
+from invenio.base.factory import with_app_context
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
 from invenio.modules.workflows.api import start
@@ -52,32 +52,12 @@ from invenio.legacy.bibsched.bibtask import (task_get_task_param,
                                              write_message,
                                              task_init
                                              )
+from invenio.legacy.oaiharvest.dblayer import create_oaiharvest_log_str
 from invenio.legacy.oaiharvest.config import InvenioOAIHarvestWarning
 from invenio.legacy.oaiharvest.utils import (compare_timestamps_with_tolerance,
                                              generate_harvest_report)
 from invenio.legacy import template
 oaiharvest_templates = template.load('oai_harvest')
-
-## precompile some often-used regexp for speed reasons:
-REGEXP_RECORD = re.compile("<record.*?>(.*?)</>record>", re.DOTALL)
-REGEXP_REFS = re.compile("<record.*?>.*?<controlfield .*?>.*?</controlfield>(.*?)</record>", re.DOTALL)
-REGEXP_AUTHLIST = re.compile("<collaborationauthorlist.*?</collaborationauthorlist>", re.DOTALL)
-
-from invenio.legacy.bibconvert.registry import templates
-CFG_OAI_AUTHORLIST_POSTMODE_STYLESHEET = templates.get('authorlist2marcxml.xsl', '')
-
-def get_nb_records_in_file(filename):
-    """
-    Return number of record in FILENAME that is either harvested or converted
-    file. Useful for statistics.
-    """
-    try:
-        nb = open(filename, 'r').read().count("</record>")
-    except IOError:
-        nb = 0 # file not exists and such
-    except:
-        nb = -1
-    return nb
 
 def task_run_core():
     start_time = time.time()
@@ -188,7 +168,6 @@ def create_oaiharvest_log(task_id, oai_src_id, marcxmlfile):
     create_oaiharvest_log_str(task_id, oai_src_id, xml_content)
 
 
-
 def get_dates(dates):
     """ A method to validate and process the dates input by the user
         at the command line """
@@ -229,6 +208,7 @@ def get_dates(dates):
         twodates = None
     return twodates
 
+
 def get_repository_names(repositories):
     """ A method to validate and process the repository names input by the
         user at the command line """
@@ -248,6 +228,7 @@ def get_repository_names(repositories):
         repository_names = None
     return repository_names
 
+
 def usage(exitcode=0, msg=""):
     """Print out info. Only used when run in 'manual' harvesting mode"""
     sys.stderr.write("*Manual single-shot harvesting mode*\n")
@@ -256,6 +237,7 @@ def usage(exitcode=0, msg=""):
     sys.exit(exitcode)
 
 
+@with_app_context()
 def main():
     """Starts the tool.
 
@@ -352,11 +334,11 @@ def main():
                         sys.stderr.write("\n%s\n" % (error,))
                         sys.exit(0)
 
-                oai_harvest_getter.harvest(network_location, path,
-                                           http_param_dict, method,
-                                           output, sets, secure, user,
-                                           password, cert_file,
-                                           key_file)
+                getter.harvest(network_location, path,
+                               http_param_dict, method,
+                               output, sets, secure, user,
+                               password, cert_file,
+                               key_file)
 
                 sys.stderr.write("Harvesting completed at: %s\n\n" %
                                  time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
@@ -443,7 +425,6 @@ Automatic (periodical) harvesting mode:
               task_run_fnc=task_run_core)
 
 
-
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """Elaborate specific cli parameters for oaiharvest."""
     if key in ("-r", "--repository"):
@@ -451,7 +432,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ("-d", "--dates"):
         task_set_option('dates', get_dates(value))
         if value is not None and task_get_option("dates") is None:
-           raise StandardError("Date format not valid.")
+            raise StandardError("Date format not valid.")
     elif key in ("--notify-email-to",):
         if email_valid_p(value):
             task_set_option('notify-email-to', value)
