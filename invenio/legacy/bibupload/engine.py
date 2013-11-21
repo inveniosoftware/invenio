@@ -952,7 +952,8 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
     """Retrieve the record Id from a record by using tag 001 or SYSNO or OAI ID or DOI
     tag. opt_mod is the desired mode.
 
-    @param post_phase Tells if we are calling this method in the postprocessing phase. If true, we accept presence of 001 fields even in the insert mode
+    @param post_phase Tells if we are calling this method in the postprocessing phase. If true, we accept presence of
+    001 fields even in the insert mode
     @type post_phase boolean
     """
 
@@ -965,9 +966,9 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
         rec_id = tag_001[0][3]
         # if we are in insert mode => error
         if opt_mode == 'insert' and not post_phase:
-            write_message("   Failed: tag 001 found in the xml" \
-                          " submitted, you should use the option replace," \
-                          " correct or append to replace an existing" \
+            write_message("   Failed: tag 001 found in the xml"
+                          " submitted, you should use the option replace,"
+                          " correct or append to replace an existing"
                           " record. (-h for help)",
                           verbose=1, stream=sys.stderr)
             return -1
@@ -983,11 +984,11 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
                     # requested to replace records. Therefore we create on the fly
                     # a empty record allocating the recid.
                     write_message("   Warning: tag 001 found in the xml with"
-                                " value %(rec_id)s, but rec_id %(rec_id)s does"
-                                " not exist. Since the mode replace was"
-                                " requested the rec_id %(rec_id)s is allocated"
-                                " on-the-fly." % {"rec_id": rec_id},
-                                stream=sys.stderr)
+                                  " value %(rec_id)s, but rec_id %(rec_id)s does"
+                                  " not exist. Since the mode replace was"
+                                  " requested the rec_id %(rec_id)s is allocated"
+                                  " on-the-fly." % {"rec_id": rec_id},
+                                  stream=sys.stderr)
                     return create_new_record(rec_id=rec_id, pretend=pretend)
                 else:
                     # Since --force was not used we are going to raise an error
@@ -997,7 +998,7 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
                                   " exists. If you want to really create"
                                   " such record, please use the --force"
                                   " parameter when calling bibupload." % {
-                                    "rec_id": rec_id}, stream=sys.stderr)
+                                  "rec_id": rec_id}, stream=sys.stderr)
                     return -1
             else:
                 # The record doesn't exist yet. We shall have try to check
@@ -1111,18 +1112,18 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
                 # Oops, this record refers to DOI existing in multiple records.
                 # Dunno which one to choose.
                 write_message("   Failed: Multiple records found in the" \
-                          " database %s that match the DOI(s) in the input" \
-                          " MARCXML %s" % (repr(matching_recids), repr(record_dois)),
-                          verbose=1, stream=sys.stderr)
+                              " database %s that match the DOI(s) in the input" \
+                              " MARCXML %s" % (repr(matching_recids), repr(record_dois)),
+                              verbose=1, stream=sys.stderr)
                 return -1
             elif len(matching_recids) == 1:
                 rec_id = matching_recids.pop()
                 if opt_mode == 'insert':
                     write_message("   Failed: DOI tag matching record #%s found in the xml" \
-                          " submitted, you should use the option replace," \
-                          " correct or append to replace an existing" \
-                          " record. (-h for help)" % rec_id,
-                          verbose=1, stream=sys.stderr)
+                                  " submitted, you should use the option replace," \
+                                  " correct or append to replace an existing" \
+                                  " record. (-h for help)" % rec_id,
+                                  verbose=1, stream=sys.stderr)
                     return -1
             else:
                 write_message("   - Tag DOI value not found in database.",
