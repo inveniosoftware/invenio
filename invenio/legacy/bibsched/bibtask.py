@@ -604,7 +604,10 @@ def task_set_option(key, value):
 def task_get_option(key, default=None):
     """Returns the value corresponding to key in the option dictionary of the task"""
     try:
-        return _OPTIONS.get(key, default)
+        if key is None:
+            return _OPTIONS
+        else:
+            return _OPTIONS.get(key, default)
     except NameError:
         return default
 
@@ -618,7 +621,10 @@ def task_has_option(key):
 def task_get_task_param(key, default=None):
     """Returns the value corresponding to the particular task param"""
     try:
-        return _TASK_PARAMS.get(key, default)
+        if key is None:
+            return _TASK_PARAMS
+        else:
+            return _TASK_PARAMS.get(key, default)
     except NameError:
         return default
 
