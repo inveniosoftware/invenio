@@ -70,9 +70,10 @@ class datetime(real_datetime):
     def strftime(self, fmt):
         return strftime(fmt, self)
 
-    @classmethod
-    def combine(self, date, time):
-        return self(date.year, date.month, date.day, time.hour, time.minute, time.microsecond, time.tzinfo)
+    def __add__(self, other):
+        d = real_datetime.combine(self, self.timetz())
+        d += other
+        return self.combine(d, d.timetz())
 
     def date(self):
         return date(self.year, self.month, self.day)
