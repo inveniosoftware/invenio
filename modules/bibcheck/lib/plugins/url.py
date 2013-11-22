@@ -28,6 +28,8 @@ except ImportError:
     print "Requests module not available, no redirect/broken url detection"
     HAS_REQUESTS = False
 
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
+
 DOMAIN_REGEXP = r"^[a-zA-Z0-9\-\.]+\.([a-z]{2}|com|edu|gov|info|net|org)\/"
 
 def clean_url(url):
@@ -70,13 +72,21 @@ def check_record(record, fields):
             continue
 
         if HAS_REQUESTS:
-            response = requests.head(url_cleaned, allow_redirects=False,
-                                     verify=False)
-            code = response.status_code
-            if code >= 400 and code < 600:
-                record.set_invalid('Server error: %s' % code)
-            elif code == 301:
-                url_cleaned = response.headers['Location']
+            try:
+                if any(url in url_cleaned for url in [CFG_SITE_URL, CFG_SITE_SECURE_URL]):
+                    continue
+                response = requests.head(url_cleaned, allow_redirects=False,
+                                         verify=False)
+                code = response.status_code
+                if code >= 400 and code < 600:
+                    record.set_invalid('Server error: %s' % code)
+                elif code == 301:
+                    url_cleaned = response.headers['Location']
+            except (requests.exceptions.ConnectionError,
+                    requests.exceptions.HTTPError,
+                    requests.exceptions.Timeout,
+                    requests.exceptions.TooManyRedirects) as e:
+                # Problem with the request occurred
+                record.set_invalid('Server error: %s' % e)
 
         record.amend_field(position, url_cleaned)
-
