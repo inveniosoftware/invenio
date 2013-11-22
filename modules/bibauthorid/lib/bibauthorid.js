@@ -883,6 +883,8 @@ var ticketbox = {
 
             modalBody.append(message);
             this.committing = false;
+            this.complete = true;
+            var modal = this.$commitModal;
         },
 
         generateCommitErrorMessage: function() {
@@ -949,6 +951,7 @@ var ticketbox = {
 
             // Indicate committing
             this.committing = true;
+            this.complete = false;
 
             // Preserve modal dimensions.
             modal.height(modal.height());
@@ -1117,6 +1120,9 @@ var ticketbox = {
                     },
                     afterHide: function(subjects, internalCallback) {
                         view.commitModalClose();
+                        if(view.complete) {
+                            document.location.reload(true);
+                        }
                         return internalCallback(subjects);
                     }
                 }
