@@ -48,7 +48,6 @@ def get_instance_config_object(filename='invenio.cfg', silent=True):
         if not (silent and e.errno in (errno.ENOENT, errno.EISDIR)):
             e.strerror = 'Unable to load configuration file (%s)' % e.strerror
             raise
-        d.__dict__ = {}
     return d
 
 
