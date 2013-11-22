@@ -16,15 +16,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.bibworkflow_worker_engine import (run_worker,
-                                               restart_worker,
-                                               continue_worker)
+
 from invenio.celery import celery
-from invenio.bibworkflow_utils import BibWorkflowObjectIdContainer
+
 from invenio.ext.sqlalchemy import db
+from invenio.base.helpers import with_app_context
 
-
-
+@with_app_context()
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.run_worker')
 def celery_run(workflow_name, data, **kwargs):
     """
@@ -32,6 +30,8 @@ def celery_run(workflow_name, data, **kwargs):
     """
 
     from ..worker_engine import run_worker
+    from ..utils import BibWorkflowObjectIdContainer
+
 
     if isinstance(data, list):
         for i in range(0, len(data)):
@@ -70,6 +70,7 @@ def celery_run(workflow_name, data, **kwargs):
     run_worker(workflow_name, data, **kwargs)
 
 
+@with_app_context()
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.restart_worker')
 def celery_restart(wid, **kwargs):
     """
@@ -79,6 +80,8 @@ def celery_restart(wid, **kwargs):
     restart_worker(wid, **kwargs)
 
 
+
+@with_app_context()
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.continue_worker')
 def celery_continue(oid, restart_point, **kwargs):
     """
