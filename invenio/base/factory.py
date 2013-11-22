@@ -27,9 +27,11 @@ import warnings
 
 #from invenio.ext.logging import register_exception
 from .helpers import with_app_context, unicodifier
-from .utils import collect_blueprints, register_extensions, \
-    register_configurations
 from .wrappers import Flask
+from invenio.ext.registry import Registry, ExtensionRegistry, \
+    PackageRegistry, ConfigurationRegistry, AutoDiscoverRegistry, \
+    ImportPathRegistry
+from flask import Blueprint
 
 
 __all__ = ['create_app', 'with_app_context']
@@ -126,11 +128,24 @@ def create_app(**kwargs_config):
 
     _app.config["SECRET_KEY"] = SECRET_KEY
 
-    # Register extendsions listed in invenio.cfg
-    register_extensions(_app)
+    # Initialize application registry
+    Registry(app=_app)
+
+    # Register core packages listed in invenio.cfg
+    _app.extensions['registry']['core_packages'] = ImportPathRegistry(
+        initial=['invenio.core.*']
+    )
+    # Register packages listed in invenio.cfg
+    _app.extensions['registry']['packages'] = PackageRegistry(_app)
+
+    # Register extensions listed in invenio.cfg
+    _app.extensions['registry']['extensions'] = ExtensionRegistry(_app)
 
     # Extend application config with packages configuration.
-    register_configurations(_app)
+    ConfigurationRegistry(
+        _app, registry_namespace='core_packages'
+    )
+    ConfigurationRegistry(_app)
 
     # Debug toolbar was here
 
@@ -178,38 +193,35 @@ def create_app(**kwargs_config):
 
     # Custom templete filters loading was here.
 
-    def _invenio_blueprint_plugin_builder(plugin):
-        """
-        Handy function to bridge pluginutils with (Invenio) blueprints.
-        """
-        from flask import Blueprint
-        if 'blueprints' in dir(plugin):
-            candidates = getattr(plugin, 'blueprints')
-        elif 'blueprint' in dir(plugin):
-            candidates = [getattr(plugin, 'blueprint')]
+    # Load views modules
+    _app.extensions['registry']['views'] = AutoDiscoverRegistry(
+        'views',
+        lazy=False,
+        app=_app,
+    )
+
+    # Register blueprints
+    for view_module in _app.extensions['registry']['views']:
+        if 'blueprints' in dir(view_module):
+            candidates = getattr(view_module, 'blueprints')
+        elif 'blueprint' in dir(view_module):
+            candidates = [getattr(view_module, 'blueprint')]
         else:
             candidates = []
 
         for candidate in candidates:
             if isinstance(candidate, Blueprint):
-                if candidate.name in _app.config.get('CFG_FLASK_DISABLED_BLUEPRINTS', []):
-                    _app.logger.info('%s is excluded by CFG_FLASK_DISABLED_BLUEPRINTS' % candidate.name)
-                    return
-                return candidate
-        _app.logger.error('%s is not a valid blueprint plugin' % plugin.__name__)
+                _app.register_blueprint(
+                    candidate,
+                    url_prefix=_app.config.get(
+                        'BLUEPRINTS_URL_PREFIXES', {}
+                    ).get(candidate.name)
+                )
+            else:
+                _app.logger.error(
+                    '%s is not a valid blueprint plugin' % view_module.__name__
+                )
 
-
-    ## Let's load all the blueprints that are composing this Invenio instance
-    _BLUEPRINTS = [m for m in map(_invenio_blueprint_plugin_builder,
-                                  collect_blueprints(app=_app))
-                   if m is not None]
-
-    ## Let's attach all the blueprints
-    for plugin in _BLUEPRINTS:
-        _app.register_blueprint(plugin,
-                                url_prefix=_app.config.get(
-                                    'BLUEPRINTS_URL_PREFIXES',
-                                    {}).get(plugin.name))
 
     # Flask-Admin was here.
     @_app.route('/testing')
