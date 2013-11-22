@@ -234,10 +234,10 @@ def validate_match(org_record, matched_record, ruleset, verbose=0, ascii_mode=Fa
             if tag_structure != None:
                 tag, ind1, ind2, code = tag_structure
                 # Fetch all field instances to match
-                original_record_values.extend(record_get_field_values(\
-                                            org_record, tag, ind1, ind2, code))
-                matched_record_values.extend(record_get_field_values(\
-                                            matched_record, tag, ind1, ind2, code))
+                original_values = record_get_field_values(org_record, tag, ind1, ind2, code)
+                original_record_values.extend([value for value in original_values if value])
+                matched_values = record_get_field_values(matched_record, tag, ind1, ind2, code)
+                matched_record_values.extend([value for value in matched_values if value])
 
         if (len(original_record_values) == 0 or len(matched_record_values) == 0):
             # Both records do not have values, ignore.
