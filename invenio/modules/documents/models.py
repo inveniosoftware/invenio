@@ -67,5 +67,17 @@ class Bibdocmoreinfo(db.Model):
                                format, id_rel, namespace, data_key),
                       db.Model.__table_args__)
 
-__all__ = ['Bibdocfsinfo',
-           'Bibdocmoreinfo']
+class Document(db.Model):
+    """Represents a document object inside the SQL database"""
+
+    __tablename__ = 'documents'
+    id = db.Column(db.UUID, primary_key=True)
+    parent_id = db.Column(db.UUID, nullable=True)
+    creation_date = db.Column(db.DateTime, nullable=False,
+                              server_default='1900-01-01 00:00:00', index=True)
+    modification_date = db.Column(db.DateTime, nullable=False,
+                                  server_default='1900-01-01 00:00:00',
+                                  index=True)
+    json = db.Column(db.JSON, nullable=True)
+
+    #FIXME write better setter for json
