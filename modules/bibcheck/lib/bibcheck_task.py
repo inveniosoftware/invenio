@@ -258,6 +258,8 @@ def task_parse_options(key, val, *_):
     elif key in ("--dry-run", "-n"):
         task_set_option("no_upload", True)
         task_set_option("no_tickets", True)
+    elif key in ("--config", "-c"):
+        task_set_option("config", val)
     else:
         raise StandardError("Error: Unrecognised argument '%s'." % key)
     return True
@@ -541,7 +543,8 @@ def load_rules(plugins):
     """
     Load the rules and return a dict with the rules
     """
-    filename = os.path.join(CFG_ETCDIR, "bibcheck/rules.cfg")
+    config = task_get_option("config", "rules.cfg")
+    filename = os.path.join(CFG_ETCDIR, "bibcheck/", config)
     config = RawConfigParser()
     config.readfp(open(filename))
     rules = {}
@@ -722,6 +725,8 @@ def main():
   -t, --no-tickets         Don't create any ticket in RT. Useful for debugging
   -b, --no-upload          Don't upload changes to the database
   -n, --dry-run            Like --no-tickets and --no-upload
+  -c, --config             By default bibcheck reads the file rules.cfg. This
+                           allows to specify a different config file
 
   If any of the options --id, --no-tickets, --no-upload or --dry-run is enabled,
     bibcheck won't update the last-run-time of a task in the database.
@@ -759,9 +764,9 @@ def main():
               description="",
               help_specific_usage=usage,
               version="Invenio v%s" % CFG_VERSION,
-              specific_params=("hvtbnV:e:a:i:q:", ["help", "version",
+              specific_params=("hvtbnV:e:a:i:q:c:", ["help", "version",
                   "verbose=", "enable-rules=", "all=", "id=", "queue=",
-                  "no-tickets", "no-upload", "dry-run"]),
+                  "no-tickets", "no-upload", "dry-run", "config"]),
               task_submit_elaborate_specific_parameter_fnc=task_parse_options,
               task_run_fnc=task_run_core)
 
