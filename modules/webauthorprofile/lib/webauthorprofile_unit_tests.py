@@ -36,8 +36,8 @@ class WebAuthorProfileTest(TestCase):
     def test_caching(self):
         """ Test if the main corefuntions work correctly. """
         res1 = _foo(1,2,3,0)
-        res2, status2, _ = foo(1,2,3,0)
-        res3, status3, _ = foo(1,2,3,0)
+        res2, status2, = foo(1,2,3,0)
+        res3, status3, = foo(1,2,3,0)
         self.assertEqual(res1, res2)
         self.assertEqual(True, status2)
         self.assertEqual(res2, res3)

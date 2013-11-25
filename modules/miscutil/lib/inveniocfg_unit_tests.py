@@ -23,6 +23,7 @@ from invenio.testutils import InvenioTestCase
 import sys
 import StringIO
 import logging
+import warnings
 
 from invenio.inveniocfg import main
 from invenio.testutils import make_test_suite, run_test_suite
