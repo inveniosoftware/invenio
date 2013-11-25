@@ -112,13 +112,10 @@ class InvenioLoader(BaseLoader):
     @with_app_context()
     def read_configuration(self):
         """ Read configuration defined in invenio.celery.config """
-        usercfg = self._import_config_module('invenio.celery.config')
-        self.configured = True
-
-        from werkzeug.datastructures import CombinedMultiDict
+        from invenio.celery.config import default_config
         from flask import current_app
-
-        return DictAttribute(CombinedMultiDict([current_app.config, usercfg]))
+        self.configured = True
+        return default_config(current_app.config)
 
     def close_database(self, **dummy_kwargs):
         if self.db:
