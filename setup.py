@@ -106,6 +106,7 @@ setup(
             'bibsort = invenio.legacy.bibsort.scripts.bibsort:main',
             'bibrank = invenio.legacy.bibrank.scripts.bibrank:main',
             'bibindex = invenio.legacy.bibindex.scripts.bibindex:main',
+            'bibtasklet = invenio.legacy.bibsched.scripts.bibtasklet:main',
             'bibupload = invenio.legacy.bibupload.scripts.bibupload:main',
             'bibdocfile = invenio.legacy.bibdocfile.scripts.bibdocfile:main',
             'bibreformat = invenio.legacy.bibformat.scripts.bibreformat:main',
