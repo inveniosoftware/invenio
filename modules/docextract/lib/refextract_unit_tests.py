@@ -298,7 +298,6 @@ class RebuildReferencesTest(unittest.TestCase):
             u"[1] hello hello2",
             u"[2] foo",
         ])
-        print 'rebuilt_refs', repr(rebuilt_refs)
 
 
 class tagArxivTest(unittest.TestCase):
