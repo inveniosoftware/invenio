@@ -34,6 +34,7 @@ import subprocess
 import difflib
 
 from warnings import warn
+from functools import wraps
 from urlparse import urlsplit, urlunsplit
 from urllib import urlencode
 from itertools import chain, repeat
@@ -970,3 +971,18 @@ class XmlTest(unittest.TestCase):
             for line in difflib.unified_diff(xml.split('\n'), xml2.split('\n')):
                 print line.strip('\n')
             raise
+
+
+def failfast(method):
+    @wraps(method)
+    def inner(self, *args, **kw):
+        self.stop()
+        return method(self, *args, **kw)
+    return inner
+
+
+def wrap_failfast():
+    """Makes it so unit tests will fail at the first error"""
+    unittest.TestResult.addError = failfast(unittest.TestResult.addError)
+    unittest.TestResult.addFailure = failfast(unittest.TestResult.addFailure)
+    unittest.TestResult.addUnexpectedSuccess = failfast(unittest.TestResult.addUnexpectedSuccess)

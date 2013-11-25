@@ -1620,6 +1620,7 @@ def prepare_option_parser():
     parser.add_option_group(helper_options)
 
     parser.add_option('--yes-i-know', action='store_true', dest='yes-i-know', help='use with care!')
+    parser.add_option('-x', '--stop', action='store_true', dest='stop_on_error', help='When running tests, stop at first error')
 
     return parser
 
@@ -1660,6 +1661,10 @@ def main(*cmd_args):
     # Parse arguments
     parser = prepare_option_parser()
     (options, dummy_args) = parser.parse_args(list(cmd_args))
+
+    if getattr(options, 'stop_on_error', False):
+        from invenio.testutils import wrap_failfast
+        wrap_failfast()
 
     if getattr(options, 'version', False):
         print_version()
