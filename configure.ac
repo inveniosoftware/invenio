@@ -727,7 +727,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibsched/bin/Makefile \
      modules/bibsched/bin/bibsched \
      modules/bibsched/bin/bibtaskex \
-     modules/bibsched/bin/bibtasklet \
      modules/bibsched/doc/Makefile \
      modules/bibsched/doc/admin/Makefile \
      modules/bibsched/doc/hacking/Makefile \
