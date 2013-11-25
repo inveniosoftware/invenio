@@ -509,11 +509,16 @@ class BibSched(object):
                 ## Let's normalize the prority of all tasks in a sequenceid to the
                 ## max priority of the group
                 max_priority = run_sql("""SELECT MAX(priority) FROM schTASK
-                                          WHERE status='WAITING'
+                                          WHERE status IN ('WAITING', 'RUNNING',
+                                          'SLEEPING', 'ABOUT TO STOP',
+                                          'ABOUT TO SLEEP',
+                                          'SCHEDULED', 'CONTINUING')
                                           AND sequenceid=%s""",
                                        (task.sequenceid, ))[0][0]
                 if run_sql("""UPDATE schTASK SET priority=%s
-                              WHERE status='WAITING' AND sequenceid=%s""",
+                              WHERE status IN ('WAITING', 'RUNNING',
+                              'SLEEPING', 'ABOUT TO STOP', 'ABOUT TO SLEEP',
+                              'SCHEDULED', 'CONTINUING') AND sequenceid=%s""",
                            (max_priority, task.sequenceid)):
                     Log("Raised all waiting tasks with sequenceid "
                         "%s to the max priority %s" % (task.sequenceid, max_priority))
