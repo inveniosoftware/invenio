@@ -1059,7 +1059,8 @@ def get_format_template_attrs(filename):
     return attrs
 
 
-def get_format_element(element_name, verbose=0, with_built_in_params=False):
+def get_format_element(element_name, verbose=0, with_built_in_params=False,
+                       soft_fail=False):
     """
     Returns the format element structured content.
 
@@ -1081,8 +1082,6 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
     @return: a dictionary with format element attributes
     """
     _ = gettext_set_language(CFG_SITE_LANG)
-
-    errors = []
 
     # Resolve filename and prepare 'name' as key for the cache
     filename = resolve_format_element_filename(element_name)
@@ -1111,15 +1110,11 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             format_elements_cache[name] = format_element
             return format_element
 
-        else:
-            try:
-                raise InvenioBibFormatError(_('Format element %s could not be found.') % element_name)
-            except InvenioBibFormatError, exc:
-                register_exception()
-
-            if verbose >= 5:
-                sys.stderr.write(exc.message)
+        elif soft_fail:
+            register_exception()
             return None
+        else:
+            raise InvenioBibFormatError(_('Format element %s could not be found.') % element_name)
 
     else:
         format_element = {}
@@ -1140,25 +1135,12 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             components = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH.split(".")
             for comp in components[1:]:
                 module = getattr(module, comp)
-
-        except Exception, e:
-            register_exception()
-            # We catch all exceptions here, as we just want to print
-            # traceback in all cases
-            tb = sys.exc_info()[2]
-            stack = traceback.format_exception(Exception, e, tb, limit=None)
-            try:
-                raise InvenioBibFormatError(_('Error in format element %s. %s.') % (element_name, "\n" + "\n".join(stack[-2:-1])))
-            except InvenioBibFormatError, exc:
-                errors.append(exc.message)
-
-            if verbose >= 5:
-                sys.stderr.write(exc.message)
-
-        if errors:
-            if verbose >= 7:
-                raise Exception(exc.message)
-            return None
+        except:
+            if soft_fail:
+                register_exception()
+                return None
+            else:
+                raise
 
         # Load function 'format_element()' inside element
         try:
@@ -1170,24 +1152,19 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
                 function_format = module.__dict__[module_name].format
                 format_element['code'] = function_format
             except AttributeError, e:
-                try:
-                    raise InvenioBibFormatError(_('Format element %s has no function named "format".') % element_name)
-                except InvenioBibFormatError, exc:
-                    register_exception()
-                    errors.append(exc.message)
-
-                if verbose >= 5:
-                    sys.stderr.write(exc.message)
-
-        if errors:
-            if verbose >= 7:
-                raise Exception(exc.message)
-            return None
+                if soft_fail:
+                    try:
+                        raise InvenioBibFormatError(_('Format element %s has no function named "format".') % element_name)
+                    except InvenioBibFormatError, exc:
+                        register_exception()
+                    return None
+                else:
+                    raise
 
         # Load function 'escape_values()' inside element
         function_escape = getattr(module.__dict__[module_name],
-                                   'escape_values',
-                                   None)
+                                  'escape_values',
+                                  None)
         format_element['escape_function'] = function_escape
 
         # Prepare, cache and return
@@ -1234,7 +1211,8 @@ def get_format_elements(with_built_in_params=False):
                 filename_test = filename_test[4:]
             element_name = filename_test[:-3]
             element = get_format_element(element_name,
-                                         with_built_in_params=with_built_in_params)
+                                         with_built_in_params=with_built_in_params,
+                                         soft_fail=True)
             if element is not None:
                 format_elements[element_name] = element
 
@@ -1713,10 +1691,7 @@ def resolve_output_format_filename(code, verbose=0):
             return filename
 
     # No output format with that name found
-    try:
-        raise InvenioBibFormatError(_('Could not find output format named %s.') % code)
-    except InvenioBibFormatError, exc:
-        register_exception()
+    raise InvenioBibFormatError(_('Could not find output format named %s.') % code)
 
     if verbose >= 5:
         sys.stderr.write(exc.message)

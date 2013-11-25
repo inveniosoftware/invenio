@@ -47,7 +47,7 @@ class InvenioBibFormatError(Exception):
 
     def __str__(self):
         """String representation."""
-        return repr(self.message)
+        return self.message
 
 # Exceptions: warnings
 class InvenioBibFormatWarning(Exception):

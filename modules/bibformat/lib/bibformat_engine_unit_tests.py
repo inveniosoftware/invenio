@@ -178,12 +178,26 @@ class FormatElementTest(InvenioTestCase):
         self.assertEqual(element_2, element_2_bis)
 
         #Test loading incorrect elements
-        element_3 = bibformat_engine.get_format_element("test 3", with_built_in_params=True)
-        self.assertEqual(element_3, None)
-        element_4 = bibformat_engine.get_format_element("test 4", with_built_in_params=True)
-        self.assertEqual(element_4, None)
-        unknown_element = bibformat_engine.get_format_element("TEST_NO_ELEMENT", with_built_in_params=True)
-        self.assertEqual(unknown_element, None)
+        try:
+            element_3 = bibformat_engine.get_format_element("test 3", with_built_in_params=True)
+        except bibformat_engine.InvenioBibFormatError, e:
+            self.assertEqual(str(e), 'Format element test 3 could not be found.')
+        else:
+            self.fail("Should have raised InvenioBibFormatError")
+
+        try:
+            element_4 = bibformat_engine.get_format_element("test 4", with_built_in_params=True)
+        except SyntaxError:
+            self.assertEqual(str(e), 'Format element test 3 could not be found.')
+        else:
+            self.fail("Should have raised SyntaxError")
+
+        try:
+            unknown_element = bibformat_engine.get_format_element("TEST_NO_ELEMENT", with_built_in_params=True)
+        except bibformat_engine.InvenioBibFormatError, e:
+            self.assertEqual(str(e), 'Format element TEST_NO_ELEMENT could not be found.')
+        else:
+            self.fail("Should have raised InvenioBibFormatError")
 
         #Test element without docstring
         element_5 = bibformat_engine.get_format_element("test_5", with_built_in_params=True)
@@ -217,8 +231,12 @@ class FormatElementTest(InvenioTestCase):
 
 
         #Test non existing element
-        non_existing_element = bibformat_engine.get_format_element("BFE_NON_EXISTING_ELEMENT")
-        self.assertEqual(non_existing_element, None)
+        try:
+            non_existing_element = bibformat_engine.get_format_element("BFE_NON_EXISTING_ELEMENT")
+        except bibformat_engine.InvenioBibFormatError, e:
+            self.assertEqual(str(e), 'Format element BFE_NON_EXISTING_ELEMENT could not be found.')
+        else:
+            self.fail("Should have raised InvenioBibFormatError")
 
     def test_get_format_element_attrs_from_function(self):
         """ bibformat - correct parsing of attributes in 'format' docstring"""
@@ -293,16 +311,12 @@ class OutputFormatTest(InvenioTestCase):
         self.assertEqual(output_2['attrs']['code'], "TEST2")
         self.assert_(len(output_2['attrs']['code']) <= 6)
         self.assertEqual(output_2['rules'], [])
-        unknown_output = bibformat_engine.get_output_format("unknow", with_attributes=True)
-        self.assertEqual(unknown_output, {'rules': [],
-                                          'default': "",
-                                          'attrs': {'names': {'generic': "",
-                                                              'ln': {},
-                                                              'sn': {}},
-                                                    'description': '',
-                                                    'code': "UNKNOW",
-                                                    'visibility': 1,
-                                                    'content_type': ""}})
+        try:
+            unknown_output = bibformat_engine.get_output_format("unknow", with_attributes=True)
+        except bibformat_engine.InvenioBibFormatError:
+            pass
+        else:
+            self.fail("Should have raised the InvenioBibFormatError")
 
     def test_get_output_formats(self):
         """ bibformat - loading multiple output formats """
@@ -748,8 +762,12 @@ class FormatTest(InvenioTestCase):
         self.assertEqual(result, None)
 
         #Non existing output format
-        result = bibformat_engine.decide_format_template(self.bfo_2, "UNKNOW")
-        self.assertEqual(result, None)
+        try:
+            result = bibformat_engine.decide_format_template(self.bfo_2, "UNKNOW")
+        except bibformat_engine.InvenioBibFormatError:
+            pass
+        else:
+            self.fail("Should have raised InvenioBibFormatError")
 
     def test_format_record(self):
         """ bibformat - correct formatting"""
