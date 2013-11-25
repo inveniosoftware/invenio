@@ -2100,7 +2100,7 @@ class BibDoc(object):
         run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
         run_sql('DELETE FROM bibdoc_bibdoc WHERE id_bibdoc1=%s OR id_bibdoc2=%s', (self.id, self.id))
         run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
-        run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, doctimestamp) VALUES("EXPUNGE", %s, NOW())', (self.id, ))
+        run_sql('INSERT INTO hstDOCUMENT(action, id_bibdoc, doctimestamp) VALUES("EXPUNGE", %s, NOW())', (self.id, ))
         run_sql('DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s', (self.id, ))
         del self.docfiles
         del self.id
@@ -2617,9 +2617,9 @@ class BibDoc(object):
             """Log an action into the bibdoclog table."""
             try:
                 if timestamp:
-                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)', (action, docid, docname, docformat, version, size, checksum, timestamp))
+                    run_sql('INSERT INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)', (action, docid, docname, docformat, version, size, checksum, timestamp))
                 else:
-                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, NOW())', (action, docid, docname, docformat, version, size, checksum))
+                    run_sql('INSERT INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, NOW())', (action, docid, docname, docformat, version, size, checksum))
             except DatabaseError:
                 register_exception()
 
@@ -2788,7 +2788,7 @@ class BibDoc(object):
         docformat = docformat.upper()
         if not version:
             version = self.get_latest_version()
-        return run_sql("INSERT DELAYED INTO rnkDOWNLOADS "
+        return run_sql("INSERT INTO rnkDOWNLOADS "
             "(id_bibrec,id_bibdoc,file_version,file_format,"
             "id_user,client_host,download_time) VALUES "
             "(%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",

@@ -26,11 +26,7 @@
 from itertools import groupby
 from operator import itemgetter
 
-#Well this is bad, BUT otherwise there must 100+ lines
-#of the form from dbinterface import ...  # emitting
-from invenio.legacy.bibauthorid.dbinterface import * #pylint:  disable-msg=W0614
-
-import invenio.bibauthorid_dbinterface as dbinter
+import invenio.legacy.bibauthorid.dbinterface as dbinter
 
 
 def group_personid(papers_table="aidPERSONID_PAPERS", data_table="aidPERSONID_DATA"):
@@ -103,6 +99,7 @@ def compare_personid_tables(personIDold_papers, personIDold_data,
 
             write_end_personid()
 
+
 def compare_personid_tables_easy(suffix='_copy', filename='/tmp/pid_comparison'):
     f = open(filename, 'w')
     oldPap, oldDat = group_personid('aidPERSONIDPAPERS' + suffix, 'aidPERSONIDDATA' + suffix)
@@ -110,13 +107,13 @@ def compare_personid_tables_easy(suffix='_copy', filename='/tmp/pid_comparison')
     compare_personid_tables(oldPap, oldDat, pap, dat, f)
     f.close()
 
+
 def filter_bibrecs_outside(all_papers):
-    all_bibrecs = get_all_bibrecs()
+    all_bibrecs = dbinter.get_all_bibrecs()
 
     to_remove = list(frozenset(all_bibrecs) - frozenset(all_papers))
     chunk = 1000
     separated = [to_remove[i: i + chunk] for i in range(0, len(to_remove), chunk)]
 
     for sep in separated:
-        remove_all_bibrecs(sep)
-
+        dbinter.remove_all_bibrecs(sep)

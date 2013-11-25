@@ -22,16 +22,13 @@
     bibauthorid_bdinterface in order to make it usable by the
     frontend so to keep it as clean as possible.
 '''
-
-from invenio.legacy.bibauthorid.name_utils import split_name_parts #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.name_utils import soft_compare_names
-from invenio.legacy.bibauthorid.name_utils import create_normalized_name #emitting #pylint: disable-msg=W0611
-from invenio import bibauthorid_dbinterface as dbinter
 from cgi import escape
+from intertools import groupby
+from operator import itemgetter
 
-#Well this is bad, BUT otherwise there must 100+ lines
-#of the form from dbinterface import ...  # emitting
-from invenio.legacy.bibauthorid.dbinterface import * #pylint:  disable-msg=W0614
+from invenio.legacy.bibauthorid.name_utils import split_name_parts  # emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.name_utils import soft_compare_names
+from invenio.legacy.bibauthorid import dbinterface as dbinter
 
 
 def set_person_data(person_id, tag, value, user_level=None):
@@ -50,6 +47,7 @@ def set_person_data(person_id, tag, value, user_level=None):
     if value not in old_data:
         dbinter.set_personid_row(person_id, tag, value, opt2=user_level)
 
+
 def get_person_data(person_id, tag):
     res = dbinter.get_personid_row(person_id, tag)
     if res:
@@ -57,8 +55,10 @@ def get_person_data(person_id, tag):
     else:
         return []
 
+
 def del_person_data(tag, person_id=None, value=None):
     dbinter.del_personid_row(tag, person_id, value)
+
 
 def get_bibrefrec_name_string(bibref):
     '''
@@ -81,7 +81,7 @@ def get_bibrefrec_name_string(bibref):
         ref = bibref
 
     table, ref = ref.split(":")
-    dbname = get_name_by_bibrecref((int(table), int(ref)))
+    dbname = dbinter.get_name_by_bibrecref((int(table), int(ref)))
 
     if dbname:
         name = dbname
@@ -145,6 +145,7 @@ def assign_person_to_uid(uid, pid):
             pid = dbinter.create_new_person_from_uid(uid)
             return pid
 
+
 def get_processed_external_recids(pid):
     '''
     Returns processed external recids
@@ -200,23 +201,28 @@ def find_personIDs_by_name_string(target):
         is_canonical = True
 
     names = groupby(sorted(names))
-    names = [(key[0], key[1], len(list(data)), soft_compare_names(target, key[1])) for key, data in names]
+    names = [(key[0], key[1], len(list(data)),
+              soft_compare_names(target, key[1])) for key, data in names]
     names = groupby(names, itemgetter(0))
-    names = [(key, sorted([(d[1], d[2], d[3]) for d in data if (d[3] > 0.5 or is_canonical)],
-             key=itemgetter(2), reverse=True)) for key, data in names]
+    names = [(key, sorted([(d[1], d[2], d[3]) for d in data
+                           if (d[3] > 0.5 or is_canonical)],
+                          key=itemgetter(2), reverse=True))
+             for key, data in names]
     names = [name for name in names if name[1]]
-    names = sorted(names, key=lambda x: (x[1][0][2], x[1][0][0], x[1][0][1]), reverse=True)
+    names = sorted(names, key=lambda x: (x[1][0][2], x[1][0][0], x[1][0][1]),
+                   reverse=True)
 
     return names
+
 
 def find_top5_personid_for_new_arXiv_user(bibrecs, name):
 
     top5_list = []
 
-    pidlist = get_personids_and_papers_from_bibrecs(bibrecs, limit_by_name=name)
+    pidlist = dbinter.get_personids_and_papers_from_bibrecs(bibrecs, limit_by_name=name)
 
     for p in pidlist:
-        if not get_uid_from_personid(p[0]):
+        if not dbinter.get_uid_from_personid(p[0]):
             top5_list.append(p[0])
             if len(top5_list) > 4:
                 break
@@ -231,7 +237,7 @@ def find_top5_personid_for_new_arXiv_user(bibrecs, name):
     pidlist = find_personIDs_by_name_string(escaped_name)
 
     for p in pidlist:
-        if not get_uid_from_personid(p[0]) and not p[0] in top5_list:
+        if not dbinter.get_uid_from_personid(p[0]) and not p[0] in top5_list:
             top5_list.append(p[0])
             if len(top5_list) > 4:
                 break
@@ -242,11 +248,10 @@ def find_top5_personid_for_new_arXiv_user(bibrecs, name):
 def check_personids_availability(picked_profile, uid):
 
     if picked_profile == -1:
-        return create_new_person(uid, uid_is_owner=True)
+        return dbinter.create_new_person(uid, uid_is_owner=True)
     else:
-        if not get_uid_from_personid(picked_profile):
+        if not dbinter.get_uid_from_personid(picked_profile):
             dbinter.set_personid_row(picked_profile, 'uid', uid)
             return picked_profile
         else:
-            return create_new_person(uid, uid_is_owner=True)
-
+            return dbinter.create_new_person(uid, uid_is_owner=True)
