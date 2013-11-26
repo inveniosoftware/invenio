@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -305,3 +305,27 @@ def get_index_tags(indexname, virtual=True):
     return out
 
 
+def get_min_last_updated(indexes):
+    """Returns min modification date for 'indexes':
+       min(last_updated)
+       @param indexes: list of indexes
+    """
+    query= """SELECT min(last_updated) FROM idxINDEX WHERE name IN ("""
+    for index in indexes:
+        query += "%s,"
+    query = query[:-1] + ")"
+    res = run_sql(query, tuple(indexes))
+    return res
+
+
+def remove_inexistent_indexes(indexes, leave_virtual=False):
+    """Removes indexes that don't exist from the given list of indexes.
+       @param indexes: list of indexes
+       @param leave_virtual: should we leave virtual indexes in the list?
+    """
+    correct_indexes = get_all_indexes(leave_virtual)
+    cleaned = []
+    for index in indexes:
+        if index in correct_indexes:
+            cleaned.append(index)
+    return cleaned
