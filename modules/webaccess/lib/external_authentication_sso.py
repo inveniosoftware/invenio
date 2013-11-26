@@ -171,8 +171,10 @@ class ExternalAuthSSO(ExternalAuth):
             req.add_common_vars()
             if req.subprocess_env.has_key('HTTP_SHIB_AUTHENTICATION_METHOD'):
                 ret['authmethod'] = req.subprocess_env['HTTP_SHIB_AUTHENTICATION_METHOD']
-            egroups = self._fetch_egroups(req)
-            ret['external'] = 'CERN External Users' in egroups and '1' or '0'
+            ret['external'] = '1'
+            if req.subprocess_env.has_key('ADFS_IDENTITYCLASS') and \
+              req.subprocess_env['ADFS_IDENTITYCLASS'] in ('CERN Registered', 'CERN Shared'):
+                ret['external'] = '0'
             return ret
         return {}
 
