@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
-from invenio import bibknowledgeadmin
+from invenio.legacy.bibknowledge import admin as bibknowledgeadmin
 from invenio.config import CFG_SITE_LANG
 
 class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):

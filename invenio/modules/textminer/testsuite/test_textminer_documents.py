@@ -17,10 +17,19 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
+import pkg_resources
+import unittest
 try:
     import requests
-    HAS_REQUESTS = True
+    from werkzeug.local import LocalProxy
+    from flask import url_for
+    def has_request():
+        try:
+            return requests.get(
+                url_for('search.index', _external=True)).status_code == 200
+        except:
+            return False
+    HAS_REQUESTS = LocalProxy(has_request)
 except ImportError:
     HAS_REQUESTS = False
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
@@ -173,36 +182,42 @@ class DocExtractTest(InvenioTestCase):
         #setup_loggers(verbosity=1)
         self.maxDiff = 10000
 
-    if HAS_REQUESTS:
-        def test_upload(self):
-            from invenio.config import CFG_SITE_URL, CFG_ETCDIR
-            url = CFG_SITE_URL + '/textmining/api/extract-references-pdf'
+    @unittest.skipUnless(HAS_REQUESTS, 'no request')
+    def test_upload(self):
+        from invenio.config import CFG_SITE_URL, CFG_ETCDIR
+        url = CFG_SITE_URL + '/textmining/api/extract-references-pdf'
 
-            pdf = open("%s/docextract/example.pdf" % CFG_ETCDIR, 'rb')
-            response = requests.post(url, files={'pdf': pdf})
-            # Remove stats tag
-            lines = response.content.split('\n')
-            lines[-6:-1] = []
-            compare_references(self, '\n'.join(lines), expected_response())
+        pdf = open(pkg_resources.resource_filename(
+            'invenio.modules.textminer.testsuite',
+            'data/example.pdf'), 'rb')
+        response = requests.post(url, files={'pdf': pdf})
+        # Remove stats tag
+        lines = response.content.split('\n')
+        lines[-6:-1] = []
+        compare_references(self, '\n'.join(lines), expected_response())
 
-        def test_url(self):
-            from invenio.config import CFG_SITE_URL, CFG_ETCDIR
-            url = CFG_SITE_URL + '/textmining/api/extract-references-pdf-url'
+    @unittest.skipUnless(HAS_REQUESTS, 'no request')
+    def test_url(self):
+        from invenio.config import CFG_SITE_URL
+        url = CFG_SITE_URL + '/textmining/api/extract-references-pdf-url'
 
-            pdf = CFG_SITE_URL + '/textmining/example.pdf'
-            response = requests.post(url, data={'url': pdf})
-            compare_references(self, response.content, expected_response())
+        pdf = CFG_SITE_URL + '/textmining/example.pdf'
+        response = requests.post(url, data={'url': pdf})
+        compare_references(self, response.content, expected_response())
 
-        def test_txt(self):
-            from invenio.config import CFG_SITE_URL, CFG_ETCDIR
-            url = CFG_SITE_URL + '/textmining/api/extract-references-txt'
+    @unittest.skipUnless(HAS_REQUESTS, 'no request')
+    def test_txt(self):
+        from invenio.config import CFG_SITE_URL
+        url = CFG_SITE_URL + '/textmining/api/extract-references-txt'
 
-            pdf = open("%s/docextract/example.txt" % CFG_ETCDIR, 'rb')
-            response = requests.post(url, files={'txt': pdf})
-            # Remove stats tag
-            lines = response.content.split('\n')
-            lines[-6:-1] = []
-            compare_references(self, '\n'.join(lines), expected_response())
+        pdf = open(pkg_resources.resource_filename(
+            'invenio.modules.textminer.testsuite',
+            'data/example.txt'), 'rb')
+        response = requests.post(url, files={'txt': pdf})
+        # Remove stats tag
+        lines = response.content.split('\n')
+        lines[-6:-1] = []
+        compare_references(self, '\n'.join(lines), expected_response())
 
 TEST_SUITE = make_test_suite(DocExtractTest)
 

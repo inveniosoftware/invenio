@@ -36,17 +36,17 @@ import ConfigParser
 from invenio.modules.formatter.utils import parse_tag
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.bibrank.citation_indexer import tagify
-from invenio.config import CFG_ETCDIR, \
-                           CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
+from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
                            CFG_BIBRANK_SELFCITES_PRECOMPUTE
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibauthorid.searchinterface import get_personids_from_bibrec
 from invenio.legacy.bibrank.citation_searcher import get_cited_by
+from invenio.modules.rank.registry import configuration
 
 
 def load_config_file(key):
     """Load config file containing the authors, co-authors tags #"""
-    filename = CFG_ETCDIR + "/bibrank/" + key + ".cfg"
+    filename = configuration.get(rank_method_code + '.cfg', '')
     config = ConfigParser.ConfigParser()
     try:
         config.readfp(open(filename))

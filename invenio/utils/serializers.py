@@ -26,7 +26,11 @@ import marshal
 import cPickle as pickle
 from zlib import compress, decompress
 
-__all__ = ['ZlibMarshal', 'serialize_via_marshal', 'deserialize_via_marshal']
+__all__ = ['ZlibMarshal',
+           'serialize_via_marshal',
+           'deserialize_via_marshal',
+           'serialize_via_pickle',
+           'deserialize_via_pickle']
 
 
 class ZlibMarshal(object):
@@ -59,3 +63,6 @@ class ZlibPickle(object):
         """Serialize Python object via pickle into a compressed string."""
         return compress(pickle.dumps(obj))
 
+# Provides legacy API functions.
+serialize_via_pickle = ZlibPickle.dumps
+deserialize_via_pickle = ZlibPickle.loads

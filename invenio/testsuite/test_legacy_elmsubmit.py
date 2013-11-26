@@ -34,21 +34,15 @@ class ElmTestCase(InvenioTestCase):
 
     def setUp(self):
         from invenio.config import CFG_TMPDIR
-        from invenio import elmsubmit
-        import invenio.elmsubmit_config as elmsubmit_config
+        from invenio.legacy.elmsubmit import api as elmsubmit
+        import invenio.legacy.elmsubmit.config as elmsubmit_config
         self.f1 = None
-        if os.path.exists(os.path.join(
-            CFG_TMPDIR, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1'])):
-            self.f1 = open(os.path.join(
-                CFG_TMPDIR,
-                elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1']), 'r')
+        if os.path.exists(elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1']):
+            self.f1 = open(elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1'], 'r')
 
         self.f2 = None
-        if os.path.exists(os.path.join(
-            CFG_TMPDIR, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2'])):
-            self.f2 = open(os.path.join(
-                CFG_TMPDIR,
-                elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']), 'r')
+        if os.path.exists(elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']):
+            self.f2 = open(elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2'], 'r')
 
         self.elmsubmit = elmsubmit
 

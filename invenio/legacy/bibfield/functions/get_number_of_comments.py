@@ -26,6 +26,6 @@ def get_number_of_comments(recid):
 
     @return: Number of comments
     """
-    from invenio.webcommentadminlib import get_nb_comments
+    from invenio.legacy.webcomment.adminlib import get_nb_comments
     if recid:
         return get_nb_comments(recid)

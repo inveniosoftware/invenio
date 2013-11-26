@@ -23,10 +23,10 @@
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-binary_search = lazy_import('invenio.bibsort_engine:binary_search')
-perform_delete_record = lazy_import('invenio.bibsort_engine:perform_delete_record')
-perform_insert_record = lazy_import('invenio.bibsort_engine:perform_insert_record')
-perform_modify_record = lazy_import('invenio.bibsort_engine:perform_modify_record')
+binary_search = lazy_import('invenio.legacy.bibsort.engine:binary_search')
+perform_delete_record = lazy_import('invenio.legacy.bibsort.engine:perform_delete_record')
+perform_insert_record = lazy_import('invenio.legacy.bibsort.engine:perform_insert_record')
+perform_modify_record = lazy_import('invenio.legacy.bibsort.engine:perform_modify_record')
 
 class TestBibSort(InvenioTestCase):
     """Test BibSort."""

@@ -28,8 +28,8 @@ from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from invenio.ext.sqlalchemy import db
 from invenio.base.globals import cfg
-from invenio.bibworkflow_config import CFG_OBJECT_VERSION
-from invenio.bibworkflow_utils import redis_create_search_entry
+from .config import CFG_OBJECT_VERSION
+from .utils import redis_create_search_entry
 from .logger import (get_logger,
                      BibWorkflowLogHandler)
 
@@ -375,7 +375,7 @@ BibWorkflowObject
             self._update_db()
 
     def save_to_file(self, directory=None,
-                     prefix="bibworkflow_object_data_", suffix=".obj"):
+                     prefix="workflow_object_data_", suffix=".obj"):
         """
         Saves the contents of self.data['data'] to file.
 

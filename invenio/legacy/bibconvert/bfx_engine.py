@@ -58,9 +58,9 @@ except ImportError:
 ##        * import Ft.Xml.Xslt
 
 from invenio.modules.formatter.engines import bfx as bibformat_bfx_engine
-from invenio.config import CFG_ETCDIR
 
-CFG_BFX_TEMPLATES_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR, os.sep, os.sep)
+from .registry import templates
+
 
 def convert(xmltext, template_filename=None, template_source=None):
     """
@@ -89,8 +89,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         template = template_source
     elif template_filename:
         try:
-            path_to_templates = (CFG_BFX_TEMPLATES_PATH + os.sep +
-                                 template_filename)
+            path_to_templates = templates.get(template_filename, '')
             if os.path.exists(path_to_templates):
                 template = file(path_to_templates).read()
             elif os.path.exists(template_filename):

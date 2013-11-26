@@ -33,6 +33,8 @@ __revision__ = "$Id$"
 import os
 import re
 
+from invenio.base.globals imoprt cfg
+
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_ADMIN_EMAIL, \
@@ -57,13 +59,12 @@ from invenio.legacy.websubmit.functions.Retrieve_Data import Get_Field
 from invenio.ext.email import send_email
 from invenio.utils.url import wash_url_argument
 from invenio.legacy.websession.dblayer import get_group_infos, insert_new_group, insert_new_member, delete_member
-from invenio.webaccessadmin_lib import cleanstring_email
+from invenio.modules.access.admin_lib import cleanstring_email
 from invenio.modules.access.local_config import MAXSELECTUSERS
 from invenio.modules.access.control import acc_get_user_email
 from invenio.modules.access.engine import acc_get_authorized_emails
 from invenio.legacy.webmessage.api import perform_request_send
-import invenio.webbasket_dblayer as basketdb
-from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, CFG_WEBBASKET_CATEGORIES, CFG_WEBBASKET_SHARE_LEVELS_ORDERED
+import invenio.legacy.webbasket.db_layer as basketdb
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibrecord import create_records, record_get_field_value, record_get_field_values
 
@@ -499,7 +500,7 @@ def __displayCplxDocument(req, doctype, categ, RN, apptype, reply, commentId, ln
 
     if id_bskBASKET > 0:
         rights = basketdb.get_max_user_rights_on_basket(uid, id_bskBASKET)
-        if not(__check_basket_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READITM'])):
+        if not(__check_basket_sufficient_rights(rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READITM'])):
             return t
 
         # FIXME This error will be fixed with Sam's new version of publiline.
@@ -510,7 +511,7 @@ def __displayCplxDocument(req, doctype, categ, RN, apptype, reply, commentId, ln
         if dProjectLeaderAction != None:
             user_can_add_comment = 0
         else:
-            user_can_add_comment = __check_basket_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+            user_can_add_comment = __check_basket_sufficient_rights(rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
 
             comment_subject = ""
             comment_body = ""
@@ -528,10 +529,10 @@ def __displayCplxDocument(req, doctype, categ, RN, apptype, reply, commentId, ln
             t += websubmit_templates.tmpl_publiline_displaycplxdocitem(
                                                   doctype, categ, RN, apptype, "AddComment",
                                                   comments,
-                                                  (__check_basket_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                                  (__check_basket_sufficient_rights(rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT']),
                                                    user_can_add_comment,
-                                                   __check_basket_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
-                                                  selected_category=CFG_WEBBASKET_CATEGORIES['GROUP'], selected_topic=0, selected_group_id=id_group,
+                                                   __check_basket_sufficient_rights(rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELCMT'])),
+                                                  selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'], selected_topic=0, selected_group_id=id_group,
                                                   comment_subject=comment_subject, comment_body=comment_body, ln=ln)
 
     return t
@@ -539,8 +540,8 @@ def __displayCplxDocument(req, doctype, categ, RN, apptype, reply, commentId, ln
 def __check_basket_sufficient_rights(rights_user_has, rights_needed):
     """Private function, check if the rights are sufficient."""
     try:
-        out = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_user_has) >= \
-              CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_needed)
+        out = cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(rights_user_has) >= \
+              cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(rights_needed)
     except ValueError:
         out = 0
     return out
@@ -818,7 +819,7 @@ def __doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern,
         if validate == "go":
             if dRefereeSel == None:
                 id_bsk = basketdb.create_basket (int(id_user_val), RN, TEXT_RefereeSel_BASKET_DESCR)
-                basketdb.share_basket_with_group (id_bsk, id_group, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                basketdb.share_basket_with_group (id_bsk, id_group, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                 basketdb.add_to_basket (int(id_user_val), (sysno, ), (id_bsk, ))
 
                 __db_set_basket (key, id_bsk)

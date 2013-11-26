@@ -31,7 +31,7 @@ class ExternalAuthenticationCernTest(InvenioTestCase):
     def setUp(self):
         # pylint: disable=C0103
         """setting up helper variables for tests"""
-        from invenio import external_authentication_cern as cern
+        from invenio.legacy.external_authentication import cern as cern
         self.username, self.userpwd, self.useremail = \
                 open('demopwd.cfg', 'r').readline().strip().split(':', 2)
         self.cern = cern.ExternalAuthCern()

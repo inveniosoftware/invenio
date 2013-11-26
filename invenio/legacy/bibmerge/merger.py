@@ -22,7 +22,7 @@ from invenio.legacy.bibrecord import record_has_field, \
                               record_delete_field, \
                               record_add_fields
 
-from invenio.bibmerge_differ import record_field_diff, match_subfields, \
+from invenio.legacy.bibmerge.differ import record_field_diff, match_subfields, \
                                     diff_subfields
 
 from copy import deepcopy

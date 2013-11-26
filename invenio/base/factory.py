@@ -196,7 +196,6 @@ def create_app(**kwargs_config):
     # Load views modules
     _app.extensions['registry']['views'] = AutoDiscoverRegistry(
         'views',
-        lazy=False,
         app=_app,
     )
 
@@ -221,7 +220,6 @@ def create_app(**kwargs_config):
                 _app.logger.error(
                     '%s is not a valid blueprint plugin' % view_module.__name__
                 )
-
 
     # Flask-Admin was here.
     @_app.route('/testing')

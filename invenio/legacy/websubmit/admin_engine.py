@@ -36,7 +36,7 @@ from invenio.base.i18n import gettext_set_language
 import invenio.legacy.template
 
 try:
-    websubmitadmin_templates = invenio.legacy.template.load('websubmitadmin')
+    websubmitadmin_templates = invenio.legacy.template.load('websubmit', 'admin_')
 except:
     pass
 

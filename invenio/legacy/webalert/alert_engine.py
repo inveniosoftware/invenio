@@ -36,8 +36,8 @@ from invenio.config import \
      CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES, \
      CFG_SITE_NAME, \
      CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
-from invenio.webbasket_dblayer import get_basket_owner_id, add_to_basket
-from invenio.webbasket import format_external_records
+from invenio.legacy.webbasket.db_layer import get_basket_owner_id, add_to_basket
+from invenio.legacy.webbasket.api import format_external_records
 from invenio.legacy.search_engine import perform_request_search, wash_colls, \
      get_coll_sons, is_hosted_collection, get_coll_normalised_name, \
      check_user_can_view_record
@@ -46,13 +46,13 @@ from invenio.legacy.dbquery import run_sql
 from invenio.legacy.webuser import get_email, collect_user_info
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
-from invenio.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL
+from invenio.legacy.webalert.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL
 
-from invenio.legacy.websearch_external_collections.websearch_external_collections_config import \
+from invenio.legacy.websearch_external_collections.config import \
 CFG_EXTERNAL_COLLECTION_TIMEOUT, \
 CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS
-from invenio.legacy.websearch_external_collections.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
-from invenio.legacy.websearch_external_collections.websearch_external_collections_utils import get_collection_id
+from invenio.legacy.websearch_external_collections.getter import HTTPAsyncPageGetter, async_download
+from invenio.legacy.websearch_external_collections.utils import get_collection_id
 
 import invenio.legacy.template
 websearch_templates = invenio.legacy.template.load('websearch')

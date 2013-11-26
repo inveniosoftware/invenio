@@ -23,13 +23,14 @@
     frontend so to keep it as clean as possible.
 '''
 from cgi import escape
-from intertools import groupby
+from itertools import groupby
 from operator import itemgetter
 
 from invenio.legacy.bibauthorid.name_utils import split_name_parts  # emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.name_utils import soft_compare_names
 from invenio.legacy.bibauthorid import dbinterface as dbinter
 
+from invenio.legacy.bibauthorid.dbinterface import *
 
 def set_person_data(person_id, tag, value, user_level=None):
     '''

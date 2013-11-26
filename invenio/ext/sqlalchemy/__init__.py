@@ -34,7 +34,7 @@ from sqlalchemy import event
 from sqlalchemy.pool import Pool
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 from invenio.utils.hash import md5
-#from invenio.base.utils import autodiscover_models
+from invenio.ext.registry import RegistryProxy, AutoDiscoverRegistry
 
 
 def _include_sqlalchemy(obj, engine=None):
@@ -180,6 +180,9 @@ db = SQLAlchemy()
     Provides access to :class:`~.SQLAlchemy` instance.
 """
 
+models = RegistryProxy('models', AutoDiscoverRegistry, 'models')
+
+
 def setup_app(app):
     """Setup SQLAlchemy extension."""
     if 'SQLALCHEMY_DATABASE_URI' not in app.config:
@@ -197,8 +200,5 @@ def setup_app(app):
 
     ## Let's initialize database.
     db.init_app(app)
-
-    ## Make sure that all tables are loaded in `db.metadata.tables`.
-    #autodiscover_models()
 
     return app

@@ -53,7 +53,7 @@ __revision__ = \
     "$Id$"
 
 import ldap
-from invenio.modules.access.external_authentication import ExternalAuth, \
+from invenio.legacy.external_authentication import ExternalAuth, \
                                             InvenioWebAccessExternalAuthError
 
 

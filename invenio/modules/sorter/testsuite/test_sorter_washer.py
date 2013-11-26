@@ -19,8 +19,7 @@
 
 """Testing module for BibSort Method Treatment"""
 
-
-from invenio.bibsort_washer import BibSortWasher
+from invenio.legacy.bibsort.washer import BibSortWasher
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 

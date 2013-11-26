@@ -35,11 +35,11 @@ from invenio.config import CFG_SITE_LANG
 from invenio.legacy.dbquery import run_sql, OperationalError, ProgrammingError
 from invenio.base.i18n import gettext_set_language
 
-from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
-from invenio.legacy.websearch_external_collections.websearch_external_collections_searcher import external_collections_dictionary
-from invenio.legacy.websearch_external_collections.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
-from invenio.legacy.websearch_external_collections.templates import print_results, print_timeout
-from invenio.legacy.websearch_external_collections.websearch_external_collections_utils import get_collection_id, get_collection_descendants, \
+from .config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from .searcher import external_collections_dictionary
+from .getter import HTTPAsyncPageGetter, async_download
+from .templates import print_results, print_timeout
+from .utils import get_collection_id, get_collection_descendants, \
     warning, get_verbose_print
 
 import invenio.legacy.template

@@ -23,13 +23,13 @@ from invenio.config import CFG_TMPDIR, \
                            CFG_PLOTEXTRACTOR_SOURCE_TARBALL_FOLDER, \
                            CFG_PLOTEXTRACTOR_SOURCE_PDF_FOLDER, \
                            CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT
-from invenio.plotextractor_config import CFG_PLOTEXTRACTOR_DESY_BASE, \
+from .config import CFG_PLOTEXTRACTOR_DESY_BASE, \
                                          CFG_PLOTEXTRACTOR_DESY_PIECE
 from invenio.legacy.search_engine import get_record
 from invenio.legacy.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
 from invenio.utils.shell import run_shell_command
-from invenio.plotextractor_output_utils import write_message
+from .output_utils import write_message
 from invenio.utils.url import make_invenio_opener
 
 PLOTEXTRACTOR_OPENER = make_invenio_opener('plotextractor')

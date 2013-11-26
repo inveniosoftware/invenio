@@ -28,7 +28,7 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 class RefextractApiTest(InvenioTestCase):
     def test_no_fulltext(self):
-        from invenio.refextract_api import FullTextNotAvailable, \
+        from invenio.legacy.refextract.api import FullTextNotAvailable, \
             update_references
         try:
             update_references(1000000000000)
@@ -38,7 +38,7 @@ class RefextractApiTest(InvenioTestCase):
             pass
 
     def test_no_overwrite(self):
-        from invenio.refextract_api import RecordHasReferences, \
+        from invenio.legacy.refextract.api import RecordHasReferences, \
             update_references
         try:
             update_references(92, overwrite=False)

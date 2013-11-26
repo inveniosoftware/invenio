@@ -27,8 +27,8 @@ __revision__ = \
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-issue_is_later_than = lazy_import('invenio.webjournal:issue_is_later_than')
-compare_issues = lazy_import('invenio.webjournal_utils:compare_issues')
+issue_is_later_than = lazy_import('invenio.legacy.webjournal.api:issue_is_later_than')
+compare_issues = lazy_import('invenio.legacy.webjournal.utils:compare_issues')
 
 
 class TestCompareIssues(InvenioTestCase):

@@ -22,22 +22,11 @@
 
 __revision__ = "$Id$"
 
-try:
-    import sys
-    import getopt
-    from invenio.flaskshell import *
-    from invenio.config import CFG_VERSION, CFG_SITE_SUPPORT_EMAIL
-    from invenio.alert_engine import run_alerts
-    from time import time
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
-
-import datetime
+from invenio.base.factory import with_app_context
 
 
 def usage():
+    from invenio.config import CFG_SITE_SUPPORT_EMAIL
     print """Usage: alertengine [OPTION]
 Run the alert engine.
 
@@ -49,7 +38,13 @@ Run the alert engine.
 
 Report bugs to <%s>""" % CFG_SITE_SUPPORT_EMAIL
 
+@with_app_context()
 def main():
+    import datetime
+    import sys
+    import getopt
+    from invenio.legacy.webalert.alert_engine import run_alerts
+    # from time import time
 
     date = datetime.date.today()
 
@@ -74,8 +69,8 @@ def main():
 
     run_alerts(date)
 
-if __name__ == "__main__":
-    t0 = time()
-    main()
-    t1 = time()
-    print 'Alert engine finished in %.2f seconds' % (t1 - t0)
+# if __name__ == "__main__":
+#     t0 = time()
+#     main()
+#     t1 = time()
+#     print 'Alert engine finished in %.2f seconds' % (t1 - t0)

@@ -24,8 +24,8 @@ __revision__ = "$Id$"
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-bibrank_tag_based_indexer = lazy_import('invenio.bibrank_tag_based_indexer')
-split_ranges = lazy_import('invenio.bibrank:split_ranges')
+bibrank_tag_based_indexer = lazy_import('invenio.legacy.bibrank.tag_based_indexer')
+split_ranges = lazy_import('invenio.legacy.bibrank.cli:split_ranges')
 
 
 class TestListSetOperations(InvenioTestCase):

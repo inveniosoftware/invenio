@@ -53,7 +53,7 @@ from invenio.bibexport_method_fieldexporter import get_css, \
                                         perform_request_display_job_result, \
                                         perform_request_download_job_result, \
                                         AccessDeniedError
-from invenio.bibexport_method_fieldexporter_dblayer import Job, \
+from invenio.legacy.bibexport.fieldexporter_dblayer import Job, \
                                                            Query, \
                                                            JobResult
 from invenio.legacy.webuser import collect_user_info, \

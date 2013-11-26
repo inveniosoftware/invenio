@@ -1,5 +1,18 @@
 {% extends "workflows/layout.html" %}
-{%- js url_for('holdingpen.static', filename='js/workflows/workflows.js') -%}
+
+{% block javascript %}
+    {{ super() }}
+    {% block workflows_entry_assets %}
+        {% js url_for('workflows.static', filename='js/workflows/workflows.js') %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                var url_run_workflow = "{{ url_for('workflows.run_workflow') }}";
+                init_workflow(url_run_workflow);
+            });
+        </script>
+    {% endblock workflows_entry_assets %}
+{% endblock javascript %}
+
 {% block workflowbody %}
     <div id = "alert_placeholder"></div>
 

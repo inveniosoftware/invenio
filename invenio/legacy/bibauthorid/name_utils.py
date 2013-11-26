@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,20 +22,16 @@ bibauthorid_name_utils
     Bibauthorid utilities used by many parts of the framework
 '''
 
+import os
 import re
-import invenio.legacy.bibauthorid.config as bconfig
-from invenio.legacy.bibauthorid.string_utils import string_partition
+import pkg_resources
 from copy import deepcopy
 
+from . import config as bconfig
+from .string_utils import string_partition
+from .general_utils import name_comparison_print
+
 from invenio.utils.text import translate_to_ascii
-
-from invenio.legacy.bibauthorid.general_utils import name_comparison_print
-
-try:
-    from invenio.config import CFG_ETCDIR
-    NO_CFG_ETCDIR = False
-except ImportError:
-    NO_CFG_ETCDIR = True
 
 try:
     from editdist import distance
@@ -69,6 +65,9 @@ except ImportError:
             return d[lenstr1 - 1, lenstr2 - 1]
 
 artifact_removal = re.compile("[^a-zA-Z0-9]")
+
+CFG_AUTHORIDS_NAME_AUTHORITY_DIR = pkg_resources.resource_filename(
+            'invenio.modules.authorids', 'name_authority_files')
 
 #Gender names and names variation files are loaded updon module import to increase performances
 
@@ -559,13 +558,12 @@ def full_names_are_substrings(name1, name2):
 
     return names_are_substrings_b
 
-def _load_gender_firstnames_dict(files=''):
-    if not NO_CFG_ETCDIR and not files:
-        files = {'boy':  CFG_ETCDIR + '/bibauthorid/name_authority_files/male_firstnames.txt',
-                 'girl': CFG_ETCDIR + '/bibauthorid/name_authority_files/female_firstnames.txt'}
-    elif NO_CFG_ETCDIR and not files:
-        files = {'boy':  '../etc/name_authority_files/male_firstnames.txt',
-                 'girl': '../etc/name_authority_files/female_firstnames.txt'}
+def _load_gender_firstnames_dict(files=None):
+    if not files:
+        files = {'boy':  os.path.join(CFG_AUTHORIDS_NAME_AUTHORITY_DIR,
+                                      'male_firstnames.txt'),
+                 'girl': os.path.join(CFG_AUTHORIDS_NAME_AUTHORITY_DIR,
+                                      'female_firstnames.txt')}
 
     boyf = open(files['boy'], 'r')
     boyn = set([x.strip().lower() for x in boyf.readlines()])
@@ -578,10 +576,9 @@ def _load_gender_firstnames_dict(files=''):
 
 def _load_firstname_variations(filename=''):
     #will load an array of arrays: [['rick','richard','dick'],['john','jhonny']]
-    if not NO_CFG_ETCDIR and not filename:
-        filename = CFG_ETCDIR + '/bibauthorid/name_authority_files/name_variants.txt'
-    elif NO_CFG_ETCDIR and not filename:
-        filename = '../etc/name_authority_files/name_variants.txt'
+    if not filename:
+        filename = os.path.join(CFG_AUTHORIDS_NAME_AUTHORITY_DIR,
+                                'name_variants.txt')
 
     retval = []
     r = re.compile("\n")

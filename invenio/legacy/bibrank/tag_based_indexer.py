@@ -28,7 +28,6 @@ import ConfigParser
 
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_ETCDIR, \
      CFG_PREFIX
 from invenio.legacy.search_engine import perform_request_search
 from invenio.legacy.bibrank.citation_indexer import get_citation_weight, print_missing, get_cit_dict, insert_into_cit_db
@@ -39,6 +38,7 @@ from invenio.ext.logging import register_exception
 from invenio.legacy.bibsched.bibtask import task_get_option, write_message, task_sleep_now_if_required
 from invenio.legacy.bibindex.engine import create_range_list
 from invenio.intbitset import intbitset
+from invenio.modules.rank.registry import configuration
 
 options = {}
 
@@ -337,12 +337,12 @@ def bibrank_engine(run):
             cfg_name = getName(rank_method_code)
             write_message("Running rank method: %s." % cfg_name)
 
-            file = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
+            config_file = configuration.get(rank_method_code + '.cfg', '')
             config = ConfigParser.ConfigParser()
             try:
-                config.readfp(open(file))
+                config.readfp(open(config_file))
             except StandardError, e:
-                write_message("Cannot find configurationfile: %s" % file, sys.stderr)
+                write_message("Cannot find configurationfile: %s" % config_file, sys.stderr)
                 raise StandardError
 
             cfg_short = rank_method_code

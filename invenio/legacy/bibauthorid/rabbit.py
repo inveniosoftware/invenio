@@ -23,34 +23,34 @@ from operator import itemgetter
 from invenio.legacy.bibsched.bibtask import task_sleep_now_if_required
 from invenio.legacy.bibauthorid import config as bconfig
 
-from invenio.bibauthorid_comparison import cached_sym
+from invenio.legacy.bibauthorid.comparison import cached_sym
 from invenio.legacy.bibauthorid.name_utils import compare_names as comp_names
 from invenio.legacy.bibauthorid.name_utils import split_name_parts
 from invenio.legacy.bibauthorid.name_utils import create_normalized_name
 from invenio.legacy.bibauthorid.general_utils import update_status \
                                     , update_status_final
-from invenio.bibauthorid_matrix_optimization import maximized_mapping
-from invenio.bibauthorid_backinterface import get_all_valid_bibrecs
-from invenio.bibauthorid_backinterface import filter_bibrecs_outside
-from invenio.bibauthorid_backinterface import get_deleted_papers
-from invenio.bibauthorid_backinterface import delete_paper_from_personid
-from invenio.bibauthorid_backinterface import get_authors_from_paper
-from invenio.bibauthorid_backinterface import get_coauthors_from_paper
-from invenio.bibauthorid_backinterface import get_signatures_from_rec
-from invenio.bibauthorid_backinterface import modify_signature
-from invenio.bibauthorid_backinterface import remove_sigs
-from invenio.bibauthorid_backinterface import find_pids_by_exact_name as _find_pids_by_exact_name
-from invenio.bibauthorid_backinterface import new_person_from_signature as _new_person_from_signature
-from invenio.bibauthorid_backinterface import add_signature as _add_signature
-from invenio.bibauthorid_backinterface import update_personID_canonical_names
-from invenio.bibauthorid_backinterface import update_personID_external_ids
-from invenio.bibauthorid_backinterface import get_name_by_bibrecref
-from invenio.bibauthorid_backinterface import populate_partial_marc_caches
-from invenio.bibauthorid_backinterface import destroy_partial_marc_caches
-from invenio.bibauthorid_backinterface import get_inspire_id
-from invenio.bibauthorid_backinterface import get_person_with_extid
-from invenio.bibauthorid_backinterface import get_name_string_to_pid_dictionary
-from invenio.bibauthorid_backinterface import get_new_personid
+from invenio.legacy.bibauthorid.matrix_optimization import maximized_mapping
+from invenio.legacy.bibauthorid.backinterface import get_all_valid_bibrecs
+from invenio.legacy.bibauthorid.backinterface import filter_bibrecs_outside
+from invenio.legacy.bibauthorid.backinterface import get_deleted_papers
+from invenio.legacy.bibauthorid.backinterface import delete_paper_from_personid
+from invenio.legacy.bibauthorid.backinterface import get_authors_from_paper
+from invenio.legacy.bibauthorid.backinterface import get_coauthors_from_paper
+from invenio.legacy.bibauthorid.backinterface import get_signatures_from_rec
+from invenio.legacy.bibauthorid.backinterface import modify_signature
+from invenio.legacy.bibauthorid.backinterface import remove_sigs
+from invenio.legacy.bibauthorid.backinterface import find_pids_by_exact_name as _find_pids_by_exact_name
+from invenio.legacy.bibauthorid.backinterface import new_person_from_signature as _new_person_from_signature
+from invenio.legacy.bibauthorid.backinterface import add_signature as _add_signature
+from invenio.legacy.bibauthorid.backinterface import update_personID_canonical_names
+from invenio.legacy.bibauthorid.backinterface import update_personID_external_ids
+from invenio.legacy.bibauthorid.backinterface import get_name_by_bibrecref
+from invenio.legacy.bibauthorid.backinterface import populate_partial_marc_caches
+from invenio.legacy.bibauthorid.backinterface import destroy_partial_marc_caches
+from invenio.legacy.bibauthorid.backinterface import get_inspire_id
+from invenio.legacy.bibauthorid.backinterface import get_person_with_extid
+from invenio.legacy.bibauthorid.backinterface import get_name_string_to_pid_dictionary
+from invenio.legacy.bibauthorid.backinterface import get_new_personid
 
 USE_EXT_IDS = bconfig.RABBIT_USE_EXTERNAL_IDS
 USE_INSPIREID = bconfig.RABBIT_USE_EXTERNAL_ID_INSPIREID

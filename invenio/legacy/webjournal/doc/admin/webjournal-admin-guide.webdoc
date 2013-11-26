@@ -257,7 +257,7 @@ returns a dictionary with the keys and values:</p>
   empty <code>string</code>)</small></li>
 </ul>
 <pre style="border:1px dashed #888;background-color:#EEE">
-from invenio.webjournal_utils import parse_url_string
+from invenio.legacy.webjournal.utils import parse_url_string
 
 def format_element(bfo):
     args = parse_url_string(bfo.user_info['uri'])

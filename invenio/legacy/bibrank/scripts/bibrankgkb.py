@@ -33,14 +33,12 @@ Usage: bibrankgkb %s [options]
  -V,  --version             print version and exit
  -v,  --verbose=LEVEL       verbose level (from 0 to 9, default 1)
 """
-
 __revision__ = "$Id$"
 
-try:
-    from invenio.legacy.bibrank.gkb import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from invenio.base.factory import with_app_context
 
-main()
+
+@with_app_context()
+def main():
+    from invenio.legacy.bibrank.gkb import main as gkb_main
+    return gkb_main()

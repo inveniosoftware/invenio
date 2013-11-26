@@ -1,12 +1,16 @@
 {% extends "workflows/hp_layout.html" %}
 
-{%- block header %}
+{%- block header%}
+    {{ super() }}
+    {% css url_for('static', filename='css/prettify.css') %}
+{%- endblock header %}
+
+{%- block javascript %}
     {{ super() }}
     {%- block widget_assets %}
         {% js url_for('static', filename='js/google-code-prettify/run_prettify.js'), '50-workflows' %}
-        {% css url_for('static', filename='css/prettify.css') %}
     {%- endblock widget_assets %}
-{%- endblock header %}
+{%- endblock javascript %}
 
 {% block hpbody %}
     <h1>Bibmatch Widget</h1>

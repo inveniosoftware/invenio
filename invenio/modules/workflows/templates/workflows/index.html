@@ -1,5 +1,21 @@
 {% extends "workflows/layout.html" %}
-{%- js url_for('holdingpen.static', filename='js/workflows/index.js') -%}
+
+{% block javascript %}
+    {{ super() }}
+    {% block workflows_entry_assets %}
+        {% js url_for('workflows.static', filename='js/workflows/index.js') %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                var url_redis_get = "{{ url_for('workflows.get_redis_keys') }}";
+                var url_entry_details = "{{ url_for('workflows.entry_details') }}";
+                var url_workflow_details = "{{ url_for('workflows.workflow_details') }}";
+
+                init_index(url_redis_get, url_entry_details, url_workflow_details);
+            });
+        </script>
+    {% endblock workflows_entry_assets %}
+{% endblock javascript %}
+
 {% block workflowbody %}
     <div class="alert alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>

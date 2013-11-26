@@ -30,7 +30,7 @@ from invenio.config import \
      CFG_SITE_RECORD
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.webpage import page
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      get_number_of_articles_for_issue, \
      get_release_datetime, \
      get_announcement_datetime, \

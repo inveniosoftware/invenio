@@ -39,7 +39,7 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
 from invenio.legacy.search_engine import get_coll_i18nname, \
     wash_index_term
 from invenio.legacy.dbquery import run_sql, wash_table_column_name, ProgrammingError
-from invenio.legacy.bibsched.scripts.bibsched import is_task_scheduled, \
+from invenio.legacy.bibsched.cli import is_task_scheduled, \
     get_task_ids_by_descending_date, \
     get_task_options
 

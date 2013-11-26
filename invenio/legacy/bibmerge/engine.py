@@ -21,7 +21,7 @@
 
 import os
 
-from invenio.bibmerge_merger import merge_field_group, replace_field, \
+from invenio.legacy.bibmerge.merger import merge_field_group, replace_field, \
                                     add_field, delete_field, merge_field, \
                                     add_subfield, replace_subfield, \
                                     delete_subfield, copy_R2_to_R1, merge_record

@@ -39,7 +39,7 @@ from invenio.legacy.webuser import getUid, get_user_preferences, \
         collect_user_info
 from invenio.modules.access.control import acc_find_user_role_actions
 from invenio.base.i18n import gettext_set_language
-from invenio.modules.access.external_authentication import InvenioWebAccessExternalAuthError
+from invenio.legacy.external_authentication import InvenioWebAccessExternalAuthError
 
 import invenio.legacy.template
 websession_templates = invenio.legacy.template.load('websession')

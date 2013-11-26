@@ -30,7 +30,6 @@ import copy
 
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_ETCDIR, \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
 from invenio.legacy.dbquery import run_sql, deserialize_via_marshal, wash_table_column_name
 from invenio.ext.logging import register_exception
@@ -44,6 +43,7 @@ from invenio.legacy.bibrank.word_searcher import find_similar
 from invenio.legacy.bibrank.word_searcher import word_similarity
 from invenio.legacy.miscutil.solrutils_bibrank_searcher import word_similarity_solr
 from invenio.legacy.miscutil.xapianutils_bibrank_searcher import word_similarity_xapian
+from invenio.modules.rank.registry import configuration
 
 
 def compare_on_val(first, second):
@@ -108,9 +108,9 @@ def create_rnkmethod_cache():
 
     for (rank_method_code,) in bibrank_meths:
         try:
-            file = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
+            config_file = configuration.get(rank_method_code + '.cfg', '')
             config = ConfigParser.ConfigParser()
-            config.readfp(open(file))
+            config.readfp(open(config_file))
         except StandardError, e:
             pass
 
@@ -122,7 +122,7 @@ def create_rnkmethod_cache():
             methods[rank_method_code]["postfix"] = config.get(cfg_function, "relevance_number_output_epilogue")
             methods[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
         else:
-            raise Exception("Error in configuration file: %s" % (CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"))
+            raise Exception("Error in configuration config_file: %s" % (config_file + ".cfg", ))
 
         i8n_names = run_sql("""SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name=%s""", (rank_method_code,))
         for (ln, value) in i8n_names:

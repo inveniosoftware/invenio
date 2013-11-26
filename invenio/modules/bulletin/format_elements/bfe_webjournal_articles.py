@@ -24,7 +24,7 @@ certain category in one specific issue.
 from invenio.modules.formatter.engine import BibFormatObject
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      get_journal_articles, \
      cache_index_page, \

@@ -160,7 +160,7 @@ def perform_managerobotlogin(req, robot_name='', new_pwd1='', new_pwd2='', login
     nickname = wash_url_argument(nickname, 'str')
     url_only = wash_url_argument(url_only, 'int')
     json_assertion = wash_url_argument(json_assertion, 'str')
-    from invenio.modules.access.external_authentication_robot import update_robot_key, load_robot_keys, json
+    from invenio.legacy.external_authentication.robot import update_robot_key, load_robot_keys, json
     (auth_code, auth_message) = acce.acc_authorize_action(req, 'cfgrobotkeys', login_method='*', robot='*')
     if auth_code != 0: return mustloginpage(req, auth_message)
 

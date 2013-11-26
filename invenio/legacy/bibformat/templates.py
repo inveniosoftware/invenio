@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 # non Invenio imports
 import cgi
+from flask import url_for
 
 # Invenio imports
 from invenio.base.i18n import gettext_set_language
@@ -506,7 +507,7 @@ class Template:
                 }
             -->
         </style>
-        <script src="%(siteurl)s/static/bibformat-admin-interface/js_quicktags.js" type="text/javascript"></script>
+        <script src="%(quicktags)s" type="text/javascript"></script>
         <script type="text/javascript">
 
         /* Ask user confirmation before leaving page */
@@ -585,7 +586,9 @@ class Template:
                'check_dependencies': _("Check Dependencies"),
                'nb_menu_options': nb_menu_options,
                'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL,
-               'leave_editor_message': _('Your modifications will not be saved.').replace('"', '\\"')
+               'leave_editor_message': _('Your modifications will not be saved.').replace('"', '\\"'),
+               'quicktags': url_for('formatter.static',
+                                    filename='js/formatter/quicktags.js'),
                }
 
         if not filename.endswith('.xsl'):
@@ -767,7 +770,7 @@ class Template:
         <head>
         <title>BibFormat Short Documentation of Format Elements</title>
         <link rel="stylesheet" href="%(siteurl)s/img/invenio.css">
-        <script src="%(siteurl)s/static/bibformat-admin-interface/js_quicktags.js" type="text/javascript"></script>
+        <script src="%(quicktags)s" type="text/javascript"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         </head>
         <body>
@@ -828,7 +831,11 @@ class Template:
         }
         }
         </script>
-        ''' % {'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL}
+        ''' % {
+            'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL,
+            'quicktags': url_for('formatter.static',
+                                 filename='js/formatter/quicktags.js')
+            }
 
         if len(format_elements) == 0:
             out += '''

@@ -24,14 +24,14 @@ CFG_DATACITE_USERNAME and CFG_DATACITE_PASSWORD has to be set to be able to run
 the tests.
 """
 
-from invenio.flaskshell import *
-
-from invenio.utils import datacite as dataciteutils
-from invenio import config
-from invenio.testsuite import make_test_suite, run_test_suite
-import random
 import string
 import os
+
+from invenio.base.factory import with_app_context
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+
+dataciteutils = lazy_import('invenio.utils.datacite')
 
 
 class DataCiteTestCase(InvenioTestCase):
@@ -123,7 +123,9 @@ class DataCiteTestCase(InvenioTestCase):
 TEST_SUITE = make_test_suite(DataCiteTestCase)
 
 
+@with_app_context()
 def main():
+    from invenio import config
     if not(hasattr(config, 'CFG_DATACITE_USERNAME') and hasattr(config, 'CFG_DATACITE_PASSWORD')):
         config.CFG_DATACITE_USERNAME = os.environ.get('CFG_DATACITE_USERNAME', '') or raw_input("DataCite username:")
         config.CFG_DATACITE_PASSWORD = os.environ.get('CFG_DATACITE_PASSWORD', '') or raw_input("DataCite password:")

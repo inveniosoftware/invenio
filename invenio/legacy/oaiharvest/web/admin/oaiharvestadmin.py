@@ -24,15 +24,15 @@ __lastupdated__ = """$Date$"""
 import datetime
 import urllib
 
-import invenio.oai_harvest_admin as oha
+import invenio.legacy.oaiharvest.admin as oha
 from invenio.utils.json import json
 from invenio.legacy.webpage import page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.legacy.dbquery import Error
 from invenio.legacy.webuser import getUid, page_not_authorized
 from invenio.legacy.bibrank.adminlib import check_user
-from invenio.oai_harvest_dblayer import get_holdingpen_day_size
-from invenio.oai_harvest_admin import perform_request_gethpdayfragment
+from invenio.legacy.oaiharvest.dblayer import get_holdingpen_day_size
+from invenio.legacy.oaiharvest.admin import perform_request_gethpdayfragment
 
 def index(req, ln=CFG_SITE_LANG):
     """Main OAI Harvest admin page"""

@@ -1,8 +1,7 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,19 +21,12 @@
 
 __revision__ = "$Id$"
 
-try:
-    import getpass
-    import readline
-    import sys
-    from invenio.flaskshell import *
-    from invenio.config import CFG_SITE_SUPPORT_EMAIL
-    from invenio.modules.messages.dblayer import clean_messages
-    from invenio.legacy.dbquery import run_sql
+import getpass
+import readline
+import sys
 
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from invenio.base.factory import with_app_context
+
 
 def usage(code, msg=''):
     """Print usage info."""
@@ -49,11 +41,16 @@ def usage(code, msg=''):
     sys.stderr.write("  -V, --version   \t\t Print version information.\n")
     sys.exit(code)
 
+
+@with_app_context()
 def main():
     """CLI to clean_messages. The function finds the needed
     arguments in sys.argv.
     If the number of arguments is wrong it prints help.
     Return 1 on success, 0 on failure. """
+    from invenio.config import CFG_SITE_SUPPORT_EMAIL
+    from invenio.modules.messages.dblayer import clean_messages
+    from invenio.legacy.dbquery import run_sql
 
     alen = len(sys.argv)
     action = ''
@@ -90,8 +87,3 @@ def main():
         print 'Database cleaned. %i suppressed messages' % int(cleaned)
 
     return perform
-
-
-if __name__ == '__main__':
-    main()
-

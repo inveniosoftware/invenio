@@ -153,7 +153,7 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
     # res2 = query_retrieve_comments_or_remarks(recID, display_order, display_since, not reviews, user_info=user_info)
     nb_res = len(res)
 
-    from invenio.webcommentadminlib import get_nb_reviews, get_nb_comments
+    from invenio.legacy.webcomment.adminlib import get_nb_reviews, get_nb_comments
 
     nb_reviews = get_nb_reviews(recID, count_deleted=False)
     nb_comments = get_nb_comments(recID, count_deleted=False)

@@ -33,7 +33,7 @@ from invenio.legacy.wsgi.utils import handle_file_post
 from invenio.legacy.webuser import getUid, page_not_authorized, get_email
 from invenio.legacy.webpage import page
 
-from invenio.batchuploader_engine import metadata_upload, cli_upload, \
+from invenio.legacy.batchuploader.engine import metadata_upload, cli_upload, \
      get_user_metadata_uploads, get_user_document_uploads, document_upload, \
      get_daemon_doc_files, get_daemon_meta_files, cli_allocate_record, \
      user_authorization, perform_upload_check

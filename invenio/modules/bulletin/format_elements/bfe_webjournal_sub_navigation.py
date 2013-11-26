@@ -23,7 +23,7 @@ article pages.
 """
 from invenio.modules.formatter.engine import BibFormatObject
 from invenio.base.i18n import gettext_set_language
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      make_journal_url, \
      get_journal_articles,\

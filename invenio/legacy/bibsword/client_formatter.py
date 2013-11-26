@@ -25,7 +25,7 @@ from tempfile import mkstemp
 from xml.dom import minidom
 from invenio.config import CFG_TMPDIR
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
-from invenio.bibsword_config import CFG_MARC_REPORT_NUMBER, \
+from invenio.legacy.bibsword.config import CFG_MARC_REPORT_NUMBER, \
                                     CFG_MARC_TITLE, \
                                     CFG_MARC_AUTHOR_NAME, \
                                     CFG_MARC_AUTHOR_AFFILIATION, \

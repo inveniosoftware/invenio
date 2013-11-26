@@ -24,7 +24,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_ETCDIR
 from invenio.base.i18n import gettext_set_language
-from invenio.webjournal_utils import get_journal_name_intl
+from invenio.legacy.webjournal.utils import get_journal_name_intl
 import invenio.legacy.template
 webjournal_templates = invenio.legacy.template.load('webjournal')
 

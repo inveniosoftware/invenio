@@ -1,18 +1,21 @@
 {% extends "workflows/hp_layout.html" %}
 {% block hpbody %}
 
-{%- block header %}
+{%- block header%}
+    {{ super() }}
+    {% css url_for('static', filename='css/ColVis.css') %}
+    {% css url_for('static', filename='css/dataTables.bootstrap.css') %}
+{%- endblock header %}
+
+{%- block javascript %}
     {{ super() }}
     {%- block holdingpen_assets %}
       {% js url_for('static', filename='js/jquery.dataTables.min.js'), '30-datatables' %}
       {% js url_for('static', filename='js/ColVis.js'), '30-datatables' %}
       {% js url_for('static', filename='js/dataTables.bootstrap.js'), '30-datatables' %}
-      {% js url_for('holdingpen.static', filename='js/workflows/hp_maintable.js'), '50-workflows' %}
-
-      {% css url_for('static', filename='css/ColVis.css') %}
-      {% css url_for('static', filename='css/dataTables.bootstrap.css') %}
+      {% js url_for('workflows.static', filename='js/workflows/hp_maintable.js'), '50-workflows' %}
     {%- endblock holdingpen_assets %}
-{%- endblock header %}
+{%- endblock javascript %}
 
     <div id="alert-message"></div>
 

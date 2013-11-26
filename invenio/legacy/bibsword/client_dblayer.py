@@ -22,7 +22,7 @@ BibSWORD Client DBLayer
 import datetime
 import time
 from invenio.legacy.dbquery import run_sql
-from invenio.bibsword_config import CFG_SUBMISSION_STATUS_PUBLISHED, \
+from invenio.legacy.bibsword.config import CFG_SUBMISSION_STATUS_PUBLISHED, \
                                                 CFG_SUBMISSION_STATUS_REMOVED
 
 

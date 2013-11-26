@@ -29,7 +29,7 @@ class TestListSetOperations(InvenioTestCase):
 
     def test_record_sorter(self):
         """bibrank record sorter - sorting records"""
-        from invenio import bibrank_word_searcher
+        from invenio.legacy.bibrank import word_searcher as bibrank_word_searcher
         from invenio.intbitset import intbitset
         hitset = intbitset()
         hitset += (1,2,5)
@@ -41,7 +41,7 @@ class TestListSetOperations(InvenioTestCase):
 
     def test_calculate_record_relevance(self):
         """bibrank record sorter - calculating relevances"""
-        from invenio import bibrank_word_searcher
+        from invenio.legacy.bibrank import word_searcher as bibrank_word_searcher
         from invenio.intbitset import intbitset
         hitset = intbitset()
         hitset += (1,2,5)

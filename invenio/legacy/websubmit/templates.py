@@ -691,7 +691,7 @@ class Template:
                                     alert("%(field_mandatory)s");
                                     return 0;
                               } """ % {
-                                'field_mandatory' : _("The field %s is mandatory.") % txt[i] + '\\n' + _("Please make a choice in the select box")
+                                'field_mandatory' : _("The field %(field)s is mandatory.", field=txt[i]) + '\\n' + _("Please make a choice in the select box")
                               }
                 elif radio[i] != 0:
                     # If the field is a radio buttonset
@@ -713,7 +713,7 @@ class Template:
                                alert("%(field_mandatory)s");
                                return 0;
                               }""" % {
-                                'field_mandatory' : _("The field %s is mandatory. Please fill it in.") % txt[i]
+                                'field_mandatory' : _("The field %(field)s is mandatory. Please fill it in.", field=txt[i])
                               }
         out += """  return 1;
                   }

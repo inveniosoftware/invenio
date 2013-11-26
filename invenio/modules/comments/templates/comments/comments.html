@@ -22,6 +22,7 @@
 
 {% css url_for('comments.static', filename='css/comments/comments.css'), '10-comments' %}
 {% js url_for('comments.static', filename='js/comments/collapse.js'), '10-comments' %}
+{%- js url_for('comments.static', filename='js/comments/modal_tweaks.js'), '10-comments' -%}
 
 {% block record_content %}
   <div class="page-header">
@@ -35,13 +36,11 @@
       <small>
         {% if current_user.is_guest %}
           <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
-            <i class="icon-pencil"></i> {{ _('write comment') }}
-          </a>
         {% else %}
           <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid) }}">
+        {% endif %}
             <i class="icon-pencil"></i> {{ _('write comment') }}
           </a>
-        {% endif %}
       </small>
     </h4>
   </div>
@@ -99,9 +98,13 @@
         {%- endif -%} &nbsp;
         - <i class="icon-time"></i> {{ c.date_creation }}
         - <i class="icon-pencil"></i>
-        <a data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid, in_reply=c.id) }}">
-          {{ _('reply') }}
-        </a>
+        {% if current_user.is_guest %}
+          <a href="{{ url_for('webaccount.login', referer=url_for('comments.add_comment', recid=recid, in_reply=c.id)) }}">
+        {% else %}
+          <a data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid, in_reply=c.id) }}">
+        {% endif %}
+            {{ _('reply') }}
+          </a>
         - <i class="icon-question-sign"></i> {{ _('Was it helpful?') }}
          <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=1,
             referer=request.url
@@ -138,13 +141,11 @@
 
   {% if current_user.is_guest %}
     <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
-      <i class="icon-pencil"></i> {{ _('write comment') }}
-    </a>
   {% else %}
     <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid) }}">
+  {% endif %}
       <i class="icon-pencil"></i> {{ _('write comment') }}
     </a>
-  {% endif %}
 
   {%- else -%}
   <div class="alert alert-info">

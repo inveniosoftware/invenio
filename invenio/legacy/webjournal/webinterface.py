@@ -34,7 +34,7 @@ from invenio.config import \
 from invenio.legacy.webuser import getUid
 from invenio.utils.url import redirect_to_url
 from invenio.ext.logging import register_exception
-from invenio.webjournal_config import \
+from invenio.legacy.webjournal.config import \
      InvenioWebJournalNoJournalOnServerError, \
      InvenioWebJournalNoNameError, \
      InvenioWebJournalNoCurrentIssueError, \
@@ -45,11 +45,11 @@ from invenio.webjournal_config import \
      InvenioWebJournalNoPopupRecordError, \
      InvenioWebJournalIssueNotFoundDBError, \
      InvenioWebJournalNoCategoryError
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      get_current_issue, \
      get_recid_from_legacy_number, \
      get_journal_categories
-from invenio.webjournal_washer import \
+from invenio.legacy.webjournal.washer import \
      wash_category, \
      wash_issue_number, \
      wash_journal_name, \
@@ -57,7 +57,7 @@ from invenio.webjournal_washer import \
      wash_article_number, \
      wash_popup_record, \
      wash_archive_date
-from invenio.webjournal import \
+from invenio.legacy.webjournal.api import \
      perform_request_index, \
      perform_request_article, \
      perform_request_contact, \

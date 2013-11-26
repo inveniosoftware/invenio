@@ -29,9 +29,9 @@ from invenio.base.factory import with_app_context
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, nottest, InvenioTestCase
 
-HTTPAsyncPageGetter = lazy_import('invenio.websearch_external_collections_getter:HTTPAsyncPageGetter')
-async_download = lazy_import('invenio.websearch_external_collections_getter:async_download')
-external_collections_dictionary = lazy_import('invenio.websearch_external_collections_searcher:external_collections_dictionary')
+HTTPAsyncPageGetter = lazy_import('invenio.legacy.websearch_external_collections.getter:HTTPAsyncPageGetter')
+async_download = lazy_import('invenio.legacy.websearch_external_collections.getter:async_download')
+external_collections_dictionary = lazy_import('invenio.legacy.websearch_external_collections.searcher:external_collections_dictionary')
 
 
 def download_and_parse():

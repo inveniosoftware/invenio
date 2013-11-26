@@ -24,7 +24,7 @@ from HTMLParser import HTMLParser
 from werkzeug.local import LocalProxy
 from invenio.base.globals import cfg
 from invenio.utils.text import indent_text, encode_for_xml
-default_ln = lambda ln: cfg('CFG_SITE_LANG') if ln is None else ln
+default_ln = lambda ln: cfg['CFG_SITE_LANG'] if ln is None else ln
 import re
 import cgi
 import os

@@ -29,7 +29,7 @@ import cgi
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.date import convert_datestruct_to_datetext, convert_datetext_to_dategui, convert_datestruct_to_dategui
-from invenio.bibexport_method_fieldexporter_dblayer import Job, JobResult
+from invenio.legacy.bibexport.fieldexporter_dblayer import Job, JobResult
 
 class Template:
     """Templates for field exporter plugin"""

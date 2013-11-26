@@ -31,7 +31,7 @@ import difflib
 
 from invenio.config import CFG_BIBMATCH_MATCH_VALIDATION_RULESETS, \
                            CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT
-from invenio.bibmatch_config import CFG_BIBMATCH_VALIDATION_MATCHING_MODES, \
+from invenio.legacy.bibmatch.config import CFG_BIBMATCH_VALIDATION_MATCHING_MODES, \
                                     CFG_BIBMATCH_VALIDATION_RESULT_MODES, \
                                     CFG_BIBMATCH_VALIDATION_COMPARISON_MODES, \
                                     CFG_BIBMATCH_LOGGER

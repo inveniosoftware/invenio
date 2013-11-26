@@ -33,7 +33,7 @@ import re
 import subprocess
 
 from invenio.config import CFG_PATH_PDFTOTEXT
-from invenio.docextract_utils import write_message
+from invenio.legacy.docextract.utils import write_message
 
 # a dictionary of undesirable characters and their replacements:
 UNDESIRABLE_CHAR_REPLACEMENTS = {

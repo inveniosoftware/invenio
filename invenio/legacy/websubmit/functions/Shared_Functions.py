@@ -32,7 +32,7 @@ from invenio.ext.logging import register_exception
 from invenio.legacy.websubmit.file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats, get_file_converter_logger
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 from invenio.legacy.dbquery import run_sql
-from invenio.legacy.bibsched.scripts.bibsched import server_pid
+from invenio.legacy.bibsched.cli import server_pid
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import get_record
 from invenio.legacy.bibrecord import record_get_field_values, record_get_field_value

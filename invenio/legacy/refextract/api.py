@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,11 +29,9 @@ import os
 from urllib import urlretrieve
 from tempfile import mkstemp
 
-from invenio.refextract_engine import parse_references, \
-                                      get_plaintext_document_body, \
-                                      parse_reference_line, \
-                                      get_kbs
-from invenio.refextract_text import extract_references_from_fulltext
+from .engine import parse_references, get_plaintext_document_body, \
+    parse_reference_line, get_kbs
+from .text import extract_references_from_fulltext
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_TAG
@@ -44,10 +42,9 @@ from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.legacy.bibrecord import record_delete_fields, record_xml_output, \
     create_record, record_get_field_instances, record_add_fields, \
     record_has_field
-from invenio.refextract_find import get_reference_section_beginning, \
-                                    find_numeration_in_body
-from invenio.refextract_text import rebuild_reference_lines
-from invenio.refextract_config import CFG_REFEXTRACT_FILENAME
+from .find import get_reference_section_beginning, find_numeration_in_body
+from .text import rebuild_reference_lines
+from .config import CFG_REFEXTRACT_FILENAME
 from invenio.config import CFG_TMPSHAREDDIR
 
 

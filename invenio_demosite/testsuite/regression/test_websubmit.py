@@ -33,7 +33,7 @@ from invenio.testsuite import make_test_suite, run_test_suite, \
                               InvenioTestCase
 from invenio.base.factory import with_app_context
 
-websubmit_file_stamper = lazy_import('invenio.websubmit_file_stamper')
+websubmit_file_stamper = lazy_import('invenio.legacy.websubmit.file_stamper')
 
 class WebSubmitWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSubmit web pages whether they are up or not."""

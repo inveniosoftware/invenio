@@ -20,6 +20,8 @@
   {% extends "records/base.html" %}
 {%- endif -%}
 
+{%- js url_for('comments.static', filename='js/comments/modal_tweaks.js'), '10-comments' -%}
+
 {% block record_content %}
   <div class="page-header">
     {{ format_record(recid, 'hs', ln=g.ln)|safe }}
@@ -31,13 +33,12 @@
       <small>
       {% if current_user.is_guest %}
         <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
-          <i class="icon-pencil"></i> {{ _('write review') }}
-        </a>
       {% else %}
         <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_review', recid=recid) }}">
+      {% endif %}
           <i class="icon-pencil"></i> {{ _('write review') }}
         </a>
-      {% endif %}
+
       </small>
     </h4>
   </div>

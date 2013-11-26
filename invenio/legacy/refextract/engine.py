@@ -28,7 +28,7 @@ import os
 import subprocess
 from itertools import chain
 
-from invenio.refextract_config import \
+from invenio.legacy.refextract.config import \
             CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM, \
             CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL, \
             CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
@@ -43,15 +43,15 @@ from invenio.refextract_config import \
 # make refextract runnable without requiring the full Invenio installation:
 from invenio.config import CFG_PATH_GFILE
 
-from invenio.refextract_tag import tag_reference_line, \
+from invenio.legacy.refextract.tag import tag_reference_line, \
     sum_2_dictionaries, identify_and_tag_DOI, identify_and_tag_URLs
-from invenio.refextract_xml import create_xml_record, \
+from invenio.legacy.refextract.xml import create_xml_record, \
                                    build_xml_citations
-from invenio.docextract_pdf import convert_PDF_to_plaintext
-from invenio.docextract_utils import write_message
-from invenio.refextract_kbs import get_kbs
-from invenio.refextract_linker import find_referenced_recid
-from invenio.refextract_re import get_reference_line_numeration_marker_patterns, \
+from invenio.legacy.docextract.pdf import convert_PDF_to_plaintext
+from invenio.legacy.docextract.utils import write_message
+from invenio.legacy.refextract.kbs import get_kbs
+from invenio.legacy.refextract.linker import find_referenced_recid
+from invenio.legacy.refextract.regexs import get_reference_line_numeration_marker_patterns, \
                                   regex_match_list, \
                                   re_tagged_citation, \
                                   re_numeration_no_ibid_txt, \

@@ -16,3 +16,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+import os
+
+from invenio.ext.registry import PkgResourcesDiscoverRegistry, AutoDiscoverRegistry, RegistryProxy
+from invenio.utils.datastructures import LazyDict
+
+converterext = RegistryProxy('classifierext', AutoDiscoverRegistry, 'classifierext')
+
+kb = LazyDict(lambda: dict((os.path.basename(f), f)
+              for f in RegistryProxy('converterext.kb',
+                                     PkgResourcesDiscoverRegistry,
+                                     'kb', registry_namespace=converterext)))
+
+templates = LazyDict(lambda: dict((os.path.basename(f), f)
+                     for f in RegistryProxy('converterext.templates',
+                                            PkgResourcesDiscoverRegistry,
+                                            'templates', registry_namespace=converterext)))
+

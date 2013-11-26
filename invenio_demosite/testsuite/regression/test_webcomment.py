@@ -111,7 +111,7 @@ class WebCommentRestrictionsTest(InvenioTestCase):
     def setUp(self):
         """Insert some comments in some records"""
         from invenio.modules.comments.api import query_add_comment_or_remark
-        from invenio.webcommentadminlib import query_delete_comment_auth
+        from invenio.legacy.webcomment.adminlib import query_delete_comment_auth
 
         # Comments have access restrictions when:
         # - the comment is in a restricted collection ('viewrestrcoll' action)

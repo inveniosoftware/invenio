@@ -37,16 +37,16 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_LOGDIR, \
      CFG_SITE_RECORD
-from invenio.oai_harvest_config import CFG_OAI_POSSIBLE_POSTMODES
+from invenio.legacy.oaiharvest.config import CFG_OAI_POSSIBLE_POSTMODES
 from invenio.legacy.bibrank.adminlib import \
      write_outcome, \
      addadminbox, \
      tupletotable, \
      createhiddenform
 from invenio.legacy.dbquery import run_sql
-from invenio.oai_harvest_dblayer import get_holdingpen_day_size
+from invenio.legacy.oaiharvest.dblayer import get_holdingpen_day_size
 
-from invenio.oai_harvest_dblayer import get_month_logs_size, \
+from invenio.legacy.oaiharvest.dblayer import get_month_logs_size, \
      get_history_entries_for_day, get_day_logs_size, get_entry_history, \
      get_entry_logs_size, get_holdingpen_entries, delete_holdingpen_entry, \
      get_holdingpen_years, get_holdingpen_month, get_holdingpen_year, \
@@ -1343,12 +1343,10 @@ def validatefile(oai_src_config):
      0 = okay
      1 = file non existing
      """
+     from invenio.legacy.bibconvert.registry import templates
 
-    CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR,
-                                                          os.sep,
-                                                          os.sep)
-    path_to_config = (CFG_BIBCONVERT_XSL_PATH + os.sep +
-                      oai_src_config)
+    path_to_config = templates.get(oai_src_config, '')
+
     if os.path.exists(path_to_config):
         # Try to read in config directory
         try:

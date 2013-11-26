@@ -28,7 +28,7 @@ from invenio.base.wrappers import lazy_import
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 create_records = lazy_import('invenio.legacy.bibrecord:create_records')
-match_records = lazy_import('invenio.bibmatch_engine:match_records')
+match_records = lazy_import('invenio.legacy.bibmatch.engine:match_records')
 
 
 class BibMatchTest(InvenioTestCase):
@@ -598,7 +598,7 @@ class BibMatchTest(InvenioTestCase):
 
     def test_check_textmarc(self):
         """bibmatch - check textmarc as input"""
-        from invenio.bibmatch_engine import transform_input_to_marcxml
+        from invenio.legacy.bibmatch.engine import transform_input_to_marcxml
         marcxml = transform_input_to_marcxml("", self.textmarc)
         records = create_records(marcxml)
         [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, \
@@ -617,7 +617,7 @@ class BibMatchTest(InvenioTestCase):
 
     def test_check_qrystr(self):
         """bibmatch - check querystrings"""
-        from invenio.bibmatch_engine import Querystring
+        from invenio.legacy.bibmatch.engine import Querystring
         operator = "and"
         qrystr_old = "title||author"
         qrystr_new = "[title] %s [author]" % (operator,)

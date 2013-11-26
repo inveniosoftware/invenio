@@ -21,12 +21,17 @@
 
 __revision__ = "$Id$"
 
-try:
-    from invenio.flaskshell import *
-    from invenio.legacy.bibcirculation.daemon import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+# try:
+#     from invenio.legacy.bibcirculation.daemon import main
+# except ImportError, e:
+#     print "Error: %s" % e
+#     import sys
+#     sys.exit(1)
 
-main()
+from invenio.base.factory import with_app_context
+
+
+@with_app_context()
+def main():
+    from invenio.legacy.bibcirculation.daemon import main as bibcirc_main
+    bibcirc_main()

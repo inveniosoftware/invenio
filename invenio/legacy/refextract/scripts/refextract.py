@@ -1,8 +1,7 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -46,15 +45,14 @@
     fulltext file using
     [-f, --fulltext].
 """
-import sys
-
-from invenio.flaskshell import *
-from invenio.refextract_task import main as daemon_main
+from invenio.base.factory import with_app_context
 
 
-if __name__ == '__main__':
+@with_app_context()
+def main():
+    from invenio.legacy.refextract.task import main as daemon_main
     try:
-        daemon_main()
+        return daemon_main()
     except KeyboardInterrupt:
         # Exit cleanly
         print 'Interrupted'

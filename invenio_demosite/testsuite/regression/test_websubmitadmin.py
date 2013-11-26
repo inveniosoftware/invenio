@@ -26,7 +26,7 @@ from invenio.testutils import InvenioTestCase
 from invenio.config import CFG_SITE_URL
 from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
-from invenio.websubmitadmincli import \
+from invenio.legacy.websubmit.admincli import \
      dump_submission, \
      load_submission, \
      remove_submission, \

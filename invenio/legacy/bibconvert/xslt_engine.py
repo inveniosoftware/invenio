@@ -48,8 +48,10 @@ from warnings import warn
 from invenio.config import \
      CFG_ETCDIR, \
      CFG_SITE_URL
-from invenio.bibconvert import FormatField
 from invenio.utils.text import encode_for_xml
+
+from .api import FormatField
+from .registry import templates
 
 # The namespace used for BibConvert functions
 CFG_BIBCONVERT_FUNCTION_NS = "http://cdsweb.cern.ch/bibconvert/fn"
@@ -94,7 +96,6 @@ if processor_type == 0:
     sys.stderr.write('No XSLT processor could be found.\n' \
                      'No output produced.\n')
 
-CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR, os.sep, os.sep)
 
 def bibconvert_function_lxml(dummy_ctx, value, func):
     """
@@ -283,8 +284,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         template = template_source
     elif template_filename:
         try:
-            path_to_templates = (CFG_BIBCONVERT_XSL_PATH + os.sep +
-                                 template_filename)
+            path_to_templates = templates.get(template_filename, '')
             if os.path.exists(path_to_templates):
                 template = file(path_to_templates).read()
             elif os.path.exists(template_filename):

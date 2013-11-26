@@ -31,15 +31,15 @@ from invenio.legacy.bibsched.bibtask import write_message
 # imports used in FieldExporter class
 import invenio.legacy.search_engine
 from invenio.legacy import bibrecord
-from invenio import bibdocfile
+from invenio.legacy.bibdocfile import api as bibdocfile
 import os
 
 # imports used in perform_request_... methods
 from invenio.config import CFG_SITE_LANG
-from invenio import bibexport_method_fieldexporter_dblayer as fieldexporter_dblayer
+from . import fieldexporter_dblayer
 
 from invenio.legacy import template
-fieldexporter_templates = template.load('bibexport_method_fieldexporter')
+fieldexporter_templates = template.load('bibexport')
 from invenio.base.i18n import gettext_set_language
 
 def run_export_method(jobname):

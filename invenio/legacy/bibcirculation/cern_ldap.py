@@ -24,7 +24,7 @@ from invenio.config import CFG_CERN_SITE
 try:
     import ldap
     import ldap.filter
-    #from invenio.modules.access.external_authentication_cern_wrapper import _cern_nice_soap_auth
+    #from invenio.legacy.external_authentication.cern_wrapper import _cern_nice_soap_auth
     CFG_BIBCIRCULATION_HAS_LDAP = CFG_CERN_SITE
 except (ImportError, IOError):
     CFG_BIBCIRCULATION_HAS_LDAP = False

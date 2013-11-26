@@ -20,7 +20,9 @@
 
 import sys
 import getopt
-import invenio.elmsubmit as elmsubmit
+
+from invenio.base.factory import with_app_context
+
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -34,7 +36,11 @@ def usage(exitcode=1, msg=""):
 and upload the records it contains to the system.\n""")
     sys.exit(exitcode)
 
-if __name__ == '__main__':
+
+@with_app_context()
+def main():
+    import invenio.legacy.elmsubmit.api as elmsubmit
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hV", ["help", "version"])
     except getopt.GetoptError, err:
@@ -48,6 +54,4 @@ if __name__ == '__main__':
                 sys.exit(0)
     except StandardError, e:
         usage(e)
-    elmsubmit.process_email(sys.stdin.read())
-
-
+    return elmsubmit.process_email(sys.stdin.read())

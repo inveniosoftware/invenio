@@ -22,19 +22,19 @@ aidPersonID maintenance algorithms.
 """
 from invenio.legacy.bibauthorid.name_utils import split_name_parts
 from invenio.legacy.bibauthorid.name_utils import create_normalized_name
-from invenio.bibauthorid_backinterface import get_name_by_bibrecref
-from invenio.bibauthorid_backinterface import copy_personids                       #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import compare_personid_tables              #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import group_personid
-from invenio.bibauthorid_backinterface import check_personid_papers                #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import personid_get_recids_affected_since as get_recids_affected_since #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import repair_personid                      #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import check_results                        #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import check_merger                         #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import restore_personids                    #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import get_full_personid_papers             #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import get_full_results                     #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import personid_get_recids_affected_since as get_recids_affected_since #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import get_name_by_bibrecref
+from invenio.legacy.bibauthorid.backinterface import copy_personids                       #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import compare_personid_tables              #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import group_personid
+from invenio.legacy.bibauthorid.backinterface import check_personid_papers                #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import personid_get_recids_affected_since as get_recids_affected_since #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import repair_personid                      #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import check_results                        #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import check_merger                         #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import restore_personids                    #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import get_full_personid_papers             #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import get_full_results                     #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import personid_get_recids_affected_since as get_recids_affected_since #emitting #pylint: disable-msg=W0611
 
 
 def convert_personid():

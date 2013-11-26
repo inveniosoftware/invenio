@@ -20,7 +20,7 @@
 """
 WebJournal element - Prints main (horizontal) navigation menu
 """
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      make_journal_url, \
      get_journal_categories

@@ -24,7 +24,7 @@ import re
 import time
 
 from invenio.utils.shell import run_shell_command, Timeout, run_process_with_timeout
-from invenio.invenio_connector import InvenioConnector
+from invenio.utils.connector import InvenioConnector
 from invenio.utils.text import wrap_text_in_a_box, \
                               wait_for_user
 from invenio.config import CFG_TMPDIR, CFG_SITE_URL, \
@@ -33,14 +33,14 @@ from invenio.config import CFG_TMPDIR, CFG_SITE_URL, \
                            CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT, \
                            CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
-from invenio.plotextractor_getter import get_list_of_all_matching_files, \
+from .getter import get_list_of_all_matching_files, \
                                          parse_and_download, \
                                          make_single_directory, \
                                          tarballs_by_recids, \
                                          tarballs_by_arXiv_id
-from invenio.plotextractor_converter import untar, extract_text, \
+from .converter import untar, extract_text, \
                                             convert_images
-from invenio.plotextractor_output_utils import assemble_caption, \
+from .output_utils import assemble_caption, \
                                                find_open_and_close_braces, \
                                                create_MARC, get_tex_location, \
                                                get_image_location, \
@@ -1226,16 +1226,16 @@ def upload_to_site(marcxml, yes_i_know):
 help_string = """
     name: plotextractor
     usage:
-            python plotextractor.py -d tar/dir -s scratch/dir
-            python plotextractor.py -i inputfile -u
-            python plotextractor.py --arXiv=arXiv_id
-            python plotextractor.py --recid=recids
+            plotextractor -d tar/dir -s scratch/dir
+            plotextractor -i inputfile -u
+            plotextractor --arXiv=arXiv_id
+            plotextractor --recid=recids
 
     example:
-            python plotextractor.py -d /some/path/with/tarballs
-            python plotextractor.py -i input.txt --no-sdir --extract-text
-            python plotextractor.py --arXiv=hep-ex/0101001
-            python plotextractor.py --recid=13-20,29
+            plotextractor -d /some/path/with/tarballs
+            plotextractor -i input.txt --no-sdir --extract-text
+            plotextractor --arXiv=hep-ex/0101001
+            plotextractor --recid=13-20,29
 
     options:
         -d, --tardir=
@@ -1305,6 +1305,3 @@ help_string = """
 
 def usage():
     write_message(help_string)
-
-if __name__ == '__main__':
-    main()

@@ -24,7 +24,7 @@ __revision__ = \
 
 import re
 
-from invenio.modules.access.external_authentication import ExternalAuth
+from invenio.legacy.external_authentication import ExternalAuth
 
 
 # Tunable list of settings to be hidden

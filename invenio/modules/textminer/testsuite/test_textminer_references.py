@@ -29,9 +29,9 @@ import re
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 # Import the minimal necessary methods and variables needed to run Refextract
-refextract_re = lazy_import('invenio.refextract_re')
-setup_loggers = lazy_import('invenio.docextract_utils:setup_loggers')
-search_from_reference = lazy_import('invenio.refextract_api:search_from_reference')
+refextract_re = lazy_import('invenio.legacy.refextract.regexs')
+setup_loggers = lazy_import('invenio.legacy.docextract.utils:setup_loggers')
+search_from_reference = lazy_import('invenio.legacy.refextract.api:search_from_reference')
 
 
 class ReTest(InvenioTestCase):
@@ -81,12 +81,12 @@ class IbidTest(InvenioTestCase):
         setup_loggers(verbosity=1)
 
     def test_identify_ibids_empty(self):
-        from invenio.refextract_tag import identify_ibids
+        from invenio.legacy.refextract.tag import identify_ibids
         r = identify_ibids("")
         self.assertEqual(r, ({}, {}, ''))
 
     def test_identify_ibids_simple(self):
-        from invenio.refextract_tag import identify_ibids
+        from invenio.legacy.refextract.tag import identify_ibids
         ref_line = u"""[46] E. Schrodinger, Sitzungsber. Preuss. Akad. Wiss. Phys. Math. Kl. 24, 418(1930); ibid, 3, 1(1931)"""
         r = identify_ibids(ref_line.upper())
         self.assertEqual(r, ({85: 4}, {85: u'IBID'}, u'[46] E. SCHRODINGER, SITZUNGSBER. PREUSS. AKAD. WISS. PHYS. MATH. KL. 24, 418(1930); ____, 3, 1(1931)'))
@@ -98,14 +98,14 @@ class TagNumerationTest(InvenioTestCase):
 
     def test_vol_page_year(self):
         "<vol>, <page> (<year>)"
-        from invenio.refextract_tag import tag_numeration
+        from invenio.legacy.refextract.tag import tag_numeration
         ref_line = u"""24, 418 (1930)"""
         r = tag_numeration(ref_line)
         self.assertEqual(r.strip(': '), u"<cds.VOL>24</cds.VOL> <cds.YR>(1930)</cds.YR> <cds.PG>418</cds.PG>")
 
     def test_vol_year_page(self):
         "<vol>, (<year>) <page> "
-        from invenio.refextract_tag import tag_numeration
+        from invenio.legacy.refextract.tag import tag_numeration
         ref_line = u"""24, (1930) 418"""
         r = tag_numeration(ref_line)
         self.assertEqual(r.strip(': '), u"<cds.VOL>24</cds.VOL> <cds.YR>(1930)</cds.YR> <cds.PG>418</cds.PG>")
@@ -116,7 +116,7 @@ class FindSectionTest(InvenioTestCase):
         setup_loggers(verbosity=1)
 
     def test_simple(self):
-        from invenio.refextract_find import get_reference_section_beginning
+        from invenio.legacy.refextract.find import get_reference_section_beginning
         sect = get_reference_section_beginning([
             "Hello",
             "References",
@@ -132,12 +132,12 @@ class FindSectionTest(InvenioTestCase):
         })
 
     def test_no_section(self):
-        from invenio.refextract_find import get_reference_section_beginning
+        from invenio.legacy.refextract.find import get_reference_section_beginning
         sect = get_reference_section_beginning("")
         self.assertEqual(sect, None)
 
     def test_no_title_via_brackets(self):
-        from invenio.refextract_find import get_reference_section_beginning
+        from invenio.legacy.refextract.find import get_reference_section_beginning
         sect = get_reference_section_beginning([
             "Hello",
             "[1] Ref1"
@@ -153,7 +153,7 @@ class FindSectionTest(InvenioTestCase):
         })
 
     def test_no_title_via_dots(self):
-        from invenio.refextract_find import get_reference_section_beginning
+        from invenio.legacy.refextract.find import get_reference_section_beginning
         sect = get_reference_section_beginning([
             "Hello",
             "1. Ref1"
@@ -169,7 +169,7 @@ class FindSectionTest(InvenioTestCase):
         })
 
     def test_no_title_via_numbers(self):
-        from invenio.refextract_find import get_reference_section_beginning
+        from invenio.legacy.refextract.find import get_reference_section_beginning
         sect = get_reference_section_beginning([
             "Hello",
             "1 Ref1"
@@ -185,7 +185,7 @@ class FindSectionTest(InvenioTestCase):
         })
 
     def test_no_title_via_numbers2(self):
-        from invenio.refextract_find import get_reference_section_beginning
+        from invenio.legacy.refextract.find import get_reference_section_beginning
         sect = get_reference_section_beginning([
             "Hello",
             "1",
@@ -207,12 +207,12 @@ class FindSectionTest(InvenioTestCase):
 class SearchTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=9)
-        from invenio import refextract_kbs
+        from invenio.legacy.refextract import kbs as refextract_kbs
         self.old_override = refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE
         refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE = {}
 
     def tearDown(self):
-        from invenio import refextract_kbs
+        from invenio.legacy.refextract import kbs as refextract_kbs
         refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE = self.old_override
 
     def test_not_recognized(self):

@@ -29,7 +29,7 @@ from invenio.legacy.search_engine import record_public_p
 from invenio.utils.html import escape_javascript_string
 from invenio.modules.formatter.format_elements.bfe_sciencewise import create_sciencewise_url, \
     get_arxiv_reportnumber
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      make_journal_url, \
      get_journals_ids_and_names

@@ -29,7 +29,7 @@ except ImportError:
 from invenio.testsuite import make_test_suite, run_test_suite
 from invenio.legacy.dbquery import run_sql
 
-from invenio.sequtils import SequenceGenerator
+from invenio.modules.sequencegenerator.backend import SequenceGenerator
 
 def get_bibrecord_mock(_):
     return {'001': [([], ' ', ' ', '1086086', 1)],
@@ -75,10 +75,10 @@ class TestIntSequenceGeneratorClass(InvenioTestCase):
 class TestCnumSequenceGeneratorClass(InvenioTestCase):
 
     if HAS_MOCK:
-        @patch('invenio.bibedit_utils.get_bibrecord',
+        @patch('invenio.legacy.bibedit.utils.get_bibrecord',
             get_bibrecord_mock)
         def test_get_next_cnum(self):
-            from invenio.sequtils_cnum import CnumSeq
+            from invenio.modules.sequencegenerator.cnum import CnumSeq
 
             cnum_seq = CnumSeq()
             res = cnum_seq.next_value('xx')

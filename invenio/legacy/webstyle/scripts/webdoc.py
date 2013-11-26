@@ -22,12 +22,10 @@
 
 __revision__ = "$Id$"
 
-try:
-    from invenio.flaskshell import *
-    from invenio.webdoc import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from invenio.base.factory import with_app_context
 
-main()
+
+@with_app_context()
+def main():
+    from invenio.legacy.webstyle.webdoc import main as webdoc_main
+    webdoc_main()

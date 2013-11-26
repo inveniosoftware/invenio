@@ -22,7 +22,7 @@
 # pylint: disable=W0105
 # pylint: disable=C0301
 
-
+from flask import url_for
 #from cgi import escape
 #from urllib import quote
 #
@@ -33,11 +33,11 @@ from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.modules.formatter import format_record
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.bibauthorid.config import EXTERNAL_SYSTEMS_LIST
-from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id, get_person_names_from_id
-from invenio.bibauthorid_webapi import get_personiID_external_ids
-from invenio.bibauthorid_frontinterface import get_uid_from_personid
-from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
-from invenio.bibauthorid_frontinterface import get_canonical_id_from_personid
+from invenio.legacy.bibauthorid.webapi import get_person_redirect_link, get_canonical_id_from_person_id, get_person_names_from_id
+from invenio.legacy.bibauthorid.webapi import get_personiID_external_ids
+from invenio.legacy.bibauthorid.frontinterface import get_uid_from_personid
+from invenio.legacy.bibauthorid.frontinterface import get_bibrefrec_name_string
+from invenio.legacy.bibauthorid.frontinterface import get_canonical_id_from_personid
 from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.legacy.webuser import get_email
 from invenio.utils.html import escape_html
@@ -346,7 +346,7 @@ class Template:
         scripts = ["jquery-ui.min.js",
                    "jquery.form.js",
                    "jquery.dataTables.min.js",
-                   "bibauthorid.js"]
+                   ]
 
         result.append('<link rel="stylesheet" type="text/css" href='
                       '"%s/jquery-ui/themes/smoothness/jquery-ui.css" />'
@@ -355,13 +355,17 @@ class Template:
                       '"%s/datatables_jquery-ui.css" />'
                       % (imgcss_path))
         result.append('<link rel="stylesheet" type="text/css" href='
-                      '"%s/bibauthorid.css" />'
-                      % (imgcss_path))
+                      '"%s" />'
+                      % (url_for('authorids.static',
+                                 filename='css/authorids/base.css'), ))
 
         for script in scripts:
             result.append('<script type="text/javascript" src="%s/%s">'
                       '</script>' % (js_path, script))
 
+        result.append('<script type="text/javascript" src="%s">'
+                      '</script>' % (url_for('authorids.static',
+                                             filename='js/authorids/base.js')))
         return "\n".join(result)
 
 

@@ -26,12 +26,12 @@ import os
 def handleSIGCHLD():
     os.waitpid(-1, os.WNOHANG)
 
-from invenio.bibauthorid_webauthorprofileinterface import get_papers_by_person_id, \
+from invenio.legacy.bibauthorid.webauthorprofileinterface import get_papers_by_person_id, \
     get_person_db_names_count, create_normalized_name, \
     get_person_redirect_link, is_valid_canonical_id, split_name_parts, \
     gathered_names_by_personid, get_canonical_id_from_personid, get_coauthor_pids, \
     get_person_names_count, get_existing_personids
-from invenio.webauthorprofile_dbapi import get_cached_element, precache_element, cache_element, \
+from .dbapi import get_cached_element, precache_element, cache_element, \
     expire_all_cache_for_person, get_expired_person_ids, get_cache_oldest_date
 from invenio.legacy.search_engine.summarizer import summarize_records
 from invenio.legacy.bibrank.citation_searcher import get_cited_by_list as real_get_cited_by_list

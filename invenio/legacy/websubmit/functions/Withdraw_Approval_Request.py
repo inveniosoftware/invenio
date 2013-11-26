@@ -26,7 +26,7 @@ import sre_constants
 import os
 import cgi
 import re
-from invenio.websubmit_dblayer import get_simple_approval_status, \
+from invenio.legacy.websubmit.db_layer import get_simple_approval_status, \
                                       update_approval_request_status
 from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError, \

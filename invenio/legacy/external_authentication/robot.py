@@ -35,7 +35,7 @@ from zlib import decompress, compress
 
 from invenio.utils.json import json, json_unicode_to_utf8
 from invenio.utils.shell import mymkdir
-from invenio.modules.access.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
+from invenio.legacy.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.utils.hash import sha1
 

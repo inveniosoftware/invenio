@@ -22,6 +22,8 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
+from flask import url_for
+
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_RECORD
 from invenio.legacy.search_engine import guess_primary_collection_of_a_record
@@ -30,7 +32,7 @@ from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_inf
 from invenio.utils.json import json, json_unicode_to_utf8
 from invenio.utils.url import redirect_to_url
 from invenio.ext.legacy.handler import WebInterfaceDirectory, wash_urlargd
-from invenio.bibmerge_engine import perform_request_init, \
+from invenio.legacy.bibmerge.engine import perform_request_init, \
                                     perform_request_ajax
 
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
@@ -112,7 +114,7 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
             # Show BibEdit start page.
             body, errors, warnings = perform_request_init()
             metaheaderadd = """<script type="text/javascript" src="%(site)s/js/json2.js"></script>
-  <script type="text/javascript" src="%(site)s/js/bibmerge_engine.js"></script>""" % {'site': CFG_SITE_SECURE_URL}
+  <script type="text/javascript" src="%(url)s"></script>""" % {'site': url_for('merger.static', filename='js/merger/engine.js')}
             title = 'Record Merger'
             return page(title         = title,
                         metaheaderadd = metaheaderadd,

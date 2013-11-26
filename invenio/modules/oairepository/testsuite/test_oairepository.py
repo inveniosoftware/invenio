@@ -29,7 +29,7 @@ from cStringIO import StringIO
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-oai_repository_server = lazy_import('invenio.oai_repository_server')
+oai_repository_server = lazy_import('invenio.legacy.oairepository.server')
 
 
 class TestVerbs(InvenioTestCase):

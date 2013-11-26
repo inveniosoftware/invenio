@@ -60,7 +60,7 @@ class WebAlertHTMLToTextTest(InvenioTestCase):
 
     def test_your_alerts_pages_availability(self):
         """webalert - HTML to text conversion"""
-        from invenio.htmlparser import get_as_text
+        from invenio.legacy.webalert.htmlalert import get_as_text
 
         out = get_as_text(5)
         self.assertIn("High energy cosmic rays striking atoms at the top of the atmosphere give the rise to showers of particles striking the Earth's surface", out)

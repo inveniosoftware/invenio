@@ -53,10 +53,10 @@ from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.legacy.webstat.api import register_customevent
 from invenio.ext.logging import register_exception
 from invenio.utils.url import make_canonical_urlargd, redirect_to_url
-from invenio.websubmitadmin_engine import string_is_alphanumeric_including_underscore
+from invenio.legacy.websubmit.admin_engine import string_is_alphanumeric_including_underscore
 from invenio.utils.html import get_mathjax_header
 
-from invenio.websubmit_dblayer import \
+from invenio.legacy.websubmit.db_layer import \
      get_storage_directory_of_action, \
      get_longname_of_doctype, \
      get_longname_of_action, \
@@ -1699,8 +1699,9 @@ def print_function_calls(req, doctype, action, step, form, start_time,
                 'error' : 0,
                 'text' : '',
                 }
-                from invenio.legacy.websubmit import functions
-                function_path = os.path.join(function.__path__,
+                #FIXME: deprecated
+                from invenio.legacy.websubmit import functions as legacy_functions
+                function_path = os.path.join(legacy_functions.__path__[0],
                                              function_name + '.py')
                 if os.path.exists(function_path):
                     # import the function itself

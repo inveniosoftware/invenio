@@ -28,6 +28,8 @@ from operator import itemgetter
 
 import invenio.legacy.bibauthorid.dbinterface as dbinter
 
+from invenio.legacy.bibauthorid.dbinterface import *
+
 
 def group_personid(papers_table="aidPERSONID_PAPERS", data_table="aidPERSONID_DATA"):
     '''

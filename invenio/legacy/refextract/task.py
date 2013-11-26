@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,11 +33,9 @@ from invenio.config import CFG_VERSION, \
                            CFG_REFEXTRACT_TICKET_QUEUE
 from invenio.legacy.search_engine import perform_request_search
 # Help message is the usage() print out of how to use Refextract
-from invenio.refextract_cli import HELP_MESSAGE, DESCRIPTION
-from invenio.refextract_api import update_references, \
-                                   FullTextNotAvailable, \
-                                   RecordHasReferences
-from invenio.docextract_task import task_run_core_wrapper, split_ids
+from .cli import HELP_MESSAGE, DESCRIPTION
+from .api import update_references, FullTextNotAvailable, RecordHasReferences
+from invenio.legacy.docextract.task import task_run_core_wrapper, split_ids
 from invenio.legacy.bibcatalog.system_rt import BibCatalogSystemRT
 from invenio.legacy.bibedit.utils import get_bibrecord
 from invenio.legacy.bibrecord import record_get_field_instances, \

@@ -23,7 +23,7 @@ def celery_run(workflow_name, data, **kwargs):
     """
     Runs the workflow with Celery
     """
-    from invenio.bibworkflow_worker_engine import run_worker
+    from ..worker_engine import run_worker
     run_worker(workflow_name, data, **kwargs)
 
 
@@ -32,7 +32,7 @@ def celery_restart(wid, **kwargs):
     """
     Restarts the workflow with Celery
     """
-    from invenio.bibworkflow_worker_engine import restart_worker
+    from ..worker_engine import restart_worker
     restart_worker(wid, **kwargs)
 
 
@@ -41,7 +41,7 @@ def celery_continue(oid, restart_point, **kwargs):
     """
     Restarts the workflow with Celery
     """
-    from invenio.bibworkflow_worker_engine import continue_worker
+    from ..worker_engine import continue_worker
     continue_worker(oid, restart_point, **kwargs)
 
 

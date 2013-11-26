@@ -23,7 +23,6 @@ from invenio.legacy.bibrecord import create_record
 from invenio.ext.logging import register_exception
 from invenio.ext.sqlalchemy import db
 
-
 REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
 
 
@@ -31,29 +30,8 @@ class InvenioWorkflowDefinitionError(Exception):
     pass
 
 
-def create_objects(path_to_file):
-    from invenio.modules.workflows.models import BibWorkflowObject
-
-    list_of_bwo = []
-    f = open(path_to_file, "r")
-    records = f.read()
-    f.close()
-
-    record_xmls = REGEXP_RECORD.findall(records)
-    for record_xml in record_xmls:
-        rec = "<record>"
-        rec += record_xml
-        rec += "</record>"
-        rec = create_record(rec)[0]
-        #check for errors, if record is empty
-
-        bwo = BibWorkflowObject(rec, "bibrecord")
-        list_of_bwo.append(bwo)
-    return list_of_bwo
-
-
 def get_workflow_definition(name):
-    from invenio.modules.workflows.loader import workflows
+    from .loader import workflows
     if name in workflows:
         return workflows[name]
     else:
@@ -124,60 +102,6 @@ class dictproperty(object):
         if obj is None:
             return self
         return self._proxy(obj, self._fget, self._fset, self._fdel)
-
-
-def create_hp_containers(iSortCol_0=None, sSortDir_0=None,
-                         sSearch=None):
-    """
-    Looks for related HPItems and groups them together in HPContainers
-
-    @type hpitems: list
-    @return: A list containing all the HPContainers.
-    """
-    from invenio.modules.workflows.models import BibWorkflowObject
-
-    redis_server = redis.Redis()
-
-    if iSortCol_0:
-        iSortCol_0 = int(iSortCol_0)
-
-    bwobject_list = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id_parent != 0).all()
-
-    if sSearch:
-        if len(sSearch) < 4:
-            pass
-        else:
-            bwobject_list2 = []
-            for bwo in bwobject_list:
-                extra_data = bwo.get_extra_data()
-                if bwo.id_parent == sSearch:
-                    bwobject_list2.append(bwo)
-                elif bwo.id_user == sSearch:
-                    bwobject_list2.append(bwo)
-                elif sSearch in bwo.id_workflow:
-                    bwobject_list2.append(bwo)
-                elif sSearch in extra_data['widget']:
-                    bwobject_list2.append(bwo)
-                elif sSearch in extra_data['last_task_name']:
-                    bwobject_list2.append(bwo)
-                try:
-                    if sSearch in extra_data['redis_search']['category']:
-                        bwobject_list2.append(bwo)
-                    elif sSearch in extra_data['redis_search']['source']:
-                        bwobject_list2.append(bwo)
-                    elif sSearch in extra_data['redis_search']['title']:
-                        bwobject_list2.append(bwo)
-                except KeyError:
-                    pass
-            bwobject_list = bwobject_list2
-
-    if iSortCol_0 == -6:
-        column = 'created'
-        if sSortDir_0 == 'desc':
-            bwobject_list.reverse()
-
-    return bwobject_list
 
 
 def redis_create_search_entry(bwobject):

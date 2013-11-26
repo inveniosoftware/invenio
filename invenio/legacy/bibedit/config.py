@@ -179,11 +179,6 @@ CFG_BIBEDIT_TAG_FORMAT = 'MARC'
 ## <CFG_BIBEDIT_FILENAME>_<RECID>_<UID>_<CFG_BIBEDIT_TO_MERGE_SUFFIX>.xml
 CFG_BIBEDIT_TO_MERGE_SUFFIX = 'merge'
 
-# CFG_BIBEDIT_RECORD_TEMPLATES_PATH - path to record template directory
-
-CFG_BIBEDIT_RECORD_TEMPLATES_PATH = "%s%sbibedit%srecord_templates" % (CFG_ETCDIR, os.sep, os.sep)
-CFG_BIBEDIT_FIELD_TEMPLATES_PATH = "%s%sbibedit%sfield_templates" % (CFG_ETCDIR, os.sep, os.sep)
-
 # CFG_BIBEDIT_AUTOSUGGEST_TAGS - for which tags the editor should try to autosuggest values
 # This is "safe" to have configured since it does not rely to a particular existing KB
 CFG_BIBEDIT_AUTOSUGGEST_TAGS = ['100__a']

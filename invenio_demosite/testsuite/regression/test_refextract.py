@@ -29,11 +29,11 @@ import re
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 ## Import the minimal necessary methods and variables needed to run Refextract
-parse_references = lazy_import('invenio.refextract_engine:parse_references')
-setup_loggers = lazy_import('invenio.docextract_utils:setup_loggers')
-wash_and_repair_reference_line = lazy_import('invenio.refextract_text:wash_and_repair_reference_line')
-refextract_kbs = lazy_import('invenio.refextract_kbs')
-refextract_xml = lazy_import('invenio.refextract_xml')
+parse_references = lazy_import('invenio.legacy.refextract.engine:parse_references')
+setup_loggers = lazy_import('invenio.legacy.docextract.utils:setup_loggers')
+wash_and_repair_reference_line = lazy_import('invenio.legacy.refextract.text:wash_and_repair_reference_line')
+refextract_kbs = lazy_import('invenio.legacy.refextract.kbs')
+refextract_xml = lazy_import('invenio.legacy.refextract.xml')
 
 
 def compare_references(test, references, expected_references, ignore_misc=True):
@@ -2384,7 +2384,7 @@ Rev. D 80 034030 1-25"""
 </record>""")
 
     def test_reference_size_limit_check_valid_in_one_line(self):
-        from invenio.refextract_api import extract_references_from_string_xml
+        from invenio.legacy.refextract.api import extract_references_from_string_xml
         ref_line = u"""[1] D. Adams, S. Asai, D. Cavalli, K. Edmonds,
         The ATLFAST-II performance in release 14,
         Tech. Rep. ATL-PHYS-INT-2009-110, CERN, Geneva, Dec, 2009.
@@ -2410,7 +2410,7 @@ Rev. D 80 034030 1-25"""
         Needs to match test_reference_size_limit_check_valid_in_one_line
         above but be on multiple lines
         """
-        from invenio.refextract_api import extract_references_from_string_xml
+        from invenio.legacy.refextract.api import extract_references_from_string_xml
         ref_line = u"""[1] D. Adams, S. Asai, D. Cavalli, K. Edmonds,
         a\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\n
         a\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\n
@@ -2433,7 +2433,7 @@ class TaskTest(InvenioTestCase):
         setup_loggers(verbosity=0)
 
     def test_task_run_core(self):
-        from invenio.refextract_task import task_run_core
+        from invenio.legacy.refextract.task import task_run_core
         task_run_core(1)
 
 TEST_SUITE = make_test_suite(RefextractTest)

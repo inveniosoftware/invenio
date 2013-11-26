@@ -33,9 +33,9 @@ from flask import redirect, render_template, flash, url_for, request, session
 from flask.ext.login import current_user
 
 from invenio.ext.sqlalchemy import db
-from invenio.bibworkflow_config import CFG_OBJECT_VERSION, CFG_WORKFLOW_STATUS
+from invenio.modules.workflows.config import CFG_OBJECT_VERSION, CFG_WORKFLOW_STATUS
 from invenio.modules.workflows.models import BibWorkflowObject, Workflow
-from invenio.bibworkflow_engine import BibWorkflowEngine
+from invenio.modules.workflows.engine import BibWorkflowEngine
 from invenio.modules.workflows.api import continue_oid
 
 from . import forms

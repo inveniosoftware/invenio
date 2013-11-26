@@ -26,7 +26,7 @@ from invenio.ext.sqlalchemy import db
 
 # Create your models here.
 
-from invenio.modules.legacy.scheduler.models import SchTASK
+from invenio.modules.scheduler.models import SchTASK
 
 class HstBATCHUPLOAD(db.Model):
     """Represents a HstBATCHUPLOAD record."""

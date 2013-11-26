@@ -22,20 +22,20 @@ from itertools import groupby, chain, imap, izip
 
 from invenio.legacy.bibauthorid.general_utils import update_status \
                                     , update_status_final
-from invenio.bibauthorid_matrix_optimization import maximized_mapping
-from invenio.bibauthorid_backinterface import update_personID_canonical_names
-from invenio.bibauthorid_backinterface import get_existing_result_clusters
-from invenio.bibauthorid_backinterface import get_lastname_results
-from invenio.bibauthorid_backinterface import personid_name_from_signature
-from invenio.bibauthorid_backinterface import personid_from_signature
-from invenio.bibauthorid_backinterface import move_signature
-from invenio.bibauthorid_backinterface import get_claimed_papers
-from invenio.bibauthorid_backinterface import get_new_personid
-from invenio.bibauthorid_backinterface import find_conflicts
-from invenio.bibauthorid_backinterface import get_free_pids as backinterface_get_free_pids
-from invenio.bibauthorid_backinterface import get_signature_info
-from invenio.bibauthorid_backinterface import delete_empty_persons
-from invenio.bibauthorid_backinterface import get_bibrefrec_to_pid_flag_mapping
+from invenio.legacy.bibauthorid.matrix_optimization import maximized_mapping
+from invenio.legacy.bibauthorid.backinterface import update_personID_canonical_names
+from invenio.legacy.bibauthorid.backinterface import get_existing_result_clusters
+from invenio.legacy.bibauthorid.backinterface import get_lastname_results
+from invenio.legacy.bibauthorid.backinterface import personid_name_from_signature
+from invenio.legacy.bibauthorid.backinterface import personid_from_signature
+from invenio.legacy.bibauthorid.backinterface import move_signature
+from invenio.legacy.bibauthorid.backinterface import get_claimed_papers
+from invenio.legacy.bibauthorid.backinterface import get_new_personid
+from invenio.legacy.bibauthorid.backinterface import find_conflicts
+from invenio.legacy.bibauthorid.backinterface import get_free_pids as backinterface_get_free_pids
+from invenio.legacy.bibauthorid.backinterface import get_signature_info
+from invenio.legacy.bibauthorid.backinterface import delete_empty_persons
+from invenio.legacy.bibauthorid.backinterface import get_bibrefrec_to_pid_flag_mapping
 
 def merge_static_classy():
     '''

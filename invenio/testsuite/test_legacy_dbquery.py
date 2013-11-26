@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-dbquery = lazy_import('invenio.dbquery')
+dbquery = lazy_import('invenio.legacy.dbquery')
 
 
 class TableUpdateTimesTest(InvenioTestCase):

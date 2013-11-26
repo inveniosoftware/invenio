@@ -23,7 +23,8 @@ import urllib2
 
 from invenio.config import CFG_ETCDIR, CFG_CROSSREF_USERNAME, \
  CFG_CROSSREF_PASSWORD
-from invenio.bibconvert_xslt_engine import convert
+from invenio.legacy.bibconvert.registry import templates
+from invenio.legacy.bibconvert.xslt_engine import convert
 
 
 # Exceptions classes
@@ -68,8 +69,7 @@ def get_marcxml_for_doi(doi):
     # Convert xml to marc using convert function
     # from bibconvert_xslt_engine file
     # Seting the path to xsl template
-    xsl_crossref2marc_config = "%s/bibconvert/config/%s" % \
-    (CFG_ETCDIR, "crossref2marcxml.xsl")
+    xsl_crossref2marc_config = templates.get('crossref2marcxml.xsl', '')
 
     output = convert(xmltext=content, \
                     template_filename=xsl_crossref2marc_config)

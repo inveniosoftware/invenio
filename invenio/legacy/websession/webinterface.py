@@ -43,17 +43,17 @@ from invenio.config import \
      CFG_OPENAIRE_SITE
 from invenio.legacy import webuser
 from invenio.legacy.webpage import page
-from invenio import webaccount
-from invenio import webbasket
-from invenio import webalert
+from invenio.legacy.websession import webaccount
+from invenio.legacy.webbasket import api as webbasket
+from invenio.legacy.webalert import api as webalert
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.webmessage.api import account_new_mail
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd
-from invenio import webgroup
-from invenio import webgroup_dblayer
+from invenio.legacy.websession import webgroup
+from invenio.legacy.websession import dblayer as webgroup_dblayer
 from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
@@ -69,7 +69,7 @@ from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS, \
     CFG_OAUTH1_CONFIGURATIONS, CFG_OAUTH2_PROVIDERS, CFG_OAUTH1_PROVIDERS, \
     CFG_OPENID_PROVIDERS, CFG_OPENID_AUTHENTICATION, \
     CFG_OAUTH1_AUTHENTICATION, CFG_OAUTH2_AUTHENTICATION
-from invenio.session import get_session
+from invenio.legacy.websession.session import get_session
 
 from invenio.modules import apikeys as web_api_key
 
@@ -752,7 +752,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         """
         Implement authentication method for external service providers.
         """
-        from invenio.modules.access.external_authentication import InvenioWebAccessExternalAuthError
+        from invenio.legacy.external_authentication import InvenioWebAccessExternalAuthError
         args = wash_urlargd(form, {
             'login_method': (str, None),
             'remember_me' : (str, ''),

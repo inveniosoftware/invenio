@@ -28,7 +28,7 @@ __revision__ = \
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-QueryResult = lazy_import('invenio.bibexport_method_fieldexporter_dblayer:QueryResult')
+QueryResult = lazy_import('invenio.legacy.bibexport.fieldexporter_dblayer:QueryResult')
 
 
 def _create_record_marc_xml():

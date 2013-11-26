@@ -36,7 +36,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_TMPDIR, \
      CFG_SITE_LANG
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      cache_index_page, \
      get_index_page_from_cache, \
      parse_url_string, \
@@ -44,7 +44,7 @@ from invenio.webjournal_utils import \
      get_journal_articles, \
      issue_is_later_than, \
      get_current_issue
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      img_pattern, \
      header_pattern, \
      header_pattern2, \

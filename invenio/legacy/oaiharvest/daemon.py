@@ -49,7 +49,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_OAI_FAILED_HARVESTING_STOP_QUEUE, \
      CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN
-from invenio.oai_harvest_config import InvenioOAIHarvestWarning
+from invenio.legacy.oaiharvest.config import InvenioOAIHarvestWarning
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibsched.bibtask import \
      task_get_task_param, \
@@ -66,25 +66,27 @@ from invenio.legacy.bibrecord import record_extract_oai_id, create_records, \
                               record_get_field_instances, \
                               record_modify_subfield, \
                               record_has_field, field_xml_output
-from invenio import oai_harvest_getter
+from . import getter as oai_harvest_getter
+from invenio.base.helpers import with_app_context
 from invenio.ext.logging import register_exception
-from invenio.plotextractor_getter import harvest_single, make_single_directory
-from invenio.plotextractor_converter import untar
-from invenio.plotextractor import process_single, get_defaults
+from invenio.utils.plotextractor.getter import harvest_single, make_single_directory
+from invenio.utils.plotextractor.converter import untar
+from invenio.utils.plotextractor.cli import process_single, get_defaults
 from invenio.utils.shell import run_shell_command, Timeout
 from invenio.utils.text import translate_latex2unicode
 from invenio.legacy.bibedit.utils import record_find_matching_fields
 from invenio.legacy.bibcatalog.api import bibcatalog_system
-import invenio.template
-oaiharvest_templates = invenio.template.load('oai_harvest')
-from invenio.ext.legacy.handler_flask import with_app_context
+from invenio.legacy import template
+oaiharvest_templates = template.load('oai_harvest')
 
 ## precompile some often-used regexp for speed reasons:
 REGEXP_OAI_ID = re.compile("<identifier.*?>(.*?)<\/identifier>", re.DOTALL)
 REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
 REGEXP_REFS = re.compile("<record.*?>.*?<controlfield .*?>.*?</controlfield>(.*?)</record>", re.DOTALL)
 REGEXP_AUTHLIST = re.compile("<collaborationauthorlist.*?</collaborationauthorlist>", re.DOTALL)
-CFG_OAI_AUTHORLIST_POSTMODE_STYLESHEET = "%s/bibconvert/config/%s" % (CFG_ETCDIR, "authorlist2marcxml.xsl")
+
+from invenio.legacy.bibconvert.registry import templates
+CFG_OAI_AUTHORLIST_POSTMODE_STYLESHEET = templates.get('authorlist2marcxml.xsl', '')
 
 def get_nb_records_in_file(filename):
     """
@@ -1423,7 +1425,7 @@ def usage(exitcode=0, msg=""):
         sys.stderr.write(msg + "\n")
     sys.exit(exitcode)
 
-@with_app_context
+
 def main():
     """Starts the tool.
 
@@ -1615,8 +1617,3 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     else:
         return False
     return True
-
-
-### okay, here we go:
-if __name__ == '__main__':
-    main()

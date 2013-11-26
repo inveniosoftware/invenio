@@ -25,7 +25,7 @@ from invenio.legacy.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.legacy.webuser import getUid, page_not_authorized
 from invenio.utils.url import wash_url_argument
-from invenio import bibsortadminlib as bsc
+from invenio.legacy.bibsort import adminlib as bsc
 
 
 def index(req, ln=CFG_SITE_LANG, action='', bsrID='', sm_name='', sm_def_type='', sm_def_value='', sm_washer='', sm_locale=''):

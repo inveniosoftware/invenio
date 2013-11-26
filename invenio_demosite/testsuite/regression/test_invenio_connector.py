@@ -27,7 +27,7 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
-InvenioConnector = lazy_import('invenio.invenio_connector:InvenioConnector')
+InvenioConnector = lazy_import('invenio.utils.connector:InvenioConnector')
 
 
 class InvenioConnectorTest(InvenioTestCase):
@@ -56,7 +56,7 @@ class InvenioConnectorTest(InvenioTestCase):
 
     def test_search_local_restricted_collections(self):
         """InvenioConnector - local restricted collection search"""
-        from invenio.invenio_connector import InvenioConnectorAuthError
+        from invenio.utils.connector import InvenioConnectorAuthError
         server = InvenioConnector(CFG_SITE_URL)
         search_params = dict(p='LBL-28106', c=['Theses'], of='id')
         self.assertRaises(InvenioConnectorAuthError, server.search, **search_params)
@@ -68,7 +68,7 @@ class InvenioConnectorTest(InvenioTestCase):
 
     def test_search_remote_restricted_collections(self):
         """InvenioConnector - remote restricted collection search"""
-        from invenio.invenio_connector import InvenioConnectorAuthError
+        from invenio.utils.connector import InvenioConnectorAuthError
         server = InvenioConnector("http://invenio-demo.cern.ch")
         search_params = dict(p='LBL-28106', c=['Theses'], of='id')
         self.assertRaises(InvenioConnectorAuthError, server.search, **search_params)

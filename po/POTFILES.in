@@ -122,7 +122,7 @@ modules/elmsubmit/lib/elmsubmit_html2txt.py
 modules/elmsubmit/lib/elmsubmit_misc.py
 modules/elmsubmit/lib/elmsubmit_richtext2txt.py
 modules/elmsubmit/lib/elmsubmit_submission_parser.py
-modules/elmsubmit/lib/myhtmlentitydefs.py
+modules/elmsubmit/lib/htmlentitydefs.py
 modules/miscutil/bin/dbexec.in
 modules/miscutil/lib/__init__.py
 modules/miscutil/lib/dateutils.py

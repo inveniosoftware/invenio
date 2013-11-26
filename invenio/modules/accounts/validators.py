@@ -74,7 +74,7 @@ def validate_nickname(nickname):
     if nickname and \
        not(nickname.startswith(' ') or nickname.endswith(' ')) and \
        nickname.lower() != 'guest':
-        if not re_invalid_nickname.match(nickname):
+        if re_invalid_nickname.match(nickname) is not None:
             raise validators.ValidationError(
                 _("Desired nickname %s is invalid.") % nickname
             )

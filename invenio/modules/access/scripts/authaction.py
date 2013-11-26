@@ -22,16 +22,10 @@
 
 __revision__ = "$Id$"
 
-try:
-    import sys
-    from invenio.flaskshell import *
-    from invenio.config import *
-    from invenio.modules.access.engine import acc_authorize_action
-    from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+import sys
+
+from invenio.base.helpers import with_app_context
+
 
 def usage(code, msg=''):
     """Print usage info."""
@@ -52,11 +46,16 @@ def usage(code, msg=''):
     sys.stderr.write("  -V, --version   \t\t Print version information.\n")
     sys.exit(code)
 
+
+@with_app_context()
 def main():
     """CLI to acc_authorize_action. The function finds the needed
     arguments in sys.argv.
     If the number of arguments is wrong it prints help.
     Return 0 on success, 9 or higher on failure. """
+
+    from invenio.modules.access.engine import acc_authorize_action
+    from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS
 
     alen, auth = len(sys.argv), 0
 
@@ -76,18 +75,14 @@ def main():
         id_user = int(sys.argv[1])
         name_action = sys.argv[2]
 
-        dict = {}
+        kwargs = {}
         for i in range(3, alen, 2):
-            dict[sys.argv[i]] = sys.argv[i + 1]
+            kwargs[sys.argv[i]] = sys.argv[i + 1]
 
         # run ace-function
-        (auth_code, auth_message) = acc_authorize_action(id_user, name_action, **dict)
+        (auth_code, auth_message) = acc_authorize_action(id_user, name_action,
+                                                         **kwargs)
 
     # print and return
     print "%s - %s" % (auth_code, auth_message)
     return "%s - %s" % (auth_code, auth_message)
-
-
-if __name__ == '__main__':
-    main()
-

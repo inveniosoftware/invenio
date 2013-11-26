@@ -37,7 +37,7 @@ from invenio.legacy.bibdocfile.api import \
      InvenioBibDocFileError, \
      BibRecDocs
 from invenio.ext.logging import register_exception
-from invenio.websubmit_icon_creator import \
+from invenio.legacy.websubmit.icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.config import CFG_BINDIR
 from invenio.legacy.dbquery import run_sql

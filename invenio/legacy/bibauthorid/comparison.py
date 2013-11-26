@@ -27,7 +27,7 @@ from invenio.legacy.bibauthorid.dbinterface import get_grouped_records
 from invenio.legacy.bibauthorid.dbinterface import get_all_authors
 from invenio.legacy.bibauthorid.dbinterface import get_collaboration
 from invenio.legacy.bibauthorid.dbinterface import resolve_affiliation
-from invenio.bibauthorid_backinterface import get_key_words
+from invenio.legacy.bibauthorid.backinterface import get_key_words
 #from invenio.legacy.bibrank.citation_searcher import get_citation_dict
 #metadat_comparison_print commented everywhere to increase performances,
 #import and calls left here to make future debug easier.

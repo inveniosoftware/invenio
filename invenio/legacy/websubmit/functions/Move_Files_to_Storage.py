@@ -25,7 +25,7 @@ from invenio.legacy.bibdocfile.api import \
      CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 import os
 import re
-from invenio.websubmit_icon_creator import create_icon
+from invenio.legacy.websubmit.icon_creator import create_icon
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionWarning
 from invenio.legacy.websubmit.functions.Shared_Functions import get_dictionary_from_string, \
      createRelatedFormats

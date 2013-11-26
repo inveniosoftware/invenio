@@ -24,11 +24,11 @@ from invenio import config
 
 # Start remote debugger if appropriate:
 try:
-    from invenio.remote_debugger_config import CFG_REMOTE_DEBUGGER_ENABLED, \
+    from .config import CFG_REMOTE_DEBUGGER_ENABLED, \
         CFG_REMOTE_DEBUGGER_WSGI_LOADING
 
     if CFG_REMOTE_DEBUGGER_ENABLED:
-        from invenio import remote_debugger
+        from invenio.utils import remote_debugger
         remote_debugger.start_file_changes_monitor()
         if CFG_REMOTE_DEBUGGER_WSGI_LOADING:
             remote_debugger.start()

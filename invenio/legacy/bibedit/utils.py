@@ -44,8 +44,8 @@ except ImportError:
     from StringIO import StringIO
 
 from invenio.legacy.bibedit.config import CFG_BIBEDIT_FILENAME, \
-    CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
+    CFG_BIBEDIT_TO_MERGE_SUFFIX, \
+    CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_CACHEDIR
 from invenio.legacy.bibedit.db_layer import get_record_last_modification_date, \
     delete_hp_change
@@ -76,14 +76,14 @@ from invenio.legacy.webuser import get_user_info, getUid, get_email
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 from invenio.modules.access.engine import acc_authorize_action
-from invenio.refextract_api import extract_references_from_record_xml, \
+from invenio.legacy.refextract.api import extract_references_from_record_xml, \
                                    extract_references_from_string_xml, \
                                    extract_references_from_url_xml
 from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file, ParseError
 from invenio.legacy.bibauthorid.name_utils import split_name_parts, \
                                         create_normalized_name
 from invenio.modules.knowledge.api import get_kbr_values
-
+from invenio.modules.editor.registry import field_templates, record_templates
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_BIBEDIT_CACHEDIR)
 re_xmlfilename_suffix = re.compile('_(\d+)_\d+\.xml$')
@@ -570,15 +570,14 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent = Fa
     """Return list of templates [filename, name, description, content*]
        the extractContent variable indicated if the parsed content should
        be included"""
-    template_fnames = fnmatch.filter(os.listdir(
-            templatesDir), '*.xml')
+    template_fnames = fnmatch.filter(templatesDir, '*.xml')
 
     templates = []
-    for fname in template_fnames:
-        filepath = '%s%s%s' % (templatesDir, os.sep, fname)
+    for filepath in template_fnames:
         template_file = open(filepath,'r')
         template = template_file.read()
         template_file.close()
+        fname = os.path.basename(filepath)
         fname_stripped = os.path.splitext(fname)[0]
         mo_name = tmpl_name.search(template)
         mo_description = tmpl_description.search(template)
@@ -607,17 +606,18 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent = Fa
 
 def get_field_templates():
     """Returns list of field templates [filename, name, description, content]"""
-    return get_templates(CFG_BIBEDIT_FIELD_TEMPLATES_PATH, re_ftmpl_name, re_ftmpl_description, True)
+    return get_templates(field_templates, re_ftmpl_name, re_ftmpl_description, True)
 
 # Record templates
 def get_record_templates():
     """Return list of record template [filename, name, description]  ."""
-    return get_templates(CFG_BIBEDIT_RECORD_TEMPLATES_PATH, re_tmpl_name, re_tmpl_description, False)
+    return get_templates(record_templates, re_tmpl_name, re_tmpl_description, False)
 
 
 def get_record_template(name):
     """Return an XML record template."""
-    filepath = '%s%s%s.xml' % (CFG_BIBEDIT_RECORD_TEMPLATES_PATH, os.sep, name)
+    filepath = filter(lambda n: n.endswith('%s.xml' % (name, )),
+                      record_templates)[-1]
     if os.path.isfile(filepath):
         template_file = open(filepath, 'r')
         template = template_file.read()
@@ -896,7 +896,7 @@ def add_record_cnum(recid, uid):
     @rtype: None or string
     """
     # Import placed here to avoid circular dependency
-    from invenio.sequtils_cnum import CnumSeq, ConferenceNoStartDateError
+    from invenio.modules.sequencegenerator.cnum import CnumSeq, ConferenceNoStartDateError
 
     record_revision, record, pending_changes, deactivated_hp_changes, \
     undo_list, redo_list = get_cache_file_contents(recid, uid)[1:]

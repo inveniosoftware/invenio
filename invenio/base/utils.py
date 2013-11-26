@@ -103,7 +103,6 @@ def import_submodules_from_packages(name, app=None, packages=None,
 
 collect_blueprints = partial(import_module_from_packages, 'views')
 autodiscover_admin_views = partial(import_module_from_packages, 'admin')
-autodiscover_models = partial(import_module_from_packages, 'models')
 autodiscover_user_settings = partial(import_module_from_packages,
                                      'user_settings')
 autodiscover_configs = partial(import_module_from_packages, 'config')

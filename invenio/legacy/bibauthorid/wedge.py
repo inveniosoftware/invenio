@@ -20,12 +20,12 @@
 from invenio.legacy.bibauthorid import config as bconfig
 from itertools import izip, starmap
 from operator import mul
-from invenio.bibauthorid_backinterface import Bib_matrix
+from invenio.legacy.bibauthorid.backinterface import Bib_matrix
 from invenio.legacy.bibauthorid.general_utils import update_status \
                                     , update_status_final \
                                     , bibauthor_print \
                                     , wedge_print
-from invenio.bibauthorid_prob_matrix import ProbabilityMatrix
+from invenio.legacy.bibauthorid.prob_matrix import ProbabilityMatrix
 import numpy
 #mport cPickle as SER
 import msgpack as SER

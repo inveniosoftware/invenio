@@ -42,7 +42,7 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, CFG_INSPI
 
 from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
 from invenio.base.i18n import gettext_set_language #, wash_language
-from invenio.template import load
+from invenio.legacy.template import load
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import redirect_to_url
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, set_user_preferences, \
@@ -52,10 +52,10 @@ from invenio.modules.access.control import acc_find_user_role_actions, acc_get_u
 from invenio.legacy.search_engine import perform_request_search
 from invenio.legacy.bibrecord import get_fieldvalues
 
-import invenio.bibauthorid_webapi as webapi
-from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
+import invenio.legacy.bibauthorid.webapi as webapi
+from invenio.legacy.bibauthorid.frontinterface import get_bibrefrec_name_string
 from flask import session
-from invenio.bibauthorid_backinterface import update_personID_external_ids
+from invenio.legacy.bibauthorid.backinterface import update_personID_external_ids
 
 TEMPLATE = load('bibauthorid')
 

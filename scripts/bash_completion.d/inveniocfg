@@ -36,7 +36,7 @@ _inveniocfg()
             ;;
         --get)
             # Configuration options
-            local args=$(for arg in $(@PYTHON@ -c 'import invenio.config; print dir(invenio.config)' | tr -s "', '" "\n" | grep ^CFG_); do echo $arg; done)
+            local args=$(for arg in $(inveniomanage config list | grep ^CFG_ | cut -d' ' -f1); do echo $arg; done)
             COMPREPLY=( $(compgen -W "${args}" -- ${cur}) )
             return 0
             ;;

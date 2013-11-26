@@ -26,10 +26,11 @@ import re
 import sys
 from time import strftime, localtime
 
-from invenio.config import CFG_OAI_ID_PREFIX, CFG_ETCDIR
+#FIXME: pu
+from invenio.config import CFG_OAI_ID_PREFIX
 from invenio.legacy.search_engine import perform_request_search
 
-CFG_BIBCONVERT_KB_PATH = "%s%sbibconvert%sKB" % (CFG_ETCDIR, os.sep, os.sep)
+from .registry import kb
 
 ### Matching records with database content
 
@@ -726,7 +727,7 @@ def crawl_KB(filename, value, mode):
         except NameError:
             # File was not found. Try to look inside default KB
             # directory
-            filename = CFG_BIBCONVERT_KB_PATH + os.sep + filename
+            filename = kb.get(filename, '')
 
     # FIXME: Remove \n from returned value?
     if (os.path.isfile(filename)):

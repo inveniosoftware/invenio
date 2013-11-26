@@ -25,12 +25,12 @@ __revision__ = "$Id$"
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-assemble_caption = lazy_import('invenio.plotextractor:assemble_caption')
-find_open_and_close_braces = lazy_import('invenio.plotextractor:find_open_and_close_braces')
-intelligently_find_filenames = lazy_import('invenio.plotextractor:intelligently_find_filenames')
-put_it_together = lazy_import('invenio.plotextractor:put_it_together')
-get_converted_image_name = lazy_import('invenio.plotextractor_output_utils:get_converted_image_name')
-remove_dups = lazy_import('invenio.plotextractor_output_utils:remove_dups')
+assemble_caption = lazy_import('invenio.utils.plotextractor.cli:assemble_caption')
+find_open_and_close_braces = lazy_import('invenio.utils.plotextractor.cli:find_open_and_close_braces')
+intelligently_find_filenames = lazy_import('invenio.utils.plotextractor.cli:intelligently_find_filenames')
+put_it_together = lazy_import('invenio.utils.plotextractor.cli:put_it_together')
+get_converted_image_name = lazy_import('invenio.utils.plotextractor.output_utils:get_converted_image_name')
+remove_dups = lazy_import('invenio.utils.plotextractor.output_utils:remove_dups')
 run_shell_command = lazy_import('invenio.utils.shell:run_shell_command')
 
 

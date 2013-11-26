@@ -39,14 +39,14 @@ from invenio.template import load
 from invenio.ext.legacy.handler import wash_urlargd
 from invenio.legacy.webuser import collect_user_info
 import invenio.modules.access.engine as acce
-from invenio import dbquery
+from invenio.legacy import dbquery
 from invenio import bibtask
 from invenio.legacy import bibrecord
 
 from invenio import bibclassify_config as bconfig
 from invenio import bibclassify_text_extractor
 from invenio import bibclassify_engine
-from invenio import bibclassify_ontology_reader as bor
+from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader as bor
 
 log = bconfig.get_logger("bibclassify.webinterface")
 

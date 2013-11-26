@@ -19,14 +19,15 @@
 
 __revision__ = "$Id$"
 
+import pkg_resources
 from invenio.config import CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_URL, CFG_SITE_NAME
 
 # elmsubmit configuration file:
 CFG_ELMSUBMIT_FILES = {
          'mailprefix': 'mail',
-         'test_case_1': 'elmsubmit_tests_1.mbox',
-         'test_case_2': 'elmsubmit_tests_2.mbox',
+         'test_case_1': pkg_resources.resource_filename('invenio.testsuite', 'data/elmsubmit_tests_1.mbox'),
+         'test_case_2': pkg_resources.resource_filename('invenio.testsuite', 'data/elmsubmit_tests_2.mbox'),
          }
 # Messages we need to send to the user, before we've identified the
 # correct language to talk to them in (so we assume English!):

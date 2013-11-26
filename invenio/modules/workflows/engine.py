@@ -18,10 +18,8 @@
 
 import cPickle
 import sys
-
-from invenio.modules.workflows.models import (Workflow,
-                                              BibWorkflowObject,
-                                              BibWorkflowEngineLog)
+from datetime import datetime
+from uuid import uuid1 as new_uuid
 from workflow.engine import (GenericWorkflowEngine,
                              ContinueNextToken,
                              HaltProcessing,
@@ -29,17 +27,16 @@ from workflow.engine import (GenericWorkflowEngine,
                              JumpTokenBack,
                              JumpTokenForward,
                              WorkflowError)
-
 from invenio.ext.sqlalchemy import db
-from datetime import datetime
 from invenio.config import CFG_DEVEL_SITE
-from invenio.bibworkflow_utils import get_workflow_definition
-from uuid import uuid1 as new_uuid
-from invenio.bibworkflow_utils import dictproperty
-from invenio.bibworkflow_config import (CFG_WORKFLOW_STATUS,
-                                        CFG_OBJECT_VERSION)
-from invenio.modules.workflows.logger import (get_logger,
-                                              BibWorkflowLogHandler)
+from .models import (Workflow,
+                     BibWorkflowObject,
+                     BibWorkflowEngineLog)
+from .utils import dictproperty, get_workflow_definition
+from .config import (CFG_WORKFLOW_STATUS,
+                     CFG_OBJECT_VERSION)
+from .logger import (get_logger,
+                     BibWorkflowLogHandler)
 
 
 DEBUG = CFG_DEVEL_SITE > 0

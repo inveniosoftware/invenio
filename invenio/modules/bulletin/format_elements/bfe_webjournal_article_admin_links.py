@@ -25,7 +25,7 @@ from invenio.config import \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_RECORD
 from invenio.modules.access.engine import acc_authorize_action
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      get_journal_submission_params
 

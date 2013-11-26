@@ -92,7 +92,7 @@ def get_record_coauthors_mock(recID, dummy_tags):
 
 class SelfCitesOtherTests(InvenioTestCase):
     if HAS_MOCK:
-        @patch('invenio.bibrank_selfcites_indexer.get_fieldvalues',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_fieldvalues',
             get_fieldvalues_mock)
         def get_collaborations_from_record(self):
             """
@@ -104,11 +104,11 @@ class SelfCitesOtherTests(InvenioTestCase):
             collaborations = get_collaborations_from_record(2, tags)
             self.assertEqual(collaborations, ['1'])
 
-        @patch('invenio.bibrank_selfcites_indexer.get_collaborations_from_record',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_collaborations_from_record',
             get_collaborations_from_record_mock)
-        @patch('invenio.bibrank_selfcites_indexer.get_authors_from_record',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_authors_from_record',
             get_authors_from_record_mock)
-        @patch('invenio.bibrank_selfcites_indexer.get_cited_by',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_cited_by',
             get_cited_by_mock(4, 5))
         def test_compute_self_citations_no_self_citations(self):
             """
@@ -122,11 +122,11 @@ class SelfCitesOtherTests(InvenioTestCase):
             self_citations = compute_self_citations(1, tags, get_record_coauthors_mock)
             self.assertEqual(self_citations, set())
 
-        @patch('invenio.bibrank_selfcites_indexer.get_collaborations_from_record',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_collaborations_from_record',
             get_collaborations_from_record_mock)
-        @patch('invenio.bibrank_selfcites_indexer.get_authors_from_record',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_authors_from_record',
             get_authors_from_record_mock)
-        @patch('invenio.bibrank_selfcites_indexer.get_cited_by',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_cited_by',
             get_cited_by_mock(3, 4))
         def test_compute_self_citations(self):
             """Check self citations count matches in a typical case
@@ -140,11 +140,11 @@ class SelfCitesOtherTests(InvenioTestCase):
             self_citations = compute_self_citations(1, tags, get_record_coauthors_mock)
             self.assertEqual(self_citations, set([3]))
 
-        @patch('invenio.bibrank_selfcites_indexer.get_collaborations_from_record',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_collaborations_from_record',
             get_collaborations_from_record_mock)
-        @patch('invenio.bibrank_selfcites_indexer.get_authors_from_record',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_authors_from_record',
             get_authors_from_record_mock)
-        @patch('invenio.bibrank_selfcites_indexer.get_cited_by',
+        @patch('invenio.legacy.bibrank.selfcites_indexer.get_cited_by',
             get_cited_by_mock(1, 2, 3))
         def test_compute_self_citations_all_self_citations(self):
             """

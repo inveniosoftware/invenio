@@ -38,7 +38,7 @@ from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase
 
-oai_repository_server = lazy_import('invenio.oai_repository_server')
+oai_repository_server = lazy_import('invenio.legacy.oairepository.server')
 search_engine = lazy_import('invenio.legacy.search_engine')
 
 
@@ -67,7 +67,7 @@ class OAIRepositoryTouchSetTest(InvenioTestCase):
         oai_repository_server.oai_list_records_or_identifiers(req,  {'verb': 'ListIdentifiers', 'metadataPrefix': 'marcxml', 'set':'cern:experiment', 'from': future_timestamp})
         response = req.getvalue()
         self.failIf(re.findall("<datestamp>(.*?)</datestamp>", response))
-        from invenio.oai_repository_admin import touch_oai_set
+        from invenio.legacy.oairepository.admin import touch_oai_set
         touch_oai_set('cern:experiment')
         req = StringIO()
         oai_repository_server.oai_list_records_or_identifiers(req,  {'verb': 'ListIdentifiers', 'metadataPrefix': 'marcxml', 'set':'cern:experiment', 'from': future_timestamp})

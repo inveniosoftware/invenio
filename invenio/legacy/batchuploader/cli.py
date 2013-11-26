@@ -40,7 +40,7 @@ from invenio.config import CFG_TMPSHAREDDIR, \
 from invenio.legacy.bibsched.bibtask import task_init, task_set_option, \
      task_get_option, task_update_progress, task_low_level_submission, \
      write_message, task_sleep_now_if_required
-from invenio.batchuploader_engine import document_upload
+from invenio.legacy.batchuploader.engine import document_upload
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key, checks its meaning and returns True if

@@ -82,6 +82,7 @@ from ConfigParser import ConfigParser
 from optparse import OptionParser, OptionGroup, IndentedHelpFormatter, Option, \
     OptionError
 import os
+import pkg_resources
 import random
 import re
 import shutil
@@ -445,7 +446,7 @@ def cli_cmd_update_bibconvert_tpl(conf):
     from conf file.  Note: this edits tpl files in situ, taking a
     backup first.  Use only when you know what you are doing.
     """
-    from invenio.bibconvert_manager import main
+    from invenio.legacy.bibconvert.manager import main
 
     warn('inveniocfg --update-bibconvert-tpl is deprecated. Using instead: inveniomanage bibconvert update')
 
@@ -508,8 +509,8 @@ def cli_cmd_reset_sitename(conf):
     except IntegrityError:
         run_sql("""UPDATE collection SET name=%s WHERE id=1""", (sitename,))
     # reset CFG_SITE_NAME_INTL:
-    for lang in conf.get("Invenio", "CFG_SITE_LANGS").split(","):
-        sitename_lang = conf.get("Invenio", "CFG_SITE_NAME_INTL_" + lang)
+    for lang in conf.get("Invenio", "CFG_SITE_LANGS"):
+        sitename_lang = conf.get("Invenio", "CFG_SITE_NAME_INTL")[lang]
         try:
             run_sql("""INSERT INTO collectionname (id_collection, ln, type, value) VALUES
                          (%s,%s,%s,%s)""", (1, lang, 'ln', sitename_lang))
@@ -527,7 +528,7 @@ def cli_cmd_reset_recstruct_cache(conf):
     from invenio.intbitset import intbitset
     from invenio.legacy.dbquery import run_sql, serialize_via_marshal
     from invenio.legacy.search_engine import get_record
-    from invenio.legacy.bibsched.scripts.bibsched import server_pid, pidfile
+    from invenio.legacy.bibsched.cli import server_pid, pidfile
     enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
     enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
     pid = server_pid(ping_the_process=False)
@@ -845,7 +846,8 @@ def cli_cmd_load_demo_records(conf):
     from invenio.legacy.dbquery import run_sql
     print ">>> Going to load demo records..."
     run_sql("TRUNCATE schTASK")
-    for cmd in ["%s/bin/bibupload -u admin -i %s/var/tmp/demobibdata.xml" % (CFG_PREFIX, CFG_PREFIX),
+    for cmd in ["%s/bin/bibupload -u admin -i %s" % (CFG_PREFIX,
+                    pkg_resources.resource_filename('invenio.testsuite', os.path.join('data','demo_record_marc_data.xml'))),
                 "%s/bin/bibupload 1" % CFG_PREFIX,
                 "%s/bin/bibdocfile --textify --with-ocr --recid 97" % CFG_PREFIX,
                 "%s/bin/bibdocfile --textify --all" % CFG_PREFIX,
@@ -1205,28 +1207,11 @@ def prepare_option_parser():
 
 def prepare_conf(options):
     """ Read configuration files """
+    from flask import current_app
     conf = ConfigParser()
-    confdir = getattr(options, 'conf_dir', None)
-
-    if confdir is None:
-        ## try to detect path to conf dir (relative to this bin dir):
-        confdir = re.sub(r'/bin$', '/etc', sys.path[0])
-
-    if confdir and not os.path.exists(confdir):
-        raise Exception("ERROR: bad --conf-dir option value - directory does not exists.")
-        sys.exit(1)
-
-    ## read conf files:
-    for conffile in [confdir + os.sep + 'invenio.conf',
-                     confdir + os.sep + 'invenio-autotools.conf',
-                     confdir + os.sep + 'invenio-local.conf', ]:
-
-        if os.path.exists(conffile):
-            conf.read(conffile)
-        else:
-            if not conffile.endswith("invenio-local.conf"):
-                # invenio-local.conf is optional, otherwise stop
-                raise Exception("ERROR: Badly guessed conf file location %s (Please use --conf-dir option.)" % conffile)
+    conf.add_section('Invenio')
+    for (k, v) in current_app.config.iteritems():
+        conf.set('Invenio', k, v)
     return conf
 
 

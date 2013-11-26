@@ -31,7 +31,7 @@ class BibCatalogSystemEmailTest(MailTestCase):
 
     def setUp(self):
         super(BibCatalogSystemEmailTest, self).setUp()
-        from invenio import bibcatalog_system_email
+        from invenio.legacy.bibcatalog import system_email as bibcatalog_system_email
         from invenio.config import CFG_SITE_SUPPORT_EMAIL
         self.email = bibcatalog_system_email.BibCatalogSystemEmail()
         bibcatalog_system_email.CFG_BIBCATALOG_SYSTEM_TICKETS_EMAIL = CFG_SITE_SUPPORT_EMAIL

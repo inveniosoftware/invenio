@@ -1,17 +1,20 @@
 {% extends "workflows/hp_layout.html" %}
 {% import 'workflows/hp_utils.html' as utils %}
 
-{%- block header %}
+{%- block header%}
+    {{ super() }}
+    {% css url_for('static', filename='css/prism.css') %}
+{%- endblock header %}
+
+{%- block javascript %}
     {{ super() }}
     {%- block widget_assets %}
         {% js url_for('static', filename='js/prism.js'), '40-workflows' %}
-        {% css url_for('static', filename='css/prism.css') %}
-
-        {% js url_for('holdingpen.static', filename='js/workflows/hp_details.js'), '50-workflows' %}
-        {% js url_for('holdingpen.static', filename='js/workflows/widgets/approval.js'), '50-workflows' %}
-        {% js url_for('holdingpen.static', filename='js/workflows/hp_datapreview.js'), '50-workflows' %}
+        {% js url_for('workflows.static', filename='js/workflows/hp_details.js'), '50-workflows' %}
+        {% js url_for('workflows.static', filename='js/workflows/widgets/approval.js'), '50-workflows' %}
+        {% js url_for('workflows.static', filename='js/workflows/hp_datapreview.js'), '50-workflows' %}
     {%- endblock widget_assets %}
-{%- endblock header %}
+{%- endblock javascript %}
 
 {% block hpbody %}
 

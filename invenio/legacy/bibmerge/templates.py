@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import string
 from invenio.legacy.bibrecord import *
-from invenio.bibmerge_differ import *
+from invenio.legacy.bibmerge.differ import *
 
 class Template:
 

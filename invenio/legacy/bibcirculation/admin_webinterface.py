@@ -31,7 +31,7 @@ from invenio.utils.url import redirect_to_url
 from invenio.config import CFG_SITE_URL, CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 
-import invenio.bibcirculationadminlib as bal
+import invenio.legacy.bibcirculation.adminlib as bal
 
 class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
     """Defines the set of /admin2/bibcirculation pages."""

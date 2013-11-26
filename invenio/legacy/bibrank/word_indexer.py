@@ -26,7 +26,6 @@ import ConfigParser
 
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_ETCDIR
 from invenio.legacy.search_engine import perform_request_search, wash_index_term
 from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.legacy.bibindex.engine_stemmer import is_stemmer_available_for_language, stem
@@ -38,6 +37,7 @@ from invenio.legacy.bibsched.bibtask import write_message, task_get_option, task
 from invenio.intbitset import intbitset
 from invenio.ext.logging import register_exception
 from invenio.utils.text import strip_accents
+from invenio.modules.rank.registry import configuration
 
 options = {} # global variable to hold task options
 
@@ -752,11 +752,11 @@ def word_index(run):
         method_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         write_message("Running rank method: %s" % getName(rank_method_code))
         try:
-            file = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
+            config_file = configuration.get(rank_method_code + '.cfg', '')
             config = ConfigParser.ConfigParser()
-            config.readfp(open(file))
+            config.readfp(open(config_file))
         except StandardError, e:
-            write_message("Cannot find configurationfile: %s" % file, sys.stderr)
+            write_message("Cannot find configurationfile: %s" % config_file, sys.stderr)
             raise StandardError
         options["current_run"] = rank_method_code
         options["modified_words"] = {}

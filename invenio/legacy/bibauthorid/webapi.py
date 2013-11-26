@@ -23,9 +23,9 @@ Provides utilities to safely interact with stored data.
 '''
 
 import invenio.legacy.bibauthorid.config as bconfig
-import invenio.bibauthorid_frontinterface as dbapi
-import invenio.bibauthorid_name_utils as nameapi
-import invenio.webauthorprofile_interface as webauthorapi
+import invenio.legacy.bibauthorid.frontinterface as dbapi
+import invenio.legacy.bibauthorid.name_utils as nameapi
+import invenio.legacy.webauthorprofile.interface as webauthorapi
 
 import invenio.legacy.search_engine as search_engine
 from invenio.legacy.search_engine import perform_request_search
@@ -37,8 +37,8 @@ from invenio.legacy.webuser import collect_user_info, getUid
 from invenio.legacy.webuser import isUserSuperAdmin
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.control import acc_get_role_id, acc_get_user_roles
-from invenio.modules.access.external_authentication_robot import ExternalAuthRobot
-from invenio.modules.access.external_authentication_robot import load_robot_keys
+from invenio.external_authentication_robot import ExternalAuthRobot
+from invenio.external_authentication_robot import load_robot_keys
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.config import CFG_SITE_URL
 from invenio.ext.email import send_email

@@ -30,7 +30,7 @@ from urllib import urlencode
 
 from invenio.utils.json import json_unicode_to_utf8
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.modules.access.external_authentication import ExternalAuth
+from invenio.legacy.external_authentication import ExternalAuth
 from invenio.utils.container import get_substructure
 
 class ExternalOAuth2(ExternalAuth):

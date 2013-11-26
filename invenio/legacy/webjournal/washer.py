@@ -21,13 +21,13 @@ WebJournal input parameters washing related functions
 """
 import time
 import re
-from invenio.webjournal_config import \
+from invenio.legacy.webjournal.config import \
      InvenioWebJournalIssueNumberBadlyFormedError, \
      InvenioWebJournalNoArticleNumberError, \
      InvenioWebJournalArchiveDateWronglyFormedError, \
      InvenioWebJournalNoPopupRecordError, \
      InvenioWebJournalNoCategoryError
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      get_current_issue, \
      guess_journal_name, \
      get_journal_categories, \

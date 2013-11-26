@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.webcommentadminlib import *
+from invenio.legacy.webcomment.adminlib import *
 from invenio.legacy.bibrank.adminlib import check_user
 from invenio.legacy.webpage import page, create_error_box
 from invenio.config import CFG_SITE_SECURE_URL,CFG_SITE_LANG,CFG_SITE_NAME

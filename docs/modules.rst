@@ -59,7 +59,7 @@ Modules
 .. automodule:: invenio.modules.groups
    :members:
 
-.. automodule:: invenio.modules.index
+.. automodule:: invenio.modules.indexer
    :members:
 
 .. automodule:: invenio.modules.journals
@@ -92,10 +92,10 @@ Modules
 .. automodule:: invenio.modules.search
    :members:
 
-.. automodule:: invenio.modules.sequence_generator
+.. automodule:: invenio.modules.sequencegenerator
    :members:
 
-.. automodule:: invenio.modules.sort
+.. automodule:: invenio.modules.sorter
    :members:
 
 .. automodule:: invenio.modules.statistics
@@ -111,7 +111,7 @@ Modules
 .. automodule:: invenio.modules.upgrader
    :members:
 
-.. automodule:: invenio.modules.upload
+.. automodule:: invenio.modules.uploader
    :members:
 
 .. automodule:: invenio.modules.workflows

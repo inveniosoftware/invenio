@@ -19,7 +19,7 @@
 
 __revision__ = ""
 
-import invenio.bibcirculationadminlib as bal
+import invenio.legacy.bibcirculation.adminlib as bal
 from invenio.config import CFG_SITE_LANG
 from invenio.utils.url import wash_url_argument
 

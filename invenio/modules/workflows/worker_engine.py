@@ -17,10 +17,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.ext.sqlalchemy import db
-from invenio.bibworkflow_client import run_workflow, continue_execution
-from invenio.bibworkflow_engine import BibWorkflowEngine
-from invenio.modules.workflows.models import BibWorkflowObject, Workflow
-from invenio.bibworkflow_config import CFG_OBJECT_VERSION
+from .client import run_workflow, continue_execution
+from .engine import BibWorkflowEngine
+from .models import BibWorkflowObject, Workflow
+from .config import CFG_OBJECT_VERSION
 
 
 class InvenioBibWorkflowValueError(Exception):

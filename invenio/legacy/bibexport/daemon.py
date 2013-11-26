@@ -45,6 +45,8 @@ from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibsched.bibtask import task_init, write_message, task_set_option, \
        task_get_option, task_has_option, task_get_task_param
 
+from .registry import configurations
+
 def _detect_jobs_to_run(string_of_jobnames=None):
     """Detect which jobs to run from optional string of jobs.
        If not passed, run all jobs.
@@ -63,7 +65,7 @@ def _detect_export_method(jobname):
     """Detect export method of JOBNAME.  Basically, parse JOBNAME.cfg
        and return export_method.  Return None if problem found."""
     jobconf = ConfigParser()
-    jobconffile = CFG_ETCDIR + os.sep + 'bibexport' + os.sep + jobname + '.cfg'
+    jobconffile = configurations.get(jobname, '')
     if not os.path.exists(jobconffile):
         write_message("ERROR: cannot find config file %s." % jobconffile, sys.stderr)
         return None

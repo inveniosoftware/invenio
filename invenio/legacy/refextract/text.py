@@ -19,15 +19,15 @@
 
 import re
 
-from invenio.docextract_pdf import replace_undesirable_characters
-from invenio.docextract_utils import write_message
+from invenio.legacy.docextract.pdf import replace_undesirable_characters
+from invenio.legacy.docextract.utils import write_message
 
-from invenio.docextract_text import join_lines, \
+from invenio.legacy.docextract.text import join_lines, \
                                     repair_broken_urls, \
                                     re_multiple_space, \
                                     remove_page_boundary_lines
-from invenio.refextract_config import CFG_REFEXTRACT_MAX_LINES
-from invenio.refextract_find import find_end_of_reference_section, \
+from invenio.legacy.refextract.config import CFG_REFEXTRACT_MAX_LINES
+from invenio.legacy.refextract.find import find_end_of_reference_section, \
                                     get_reference_section_beginning
 
 

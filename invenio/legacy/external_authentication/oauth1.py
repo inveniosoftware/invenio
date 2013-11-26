@@ -27,7 +27,7 @@ __revision__ = \
 
 from invenio.utils.container import get_substructure
 from invenio.legacy.dbquery import run_sql
-from invenio.modules.access.external_authentication import ExternalAuth
+from invenio.legacy.external_authentication import ExternalAuth
 
 class ExternalOAuth1(ExternalAuth):
     """

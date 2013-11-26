@@ -151,9 +151,9 @@ except:
     pass
 
 from invenio.legacy.websearch_external_collections import calculate_hosted_collections_results, do_calculate_hosted_collections_results
-from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH
-from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
-from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH
+from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
+from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
 VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
 
@@ -2337,7 +2337,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
         # we are doing search by the citation count
         hitset = search_unit_refersto(p)
     elif f == 'rawref':
-        from invenio.refextract_api import search_from_reference
+        from invenio.legacy.refextract.api import search_from_reference
         field, pattern = search_from_reference(p)
         return search_unit(pattern, field)
     elif f == 'citedby':

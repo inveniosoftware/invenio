@@ -37,8 +37,8 @@ from invenio.base.utils import import_submodules_from_packages
 
 metadata_extractor_plugins = LazyDict(lambda: dict(filter(None, map(
     plugin_builder_function,
-    import_submodules_from_packages('websubmit_file_metadata_plugins',
-                                    packages=['invenio'])))))
+    import_submodules_from_packages('file_metadata_plugins',
+                                    packages=['invenio.legacy.websubmit'])))))
 
 
 def read_metadata(inputfile, force=None, remote=False,

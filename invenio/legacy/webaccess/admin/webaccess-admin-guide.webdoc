@@ -940,7 +940,7 @@ II. Example - connecting role and user</a>
 
 
      Example template:
-     from invenio.modules.access.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
+     from invenio.legacy.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 
      class ExternalAuthFoo(ExternalAuth):
          """External authentication template example."""

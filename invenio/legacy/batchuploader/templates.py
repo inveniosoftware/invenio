@@ -22,6 +22,7 @@
 __revision__ = "$Id$"
 
 import cgi
+from flask import url_for
 from invenio.legacy.bibrank.adminlib import addadminbox
 from invenio.legacy.bibrank.adminlib import tupletotable
 from invenio.config import CFG_SITE_LANG
@@ -158,7 +159,8 @@ class Template:
         <script type="text/javascript" src="%(site_url)s/js/jquery-ui.min.js"></script>
         <script type="text/javascript" src="%(site_url)s/%(script)s"></script>
         """ % {'site_url':CFG_SITE_URL,
-               'script': auto_version_url("js/batchuploader.js")}
+               'script': auto_version_url(
+                   url_for('uploader.static', filename="js/uploader/batchuploader.js")}
 
         return styles
 

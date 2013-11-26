@@ -21,8 +21,8 @@ from invenio.modules.access.engine import acc_authorize_action
 from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_BIBSORT_BUCKETS, CFG_ETCDIR, CFG_SITE_LANG
 from invenio.base.i18n import gettext_set_language, language_list_long
-from invenio.bibsort_engine import delete_all_data_for_method, add_sorting_method
-from invenio.bibsort_washer import get_all_available_washers
+from invenio.legacy.bibsort.engine import delete_all_data_for_method, add_sorting_method
+from invenio.legacy.bibsort.washer import get_all_available_washers
 from invenio.legacy.bibrank.adminlib import write_outcome, modify_translations, \
     get_i8n_name, get_languages, \
     tupletotable, createhiddenform

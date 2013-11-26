@@ -97,9 +97,9 @@ CFG_EXTERNAL_AUTHENTICATION = {
     #"ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
 }
 
-# from invenio.modules.access.external_authentication_robot import ExternalAuthRobot
+# from invenio.legacy.external_authentication.robot import ExternalAuthRobot
 # if CFG_CERN_SITE:
-#     from invenio import external_authentication_sso as ea_sso
+#     from invenio.legacy.external_authentication import sso as ea_sso
 #     CFG_EXTERNAL_AUTH_USING_SSO = "CERN"
 #     CFG_EXTERNAL_AUTH_DEFAULT = CFG_EXTERNAL_AUTH_USING_SSO
 #     CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
@@ -448,19 +448,19 @@ if config['CFG_OAUTH2_CONFIGURATIONS']:
 # If OpenID authentication is enabled, add 'openid' to login methods
 CFG_OPENID_AUTHENTICATION = bool(CFG_OPENID_PROVIDERS)
 if CFG_OPENID_AUTHENTICATION:
-    from invenio.modules.access.external_authentication_openid import ExternalOpenID
+    from invenio.legacy.external_authentication.openid import ExternalOpenID
     CFG_EXTERNAL_AUTHENTICATION['openid'] = ExternalOpenID(enforce_external_nicknames=True)
 
 # If OAuth1 authentication is enabled, add 'oauth1' to login methods.
 CFG_OAUTH1_AUTHENTICATION = bool(CFG_OAUTH1_PROVIDERS)
 if CFG_OAUTH1_PROVIDERS:
-    from invenio.modules.access.external_authentication_oauth1 import ExternalOAuth1
+    from invenio.legacy.external_authentication.oauth1 import ExternalOAuth1
     CFG_EXTERNAL_AUTHENTICATION['oauth1'] = ExternalOAuth1(enforce_external_nicknames=True)
 
 # If OAuth2 authentication is enabled, add 'oauth2' to login methods.
 CFG_OAUTH2_AUTHENTICATION = bool(CFG_OAUTH2_PROVIDERS)
 if CFG_OAUTH2_AUTHENTICATION:
-    from invenio.modules.access.external_authentication_oauth2 import ExternalOAuth2
+    from invenio.legacy.external_authentication.oauth2 import ExternalOAuth2
     CFG_EXTERNAL_AUTHENTICATION['oauth2'] = ExternalOAuth2(enforce_external_nicknames=True)
 
 

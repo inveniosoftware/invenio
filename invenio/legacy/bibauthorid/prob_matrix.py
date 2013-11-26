@@ -18,10 +18,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.legacy.bibauthorid import config as bconfig
-from invenio.bibauthorid_comparison import compare_bibrefrecs
-from invenio.bibauthorid_comparison import clear_all_caches as clear_comparison_caches
-from invenio.bibauthorid_backinterface import Bib_matrix
-from invenio.bibauthorid_backinterface import filter_modified_record_ids
+from invenio.legacy.bibauthorid.comparison import compare_bibrefrecs
+from invenio.legacy.bibauthorid.comparison import clear_all_caches as clear_comparison_caches
+from invenio.legacy.bibauthorid.backinterface import Bib_matrix
+from invenio.legacy.bibauthorid.backinterface import filter_modified_record_ids
 from invenio.legacy.bibauthorid.general_utils import bibauthor_print \
                                     , update_status \
                                     , update_status_final \

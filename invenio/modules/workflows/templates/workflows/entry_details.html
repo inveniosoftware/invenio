@@ -1,12 +1,17 @@
 {% extends "workflows/layout_workflow_details.html" %}
 {% import 'workflows/utils.html' as utils %}
 
-{% block header %}
+{% block javascript %}
     {{ super() }}
-    {% block holdingpen_entry_assets %}
-        {% js url_for('holdingpen.static', filename='js/workflows/entry_details.js', '50-workflows') %}
-    {% endblock holdingpen_entry_assets %}
-{% endblock header %}
+    {% block workflows_entry_assets %}
+        {% js url_for('workflows.static', filename='js/workflows/entry_details.js', '50-workflows') %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                bind_object_preview("{{ url_for('workflows.entry_data_preview') }}", "{{ entry.id }}");
+            });
+        </script>
+    {% endblock workflows_entry_assets %}
+{% endblock javascript %}
 {% block body %}
 
 <div class="modal-header">

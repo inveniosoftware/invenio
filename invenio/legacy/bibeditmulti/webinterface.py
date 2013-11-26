@@ -26,7 +26,7 @@ from invenio.ext.legacy.handler import WebInterfaceDirectory, \
                                          wash_urlargd
 from invenio.legacy.webpage import page
 from invenio.base.i18n import gettext_set_language
-from invenio import bibeditmulti_engine as multi_edit_engine
+from invenio.legacy.bibeditmulti import engine as multi_edit_engine
 
 from invenio.legacy.webuser import page_not_authorized
 from invenio.modules.access.engine import acc_authorize_action

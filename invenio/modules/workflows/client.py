@@ -18,8 +18,8 @@
 
 import traceback
 from workflow.engine import HaltProcessing
-from invenio.bibworkflow_config import CFG_OBJECT_VERSION
-from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS
+from .config import CFG_OBJECT_VERSION
+from .config import CFG_WORKFLOW_STATUS
 
 
 def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False, **kwargs):

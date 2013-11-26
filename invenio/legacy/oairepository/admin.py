@@ -29,10 +29,10 @@ from invenio.config import \
 import invenio.modules.access.engine as access_manager
 from invenio.utils.url import create_html_link
 from invenio.legacy.dbquery import run_sql
-from invenio.oai_repository_updater import parse_set_definition
+from invenio.legacy.oairepository.updater import parse_set_definition
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.logging import register_exception
-from invenio.oai_repository_config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
+from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 
 import invenio.legacy.template
 oaiharvest_templates = invenio.legacy.template.load('oai_harvest')

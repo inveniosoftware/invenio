@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio import dbquery
+from invenio.legacy import dbquery
 from invenio.config import CFG_SITE_NAME
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 

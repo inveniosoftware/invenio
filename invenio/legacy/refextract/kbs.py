@@ -21,17 +21,17 @@ import re
 import sys
 import csv
 
-from invenio.refextract_config import CFG_REFEXTRACT_KBS
+from invenio.legacy.refextract.config import CFG_REFEXTRACT_KBS
 from invenio.modules.knowledge.api import get_kbr_items
 from invenio.config import CFG_REFEXTRACT_KBS_OVERRIDE
-from invenio.refextract_re import re_kb_line, \
+from invenio.legacy.refextract.regexs import re_kb_line, \
                                   re_regexp_character_class, \
                                   re_report_num_chars_to_escape, \
                                   re_extract_quoted_text, \
                                   re_extract_char_class, \
                                   re_punctuation
-from invenio.docextract_utils import write_message
-from invenio.docextract_text import re_group_captured_multiple_space
+from invenio.legacy.docextract.utils import write_message
+from invenio.legacy.docextract.text import re_group_captured_multiple_space
 from invenio.utils.hash import md5
 
 def get_kbs(custom_kbs_files=None, cache=None):

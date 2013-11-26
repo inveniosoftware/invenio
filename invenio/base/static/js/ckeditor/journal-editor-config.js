@@ -33,7 +33,7 @@ config.resize_enabled = false;
 /* Remove "status" bar at the bottom of the editor displaying the DOM path*/
 config.removePlugins = 'elementspath';
 
-config.contentsCss = '/img/AtlantisTimes.css' ;
+config.contentsCss = '/css/AtlantisTimes.css' ;
 config.bodyClass = 'ckeditor_body';
 config.stylesSet = 'journal-editor-style:/ckeditor/journal-editor-styles.js';
 config.templates_files = [ '/ckeditor/journal-editor-templates.js' ];

@@ -47,6 +47,7 @@ from invenio.legacy.search_engine import search_pattern, record_exists
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.logging import register_exception
 from invenio.utils.url import make_invenio_opener
+from invenio.modules.bulletin.registry import journals as journals_registry
 
 WEBJOURNAL_OPENER = make_invenio_opener('WebJournal')
 
@@ -519,8 +520,8 @@ def get_xml_from_config(nodes, journal_name):
     if cached_parsed_xml_config.has_key(journal_name):
         config_file = cached_parsed_xml_config[journal_name]
     else:
-        config_path = '%s/webjournal/%s/%s-config.xml' % \
-                      (CFG_ETCDIR, journal_name, journal_name)
+        config_path = os.path.join(journals_registry[journal_name],
+                                   'config.xml')
         config_file = minidom.Document
         try:
             config_file = minidom.parse("%s" % config_path)
@@ -687,7 +688,7 @@ def get_journal_template(template, journal_name, ln=CFG_SITE_LANG):
     Returns the journal templates name for the given template type
     Raise an exception if template cannot be found.
     """
-    from invenio.webjournal_config import \
+    from invenio.legacy.webjournal.config import \
          InvenioWebJournalTemplateNotFoundError
     config_strings = get_xml_from_config([template], journal_name)
 
@@ -1202,7 +1203,7 @@ def get_journal_id(journal_name, ln=CFG_SITE_LANG):
     from cache.
     """
     journal_id = None
-    from invenio.webjournal_config import InvenioWebJournalJournalIdNotFoundDBError
+    from invenio.legacy.webjournal.config import InvenioWebJournalJournalIdNotFoundDBError
 
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
         # do not connect to the database as the site is closed for
@@ -1249,8 +1250,8 @@ def guess_journal_name(ln, journal_name=None):
     not providing a name for the journal, or if given journal name
     does not match case of original journal.
     """
-    from invenio.webjournal_config import InvenioWebJournalNoJournalOnServerError
-    from invenio.webjournal_config import InvenioWebJournalNoNameError
+    from invenio.legacy.webjournal.config import InvenioWebJournalNoJournalOnServerError
+    from invenio.legacy.webjournal.config import InvenioWebJournalNoNameError
 
     journals_id_and_names = get_journals_ids_and_names()
     if len(journals_id_and_names) == 0:

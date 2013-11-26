@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.websubmitadmin_engine import *
+from invenio.legacy.websubmit.admin_engine import *
 from invenio.config import CFG_SITE_LANG
 from invenio.legacy.webuser import getUid, page_not_authorized
 from invenio.legacy.webpage import page

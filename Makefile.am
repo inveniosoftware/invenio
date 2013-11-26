@@ -18,7 +18,7 @@
 confignicedir = $(sysconfdir)/build
 confignice_SCRIPTS=config.nice
 
-SUBDIRS = config modules
+SUBDIRS = config
 
 EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
              config.rpath
@@ -62,19 +62,19 @@ check-custom-templates:
 	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-custom-templates $(top_srcdir)
 
 kwalitee-check:
-	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --stats $(top_srcdir)
+	@$(PYTHON) $(top_srcdir)/scripts/kwalitee.py --stats $(top_srcdir)
 
 kwalitee-check-errors-only:
-	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-errors $(top_srcdir)
+	@$(PYTHON) $(top_srcdir)/scripts/kwalitee.py --check-errors $(top_srcdir)
 
 kwalitee-check-variables:
-	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-variables $(top_srcdir)
+	@$(PYTHON) $(top_srcdir)/scripts/kwalitee.py --check-variables $(top_srcdir)
 
 kwalitee-check-indentation:
-	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-indentation $(top_srcdir)
+	@$(PYTHON) $(top_srcdir)/scripts/kwalitee.py --check-indentation $(top_srcdir)
 
 kwalitee-check-sql-queries:
-	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-sql $(top_srcdir)
+	@$(PYTHON) $(top_srcdir)/scripts/kwalitee.py --check-sql $(top_srcdir)
 
 etags:
 	\rm -f $(top_srcdir)/TAGS
@@ -489,7 +489,7 @@ install-solrutils:
 	jar -cf invenio-solr.jar org/invenio_software/solr/*class
 
 update-v0.99.0-tables:
-	cat $(top_srcdir)/modules/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
+	cat $(top_srcdir)/invenio/legacy/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
 	echo "DROP TABLE IF EXISTS oaiREPOSITORY;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bibdoc ADD COLUMN more_info mediumblob NULL default NULL;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK ADD COLUMN priority tinyint(4) NOT NULL default 0;" | ${prefix}/bin/dbexec
@@ -526,7 +526,7 @@ update-v0.99.7-tables:
 
 update-v0.99.8-tables: # from v0.99.8 to v1.0.0-rc0
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
-	cat $(top_srcdir)/modules/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
+	cat $(top_srcdir)/invenio/legacy/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
 	echo "INSERT INTO knwKB (id,name,description,kbtype) SELECT id,name,description,'' FROM fmtKNOWLEDGEBASES;" | ${prefix}/bin/dbexec
 	echo "INSERT INTO knwKBRVAL (id,m_key,m_value,id_knwKB) SELECT id,m_key,m_value,id_fmtKNOWLEDGEBASES FROM fmtKNOWLEDGEBASEMAPPINGS;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE sbmPARAMETERS CHANGE name name varchar(40) NOT NULL default '';" | ${prefix}/bin/dbexec
@@ -615,7 +615,7 @@ update-v0.99.8-tables: # from v0.99.8 to v1.0.0-rc0
 	echo "ALTER TABLE bskRECORDCOMMENT ADD reply_order_cached_data blob NULL default NULL;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE cmtRECORDCOMMENT ADD INDEX (reply_order_cached_data(40));" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bskRECORDCOMMENT ADD INDEX (reply_order_cached_data(40));" | ${prefix}/bin/dbexec
-	echo -e 'from invenio.webcommentadminlib import migrate_comments_populate_threads_index;\
+	echo -e 'from invenio.legacy.webcomment.adminlib import migrate_comments_populate_threads_index;\
 	migrate_comments_populate_threads_index()' | $(PYTHON)
 	echo -e 'from invenio.modules.access.firerole import repair_role_definitions;\
 	repair_role_definitions()' | $(PYTHON)

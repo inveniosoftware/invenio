@@ -91,7 +91,7 @@ def method_wrapper(module, old_method, method_name, self, *args, **kwds):
     else:
         return ret
 
-def load(module=''):
+def load(module='', prefix=''):
     """ Load and returns a template class, given a module name (like
         'websearch', 'webbasket',...).  The module corresponding to
         the currently selected template model (see invenio.conf,
@@ -102,10 +102,10 @@ def load(module=''):
     # load the right template based on the CFG_WEBSTYLE_TEMPLATE_SKIN and the specified module
     if CFG_WEBSTYLE_TEMPLATE_SKIN == "default":
         try:
-            mymodule = __import__("invenio.%s_templates" % (module), local,
+            mymodule = __import__("invenio.%s_%stemplates" % (module, prefix), local,
                                   local, ["invenio.templates.%s" % (module)])
         except ImportError:
-            mymodule = __import__("invenio.legacy.%s.templates" % (module),
+            mymodule = __import__("invenio.legacy.%s.%stemplates" % (module, prefix),
                                   local, local,
                                   ["invenio.templates.%s" % (module)])
     else:

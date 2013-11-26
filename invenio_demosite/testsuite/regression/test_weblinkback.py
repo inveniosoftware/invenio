@@ -39,34 +39,34 @@ try:
 except ImportError:
     HAS_MOCK = False
 
-run_sql = lazy_import('invenio.dbquery:run_sql')
-CFG_DATABASE_NAME = lazy_import('invenio.dbquery:CFG_DATABASE_NAME')
+run_sql = lazy_import('invenio.legacy.dbquery:run_sql')
+CFG_DATABASE_NAME = lazy_import('invenio.legacy.dbquery:CFG_DATABASE_NAME')
 
-weblinkback = lazy_import('invenio.weblinkback')
+weblinkback = lazy_import('invenio.legacy.weblinkback')
 
-get_all_linkbacks = lazy_import('invenio.weblinkback_dblayer:get_all_linkbacks')
-approve_linkback = lazy_import('invenio.weblinkback_dblayer:approve_linkback')
-reject_linkback = lazy_import('invenio.weblinkback_dblayer:reject_linkback')
-get_approved_latest_added_linkbacks = lazy_import('invenio.weblinkback_dblayer:get_approved_latest_added_linkbacks')
-get_url_list = lazy_import('invenio.weblinkback_dblayer:get_url_list')
-add_url_to_list = lazy_import('invenio.weblinkback_dblayer:add_url_to_list')
-remove_url = lazy_import('invenio.weblinkback_dblayer:remove_url')
-url_exists = lazy_import('invenio.weblinkback_dblayer:url_exists')
-get_url_title = lazy_import('invenio.weblinkback_dblayer:get_url_title')
-get_urls_and_titles = lazy_import('invenio.weblinkback_dblayer:get_urls_and_titles')
-remove_linkback = lazy_import('invenio.weblinkback_dblayer:remove_linkback')
-set_url_broken = lazy_import('invenio.weblinkback_dblayer:set_url_broken')
-update_url_title = lazy_import('invenio.weblinkback_dblayer:update_url_title')
+get_all_linkbacks = lazy_import('invenio.legacy.weblinkback.dblayer:get_all_linkbacks')
+approve_linkback = lazy_import('invenio.legacy.weblinkback.dblayer:approve_linkback')
+reject_linkback = lazy_import('invenio.legacy.weblinkback.dblayer:reject_linkback')
+get_approved_latest_added_linkbacks = lazy_import('invenio.legacy.weblinkback.dblayer:get_approved_latest_added_linkbacks')
+get_url_list = lazy_import('invenio.legacy.weblinkback.dblayer:get_url_list')
+add_url_to_list = lazy_import('invenio.legacy.weblinkback.dblayer:add_url_to_list')
+remove_url = lazy_import('invenio.legacy.weblinkback.dblayer:remove_url')
+url_exists = lazy_import('invenio.legacy.weblinkback.dblayer:url_exists')
+get_url_title = lazy_import('invenio.legacy.weblinkback.dblayer:get_url_title')
+get_urls_and_titles = lazy_import('invenio.legacy.weblinkback.dblayer:get_urls_and_titles')
+remove_linkback = lazy_import('invenio.legacy.weblinkback.dblayer:remove_linkback')
+set_url_broken = lazy_import('invenio.legacy.weblinkback.dblayer:set_url_broken')
+update_url_title = lazy_import('invenio.legacy.weblinkback.dblayer:update_url_title')
 
-create_trackback = lazy_import('invenio.weblinkback:create_trackback')
-delete_linkbacks_on_blacklist = lazy_import('invenio.weblinkback:delete_linkbacks_on_blacklist')
-update_linkbacks = lazy_import('invenio.weblinkback:update_linkbacks')
+create_trackback = lazy_import('invenio.legacy.weblinkback.api:create_trackback')
+delete_linkbacks_on_blacklist = lazy_import('invenio.legacy.weblinkback.api:delete_linkbacks_on_blacklist')
+update_linkbacks = lazy_import('invenio.legacy.weblinkback.api:update_linkbacks')
 
-CFG_WEBLINKBACK_STATUS = lazy_import('invenio.weblinkback_config:CFG_WEBLINKBACK_STATUS')
-CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME = lazy_import('invenio.weblinkback_config:CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME')
-CFG_WEBLINKBACK_LIST_TYPE = lazy_import('invenio.weblinkback_config:CFG_WEBLINKBACK_LIST_TYPE')
-CFG_WEBLINKBACK_TYPE = lazy_import('invenio.weblinkback_config:CFG_WEBLINKBACK_TYPE')
-CFG_WEBLINKBACK_PAGE_TITLE_STATUS = lazy_import('invenio.weblinkback_config:CFG_WEBLINKBACK_PAGE_TITLE_STATUS')
+CFG_WEBLINKBACK_STATUS = lazy_import('invenio.legacy.weblinkback.config:CFG_WEBLINKBACK_STATUS')
+CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME = lazy_import('invenio.legacy.weblinkback.config:CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME')
+CFG_WEBLINKBACK_LIST_TYPE = lazy_import('invenio.legacy.weblinkback.config:CFG_WEBLINKBACK_LIST_TYPE')
+CFG_WEBLINKBACK_TYPE = lazy_import('invenio.legacy.weblinkback.config:CFG_WEBLINKBACK_TYPE')
+CFG_WEBLINKBACK_PAGE_TITLE_STATUS = lazy_import('invenio.legacy.weblinkback.config:CFG_WEBLINKBACK_PAGE_TITLE_STATUS')
 
 
 def get_max_auto_increment_id(table):
@@ -689,7 +689,7 @@ class WebLinkbackUpdaterTest(InvenioTestCase):
                 self.assertNotEqual([], test_web_page_content(url_for('weblinkback.sendtrackback', recid=30, url='http://www.google.at'), username='admin'))
                 self.assertNotEqual([], test_web_page_content(url_for('weblinkback.sendtrackback', recid=30, url='http://www.google.co.za', title='Google'), username='admin'))
 
-                p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock1)
+                p = patch('invenio.legacy.weblinkback.get_title_of_page', get_title_of_page_mock1)
                 p.start()
                 update_linkbacks(1)
                 url_titles = self.get_all_from_table("lnkENTRYURLTITLE")
@@ -708,7 +708,7 @@ class WebLinkbackUpdaterTest(InvenioTestCase):
 
                 update_url_title("http://www.google.au", "Google AU")
 
-                p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock1)
+                p = patch('invenio.legacy.weblinkback.get_title_of_page', get_title_of_page_mock1)
                 p.start()
                 update_linkbacks(2)
                 url_entries = self.get_all_from_table("lnkENTRYURLTITLE")
@@ -718,7 +718,7 @@ class WebLinkbackUpdaterTest(InvenioTestCase):
                 update_linkbacks(1)
                 p.stop()
 
-                p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock2)
+                p = patch('invenio.legacy.weblinkback.get_title_of_page', get_title_of_page_mock2)
                 p.start()
                 update_linkbacks(2)
                 url_entries = self.get_all_from_table("lnkENTRYURLTITLE")
@@ -735,7 +735,7 @@ class WebLinkbackUpdaterTest(InvenioTestCase):
                 self.assertNotEqual([], test_web_page_content(url_for('weblinkback.sendtrackback', recid=30, url='http://www.google.at'), username='admin'))
                 self.assertNotEqual([], test_web_page_content(url_for('weblinkback.sendtrackback', recid=30, url='http://www.google.co.za', title='Google'), username='admin'))
 
-                p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock1)
+                p = patch('invenio.legacy.weblinkback.get_title_of_page', get_title_of_page_mock1)
                 p.start()
                 update_linkbacks(3)
                 url_titles = self.get_all_from_table("lnkENTRYURLTITLE")
@@ -758,7 +758,7 @@ class WebLinkbackUpdaterTest(InvenioTestCase):
                               (%s, %s, %s, %s)
                         """, ("http://www.google.de", "Google DE", 0, 3))
 
-                p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock_broken)
+                p = patch('invenio.legacy.weblinkback.get_title_of_page', get_title_of_page_mock_broken)
                 p.start()
                 update_linkbacks(4)
                 url_titles = self.get_all_from_table("lnkENTRYURLTITLE")
@@ -817,7 +817,7 @@ class WebLinkbackUpdaterTest(InvenioTestCase):
                 self.assertEqual(1, url_titles[3][5])
                 p.stop()
 
-                p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock1)
+                p = patch('invenio.legacy.weblinkback.get_title_of_page', get_title_of_page_mock1)
                 p.start()
                 update_linkbacks(1)
                 url_titles = self.get_all_from_table("lnkENTRYURLTITLE")
@@ -862,7 +862,7 @@ class WebLinkbackUpdaterTest(InvenioTestCase):
                 self.assertEqual(1, url_titles[3][5])
                 p.stop()
 
-                p = patch('invenio.weblinkback.get_title_of_page', get_title_of_page_mock_broken)
+                p = patch('invenio.legacy.weblinkback.get_title_of_page', get_title_of_page_mock_broken)
                 p.start()
                 update_linkbacks(4)
                 url_titles = self.get_all_from_table("lnkENTRYURLTITLE")

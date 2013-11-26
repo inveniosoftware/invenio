@@ -39,16 +39,16 @@ except:
 from itertools import groupby, chain, repeat
 from invenio.legacy.bibauthorid.general_utils import update_status, update_status_final, override_stdout_config
 
-from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_marktables
-from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_personid
-from invenio.bibauthorid_wedge import wedge
+from invenio.legacy.bibauthorid.cluster_set import delayed_cluster_sets_from_marktables
+from invenio.legacy.bibauthorid.cluster_set import delayed_cluster_sets_from_personid
+from invenio.legacy.bibauthorid.wedge import wedge
 from invenio.legacy.bibauthorid.name_utils import generate_last_name_cluster_str
-from invenio.bibauthorid_backinterface import empty_results_table
-from invenio.bibauthorid_backinterface import remove_result_cluster
+from invenio.legacy.bibauthorid.backinterface import empty_results_table
+from invenio.legacy.bibauthorid.backinterface import remove_result_cluster
 from invenio.legacy.bibauthorid.general_utils import bibauthor_print
-from invenio.bibauthorid_prob_matrix import prepare_matirx
-from invenio.bibauthorid_scheduler import schedule, matrix_coefs
-from invenio.bibauthorid_least_squares import to_function as create_approx_func
+from invenio.legacy.bibauthorid.prob_matrix import prepare_matirx
+from invenio.legacy.bibauthorid.scheduler import schedule, matrix_coefs
+from invenio.legacy.bibauthorid.least_squares import to_function as create_approx_func
 from math import isnan
 
 import multiprocessing as mp

@@ -26,7 +26,7 @@ __revision__ = \
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-RecordHTMLParser = lazy_import('invenio.htmlparser:RecordHTMLParser')
+RecordHTMLParser = lazy_import('invenio.legacy.webalert.htmlparser:RecordHTMLParser')
 
 
 class TestWashHTMLtoText(InvenioTestCase):

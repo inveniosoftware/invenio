@@ -17,42 +17,27 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-$(document).ready(function(){
-    var bwoid = getURLParameter('bwobject_id');
-    var datapreview = "hd";
-    var url_preview = "/admin/holdingpen/entry_data_preview";
-
-    window.data_preview = function(format){
-        jQuery.ajax({
-            url: url_preview + "?oid=" + bwoid + "&recformat=" + format,
-            success: function(json){
-                if(format == "xm" || format == "marcxml"){
-                    if( json.data === ""){
-                        json.data = "Preview not available";
-                    }
-                    $('div[id="object_preview_container'+bwoid+'"]').empty();
-                    $('div[id="object_preview_container'+bwoid+'"]').append("<pre><code id='object_preview' class='language-markup'></code></pre>");
-                    $('code[id="object_preview"]').append(json.data);
-                    Prism.highlightElement($('code[id="object_preview"]')[0]);
-                }else{
-                    if( json.data === ""){
-                        json.data = "Preview not available";
-                    }
-                    $('div[id="object_preview_container'+bwoid+'"]').empty();
-                    $('div[id="object_preview_container'+bwoid+'"]').append(json.data);
+function data_preview(url_preview, bwoid, format) {
+    jQuery.ajax({
+        url: url_preview,
+        data: {'oid': bwoid,
+               'recformat': format},
+        success: function(json){
+            if(format == "xm" || format == "marcxml"){
+                if( json.data === ""){
+                    json.data = "Preview not available";
                 }
+                $('div[id="object_preview_container'+bwoid+'"]').empty();
+                $('div[id="object_preview_container'+bwoid+'"]').append("<pre><code id='object_preview' class='language-markup'></code></pre>");
+                $('code[id="object_preview"]').append(json.data);
+                Prism.highlightElement($('code[id="object_preview"]')[0]);
+            }else{
+                if( json.data === ""){
+                    json.data = "Preview not available";
+                }
+                $('div[id="object_preview_container'+bwoid+'"]').empty();
+                $('div[id="object_preview_container'+bwoid+'"]').append(json.data);
             }
-        });
-    };
-
-    window.setbwoid = function(id){
-        bwoid = id;
-        data_preview(datapreview);
-        console.log(id);
-    };
-
-    window.setDataPreview = function(dp){
-        datapreview = dp;
-        data_preview(datapreview);
-    };
-});
+        }
+    });
+};

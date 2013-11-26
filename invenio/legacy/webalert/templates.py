@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL, \
      CFG_SITE_RECORD
 from invenio.base.i18n import gettext_set_language
-from invenio.htmlparser import get_as_text, wrap, wrap_records
+from invenio.legacy.webalert.htmlparser import get_as_text, wrap, wrap_records
 from invenio.utils.url import create_html_link
 
 from invenio.legacy.search_engine import guess_primary_collection_of_a_record, get_coll_ancestors
@@ -297,12 +297,14 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = '<p>' + _("Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %(x_url2_open)spopular searches%(x_url2_close)s, or the input form.") + '</p>'
-        out %= {'x_url1_open': '<a href="display?ln=' + ln + '">',
-                'x_url1_close': '</a>',
-                'x_url2_open': '<a href="display?ln=' + ln + '&amp;p=y">',
-                'x_url2_close': '</a>',
-                }
+        out = '<p>'
+        out += _("Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %(x_url2_open)spopular searches%(x_url2_close)s, or the input form.", **{
+            'x_url1_open': '<a href="display?ln=' + ln + '">',
+            'x_url1_close': '</a>',
+            'x_url2_open': '<a href="display?ln=' + ln + '&amp;p=y">',
+            'x_url2_close': '</a>',
+            })
+        out += '</p>'
         if len(alerts):
             out += """<table class="alrtTable">
                           <tr class="pageboxlefttop" style="text-align: center;">
@@ -396,7 +398,7 @@ class Template:
 
             out += '</table>'
 
-        out += '<p>' + (_("You have defined %s alerts.") % ('<b>' + str(len(alerts)) + '</b>' )) + '</p>'
+        out += '<p>' + (_("You have defined %(num)s alerts.", num='<b>' + str(len(alerts)) + '</b>')) + '</p>'
         if guest:
             out += guesttxt
         return out

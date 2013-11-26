@@ -20,12 +20,12 @@
 from itertools import chain, groupby, izip, cycle
 from operator import itemgetter
 import cPickle
-from invenio.bibauthorid_matrix_optimization import maximized_mapping
-from invenio.bibauthorid_backinterface import save_cluster
-from invenio.bibauthorid_backinterface import get_all_papers_of_pids
-from invenio.bibauthorid_backinterface import get_bib10x, get_bib70x
-from invenio.bibauthorid_backinterface import get_all_modified_names_from_personid
-from invenio.bibauthorid_backinterface import get_signatures_from_bibrefs
+from invenio.legacy.bibauthorid.matrix_optimization import maximized_mapping
+from invenio.legacy.bibauthorid.backinterface import save_cluster
+from invenio.legacy.bibauthorid.backinterface import get_all_papers_of_pids
+from invenio.legacy.bibauthorid.backinterface import get_bib10x, get_bib70x
+from invenio.legacy.bibauthorid.backinterface import get_all_modified_names_from_personid
+from invenio.legacy.bibauthorid.backinterface import get_signatures_from_bibrefs
 from invenio.legacy.bibauthorid.name_utils import generate_last_name_cluster_str
 from invenio.legacy.bibauthorid.general_utils import  bibauthor_print
 

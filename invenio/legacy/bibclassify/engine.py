@@ -42,7 +42,7 @@ import cgi
 from invenio import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.engine")
 
-from invenio import bibclassify_ontology_reader as reader
+from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader as reader
 from invenio import bibclassify_text_extractor as extractor
 from invenio import bibclassify_text_normalizer as normalizer
 from invenio import bibclassify_keyword_analyzer as keyworder

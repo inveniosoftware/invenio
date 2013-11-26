@@ -24,7 +24,7 @@ issue.
 import datetime
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      get_all_released_issues, \
      compare_issues, \

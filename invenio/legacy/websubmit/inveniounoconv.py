@@ -46,7 +46,6 @@ import time
 import signal
 import errno
 
-from invenio.flaskshell import *
 from invenio.legacy.websubmit.file_converter import CFG_OPENOFFICE_TMPDIR
 
 CFG_SOFFICE_PID = os.path.join(CFG_OPENOFFICE_TMPDIR, 'soffice.pid')
@@ -1085,33 +1084,6 @@ def die(ret, msg=None):
     sys.exit(ret)
 
 def main():
-    global convertor, exitcode
-    convertor = None
-
-    try:
-        if op.listener:
-            listener = Listener()
-
-        if op.filenames:
-            convertor = Convertor()
-            for inputfn in op.filenames:
-                convertor.convert(inputfn)
-
-    except NoConnectException, e:
-        error("unoconv: could not find an existing connection to LibreOffice at %s:%s." % (op.server, op.port))
-        if op.connection:
-            info(0, "Please start an LibreOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    soffice -nologo -nodefault -accept=\"%s\"" % (op.server, op.server, op.port, op.connection))
-        else:
-            info(0, "Please start an LibreOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    soffice -nologo -nodefault -accept=\"socket,host=%s,port=%s;urp;\"" % (op.server, op.server, op.port, op.server, op.port))
-            info(0, "Please start an soffice instance on server '%s' by doing:\n\n    soffice -nologo -nodefault -accept=\"socket,host=localhost,port=%s;urp;\"" % (op.server, op.port))
-        exitcode = 1
-#    except UnboundLocalError:
-#        die(252, "Failed to connect to remote listener.")
-    except OSError:
-        error("Warning: failed to launch Office suite. Aborting.")
-
-### Main entrance
-if __name__ == '__main__':
     os.environ['HOME'] = CFG_OPENOFFICE_TMPDIR
 
     exitcode = 0
@@ -1185,3 +1157,27 @@ if __name__ == '__main__':
         from invenio.ext.logging import register_exception
         register_exception(alert_admin=True)
     die(exitcode)
+    global convertor, exitcode
+    convertor = None
+
+    try:
+        if op.listener:
+            listener = Listener()
+
+        if op.filenames:
+            convertor = Convertor()
+            for inputfn in op.filenames:
+                convertor.convert(inputfn)
+
+    except NoConnectException, e:
+        error("unoconv: could not find an existing connection to LibreOffice at %s:%s." % (op.server, op.port))
+        if op.connection:
+            info(0, "Please start an LibreOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    soffice -nologo -nodefault -accept=\"%s\"" % (op.server, op.server, op.port, op.connection))
+        else:
+            info(0, "Please start an LibreOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    soffice -nologo -nodefault -accept=\"socket,host=%s,port=%s;urp;\"" % (op.server, op.server, op.port, op.server, op.port))
+            info(0, "Please start an soffice instance on server '%s' by doing:\n\n    soffice -nologo -nodefault -accept=\"socket,host=localhost,port=%s;urp;\"" % (op.server, op.port))
+        exitcode = 1
+#    except UnboundLocalError:
+#        die(252, "Failed to connect to remote listener.")
+    except OSError:
+        error("Warning: failed to launch Office suite. Aborting.")

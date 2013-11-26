@@ -25,9 +25,9 @@ import htmllib
 import sgmllib
 import os
 
-from invenio.elmsubmit_misc import write_to_and_return_tempfile_name as _write_to_and_return_tempfile_name
-from invenio.elmsubmit_misc import remove_tempfile as _remove_tempfile
-from invenio.elmsubmit_misc import mapmany as _mapmany
+from invenio.legacy.elmsubmit.misc import write_to_and_return_tempfile_name as _write_to_and_return_tempfile_name
+from invenio.legacy.elmsubmit.misc import remove_tempfile as _remove_tempfile
+from invenio.legacy.elmsubmit.misc import mapmany as _mapmany
 
 # Search down to ###!!! See here !!!### for editable stuff.
 
@@ -42,8 +42,8 @@ class UnicodeHTMLParser(htmllib.HTMLParser):
         except(OverflowError, ValueError):
             raise HTMLParsingFailed
 
-    # myhtmlentitydefs.py should be found in the dir with this file:
-    from invenio.myhtmlentitydefs import entitydefs
+    # htmlentitydefs.py should be found in the dir with this file:
+    from .htmlentitydefs import entitydefs
 
 class NativeParser:
 

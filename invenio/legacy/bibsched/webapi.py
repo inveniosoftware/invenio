@@ -18,6 +18,8 @@
 # pylint: disable=C0103
 """Invenio BibSched live view engine implementation"""
 
+from flask import url_for
+
 from invenio.config import CFG_SITE_URL, CFG_BINDIR, CFG_PREFIX
 from invenio.legacy.dbquery import run_sql
 
@@ -75,9 +77,11 @@ def get_javascript():
     """
     js_scripts = """<script type="text/javascript" src="%(site_url)s/js/jquery.min.js">
                     </script>
-                    <script type="text/javascript" src="%(site_url)s/js/bibsched.js">
+                    <script type="text/javascript" src="%(custom)s">
                     </script>
-                 """ % {'site_url':CFG_SITE_URL}
+                 """ % {'site_url':CFG_SITE_URL,
+                        'custom': url_for('scheduler.static',
+                                          filename='js/scheduler/base.js') }
     return js_scripts
 
 def get_bibsched_tasks():

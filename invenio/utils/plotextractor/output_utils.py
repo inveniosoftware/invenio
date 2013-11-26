@@ -11,12 +11,12 @@
 import os
 import re
 import sys
+import pkg_resources
 
-from invenio.config import CFG_TMPDIR
 from invenio.utils.text import encode_for_xml, wash_for_utf8
 from invenio.legacy.bibrecord import field_xml_output
 
-DUMMY_IMAGE_TMP = os.path.join(CFG_TMPDIR, 'plotextractor_dummy.png')
+DUMMY_IMAGE_TMP = pkg_resources.resource_filename(__name__, 'plotextractor_dummy.png')
 
 def write_message(message):
     print message

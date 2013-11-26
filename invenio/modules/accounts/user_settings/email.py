@@ -24,7 +24,7 @@ from invenio.modules.accounts.models import User
 from flask.ext.login import current_user
 from invenio.ext.template import render_template_to_string
 from invenio.modules.dashboard.settings import Settings, ModelSettingsStorageBuilder
-from .forms import ChangeUserEmailSettingsForm
+from invenio.modules.accounts.forms import ChangeUserEmailSettingsForm
 
 
 class WebAccountSettings(Settings):
@@ -41,7 +41,7 @@ class WebAccountSettings(Settings):
         self.edit = url_for('webaccount.edit', name=self.name)
 
     def widget(self):
-        return render_template_to_string('webuser_widget.html')
+        return render_template_to_string('accounts/widget.html')
 
     widget.size = 4
 

@@ -30,7 +30,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_CACHEDIR, \
      CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      make_journal_url, \
      get_journal_info_path, \

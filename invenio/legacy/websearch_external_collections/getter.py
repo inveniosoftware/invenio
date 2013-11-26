@@ -21,7 +21,7 @@
 
 Example 1, downloading a set of webpages :
 
-from websearch_external_collections_getter import *
+from invenio.legacy.websearch_external_collections.getter import *
 urls = ['http://www.google.fr', 'http://linuxfr.org']
 pagegetters = [HTTPAsyncPageGetter(url) for url in urls]
 async_download(pagegetters)
@@ -36,7 +36,7 @@ Example 2, downloading a set of webpages but with callback function.
 def func(pagegetter, data, current_time):
     print "OK (%f): " % current_time + pagegetter.uri + " - " + data
 
-from websearch_external_collections_getter import *
+from invenio.legacy.websearch_external_collections.getter import *
 urls = ['http://www.google.fr', 'http://linuxfr.org']
 pagegetters = [HTTPAsyncPageGetter(url) for url in urls]
 async_download(pagegetters, func, ['info1', 'info2'], 10)
@@ -51,7 +51,7 @@ import sys
 import StringIO
 import time
 import urlparse
-#from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+#from .config import CFG_EXTERNAL_COLLECTION_TIMEOUT
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
 CFG_EXTERNAL_COLLECTION_TIMEOUT = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
 

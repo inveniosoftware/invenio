@@ -22,12 +22,10 @@ WebSubmit admin CLI tool.
 """
 
 __revision__ = "$Id$"
+from invenio.base.factory import with_app_context
 
-try:
-    from invenio.websubmitadmincli import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
 
-main()
+@with_app_context()
+def main():
+    from invenio.legacy.websubmit.admincli import main as websubmitadmin_main
+    return websubmitadmin_main()

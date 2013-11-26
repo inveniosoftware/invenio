@@ -37,7 +37,7 @@ from ..models import Collection
 from ..washers import wash_search_urlargd
 from invenio.ext.menu import register_menu
 from invenio.base.signals import websearch_before_browse, websearch_before_search
-from invenio.modules.index import models as BibIndex
+from invenio.modules.indexer import models as BibIndex
 from invenio.modules.formatter import format_record
 from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated

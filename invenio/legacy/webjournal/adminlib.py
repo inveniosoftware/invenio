@@ -42,11 +42,11 @@ from invenio.config import \
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.email import send_email
 from invenio.modules.access.engine import acc_authorize_action
-from invenio.webjournal_config import \
+from invenio.legacy.webjournal.config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
      InvenioWebJournalReleaseUpdateError, \
      InvenioWebJournalNoJournalOnServerError
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      get_journals_ids_and_names, \
      guess_journal_name, \
      get_current_issue, \
@@ -545,8 +545,8 @@ def perform_request_configure(journal_name, xml_config, action, ln=CFG_SITE_LANG
         <niceName>Atlantis Times</niceName>
         <niceURL>%(CFG_SITE_URL)s</niceURL>
         <css>
-            <screen>/img/AtlantisTimes.css</screen>
-            <print>/img/AtlantisTimes.css</print>
+            <screen>/css/AtlantisTimes.css</screen>
+            <print>/css/AtlantisTimes.css</print>
         </css>
         <format_template>
             <index>AtlantisTimes_Index.bft</index>

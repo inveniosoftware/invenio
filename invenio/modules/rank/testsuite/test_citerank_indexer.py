@@ -27,8 +27,8 @@ if sys.hexversion < 0x2040000:
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-bibrank_citerank_indexer = lazy_import('invenio.bibrank_citerank_indexer')
-task_set_task_param = lazy_import('invenio.bibtask:task_set_task_param')
+bibrank_citerank_indexer = lazy_import('invenio.legacy.bibrank.citerank_indexer')
+task_set_task_param = lazy_import('invenio.legacy.bibsched.bibtask:task_set_task_param')
 
 
 class TestCiterankIndexer(InvenioTestCase):

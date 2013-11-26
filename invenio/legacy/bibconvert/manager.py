@@ -19,6 +19,8 @@
 
 from invenio.ext.script import Manager
 
+from .registry import templates
+
 manager = Manager(usage="Perform BibConvert operations")
 
 
@@ -35,11 +37,10 @@ def update():
     import os
     import re
     import shutil
-    from invenio.config import CFG_ETCDIR, CFG_SITE_RECORD, CFG_SITE_URL
+    from invenio.config import CFG_SITE_RECORD, CFG_SITE_URL
     ## location where bibconvert/config/*.tpl are:
-    tpldir = os.path.join(CFG_ETCDIR, 'bibconvert', 'config')
     ## find all *.tpl files:
-    for tplfilename in os.listdir(tpldir):
+    for tplfilename in templates.itervalues():
         if tplfilename.endswith(".tpl"):
             ## change tpl file:
             tplfile = tpldir + os.sep + tplfilename

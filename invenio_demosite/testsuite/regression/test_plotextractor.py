@@ -36,7 +36,7 @@ class GetDefaultsTest(InvenioTestCase):
     def test_get_defaults(self):
         """plotextractor - get defaults"""
         from invenio.utils.shell import run_shell_command
-        from invenio.plotextractor import get_defaults
+        from invenio.utils.plotextractor.cli import get_defaults
         sdir_should_be = os.path.join(CFG_TMPDIR, self.arXiv_id + '_plots')
         refno_should_be = "15" # Note: For ATLANTIS DEMO site
         sdir, refno = get_defaults(tarball=self.tarball, sdir=None, refno_url=CFG_SITE_URL)

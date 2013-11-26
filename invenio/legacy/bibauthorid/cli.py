@@ -27,7 +27,7 @@ from invenio.legacy.bibauthorid.general_utils import bibauthor_print
 def main():
     """Main function """
     try:
-        import invenio.bibauthorid_daemon as daemon
+        import invenio.legacy.bibauthorid.daemon as daemon
     except ImportError:
         bibauthor_print("Hmm...No Daemon process running.")
         return

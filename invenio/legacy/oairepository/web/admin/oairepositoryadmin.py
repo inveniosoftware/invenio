@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import invenio.oai_repository_admin as ora
+import invenio.legacy.oairepository.admin as ora
 from invenio.legacy.webpage import page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.legacy.dbquery import Error

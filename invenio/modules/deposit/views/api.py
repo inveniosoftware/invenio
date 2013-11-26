@@ -24,7 +24,7 @@ from flask import Blueprint, \
     jsonify
 
 from ..loader import deposition_types
-from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS
+from invenio.modules.workflows.config import CFG_WORKFLOW_STATUS
 from invenio.webdeposit_utils import create_workflow,\
     get_workflow, \
     set_form_status, \

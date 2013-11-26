@@ -54,16 +54,18 @@ except ImportError:
     rdflib = None
     rdflib_exceptions_Error = None
 
-from invenio import bibclassify_config as bconfig
+from invenio.legacy.bibclassify import config as bconfig
 log = bconfig.get_logger("bibclassify.ontology_reader")
 from invenio import config
+
+from invenio.modules.classifier.registry import taxonomies
 
 # only if not running in a stanalone mode
 if bconfig.STANDALONE:
     dbquery = None
     from urllib2 import urlopen
 else:
-    from invenio import dbquery
+    from invenio.legacy import dbquery
     from invenio.utils.url import make_invenio_opener
     urlopen = make_invenio_opener('BibClassify').open
 
@@ -257,42 +259,48 @@ def _discover_ontology(ontology_name):
     @return: absolute path of a file if found, or None
     """
     last_part = os.path.split(os.path.abspath(ontology_name))[1].lower()
-    possible_patterns = [last_part + ".rdf", last_part]
-    places = [config.CFG_CACHEDIR,
-              config.CFG_ETCDIR,
-              os.path.join(config.CFG_CACHEDIR, "bibclassify"),
-              os.path.join(config.CFG_ETCDIR, "bibclassify"),
-              os.path.abspath('.'),
-              os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../etc/bibclassify")),
-              os.path.join(os.path.dirname(__file__), "bibclassify"),
-              config.CFG_WEBDIR ]
+    if last_part in taxonomies:
+        return taxonomies.get(last_part)
+    elif last_part + ".rdf" in taxonomies:
+        return taxonomies.get(last_part+".rdf")
+    else:
+        log.debug("No taxonomy with pattern '%s' found" % ontology_name)
+    #FIXME: review
+    # places = [config.CFG_CACHEDIR,
+    #           config.CFG_ETCDIR,
+    #           os.path.join(config.CFG_CACHEDIR, "bibclassify"),
+    #           os.path.join(config.CFG_ETCDIR, "bibclassify"),
+    #           os.path.abspath('.'),
+    #           os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../etc/bibclassify")),
+    #           os.path.join(os.path.dirname(__file__), "bibclassify"),
+    #           config.CFG_WEBDIR ]
 
-    log.debug("Searching for taxonomy using string: %s" % last_part)
-    log.debug("Possible patterns: %s" % possible_patterns)
-    for path in places:
+    # log.debug("Searching for taxonomy using string: %s" % last_part)
+    # log.debug("Possible patterns: %s" % possible_patterns)
+    # for path in places:
 
-        try:
-            if os.path.isdir(path):
-                log.debug("Listing: %s" % path)
-                for filename in os.listdir(path):
-                    #log.debug('Testing: %s' % filename)
-                    for pattern in possible_patterns:
-                        filename_lc = filename.lower()
-                        if pattern == filename_lc and os.path.exists(os.path.join(path, filename)):
-                            filepath = os.path.abspath(os.path.join(path, filename))
-                            if (os.access(filepath, os.R_OK)):
-                                log.debug("Found taxonomy at: %s" % filepath)
-                                return filepath
-                            else:
-                                log.warning('Found taxonony at: %s, but it is not readable. Continue searching...' % filepath)
-        except OSError, os_error_msg:
-            log.warning('OS Error when listing path "%s": %s' % (str(path), str(os_error_msg)))
-    log.debug("No taxonomy with pattern '%s' found" % ontology_name)
+    #     try:
+    #         if os.path.isdir(path):
+    #             log.debug("Listing: %s" % path)
+    #             for filename in os.listdir(path):
+    #                 #log.debug('Testing: %s' % filename)
+    #                 for pattern in possible_patterns:
+    #                     filename_lc = filename.lower()
+    #                     if pattern == filename_lc and os.path.exists(os.path.join(path, filename)):
+    #                         filepath = os.path.abspath(os.path.join(path, filename))
+    #                         if (os.access(filepath, os.R_OK)):
+    #                             log.debug("Found taxonomy at: %s" % filepath)
+    #                             return filepath
+    #                         else:
+    #                             log.warning('Found taxonony at: %s, but it is not readable. Continue searching...' % filepath)
+    #     except OSError, os_error_msg:
+    #         log.warning('OS Error when listing path "%s": %s' % (str(path), str(os_error_msg)))
+    # log.debug("No taxonomy with pattern '%s' found" % ontology_name)
 
 
 class KeywordToken:
     # this tells pickle that the class we are pickling is coming from
-    # module 'bibclassify_ontology_reader' instead of invenio.bibclassify_ontology_reader
+    # module 'bibclassify_ontology_reader' instead of invenio.legacy.bibclassify.ontology_reader
     #__module__ = os.path.splitext(os.path.basename(__file__))[0]
 
     def __init__(self, subject, store=None, namespace=None, type='HEP'):
@@ -775,6 +783,9 @@ def _get_cache_path(source_file):
     local_name = os.path.basename(source_file)
     cache_name = local_name + ".db"
     cache_dir = os.path.join(config.CFG_CACHEDIR, "bibclassify")
+
+    if not os.path.isdir(cache_dir):
+        os.makedirs(cache_dir)
 
     return os.path.abspath(os.path.join(cache_dir, cache_name))
 

@@ -47,9 +47,8 @@ from invenio.config import CFG_TMPDIR
 from invenio.config import CFG_ETCDIR
 
 CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR = \
-                        "%s/websubmit/file_stamper_templates" % CFG_ETCDIR
+        pkg_resources.resource_filename('invenio.legacy.websubmit', 'file_stamper_templates')
 from invenio.config import CFG_PATH_PDFTK
-from invenio.config import CFG_PATH_PDF2PS
 from invenio.utils.shell import escape_shell_arg
 from invenio.legacy.websubmit.config import InvenioWebSubmitFileStamperError
 

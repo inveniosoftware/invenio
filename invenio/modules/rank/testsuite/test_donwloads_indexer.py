@@ -17,7 +17,7 @@
 
 __revision__ = "$Id$"
 
-from invenio import bibrank_downloads_indexer
+from invenio.legacy.bibrank import downloads_indexer as bibrank_downloads_indexer
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 

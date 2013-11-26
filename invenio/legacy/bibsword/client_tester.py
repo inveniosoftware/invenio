@@ -23,30 +23,33 @@ __revision__ = "$Id$"
 
 # pylint: disable-msg=C0301
 
-from invenio.testutils import InvenioTestCase
 import os
 import sys
 import time
-from invenio.testsuite import make_test_suite, run_test_suite
-from invenio.config import CFG_TMPDIR
-from invenio.bibsword_client_formatter import format_marcxml_file, \
+import pkg_resources
+
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.legacy.bibsword.client_formatter import format_marcxml_file, \
                                               format_submission_status, \
                                               ArXivFormat
-from invenio.bibsword_client import format_metadata, \
+from invenio.legacy.bibsword.client import format_metadata, \
                                     list_submitted_resources, \
                                     perform_submission_process
 
-from invenio.bibsword_client_http import RemoteSwordServer
-from invenio.bibsword_client_dblayer import get_remote_server_auth, \
+from invenio.legacy.bibsword.client_http import RemoteSwordServer
+from invenio.legacy.bibsword.client_dblayer import get_remote_server_auth, \
                                             insert_into_swr_clientdata, \
                                             update_submission_status, \
                                             select_submitted_record_infos, \
                                             delete_from_swr_clientdata
 from invenio.legacy.dbquery import run_sql
-from invenio.bibsword_config import CFG_SUBMISSION_STATUS_SUBMITTED, \
+from invenio.legacy.bibsword.config import CFG_SUBMISSION_STATUS_SUBMITTED, \
                                     CFG_SUBMISSION_STATUS_PUBLISHED, \
                                     CFG_SUBMISSION_STATUS_REMOVED
 from xml.dom import minidom
+
+TEST_DATA = pkg_resources.resource_filename('invenio.legacy.bibsword', 'data')
+
 
 class Test_format_marcxml_file(InvenioTestCase):
     """ bibsword_format - test the parsing and extracting of marcxml nodes"""
@@ -54,7 +57,7 @@ class Test_format_marcxml_file(InvenioTestCase):
     def test_extract_marcxml_1(self):
         """Test_format_marcxml_file - extract marcxml without id, report_nos and comment"""
         # Test with marcxml file 1
-        marcxml = open("%s%sTest_marcxml_file_1.xml" % (CFG_TMPDIR, os.sep)).read()
+        marcxml = open("%s%sTest_marcxml_file_1.xml" % (TEST_DATA, os.sep)).read()
         metadata = format_marcxml_file(marcxml)
         self.assertEqual(metadata['id'], '')
         self.assertEqual(metadata['title'],  "Calorimetry triggering in ATLAS")
@@ -80,7 +83,7 @@ class Test_format_marcxml_file(InvenioTestCase):
         """Test_format_marcxml_file - extract marcxml without report_nos, doi"""
 
         #Test with marcxml file 2
-        marcxml = open("%s%sTest_marcxml_file_2.xml" % (CFG_TMPDIR, os.sep)).read()
+        marcxml = open("%s%sTest_marcxml_file_2.xml" % (TEST_DATA, os.sep)).read()
         metadata = format_marcxml_file(marcxml)
         self.assertEqual(metadata['id'], "arXiv:1001.1674")
         self.assertEqual(metadata['title'],  "Persistent storage of non-event data in the CMS databases")
@@ -107,7 +110,7 @@ class Test_format_marcxml_file(InvenioTestCase):
         """Test_format_marcxml_file - extract marcxml without doi"""
 
         #Test with marcxml file 3
-        marcxml = open("%s%sTest_marcxml_file_3.xml" % (CFG_TMPDIR, os.sep)).read()
+        marcxml = open("%s%sTest_marcxml_file_3.xml" % (TEST_DATA, os.sep)).read()
         metadata = format_marcxml_file(marcxml)
         self.assertEqual(metadata['id'], "ATL-PHYS-CONF-2007-008")
         self.assertEqual(metadata['title'],  "Early Standard Model physics and early discovery strategy in ATLAS")
@@ -134,7 +137,7 @@ class Test_format_marcxml_file(InvenioTestCase):
         """Test_format_marcxml_file - unexistant metadata file"""
 
         #Test with a unknown marcxml file
-        metadata = format_marcxml_file("%s%sTest_marcxml_file_false.xml" % (CFG_TMPDIR, os.sep), True)
+        metadata = format_marcxml_file("%s%sTest_marcxml_file_false.xml" % (TEST_DATA, os.sep), True)
         self.assertEqual(metadata["error"], "Unable to open marcxml file !")
 
 
@@ -144,7 +147,7 @@ class Test_format_metadata(InvenioTestCase):
     def test_correct_metadata_collection(self):
         """Test_format_metadata - collection of metadata without errors"""
 
-        marcxml = open("%s%sTest_marcxml_file_3.xml" % (CFG_TMPDIR, os.sep)).read()
+        marcxml = open("%s%sTest_marcxml_file_3.xml" % (TEST_DATA, os.sep)).read()
 
         metadata = {}
         metadata['primary_label'] = 'Test - Test Disruptive Networks'
@@ -155,7 +158,7 @@ class Test_format_metadata(InvenioTestCase):
         user_info['email'] = 'test@user.com'
 
         deposit_results = []
-        deposit_results.append(open("%s%sTest_media_deposit.xml" % (CFG_TMPDIR, os.sep)).read())
+        deposit_results.append(open("%s%sTest_media_deposit.xml" % (TEST_DATA, os.sep)).read())
         metadata = format_metadata(marcxml, deposit_results, user_info, metadata)
 
         self.assertEqual(metadata['id'], "ATL-PHYS-CONF-2007-008")
@@ -261,7 +264,7 @@ class Test_format_submission_status(InvenioTestCase):
     def test_format_submission_status_submitted(self):
         """Test_format_submission_status_submitted"""
 
-        status_xml = open("%s%sTest_submission_status_submitted.xml" % (CFG_TMPDIR, os.sep)).read()
+        status_xml = open("%s%sTest_submission_status_submitted.xml" % (TEST_DATA, os.sep)).read()
         response =  format_submission_status(status_xml)
 
         self.assertEqual(response['status'], "submitted")
@@ -272,7 +275,7 @@ class Test_format_submission_status(InvenioTestCase):
     def test_format_submission_status_published(self):
         """Test_format_submission_status_published"""
 
-        status_xml = open("%s%sTest_submission_status_published.xml" % (CFG_TMPDIR, os.sep)).read()
+        status_xml = open("%s%sTest_submission_status_published.xml" % (TEST_DATA, os.sep)).read()
         response =  format_submission_status(status_xml)
 
         self.assertEqual(response['status'], "published")
@@ -283,7 +286,7 @@ class Test_format_submission_status(InvenioTestCase):
     def test_format_submission_status_onhold(self):
         """Test_format_submission_status_onhold"""
 
-        status_xml = open("%s%sTest_submission_status_onhold.xml" % (CFG_TMPDIR, os.sep)).read()
+        status_xml = open("%s%sTest_submission_status_onhold.xml" % (TEST_DATA, os.sep)).read()
         response = format_submission_status(status_xml)
 
         self.assertEqual(response['status'], "onhold")
@@ -294,7 +297,7 @@ class Test_format_submission_status(InvenioTestCase):
     def test_format_submission_status_removed(self):
         """Test_format_submission_status_removed"""
 
-        status_xml = open("%s%sTest_submission_status_unknown.xml" % (CFG_TMPDIR, os.sep)).read()
+        status_xml = open("%s%sTest_submission_status_unknown.xml" % (TEST_DATA, os.sep)).read()
         response =  format_submission_status(status_xml)
 
         self.assertEqual(response['status'], CFG_SUBMISSION_STATUS_REMOVED)

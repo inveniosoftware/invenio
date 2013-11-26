@@ -22,12 +22,8 @@ __revision__ = "$Id$"
 import cgi
 import urllib
 
+from invenio.base.globals import cfg
 from invenio.base.i18n import gettext_set_language
-from invenio.webbasket_config import \
-                       CFG_WEBBASKET_CATEGORIES, \
-                       CFG_WEBBASKET_ACTIONS, \
-                       CFG_WEBBASKET_SHARE_LEVELS, \
-                       CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS
 from invenio.utils.mail import email_quoted_txt2html, \
                                          email_quote_txt, \
                                          escape_email_quoted_text
@@ -41,7 +37,7 @@ from invenio.config import \
      CFG_SITE_RECORD
 from invenio.legacy.webuser import get_user_info
 from invenio.utils.date import convert_datetext_to_dategui
-from invenio.webbasket_dblayer import get_basket_ids_and_names
+from invenio.legacy.webbasket.db_layer import get_basket_ids_and_names
 
 ICON_BACK = 'icon-arrow-left'
 ICON_CREATE_BASKET = 'icon-plus'
@@ -122,12 +118,12 @@ class Template:
             if personal_baskets_info:
                 personalbaskets_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;ln=%(ln)s">%(label)s</a>""" % \
                                        {'url': CFG_SITE_URL,
-                                        'category': CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                        'category': cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                                         'ln': ln,
                                         'label': _('Personal baskets')}
                 topic_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;topic=%(topic)s&amp;ln=%(ln)s">%(label)s</a>""" % \
                              {'url': CFG_SITE_URL,
-                              'category': CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                              'category': cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                               'topic': urllib.quote(topic),
                               'ln': ln,
                               'label': cgi.escape(topic, True)}
@@ -169,11 +165,11 @@ class Template:
                 personal_tab = """
               <td class="%(class)s">
               <a href="%(url)s/yourbaskets/display?category=%(category)s&amp;ln=%(ln)s">%(label)s</a>
-              </td>""" % {'class': category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] \
+              </td>""" % {'class': category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] \
                           and "bsk_directory_box_tab_content_selected" \
                           or "bsk_directory_box_tab_content",
                           'url': CFG_SITE_URL,
-                          'category': CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                          'category': cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                           'ln': ln,
                           'label': _('Personal baskets')}
         else:
@@ -189,12 +185,12 @@ class Template:
             if group_baskets_info:
                 groupbaskets_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;ln=%(ln)s">%(label)s</a>""" % \
                                     {'url': CFG_SITE_URL,
-                                     'category': CFG_WEBBASKET_CATEGORIES['GROUP'],
+                                     'category': cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'],
                                      'ln': ln,
                                      'label': _('Group baskets')}
                 group_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;group=%(grpid)i&amp;ln=%(ln)s">%(label)s</a>""" % \
                              {'url': CFG_SITE_URL,
-                              'category': CFG_WEBBASKET_CATEGORIES['GROUP'],
+                              'category': cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'],
                               'grpid': grpid,
                               'ln': ln,
                               'label': cgi.escape(group_name, True)}
@@ -217,11 +213,11 @@ class Template:
                 group_tab = """
               <td class="%(class)s">
               <a href="%(url)s/yourbaskets/display?category=%(category)s&amp;ln=%(ln)s">%(label)s</a>
-              </td>""" % {'class': category == CFG_WEBBASKET_CATEGORIES['GROUP'] \
+              </td>""" % {'class': category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] \
                           and "bsk_directory_box_tab_content_selected" \
                           or "bsk_directory_box_tab_content",
                           'url': CFG_SITE_URL,
-                          'category': CFG_WEBBASKET_CATEGORIES['GROUP'],
+                          'category': cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'],
                           'ln': ln,
                           'label': _('Group baskets')}
         else:
@@ -236,11 +232,11 @@ class Template:
             public_tab = """
               <td class="%(class)s">
               <a href="%(url)s/yourbaskets/display?category=%(category)s&amp;ln=%(ln)s">%(label)s</a>
-              </td>""" % {'class': category == CFG_WEBBASKET_CATEGORIES['EXTERNAL'] \
+              </td>""" % {'class': category == cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL'] \
                           and "bsk_directory_box_tab_content_selected" \
                           or "bsk_directory_box_tab_content",
                           'url': CFG_SITE_URL,
-                          'category': CFG_WEBBASKET_CATEGORIES['EXTERNAL'],
+                          'category': cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL'],
                           'ln': ln,
                           'label': _('Public baskets')}
         else:
@@ -288,7 +284,7 @@ class Template:
         tabs += """</div>"""
 
         ## Secondly, create the content.
-        if personal_info and category==CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+        if personal_info and category==cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE']:
             content_list = []
             ## If a specific topic is selected create a list of baskets for that topic.
             if personal_baskets_info:
@@ -339,7 +335,7 @@ class Template:
                                        'bskid': bskid,
                                        'ln': ln,
                                        'title_name': cgi.escape(basket_name, True),
-                                       'basket_name': cgi.escape(prettify_name(basket_name, __calculate_prettify_name_char_limit(nb_baskets, 135/CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS)), True)}
+                                       'basket_name': cgi.escape(prettify_name(basket_name, __calculate_prettify_name_char_limit(nb_baskets, 135/cfg['CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS'])), True)}
                         basket_links_list.append(basket_link)
                         basket_links = ', '.join(basket_links_list)
                     if nb_baskets > 3:
@@ -390,7 +386,7 @@ class Template:
                     </div>
                 </div>""" % (create_basket_link,)
 
-        elif group_info and category==CFG_WEBBASKET_CATEGORIES['GROUP']:
+        elif group_info and category==cfg['CFG_WEBBASKET_CATEGORIES']['GROUP']:
             content_list = []
             ## If a specific grpid is selected create a list of baskets for that group.
             if group_baskets_info:
@@ -402,7 +398,7 @@ class Template:
                                  {'opening_tag': basket_id==bskid and "<em>" or "",
                                   'closing_tag': basket_id==bskid and "</em>" or "",
                                   'url': CFG_SITE_URL,
-                                  'category': CFG_WEBBASKET_CATEGORIES['GROUP'],
+                                  'category': cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'],
                                   'grpid': grpid,
                                   'bskid': basket_id,
                                   'ln': ln,
@@ -455,7 +451,7 @@ class Template:
                                       'basket_links': basket_links}
                     content_list.append(content_list_item)
 
-            nb_cells = CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS
+            nb_cells = cfg['CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS']
             nb_items = len(content_list)
             content_list.reverse()
             content = """
@@ -479,7 +475,7 @@ class Template:
               </table>
             </div>"""
 
-        elif public_info and category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
+        elif public_info and category==cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL']:
             content_list = []
             for basket in public_info:
                 basket_id = basket[0]
@@ -497,7 +493,7 @@ class Template:
                       %(basket_link)s""" % {'basket_link': basket_link}
                 content_list.append(content_list_item)
 
-            nb_cells = CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS
+            nb_cells = cfg['CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS']
             nb_items = len(content_list)
             content_list.reverse()
             content = """
@@ -528,8 +524,8 @@ class Template:
           %(content)s
         </div>
       </div>
-    </div>""" % {'class': ((category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and topic) or \
-                          (category == CFG_WEBBASKET_CATEGORIES['GROUP'] and grpid)) and \
+    </div>""" % {'class': ((category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] and topic) or \
+                          (category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] and grpid)) and \
                           "bsk_directory_box_content_list_baskets" or \
                           "bsk_directory_box_content_list_topics_groups",
                  'tabs': tabs,
@@ -715,7 +711,7 @@ class Template:
             for bskid in personal_search_results.keys():
                 basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;topic=%(topic)s&amp;bskid=%(bskid)i&amp;ln=%(ln)s">%(basket_name)s</a>""" % \
                               {'url': CFG_SITE_URL,
-                               'category': CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                               'category': cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                                'topic': urllib.quote(personal_search_results[bskid][1]),
                                'bskid': bskid,
                                'ln': ln,
@@ -821,7 +817,7 @@ class Template:
             for bskid in group_search_results.keys():
                 basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;group=%(grpid)i&amp;bskid=%(bskid)i&amp;ln=%(ln)s">%(basket_name)s</a>""" % \
                               {'url': CFG_SITE_URL,
-                               'category': CFG_WEBBASKET_CATEGORIES['GROUP'],
+                               'category': cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'],
                                'grpid': group_search_results[bskid][1],
                                'bskid': bskid,
                                'ln': ln,
@@ -928,7 +924,7 @@ class Template:
             for bskid in public_search_results.keys():
                 basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;bskid=%(bskid)i&amp;ln=%(ln)s">%(basket_name)s</a>""" % \
                               {'url': CFG_SITE_URL,
-                               'category': CFG_WEBBASKET_CATEGORIES['EXTERNAL'],
+                               'category': cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL'],
                                'bskid': bskid,
                                'ln': ln,
                                'basket_name': cgi.escape(public_search_results[bskid][0], True)}
@@ -1268,7 +1264,7 @@ class Template:
             webmessage_link = self.__create_webmessage_link(nickname, display, ln)
 
             basket_link = """<a href="%s/yourbaskets/display_public?category=%s&amp;bskid=%s&amp;ln=%s">%s<a/>""" % \
-                          (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['EXTERNAL'], bskid, ln, cgi.escape(basket_name, True))
+                          (CFG_SITE_URL, cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL'], bskid, ln, cgi.escape(basket_name, True))
 
             nb_views_td = """<td class="bsk_list_public_baskets_basket_right">%i</td>""" % (nb_views,)
 
@@ -1648,7 +1644,7 @@ class Template:
             out = """
 %(success_label)s.
 <br /><br />
-%(proceed_label)s""" % {'success_label': _('%i items have been successfully added to your basket') % (colid == -1 and 1 or len(recids)),
+%(proceed_label)s""" % {'success_label': _('%(number)i items have been successfully added to your basket', number=(colid == -1 and 1 or len(recids))),
                         'proceed_label': _('Proceed to the %(x_url_open)sbasket%(x_url_close)s') % \
                                          {'x_url_open': '<a href="%s/yourbaskets/display?category=%s&amp;bskid=%i&amp;ln=%s">' % (CFG_SITE_URL, category, bskid, ln),
                                          'x_url_close': "</a>"}}
@@ -1750,10 +1746,10 @@ class Template:
 	<input type="hidden" name="move_from_basket" value="%(move_from_basket)s" />
 	<input type="submit" class="btn btn-primary formbutton" value="%(add_label)s" />
     <input type="button" class="btn nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='/'" />
-</div>"""   % {'header_label': _("Adding %i items to your baskets") % (colid == -1 and 1 or len(recids)),
-               'create_new_basket': _("Please choose a basket: %(x_basket_selection_box)s %(x_fmt_open)s(or %(x_url_open)screate a new one%(x_url_close)s first)%(x_fmt_close)s") % \
-                                    {'x_basket_selection_box': '&nbsp;<select name="b">%s</select>' % select_options,
-                                     'x_url_open': colid == -1 and ('''<a href="%s/yourbaskets/create_basket?colid=-1" onClick="this.href+= \
+</div>"""   % {'header_label': _("Adding %(number)i items to your baskets", number=(colid == -1 and 1 or len(recids))),
+               'create_new_basket': _("Please choose a basket: %(x_basket_selection_box)s %(x_fmt_open)s(or %(x_url_open)screate a new one%(x_url_close)s first)%(x_fmt_close)s",
+                                    **{'x_basket_selection_box': '&nbsp;<select name="b">%s</select>' % select_options,
+                                       'x_url_open': colid == -1 and ('''<a href="%s/yourbaskets/create_basket?colid=-1" onClick="this.href+= \
                                                                         '&amp;es_title=' + encodeURIComponent(document.add_to_basket.es_title.value) + \
                                                                         '&amp;es_url=' + encodeURIComponent(document.add_to_basket.es_url.value) + \
                                                                         '&amp;es_desc=' + encodeURIComponent(document.add_to_basket.es_desc.value);">''' % \
@@ -1765,9 +1761,9 @@ class Template:
                                                                      colid,
                                                                      int(move_from_basket),
                                                                      '&amp;recid='.join(str(recid) for recid in recids))),
-                                     'x_url_close': '</a>',
-                                     'x_fmt_open': '<br /><small>',
-                                     'x_fmt_close': '</small>'},
+                                       'x_url_close': '</a>',
+                                       'x_fmt_open': '<br /><small>',
+                                       'x_fmt_close': '</small>'}),
                'move_from_basket': move_from_basket,
                'note_label': len(recids) > 1 and _('Optionally, add a note to each one of these items') \
                or _('Optionally, add a note to this item'),
@@ -1786,7 +1782,7 @@ class Template:
 
     def tmpl_confirm_delete(self, bskid,
                             (nb_users, nb_groups, nb_alerts),
-                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                            category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                             selected_topic="", selected_group_id=0,
                             ln=CFG_SITE_LANG):
         """
@@ -1852,7 +1848,7 @@ class Template:
                   display_general=0, display_sharing=0, display_delete=0, ln=CFG_SITE_LANG):
         """Display interface for rights management over the given basket
         @param group_rights: list of (group id, name, rights) tuples
-        @param external_rights: rights as defined in CFG_WEBBASKET_SHARE_LEVELS for public access.
+        @param external_rights: rights as defined in cfg['CFG_WEBBASKET_SHARE_LEVELS']for public access.
         @param display_general: display fields name and topic, used with personal baskets
         @param display_sharing: display sharing possibilities
         @param display_delete: display delete basket button
@@ -2014,39 +2010,39 @@ class Template:
     def __create_rights_selection_menu(self, name, current_rights, ln=CFG_SITE_LANG):
         """Private function. create a drop down menu for selection of rights
         @param name: name of menu (for HTML name attribute)
-        @param current_rights: rights as defined in CFG_WEBBASKET_SHARE_LEVELS
+        @param current_rights: rights as defined in cfg['CFG_WEBBASKET_SHARE_LEVELS']
         @param ln: language
         """
         _ = gettext_set_language(ln)
         elements = [('NO', _("No rights")),
-                    (CFG_WEBBASKET_SHARE_LEVELS['READITM'],
+                    (cfg['CFG_WEBBASKET_SHARE_LEVELS']['READITM'],
                      _("View records")),
-                    (CFG_WEBBASKET_SHARE_LEVELS['READCMT'],
+                    (cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'],
                      '... ' + _("and") + ' ' + _("view comments")),
-                    (CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'],
+                    (cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'],
                      '... ' + _("and") + ' ' + _("add comments"))]
         return self.__create_select_menu(name, elements, current_rights)
 
     def __create_group_rights_selection_menu(self, group_id, current_rights, ln=CFG_SITE_LANG):
         """Private function. create a drop down menu for selection of rights
-        @param current_rights: rights as defined in CFG_WEBBASKET_SHARE_LEVELS
+        @param current_rights: rights as defined in cfg['CFG_WEBBASKET_SHARE_LEVELS']
         @param ln: language
         """
         _ = gettext_set_language(ln)
         elements = [(str(group_id) + '_' + 'NO', _("No rights")),
-                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['READITM'],
+                    (str(group_id) + '_' + cfg['CFG_WEBBASKET_SHARE_LEVELS']['READITM'],
                      _("View records")),
-                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['READCMT'],
+                    (str(group_id) + '_' + cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'],
                      '... ' + _("and") + ' ' + _("view notes")),
-                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'],
+                    (str(group_id) + '_' + cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'],
                      '... ' + _("and") + ' ' + _("add notes")),
-                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['ADDITM'],
+                    (str(group_id) + '_' + cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDITM'],
                      '... ' + _("and") + ' ' + _("add records")),
-                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['DELCMT'],
+                    (str(group_id) + '_' + cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELCMT'],
                      '... ' + _("and") + ' ' + _("delete notes")),
-                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['DELITM'],
+                    (str(group_id) + '_' + cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELITM'],
                      '... ' + _("and") + ' ' + _("remove records")),
-                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['MANAGE'],
+                    (str(group_id) + '_' + cfg['CFG_WEBBASKET_SHARE_LEVELS']['MANAGE'],
                      '... ' + _("and") + ' ' + _("manage sharing rights"))
                     ]
         return self.__create_select_menu('groups', elements, str(group_id) + '_' + current_rights)
@@ -2232,7 +2228,7 @@ class Template:
                      user_can_delete_item),
                     nb_comments,
                     share_level,
-                    selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                    selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                     selected_topic="",
                     selected_group=0,
                     items=[],
@@ -2322,7 +2318,7 @@ class Template:
         optional_colspan = nb_items and user_can_view_content and ' colspan="3"' or ''
         records_field = '<br />' + _('%i items') % nb_items
         comments_field = user_can_view_notes and (nb_comments and (', ' + _('%i notes') % nb_comments) or ', ' + _('no notes yet')) or ''
-        subscribers_field = selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and \
+        subscribers_field = selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] and \
                             share_level == 0 and \
                             ', ' + (_('%i subscribers') % nb_subscribers) or \
                             ''
@@ -2348,7 +2344,7 @@ class Template:
             delete_basket_logo = """<i class="icon %s"></i> """ % (ICON_DELETE_BASKET,)
             delete_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
 
-        if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
+        if selected_category==cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
             unsubscribe_logo = """<i class="icon %s"></i> """ % (ICON_UNSUBSCRIBE,)
             unsubscribe = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
@@ -2427,7 +2423,7 @@ class Template:
             delete_basket_logo = """<i class="icon %s"></i> """ % (ICON_DELETE_BASKET,)
             delete_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
 
-        if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
+        if selected_category==cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
             unsubscribe_logo = """<i class="icon %s"></i> """ % (ICON_UNSUBSCRIBE,)
             unsubscribe = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
@@ -2470,7 +2466,7 @@ class Template:
                              user_can_add_notes,
                              user_can_add_item,
                              user_can_delete_item),
-                            selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                            selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                             selected_topic="",
                             selected_group=0,
                             items=[],
@@ -2544,7 +2540,7 @@ class Template:
                            delete_item=0,
                            view_notes=0,
                            add_notes=0,
-                           selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                           selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                            selected_topic="",
                            selected_group=0,
                            ln=CFG_SITE_LANG):
@@ -2611,7 +2607,7 @@ class Template:
             move_url = "%(siteurl)s/yourbaskets/modify?action=%(action)s&amp;bskid=%(bskid)i&amp;recid=%(recid)i"\
                        "&amp;category=%(category)s&amp;topic=%(topic)s&amp;group_id=%(group)i&amp;ln=%(ln)s" % \
                        {'siteurl': CFG_SITE_URL,
-                        'action': CFG_WEBBASKET_ACTIONS['MOVE'],
+                        'action': cfg['CFG_WEBBASKET_ACTIONS']['MOVE'],
                         'bskid': bskid,
                         'recid': recid,
                         'category': selected_category,
@@ -2737,7 +2733,7 @@ class Template:
                                  user_can_view_notes,
                                  user_can_add_notes,
                                  user_can_delete_notes),
-                                selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                                 selected_topic="",
                                 selected_group=0,
                                 item=(),
@@ -2985,7 +2981,7 @@ class Template:
                                          user_can_view_notes,
                                          user_can_add_notes,
                                          user_can_delete_notes),
-                                        selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                        selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                                         selected_topic="",
                                         selected_group=0,
                                         item=(),
@@ -4124,7 +4120,7 @@ class Template:
         return out
 
     def tmpl_create_export_as_list(self,
-                                   selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                   selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                                    selected_topic="",
                                    selected_group=0,
                                    bskid=0,
@@ -4223,9 +4219,9 @@ def create_search_box_select_options(category,
 
     if category:
         if topic:
-            b = CFG_WEBBASKET_CATEGORIES['PRIVATE'] + '_' + cgi.escape(topic, True)
+            b = cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] + '_' + cgi.escape(topic, True)
         elif grpid:
-            b = CFG_WEBBASKET_CATEGORIES['GROUP'] + '_' + str(grpid)
+            b = cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] + '_' + str(grpid)
         else:
             b = category
     else:
@@ -4240,8 +4236,8 @@ def create_search_box_select_options(category,
                {'label': _("Your personal baskets")}
         if len(topic_list) > 1:
             out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
-                   {'value': CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                    'selected': b == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and ' selected="selected"' or '',
+                   {'value': cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
+                    'selected': b == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] and ' selected="selected"' or '',
                     'label': _("All your topics")}
         for topic_name in topic_list:
             topic_label = cgi.escape(topic_name[0], True)
@@ -4256,8 +4252,8 @@ def create_search_box_select_options(category,
                {'label': _("Your group baskets")}
         if len(group_list) > 1:
             out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
-                   {'value': CFG_WEBBASKET_CATEGORIES['GROUP'],
-                    'selected': b == CFG_WEBBASKET_CATEGORIES['GROUP'] and ' selected="selected"' or '',
+                   {'value': cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'],
+                    'selected': b == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] and ' selected="selected"' or '',
                     'label': _("All your groups")}
         for group_id_and_name in group_list:
             group_label = cgi.escape(group_id_and_name[1], True)
@@ -4271,13 +4267,13 @@ def create_search_box_select_options(category,
         out += """<optgroup label="%(label)s">""" % \
                {'label': _("Your public baskets")}
         out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
-               {'value': CFG_WEBBASKET_CATEGORIES['EXTERNAL'],
-                'selected': b == CFG_WEBBASKET_CATEGORIES['EXTERNAL'] and ' selected="selected"' or '',
+               {'value': cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL'],
+                'selected': b == cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL'] and ' selected="selected"' or '',
                 'label': _("All your public baskets")}
         out += "</optgroup>"
     out += """<option value="%(value)s"%(selected)s>%(label)s</option>""" % \
-           {'value': CFG_WEBBASKET_CATEGORIES['ALLPUBLIC'],
-            'selected': b == CFG_WEBBASKET_CATEGORIES['ALLPUBLIC'] and ' selected="selected"' or '',
+           {'value': cfg['CFG_WEBBASKET_CATEGORIES']['ALLPUBLIC'],
+            'selected': b == cfg['CFG_WEBBASKET_CATEGORIES']['ALLPUBLIC'] and ' selected="selected"' or '',
             'label': _("All the public baskets")}
 
     return out
@@ -4295,12 +4291,12 @@ def create_add_box_select_options(category,
 
     # Calculate the selected basket if there is one pre-selected.
     if category and bskid:
-        if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
-            b = CFG_WEBBASKET_CATEGORIES['PRIVATE'] + '_' + str(bskid)
-        elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
-            b = CFG_WEBBASKET_CATEGORIES['GROUP'] + '_' + str(bskid)
-        elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
-            b = CFG_WEBBASKET_CATEGORIES['EXTERNAL'] + '_' + str(bskid)
+        if category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE']:
+            b = cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] + '_' + str(bskid)
+        elif category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP']:
+            b = cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] + '_' + str(bskid)
+        elif category == cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL']:
+            b = cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL'] + '_' + str(bskid)
         else:
             b = ""
     else:
@@ -4321,11 +4317,11 @@ def create_add_box_select_options(category,
         if len(personal_basket_list) == 1:
             bskids = personal_basket_list[0][1].split(',')
             if len(bskids) == 1:
-               b = CFG_WEBBASKET_CATEGORIES['PRIVATE'] + '_' + bskids[0]
+               b = cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] + '_' + bskids[0]
         elif len(group_basket_list) == 1:
             bskids = group_basket_list[0][1].split(',')
             if len(bskids) == 1:
-               b = CFG_WEBBASKET_CATEGORIES['GROUP'] + '_' + bskids[0]
+               b = cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] + '_' + bskids[0]
 
     # Create the <optgroup>s and <option>s for the user personal baskets.
     if personal_basket_list:
@@ -4338,7 +4334,7 @@ def create_add_box_select_options(category,
               <optgroup label="%s">""" % (cgi.escape(topic, True),)
             bskids_and_names = get_basket_ids_and_names(bskids)
             for bskid_and_name in bskids_and_names:
-                basket_value = CFG_WEBBASKET_CATEGORIES['PRIVATE'] + '_' + str(bskid_and_name[0])
+                basket_value = cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] + '_' + str(bskid_and_name[0])
                 basket_name = bskid_and_name[1]
                 out += """
                 <option value="%(value)s"%(selected)s>%(label)s</option>""" % \
@@ -4361,7 +4357,7 @@ def create_add_box_select_options(category,
               <optgroup label="%s">""" % (cgi.escape(group, True),)
             bskids_and_names = get_basket_ids_and_names(bskids)
             for bskid_and_name in bskids_and_names:
-                basket_value = CFG_WEBBASKET_CATEGORIES['GROUP'] + '_' + str(bskid_and_name[0])
+                basket_value = cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] + '_' + str(bskid_and_name[0])
                 basket_name = bskid_and_name[1]
                 out += """
                 <option value="%(value)s"%(selected)s>%(label)s</option>""" % \

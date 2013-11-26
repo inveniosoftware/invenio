@@ -154,16 +154,16 @@ if CFG_DEVEL_SITE:
             self.another_nickname = "baz"
             self.some_groups = ["a group for regression test", "another group for regression test"]
             self.myip = urlopen(CFG_SITE_URL + "/httptest/whatismyip").read()
-            from invenio.modules.access.external_authentication_robot import update_robot_key
+            from invenio.legacy.external_authentication.robot import update_robot_key
             for method_name in self.robot_login_methods:
                 update_robot_key(method_name, self.a_robot, self.a_password)
-            from invenio.modules.access.external_authentication_robot import load_robot_keys
+            from invenio.legacy.external_authentication.robot import load_robot_keys
 
         def tearDown(self):
-            from invenio.modules.access.external_authentication_robot import update_robot_key
+            from invenio.legacy.external_authentication.robot import update_robot_key
             #for method_name in self.robot_login_methods:
                 #update_robot_key(method_name, self.a_robot)
-            from invenio.modules.access.external_authentication_robot import load_robot_keys
+            from invenio.legacy.external_authentication.robot import load_robot_keys
             self._erase_example_user_and_groups()
 
         def test_normal_robot_login_method(self):

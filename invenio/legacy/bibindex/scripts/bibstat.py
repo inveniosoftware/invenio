@@ -1,5 +1,4 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
@@ -24,24 +23,18 @@ BibStat reports some interesting numbers on the bibliographic record set.
 
 __revision__ = "$Id$"
 
-## import interesting modules:
-try:
-    import sys
-    from invenio.flaskshell import *
-    from invenio.legacy.dbquery import run_sql, get_table_status_info
-    from invenio.legacy.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_PORT, \
-        CFG_DATABASE_NAME
-    import getopt
-    import time
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+import getopt
+import sys
+import time
+
+from invenio.base.factory import with_app_context
+
 
 def report_table_status(tablename):
     """Report stats for the table TABLENAME.  If TABLENAME does not
        exists, return empty string.
     """
+    from invenio.legacy.dbquery import get_table_status_info
     out = ""
     table_info = get_table_status_info(tablename)
     if table_info:
@@ -52,10 +45,12 @@ def report_table_status(tablename):
                                         )
     return out
 
+
 def report_definitions_of_physical_tags():
     """
     Report definitions of physical MARC tags.
     """
+    from invenio.legacy.dbquery import run_sql
     print "### 1 - PHYSICAL TAG DEFINITIONS"
     print
     print "# MARC tag ... description"
@@ -64,10 +59,12 @@ def report_definitions_of_physical_tags():
         (dummytagid, tagvalue, tagname) = row
         print "%s ... %s" % (tagvalue, tagname,)
 
+
 def report_definitions_of_logical_fields():
     """
     Report definitions of logical fields.
     """
+    from invenio.legacy.dbquery import run_sql
     print
     print "### 2 - LOGICAL FIELD DEFINITIONS"
     print
@@ -85,10 +82,12 @@ def report_definitions_of_logical_fields():
             print tag,
     print
 
+
 def report_definitions_of_indexes():
     """
     Report definitions of indexes.
     """
+    from invenio.legacy.dbquery import run_sql
     print
     print "### 3 - INDEX DEFINITIONS"
     print
@@ -109,6 +108,7 @@ def report_definitions_of_indexes():
             print code,
     print
 
+
 def report_on_all_bibliographic_tables():
     """Report stats for all the interesting bibliographic tables."""
     print
@@ -127,12 +127,14 @@ def report_on_all_bibliographic_tables():
         print report_table_status("idxPHRASE%02dR" % i)
     return
 
+
 def report_tag_usage():
     """Analyze bibxxx tables and report info on usage of various tags."""
     print ''
     print "### 5 -  TAG USAGE INFO"
     print ''
     print "# TAG     NB_RECORDS\t# recID1 recID2 ... recID9 (example records)"
+    from invenio.legacy.dbquery import run_sql
     for i in range(0, 10):
         for j in range(0, 10):
             bibxxx = "bib%1d%1dx" % (i, j)
@@ -154,15 +156,19 @@ def report_tag_usage():
                       '\t\t', '#', " ".join([str(row[0]) for row in
                                              res_usage[:9]])
 
+
 def report_header():
     """
     Start reporting.
     """
+    from invenio.legacy.dbquery import CFG_DATABASE_HOST, \
+        CFG_DATABASE_PORT, CFG_DATABASE_NAME
     print '### BIBSTAT REPORT FOR DB %s:%s.%s RUN AT %s' % (CFG_DATABASE_HOST,
                                                          CFG_DATABASE_PORT,
                                                          CFG_DATABASE_NAME,
                                                          time.asctime())
     print ''
+
 
 def report_footer():
     """
@@ -171,6 +177,7 @@ def report_footer():
     print
     print
     print '### END OF BIBSTAT REPORT'
+
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -182,6 +189,8 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -V, --version   \t\t Print version information.\n")
     sys.exit(exitcode)
 
+
+@with_app_context()
 def main():
     """Report stats on the Invenio bibliographic tables."""
     try:
@@ -205,6 +214,3 @@ def main():
         report_on_all_bibliographic_tables()
         report_tag_usage()
         report_footer()
-
-if __name__ == "__main__":
-    main()

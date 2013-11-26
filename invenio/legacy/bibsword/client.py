@@ -24,12 +24,12 @@ import datetime
 import time
 import StringIO
 from tempfile import NamedTemporaryFile
-from invenio.bibsword_config import CFG_SUBMISSION_STATUS_SUBMITTED, \
+from invenio.legacy.bibsword.config import CFG_SUBMISSION_STATUS_SUBMITTED, \
                                     CFG_SUBMISSION_STATUS_REMOVED, \
                                     CFG_SUBMISSION_STATUS_PUBLISHED, \
                                     CFG_BIBSWORD_SERVICEDOCUMENT_UPDATE_TIME
-from invenio.bibsword_client_http import RemoteSwordServer
-from invenio.bibsword_client_formatter import format_remote_server_infos, \
+from invenio.legacy.bibsword.client_http import RemoteSwordServer
+from invenio.legacy.bibsword.client_formatter import format_remote_server_infos, \
                                               format_remote_collection, \
                                               format_collection_informations, \
                                               format_primary_categories, \
@@ -48,7 +48,7 @@ from invenio.bibsword_client_formatter import format_remote_server_infos, \
                                               format_author_from_marcxml, \
                                               upload_fulltext, \
                                               update_marcxml_with_info
-from invenio.bibsword_client_dblayer import get_all_remote_server, \
+from invenio.legacy.bibsword.client_dblayer import get_all_remote_server, \
                                             get_last_update, \
                                             update_servicedocument, \
                                             select_servicedocument, \
@@ -60,7 +60,7 @@ from invenio.bibsword_client_dblayer import get_all_remote_server, \
                                             count_nb_submitted_record, \
                                             select_remote_server_infos
 from invenio.modules.formatter import record_get_xml
-from invenio.bibsword_client_templates import BibSwordTemplate
+from invenio.legacy.bibsword.client_templates import BibSwordTemplate
 from invenio.config import CFG_TMPDIR, CFG_SITE_ADMIN_EMAIL
 
 #-------------------------------------------------------------------------------

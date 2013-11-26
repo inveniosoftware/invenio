@@ -30,10 +30,10 @@ from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, \
     test_web_page_content
 
-bconfig = lazy_import('invenio.bibclassify_config')
-bibclassify_cli = lazy_import('invenio.bibclassify_cli')
-bibclassify_engine = lazy_import('invenio.bibclassify_engine')
-bibclassify_ontology_reader = lazy_import('invenio.bibclassify_ontology_reader')
+bconfig = lazy_import('invenio.legacy.bibclassify.config')
+bibclassify_cli = lazy_import('invenio.legacy.bibclassify.cli')
+bibclassify_engine = lazy_import('invenio.legacy.bibclassify.engine')
+bibclassify_ontology_reader = lazy_import('invenio.legacy.bibclassify.ontology_reader')
 
 
 class BibClassifyRegressionTest(BibClassifyTestCase):
@@ -93,7 +93,7 @@ class BibClassifyRegressionTest(BibClassifyTestCase):
         """bibclassify  - extracting data from database (using recID to find fulltext)"""
 
         if not bconfig.STANDALONE:
-            from invenio import dbquery
+            from invenio.legacy import dbquery
             from invenio import bibclassify_daemon
             bibtask = bibclassify_daemon.bibtask
             #first test if the record exists in the database

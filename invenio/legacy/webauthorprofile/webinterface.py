@@ -22,13 +22,14 @@
 # pylint: disable=W0613
 
 import sys
+from flask import url_for
 from operator import  itemgetter
 
-from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id, \
+from invenio.legacy.bibauthorid.webauthorprofileinterface import is_valid_canonical_id, \
     get_person_id_from_paper, get_person_id_from_canonical_id, \
     search_person_ids_by_name, get_papers_by_person_id, get_person_redirect_link
 
-from invenio.webauthorprofile_corefunctions import get_pubs, get_person_names_dicts, \
+from .corefunctions import get_pubs, get_person_names_dicts, \
     get_institute_pub_dict, get_coauthors, get_summarize_records, \
     get_total_downloads, get_cited_by_list, get_kwtuples, get_venuetuples, \
     get_veryfy_my_pubs_list_link, get_hepnames_data, get_self_pubs, \
@@ -246,7 +247,8 @@ class WebAuthorPages(WebInterfaceDirectory):
         else:
             req.content_type = "text/html"
         req.send_http_header()
-        metaheaderadd = '<script type="text/javascript" src="%s/js/webauthorprofile.js"> </script>' % (CFG_SITE_URL)
+        metaheaderadd = '<script type="text/javascript" src="%s"> </script>' % (
+            url_for('authorprofile.static', filename='js/authorprofile/base.js'), )
         metaheaderadd += """
         <style>
         .hidden {

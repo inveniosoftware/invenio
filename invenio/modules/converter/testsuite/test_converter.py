@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
-bibconvert = lazy_import('invenio.bibconvert')
+bibconvert = lazy_import('invenio.legacy.bibconvert.api')
 
 
 class TestFormattingFunctions(InvenioTestCase):

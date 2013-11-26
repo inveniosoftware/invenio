@@ -33,7 +33,7 @@ from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, \
      test_web_page_content, merge_error_messages, InvenioTestCase
 
-wju = lazy_import('invenio.webjournal_utils')
+wju = lazy_import('invenio.legacy.webjournal.utils')
 
 
 class ArticlesRelated(InvenioTestCase):
@@ -91,7 +91,7 @@ class JournalConfigVars(InvenioTestCase):
 
     def test_get_journal_css_url(self):
         """webjournal - returns URL to this journal's CSS """
-        self.assertEqual(wju.get_journal_css_url('AtlantisTimes', type='screen'), CFG_SITE_URL + '/img/AtlantisTimes.css')
+        self.assertEqual(wju.get_journal_css_url('AtlantisTimes', type='screen'), CFG_SITE_URL + '/css/AtlantisTimes.css')
 
     def test_get_journal_submission_params(self):
         """webjournal - returns params for the submission of articles """

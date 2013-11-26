@@ -18,6 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
+import pkg_resources
 import sys
 
 from invenio.ext.script import Manager
@@ -47,7 +48,8 @@ def populate(packages=['invenio_demosite'], default_data=True):
     print ">>> Going to load demo records..."
     db.session.execute("TRUNCATE schTASK")
     db.session.commit()
-    for cmd in ["%s/bin/bibupload -u admin -i %s/var/tmp/demobibdata.xml" % (CFG_PREFIX, CFG_PREFIX),
+    for cmd in ["%s/bin/bibupload -u admin -i %s" % (CFG_PREFIX,
+                    pkg_resources.resource_filename('invenio.testsuite', os.path.join('data','demo_record_marc_data.xml'))),
                 "%s/bin/bibupload 1" % CFG_PREFIX,
                 "%s/bin/bibdocfile --textify --with-ocr --recid 97" % CFG_PREFIX,
                 "%s/bin/bibdocfile --textify --all" % CFG_PREFIX,
