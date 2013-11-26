@@ -37,7 +37,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
 from sqlalchemy.ext.orderinglist import ordering_list
-#from invenio.legacy.websearch_external_collections.websearch_external_collections_searcher import \
+#from invenio.legacy.websearch_external_collections.searcher import \
 #    external_collections_dictionary
 
 # Create your models here.
@@ -555,7 +555,7 @@ class Externalcollection(db.Model):
 
     @property
     def engine(self):
-        from invenio.legacy.websearch_external_collections.websearch_external_collections_searcher import external_collections_dictionary
+        from invenio.legacy.websearch_external_collections.searcher import external_collections_dictionary
 
         if self.name in external_collections_dictionary:
             return external_collections_dictionary[self.name]

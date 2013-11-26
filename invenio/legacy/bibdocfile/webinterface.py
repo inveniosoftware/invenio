@@ -41,7 +41,7 @@ from invenio.legacy.webpage import page, pageheaderonly, \
     pagefooteronly, warning_page, write_warning
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, isUserSuperAdmin, \
                             isGuestUser
-from invenio import webjournal_utils
+from invenio.legacy.webjournal import utils as webjournal_utils
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,12 +31,15 @@ derive from the base class and add specific bits.
 
 import sys
 
+from invenio.base.wrappers import lazy_import
 from invenio.legacy.dbquery import run_sql
-from invenio.modules.access.control import acc_get_role_id, acc_add_user_role
 from invenio.utils.hash import md5
 from datetime import datetime, timedelta
 from random import random
 from cPickle import dumps, loads
+
+acc_get_role_id = lazy_import('invenio.modules.access.control:acc_get_role_id')
+acc_add_user_role = lazy_import('invenio.modules.access.control:acc_add_user_role')
 
 
 class InvenioWebAccessMailCookieError(Exception):
@@ -174,6 +177,7 @@ def mail_cookie_check_mail_activation(cookie):
             raise InvenioWebAccessMailCookieError, "email '%s' doesn't exist" % email
     except (TypeError, AssertionError), e:
         raise InvenioWebAccessMailCookieError, e
+
 
 def mail_cookie_check_authorize_action(cookie):
     """Check a given cookie for a valid authorization contanin all the

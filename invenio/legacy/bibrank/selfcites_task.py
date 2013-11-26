@@ -27,8 +27,7 @@ import sys
 import ConfigParser
 from datetime import datetime
 
-from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
-                           CFG_ETCDIR
+from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID
 from invenio.legacy.bibsched.bibtask import task_set_option, \
                             task_get_option, write_message, \
                             task_sleep_now_if_required, \
@@ -40,8 +39,9 @@ from invenio.legacy.bibrank.selfcites_indexer import update_self_cites_tables, \
                                               compute_simple_self_citations, \
                                               get_authors_tags
 from invenio.legacy.bibrank.citation_searcher import get_refers_to
-from invenio.bibauthorid_daemon import get_user_log as bibauthorid_user_log
+from invenio.legacy.bibauthorid.daemon import get_user_log as bibauthorid_user_log
 from invenio.legacy.bibrank.citation_indexer import get_bibrankmethod_lastupdate
+from invenio.modules.rank.registry import configuration
 
 HELP_MESSAGE = """
   Scheduled (daemon) self cites options:
@@ -214,7 +214,7 @@ def store_last_updated(name, date):
 
 
 def read_configuration(rank_method_code):
-    filename = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
+    filename = configuration.get(rank_method_code + '.cfg', '')
     config = ConfigParser.ConfigParser()
     try:
         config.readfp(open(filename))

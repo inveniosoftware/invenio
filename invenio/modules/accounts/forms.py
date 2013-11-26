@@ -26,6 +26,7 @@ from wtforms.fields import SubmitField, BooleanField, TextField, \
 from sqlalchemy.exc import SQLAlchemyError
 
 from invenio.base.i18n import _
+from invenio.legacy.webuser import email_valid_p
 from invenio.utils.forms import InvenioBaseForm
 from .models import User
 from .validators import wash_login_method, validate_nickname_or_email, \
@@ -53,14 +54,14 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
         field.data = field.data.lower()
         if validate_email(field.data.lower()) != 1:
             raise validators.ValidationError(
-                _("Supplied email address %s is invalid.") % field.data
+                _("Supplied email address %(email)s is invalid.", email=field.data)
             )
 
         # is email already taken?
         try:
             User.query.filter(User.email == field.data).one()
             raise validators.ValidationError(
-                _("Supplied email address %s already exists in the database.") % field.data
+                _("Supplied email address %(email)s already exists in the database.", email=field.data)
             )
         except SQLAlchemyError:
             pass
@@ -73,17 +74,17 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
 
         from flask import flash, url_for
         flash(_("Note that if you have changed your email address, you \
-                will have to <a href=%s>reset</a> your password anew." %
-                url_for('webaccount.lost')), 'warning')
+                will have to <a href=%(link)s>reset</a> your password anew.",
+                link=url_for('webaccount.lost')), 'warning')
 
 class LostPasswordForm(InvenioBaseForm):
     email = TextField(_("Email address"))
 
     def validate_email(self, field):
         field.data = field.data.lower()
-        if email_valid_p(field.data.lower()) != 1:
+        if email_valid_p(field.data) != 1:
             raise validators.ValidationError(
-                _("Supplied email address %s is invalid.") % field.data
+                _("Supplied email address %(email)s is invalid.", email=field.data)
             )
 
         # is email registered?
@@ -91,7 +92,7 @@ class LostPasswordForm(InvenioBaseForm):
             User.query.filter(User.email == field.data).one()
         except SQLAlchemyError:
             raise validators.ValidationError(
-                _("Supplied email address %s is not registered.") % field.data
+                _("Supplied email address %(email)s is not registered.", email=field.data)
             )
 
 
@@ -153,7 +154,7 @@ class RegisterForm(Form):
         try:
             User.query.filter(User.nickname == field.data).one()
             raise validators.ValidationError(
-                _("Desired nickname %s already exists in the database.") % field.data
+                _("Desired nickname %(nick)s already exists in the database.", nick=field.data)
             )
         except SQLAlchemyError:
             pass
@@ -165,7 +166,7 @@ class RegisterForm(Form):
         try:
             User.query.filter(User.email == field.data).one()
             raise validators.ValidationError(
-                _("Supplied email address %s already exists in the database.") % field.data
+                _("Supplied email address %(addr)s already exists in the database.", addr=field.data)
             )
         except SQLAlchemyError:
             pass

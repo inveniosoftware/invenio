@@ -17,26 +17,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-$(document).ready(function(){
 
-    var url_run_workflow = "/admin/bibworkflow/run_workflow";
+function init_workflow(url_run_workflow) {
 
-    bootstrap_alert = function() {}
-    bootstrap_alert.warning = function(message) {
-        $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>')
-    }
-
-
-    window.setTimeout(function() {
-        $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
-            // $(this).slideDown(500); 
-        });
-    }, 3500);
     $("#example_my_workflow").popover({
         trigger: 'hover',
         placement: 'right',
         content: "Workflow has been started."
-    });  
+    });
     $("input[type=submit]").bind('click', function(){
         w_name = $(this).attr('name');
         jQuery.ajax({
@@ -46,7 +34,22 @@ $(document).ready(function(){
             }
         })
     });
-});
+
+    bind_alerts();
+}
+
+function bind_alerts() {
+    bootstrap_alert = function() {}
+    bootstrap_alert.warning = function(message) {
+        $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>')
+    }
+
+    window.setTimeout(function() {
+        $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
+            // $(this).slideDown(500);
+        });
+    }, 3500);
+}
 
 function activate_button(){
     $("input[type=submit]").removeAttr("disabled");

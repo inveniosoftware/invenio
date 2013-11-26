@@ -20,11 +20,12 @@
 """
 Flask-Registry extension
 """
+import os
 
 from werkzeug.utils import import_string, find_modules
 from werkzeug.local import LocalProxy
-from pkg_resources import iter_entry_points
-from flask import current_app
+from pkg_resources import iter_entry_points, resource_listdir, resource_isdir
+from flask import current_app, has_app_context
 
 
 class RegistryError(Exception):
@@ -62,6 +63,10 @@ class Registry(object):
         if key in self._registry:
             raise RegistryError("Namespace %s already taken." % key)
         self._registry[key] = value
+        self._registry[key]._namespace = key
+
+    def __delitem__(self, key):
+        self._registry.__delitem__(key)
 
     def __missing__(self, key):
         return self._registry.__missing__(key)
@@ -74,6 +79,10 @@ class RegistryBase(object):
     """
     Base class for all registries
     """
+    @property
+    def namespace(self):
+        return self._namespace
+
     def register(self, *args, **kwargs):
         raise NotImplementedError()
 
@@ -249,9 +258,9 @@ class PackageRegistry(ImportPathRegistry):
         )
 
 
-class AutoDiscoverRegistry(ModuleRegistry):
+class DiscoverRegistry(ModuleRegistry):
     """
-    Python module registry with auto discover capabilities.
+    Python module registry with discover capabilities.
 
     The registry will discover module with a given name from packages specified
     in a ``PackageRegistry''.
@@ -261,33 +270,33 @@ class AutoDiscoverRegistry(ModuleRegistry):
         app.config['PACKAGES_VIEWS_EXCLUDE'] = ['invenio.modules.oldstuff']
 
         app.extensions['registry']['packages'] = PackageRegistry()
-        app.extensions['registry']['views'] = AutoDiscoverRegistry('views')
-        app.extensions['registry']['views'].autodiscover(app)
+        app.extensions['registry']['views'] = DiscoverRegistry('views')
+        app.extensions['registry']['views'].discover(app)
 
     :param module_name: Name of module to look for in packages
     :param registry_namespace: Name of registry containing the package
         registry. Defaults to ``packages''.
     :param with_setup: Call ``setup'' and ``teardown'' functions on module.
-    :param lazy: Determines if discovery should be done immediately or later.
-    :param app: If lazy=False, you must specify the app,
     """
     def __init__(self, module_name, registry_namespace=None, with_setup=False,
-                 silent=False, lazy=True, app=None, args=None, kwargs=None):
+                 silent=False):
 
         self.module_name = module_name
         self.silent = silent
-        self.registry_namespace = registry_namespace or 'packages'
+        if registry_namespace is not None and \
+                isinstance(registry_namespace, (RegistryProxy, RegistryBase)):
+            self.registry_namespace = registry_namespace.namespace
+        else:
+            self.registry_namespace = registry_namespace or 'packages'
         # Setup config variable prefix
         self.cfg_var_prefix = self.registry_namespace
         self.cfg_var_prefix.upper()
         self.cfg_var_prefix.replace('.', '_')
-        super(AutoDiscoverRegistry, self).__init__(with_setup=with_setup)
-        if not lazy:
-            self.autodiscover(app)
+        super(DiscoverRegistry, self).__init__(with_setup=with_setup)
 
-    def autodiscover(self, app, *args, **kwargs):
+    def discover(self, app=None, *args, **kwargs):
         """
-        Auto-discover modules
+        Discover modules
 
         Specific modules can be excluded with the configuration variable
         ``<NAMESPACE>_<MODULE_NAME>_EXCLUDE'' (e.g PACKAGES_VIEWS_EXCLUDE).
@@ -298,8 +307,13 @@ class AutoDiscoverRegistry(ModuleRegistry):
             registry. Defaults to ``packages''.
         :param with_setup: Call ``setup'' and ``teardown'' functions on module.
         """
+        if app is None and has_app_context():
+            app = current_app
+        if app is None and hasattr(self, 'app'):
+            app = getattr(self, 'app')
         if app is None:
             RegistryError("You must provide a Flask application.")
+        self.app = app
 
         blacklist = app.config.get(
             '%s_%s_EXCLUDE' % (self.cfg_var_prefix, self.module_name.upper()),
@@ -307,24 +321,72 @@ class AutoDiscoverRegistry(ModuleRegistry):
         )
 
         for pkg in app.extensions['registry'][self.registry_namespace]:
+            if not isinstance(pkg, basestring):
+                pkg = pkg.__name__
+
             if pkg in blacklist:
                 continue
 
-            import_str = pkg + '.' + self.module_name
+            self._discover_module(pkg)
 
+    def _discover_module(self, pkg):
+        import_str = pkg + '.' + self.module_name
+
+        try:
+            module = import_string(import_str, self.silent)
+            self.register(module)
+        except ImportError:
+            pass
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            self.app.logger.error('Could not import: "%s: %s',
+                                  import_str, str(e))
+
+
+class AutoDiscoverRegistry(DiscoverRegistry):
+
+    def __init__(self, module_name, app=None, *args, **kwargs):
+        super(AutoDiscoverRegistry, self).__init__(module_name, *args, **kwargs)
+        self.app = app
+        self.discover(app=app)
+
+
+class AutoDiscoverSubRegistry(AutoDiscoverRegistry):
+
+    def _discover_module(self, pkg):
+        import_str = pkg + '.' + self.module_name
+
+        try:
+            import_string(import_str)
+        except ImportError:
+            return
+
+        for m in find_modules(import_str):
             try:
-                module = import_string(import_str, self.silent)
-                self.register(module, *args, **kwargs)
+                module = import_string(m, silent=True)
+                if module is not None:
+                    self.register(module)
             except ImportError:
                 pass
             except Exception as e:
                 import traceback
                 traceback.print_exc()
-                app.logger.error('Could not import: "%s: %s',
-                                 import_str, str(e))
+                self.app.logger.error('Could not import: "%s: %s',
+                                      import_str, str(e))
 
 
-class ConfigurationRegistry(AutoDiscoverRegistry):
+class PkgResourcesDiscoverRegistry(AutoDiscoverRegistry):
+
+    def _discover_module(self, pkg):
+        if pkg is not None and resource_isdir(pkg, self.module_name):
+            for f in resource_listdir(pkg, self.module_name):
+                self.register(os.path.join(
+                    os.path.dirname(import_string(pkg).__file__),
+                    self.module_name, f))
+
+
+class ConfigurationRegistry(DiscoverRegistry):
     """
     Specialized import path registry that takes the initial list of import
     paths from PACKAGES configuration variable.
@@ -341,23 +403,21 @@ class ConfigurationRegistry(AutoDiscoverRegistry):
             'config',
             registry_namespace=registry_namespace,
             with_setup=False,
-            lazy=True,
-            app=app,
         )
 
         # Create a new configuration module to collect configuration in.
         from flask import Config
-        new_config = Config(app.config.root_path)
+        self.new_config = Config(app.config.root_path)
 
         # Auto-discover configuration in packages
-        self.autodiscover(app, new_config)
+        self.discover(app)
 
         # Overwrite default configuration with user specified configuration
-        new_config.update(app.config)
-        app.config = new_config
+        self.new_config.update(app.config)
+        app.config.update(self.new_config)
 
-    def register(self, new_object, config):
-        config.from_object(new_object)
+    def register(self, new_object):
+        self.new_config.from_object(new_object)
         super(ConfigurationRegistry, self).register(new_object)
 
     def unregister(self, *args, **kwargs):
@@ -386,6 +446,7 @@ class EntryPointRegistry(DictRegistry):
     :param entry_point_ns: Namespace of entry points.
     :param load: Load entry points. Defaults to true.
     """
+
     def __init__(self, entry_point_ns, load=True):
         super(EntryPointRegistry, self).__init__()
         self.load = load
@@ -393,9 +454,9 @@ class EntryPointRegistry(DictRegistry):
             self.register(entry_point_group)
 
     def register(self, entry_point):
-        if entry_point.name not in self.entry_points:
-            self.entry_points[entry_point.name] = []
-        self.entry_points.append(
+        if entry_point.name not in self.registry:
+            self.registry[entry_point.name] = []
+        self.registry[entry_point.name].append(
             entry_point.load() if self.load else entry_point
         )
 
@@ -408,9 +469,11 @@ class RegistryProxy(LocalProxy):
     """
     def __init__(self, namespace, registry_class, *args, **kwargs):
         def _lookup():
+            if not 'registry' in current_app.extensions:
+                raise RegistryError('Registry is not initialized.')
             if namespace not in current_app.extensions['registry']:
-                current_app.registry[namespace] = registry_class(
+                current_app.extensions['registry'][namespace] = registry_class(
                     *args, **kwargs
                 )
-            return current_app.registry[namespace]
+            return current_app.extensions['registry'][namespace]
         super(RegistryProxy, self).__init__(_lookup)

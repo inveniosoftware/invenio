@@ -35,10 +35,8 @@ CFG_BIBFORMAT_USE_OLD_BIBFORMAT = False
 
 # Paths to main formats directories
 CFG_BIBFORMAT_TEMPLATES_DIR = "format_templates"
-CFG_BIBFORMAT_TEMPLATES_PATH = os.path.join(CFG_ETCDIR, 'bibformat', CFG_BIBFORMAT_TEMPLATES_DIR)
+CFG_BIBFORMAT_TEMPLATES_PATH = pkg_resources.resource_filename('invenio.modules.formatter', CFG_BIBFORMAT_TEMPLATES_DIR)
 CFG_BIBFORMAT_JINJA_TEMPLATE_PATH = os.path.join(CFG_ETCDIR, 'templates', CFG_BIBFORMAT_TEMPLATES_DIR)
-CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = None  # defaults to autodiscovery
-CFG_BIBFORMAT_ELEMENTS_PATH = pkg_resources.resource_filename('invenio.modules.formatter', 'format_elements')
 CFG_BIBFORMAT_OUTPUTS_PATH = pkg_resources.resource_filename('invenio.modules.formatter', 'output_formats')
 
 # CFG_BIBFORMAT_HIDDEN_TAGS -- list of MARC tags that

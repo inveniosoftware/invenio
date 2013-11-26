@@ -545,7 +545,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     """
     mod_python legacy publisher minimum implementation.
     """
-    from invenio.session import get_session
+    from invenio.legacy.websession.session import get_session
     from invenio.ext.legacy.handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
     the_module = open(possible_module).read()
     module_globals = {}

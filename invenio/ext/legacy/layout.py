@@ -91,19 +91,19 @@ except:
     WebInterfaceSubmitPages = WebInterfaceDumbPages
 
 try:
-    from invenio.legacy.websession.websesion_webinterface import WebInterfaceYourAccountPages
+    from invenio.legacy.websession.webinterface import WebInterfaceYourAccountPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourAccountPages = WebInterfaceDumbPages
 
 try:
-    from invenio.legacy.websession.websesion_webinterface import WebInterfaceYourTicketsPages
+    from invenio.legacy.websession.webinterface import WebInterfaceYourTicketsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourTicketsPages = WebInterfaceDumbPages
 
 try:
-    from invenio.legacy.websession.websesion_webinterface import WebInterfaceYourGroupsPages
+    from invenio.legacy.websession.webinterface import WebInterfaceYourGroupsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourGroupsPages = WebInterfaceDumbPages
@@ -145,7 +145,7 @@ except:
     WebInterfaceErrorPages = WebInterfaceDumbPages
 
 try:
-    from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
+    from invenio.legacy.oairepository.webinterface import WebInterfaceOAIProviderPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceOAIProviderPages = WebInterfaceDumbPages
@@ -174,7 +174,7 @@ except:
     WebInterfaceJournalPages = WebInterfaceDumbPages
 
 try:
-    from invenio.webdoc_webinterface import WebInterfaceDocumentationPages
+    from invenio.legacy.webstyle.webdoc_webinterface import WebInterfaceDocumentationPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceDocumentationPages = WebInterfaceDumbPages
@@ -193,7 +193,7 @@ except:
     WebInterfaceBibKnowledgePages = WebInterfaceDumbPages
 
 try:
-    from invenio.batchuploader_webinterface import \
+    from invenio.legacy.batchuploader.webinterface import \
          WebInterfaceBatchUploaderPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
@@ -207,7 +207,7 @@ except:
     WebInterfaceSword = WebInterfaceDumbPages
 
 try:
-    from invenio.ping_webinterface import \
+    from invenio.legacy.webstyle.ping_webinterface import \
          WebInterfacePingPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCE')
@@ -253,7 +253,7 @@ except:
     WebInterfaceYourAlertsPages = WebInterfaceDumbPages
 
 try:
-    from invenio.goto_webinterface import WebInterfaceGotoPages
+    from invenio.legacy.webstyle.goto_webinterface import WebInterfaceGotoPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceGotoPages = WebInterfaceDumbPages
@@ -271,7 +271,7 @@ else:
 
 if CFG_DEVEL_SITE:
     try:
-        from invenio.httptest_webinterface import WebInterfaceHTTPTestPages
+        from invenio.legacy.webstyle.httptest_webinterface import WebInterfaceHTTPTestPages
     except:
         register_exception(alert_admin=True, subject='EMERGENCY')
         WebInterfaceHTTPTestPages = WebInterfaceDumbPages

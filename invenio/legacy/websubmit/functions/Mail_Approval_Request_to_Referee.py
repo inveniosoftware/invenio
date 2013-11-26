@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import os
 import re
 import sre_constants
-from invenio.websubmit_dblayer import get_approval_request_notes
+from invenio.legacy.websubmit.db_layer import get_approval_request_notes
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError, \
                                      CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.config import CFG_CERN_SITE, \

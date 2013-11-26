@@ -22,6 +22,7 @@
 __revision__ = "$Id$"
 
 import invenio.config
+import pkg_resources
 import re
 
 
@@ -130,10 +131,10 @@ CFG_BIBENCODE_FFMPEG_METADATA_SET_COMMAND = "ffmpeg -y -i %s -acodec copy -vcode
 CFG_BIBENCODE_FFMPEG_METADATA_ARGUMENT = "%s=\"%s\""
 
 ## File containing mappings from ffprobe and mediainfo to pbcore
-CFG_BIBENCODE_PBCORE_MAPPINGS = invenio.config.CFG_ETCDIR + "/bibencode/pbcore_mappings.json"
+CFG_BIBENCODE_PBCORE_MAPPINGS = pkg_resources.resource_filename('invenio.modules.encoder','pbcore_mappings.json')
 
 ## XSLT Template from PBCORE to MARCXML
-CFG_BIBENCODE_PBCORE_MARC_XSLT = invenio.config.CFG_ETCDIR + "/bibencode/pbcore_to_marc_nons.xsl"
+CFG_BIBENCODE_PBCORE_MARC_XSLT = pkg_resources.resource_filename('invenio.modules.encoder','pbcore_to_marc_nons.xsl')
 
 CFG_BIBENCODE_ASPECT_RATIO_MARC_FIELD  = "951__x"
 
@@ -214,11 +215,11 @@ CFG_BIBENCODE_FFMPEG_VALID_ACODECS = [
 # Profiles Configuration #
 #------------------------#
 
-CFG_BIBENCODE_PROFILES_ENCODING = invenio.config.CFG_ETCDIR + "/bibencode/encoding_profiles.json"
-CFG_BIBENCODE_PROFILES_ENCODING_LOCAL = invenio.config.CFG_ETCDIR + "/bibencode/encoding_profiles_local.json"
-CFG_BIBENCODE_PROFILES_EXTRACT = invenio.config.CFG_ETCDIR + "/bibencode/extract_profiles.json"
-CFG_BIBENCODE_PROFILES_EXTRACT_LOCAL = invenio.config.CFG_ETCDIR + "/bibencode/extract_profiles_local.json"
-CFG_BIBENCODE_TEMPLATE_BATCH_SUBMISSION = invenio.config.CFG_ETCDIR + "/bibencode/batch_template_submission.json"
+CFG_BIBENCODE_PROFILES_ENCODING = pkg_resources.resource_filename('invenio.modules.encoder','encoding_profiles.json')
+CFG_BIBENCODE_PROFILES_ENCODING_LOCAL = pkg_resources.resource_filename('invenio.modules.encoder','encoding_profiles_local.json')
+CFG_BIBENCODE_PROFILES_EXTRACT = pkg_resources.resource_filename('invenio.modules.encoder','extract_profiles.json')
+CFG_BIBENCODE_PROFILES_EXTRACT_LOCAL = pkg_resources.resource_filename('invenio.modules.encoder','extract_profiles_local.json')
+CFG_BIBENCODE_TEMPLATE_BATCH_SUBMISSION = pkg_resources.resource_filename('invenio.modules.encoder','batch_template_submission.json')
 
 #----------------------#
 # Daemon Configuration #

@@ -20,7 +20,7 @@
 """W
 ebJournal Element - Prints issue number
 """
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      get_issue_number_display, \
      make_journal_url, \
@@ -28,7 +28,7 @@ from invenio.webjournal_utils import \
      MONTHLY, WEEKLY, DAILY, \
      get_grouped_issues, \
      get_release_datetime
-from invenio.webjournal_config import InvenioWebJournalJournalIdNotFoundDBError
+from invenio.legacy.webjournal.config import InvenioWebJournalJournalIdNotFoundDBError
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.date import \
      get_i18n_month_name, \

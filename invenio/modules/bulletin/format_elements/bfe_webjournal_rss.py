@@ -21,7 +21,7 @@
 WebJournal widget - Display the index of the lastest articles,
 including 'breaking news'.
 """
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      get_journal_categories, \
      get_category_query

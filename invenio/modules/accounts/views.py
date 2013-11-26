@@ -25,23 +25,23 @@ from flask import render_template, request, flash, redirect, url_for, \
 from flask.ext.login import current_user, login_required
 
 #from invenio import websession_config
-#from invenio.legacy import webuser
-webuser = object
+from invenio.legacy import webuser
 from .forms import LoginForm, RegisterForm, LostPasswordForm
 from .models import User
 from .validators import wash_login_method
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
+from invenio.base.i18n import _
 from invenio.ext.breadcrumb import register_breadcrumb
 from invenio.ext.login import login_user, logout_user, UserInfo, \
     reset_password
 from invenio.ext.menu import register_menu
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
+from invenio.modules.access.mailcookie import mail_cookie_check_mail_activation
 from invenio.utils.datastructures import LazyDict, flatten_multidict
 from invenio.utils.url import rewrite_to_secure_url
 
-_ = lambda x: x
 
 #CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
 #CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
@@ -119,9 +119,9 @@ def login(nickname=None, password=None, login_method=None, action='',
             if user.note == '2':  # account is not confirmed
                 logout_user()
                 flash(_("You have not yet confirmed the email address for the \
-                        '%s' authentication method.") % login_method, 'warning')
+                        '%(login_method)s' authentication method.", login_method=login_method), 'warning')
             else:  # account is valid
-                flash(_("You are logged in as %s.") % user.nickname, "info")
+                flash(_("You are logged in as %(nick)s.", nick=user.nickname), "info")
                 if referer:
                     from urlparse import urlparse
                     # we should not redirect to these URLs after login
@@ -194,7 +194,7 @@ def register():
                 messages.append(_("The error has been logged and will be taken in consideration as soon as possible."))
             else:
                 # Errors [-2, (1), 2, 3, 4] taken care of by form validation
-                messages.append(_("Internal error %s") % ruid)
+                messages.append(_("Internal error %(ruid)s", ruid=ruid))
     elif request.method == 'POST':
         title = _("Registration failure")
         state = "warning"
@@ -232,7 +232,7 @@ def load_user_settings():
     for module in modules:
         candidates = getattr(module, 'settings')
         if candidates is not None:
-            if candidates is not list:
+            if type(candidates) is not list:
                 candidates = [candidates]
             for candidate in candidates:
                 if issubclass(candidate, Settings):
@@ -347,8 +347,26 @@ def lost():
     form = LostPasswordForm(request.values)
     if form.validate_on_submit():
         if reset_password(request.values['email'], g.ln):
-            flash(_('A password reset link has been sent to %s') % request.values['email'], 'success')
+            flash(_('A password reset link has been sent to %(whom)s',
+                    whom=request.values['email']), 'success')
     else:
         pass
     logout_user()  # makes no sense to have the user logged-in here
     return render_template('accounts/lost.html', form=form)
+
+
+@blueprint.route('/access', methods=['GET', 'POST'])
+@ssl_required
+def access():
+    try:
+        mail = mail_cookie_check_mail_activation(request.values['mailcookie'])
+        User.query.filter(User.email == mail).one().note = 1
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            flash(_('Authorization failled.'), 'error')
+        flash(_('Your email has been validated.'), 'success')
+    except:
+        flash(_('The authorization token is invalid.'), 'error')
+    return redirect('/')

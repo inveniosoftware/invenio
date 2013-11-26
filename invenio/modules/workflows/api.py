@@ -76,7 +76,7 @@ def start(workflow_name, data, **kwargs):
 
     @return: BibWorkflowEngine that ran the workflow.
     """
-    from invenio.bibworkflow_worker_engine import run_worker
+    from .worker_engine import run_worker
     return run_worker(workflow_name, data, **kwargs)
 
 
@@ -113,7 +113,7 @@ def start_by_wid(wid, **kwargs):
 
     @return: BibWorkflowEngine that ran the workflow.
     """
-    from invenio.bibworkflow_worker_engine import restart_worker
+    from .worker_engine import restart_worker
     return restart_worker(wid, **kwargs)
 
 
@@ -155,7 +155,7 @@ def start_by_oids(workflow_name, oids, **kwargs):
 
     @return: BibWorkflowEngine that ran the workflow.
     """
-    from invenio.modules.workflows.models import BibWorkflowObject
+    from .models import BibWorkflowObject
     objects = BibWorkflowObject.query.filter(BibWorkflowObject.id.in_(list(oids))).all()
 
     return start(workflow_name, objects, **kwargs)
@@ -182,7 +182,7 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
 
     @return: BibWorkflowEngine that ran the workflow.
     """
-    from invenio.modules.workflows.models import BibWorkflowObject
+    from .models import BibWorkflowObject
     objects = BibWorkflowObject.query.filter(BibWorkflowObject.id.in_(list(oids))).all()
 
     return start_delayed(workflow_name, objects, **kwargs)
@@ -212,7 +212,7 @@ def continue_oid(oid, start_point="continue_next", **kwargs):
 
     @return: BibWorkflowEngine that ran the workflow
     """
-    from invenio.bibworkflow_worker_engine import continue_worker
+    from .worker_engine import continue_worker
     return continue_worker(oid, start_point, **kwargs)
 
 
@@ -267,8 +267,8 @@ def resume_objects_in_workflow(id_workflow, start_point="continue_next",
 
     @yield: BibWorkflowEngine that ran the workflow
     """
-    from invenio.modules.workflows.models import BibWorkflowObject
-    from invenio.bibworkflow_config import CFG_OBJECT_VERSION
+    from .models import BibWorkflowObject
+    from .config import CFG_OBJECT_VERSION
 
     # Resume workflow if there are objects to resume
     objects = BibWorkflowObject.query.filter(

@@ -74,7 +74,7 @@ from invenio.legacy.bibsched.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
 from invenio.utils.date import parse_runtime_limit
 from invenio.utils.shell import escape_shell_arg
 from invenio.ext.email import send_email
-from invenio.legacy.bibsched.scripts.bibsched import bibsched_set_host, \
+from invenio.legacy.bibsched.cli import bibsched_set_host, \
                              bibsched_get_host
 
 

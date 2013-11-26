@@ -247,10 +247,11 @@ def get_elements_that_use_kb(name):
 
     format_elements = {}
     #Retrieve all elements in files
-    files = os.listdir(cfg['CFG_BIBFORMAT_ELEMENTS_PATH'])
-    for filename in files:
+    from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
+    for element in TEMPLATE_CONTEXT_FUNCTIONS_CACHE.bibformat_elements().values():
+        path = element.__file__
+        filename = os.path.basename(element.__file__)
         if filename.endswith(".py"):
-            path = cfg['CFG_BIBFORMAT_ELEMENTS_PATH'] + os.sep + filename
             formatf = open(path, 'r')
             code = formatf.read()
             formatf.close()

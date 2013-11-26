@@ -27,7 +27,7 @@ from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError, \
                                      InvenioWebSubmitFunctionStop
-from invenio.websubmit_dblayer import get_simple_approval_status, \
+from invenio.legacy.websubmit.db_layer import get_simple_approval_status, \
                                       update_approval_request_status
 
 def Register_Referee_Decision(parameters, curdir, form, user_info=None):

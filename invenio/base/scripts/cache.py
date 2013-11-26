@@ -36,7 +36,7 @@ def reset_rec_cache(output_format, get_record, split_by=1000):
         import pickle
     from itertools import islice
     from invenio.intbitset import intbitset
-    from invenio.legacy.bibsched.scripts.bibsched import server_pid, pidfile
+    from invenio.legacy.bibsched.cli import server_pid, pidfile
     from invenio.ext.sqlalchemy import db
     from invenio.modules.record_editor.models import Bibrec
     from invenio.modules.formatter.models import Bibfmt

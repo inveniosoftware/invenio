@@ -23,7 +23,7 @@ from invenio.base.i18n import _
 from invenio.ext.template import render_template_to_string
 from flask.ext.login import current_user
 from invenio.modules.dashboard.settings import Settings, UserSettingsStorage
-from invenio.webbasket_dblayer import get_all_personal_baskets_names
+from invenio.legacy.webbasket.db_layer import get_all_personal_baskets_names
 
 
 class WebBasketSettings(Settings):

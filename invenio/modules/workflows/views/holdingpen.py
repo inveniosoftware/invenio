@@ -25,11 +25,11 @@ from ..loader import widgets
 from invenio.base.decorators import templated, wash_arguments
 from invenio.modules.formatter.engine import format_record
 from invenio.base.i18n import _
-from invenio.ext.breadcrumb import default_breadcrumb_root, breadcrumbs, register_breadcrumb
+from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
 from invenio.ext.menu import register_menu
 from invenio.utils.date import pretty_date
-from invenio.bibworkflow_utils import (get_workflow_definition,
-                                       sort_bwolist)
+from ..utils import (get_workflow_definition,
+                     sort_bwolist)
 from ..api import continue_oid_delayed, start
 
 
@@ -51,7 +51,7 @@ def index():
     Displays main interface of Holdingpen.
     Acts as a hub for catalogers (may be removed)
     """
-    from invenio.bibworkflow_containers import bwolist
+    from ..containers import bwolist
 
     # FIXME: need to autodiscover widgets properly
     widget_list = {}
@@ -77,7 +77,7 @@ def maintable():
     """
     Displays main table interface of Holdingpen.
     """
-    from invenio.bibworkflow_containers import bwolist
+    from ..containers import bwolist
 
     # FIXME: need to autodiscover widgets properly
     widget_list = {}
@@ -102,8 +102,9 @@ def refresh():
     Reloads the bibworkflow_containers file,
     thus rebuilding the BWObject list.
     """
-    import invenio.bibworkflow_containers
-    reload(invenio.bibworkflow_containers)
+    # FIXME: Temp hack until redis is hooked up
+    import invenio.modules.workflows.containers
+    reload(invenio.modules.workflows.containers)
     return 'Records Refreshed'
 
 
@@ -114,7 +115,7 @@ def batch_widget(bwolist):
     """
     Renders widget accepting single or multiple records.
     """
-    from invenio.bibworkflow_utils import parse_bwids
+    from ..utils import parse_bwids
     bwolist = parse_bwids(bwolist)
 
     try:
@@ -160,7 +161,7 @@ def load_table():
     """
     Function used for the passing of JSON data to the DataTable
     """
-    from invenio.bibworkflow_containers import bwolist
+    from ..containers import bwolist
 
     # sSearch will be used for searching later
     a_search = request.args.get('sSearch')
@@ -174,7 +175,8 @@ def load_table():
     i_display_length = int(request.args.get('iDisplayLength'))
 
     if a_search:
-        from invenio.bibworkflow_containers import create_hp_containers
+        # FIXME: Temp measure until Redis is hooked up
+        from ..containers import create_hp_containers
         bwolist = create_hp_containers(sSearch=a_search)
 
     if 'iSortCol_0' in current_app.config:
@@ -301,9 +303,10 @@ def delete_from_db(bwobject_id):
     """
     Deletes all available versions of the object from the db
     """
-    import invenio.bibworkflow_containers
+    # FIXME: Temp hack until redis is hooked up
+    import invenio.modules.workflows.containers
     _delete_from_db(bwobject_id)
-    reload(invenio.bibworkflow_containers)
+    reload(invenio.modules.workflows.containers)
     flash('Record Deleted')
     return redirect(url_for('holdingpen.index'))
 
@@ -320,7 +323,7 @@ def _delete_from_db(bwobject_id):
 @login_required
 @wash_arguments({'bwolist': (unicode, "")})
 def delete_multi(bwolist):
-    from invenio.bibworkflow_utils import parse_bwids
+    from ..utils import parse_bwids
     bwolist = parse_bwids(bwolist)
 
     for bwobject_id in bwolist:

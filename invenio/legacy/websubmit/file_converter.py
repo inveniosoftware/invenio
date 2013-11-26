@@ -20,25 +20,26 @@
 This module implement fulltext conversion between many different file formats.
 """
 
-import os
-import stat
-import re
-import sys
-import shutil
-import tempfile
 import HTMLParser
-import time
-import subprocess
 import atexit
+import os
+import pkg_resources
+import re
+import shutil
 import signal
+import stat
+import subprocess
+import sys
+import tempfile
 import threading
+import time
 
 from logging import DEBUG, getLogger
 from htmlentitydefs import entitydefs
 from optparse import OptionParser
 
 try:
-    from invenio.hocrlib import create_pdf, extract_hocr, CFG_PPM_RESOLUTION
+    from invenio.legacy.websubmit.hocrlib import create_pdf, extract_hocr, CFG_PPM_RESOLUTION
     try:
         from PyPDF2 import PdfFileReader, PdfFileWriter
     except ImportError:
@@ -94,9 +95,11 @@ CFG_TWO2THREE_LANG_CODES = {
 CFG_OPENOFFICE_TMPDIR = os.path.join(CFG_TMPDIR, 'ooffice-tmp-files')
 CFG_GS_MINIMAL_VERSION_FOR_PDFA = "8.65"
 CFG_GS_MINIMAL_VERSION_FOR_PDFX = "8.52"
+#FIXME: pu don't know where is this file
 CFG_ICC_PATH = os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'ISOCoatedsb.icc')
-CFG_PDFA_DEF_PATH = os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'PDFA_def.ps')
-CFG_PDFX_DEF_PATH = os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'PDFX_def.ps')
+
+CFG_PDFA_DEF_PATH = pkg_resources.resource_filename('invenio.legacy.websubmit', os.path.join('file_converter_template', 'PDFA_def.ps'))
+CFG_PDFX_DEF_PATH = pkg_resources.resource_filename('invenio.legacy.websubmit', os.path.join('file_converter_template', 'PDFX_def.ps'))
 
 CFG_UNOCONV_LOG_PATH = os.path.join(CFG_LOGDIR, 'unoconv.log')
 _RE_CLEAN_SPACES = re.compile(r'\s+')

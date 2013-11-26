@@ -62,9 +62,9 @@ from invenio.legacy.websearch_external_collections import \
      external_collection_get_state, \
      external_collection_get_update_state_list, \
      external_collection_apply_changes
-from invenio.legacy.websearch_external_collections.websearch_external_collections_utils import \
+from invenio.legacy.websearch_external_collections.utils import \
      get_collection_descendants
-from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_STATES_NAME
+from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_STATES_NAME
 #from invenio.modules.formatter.format_elements import bfe_references
 #from invenio.modules.formatter.engine import BibFormatObject
 from invenio.legacy.bibdocfile.api import BibRecDocs
@@ -3520,7 +3520,7 @@ def get_detailed_page_tabs_counts(recID):
         if reftag and len(reftag) > 4:
             tabs_counts['References'] = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
     # obtain number of comments/reviews
-    from invenio.webcommentadminlib import get_nb_reviews, get_nb_comments
+    from invenio.legacy.webcomment.adminlib import get_nb_reviews, get_nb_comments
     if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
         num_comments = get_nb_comments(recID, count_deleted=False)
     if CFG_WEBCOMMENT_ALLOW_REVIEWS and CFG_WEBSEARCH_SHOW_REVIEW_COUNT:

@@ -2244,7 +2244,7 @@ def check_duplicated_papers(printer, repair=False):
 
     if repair and bibrecs_to_reassign:
         printer("Reassigning deleted bibrecs %s" % str(bibrecs_to_reassign))
-        from invenio.bibauthorid_rabbit import rabbit
+        from invenio.legacy.bibauthorid.rabbit import rabbit
         rabbit(bibrecs_to_reassign)
 
     return all_ok
@@ -2284,7 +2284,7 @@ def check_duplicated_signatures(printer, repair=False):
 
     if repair and bibrecs_to_reassign:
         printer("Reassigning deleted duplicates %s" % str(bibrecs_to_reassign))
-        from invenio.bibauthorid_rabbit import rabbit
+        from invenio.legacy.bibauthorid.rabbit import rabbit
         rabbit(bibrecs_to_reassign)
     return all_ok
 
@@ -2424,7 +2424,7 @@ def check_wrong_rejection(printer, repair=False):
 
     if repair and (to_reassign or to_deal_with):
 
-        from invenio.bibauthorid_rabbit import rabbit
+        from invenio.legacy.bibauthorid.rabbit import rabbit
 
         if to_reassign:
             #Rabbit is not designed to reassign signatures which are rejected but not assigned:

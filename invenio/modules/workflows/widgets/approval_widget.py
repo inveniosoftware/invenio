@@ -17,8 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibworkflow_hp_field_widgets import bootstrap_accept, \
-    bootstrap_reject
+from ..hp_field_widgets import (bootstrap_accept,
+                                bootstrap_reject)
 
 from wtforms import SubmitField, Form
 

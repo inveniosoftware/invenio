@@ -91,8 +91,7 @@ def drop(yes_i_know=False):
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
     from invenio.legacy.webstat.api import destroy_customevents
     from invenio.legacy.inveniocfg import test_db_connection
-    from invenio.base.utils import autodiscover_models
-    from invenio.ext.sqlalchemy import db
+    from invenio.ext.sqlalchemy import db, models
     from invenio.legacy.bibdocfile.api import _make_base_dir
 
     ## Step 0: confirm deletion
@@ -100,7 +99,7 @@ def drop(yes_i_know=False):
 
     ## Step 1: test database connection
     test_db_connection()
-    list(autodiscover_models())
+    list(models)
 
     ## Step 2: disable foreign key checks
     if db.engine.name == 'mysql':
@@ -163,15 +162,14 @@ def create(default_data=True):
     from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
     from invenio.legacy.inveniocfg import test_db_connection
-    from invenio.base.utils import autodiscover_models
-    from invenio.ext.sqlalchemy import db
+    from invenio.ext.sqlalchemy import db, models
     try:
         test_db_connection()
     except:
         from invenio.ext.logging import get_tracestack
         print get_tracestack()
 
-    list(autodiscover_models())
+    list(models)
 
     def cfv_after_create(target, connection, **kw):
         print
@@ -229,14 +227,13 @@ def uri():
 
 
 def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
-    from invenio.base.utils import autodiscover_models, \
-        import_module_from_packages
-    from invenio.ext.sqlalchemy import db
+    from invenio.base.utils import import_module_from_packages
+    from invenio.ext.sqlalchemy import db, models
     from fixture import SQLAlchemyFixture
 
     fixture_modules = list(import_module_from_packages('fixtures',
                                                        packages=packages))
-    model_modules = list(autodiscover_models())
+    model_modules = list(models)
     fixtures = dict((f, getattr(ff, f)) for ff in fixture_modules
                     for f in dir(ff) if f[-4:] == 'Data')
     fixture_names = fixtures.keys()

@@ -28,7 +28,7 @@ from invenio.ext.sqlalchemy import db
 
 #from websearch_model import Collection
 from invenio.modules.record_editor.models import Bibrec
-from invenio.modules.legacy.scheduler.models import SchTASK
+from invenio.modules.scheduler.models import SchTASK
 
 class OaiHARVEST(db.Model):
     """Represents a OaiHARVEST record."""

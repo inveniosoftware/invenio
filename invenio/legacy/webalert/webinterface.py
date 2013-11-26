@@ -24,7 +24,7 @@ __lastupdated__ = """$Date$"""
 from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_NAME, \
   CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_SITE_NAME_INTL
 from invenio.legacy.webpage import page
-from invenio import webalert
+from invenio.legacy.webalert import api as webalert
 from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd
@@ -318,8 +318,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description=_("%s Personalize, Display alerts") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    description=_("%(site)s Personalize, Display alerts", site=CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME)),
+                    keywords=_("%(site)s, personalize", site=CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME)),
                     uid=uid,
                     language=argd['ln'],
                     req=req,

@@ -55,5 +55,5 @@ from invenio.base.factory import with_app_context
 
 @with_app_context()
 def main():
-    from invenio.bibclassify_cli import main as classify_main
+    from invenio.legacy.bibclassify.cli import main as classify_main
     return classify_main()

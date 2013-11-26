@@ -22,7 +22,7 @@ WebJournal widget - List the featured records
 """
 from invenio.modules.formatter.engine import BibFormatObject
 from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      get_featured_records
 

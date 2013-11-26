@@ -33,7 +33,6 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_ETCDIR
 from invenio.modules.formatter.config import \
      CFG_BIBFORMAT_TEMPLATES_PATH, \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
-     CFG_BIBFORMAT_ELEMENTS_PATH, \
      CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
      InvenioBibFormatError
 from invenio.utils.url import wash_url_argument
@@ -42,6 +41,7 @@ from invenio.base.i18n import gettext_set_language, wash_language, language_list
 from invenio.legacy.search_engine import perform_request_search
 import invenio.modules.formatter.api as bibformat_dblayer
 from invenio.modules.formatter import engine as bibformat_engine
+from invenio.modules.formatter import registry
 from invenio.utils.text import encode_for_xml
 
 import invenio.legacy.template
@@ -943,7 +943,7 @@ def can_read_format_element(name):
     """
 
     filename = bibformat_engine.resolve_format_element_filename(name)
-    path = "%s%s%s" % (CFG_BIBFORMAT_ELEMENTS_PATH, os.sep, filename)
+    path = bibformat_engine.get_format_element_path(filename)
     return os.access(path, os.R_OK)
 
 def can_write_format_template(bft):
@@ -1119,7 +1119,7 @@ def get_tags_used_by_element(filename):
         return tags
 
     filename = bibformat_engine.resolve_format_element_filename(filename)
-    path = CFG_BIBFORMAT_ELEMENTS_PATH + os.sep + filename
+    path = bibformat_engine.get_format_element_path(filename)
     format = open(path, 'r')
     code = format.read()
     format.close

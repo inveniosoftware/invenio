@@ -26,6 +26,6 @@ def get_number_of_reviews(recid):
 
     @return: Number of reviews
     """
-    from invenio.webcommentadminlib import get_nb_reviews
+    from invenio.legacy.webcomment.adminlib import get_nb_reviews
     if recid:
         return get_nb_reviews(recid)

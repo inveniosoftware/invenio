@@ -77,8 +77,8 @@ from invenio.legacy.webuser import session_param_get
 from invenio.intbitset import intbitset
 
 from invenio.legacy.websearch_external_collections import external_collection_get_state, get_external_collection_engine
-from invenio.legacy.websearch_external_collections.websearch_external_collections_utils import get_collection_id
-from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+from invenio.legacy.websearch_external_collections.utils import get_collection_id
+from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.legacy.bibrecord import get_fieldvalues
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)

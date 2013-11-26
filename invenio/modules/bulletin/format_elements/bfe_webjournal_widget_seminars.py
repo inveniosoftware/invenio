@@ -26,7 +26,7 @@ import time
 import base64
 import socket
 
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, WEBJOURNAL_OPENER
 from invenio.base.i18n import gettext_set_language
 

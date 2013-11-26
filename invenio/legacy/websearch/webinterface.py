@@ -130,7 +130,7 @@ from invenio.legacy.bibrank.downloads_indexer import get_download_weight_total
 from invenio.legacy.search_engine.summarizer import summarize_records
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibedit.webinterface import WebInterfaceEditPages
-from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
+from invenio.legacy.bibeditmulti.webinterface import WebInterfaceMultiEditPages
 from invenio.legacy.bibmerge.webinterface import WebInterfaceMergePages
 from invenio.legacy.bibdocfile.webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
 from invenio.legacy.search_engine import get_record

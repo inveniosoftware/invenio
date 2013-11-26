@@ -29,7 +29,7 @@ __revision__ = "$Id$"
 
 ## Import the remote debugger as a first thing, if allowed
 try:
-    import invenio.remote_debugger as remote_debugger
+    import invenio.utils.remote_debugger as remote_debugger
 except:
     remote_debugger = None
 

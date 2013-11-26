@@ -31,7 +31,7 @@ from invenio.legacy.websession.websession_config import CFG_WEBSESSION_INFO_MESS
 from invenio.legacy.webuser import nickname_valid_p, get_user_info
 from invenio.legacy.webmessage.api import perform_request_send
 from invenio.ext.logging import register_exception
-import invenio.webgroup_dblayer as db
+import invenio.legacy.websession.dblayer as db
 from invenio.legacy.dbquery import IntegrityError
 try:
     import invenio.legacy.template

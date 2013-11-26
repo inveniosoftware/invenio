@@ -93,7 +93,7 @@ from invenio.legacy.websubmit.functions.Shared_Functions import \
      createRelatedFormats
 from invenio.ext.logging import register_exception
 from invenio.legacy.dbquery import run_sql
-from invenio.websubmit_icon_creator import \
+from invenio.legacy.websubmit.icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.utils.url import create_html_mailto
 from invenio.utils.html import escape_javascript_string

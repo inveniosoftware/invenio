@@ -1,17 +1,17 @@
-{% css url_for('holdingpen.static', filename='css/workflows/style.css', '20-workflows' %}
+{% css url_for('workflows.static', filename='css/workflows/style.css'), '20-workflows' %}
 {% extends "page.html" %}
 {% block body %}
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li><a href="{{ url_for('bibworkflow.index') }}"
+                    <li><a href="{{ url_for('workflows.index') }}"
                         {% if request.path == url_for('workflows.index') %}
                             class="active"
                         {% endif %}>
                         Running workflows
                     </a></li>
-                    <li><a href="{{ url_for('bibworkflow.show_workflows') }}"
+                    <li><a href="{{ url_for('workflows.show_workflows') }}"
                     {% if request.path == url_for('workflows.show_workflows') %}
                         class="active"
                     {% endif %}>

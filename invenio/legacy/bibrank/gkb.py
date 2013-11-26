@@ -44,6 +44,7 @@ import ConfigParser
 from invenio.utils.url import make_invenio_opener
 from invenio.config import CFG_ETCDIR
 from invenio.legacy.dbquery import run_sql
+from invenio.modules.rank.registry import configuration
 
 BIBRANK_OPENER = make_invenio_opener('BibRank')
 
@@ -225,7 +226,7 @@ def usage(code, msg=''):
        %s -v9
 
  Generate options:
- -i,  --input=file          input file, default from /etc/bibrank/bibrankgkb.cfg
+ -i,  --input=file          input file, default from bibrankgkb.cfg (see rankext/configuration)
  -o,  --output=file         output file, will be placed in current folder
  General options:
  -h,  --help                print this help and exit
@@ -248,7 +249,7 @@ def command_line():
         usage(1)
     if args:
         usage(1)
-    opts_dict = {"input": "%s/bibrank/bibrankgkb.cfg" % CFG_ETCDIR, "output":"", "verbose":1}
+    opts_dict = {"input": configuration.get('bibrankgkb.cfg', ''), "output":"", "verbose":1}
     sched_time = time.strftime(format_string)
     user = ""
     try:
@@ -259,7 +260,7 @@ def command_line():
                 print __revision__
                 sys.exit(1)
             elif opt[0] in ["--input", "-i"]:
-                opts_dict["input"] = opt[1]
+                opts_dict["input"] = configuration.get(opt[1], opt[1])
             elif opt[0] in ["--output", "-o"]:
                 opts_dict["output"] = opt[1]
             elif opt[0] in ["--verbose", "-v"]:
@@ -268,9 +269,9 @@ def command_line():
                 usage(1)
 
         startCreate = time.time()
-        file = opts_dict["input"]
+        config_file = opts_dict["input"]
         config = ConfigParser.ConfigParser()
-        config.readfp(open(file))
+        config.readfp(open(config_file))
         bibrankgkb(config)
         if opts_dict["verbose"] >= 9:
             showtime((time.time() - startCreate))

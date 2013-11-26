@@ -26,7 +26,7 @@ import os
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR
 from invenio.legacy.webuser import page_not_authorized, collect_user_info
-from invenio.bibsword_client import perform_display_sub_status, \
+from invenio.legacy.bibsword.client import perform_display_sub_status, \
                                     perform_display_server_list, \
                                     perform_display_collection_list, \
                                     perform_display_category_list, \
@@ -40,7 +40,7 @@ from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.legacy.websubmit.functions.Get_Recid import \
                                            get_existing_records_for_reportnumber
 from invenio.legacy.bibrecord import get_fieldvalues
-from invenio.bibsword_config import CFG_MARC_REPORT_NUMBER, CFG_MARC_ADDITIONAL_REPORT_NUMBER
+from invenio.legacy.bibsword.config import CFG_MARC_REPORT_NUMBER, CFG_MARC_ADDITIONAL_REPORT_NUMBER
 
 class WebInterfaceSword(WebInterfaceDirectory):
     """ Handle /bibsword set of pages."""

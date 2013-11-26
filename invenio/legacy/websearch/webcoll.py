@@ -60,9 +60,9 @@ from invenio.legacy.bibsched.bibtask import task_init, task_get_option, task_set
 import invenio.legacy.template
 websearch_templates = invenio.legacy.template.load('websearch')
 
-from invenio.legacy.websearch_external_collections.websearch_external_collections_searcher import external_collections_dictionary
-from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
-from invenio.legacy.websearch_external_collections.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS
+from invenio.legacy.websearch_external_collections.searcher import external_collections_dictionary
+from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS
 
 from invenio.base.signals import webcoll_after_webpage_cache_update
 

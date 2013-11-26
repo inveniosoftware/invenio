@@ -21,7 +21,7 @@ import warnings
 ## Import the remote debugger as a first thing, if allowed
 #FIXME enable remote_debugger when invenio.config is ready
 #try:
-#    from invenio import remote_debugger
+#    from invenio.utils import remote_debugger
 #except:
 #    remote_debugger = None
 

@@ -54,5 +54,5 @@ from invenio.base.factory import with_app_context
 
 @with_app_context()
 def main():
-    from invenio.bibsort_daemon import main as bibsort_main
+    from invenio.legacy.bibsort.daemon import main as bibsort_main
     return bibsort_main()

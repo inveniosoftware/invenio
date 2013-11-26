@@ -40,5 +40,5 @@ from invenio.base.factory import with_app_context
 
 @with_app_context()
 def main():
-    from invenio.batchuploader import main as batchuploader_main
+    from invenio.legacy.batchuploader.cli import main as batchuploader_main
     return batchuploader_main()
