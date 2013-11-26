@@ -50,11 +50,11 @@ class BibIndexAdminWebPagesAvailabilityTest(InvenioTestCase):
                     'field?mtype=perform_showfieldoverview',
                     'field?mtype=perform_editfields',
                     'field?mtype=perform_addfield',
-                    'editindex?mtype=perform_modifysynonymkb',
-                    'editindex?mtype=perform_modifystopwords',
-                    'editindex?mtype=perform_modifyremovehtml',
-                    'editindex?mtype=perform_modifyremovelatex',
-                    'editindex?mtype=perform_modifytokenizer'
+                    'editindex?idxID=1&mtype=perform_modifysynonymkb',
+                    'editindex?idxID=1&mtype=perform_modifystopwords',
+                    'editindex?idxID=1&mtype=perform_modifyremovehtml',
+                    'editindex?idxID=1&mtype=perform_modifyremovelatex',
+                    'editindex?idxID=1&mtype=perform_modifytokenizer'
                     ]
 
         error_messages = []
