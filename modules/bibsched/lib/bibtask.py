@@ -617,7 +617,7 @@ def _task_build_params(task_name,
             elif opt[0] in ("-L", "--limit"):
                 params["runtime_limit"] = parse_runtime_limit(opt[1])
             elif opt[0] in ("--profile", ):
-                params["profile"] += opt[1].split(',')
+                params.setdefault("profile", []).extend(opt[1].split(','))
             elif opt[0] in ("--post-process", ):
                 params.setdefault("post-process", []).append(opt[1])
             elif opt[0] in ("-I", "--sequence-id"):
