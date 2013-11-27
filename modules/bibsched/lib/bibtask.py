@@ -350,8 +350,8 @@ def setup_loggers(task_id=None):
         logger.removeHandler(handler)
     formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
     if task_id is not None:
-        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
-        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
+        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id']), 'a', 5*1024*1024, 10)
+        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a', 5*1024*1024, 10)
         log_logger.setFormatter(formatter)
         log_logger.setLevel(logging.DEBUG)
         err_logger.setFormatter(formatter)
