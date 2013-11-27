@@ -148,7 +148,7 @@ LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS = True
 # BibAuthorID debugging options
 
 # This flag triggers most of the output.
-DEBUG_OUTPUT = True
+DEBUG_OUTPUT = False
 # Print timestamps
 DEBUG_TIMESTAMPS = True
 
