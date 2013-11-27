@@ -62,4 +62,3 @@ TEST_SUITE = make_test_suite(TestWashHTMLtoText)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-

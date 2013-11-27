@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import re
 
 from invenio.config import CFG_SITE_URL
@@ -30,7 +30,7 @@ from invenio.testutils import make_test_suite, run_test_suite, \
                               get_authenticated_mechanize_browser, make_url
 
 
-class BibIndexAdminWebPagesAvailabilityTest(unittest.TestCase):
+class BibIndexAdminWebPagesAvailabilityTest(InvenioTestCase):
     """Check BibIndex Admin web pages whether they are up or not."""
 
     def test_bibindex_admin_interface_pages_availability(self):
@@ -122,7 +122,7 @@ def check_admin_forms_with_input_text(url, fields):
     resp = browser.submit()
     return resp.read()
 
-class BibIndexAdminSynonymKnowledgeBaseTest(unittest.TestCase):
+class BibIndexAdminSynonymKnowledgeBaseTest(InvenioTestCase):
     """Tests BibIndexAdmin's ability to change knowledge base details for indexes"""
 
     def setUp(self):
@@ -157,7 +157,7 @@ class BibIndexAdminSynonymKnowledgeBaseTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
 
 
-class BibIndexAdminRemoveStopwordsTest(unittest.TestCase):
+class BibIndexAdminRemoveStopwordsTest(InvenioTestCase):
     """Tests BibIndexAdmin's ability to change stopwords configuration details for indexes.
        Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
     """
@@ -196,7 +196,7 @@ class BibIndexAdminRemoveStopwordsTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
 
 
-class BibIndexAdminRemoveHTMLTest(unittest.TestCase):
+class BibIndexAdminRemoveHTMLTest(InvenioTestCase):
     """Tests BibIndexAdmin's ability to change 'remove html' configuration details for indexes.
        Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
     """
@@ -234,7 +234,7 @@ class BibIndexAdminRemoveHTMLTest(unittest.TestCase):
 
 
 
-class BibIndexAdminRemoveLatexTest(unittest.TestCase):
+class BibIndexAdminRemoveLatexTest(InvenioTestCase):
     """Tests BibIndexAdmin's ability to change 'remove latex' configuration details for indexes.
        Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
     """
@@ -271,7 +271,7 @@ class BibIndexAdminRemoveLatexTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
 
 
-class BibIndexAdminTokenizerTest(unittest.TestCase):
+class BibIndexAdminTokenizerTest(InvenioTestCase):
     """Tests BibIndexAdmin's ability to change tokenizer configuration details for indexes.
        Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
     """

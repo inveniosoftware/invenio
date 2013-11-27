@@ -28,7 +28,6 @@ load_tokenizers = lazy_import('invenio.bibindex_engine_utils:load_tokenizers')
 _TOKENIZERS = None
 
 
-
 class TestAuthorTokenizerScanning(InvenioTestCase):
     """Test BibIndex name tokenization"""
 
@@ -367,5 +366,4 @@ TEST_SUITE = make_test_suite(TestAuthorTokenizerScanning,
 
 
 if __name__ == '__main__':
-    #unittest.main()
     run_test_suite(TEST_SUITE)

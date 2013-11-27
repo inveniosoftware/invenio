@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio.config import CFG_SOLR_URL, CFG_SITE_URL, CFG_SITE_NAME
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
@@ -50,7 +50,7 @@ def get_topN(n, data):
     return res
 
 
-class TestSolrSearch(unittest.TestCase):
+class TestSolrSearch(InvenioTestCase):
     """Test for Solr search. Requires:
     make install-solrutils
     CFG_SOLR_URL set
@@ -74,7 +74,7 @@ class TestSolrSearch(unittest.TestCase):
         self.assertEqual(HITSETS['"higgs boson"'], self._get_result('"higgs boson"'))
 
 
-class TestSolrRanking(unittest.TestCase):
+class TestSolrRanking(InvenioTestCase):
     """Test for Solr ranking. Requires:
     make install-solrutils
     CFG_SOLR_URL set
@@ -166,7 +166,7 @@ class TestSolrRanking(unittest.TestCase):
         self.assertEqual((55, 56), self._get_ranked_result_sequence(query='"higgs boson"', hitset=hitset))
 
 
-class TestSolrSimilarToRecid(unittest.TestCase):
+class TestSolrSimilarToRecid(InvenioTestCase):
     """Test for Solr similar ranking. Requires:
     make install-solrutils
     CFG_SOLR_URL set
@@ -237,7 +237,7 @@ class TestSolrSimilarToRecid(unittest.TestCase):
         self.assertEqual(similar_top[recid], self._get_similar_result_sequence(recid=recid, rows=top_n))
 
 
-class TestSolrWebSearch(unittest.TestCase):
+class TestSolrWebSearch(InvenioTestCase):
     """Test for webbased Solr search. Requires:
     make install-solrutils
     CFG_SOLR_URL set
@@ -269,7 +269,7 @@ class TestSolrWebSearch(unittest.TestCase):
                                                expected_text="[12, 47, 51, 55, 56, 68, 81, 85]"))
 
 
-class TestSolrWebRanking(unittest.TestCase):
+class TestSolrWebRanking(InvenioTestCase):
     """Test for webbased Solr ranking. Requires:
     make install-solrutils
     CFG_SOLR_URL set
@@ -312,7 +312,7 @@ class TestSolrWebRanking(unittest.TestCase):
                                                expected_text="[12, 47, 51, 68, 81, 85, 55, 56]"))
 
 
-class TestSolrWebSimilarToRecid(unittest.TestCase):
+class TestSolrWebSimilarToRecid(InvenioTestCase):
     """Test for webbased Solr similar ranking. Requires:
     make install-solrutils
     CFG_SOLR_URL set
@@ -333,7 +333,7 @@ class TestSolrWebSimilarToRecid(unittest.TestCase):
                                                expected_text="[3, 4, 8, 9, 13, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 34, 43, 49, 56, 66, 67, 69, 71, 73, 75, 76, 87, 90, 98, 104, 107, 109, 113, 12, 95, 85, 82, 44, 1, 89, 64, 58, 15, 96, 61, 50, 86, 78, 77, 65, 62, 60, 47, 46, 100, 99, 102, 91, 80, 7, 5, 92, 88, 74, 57, 55, 108, 84, 81, 79, 54, 101, 11, 103, 94, 48, 83, 72, 63, 2, 68, 51, 53, 97, 93, 70, 45, 52, 14, 59, 6, 10, 32, 33, 29, 30]"))
 
 
-class TestSolrLoadLogicalFieldSettings(unittest.TestCase):
+class TestSolrLoadLogicalFieldSettings(InvenioTestCase):
     """Test for loading Solr logical field settings. Requires:
     make install-solrutils
     CFG_SOLR_URL set
@@ -353,7 +353,7 @@ class TestSolrLoadLogicalFieldSettings(unittest.TestCase):
                          get_tags())
 
 
-class TestSolrBuildFieldContent(unittest.TestCase):
+class TestSolrBuildFieldContent(InvenioTestCase):
     """Test for building Solr field content. Requires:
     make install-solrutils
     CFG_SOLR_URL set

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,7 +44,6 @@ CFG_BIBFORMAT_OUTPUTS_PATH = "%s" % (CFG_TMPDIR)
 CFG_BIBFORMAT_TEMPLATES_PATH = "%s" % (CFG_TMPDIR)
 CFG_BIBFORMAT_ELEMENTS_PATH = "%s%stests_bibformat_elements" % (CFG_TMPDIR, os.sep)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "tests_bibformat_elements"
-
 
 class FormatTemplateTest(InvenioTestCase):
     """ bibformat - tests on format templates"""

@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,7 +27,6 @@ binary_search = lazy_import('invenio.bibsort_engine:binary_search')
 perform_delete_record = lazy_import('invenio.bibsort_engine:perform_delete_record')
 perform_insert_record = lazy_import('invenio.bibsort_engine:perform_insert_record')
 perform_modify_record = lazy_import('invenio.bibsort_engine:perform_modify_record')
-
 
 class TestBibSort(InvenioTestCase):
     """Test BibSort."""

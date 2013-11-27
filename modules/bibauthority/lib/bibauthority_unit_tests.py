@@ -20,11 +20,11 @@
 
 from invenio.bibauthority_config import CFG_BIBAUTHORITY_PREFIX_SEP
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibauthority_engine import get_type_from_control_no
 
-class TestBibAuthorityEngine(unittest.TestCase):
+class TestBibAuthorityEngine(InvenioTestCase):
     """Unit tests for bibauthority_engine"""
 
     def test_split_name_parts(self):

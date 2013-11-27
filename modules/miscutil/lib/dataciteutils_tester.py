@@ -26,15 +26,15 @@ the tests.
 
 from invenio.flaskshell import *
 
-import unittest
 from invenio import dataciteutils
 from invenio import config
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 import random
 import string
 import os
 
-class DataCiteTestCase(unittest.TestCase):
+
+class DataCiteTestCase(InvenioTestCase):
 
     def setUp(self):
         # Force API in test mode

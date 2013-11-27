@@ -20,7 +20,7 @@
 """Unit tests for the search engine query parsers."""
 
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import sys
 from StringIO import StringIO
 from datetime import datetime, timedelta
@@ -28,7 +28,7 @@ from datetime import datetime, timedelta
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class SelfCitesIndexerTests(unittest.TestCase):
+class SelfCitesIndexerTests(InvenioTestCase):
     """Test utility functions for the summarizer components"""
 
     def setUp(self):
@@ -173,7 +173,7 @@ class SelfCitesIndexerTests(unittest.TestCase):
         self.assert_(get_record_coauthors(1))
 
 
-class SelfCitesTaskTests(unittest.TestCase):
+class SelfCitesTaskTests(InvenioTestCase):
     def test_check_options(self):
         from invenio.bibrank_selfcites_task import check_options
         old_stderr = sys.stderr

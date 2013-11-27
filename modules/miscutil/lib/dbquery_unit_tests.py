@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
@@ -20,7 +21,6 @@
 """Unit tests for dbquery library."""
 
 __revision__ = "$Id$"
-
 
 
 from invenio import dbquery

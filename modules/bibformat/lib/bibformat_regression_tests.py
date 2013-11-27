@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import re
 
 from invenio.config import CFG_SITE_URL, \
@@ -477,7 +477,7 @@ class BibFormatPublInfoFormattingTest(InvenioTestCase):
             expected_text="Nucl. Phys. B: 656 (2003) pp. 23-36"))
 
 
-class BibFormatAuthorityRecordsTest(unittest.TestCase):
+class BibFormatAuthorityRecordsTest(InvenioTestCase):
     """Check authority record related functions"""
 
     def test_brief_output(self):
@@ -505,7 +505,7 @@ class BibFormatAuthorityRecordsTest(unittest.TestCase):
         self.assertTrue(", , " not in bfe_authority_author.format_element(bfo, detail='yes'))
 
 
-class BibFormatAuthorityRecordsBrowsingTest(unittest.TestCase):
+class BibFormatAuthorityRecordsBrowsingTest(InvenioTestCase):
     """Tests authority records browsing pre and successor"""
 
     def setUp(self):

@@ -20,7 +20,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import os
 import re
 from datetime import timedelta

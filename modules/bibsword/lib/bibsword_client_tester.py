@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 # pylint: disable-msg=C0301
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import os
 import sys
 import time
@@ -48,7 +48,7 @@ from invenio.bibsword_config import CFG_SUBMISSION_STATUS_SUBMITTED, \
                                     CFG_SUBMISSION_STATUS_REMOVED
 from xml.dom import minidom
 
-class Test_format_marcxml_file(unittest.TestCase):
+class Test_format_marcxml_file(InvenioTestCase):
     """ bibsword_format - test the parsing and extracting of marcxml nodes"""
 
     def test_extract_marcxml_1(self):
@@ -138,7 +138,7 @@ class Test_format_marcxml_file(unittest.TestCase):
         self.assertEqual(metadata["error"], "Unable to open marcxml file !")
 
 
-class Test_format_metadata(unittest.TestCase):
+class Test_format_metadata(InvenioTestCase):
     """ bibsword - test the collection of all metadata """
 
     def test_correct_metadata_collection(self):
@@ -223,7 +223,7 @@ class Test_format_metadata(unittest.TestCase):
         self.assertEqual(len(metadata['links']), 0)
 
 
-class Test_get_submission_status(unittest.TestCase):
+class Test_get_submission_status(InvenioTestCase):
     """ bibsword_httpquery - test the get_submission_status method """
 
     def test_get_submission_status_ok(self):
@@ -255,7 +255,7 @@ class Test_get_submission_status(unittest.TestCase):
         self.assertEqual(result != "", False)
 
 
-class Test_format_submission_status(unittest.TestCase):
+class Test_format_submission_status(InvenioTestCase):
     """bibsword_format - test the parsing of format_submission_status method"""
 
     def test_format_submission_status_submitted(self):
@@ -302,7 +302,7 @@ class Test_format_submission_status(unittest.TestCase):
         self.assertEqual(response['error'], "identifier does not correspond to a SWORD wrapper, it may belong to a media deposit")
 
 
-class Test_swrCLIENTDATA_table(unittest.TestCase):
+class Test_swrCLIENTDATA_table(InvenioTestCase):
     '''
       This test check that the entire update process works fine. It insert some
       data into the swrCLIENTDATA table, then he get some xml status entry from
@@ -497,7 +497,7 @@ class Test_swrCLIENTDATA_table(unittest.TestCase):
         self.assertEqual(nb_rows, 3)
 
 
-class Test_list_submitted_resources(unittest.TestCase):
+class Test_list_submitted_resources(InvenioTestCase):
     '''Test_list_submitted_resources - check the data selection and update for admin interface'''
 
     def test_list_submitted_resources(self):
@@ -553,7 +553,7 @@ class Test_list_submitted_resources(unittest.TestCase):
             delete_from_swr_clientdata(id_test)
 
 
-class Test_format_metadata_atom(unittest.TestCase):
+class Test_format_metadata_atom(InvenioTestCase):
     ''' Test_format_metadata_atom - check the generation of the atom entry containing metadata'''
 
     def test_format_full_metadata(self):
@@ -625,7 +625,7 @@ class Test_format_metadata_atom(unittest.TestCase):
         self.assertEqual(metadata_atom != '', True)
 
 
-class Test_submission_process(unittest.TestCase):
+class Test_submission_process(InvenioTestCase):
     '''Test_submission_process - test document submission'''
 
     def test_perform_submission_process(self):

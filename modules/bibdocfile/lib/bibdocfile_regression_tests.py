@@ -402,7 +402,6 @@ class BibRelationTest(InvenioTestCase):
         newer_rel1.delete()
         newer_rel2.delete()
 
-
 class BibDocFilesTest(InvenioTestCase):
     """regression tests about BibDocFiles"""
 

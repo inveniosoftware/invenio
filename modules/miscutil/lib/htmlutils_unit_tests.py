@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,7 +20,6 @@
 """Unit tests for htmlutils library."""
 
 __revision__ = "$Id$"
-
 
 
 from invenio.htmlutils import HTMLWasher, nmtoken_from_string, \

@@ -19,7 +19,6 @@
 
 """Unit tests for the solrutils library."""
 
-
 from invenio import intbitset
 from invenio.importutils import lazy_import
 from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase

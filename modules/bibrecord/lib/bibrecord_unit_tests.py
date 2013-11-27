@@ -22,7 +22,6 @@ The BibRecord test suite.
 """
 
 
-
 from invenio.config import CFG_TMPDIR, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio import bibrecord, bibrecord_config

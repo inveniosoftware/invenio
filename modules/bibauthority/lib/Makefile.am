@@ -21,7 +21,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = \
     bibauthority_config.py \
     bibauthority_engine.py \
-    bibauthority_tests.py \
+    bibauthority_unit_tests.py \
     bibauthority_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
