@@ -218,6 +218,8 @@ class BibFieldDict(object):
         @see C{dict.__repr__}
         """
         info = dict((key, value) for key, value in self.rec_json.iteritems() if not re.search('^__[a-zA-Z0-9]', key))
+        if not info:
+            info = {}
         return repr(info)
 
     def __iter__(self):

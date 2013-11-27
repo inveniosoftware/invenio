@@ -152,6 +152,7 @@ class JsonReader(BibFieldDict):
         It creates a valid marcxml using the legacy rules defined in the config
         file
         """
+        from collections import Iterable
         def encode_for_marcxml(value):
             from invenio.textutils import encode_for_xml
             if isinstance(value, unicode):
@@ -166,7 +167,7 @@ class JsonReader(BibFieldDict):
             ind1 = ''
             ind2 = ''
             for key, value in marc_dict.iteritems():
-                if isinstance(value, basestring) or not hasattr(value, '__iter__'):
+                if isinstance(value, basestring) or not isinstance(value, Iterable):
                     value = [value]
                 for v in value:
                     if v is None:
