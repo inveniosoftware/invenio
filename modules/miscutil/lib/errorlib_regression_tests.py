@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import os
 import sys
 
@@ -30,7 +30,7 @@ from invenio.config import CFG_SITE_URL, CFG_LOGDIR
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
-class ErrorlibWebPagesAvailabilityTest(unittest.TestCase):
+class ErrorlibWebPagesAvailabilityTest(InvenioTestCase):
     """Check errorlib web pages whether they are up or not."""
 
     def test_your_baskets_pages_availability(self):
@@ -47,7 +47,7 @@ class ErrorlibWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class ErrorlibRegisterExceptionTest(unittest.TestCase):
+class ErrorlibRegisterExceptionTest(InvenioTestCase):
     """Check errorlib register_exception functionality."""
 
     def setUp(self):

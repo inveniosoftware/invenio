@@ -19,7 +19,7 @@
 
 """WebLinkback - Regression Test Suite"""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_RECORD, \
@@ -75,7 +75,7 @@ def remove_test_data():
     run_sql("DELETE FROM lnkADMINURLLOG")
 
 
-class WebLinkbackWebPagesAvailabilityTest(unittest.TestCase):
+class WebLinkbackWebPagesAvailabilityTest(InvenioTestCase):
     """Test WebLinkback web pages whether they are up or not"""
 
     def test_linkback_pages_availability(self):
@@ -115,7 +115,7 @@ class WebLinkbackWebPagesAvailabilityTest(unittest.TestCase):
         return
 
 
-class WebLinkbackDatabaseTest(unittest.TestCase):
+class WebLinkbackDatabaseTest(InvenioTestCase):
     """Test WebLinkback database layer"""
 
     def setUp(self):
@@ -643,7 +643,7 @@ def get_title_of_page_mock_broken(url=""): # pylint: disable=W0613
     return None
 
 
-class WebLinkbackUpdaterTest(unittest.TestCase):
+class WebLinkbackUpdaterTest(InvenioTestCase):
     """Test WebLinkback updater"""
 
     def setUp(self):

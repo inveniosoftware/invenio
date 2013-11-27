@@ -19,7 +19,7 @@
 
 """ Test unit for the miscutil/lib/inveniocfg_upgrader module. """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.inveniocfg_upgrader import InvenioUpgrader
@@ -53,7 +53,7 @@ class TestUpgrade(dict):
         self['do_upgrade'] = lambda: str(node_id)
 
 
-class TestInvenioUpgraderOrdering(unittest.TestCase):
+class TestInvenioUpgraderOrdering(InvenioTestCase):
 
     def test_normal(self):
         """

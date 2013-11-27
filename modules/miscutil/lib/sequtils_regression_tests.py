@@ -19,7 +19,7 @@
 
 """ Test unit for the miscutil/sequtils module. """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 try:
     from mock import patch
     HAS_MOCK = True
@@ -55,7 +55,7 @@ class IntSeq(SequenceGenerator):
         return x + 1
 
 
-class TestIntSequenceGeneratorClass(unittest.TestCase):
+class TestIntSequenceGeneratorClass(InvenioTestCase):
 
     def test_sequence_next_int(self):
         int_seq = IntSeq()
@@ -72,7 +72,7 @@ class TestIntSequenceGeneratorClass(unittest.TestCase):
         run_sql(""" DELETE FROM seqSTORE WHERE seq_name="test_int" """)
 
 
-class TestCnumSequenceGeneratorClass(unittest.TestCase):
+class TestCnumSequenceGeneratorClass(InvenioTestCase):
 
     if HAS_MOCK:
         @patch('invenio.bibedit_utils.get_bibrecord',

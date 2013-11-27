@@ -24,7 +24,7 @@ The tests will not modifiy the database.
 They are intended to make sure there is no regression in references parsing.
 """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import re
 
 from invenio.testutils import make_test_suite, run_test_suite
@@ -67,7 +67,7 @@ def _reference_test(test, ref_line, parsed_reference, ignore_misc=True):
     compare_references(test, out, parsed_reference, ignore_misc=ignore_misc)
 
 
-class RefextractInvenioTest(unittest.TestCase):
+class RefextractInvenioTest(InvenioTestCase):
 
     def setUp(self):
         self.old_override = refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE
@@ -145,7 +145,7 @@ class RefextractInvenioTest(unittest.TestCase):
 </record>""")
 
 
-class RefextractTest(unittest.TestCase):
+class RefextractTest(InvenioTestCase):
     """Testing output of refextract"""
 
     def setUp(self):
@@ -2428,7 +2428,7 @@ Rev. D 80 034030 1-25"""
 </record>""")
 
 
-class TaskTest(unittest.TestCase):
+class TaskTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=0)
 

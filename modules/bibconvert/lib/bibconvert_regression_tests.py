@@ -21,13 +21,13 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, test_web_page_existence
 
-class BibConvertWebPagesAvailabilityTest(unittest.TestCase):
+class BibConvertWebPagesAvailabilityTest(InvenioTestCase):
     """Check BibConvert web pages whether they are up or not."""
 
     def test_availability_bibconvert_admin_guide(self):

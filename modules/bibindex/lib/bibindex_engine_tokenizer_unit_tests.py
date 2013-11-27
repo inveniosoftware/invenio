@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,7 +21,7 @@
 There should always be at least one test class for each class in b_e_t.
 """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibindex_engine_utils import load_tokenizers
@@ -30,7 +30,7 @@ _TOKENIZERS = load_tokenizers()
 
 
 
-class TestAuthorTokenizerScanning(unittest.TestCase):
+class TestAuthorTokenizerScanning(InvenioTestCase):
     """Test BibIndex name tokenization"""
 
     def setUp(self):
@@ -139,7 +139,7 @@ class TestAuthorTokenizerScanning(unittest.TestCase):
         self.assertEqual(output, anticipated)
 
 
-class TestAuthorTokenizerTokens(unittest.TestCase):
+class TestAuthorTokenizerTokens(InvenioTestCase):
     """Test BibIndex name variant token generation from scanned and tagged sets"""
 
     def setUp(self):
@@ -280,7 +280,7 @@ class TestAuthorTokenizerTokens(unittest.TestCase):
 
 
 
-class TestExactAuthorTokenizer(unittest.TestCase):
+class TestExactAuthorTokenizer(InvenioTestCase):
     """Test exact author name tokenizer."""
 
     def setUp(self):
@@ -316,7 +316,7 @@ class TestExactAuthorTokenizer(unittest.TestCase):
 
 
 
-class TestCJKTokenizer(unittest.TestCase):
+class TestCJKTokenizer(InvenioTestCase):
     """Tests for CJK Tokenizer which splits CJK words into characters and treats
        every single character as a word"""
 
@@ -364,5 +364,4 @@ TEST_SUITE = make_test_suite(TestAuthorTokenizerScanning,
 
 
 if __name__ == '__main__':
-    #unittest.main()
     run_test_suite(TEST_SUITE)

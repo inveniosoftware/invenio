@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
@@ -49,7 +49,7 @@ from invenio.webmessage_dblayer import CFG_WEBMESSAGE_STATUS_CODE, \
      set_message_status, \
      user_exists
 
-class WebMessageWebPagesAvailabilityTest(unittest.TestCase):
+class WebMessageWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebMessage web pages whether they are up or not."""
 
     def test_your_message_pages_availability(self):
@@ -67,7 +67,7 @@ class WebMessageWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
+class WebMessageSendingAndReceivingMessageTest(InvenioTestCase):
     """Check sending and receiving message throught WebMessage"""
 
     def test_sending_message(self):
@@ -253,7 +253,7 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
         delete_all_messages(2)
 
 
-class WebMessageGettingUidsGidsTest(unittest.TestCase):
+class WebMessageGettingUidsGidsTest(InvenioTestCase):
     """Many way to get uids or gids"""
 
     def test_get_uids_from_nicks(self):
@@ -287,7 +287,7 @@ class WebMessageGettingUidsGidsTest(unittest.TestCase):
         """webmessage - check if a user exist"""
         self.assertEqual(user_exists(6), 1)
 
-class WebMessagePatternTest(unittest.TestCase):
+class WebMessagePatternTest(InvenioTestCase):
     """pattern"""
 
     def test_get_nicknames_like(self):

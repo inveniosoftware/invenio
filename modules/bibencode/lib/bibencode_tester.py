@@ -24,7 +24,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio import bibencode_utils
 from invenio import bibencode_encode
 from invenio import bibencode_metadata
@@ -107,7 +107,7 @@ def printr(message):
     """
     print("\r" + message)
 
-class SetupTester(unittest.TestCase):
+class SetupTester(InvenioTestCase):
     """Prepares the necessary files for the tests"""
     def test_setUp(self):
         if not os.path.exists(video01):
@@ -138,13 +138,13 @@ class SetupTester(unittest.TestCase):
 
         print("All done")
 
-class TestFFmpegMinInstallation(unittest.TestCase):
+class TestFFmpegMinInstallation(InvenioTestCase):
     """Tests if the minimum FFmpeg installation is available"""
 
     def test_ffmpeg(self):
         self.assertEqual(bibencode_utils.check_ffmpeg_configuration(), None)
 
-class TestUtilsFunctions(unittest.TestCase):
+class TestUtilsFunctions(InvenioTestCase):
     """Tests the utility functions in bibencode_utils"""
 
     def test_timcode_to_seconds(self):
@@ -204,7 +204,7 @@ class TestUtilsFunctions(unittest.TestCase):
         self.assertAlmostEqual(bibencode_utils.aspect_string_to_float("16:9"), 1.777, places=2)
 
 
-class TestEncodeFunctions(unittest.TestCase):
+class TestEncodeFunctions(InvenioTestCase):
     """Tests the functions of bibencode_encode"""
 
     def test_determine_aspect(self):
@@ -294,11 +294,11 @@ class TestEncodeFunctions(unittest.TestCase):
         self.assertEqual(bibencode_encode.assure_quality(movie_no_aspect, "16:9", 1920, 1080, 6000000, True, 1.0), True)
 
 
-class TestExtractFunctions(unittest.TestCase):
+class TestExtractFunctions(InvenioTestCase):
     """Tests the functions of bibencode_extract"""
     pass
 
-class TestMetadataFunctions(unittest.TestCase):
+class TestMetadataFunctions(InvenioTestCase):
     """Tests the functions of bibencode_metadata"""
 
     def test_ffrobe_metadata(self):
@@ -354,11 +354,11 @@ class TestMetadataFunctions(unittest.TestCase):
         self.assertEqual(bibencode_metadata.ffprobe_metadata(video01_out01), metadata_check)
 
 
-class TestBatchEngineFunctions(unittest.TestCase):
+class TestBatchEngineFunctions(InvenioTestCase):
     """Tests the functions of bibencode_batch_engine"""
     pass
 
-class TestDaemonFunctions(unittest.TestCase):
+class TestDaemonFunctions(InvenioTestCase):
     """Tests the functions of bibencode_daemon"""
     pass
 

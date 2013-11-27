@@ -25,7 +25,7 @@ from invenio.bibauthority_config import \
     CFG_BIBAUTHORITY_TYPE_NAMES, \
     CFG_BIBAUTHORITY_PREFIX_SEP
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibauthority_engine import is_authority_record, \
     get_dependent_records_for_control_no, \
@@ -37,7 +37,7 @@ from invenio.bibauthority_engine import is_authority_record, \
     guess_main_name_from_authority_recID
 from invenio.search_engine_utils import get_fieldvalues
 
-class BibAuthorityEngineTest(unittest.TestCase):
+class BibAuthorityEngineTest(InvenioTestCase):
     """Check BibEdit web pages whether they are up or not."""
 
     def test_bibauthority_is_authority_record(self):

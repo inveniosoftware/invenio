@@ -21,7 +21,7 @@
 
 """Regression tests for the BatchUploader."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import os
 import os.path
 import urllib2

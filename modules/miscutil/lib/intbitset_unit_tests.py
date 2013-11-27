@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import sys
 import zlib
 import os
@@ -55,7 +55,7 @@ def _check_enough_ram():
 
 CFG_ENOUGH_RAM = _check_enough_ram()
 
-class IntBitSetTest(unittest.TestCase):
+class IntBitSetTest(InvenioTestCase):
     """Test functions related to intbitset data structure."""
     def setUp(self):
         self.sets = [

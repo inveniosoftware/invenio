@@ -21,11 +21,11 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.testutils import make_test_suite, run_test_suite
 
-class TestCitationSearcher(unittest.TestCase):
+class TestCitationSearcher(InvenioTestCase):
 
     def setUp(self):
         # pylint: disable=C0103

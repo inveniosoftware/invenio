@@ -21,14 +21,14 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio import messages
 from invenio.config import CFG_SITE_LANG, CFG_SITE_LANGS
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class MessagesLanguageTest(unittest.TestCase):
+class MessagesLanguageTest(InvenioTestCase):
     """
     Testing language-related functions
     """

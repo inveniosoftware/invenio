@@ -19,14 +19,14 @@
 
 """Unit tests for BibEdit functions"""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import re
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibedit_utils import get_xml_from_textmarc
 from invenio.bibedit_engine import perform_doi_search
 
-class TextmarcToXMLTests(unittest.TestCase):
+class TextmarcToXMLTests(InvenioTestCase):
     """ Test utility functions to convert textmarc to XML """
 
     def test_get_xml_from_textmarc_success(self):
@@ -110,7 +110,7 @@ class TextmarcToXMLTests(unittest.TestCase):
         self.assertEqual(re.sub("\s+", " ", output['resultXML'].strip()),
             re.sub("\s+", " ", xml_expected_output.strip()))
 
-class TestPerformDoiSearch(unittest.TestCase):
+class TestPerformDoiSearch(InvenioTestCase):
     """Test the perform_doi_search function, which resolves the doi using
     dx.doi.org page and returns the url of the resource
     """

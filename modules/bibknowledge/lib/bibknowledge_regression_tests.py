@@ -19,7 +19,7 @@
 
 """Regression tests for BibKnowledge."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR
 from invenio.bibknowledge import kb_exists, get_kba_values, get_kbr_values, \
@@ -31,7 +31,7 @@ from invenio.bibknowledge_dblayer import get_kb_description
 from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
 
 
-class BibknowledgeRegressionTests(unittest.TestCase):
+class BibknowledgeRegressionTests(InvenioTestCase):
     """Regression test functions for bibknowledge."""
 
     def _randomstring(self):

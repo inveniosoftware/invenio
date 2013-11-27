@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import cgi
 
 from invenio.testutils import make_test_suite, run_test_suite
@@ -78,7 +78,7 @@ from invenio import webinterface_handler
 from invenio.config import CFG_SITE_LANG
 
 
-class TestWashArgs(unittest.TestCase):
+class TestWashArgs(InvenioTestCase):
     """webinterface - Test for washing of URL query arguments"""
 
     def _check(self, query, default, expected):

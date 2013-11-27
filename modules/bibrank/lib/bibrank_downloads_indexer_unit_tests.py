@@ -17,12 +17,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio import bibrank_downloads_indexer
 from invenio.testutils import make_test_suite, run_test_suite
 
-class TestListSetOperations(unittest.TestCase):
+class TestListSetOperations(InvenioTestCase):
     """Test list set operations."""
 
     def test_uniq(self):
@@ -33,7 +33,7 @@ class TestListSetOperations(unittest.TestCase):
         """bibrank downloads indexer - database tuples to list"""
         self.assertEqual([1, 2, 3], bibrank_downloads_indexer.database_tuples_to_single_list(((1,), (2,), (3,))))
 
-class TestMergeDictionnaries(unittest.TestCase):
+class TestMergeDictionnaries(InvenioTestCase):
     """Test bibrank_downloads_indexer merge 2 dictionnaries"""
 
     def test_merge_with_old_dictionnary(self):

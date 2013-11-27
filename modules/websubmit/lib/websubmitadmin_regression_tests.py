@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
@@ -33,7 +33,7 @@ from invenio.websubmitadmincli import \
      diff_submission
 from invenio.dbquery import run_sql
 
-class WebSubmitAdminWebPagesAvailabilityTest(unittest.TestCase):
+class WebSubmitAdminWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSubmit Admin web pages whether they are up or not."""
 
     def test_websubmit_admin_interface_pages_availability(self):
@@ -69,7 +69,7 @@ class WebSubmitAdminWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class WebSubmitAdminCLITest(unittest.TestCase):
+class WebSubmitAdminCLITest(InvenioTestCase):
     """Test WebSubmit Admin CLI."""
 
     dummy_submission_dump_1 = r"""

@@ -24,7 +24,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import re
 import urlparse, cgi
 import sys
@@ -115,7 +115,7 @@ def combinations(iterable, r):
             indices[j] = indices[j-1] + 1
         yield tuple(pool[i] for i in indices)
 
-class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
+class WebSearchWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSearch web pages whether they are up or not."""
 
     def test_search_interface_pages_availability(self):
@@ -213,7 +213,7 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
                              test_web_page_content(CFG_SITE_URL + '/help/search-guide?ln=fr',
                                                    expected_text="Guide de recherche"))
 
-class WebSearchTestLegacyURLs(unittest.TestCase):
+class WebSearchTestLegacyURLs(InvenioTestCase):
 
     """ Check that the application still responds to legacy URLs for
     navigating, searching and browsing."""
@@ -304,7 +304,7 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/help/search/guide.en.html',
                                                expected_text="Search Guide"))
 
-class WebSearchTestRecord(unittest.TestCase):
+class WebSearchTestRecord(InvenioTestCase):
     """ Check the interface of the /CFG_SITE_RECORD results """
 
     def test_format_links(self):
@@ -390,7 +390,7 @@ class WebSearchTestRecord(unittest.TestCase):
         return
 
 
-class WebSearchTestCollections(unittest.TestCase):
+class WebSearchTestCollections(InvenioTestCase):
 
     def test_traversal_links(self):
         """ websearch - traverse all the publications of a collection """
@@ -535,7 +535,7 @@ class WebSearchTestCollections(unittest.TestCase):
                                            unexpected_text=unexpected_text))
         return
 
-class WebSearchTestBrowse(unittest.TestCase):
+class WebSearchTestBrowse(InvenioTestCase):
 
     def test_browse_field(self):
         """ websearch - check that browsing works """
@@ -628,7 +628,7 @@ class WebSearchTestBrowse(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
 
 
-class WebSearchTestOpenURL(unittest.TestCase):
+class WebSearchTestOpenURL(InvenioTestCase):
 
     def test_isbn_01(self):
         """ websearch - isbn query via OpenURL 0.1"""
@@ -679,7 +679,7 @@ class WebSearchTestOpenURL(unittest.TestCase):
         })
 
 
-class WebSearchTestSearch(unittest.TestCase):
+class WebSearchTestSearch(InvenioTestCase):
 
     def test_hits_in_other_collection(self):
         """ websearch - check extension of a query to the home collection """
@@ -869,7 +869,7 @@ class WebSearchTestSearch(unittest.TestCase):
         return
 
 
-class WebSearchCJKTokenizedSearchTest(unittest.TestCase):
+class WebSearchCJKTokenizedSearchTest(InvenioTestCase):
     """
         Reindexes record 104 (the one with chinese poetry) with use of BibIndexCJKTokenizer.
         After tests it reindexes record 104 back with BibIndexDefaultTokenizer.
@@ -912,7 +912,7 @@ class WebSearchCJKTokenizedSearchTest(unittest.TestCase):
                                                    expected_text='[104]'))
 
 
-class WebSearchTestWildcardLimit(unittest.TestCase):
+class WebSearchTestWildcardLimit(InvenioTestCase):
     """Checks if the wildcard limit is correctly passed and that
     users without autorization can not exploit it"""
 
@@ -973,7 +973,7 @@ class WebSearchTestWildcardLimit(unittest.TestCase):
         browser.response().read()
         browser.close()
 
-class WebSearchNearestTermsTest(unittest.TestCase):
+class WebSearchNearestTermsTest(InvenioTestCase):
     """Check various alternatives of searches leading to the nearest
     terms box."""
 
@@ -1123,7 +1123,7 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_link_label='finch'))
 
 
-class WebSearchBooleanQueryTest(unittest.TestCase):
+class WebSearchBooleanQueryTest(InvenioTestCase):
     """Check various boolean queries."""
 
     def test_successful_boolean_query(self):
@@ -1146,7 +1146,7 @@ class WebSearchBooleanQueryTest(unittest.TestCase):
                                                expected_text="Boolean query returned no hits. Please combine your search terms differently."))
 
 
-class WebSearchAuthorQueryTest(unittest.TestCase):
+class WebSearchAuthorQueryTest(InvenioTestCase):
     """Check various author-related queries."""
 
     def test_propose_similar_author_names_box(self):
@@ -1168,7 +1168,7 @@ class WebSearchAuthorQueryTest(unittest.TestCase):
             self.fail("Should not propose similar author names box.")
         return
 
-class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
+class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
     """Check typical search engine Python API calls on the demo data."""
 
     def test_search_engine_python_api_for_failed_query(self):
@@ -1918,7 +1918,7 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
         """this test was written along with a bug report, needs fixing."""
         self.assertEqual([16], perform_request_search(p='author:"Abbott, R B"'))
 
-class WebSearchSearchEngineWebAPITest(unittest.TestCase):
+class WebSearchSearchEngineWebAPITest(InvenioTestCase):
     """Check typical search engine Web API calls on the demo data."""
 
     def test_search_engine_web_api_for_failed_query(self):
@@ -2742,7 +2742,7 @@ Zaffaroni, A
 
 
 
-class WebSearchRecordWebAPITest(unittest.TestCase):
+class WebSearchRecordWebAPITest(InvenioTestCase):
     """Check typical /record Web API calls on the demo data."""
 
     def test_record_web_api_textmarc_full(self):
@@ -3164,7 +3164,7 @@ Zaffaroni, A
 """))
 
 
-class WebSearchRestrictedCollectionTest(unittest.TestCase):
+class WebSearchRestrictedCollectionTest(InvenioTestCase):
     """Test of the restricted collections behaviour."""
 
     def test_restricted_collection_interface_page(self):
@@ -3294,7 +3294,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
             self.fail("Oops, a 'Restricted' flag should appear on restricted records.")
 
 
-class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
+class WebSearchRestrictedCollectionHandlingTest(InvenioTestCase):
     """
     Check how the restricted or restricted and "hidden" collection
     handling works: (i)user has or not rights to access to specific
@@ -3606,7 +3606,7 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
 
 
-class WebSearchRestrictedPicturesTest(unittest.TestCase):
+class WebSearchRestrictedPicturesTest(InvenioTestCase):
     """
     Check whether restricted pictures on the demo site can be accessed
     well by people who have rights to access them.
@@ -3641,7 +3641,7 @@ class WebSearchRestrictedPicturesTest(unittest.TestCase):
         if error_messages:
             self.failUnless("HTTP Error 401: Unauthorized" in merge_error_messages(error_messages))
 
-class WebSearchRestrictedWebJournalFilesTest(unittest.TestCase):
+class WebSearchRestrictedWebJournalFilesTest(InvenioTestCase):
     """
     Check whether files attached to a WebJournal article are well
     accessible when the article is published
@@ -3708,7 +3708,7 @@ class WebSearchRestrictedWebJournalFilesTest(unittest.TestCase):
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
-class WebSearchRSSFeedServiceTest(unittest.TestCase):
+class WebSearchRSSFeedServiceTest(InvenioTestCase):
     """Test of the RSS feed service."""
 
     def test_rss_feed_service(self):
@@ -3717,7 +3717,7 @@ class WebSearchRSSFeedServiceTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/rss',
                                                expected_text='<rss version="2.0"'))
 
-class WebSearchXSSVulnerabilityTest(unittest.TestCase):
+class WebSearchXSSVulnerabilityTest(InvenioTestCase):
     """Test possible XSS vulnerabilities of the search engine."""
 
     def test_xss_in_collection_interface_page(self):
@@ -3756,7 +3756,7 @@ class WebSearchXSSVulnerabilityTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&action_browse=Browse',
                                                expected_text='&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;'))
 
-class WebSearchResultsOverview(unittest.TestCase):
+class WebSearchResultsOverview(InvenioTestCase):
     """Test of the search results page's Results overview box and links."""
 
     def test_results_overview_split_off(self):
@@ -3800,7 +3800,7 @@ class WebSearchResultsOverview(unittest.TestCase):
             self.fail("Oops, when split by collection is on, "
                       "a link to Multimedia & Arts should be found.")
 
-class WebSearchSortResultsTest(unittest.TestCase):
+class WebSearchSortResultsTest(InvenioTestCase):
     """Test of the search results page's sorting capability."""
 
     def test_sort_results_default(self):
@@ -3827,7 +3827,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1&sf=reportnumber&so=d&sp=cern',
                                                expected_text="[CERN-TH-2002-069]"))
 
-class WebSearchSearchResultsXML(unittest.TestCase):
+class WebSearchSearchResultsXML(InvenioTestCase):
     """Test search results in various output"""
 
     def test_search_results_xm_output_split_on(self):
@@ -3926,7 +3926,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
             self.fail("Oops, multiple document elements </collection> "
                       "found in search results.")
 
-class WebSearchUnicodeQueryTest(unittest.TestCase):
+class WebSearchUnicodeQueryTest(InvenioTestCase):
     """Test of the search results for queries containing Unicode characters."""
 
     def test_unicode_word_query(self):
@@ -3962,7 +3962,7 @@ class WebSearchUnicodeQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=title%3A%2F%CE%B7%2F',
                                                expected_text="[76]"))
 
-class WebSearchMARCQueryTest(unittest.TestCase):
+class WebSearchMARCQueryTest(InvenioTestCase):
     """Test of the search results for queries containing physical MARC tags."""
 
     def test_single_marc_tag_exact_phrase_query(self):
@@ -3989,7 +3989,7 @@ class WebSearchMARCQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F&rg=100',
                                                expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96, 108]"))
 
-class WebSearchExtSysnoQueryTest(unittest.TestCase):
+class WebSearchExtSysnoQueryTest(InvenioTestCase):
     """Test of queries using external system numbers."""
 
     def test_existing_sysno_html_output(self):
@@ -4016,7 +4016,7 @@ class WebSearchExtSysnoQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?sysno=000289446CERRRR&of=id',
                                                expected_text="[]"))
 
-class WebSearchResultsRecordGroupingTest(unittest.TestCase):
+class WebSearchResultsRecordGroupingTest(InvenioTestCase):
     """Test search results page record grouping (rg)."""
 
     def test_search_results_rg_guest(self):
@@ -4034,7 +4034,7 @@ class WebSearchResultsRecordGroupingTest(unittest.TestCase):
                                                username='admin',
                                                expected_text="1 - 17"))
 
-class WebSearchSpecialTermsQueryTest(unittest.TestCase):
+class WebSearchSpecialTermsQueryTest(InvenioTestCase):
     """Test of the search results for queries containing special terms."""
 
     def test_special_terms_u1(self):
@@ -4069,7 +4069,7 @@ class WebSearchSpecialTermsQueryTest(unittest.TestCase):
                                                expected_text="[57, 79, 80, 88, 96]"))
 
 
-class WebSearchJournalQueryTest(unittest.TestCase):
+class WebSearchJournalQueryTest(InvenioTestCase):
     """Test of the search results for journal pubinfo queries."""
 
     def test_query_journal_title_only(self):
@@ -4088,7 +4088,7 @@ class WebSearchJournalQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&f=journal&p=Phys.+Lett.+B+531+%282002%29+301',
                                                expected_text="[78]"))
 
-class WebSearchStemmedIndexQueryTest(unittest.TestCase):
+class WebSearchStemmedIndexQueryTest(InvenioTestCase):
     """Test of the search results for queries using stemmed indexes."""
 
     def test_query_stemmed_lowercase(self):
@@ -4108,7 +4108,7 @@ class WebSearchStemmedIndexQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=DASSE',
                                                expected_text="[25, 26]"))
 
-class WebSearchSummarizerTest(unittest.TestCase):
+class WebSearchSummarizerTest(InvenioTestCase):
     """Test of the search results summarizer functions."""
 
     def test_most_popular_field_values_singletag(self):
@@ -4171,7 +4171,7 @@ class WebSearchSummarizerTest(unittest.TestCase):
                                                expected_link_label='1'))
 
 
-class WebSearchRecordCollectionGuessTest(unittest.TestCase):
+class WebSearchRecordCollectionGuessTest(InvenioTestCase):
     """Primary collection guessing tests."""
 
     def test_guess_primary_collection_of_a_record(self):
@@ -4185,7 +4185,7 @@ class WebSearchRecordCollectionGuessTest(unittest.TestCase):
         self.assertEqual(guess_collection_of_a_record(12, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
         self.assertEqual(guess_collection_of_a_record(12, '%s/collection/Theoretical%%20Physics%%20%%28TH%%29?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
 
-class WebSearchGetFieldValuesTest(unittest.TestCase):
+class WebSearchGetFieldValuesTest(InvenioTestCase):
     """Testing get_fieldvalues() function."""
 
     def test_get_fieldvalues_001(self):
@@ -4221,7 +4221,7 @@ class WebSearchGetFieldValuesTest(unittest.TestCase):
         self.assertEqual(get_fieldvalues([17, 18], '909C1u', repetitive_values=False),
                          ['CERN'])
 
-class WebSearchAddToBasketTest(unittest.TestCase):
+class WebSearchAddToBasketTest(InvenioTestCase):
     """Test of the add-to-basket presence depending on user rights."""
 
     def test_add_to_basket_guest(self):
@@ -4259,7 +4259,7 @@ class WebSearchAddToBasketTest(unittest.TestCase):
                                                username='hyde',
                                                password='h123yde'))
 
-class WebSearchAlertTeaserTest(unittest.TestCase):
+class WebSearchAlertTeaserTest(InvenioTestCase):
     """Test of the alert teaser presence depending on user rights."""
 
     def test_alert_teaser_guest(self):
@@ -4298,7 +4298,7 @@ class WebSearchAlertTeaserTest(unittest.TestCase):
                                                password='h123yde'))
 
 
-class WebSearchSpanQueryTest(unittest.TestCase):
+class WebSearchSpanQueryTest(InvenioTestCase):
     """Test of span queries."""
 
     def test_span_in_word_index(self):
@@ -4336,7 +4336,7 @@ class WebSearchSpanQueryTest(unittest.TestCase):
                                                expected_text='[8, 9, 11, 12, 13, 14, 17, 18, 47]'))
 
 
-class WebSearchReferstoCitedbyTest(unittest.TestCase):
+class WebSearchReferstoCitedbyTest(InvenioTestCase):
     """Test of refersto/citedby search operators."""
 
     def test_refersto_recid(self):
@@ -4400,7 +4400,7 @@ class WebSearchReferstoCitedbyTest(unittest.TestCase):
                                                expected_text='There are no records cited by title:.'))
 
 
-class WebSearchSPIRESSyntaxTest(unittest.TestCase):
+class WebSearchSPIRESSyntaxTest(InvenioTestCase):
     """Test of SPIRES syntax issues"""
 
     if CFG_WEBSEARCH_SPIRES_SYNTAX > 0:
@@ -4420,7 +4420,7 @@ class WebSearchSPIRESSyntaxTest(unittest.TestCase):
                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113, 127, 128]'))
 
 
-class WebSearchDateQueryTest(unittest.TestCase):
+class WebSearchDateQueryTest(InvenioTestCase):
     """Test various date queries."""
 
     def setUp(self):
@@ -4444,7 +4444,7 @@ class WebSearchDateQueryTest(unittest.TestCase):
         self.assertEqual(self.empty, search_unit_in_bibrec("3000-01-01", "9999-12-31", 'creationdate'))
 
 
-class WebSearchSynonymQueryTest(unittest.TestCase):
+class WebSearchSynonymQueryTest(InvenioTestCase):
     """Test of queries using synonyms."""
 
     def test_journal_phrvd(self):
@@ -4495,7 +4495,7 @@ class WebSearchSynonymQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2&of=id',
                                                expected_text="[59]"))
 
-class WebSearchWashCollectionsTest(unittest.TestCase):
+class WebSearchWashCollectionsTest(InvenioTestCase):
     """Test if the collection argument is washed correctly"""
 
     def test_wash_coll_when_coll_restricted(self):
@@ -4508,7 +4508,7 @@ class WebSearchWashCollectionsTest(unittest.TestCase):
             ['Books & Reports', 'Theses'])
 
 
-class WebSearchAuthorCountQueryTest(unittest.TestCase):
+class WebSearchAuthorCountQueryTest(InvenioTestCase):
     """Test of queries using authorcount fields."""
 
     def test_journal_authorcount_word(self):
@@ -4536,7 +4536,7 @@ class WebSearchAuthorCountQueryTest(unittest.TestCase):
                                                expected_text="[10, 17]"))
 
 
-class WebSearchItemCountQueryTest(unittest.TestCase):
+class WebSearchItemCountQueryTest(InvenioTestCase):
     """Test of queries using itemcount field/index"""
 
     def test_itemcount_plus(self):
@@ -4564,7 +4564,7 @@ class WebSearchItemCountQueryTest(unittest.TestCase):
                                                expected_text="[31, 34]"))
 
 
-class WebSearchFiletypeQueryTest(unittest.TestCase):
+class WebSearchFiletypeQueryTest(InvenioTestCase):
     """Test of queries using filetype fields."""
 
     def test_mpg_filetype(self):
@@ -4586,7 +4586,7 @@ class WebSearchFiletypeQueryTest(unittest.TestCase):
                                         expected_text="[50, 93]"))
 
 
-class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
+class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
     """Tests the perform request search API after refactoring."""
 
     def _run_test(self, test_args, expected_results):
@@ -4685,7 +4685,7 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
         self._run_test('p=recid:148x;of=xm;rg=200', "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n\n</collection>")
 
 
-class WebSearchGetRecordTests(unittest.TestCase):
+class WebSearchGetRecordTests(InvenioTestCase):
     def setUp(self):
         self.recid = run_sql("INSERT INTO bibrec(creation_date, modification_date) VALUES(NOW(), NOW())")
 
@@ -4699,7 +4699,7 @@ class WebSearchGetRecordTests(unittest.TestCase):
         self.assertEqual(get_record(self.recid), {'001': [([], ' ', ' ', str(self.recid), 1)]})
 
 
-class WebSearchExactTitleIndexTest(unittest.TestCase):
+class WebSearchExactTitleIndexTest(InvenioTestCase):
     """Checks if exact title index works correctly """
 
     def test_exacttitle_query_solves_problems(self):

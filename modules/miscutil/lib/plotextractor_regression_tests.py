@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 import os
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.plotextractor import get_defaults
 from invenio.plotextractor_output_utils import remove_dups, get_converted_image_name
@@ -31,7 +31,7 @@ from invenio.config import CFG_TMPDIR, CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.shellutils import run_shell_command
 
-class GetDefaultsTest(unittest.TestCase):
+class GetDefaultsTest(InvenioTestCase):
     """Test function to get default values."""
     def setUp(self):
         self.arXiv_id = "arXiv:astro-ph_0104076"

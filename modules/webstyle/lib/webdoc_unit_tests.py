@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_LANG, \
                            CFG_SITE_LANGS, \
@@ -46,7 +46,7 @@ if 'fr' in CFG_SITE_LANGS:
 else:
     lang_french_configured = False
 
-class WebDocLanguageTest(unittest.TestCase):
+class WebDocLanguageTest(InvenioTestCase):
     """Check that WebDoc correctly supports <lang> translation
        directives and _()_ syntax"""
 
@@ -85,7 +85,7 @@ class WebDocLanguageTest(unittest.TestCase):
             self.assertEqual(result[0][1],
                              'my_string: %s (end)' % _("Search"))
 
-class WebDocPartsTest(unittest.TestCase):
+class WebDocPartsTest(InvenioTestCase):
     """Check that WebDoc correctly returns values for the different
        parts of webdoc files"""
 
@@ -116,7 +116,7 @@ class WebDocPartsTest(unittest.TestCase):
             # Description
             self.assertEqual(result[0][6], 'A description')
 
-class WebDocVariableReplacementTest(unittest.TestCase):
+class WebDocVariableReplacementTest(InvenioTestCase):
     """Check that WebDoc correctly replaces variables with their
        values"""
 
@@ -140,7 +140,7 @@ class WebDocVariableReplacementTest(unittest.TestCase):
             result = transform('<lang:link />', languages=['fr'])
             self.assertEqual(result[0][1], '?ln=fr')
 
-class WebDocCommentsFiltering(unittest.TestCase):
+class WebDocCommentsFiltering(InvenioTestCase):
     """Check that comments are correctly removed from webdoc files"""
 
     if lang_english_configured:

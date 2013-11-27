@@ -19,7 +19,7 @@
 
 """WebLinkback - Unit Test Suite"""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import datetime
 
 from invenio.weblinkback import split_in_days
@@ -27,7 +27,7 @@ from invenio.testutils import make_test_suite, run_test_suite
 from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, CFG_WEBLINKBACK_STATUS
 
 
-class TestSplitLinkbacksInInsertionDayGroups(unittest.TestCase):
+class TestSplitLinkbacksInInsertionDayGroups(InvenioTestCase):
     """Test for splitting linkbacks in insertion day groups"""
 
     def setUp(self):

@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.access_control_firerole import compile_role_definition, \
     serialize, deserialize, acc_firerole_check_user
@@ -30,7 +30,7 @@ from invenio.access_control_config import InvenioWebAccessFireroleError, \
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.webuser import collect_user_info
 
-class AccessControlFireRoleTest(unittest.TestCase):
+class AccessControlFireRoleTest(InvenioTestCase):
     """Test functions related to the firewall like role definitions."""
 
     def setUp(self):

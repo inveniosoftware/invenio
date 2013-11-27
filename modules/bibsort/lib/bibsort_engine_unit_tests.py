@@ -19,7 +19,7 @@
 
 """Testing module for BibSort Engine"""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.bibsort_engine import perform_modify_record, \
     perform_insert_record, perform_delete_record, \
@@ -27,7 +27,7 @@ from invenio.bibsort_engine import perform_modify_record, \
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class TestBibSort(unittest.TestCase):
+class TestBibSort(InvenioTestCase):
     """Test BibSort."""
 
     def test_perform_modify_record(self):

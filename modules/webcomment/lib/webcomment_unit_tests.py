@@ -19,12 +19,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.webcomment import calculate_start_date
 from invenio.testutils import make_test_suite, run_test_suite
 
-class TestCalculateStartDate(unittest.TestCase):
+class TestCalculateStartDate(InvenioTestCase):
     """Test for calculating previous date."""
 
     def test_previous_year(self):

@@ -19,7 +19,7 @@
 
 """Unit tests for jsonutils library."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.testutils import make_test_suite, run_test_suite
 

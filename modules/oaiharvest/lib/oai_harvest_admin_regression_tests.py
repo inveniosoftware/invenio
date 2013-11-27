@@ -21,13 +21,13 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
-class OAIHarvestAdminWebPagesAvailabilityTest(unittest.TestCase):
+class OAIHarvestAdminWebPagesAvailabilityTest(InvenioTestCase):
     """Check OAIHarvest Admin web pages whether they are up or not."""
 
     def test_oaiharvestadmin_interface_pages_availability(self):

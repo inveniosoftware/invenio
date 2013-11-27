@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 import os
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.plotextractor import put_it_together, \
                                   find_open_and_close_braces, \
@@ -35,7 +35,7 @@ from invenio.config import CFG_TMPDIR, CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.shellutils import run_shell_command
 
-class PutItTogetherTest(unittest.TestCase):
+class PutItTogetherTest(InvenioTestCase):
     """Test functions related to the put_it_together function."""
 
     def setUp(self):
@@ -128,7 +128,7 @@ class PutItTogetherTest(unittest.TestCase):
         self.assertTrue(images_and_captions == [('singleimage', 'some caption', 'singlelabel')], \
                 'didn\'t correctly extract the caption for zipping')
 
-class TestFindOpenAndCloseBraces(unittest.TestCase):
+class TestFindOpenAndCloseBraces(InvenioTestCase):
 
     def test_simple_test(self):
         """plotextractor - find_open_and_close_braces simple"""
@@ -202,7 +202,7 @@ class TestFindOpenAndCloseBraces(unittest.TestCase):
         self.assertTrue(end == -1, 'didn\'t identify non-brace')
         self.assertTrue(end_line == -1, 'didn\'t identify non-brace')
 
-class TestIntelligentlyFindFilenames(unittest.TestCase):
+class TestIntelligentlyFindFilenames(InvenioTestCase):
 
     def test_simple_test(self):
         """plotextractor - intelligently_find_filenames simple"""
@@ -250,7 +250,7 @@ class TestIntelligentlyFindFilenames(unittest.TestCase):
         self.assertTrue('something.eps' in filenames, 'didn\'t find figure=')
         self.assertTrue('anotherthing.ps' in filenames, 'didn\'t find filename')
 
-class TestAssembleCaption(unittest.TestCase):
+class TestAssembleCaption(InvenioTestCase):
 
     def test_simple_test(self):
         """plotextractor - assemble caption simple"""
@@ -268,7 +268,7 @@ class TestAssembleCaption(unittest.TestCase):
         self.assertTrue(caption == 'some simple caption!', 'didn\'t correctly assemble ' + \
                         'caption')
 
-class TestRemoveDups(unittest.TestCase):
+class TestRemoveDups(InvenioTestCase):
 
     def test_no_dups(self):
         """plotextractor - remove_dups no dupes"""
@@ -294,7 +294,7 @@ class TestRemoveDups(unittest.TestCase):
         self.assertTrue(pared_images_and_captions == [('img1', 'caption1 : caption2', 'label1', 'FIXME1')], \
                 'didn\'t merge captions correctly')
 
-class TestGetConvertedImageName(unittest.TestCase):
+class TestGetConvertedImageName(InvenioTestCase):
 
     def test_no_change_test(self):
         """plotextractor - get_converted_image_name no change"""

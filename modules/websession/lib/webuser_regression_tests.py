@@ -24,7 +24,7 @@
 __revision__ = \
     "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from mechanize import Browser
 
@@ -33,7 +33,7 @@ from invenio.config import CFG_SITE_SECURE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio import webuser
 
-class IsUserSuperAdminTests(unittest.TestCase):
+class IsUserSuperAdminTests(InvenioTestCase):
     """Test functions related to the isUserSuperAdmin function."""
     def setUp(self):
         self.id_admin = run_sql('SELECT id FROM user WHERE nickname="admin"')[0][0]
@@ -47,7 +47,7 @@ class IsUserSuperAdminTests(unittest.TestCase):
         """webuser - isUserSuperAdmin with hyde"""
         self.failIf(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_hyde)))
 
-class WebSessionYourSettingsTests(unittest.TestCase):
+class WebSessionYourSettingsTests(InvenioTestCase):
     """Check WebSession web pages whether they are up or not."""
 
     def tearDown(self):

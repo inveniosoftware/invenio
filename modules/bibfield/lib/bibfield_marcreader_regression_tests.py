@@ -23,7 +23,7 @@ BibField Marc21 reader regression tests.
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.bibfield_utils import BlobWrapper
 from invenio.bibfield_marcreader import MarcReader
@@ -31,7 +31,7 @@ from invenio.bibfield_marcreader import MarcReader
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class BibFieldMarcReaderMarcXML(unittest.TestCase):
+class BibFieldMarcReaderMarcXML(InvenioTestCase):
     """
 
     """
@@ -522,7 +522,7 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
         self.assertTrue(r['authors[0].full_name'] == "Hughes, Robert James")
 
 
-class BibFieldMarcReaderRecstruct(unittest.TestCase):
+class BibFieldMarcReaderRecstruct(InvenioTestCase):
     """
 
     """
@@ -553,7 +553,7 @@ class BibFieldMarcReaderRecstruct(unittest.TestCase):
         self.assertTrue(r['collection.primary'] == 'PICTURE')
 
 
-class BibFieldCheckRecord(unittest.TestCase):
+class BibFieldCheckRecord(InvenioTestCase):
     """
 
     """

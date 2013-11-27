@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 try:
     import chardet
@@ -49,7 +49,7 @@ from invenio.textutils import \
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class GuessMinimumEncodingTest(unittest.TestCase):
+class GuessMinimumEncodingTest(InvenioTestCase):
     """Test functions related to guess_minimum_encoding function."""
     def test_guess_minimum_encoding(self):
         """textutils - guess_minimum_encoding."""
@@ -58,7 +58,7 @@ class GuessMinimumEncodingTest(unittest.TestCase):
         self.assertEqual(guess_minimum_encoding('Ιθάκη'), ('Ιθάκη', 'utf8'))
 
 
-class WashForXMLTest(unittest.TestCase):
+class WashForXMLTest(InvenioTestCase):
     """Test functions related to wash_for_xml function."""
 
     def test_latin_characters_washing_1_0(self):
@@ -198,7 +198,7 @@ class WashForXMLTest(unittest.TestCase):
         self.assertEqual(wash_for_xml('$b\bar{b}$', xml_version='1.1'), '$b\x08ar{b}$')
 
 
-class WashForUTF8Test(unittest.TestCase):
+class WashForUTF8Test(InvenioTestCase):
     def test_normal_legal_string_washing(self):
         """textutils - testing UTF-8 washing on a perfectly normal string"""
         some_str = "This is an example string"
@@ -254,7 +254,7 @@ class WashForUTF8Test(unittest.TestCase):
         self.assertEqual('Göppert', wash_for_utf8(u'G\xf6ppert', True))
 
 
-class WrapTextInABoxTest(unittest.TestCase):
+class WrapTextInABoxTest(InvenioTestCase):
     """Test functions related to wrap_text_in_a_box function."""
 
     def test_plain_wrap_text_in_a_box(self):
@@ -415,7 +415,7 @@ At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praese
         self.assertEqual(wrap_text_in_a_box(text), result)
 
 
-class DecodeToUnicodeTest(unittest.TestCase):
+class DecodeToUnicodeTest(InvenioTestCase):
     """Test functions related to decode_to_unicode function."""
     if CHARDET_AVAILABLE:
         def test_decode_to_unicode(self):
@@ -427,7 +427,7 @@ class DecodeToUnicodeTest(unittest.TestCase):
         pass
 
 
-class Latex2UnicodeTest(unittest.TestCase):
+class Latex2UnicodeTest(InvenioTestCase):
     """Test functions related to translating LaTeX symbols to Unicode."""
 
     def test_latex_to_unicode(self):
@@ -438,7 +438,7 @@ class Latex2UnicodeTest(unittest.TestCase):
         self.assertEqual(translate_latex2unicode("$\\mathsl{\\Zeta}$"), u'\U0001d6e7')
 
 
-class TestStripping(unittest.TestCase):
+class TestStripping(InvenioTestCase):
     """Test for stripping functions like accents and control characters."""
     if UNIDECODE_AVAILABLE:
         def test_text_to_ascii(self):
@@ -466,7 +466,7 @@ class TestStripping(unittest.TestCase):
                          strip_accents('Œ'))
 
 
-class TestALALC(unittest.TestCase):
+class TestALALC(InvenioTestCase):
     """Test for handling ALA-LC transliteration."""
 
     if UNIDECODE_AVAILABLE:

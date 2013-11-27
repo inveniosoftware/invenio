@@ -28,9 +28,9 @@ from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibrecord import create_records, record_has_field
 from invenio.bibmatch_engine import match_records, transform_input_to_marcxml, \
                                     Querystring
-import unittest
+from invenio.testutils import InvenioTestCase
 
-class BibMatchTest(unittest.TestCase):
+class BibMatchTest(InvenioTestCase):
     """Test functions to check the functionality of bibmatch."""
 
     def setUp(self):

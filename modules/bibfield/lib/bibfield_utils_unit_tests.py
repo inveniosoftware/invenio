@@ -21,14 +21,14 @@
 BibFieldUtils Unit tests.
 """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.bibfield_utils import prepare_field_keys, build_data_structure, CoolList, CoolDict, BibFieldDict
 
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class BibFieldCoolListDictUnitTests(unittest.TestCase):
+class BibFieldCoolListDictUnitTests(InvenioTestCase):
     """
     Test class to verify the correct behaviour of the classes involved into the
     intermediate structure
@@ -99,7 +99,7 @@ class BibFieldCoolListDictUnitTests(unittest.TestCase):
         self.assertTrue(d.consumed)
 
 
-class BibFieldUtilsUnitTests(unittest.TestCase):
+class BibFieldUtilsUnitTests(InvenioTestCase):
     """
     Test class for bibfield utilities
     """
@@ -138,7 +138,7 @@ class BibFieldUtilsUnitTests(unittest.TestCase):
         self.assertEqual(d, {'a': [{'b': [{'c': {'d': [None]}}]}]})
 
 
-class BibFieldDictUnitTest(unittest.TestCase):
+class BibFieldDictUnitTest(InvenioTestCase):
     """
     Test class for bibfield base dictionary
     """

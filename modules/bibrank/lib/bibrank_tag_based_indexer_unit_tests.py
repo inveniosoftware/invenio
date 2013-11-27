@@ -21,13 +21,13 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio import bibrank_tag_based_indexer
 from invenio.bibrank import split_ranges
 from invenio.testutils import make_test_suite, run_test_suite
 
-class TestListSetOperations(unittest.TestCase):
+class TestListSetOperations(InvenioTestCase):
     """Test list set operations."""
 
     def test_union_dicts(self):

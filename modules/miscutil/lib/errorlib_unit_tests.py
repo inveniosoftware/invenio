@@ -24,10 +24,10 @@ __revision__ = "$Id$"
 from invenio.errorlib import get_emergency_recipients
 from invenio.testutils import make_test_suite, run_test_suite
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import datetime
 
-class TestGetEmergencyRecipients(unittest.TestCase):
+class TestGetEmergencyRecipients(InvenioTestCase):
 
     def test_get_emergency_recipients(self):
         """errorlib - test return of proper set of recipients"""

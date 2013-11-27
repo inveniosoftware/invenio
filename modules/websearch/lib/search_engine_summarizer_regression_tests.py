@@ -19,13 +19,13 @@
 
 """Regression tests for the search engine summarizer."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.intbitset import intbitset
 
 
-class WebSearchSummarizerTests(unittest.TestCase):
+class WebSearchSummarizerTests(InvenioTestCase):
     """Test utility functions for search engine summarizer."""
 
     def test_basic(self):

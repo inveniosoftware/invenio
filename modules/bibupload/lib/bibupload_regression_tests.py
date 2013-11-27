@@ -24,7 +24,7 @@
 __revision__ = "$Id$"
 
 import re
-import unittest
+from invenio.testutils import InvenioTestCase
 import os
 import time
 import sys
@@ -264,7 +264,7 @@ def force_webcoll(recid):
     c.calculate_reclist()
     c.update_reclist()
 
-class GenericBibUploadTest(unittest.TestCase):
+class GenericBibUploadTest(InvenioTestCase):
     """Generic BibUpload testing class with predefined
     setUp and tearDown methods.
     """

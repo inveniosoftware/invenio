@@ -30,9 +30,9 @@ from invenio.bibmatch_validator import compare_fieldvalues_normal, \
                                        compare_fieldvalues_title, \
                                        compare_fieldvalues_date, \
                                        get_paired_comparisons
-import unittest
+from invenio.testutils import InvenioTestCase
 
-class BibMatchTest(unittest.TestCase):
+class BibMatchTest(InvenioTestCase):
     """Test functions to check the validator of Bibmatch."""
 
     def test_validation_get_paired_comparisons(self):

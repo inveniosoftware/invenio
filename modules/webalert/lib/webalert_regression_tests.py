@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from cStringIO import StringIO
 import sys
 import datetime
@@ -37,7 +37,7 @@ from invenio.search_engine import get_creation_date
 from invenio.dbquery import run_sql
 from invenio import alert_engine
 
-class WebAlertWebPagesAvailabilityTest(unittest.TestCase):
+class WebAlertWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebAlert web pages whether they are up or not."""
 
     def test_your_alerts_pages_availability(self):
@@ -55,7 +55,7 @@ class WebAlertWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class WebAlertHTMLToTextTest(unittest.TestCase):
+class WebAlertHTMLToTextTest(InvenioTestCase):
     """Check that HTML is properly converted to text."""
 
     def test_your_alerts_pages_availability(self):
@@ -65,7 +65,7 @@ class WebAlertHTMLToTextTest(unittest.TestCase):
 
         self.assertEqual("Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes / Wang, B ; Lin, C Y ; Abdalla, E [hep-th/0003295] \nComplex frequencies associated with quasinormal modes for large Reissner-Nordstr$\\ddot{o}$m Anti-de Sitter black holes have been computed. [...] \nPublished in Phys. Lett., B :481 2000 79-88", get_as_text(74))
 
-class WebAlertFilteringRestrictedRecords(unittest.TestCase):
+class WebAlertFilteringRestrictedRecords(InvenioTestCase):
     """Check that restricted records are filtered out for unauthorized users"""
 
     def setUp(self):

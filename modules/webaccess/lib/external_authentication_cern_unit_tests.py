@@ -21,12 +21,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_CERN_SITE
 from invenio.testutils import make_test_suite, run_test_suite, nottest
 
-class ExternalAuthenticationCernTest(unittest.TestCase):
+class ExternalAuthenticationCernTest(InvenioTestCase):
     """Test functions related to the CERN authentication."""
 
     def setUp(self):

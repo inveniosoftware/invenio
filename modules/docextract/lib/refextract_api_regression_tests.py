@@ -23,7 +23,7 @@ The Refextract task tests suite for tasks
 It requires a fully functional invenio installation.
 """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.refextract_api import update_references, \
@@ -31,7 +31,7 @@ from invenio.refextract_api import update_references, \
                                    FullTextNotAvailable
 
 
-class RefextractApiTest(unittest.TestCase):
+class RefextractApiTest(InvenioTestCase):
     def test_no_fulltext(self):
         try:
             update_references(1000000000000)

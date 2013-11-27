@@ -24,7 +24,7 @@
 __revision__ = \
     "$Id: search_engine_tests.py,v 1.20 2008/08/11 12:49:27 kaplun Exp $"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 
 from invenio.bibexport_method_fieldexporter_dblayer import QueryResult
@@ -65,11 +65,11 @@ def _create_record_marc_xml():
 
     return xml_text
 
-class TestFieldExporter(unittest.TestCase):
+class TestFieldExporter(InvenioTestCase):
     """Tests for exporting of fields."""
     pass
 
-class TesQueryResult(unittest.TestCase):
+class TesQueryResult(InvenioTestCase):
     """Tests QueryResult class"""
 
     def test_get_number_of_records_found(self):

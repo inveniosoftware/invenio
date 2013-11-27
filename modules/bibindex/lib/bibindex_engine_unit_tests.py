@@ -22,7 +22,7 @@
 __revision__ = \
     "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio import bibindex_engine
 from invenio.bibindex_engine_utils import load_tokenizers
@@ -33,7 +33,7 @@ _TOKENIZERS = load_tokenizers()
 
 
 
-class TestListSetOperations(unittest.TestCase):
+class TestListSetOperations(InvenioTestCase):
     """Tests for list set operations."""
 
     def test_list_union(self):
@@ -49,7 +49,7 @@ class TestListSetOperations(unittest.TestCase):
 
 
 
-class TestWashIndexTerm(unittest.TestCase):
+class TestWashIndexTerm(InvenioTestCase):
     """Tests for washing index terms, useful for both searching and indexing."""
 
     def test_wash_index_term_short(self):
@@ -73,7 +73,7 @@ class TestWashIndexTerm(unittest.TestCase):
           bibindex_engine.wash_index_term("Ελληνικό αλφάβητο"))
 
 
-class TestGetWordsFromPhrase(unittest.TestCase):
+class TestGetWordsFromPhrase(InvenioTestCase):
     """Tests for getting words from phrase."""
 
 
@@ -141,7 +141,7 @@ class TestGetWordsFromPhrase(unittest.TestCase):
         self.assertEqual(l_words_obtained, l_words_expected)
 
 
-class TestGetPairsFromPhrase(unittest.TestCase):
+class TestGetPairsFromPhrase(InvenioTestCase):
     """Tests for getting pairs from phrase."""
 
     def test_remove_stopwords_phrase_first(self):
@@ -161,7 +161,7 @@ class TestGetPairsFromPhrase(unittest.TestCase):
         self.assertEqual(pairs_expected, pairs_obtained)
 
 
-class TestGetWordsFromDateTag(unittest.TestCase):
+class TestGetWordsFromDateTag(InvenioTestCase):
     """Tests for getting words for date-like tag."""
 
     def test_dateindex_yyyy(self):
@@ -189,7 +189,7 @@ class TestGetWordsFromDateTag(unittest.TestCase):
                          tokenizer.get_words_from_date_tag("dd mon yyyy"))
 
 
-class TestGetAuthorFamilyNameWords(unittest.TestCase):
+class TestGetAuthorFamilyNameWords(InvenioTestCase):
     """Tests for getting family name words from author names."""
 
     def test_authornames_john_doe(self):

@@ -30,9 +30,9 @@ from invenio.dbquery import run_sql
 from invenio.webgroup import synchronize_external_groups, synchronize_all_external_groups
 from invenio.webgroup_dblayer import get_external_groups, get_all_login_method_groups
 from invenio.testutils import make_test_suite, run_test_suite
-import unittest
+from invenio.testutils import InvenioTestCase
 
-class WebGroupTest(unittest.TestCase):
+class WebGroupTest(InvenioTestCase):
     """Test functions related to the Apache authentication."""
 
     def setUp(self):

@@ -23,7 +23,7 @@ BibField module regression tests.
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_TMPDIR
 from invenio.bibfield import get_record, create_record, create_records
@@ -34,7 +34,7 @@ from invenio.search_engine import get_record as search_engine_get_record
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class BibFieldRecordFieldValuesTest(unittest.TestCase):
+class BibFieldRecordFieldValuesTest(InvenioTestCase):
     """
     Check values returned by BibField for record fields are consistent or not
     """
@@ -103,7 +103,7 @@ class BibFieldRecordFieldValuesTest(unittest.TestCase):
         self.assertTrue('title' in mainauthor_title)
 
 
-class BibFieldCreateRecordTests(unittest.TestCase):
+class BibFieldCreateRecordTests(InvenioTestCase):
     """
     Bibfield - demo file parsing test
     """
@@ -259,7 +259,7 @@ class BibFieldCreateRecordTests(unittest.TestCase):
         self.assertEquals(image['name'], bibdoc.name)
 
 
-class BibFieldLegacyTests(unittest.TestCase):
+class BibFieldLegacyTests(InvenioTestCase):
     """
     Legacy functionality tests
     """
@@ -295,7 +295,7 @@ class BibFieldLegacyTests(unittest.TestCase):
         self.assertEquals(guess_legacy_field_names('foo', 'bar'), {'foo': []})
 
 
-class BibFieldProducerTests(unittest.TestCase):
+class BibFieldProducerTests(InvenioTestCase):
     """
     Low level output tests
     """

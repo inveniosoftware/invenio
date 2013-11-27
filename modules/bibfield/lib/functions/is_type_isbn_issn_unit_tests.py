@@ -15,14 +15,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibfield_functions.is_type_isbn import is_type_isbn10, is_type_isbn13, is_type_isbn
 from invenio.bibfield_functions.is_type_issn import is_type_issn
 
 
-class ISBNISSNValidationTest(unittest.TestCase):
+class ISBNISSNValidationTest(InvenioTestCase):
     valid_isbn10 = ['99921-58-10-7', '9971-5-0210-0', '960-425-059-0',
                     '80-902734-1-6', '85-359-0277-5', '1-84356-028-3',
                     '0-684-84328-5', '0-8044-2957-X', '0-85131-041-9',

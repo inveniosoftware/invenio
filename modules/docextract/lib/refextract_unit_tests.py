@@ -23,7 +23,7 @@ The Refextract unit test suite
 The tests will not modifiy the database.
 """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import re
 
 from invenio.testutils import make_test_suite, run_test_suite
@@ -35,7 +35,7 @@ from invenio.refextract_find import get_reference_section_beginning
 from invenio.refextract_api import search_from_reference
 
 
-class ReTest(unittest.TestCase):
+class ReTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=1)
 
@@ -76,7 +76,7 @@ class ReTest(unittest.TestCase):
         self.assertEqual(m, None)
 
 
-class IbidTest(unittest.TestCase):
+class IbidTest(InvenioTestCase):
     """Testing output of refextract"""
     def setUp(self):
         setup_loggers(verbosity=1)
@@ -91,7 +91,7 @@ class IbidTest(unittest.TestCase):
         self.assertEqual(r, ({85: 4}, {85: u'IBID'}, u'[46] E. SCHRODINGER, SITZUNGSBER. PREUSS. AKAD. WISS. PHYS. MATH. KL. 24, 418(1930); ____, 3, 1(1931)'))
 
 
-class TagNumerationTest(unittest.TestCase):
+class TagNumerationTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=1)
 
@@ -108,7 +108,7 @@ class TagNumerationTest(unittest.TestCase):
         self.assertEqual(r.strip(': '), u"<cds.VOL>24</cds.VOL> <cds.YR>(1930)</cds.YR> <cds.PG>418</cds.PG>")
 
 
-class FindSectionTest(unittest.TestCase):
+class FindSectionTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=1)
 
@@ -195,7 +195,7 @@ class FindSectionTest(unittest.TestCase):
         })
 
 
-class SearchTest(unittest.TestCase):
+class SearchTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=9)
         from invenio import refextract_kbs

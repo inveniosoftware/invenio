@@ -20,7 +20,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import os
 import re
 from datetime import timedelta
@@ -189,7 +189,7 @@ def remove_reindexed_word_testtables(index_name, prefix = 'test'):
     run_sql(query_drop_reversed_index_table)
 
 
-class BibIndexRemoveStopwordsTest(unittest.TestCase):
+class BibIndexRemoveStopwordsTest(InvenioTestCase):
     """Tests remove_stopwords parameter of an index. Changes it in the database
        and reindexes from scratch into a new table to see the diffrence which is brought
        by change. Uses 'title' index.
@@ -267,7 +267,7 @@ class BibIndexRemoveStopwordsTest(unittest.TestCase):
         self.assertEqual(len(iset_removed), len(iset_original))
 
 
-class BibIndexRemoveLatexTest(unittest.TestCase):
+class BibIndexRemoveLatexTest(InvenioTestCase):
     """Tests remove_latex_markup parameter of an index. Changes it in the database
        and reindexes from scratch into a new table to see the diffrence which is brought
        by change. Uses 'abstract' index.
@@ -354,7 +354,7 @@ class BibIndexRemoveLatexTest(unittest.TestCase):
         self.assertEqual([80], ilist)
 
 
-class BibIndexRemoveHtmlTest(unittest.TestCase):
+class BibIndexRemoveHtmlTest(InvenioTestCase):
     """Tests remove_html_markup parameter of an index. Changes it in the database
        and reindexes from scratch into a new table to see the diffrence which is brought
        by change. Uses 'abstract' index.
@@ -418,7 +418,7 @@ class BibIndexRemoveHtmlTest(unittest.TestCase):
         self.assertNotEqual(ilist, ilist_test)
 
 
-class BibIndexYearIndexTest(unittest.TestCase):
+class BibIndexYearIndexTest(InvenioTestCase):
     """
         Checks year index. Tests are diffrent than those inside WebSearch module because
         they only test content and reindexation and not the search itself.
@@ -489,7 +489,7 @@ class BibIndexYearIndexTest(unittest.TestCase):
 
 
 
-class BibIndexAuthorCountIndexTest(unittest.TestCase):
+class BibIndexAuthorCountIndexTest(InvenioTestCase):
     """
        Checks author count index. Tests are diffrent than those inside WebSearch module because
        they only test content and reindexation and not the search itself.
@@ -546,7 +546,7 @@ class BibIndexAuthorCountIndexTest(unittest.TestCase):
         self.assertEqual(num_orig, num_test)
 
 
-class BibIndexItemCountIndexTest(unittest.TestCase):
+class BibIndexItemCountIndexTest(InvenioTestCase):
     """
        Checks item count index. Checks a number of copies of books for records
        as well as occurrences of particular number of copies in test data.
@@ -585,7 +585,7 @@ class BibIndexItemCountIndexTest(unittest.TestCase):
         self.assertEqual(deserialize_via_marshal(res[0][0]),['3'])
 
 
-class BibIndexFiletypeIndexTest(unittest.TestCase):
+class BibIndexFiletypeIndexTest(InvenioTestCase):
     """
        Checks filetype index. Tests are diffrent than those inside WebSearch module because
        they only test content and indexation and not the search itself.
@@ -616,7 +616,7 @@ class BibIndexFiletypeIndexTest(unittest.TestCase):
         self.assertEqual(set2, ['pdf', 'ps.gz'])
 
 
-class BibIndexJournalIndexTest(unittest.TestCase):
+class BibIndexJournalIndexTest(InvenioTestCase):
     """
         Checks journal index. Tests are diffrent than those inside WebSearch module because
         they only test content and reindexation and not the search itself.
@@ -672,7 +672,7 @@ class BibIndexJournalIndexTest(unittest.TestCase):
         self.assertEqual(num_orig, num_test)
 
 
-class BibIndexCJKTokenizerTitleIndexTest(unittest.TestCase):
+class BibIndexCJKTokenizerTitleIndexTest(InvenioTestCase):
     """
        Checks CJK tokenization on title index.
     """
@@ -722,7 +722,7 @@ class BibIndexCJKTokenizerTitleIndexTest(unittest.TestCase):
         self.assertEqual(iset, ['\xe6\x95\xac', '\xe7\x8d\xa8', '\xe4\xba\xad', '\xe5\x9d\x90'])
 
 
-class BibIndexAuthorityRecordTest(unittest.TestCase):
+class BibIndexAuthorityRecordTest(InvenioTestCase):
     """Test if BibIndex correctly knows when to update the index for a
     bibliographic record if it is dependent upon an authority record changed
     within the given date range"""
@@ -921,7 +921,7 @@ def remove_virtual_index(index_id):
     run_sql(query % index_id)
 
 
-class BibIndexFindingAffectedIndexes(unittest.TestCase):
+class BibIndexFindingAffectedIndexes(InvenioTestCase):
     """
     Checks if function 'find_affected_records_for_index'
     works correctly.
@@ -999,7 +999,7 @@ class BibIndexFindingAffectedIndexes(unittest.TestCase):
 
 
 
-class BibIndexIndexingAffectedIndexes(unittest.TestCase):
+class BibIndexIndexingAffectedIndexes(InvenioTestCase):
 
     started = False
     records = []
@@ -1082,7 +1082,7 @@ class BibIndexIndexingAffectedIndexes(unittest.TestCase):
         self.assertEqual(False, 'john' in global_rec1)
 
 
-class BibIndexFindingIndexesForTags(unittest.TestCase):
+class BibIndexFindingIndexesForTags(InvenioTestCase):
     """ Tests function 'get_tag_indexes' """
 
     def test_fulltext_tag_virtual_indexes_on(self):
@@ -1129,7 +1129,7 @@ class BibIndexFindingIndexesForTags(unittest.TestCase):
         self.assertEqual(('authoritysubject', 'miscellaneous'), zip(*get_tag_indexes('15%',virtual=False))[1])
 
 
-class BibIndexFindingTagsForIndexes(unittest.TestCase):
+class BibIndexFindingTagsForIndexes(InvenioTestCase):
     """ Tests function 'get_index_tags' """
 
 
@@ -1149,7 +1149,7 @@ class BibIndexFindingTagsForIndexes(unittest.TestCase):
         self.assertEqual('245__%' in tags, True)
 
 
-class BibIndexGlobalIndexContentTest(unittest.TestCase):
+class BibIndexGlobalIndexContentTest(InvenioTestCase):
     """ Tests if virtual global index is correctly indexed"""
 
     def is_part_of(self, container, content):
@@ -1228,7 +1228,7 @@ class BibIndexGlobalIndexContentTest(unittest.TestCase):
         self.assertEqual(self.is_part_of(glob, res), True)
 
 
-class BibIndexVirtualIndexAlsoChangesTest(unittest.TestCase):
+class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
     """ Tests if virtual index changes after changes in dependent index"""
 
     counter = 0
@@ -1309,7 +1309,7 @@ class BibIndexVirtualIndexAlsoChangesTest(unittest.TestCase):
                          deserialize_via_marshal(run_sql(query)[0][0]))
 
 
-class BibIndexVirtualIndexRemovalTest(unittest.TestCase):
+class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
 
     counter = 0
     indexes = ["authorcount", "journal", "year"]
@@ -1400,7 +1400,7 @@ class BibIndexVirtualIndexRemovalTest(unittest.TestCase):
         self.assertEqual(['151', '357','1985', 'Phys. Lett., B 151 (1985) 357', 'Phys. Lett., B'],
                          deserialize_via_marshal(res[0][0]))
 
-class BibIndexCLICallTest(unittest.TestCase):
+class BibIndexCLICallTest(InvenioTestCase):
     """Tests if calls to bibindex from CLI (bibsched deamon) are run correctly"""
 
     def test_correct_message_for_wrong_index_names(self):

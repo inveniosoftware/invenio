@@ -19,7 +19,7 @@
 
 """Unit tests for the inveniocfg script."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import sys
 import StringIO
 import logging
@@ -29,7 +29,7 @@ from invenio.testutils import make_test_suite, run_test_suite
 from invenio.config import CFG_PREFIX
 
 
-class InveniocfgTest(unittest.TestCase):
+class InveniocfgTest(InvenioTestCase):
     """
     Test suite for inveniocfg
     """

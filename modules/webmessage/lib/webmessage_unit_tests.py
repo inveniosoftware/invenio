@@ -22,12 +22,12 @@
 __revision__ = \
     "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio import webmessage_mailutils
 from invenio.testutils import make_test_suite, run_test_suite
 
-class TestQuotingMessage(unittest.TestCase):
+class TestQuotingMessage(InvenioTestCase):
     """Test for quoting messages."""
 
     def test_simple_quoting_per_block(self):

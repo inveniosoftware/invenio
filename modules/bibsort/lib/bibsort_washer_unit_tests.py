@@ -19,13 +19,13 @@
 
 """Testing module for BibSort Method Treatment"""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.bibsort_washer import BibSortWasher
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class TestBibSortWasherCreation(unittest.TestCase):
+class TestBibSortWasherCreation(InvenioTestCase):
     """Test BibSortWasher Creation."""
 
     def test_method_creation(self):
@@ -35,7 +35,7 @@ class TestBibSortWasherCreation(unittest.TestCase):
         self.assertEqual(bsm.get_washer(), method)
 
 
-class TestBibSortWasherWashers(unittest.TestCase):
+class TestBibSortWasherWashers(InvenioTestCase):
     """Test BibSortWasher Washers."""
 
     def test_sort_alphanumerically_remove_leading_articles(self):

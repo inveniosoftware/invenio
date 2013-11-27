@@ -24,7 +24,7 @@ CFG_DATACITE_USERNAME and CFG_DATACITE_PASSWORD has to be set to be able to run
 the tests.
 """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio import dataciteutils
 from invenio import config
 from invenio.testutils import make_test_suite, run_test_suite
@@ -33,7 +33,7 @@ import string
 import os
 
 
-class DataCiteTestCase(unittest.TestCase):
+class DataCiteTestCase(InvenioTestCase):
 
     def setUp(self):
         # Force API in test mode

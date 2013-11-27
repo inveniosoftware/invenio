@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import shutil
 import os
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibdocfile import BibRecDocs, BibRelation, MoreInfo, \
     check_bibdoc_authorization, bibdocfile_url_p, guess_format_from_url, CFG_HAS_MAGIC, \
@@ -43,7 +43,7 @@ import invenio.template
 from datetime import datetime
 import time
 
-class BibDocFsInfoTest(unittest.TestCase):
+class BibDocFsInfoTest(InvenioTestCase):
     """Regression tests about the table bibdocfsinfo"""
     def setUp(self):
         self.my_bibrecdoc = BibRecDocs(2)
@@ -66,7 +66,7 @@ class BibDocFsInfoTest(unittest.TestCase):
         self.assertEqual(run_sql("SELECT MAX(version) FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.my_bibdoc_id, ))[0][0], 1)
         self.assertEqual(run_sql("SELECT last_version FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=1 AND format='.jpg'", (self.my_bibdoc_id, ))[0][0], True)
 
-class BibDocFileGuessFormat(unittest.TestCase):
+class BibDocFileGuessFormat(InvenioTestCase):
     """Regression tests for guess_format_from_url"""
 
     def test_guess_format_from_url_local_no_ext(self):
@@ -161,7 +161,7 @@ distribute copies of the software, or if you modify it.
             os.remove(local_path)
 
 
-class BibRecDocsTest(unittest.TestCase):
+class BibRecDocsTest(InvenioTestCase):
     """regression tests about BibRecDocs"""
 
     def test_BibRecDocs(self):
@@ -210,7 +210,7 @@ class BibRecDocsTest(unittest.TestCase):
         my_bibrecdoc.delete_bibdoc('file')
         my_bibrecdoc.delete_bibdoc('test')
 
-class BibDocsTest(unittest.TestCase):
+class BibDocsTest(InvenioTestCase):
     """regression tests about BibDocs"""
 
     def test_BibDocs(self):
@@ -347,7 +347,7 @@ class BibDocsTest(unittest.TestCase):
 
 
 
-class BibRelationTest(unittest.TestCase):
+class BibRelationTest(InvenioTestCase):
     """ regression tests for BibRelation"""
     def test_RelationCreation_Version(self):
         """
@@ -399,7 +399,7 @@ class BibRelationTest(unittest.TestCase):
         newer_rel1.delete()
         newer_rel2.delete()
 
-class BibDocFilesTest(unittest.TestCase):
+class BibDocFilesTest(InvenioTestCase):
     """regression tests about BibDocFiles"""
 
     def test_BibDocFiles(self):
@@ -459,7 +459,7 @@ class BibDocFilesTest(unittest.TestCase):
         my_new_bibdoc.delete()
         self.assertEqual(my_new_bibdoc.deleted_p(), True)
 
-class CheckBibDocAuthorizationTest(unittest.TestCase):
+class CheckBibDocAuthorizationTest(InvenioTestCase):
     """Regression tests for check_bibdoc_authorization function."""
     def test_check_bibdoc_authorization(self):
         """bibdocfile - check_bibdoc_authorization function"""
@@ -478,14 +478,14 @@ class CheckBibDocAuthorizationTest(unittest.TestCase):
         self.assertNotEqual(check_bibdoc_authorization(juliet, 'restricted_video')[0], 0)
         self.assertNotEqual(check_bibdoc_authorization(juliet, 'status: restricted_video')[0], 0)
 
-class BibDocFileURLTest(unittest.TestCase):
+class BibDocFileURLTest(InvenioTestCase):
     """Regression tests for bibdocfile_url_p function."""
     def test_bibdocfile_url_p(self):
         """bibdocfile - check bibdocfile_url_p() functionality"""
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/98/files/9709037.pdf' % CFG_SITE_RECORD))
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/098/files/9709037.pdf' % CFG_SITE_RECORD))
 
-class MoreInfoTest(unittest.TestCase):
+class MoreInfoTest(InvenioTestCase):
     """regression tests about BibDocFiles"""
 
     def test_initialData(self):
@@ -550,7 +550,7 @@ class MoreInfoTest(unittest.TestCase):
         m2.delete()
 
 
-class BibDocFileMd5FolderTests(unittest.TestCase):
+class BibDocFileMd5FolderTests(InvenioTestCase):
     """Regression test class for the Md5Folder class"""
     def setUp(self):
         self.path = os.path.join(CFG_TMPDIR, 'md5_tests')

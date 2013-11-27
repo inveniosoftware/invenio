@@ -21,13 +21,13 @@
 Test unit for the miscutil/importutils module.
 """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.importutils import autodiscover_modules
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class TestImportUtils(unittest.TestCase):
+class TestImportUtils(InvenioTestCase):
     """
     importutils TestSuite.
     """

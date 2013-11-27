@@ -19,12 +19,12 @@
 
 """Unit tests for BibKnowledge."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
 
 
-class BibknowledgeTests(unittest.TestCase):
+class BibknowledgeTests(InvenioTestCase):
     """Unit test functions for bibknowledge."""
     pass
 

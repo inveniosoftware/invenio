@@ -22,12 +22,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 from invenio.testutils import make_test_suite, run_test_suite
 
-class AsyncDownloadTest(unittest.TestCase):
+class AsyncDownloadTest(InvenioTestCase):
     """Test suite for websearch_external_collections_*"""
 
     def test_async_download(self):

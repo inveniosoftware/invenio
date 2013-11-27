@@ -31,9 +31,9 @@ from invenio.bibformat_config import CFG_BIBFORMAT_ELEMENTS_PATH
 from invenio.external_authentication import ExternalAuth
 from invenio.testutils import make_test_suite, run_test_suite
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
-class TestPluginContainer(unittest.TestCase):
+class TestPluginContainer(InvenioTestCase):
     """
     PluginContainer TestSuite.
     """

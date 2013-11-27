@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.dbquery import run_sql
@@ -29,7 +29,7 @@ from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
 
-class BibRankWebPagesAvailabilityTest(unittest.TestCase):
+class BibRankWebPagesAvailabilityTest(InvenioTestCase):
     """Check BibRank web pages whether they are up or not."""
 
     def test_rank_by_word_similarity_pages_availability(self):
@@ -60,7 +60,7 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class BibRankIntlMethodNames(unittest.TestCase):
+class BibRankIntlMethodNames(InvenioTestCase):
     """Check BibRank I18N ranking method names."""
 
     def test_i18n_ranking_method_names(self):
@@ -72,7 +72,7 @@ class BibRankIntlMethodNames(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/collection/Articles%20%26%20Preprints?as=1',
                                                expected_text="journal impact factor"))
 
-class BibRankWordSimilarityRankingTest(unittest.TestCase):
+class BibRankWordSimilarityRankingTest(InvenioTestCase):
     """Check BibRank word similarity ranking tools."""
 
     def test_search_results_ranked_by_similarity(self):
@@ -87,7 +87,7 @@ class BibRankWordSimilarityRankingTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A77&rm=wrd&of=id',
                                                expected_text="[96, 95, 85, 77]"))
 
-class BibRankCitationRankingTest(unittest.TestCase):
+class BibRankCitationRankingTest(InvenioTestCase):
     """Check BibRank citation ranking tools."""
 
     def test_search_results_ranked_by_citations(self):
@@ -111,7 +111,7 @@ class BibRankCitationRankingTest(unittest.TestCase):
                                                expected_text=["Cited by: 1 records",
                                                               "Co-cited with: 2 records"]))
 
-class BibRankExtCitesTest(unittest.TestCase):
+class BibRankExtCitesTest(InvenioTestCase):
     """Check BibRank citation ranking tools with respect to the external cites."""
 
     def _detect_extcite_info(self, extcitepubinfo):

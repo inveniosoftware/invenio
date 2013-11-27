@@ -20,13 +20,13 @@
 
 """Unit tests for bibcatalog_system_rt library."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 
 from invenio import bibcatalog_system_rt 
 
 
-class BibCatalogSystemRTTest(unittest.TestCase):
+class BibCatalogSystemRTTest(InvenioTestCase):
     """Testing of BibCatalog."""
 
     def setUp(self):

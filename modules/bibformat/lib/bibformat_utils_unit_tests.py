@@ -20,13 +20,13 @@
 """BibFormat - Unit Test Suite"""
 
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibformat_utils import words_start_with_patterns, \
                                     cut_out_snippet_core_creation
 
 
-class WordsStartsWithPatternTest(unittest.TestCase):
+class WordsStartsWithPatternTest(InvenioTestCase):
     """Test for words start with pattern functionality"""
 
     def test_word_starts_with_single_pattern(self):
@@ -66,7 +66,7 @@ class WordsStartsWithPatternTest(unittest.TestCase):
         self.assertEqual((False,0), words_start_with_patterns(['this', 'is'], ['no I do not', 'this is a']))
 
 
-class SnippetCutOutCoreCreation(unittest.TestCase):
+class SnippetCutOutCoreCreation(InvenioTestCase):
     """Test for snippet cut out core creation"""
 
     _words = dict()

@@ -21,13 +21,13 @@
 Unit tests for the memoise facility.
 """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 
 from invenio.memoiseutils import Memoise
 
 
-class MemoiseTest(unittest.TestCase):
+class MemoiseTest(InvenioTestCase):
     """Unit test cases for Memoise."""
 
     def test_memoise_fib(self):

@@ -19,7 +19,7 @@
 
 """Unit tests for the citation indexer."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import ConfigParser
 
 from invenio.testutils import make_test_suite, run_test_suite
@@ -75,7 +75,7 @@ def remove_from_dicts(dicts, recid):
                 del dicts['refs'][recid]
 
 
-class TestCitationIndexer(unittest.TestCase):
+class TestCitationIndexer(InvenioTestCase):
     """Testing citation indexer."""
     def test_basic(self):
         from invenio.bibrank_citation_indexer import process_chunk
@@ -129,7 +129,7 @@ class TestCitationIndexer(unittest.TestCase):
         compare_dicts(self, dicts)
 
 
-class TestCitationIndexerWarnings(unittest.TestCase):
+class TestCitationIndexerWarnings(InvenioTestCase):
     def cleanup(self):
         run_sql("""DELETE FROM rnkCITATIONDATAERR
                    WHERE citinfo LIKE 'Test Ref %'""")

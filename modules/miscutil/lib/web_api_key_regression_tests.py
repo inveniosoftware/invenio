@@ -24,7 +24,7 @@ try:
     import hashlib
 except:
     pass
-import unittest
+from invenio.testutils import InvenioTestCase
 import re
 import hmac
 import urllib
@@ -54,7 +54,7 @@ def build_web_request(path, params, api_key=None, secret_key=None):
         return path
     return '%s?%s' % (path, urllib.urlencode(items))
 
-class APIKeyTest(unittest.TestCase):
+class APIKeyTest(InvenioTestCase):
     """ Test functions related to the REST authentication API """
     def setUp(self):
         self.id_admin = run_sql('SELECT id FROM user WHERE nickname="admin"')[0][0]

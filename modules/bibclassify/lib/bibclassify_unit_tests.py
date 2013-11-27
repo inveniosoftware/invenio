@@ -28,7 +28,7 @@ This module is STANDALONE SAFE
 
 import sys
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import tempfile
 import cStringIO
 import os
@@ -49,7 +49,7 @@ if not bconfig.STANDALONE:
     from invenio import bibdocfile
 
 
-class BibClassifyTestCase(unittest.TestCase):
+class BibClassifyTestCase(InvenioTestCase):
     """ Abusive test suite - the one that takes sooooo long """
 
     def setUp(self):
@@ -280,6 +280,7 @@ class BibClassifyTest(BibClassifyTestCase):
 
 
 def suite(cls=BibClassifyTest):
+    import unittest
     tests = []
     for x in sys.argv[1:]:
         if x[0:4] == 'test':

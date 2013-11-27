@@ -21,14 +21,14 @@
 BibFieldParser Unit tests.
 """
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.bibfield_config_engine import BibFieldParser
 
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class BibFieldParserUnitTests(unittest.TestCase):
+class BibFieldParserUnitTests(InvenioTestCase):
     """
     Test to verify the correct creation of bibfield_config.py from the rules and
     doctypes files.

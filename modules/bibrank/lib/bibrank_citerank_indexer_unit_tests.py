@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import sys
 
 if sys.hexversion < 0x2040000:
@@ -29,7 +29,7 @@ from invenio import bibrank_citerank_indexer
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibtask import task_set_task_param
 
-class TestCiterankIndexer(unittest.TestCase):
+class TestCiterankIndexer(InvenioTestCase):
 
     def setUp(self):
         """Initialization"""

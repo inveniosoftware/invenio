@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 import datetime
-import unittest
+from invenio.testutils import InvenioTestCase
 import urllib
 from invenio.search_engine import record_public_p
 from invenio import webjournal_utils as wju
@@ -34,7 +34,7 @@ from invenio.config import CFG_SITE_URL, \
 from invenio.testutils import make_test_suite, run_test_suite, \
      test_web_page_content, merge_error_messages
 
-class ArticlesRelated(unittest.TestCase):
+class ArticlesRelated(InvenioTestCase):
     """Functions about articles"""
 
     def test_is_new_article(self):
@@ -46,7 +46,7 @@ class ArticlesRelated(unittest.TestCase):
         self.assertEqual(article, True)
 
 
-class CategoriesRelated(unittest.TestCase):
+class CategoriesRelated(InvenioTestCase):
     """Functions about journal categories"""
 
     def test_get_journal_categories(self):
@@ -68,7 +68,7 @@ class CategoriesRelated(unittest.TestCase):
                                                 '980__a:ATLANTISTIMESSCIENCE or 980__a:ATLANTISTIMESSCIENCEDRAFT')
 
 
-class JournalConfigVars(unittest.TestCase):
+class JournalConfigVars(InvenioTestCase):
     """Functions to get journal variables """
 
     def test_get_xml_from_config(self):
@@ -162,7 +162,7 @@ class JournalConfigVars(unittest.TestCase):
         self.assertEqual(issue, '02/2009')
 
 
-class TimeIssueFunctions(unittest.TestCase):
+class TimeIssueFunctions(InvenioTestCase):
     """Functions about time, using issues"""
 
     def test_get_current_issue(self):
@@ -286,7 +286,7 @@ class TimeIssueFunctions(unittest.TestCase):
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
-class JournalRelated(unittest.TestCase):
+class JournalRelated(InvenioTestCase):
     """Functions about journal"""
 
     def test_get_journal_info_path(self):
@@ -353,7 +353,7 @@ class JournalRelated(unittest.TestCase):
         self.assertEqual(dont_find_journal, 'ok')
 
 
-class HtmlCachingFunction(unittest.TestCase):
+class HtmlCachingFunction(InvenioTestCase):
     """HTML caching functions"""
 
     def setUp(self):
@@ -376,7 +376,7 @@ class HtmlCachingFunction(unittest.TestCase):
         value = wju.clear_cache_for_issue('AtlantisTimes', '03/2009')
         self.assertEqual(value, True)
 
-class FormattingElements(unittest.TestCase):
+class FormattingElements(InvenioTestCase):
     """Test how formatting elements behave in various contexts"""
 
     def test_language_handling_in_journal(self):

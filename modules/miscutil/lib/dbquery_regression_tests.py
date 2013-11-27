@@ -21,12 +21,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio import dbquery
 from invenio.testutils import make_test_suite, run_test_suite
 
-class RunSqlReturnListOfDictionaries(unittest.TestCase):
+class RunSqlReturnListOfDictionaries(InvenioTestCase):
     """Test run_sql behavior when with_dict parameter is provided"""
 
     def test_select_simple_columns_query(self):

@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from cgi import parse_qs
 from invenio.config import CFG_SITE_URL
@@ -38,7 +38,7 @@ from invenio.urlutils import \
      create_url, \
      create_Indico_request_url
 
-class TestWashUrlArgument(unittest.TestCase):
+class TestWashUrlArgument(InvenioTestCase):
     def test_wash_url_argument(self):
         """urlutils - washing of URL arguments"""
         self.assertEqual(1,
@@ -60,7 +60,7 @@ class TestWashUrlArgument(unittest.TestCase):
         self.assertEqual(["ellis"],
                          wash_url_argument(['ellis'], 'list'))
 
-class TestUrls(unittest.TestCase):
+class TestUrls(InvenioTestCase):
     """Tests on URLs"""
 
     def test_url_creation(self):
@@ -176,7 +176,7 @@ class TestUrls(unittest.TestCase):
                                      CFG_SITE_URL + '?e=f&c=d&a=b&ln=en'),
                          False)
 
-class TestHtmlLinks(unittest.TestCase):
+class TestHtmlLinks(InvenioTestCase):
     """Tests on HTML links"""
 
     def test_html_link_creation(self):
@@ -227,7 +227,7 @@ class TestHtmlLinks(unittest.TestCase):
         self.assertEqual(string_to_numeric_char_reference('\/&;,#$%~é'),
                          "&#92;&#47;&#38;&#59;&#44;&#35;&#36;&#37;&#126;&#195;&#169;")
 
-class TestEmailObfuscationMode(unittest.TestCase):
+class TestEmailObfuscationMode(InvenioTestCase):
     """Tests on HTML mailto links creation and obfuscation modes"""
 
     def test_html_mailto_obfuscation_mode_minus1(self):

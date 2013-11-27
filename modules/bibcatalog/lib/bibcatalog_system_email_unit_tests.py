@@ -20,14 +20,14 @@
 
 """Unit tests for bibcatalog_system_email library."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio import bibcatalog_system_email
 
 
-class BibCatalogSystemEmailTest(unittest.TestCase):
+class BibCatalogSystemEmailTest(InvenioTestCase):
     """Testing of BibCatalog."""
 
     def setUp(self):

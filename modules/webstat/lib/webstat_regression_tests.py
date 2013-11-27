@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL, \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
@@ -29,7 +29,7 @@ from invenio.testutils import make_test_suite, run_test_suite, \
      test_web_page_content, merge_error_messages
 
 
-class WebStatWebPagesAvailabilityTest(unittest.TestCase):
+class WebStatWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebStat web pages whether they are up or not."""
 
     def test_stats_pages_availability(self):

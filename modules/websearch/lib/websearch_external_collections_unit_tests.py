@@ -25,7 +25,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.websearch_external_collections_searcher import external_collections_dictionary
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
@@ -84,7 +84,7 @@ def build_search_urls_test():
             url = engine.build_search_url(test)
             print "    Url: " + str(url)
 
-class ExtCollTests(unittest.TestCase):
+class ExtCollTests(InvenioTestCase):
     """Test cases for websearch_external_collections_*"""
 
     @nottest

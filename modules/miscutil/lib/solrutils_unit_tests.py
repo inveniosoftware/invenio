@@ -19,14 +19,14 @@
 
 """Unit tests for the solrutils library."""
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio import intbitset
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.solrutils_bibindex_indexer import replace_invalid_solr_characters
 from invenio.solrutils_bibrank_searcher import get_collection_filter
 
 
-class TestReplaceInvalidCharacters(unittest.TestCase):
+class TestReplaceInvalidCharacters(InvenioTestCase):
     """Test for removal of invalid Solr characters and control characters."""
 
     def test_no_replacement(self):
@@ -58,7 +58,7 @@ class TestReplaceInvalidCharacters(unittest.TestCase):
         self.assertEqual(u'abc\nde', replace_invalid_solr_characters(u'abc\uFFFF\nde'))
 
 
-class TestSolrRankingHelpers(unittest.TestCase):
+class TestSolrRankingHelpers(InvenioTestCase):
     """Test for Solr ranking helper functions."""
     def test_get_collection_filter(self):
         """solrutils - creation of collection filter"""

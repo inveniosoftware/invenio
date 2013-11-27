@@ -21,13 +21,13 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
-class WebSearchAdminWebPagesAvailabilityTest(unittest.TestCase):
+class WebSearchAdminWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSearch Admin web pages whether they are up or not."""
 
     def test_websearch_admin_interface_pages_availability(self):

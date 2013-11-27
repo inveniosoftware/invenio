@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import os
 from logging import StreamHandler, DEBUG
 from cStringIO import StringIO
@@ -33,7 +33,7 @@ from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 from invenio import websubmit_file_stamper
 
-class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
+class WebSubmitWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSubmit web pages whether they are up or not."""
 
     def test_submission_pages_availability(self):
@@ -85,7 +85,7 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/help/submit-guide',
                                                expected_text="Submit Guide"))
 
-class WebSubmitLegacyURLsTest(unittest.TestCase):
+class WebSubmitLegacyURLsTest(InvenioTestCase):
     """ Check that the application still responds to legacy URLs"""
 
     def test_legacy_help_page_link(self):
@@ -103,7 +103,7 @@ class WebSubmitLegacyURLsTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/help/submit/access.en.html',
                                               expected_text="Submit Guide"))
 
-class WebSubmitXSSVulnerabilityTest(unittest.TestCase):
+class WebSubmitXSSVulnerabilityTest(InvenioTestCase):
     """Test possible XSS vulnerabilities of the submission engine."""
 
     def test_xss_in_submission_doctype(self):
@@ -154,7 +154,7 @@ def WebSubmitFileConverterTestGenerator():
                     continue
                 yield WebSubmitFileConverterTest(input_file, from_format, to_format)
 
-class WebSubmitFileConverterTest(unittest.TestCase):
+class WebSubmitFileConverterTest(InvenioTestCase):
     """Test WebSubmit file converter tool"""
 
     def __init__(self, input_file, from_format, to_format):
@@ -193,7 +193,7 @@ class WebSubmitFileConverterTest(unittest.TestCase):
             self.fail("ERROR: when converting from %s to %s: %s, the log contained: %s" % (self.from_format, self.to_format, err, self.log.getvalue()))
 
 if CFG_PATH_PDFTK:
-    class WebSubmitStampingTest(unittest.TestCase):
+    class WebSubmitStampingTest(InvenioTestCase):
         """Test WebSubmit file stamping tool"""
 
         def test_stamp_coverpage(self):
@@ -258,7 +258,7 @@ if CFG_PATH_PDFTK:
 else:
     ## pdftk is not available. Disabling stamping-related
     ## regression tests.
-    class WebSubmitStampingTest(unittest.TestCase):
+    class WebSubmitStampingTest(InvenioTestCase):
         pass
 
 TEST_SUITE = make_test_suite(WebSubmitWebPagesAvailabilityTest,

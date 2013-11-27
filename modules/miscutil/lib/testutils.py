@@ -493,6 +493,10 @@ def build_and_run_web_test_suite():
     return res.wasSuccessful()
 
 
+class InvenioTestCase(unittest.TestCase):
+    "Invenio Test Case class."
+    pass
+
 class InvenioWebTestCase(unittest.TestCase):
     """ Helper library of useful web test functions
     for web tests creation.

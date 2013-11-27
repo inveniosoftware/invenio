@@ -22,14 +22,14 @@
 __revision__ = "$Id$"
 
 import os
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.invenio_connector import InvenioConnector, \
                                       InvenioConnectorAuthError
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 
-class InvenioConnectorTest(unittest.TestCase):
+class InvenioConnectorTest(InvenioTestCase):
     """Test function to get default values."""
 
     def test_local_search(self):

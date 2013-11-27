@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import httplib
 import os
 import urlparse
@@ -40,7 +40,7 @@ def get_final_url(url):
     response.read()
     return response.url
 
-class WebStyleWSGIUtilsTests(unittest.TestCase):
+class WebStyleWSGIUtilsTests(InvenioTestCase):
     """Test WSGI Utils."""
 
     if CFG_DEVEL_SITE:
@@ -70,7 +70,7 @@ class WebStyleWSGIUtilsTests(unittest.TestCase):
             self.assertEqual(body, body2, "Body sent differs from body received")
 
 
-class WebStyleGotoTests(unittest.TestCase):
+class WebStyleGotoTests(InvenioTestCase):
     """Test the goto framework"""
     def tearDown(self):
         drop_redirection('first_record')

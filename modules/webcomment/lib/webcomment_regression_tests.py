@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import shutil
 from mechanize import Browser, LinkNotFoundError, HTTPError
 
@@ -48,7 +48,7 @@ def prepare_attachments():
     shutil.copy(CFG_WEBDIR + '/img/invenio.css', CFG_TMPDIR)
 
 
-class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
+class WebCommentWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebComment web pages whether they are up or not."""
 
     def test_your_baskets_pages_availability(self):
@@ -100,7 +100,7 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
                                                expected_text="(Not yet reviewed)")
 
 
-class WebCommentRestrictionsTest(unittest.TestCase):
+class WebCommentRestrictionsTest(InvenioTestCase):
     """Check WebComment restrictions"""
 
     def setUp(self):
@@ -742,7 +742,7 @@ class WebCommentRestrictionsTest(unittest.TestCase):
             print response
             self.fail("Oops, this user should be able to subscribe to this discussion")
 
-class WebCommentTransformationHTMLMarkupTest(unittest.TestCase):
+class WebCommentTransformationHTMLMarkupTest(InvenioTestCase):
     """ Test functions related to transforming HTML markup."""
 
     def test_unordered_lists_markup_transformation(self):

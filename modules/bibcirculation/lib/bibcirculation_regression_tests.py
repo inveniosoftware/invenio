@@ -21,13 +21,13 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
-class BibCirculationUsersWebPagesAvailabilityTest(unittest.TestCase):
+class BibCirculationUsersWebPagesAvailabilityTest(InvenioTestCase):
     """Check BibCirculation web pages whether they are up or not."""
 
     def test_your_loans_page_availability(self):
@@ -44,7 +44,7 @@ class BibCirculationUsersWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
+class BibCirculationAdminsWebPagesAvailabilityTest(InvenioTestCase):
     """Check BibCirculation web pages whether they are up or not for Admins."""
 
     def test_admin_pages_availability(self):

@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 import socket
 import time
 import cgi
@@ -39,7 +39,7 @@ from invenio.testutils import make_test_suite, run_test_suite, \
                               get_authenticated_mechanize_browser
 from invenio.dbquery import run_sql
 
-class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
+class WebAccessWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebAccess web pages whether they are up or not."""
 
     def test_webaccess_admin_interface_availability(self):
@@ -83,7 +83,7 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
         browser.open(browser.find_link(text="Become user").absolute_url)
         self.failUnless('romeo' in browser.response().read())
 
-class WebAccessFireRoleTest(unittest.TestCase):
+class WebAccessFireRoleTest(InvenioTestCase):
     """Check WebAccess behaviour WRT FireRole."""
 
     def setUp(self):
@@ -106,7 +106,7 @@ class WebAccessFireRoleTest(unittest.TestCase):
         tmp_def_ser = acc_get_role_definition(self.role_id)
         self.assertEqual(def_ser, deserialize(tmp_def_ser))
 
-class WebAccessUseBasketsTest(unittest.TestCase):
+class WebAccessUseBasketsTest(InvenioTestCase):
     """
     Check WebAccess behaviour WRT enabling/disabling web modules such
     as baskets.
@@ -121,7 +121,7 @@ class WebAccessUseBasketsTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
 
 if CFG_DEVEL_SITE:
-    class WebAccessRobotLoginTest(unittest.TestCase):
+    class WebAccessRobotLoginTest(InvenioTestCase):
         """
         Check whether robot login functionality is OK.
         """

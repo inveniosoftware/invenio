@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
+from invenio.testutils import InvenioTestCase
 try:
     import requests
     HAS_REQUESTS = True
@@ -166,7 +166,7 @@ def compare_references(test, a, b):
     test.assertEqual(a, b)
 
 
-class DocExtractTest(unittest.TestCase):
+class DocExtractTest(InvenioTestCase):
     def setUp(self):
         #setup_loggers(verbosity=1)
         self.maxDiff = 10000

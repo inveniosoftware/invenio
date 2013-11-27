@@ -22,12 +22,12 @@
 __revision__ = \
     "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.htmlparser import RecordHTMLParser
 
-class TestWashHTMLtoText(unittest.TestCase):
+class TestWashHTMLtoText(InvenioTestCase):
     """Test HTML to text conversion."""
 
     def test_wash_html_to_text(self):
