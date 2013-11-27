@@ -318,7 +318,6 @@ class Collection:
             sys.exit(1)
         # print user info:
         write_message("... creating %s" % fullfilename, verbose=6)
-        sys.stdout.flush()
         # print page body:
         cPickle.dump(filebody, f, cPickle.HIGHEST_PROTOCOL)
         # close file:
@@ -911,13 +910,13 @@ def perform_display_collection(colID, colname, aas, ln, em, show_help_boxes):
     em - code to display just part of the page
     show_help_boxes - whether to show the help boxes or not"""
     # check and update cache if necessary
+    cachedfile = open("%s/collections/%s-ln=%s.html" %
+                      (CFG_CACHEDIR, colname, ln), "rb")
     try:
-        cachedfile = open("%s/collections/%s-ln=%s.html" % \
-                        (CFG_CACHEDIR, colname, ln), "rb")
         data = cPickle.load(cachedfile)
-        cachedfile.close()
-    except:
+    except ValueError:
         data = get_collection(colname).update_webpage_cache(ln)
+    cachedfile.close()
     # check em value to return just part of the page
     if em != "":
         if EM_REPOSITORY["search_box"] not in em:
