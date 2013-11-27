@@ -203,7 +203,7 @@ class AmendableRecord(dict):
     def set_invalid(self, reason):
         """ Mark the record as invalid """
         write_message("Record %s marked as invalid by rule %s: %s" %
-                (self.record_id, self.rule["name"], reason))
+                (CFG_SITE_URL + "/record/%s" % self.record_id, self.rule["name"], reason))
         self.errors.append("Rule %s: %s" % (self.rule["name"], reason))
         self.valid = False
 
@@ -292,7 +292,7 @@ def task_run_core():
         for rule_name in batch_rules:
             rule = rules[rule_name]
             rule_recids = recids_for_rules[rule_name]
-            task_sleep_now_if_required(can_stop_too=False)
+            task_sleep_now_if_required(can_stop_too=True)
             records = []
             for i, record_id, record in batch:
                 if record_id in rule_recids:
@@ -310,7 +310,7 @@ def task_run_core():
             for rule_name in single_rules:
                 rule = rules[rule_name]
                 rule_recids = recids_for_rules[rule_name]
-                task_sleep_now_if_required(can_stop_too=False)
+                task_sleep_now_if_required(can_stop_too=True)
                 if record_id in rule_recids:
                     check_record(rule, record)
 

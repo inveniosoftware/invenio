@@ -79,14 +79,16 @@ def check_record(record, fields):
                                          verify=False)
                 code = response.status_code
                 if code >= 400 and code < 600:
-                    record.set_invalid('Server error: %s' % code)
+                    record.set_invalid('Server error: %s - %s' % (code, url_cleaned))
                 elif code == 301:
                     url_cleaned = response.headers['Location']
             except (requests.exceptions.ConnectionError,
                     requests.exceptions.HTTPError,
                     requests.exceptions.Timeout,
-                    requests.exceptions.TooManyRedirects) as e:
+                    requests.exceptions.TooManyRedirects,
+                    requests.exceptions.InvalidSchema,
+                    requests.exceptions.InvalidURL) as e:
                 # Problem with the request occurred
-                record.set_invalid('Server error: %s' % e)
+                record.set_invalid('Server error: %s - %s' % (e, url_cleaned))
 
         record.amend_field(position, url_cleaned)
