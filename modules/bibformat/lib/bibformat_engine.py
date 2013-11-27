@@ -272,9 +272,11 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
         except InvenioBibFormatError, exc:
             register_exception(req=bfo.req)
 
-        if verbose > 5:
-            print 'verbose', verbose
-            return out + str(exc.message)
+            if verbose > 5:
+                out += """\n<br/><span class="quicknote">
+                          %s
+                          </span>""" % str(exc)
+
         return out, False
 
     # Format with template
