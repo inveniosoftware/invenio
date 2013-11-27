@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -128,12 +128,11 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
             return _write(req, msg)
 
     # write temporary file:
-    tempfile.tempdir = CFG_TMPSHAREDDIR
+    (fd, filename) = tempfile.mkstemp(prefix="batchupload_" + \
+               time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_",
+               dir=CFG_TMPSHAREDDIR)
 
-    filename = tempfile.mktemp(prefix="batchupload_" + \
-               time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_")
-
-    filedesc = open(filename, 'w')
+    filedesc = os.fdopen(fd, 'w')
     filedesc.write(arg_file)
     filedesc.close()
 
@@ -189,11 +188,10 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
         metafile = _transform_input_to_marcxml(file_input=metafile.value)
 
     user_info = collect_user_info(req)
-    tempfile.tempdir = CFG_TMPSHAREDDIR
-    filename = tempfile.mktemp(prefix="batchupload_" + \
+    (fd, filename) = tempfile.mkstemp(prefix="batchupload_" + \
         user_info['nickname'] + "_" + time.strftime("%Y%m%d%H%M%S",
-        time.localtime()) + "_")
-    filedesc = open(filename, 'w')
+        time.localtime()) + "_", dir=CFG_TMPSHAREDDIR)
+    filedesc = os.fdopen(fd, 'w')
     filedesc.write(metafile)
     filedesc.close()
 
@@ -310,13 +308,12 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                     error_msg = err_desc[5] % file_collection
                     errors.append((docfile, error_msg))
                     continue
-            tempfile.tempdir = CFG_TMPSHAREDDIR
             # Move document to be uploaded to temporary folder
-            tmp_file = tempfile.mktemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension)
+            (fd, tmp_file) = tempfile.mkstemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension, dir=CFG_TMPSHAREDDIR)
             shutil.copy(os.path.join(folder, docfile), tmp_file)
             # Create MARC temporary file with FFT tag and call bibupload
-            filename = tempfile.mktemp(prefix=identifier + '_')
-            filedesc = open(filename, 'w')
+            (fd, filename) = tempfile.mkstemp(prefix=identifier + '_', dir=CFG_TMPSHAREDDIR)
+            filedesc = os.fdopen(fd, 'w')
             marc_content = """ <record>
                                     <controlfield tag="001">%(rec_id)s</controlfield>
                                         <datafield tag="FFT" ind1=" " ind2=" ">
