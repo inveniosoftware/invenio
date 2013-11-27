@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import os
 import tempfile
 
-from invenio.config import CFG_WEBDIR
+from invenio.config import CFG_TMPDIR, CFG_WEBDIR
 from invenio.websubmit_config import *
 
 ## test gnuplot presence:
@@ -46,9 +46,8 @@ def write_coordinates_in_tmp_file(lists_coordinates):
     One set represents a curve in the graph.
     """
     max_y_datas = 0
-    tempfile.tempdir = CFG_WEBDIR + "/img"
-    fname = tempfile.mktemp()
-    file_dest = open(fname, 'a')
+    (fd, fname) = tempfile.mkstemp(prefix='bibrank_grapher_', dir=CFG_TMPDIR)
+    file_dest = os.fdopen(fd, 'a')
     for list_elem in lists_coordinates:
         y_axe = []
         #prepare data and store them in a file
