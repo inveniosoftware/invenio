@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -60,7 +60,6 @@ def task_run_core():
         and uploads them.
         Files are then moved to the corresponding DONE folders.
     """
-    tempfile.tempdir = CFG_TMPSHAREDDIR
     daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
                  or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
     # Check if directory /batchupload exists
@@ -90,7 +89,7 @@ def task_run_core():
             for metafile in files:
                 if os.path.isfile(os.path.join(files_dir, metafile)):
                     # Create temporary file to be uploaded
-                    filename = tempfile.mktemp(prefix=metafile + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_")
+                    (fd, filename) = tempfile.mkstemp(prefix=metafile + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", dir=CFG_TMPSHAREDDIR)
                     shutil.copy(os.path.join(files_dir, metafile), filename)
                     # Send bibsched task
                     mode = "-" + folder[0]
