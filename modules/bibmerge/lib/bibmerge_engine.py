@@ -148,13 +148,13 @@ def perform_request_record(requestType, uid, data):
             # mark record2 as duplicate of record1
             record_add_field(record2, '970', ' ', ' ', '', [('d', str(recid1))])
 
-            #submit record1
-            xml_record1 = record_xml_output(record1)
-            save_xml_record(recid1, uid, xml_record1)
-
             # submit record2 to be deleted
             xml_record2 = record_xml_output(record2)
             save_xml_record(recid2, uid, xml_record2)
+
+            #submit record1
+            xml_record1 = record_xml_output(record1)
+            save_xml_record(recid1, uid, xml_record1)
 
             result['resultText'] = 'Records submitted'
             return result

@@ -19,6 +19,7 @@
 
 """BibFormat element - return the video of a record"""
 
+import cgi
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_CERN_SITE
 from invenio.bibdocfile import BibRecDocs, get_superformat_from_format
 from invenio.config import CFG_WEBSEARCH_ENABLE_OPENGRAPH
@@ -72,6 +73,9 @@ def format_element(bfo):
                 <meta property="og:video:type" content="application/x-shockwave-flash" />
                 <meta property="og:video" content="%(mp4_url)s" />
                 <meta property="og:video:type" content="video/mp4" />
+                <meta property="og:image" content="%(image_url)s" />
+                <meta name="twitter:player:height" content="%(height)s" />
+                <meta name="twitter:player:width" content="%(width)s" />
 
                 <link rel="image_src" href="%(image_url)s" />
                 <link rel="video_src" href="%(CFG_CERN_PLAYER_URL)s?file=%(mp4_url_relative)s&streamer=%(CFG_STREAMER_URL)s&provider=rtmp&stretching=exactfit&image=%(image_url)s"/>
@@ -82,6 +86,12 @@ def format_element(bfo):
                        'image_url': img_urls and img_urls[0] or '',
                        'mp4_url': mp4_url.replace('http://mediaarchive.cern.ch', 'https://mediastream.cern.ch'),
                        'mp4_url_relative': '/' + '/'.join(mp4_url.split('/')[4:])}
+            try:
+                from invenio.media_utils import generate_embedding_url
+                embed_url = generate_embedding_url(bfo.field('037__a'))
+                additional_tags += '''<meta name="twitter:player" content="%s"/>''' % cgi.escape(embed_url, quote=True).replace('http://', 'https://', 1)
+            except:
+                pass
 
 
     tags = ['<meta property="og:image" content="%s" />%s' % (image_url, image_url != image_secure_url and '\n<meta property="og:image:secure_url" content="%s" />' % image_secure_url or "") for image_url, image_secure_url in images]

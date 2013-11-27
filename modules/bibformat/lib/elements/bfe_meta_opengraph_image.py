@@ -23,7 +23,7 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_CERN_SITE
 from invenio.bibdocfile import BibRecDocs, get_superformat_from_format
 from invenio.config import CFG_WEBSEARCH_ENABLE_OPENGRAPH
 
-def format_element(bfo, max_photos=''):
+def format_element(bfo, max_photos='', one_icon_per_bibdoc='yes', twitter_card_type='photo', use_webjournal_featured_image='no'):
     """Return an image of the record, suitable for the Open Graph protocol.
 
     Will look for any icon stored with the record, and will fallback to any
@@ -33,6 +33,9 @@ def format_element(bfo, max_photos=''):
     and page size.
 
     @param max_photos: the maximum number of photos to display
+    @param one_icon_per_bibdoc: shall we keep just one icon per bibdoc in the output (not repetition of same preview in multiple sizes)?
+    @param twitter_card_type: the type of Twitter card: 'photo' (single photo) or 'gallery'. Fall back to 'photo' if not enough pictures for a 'gallery'.
+    @param use_webjournal_featured_image: if 'yes', use the "featured image" (as defined in bfe_webjournal_articles_overview) as image for the Twitter Card
     """
     if not CFG_WEBSEARCH_ENABLE_OPENGRAPH:
         return ""
@@ -49,24 +52,61 @@ def format_element(bfo, max_photos=''):
     for doc in bibdocs[:max_photos]:
         found_icons = []
         found_image_url = ''
+        found_image_size = 0
         for docfile in doc.list_latest_files(list_hidden=False):
             if docfile.is_icon():
                 found_icons.append((docfile.get_size(), docfile.get_url()))
             elif get_superformat_from_format(docfile.get_format()).lower() in [".jpg", ".gif", ".jpeg", ".png"]:
                 found_image_url = docfile.get_url()
+                found_image_size = docfile.get_size()
         found_icons.sort()
 
+        # We might have found several icons for the same file: keep
+        # middle-size one
+        if found_icons:
+            if one_icon_per_bibdoc.lower() == 'yes':
+                found_icons = [found_icons[len(found_icons)/2]]
         for icon_size, icon_url in found_icons:
-            images.append((icon_url, icon_url.replace(CFG_SITE_URL, CFG_SITE_SECURE_URL)))
+            images.append((icon_url, icon_url.replace(CFG_SITE_URL, CFG_SITE_SECURE_URL), icon_size))
+        # Link to main file too (?)
         if found_image_url:
-            images.append((found_image_url, found_image_url.replace(CFG_SITE_URL, CFG_SITE_SECURE_URL)))
+            images.append((found_image_url, found_image_url.replace(CFG_SITE_URL, CFG_SITE_SECURE_URL), found_image_size))
 
     if CFG_CERN_SITE:
         # Add some more pictures from metadata
-        additional_images = [(image_url, image_url.replace("http://mediaarchive.cern.ch/", "https://mediastream.cern.ch")) for image_url in bfo.fields("8567_u") if image_url.split('.')[-1] in ('jpg', 'png', 'jpeg', 'gif') and 'A5' in image_url]
+        dummy_size = 500*1024 # we don't we to check image size, we just make one (see Twitter Card limit)
+        additional_images = [(image_url, image_url.replace("http://mediaarchive.cern.ch/", "https://mediastream.cern.ch"), dummy_size) for image_url in bfo.fields("8567_u") if image_url.split('.')[-1] in ('jpg', 'png', 'jpeg', 'gif') and 'A5' in image_url]
         images.extend(additional_images)
 
-    tags = ['<meta property="og:image" content="%s" />%s' % (image_url, image_url != image_secure_url and '\n<meta property="og:image:secure_url" content="%s" />' % image_secure_url or "") for image_url, image_secure_url in images]
+    tags = ['<meta property="og:image" content="%s" />%s' % (image_url, image_url != image_secure_url and '\n<meta property="og:image:secure_url" content="%s" />' % image_secure_url or "") for image_url, image_secure_url, image_size in images]
+
+    # Twitter Card
+
+    if use_webjournal_featured_image.lower() == 'yes':
+        # First look for the prefered image, if available. Note that
+        # it might be a remote one.
+        try:
+            from invenio.bibformat_elements import bfe_webjournal_articles_overview
+            image_url = bfe_webjournal_articles_overview._get_feature_image(bfo)
+            image_secure_url = image_url.replace('http:', 'https:')
+            image_size = 500 * 1024 # TODO: check for real image size
+            if image_url.strip():
+                images.insert(0, (image_url, image_secure_url, image_size))
+        except:
+            pass
+
+    # Filter out images that would not be compatible
+    twitter_compatible_images = [image_url for image_url, image_secure_url, image_size in images if \
+                                 image_size < 1024*1024][:4] #Max 1MB according to Twitter Card APIs, max 4 photos
+    twitter_card_tags = []
+    if len(twitter_compatible_images) == 4 and twitter_card_type == 'gallery':
+        twitter_card_tags = ['<meta name="twitter:image%i" content="%s" />' % \
+                             (twitter_compatible_images.index(image_url), image_url) \
+                             for image_url in twitter_compatible_images]
+    elif twitter_compatible_images:
+        twitter_card_tags = ['<meta name="twitter:image" content="%s" />' % twitter_compatible_images[0]]
+
+    tags = twitter_card_tags + tags
 
     return "\n".join(tags)
 
