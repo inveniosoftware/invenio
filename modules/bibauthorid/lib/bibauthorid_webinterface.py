@@ -2067,7 +2067,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                         webapi.session_bareinit(req)
                         session = get_session(req)
                         profiles_to_merge = session["personinfo"]["merge_profiles"]
-                        print (str(profiles_to_merge))
+                        # print (str(profiles_to_merge))
                         if profile in [el[0] for el in profiles_to_merge]:
                             for prof in list(profiles_to_merge):
                                 if prof[0] == profile:
