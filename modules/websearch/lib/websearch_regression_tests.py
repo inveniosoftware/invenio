@@ -1275,7 +1275,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
         req = make_fake_request()
         perform_request_search(req=req, p='higgs', of='tm', so='d')
         out = req.test_output_buffer.getvalue()
-        self.assertEqual(out, """\
+        self.assertMultiLineEqual(out, """\
 000000107 001__ 107
 000000107 003__ SzGeCERN
 000000107 005__ %(rec_107_rev)s
@@ -1331,8 +1331,8 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
 000000085 695__ $$9LANL EDS$$aHigh Energy Physics - Theory
 000000085 700__ $$aPorrati, Massimo
 000000085 700__ $$aZaffaroni, A
-000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.pdf
-000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.ps.gz
+000000085 8564_ $$s112828$$u%(siteurl)s/record/85/files/0212181.ps.gz
+000000085 8564_ $$s151257$$u%(siteurl)s/record/85/files/0212181.pdf
 000000085 859__ $$falberto.zaffaroni@mib.infn.it
 000000085 909C4 $$c289-293$$pPhys. Lett. B$$v561$$y2003
 000000085 916__ $$sn$$w200251
@@ -1379,8 +1379,8 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
 000000001 65017 $$2SzGeCERN$$aExperiments and Tracks
 000000001 6531_ $$aLEP
 000000001 8560_ $$fneil.calder@cern.ch
-000000001 8564_ $$u%(siteurl)s/record/1/files/0106015_01.jpg
-000000001 8564_ $$u%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon$$xicon
+000000001 8564_ $$s1585244$$u%(siteurl)s/record/1/files/0106015_01.jpg
+000000001 8564_ $$s20954$$u%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon$$xicon
 000000001 909C0 $$o0003717PHOPHO
 000000001 909C0 $$y2000
 000000001 909C0 $$b81
@@ -1635,10 +1635,12 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
     <subfield code="a">Zaffaroni, A</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">%(siteurl)s/record/85/files/0212181.pdf</subfield>
+    <subfield code="s">112828</subfield>
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.ps.gz</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">%(siteurl)s/record/85/files/0212181.ps.gz</subfield>
+    <subfield code="s">151257</subfield>
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.pdf</subfield>
   </datafield>
   <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">289-293</subfield>
@@ -1852,9 +1854,11 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
     <subfield code="f">neil.calder@cern.ch</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="s">1585244</subfield>
     <subfield code="u">%(siteurl)s/record/1/files/0106015_01.jpg</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="s">20954</subfield>
     <subfield code="u">%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon</subfield>
     <subfield code="x">icon</subfield>
   </datafield>
@@ -2121,8 +2125,8 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
 000000085 695__ $$9LANL EDS$$aHigh Energy Physics - Theory
 000000085 700__ $$aPorrati, Massimo
 000000085 700__ $$aZaffaroni, A
-000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.pdf
-000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.ps.gz
+000000085 8564_ $$s112828$$u%(siteurl)s/record/85/files/0212181.ps.gz
+000000085 8564_ $$s151257$$u%(siteurl)s/record/85/files/0212181.pdf
 000000085 859__ $$falberto.zaffaroni@mib.infn.it
 000000085 909C4 $$c289-293$$pPhys. Lett. B$$v561$$y2003
 000000085 916__ $$sn$$w200251
@@ -2169,8 +2173,8 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
 000000001 65017 $$2SzGeCERN$$aExperiments and Tracks
 000000001 6531_ $$aLEP
 000000001 8560_ $$fneil.calder@cern.ch
-000000001 8564_ $$u%(siteurl)s/record/1/files/0106015_01.jpg
-000000001 8564_ $$u%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon$$xicon
+000000001 8564_ $$s1585244$$u%(siteurl)s/record/1/files/0106015_01.jpg
+000000001 8564_ $$s20954$$u%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon$$xicon
 000000001 909C0 $$o0003717PHOPHO
 000000001 909C0 $$y2000
 000000001 909C0 $$b81
@@ -2412,10 +2416,12 @@ Zaffaroni, A
     <subfield code="a">Zaffaroni, A</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">%(siteurl)s/record/85/files/0212181.pdf</subfield>
+    <subfield code="s">112828</subfield>
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.ps.gz</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">%(siteurl)s/record/85/files/0212181.ps.gz</subfield>
+    <subfield code="s">151257</subfield>
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.pdf</subfield>
   </datafield>
   <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">289-293</subfield>
@@ -2629,9 +2635,11 @@ Zaffaroni, A
     <subfield code="f">neil.calder@cern.ch</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="s">1585244</subfield>
     <subfield code="u">%(siteurl)s/record/1/files/0106015_01.jpg</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="s">20954</subfield>
     <subfield code="u">%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon</subfield>
     <subfield code="x">icon</subfield>
   </datafield>
@@ -2812,8 +2820,8 @@ class WebSearchRecordWebAPITest(InvenioTestCase):
 000000085 695__ $$9LANL EDS$$aHigh Energy Physics - Theory
 000000085 700__ $$aPorrati, Massimo
 000000085 700__ $$aZaffaroni, A
-000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.pdf
-000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.ps.gz
+000000085 8564_ $$s112828$$u%(siteurl)s/record/85/files/0212181.ps.gz
+000000085 8564_ $$s151257$$u%(siteurl)s/record/85/files/0212181.pdf
 000000085 859__ $$falberto.zaffaroni@mib.infn.it
 000000085 909C4 $$c289-293$$pPhys. Lett. B$$v561$$y2003
 000000085 916__ $$sn$$w200251
@@ -2913,10 +2921,12 @@ class WebSearchRecordWebAPITest(InvenioTestCase):
     <subfield code="a">Zaffaroni, A</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">%(siteurl)s/record/85/files/0212181.pdf</subfield>
+    <subfield code="s">112828</subfield>
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.ps.gz</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">%(siteurl)s/record/85/files/0212181.ps.gz</subfield>
+    <subfield code="s">151257</subfield>
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.pdf</subfield>
   </datafield>
   <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">289-293</subfield>
