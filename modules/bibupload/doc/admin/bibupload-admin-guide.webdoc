@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -346,7 +346,12 @@ semantic of the metadata upload:
 </blockquote>
 </p>
 
-<p>Note, in append and insert mode, <pre>$m</pre> is ignored.
+<p>Note that you can mix regular MARC tags with special FFT tags in
+the incoming XML input file.  Both record metadata and record files
+will be updated as a result.  Hence beware with some input modes, such
+as replace mode, if you would like to touch only files.</p>
+
+<p>Note that in append and insert mode the <code>$m</code> is ignored.
 
 <p>In order to rename a document just use the the correct mode specifing in the
 $n subfield the original docname that should be renamed and in $m the new name.
