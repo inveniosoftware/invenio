@@ -1,0 +1,53 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+   This file is part of Invenio.
+   Copyright (C) 2009, 2010, 2011 CERN.
+
+   Invenio is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of the
+   License, or (at your option) any later version.
+
+   Invenio is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Invenio; if not, write to the Free Software Foundation, Inc.,
+   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+/* placeholder style for all inputs (mozilla/webkit) */
+::-webkit-input-placeholder  { color: gray; }
+input:-moz-placeholder { color: gray; }
+
+.placeholder_default_text {
+    color: gray;
+}
+
+.admin_label {
+    float: left;
+    width: 150px;
+    font-weight: bold;
+    font-size: small;
+    text-align: right;
+}
+
+.admin_arguments {
+    margin: 10px 20px;
+}
+
+.admin_source_td {
+    width: 45%;
+    vertical-align: top;
+}
+
+.admin_source_separator {
+    width: 5%;
+}
+
+h3 {
+    width: 100%;
+}

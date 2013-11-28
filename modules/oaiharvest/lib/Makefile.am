@@ -24,6 +24,7 @@ pylib_DATA = oai_harvest_getter.py \
              oai_harvest_admin_regression_tests.py \
              oai_harvest_daemon.py \
              oai_harvest_config.py \
+             oai_harvest_utils.py \
              oai_harvest_web_tests.py
 
 EXTRA_DIST = $(pylib_DATA)

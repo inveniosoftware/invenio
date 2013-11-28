@@ -21,8 +21,12 @@ webapp_DATA = oaiharvestadmin.py
 
 jsdir=$(localstatedir)/www/js
 
-js_DATA = oai_harvest_admin.js
+js_DATA = oai_harvest_admin.js oai_harvest_admin_hp.js
 
-EXTRA_DIST = oaiharvestadmin.py oai_harvest_admin.js
+imgdir=$(localstatedir)/www/img
+
+img_DATA = oai_harvest_admin.css
+
+EXTRA_DIST = $(webapp_DATA) $(js_DATA) $(img_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc
