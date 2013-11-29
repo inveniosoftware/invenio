@@ -133,7 +133,6 @@ class Collection:
         self.update_reclist_run_already = 0 # to speed things up without much refactoring
         self.reclist_updated_since_start = 0 # to check if webpage cache need rebuilding
         self.reclist_with_nonpublic_subcolls = intbitset()
-
         # temporary counters for the number of records in hosted collections
         self.nbrecs_tmp = None # number of records in a hosted collection
         self.nbrecs_from_hosted_collections = 0 # total number of records from
@@ -789,9 +788,10 @@ class Collection:
                     self.nbrecs_from_hosted_collections)
 
         write_message("... calculating reclist of %s" % self.name, verbose=6)
+
         reclist = intbitset() # will hold results for public sons only; good for storing into DB
         reclist_with_nonpublic_subcolls = intbitset() # will hold results for both public and nonpublic sons; good for deducing total
-                                                   # number of documents
+                                                      # number of documents
         nbrecs_from_hosted_collections = 0 # will hold the total number of records from descendant hosted collections
 
         if not self.dbquery:
