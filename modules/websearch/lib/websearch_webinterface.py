@@ -829,11 +829,10 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                     language=ln,
                     req=req,
                     navmenuid='search')
-    # start display:
-    req.content_type = "text/html"
-    req.send_http_header()
+
     # deduce collection id:
-    colID = get_colID(get_coll_normalised_name(c))
+    normalised_name = get_coll_normalised_name(c)
+    colID = get_colID(normalised_name)
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
         page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
@@ -847,6 +846,13 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                     language=ln,
                     req=req,
                     navmenuid='search')
+
+    if normalised_name != c:
+        redirect_to_url(req, normalised_name, apache.HTTP_MOVED_PERMANENTLY)
+
+    # start display:
+    req.content_type = "text/html"
+    req.send_http_header()
 
     c_body, c_navtrail, c_portalbox_lt, c_portalbox_rt, c_portalbox_tp, c_portalbox_te, \
         c_last_updated = perform_display_collection(colID, c, aas, ln, em,
