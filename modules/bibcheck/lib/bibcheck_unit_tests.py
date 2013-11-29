@@ -22,9 +22,8 @@
 
 __revision__ = "$Id$"
 
-import unittest
 from ConfigParser import RawConfigParser
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.bibcheck_task import RulesParseError, \
         load_rule, \
         AmendableRecord
@@ -78,7 +77,7 @@ INVALID_RULES = (
 )
 
 
-class BibCheckRulesParseTest(unittest.TestCase):
+class BibCheckRulesParseTest(InvenioTestCase):
     """ Tests the rule parse functionality """
     def test_invalid_rule(self):
         """ Makes sure the parser raises an error with invalid rules """
@@ -134,7 +133,7 @@ class BibCheckRulesParseTest(unittest.TestCase):
         self.assertEqual(rule2["check"], "other_checker")
 
 
-class BibCheckAmendableRecordTest(unittest.TestCase):
+class BibCheckAmendableRecordTest(InvenioTestCase):
     """ Check the AmendableRecord class """
 
     def setUp(self):

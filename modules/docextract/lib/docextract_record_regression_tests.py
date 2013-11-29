@@ -24,13 +24,13 @@ from invenio.docextract_record import BibRecord, \
 from invenio.search_engine import get_record as get_record_original
 from invenio.search_engine import perform_request_search
 from invenio.bibrecord import print_rec
-from invenio.testutils import XmlTest
+from invenio.testutils import InvenioXmlTestCase
 from invenio.dbquery import run_sql
 from invenio.testutils import (make_test_suite,
                                run_test_suite)
 
 
-class BibRecordTest(XmlTest):
+class BibRecordTest(InvenioXmlTestCase):
     def setUp(self):
         self.maxDiff = None
         from invenio import bibrecord

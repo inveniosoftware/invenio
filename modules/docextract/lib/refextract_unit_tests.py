@@ -242,7 +242,7 @@ class SearchTest(InvenioTestCase):
         self.assert_('477' in pattern)
 
 
-class RebuildReferencesTest(unittest.TestCase):
+class RebuildReferencesTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=1)
 
@@ -300,7 +300,7 @@ class RebuildReferencesTest(unittest.TestCase):
         ])
 
 
-class tagArxivTest(unittest.TestCase):
+class tagArxivTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=1)
 

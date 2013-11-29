@@ -299,7 +299,7 @@ class TestEmailObfuscationMode(InvenioTestCase):
 
 
 
-class TestRelativeURL(unittest.TestCase):
+class TestRelativeURL(InvenioTestCase):
     """Tests the get_relative_url function with different input strings"""
 
     def test_relative_url(self):

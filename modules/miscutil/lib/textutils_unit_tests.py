@@ -481,7 +481,7 @@ class TestALALC(InvenioTestCase):
                              transliterate_ala_lc(unicode_text))
 
 
-class LatexEscape(unittest.TestCase):
+class LatexEscape(InvenioTestCase):
     """Test for escape latex function"""
 
     def test_escape_latex(self):

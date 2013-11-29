@@ -959,7 +959,7 @@ class InvenioWebTestCaseException(Exception):
         return repr(self.message)
 
 
-class XmlTest(unittest.TestCase):
+class InvenioXmlTestCase(InvenioTestCase):
     def assertXmlEqual(self, got, want):
         xml_lines = parseString(got).toprettyxml(encoding='utf-8').split('\n')
         xml = '\n'.join(line for line in xml_lines if line.strip())

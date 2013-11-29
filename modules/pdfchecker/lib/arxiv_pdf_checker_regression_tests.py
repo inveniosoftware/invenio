@@ -1,9 +1,27 @@
-import unittest
+# -*- coding: utf-8 -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2011 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 import os
 from datetime import datetime
 from tempfile import mkstemp
 
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio import bibupload
 from invenio import bibtask
 from invenio.dbquery import run_sql
@@ -58,7 +76,7 @@ La(2-x)Ba(x)CuO(4) family of high-temperature superconductors.
 
 
 
-class TestTask(unittest.TestCase):
+class TestTask(InvenioTestCase):
     def setUp(self, recid=RECID, arxiv_id=ARXIV_ID):
         self.recid = recid
         self.arxiv_id = arxiv_id
@@ -194,7 +212,7 @@ class TestTask(unittest.TestCase):
                     if d.get_format().strip('.') in ['pdf', 'pdfa', 'PDF']:
                         try:
                             yield doc, d
-                        except InvenioWebBibDocFileError:
+                        except InvenioBibDocFileError:
                             pass
 
 

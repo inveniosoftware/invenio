@@ -21,8 +21,7 @@
 BibCatalog unit tests
 """
 
-import unittest
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 from invenio.bibcatalog_utils import \
     load_tag_code_from_name, \
@@ -34,7 +33,7 @@ from invenio.bibcatalog_utils import \
 from invenio.bibformat_dblayer import get_all_name_tag_mappings
 
 
-class TestUtilityFunctions(unittest.TestCase):
+class TestUtilityFunctions(InvenioTestCase):
     """Test non-data-specific utility functions for BibCatalog."""
 
     def setUp(self):

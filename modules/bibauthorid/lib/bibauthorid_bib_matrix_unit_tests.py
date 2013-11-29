@@ -22,12 +22,12 @@
 __revision__ = \
     "$Id$"
 
-import unittest
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 
 from invenio.bibauthorid_cluster_set import ClusterSet
 from invenio.bibauthorid_bib_matrix import Bib_matrix
 
-class Test_Bib_matrix(unittest.TestCase):
+class TestBibMatrix(InvenioTestCase):
 
     def setUp(self):
         """
@@ -130,6 +130,7 @@ class Test_Bib_matrix(unittest.TestCase):
         self.assertTrue(self.bmcs0.getitem_numeric([0,1])[0] == -1)
         self.assertTrue(self.bmcs0.getitem_numeric([0,2])[0] == -3)
 
-if __name__ == '__main__':
-    #run_test_suite(TEST_SUITE)
-    unittest.main(verbosity=2)
+TEST_SUITE = make_test_suite(TestBibMatrix)
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE, warn_user=True)

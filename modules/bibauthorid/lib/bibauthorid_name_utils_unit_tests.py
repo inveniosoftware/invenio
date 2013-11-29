@@ -22,9 +22,8 @@
 __revision__ = \
     "$Id$"
 
-import unittest
 from operator import ge,le,eq
-
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 
 #name_tests: name string, split_name_parts,
 
@@ -50,7 +49,7 @@ from invenio.bibauthorid_name_utils import split_name_parts, distance, create_ca
 from invenio.bibauthorid_name_utils import full_names_are_equal_composites, full_names_are_substrings, surname_compatibility, initials_compatibility, compare_names
 from invenio.bibauthorid_name_utils import create_name_tuples
 
-class Test_distance_functions(unittest.TestCase):
+class TestDistanceFunctions(InvenioTestCase):
     """ Test string distance functions """
 
     def test_simple_distance(self):
@@ -61,7 +60,7 @@ class Test_distance_functions(unittest.TestCase):
         self.assertEqual(distance('eecbr','bbbbb'), 4)
 
 
-class Test_split_name_parts(unittest.TestCase):
+class TestSplitNameParts(InvenioTestCase):
     'Test splitting of names'
     names_split_name_parts = {
          'Test, m. e.': ['Test', ['M', 'E'], [], []],
@@ -89,7 +88,7 @@ class Test_split_name_parts(unittest.TestCase):
             self.assertEqual(split_name_parts(tn), self.names_split_name_parts[tn])
 
 
-class Test_create_canonical_names(unittest.TestCase):
+class TestCreateCanonicalNames(InvenioTestCase):
     'Test creation of canonical names'
     names_create_canonical_names = {
      'Test': 'Test',
@@ -115,7 +114,7 @@ class Test_create_canonical_names(unittest.TestCase):
             self.assertEqual(create_canonical_name(tn), self.names_create_canonical_names[tn])
 
 
-class Test_create_normalized_name(unittest.TestCase):
+class TestCreateNormalizedName(InvenioTestCase):
     'Test creation of normalized names'
     tc ={
      'Hyphened-surname, hyphened-name and normal': 'Hyphened-Surname, Hyphened Name And Normal',
@@ -143,7 +142,7 @@ class Test_create_normalized_name(unittest.TestCase):
 
 
 
-class Test_create_uinified_name(unittest.TestCase):
+class TestCreateUinifiedName(InvenioTestCase):
     'Test creation of unified names'
     tc = {
      'Hyphened-surname, hyphened-name and normal': 'Hyphened-Surname, H. N. A. N. ',
@@ -168,7 +167,7 @@ class Test_create_uinified_name(unittest.TestCase):
         for tn in self.tc.keys():
             self.assertEqual(create_unified_name(tn), self.tc[tn])
 
-class Test_soft_name_comparison(unittest.TestCase):
+class TestSoftNameComparison(InvenioTestCase):
     'Test soft name comparison'
 
     tc = {
@@ -198,7 +197,7 @@ class Test_soft_name_comparison(unittest.TestCase):
                 self.assertTrue(test[0](cn(n1,n2), test[1]))
 
 
-class Test_name_comparison(unittest.TestCase):
+class TestNameComparison(InvenioTestCase):
     'Test name comparison'
     tc = {
         'Test, Name': ['Test, Name', [(ge, 0.7), (le, 1.)]],
@@ -270,6 +269,13 @@ class Test_name_comparison(unittest.TestCase):
                 self.assertTrue(cn(n1,n2) == cn(n2,n1))
                 self.assertTrue(test[0](cn(n1,n2), test[1]))
 
-if __name__ == '__main__':
-    #run_test_suite(TEST_SUITE)
-    unittest.main(verbosity=2)
+TEST_SUITE = make_test_suite(TestDistanceFunctions,
+                             TestSoftNameComparison,
+                             TestSplitNameParts,
+                             TestCreateCanonicalNames,
+                             TestCreateNormalizedName,
+                             TestSoftNameComparison,
+                             TestNameComparison)
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE, warn_user=True)

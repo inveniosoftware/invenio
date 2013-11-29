@@ -26,11 +26,11 @@ from invenio.testutils import make_test_suite, run_test_suite
 from invenio.docextract_record import BibRecord
 from invenio.refextract_kbs import get_kbs
 from invenio.config import CFG_BINDIR, CFG_TMPDIR
-from invenio.testutils import XmlTest
+from invenio.testutils import InvenioXmlTestCase
 from invenio.docextract_convert_journals import USAGE_MESSAGE, convert_journals
 
 
-class ConverterTests(XmlTest):
+class ConverterTests(InvenioXmlTestCase):
     def setUp(self):
         kb = [("TEST JOURNAL NAME", "Converted")]
         kbs_files = {'journals': kb}
@@ -51,7 +51,7 @@ class ConverterTests(XmlTest):
         self.assertEqual(expected_record, converted_record)
 
 
-class ScriptTests(XmlTest):
+class ScriptTests(InvenioXmlTestCase):
     def setUp(self):
         self.bin_path = os.path.join(CFG_BINDIR, 'convert_journals')
 

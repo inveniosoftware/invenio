@@ -22,16 +22,17 @@
 __revision__ = \
     "$Id$"
 
-import unittest
 from itertools import chain
 
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 from invenio.bibauthorid_cluster_set import ClusterSet
 
-class Test_probability_matrix(unittest.TestCase):
+class TestProbabilityMatrix(InvenioTestCase):
 
     def setUp(self):
         pass
 
-if __name__ == '__main__':
-    #run_test_suite(TEST_SUITE)
-    unittest.main(verbosity=2)
+TEST_SUITE = make_test_suite()
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE, warn_user=True)

@@ -319,7 +319,7 @@ class TestGetConvertedImageName(InvenioTestCase):
         self.assertTrue(converted_image == '/path/to/image.png', 'didn\'t change extension')
 
 
-class TestGetter(unittest.TestCase):
+class TestGetter(InvenioTestCase):
 
     def test_harvest_single(self):
         """plotextractor - check harvest_single"""

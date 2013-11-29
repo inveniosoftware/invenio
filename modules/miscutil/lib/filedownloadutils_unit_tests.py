@@ -18,16 +18,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """Tests for downloadutils."""
 
-import unittest
-
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.filedownloadutils import (download_url,
                                        is_url_a_local_file,
                                        safe_mkstemp,
                                        InvenioFileDownloadError)
 
 
-class TestDownloadUtils(unittest.TestCase):
+class TestDownloadUtils(InvenioTestCase):
     """Test simple download functionality."""
 
     def test_content_type(self):

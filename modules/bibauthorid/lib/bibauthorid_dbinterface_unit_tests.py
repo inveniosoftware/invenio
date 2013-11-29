@@ -22,12 +22,12 @@
 __revision__ = \
     "$Id$"
 
-import unittest
 from itertools import chain
 
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 from invenio.bibauthorid_cluster_set import ClusterSet
 
-class Test_(unittest.TestCase):
+class TestDummy(InvenioTestCase):
 
     def setUp(self):
         pass
@@ -35,8 +35,7 @@ class Test_(unittest.TestCase):
     def test_one(self):
         pass
 
+TEST_SUITE = make_test_suite(TestDummy)
 
-
-if __name__ == '__main__':
-    #run_test_suite(TEST_SUITE)
-    unittest.main(verbosity=2)
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE, warn_user=True)

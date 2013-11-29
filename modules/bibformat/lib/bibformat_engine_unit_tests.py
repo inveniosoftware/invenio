@@ -926,7 +926,7 @@ class MarcFilteringTest(InvenioTestCase):
         self.assertEqual(numhfields, 1)
 
 
-class BibFormat2ndPassTest(unittest.TestCase):
+class BibFormat2ndPassTest(InvenioTestCase):
     """Check for 2 passes parsing for record"""
 
     def setUp(self):

@@ -20,17 +20,16 @@
 """Unit tests for the hepdatautils library."""
 __revision__ = "$Id$"
 
-import unittest
 import os
 import cPickle
 
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio import hepdatautils
 from invenio.hepdatautils import Dataset
 from invenio import bibrecord
 
 
-class TestParsingSystematics(unittest.TestCase):
+class TestParsingSystematics(InvenioTestCase):
     """ Systematics strings to be parsed (we check only that they parse
     at all not generating exceptions)
     """
@@ -42,7 +41,7 @@ class TestParsingSystematics(unittest.TestCase):
         # we make sure that this does not cauase any exception !
         pass
 
-class TestDatasetPaperLogic(unittest.TestCase):
+class TestDatasetPaperLogic(InvenioTestCase):
     """ Testing the business logic classes
     """
 

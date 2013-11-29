@@ -22,8 +22,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.bibcheck_plugins import mandatory, \
     trailing_space, \
     regexp, \
@@ -61,7 +60,7 @@ RULE_MOCK = {
     "holdingpen": True
 }
 
-class BibCheckPluginsTest(unittest.TestCase):
+class BibCheckPluginsTest(InvenioTestCase):
     """ Bibcheck default plugins test """
 
     def assertAmends(self, test, changes, **kwargs):

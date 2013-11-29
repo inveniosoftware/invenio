@@ -17,13 +17,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
 try:
     import requests
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.config import CFG_SITE_URL, CFG_ETCDIR, CFG_INSPIRE_SITE
 from invenio.bibrecord import create_record, record_xml_output, record_delete_field
 
@@ -166,7 +165,7 @@ def compare_references(test, a, b):
     test.assertEqual(a, b)
 
 
-class DocExtractTest(unittest.TestCase):
+class DocExtractTest(InvenioTestCase):
     def setUp(self):
         #setup_loggers(verbosity=1)
         self.maxDiff = 10000

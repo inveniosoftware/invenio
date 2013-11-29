@@ -24,11 +24,11 @@ from invenio.docextract_record import (BibRecord,
                                        BibRecordSubField,
                                        BibRecordField,
                                        BibRecordControlField)
-from invenio.testutils import XmlTest
+from invenio.testutils import InvenioXmlTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 
 
-class BibRecordTest(XmlTest):
+class BibRecordTest(InvenioXmlTestCase):
     def setUp(self):
         self.xml = """<record>
             <datafield tag="100" ind1=" " ind2=" ">

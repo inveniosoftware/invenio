@@ -22,12 +22,12 @@
 __revision__ = \
     "$Id$"
 
-import unittest
 from itertools import chain
 
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 from invenio.bibauthorid_cluster_set import ClusterSet
 
-class Test_cluster(unittest.TestCase):
+class TestCluster(InvenioTestCase):
 
     def setUp(self):
         self.clusters = [ClusterSet.Cluster(range(i*10,i*10+10)) for i in range(3)]
@@ -43,7 +43,7 @@ class Test_cluster(unittest.TestCase):
         self.assertTrue(c1.hates(c2))
         self.assertTrue(c2.hates(c1))
 
-class Test_cluster_set(unittest.TestCase):
+class TestClusterSet(InvenioTestCase):
 
     def setUp(self):
         self.clusters = [ClusterSet.Cluster(range(i*10,i*10+5)) for i in range(10)]
@@ -57,6 +57,7 @@ class Test_cluster_set(unittest.TestCase):
         self.assertTrue( sorted(list((c.all_bibs()))) ==
                          list(chain.from_iterable(range(i*10,i*10+5) for i in range(10))))
 
-if __name__ == '__main__':
-    #run_test_suite(TEST_SUITE)
-    unittest.main(verbosity=2)
+TEST_SUITE = make_test_suite(TestCluster, TestClusterSet)
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE, warn_user=True)

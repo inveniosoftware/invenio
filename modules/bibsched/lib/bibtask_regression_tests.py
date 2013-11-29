@@ -22,13 +22,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
 import datetime
 from invenio.dbquery import run_sql
 from invenio.bibtask import get_modified_records_since
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class BibTaskGetModifiedRecordsSiceTest(unittest.TestCase):
+class BibTaskGetModifiedRecordsSiceTest(InvenioTestCase):
 
     def setUp(self):
         # Save old modification times to restore them later

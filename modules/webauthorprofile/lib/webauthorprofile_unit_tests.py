@@ -23,14 +23,13 @@
 WebAuthorProfile unit tests
 """
 
-from unittest import TestCase
 from threading import Thread
 from time import sleep
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.webauthorprofile_dbapi import expire_cache_element
 from invenio.webauthorprofile_corefunctions import foo, _foo
 
-class WebAuthorProfileTest(TestCase):
+class WebAuthorProfileTest(InvenioTestCase):
     """ Test functions to check the validator of WebAuthorProfile. """
 
     def test_caching(self):

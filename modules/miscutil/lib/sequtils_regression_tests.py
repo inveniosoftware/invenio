@@ -161,7 +161,7 @@ class TestCnumSequenceGeneratorClass(InvenioTestCase):
                         AND seq_value IN ("C50-09-14", "C50-09-14.1") """)
 
 
-class TestTexkeySequenceGeneratorClass(unittest.TestCase):
+class TestTexkeySequenceGeneratorClass(InvenioTestCase):
 
     def setUp(self):
         self.texkey1 = ""
@@ -205,7 +205,7 @@ class TestTexkeySequenceGeneratorClass(unittest.TestCase):
                                                                self.texkey3))
 
 
-class TestTexkeydaemonClass(unittest.TestCase):
+class TestTexkeydaemonClass(InvenioTestCase):
     def test_task_run_core(self):
         """ Basic task_run_core check """
         task_run_core()

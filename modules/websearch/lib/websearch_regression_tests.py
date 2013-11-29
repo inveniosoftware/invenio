@@ -53,7 +53,7 @@ from invenio.testutils import (make_test_suite,
                                make_rurl,
                                test_web_page_content,
                                merge_error_messages,
-                               XmlTest)
+                               InvenioXmlTestCase)
 from invenio.urlutils import same_urls_p
 from invenio.dbquery import run_sql
 from invenio.webinterface_handler_wsgi import SimulatedModPythonRequest
