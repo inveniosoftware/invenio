@@ -1,6 +1,6 @@
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,7 +24,8 @@ pylib_DATA = webauthorprofile_corefunctions.py \
 	     webauthorprofile_templates.py  \
 	     webauthorprofile_webinterface.py \
 	     webauthorprofile_cli.py \
-	     webauthorprofile_daemon.py
+	     webauthorprofile_daemon.py \
+	     webauthorprofile_regression_tests.py
 
 
 jsdir=$(localstatedir)/www/js
