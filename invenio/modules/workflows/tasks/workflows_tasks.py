@@ -1,9 +1,9 @@
 
 from invenio.modules.workflows.models import (BibWorkflowObject,
                                               BibWorkflowEngineLog)
-from invenio.bibworkflow_api import (start_delayed)
+from invenio.modules.workflows.api import (start_delayed)
 
-from invenio.bibworkflow_utils import InvenioWorkflowError
+from invenio.modules.workflows.utils import InvenioWorkflowError
 
 
 def get_nb_workflow_created(obj, eng):
@@ -78,7 +78,7 @@ def wait_for_workflows_to_complete(obj, eng):
                 eng.log.error("___________________\n_______ALERT_______\n___________________\n_______WORKFLOW " +
                               e.id_workflow + " FAILED_______\n_______ERROR MESSAGE IS :_______\n" + repr(e))
 
-                workflowlog = BibWorkflowEngineLog.query.filter(BibWorkflowEngineLog.id_workflow == e.id_workflow).all()
+                workflowlog = BibWorkflowEngineLog.query.filter(BibWorkflowEngineLog.id_object == e.id_workflow).all()
 
                 for log in workflowlog:
                     eng.log.error(log.message)

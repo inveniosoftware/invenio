@@ -9,6 +9,8 @@ Flask-Login==0.2.7
 Flask-Principal==0.4.0
 #Flask-SQLAlchemy==1.0
 git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy
+git+git://github.com/inveniosoftware/flask-menu.git
+git+git://github.com/inveniosoftware/flask-breadcrumbs.git
 Flask-Script==0.6.2
 Flask-Testing==0.4
 Flask-WTF==0.9.3

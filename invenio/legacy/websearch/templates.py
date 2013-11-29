@@ -431,8 +431,8 @@ class Template:
   {'CFG_SITE_URL': CFG_SITE_URL,
    'short_name': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)[:16],
    'long_name': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-   'description': (_("Search on %(x_CFG_SITE_NAME_INTL)s") % \
-   {'x_CFG_SITE_NAME_INTL': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)})[:1024],
+   'description': _("Search on %(x_CFG_SITE_NAME_INTL)s",
+                    x_CFG_SITE_NAME_INTL=CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME))[:1024],
    'CFG_SITE_ADMIN_EMAIL': CFG_SITE_ADMIN_EMAIL,
    'rss_search_syntax': self.tmpl_opensearch_rss_url_syntax,
    'html_search_syntax': self.tmpl_opensearch_html_url_syntax

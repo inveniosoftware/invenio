@@ -22,12 +22,12 @@ import glob
 import re
 
 
-from invenio.bibupload import (find_record_from_recid,
-                               find_record_from_sysno,
-                               find_records_from_extoaiid,
-                               find_record_from_oaiid,
-                               find_record_from_doi
-                               )
+from invenio.legacy.bibupload.engine import (find_record_from_recid,
+                                             find_record_from_sysno,
+                                             find_records_from_extoaiid,
+                                             find_record_from_oaiid,
+                                             find_record_from_doi
+                                             )
 from invenio.legacy.oaiharvest.dblayer import create_oaiharvest_log_str
 
 
@@ -35,48 +35,47 @@ from invenio.base.config import (CFG_TMPSHAREDDIR,
                                  CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT,
                                  CFG_TMPDIR,
                                  CFG_INSPIRE_SITE)
-from invenio.oai_harvest_utils import (record_extraction_from_file,
-                                       collect_identifiers,
-                                       harvest_step,
-                                       translate_fieldvalues_from_latex,
-                                       find_matching_files,
-                                       )
-from invenio.bibtask import (task_sleep_now_if_required,
-                             task_get_option,
-                             task_low_level_submission
-                             )
+from invenio.legacy.oaiharvest.utils import (record_extraction_from_file,
+                                             collect_identifiers,
+                                             harvest_step,
+                                             translate_fieldvalues_from_latex,
+                                             find_matching_files,
+                                             )
+from invenio.legacy.bibsched.bibtask import (task_sleep_now_if_required,
+                                             task_get_option,
+                                             task_low_level_submission
+                                             )
 from invenio.modules.oai_harvest.models import OaiHARVEST
-from invenio.bibfield_jsonreader import JsonReader
-from invenio.bibworkflow_utils import InvenioWorkflowError
-from invenio.refextract_api import extract_references_from_file_xml
+from invenio.legacy.bibfield.bibfield_jsonreader import JsonReader
+from invenio.modules.workflows.utils import InvenioWorkflowError
+from invenio.legacy.refextract.api import extract_references_from_file_xml
 from invenio.legacy.bibrecord import (create_records,
                                       record_xml_output
                                       )
-from invenio.plotextractor_output_utils import (create_MARC,
-                                                create_contextfiles,
-                                                prepare_image_data,
-                                                write_message,
-                                                remove_dups
+from invenio.utils.plotextractor.output_utils import (create_MARC,
+                                                      create_contextfiles,
+                                                      prepare_image_data,
+                                                      write_message,
+                                                      remove_dups
+                                                      )
+from invenio.utils.plotextractor.getter import (harvest_single,
+                                                make_single_directory
                                                 )
-from invenio.plotextractor_getter import (harvest_single,
-                                          make_single_directory
-                                          )
 
-from invenio.plotextractor import (get_defaults,
-                                   extract_captions,
-                                   extract_context
-                                   )
-from invenio.shellutils import (run_shell_command,
-                                Timeout
-                                )
-import invenio.template
-from invenio.plotextractor_converter import (untar,
-                                             convert_images
+from invenio.utils.plotextractor.cli import (get_defaults,
+                                             extract_captions,
+                                             extract_context
                                              )
+from invenio.utils.shell import (run_shell_command,
+                                 Timeout
+                                 )
+import invenio.legacy.template
+from invenio.utils.plotextractor.converter import (untar,
+                                                   convert_images
+                                                   )
 
-oaiharvest_templates = invenio.template.load('oai_harvest')
+oaiharvest_templates = invenio.legacy.template.load('oaiharvest')
 
-REGEXP_RECORD = re.compile("<record.*?>(.*?)</>record>", re.DOTALL)
 REGEXP_REFS = re.compile("<record.*?>.*?<controlfield .*?>.*?</controlfield>(.*?)</record>", re.DOTALL)
 REGEXP_AUTHLIST = re.compile("<collaborationauthorlist.*?</collaborationauthorlist>", re.DOTALL)
 
@@ -126,7 +125,7 @@ def convert_record_to_bibfield(obj, eng):
     Convert a record in data into a 'dictionary'
     thanks to BibField
     """
-    from invenio.bibfield import create_record
+    from invenio.legacy.bibfield import create_record
 
     eng.log.info("last task name: convert_record_to_bibfield")
     obj.data = create_record(obj.data).rec_json
@@ -138,10 +137,20 @@ def init_harvesting(obj, eng):
     This function gets all the option linked to the task and stores them into the
     object to be used later.
     """
-
+    obj.log.error("TEST")
+    obj.log.error("TEST")
+    obj.log.error("TEST")
+    obj.log.error("TEST")
+    obj.log.error("TEST")
+    obj.log.error("TEST")
+    obj.log.error(str(obj.extra_data))
+    obj.log.error("FIN TEST")
+    obj.log.error("FIN TEST")
+    obj.log.error("FIN TEST")
     eng.log.info("last task name: init_harvesting")
     obj.extra_data["options"] = task_get_option(None)
     obj.log.error(str(task_get_option(None)))
+    obj.log.error(str(task_get_option("workflow")))
     eng.log.info("end of init_harvesting")
 
 
@@ -151,6 +160,7 @@ def get_repositories_list(repositories):
     It will allows in the future to do all the correct operations.
     """
     def _get_repositories_list(obj, eng):
+
 
         eng.log.info("last task name: _get_repositories_list")
 
@@ -320,7 +330,7 @@ def fulltext_download(obj, eng):
 
             updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>\n' + fulltext_xml + \
                           '</record>\n</collection>'
-            from invenio.bibfield import create_record
+            from invenio.legacy.bibfield import create_record
 
             new_dict_representation = create_record(updated_xml).rec_json
             try:
@@ -336,8 +346,6 @@ def quick_match_record(obj, eng):
 
     001 fields even in the insert mode
     """
-    from invenio.legacy.bibrecord import create_record
-    from invenio.legacy.bibmatch.engine import match_records
     eng.log.info("last task name: quick_match_record")
     obj.extra_data["last_task_name"] = 'Quick Match Record'
 
@@ -347,8 +355,11 @@ def quick_match_record(obj, eng):
 
     my_json_reader = JsonReader()
     my_json_reader.rec_json = obj.data
-
-    identifiers = my_json_reader.get_persistent_identifiers()
+    try:
+        identifiers = {}
+        #identifiers = my_json_reader.get_persistent_identifiers()
+    except KeyError:
+        identifiers = {}
 
     if not "recid" in identifiers:
         for identifier in identifiers:
@@ -452,7 +463,7 @@ def plot_extract(plotextractor_types):
                 marc_xml += "\n</collection>"
 
                 if marc_xml:
-                    from invenio.bibfield import create_record
+                    from invenio.legacy.bibfield import create_record
                     # We store the path to the directory  the tarball contents live
                     # Read and grab MARCXML from plotextractor run
                     new_dict_representation = create_record(marc_xml).rec_json
@@ -479,22 +490,32 @@ def refextract(obj, eng):
         if pdf is not None:
             obj.extra_data["options"]["identifiers"]["pdf"] = pdf
 
-    cmd_stdout = extract_references_from_file_xml(obj.extra_data["options"]["identifiers"]["pdf"])
-    references_xml = REGEXP_REFS.search(cmd_stdout)
+    elif not os.path.isfile(obj.extra_data["options"]["identifiers"]["pdf"]):
+        extract_path = make_single_directory(CFG_TMPSHAREDDIR, eng.uuid)
+        tarball, pdf = harvest_single(obj.data["system_control_number"]["value"], extract_path, ["pdf"])
+        time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT)
+        if pdf is not None:
+            obj.extra_data["options"]["identifiers"]["pdf"] = pdf
 
-    if references_xml:
-        updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>' + references_xml.group(1) + \
-                      "</record>\n</collection>"
+    if os.path.isfile(obj.extra_data["options"]["identifiers"]["pdf"]):
 
-        from invenio.bibfield import create_record
+        cmd_stdout = extract_references_from_file_xml(obj.extra_data["options"]["identifiers"]["pdf"])
+        references_xml = REGEXP_REFS.search(cmd_stdout)
 
-        new_dict_representation = create_record(updated_xml).rec_json
-        try:
-            obj.data['reference'].append(new_dict_representation["reference"])
-        except KeyError:
-            if 'reference' in new_dict_representation:
-                obj.data['reference'] = [new_dict_representation['reference']]
+        if references_xml:
+            updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>' + references_xml.group(1) + \
+                          "</record>\n</collection>"
 
+            from invenio.legacy.bibfield import create_record
+
+            new_dict_representation = create_record(updated_xml).rec_json
+            try:
+                obj.data['reference'].append(new_dict_representation["reference"])
+            except KeyError:
+                if 'reference' in new_dict_representation:
+                    obj.data['reference'] = [new_dict_representation['reference']]
+    else:
+        obj.log.error("Not able to download and process the PDF ")
 
 def author_list(obj, eng):
     """
@@ -537,7 +558,7 @@ def author_list(obj, eng):
             authors += match[0]
             # Generate file to store conversion results
     if authors is not '':
-        from invenio.bibconvert_xslt_engine import convert
+        from invenio.legacy.bibconvert.xslt_engine import convert
 
         authors = convert(authors, "authorlist2marcxml.xsl")
         authorlist_record = create_records(authors)
@@ -565,7 +586,7 @@ def author_list(obj, eng):
         updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' + record_xml_output(authorlist_record) \
                       + '</collection>'
         if not None == updated_xml:
-            from invenio.bibfield import create_record
+            from invenio.legacy.bibfield import create_record
             # We store the path to the directory  the tarball contents live
             # Read and grab MARCXML from plotextractor run
             new_dict_representation = create_record(updated_xml).rec_json

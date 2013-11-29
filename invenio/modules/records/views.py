@@ -35,10 +35,11 @@ from invenio.modules.search.signals import record_viewed
 from invenio.modules.record_editor.models import Bibrec
 from invenio.base.i18n import _
 from invenio.utils import apache
-from invenio.ext.breadcrumb import default_breadcrumb_root
+from flask.ext.breadcrumbs import default_breadcrumb_root
 
-blueprint = Blueprint('record', __name__, url_prefix="/"+CFG_SITE_RECORD,
-                      template_folder='templates', static_folder='static')
+blueprint = Blueprint('record', __name__, url_prefix="/" + CFG_SITE_RECORD,
+                      static_url_path='/record', template_folder='templates',
+                      static_folder='static')
 
 default_breadcrumb_root(blueprint, '.')
 

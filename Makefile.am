@@ -162,6 +162,7 @@ install-jquery-plugins:
 	@echo "***********************************************************"
 	mkdir -p ${prefix}/var/www/js
 	mkdir -p $(prefix)/var/www/css
+	mkdir -p $(prefix)/var/www/img
 	(cd ${prefix}/var/www/js && \
 	wget http://code.jquery.com/jquery-1.7.1.min.js && \
 	mv jquery-1.7.1.min.js jquery.min.js && \
@@ -281,7 +282,7 @@ install-ckeditor-plugin:
 	find ${prefix}/var/www/ckeditor/ckeditor* -maxdepth 0 ! -name "ckeditor.js" -exec rm -r {} \; && \
 	rm -fr /tmp/invenio-ckeditor-plugin
 	@echo "* Installing Invenio-specific CKeditor config..."
-	(cd $(top_srcdir)/modules/webstyle/etc && make install)
+	@echo "Ignored: (cd $(top_srcdir)/modules/webstyle/etc && make install)"
 	@echo "***********************************************************"
 	@echo "** The CKeditor plugin was successfully installed.      **"
 	@echo "** Please do not forget to properly set the option       **"

@@ -25,8 +25,8 @@ from invenio.modules.access.models import AccACTION, AccROLE
 from invenio.modules.accounts.models import User
 from invenio.base.i18n import _
 from invenio.base.decorators import templated, sorted_by
-from invenio.ext.menu import register_menu
-from invenio.ext.breadcrumb import register_breadcrumb
+from flask.ext.menu import register_menu
+from flask.ext.breadcrumbs import register_breadcrumb
 from invenio.ext.principal import permission_required
 #from invenio.modules.access.local_config import \
 #FIXME

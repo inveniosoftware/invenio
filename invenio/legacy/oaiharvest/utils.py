@@ -29,8 +29,8 @@ import re
 import time
 import urlparse
 import calendar
-from invenio.errorlib import register_exception
-from invenio import oai_harvest_getter
+from invenio.ext.logging import register_exception
+from invenio.legacy.oaiharvest import getter
 
 from invenio.config import (CFG_ETCDIR, CFG_SITE_URL,
                             CFG_SITE_ADMIN_EMAIL
@@ -39,9 +39,9 @@ from invenio.legacy.bibrecord import (record_get_field_instances,
                                       record_modify_subfield,
                                       field_xml_output
                                       )
-from invenio.shellutils import run_shell_command
+from invenio.utils.shell import run_shell_command
 from invenio.utils.text import translate_latex2unicode
-from invenio.oai_harvest_dblayer import update_lastrun
+from invenio.legacy.oaiharvest.dblayer import update_lastrun
 from invenio.legacy.bibcatalog.api import bibcatalog_system
 from invenio.legacy.bibsched.bibtask import write_message
 
@@ -551,12 +551,12 @@ def oai_harvest_get(prefix, baseurl, harvestpath,
         if setspecs:
             sets = [oai_set.strip() for oai_set in setspecs.split(' ')]
 
-        harvested_files = oai_harvest_getter.harvest(network_location, path, http_param_dict, method, harvestpath,
+        harvested_files = getter.harvest(network_location, path, http_param_dict, method, harvestpath,
                                                      sets, secure, user, password, cert_file, key_file)
         if verb == "ListRecords":
             remove_duplicates(harvested_files)
         return harvested_files
-    except (StandardError, oai_harvest_getter.InvenioOAIRequestError) as exce:
+    except (StandardError, getter.InvenioOAIRequestError) as exce:
         register_exception()
         raise Exception("An error occurred while harvesting from %s: %s\n"
                         % (baseurl, str(exce)))

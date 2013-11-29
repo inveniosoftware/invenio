@@ -21,7 +21,7 @@
 
 from flask import Blueprint, g, render_template, request, flash, redirect, \
     url_for, abort
-from invenio.ext.menu import register_menu
+from flask.ext.menu import register_menu
 from invenio.ext.sqlalchemy import db
 from ..models import Collection, CollectionCollection, \
         Collectionname, CollectionPortalbox, Portalbox

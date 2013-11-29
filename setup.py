@@ -135,7 +135,6 @@ setup(
             'websubmitadmin = invenio.legacy.websubmit.scripts.websubmitadmin:main',
             'xmlmarc2textmarc = invenio.legacy.bibrecord.scripts.xmlmarc2textmarc:main',
             'xmlmarclint = invenio.legacy.bibrecord.scripts.xmlmarclint:main',
-            'oaiharvest = invenio.legacy.oaiharvest.scripts.oaiharvest:main',
         ],
     },
     install_requires=install_requires,

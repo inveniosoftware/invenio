@@ -15,8 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
+import time
 from invenio.legacy.dbquery import run_sql
+from invenio.utils.serializers import serialize_via_marshal
+from invenio.legacy.bibrecord import create_records, record_extract_oai_id
 
 class HistoryEntry:
     date_harvested = None
@@ -47,6 +49,7 @@ class HistoryEntry:
                "inserted_to_db: " + str(self.inserted_to_db) + ', ' + \
                "oai_src_id: " + str(self.oai_src_id) + ', ' + ")"
 
+
 def get_history_entries_raw(query_suffix, sqlparameters):
     """
        Internally used function which obtains sql query suffix ( starting from WHERE)
@@ -62,12 +65,14 @@ def get_history_entries_raw(query_suffix, sqlparameters):
                       str(entry[5]), int(entry[6])))
     return result
 
+
 def get_history_entries(oai_src_id, monthdate, method = "harvested"):
     sql_column = "date_harvested"
     if method == "inserted":
         sql_column = "date_inserted"
     query_suffix = "WHERE id_oaiHARVEST = %s AND MONTH(" + sql_column + ") = %s AND YEAR(" + sql_column + ") = %s ORDER BY " + sql_column
     return get_history_entries_raw(query_suffix,(str(oai_src_id), str(monthdate.month), str(monthdate.year)))
+
 
 def get_history_entries_for_day(oai_src_id, date, limit = -1, start = 0, method = "harvested"):
     """
@@ -122,6 +127,7 @@ def get_month_logs_size(oai_src_id, date, method = "harvested"):
             result[int(entry[0])] = int(entry[1])
     return result
 
+
 def get_day_logs_size(oai_src_id, date, method = "harvested"):
     """
     Function which returns number of inserts which took place in given day
@@ -136,6 +142,7 @@ def get_day_logs_size(oai_src_id, date, method = "harvested"):
     for entry in query_result:
         return int(entry[0])
     return 0
+
 
 def get_entry_logs_size(oai_id):
     """
@@ -152,6 +159,7 @@ def get_entry_logs_size(oai_id):
 ##################################################################
 ### Here the functions to retrieve, modify, delete and add sources
 ##################################################################
+
 
 def get_oai_src_by_id(oai_src_id):
     """
@@ -235,6 +243,7 @@ def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix,
     except StandardError, e:
         return (0, e)
 
+
 def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency,
                 oai_src_lastrun, oai_src_post, oai_src_comment,
                 oai_src_sets=None, oai_src_args=None):
@@ -260,6 +269,7 @@ def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency
     except StandardError, e:
         return (0, e)
 
+
 def delete_oai_src(oai_src_id):
     """Deletes a row from the database according to its id"""
     try:
@@ -267,6 +277,7 @@ def delete_oai_src(oai_src_id):
         return (1, "")
     except StandardError, e:
         return (0, e)
+
 
 def get_tot_oai_src():
     """Returns number of rows in the database"""
@@ -276,6 +287,7 @@ def get_tot_oai_src():
         return res[0][0]
     except StandardError, e:
         return ""
+
 
 def get_update_status():
     """Returns a table showing a list of all rows and their LastUpdate status"""
@@ -309,13 +321,16 @@ def get_holdingpen_entries(start = 0, limit = 0):
 
     return run_sql(query)
 
+
 def get_holdingpen_entry(oai_id, date_inserted):
     query = "SELECT changeset_xml FROM bibHOLDINGPEN WHERE changeset_date = %s AND oai_id = %s"
     return run_sql(query, (str(date_inserted), str(oai_id)))[0][0]
 
+
 def delete_holdingpen_entry(hpupdate_id):
     query = "DELETE FROM bibHOLDINGPEN WHERE changeset_id=%s"
     run_sql(query, (hpupdate_id, ))
+
 
 def get_holdingpen_day_fragment(year, month, day, limit, start, filter_key):
     """
@@ -327,6 +342,7 @@ def get_holdingpen_day_fragment(year, month, day, limit, start, filter_key):
     query = "SELECT oai_id, changeset_date, changeset_id FROM bibHOLDINGPEN WHERE changeset_date > '%i-%i-%i 00:00:00' and changeset_date <= '%i-%i-%i 23:59:59' %s ORDER BY changeset_date LIMIT %i, %i" % (year, month, day, year, month, day, filterSql, start, limit)
     query_results = run_sql(query)
     return query_results
+
 
 def get_holdingpen_day_size(year, month, day, filter_key):
     """
@@ -363,7 +379,6 @@ def get_holdingpen_year(year, filter_key):
     return run_sql(query)
 
 
-
 def get_holdingpen_years(filter_key):
     """
     Returning the particular years of records present in the holding pen
@@ -375,6 +390,7 @@ def get_holdingpen_years(filter_key):
     results = run_sql(query)
     return results
 
+
 def get_holdingpen_entry_details(hpupdate_id):
     """
     Returning the detials of the Holding Pen entry, the result of this function is a tuple:
@@ -382,3 +398,30 @@ def get_holdingpen_entry_details(hpupdate_id):
     """
     query = "SELECT oai_id, id_bibrec, changeset_date, changeset_xml FROM bibHOLDINGPEN WHERE changeset_id=%s"
     return run_sql(query, (hpupdate_id,))[0]
+
+
+def update_lastrun(index):
+    """ A method that updates the lastrun of a repository
+        successfully harvested """
+    try:
+        today = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        sql = 'UPDATE oaiHARVEST SET lastrun=%s WHERE id=%s'
+        run_sql(sql, (today, index))
+        return 1
+    except StandardError, e:
+        return (0, e)
+
+
+def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
+    """
+    Function which creates the harvesting logs
+    @param task_id bibupload task id
+    """
+    try:
+        records = create_records(xml_content)
+        for record in records:
+            oai_id = record_extract_oai_id(record[0])
+            query = "INSERT INTO oaiHARVESTLOG (id_oaiHARVEST, oai_id, date_harvested, bibupload_task_id) VALUES (%s, %s, NOW(), %s)"
+            run_sql(query, (str(oai_src_id), str(oai_id), str(task_id)))
+    except Exception, msg:
+        print "Logging exception : %s   " % (str(msg),)

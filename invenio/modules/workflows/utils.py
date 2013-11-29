@@ -19,8 +19,6 @@
 import re
 import redis
 
-from invenio.legacy.bibrecord import create_record
-
 from invenio.ext.logging import register_exception
 
 
@@ -78,10 +76,12 @@ class InvenioWorkflowDefinitionError(Exception):
 
 
 def get_workflow_definition(name):
+
     from .loader import workflows
-    if name in workflows:
+
+    try:
         return workflows[name]
-    else:
+    except:
         raise InvenioWorkflowDefinitionError("Cannot find workflow %s" % (name,))
 
 

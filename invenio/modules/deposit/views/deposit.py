@@ -35,8 +35,8 @@ from flask import current_app, Blueprint, \
 from flask.ext.login import current_user, login_required
 from werkzeug.utils import secure_filename
 
-from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
-from invenio.ext.menu import register_menu
+from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
+from flask.ext.menu import register_menu
 from invenio.base.i18n import _
 from .. import forms
 from ..signals import template_context_created

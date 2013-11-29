@@ -38,8 +38,8 @@ from invenio.modules.accounts.models import User
 from invenio.modules.record_editor.models import Bibrec
 from invenio.modules.search.models import Collection
 from invenio.modules.search.views.search import response_formated_records
-from invenio.ext.menu import register_menu
-from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
+from flask.ext.menu import register_menu
+from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from invenio.ext.sqlalchemy import db
 
 # Internal imports

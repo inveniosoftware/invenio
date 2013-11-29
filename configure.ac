@@ -35,8 +35,8 @@ test "${prefix%/}" != "" && prefix=${prefix%/}
 AC_PROG_INSTALL
 
 ## Check for gettext support:
-AM_GNU_GETTEXT(external)
-AM_GNU_GETTEXT_VERSION(0.14.4)
+#AM_GNU_GETTEXT(external)
+#AM_GNU_GETTEXT_VERSION(0.14.4)
 
 ## Check for MySQL client:
 AC_MSG_CHECKING(for mysql)

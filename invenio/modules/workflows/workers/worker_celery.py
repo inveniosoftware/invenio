@@ -16,14 +16,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-
 from invenio.celery import celery
 
 from invenio.ext.sqlalchemy import db
 from invenio.base.helpers import with_app_context
 
-@with_app_context()
+
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.run_worker')
+@with_app_context()
 def celery_run(workflow_name, data, **kwargs):
     """
     Runs the workflow with Celery
@@ -70,8 +70,8 @@ def celery_run(workflow_name, data, **kwargs):
     run_worker(workflow_name, data, **kwargs)
 
 
-@with_app_context()
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.restart_worker')
+@with_app_context()
 def celery_restart(wid, **kwargs):
     """
     Restarts the workflow with Celery
@@ -81,8 +81,9 @@ def celery_restart(wid, **kwargs):
 
 
 
-@with_app_context()
+
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.continue_worker')
+@with_app_context()
 def celery_continue(oid, restart_point, **kwargs):
     """
     Restarts the workflow with Celery

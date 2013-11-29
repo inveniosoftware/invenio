@@ -30,7 +30,7 @@ from invenio.base.config import CFG_BIBWORKFLOW_WORKER
 
 
 
-from invenio.bibworkflow_utils import BibWorkflowObjectIdContainer
+from invenio.modules.workflows.utils import BibWorkflowObjectIdContainer
 from invenio.modules.workflows.models import BibWorkflowObject
 
 

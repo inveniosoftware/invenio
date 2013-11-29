@@ -32,10 +32,10 @@ from .validators import wash_login_method
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from invenio.ext.breadcrumb import register_breadcrumb
+from flask.ext.breadcrumbs import register_breadcrumb
 from invenio.ext.login import login_user, logout_user, UserInfo, \
     reset_password
-from invenio.ext.menu import register_menu
+from flask.ext.menu import register_menu
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
 from invenio.modules.access.mailcookie import mail_cookie_check_mail_activation

@@ -23,7 +23,7 @@ from flask import Blueprint, render_template, request, jsonify
 from flask.ext.login import current_user, login_required
 from invenio.base.decorators import wash_arguments
 from invenio.base.i18n import _
-from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
+from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
 

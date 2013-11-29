@@ -32,8 +32,8 @@ from .forms import AddCmtRECORDCOMMENTForm, AddCmtRECORDCOMMENTFormReview
 from invenio.base.i18n import _
 from invenio.base.decorators import templated
 from flask.ext.login import current_user, login_required
-from invenio.ext.menu import register_menu
-from invenio.ext.breadcrumb import register_breadcrumb
+from flask.ext.menu import register_menu
+from flask.ext.breadcrumbs import register_breadcrumb
 from invenio.ext.principal import permission_required
 #from invenio.config import CFG_SITE_RECORD
 CFG_SITE_RECORD = 'record'

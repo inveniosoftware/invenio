@@ -56,15 +56,22 @@ from invenio.legacy.oaiharvest.dblayer import create_oaiharvest_log_str
 from invenio.legacy.oaiharvest.config import InvenioOAIHarvestWarning
 from invenio.legacy.oaiharvest.utils import (compare_timestamps_with_tolerance,
                                              generate_harvest_report)
-from invenio.legacy import template
-oaiharvest_templates = template.load('oai_harvest')
+import invenio.legacy.template
+
+oaiharvest_templates = invenio.legacy.template.load('oaiharvest')
+
 
 def task_run_core():
     start_time = time.time()
 
+    all_options = task_get_option(None)
     try:
+        workflow_name = all_options("workflow")
+    except:
+        workflow_name = "generic_harvesting_workflow"
 
-        workflow = start('generic_harvesting_workflow', data=[123], stop_on_error=True)
+    try:
+        workflow = start(workflow_name, data=[123], stop_on_error=True, args=all_options)
 
     except InvenioWorkflowError as e:
 
@@ -247,7 +254,7 @@ def main():
     """
     # Let's try to parse the arguments as used in manual harvesting:
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "o:v:m:p:i:s:f:u:r:x:c:k:w:l:",
+        opts, args = getopt.getopt(sys.argv[1:], "o:v:m:p:i:s:f:u:r:c:k:w:l:",
                                    ["output=",
                                     "verb=",
                                     "method=",
@@ -260,7 +267,8 @@ def main():
                                     "certificate=",
                                     "key=",
                                     "user=",
-                                    "password="]
+                                    "password=",
+                                    "workflow="]
         )
         # So everything went smoothly: start harvesting in manual mode
         if len([opt for opt, opt_value in opts if opt in ['-v', '--verb']]) > 0:
@@ -273,7 +281,6 @@ def main():
             cert_file = None
             key_file = None
             sets = []
-
             # get options and arguments
             for opt, opt_value in opts:
                 if opt in ["-v", "--verb"]:
@@ -359,12 +366,12 @@ def main():
         # start the BibSched task (automated harvesting) and see if it
         # validates
         pass
-
     # BibSched mode - periodical harvesting
     # Note that the 'help' is common to both manual and automated
     # mode.
     task_set_option("repository", None)
     task_set_option("dates", None)
+    task_set_option("workflow", None)
     task_init(authorization_action='runoaiharvest',
               authorization_msg="oaiharvest Task Submission",
               description="""
@@ -416,11 +423,12 @@ Automatic (periodical) harvesting mode:
                                   '  -d, --dates=yyyy-mm-dd:yyyy-mm-dd \t reharvest given dates only\n'
                                   '  -i, --identifier     OAI identifier if wished to run in as a task.\n'
                                   '  --notify-email-to    Receive notifications on given email on successful upload and/or finished harvest.\n'
+                                  '  --workflow       specify the workflow to execute.\n'
                                   '  --create-ticket-in   Provide desired ticketing queue to create a ticket in it on upload and/or finished harvest.\n'
                                   '                       Requires a configured ticketing system (BibCatalog).\n',
               version=__revision__,
               specific_params=(
-                  "r:i:d:", ["repository=", "idenfifier=", "dates=", "notify-email-to=", "create-ticket-in="]),
+                  "r:i:d:W", ["repository=", "idenfifier=", "dates=", "workflow=", "notify-email-to=", "create-ticket-in="]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               task_run_fnc=task_run_core)
 
@@ -429,6 +437,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """Elaborate specific cli parameters for oaiharvest."""
     if key in ("-r", "--repository"):
         task_set_option('repository', get_repository_names(value))
+    elif key in ("--workflow"):
+        task_set_option('workflow', value)
     elif key in ("-d", "--dates"):
         task_set_option('dates', get_dates(value))
         if value is not None and task_get_option("dates") is None:
