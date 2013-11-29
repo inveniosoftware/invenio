@@ -62,7 +62,7 @@ def check_record(record, fields, dayfirst=True, yearfirst=False,
     for position, value in record.iterfields(fields):
         try:
             new_date = parser.parse(value, dayfirst=dayfirst, yearfirst=yearfirst)
-        except ValueError:
+        except (ValueError, TypeError):
             record.set_invalid("Non-parseable date format in field %s" % position[0])
             continue
 
