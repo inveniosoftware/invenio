@@ -461,7 +461,7 @@ class Querystring:
         # Find all potential references to record tag values and
         # add to fields-dict as a list of values using field-name tuple as key.
         #
-        # Each reference will be split into prefix, field-ref and suffix. 
+        # Each reference will be split into prefix, field-ref and suffix.
         # Example:
         # 773__p:"[773__p]" 100__a:/.*[100__a].*/ =>
         # [('773__p:"', '773__p', '"'), ('100__a:/.*', '100__a', '.*/')]
@@ -474,7 +474,7 @@ class Querystring:
             field_prefix = field_prefix.lower()
             field_suffix = field_suffix.lower()
             # Find proper MARC tag(s) for the stripped field-name, if fieldname is used.
-            # e.g. author -> [100__a, 700__a] 
+            # e.g. author -> [100__a, 700__a]
             # FIXME: Local instance only!
             tag_list = get_field_tags_from_fieldname(fieldname)
             if len(tag_list) == 0:
@@ -679,7 +679,8 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", \
                   verbose=1, server_url=CFG_SITE_SECURE_URL, modify=0, \
                   sleeptime=CFG_BIBMATCH_LOCAL_SLEEPTIME, \
                   clean=False, collections=[], user="", password="", \
-                  fuzzy=True, validate=True, ascii_mode=False):
+                  fuzzy=True, validate=True, ascii_mode=False,
+                  insecure_login=False):
     """
     Match passed records with existing records on a local or remote Invenio
     installation. Returns which records are new (no match), which are matched,
@@ -745,7 +746,8 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", \
     fuzzyrecs = []
     CFG_BIBMATCH_LOGGER.info("-- BibMatch starting match of %d records --" % (len(records),))
     try:
-        server = InvenioConnector(server_url, user=user, password=password)
+        server = InvenioConnector(server_url, user=user, password=password,
+                                  insecure_login=insecure_login)
     except InvenioConnectorAuthError, error:
         if verbose > 0:
             sys.stderr.write("Authentication error when connecting to server: %s" \

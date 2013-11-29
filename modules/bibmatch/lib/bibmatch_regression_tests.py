@@ -653,7 +653,8 @@ class BibMatchTest(InvenioTestCase):
                                                                   collections=["Theses"], \
                                                                   user="jekyll",
                                                                   password="j123ekyll", \
-                                                                  verbose=0)
+                                                                  verbose=0,
+                                                                  insecure_login=True)
             self.assertEqual(1, len(matchedrecs))
 
     if MECHANIZE_AVAILABLE:
