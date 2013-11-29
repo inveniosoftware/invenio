@@ -484,7 +484,7 @@ class BibFormatAuthorityRecordsTest(InvenioTestCase):
     def test_brief_output(self):
         """bibformat - brief authority record format outputs something"""
         self.assertEqual([],
-          test_web_page_content(CFG_SITE_URL + '/search?cc=Authority+Records&rg=100',
+          test_web_page_content(CFG_SITE_URL + '/search?cc=Authorities&rg=100',
             expected_text="Ellis, John, 1946-"))
 
     def test_detailed_output(self):
@@ -510,10 +510,10 @@ class BibFormatAuthorityRecordsBrowsingTest(InvenioTestCase):
     """Tests authority records browsing pre and successor"""
 
     def setUp(self):
-        self.re_institution = re.compile(r"Werkstoffsynthese und Herstellverfahren")
+        self.re_institute = re.compile(r"Werkstoffsynthese und Herstellverfahren")
         self.re_non_compact = re.compile(r"Non-compact supergravity")
-        self.re_cern_control_number = re.compile(r"INSTITUTION|(SzGeCERN)")
-        self.re_institution_energy = re.compile(r"Institut für Energieforschung")
+        self.re_cern_control_number = re.compile(r"INSTITUTE|(SzGeCERN)")
+        self.re_institute_energy = re.compile(r"Institut für Energieforschung")
 
     def test_format_authority_browsing_pre_and_successor(self):
         """bibformat - test format authority browsing pre and successor"""
@@ -528,12 +528,12 @@ class BibFormatAuthorityRecordsBrowsingTest(InvenioTestCase):
         resp = browser.follow_link(link)
         link = browser.find_link(text_regex=re.compile("Detailed record"), nr=1)
         resp = browser.follow_link(link)
-        found = self.re_institution.search(resp.read())
+        found = self.re_institute.search(resp.read())
         if not found:
             error_messages.append("There is no 'Werkstoffsynthese und Herstellverfahren' in html response.")
         link = browser.find_link(text_regex=re.compile("1 dependent record"))
         resp = browser.follow_link(link)
-        found = self.re_institution.search(resp.read())
+        found = self.re_institute.search(resp.read())
         if not found:
             error_messages.append("There is no 'Werkstoffsynthese und Herstellverfahren' in html response.")
         self.assertEqual([], error_messages)
@@ -591,7 +591,7 @@ class BibFormatAuthorityRecordsBrowsingTest(InvenioTestCase):
         resp = browser.follow_link(link)
         link = browser.find_link(text_regex=re.compile("6 dependent records"))
         resp = browser.follow_link(link)
-        found = self.re_institution_energy.search(resp.read())
+        found = self.re_institute_energy.search(resp.read())
         if not found:
             error_messages.append("There is no 'Institut für Energieforschung' in html response.")
         self.assertEqual([], error_messages)

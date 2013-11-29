@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -65,7 +65,7 @@ class BibAuthorityEngineTest(InvenioTestCase):
 
     def test_bibauthority_get_low_level_recIDs(self):
         """bibauthority - test get_low_level_recIDs_from_control_no()"""
-        _type = CFG_BIBAUTHORITY_TYPE_NAMES['INSTITUTION']
+        _type = CFG_BIBAUTHORITY_TYPE_NAMES['INSTITUTE']
         control_no = _type + CFG_BIBAUTHORITY_PREFIX_SEP + "(SzGeCERN)iii0002"
         recIDs = [121]
         self.assertEqual(get_low_level_recIDs_from_control_no(control_no),

@@ -58,7 +58,7 @@ INSERT INTO field VALUES (30,'author count','authorcount');
 INSERT INTO field VALUES (31,'reference to','rawref');
 INSERT INTO field VALUES (32,'exact title','exacttitle');
 INSERT INTO field VALUES (33,'authority author','authorityauthor');
-INSERT INTO field VALUES (34,'authority institution','authorityinstitution');
+INSERT INTO field VALUES (34,'authority institute','authorityinstitute');
 INSERT INTO field VALUES (35,'authority journal','authorityjournal');
 INSERT INTO field VALUES (36,'authority subject','authoritysubject');
 INSERT INTO field VALUES (37,'item count','itemcount');
@@ -529,10 +529,10 @@ INSERT INTO tag VALUES (214,'988x','988%');
 INSERT INTO tag VALUES (215,'989x','989%');
 -- authority controled tags
 INSERT INTO tag VALUES (216,'author control','100__0');
-INSERT INTO tag VALUES (217,'institution control','110__0');
+INSERT INTO tag VALUES (217,'institute control','110__0');
 INSERT INTO tag VALUES (218,'journal control','130__0');
 INSERT INTO tag VALUES (219,'subject control','150__0');
-INSERT INTO tag VALUES (220,'additional institution control', '260__0');
+INSERT INTO tag VALUES (220,'additional institute control', '260__0');
 INSERT INTO tag VALUES (221,'additional author control', '700__0');
 
 
@@ -550,7 +550,7 @@ INSERT INTO idxINDEX VALUES (9,'fulltext','This index contains words/phrases fro
 INSERT INTO idxINDEX VALUES (10,'year','This index contains words/phrases from year fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexYearTokenizer');
 INSERT INTO idxINDEX VALUES (11,'journal','This index contains words/phrases from journal publication information fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexJournalTokenizer');
 INSERT INTO idxINDEX VALUES (12,'collaboration','This index contains words/phrases from collaboration name fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
-INSERT INTO idxINDEX VALUES (13,'affiliation','This index contains words/phrases from institutional affiliation fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
+INSERT INTO idxINDEX VALUES (13,'affiliation','This index contains words/phrases from affiliation fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (14,'exactauthor','This index contains exact words/phrases from author fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexExactAuthorTokenizer');
 INSERT INTO idxINDEX VALUES (15,'caption','This index contains exact words/phrases from figure captions.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (16,'firstauthor','This index contains fuzzy words/phrases from first author field.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexAuthorTokenizer');
@@ -558,7 +558,7 @@ INSERT INTO idxINDEX VALUES (17,'exactfirstauthor','This index contains exact wo
 INSERT INTO idxINDEX VALUES (18,'authorcount','This index contains number of authors of the record.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexAuthorCountTokenizer');
 INSERT INTO idxINDEX VALUES (19,'exacttitle','This index contains exact words/phrases from title fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (20,'authorityauthor','This index contains words/phrases from author authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexAuthorTokenizer');
-INSERT INTO idxINDEX VALUES (21,'authorityinstitution','This index contains words/phrases from institution authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
+INSERT INTO idxINDEX VALUES (21,'authorityinstitute','This index contains words/phrases from institute authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (22,'authorityjournal','This index contains words/phrases from journal authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (23,'authoritysubject','This index contains words/phrases from subject authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (24,'itemcount','This index contains number of copies of items in the library.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexItemCountTokenizer');

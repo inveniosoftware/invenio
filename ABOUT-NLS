@@ -260,11 +260,11 @@ translator sends over the following translations by email:
         ISOLDE Internal Notes
         Drafts
         Videos
-        Authority Records
-        Authority Author
-        Authority Institution
-        Authority Journal
-        Authority Subject
+        Authorities
+        People
+        Institutes
+        Journals
+        Subjects
 
    - demo right-hand-side portalbox, from democfgdata.sql:
 

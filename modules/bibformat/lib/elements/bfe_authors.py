@@ -76,7 +76,7 @@ def format_element(bfo, limit, separator=' ; ',
             author['u'] = author['u'][0]
         pattern = '%s' + CFG_BIBAUTHORITY_PREFIX_SEP + "("
         for control_no in author.get('0', []):
-            if pattern % (CFG_BIBAUTHORITY_TYPE_NAMES["INSTITUTION"]) in control_no:
+            if pattern % (CFG_BIBAUTHORITY_TYPE_NAMES["INSTITUTE"]) in control_no:
                 author['u0'] = control_no # overwrite if multiples
             elif pattern % (CFG_BIBAUTHORITY_TYPE_NAMES["AUTHOR"]) in control_no:
                 author['a0'] = control_no # overwrite if multiples

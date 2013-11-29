@@ -27,12 +27,12 @@ def info():
                          authorityauthor
                          authoritysubject
                          authorityjournal
-                         authorityinstitution
+                         authorityinstitute
               -> new fields:
                          authorityauthor
                          authoritysubject
                          authorityjournal
-                         authorityinstitution
+                         authorityinstitute
               -> new tags:
                          authority: main personal name
                          authority: alternative personal name
@@ -225,7 +225,7 @@ def do_upgrade_atlantis():
                ) ENGINE=MyISAM;""")
     #second step: fill tables with data
     run_sql("""INSERT INTO field VALUES (33,'authority author','authorityauthor')""")
-    run_sql("""INSERT INTO field VALUES (34,'authority institution','authorityinstitution')""")
+    run_sql("""INSERT INTO field VALUES (34,'authority institute','authorityinstitute')""")
     run_sql("""INSERT INTO field VALUES (35,'authority journal','authorityjournal')""")
     run_sql("""INSERT INTO field VALUES (36,'authority subject','authoritysubject')""")
     run_sql("""INSERT INTO field_tag VALUES (33,1,100)""")
@@ -254,7 +254,7 @@ def do_upgrade_atlantis():
     run_sql("""INSERT INTO tag VALUES (156,'authority: subject main name','550__a')""")
 
     run_sql("""INSERT INTO idxINDEX VALUES (20,'authorityauthor','This index contains words/phrases from author authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexAuthorTokenizer')""")
-    run_sql("""INSERT INTO idxINDEX VALUES (21,'authorityinstitution','This index contains words/phrases from institution authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer')""")
+    run_sql("""INSERT INTO idxINDEX VALUES (21,'authorityinstitute','This index contains words/phrases from institute authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer')""")
     run_sql("""INSERT INTO idxINDEX VALUES (22,'authorityjournal','This index contains words/phrases from journal authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer')""")
     run_sql("""INSERT INTO idxINDEX VALUES (23,'authoritysubject','This index contains words/phrases from subject authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer')""")
 
