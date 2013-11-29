@@ -102,6 +102,8 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
         source = ""
         if os.path.isdir(entry):
             for filename in os.listdir(entry):
+                if filename.startswith('.'):
+                    continue
                 filename = os.path.join(entry, filename)
                 if os.path.isfile(filename):
                     text_lines = extractor.text_lines_from_local_file(filename)

@@ -84,7 +84,6 @@ def get_single_keywords(skw_db, fulltext):
         single_keywords.setdefault(single_keyword, [[]])
         single_keywords[single_keyword][0].append(span)
 
-
     log.info("Matching single keywords... %d keywords found "
             "in %.1f sec." % (len(single_keywords), time.clock() - timer_start),
             )
