@@ -61,6 +61,12 @@ class TexkeyNoAuthorError(Exception):
     pass
 
 
+class TexkeyNoYearError(Exception):
+    """ Error raised when the record does not have a year field
+    """
+    pass
+
+
 def _texkey_random_chars(recid, use_random=False):
     """ Generate the three random chars for the end of the texkey """
     if recid and not use_random:
@@ -160,6 +166,10 @@ class TexkeySeq(SequenceGenerator):
                                     ind1="",
                                     ind2="",
                                     code="d")
+
+                    if not year:
+                        raise TexkeyNoYearError
+
         try:
             texkey_second_part = year.split("-")[0]
         except KeyError:
@@ -298,6 +308,9 @@ def task_run_core():
                 new_texkey = TexKeySeq.next_value(recid)
             except TexkeyNoAuthorError:
                 write_message("WARNING: Record %s has no first author or collaboration" % recid)
+                continue
+            except TexkeyNoYearError:
+                write_message("WARNING: Record %s has no year" % recid)
                 continue
             write_message("Created texkey %s for record %d" % (new_texkey, recid))
             xml = create_xml(recid, new_texkey)

@@ -31,7 +31,7 @@ from invenio.dbquery import run_sql
 
 from invenio.sequtils import SequenceGenerator
 from invenio.sequtils_texkey import TexkeySeq, TexkeyNoAuthorError, \
-                                    task_run_core
+                                    task_run_core, TexkeyNoYearError
 
 
 def get_bibrecord_mock(_):
@@ -114,6 +114,19 @@ def get_sample_texkey(num_test=0):
     """
     sample_records.append(xml)
 
+
+    xml = """
+    <record>
+        <datafield tag="100" ind1=" " ind2=" ">
+            <subfield code="a">Broekhoven-Fiene, Hannah</subfield>
+        </datafield>
+        <datafield tag="700" ind1=" " ind2=" ">
+            <subfield code="a">Matthews, Brenda C.</subfield>
+        </datafield>
+    </record>
+    """
+    sample_records.append(xml)
+
     return sample_records[num_test]
 
 
@@ -189,12 +202,19 @@ class TestTexkeySequenceGeneratorClass(InvenioTestCase):
         self.texkey3 = texkey_seq.next_value(xml_record=get_sample_texkey(2))
         self.assertEqual(self.texkey3[:-3], 'ATLAS:2012')
 
-    def test_get_next_texkey_error(self):
-        """ Generate an error while getting a texkey """
+    def test_get_next_texkey_no_author(self):
+        """ Generate an error while getting a texkey with no author """
 
         texkey_seq = TexkeySeq()
         self.assertRaises(TexkeyNoAuthorError,
             texkey_seq.next_value, xml_record=get_sample_texkey(3))
+
+    def test_get_next_texkey_no_year(self):
+        """ Generate an error while getting a texkey with no year """
+        texkey_seq = TexkeySeq()
+        self.assertRaises(TexkeyNoYearError,
+            texkey_seq.next_value, xml_record=get_sample_texkey(4))
+
 
     def tearDown(self):
         # Clean DB entries
