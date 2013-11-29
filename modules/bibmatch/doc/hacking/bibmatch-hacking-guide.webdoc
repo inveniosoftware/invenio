@@ -97,6 +97,9 @@ Normally 0.8 (80% match) is considered to be a close match.</li>
                       a successful match will cause validation to immediately exit as a success.
 'joker'     : a failed match will cause the validation to continue on other rules (if any).
                       a successful match will cause validation to immediately exit as a success.
+'fuzzy'     : a failed match will cause the validation to continue on other rules (if any)
+                      so long as it is the only rule that is failing, else exit as failure.
+                      a successful match will cause the validation to continue on other rules (if any)
 </li>
 </ul>
 </li>

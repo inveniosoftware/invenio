@@ -23,7 +23,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_RECORD
+from invenio.config import CFG_SITE_RECORD, CFG_SITE_SECURE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibrecord import create_records, record_has_field
 from invenio.bibmatch_engine import match_records, transform_input_to_marcxml, \
@@ -542,6 +542,105 @@ class BibMatchTest(InvenioTestCase):
 </record>
 </collection>
         """
+
+        self.recxml7 = """
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">English</subfield>
+  </datafield>
+  <datafield tag="084" ind1=" " ind2=" ">
+    <subfield code="2">Inspec</subfield>
+    <subfield code="a">Fuel cells</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="0">PER:96536</subfield>
+    <subfield code="a">Menzler, N.H.</subfield>
+    <subfield code="b">0</subfield>
+    <subfield code="g">fzj</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Influence of processing parameters on the manufacturing of anode-supported solid oxide fuel cells by different wet chemical routes</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">2007</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a"></subfield>
+  </datafield>
+  <datafield tag="440" ind1=" " ind2="0">
+    <subfield code="0">4206</subfield>
+    <subfield code="a">Materials Science Forum</subfield>
+    <subfield code="v">638-642</subfield>
+    <subfield code="x">0255-5476</subfield>
+    <subfield code="y">1098 - 1105</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="3">Journal Article</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Anode-supported solid oxide fuel cells (SOFC) are manufactured at Forschungszentrum Jülich by different wet chemical powder processes and subsequent sintering at high temperatures. Recently, the warm pressing of Coat-Mix powders has been replaced by tape casting as the shaping technology for the NiO/8YSZ-containing substrate in order to decrease the demand for raw materials due to lower substrate thickness and in order to increase reproducibility and fabrication capacities (scalable process). Different processing routes for the substrates require the adjustment of process parameters for further coating with functional layers. Therefore, mainly thermal treatment steps have to be adapted to the properties of the new substrate types in order to obtain high-performance cells with minimum curvature (for stack assembly). In this presentation, the influence of selected process parameters during cell manufacturing will be characterized with respect to the resulting physical parameters such as slurry viscosity, green tape thickness, relative density, substrate strength, electrical conductivity, and shrinkage of the different newly developed substrate types. The influencing factors during manufacturing and the resulting characteristics will be presented and possible applications for the various substrates identified.</subfield>
+  </datafield>
+  <datafield tag="588" ind1=" " ind2=" ">
+    <subfield code="a">Enriched from Inspec</subfield>
+  </datafield>
+  <datafield tag="650" ind1=" " ind2="7">
+    <subfield code="2">Inspec</subfield>
+    <subfield code="a">anode-supported solid oxide fuel cells</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="0">PER:76694</subfield>
+    <subfield code="a">Schafbauer, W.</subfield>
+    <subfield code="b">1</subfield>
+    <subfield code="g">fzj</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="0">PER:96316</subfield>
+    <subfield code="a">Buchkremer, H.P.</subfield>
+    <subfield code="b">2</subfield>
+    <subfield code="g">fzj</subfield>
+  </datafield>
+  <datafield tag="773" ind1=" " ind2=" ">
+    <subfield code="0">ZDBID:2047372-2</subfield>
+    <subfield code="a">10.4028/www.scientific.net/MSF.638-642.1098</subfield>
+    <subfield code="g">Vol. 638-642, p. 1098 - 1105</subfield>
+    <subfield code="q">638-642:&lt;1098 - 1105</subfield>
+    <subfield code="t">Materials science forum</subfield>
+    <subfield code="v">638-642</subfield>
+    <subfield code="x">0255-5476</subfield>
+    <subfield code="y">2010</subfield>
+  </datafield>
+  <datafield tag="856" ind1="7" ind2=" ">
+    <subfield code="u">http://dx.doi.org/10.4028/www.scientific.net/MSF.638-642.1098</subfield>
+  </datafield>
+  <datafield tag="913" ind1=" " ind2=" ">
+    <subfield code="0">GRANT:402</subfield>
+    <subfield code="k">P12</subfield>
+    <subfield code="s">Energie</subfield>
+    <subfield code="v">Rationelle Energieumwandlung</subfield>
+  </datafield>
+  <datafield tag="914" ind1=" " ind2=" ">
+    <subfield code="y">2010</subfield>
+  </datafield>
+  <datafield tag="920" ind1=" " ind2=" ">
+    <subfield code="0">INSTITUTION|(DE-Juel1)1130</subfield>
+    <subfield code="g">IEK</subfield>
+    <subfield code="k">IEK-1</subfield>
+    <subfield code="v">Werkstoffsynthese und Herstellverfahren</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">VDB:125298</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">VDB</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+</record>
+</collection>
+        """
         return
 
     def test_check_existing(self):
@@ -585,6 +684,14 @@ class BibMatchTest(InvenioTestCase):
         """bibmatch - check fuzzily matched record"""
         records = create_records(self.recxml1)
         [dummy1, dummy2, dummy3, fuzzyrecs] = match_records(records, \
+                                                            verbose=0)
+        self.assertEqual(1, len(fuzzyrecs))
+
+    def test_check_fuzzy_validation(self):
+        """bibmatch - check fuzzily matched record"""
+        records = create_records(self.recxml7)
+        [dummy1, dummy2, dummy3, fuzzyrecs] = match_records(records,
+                                                            qrystrs=[("", "[title]")],
                                                             verbose=0)
         self.assertEqual(1, len(fuzzyrecs))
 
@@ -646,7 +753,7 @@ class BibMatchTest(InvenioTestCase):
                                                               verbose=0)
         self.assertEqual(1, len(nomatchrecs))
 
-        if MECHANIZE_AVAILABLE:
+        if MECHANIZE_AVAILABLE and "https" in CFG_SITE_SECURE_URL:
             # Jekyll should have access
             [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, \
                                                                   qrystrs=[("", "[088__a]")], \

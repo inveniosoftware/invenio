@@ -926,7 +926,7 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
         CFG_BIBMATCH_LOGGER.info("Searching with values %s" % (search_params,))
         ## Perform the search with retries
         try:
-            result_recids = server.search_with_retry(**search_params)
+            result_recids = server.search_with_retry(sleeptime=62.0, retrycount=4,**search_params)
         except InvenioConnectorAuthError, error:
             if verbose > 0:
                 sys.stderr.write("Authentication error when searching: %s" \
