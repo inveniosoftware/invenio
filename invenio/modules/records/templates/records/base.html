@@ -66,53 +66,8 @@
 {% endblock %}
 
 {% block javascript %}
-{{ super() }}
-<script>
-$(function () {
-
-  var reloadTab = function(path) {
-    $.post(path, function(data) {
-      $('#record_content').html(data);
-    });
-    $('#record-links li.active').removeClass('active');
-    $('#record-links a[href="'+path+'"]').parent().addClass('active');
-  };
-
-  $('#record-links li.disabled a').on('click', function(event) {
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    return false;
-  });
-
-  $('#record-links li:not(.disabled) a').on('click', function(event) {
-    var path = $(event.target).attr('href');
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if (typeof(window.history.pushState) == 'function') {
-      window.history.pushState({path:path}, document.title, path);
-    } else {
-      window.location.hash = '#!' + path;
-    }
-    reloadTab(path);
-  });
-
-  var init_href = $('#record-links li.active a').attr('href'),
-      init_loc = null, last_loc = window.location;
-  window.onpopstate = function(event) {
-    if (event.state && event.state.path) {
-      reloadTab(event.state.path);
-    } else if (event.target.location == init_loc) {
-      if (last_loc != init_loc) {
-        reloadTab(init_href);
-      }
-    } else {
-      init_loc = window.location;
-    }
-    last_loc = window.location;
-  }
-
-});
-</script>
+  {{ super() }}
+  {%- js url_for('record.static', filename='js/records/records.js'), '20-record' -%}
 {% endblock javascript %}
 
 {% block _top_assets %}

@@ -29,28 +29,34 @@ import tempfile
 import datetime
 
 from httplib import InvalidURL
-from invenio.config import \
-     CFG_SITE_LANG, \
-     CFG_TMPDIR, \
-     CFG_SITE_URL, \
-     CFG_ETCDIR, \
-     CFG_BINDIR, \
-     CFG_LOGDIR, \
-     CFG_SITE_RECORD
-from invenio.legacy.oaiharvest.config import CFG_OAI_POSSIBLE_POSTMODES
-from invenio.legacy.bibrank.adminlib import \
-     write_outcome, \
-     addadminbox, \
-     tupletotable, \
-     createhiddenform
-from invenio.legacy.dbquery import run_sql
-from invenio.legacy.oaiharvest.dblayer import get_holdingpen_day_size
+from invenio.config import(CFG_SITE_LANG,
+                           CFG_TMPDIR,
+                           CFG_SITE_URL,
+                           CFG_ETCDIR,
+                           CFG_BINDIR,
+                           CFG_LOGDIR,
+                           CFG_SITE_RECORD)
 
-from invenio.legacy.oaiharvest.dblayer import get_month_logs_size, \
-     get_history_entries_for_day, get_day_logs_size, get_entry_history, \
-     get_entry_logs_size, get_holdingpen_entries, delete_holdingpen_entry, \
-     get_holdingpen_years, get_holdingpen_month, get_holdingpen_year, \
-     get_holdingpen_day_fragment, get_holdingpen_entry_details
+from invenio.legacy.oaiharvest.config import CFG_OAI_POSSIBLE_POSTMODES
+from invenio.legacy.bibrank.adminlib import (write_outcome,
+                                             addadminbox,
+                                             tupletotable,
+                                             createhiddenform)
+from invenio.legacy.dbquery import run_sql
+
+
+from invenio.legacy.oaiharvest.dblayer import (get_month_logs_size,
+                                               get_history_entries_for_day,
+                                               get_day_logs_size, get_entry_history,
+                                               get_entry_logs_size,
+                                               get_holdingpen_entries,
+                                               delete_holdingpen_entry,
+                                               get_holdingpen_years,
+                                               get_holdingpen_month,
+                                               get_holdingpen_year,
+                                               get_holdingpen_day_fragment,
+                                               get_holdingpen_entry_details)
+
 from invenio.legacy.search_engine import get_record
 
 import invenio.legacy.template
@@ -1343,7 +1349,7 @@ def validatefile(oai_src_config):
      0 = okay
      1 = file non existing
      """
-     from invenio.legacy.bibconvert.registry import templates
+    from invenio.legacy.bibconvert.registry import templates
 
     path_to_config = templates.get(oai_src_config, '')
 
@@ -1374,6 +1380,7 @@ def validatefile(oai_src_config):
         return 1
 
     return 1
+
 
 def findMetadataFormats(oai_src_baseurl):
     """This function finds the Metadata formats offered by a OAI repository by analysing the output of verb=ListMetadataFormats"""

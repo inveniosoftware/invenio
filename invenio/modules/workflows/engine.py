@@ -45,8 +45,6 @@ from .logger import (get_logger,
                      BibWorkflowLogHandler)
 
 
-
-
 DEBUG = CFG_DEVEL_SITE > 0
 
 

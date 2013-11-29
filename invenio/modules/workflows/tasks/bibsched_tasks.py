@@ -15,9 +15,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 021111307, USA.
 
-from invenio.bibtask import (write_message,
-                             task_get_task_param
-                             )
+from invenio.legacy.bibsched.bibtask import (write_message,
+                                             task_get_task_param
+                                             )
 
 
 def write_something_bibsched(messagea="This is the default message"):
@@ -33,7 +33,6 @@ def write_something_bibsched(messagea="This is the default message"):
 
         if not isinstance(messagea, list):
             if callable(messagea):
-
                 write_message(messagea(obj, eng))
             return None
 

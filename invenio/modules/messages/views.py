@@ -28,8 +28,8 @@ from invenio.base.decorators import (wash_arguments, templated, sorted_by,
                                      filtered_by)
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
-from invenio.ext.menu import register_menu
+from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
+from flask.ext.menu import register_menu
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 

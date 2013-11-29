@@ -35,14 +35,14 @@ from ..facet_builders import get_current_user_records_that_can_be_displayed, \
 from ..forms import EasySearchForm
 from ..models import Collection
 from ..washers import wash_search_urlargd
-from invenio.ext.menu import register_menu
+from flask.ext.menu import register_menu
 from invenio.base.signals import websearch_before_browse, websearch_before_search
 from invenio.modules.indexer import models as BibIndex
 from invenio.modules.formatter import format_record
 from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated
-from invenio.ext.breadcrumb import \
-    register_breadcrumb, breadcrumbs, default_breadcrumb_root
+from flask.ext.breadcrumbs import \
+    register_breadcrumb, current_breadcrumbs, default_breadcrumb_root
 from invenio.ext.template.context_processor import \
     register_template_context_processor
 from invenio.utils.pagination import Pagination
@@ -120,7 +120,7 @@ def response_formated_records(recids, collection, of, **kwargs):
 @blueprint.route('/', methods=['GET', 'POST'])
 @templated('search/index.html')
 @register_menu(blueprint, 'main.search', _('Search'), order=1)
-@register_breadcrumb(blueprint, 'breadcrumbs', _('Home'))
+@register_breadcrumb(blueprint, '.', _('Home'))
 def index():
     """ Renders homepage. """
 
@@ -152,7 +152,7 @@ def collection(name):
         return dict(
             format_record=format_record,
             easy_search_form=EasySearchForm(csrf_enabled=False),
-            breadcrumbs=breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:])
+            breadcrumbs=current_breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:])
     return dict(collection=collection)
 
 
@@ -299,7 +299,7 @@ def browse(collection, p, f, of, so, rm, rg, jrec):
                     pagination=Pagination(int(ceil(jrec / float(rg))), rg, len(records)),
                     rg=rg, p=p, f=f,
                     easy_search_form=EasySearchForm(csrf_enabled=False),
-                    breadcrumbs=breadcrumbs+collection_breadcrumbs(collection)
+                    breadcrumbs=current_breadcrumbs+collection_breadcrumbs(collection)
                     )
 
     return dict(records=records)

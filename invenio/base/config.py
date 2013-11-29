@@ -20,8 +20,8 @@ EXTENSIONS = [
     'invenio.ext.admin',
     'invenio.ext.logging',
     'invenio.ext.gravatar',
-    'invenio.ext.menu:MenuAlchemy',
-    'invenio.ext.breadcrumb:BreadcrumbAlchemy',
+    'flask.ext.menu:Menu',
+    'flask.ext.breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
 ]
 

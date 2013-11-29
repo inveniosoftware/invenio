@@ -24,12 +24,6 @@ Extensions
 .. automodule:: invenio.ext.sqlalchemy
    :members:
 
-.. automodule:: invenio.ext.menu.menu
-   :members:
-
-.. automodule:: invenio.ext.breadcrumb
-   :members:
-
 Modules
 -------
 

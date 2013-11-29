@@ -23,7 +23,7 @@ from flask.ext.login import login_required
 
 from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated
-from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
+from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from ..api import start_delayed
 from ..utils import (get_workflow_definition,
                      get_redis_keys as utils_get_redis_keys,

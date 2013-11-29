@@ -77,7 +77,8 @@ def setup_app(app):
                 response = current_app.make_response(str(response))
             return response
         except HTTPException:
-            return render_template("404.html"), 404
+            from flask import current_app
+            return current_app.send_static_file(request.path)
 
     @app.endpoint('static')
     @app.route(app.static_url_path + '/<path:filename>', methods=['POST', 'PUT'])

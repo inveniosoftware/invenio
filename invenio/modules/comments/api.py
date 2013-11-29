@@ -1414,7 +1414,7 @@ def get_first_comments_or_remarks(recID=-1,
                 first_res_comments = res_comments
     else: #error
         try:
-            raise InvenioWebCommentError(_('%s is an invalid record ID') % recID)
+            raise InvenioWebCommentError(_('%(recid)s is an invalid record ID', recid=recID))
         except InvenioWebCommentError, exc:
             register_exception()
             body = webcomment_templates.tmpl_error(exc.message, ln)
@@ -1562,7 +1562,7 @@ def perform_request_add_comment_or_remark(recID=0,
     check_recID_is_in_range(recID, warnings, ln)
     if uid <= 0:
         try:
-            raise InvenioWebCommentError(_('%s is an invalid user ID.') % uid)
+            raise InvenioWebCommentError(_('%(uid)s is an invalid user ID.', uid=uid))
         except InvenioWebCommentError, exc:
             register_exception()
             body = webcomment_templates.tmpl_error(exc.message, ln)
@@ -1849,7 +1849,7 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
                 return (1,"")
             else:
                 try:
-                    raise InvenioWebCommentWarning(_('Record ID %s does not exist in the database.') % recID)
+                    raise InvenioWebCommentWarning(_('Record ID %(recid)s does not exist in the database.', recid=recID))
                 except InvenioWebCommentWarning, exc:
                     register_exception(stream='warning')
                     warnings.append((exc.message, ''))
@@ -1865,7 +1865,7 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
             return (0, webcomment_templates.tmpl_record_not_found(status='missing', recID=recID, ln=ln))
         else:
             try:
-                raise InvenioWebCommentWarning(_('Record ID %s is an invalid ID.') % recID)
+                raise InvenioWebCommentWarning(_('Record ID %(recid)s is an invalid ID.', recid=recID))
             except InvenioWebCommentWarning, exc:
                 register_exception(stream='warning')
                 warnings.append((exc.message, ''))
@@ -1873,7 +1873,7 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
             return (0, webcomment_templates.tmpl_record_not_found(status='invalid', recID=recID, ln=ln))
     else:
         try:
-            raise InvenioWebCommentWarning(_('Record ID %s is not a number.') % recID)
+            raise InvenioWebCommentWarning(_('Record ID %(recid)s is not a number.', recid=recID))
         except InvenioWebCommentWarning, exc:
             register_exception(stream='warning')
             warnings.append((exc.message, ''))

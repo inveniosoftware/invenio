@@ -29,10 +29,10 @@ from sphinx.websupport.errors import DocumentNotFoundError
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from invenio.ext.breadcrumb import (default_breadcrumb_root,
-                                    register_breadcrumb,
-                                    breadcrumbs)
-from invenio.ext.menu import register_menu
+from flask.ext.breadcrumbs import (default_breadcrumb_root,
+                                   register_breadcrumb,
+                                   current_breadcrumbs)
+from flask.ext.menu import register_menu
 
 
 class DocsBlueprint(Blueprint):
@@ -84,5 +84,6 @@ def index(docname='index'):
         abort(404)
     additional_breadcrumbs = [{'text': document['title'],
                                'url': url_for('.index', docname=docname)}]
-    return render_template('documentation/index.html', document=document,
-                           breadcrumbs=breadcrumbs + additional_breadcrumbs)
+    return render_template(
+        'documentation/index.html', document=document,
+        breadcrumbs=current_breadcrumbs + additional_breadcrumbs)

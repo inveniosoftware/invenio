@@ -148,7 +148,7 @@ class ExtensionRegistry(ListRegistry):
 
         EXTENSIONS = [
             'invenio.ext.debug_toolbar',
-            'invenio.ext.menu:MenuAlchemy',
+            'flask.ext.menu:Menu',
         ]
     """
     def __init__(self, app):
