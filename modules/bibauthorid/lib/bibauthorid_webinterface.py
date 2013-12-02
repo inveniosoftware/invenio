@@ -1802,7 +1802,12 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         last_visited_pid = webapi.history_get_last_visited_pid(session['personinfo']['visit_diary'])
         if last_visited_pid is not None:
             cname = webapi.get_canonical_id_from_person_id(last_visited_pid)
-            is_owner = self._is_profile_owner(last_visited_pid)
+            try:
+                int(cname)
+            except ValueError:
+                is_owner = False
+            else:
+                is_owner = self._is_profile_owner(last_visited_pid)
 
         menu = WebProfileMenu(str(cname), "search", ln, is_owner, self._is_admin(pinfo))
 

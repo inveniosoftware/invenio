@@ -47,7 +47,7 @@ from invenio.external_authentication_robot import load_robot_keys
 from invenio.config import CFG_INSPIRE_SITE, CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL, \
     CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS, CFG_WEBAUTHORPROFILE_MAX_HEP_CHOICES, \
     CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
-    CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG
+    CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, CFG_BIBAUTHORID_ENABLED
 from invenio.config import CFG_SITE_URL
 from invenio.mailutils import send_email
 from invenio.bibauthorid_name_utils import most_relevant_name
@@ -173,6 +173,8 @@ def get_longest_name_from_pid(person_id= -1):
     @rtype: string
     '''
     if (not person_id > -1) or (not isinstance(person_id, (int, long))):
+        if ',' in str(person_id):
+            return person_id
         return "This doesn't look like a person ID!"
 
     longest_name = ""

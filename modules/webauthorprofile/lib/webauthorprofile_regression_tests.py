@@ -28,10 +28,10 @@ class WebAuthorProfilePageTest(InvenioTestCase):
     """Check /author profile pages."""
 
     def test_author_page_klebanov(self):
-        """webauthorprofile - /author/Klebanov,%20Igor%20R"""
+        """webauthorprofile - /author/profile/Klebanov,%20Igor%20R"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/author/Klebanov,%20Igor%20R',
-                                               expected_text='2</a> papers'))
+                         test_web_page_content(CFG_SITE_URL + '/author/profile/Klebanov,%20Igor%20R',
+                                               expected_text=['Klebanov, Igor R']))
 
 
 TEST_SUITE = make_test_suite(WebAuthorProfilePageTest,)

@@ -200,6 +200,7 @@ class WebAuthorPages(WebInterfaceDirectory):
         @rtype: str
         '''
         if not CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID:
+            self.person_id = self.original_search_parameter
             return self.index(req, form)
 
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
