@@ -68,7 +68,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
             return cli_upload(req, form.get('file', None), argd['mode'], argd['callback_url'], argd['nonce'], argd['special_treatment'])
 
         if component == 'robotupload':
-            if path and path[0] in ('insert', 'replace', 'correct', 'append'):
+            if path and path[0] in ('insert', 'replace', 'correct', 'append', 'insertorreplace'):
                 return restupload, None
             else:
                 return legacyrobotupload, None

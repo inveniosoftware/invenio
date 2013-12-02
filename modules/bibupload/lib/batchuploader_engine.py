@@ -112,6 +112,8 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
         msg = "[ERROR] Please specify upload mode to use."
         _log(msg)
         return _write(req, msg)
+    if arg_mode == '--insertorreplace':
+        arg_mode = '-ir'
     if not arg_mode in PERMITTED_MODES:
         msg = "[ERROR] Invalid upload mode."
         _log(msg)
