@@ -403,8 +403,10 @@ def oai_list_records_or_identifiers(req, argd):
             argd = cache['argd']
             complete_list = cache['complete_list']
             complete_list = filter_out_based_on_date_range(complete_list, argd.get('from', ''), argd.get('until', ''))
-        except Exception:
-            register_exception(alert_admin=True)
+        except Exception, e:
+            # Ignore cache not found errors
+            if not isinstance(e, IOError) or e.errno != 2:
+                register_exception(alert_admin=True)
             req.write(oai_error(argd, [("badResumptionToken", "ResumptionToken expired or invalid: %s" % argd['resumptionToken'])]))
             return
     else:
