@@ -122,7 +122,7 @@ class WebInterfaceAPIDocExtract(WebInterfaceDirectory):
 
         txt = form['txt'].value
 
-        return extract_references_from_string_xml(txt)
+        return extract_references_from_string_xml(txt, is_only_references=False)
 
 
 class WebInterfaceDocExtract(WebInterfaceDirectory):

@@ -22,13 +22,12 @@ try:
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testutils import make_test_suite, run_test_suite, InvenioXmlTestCase
 from invenio.config import CFG_SITE_URL, CFG_ETCDIR, CFG_INSPIRE_SITE
 from invenio.bibrecord import create_record, record_xml_output, record_delete_field
 
 if CFG_INSPIRE_SITE:
     EXPECTED_RESPONSE = """<record>
-  <controlfield tag="001">1</controlfield>
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">1</subfield>
     <subfield code="h">D. Clowe, A. Gonzalez, and M. Markevitch</subfield>
@@ -92,7 +91,6 @@ if CFG_INSPIRE_SITE:
 """
 else:
     EXPECTED_RESPONSE = """<record>
-   <controlfield tag="001">1</controlfield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">1</subfield>
       <subfield code="h">D. Clowe, A. Gonzalez, and M. Markevitch</subfield>
@@ -162,14 +160,10 @@ def compare_references(test, a, b):
     record_delete_field(a, '999', 'C', '6')
     a = record_xml_output(a)
     b = record_xml_output(b)
-    test.assertEqual(a, b)
+    test.assertXmlEqual(a, b)
 
 
-class DocExtractTest(InvenioTestCase):
-    def setUp(self):
-        #setup_loggers(verbosity=1)
-        self.maxDiff = 10000
-
+class DocExtractTest(InvenioXmlTestCase):
     if HAS_REQUESTS:
         def test_upload(self):
             url = CFG_SITE_URL + '/textmining/api/extract-references-pdf'
