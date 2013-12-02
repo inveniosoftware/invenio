@@ -944,7 +944,7 @@ def ps2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     clean_working_dir(working_dir)
     return output_file
 
-def ps2pdf(input_file, output_file=None, pdfopt=True, **dummy):
+def ps2pdf(input_file, output_file=None, pdfopt=None, **dummy):
     """
     Transform any PS into a PDF
     @param input_file [string] the input file name
@@ -953,6 +953,9 @@ def ps2pdf(input_file, output_file=None, pdfopt=True, **dummy):
     @return [string] output_file input_file
     raise InvenioWebSubmitFileConverterError in case of errors.
     """
+    if pdfopt is None:
+        pdfopt = bool(CFG_PATH_PDFOPT)
+
     input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
     if input_file.endswith('.gz'):
         new_input_file = os.path.join(working_dir, 'input.ps')
