@@ -28,12 +28,12 @@ from invenio.testutils import InvenioXmlTestCase
 from invenio.dbquery import run_sql
 from invenio.testutils import (make_test_suite,
                                run_test_suite)
+from invenio import bibrecord
 
 
 class BibRecordTest(InvenioXmlTestCase):
     def setUp(self):
         self.maxDiff = None
-        from invenio import bibrecord
 
         def order_by_tag(field1, field2):
             """Function used to order the fields according to their tag"""
@@ -103,10 +103,8 @@ class BibRecordTest(InvenioXmlTestCase):
             </datafield>
         </record>"""
         expected_record = create_record(xml)
-        print expected_record
         record = BibRecord()
         record.add_subfield('100__a', 'our title')
-        print record
         self.assertEqual(record, expected_record)
 
 TEST_SUITE = make_test_suite(BibRecordTest)
