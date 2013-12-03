@@ -19,7 +19,7 @@
 
 """WebAuthorProfile functional/regression test suite."""
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID
 from invenio.testutils import make_test_suite, run_test_suite, \
     test_web_page_content, InvenioTestCase
 
@@ -27,10 +27,11 @@ from invenio.testutils import make_test_suite, run_test_suite, \
 class WebAuthorProfilePageTest(InvenioTestCase):
     """Check /author profile pages."""
 
-    def test_author_page_klebanov(self):
-        """webauthorprofile - /author/profile/Klebanov,%20Igor%20R"""
-        self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/author/profile/Klebanov,%20Igor%20R',
+    if CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID:
+        def test_author_page_klebanov(self):
+            """webauthorprofile - /author/profile/Klebanov,%20Igor%20R"""
+            self.assertEqual([],
+                             test_web_page_content(CFG_SITE_URL + '/author/profile/Klebanov,%20Igor%20R',
                                                expected_text=['Klebanov, Igor R']))
 
 

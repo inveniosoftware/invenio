@@ -29,6 +29,7 @@ from sys import hexversion
 from urllib import urlencode
 from datetime import datetime, timedelta
 
+from invenio import webinterface_handler_config
 from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id, \
     is_valid_bibref, get_person_id_from_paper, get_person_id_from_canonical_id, \
     search_person_ids_by_name, get_papers_by_person_id, get_person_redirect_link, \
@@ -200,8 +201,10 @@ class WebAuthorPages(WebInterfaceDirectory):
         @rtype: str
         '''
         if not CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID:
-            self.person_id = self.original_search_parameter
-            return self.index(req, form)
+            raise webinterface_handler_config.SERVER_RETURN(webinterface_handler_config.HTTP_NOT_FOUND)
+            # return webinterface_handler_config.HTTP_NOT_FOUND
+            # self.person_id = self.original_search_parameter
+            # return self.index(req, form)
 
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
                                    'recid': (int, -1),
