@@ -518,6 +518,13 @@ class InvenioTestCase(unittest.TestCase):
     "Invenio Test Case class."
     pass
 
+
+try:
+    InvenioTestCase.assertMultiLineEqual
+except AttributeError:
+    InvenioTestCase.assertMultiLineEqual = InvenioTestCase.assertEqual
+
+
 class InvenioWebTestCase(unittest.TestCase):
     """ Helper library of useful web test functions
     for web tests creation.
