@@ -120,7 +120,7 @@ def download_url(url, content_type=None, download_to_file=None,
 
 
 def download_external_url(url, download_to_file, content_type=None,
-                          retry_count=10, timeout=10.0):
+                          retry_count=10, timeout=10.0, verbose=False):
     """
     Download a url (if it corresponds to a remote file) and return a
     local url to it. If format is specified, a check will be performed
@@ -166,8 +166,9 @@ def download_external_url(url, download_to_file, content_type=None,
                     retry_after = max(retry_after, timeout)
                 except ValueError:
                     retry_after = timeout
-                msg = "retrying after %ss" % (retry_after,)
-                print >> sys.stderr, msg
+                if verbose:
+                    msg = "retrying after %ss" % (retry_after,)
+                    print >> sys.stderr, msg
                 time.sleep(retry_after)
                 retry_attempt += 1
                 continue
@@ -186,17 +187,19 @@ def download_external_url(url, download_to_file, content_type=None,
                     retry_after = max(retry_after, timeout)
                 except ValueError:
                     pass
-            msg = "retrying after %ss" % (retry_after,)
-            print >> sys.stderr, msg
+            if verbose:
+                msg = "retrying after %ss" % (retry_after,)
+                print >> sys.stderr, msg
             time.sleep(retry_after)
             retry_attempt += 1
         except (urllib2.URLError,
                 socket.timeout,
                 socket.gaierror,
                 socket.error), e:
-            error_str = str(e)
-            msg = "socket error, retrying after %ss" % (timeout,)
-            print >> sys.stderr, msg
+            if verbose:
+                error_str = str(e)
+                msg = "socket error, retrying after %ss" % (timeout,)
+                print >> sys.stderr, msg
             time.sleep(timeout)
             retry_attempt += 1
         else:
