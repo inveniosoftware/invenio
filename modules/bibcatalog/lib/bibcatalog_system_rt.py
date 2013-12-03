@@ -195,9 +195,9 @@ class BibCatalogSystemRT(BibCatalogSystem):
             # The BibCatalog API returns int if successful or
             # a string explaining the error if unsuccessful.
             ticketid = int(res)
-        except ValueError:
+        except (ValueError, TypeError), e:
             # Not a number. Must be an error string
-            raise Exception(res)
+            raise Exception("%s\n%s" % (res, str(e)))
 
         if comment:
             self.ticket_comment(uid=uid,

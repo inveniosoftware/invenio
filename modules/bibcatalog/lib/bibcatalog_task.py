@@ -244,6 +244,7 @@ def task_run_core():
                         write_message("Skipping record %s", (recid,))
                 except Exception, e:
                     write_message("Error submitting ticket for record %s:" % (recid,))
+                    write_message(traceback.format_exc())
                     raise e
             else:
                 raise BibCatalogPluginException("Plugin not valid in %s" % (ticket_name,))
