@@ -24,6 +24,7 @@ import re
 import cgi
 import gc
 import inspect
+import socket
 from fnmatch import fnmatch
 from urlparse import urlparse, urlunparse
 
@@ -321,6 +322,12 @@ class SimulatedModPythonRequest(object):
                         self.__bytes_sent += the_len
                         self.__write(chunk[:the_len])
                         break
+        except socket.error, e:
+            if e.errno == 54:
+                # Client disconnected, ignore
+                pass
+            else:
+                raise
         except IOError, err:
             if "failed to write data" in str(err) or "client connection closed" in str(err):
                 ## Let's just log this exception without alerting the admin:
