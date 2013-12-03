@@ -4652,7 +4652,7 @@ CREATE TABLE IF NOT EXISTS collection_bsrMETHOD (
 CREATE TABLE IF NOT EXISTS seqSTORE (
   id int(15) NOT NULL auto_increment,
   seq_name varchar(15),
-  seq_value varchar(20),
+  seq_value varchar(60),
   PRIMARY KEY (id),
   UNIQUE KEY seq_name_value (seq_name, seq_value)
 ) ENGINE=MyISAM;
@@ -4903,5 +4903,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_aidPERSONIDDA
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_bibauthorid_search_engine_tables',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_wapCACHE_object_value_longblob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_16_aidPERSONIDDATA_datablob',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_04_seqSTORE_larger_value',NOW());
 
 -- end of file
