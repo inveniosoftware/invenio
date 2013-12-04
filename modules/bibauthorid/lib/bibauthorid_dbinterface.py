@@ -2148,7 +2148,7 @@ def create_new_author_by_uid(uid=-1, uid_is_owner=False):   ### create_new_perso
     '''
     pid_with_uid = _select_from_aidpersoniddata_where(select=['personid'], tag='uid', data=uid)
 
-    if pid_with_uid:
+    if pid_with_uid and uid_is_owner:
         return pid_with_uid[0][0]
 
     pid = get_free_author_id()

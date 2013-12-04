@@ -251,7 +251,7 @@ var ticketbox = {
 
     var opsource = "<div class=\"row-fluid\">{{#action}}" +
         "<div class=\"span2 action {{ classes }}\">{{ action }}</div>" +
-        "<div class=\"span9\">{{/action}}<div class=\"title\"><a href=\"{{ rec_link }}\" target=\"_blank\">{{rec_title}}</a></div>For profile <a href=\"{{ profile_link }}\">{{ cname }}</a>{{#editable}}, known by: <select>{{#bibrefs}}<option value=\"{{ bibref }}\">{{ sig }}</option>{{/bibrefs}}<option class=\"nobibref\" value=\"\">I don't know</option></select>{{/editable}}</div>" +
+        "<div class=\"span9\">{{/action}}<div class=\"title\"><a href=\"{{ rec_link }}\" target=\"_blank\">{{rec_title}}</a></div>For profile <a href=\"{{ profile_link }}\">{{ profile }}</a>{{#editable}}, known by: <select>{{#bibrefs}}<option value=\"{{ bibref }}\">{{ sig }}</option>{{/bibrefs}}<option class=\"nobibref\" value=\"\">I don't know</option></select>{{/editable}}</div>" +
         "<div class=\"span1\"><div class=\"op-buttons btn-group btn-group-vertical\"><button class=\"btn btn-small op-btn removeOp\" type=\"button\">Discard</button></div></div>" +
         "</div>";
     var template = Handlebars.compile(opsource);
@@ -390,6 +390,8 @@ var ticketbox = {
                 rec_title: this.model.get("rec_title"),
                 rec_link: document.location.origin + "/record/" + this.model.get("rec"),
                 cname: this.model.get("cname"),
+                pid: this.model.get("pid"),
+                profile: (!this.model.get("cname") && this.model.get("pid")) ? this.model.get("pid") : this.model.get("cname"),
                 profile_link: document.location.origin + "/author/profile/" + this.model.get("cname"),
                 editable: this.model.has("bibrefs"),
                 bibrefs: this.model.get("bibrefs"),
