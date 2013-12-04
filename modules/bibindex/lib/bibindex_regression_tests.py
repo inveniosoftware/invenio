@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 from invenio.testutils import InvenioTestCase
 import os
 from datetime import timedelta
+from time import sleep
 
 from invenio.bibindex_engine import WordTable, \
     get_word_tables, \
@@ -56,6 +57,8 @@ from invenio.bibrecord import record_get_field_value
 from invenio.bibsort_engine import get_max_recid
 from invenio.bibtask import task_log_path
 
+from invenio.dbquery import get_table_update_time
+from invenio.search_engine import get_index_stemming_language as gis
 
 def reindex_for_type_with_bibsched(index_name, force_all=False, *other_options):
     """Runs bibindex for the specified index and returns the task_id.
@@ -95,7 +98,7 @@ def prepare_for_index_update(index_id, parameters={}):
     parameter_set = False
     query_update = "UPDATE idxINDEX SET "
     for key in parameters:
-        if parameters[key]:
+        if parameters[key] is not None:
             query_update += parameter_set and ", " or ""
             query_update += "%s='%s'" % (key, parameters[key])
             parameter_set = True
@@ -1379,7 +1382,7 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         """bibindex - checks virtual index after authorcount index removal - termlist for record 10"""
         query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=10"""
         res = run_sql(query % self._id)
-        self.assertEqual(['2002', 'Eur. Phys. J., C'], deserialize_via_marshal(res[0][0]))
+        self.assertEqual(sorted(['2002', 'Eur. Phys. J., C']), sorted(deserialize_via_marshal(res[0][0])))
 
     def test_year_removal_number_of_items(self):
         """bibindex - checks virtual index after year removal - number of items"""
@@ -1395,8 +1398,8 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         #must be run after: tearDown, test_year_removal_number_of_items
         query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=18"""
         res = run_sql(query % self._id)
-        self.assertEqual(['151', '357','1985', 'Phys. Lett., B 151 (1985) 357', 'Phys. Lett., B'],
-                         deserialize_via_marshal(res[0][0]))
+        self.assertEqual(sorted(['151', '357','1985', 'Phys. Lett., B 151 (1985) 357', 'Phys. Lett., B']),
+                         sorted(deserialize_via_marshal(res[0][0])))
 
 class BibIndexCLICallTest(InvenioTestCase):
     """Tests if calls to bibindex from CLI (bibsched deamon) are run correctly"""
@@ -1422,6 +1425,134 @@ class BibIndexCLICallTest(InvenioTestCase):
         self.assertTrue(text.find("Selected indexes/recIDs are up to date.") >= 0)
 
 
+class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
+    """Tests if WordTable indexes virtual index correctly in case when
+       two or more dependent indexes have common words and we change
+       only one of them
+    """
+    counter = 0
+    index_name = 'title'
+
+    @classmethod
+    def setUp(self):
+        self.counter += 1
+        if self.counter == 3:
+            index_id = get_index_id_from_index_name(self.index_name)
+            index_tags = get_index_tags(self.index_name)
+            # tests are too fast for DataCacher timestamp_verifier to notice the difference
+            sleep(1)
+            query = """UPDATE idxINDEX SET stemming_language='' WHERE id=8"""
+            run_sql(query)
+
+            wordTable = WordTable(index_name=self.index_name,
+                                  index_id=index_id,
+                                  fields_to_index=index_tags,
+                                  table_name_pattern='idxWORD%02dF',
+                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
+                                  wash_index_terms=50)
+            wordTable.add_recIDs([[1, 9]], 1000)
+            wordTable = WordTable(index_name=self.index_name,
+                                  index_id=index_id,
+                                  fields_to_index=index_tags,
+                                  table_name_pattern='idxPAIR%02dF',
+                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
+                                  wash_index_terms=50)
+            wordTable.add_recIDs([[6, 9]], 1000)
+
+    def tearDown(self):
+        if self.counter == 8:
+            index_id = get_index_id_from_index_name(self.index_name)
+            index_tags = get_index_tags(self.index_name)
+            # tests are too fast for DataCacher timestamp_verifier to notice the difference
+            sleep(1)
+            query = """UPDATE idxINDEX SET stemming_language='en' WHERE id=8"""
+            run_sql(query)
+
+            wordTable = WordTable(index_name=self.index_name,
+                                  index_id=index_id,
+                                  fields_to_index=index_tags,
+                                  table_name_pattern='idxWORD%02dF',
+                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
+                                  wash_index_terms=50)
+            wordTable.add_recIDs([[1, 9]], 1000)
+            wordTable = WordTable(index_name=self.index_name,
+                                  index_id=index_id,
+                                  fields_to_index=index_tags,
+                                  table_name_pattern='idxPAIR%02dF',
+                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
+                                  wash_index_terms=50)
+            wordTable.add_recIDs([[6, 9]], 1000)
+
+    def test_1_initial_state_of_record_1(self):
+        """bibindex - checks if record 1 has proper initial state for word: experiment"""
+        query = """SELECT termlist FROM idxWORD08R WHERE id_bibrec=1"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual(terms.count('experi'), 1)
+        query = """SELECT termlist FROM idxWORD01R WHERE id_bibrec=1"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual(terms.count('experi'), 2)
+        self.assertEqual(terms.count('experiment'), 1)
+
+    def test_2_initial_state_of_record_3(self):
+        """bibindex - checks if record 3 has proper initial state for word: biology"""
+        query = """SELECT termlist FROM idxWORD08R WHERE id_bibrec=3"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual(terms.count('biolog'), 1)
+        self.assertEqual(terms.count('biology'), 0)
+        query = """SELECT termlist FROM idxWORD01R WHERE id_bibrec=3"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual(terms.count('biolog'), 2)
+
+    def test_3_experiment_in_record_1(self):
+        """bibindex - checks count of 'experiment' and 'experi' words in global virtual index"""
+        query = """SELECT termlist FROM idxWORD01R WHERE id_bibrec=1"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual(terms.count('experi'), 1)
+        self.assertEqual(terms.count('experiment'), 2)
+
+    def test_4_boson_in_record_1(self):
+        """bibindex - checks count of 'boson' - it doesn't change"""
+        query = """SELECT termlist FROM idxWORD01R WHERE id_bibrec=1"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual(terms.count('boson'), 3)
+
+    def test_5_biology_in_record_3(self):
+        """bibindex - checks count of 'biology' word in record 3"""
+        query = """SELECT termlist FROM idxWORD01R WHERE id_bibrec=3"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual(terms.count('biology'), 2)
+        self.assertEqual(terms.count('biolog'), 1)
+        query = """SELECT termlist FROM idxWORD08R WHERE id_bibrec=3"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual(terms.count('biolog'), 0)
+
+    def test_6_supersymmetry_in_record_9(self):
+        """bibindex - checks count of 'supersymmetry' word in record 9"""
+        query = """SELECT termlist FROM idxWORD01R WHERE id_bibrec=9"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual(terms.count('supersymmetri'), 0)
+
+    def test_7_biology_in_record_3_forward_table(self):
+        """bibindex - checks if 'biolog' word is in forward table"""
+        query = """SELECT term FROM idxWORD01F WHERE term='biolog'"""
+        res = run_sql(query)
+        self.assertEqual('biolog', res[0][0])
+
+    def test_8_nobel_prizewinners_pair_in_record_6(self):
+        """bibindex - checks if 'nobel prizewinners' is in virtual index"""
+        query = """SELECT termlist FROM idxPAIR08R WHERE id_bibrec=6"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        self.assertEqual('nobel prizewinners' in terms, True)
+        query = """SELECT termlist FROM idxPAIR01R WHERE id_bibrec=6"""
+        terms = deserialize_via_marshal(run_sql(query)[0][0])
+        #print terms
+        self.assertEqual('nobel prizewinn' in terms, True)
+        self.assertEqual('nobel prizewinners' in terms, True)
+
 
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
@@ -1440,7 +1571,8 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexGlobalIndexContentTest,
                              BibIndexVirtualIndexAlsoChangesTest,
                              BibIndexVirtualIndexRemovalTest,
-                             BibIndexCLICallTest)
+                             BibIndexCLICallTest,
+                             BibIndexCommonWordsInVirtualIndexTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

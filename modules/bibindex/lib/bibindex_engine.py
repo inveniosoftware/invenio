@@ -583,11 +583,16 @@ class WordTable:
         self.index_name = index_name
         self.index_id = index_id
         self.tablename = table_name_pattern % index_id
+        self.old_tablename = table_name_pattern[table_name_pattern.find('idx'):] % index_id
         self.virtual_tablename_pattern = table_name_pattern[table_name_pattern.find('idx'):-1]
         self.humanname = get_def_name('%s' % (str(index_id),), "idxINDEX")[0][1]
         self.recIDs_in_mem = []
         self.fields_to_index = fields_to_index
+
         self.value = {}
+        self.virtual_value = {}
+        self._init_virtual_indexes()
+
         try:
             self.stemming_language = get_index_stemming_language(index_id)
         except KeyError:
@@ -601,8 +606,7 @@ class WordTable:
                                                        self.remove_latex_markup)
         self.default_tokenizer_function = self.tokenizer.get_tokenizing_function(wordtable_type)
         self.wash_index_terms = wash_index_terms
-        self.is_virtual = is_index_virtual(self.index_id)
-        self.virtual_indexes = get_index_virtual_indexes(self.index_id)
+
 
         # tagToTokenizer mapping. It offers an indirection level necessary for
         # indexing fulltext.
@@ -618,6 +622,14 @@ class WordTable:
         if self.stemming_language and self.tablename.startswith('idxWORD'):
             write_message('%s has stemming enabled, language %s' % (self.tablename, self.stemming_language))
 
+    def _init_virtual_indexes(self):
+        """
+           Gathers informations about related virtual indexes.
+        """
+        self.is_virtual = is_index_virtual(self.index_id)
+        self.virtual_indexes = get_index_virtual_indexes(self.index_id)
+        for _id, _name in self.virtual_indexes:
+            self.virtual_value[_id] = {}
 
     def turn_off_virtual_indexes(self):
         self.virtual_indexes = []
@@ -739,14 +751,30 @@ class WordTable:
         set.update_with_signs(self.value[word])
         return set != oldset
 
+    def leave_old_recIDs(self, word, set, index_id):
+        """
+            Modifies hitlist for term in virtual index
+            if necessary. It is necessary when we want
+            to remove a word from dependent index but we
+            still need to leave it in virtual index, because
+            word appers in other dependent index for some recIDs.
+        """
+        if self.virtual_value[index_id].has_key(word):
+            set.update_with_signs(self.virtual_value[index_id][word])
+
     def put_word_into_db(self, word, index_id):
         """Flush a single word to the database and delete it from memory"""
         tab_name = self.tablename
+        virtual_index = False
         if index_id != self.index_id:
             tab_name = self.virtual_tablename_pattern % index_id + "F"
+            virtual_index = True
         set = self.load_old_recIDs(word, index_id)
         if set is not None: # merge the word recIDs found in memory:
-            if not self.merge_with_old_recIDs(word, set):
+            hitlist_was_changed = self.merge_with_old_recIDs(word, set)
+            if virtual_index:
+                self.leave_old_recIDs(word, set, index_id)
+            if not hitlist_was_changed:
                 # nothing to update:
                 write_message("......... unchanged hitlist for ``%s''" % word, verbose=9)
                 pass
@@ -1000,7 +1028,7 @@ class WordTable:
         #first: need to take old values from given index to remove
         #them from virtual indexes
         query = """SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec
-                   BETWEEN %%s AND %%s""" % wash_table_column_name(self.tablename[:-1])
+                   BETWEEN %%s AND %%s""" % wash_table_column_name(self.old_tablename[:-1])
         old_index_values = run_sql(query, (recID1, recID2))
         if old_index_values:
             zipped = zip(*old_index_values)
@@ -1009,6 +1037,7 @@ class WordTable:
             old_index_values = dict()
         recIDs = wlist.keys()
 
+        update_termlist_for_virtual_index_record = self.update_termlist_for_virtual_index_record
         for vindex_id, vindex_name in self.virtual_indexes:
             #second: need to take old values from virtual index
             #to have a list of words from which we can remove old values from given index
@@ -1021,8 +1050,13 @@ class WordTable:
                 old_virtual_index_values = dict(zip(zipped[0], map(deserialize_via_marshal, zipped[1])))
             else:
                 old_virtual_index_values = dict()
+
             for recID in recIDs:
-                to_serialize = list((set(old_virtual_index_values.get(recID) or []) - set(old_index_values.get(recID) or [])) | set(wlist[recID]))
+                to_serialize = update_termlist_for_virtual_index_record(vindex_id,
+                                                                        recID,
+                                                                        old_virtual_index_values.get(recID) or [],
+                                                                        old_index_values.get(recID) or [],
+                                                                        wlist[recID])
                 run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
                 try:
                     run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
@@ -1044,6 +1078,39 @@ class WordTable:
                         """ % ((wash_table_column_name(tab_name),)*3)
                 run_sql(query, (recID1, recID2, recID1, recID2))
 
+    def update_termlist_for_virtual_index_record(self, index_id, recID, old_vindex_termlist, old_values, new_values):
+        """
+            Prepares new termlist for record in virtual index in reversed table and
+            updates information in memory on what to keep in forward table.
+
+            Example:
+            old_termlist = ['dog', 'dog', 'cat', 'horse'] #we store many copies of the same word
+                                                           if it appears in many dependent indexes
+            old_values = ['dog', 'cat']
+            new_values = ['dogs', 'cat']
+            output termlist:
+            output = ['dog', 'dogs', 'cat', 'horse']
+
+            @param recID: recID of the record to change
+            @param old_vindex_termlist: old values from record from virtual index
+            @param old_values: old values from record from considered dependent index
+            @param new_values: new values for record from considered dependent index
+        """
+        # remove old values
+        for value in old_values:
+            try:
+                old_vindex_termlist.remove(value)
+            except ValueError:
+                write_message("Inconsistency detected for record %s for virtual index conected to this index: %s" % (recID, self.index_name))
+        still_left = set(old_vindex_termlist) & set(old_values)
+        # add new values
+        old_vindex_termlist.extend(new_values)
+        # update memory
+        put = self.put_virtual
+        for value in still_left:
+            put(recID, value, 1, index_id)
+
+        return old_vindex_termlist
 
     def log_progress(self, start, done, todo):
         """Calculate progress and store it.
@@ -1063,18 +1130,55 @@ class WordTable:
             write_message("Estimated runtime: %.1f minutes" % \
                     ((todo - done) / time_recs_per_min))
 
-    def put(self, recID, word, sign):
-        """Adds/deletes a word to the word list."""
+    def put_virtual(self, recID, word, sign, virtual_index_id):
+        """Keeps track of changes done during indexing
+           and stores these changes in memory for further use.
+           Indexing process needs this information later while
+           filling in the database.
+           Function is similar to function put() but stores
+           only additional information necessary during indexing
+           virtual indexes i.e. information about terms that should be
+           kept in virtual indexes but not in dependent index.
+
+           @param recID: recID of the record we want to update in memory
+           @param word: word we want to update
+           @param sing: sign of the word, 1 means keep this word in database, -1 remove word from database
+           @param virtual_index_id: id of the virtual index to which these changes apply
+        """
+        value = self.virtual_value[virtual_index_id]
         try:
             if self.wash_index_terms:
                 word = wash_index_term(word, self.wash_index_terms)
-            if self.value.has_key(word):
+            if value.has_key(word):
                 # the word 'word' exist already: update sign
-                self.value[word][recID] = sign
+                value[word][recID] = sign
             else:
-                self.value[word] = {recID: sign}
+                value[word] = {recID: sign}
         except:
             write_message("Error: Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
+
+    def put(self, recID, word, sign):
+        """Keeps track of changes done during indexing
+           and stores these changes in memory for further use.
+           Indexing process needs this information later while
+           filling in the database.
+
+           @param recID: recID of the record we want to update in memory
+           @param word: word we want to update
+           @param sing: sign of the word, 1 means keep this word in database, -1 remove word from database
+        """
+        value = self.value
+        try:
+            if self.wash_index_terms:
+                word = wash_index_term(word, self.wash_index_terms)
+            if value.has_key(word):
+                # the word 'word' exist already: update sign
+                value[word][recID] = sign
+            else:
+                value[word] = {recID: sign}
+        except:
+            write_message("Error: Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
+
 
     def del_recIDs(self, recIDs):
         """Fetches records which id in the recIDs range list and adds
