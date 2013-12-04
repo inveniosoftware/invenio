@@ -3010,6 +3010,9 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         else:
             permitted_restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
 
+        if verbose and of.startswith("h"):
+            write_warning("Search stage 4: Your permitted collections: %s" % (str(permitted_restricted_collections),), req=req)
+
         # let's build the list of the both public and restricted
         # child collections of the collection from which the user
         # started his/her search. This list of children colls will be
@@ -3024,6 +3027,9 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         # children of 'cc' (real, virtual, restricted), rest of 'c' that are  not cc's children
         colls_to_be_displayed = [coll for coll in current_coll_children if coll in colls or coll in permitted_restricted_collections]
         colls_to_be_displayed.extend([coll for coll in colls if coll not in colls_to_be_displayed])
+
+        if verbose and of.startswith("h"):
+            write_warning("Search stage 4: Collections to display: %s" % (str(colls_to_be_displayed),), req=req)
 
         if policy == 'ANY':# the user needs to have access to at least one collection that restricts the records
             #we need this to be able to remove records that are both in a public and restricted collection
@@ -3046,6 +3052,9 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         for coll in colls_to_be_displayed:
             results[coll] = results.get(coll, intbitset()) | (records_that_can_be_displayed & get_collection_reclist(coll))
             results_nbhits += len(results[coll])
+
+        if verbose and of.startswith("h"):
+            write_warning("Search stage 4: Final results (%d): %s " % (results_nbhits, str(results),), req=req)
 
     if results_nbhits == 0:
         # no hits found, try to search in Home and restricted and/or hidden collections:
@@ -6260,7 +6269,7 @@ def prs_split_into_collections(kwargs=None, results_final=None, colls_to_search=
     # we have to avoid counting it multiple times.  The price to
     # pay for this accuracy of results_final_nb_total is somewhat
     # increased CPU time.
-    if results_final.keys() == 1:
+    if len(results_final.keys()) == 1:
         # only one collection; no need to union them
         results_final_for_all_selected_colls = results_final.values()[0]
         results_final_nb_total = results_final_nb.values()[0]
@@ -6608,8 +6617,10 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
 
 def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
                                                kwargs=None, req=None, of=None,
-                                               **dummy):
+                                               verbose=None, **dummy):
     # search stage 4: intersection with collection universe:
+    if verbose and of.startswith("h"):
+        write_warning("Search stage 4: Starting with %s hits." % str(results_in_any_collection), req=req)
     results_final = {}
     output = prs_intersect_results_with_collrecs(results_final, results_in_any_collection, kwargs, **kwargs)
     if output is not None:
@@ -6625,6 +6636,8 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
         raise Exception
 
     # search stage 5: apply search option limits and restrictions:
+    if verbose and of.startswith("h"):
+        write_warning("Search stage 5: Starting with %s hits." % str(results_final), req=req)
     output = prs_apply_search_limits(results_final, kwargs=kwargs, **kwargs)
     kwargs['results_final'] = results_final
     if output is not None:
