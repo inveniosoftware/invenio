@@ -4641,7 +4641,9 @@ class WebSearchFiletypeQueryTest(InvenioTestCase):
 
 
 def make_fake_request(admin_user=True):
-    environ = {'wsgi.errors': '', 'QUERY_STRING': '', 'PATH_INFO': ''}
+    environ = {'wsgi.errors': cStringIO.StringIO(),
+               'QUERY_STRING': '',
+               'PATH_INFO': ''}
     if admin_user:
         user_info = {'uid': 1, 'guest': '0', 'email': '', 'nickname': ''}
     else:
