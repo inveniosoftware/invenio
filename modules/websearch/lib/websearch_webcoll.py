@@ -133,8 +133,11 @@ class Collection:
         self.update_reclist_run_already = 0 # to speed things up without much refactoring
         self.reclist_updated_since_start = 0 # to check if webpage cache need rebuilding
         self.reclist_with_nonpublic_subcolls = intbitset()
-        # used to store the temporary result of the calculation of nbrecs of an external collection
-        self.nbrecs_tmp = None
+
+        # temporary counters for the number of records in hosted collections
+        self.nbrecs_tmp = None # number of records in a hosted collection
+        self.nbrecs_from_hosted_collections = 0 # total number of records from
+                                                # descendant hosted collections
         if not name:
             self.name = CFG_SITE_NAME # by default we are working on the home page
             self.id = 1
@@ -764,24 +767,50 @@ class Collection:
         )
 
     def calculate_reclist(self):
-        """Calculate, set and return the (reclist, reclist_with_nonpublic_subcolls) tuple for given collection."""
-        if self.calculate_reclist_run_already or str(self.dbquery).startswith("hostedcollection:"):
-            # do we have to recalculate?
-            return (self.reclist, self.reclist_with_nonpublic_subcolls)
+        """
+        Calculate, set and return the (reclist,
+                                       reclist_with_nonpublic_subcolls,
+                                       nbrecs_from_hosted_collections)
+        tuple for the given collection."""
+
+        if str(self.dbquery).startswith("hostedcollection:"):
+            # we don't normally use this function to calculate the reclist
+            # for hosted collections. In case we do, recursively for a regular
+            # ancestor collection, then quickly return the object attributes.
+            return (self.reclist,
+                    self.reclist_with_nonpublic_subcolls,
+                    self.nbrecs)
+
+        if self.calculate_reclist_run_already:
+            # do we really have to recalculate? If not,
+            # then return the object attributes
+            return (self.reclist,
+                    self.reclist_with_nonpublic_subcolls,
+                    self.nbrecs_from_hosted_collections)
+
         write_message("... calculating reclist of %s" % self.name, verbose=6)
         reclist = intbitset() # will hold results for public sons only; good for storing into DB
         reclist_with_nonpublic_subcolls = intbitset() # will hold results for both public and nonpublic sons; good for deducing total
                                                    # number of documents
+        nbrecs_from_hosted_collections = 0 # will hold the total number of records from descendant hosted collections
+
         if not self.dbquery:
             # A - collection does not have dbquery, so query recursively all its sons
             #     that are either non-restricted or that have the same restriction rules
             for coll in self.get_sons():
-                coll_reclist, coll_reclist_with_nonpublic_subcolls = coll.calculate_reclist()
+                coll_reclist,\
+                coll_reclist_with_nonpublic_subcolls,\
+                coll_nbrecs_from_hosted_collection = coll.calculate_reclist()
+
                 if ((coll.restricted_p() is None) or
                     (coll.restricted_p() == self.restricted_p())):
                     # add this reclist ``for real'' only if it is public
                     reclist.union_update(coll_reclist)
                 reclist_with_nonpublic_subcolls.union_update(coll_reclist_with_nonpublic_subcolls)
+
+                # increment the total number of records from descendant hosted collections
+                nbrecs_from_hosted_collections += coll_nbrecs_from_hosted_collection
+
         else:
             # B - collection does have dbquery, so compute it:
             #     (note: explicitly remove DELETED records)
@@ -791,14 +820,20 @@ class Collection:
             else:
                 reclist = search_pattern_parenthesised(None, self.dbquery + ' -980__:"DELETED"', ap=-9) #ap=-9 allow queries containing hidden tags
             reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
+
         # store the results:
-        self.nbrecs = len(reclist_with_nonpublic_subcolls)
+        self.nbrecs_from_hosted_collections = nbrecs_from_hosted_collections
+        self.nbrecs = len(reclist_with_nonpublic_subcolls) + \
+                      nbrecs_from_hosted_collections
         self.reclist = reclist
         self.reclist_with_nonpublic_subcolls = reclist_with_nonpublic_subcolls
         # last but not least, update the speed-up flag:
         self.calculate_reclist_run_already = 1
-        # return the two sets:
-        return (self.reclist, self.reclist_with_nonpublic_subcolls)
+        # return the two sets, as well as
+        # the total number of records from descendant hosted collections:
+        return (self.reclist,
+                self.reclist_with_nonpublic_subcolls,
+                self.nbrecs_from_hosted_collections)
 
     def calculate_nbrecs_for_external_collection(self, timeout=CFG_EXTERNAL_COLLECTION_TIMEOUT):
         """Calculate the total number of records, aka nbrecs, for given external collection."""
