@@ -19,6 +19,9 @@
 
 {# Tag editing box #}
 
+{%- from "_translate.html" import translate -%}
+{{ translate(["Create new tag"]) }}
+
 {% block webtag_editor_body %}
   <p>
       {{ _('Tags:') }}
