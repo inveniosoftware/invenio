@@ -2242,7 +2242,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         register_exception()
                         write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
                         raise
-            if not pretend:
+            if not pretend and doctype not in ('PURGE', 'DELETE', 'EXPUNGE'):
                 _process_document_moreinfos(more_infos, newname, version, urls and urls[0][1], mode)
 
             # resolving temporary version and identifier
