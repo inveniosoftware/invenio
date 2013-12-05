@@ -96,7 +96,7 @@ def remove_tag_001_from_hmbuffer(hmbuffer):
        HTML MARC buffers without paying attention to recIDs attributed
        during the bibupload.
     """
-    return re.sub(r'(^|\n)(<pre>)?[0-9]{9}\s001__\s\d+($|\n)', '', hmbuffer)
+    return re.sub(r'(^|\n)(<pre style="margin: 1em 0px;">)?[0-9]{9}\s001__\s\d+($|\n)', '', hmbuffer)
 
 def compare_hmbuffers(hmbuffer1, hmbuffer2):
     """Compare two HM (HTML MARC) buffers by removing whitespaces
@@ -107,8 +107,8 @@ def compare_hmbuffers(hmbuffer1, hmbuffer2):
     hmbuffer2 = hmbuffer2.strip()
 
     # remove eventual <pre>...</pre> formatting:
-    hmbuffer1 = re.sub(r'^<pre>', '', hmbuffer1)
-    hmbuffer2 = re.sub(r'^<pre>', '', hmbuffer2)
+    hmbuffer1 = re.sub(r'^<pre style="margin: 1em 0px;">', '', hmbuffer1)
+    hmbuffer2 = re.sub(r'^<pre style="margin: 1em 0px;">', '', hmbuffer2)
     hmbuffer1 = re.sub(r'</pre>$', '', hmbuffer1)
     hmbuffer2 = re.sub(r'</pre>$', '', hmbuffer2)
 

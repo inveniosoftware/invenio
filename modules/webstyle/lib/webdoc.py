@@ -502,7 +502,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
     _ = gettext_set_language(ln)
 
     topics = {}
-    ln_link = (ln != CFG_SITE_LANG and '?ln=' + ln) or ''
+    ln_link = '?ln=' + ln
 
     for category in categ:
         if not webdoc_dirs.has_key(category):
@@ -634,13 +634,9 @@ def transform(webdoc_source, verbose=0, req=None, languages=CFG_SITE_LANGS):
         # 3 step
         ## Print current language 'en', 'fr', .. instead of
         ## <lang:current /> tags and '?ln=en', '?ln=fr', .. instead of
-        ## <lang:link /> if ln is not default language
-        if ln != CFG_SITE_LANG:
-            localized_webdoc = pattern_lang_link_current.sub('?ln=' + ln,
-                                                             localized_webdoc)
-        else:
-            localized_webdoc = pattern_lang_link_current.sub('',
-                                                             localized_webdoc)
+        ## <lang:link />
+        localized_webdoc = pattern_lang_link_current.sub('?ln=' + ln,
+                                                         localized_webdoc)
         localized_webdoc = pattern_lang_current.sub(ln, localized_webdoc)
 
         # 4 step
