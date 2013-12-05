@@ -911,14 +911,13 @@ def cli_delete(options):
         docname = None
         recid = None
         # retrieve the 1st recid
-        if recid.bibrec_links:
+        if bibdoc.bibrec_links:
             recid = bibdoc.bibrec_links[0]["recid"]
             docname = bibdoc.bibrec_links[0]["docname"]
-
-        if recid not in ffts:
-            ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
-        else:
-            ffts[recid].append({'docname' : docname, 'doctype' : 'DELETE'})
+            ffts.setdefault(recid, []).append(
+                {'docname' : docname,
+                 'doctype' : 'DELETE'}
+            )
     return bibupload_ffts(ffts)
 
 def cli_delete_file(options):
