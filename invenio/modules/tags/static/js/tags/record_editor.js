@@ -289,7 +289,7 @@ WebTagEditor.prototype.tokenInput_resultsFormatter = function(item) {
 
     if(item.status == 'creating')
     {
-        token_html += '<span style="color: blue; float: right;"> (Create new tag)</span>';
+        token_html += '<span style="color: blue; float: right;"> (' + _('Create new tag') + ')</span>';
     }
 
     return "<li><p>"+token_html+"</p></li>";
