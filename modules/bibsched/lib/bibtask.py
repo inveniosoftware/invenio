@@ -334,7 +334,7 @@ def bibtask_allocate_sequenceid(curdir=None):
             access = fd.readline().strip()
             fd.close()
             return access.replace("_", "")[-9:]
-        except:
+        except (IOError, OSError):
             return 0
     else:
         return random.randrange(1, 4294967296)
@@ -606,7 +606,10 @@ def task_init(authorization_action="",
                     ret = _task_run(task_run_fnc)
                 if not ret:
                     write_message("Error occurred.  Exiting.", sys.stderr)
-            except Exception, e:
+            except Exception, e:  # pylint: disable-msg=W0703
+                # We want to catch all exceptions here because:
+                # We set the task status to error and we want to display
+                # an error traceback
                 if isinstance(e, SystemExit) and e.code == 0:
                     raise
                 register_exception(alert_admin=True)
@@ -779,7 +782,7 @@ def task_read_status():
         (_TASK_PARAMS['task_id'],), 1)
     try:
         out = res[0][0]
-    except:
+    except IndexError:
         out = 'UNKNOWN'
     return out
 
@@ -815,7 +818,7 @@ def write_message(msg, stream=None, verbose=1):
         for handler in logging.root.handlers:
             handler.flush()
 
-_RE_SHIFT = re.compile("([-\+]{0,1})([\d]+)([dhms])")
+_RE_SHIFT = re.compile(r"([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S", now=None):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
@@ -847,7 +850,7 @@ def task_sleep_now_if_required(can_stop_too=False):
     if status == 'ABOUT TO SLEEP':
         write_message("sleeping...")
         task_update_status("SLEEPING")
-        signal.signal(signal.SIGTSTP, _task_sig_dumb)
+        signal.signal(signal.SIGTSTP, cb_task_sig_dumb)
         os.kill(os.getpid(), signal.SIGSTOP)
         time.sleep(1)
         if task_read_status() == 'NOW STOP':
@@ -861,7 +864,7 @@ def task_sleep_now_if_required(can_stop_too=False):
         else:
             write_message("... continuing...")
             task_update_status("CONTINUING")
-        signal.signal(signal.SIGTSTP, _task_sig_sleep)
+        signal.signal(signal.SIGTSTP, cb_task_sig_sleep)
     elif status == 'ABOUT TO STOP':
         if can_stop_too:
             write_message("stopped")
@@ -999,7 +1002,7 @@ def task_get_options(task_id, task_name):
         (task_id, task_name+'%'))
     try:
         out = marshal.loads(res[0][0])
-    except:
+    except ValueError:
         write_message("Error: %s task %d does not seem to exist."
             % (task_name, task_id), sys.stderr)
         task_update_status('ERROR')
@@ -1126,12 +1129,12 @@ def _task_run(task_run_fnc):
         bibsched_set_host(_TASK_PARAMS['task_id'], gethostname())
 
     ## initialize signal handler:
-    signal.signal(signal.SIGUSR2, _task_sig_debug)
-    signal.signal(signal.SIGTSTP, _task_sig_sleep)
-    signal.signal(signal.SIGTERM, _task_sig_stop)
-    signal.signal(signal.SIGQUIT, _task_sig_stop)
-    signal.signal(signal.SIGABRT, _task_sig_suicide)
-    signal.signal(signal.SIGINT, _task_sig_stop)
+    signal.signal(signal.SIGUSR2, cb_task_sig_debug)
+    signal.signal(signal.SIGTSTP, cb_task_sig_sleep)
+    signal.signal(signal.SIGTERM, cb_task_sig_stop)
+    signal.signal(signal.SIGQUIT, cb_task_sig_stop)
+    signal.signal(signal.SIGABRT, cb_task_sig_suicide)
+    signal.signal(signal.SIGINT, cb_task_sig_stop)
     ## we can run the task now:
     write_message("Task #%d started." % _TASK_PARAMS['task_id'])
     task_update_status("RUNNING")
@@ -1231,7 +1234,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
         sys.stderr.write(description)
     sys.exit(exitcode)
 
-def _task_sig_sleep(sig, frame):
+def cb_task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     signal.signal(signal.SIGTSTP, signal.SIG_IGN)
     write_message("task_sig_sleep(), got signal %s frame %s"
@@ -1240,7 +1243,7 @@ def _task_sig_sleep(sig, frame):
     _db_login(relogin=1)
     task_update_status("ABOUT TO SLEEP")
 
-def _task_sig_stop(sig, frame):
+def cb_task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     write_message("task_sig_stop(), got signal %s frame %s"
             % (sig, frame), verbose=9)
@@ -1248,7 +1251,7 @@ def _task_sig_stop(sig, frame):
     _db_login(relogin=1) # To avoid concurrency with an interrupted run_sql call
     task_update_status("ABOUT TO STOP")
 
-def _task_sig_suicide(sig, frame):
+def cb_task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     write_message("task_sig_suicide(), got signal %s frame %s"
             % (sig, frame), verbose=9)
@@ -1259,7 +1262,7 @@ def _task_sig_suicide(sig, frame):
     task_update_status("SUICIDED")
     sys.exit(1)
 
-def _task_sig_debug(sig, frame):
+def cb_task_sig_debug(sig, frame):
     """Signal handler for the 'debug' signal sent by BibSched.
 
     This spawn a remote console server we can connect to to check
@@ -1269,11 +1272,11 @@ def _task_sig_debug(sig, frame):
     from rfoo.utils import rconsole
     rconsole.spawn_server()
 
-def _task_sig_dumb(sig, frame):
+def cb_task_sig_dumb(sig, frame):
     """Dumb signal handler."""
     pass
 
-_RE_PSLINE = re.compile('^\s*(\w+)\s+(\w+)')
+_RE_PSLINE = re.compile(r'^\s*(\w+)\s+(\w+)')
 def guess_apache_process_user_from_ps():
     """Guess Apache process user by parsing the list of running processes."""
     apache_users = []
@@ -1284,10 +1287,10 @@ def guess_apache_process_user_from_ps():
             if g:
                 username = g.group(1)
                 process = os.path.basename(g.group(2))
-                if process in ('apache', 'apache2', 'httpd') :
+                if process in ('apache', 'apache2', 'httpd'):
                     if username not in apache_users and username != 'root':
                         apache_users.append(username)
-    except Exception, e:
+    except OSError, e:
         print >> sys.stderr, "WARNING: %s" % e
     return tuple(apache_users)
 
