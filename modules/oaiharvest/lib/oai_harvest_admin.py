@@ -61,7 +61,7 @@ from invenio import oai_harvest_daemon
 from invenio.xmlmarc2textmarc import create_marc_record
 from invenio.bibrecord import create_record
 from invenio.urlutils import create_html_link
-from invenio.bibtask import task_low_level_submission
+from invenio.bibtask import task_low_level_submission, task_log_path
 from invenio.webuser import get_user_info, get_email
 from invenio.bibtask_config import CFG_BIBSCHED_LOGDIR
 
@@ -624,10 +624,9 @@ def does_logfile_exist(task_id):
     """
        returns logfile name if exists. None otherwise
     """
-    name = os.path.join(CFG_BIBSCHED_LOGDIR,
-                        "bibsched_task_" + str(task_id) + ".log")
-    if os.path.exists(name):
-        return name
+    path = task_log_path(task_id, 'log')
+    if os.path.exists(path):
+        return path
     else:
         return None
 
@@ -635,10 +634,9 @@ def does_errfile_exist(task_id):
     """
        returns logfile name if exists. None otherwise
     """
-    name = os.path.join(CFG_BIBSCHED_LOGDIR,
-                        "bibsched_task_" + str(task_id) + ".err")
-    if os.path.exists(name):
-        return name
+    path = task_log_path(task_id, 'err')
+    if os.path.exists(path):
+        return path
     else:
         return None
 

@@ -152,3 +152,5 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
 
 CFG_BIBTASK_TASKLETS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibsched_tasklets')
 CFG_BIBSCHED_LOGDIR = os.path.join(CFG_LOGDIR, CFG_BIBSCHED_LOGDIR)
+
+CFG_BIBTASK_LOG_FORMAT = ('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')

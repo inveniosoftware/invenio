@@ -72,12 +72,12 @@ from invenio.errorlib import register_exception
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
                                           CFG_EXTERNAL_AUTHENTICATION
 from invenio.webuser import get_user_preferences, get_email
-from invenio.bibtask_config import \
-    CFG_BIBTASK_VALID_TASKS, \
-    CFG_BIBTASK_DEFAULT_TASK_SETTINGS, \
-    CFG_BIBTASK_FIXEDTIMETASKS, \
-    CFG_BIBTASK_DEFAULT_GLOBAL_TASK_SETTINGS, \
-    CFG_BIBSCHED_LOGDIR
+from invenio.bibtask_config import (CFG_BIBTASK_VALID_TASKS,
+                                    CFG_BIBTASK_DEFAULT_TASK_SETTINGS,
+                                    CFG_BIBTASK_FIXEDTIMETASKS,
+                                    CFG_BIBTASK_DEFAULT_GLOBAL_TASK_SETTINGS,
+                                    CFG_BIBSCHED_LOGDIR,
+                                    CFG_BIBTASK_LOG_FORMAT)
 from invenio.dateutils import parse_runtime_limit
 from invenio.shellutils import escape_shell_arg
 from invenio.mailutils import send_email
@@ -340,32 +340,107 @@ def bibtask_allocate_sequenceid(curdir=None):
         return random.randrange(1, 4294967296)
 
 
-def setup_loggers(task_id=None):
-    """Sets up the logging system."""
-    logger = logging.getLogger()
-    for handler in logger.handlers:
-        ## Let's clean the handlers in case some piece of code has already
-        ## fired any write_message, i.e. any call to debug, info, etc.
-        ## which triggered a call to logging.basicConfig()
-        logger.removeHandler(handler)
-    formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
-    if task_id is not None:
-        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id']), 'a', 5*1024*1024, 10)
-        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a', 5*1024*1024, 10)
-        log_logger.setFormatter(formatter)
-        log_logger.setLevel(logging.DEBUG)
-        err_logger.setFormatter(formatter)
-        err_logger.setLevel(logging.WARNING)
-        logger.addHandler(err_logger)
-        logger.addHandler(log_logger)
+def task_log_path(task_id, log_type):
+    """Returns the path to the log files of given task
+
+    Args:
+     - task_id
+     - log_type: either 'log' or 'err' to indiciate which type of log we want
+    """
+    sub_dir = str(task_id / 10000)
+    dest_dir = os.path.join(CFG_BIBSCHED_LOGDIR, sub_dir)
+
+    return os.path.join(dest_dir, 'bibsched_task_%d.%s' % (task_id, log_type))
+
+
+def get_and_create_task_log_path(task_id, log_type):
+    """Returns and creates the path to the log files of given task
+
+    @see task_log_path
+    """
+    log_dest = task_log_path(task_id, log_type)
+
+    # log_dest and err_dest are in the same folder
+    dest_dir = os.path.dirname(log_dest)
+    try:
+        os.makedirs(dest_dir)
+    except OSError, e:
+        # If directory already exists, ignore error
+        if e.errno != 17:
+            raise
+
+    return log_dest
+
+
+def create_logfiles_handlers(task_id, formatter):
+    """Create log handlers to write into tasks log files
+
+    Args:
+     - task_id
+     - Formatter is an instance of logging.Formatter
+    Returns:
+     - log handler for standard log
+     - log handler for error log
+    """
+    std_dest = get_and_create_task_log_path(task_id, 'log')
+    err_dest = get_and_create_task_log_path(task_id, 'err')
+
+    std_logger = logging.handlers.RotatingFileHandler(std_dest, 'a', 5*1024*1024, 10)
+    err_logger = logging.handlers.RotatingFileHandler(err_dest, 'a', 5*1024*1024, 10)
+
+    std_logger.setFormatter(formatter)
+    err_logger.setFormatter(formatter)
+
+    std_logger.setLevel(logging.DEBUG)
+    err_logger.setLevel(logging.WARNING)
+
+    return std_logger, err_logger
+
+
+def create_streams_handlers(formatter):
+    """Create log handlers to print to stdout/stderr
+
+    Args:
+     - Formatter is an instance of logging.Formatter
+    Returns:
+     - log handler for standard log
+     - log handler for error log
+    """
     stdout_logger = logging.StreamHandler(sys.stdout)
     stdout_logger.setFormatter(formatter)
     stdout_logger.setLevel(logging.DEBUG)
+
     stderr_logger = logging.StreamHandler(sys.stderr)
     stderr_logger.setFormatter(formatter)
     stderr_logger.setLevel(logging.WARNING)
-    logger.addHandler(stderr_logger)
+
+    return stdout_logger, stderr_logger
+
+
+def setup_loggers(task_id=None):
+    """Sets up the logging system."""
+    logger = logging.getLogger()
+
+    # Let's clean the handlers in case some piece of code has already
+    # fired any write_message, i.e. any call to debug, info, etc.
+    # which triggered a call to logging.basicConfig()
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+
+    formatter = logging.Formatter(*CFG_BIBTASK_LOG_FORMAT)
+
+    # Log files
+    if task_id is not None:
+        log_logger, err_logger = create_logfiles_handlers(task_id, formatter)
+        logger.addHandler(err_logger)
+        logger.addHandler(log_logger)
+
+    # Stream handlers
+    stdout_logger, stderr_logger = create_streams_handlers(formatter)
     logger.addHandler(stdout_logger)
+    logger.addHandler(stderr_logger)
+
+    # Default log level
     logger.setLevel(logging.INFO)
     return logger
 
@@ -945,7 +1020,7 @@ def _task_email_logs():
     task_name = task_get_task_param('task_name')
     task_specific_name = task_get_task_param('task_specific_name')
     if task_specific_name:
-        task_name += ':' + task_specific_name
+        task_name += '%s:%s' % (task_name, task_specific_name)
     runtime = task_get_task_param('runtime')
 
     title = "Execution of %s: %s" % (task_name, status)
@@ -957,9 +1032,10 @@ runtime: %s
 options: %s
 status: %s
 """ % (task_name, _TASK_PARAMS['task_id'], runtime, _OPTIONS, status)
-    err_file = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id'])
-    log_file = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id'])
-    return send_email(CFG_SITE_SUPPORT_EMAIL, email_logs_to, title, body, attachments=[(log_file, 'text/plain'), (err_file, 'text/plain')])
+    log_file = task_log_path(_TASK_PARAMS['task_id'], 'log')
+    err_file = task_log_path(_TASK_PARAMS['task_id'], 'err')
+    return send_email(CFG_SITE_SUPPORT_EMAIL, email_logs_to, title, body,
+                      attachments=[(log_file, 'text/plain'), (err_file, 'text/plain')])
 
 
 def get_task_old_runtime(task_params):

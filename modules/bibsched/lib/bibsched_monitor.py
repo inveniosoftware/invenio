@@ -62,7 +62,9 @@ from invenio.bibsched import bibsched_get_status, \
                              restore_stdout_and_stderr, \
                              get_task_pid, \
                              fetch_debug_mode
-from invenio.bibtask import get_sleeptime, task_get_options
+from invenio.bibtask import (get_sleeptime,
+                             task_get_options,
+                             task_log_path)
 
 
 CFG_MOTD_PATH = os.path.join(CFG_TMPSHAREDDIR, "bibsched.motd")
@@ -359,10 +361,10 @@ D - Debug mode for remote task
     def open_task_log(self, err=False):
         task_id = self.currentrow[0]
         if err:
-            logname = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.err' % task_id)
+            log_path = task_log_path(task_id, 'err')
         else:
-            logname = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % task_id)
-        self.openlog(logname)
+            log_path = task_log_path(task_id, 'log')
+        self.openlog(log_path)
 
     def open_bibsched_log(self):
         logname = os.path.join(CFG_LOGDIR, 'bibsched.log')
