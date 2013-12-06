@@ -59,7 +59,6 @@ class WorkerBackend(object):
 WORKER = WorkerBackend()
 
 
-
 def start(workflow_name, data, **kwargs):
     """
     Starts a workflow by given name for specified data *immediately*

@@ -25,7 +25,7 @@ Oai harvest database models.
 from invenio.ext.sqlalchemy import db
 
 # Create your models here.
-
+from invenio.utils.serializers import deserialize_via_marshal
 #from websearch_model import Collection
 from invenio.modules.record_editor.models import Bibrec
 from invenio.modules.scheduler.models import SchTASK
@@ -50,6 +50,9 @@ class OaiHARVEST(db.Model):
     postprocess = db.Column(db.String(20), nullable=False,
                             server_default='h')
     setspecs = db.Column(db.Text, nullable=False)
+
+    def get_arguments(self):
+        return deserialize_via_marshal(self.arguments)
 
     @classmethod
     def get(cls, *criteria, **filters):

@@ -29,7 +29,7 @@ def add_data(a):
 def check_data(obj, eng):
     """ Static task with no parameters """
     if obj.data < 5:
-        eng.haltProcessing("Value of data is too small.")
+        eng.halt("Value of data is too small.")
 
 
 def print_data(obj, eng):

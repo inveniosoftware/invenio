@@ -436,9 +436,9 @@ class Template:
         _ = gettext_set_language(ln)
 
         if len(queries) == 0:
-            out = _("You have not executed any search yet. Please go to the %(x_url_open)ssearch interface%(x_url_close)s first.") % \
-                {'x_url_open': '<a href="' + CFG_SITE_URL + '/?ln=' + ln +'">',
-                 'x_url_close': '</a>'}
+            out = _("You have not executed any search yet. Please go to the %(x_url_open)ssearch interface%(x_url_close)s first.",
+                    x_url_open='<a href="' + CFG_SITE_URL + '/?ln=' + ln + '">',
+                    x_url_close='</a>')
             return out
 
         out = ''

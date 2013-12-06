@@ -26,27 +26,33 @@ from ..tasks.marcxml_tasks import (get_repositories_list,
                                    )
 
 from ..tasks.workflows_tasks import (start_workflow,
-                                     wait_for_workflows_to_complete,
+                                     wait_for_a_workflow_to_complete,
                                      workflows_reviews,
-                                     get_nb_workflow_created
+                                     get_nb_workflow_created,
+                                     get_list_of_workflows_to_wait,
+                                     get_workflows_progress
                                      )
 
 from ..tasks.logic_tasks import (foreach,
-                                 end_for
+                                 end_for,
+                                 simple_for
                                  )
 
+from ..tasks.bibsched_tasks import (write_something_bibsched,
+                                    write_something_generic
+                                    )
 
-from ..tasks.bibsched_tasks import write_something_bibsched
+from invenio.legacy.bibsched.bibtask import task_update_progress
+
 
 from invenio.base.config import CFG_TMPSHAREDDIR
 
-
-class generic_harvesting_workflow(object):
-    workflow = [init_harvesting,
-                write_something_bibsched("starting"),
+class generic_harvesting_workflow_with_bibsched(object):
+    workflow = [write_something_generic("Initialisation",task_update_progress),
+                init_harvesting,
+                write_something_generic("Starting", task_update_progress),
                 foreach(get_repositories_list(['arxiv']), "repository"),
                 [
-                    write_something_bibsched("harvesting"),
                     harvest_records,
                     foreach(get_files_list(CFG_TMPSHAREDDIR, get_eng_uuid_harvested)),
                     [
@@ -61,8 +67,16 @@ class generic_harvesting_workflow(object):
                 ],
                 end_for,
                 write_something_bibsched("waiting workflows"),
-                wait_for_workflows_to_complete,
+                write_something_generic(["Processing : ", get_nb_workflow_created, " records"], task_update_progress),
+                simple_for(0, get_nb_workflow_created, 1),
+                [
+                    wait_for_a_workflow_to_complete,
+                    write_something_bibsched([get_workflows_progress, "%% Complete"]),
+                    write_something_generic([get_workflows_progress, "%% Complete"], task_update_progress),
+                ],
+                end_for,
                 write_something_bibsched("the end"),
+                write_something_generic("Finishing", task_update_progress),
                 workflows_reviews
     ]
 

@@ -18,9 +18,11 @@
 
 import re
 import redis
+import traceback
 
 from invenio.ext.logging import register_exception
 
+from .errors import WorkflowDefinitionError
 
 
 REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
@@ -44,45 +46,23 @@ class BibWorkflowObjectIdContainer(object):
         from invenio.modules.workflows.models import BibWorkflowObject
 
         if self.id is not None:
-            my_object = BibWorkflowObject.query.filter(BibWorkflowObject.id == self.id).one()
-            import ast
-            temp = my_object.get_extra_data()
-            temp["repository"].arguments = ast.literal_eval(my_object.get_extra_data()["repository"].arguments)
-            my_object.set_extra_data(temp)
-            return my_object
+            return BibWorkflowObject.query.filter(BibWorkflowObject.id == self.id).one()
         else:
             return None
 
     def __str__(self):
-        return "BibWorkflowObject" + str(self.id)
-
-
-class InvenioWorkflowError(Exception):
-
-    def __init__(self, error, id_workflow, id_object=0, message=""):
-        self.id_workflow = id_workflow
-        self.id_object = id_object
-        self.error = error
-        self.message = message
-        Exception.__init__(self, error, id_workflow, id_object, message)
-        super(InvenioWorkflowError, self).__init__(error,id_workflow, id_object, message)
-
-    def __str__(self):
-        return str(self.id_workflow) + "  " + str(self.id_object) + "   " + str(self.error) + "   " + str(self.message)
-
-
-class InvenioWorkflowDefinitionError(Exception):
-    pass
+        return "BibWorkflowObject(%s)" % (str(self.id),)
 
 
 def get_workflow_definition(name):
-
+    """ Tries to load the given workflow from the system. """
     from .loader import workflows
-
     try:
         return workflows[name]
-    except:
-        raise InvenioWorkflowDefinitionError("Cannot find workflow %s" % (name,))
+    except Exception as e:
+        raise WorkflowDefinitionError("Error with workflow '%s': %s\n%s" %
+                                      (name, str(e), traceback.format_exc()),
+                                      workflow_name=name)
 
 
 def determineDataType(data):

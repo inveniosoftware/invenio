@@ -107,9 +107,9 @@ class Template:
     <br /><br />
     %(create_basket_label)s""" % \
     {'no_baskets_label': _('You have no personal or group baskets or are subscribed to any public baskets.'),
-     'create_basket_label': _('You may want to start by %(x_url_open)screating a new basket%(x_url_close)s.') % \
-                             {'x_url_open': '<a href="%s/yourbaskets/create_basket?ln=%s">' % (CFG_SITE_URL, ln),
-                              'x_url_close': '</a>'}}
+     'create_basket_label': _('You may want to start by %(x_url_open)screating a new basket%(x_url_close)s.',
+                              x_url_open='<a href="%s/yourbaskets/create_basket?ln=%s">' % (CFG_SITE_URL, ln),
+                              x_url_close='</a>')}
 
         ## First, create the tabs area.
         if personal_info:
@@ -599,10 +599,9 @@ class Template:
                    'select_options': select_options,
                    'ln': ln,
                    'search_label': _('Search'),
-                   'in_label': _('%(x_search_for_term)s in %(x_collection_list)s') % \
-                                        {'x_search_for_term': '',
-                                        'x_collection_list': ''}
-                    }
+                   'in_label': _('%(x_search_for_term)s in %(x_collection_list)s',
+                                 x_search_for_term='', x_collection_list='')
+                  }
         return out
 
     def tmpl_search_results(self,

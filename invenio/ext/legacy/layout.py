@@ -139,7 +139,7 @@ except:
     WebInterfaceYourMessagesPages = WebInterfaceDumbPages
 
 try:
-    from invenio.errorlib_webinterface import WebInterfaceErrorPages
+    from invenio.legacy.errorlib.webinterface import WebInterfaceErrorPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceErrorPages = WebInterfaceDumbPages
@@ -180,8 +180,8 @@ except:
     WebInterfaceDocumentationPages = WebInterfaceDumbPages
 
 try:
-    from invenio.bibexport_method_fieldexporter_webinterface import \
-         WebInterfaceFieldExporterPages
+    from invenio.legacy.bibexport.webinterface import \
+        WebInterfaceFieldExporterPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceFieldExporterPages = WebInterfaceDumbPages

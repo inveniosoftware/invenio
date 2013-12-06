@@ -90,6 +90,10 @@ def request_record(f):
 
         g.bibrec = Bibrec.query.get(recid)
         record = get_record(recid)
+
+        if record is None:
+            return render_template('404.html')
+
         title = record.get('title.title', '')
 
         # b = [(_('Home'), '')] + collection.breadcrumbs()[1:]

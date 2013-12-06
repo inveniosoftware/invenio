@@ -28,8 +28,8 @@ from flask.ext.login import login_required
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
-from invenio.ext.menu import register_menu
+from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+from flask_menu import register_menu
 
 from .factory import CloudServiceFactory
 from .errors import CloudRedirectUrl
@@ -51,8 +51,10 @@ def connect_cloud(error):
     service = service.split('.')[-1]
     if service.endswith('_factory'):
         service = service[:-len('_factory')]
-    prompt = _('Click <a href="%s">here</a> to connect your account with %s.')
-    flash(prompt % (url, service_pretty_name(service)), 'info')
+    prompt = _('Click <a href="%(url)s">here</a> to connect your account with %(service)s.',
+               url=url,
+               service=service_pretty_name(service))
+    flash(prompt, 'info')
     return redirect(url_for('.index'))
 
 

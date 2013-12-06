@@ -3,7 +3,9 @@ from invenio.modules.workflows.models import (BibWorkflowObject,
                                               BibWorkflowEngineLog)
 from invenio.modules.workflows.api import (start_delayed)
 
-from invenio.modules.workflows.utils import InvenioWorkflowError
+from invenio.modules.workflows.errors import WorkflowError
+
+from time import sleep
 
 
 def get_nb_workflow_created(obj, eng):
@@ -42,7 +44,8 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
         eng.log.info("Workflow object ready")
 
         myobject.save()
-        workflow_id = start_delayed(workflow_to_run, data=[myobject], **kwargs)
+        workflow_id = start_delayed(workflow_to_run, data=[myobject],
+                                    stop_on_error=True, **kwargs)
 
         eng.log.info("Workflow launched")
         try:
@@ -57,7 +60,8 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
 
         if "nb_workflow_failed" not in eng.extra_data:
             eng.extra_data["nb_workflow_failed"] = 0
-
+        if "nb_workflow_finish" not in eng.extra_data:
+            eng.extra_data["nb_workflow_finish"] = 0
     return _start_workflow
 
 
@@ -72,40 +76,109 @@ def wait_for_workflows_to_complete(obj, eng):
         for workflow_id in eng.extra_data['workflow_ids']:
             try:
                 workflow_id.get()
-
-            except InvenioWorkflowError as e:
-
-                eng.log.error("___________________\n_______ALERT_______\n___________________\n_______WORKFLOW " +
-                              e.id_workflow + " FAILED_______\n_______ERROR MESSAGE IS :_______\n" + repr(e))
-
-                workflowlog = BibWorkflowEngineLog.query.filter(BibWorkflowEngineLog.id_object == e.id_workflow).all()
+                eng.extra_data["nb_workflow_finish"] += 1
+            except WorkflowError as e:
+                eng.log.error("Error: Workflow failed %s" % (e,))
+                workflowlog = BibWorkflowEngineLog.query.filter(
+                    BibWorkflowEngineLog.id_object == e.id_workflow
+                ).all()
 
                 for log in workflowlog:
                     eng.log.error(log.message)
 
                 eng.extra_data["nb_workflow_failed"] += 1
+                eng.extra_data["nb_workflow_finish"] += 1
             except Exception as e:
-                eng.log.error("_______ALERT_______")
-                eng.log.error(str(e))
+                eng.log.error("Error: Workflow failed %s" % (e,))
                 eng.extra_data["nb_workflow_failed"] += 1
+                eng.extra_data["nb_workflow_finish"] += 1
     else:
         eng.extra_data["nb_workflow"] = 0
         eng.extra_data["nb_workflow_failed"] = 0
+        eng.extra_data["nb_workflow_finish"] = 0
 
 
-def wait_for_workflow_to_complete(obj, eng):
+def wait_for_a_workflow_to_complete_obj(obj, eng):
     """
      This function wait for the asynchronous workflow specified
      in obj.data ( asyncresult )
      It acts like a barrier
      """
+    if not obj.data:
+        eng.extra_data["nb_workflow"] = 0
+        eng.extra_data["nb_workflow_failed"] = 0
+        eng.extra_data["nb_workflow_finish"] = 0
+        return None
     eng.log.info("last task name: wait_for_workflow_to_complete")
-    for workflow_id in eng.extra_data['workflow_ids']:
+    try:
+        obj.data.get()
+        eng.extra_data["nb_workflow_finish"] += 1
+    except WorkflowError as e:
+        eng.log.error("Error: Workflow failed %s" % (e,))
+        workflowlog = BibWorkflowEngineLog.query.filter(
+            BibWorkflowEngineLog.id_object == e.id_workflow
+        ).all()
+
+        for log in workflowlog:
+            eng.log.error(log.message)
+
+        eng.extra_data["nb_workflow_failed"] += 1
+        eng.extra_data["nb_workflow_finish"] += 1
+    except Exception as e:
+        eng.log.error("Error: Workflow failed %s" % (e,))
+        eng.extra_data["nb_workflow_failed"] += 1
+        eng.extra_data["nb_workflow_finish"] += 1
+
+
+def wait_for_a_workflow_to_complete(obj, eng):
+    """
+     This function wait for the asynchronous workflow specified
+     in obj.data ( asyncresult )
+     It acts like a barrier
+     """
+    if 'workflow_ids' in eng.extra_data:
+        eng.log.info("last task name: wait_for_workflow_to_complete")
+        to_wait = None
+        while not to_wait and len(eng.extra_data["workflow_ids"]) > 0:
+            for i in range(0, len(eng.extra_data["workflow_ids"])):
+                if eng.extra_data["workflow_ids"][i].status == "SUCCESS":
+                    to_wait = eng.extra_data["workflow_ids"][i]
+                    break
+                if eng.extra_data["workflow_ids"][i].status == "FAILURE":
+                    to_wait = eng.extra_data["workflow_ids"][i]
+                    break
+            sleep(1)
+        if not to_wait:
+            return None
         try:
-            obj.data.get()
-        except Exception as e:
-            eng.log.error(str(e))
+            to_wait.wait()
+            eng.extra_data["nb_workflow_finish"] += 1
+
+        except WorkflowError as e:
+            eng.log.error("Error: Workflow failed %s" % (e,))
+            workflowlog = BibWorkflowEngineLog.query.filter(
+                BibWorkflowEngineLog.id_object == e.id_workflow
+            ).all()
+
+            for log in workflowlog:
+                eng.log.error(log.message)
+
             eng.extra_data["nb_workflow_failed"] += 1
+            eng.extra_data["nb_workflow_finish"] += 1
+        except Exception as e:
+            eng.log.error("Error: Workflow failed %s" % (e,))
+            eng.extra_data["nb_workflow_failed"] += 1
+            eng.extra_data["nb_workflow_finish"] += 1
+
+        del eng.extra_data["workflow_ids"][i]
+
+    else:
+        eng.extra_data["nb_workflow"] = 0
+        eng.extra_data["nb_workflow_failed"] = 0
+        eng.extra_data["nb_workflow_finish"] = 0
+
+
+
 
 
 def get_list_of_workflows_to_wait(obj, eng):
@@ -121,6 +194,14 @@ def get_status_async_result_obj_data(obj, eng):
     eng.log.info("last task name: get_status_async_result_obj_data")
     return obj.data.state
 
+
+def get_workflows_progress(obj,eng):
+    #twist explicit conversion is 4 time slower
+
+    try:
+        return (eng.extra_data["nb_workflow_finish"]*100.0)/(eng.extra_data["nb_workflow"])
+    except KeyError:
+        return None
 
 def workflows_reviews(obj, eng):
     """

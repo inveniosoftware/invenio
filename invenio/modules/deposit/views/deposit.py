@@ -266,7 +266,7 @@ def delete(deposition_type=None, uuid=None):
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
     deposition.delete()
 
-    flash(_('%(name)s deleted.') % {'name': deposition.type.name}, 'success')
+    flash(_('%(name)s deleted.', name=deposition.type.name), 'success')
     return redirect(url_for(".index"))
 
 
