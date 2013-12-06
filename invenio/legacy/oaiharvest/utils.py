@@ -23,7 +23,6 @@ OAI Harvest utility functions.
 
 __revision__ = "$Id$"
 
-
 import os
 import re
 import time
@@ -41,13 +40,13 @@ from invenio.legacy.bibrecord import (record_get_field_instances,
                                       )
 from invenio.utils.shell import run_shell_command
 from invenio.utils.text import translate_latex2unicode
-from invenio.legacy.oaiharvest.dblayer import update_lastrun
+from invenio.legacy.oaiharvest.dblayer import create_oaiharvest_log_str
 from invenio.legacy.bibcatalog.api import bibcatalog_system
-from invenio.legacy.bibsched.bibtask import write_message
+from invenio.legacy.bibsched.bibtask import (write_message,
+                                             task_low_level_submission)
 
 ## precompile some often-used regexp for speed reasons:
 REGEXP_OAI_ID = re.compile("<identifier.*?>(.*?)<\/identifier>", re.DOTALL)
-REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
 REGEXP_REFS = re.compile("<record.*?>.*?<controlfield .*?>.*?</controlfield>(.*?)</record>", re.DOTALL)
 REGEXP_AUTHLIST = re.compile("<collaborationauthorlist.*?</collaborationauthorlist>", re.DOTALL)
 CFG_OAI_AUTHORLIST_POSTMODE_STYLESHEET = "%s/bibconvert/config/%s" % (CFG_ETCDIR, "authorlist2marcxml.xsl")
@@ -62,8 +61,6 @@ def get_nb_records_in_file(filename):
         nb = open(filename, 'r').read().count("</record>")
     except IOError:
         nb = 0  # file not exists and such
-    except:
-        nb = -1
     return nb
 
 
@@ -74,6 +71,17 @@ def get_nb_records_in_string(string):
     """
     nb = string.count("</record>")
     return nb
+
+
+def create_oaiharvest_log(task_id, oai_src_id, marcxmlfile):
+    """
+    Function which creates the harvesting logs
+    @param task_id bibupload task id
+    """
+    file_fd = open(marcxmlfile, "r")
+    xml_content = file_fd.read(-1)
+    file_fd.close()
+    create_oaiharvest_log_str(task_id, oai_src_id, xml_content)
 
 
 def collect_identifiers(harvested_file_list):
@@ -92,76 +100,6 @@ def collect_identifiers(harvested_file_list):
         data = fd_active.read()
         fd_active.close()
         result.append(REGEXP_OAI_ID.findall(data))
-    return result
-
-
-def remove_duplicates(harvested_file_list):
-    """
-    Go through a list of harvested files and remove any duplicate records.
-    Usually happens when records are cross-listed across OAI sets.
-
-    Saves a backup of original harvested file in: filename~
-    """
-    harvested_identifiers = []
-    for harvested_file in harvested_file_list:
-        # Firstly, rename original file to temporary name
-        try:
-            os.rename(harvested_file, "%s~" % (harvested_file,))
-        except IOError:
-            continue
-        # Secondly, open files for writing and reading
-        original_harvested_file = None
-        try:
-            try:
-                original_harvested_file = open("%s~" % (harvested_file,))
-                data = original_harvested_file.read()
-            except IOError:
-                continue
-        finally:
-            if original_harvested_file:
-                original_harvested_file.close()
-
-        if '<ListRecords>' not in data:
-            # We do not need to de-duplicate in non-ListRecords requests
-            continue
-
-        updated_file_content = []
-        # Get and write OAI-PMH XML header data to updated file
-        header_index_end = data.find("<ListRecords>") + len("<ListRecords>")
-        updated_file_content.append("%s" % (data[:header_index_end],))
-
-        # By checking the OAI ID we write all records not written previously (in any file)
-        harvested_records = REGEXP_RECORD.findall(data)
-        for record in harvested_records:
-            oai_identifier = REGEXP_OAI_ID.search(record)
-            if oai_identifier and oai_identifier.group(1) not in harvested_identifiers:
-                updated_file_content.append("<record>%s</record>" % (record,))
-                harvested_identifiers.append(oai_identifier.group(1))
-        updated_file_content.append("</ListRecords>\n</OAI-PMH>")
-        updated_harvested_file = None
-        try:
-            try:
-                updated_harvested_file = open(harvested_file, 'w')
-                updated_harvested_file.write("\n".join(updated_file_content))
-            except IOError:
-                continue
-        finally:
-            if updated_harvested_file:
-                updated_harvested_file.close()
-
-
-def add_timestamp_and_timelag(timestamp,
-                              timelag):
-    """ Adds a time lag in seconds to a given date (timestamp).
-        Returns the resulting date. """
-    # remove any trailing .00 in timestamp:
-    timestamp = re.sub(r'\.[0-9]+$', '', timestamp)
-    # first convert timestamp to Unix epoch seconds:
-    timestamp_seconds = calendar.timegm(time.strptime(timestamp,
-                                                      "%Y-%m-%d %H:%M:%S"))
-    # now add them:
-    result_seconds = timestamp_seconds + timelag
-    result = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(result_seconds))
     return result
 
 
@@ -299,22 +237,22 @@ def generate_harvest_report(repository, harvested_identifier_list,
             Records ready to upload are located here:
             %(files)s
             """ \
-        % {
-            'harvesting': harvesting_prefix,
-            'admin_mail': CFG_SITE_ADMIN_EMAIL,
-            'name': fullname,
-            'sourceurl': repository.baseurl,
-            'ctime': current_time,
-            'total': sum([len(ids) for ids in harvested_identifier_list]),
-            'files': '\n'.join(active_files_list),
-            'ids': '\n'.join([oaiid for ids in harvested_identifier_list for oaiid in ids]),
-            'siteurl': CFG_SITE_URL,
-            'oai_src_id': repository.id,
-            'harvesttasklink': "%s/admin/oaiharvest/oaiharvestadmin.py/viewtasklogs?ln=no&task_id=%s"
-                               % (CFG_SITE_URL, current_task_id),
-            'uploadtasklinks': '\n'.join(["%s/admin/oaiharvest/oaiharvestadmin.py/viewtasklogs?ln=no&task_id=%s"
-                                          % (CFG_SITE_URL, task_id) for task_id in uploaded_task_ids]) or "None",
-        }
+            % {
+                'harvesting': harvesting_prefix,
+                'admin_mail': CFG_SITE_ADMIN_EMAIL,
+                'name': fullname,
+                'sourceurl': repository.baseurl,
+                'ctime': current_time,
+                'total': sum([len(ids) for ids in harvested_identifier_list]),
+                'files': '\n'.join(active_files_list),
+                'ids': '\n'.join([oaiid for ids in harvested_identifier_list for oaiid in ids]),
+                'siteurl': CFG_SITE_URL,
+                'oai_src_id': repository.id,
+                'harvesttasklink': "%s/admin/oaiharvest/oaiharvestadmin.py/viewtasklogs?ln=no&task_id=%s"
+                                   % (CFG_SITE_URL, current_task_id),
+                'uploadtasklinks': '\n'.join(["%s/admin/oaiharvest/oaiharvestadmin.py/viewtasklogs?ln=no&task_id=%s"
+                                              % (CFG_SITE_URL, task_id) for task_id in uploaded_task_ids]) or "None",
+            }
     else:
         text = \
             """
@@ -344,8 +282,8 @@ def generate_harvest_report(repository, harvested_identifier_list,
                 'siteurl': CFG_SITE_URL,
                 'oai_src_id': repository['id'],
                 'uploadtasklinks': '\n'.join(["%s/admin/oaiharvest/oaiharvestadmin.py/viewtasklogs?ln=no&task_id=%s" \
-                                               % (CFG_SITE_URL, task_id) for task_id in uploaded_task_ids]) or "None",\
-            }
+                                              % (CFG_SITE_URL, task_id) for task_id in uploaded_task_ids]) or "None", \
+                }
         if not manual_harvest:
             text += "Categories harvested from: \n%s\n" % (repository.setspecs or "None",)
     return subject, text
@@ -353,11 +291,13 @@ def generate_harvest_report(repository, harvested_identifier_list,
 
 def record_extraction_from_file(path):
     """
-    get an harvested file, and transform each record as if it was another independant
-    harvested document.
+    Get an harvested file, and transform each record as if
+    it was another independent harvested document.
+
     @param path: is the path of the file harvested
-    @return : return a table of records encapsulated with markup of the document
-    designed by path
+    @return: return a table of records encapsulated with markup of the document
+             designated by path given
+    @attention: this function is much FASTER (3-5 TIMES) than using regex.
     """
 
     #Will contains all the records
@@ -365,111 +305,50 @@ def record_extraction_from_file(path):
 
     #will contains the header of the file ie: all lines before the first record
     header = ""
-
-    file = open(path,'r+')
-
-    #Exctraction of the header
-    temporary_string = file.readline()
-    while not temporary_string.startswith("<record>"):
-        header += temporary_string
-        temporary_string = file.readline()
-
-    #Exctraction of the records
-
-    temporary_record = temporary_string
-    temporary_string = file.readline()
-
-    while not temporary_string.startswith("</ListRecords>"):
-        if temporary_string.startswith("<record>"):
-            list_of_records.append(temporary_record)
-            temporary_record = temporary_string
-        else:
-            temporary_record = temporary_record + temporary_string
-        temporary_string = file.readline()
-
-    list_of_records.append(temporary_record)
-
-    #will contains the footer of the file ie: all lines after the last record
-
-    #Exctraction of the footer
-
-    footer = temporary_string
-
-    temporary_string = file.readline()
-
-    while not temporary_string == "":
-        footer = footer + temporary_string
-        temporary_string = file.readline()
-
-    file.close()
+    step = 0
+    for line in open(path, 'r+'):
+    #Extraction of the header
+        if step == 0:
+            if not line.startswith("<record>"):
+                header += line
+            else:
+                step = 1
+                temporary_record = line
+        elif step == 1:
+            if line.startswith("</ListRecords>") or line.startswith("</GetRecord>"):
+                step = 2
+                footer = line
+            elif line.startswith("<record>"):
+                temporary_record = line
+            elif line.startswith("</record>"):
+                temporary_record += line
+                list_of_records.append(temporary_record)
+            else:
+                temporary_record += line
+        elif step == 2:
+            footer += line
 
     #Reassembling of the records and the footer and header
 
     for i in range(0, len(list_of_records)):
-        list_of_records[i] = header+list_of_records[i]+footer
+        list_of_records[i] = header + list_of_records[i] + footer
 
     return list_of_records
 
 
-def record_extraction(xml_string):
-    """this function return only record
-    removing header and footer. Work only
-    in the case there is only one record
-    into the collection.
-    """
-    xml_string = xml_string[xml_string.index("<record>")+8:]
-
-    return xml_string[:xml_string.rindex("</record>")]
-
-
-def harvest_step(repository, harvestpath, identifiers, dates):
+def harvest_step(obj, harvestpath):
     """
     Performs the entire harvesting step.
     Returns a tuple of (file_list, error_code)
     """
-    harvested_files_list = None
-
-    if identifiers:
+    if obj.extra_data["options"]["identifiers"]:
         # Harvesting is done per identifier instead of server-updates
-        harvested_files_list = harvest_by_identifiers(repository, identifiers, harvestpath)
-    elif dates:
-        # Dates are given so we harvest "from" -> "to" dates
-        harvested_files_list = harvest_by_dates(repository,
-                                                harvestpath,
-                                                str(dates[0]),
-                                                str(dates[1]))
-    elif not dates and (repository.lastrun is None or repository.lastrun == '') and repository.frequency != 0:
-        # First time we harvest from this repository
-        harvested_files_list = harvest_by_dates(repository, harvestpath)
-        update_lastrun(repository.id)
-
-    elif not dates and repository.frequency != 0:
-        # Just a regular update from last time it ran
-        ### check that update is actually needed,
-        ### i.e. lastrun+frequency>today
-        timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        lastrundate = re.sub(r'\.[0-9]+$', '',
-                             str(repository.lastrun))  # remove trailing .00
-        timeinsec = int(repository.frequency) * 60 * 60
-        updatedue = add_timestamp_and_timelag(lastrundate, timeinsec)
-        proceed = compare_timestamps_with_tolerance(updatedue, timenow)
-        if proceed != 1:
-            # update needed!
-            fromdate = str(repository.lastrun)
-            # get rid of time of the day for the moment
-            fromdate = fromdate.split()[0]
-            harvested_files_list = harvest_by_dates(repository, harvestpath,
-                                                    fromdate=fromdate)
-            update_lastrun(repository.id)
-        else:
-            return []  # No actual error here.
-
-    elif not dates and repository.frequency == 0:
-        return []  # No actual error here.
-    return harvested_files_list
+        return harvest_by_identifiers(obj, harvestpath)
+    else:
+        return harvest_by_dates(obj, harvestpath)
 
 
-def harvest_by_identifiers(repository, identifiers, harvestpath):
+def harvest_by_identifiers(obj, harvestpath):
     """
     Harvest an OAI repository by identifiers.
 
@@ -479,23 +358,56 @@ def harvest_by_identifiers(repository, identifiers, harvestpath):
     The records will be harvested into the specified filepath.
     """
     harvested_files_list = []
-    count = 0
-    for oai_identifier in identifiers:
-        count += 1
-        harvested_files_list.extend(oai_harvest_get(prefix=repository.metadataprefix,
-                                                    baseurl=repository.baseurl,
+    for oai_identifier in obj.extra_data["options"]["identifiers"]:
+        harvested_files_list.extend(oai_harvest_get(prefix=obj.data["metadataprefix"],
+                                                    baseurl=obj.data["baseurl"],
                                                     harvestpath=harvestpath,
                                                     verb="GetRecord",
                                                     identifier=oai_identifier))
     return harvested_files_list
 
 
-def harvest_by_dates(repository, harvestpath, fromdate=None, todate=None):
+def call_bibupload(marcxmlfile, mode=None, oai_src_id=-1, sequence_id=None):
+    """
+    Creates a bibupload task for the task scheduler in given mode
+    on given file. Returns the generated task id and logs the event
+    in oaiHARVESTLOGS, also adding any given oai source identifier.
+
+    @param marcxmlfile: base-marcxmlfilename to upload
+    @param mode: mode to upload in
+    @param oai_src_id: id of current source config
+    @param sequence_id: sequence-number, if relevant
+
+    @return: task_id if successful, otherwise None.
+    """
+    if mode is None:
+        mode = ["-r", "-i"]
+    if os.path.exists(marcxmlfile):
+        try:
+            args = mode
+            # Add job with priority 6 (above normal bibedit tasks) and file to upload to arguments
+            #FIXME: allow per-harvest arguments
+            args.extend(["-P", "6", marcxmlfile])
+            if sequence_id:
+                args.extend(['-I', str(sequence_id)])
+            task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
+            create_oaiharvest_log(task_id, oai_src_id, marcxmlfile)
+        except Exception, msg:
+            write_message("An exception during submitting oaiharvest task occured : %s " % (str(msg)))
+            return None
+        return task_id
+    else:
+        write_message("marcxmlfile %s does not exist" % (marcxmlfile,))
+        return None
+
+
+def harvest_by_dates(obj, harvestpath):
     """
     Harvest an OAI repository by dates.
 
-    Given a repository "object" (dict from DB) and from/to dates, this function will
-    perform an OAI harvest request for records updated between the given dates.
+    Given a repository "object" (dict from DB) and from/to dates,
+    this function will perform an OAI harvest request for records
+    updated between the given dates.
 
     If no dates are given, the repository is harvested from the beginning.
 
@@ -504,25 +416,24 @@ def harvest_by_dates(repository, harvestpath, fromdate=None, todate=None):
 
     The records will be harvested into the specified filepath.
     """
-    if fromdate and todate:
-        dates = "from %s to %s" % (fromdate, todate)
-    elif fromdate:
-        dates = "from %s" % (fromdate,)
+    if obj.extra_data["options"]["dates"]:
+        fromdate = str(obj.extra_data["options"]["dates"][0])
+        todate = str(obj.extra_data["options"]["dates"][1])
+    elif obj.data["lastrun"] is None or obj.data["lastrun"] == '':
+        fromdate = None
+        todate = None
+        obj.extra_data["_should_last_run_be_update"] = True
     else:
-        dates = ""
+        fromdate = str(obj.data["lastrun"]).split()[0]
+        todate = None
+        obj.extra_data["_should_last_run_be_update"] = True
 
-    try:
-        file_list = oai_harvest_get(prefix=repository.metadataprefix,
-                                    baseurl=repository.baseurl,
-                                    harvestpath=harvestpath,
-                                    fro=fromdate,
-                                    until=todate,
-                                    setspecs=repository.setspecs)
-    except StandardError as e:
-        # exception already dealt with, just noting the error.
-        raise e
-
-    return file_list
+    return oai_harvest_get(prefix=obj.data["metadataprefix"],
+                           baseurl=obj.data["baseurl"],
+                           harvestpath=harvestpath,
+                           fro=fromdate,
+                           until=todate,
+                           setspecs=obj.data["setspecs"])
 
 
 def oai_harvest_get(prefix, baseurl, harvestpath,
@@ -552,9 +463,7 @@ def oai_harvest_get(prefix, baseurl, harvestpath,
             sets = [oai_set.strip() for oai_set in setspecs.split(' ')]
 
         harvested_files = getter.harvest(network_location, path, http_param_dict, method, harvestpath,
-                                                     sets, secure, user, password, cert_file, key_file)
-        if verb == "ListRecords":
-            remove_duplicates(harvested_files)
+                                         sets, secure, user, password, cert_file, key_file)
         return harvested_files
     except (StandardError, getter.InvenioOAIRequestError) as exce:
         register_exception()

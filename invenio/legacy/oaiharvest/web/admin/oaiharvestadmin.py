@@ -61,7 +61,7 @@ def index(req, ln=CFG_SITE_LANG):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=CFG_SITE_LANG, confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
+def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_config='', oai_src_post='', ln=CFG_SITE_LANG, confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
 
     try:
@@ -84,7 +84,6 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
                                                         oai_src_name=oai_src_name,
                                                         oai_src_baseurl=oai_src_baseurl,
                                                         oai_src_prefix=oai_src_prefix,
-                                                        oai_src_frequency=oai_src_frequency,
                                                         oai_src_config=oai_src_config,
                                                         oai_src_post=oai_src_post,
                                                         oai_src_sets=oai_src_sets,
@@ -99,7 +98,7 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addsource(req, ln=CFG_SITE_LANG, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
+def addsource(req, ln=CFG_SITE_LANG, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
 
     try:
@@ -121,7 +120,6 @@ def addsource(req, ln=CFG_SITE_LANG, oai_src_name='', oai_src_baseurl ='', oai_s
                     body=oha.perform_request_addsource(oai_src_name=oai_src_name,
                                                        oai_src_baseurl=oai_src_baseurl,
                                                        oai_src_prefix=oai_src_prefix,
-                                                       oai_src_frequency=oai_src_frequency,
                                                        oai_src_lastrun=oai_src_lastrun,
                                                        oai_src_config=oai_src_config,
                                                        oai_src_post=oai_src_post,
