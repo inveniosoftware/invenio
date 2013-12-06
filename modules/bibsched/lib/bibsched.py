@@ -92,7 +92,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
             date = time.strptime(var, format_string)
             date = time.strftime(format_string, date)
         return date
-    except:
+    except ValueError:
         return None
 
 
@@ -1129,7 +1129,7 @@ def stop(verbose=True, debug=False):
         print "Stopping BibSched if running"
     halt(verbose, soft=True, debug=debug)
     run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
-    res = run_sql("""SELECT id, proc, status FROM schTASK
+    res = run_sql("""SELECT id, status FROM schTASK
                      WHERE status NOT LIKE 'DONE'
                      AND status NOT LIKE '%_DELETED'
                      AND (status='RUNNING'
@@ -1139,7 +1139,7 @@ def stop(verbose=True, debug=False):
                          OR status='CONTINUING')""")
     if verbose:
         print "Stopping all running BibTasks"
-    for task_id, proc, status in res:
+    for task_id, status in res:
         if status == 'SLEEPING':
             bibsched_send_signal(task_id, signal.SIGCONT)
             time.sleep(CFG_BIBSCHED_REFRESHTIME)
