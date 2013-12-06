@@ -82,6 +82,7 @@ from invenio.config import \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_BIBSORT_BUCKETS, \
+     CFG_BIBSORT_ENABLED, \
      CFG_XAPIAN_ENABLED, \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_BASE_URL
@@ -4021,18 +4022,18 @@ class BibSortDataCacher(DataCacher):
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
 def get_sorting_methods():
-    if not CFG_BIBSORT_BUCKETS: # we do not want to use buckets
-        return {}
-    res = run_sql("""SELECT m.name, m.definition FROM bsrMETHOD m, bsrMETHODDATA md WHERE m.id = md.id_bsrMETHOD""")
+    res = run_sql("""SELECT m.name, m.definition
+                     FROM bsrMETHOD m, bsrMETHODDATA md
+                     WHERE m.id = md.id_bsrMETHOD""")
     return dict(res)
 
-sorting_methods = get_sorting_methods()
-cache_sorted_data = {}
-for sorting_method in sorting_methods:
+SORTING_METHODS = get_sorting_methods()
+CACHE_SORTED_DATA = {}
+for sorting_method in SORTING_METHODS:
     try:
-        cache_sorted_data[sorting_method].is_ok_p
+        CACHE_SORTED_DATA[sorting_method].is_ok_p
     except KeyError:
-        cache_sorted_data[sorting_method] = BibSortDataCacher(sorting_method)
+        CACHE_SORTED_DATA[sorting_method] = BibSortDataCacher(sorting_method)
 
 
 def get_tags_from_sort_fields(sort_fields):
@@ -4056,14 +4057,14 @@ def get_tags_from_sort_fields(sort_fields):
     return tags, ''
 
 
-def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pattern=None, verbose=0, sort_order='d', of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, field=''):
+def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pattern=None, verbose=0, sort_order='d', of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, field='', sorting_methods=SORTING_METHODS):
     """Initial entry point for ranking records, acts like a dispatcher.
        (i) rank_method_code is in bsrMETHOD, bibsort buckets can be used;
        (ii)rank_method_code is not in bsrMETHOD, use bibrank;
     """
     # Special case: sorting by citations is fast because we store the
     # ranking dictionary in memory, so we do not use bibsort buckets.
-    if CFG_BIBSORT_BUCKETS and sorting_methods and rank_method_code != 'citation':
+    if CFG_BIBSORT_ENABLED and sorting_methods and rank_method_code != 'citation':
         for sort_method in sorting_methods:
             definition = sorting_methods[sort_method]
             if definition.startswith('RNK') and \
@@ -4099,7 +4100,7 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
 
     return solution_recs, solution_scores, prefix, suffix, comment
 
-def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
+def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, sorting_methods=SORTING_METHODS):
     """Initial entry point for sorting records, acts like a dispatcher.
        (i) sort_field is in the bsrMETHOD, and thus, the BibSort has sorted the data for this field, so we can use the cache;
        (ii)sort_field is not in bsrMETHOD, and thus, the cache does not contain any information regarding this sorting method"""
@@ -4113,10 +4114,8 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
     if sort_pattern:
         return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, sort_pattern, verbose, of, ln, rg, jrec)
 
-    use_sorting_buckets = True
-
-    if not CFG_BIBSORT_BUCKETS or not sorting_methods: #ignore the use of buckets, use old fashion sorting
-        use_sorting_buckets = False
+    #ignore the use of buckets, use old fashion sorting
+    use_sorting_buckets = CFG_BIBSORT_ENABLED and sorting_methods
 
     if not sort_field:
         if use_sorting_buckets:
@@ -4158,7 +4157,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
     return recIDs[index_min:]
 
 
-def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=1, sort_or_rank='s'):
+def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=1, sort_or_rank='s', sorting_methods=SORTING_METHODS):
     """This function orders the recIDs list, based on a sorting method(sort_field) using the BibSortDataCacher for speed"""
     _ = gettext_set_language(ln)
 
@@ -4181,8 +4180,8 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
     dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
     solution = intbitset()
     input_recids = intbitset(recIDs)
-    cache_sorted_data[sort_method].recreate_cache_if_needed()
-    sort_cache = cache_sorted_data[sort_method].cache
+    CACHE_SORTED_DATA[sort_method].recreate_cache_if_needed()
+    sort_cache = CACHE_SORTED_DATA[sort_method].cache
     bucket_numbers = sort_cache['bucket_data'].keys()
     #check if all buckets have been constructed
     if len(bucket_numbers) != CFG_BIBSORT_BUCKETS:
@@ -6344,7 +6343,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                     # rank_records failed and returned some error message to display:
                     write_warning(results_final_relevances_prologue, req=req)
                     write_warning(results_final_relevances_epilogue, req=req)
-            elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
+            elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
                 results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
 
 
@@ -6656,7 +6655,7 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
                                                                                p2.split() + p3.split(), verbose, so, of, ln, kwargs['rg'], kwargs['jrec'], kwargs['f'])
                 if results_final_for_all_colls_rank_records_output[0]:
                     recIDs = results_final_for_all_colls_rank_records_output[0]
-            elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
+            elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
                 recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of, ln)
             return recIDs
 
@@ -6708,7 +6707,7 @@ def prs_rank_results(kwargs=None, results_final=None, req=None, colls_to_search=
                                                                        p2.split() + p3.split(), verbose, so, of, field=kwargs['f'])
         if results_final_for_all_colls_rank_records_output[0]:
             recIDs = results_final_for_all_colls_rank_records_output[0]
-    elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
+    elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
         recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of)
     return recIDs
 
