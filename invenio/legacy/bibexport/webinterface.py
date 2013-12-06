@@ -34,7 +34,7 @@ from invenio.config import CFG_SITE_URL, \
 from invenio.utils.date import convert_datestruct_to_datetext, \
                               convert_datetext_to_datestruct
 from invenio.base.i18n import gettext_set_language
-from invenio.bibexport_method_fieldexporter import get_css, \
+from invenio.legacy.bibexport.fieldexporter import get_css, \
                                         get_navigation_menu, \
                                         perform_request_edit_query, \
                                         perform_request_edit_job, \

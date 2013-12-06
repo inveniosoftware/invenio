@@ -20,7 +20,7 @@ import random
 import time
 import glob
 import re
-
+import traceback
 
 from invenio.legacy.bibupload.engine import (find_record_from_recid,
                                              find_record_from_sysno,
@@ -29,7 +29,6 @@ from invenio.legacy.bibupload.engine import (find_record_from_recid,
                                              find_record_from_doi
                                              )
 from invenio.legacy.oaiharvest.dblayer import create_oaiharvest_log_str
-
 
 from invenio.base.config import (CFG_TMPSHAREDDIR,
                                  CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT,
@@ -42,12 +41,11 @@ from invenio.legacy.oaiharvest.utils import (record_extraction_from_file,
                                              find_matching_files,
                                              )
 from invenio.legacy.bibsched.bibtask import (task_sleep_now_if_required,
-                                             task_get_option,
                                              task_low_level_submission
                                              )
 from invenio.modules.oai_harvest.models import OaiHARVEST
 from invenio.legacy.bibfield.bibfield_jsonreader import JsonReader
-from invenio.modules.workflows.utils import InvenioWorkflowError
+from invenio.modules.workflows.errors import WorkflowError
 from invenio.legacy.refextract.api import extract_references_from_file_xml
 from invenio.legacy.bibrecord import (create_records,
                                       record_xml_output
@@ -55,7 +53,6 @@ from invenio.legacy.bibrecord import (create_records,
 from invenio.utils.plotextractor.output_utils import (create_MARC,
                                                       create_contextfiles,
                                                       prepare_image_data,
-                                                      write_message,
                                                       remove_dups
                                                       )
 from invenio.utils.plotextractor.getter import (harvest_single,
@@ -73,6 +70,7 @@ import invenio.legacy.template
 from invenio.utils.plotextractor.converter import (untar,
                                                    convert_images
                                                    )
+from invenio.utils.serializers import deserialize_via_marshal
 
 oaiharvest_templates = invenio.legacy.template.load('oaiharvest')
 
@@ -86,14 +84,16 @@ def add_metadata_to_extra_data(obj, eng):
     populates extra_data with metadata
     """
     from invenio.legacy.bibrecord import create_record, record_get_field_value
+
     record = create_record(obj.data)
 
-    obj.extra_data['redis_search']['category'] =\
+    obj.extra_data['redis_search']['category'] = \
         record_get_field_value(record[0], '037', code='c')
-    obj.extra_data['redis_search']['title'] =\
+    obj.extra_data['redis_search']['title'] = \
         record_get_field_value(record[0], '245', code='a')
-    obj.extra_data['redis_search']['source'] =\
+    obj.extra_data['redis_search']['source'] = \
         record_get_field_value(record[0], '035', code='9')
+
 
 add_metadata_to_extra_data.__title__ = "Metadata Extraction"
 add_metadata_to_extra_data.__description__ = "Populates object's extra_data with metadata"
@@ -137,20 +137,13 @@ def init_harvesting(obj, eng):
     This function gets all the option linked to the task and stores them into the
     object to be used later.
     """
-    obj.log.error("TEST")
-    obj.log.error("TEST")
-    obj.log.error("TEST")
-    obj.log.error("TEST")
-    obj.log.error("TEST")
-    obj.log.error("TEST")
-    obj.log.error(str(obj.extra_data))
-    obj.log.error("FIN TEST")
-    obj.log.error("FIN TEST")
-    obj.log.error("FIN TEST")
     eng.log.info("last task name: init_harvesting")
-    obj.extra_data["options"] = task_get_option(None)
-    obj.log.error(str(task_get_option(None)))
-    obj.log.error(str(task_get_option("workflow")))
+    try:
+        obj.extra_data["options"] = eng.extra_data["options"]
+    except KeyError:
+        eng.log.error("Non Critical Error: No options", "No options for this task have been found. It is possible"
+                                                        "that the fillowing task could failed or work not as expected")
+        obj.extra_data["options"] = {}
     eng.log.info("end of init_harvesting")
 
 
@@ -159,6 +152,7 @@ def get_repositories_list(repositories):
     Here we are retrieving the oaiharvest configuration for the task.
     It will allows in the future to do all the correct operations.
     """
+
     def _get_repositories_list(obj, eng):
 
 
@@ -190,36 +184,36 @@ def harvest_records(obj, eng):
 
     harvestpath = "%s_%d_%s_" % ("%s/oaiharvest_%s" % (CFG_TMPSHAREDDIR, eng.uuid),
                                  1, time.strftime("%Y%m%d%H%M%S"))
-    # ## go ahead: check if user requested from-until harvesting
 
+    # ## go ahead: check if user requested from-until harvesting
     try:
         if "dates" not in obj.extra_data["options"]:
             obj.extra_data["options"]["dates"] = {}
         if "identifiers" not in obj.extra_data["options"]:
             obj.extra_data["options"]["identifiers"] = {}
-
     except TypeError:
-
         obj.extra_data["options"] = {"dates": {}, "identifiers": {}}
 
     task_sleep_now_if_required()
 
-    if obj.data.arguments:
-        eng.log.info(str(obj.data.arguments))
-        # obj.data.arguments = deserialize_via_marshal(obj.data.arguments)
-        eng.log.info("running with post-processes: %s" % (obj.data.arguments,))
+    arguments = obj.extra_data["repository"].get_arguments()
+    if arguments:
+        eng.log.info("running with post-processes: %r" % (arguments,))
 
     # Harvest phase
     try:
-        harvested_files_list = harvest_step(obj.data, harvestpath, obj.extra_data["options"]["identifiers"],
+        harvested_files_list = harvest_step(obj.data,
+                                            harvestpath,
+                                            obj.extra_data["options"]["identifiers"],
                                             obj.extra_data["options"]["dates"])
     except Exception:
         eng.log.error("Error while harvesting %s. Skipping." % (obj.data,))
 
-        raise InvenioWorkflowError(str("Error while harvesting %s. Skipping." % (obj.data,)), eng.uuid)
+        raise WorkflowError("Error while harvesting %r. Skipping." % (obj.data,),
+                            id_workflow=eng.uuid)
 
     if len(harvested_files_list) == 0:
-        eng.log.error("No records harvested for %s" % (obj.data,))
+        eng.log.error("No records harvested for %s" % (obj.data.name,))
         return None
         # Retrieve all OAI IDs and set active list
 
@@ -227,11 +221,11 @@ def harvest_records(obj, eng):
 
     if len(harvested_files_list) != len(harvested_identifier_list[0]):
         # Harvested files and its identifiers are 'out of sync', abort harvest
-        eng.log.info("Harvested files miss identifiers for %s" % (obj.data.arguments,))
-        raise InvenioWorkflowError(str("Harvested files miss identifiers ... failure !"), eng.uuid)
-    eng.log.info(str(len(harvested_files_list)) + " files harvested and processed")
+        msg = "Harvested files miss identifiers for %s" % (arguments,)
+        eng.log.info(msg)
+        raise WorkflowError(msg, id_workflow=eng.uuid)
+    eng.log.info("%d files harvested and processed" % (len(harvested_files_list),))
     eng.log.info("End harvest records task")
-
 
 harvest_records.__id__ = "h"
 
@@ -250,6 +244,7 @@ def get_records_from_file(path=None):
             else:
                 eng.extra_data["LoopData"].update({"get_records_from_file": record_extraction_from_file(obj.data)})
         return eng.extra_data["LoopData"]["get_records_from_file"]
+
     return _get_records_from_file
 
 
@@ -291,10 +286,13 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
 
         try:
             obj.data = convert(obj.data, stylesheet)
-        except:
-            obj.extra_data["error_msg"] = 'Could not convert record'
-            eng.log.error("Error: %s" % (obj.extra_data["error_msg"],))
-            raise InvenioWorkflowError(str("Error: %s" % (obj.extra_data["error_msg"])), eng.uuid)
+        except Exception as e:
+            msg = "Could not convert record: %s\n%s" % \
+                  (str(e), traceback.format_exc())
+            obj.extra_data["error_msg"] = msg
+            eng.log.error("Error: %s" % (msg,))
+            raise WorkflowError("Error: %s" % (msg,),
+                                id_workflow=eng.uuid)
 
     return _convert_record
 
@@ -304,29 +302,27 @@ def fulltext_download(obj, eng):
     Performs the fulltext download step.
     Only for arXiv
     """
-
     eng.log.info("full-text attachment step started")
     task_sleep_now_if_required()
 
-    eng.log.info(str(obj.extra_data["repository"]))
-
     if "pdf" not in obj.extra_data["options"]["identifiers"]:
-
         extract_path = make_single_directory(CFG_TMPSHAREDDIR, eng.uuid)
-        tarball, pdf = harvest_single(obj.data["system_control_number"]["value"], extract_path, ["pdf"])
+        tarball, pdf = harvest_single(obj.data["system_control_number"]["value"],
+                                      extract_path, ["pdf"])
         time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT)
-
-        if not obj.extra_data["repository"].arguments['t_doctype'] == '':
-            doctype = obj.extra_data["repository"].arguments['t_doctype']
+        arguments = obj.extra_data["repository"].get_arguments()
+        if not arguments['t_doctype'] == '':
+            doctype = arguments['t_doctype']
         else:
             doctype = 'arXiv'
         if pdf:
             obj.extra_data["options"]["identifiers"]["pdf"] = pdf
-            fulltext_xml = """  <datafield tag="FFT" ind1=" " ind2=" ">
-    <subfield code="a">%(url)s</subfield>
-    <subfield code="t">%(doctype)s</subfield>
-    </datafield>""" % {'url': obj.extra_data["options"]["identifiers"]["pdf"],
-                       'doctype': doctype}
+            fulltext_xml = ("  <datafield tag=\"FFT\" ind1=\" \" ind2=\" \">\n"
+                            "    <subfield code=\"a\">%(url)s</subfield>\n"
+                            "    <subfield code=\"t\">%(doctype)s</subfield>\n"
+                            "    </datafield>"
+                            ) % {'url': obj.extra_data["options"]["identifiers"]["pdf"],
+                                 'doctype': doctype}
 
             updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>\n' + fulltext_xml + \
                           '</record>\n</collection>'
@@ -374,7 +370,6 @@ def quick_match_record(obj, eng):
 
 def upload_record(mode="ir"):
     def _upload_record(obj, eng):
-
         eng.log.info("last task name: upload_record")
         from invenio.legacy.bibsched.bibtask import task_low_level_submission
 
@@ -419,9 +414,9 @@ def plot_extract(plotextractor_types):
                 time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT)
 
                 if tarball is None:
-                    raise InvenioWorkflowError(str("Error harvesting tarball from id: %s %s" %
-                                                   (obj.data["system_control_number"]["value"], extract_path)),
-                                               eng.uuid)
+                    raise WorkflowError("Error harvesting tarball from id: %s %s" %
+                                        (obj.data["system_control_number"]["value"], extract_path),
+                                        id_workflow=eng.uuid)
                 obj.extra_data["options"]["identifiers"]["tarball"] = tarball
             else:
                 tarball = obj.extra_data["options"]["identifiers"]["tarball"]
@@ -517,6 +512,7 @@ def refextract(obj, eng):
     else:
         obj.log.error("Not able to download and process the PDF ")
 
+
 def author_list(obj, eng):
     """
     Performs the special authorlist extraction step (Mostly INSPIRE/CERN related).
@@ -533,8 +529,9 @@ def author_list(obj, eng):
         tarball = str(tarball)
         time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT)
         if tarball is None:
-            raise InvenioWorkflowError(str("Error harvesting tarball from id: %s %s" % (identifiers, extract_path)),
-                                       eng.uuid)
+            raise WorkflowError("Error harvesting tarball from id: %s %s" %
+                                (identifiers, extract_path),
+                                id_workflow=eng.uuid)
         obj.extra_data["options"]["identifiers"]["tarball"] = tarball
 
     sub_dir, dummy = get_defaults(obj.extra_data["options"]["identifiers"]["tarball"], CFG_TMPDIR, "")
@@ -625,26 +622,28 @@ def upload_step(obj, eng):
     file_fd.close()
     mode = ["-r", "-i"]
 
+    arguments = obj.extra_data["repository"].get_arguments()
+
     if os.path.exists(filepath):
         try:
             args = mode
             if sequence_id:
                 args.extend(['-I', str(sequence_id)])
-            if obj.extra_data["repository"].arguments.get('u_name', ""):
-                args.extend(['-N', obj.extra_data["repository"].arguments.get('u_name', "")])
-            if obj.extra_data["repository"].arguments.get('u_priority', 5):
-                args.extend(['-P', str(obj.extra_data["repository"].arguments.get('u_priority', 5))])
+            if arguments.get('u_name', ""):
+                args.extend(['-N', arguments.get('u_name', "")])
+            if arguments.get('u_priority', 5):
+                args.extend(['-P', str(arguments.get('u_priority', 5))])
             args.append(filepath)
             task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
             create_oaiharvest_log(task_id, obj.extra_data["repository"].id, filepath)
         except Exception, msg:
-            write_message("An exception during submitting oaiharvest task occured : %s " % (str(msg)))
+            eng.log.error("An exception during submitting oaiharvest task occured : %s " % (str(msg)))
             return None
     else:
         eng.log.error("marcxmlfile %s does not exist" % (filepath,))
     if task_id is None:
         eng.log.error("an error occurred while uploading %s from %s" %
-                      (filepath,  obj.extra_data["repository"].name))
+                      (filepath, obj.extra_data["repository"].name))
     else:
         uploaded_task_ids.append(task_id)
         eng.log.info("material harvested from source %s was successfully uploaded" %
@@ -658,7 +657,6 @@ def upload_step(obj, eng):
                            '--post-process',
                            'bst_run_bibtask[taskname="webcoll", user="oaiharvest", P="6", c="HEP"]']
         task_low_level_submission("bibindex", "oaiharvest", *tuple(bibindex_params))
-    write_message("upload step ended")
     eng.log.info("end of upload")
 
 

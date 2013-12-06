@@ -23,11 +23,11 @@ BibWorkflow Unit tests - functions to test workflows
 from invenio.ext.sqlalchemy import db
 from invenio.testsuite import (make_test_suite,
                                run_test_suite,
-                               FlaskSQLAlchemyTest)
+                               InvenioTestCase)
 from invenio.modules.workflows.config import CFG_OBJECT_VERSION
 
 
-class TestWorkflowStart(FlaskSQLAlchemyTest):
+class TestWorkflowStart(InvenioTestCase):
     """Tests for BibWorkflow API."""
 
     def setUp(self):
@@ -178,7 +178,7 @@ distances from it.
         from invenio.modules.workflows.models import BibWorkflowObject
         from invenio.modules.workflows.api import start
 
-        initial_data = {'data': self.recxml, 'type': "text/xml"}
+        initial_data = self.recxml
         workflow = start(workflow_name="marcxml_workflow",
                          data=[initial_data], module_name="unit_tests")
         # Keep id for cleanup after
@@ -357,7 +357,7 @@ distances from it.
         given object from prev, current and next task"""
         from invenio.modules.workflows.models import BibWorkflowObject
         from invenio.modules.workflows.api import (start,
-                                             continue_oid)
+                                                   continue_oid)
         initial_data = {'data': 1}
         final_data_prev = {'data': 3}
         final_data_curr = {'data': 2}

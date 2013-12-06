@@ -28,7 +28,7 @@ class marcxml_workflow(object):
     This workflow will run various tasks required to ingesting
     MARCXML records.
     """
-    workflow = [convert_record(),
+    workflow = [convert_record(stylesheet='oaiarxiv2marcxml.xsl'),
                 add_metadata_to_extra_data,
                 approve_record]
     title = "Workflow for ingesting MARCXML records"

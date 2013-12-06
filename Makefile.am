@@ -280,6 +280,7 @@ install-ckeditor-plugin:
 	unzip -u -d ${prefix}/var/www $(CKEDITOR)) && \
 	find ${prefix}/var/www/ckeditor/ -depth -name '_*' -exec rm -rf {} \; && \
 	find ${prefix}/var/www/ckeditor/ckeditor* -maxdepth 0 ! -name "ckeditor.js" -exec rm -r {} \; && \
+	touch ${prefix}/var/www/ckeditor/invenio-ckeditor-config.js && \
 	rm -fr /tmp/invenio-ckeditor-plugin
 	@echo "* Installing Invenio-specific CKeditor config..."
 	@echo "Ignored: (cd $(top_srcdir)/modules/webstyle/etc && make install)"

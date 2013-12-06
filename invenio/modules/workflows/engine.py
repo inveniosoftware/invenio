@@ -43,7 +43,7 @@ from .config import (CFG_WORKFLOW_STATUS,
                      CFG_OBJECT_VERSION)
 from .logger import (get_logger,
                      BibWorkflowLogHandler)
-
+from .errors import WorkflowHalt
 
 DEBUG = CFG_DEVEL_SITE > 0
 
@@ -353,10 +353,9 @@ BibWorkflowEngine
                         obj.log.debug("Object preempted")
                     i[1] = [0]  # reset the callbacks pointer
                     continue
-                except HaltProcessing:
+                except HaltProcessing, e:
                     self.increase_counter_halted()
                     extra_data = obj.get_extra_data()
-                    extra_data['redis_search']['halt_processing'] = self.getCurrTaskName()
                     obj.set_extra_data(extra_data)
 
                     if DEBUG:
@@ -365,13 +364,13 @@ BibWorkflowEngine
                         #this is the only case when a WFE can be completely
                         # stopped
                         obj.log.info("Object proccesing is halted")
-                    raise
-                except Exception:
-                    self.log.info("Unexpected error: %s", sys.exc_info()[0])
+                    raise WorkflowHalt(e)
+                except Exception, e:
+                    self.log.error("Unexpected error: %s", sys.exc_info()[0])
+                    self.log.error(e.message)
                     obj.log.error("Something terribly wrong"
                                   " happend to this object")
                     extra_data = obj.get_extra_data()
-                    extra_data['redis_search']['error'] = self.getCurrTaskName()
                     obj.set_extra_data(extra_data)
                     raise
             # We save the object once it is fully run through
@@ -380,9 +379,6 @@ BibWorkflowEngine
             self.increase_counter_finished()
             self.log.info("Done saving object: %i" % (obj.id, ))
         self.after_processing(objects, self)
-
-    def getCurrTaskName(self):
-        return self._callbacks['*'][0][self.getCurrTaskId()[-1]].func_name
 
     def execute_callback(self, callback, obj):
         """Executes the callback - override this method to implement logging"""
@@ -396,12 +392,28 @@ BibWorkflowEngine
             obj.set_data(obj.data)
             obj.set_extra_data(obj.extra_data)
 
-    def halt(self, msg):
+    def get_current_taskname(self):
+        """
+        Will attempt to return name of current task/step.
+        Otherwise returns None.
+        """
+        callback_list = self.getCallbacks()
+        if callback_list:
+            try:
+                current_tasks = callback_list[0]
+                current_task_idx = self.getCurrTaskId()[-1]
+            except IndexError:
+                # We hit an IndexError which probably means callbacks
+                # or task id was empty
+                return None
+            func = current_tasks[current_task_idx]
+            return func.func_name
+
+    def halt(self, msg, widget=None):
         """Halt the workflow (stop also any parent wfe)"""
-        self.log.debug("Processing halted at task %s with message: %s" %
-                      (self.getCurrTaskId(), msg, ))
-        raise HaltProcessing("Processing halted at task %s with message: %s" %
-                             (self.getCurrTaskId(), msg, ))
+        message = "Workflow '%s' halted at task %s with message: %s" % \
+                  (self.name, self.get_current_taskname() or "Unknown", msg)
+        raise WorkflowHalt(message=message)
 
     def set_counter_initial(self, obj_count):
         self.db_obj.counter_initial = obj_count
@@ -424,5 +436,9 @@ BibWorkflowEngine
         self.setWorkflow(self.workflow_definition.workflow)
 
     def set_extra_data_params(self, **kwargs):
+        tmp = self.get_extra_data()
+        if not tmp:
+            tmp = {}
         for key, value in kwargs.iteritems():
-            self.extra_data[key] = value
+            tmp[key] = value
+        self.set_extra_data(tmp)
