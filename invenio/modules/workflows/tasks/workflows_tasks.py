@@ -10,7 +10,10 @@ from time import sleep
 
 def get_nb_workflow_created(obj, eng):
     eng.log.info("last task name: get_nb_workflow_created")
-    return eng.extra_data["nb_workflow"]
+    try:
+        return eng.extra_data["nb_workflow"]
+    except KeyError:
+        return "0"
 
 
 def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
@@ -82,7 +85,6 @@ def wait_for_workflows_to_complete(obj, eng):
                 workflowlog = BibWorkflowEngineLog.query.filter(
                     BibWorkflowEngineLog.id_object == e.id_workflow
                 ).all()
-
                 for log in workflowlog:
                     eng.log.error(log.message)
 
@@ -121,7 +123,6 @@ def wait_for_a_workflow_to_complete_obj(obj, eng):
 
         for log in workflowlog:
             eng.log.error(log.message)
-
         eng.extra_data["nb_workflow_failed"] += 1
         eng.extra_data["nb_workflow_finish"] += 1
     except Exception as e:
@@ -159,7 +160,6 @@ def wait_for_a_workflow_to_complete(obj, eng):
             workflowlog = BibWorkflowEngineLog.query.filter(
                 BibWorkflowEngineLog.id_object == e.id_workflow
             ).all()
-
             for log in workflowlog:
                 eng.log.error(log.message)
 
@@ -201,7 +201,9 @@ def get_workflows_progress(obj,eng):
     try:
         return (eng.extra_data["nb_workflow_finish"]*100.0)/(eng.extra_data["nb_workflow"])
     except KeyError:
-        return None
+        return "No progress (key missing)"
+    except ZeroDivisionError:
+        return "No workflows"
 
 def workflows_reviews(obj, eng):
     """

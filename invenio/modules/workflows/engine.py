@@ -365,7 +365,10 @@ BibWorkflowEngine
                         #this is the only case when a WFE can be completely
                         # stopped
                         obj.log.info("Object proccesing is halted")
-                    raise WorkflowHalt(e)
+                    if type(e) == WorkflowHalt:
+                        raise e
+                    else:
+                        raise WorkflowHalt(e)
                 except Exception as e:
                     self.log.error("Unexpected error: %s", sys.exc_info()[0])
                     self.log.error(e.message)
@@ -420,7 +423,7 @@ BibWorkflowEngine
         """Halt the workflow (stop also any parent wfe)"""
         message = "Workflow '%s' halted at task %s with message: %s" % \
                   (self.name, self.get_current_taskname() or "Unknown", msg)
-        raise WorkflowHalt(message=message,
+        raise WorkflowHalt(message="test",
                            widget=widget,
                            id_workflow=self.uuid)
 
@@ -451,3 +454,4 @@ BibWorkflowEngine
         for key, value in iteritems(kwargs):
             tmp[key] = value
         self.set_extra_data(tmp)
+

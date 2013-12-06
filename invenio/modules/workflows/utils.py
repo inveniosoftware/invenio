@@ -67,6 +67,11 @@ def get_workflow_definition(name):
         raise WorkflowDefinitionError("Error with workflow '%s': %s\n%s" %
                                       (name, str(e), traceback.format_exc()),
                                       workflow_name=name)
+    #try:
+    return workflows[name]
+    #except:
+    #    raise InvenioWorkflowDefinitionError("Cannot find workflow %s" % (name,))
+
 
 
 def determineDataType(data):
