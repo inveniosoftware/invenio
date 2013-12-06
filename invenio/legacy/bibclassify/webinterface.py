@@ -46,7 +46,7 @@ from invenio.legacy import bibrecord
 from invenio import bibclassify_config as bconfig
 from invenio import bibclassify_text_extractor
 from invenio import bibclassify_engine
-from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader as bor
+from invenio.legacy.bibclassify import ontology_reader as bor
 
 log = bconfig.get_logger("bibclassify.webinterface")
 
