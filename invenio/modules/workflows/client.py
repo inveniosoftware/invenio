@@ -41,6 +41,9 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
                 break
         except WorkflowHalt as e:
             # Processing was halted. Lets save current object and continue.
+
+            if e.widget:
+                wfe._objects[wfe.getCurrObjId()].extra_data["widget"] = e.widget
             wfe.log.error("Processing halted: %s (%s)" %
                          (str(e.message), e.to_dict()))
             wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED,
@@ -69,6 +72,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
                 raise WorkflowError(message=msg,
                                     id_workflow=wfe.uuid,
                                     id_object=wfe.getCurrObjId())
+
 
 
 def continue_execution(wfe, data, restart_point="restart_task",

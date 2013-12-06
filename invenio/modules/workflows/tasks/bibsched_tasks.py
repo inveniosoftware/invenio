@@ -63,7 +63,11 @@ def write_something_generic(messagea, func):
     def _write_something_generic(obj, eng):
 
         if isinstance(messagea, six.string_types):
-            func(messagea)
+            if isinstance(func,list):
+                for function in func:
+                    function(messagea)
+            else:
+                func(messagea)
             return None
 
         if not isinstance(messagea, list):
@@ -71,7 +75,11 @@ def write_something_generic(messagea, func):
                 I = messagea
                 while callable(I):
                     I = I(obj, eng)
-                func(I)
+                if isinstance(func,list):
+                    for function in func:
+                        function(I)
+                else:
+                    func(I)
             return None
 
         if len(messagea) > 0:
@@ -83,7 +91,11 @@ def write_something_generic(messagea, func):
                     temp += str(I)
                 elif isinstance(I, six.string_types):
                     temp += I
-            func(temp)
+            if isinstance(func,list):
+                for function in func:
+                    function(temp)
+            else:
+                func(temp)
             return None
 
     return _write_something_generic

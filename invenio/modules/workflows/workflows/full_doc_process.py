@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111 1307, USA.
 
 
-from ..tasks.marcxml_tasks import (convert_record,
+from ..tasks.marcxml_tasks import (convert_record_with_repository,
                                    plot_extract,
                                    convert_record_to_bibfield,
                                    fulltext_download,
@@ -26,17 +26,14 @@ from ..tasks.marcxml_tasks import (convert_record,
                                    quick_match_record
                                    )
 
-from ..tasks.workflows_tasks import log_info
-
 from workflow.patterns import IF_ELSE
 
-
 class full_doc_process(object):
-    workflow = [convert_record("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield,
-                IF_ELSE(quick_match_record, [log_info("branch two")], [log_info("branch one"), plot_extract(["latex"]),
-                                                                       fulltext_download, refextract, author_list,
-                                                                       upload_step]),
-                log_info("branch end")
+    workflow = [convert_record_with_repository("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield,
+                IF_ELSE(quick_match_record, [], [plot_extract(["latex"]),
+                                                 fulltext_download, refextract, author_list,
+                                                 upload_step
+                ]),
     ]
     #workflow =[convert_record("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield, author_list, upload_step]
 
