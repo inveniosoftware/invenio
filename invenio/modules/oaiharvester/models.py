@@ -45,15 +45,24 @@ class OaiHARVEST(db.Model):
     arguments = db.Column(db.LargeBinary, nullable=True)
     comment = db.Column(db.Text, nullable=True)
     name = db.Column(db.String(255), nullable=False)
+    #repository = db.Column(db.String(255), nullable=False)
     lastrun = db.Column(db.DateTime, nullable=True)
-    frequency = db.Column(db.MediumInteger(12), nullable=False,
-                          server_default='0')
     postprocess = db.Column(db.String(20), nullable=False,
                             server_default='h')
+    workflows = db.Column(db.String(255), nullable=True)
     setspecs = db.Column(db.Text, nullable=False)
 
     def get_arguments(self):
         return deserialize_via_marshal(self.arguments)
+
+    def to_dict(self):
+        dict_representation = self.__dict__
+        del dict_representation["_sa_instance_state"]
+        try:
+            dict_representation["arguments"] = deserialize_via_marshal( dict_representation["arguments"])
+        except TypeError:
+            dict_representation["arguments"] = {}
+        return dict_representation
 
     @classmethod
     def get(cls, *criteria, **filters):
