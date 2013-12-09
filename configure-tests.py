@@ -511,4 +511,3 @@ elif warning_messages:
     continue the installation.  However, you can also continue
     the installation now and solve these issues later, if you wish.
     """ % {'n_wrn': len(warning_messages)}
-    wait_for_user("Press ENTER to continue the installation...")
