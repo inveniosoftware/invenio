@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -470,4 +470,3 @@ elif warning_messages:
     continue the installation.  However, you can also continue
     the installation now and solve these issues later, if you wish.
     """ % {'n_wrn': len(warning_messages)}
-    wait_for_user("Press ENTER to continue the installation...")
