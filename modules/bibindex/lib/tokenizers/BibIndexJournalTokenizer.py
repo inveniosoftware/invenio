@@ -37,14 +37,17 @@ if CFG_CERN_SITE:
     CFG_JOURNAL_TAG = '773__%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p 773__v (773__y) 773__c"
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
+    CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM = "773__p 773__v"
 elif CFG_INSPIRE_SITE:
     CFG_JOURNAL_TAG = '773__%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p,773__v,773__c"
+    CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM = "773__p,773__v"
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*,\w.*,\w.*$'
 else:
     CFG_JOURNAL_TAG = '909C4%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "909C4p 909C4v (909C4y) 909C4c"
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
+    CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM = "909C4p 909C4v"
 
 
 
@@ -63,6 +66,7 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
         self.nonmarc_tag = 'journal_info'
         self.journal_pubinfo_standard_form = CFG_JOURNAL_PUBINFO_STANDARD_FORM
         self.journal_pubinfo_standard_form_regexp_check = CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
+        self.journal_pubinfo_journal_volume_form = CFG_JOURNAL_PUBINFO_JOURNAL_VOLUME_FORM
 
 
     def tokenize(self, recID):
@@ -80,16 +84,18 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
         res = run_sql(query, (recID, self.tag))
         # construct journal pubinfo:
         dpubinfos = {}
-        for row in res:
-            nb_instance, subfield, value = row
-            if subfield.endswith("c"):
-                # delete pageend if value is pagestart-pageend
-                # FIXME: pages may not be in 'c' subfield
-                value = value.split('-', 1)[0]
-            if dpubinfos.has_key(nb_instance):
-                dpubinfos[nb_instance][subfield] = value
+        for nb_instance, subfield, value in res:
+            dpubinfos.setdefault(nb_instance, {})[subfield] = value
+
+        def replace_tags(tags_values, pubinfo):
+            for tag, val in tags_values.items():
+                    pubinfo = pubinfo.replace(tag, val)
+            if self.tag[:-1] in pubinfo:
+                # some subfield was missing, do nothing
+                return None
             else:
-                dpubinfos[nb_instance] = {subfield: value}
+                return pubinfo
+
 
         # construct standard format:
         lwords = []
@@ -97,15 +103,27 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
             # index all journal subfields separately
             for tag, val in dpubinfo.items():
                 lwords.append(val)
-            # index journal standard format:
-            pubinfo = self.journal_pubinfo_standard_form
-            for tag, val in dpubinfo.items():
-                pubinfo = pubinfo.replace(tag, val)
-            if self.tag[:-1] in pubinfo:
-                # some subfield was missing, do nothing
-                pass
-            else:
-                lwords.append(pubinfo)
+
+            # Store journal and volume for searches without a page
+            # Store J.Phys.,B50
+            word = replace_tags(dpubinfo, self.journal_pubinfo_journal_volume_form)
+            if word is not None:
+                lwords.append(word)
+            # Store full info for searches with all info
+            # Store J.Phys.,B50,16-24
+            word = replace_tags(dpubinfo, self.journal_pubinfo_standard_form)
+            if word is not None:
+                lwords.append(word)
+            # Store info without ending page for searches without ending page
+            # Replace page range with just the starting page
+            # 777__c = '16-24' becomes 777__c = '16'
+            # Store J.Phys.,B50,16
+            for tag in dpubinfo.keys():
+                if tag.endswith('c'):
+                    dpubinfo[tag] = dpubinfo[tag].split('-')[0]
+            word = replace_tags(dpubinfo, self.journal_pubinfo_standard_form)
+            if word is not None:
+                lwords.append(word)
 
         # return list of words and pubinfos:
         return lwords
