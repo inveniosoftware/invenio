@@ -2138,6 +2138,9 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             if re.search(r'[^a-zA-Z0-9\s\:]', bsu_p) and bsu_f != 'refersto' and bsu_f != 'citedby':
                 if bsu_p.startswith('"') and bsu_p.endswith('"'): # is it ACC query?
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', "*", bsu_p)
+                elif bsu_f == 'journal' and len(bsu_p.split(',')) == 3 and '-' in bsu_p.split(',')[-1]:
+                    jrn, vol, page = bsu_p.split(',')
+                    bsu_pn = "%s,%s,%s" % (jrn, vol, page.split('-')[0])
                 else: # it is WRD query
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
