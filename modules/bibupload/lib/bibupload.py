@@ -53,7 +53,7 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS, \
      CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE, \
      CFG_CERN_SITE, \
-     CFG_INSPIRE_SITE
+     CFG_BIBUPLOAD_MATCH_DELETED_RECORDS
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
@@ -680,15 +680,13 @@ def find_record_ids_by_oai_id(oaiId):
                                 f = "reportnumber",
                                 m = 'e' )
 
-        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
-            ## FIXME: for the time being this functionality is available only on INSPIRE
-            ## or CDS, and waiting to be replaced by proper pidstore integration
+        if CFG_BIBUPLOAD_MATCH_DELETED_RECORDS:
+            return recids
+        else:
             if CFG_CERN_SITE:
                 return recids - (search_pattern(p='DELETED', f='980__%', m='e') | search_pattern(p='DUMMY', f='980__%', m='e'))
             else:
                 return recids - search_pattern(p='DELETED', f='980__%', m='e')
-        else:
-            return recids
     else:
         return intbitset()
 
@@ -877,13 +875,11 @@ def find_record_from_sysno(sysno):
                     'bibrec_bibxxx': bibrec_bibxxx},
                     (CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, sysno,))
     for recid in res:
-        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
-            ## FIXME: for the time being this functionality is available only on INSPIRE
-            ## or CDS, and waiting to be replaced by proper pidstore integration
+        if CFG_BIBUPLOAD_MATCH_DELETED_RECORDS:
+            return recid[0]
+        else:
             if record_exists(recid[0]) > 0: ## Only non deleted records
                 return recid[0]
-        else:
-            return recid[0]
     return None
 
 def find_records_from_extoaiid(extoaiid, extoaisrc=None):
@@ -907,9 +903,7 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
     ret = intbitset()
     for id_bibrec in id_bibrecs:
 
-        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
-            ## FIXME: for the time being this functionality is available only on INSPIRE
-            ## or CDS, and waiting to be replaced by proper pidstore integration
+        if not CFG_BIBUPLOAD_MATCH_DELETED_RECORDS:
             if record_exists(id_bibrec) < 1:
                 ## We don't match not existing records
                 continue
@@ -949,13 +943,11 @@ def find_record_from_oaiid(oaiid):
                     'bibrec_bibxxx': bibrec_bibxxx},
                     (CFG_OAI_ID_FIELD, oaiid,))
     for recid in res:
-        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
-            ## FIXME: for the time being this functionality is available only on INSPIRE
-            ## or CDS, and waiting to be replaced by proper pidstore integration
+        if CFG_BIBUPLOAD_MATCH_DELETED_RECORDS:
+            return recid[0]
+        else:
             if record_exists(recid[0]) > 0: ## Only non deleted records
                 return recid[0]
-        else:
-            return recid[0]
     return None
 
 def find_record_from_doi(doi):
@@ -976,9 +968,7 @@ def find_record_from_doi(doi):
     # For each of the result, make sure that it is really tagged as doi
     for (id_bibrec, field_number) in res:
 
-        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
-            ## FIXME: for the time being this functionality is available only on INSPIRE
-            ## or CDS, and waiting to be replaced by proper pidstore integration
+        if not CFG_BIBUPLOAD_MATCH_DELETED_RECORDS:
             if record_exists(id_bibrec) < 1:
                 ## We don't match not existing records
                 continue
