@@ -35,6 +35,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_WEBSTAT_BIBCIRCULATION_START_YEAR
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
+from invenio.bibindex_engine_utils import get_all_indexes
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
 from invenio.search_engine import get_coll_i18nname, \
     wash_index_term
@@ -1088,13 +1089,7 @@ def perform_display_current_system_health(ln=CFG_SITE_LANG):
     # Append records pending
     if conf.get("general", "waiting_box") == "True":
         last_index, last_rank, last_sort, last_coll=get_last_updates()
-        index_categories = ('global', 'collection', 'abstract',
-                            'author', 'keyword', 'reference',
-                            'reportnumber', 'title', 'fulltext',
-                            'year', 'journal', 'collaboration',
-                            'affiliation', 'exactauthor', 'caption',
-                            'firstauthor', 'exactfirstauthor',
-                            'authorcount')
+        index_categories = zip(*get_all_indexes(with_ids=True))[1]
         rank_categories = ('wrd', 'demo_jif', 'citation',
                             'citerank_citation_t',
                             'citerank_pagerank_c',
@@ -1140,11 +1135,7 @@ def perform_display_ingestion_status(req_ingestion, ln=CFG_SITE_LANG):
     @type req_ingestion: str
     """
     # preconfigured values
-    index_methods = ('global', 'collection', 'abstract', 'author', 'keyword',
-                    'reference', 'reportnumber', 'title', 'fulltext',
-                    'year', 'journal', 'collaboration', 'affiliation',
-                    'exactauthor', 'caption', 'firstauthor',
-                    'exactfirstauthor', 'authorcount')
+    index_methods = zip(*get_all_indexes(with_ids=True))[1]
     rank_methods = ('wrd', 'demo_jif', 'citation', 'citerank_citation_t',
                     'citerank_pagerank_c', 'citerank_pagerank_t')
     sort_methods = ('latest first', 'title', 'author', 'report number',
