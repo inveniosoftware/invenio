@@ -47,7 +47,7 @@ from invenio.textmarc2xmlmarc import transform_file
 from invenio.shellutils import run_shell_command
 from invenio.bibupload import xml_marc_to_records, bibupload
 from invenio.access_control_firerole import _ip_matcher_builder, _ipmatch
-
+from invenio.webinterface_handler_config import HTTP_BAD_REQUEST, HTTP_FORBIDDEN
 import invenio.bibupload as bibupload_module
 
 from invenio.bibrecord import create_records, \
@@ -95,28 +95,31 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
     """ Robot interface for uploading MARC files
     """
     req.content_type = "text/plain"
-    req.send_http_header()
 
     # check IP and useragent:
     if not _get_client_authorized_collections(_get_client_ip(req)):
         msg = "[ERROR] Sorry, client IP %s cannot use the service." % _get_client_ip(req)
         _log(msg)
+        req.status = HTTP_FORBIDDEN
         return _write(req, msg)
     if not _check_client_useragent(req):
         msg = "[ERROR] Sorry, the %s useragent cannot use the service." % _get_useragent(req)
         _log(msg)
+        req.status = HTTP_FORBIDDEN
         return _write(req, msg)
 
     arg_mode = mode
     if not arg_mode:
         msg = "[ERROR] Please specify upload mode to use."
         _log(msg)
+        req.status = HTTP_BAD_REQUEST
         return _write(req, msg)
     if arg_mode == '--insertorreplace':
         arg_mode = '-ir'
     if not arg_mode in PERMITTED_MODES:
         msg = "[ERROR] Invalid upload mode."
         _log(msg)
+        req.status = HTTP_BAD_REQUEST
         return _write(req, msg)
 
     arg_file = file_content
@@ -126,17 +129,20 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
         if not arg_file:
             msg = "[ERROR] Please provide a body to your request."
             _log(msg)
+            req.status = HTTP_BAD_REQUEST
             return _write(req, msg)
     else:
         if not arg_file:
             msg = "[ERROR] Please specify file body to input."
             _log(msg)
+            req.status = HTTP_BAD_REQUEST
             return _write(req, msg)
         if hasattr(arg_file, "filename"):
             arg_file = arg_file.value
         else:
             msg = "[ERROR] 'file' parameter must be a (single) file"
             _log(msg)
+            req.status = HTTP_BAD_REQUEST
             return _write(req, msg)
 
     # write temporary file:
@@ -156,6 +162,7 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
         if not allow:
             msg = "[ERROR] Cannot submit such a file from this IP. (Wrong collection.)"
             _log(msg)
+            req.status = HTTP_FORBIDDEN
             return _write(req, msg)
 
     # check validity of marcxml
@@ -164,6 +171,7 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
     if xmlmarclint_output != 0:
         msg = "[ERROR] MARCXML is not valid."
         _log(msg)
+        req.status = HTTP_BAD_REQUEST
         return _write(req, msg)
     args = ['bibupload', "batchupload", arg_mode, filename]
     # run upload command
