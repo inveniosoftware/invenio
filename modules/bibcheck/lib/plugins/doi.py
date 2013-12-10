@@ -43,11 +43,11 @@ def check_records(records, doi_field="0247_a", extra_subfields=(("2", "DOI"),)):
 
     dois = get_doi_for_records(records_to_check.values())
     for record_id, doi in dois.iteritems():
+        record = records_to_check[record_id]
         dup_doi_recid = find_record_from_doi(doi)
         if dup_doi_recid:
             record.warn("DOI %s to be added to record %s already exists in record/s %s" % (doi, record_id, dup_doi_recid))
             continue
-        record = records_to_check[record_id]
         subfields = [(doi_field[5], doi.encode("utf-8"))] + map(tuple, extra_subfields)
         record_add_field(record, tag=doi_field[:3], ind1=doi_field[3],
                 ind2=doi_field[4], subfields=subfields)
