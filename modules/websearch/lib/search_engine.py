@@ -4410,7 +4410,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
     if len(recIDs):
         nb_found = len(recIDs)
 
-        if rg == -9999: # print all records
+        if not rg or rg == -9999: # print all records
             rg = nb_found
         else:
             rg = abs(rg)
@@ -5341,7 +5341,7 @@ def clean_dictionary(dictionary, list_of_items):
 
 ### CALLABLES
 
-def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, sf="", so="a", sp="", rm="", of="id", ot="", aas=0,
+def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=None, sf="", so="a", sp="", rm="", of="id", ot="", aas=0,
                         p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                         recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
                         d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab="",
@@ -6621,7 +6621,7 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
 def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=None,
                         so=None, sp=None, verbose=None, p=None, p1=None, p2=None, p3=None,
                         cc=None, ln=None, _=None, ec=None, colls_to_search=None, rm=None, cpu_time=None,
-                        f=None, em=None, **dummy
+                        f=None, em=None, jrec=0, rg=None, **dummy
                      ):
     ## search stage 6: display results:
 
@@ -6657,7 +6657,10 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
                     recIDs = results_final_for_all_colls_rank_records_output[0]
             elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
                 recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of, ln)
-            return recIDs
+            if rg:
+                return recIDs[jrec:jrec+rg]
+            else:
+                return recIDs[jrec:]
 
         elif of.startswith("h"):
             if of not in ['hcs', 'hcs2', 'hcv', 'htcv', 'tlcv']:

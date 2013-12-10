@@ -1216,9 +1216,14 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
         self.assertEqual(intbitset([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]),
                          perform_request_search(p='ellis', of='intbitset'))
 
-    def test_search_engine_web_api_ignore_paging_parameter(self):
+    def test_search_engine_web_api_jrec_parameter(self):
         """websearch - search engine Python API for successful query, ignore paging parameters"""
-        self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
+        self.assertEqual([11, 12, 13, 14, 15, 16, 17, 18, 47],
+                         perform_request_search(p='ellis', jrec=3))
+
+    def test_search_engine_web_api_paging_parameters(self):
+        """websearch - search engine Python API for successful query, ignore paging parameters"""
+        self.assertEqual([11, 12, 13, 14, 15],
                          perform_request_search(p='ellis', rg=5, jrec=3))
 
     def test_search_engine_python_api_respect_sorting_parameter(self):
@@ -1984,14 +1989,26 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
     def test_search_engine_web_api_for_successful_query(self):
         """websearch - search engine Web API for successful query"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=0',
                                                expected_text="[47, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8]"))
 
-    def test_search_engine_web_api_ignore_paging_parameter(self):
+    def test_search_engine_web_api_no_paging_parameter(self):
+        """websearch - search engine Web API for successful query, ignore paging parameters"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=0',
+                                               expected_text="[47, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8]"))
+
+    def test_search_engine_web_api_jrec_parameter(self):
+        """websearch - search engine Web API for successful query, ignore paging parameters"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=0&jrec=3',
+                                               expected_text="[16, 15, 14, 13, 12, 11, 10, 9, 8]"))
+
+    def test_search_engine_web_api_paging_parameters(self):
         """websearch - search engine Web API for successful query, ignore paging parameters"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=5&jrec=3',
-                                               expected_text="[47, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8]"))
+                                               expected_text="[16, 15, 14, 13, 12]"))
 
     def test_search_engine_web_api_respect_sorting_parameter(self):
         """websearch - search engine Web API for successful query, respect sorting parameters"""
@@ -4470,7 +4487,7 @@ class WebSearchSPIRESSyntaxTest(InvenioTestCase):
             # XXX: assumes we've reinstalled our site in the last 10 years
             # should return every document in the system
             self.assertEqual([],
-                             test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id&so=a',
+                             test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id&so=a&rg=0',
                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113, 127, 128]'))
 
 

@@ -78,7 +78,7 @@ class BibRankWordSimilarityRankingTest(InvenioTestCase):
     def test_search_results_ranked_by_similarity(self):
         """bibrank - search results ranked by word similarity"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&rm=wrd&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&rm=wrd&of=id&rg=0',
                                                expected_text="[15, 18, 14, 9, 16, 13, 47, 17, 12, 11, 10, 8]"))
 
     def test_similar_records_link(self):
