@@ -149,11 +149,6 @@ def create_app(instance_path=None, **kwargs_config):
     # configuration, extensions and Invenio packages
     Registry(app=app)
 
-    # Register core packages listed in invenio.cfg
-    # - invenio.core.* to be moved to invenio.modules.* and this line removed
-    app.extensions['registry']['core_packages'] = ImportPathRegistry(
-        initial=['invenio.core.*']
-    )
     # Register packages listed in invenio.cfg
     app.extensions['registry']['packages'] = PackageRegistry(app)
 
@@ -162,9 +157,6 @@ def create_app(instance_path=None, **kwargs_config):
 
     # Extend application config with configuration from packages (app config
     # takes precedence)
-    ConfigurationRegistry(
-        app, registry_namespace='core_packages'
-    )
     ConfigurationRegistry(app)
 
     # Leagcy conf cleanup

@@ -29,6 +29,6 @@ class Document(SmartJson):
 
     @classmethod
     def create(cls, data, model='common_document'):
-        record = reader(data, model=model)
+        record = reader(data, namespace='documentext', model=model)
         document = cls(record.translate())
         return cls.storage_engine.save_one(document.dumps())

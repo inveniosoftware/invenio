@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """BibIndexFiletypeTokenizer: 'tokenizes' for file extensions.
-   Tokenizer is adapted to work with bibfield and its get_record function.
+   Tokenizer is adapted to work with recjson and its get_record function.
 """
 
 
@@ -27,11 +27,11 @@ from invenio.modules.indexer.tokenizers.BibIndexEmptyTokenizer import BibIndexEm
 class BibIndexFiletypeTokenizer(BibIndexEmptyTokenizer):
     """
         Tokenizes for file extensions.
-        Tokenizer is adapted to work with bibfield and its get_record function.
+        Tokenizer is adapted to work with recjson and its get_record function.
 
         It accepts as an input a record created by a get_record function:
 
-        from bibfield import get_record
+        from invenio.modules.records.api import get_record
         record16 = get_record(16)
         tokenizer = BibIndexFiletypeTokenizer()
         new_words = tokenizer.tokenize(record16)
@@ -42,7 +42,7 @@ class BibIndexFiletypeTokenizer(BibIndexEmptyTokenizer):
 
 
     def tokenize(self, record):
-        """'record' is a recjson record from bibfield.
+        """'record' is a recjson record.
 
            Function uses derived field 'filetypes'
            from the record.

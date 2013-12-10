@@ -21,7 +21,7 @@
 from werkzeug import MultiDict
 from invenio.utils.datacite import DataciteMetadata
 from invenio.utils.sherpa_romeo import SherpaRomeoSearch
-from invenio.legacy.bibfield import get_record
+from invenio.modules.records.api import get_record
 from invenio.utils import persistentid as pidutils
 
 #

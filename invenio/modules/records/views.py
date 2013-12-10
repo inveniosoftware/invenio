@@ -32,7 +32,7 @@ from invenio.ext.template.context_processor import \
     register_template_context_processor
 from invenio.modules.search.models import Collection
 from invenio.modules.search.signals import record_viewed
-from invenio.modules.record_editor.models import Bibrec
+from invenio.modules.records.models import Record as Bibrec
 from invenio.base.i18n import _
 from invenio.utils import apache
 from flask.ext.breadcrumbs import default_breadcrumb_root
@@ -76,7 +76,7 @@ def request_record(f):
             flash(auth_msg, 'error')
             abort(apache.HTTP_UNAUTHORIZED)
 
-        from invenio.legacy.bibfield import get_record
+        from invenio.modules.records.api import get_record
         from invenio.legacy.search_engine import record_exists, get_merged_recid
         # check if the current record has been deleted
         # and has been merged, case in which the deleted record

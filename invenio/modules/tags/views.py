@@ -35,7 +35,7 @@ from invenio.base.globals import cfg
 
 # External imports
 from invenio.modules.accounts.models import User
-from invenio.modules.record_editor.models import Bibrec
+from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.search.models import Collection
 from invenio.modules.search.views.search import response_formated_records
 from flask.ext.menu import register_menu

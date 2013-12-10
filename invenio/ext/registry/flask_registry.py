@@ -176,7 +176,6 @@ class ImportPathRegistry(ListRegistry):
     Example::
 
         registry = ImportPathRegistry(initial=[
-            'invenio.core.*',
             'invenio.modules.record',
         ])
 
@@ -434,7 +433,7 @@ class ConfigurationRegistry(DiscoverRegistry):
 
         app.extensions['registry']['packages'] = PackageRegistry()
         app.extendsions['registry']['config'] = ConfigurationRegistry(
-            _app, base_config='invenio.core.config'
+            _app, base_config='invenio.config'
         )
     """
     def __init__(self, app, registry_namespace=None):

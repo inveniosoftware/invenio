@@ -99,7 +99,7 @@ class LaziestDict(LazyDict):
 
     def reader_discover(key):
         from werkzeug.utils import import_string
-        return import_string('invenio.legacy.bibfield.%sreader:reader' % (key))
+        return import_string('invenio.jsonalchemy.jsonext.readers%sreader:reader' % (key))
 
     laziest_dict = LaziestDict(reader_discover)
 
@@ -213,26 +213,19 @@ class SmartDict(object):
         return value
 
     def __setitem__(self, key, value, extend=False):
-        """As in C{dict.__getitem__} but using 'smart queries'"""
         #TODO: Check repeatable fields
-        if '.' not in key and ']' not in key:
+        if '.' not in key and ']' not in key and not extend:
             self._dict[key] = value
         else:
             keys = SmartDict.split_key_pattern.split(key)
             self.__setitem(self._dict, keys[0], keys[1:], value, extend)
 
     def __delitem__(self, key):
-        """
-        As in C{dict.__delitem__}.
-
-        None: It only works with first keys
-        """
+        """Note: It only works with first keys"""
         del self._dict[key]
 
     def __contains__(self, key):
-        """
-        As in C{dict.__contains__} but using 'smart queries'.
-        """
+
         if '.' not in key and '[' not in key:
             return key in self._dict
         try:
@@ -242,39 +235,31 @@ class SmartDict(object):
         return True
 
     def __eq__(self, other):
-        """@see C{dict.__eq__}"""
         return (isinstance(other, self.__class__)
                 and self._dict == other._dict)
 
     def __iter__(self):
-        """@see C{dict.__iter__}"""
         return iter(self._dict)
 
     def __len__(self):
-        """@see C{dict.__len__}"""
         return len(self._dict)
 
     def keys(self):
-        """@see C{dict.keys}"""
         return self._dict.keys()
 
+    def items(self):
+        return self._dict.items()
+
     def iteritems(self):
-        """@see C{dict.iteritems}"""
         return self._dict.iteritems()
 
     def iterkeys(self):
-        """@see C{dict.iterkeys}"""
         return self._dict.iterkeys()
 
     def itervalues(self):
-        """@see C{dict.itervalues}"""
         return self._dict.itervalues()
 
     def has_key(self, key):
-        """
-        As in C{dict.has_key} but using BibField name convention.
-        @see __contains__(self, key)
-        """
         return key in self
 
     def __repr__(self):
@@ -315,7 +300,7 @@ class SmartDict(object):
                     chunk[key] = None
                     chunk[key] = setitem(chunk[key])
                 else:
-                    if keys and ']' in keys[0]:
+                    if keys:
                         chunk[key] = setitem(chunk[key])
                     else:
                         if not isinstance(chunk[key], list):
@@ -333,18 +318,16 @@ class SmartDict(object):
 
 
     def get(self, key, default=None):
-        """docstring for get"""
         try:
             return self[key]
         except:
             return default
 
     def set(self, key, value, extend=False):
-        """docstring for set"""
         self.__setitem__(key, value, extend)
 
-    def update(self, new):
-        self._dict.update(new)
+    def update(self, E, **F):
+        self._dict.update(E, **F)
 
 
 def flatten_multidict(multidict):
