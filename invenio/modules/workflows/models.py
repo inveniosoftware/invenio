@@ -423,7 +423,7 @@ BibWorkflowObject
         """
         Returns the data in some chewable format.
         """
-        from invenio.legacy.bibfield.bibfield_jsonreader import JsonReader
+        from invenio.modules.records.api import Record
         from invenio.modules.formatter.engine import format_record
 
         data = self.get_data()
@@ -433,10 +433,9 @@ BibWorkflowObject
             return formatter(data)
 
         if isinstance(data, dict):
-            # Dicts are cool on its own, but maybe its bibfield
+            # Dicts are cool on its own, but maybe its SmartJson (record)
             try:
-                new_dict_representation = JsonReader()
-                new_dict_representation.rec_json = data
+                new_dict_representation = Record(data)
                 data = new_dict_representation.legacy_export_as_marc()
             except Exception as e:
                 raise e

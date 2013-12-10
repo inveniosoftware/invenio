@@ -92,7 +92,7 @@ class WebDepositField(Field):
         Initialize WebDeposit field.
 
         Every field is associated with a marc field. To define this association you
-        have to specify the `export_key` for the bibfield's `JsonReader` or
+        have to specify the `export_key` for the recordext `Reader` or
         the `cook_function` (for more complicated fields).
 
         @param placeholder: str, Placeholder text for input fields.

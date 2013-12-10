@@ -25,7 +25,7 @@ WebLinkBack database models.
 from invenio.ext.sqlalchemy import db
 
 # Create your models here.
-from invenio.modules.record_editor.models import Bibrec
+from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.accounts.models import User
 
 class LnkADMINURL(db.Model):

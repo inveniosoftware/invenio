@@ -27,7 +27,8 @@ from invenio.ext.sqlalchemy import db
 # Create your models here.
 
 from invenio.modules.accounts.models import User
-from invenio.modules.record_editor.models import Bibrec, Bibdoc
+from invenio.modules.record_editor.models import Bibdoc
+from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.search.models import Collection
 
 from flask import g

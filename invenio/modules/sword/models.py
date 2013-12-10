@@ -27,7 +27,7 @@ from invenio.ext.sqlalchemy import db
 # Create your models here.
 
 from invenio.modules.accounts.models import User
-from invenio.modules.record_editor.models import Bibrec
+from invenio.modules.records.models import Record as Bibrec
 
 class SwrREMOTESERVER(db.Model):
     """Represents a SwrREMOTESERVER record."""

@@ -58,7 +58,7 @@ def import_module_from_packages(name, app=None, packages=None, silent=False):
         if app is None:
             raise Exception('Working outside application context or provide app')
         #FIXME
-        packages = ['invenio.core.*'] + app.config.get('PACKAGES', [])
+        packages = app.config.get('PACKAGES', [])
 
     for package in packages:
         if package.endswith('.*'):
@@ -148,10 +148,53 @@ def register_configurations(app):
     """
     from flask import Config
     new_config = Config(app.config.root_path)
-    for config in import_module_from_packages('config', app, ['invenio.core.*', ]):
-        new_config.from_object(config)
     for config in autodiscover_configs(app):
         new_config.from_object(config)
 
     new_config.update(app.config)
     app.config = new_config
+
+
+def try_to_eval(string, context={}, **general_context):
+    """
+    This method takes care of evaluating the python expression, and, if an
+    exception happens, it tries to import the needed module.
+
+    @param string: String to evaluate
+    @param context: Context needed, in some cases, to evaluate the string
+
+    @return: The value of the expression inside string
+    """
+    if not string:
+        return None
+
+    res = None
+    imports = []
+    general_context.update(context)
+
+    while (True):
+        try:
+            res = eval(string, globals().update(general_context), locals())  # kwalitee: disable=eval
+        except NameError, err:
+            #Try first to import using werkzeug import_string
+            try:
+                from werkzeug.utils import import_string
+                part = string.split('.')[0]
+                import_string(part)
+                for i in string.split('.')[1:]:
+                    part += '.' + i
+                    import_string(part)
+                continue
+            except:
+                pass
+
+            import_name = str(err).split("'")[1]
+            if not import_name in imports:
+                if import_name in context:
+                    globals()[import_name] = context[import_name]
+                else:
+                    globals()[import_name] = __import__(import_name)
+                    imports.append(import_name)
+                continue
+            raise ImportError("Can't import the needed module to evaluate %s" (string, ))
+        return res

@@ -44,7 +44,7 @@ from invenio.legacy.bibsched.bibtask import (task_sleep_now_if_required,
                                              task_low_level_submission
                                              )
 from invenio.modules.oai_harvest.models import OaiHARVEST
-from invenio.legacy.bibfield.bibfield_jsonreader import JsonReader
+from invenio.modules.records.api import Record
 from invenio.modules.workflows.errors import WorkflowError
 from invenio.legacy.refextract.api import extract_references_from_file_xml
 from invenio.legacy.bibrecord import (create_records,
@@ -125,10 +125,10 @@ def convert_record_to_bibfield(obj, eng):
     Convert a record in data into a 'dictionary'
     thanks to BibField
     """
-    from invenio.legacy.bibfield import create_record
+    from invenio.base.records.api import create_record
 
     eng.log.info("last task name: convert_record_to_bibfield")
-    obj.data = create_record(obj.data).rec_json
+    obj.data = create_record(obj.data).dumps()
     eng.log.info("Conversion succeed")
 
 
@@ -326,9 +326,9 @@ def fulltext_download(obj, eng):
 
             updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>\n' + fulltext_xml + \
                           '</record>\n</collection>'
-            from invenio.legacy.bibfield import create_record
+            from invenio.modules.records.api import create_record
 
-            new_dict_representation = create_record(updated_xml).rec_json
+            new_dict_representation = create_record(updated_xml).dumps()
             try:
                 obj.data['fft'].append(new_dict_representation["fft"])
             except:
@@ -349,8 +349,7 @@ def quick_match_record(obj, eng):
                             'oaiid': find_record_from_oaiid, 'system_control_number': find_records_from_extoaiid,
                             'doi': find_record_from_doi}
 
-    my_json_reader = JsonReader()
-    my_json_reader.rec_json = obj.data
+    my_json_reader = Record(obj.data)
     try:
         identifiers = {}
         #identifiers = my_json_reader.get_persistent_identifiers()
@@ -458,10 +457,10 @@ def plot_extract(plotextractor_types):
                 marc_xml += "\n</collection>"
 
                 if marc_xml:
-                    from invenio.legacy.bibfield import create_record
+                    from invenio.modules.records.api import create_record
                     # We store the path to the directory  the tarball contents live
                     # Read and grab MARCXML from plotextractor run
-                    new_dict_representation = create_record(marc_xml).rec_json
+                    new_dict_representation = create_record(marc_xml).dumps()
                     try:
                         obj.data['fft'].append(new_dict_representation["fft"])
                     except KeyError:
@@ -501,9 +500,9 @@ def refextract(obj, eng):
             updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>' + references_xml.group(1) + \
                           "</record>\n</collection>"
 
-            from invenio.legacy.bibfield import create_record
+            from invenio.modules.records.api import create_record
 
-            new_dict_representation = create_record(updated_xml).rec_json
+            new_dict_representation = create_record(updated_xml).dumps()
             try:
                 obj.data['reference'].append(new_dict_representation["reference"])
             except KeyError:
@@ -583,10 +582,10 @@ def author_list(obj, eng):
         updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' + record_xml_output(authorlist_record) \
                       + '</collection>'
         if not None == updated_xml:
-            from invenio.legacy.bibfield import create_record
+            from invenio.base.records.api import create_record
             # We store the path to the directory  the tarball contents live
             # Read and grab MARCXML from plotextractor run
-            new_dict_representation = create_record(updated_xml).rec_json
+            new_dict_representation = create_record(updated_xml).dumps()
             obj.data['authors'] = new_dict_representation["authors"]
             obj.data['number_of_authors'] = new_dict_representation["number_of_authors"]
 
@@ -605,8 +604,7 @@ def upload_step(obj, eng):
     #Prepare in case of filtering the files to up,
     #no filtering, no other things to do
 
-    new_dict_representation = JsonReader()
-    new_dict_representation.rec_json = obj.data
+    new_dict_representation = Record(obj.data)
     marcxml_value = new_dict_representation.legacy_export_as_marc()
 
     task_id = None

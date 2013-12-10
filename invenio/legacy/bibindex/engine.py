@@ -83,7 +83,7 @@ from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     get_min_last_updated, \
     remove_inexistent_indexes
 from invenio.legacy.bibrecord import get_fieldvalues
-from invenio.legacy.bibfield import get_record
+from invenio.modules.records.api import get_record
 from invenio.utils.memoise import Memoise
 
 

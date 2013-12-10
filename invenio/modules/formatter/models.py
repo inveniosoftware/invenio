@@ -25,7 +25,7 @@
     administration pages.
 """
 from invenio.ext.sqlalchemy import db
-from invenio.modules.record_editor.models import Bibrec
+from invenio.modules.records.models import Record as Bibrec
 
 
 class Format(db.Model):

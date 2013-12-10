@@ -29,7 +29,7 @@ from flask.ext.login import current_user
 
 from invenio.legacy.bibsched.bibtask import task_low_level_submission, \
     bibtask_allocate_sequenceid
-from invenio.legacy.bibfield.bibfield_jsonreader import JsonReader
+from invenio.modules.records.api import Record
 from invenio.config import CFG_TMPSHAREDDIR
 from invenio.legacy.dbquery import run_sql
 from invenio.modules.deposit.models import Deposition, Agent, \
@@ -214,13 +214,14 @@ def finalize_record_sip():
         d = Deposition(obj)
         sip = d.get_latest_sip(include_sealed=False)
 
-        jsonreader = JsonReader()
+        json = Record()
         for k, v in sip.metadata.items():
-            jsonreader[k] = v
+            json.set(k, v, extend=True)
 
-        sip.package = jsonreader.legacy_export_as_marc()
+        sip.package = json.legacy_export_as_marc()
 
-        current_app.logger.info(jsonreader['__error_messages'])
+        current_app.logger.info(json['__meta_metadata__']['__errors__'])
+        current_app.logger.info(json['__meta_metadata__']['__continuable_errors__'])
         current_app.logger.info(sip.package)
 
         d.update()

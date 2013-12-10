@@ -223,7 +223,7 @@ def make_flask_test_suite(*test_cases):
                                                           test_cases))])
 
 
-#@nottest
+@nottest
 def run_test_suite(testsuite, warn_user=False):
     """
     Convenience function to embed in test suites.  Run given testsuite
