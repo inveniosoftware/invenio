@@ -201,10 +201,8 @@ class WebAuthorPages(WebInterfaceDirectory):
         @rtype: str
         '''
         if not CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID:
-            raise webinterface_handler_config.SERVER_RETURN(webinterface_handler_config.HTTP_NOT_FOUND)
-            # return webinterface_handler_config.HTTP_NOT_FOUND
-            # self.person_id = self.original_search_parameter
-            # return self.index(req, form)
+            self.person_id = self.original_search_parameter
+            return self.index(req, form)
 
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
                                    'recid': (int, -1),
