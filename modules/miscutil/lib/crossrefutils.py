@@ -128,6 +128,10 @@ def get_doi_for_records(records):
             for tag, ind1, ind2 in [("773", "", "")]:
                 val = record_get_field_value(record, tag, ind1, ind2, subfield)
                 if val:
+                    if subfield == "c":
+                        # strip page range to send only starting page
+                        if '-' in val:
+                            val = val.split('-')[0]
                     data[position] = val
                     break
 
