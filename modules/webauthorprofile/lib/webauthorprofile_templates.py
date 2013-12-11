@@ -431,6 +431,7 @@ class Template:
             if (collabs):
                 if CFG_WEBAUTHORPROFILE_MAX_COLLAB_LIST > 0:
                     collabs = collabs[0:CFG_WEBAUTHORPROFILE_MAX_COLLAB_LIST]
+
                 def print_collabs(collabs):
                     collabstr = ""
                     for (cl, freq) in collabs:
