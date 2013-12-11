@@ -49,6 +49,7 @@ from invenio.config import \
      CFG_BIBFORMAT_HIDDEN_TAGS, \
      CFG_SITE_RECORD, \
      CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS
+from invenio.messages import wash_language
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.access_control_engine import acc_authorize_action
@@ -534,7 +535,7 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
     of = of.lower()
     jrec = request.values.get('jrec', ctx.get('jrec', 1), type=int)
     rg = request.values.get('rg', ctx.get('rg', 10), type=int)
-    ln = request.values.get('ln', ln)
+    ln = wash_language(request.values.get('ln', ln))
     pages = int(ceil(jrec / float(rg))) if rg > 0 else 1
 
     context = dict(
