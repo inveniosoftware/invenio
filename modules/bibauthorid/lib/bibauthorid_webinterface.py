@@ -16,8 +16,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from invenio.bibauthorid_webapi import get_canonical_id_from_person_id, add_cname_to_hepname_record
-
 """ Bibauthorid Web Interface Logic and URL handler. """
 
 # pylint: disable=W0105
@@ -29,14 +27,14 @@ from cgi import escape
 from pprint import pformat
 from operator import itemgetter
 import re
-import pprint
 
 try:
     from invenio.jsonutils import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
-except:
+except ImportError:
     CFG_JSON_AVAILABLE = False
     json = None
 
+from invenio.bibauthorid_webapi import add_cname_to_hepname_record
 from invenio.config import CFG_SITE_URL, CFG_BASE_URL
 from invenio.bibauthorid_config import AID_ENABLED, PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT, \
                             BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS, PERSONS_PER_PAGE, \
@@ -51,10 +49,17 @@ from invenio.template import load
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.session import get_session
 from invenio.urlutils import redirect_to_url, get_canonical_and_alternates_urls
-from invenio.webuser import getUid, page_not_authorized, collect_user_info, set_user_preferences, \
-                            email_valid_p, emailUnique, get_email_from_username, get_uid_from_email, \
-                            isUserSuperAdmin, isGuestUser
-from invenio.access_control_admin import acc_find_user_role_actions, acc_get_user_roles, acc_get_role_id
+from invenio.webuser import (getUid,
+                             page_not_authorized,
+                             collect_user_info,
+                             set_user_preferences,
+                             get_user_preferences,
+                             email_valid_p,
+                             emailUnique,
+                             get_email_from_username,
+                             get_uid_from_email,
+                             isGuestUser)
+from invenio.access_control_admin import acc_get_user_roles
 from invenio.search_engine import perform_request_search
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_config import CREATE_NEW_PERSON
@@ -196,9 +201,9 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
         pinfo['claim_in_process'] = True
 
-        uinfo = collect_user_info(req)
-        uinfo['precached_viewclaimlink'] = pinfo['claim_in_process']
-        set_user_preferences(pinfo['uid'], uinfo)
+        prefs = get_user_preferences(req)
+        prefs['precached_viewclaimlink'] = pinfo['claim_in_process']
+        set_user_preferences(pinfo['uid'], prefs)
 
         if self.person_id != -1:
             pinfo['claimpaper_admin_last_viewed_pid'] = self.person_id
@@ -679,10 +684,10 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         if "merge_ticket" in pinfo and pinfo['merge_ticket']:
             pinfo['merge_ticket'] = []
 
-        uinfo = collect_user_info(req)
-        uinfo['precached_viewclaimlink'] = True
+        prefs = get_user_preferences(req)
+        prefs['precached_viewclaimlink'] = True
         uid = getUid(req)
-        set_user_preferences(uid, uinfo)
+        set_user_preferences(uid, prefs)
 
         if "referer" in pinfo and pinfo["referer"]:
             referer = pinfo["referer"]
