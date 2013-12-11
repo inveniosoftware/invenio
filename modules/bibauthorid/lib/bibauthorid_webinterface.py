@@ -3100,6 +3100,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         except:
             return self._fail(req, apache.HTTP_NOT_FOUND)
 
+        webapi.session_bareinit(req)
         session = get_session(req)
         pinfo = session['personinfo']
         if not self._is_admin(pinfo):
