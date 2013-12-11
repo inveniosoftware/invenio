@@ -551,7 +551,7 @@ def _get_institute_pubs_dict(recids, names_list):
     for rec, affs in a:
         keys = affs.keys()
         for name in names_list:
-            if name in keys and affs[name][0]:
+            if name in keys and affs[name]:
                 for aff in affs[name]:
                     try:
                         affdict[aff].add(rec)
