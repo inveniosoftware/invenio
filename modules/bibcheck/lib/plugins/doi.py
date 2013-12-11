@@ -24,7 +24,7 @@ from invenio.crossrefutils import get_doi_for_records
 from invenio.bibupload import find_record_from_doi
 
 
-def check_records(records, doi_field="0247_a", extra_subfields=(("2", "DOI"),)):
+def check_records(records, doi_field="0247_a", extra_subfields=(("2", "DOI"), ("9", "bibcheck"))):
     """
     Find the DOI for the records using crossref and add it to the specified
     field.
