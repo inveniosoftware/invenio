@@ -61,7 +61,7 @@ from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.shellutils import split_cli_ids_arg
 from invenio.jsonutils import json
 
-CFG_BATCH_SIZE = 100
+CFG_BATCH_SIZE = 1000
 
 class RulesParseError(Exception):
     """ An exception indicating an error in the rules definition """
@@ -285,9 +285,9 @@ def task_run_core():
         else:
             single_rules.add(rule_name)
 
+    records_to_upload_holdingpen = []
+    records_to_upload_replace = []
     for batch in iter_batches(all_recids, CFG_BATCH_SIZE):
-        records_to_upload_holdingpen = []
-        records_to_upload_replace = []
 
         for rule_name in batch_rules:
             rule = rules[rule_name]
@@ -323,7 +323,17 @@ def task_run_core():
             if not record.valid:
                 submit_ticket(record, record_id)
 
+        if len(records_to_upload_holdingpen) >= CFG_BATCH_SIZE:
+            upload_amendments(records_to_upload_holdingpen, True)
+            records_to_upload_holdingpen = []
+        if len(records_to_upload_replace) >= CFG_BATCH_SIZE:
+            upload_amendments(records_to_upload_replace, False)
+            records_to_upload_replace = []
+
+    ## In case there are still some remaining amended records
+    if records_to_upload_holdingpen:
         upload_amendments(records_to_upload_holdingpen, True)
+    if records_to_upload_replace:
         upload_amendments(records_to_upload_replace, False)
 
     # Update the database with the last time the rules was ran
