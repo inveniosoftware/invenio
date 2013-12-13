@@ -20,22 +20,14 @@
 BibWorkflow API - functions to run workflows
 """
 
-
-
 from werkzeug.utils import (import_string,
                             cached_property)
 from invenio.base.globals import cfg
-
 from invenio.base.config import CFG_BIBWORKFLOW_WORKER
 
-
-
-from invenio.modules.workflows.utils import BibWorkflowObjectIdContainer
-from invenio.modules.workflows.models import BibWorkflowObject
-
-
-class InvenioBibWorkflowWorkerUnavailable(Exception):
-    pass
+from .utils import BibWorkflowObjectIdContainer
+from .models import BibWorkflowObject
+from .errors import WorkflowWorkerError
 
 
 class WorkerBackend(object):
@@ -52,7 +44,7 @@ class WorkerBackend(object):
 
     def __call__(self, *args, **kwargs):
         if not self.worker:
-            raise InvenioBibWorkflowWorkerUnavailable('No worker configured')
+            raise WorkflowWorkerError('No worker configured')
         return self.worker(*args, **kwargs)
 
 
@@ -106,7 +98,7 @@ def start_delayed(workflow_name, data, **kwargs):
     @return: BibWorkflowEngine that ran the workflow.
     """
     if not CFG_BIBWORKFLOW_WORKER:
-        raise InvenioBibWorkflowWorkerUnavailable('No worker configured')
+        raise WorkflowWorkerError('No worker configured')
 
     #The goal of this part is to avoid a SQLalchemy decoherence in case
     #some one try to send a Bibworkflow object. To avoid to send the
@@ -180,7 +172,9 @@ def start_by_oids(workflow_name, oids, **kwargs):
     @return: BibWorkflowEngine that ran the workflow.
     """
     from .models import BibWorkflowObject
-    objects = BibWorkflowObject.query.filter(BibWorkflowObject.id.in_(list(oids))).all()
+    objects = BibWorkflowObject.query.filter(
+        BibWorkflowObject.id.in_(list(oids))
+    ).all()
     return start(workflow_name, objects, **kwargs)
 
 
@@ -206,7 +200,9 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
     @return: BibWorkflowEngine that ran the workflow.
     """
     from .models import BibWorkflowObject
-    objects = BibWorkflowObject.query.filter(BibWorkflowObject.id.in_(list(oids))).all()
+    objects = BibWorkflowObject.query.filter(
+        BibWorkflowObject.id.in_(list(oids))
+    ).all()
 
     return start_delayed(workflow_name, objects, **kwargs)
 

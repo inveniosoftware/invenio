@@ -413,7 +413,9 @@ BibWorkflowEngine
         """Halt the workflow (stop also any parent wfe)"""
         message = "Workflow '%s' halted at task %s with message: %s" % \
                   (self.name, self.get_current_taskname() or "Unknown", msg)
-        raise WorkflowHalt(message=message)
+        raise WorkflowHalt(message=message,
+                           widget=widget,
+                           id_workflow=self.uuid)
 
     def set_counter_initial(self, obj_count):
         self.db_obj.counter_initial = obj_count

@@ -1,17 +1,17 @@
 {% extends "workflows/layout_workflow_details.html" %}
 {% import 'workflows/utils.html' as utils %}
 
+{% js url_for('workflows.static', filename='js/workflows/entry_details.js'), '50-workflows' %}
+
 {% block javascript %}
     {{ super() }}
-    {% block workflows_entry_assets %}
-        {% js url_for('workflows.static', filename='js/workflows/entry_details.js', '50-workflows') %}
-        <script type="text/javascript">
-            $(document).ready(function(){
-                bind_object_preview("{{ url_for('workflows.entry_data_preview') }}", "{{ entry.id }}");
-            });
-        </script>
-    {% endblock workflows_entry_assets %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            bind_object_preview("{{ url_for('workflows.entry_data_preview') }}", "{{ entry.id }}");
+        });
+    </script>
 {% endblock javascript %}
+
 {% block body %}
 
 <div class="modal-header">
@@ -21,7 +21,7 @@
 <div class="modal-body">
     <div class="row-fluid">
         <div class="span12">
-                        Owner: <b>{{ entry.owner }}</b> | Creation date: <b>{{ entry.created }}</b>
+                        Owner: <b>{{ entry.id_user }}</b> | Creation date: <b>{{ entry.created }}</b>
         </div>
     </div>
     <div class="row-fluid">
@@ -43,7 +43,7 @@
          <div class="span3">
             Workflow definition:
             <div class="well">
-                {{ utils.function_display(workflow_func, entry.extra_data['task_counter']) }}
+                {{ utils.function_display(workflow_func, entry.get_extra_data()['task_counter']) }}
             </div>
          </div>
          <div class="span4">

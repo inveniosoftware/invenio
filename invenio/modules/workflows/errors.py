@@ -27,7 +27,10 @@ from workflow.engine import HaltProcessing
 
 
 class WorkflowHalt(HaltProcessing):
-    """Raised when workflow should be halted."""
+    """
+    Raised when workflow should be halted.
+    Also contains the widget to be displayed.
+    """
 
     def __init__(self, message, widget=None, **kwargs):
         HaltProcessing.__init__(self)
@@ -38,12 +41,13 @@ class WorkflowHalt(HaltProcessing):
     def to_dict(self):
         rv = dict(self.payload or ())
         rv['message'] = self.message
+        rv['widget'] = self.widget
         return rv
 
     def __str__(self):
         """String representation."""
-        return "WorkflowHalt(%s, payload: %r)" % \
-               (repr(self.message), repr(self.payload))
+        return "WorkflowHalt(%s, widget: %s, payload: %r)" % \
+               (repr(self.message), repr(self.widget), repr(self.payload))
 
 
 class WorkflowError(Exception):
@@ -59,6 +63,8 @@ class WorkflowError(Exception):
     def to_dict(self):
         rv = dict(self.payload or ())
         rv['message'] = self.message
+        rv['id_workflow'] = self.id_workflow
+        rv['id_object'] = self.id_object
         return rv
 
     def __str__(self):
@@ -79,9 +85,31 @@ class WorkflowDefinitionError(Exception):
     def to_dict(self):
         rv = dict(self.payload or ())
         rv['message'] = self.message
+        rv['workflow_name'] = self.workflow_name
         return rv
 
     def __str__(self):
         """String representation."""
         return "WorkflowDefinitionError(%s, workflow_name: %s, payload: %r)" % \
                 (repr(self.message), self.workflow_name, repr(self.payload) or "None")
+
+
+class WorkflowWorkerError(Exception):
+    """Raised when there is a problem with workflow workers."""
+
+    def __init__(self, message, worker_name, **kwargs):
+        Exception.__init__(self)
+        self.message = message
+        self.worker_name = worker_name
+        self.payload = kwargs
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        rv['worker_name'] = self.worker_name
+        return rv
+
+    def __str__(self):
+        """String representation."""
+        return "WorkflowDefinitionError(%s, worker_name: %s, payload: %r)" % \
+                (repr(self.message), self.worker_name, repr(self.payload) or "None")

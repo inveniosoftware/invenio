@@ -23,7 +23,6 @@ from flask.ext.login import login_required
 from ..models import BibWorkflowObject, Workflow
 from ..loader import widgets
 from invenio.base.decorators import templated, wash_arguments
-from invenio.modules.formatter.engine import format_record
 from invenio.base.i18n import _
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.menu import register_menu
@@ -252,8 +251,7 @@ def details(bwobject_id):
                            bwparent=extracted_data['bwparent'],
                            info=extracted_data['info'],
                            log=extracted_data['logtext'],
-                           data_preview=_entry_data_preview(
-                               bwobject.get_data(), recformat),
+                           data_preview=bwobject.get_formatted_data(recformat),
                            workflow_func=extracted_data['workflow_func'],
                            workflow=extracted_data['w_metadata'])
 
@@ -375,17 +373,21 @@ def resolve_widget(bwobject_id, widget):
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])
 @login_required
 @wash_arguments({'oid': (unicode, '0'),
-                 'recformat': (unicode, 'default')})
+                 'recformat': (unicode, None)})
 def entry_data_preview(oid, recformat):
     """
     Presents the data in a human readble form or in xml code
     """
     from flask import jsonify, Markup
+    from pprint import pformat
 
     bwobject = BibWorkflowObject.query.get(int(oid))
 
-    formatted_data = _entry_data_preview(bwobject.get_data(), recformat)
-    if recformat in ("xm", "xml", "marcxml"):
+    formatted_data = bwobject.get_formatted_data(recformat)
+    if isinstance(formatted_data, dict):
+        formatted_data = pformat(formatted_data)
+
+    if recformat and recformat in ("xm", "xml", "marcxml"):
         data = Markup.escape(formatted_data)
     else:
         data = formatted_data
@@ -408,18 +410,6 @@ def get_info(bwobject):
     return info
 
 
-def _entry_data_preview(data, recformat='hd'):
-    """
-    Formats the data using format_record
-    """
-    if recformat != 'xm':
-        return format_record(recID=None, of=recformat, xml_record=data)
-    else:
-        from xml.dom.minidom import parseString
-        pretty_data = parseString(data)
-        return pretty_data.toprettyxml()
-
-
 def extract_data(bwobject):
     """
     Extracts metadata for BibWorkflowObject needed for rendering
@@ -427,8 +417,11 @@ def extract_data(bwobject):
     """
     extracted_data = {}
 
-    extracted_data['bwparent'] = \
-        BibWorkflowObject.query.get(bwobject.id_parent)
+    if bwobject.id_parent is not None:
+        extracted_data['bwparent'] = \
+            BibWorkflowObject.query.get(bwobject.id_parent)
+    else:
+        extracted_data['bwparent'] = None
 
     # TODO: read the logstuff from the db
     extracted_data['loginfo'] = ""
