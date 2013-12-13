@@ -17,13 +17,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """Holding Pen & BibWorkflow web interface"""
 
-import traceback
 from flask import render_template, Blueprint
 from flask.ext.login import login_required
 
 from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
+
 from ..api import start_delayed
 from ..utils import (get_workflow_definition,
                      get_redis_keys as utils_get_redis_keys,
@@ -60,28 +60,37 @@ def entry_details(id_entry):
     """
     Displays entry details.
     """
-    wfe_object = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                                id_entry).first()
+    wfe_object = BibWorkflowObject.query.filter(
+        BibWorkflowObject.id == id_entry
+    ).first()
 
+    workflow_object = Workflow.query.filter(
+        Workflow.uuid == wfe_object.id_workflow
+    ).first()
+
+    # Workflow class: workflow.workflow is the workflow list
+    workflow = get_workflow_definition(workflow_object.name)
     return render_template('workflows/entry_details.html',
                            entry=wfe_object, log="",
                            data_preview=_entry_data_preview(
-                               wfe_object.data, 'hd'),
-                           workflow_func=get_workflow_definition(
-                               wfe_object.bwlWORKFLOW.name))
+                               wfe_object.get_data(), 'hd'),
+                           workflow_func=workflow.workflow)
 
 
 @blueprint.route('/workflow_details', methods=['GET', 'POST'])
 @login_required
 @wash_arguments({'id_workflow': (unicode, "")})
 def workflow_details(id_workflow):
-    w_metadata = Workflow.query.filter(Workflow.uuid == id_workflow).first()
+    workflow_object = Workflow.query.filter(
+        Workflow.uuid == id_workflow
+    ).first()
 
+    # Workflow class: workflow.workflow is the workflow list
+    workflow = get_workflow_definition(workflow_object.name)
     return render_template('workflows/workflow_details.html',
-                           workflow_metadata=w_metadata,
+                           workflow_metadata=workflow_object,
                            log="",
-                           workflow_func=get_workflow_definition(
-                               w_metadata.name))
+                           workflow_func=workflow.workflow)
 
 
 @blueprint.route('/workflows', methods=['GET', 'POST'])
@@ -95,11 +104,7 @@ def show_workflows():
 @login_required
 @wash_arguments({'workflow_name': (unicode, "")})
 def run_workflow(workflow_name, data={"data": 10}):
-    try:
-        print "Starting workflow '%s'" % (workflow_name,)
-        start_delayed(workflow_name, data)
-    except:
-        traceback.print_exc()
+    start_delayed(workflow_name, data)
     return "Workflow has been started."
 
 
@@ -110,7 +115,7 @@ def run_workflow(workflow_name, data={"data": 10}):
 def entry_data_preview(oid, of):
     workflow_object = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
                                                      oid).first()
-    return _entry_data_preview(workflow_object.data, of)
+    return _entry_data_preview(workflow_object.get_data(), of)
 
 
 @blueprint.route('/get_redis_keys', methods=['GET', 'POST'])
@@ -128,8 +133,6 @@ def get_redis_keys(key):
 @login_required
 @wash_arguments({'key': (unicode, "")})
 def get_redis_values(key):
-    keys = key.split()
-    # values = filter_holdingpen_results(*keys)
     values = filter_holdingpen_results(key)
     return str(values)
 

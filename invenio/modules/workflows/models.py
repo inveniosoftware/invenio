@@ -22,6 +22,7 @@ import tempfile
 import cPickle
 import base64
 import logging
+import six
 
 from datetime import datetime
 from sqlalchemy import desc
@@ -75,7 +76,6 @@ class Workflow(db.Model):
     counter_error = db.Column(db.Integer, default=0, nullable=False)
     counter_finished = db.Column(db.Integer, default=0, nullable=False)
     module_name = db.Column(db.String(64), nullable=False)
-
 
     def __repr__(self):
         return "<Workflow(name: %s, module: %s, cre: %s, mod: %s," \
@@ -397,7 +397,7 @@ BibWorkflowObject
         tmp_fd, filename = tempfile.mkstemp(dir=directory,
                                             prefix=prefix,
                                             suffix=suffix)
-        os.write(tmp_fd, self._data)
+        os.write(tmp_fd, self.get_data())
         os.close(tmp_fd)
         return filename
 
@@ -418,6 +418,58 @@ BibWorkflowObject
         self.status = other.status
         self.data_type = other.data_type
         self.uri = other.uri
+
+    def get_formatted_data(self, format=None, formatter=None):
+        """
+        Returns the data in some chewable format.
+        """
+        from invenio.legacy.bibfield.bibfield_jsonreader import JsonReader
+        from invenio.modules.formatter.engine import format_record
+
+        data = self.get_data()
+
+        if formatter:
+            # A seperate formatter is supplied
+            return formatter(data)
+
+        if isinstance(data, dict):
+            # Dicts are cool on its own, but maybe its bibfield
+            try:
+                new_dict_representation = JsonReader()
+                new_dict_representation.rec_json = data
+                data = new_dict_representation.legacy_export_as_marc()
+            except Exception as e:
+                raise e
+
+        if isinstance(data, six.string_types):
+            # Its a string type, lets try to convert
+            if format:
+                # We can try formatter!
+                # If already XML, format_record does not like it.
+                if format != 'xm':
+                    try:
+                        return format_record(recID=None,
+                                             of=format,
+                                             xml_record=data)
+                    except TypeError as e:
+                        # Wrong kind of type
+                        pass
+                else:
+                    # So, XML then
+                    from xml.dom.minidom import parseString
+                    try:
+                        pretty_data = parseString(data)
+                        return pretty_data.toprettyxml()
+                    except TypeError:
+                        # Probably not proper XML string then
+                        return "Data cannot be parsed: %s" % (data,)
+                    except Exception:
+                        # Some other parsing error
+                        pass
+            # Just return raw string
+            return data
+        # Not any of the above types. How juicy!
+        return data
 
 
 class BibWorkflowObjectLog(db.Model):
