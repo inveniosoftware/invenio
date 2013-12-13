@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -157,22 +157,20 @@ def add(msg_reply_id):
         m.id_user_from = uid
         m.sent_date = datetime.now()
         quotas = dblayer.check_quota(cfg['CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES'] - 1)
-        users = filter(lambda x: quotas.has_key(x.id), m.recipients)
+        users = filter(lambda x: x.id in quotas, m.recipients)
         #m.recipients = m.recipients.difference(users))
         for u in users:
             m.recipients.remove(u)
         if len(users) > 0:
-            flash(_('Following users reached their quota %d messages: %s') % \
-                  (cfg['CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES'], ', '.join(
-                  [u.nickname for u in users]),), "error")
-        flash(_('Message has %d valid recipients.') %
-              (len(m.recipients),), "info")
+            flash(_('Following users reached their quota %(quota)d messages: %(users)s',
+                  quota=cfg['CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES'],
+                  users=', '.join([u.nickname for u in users])), "error")
+        flash(_('Message has %(recipients)d valid recipients.',
+                recipients=len(m.recipients)), "info")
         if len(m.recipients) == 0:
             flash(_('Message was not sent'), "info")
         else:
-            if m.received_date is not None \
-                and m.received_date > datetime.now():
-
+            if m.received_date is not None and m.received_date > datetime.now():
                 for um in m.sent_to_users:
                     um.status = cfg['CFG_WEBMESSAGE_STATUS_CODE']['REMINDER']
             else:

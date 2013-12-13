@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,14 +39,14 @@ import sys
 import time
 import cgi
 
-from invenio import bibclassify_config as bconfig
+import config as bconfig
 log = bconfig.get_logger("bibclassify.engine")
 
-from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader as reader
-from invenio import bibclassify_text_extractor as extractor
-from invenio import bibclassify_text_normalizer as normalizer
-from invenio import bibclassify_keyword_analyzer as keyworder
-from invenio import bibclassify_acronym_analyzer as acronymer
+from invenio.legacy.bibclassify import ontology_reader as reader
+import text_extractor as extractor
+import text_normalizer as normalizer
+import keyword_analyzer as keyworder
+import acronym_analyzer as acronymer
 
 try:
     from invenio.utils.url import make_user_agent_string

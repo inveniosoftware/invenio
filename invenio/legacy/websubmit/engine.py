@@ -1490,7 +1490,8 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
     doctype_details = get_doctype_details(doctype)
     if doctype_details is None:
         ## Doctype doesn't exist - raise error:
-        return warning_page(_("Unable to find document type: %s") % escape(str(doctype)), req, ln)
+        return warning_page(_("Unable to find document type: %(doctype)s",
+                              doctype=escape(str(doctype))), req, ln)
     else:
         docFullDesc  = doctype_details[0]
         # Also update the doctype as returned by the database, since

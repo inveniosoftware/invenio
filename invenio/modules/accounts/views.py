@@ -133,7 +133,7 @@ def login(nickname=None, password=None, login_method=None, action='',
                         # Change HTTP method to https if needed.
                         referer = rewrite_to_secure_url(referer)
                         return redirect(referer)
-                    return redirect('/')
+                return redirect('/')
     except Exception as e:
         current_app.logger.error('Exception during login process: %s', str(e))
         flash(_("Problem with login."), "error")

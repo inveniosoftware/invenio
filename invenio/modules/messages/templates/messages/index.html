@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@
 {% from "_formhelpers.html" import th with context %}
 {% from "_formhelpers.html" import render_filter_form with context %}
 {% extends "page.html" %}
+{%- js url_for('webmessage.static', filename='js/messages/messages.js'),'70-comments' -%}
 {% set title = _("Your Messages") %}
 {% set personalize_selected = True %}
 {% block body %}
@@ -95,14 +96,4 @@
 
 {% block javacript %}
 {{ super() }}
-<script type="text/javascript">
-$(document).ready(function() {
-  $('#togglemsg').change(function() {
-    var toggle = $('#togglemsg').attr("checked")
-    $(".msgid").attr("checked", function(i, val) {
-      return ! $(this).attr("checked");
-    });
-  });
-});
-</script>
 {% endblock %}

@@ -30,8 +30,8 @@ from invenio import config
 from invenio.base.i18n import gettext_set_language
 from urllib import quote
 from invenio.utils.html import escape_html
-from invenio import bibclassify_config as bconfig
-from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader as reader
+import config as bconfig
+from invenio.legacy.bibclassify import ontology_reader as reader
 log = bconfig.get_logger("bibclassify.template")
 
 

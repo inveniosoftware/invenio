@@ -38,7 +38,7 @@ class AddCmtRECORDCOMMENTForm(InvenioBaseForm):
             )
         )
     ])
-    in_reply_to_id_cmtRECORDCOMMENT = HiddenField()
+    in_reply_to_id_cmtRECORDCOMMENT = HiddenField(default=0)
 
 
 class AddCmtRECORDCOMMENTFormReview(AddCmtRECORDCOMMENTForm):

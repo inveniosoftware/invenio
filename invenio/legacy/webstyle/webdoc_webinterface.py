@@ -157,7 +157,8 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
                      (ln_link, _("Hacking Invenio"))}
         body = '<div class="container" ><div class="row">' + \
                '<div  class="span8"><h5>' + \
-              _('Table of contents of the %(x_category)s pages.') % {'x_category': categ}
+              _('Table of contents of the %(x_category)s pages.',
+                x_category=_(categ))
         if categ != 'help':
             body += ' <small>' + _('See also') + ' ' + \
                               ', '.join([ link for (category, link) in \
@@ -178,7 +179,7 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
     # set page title:
     page_title = page_parts.get('title', '')
     if not page_title:
-        page_title = _("Page %s Not Found") % cgi.escape(webdocname)
+        page_title = _("Page %(page)s Not Found", page=cgi.escape(webdocname))
 
     # set page navtrail:
     page_navtrail = page_parts.get('navtrail', '')
@@ -186,14 +187,15 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
     # set page body:
     page_body = page_parts.get('body' , '')
     if not page_body:
-        page_body = '<p>' + (_("Sorry, page %s does not seem to exist.") % \
-                    ('<strong>' + cgi.escape(webdocname) + '</strong>')) + \
+        page_body = '<p>' + \
+                    _("Sorry, page %(page)s does not seem to exist.",
+                      page='<strong>' + cgi.escape(webdocname) + '</strong>') + \
                     '</p>'
-        page_body += '<p>' + (_("You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)s.") % \
-                              {'x_category': _(categ),
-                               'x_url_open': '<a href="%s/help/%scontents%s">' % \
-                               (CFG_SITE_URL, ((categ != 'help' and categ + '/') or ''), ln_link),
-                               'x_url_close': '</a>'}) + \
+        page_body += '<p>' + \
+                     _("You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)s.",
+                       x_category=_(categ),
+                       x_url_open='<a href="%s/help/%scontents%s">' % (CFG_SITE_URL, ((categ != 'help' and categ + '/') or ''), ln_link),
+                       x_url_close='</a>') + \
                      '</p>'
 
     # set page description:

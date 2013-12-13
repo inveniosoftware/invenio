@@ -19,8 +19,10 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
 
 'use strict';
 
-$(document).on('hidden.bs.modal', function() {
-    // delete any existing modal elements instead of just hiding them
-    $('.modal').remove();
-    $('.modal-backdrop').remove();
+$(document).ready(function() {
+    $('#togglemsg').change(function() {
+        $('.msgid').attr('checked', function() {
+            return !$(this).attr('checked');
+        });
+    });
 });

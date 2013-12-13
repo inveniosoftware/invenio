@@ -18,8 +18,8 @@
 #}
 
 {% macro menu( active = "service") -%}
-	<ul class="nav nav-pills nav-stacked">
-		<li {{("", "class=active")[active == "dropbox"]}}><a href="{{ url_for('cloudutils.index', service='dropbox') }}">DropBox</a></li>
+  <ul class="nav nav-pills nav-stacked">
+    <li {{("", "class=active")[active == "dropbox"]}}><a href="{{ url_for('cloudutils.index', service='dropbox') }}">DropBox</a></li>
     <li {{("", "class=active")[active == "google_drive"]}}><a href="{{ url_for('cloudutils.index', service='google_drive') }}">Google Drive</a></li>
     <li {{("", "class=active")[active == "skydrive"]}}><a href="{{ url_for('cloudutils.index', service='skydrive') }}">SkyDrive</a></li>
   </ul>
