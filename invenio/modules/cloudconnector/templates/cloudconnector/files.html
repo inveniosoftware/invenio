@@ -28,9 +28,13 @@
           <form style="display:inline-block; margin-left: 15px" action="{{ url_for('cloudutils.upload', service=service_name) }}" method="POST">
               <input type="hidden" name="files"  value="{{files}}" />
               <input type="hidden" name="return_url"  value="{{request.url}}" />
-              <input type='image' width="150" height="140" title="{{ config.CFG_SERVICE_PRETTY_NAME }}" src="/img/{{service_name}}_icon.png" alt="{{ config.CFG_SERVICE_PRETTY_NAME }}" />
+              <input type='image'
+                     width="150" height="140"
+                     title="{{ config.CFG_SERVICE_PRETTY_NAME }}"
+                     src="{{ url_for('cloudutils.static', filename='img/cloudconnector/%s_icon.png'|format(service_name)) }}"
+                     alt="{{ config.CFG_SERVICE_PRETTY_NAME }}" />
           </form>
         {% endfor %}
       </div>
-  </div>  
+  </div>
 {%- endmacro %}

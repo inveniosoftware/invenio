@@ -167,7 +167,7 @@ def tag_details(id_tag):
 
 @blueprint.route('/tag/<int:id_tag>/edit', methods=['GET', 'POST'])
 @login_required
-@templated('tags/edit.html')
+@templated('tags/record_tags_test.html')  # FIXME: tag editor template missing?
 @register_breadcrumb(blueprint, '.tag_edit', _('Edit tag'))
 def tag_edit(id_tag):
     """ List of documents attached to this tag """

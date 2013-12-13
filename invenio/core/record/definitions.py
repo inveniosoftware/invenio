@@ -26,7 +26,6 @@ __all__ = ['field_definitions', 'legacy_field_matchings', 'model_definitions']
 
 
 def _rebuild_cache():
-    print ">>> Recreating the cache for fields!"
     from invenio.core.record.config_engine import FieldParser
     field_definitions, legacy_field_matchings = FieldParser(
         'recordext.fields').create()

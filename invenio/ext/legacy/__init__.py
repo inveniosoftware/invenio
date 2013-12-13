@@ -78,6 +78,7 @@ def setup_app(app):
             return response
         except HTTPException:
             from flask import current_app
+            # FIXME: check if request.path is static
             return current_app.send_static_file(request.path)
 
     @app.endpoint('static')

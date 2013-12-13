@@ -180,7 +180,7 @@ def references(recid):
 @request_record
 def files(recid):
     def get_files():
-        from invenio.bibdocfile import BibRecDocs
+        from invenio.legacy.bibdocfile.api import BibRecDocs
         for bibdoc in BibRecDocs(recid).list_bibdocs():
             for file in bibdoc.list_all_files():
                 yield file.get_url()

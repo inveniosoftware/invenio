@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,7 +30,7 @@ references section and to replace unicode characters.
 
 import sys
 import re
-from invenio import bibclassify_config as bconfig
+import config as bconfig
 
 from invenio.legacy.docextract.pdf import replace_undesirable_characters
 from invenio.legacy.refextract.find import find_reference_section, find_end_of_reference_section

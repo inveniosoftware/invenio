@@ -1201,7 +1201,8 @@ class Template:
         if not nickname:
             (uid, nickname, display) = get_user_info(uid)
         if nickname:
-            note = _("Note: Your nickname, %s, will be displayed as author of this comment.") % ('<i>' + nickname + '</i>')
+            note = _("Note: Your nickname, %(nick)s, will be displayed as author of this comment.",
+                     nick='<i>' + nickname + '</i>')
         else:
             (uid, nickname, display) = get_user_info(uid)
             link = '<a href="%s/youraccount/edit">' % CFG_SITE_SECURE_URL

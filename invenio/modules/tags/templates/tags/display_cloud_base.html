@@ -24,8 +24,8 @@
   <h4> {{_('Tag Cloud') }} </h4>
   <div class="span4">
   {% for tag in user_tags %}
-      {#<a href="{{ url_for('search.search', p='tag:"' + tag['name']) + '"' }}"#}
-      <a href="{{ url_for('webtag.tag_edit', id_tag=tag.id) }}"
+      <a href="{{ url_for('search.search', p='tag:"' + tag['name']) + '"' }}"
+      {#<a href="{{ url_for('webtag.tag_edit', id_tag=tag.id) }}"#}
         style="font-size: {{tag.css_size}}%; white-space: nowrap;">
         {{ tag.name }}
       </a>

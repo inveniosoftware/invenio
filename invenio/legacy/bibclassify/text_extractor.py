@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -38,7 +38,7 @@ import re
 import sys
 import tempfile
 import urllib2
-from invenio import bibclassify_config as bconfig
+from invenio.legacy.bibclassify import config as bconfig
 
 if bconfig.STANDALONE:
     from urllib2 import urlopen

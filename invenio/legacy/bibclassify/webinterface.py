@@ -25,7 +25,7 @@ import os
 from cgi import escape
 from urllib import quote
 import time
-from invenio import bibupload
+from invenio.legacy import bibupload
 
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.bibdocfile.api import BibRecDocs
@@ -35,17 +35,17 @@ from invenio.legacy.search_engine import get_colID, \
     guess_primary_collection_of_a_record, create_navtrail_links, \
     perform_request_search, get_record, print_record
 from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
-from invenio.template import load
+from invenio.legacy.template import load
 from invenio.ext.legacy.handler import wash_urlargd
 from invenio.legacy.webuser import collect_user_info
 import invenio.modules.access.engine as acce
 from invenio.legacy import dbquery
-from invenio import bibtask
+from invenio.legacy.bibsched import bibtask
 from invenio.legacy import bibrecord
 
-from invenio import bibclassify_config as bconfig
-from invenio import bibclassify_text_extractor
-from invenio import bibclassify_engine
+from invenio.legacy.bibclassify import config as bconfig
+from invenio.legacy.bibclassify import text_extractor
+from invenio.legacy.bibclassify import engine as bibclassify_engine
 from invenio.legacy.bibclassify import ontology_reader as bor
 
 log = bconfig.get_logger("bibclassify.webinterface")

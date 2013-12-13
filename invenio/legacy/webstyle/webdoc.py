@@ -511,6 +511,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
         if not topics.has_key(category):
             topics[category] = []
         # Build list of tuples(webdoc_name, webdoc_date, webdoc_url)
+        # FIXME: OSError: [Errno 2] No such file or directory: '/../.virtualenvs/pu/lib/webdoc/invenio/admin'
         for webdocfile in [path for path in \
                            os.listdir(source_path) \
                            if path.endswith('.webdoc')]:
