@@ -2105,7 +2105,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                         else:
                             profile_availability = "0"
                         profiles_to_merge = session["personinfo"]["merge_profiles"]
-                        if profile in [el[0] for el in profiles_to_merge]:
+                        if profile in [el[0] for el in profiles_to_merge if el and el[0]]:
                             for prof in list(profiles_to_merge):
                                 if prof[0] == profile:
                                     profiles_to_merge.remove(prof)
@@ -2864,6 +2864,8 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         if identifier is None or not isinstance(identifier, str):
             return
 
+        self.original_identifier = identifier
+
         # check if it's a canonical id: e.g. "J.R.Ellis.1"
 
         try:
@@ -2923,7 +2925,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
             return page_not_authorized(req, text=_("This page is not accessible directly."))
 
         if person_id < 0:
-            return page_not_authorized(req, text=_("This page is not accessible directly."))
+            return self._error_page(req, message=("Identifier %s is not a valid person identifier or does not exist anymore!" % self.original_identifier))
 
         # log the visit
         webapi.history_log_visit(req, 'manage_profile', pid=person_id)
