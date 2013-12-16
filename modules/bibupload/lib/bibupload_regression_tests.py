@@ -5524,6 +5524,36 @@ allow any</subfield>
         self.assertEqual(test_web_page_content(testrec_expected_url, 'jekyll', 'j123ekyll', expected_text=expected_content_version), [])
 
 
+    def test_simple_fft_replace_or_insert(self):
+        """bibupload - simple FFT replace_or_insert"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%(siteurl)s/img/iconpen.gif</subfield>
+          <subfield code="n">site_logo</subfield>
+         </datafield>
+        </record>
+        """ % {'siteurl': CFG_SITE_URL,}
+
+        # insert test record:
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        dummy, recid, dummy = bibupload.bibupload_records(recs, opt_mode='replace_or_insert')[0]
+        self.check_record_consistency(recid)
+
+        ## When insert_or_replace a record for the first time, it should be like
+        ## a simple insert, hence affected_fields should be empty.
+        ## This also for the special case of FFT.
+        affected_fields = run_sql("SELECT affected_fields FROM hstRECORD where id_bibrec=%s", (recid,))
+        self.assertEqual(len(affected_fields), 1)
+        self.failIf(affected_fields[0][0])
+
+
     def test_simple_fft_insert_with_modification_time(self):
         """bibupload - simple FFT insert with modification time"""
         # define the test case:

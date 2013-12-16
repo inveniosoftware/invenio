@@ -490,7 +490,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     bibrecdocs = BibRecDocs(rec_id)
                 record = synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=pretend)
                 # in case if FFT is in affected list make appropriate changes
-                if opt_mode is not 'insert': # because for insert, all tags are affected
+                if not insert_mode_p: # because for insert, all tags are affected
                     if ('4', ' ') not in affected_tags.get('856', []):
                         if '856' not in affected_tags:
                             affected_tags['856'] = [('4', ' ')]
@@ -562,7 +562,10 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     return (1, int(rec_id), msg)
             if not CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS:
                 # archive MARCXML format of this record for version history purposes:
-                error = archive_marcxml_for_history(rec_id, affected_fields=affected_tags, pretend=pretend)
+                if insert_mode_p:
+                    error = archive_marcxml_for_history(rec_id, affected_fields={}, pretend=pretend)
+                else:
+                    error = archive_marcxml_for_history(rec_id, affected_fields=affected_tags, pretend=pretend)
                 if error == 1:
                     msg = "   ERROR: Failed to archive MARCXML for history"
                     write_message(msg, verbose=1, stream=sys.stderr)
