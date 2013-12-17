@@ -37,7 +37,8 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
      CFG_BIBINDEX_INDEX_TABLE_TYPE, \
      CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
-     CFG_BIBINDEX_UPDATE_MESSAGE
+     CFG_BIBINDEX_UPDATE_MESSAGE, \
+     CFG_BIBINDEX_UPDATE_MODE
 from invenio.bibauthority_config import \
      CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC, \
      CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD
@@ -81,7 +82,10 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     get_index_name_from_index_id, \
     run_sql_drop_silently, \
     get_min_last_updated, \
-    remove_inexistent_indexes
+    remove_inexistent_indexes, \
+    filter_for_virtual_indexes, \
+    get_records_range_for_index, \
+    make_prefix
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibfield import get_record
 from invenio.memoiseutils import Memoise
@@ -96,7 +100,7 @@ if sys.hexversion < 0x2040000:
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
 re_datetime_shift = re.compile("([-\+]{0,1})([\d]+)([dhms])")
-
+re_prefix = re.compile('__[a-zA-Z1-9]*__')
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
@@ -192,34 +196,24 @@ def get_author_canonical_ids_for_recid(recID):
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Atomically swap reindexed temporary table with the original one.
     Delete the now-old one."""
-    is_virtual = is_index_virtual(index_id)
-    if is_virtual:
-        write_message("Removing %s index tables for id %s" % (reindex_prefix, index_id))
-        query = """DROP TABLE IF EXISTS %%sidxWORD%02dR, %%sidxWORD%02dF,
-                                        %%sidxPAIR%02dR, %%sidxPAIR%02dF,
-                                        %%sidxPHRASE%02dR, %%sidxPHRASE%02dF
-                """ % ((index_id,)*6)
-        query = query % ((reindex_prefix,)*6)
-        run_sql(query)
-    else:
-        write_message("Putting new tmp index tables for id %s into production" % index_id)
-        run_sql(
-            "RENAME TABLE " +
-            "idxWORD%02dR TO old_idxWORD%02dR," % (index_id, index_id) +
-            "%sidxWORD%02dR TO idxWORD%02dR," % (reindex_prefix, index_id, index_id) +
-            "idxWORD%02dF TO old_idxWORD%02dF," % (index_id, index_id) +
-            "%sidxWORD%02dF TO idxWORD%02dF," % (reindex_prefix, index_id, index_id) +
-            "idxPAIR%02dR TO old_idxPAIR%02dR," % (index_id, index_id) +
-            "%sidxPAIR%02dR TO idxPAIR%02dR," % (reindex_prefix, index_id, index_id) +
-            "idxPAIR%02dF TO old_idxPAIR%02dF," % (index_id, index_id) +
-            "%sidxPAIR%02dF TO idxPAIR%02dF," % (reindex_prefix, index_id, index_id) +
-            "idxPHRASE%02dR TO old_idxPHRASE%02dR," % (index_id, index_id) +
-            "%sidxPHRASE%02dR TO idxPHRASE%02dR," % (reindex_prefix, index_id, index_id) +
-            "idxPHRASE%02dF TO old_idxPHRASE%02dF," % (index_id, index_id) +
-            "%sidxPHRASE%02dF TO idxPHRASE%02dF;" % (reindex_prefix, index_id, index_id)
-        )
-        write_message("Dropping old index tables for id %s" % index_id)
-        run_sql_drop_silently("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPAIR%02dR, old_idxPAIR%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id, index_id, index_id)) # kwalitee: disable=sql
+    write_message("Putting new tmp index tables for id %s into production" % index_id)
+    run_sql(
+        "RENAME TABLE " +
+        "idxWORD%02dR TO old_idxWORD%02dR," % (index_id, index_id) +
+        "%sidxWORD%02dR TO idxWORD%02dR," % (reindex_prefix, index_id, index_id) +
+        "idxWORD%02dF TO old_idxWORD%02dF," % (index_id, index_id) +
+        "%sidxWORD%02dF TO idxWORD%02dF," % (reindex_prefix, index_id, index_id) +
+        "idxPAIR%02dR TO old_idxPAIR%02dR," % (index_id, index_id) +
+        "%sidxPAIR%02dR TO idxPAIR%02dR," % (reindex_prefix, index_id, index_id) +
+        "idxPAIR%02dF TO old_idxPAIR%02dF," % (index_id, index_id) +
+        "%sidxPAIR%02dF TO idxPAIR%02dF," % (reindex_prefix, index_id, index_id) +
+        "idxPHRASE%02dR TO old_idxPHRASE%02dR," % (index_id, index_id) +
+        "%sidxPHRASE%02dR TO idxPHRASE%02dR," % (reindex_prefix, index_id, index_id) +
+        "idxPHRASE%02dF TO old_idxPHRASE%02dF," % (index_id, index_id) +
+        "%sidxPHRASE%02dF TO idxPHRASE%02dF;" % (reindex_prefix, index_id, index_id)
+    )
+    write_message("Dropping old index tables for id %s" % index_id)
+    run_sql_drop_silently("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPAIR%02dR, old_idxPAIR%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id, index_id, index_id)) # kwalitee: disable=sql
 
 
 def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
@@ -559,10 +553,546 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
     return indexes_to_change
 
 
-#def update_text_extraction_date(first_recid, last_recid):
-    #"""for all the bibdoc connected to the specified recid, set
-    #the text_extraction_date to the task_starting_time."""
-    #run_sql("UPDATE bibdoc JOIN bibrec_bibdoc ON id=id_bibdoc SET text_extraction_date=%s WHERE id_bibrec BETWEEN %s AND %s", (task_get_task_param('task_starting_time'), first_recid, last_recid))
+def chunk_generator(rng):
+    """
+        Splits one range into several smaller ones
+        with respect to global chunksize variable.
+        @param rng: range of records
+        @type rng: list in the form: [1, 2000]
+    """
+    global chunksize
+    current_low = rng[0]
+    current_high = rng[0]
+    if rng[0] == None or rng[1] == None:
+        raise StopIteration
+    if rng[1] - rng[0] + 1 <= chunksize:
+        yield rng
+    else:
+        while current_high - 1 < rng[1]:
+            current_high += chunksize
+            yield current_low, min(current_high - 1, rng[1])
+            current_low += chunksize
+
+
+class VirtualIndexTable:
+    """
+        There are two types of indexes: virtual and regular/normal.
+        Check WordTable class for more on normal indexes.
+
+        This class represents a virtual index. Virtual index doesn't store its own terms, it
+        accumulates terms from other indexes. Good example of virtual index is the global index
+        which stores terms from title, abstract, keyword, author and so on.
+
+        Every index consists of three tables in database.
+        Every table stores different types of terms: words, pairs of words and whole phrases
+        which later can be used in search.
+        So to be more precise, this class represents only one of the tables for virtual index and it
+        can put terms only to one table at a time. A new instance of the VirtualIndexTable class need
+        to be created in order to handle other type of table.
+    """
+
+    def __init__(self, index_name, table_type, table_prefix="", wash_index_terms=50):
+        """
+            Creates VirtualIndexTable instance.
+            @param index_name: name of the index we want to reindex
+            @param table_type: words, pairs or phrases
+            @param table_prefix: add "tmp_" if you want to reindex to temporary table
+        """
+        self.index_name = index_name
+        self.index_id = get_index_id_from_index_name(index_name)
+        self.table_type = table_type
+        self.table_name = wash_table_column_name(table_prefix + "idx" + table_type + ("%02d" % self.index_id) + "F")
+        self.table_prefix = table_prefix
+        self.mode = "normal"
+        self.wash_index_terms = wash_index_terms
+
+        self.dependent_indexes = dict(get_virtual_index_building_blocks(self.index_id))
+        self.value = {} # cache
+        self.recIDs_in_mem = []
+
+    def set_reindex_mode(self):
+        """
+            Sets reindex mode. VirtualIndexTable will
+            remove all its content from database and
+            use insert_index function to repopulate it.
+        """
+        self.mode = "reindex"
+
+    def run_update(self, flush=10000):
+        """
+            Function starts all updating processes for virtual index.
+            It will take all information about pending changes, process them
+            and trigger appropriate indexing functions.
+            @param flush: how many records we will put in one go into database (at most);
+                          see also: opt_flush in WordTable class
+        """
+        global chunksize
+
+        if self.mode == "reindex":
+            self.clean_database()
+            for index_id, index_name in self.dependent_indexes.iteritems():
+                rng = get_records_range_for_index(index_id)
+                flush_count = 0
+                if not rng:
+                    continue
+                write_message('Virtual index: %s is being reindexed for %s index' % (self.index_name, index_name))
+                chunks = chunk_generator(rng)
+                try:
+                    while True:
+                        task_sleep_now_if_required()
+                        chunk = chunks.next()
+                        self.insert_index(index_id, chunk[0], chunk[1])
+                        flush_count = flush_count + chunk[1] - chunk[0] + 1
+                        self.recIDs_in_mem.append(list(chunk))
+                        if flush_count >= flush:
+                            flush_count = 0
+                            self.put_into_db()
+                except StopIteration:
+                    if flush_count > 0:
+                        self.put_into_db()
+                self.clean_queue_table(index_name)
+        else:
+            for index_id, index_name in self.dependent_indexes.iteritems():
+                query = """SELECT * FROM %s WHERE index_name=%%s
+                           ORDER BY runtime ASC""" % (self.table_name[:-1] + "Q")
+                entries = run_sql(query, (index_name, ))
+                if entries:
+                    write_message('Virtual index: %s is being updated for %s index' % (self.index_name, index_name))
+                for entry in entries:
+                    operation = None
+                    _id, runtime, recID_low, recID_high, name, mode = entry
+
+                    if mode == CFG_BIBINDEX_UPDATE_MODE["Update"]:
+                        operation = self.update_index
+                    elif mode == CFG_BIBINDEX_UPDATE_MODE["Remove"]:
+                        operation = self.remove_index
+                    elif mode == CFG_BIBINDEX_UPDATE_MODE["Insert"]:
+                        operation = self.insert_index
+
+                    flush_count = 0
+                    chunks = chunk_generator([recID_low, recID_high])
+                    try:
+                        while True:
+                            task_sleep_now_if_required()
+                            chunk = chunks.next()
+                            operation(index_id, chunk[0], chunk[1])
+                            flush_count = flush_count + chunk[1] - chunk[0] + 1
+                            self.recIDs_in_mem.append(list(chunk))
+                            if flush_count >= flush:
+                                flush_count = 0
+                                self.put_into_db()
+                    except StopIteration:
+                        if flush_count > 0:
+                            self.put_into_db()
+                self.clean_queue_table(index_name)
+
+    def retrieve_new_values_from_index(self, index_id, records_range):
+        """
+            Retrieves new values from dependent index
+            for specific range of records.
+            @param index_id: id of the dependent index
+            @param records_range: the smallest and the biggest id in the range: [id_low, id_high]
+        """
+
+        tab_name = "idx" + self.table_type + ("%02d" % index_id) + "R"
+        query = """SELECT id_bibrec, termlist FROM %s WHERE id_bibrec
+                   BETWEEN %%s AND %%s""" % tab_name
+        new_regular_values = run_sql(query, (records_range[0], records_range[1]))
+        if new_regular_values:
+            zipped = zip(*new_regular_values)
+            new_regular_values = dict(zip(zipped[0], map(deserialize_via_marshal, zipped[1])))
+        else:
+            new_regular_values = dict()
+        return new_regular_values
+
+    def retrieve_old_values(self, records_range):
+        """
+            Retrieves old values from database for this virtual index
+            for specific records range.
+            @param records_range: the smallest and the biggest id in the range: [id_low, id_high]
+        """
+
+        virtual_tab_name = self.table_name[:-1] + "R"
+        query = """SELECT id_bibrec, termlist FROM %s WHERE type='CURRENT' AND id_bibrec
+                   BETWEEN %%s AND %%s""" % virtual_tab_name
+        old_virtual_values = run_sql(query, (records_range[0], records_range[1]))
+        if old_virtual_values:
+            zipped = zip(*old_virtual_values)
+            old_virtual_values = dict(zip(zipped[0], map(deserialize_via_marshal, zipped[1])))
+        else:
+            old_virtual_values = dict()
+        return old_virtual_values
+
+    def update_index(self, index_id, recID_low, recID_high):
+        """
+            Updates the state of virtual index for records in range: recID_low, recID_high
+            for index specified by index_id.
+            Function stores terms in idxWORD/PAIR/PHRASExxR tables with
+            prefixes for specific index, for example term 'ellis' from author index
+            will be stored in reversed table as:
+            '__author__ellis'. It allows fast operations on only part of terms.
+            @param index_id: id of the dependent index we want to remove
+            @param recID_low: first recID from the range of considered recIDs
+            @param recID_high: last recID from the range of considered recIDs
+        """
+        index_name = self.dependent_indexes[index_id]
+        update_cache_for_record = self.update_cache_for_record
+        virtual_tab_name = self.table_name[:-1] + "R"
+
+        # take new values
+        new_regular_values = self.retrieve_new_values_from_index(index_id, [recID_low, recID_high])
+
+        # take old values
+        old_virtual_values = self.retrieve_old_values([recID_low, recID_high])
+
+        # update reversed table
+        for recID in xrange(recID_low, recID_high + 1):
+            new_values = new_regular_values.get(recID) or []
+            old_values = old_virtual_values.get(recID) or []
+            to_serialize = update_cache_for_record(index_name, recID, old_values, new_values)
+            if len(to_serialize) == 0:
+                continue
+            run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
+            try:
+                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+            except DatabaseError:
+                pass
+
+    def insert_index(self, index_id, recID_low, recID_high):
+        """
+            Inserts terms from dependent index to virtual table without looking
+            what's inside the virtual table and what terms are being added.
+            It's faster than 'updating', but it can only be used when virtual table
+            is free of terms from this dependent index.
+            @param index_id: id of the dependent index we want to remove
+            @param recID_low: first recID from the range of considered recIDs
+            @param recID_high: last recID from the range of considered recIDs
+        """
+        index_name = self.dependent_indexes[index_id]
+        insert_to_cache_for_record = self.insert_to_cache_for_record
+        virtual_tab_name = self.table_name[:-1] + "R"
+
+        # take new values
+        new_regular_values = self.retrieve_new_values_from_index(index_id, [recID_low, recID_high])
+
+        # take old values
+        old_virtual_values = self.retrieve_old_values([recID_low, recID_high])
+
+        # update reversed table
+        put = self.put
+        for recID in xrange(recID_low, recID_high + 1):
+            new_values = new_regular_values.get(recID) or []
+            old_values = old_virtual_values.get(recID) or []
+            to_serialize = insert_to_cache_for_record(index_name, recID, old_values, new_values)
+            if len(to_serialize) == 0:
+                continue
+            run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
+            try:
+                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+            except DatabaseError:
+                pass
+
+    def remove_index(self, index_id, recID_low, recID_high):
+        """
+            Removes words found in dependent index from reversed table of virtual index.
+            Updates the state of the memory (for future removal from forward table).
+            Takes into account that given words can be found in more that one dependent index
+            and it won't mark these words for the removal process.
+            @param index_id: id of the dependent index we want to remove
+            @param recID_low: first recID from the range of considered recIDs
+            @param recID_high: last recID from the range of considered recIDs
+        """
+        index_name = self.dependent_indexes[index_id]
+        remove_from_cache_for_record = self.remove_from_cache_for_record
+        virtual_tab_name = self.table_name[:-1] + "R"
+
+        # 'take old values' part
+        old_virtual_values = self.retrieve_old_values([recID_low, recID_high])
+
+        # 'update reversed table' part
+        put = self.put
+        for recID in xrange(recID_low, recID_high + 1):
+            old_values = old_virtual_values.get(recID) or []
+            to_serialize = remove_from_cache_for_record(index_name, recID, old_values)
+            if len(to_serialize) == 0:
+                continue
+            run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
+            try:
+                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+            except DatabaseError:
+                pass
+
+    def update_cache_for_record(self, index_name, recID, old_values, new_values):
+        """
+            Updates memory (cache) with information on what to remove/add/modify in forward table
+            for specified record.
+            It also returns new terms which should be indexed for given record.
+            @param index_name: index name of dependent index
+            @param recID: considered record
+            @param old_values: all old values from all dependent indexes for this virtual index for recID
+            @param new_values: new values from some dependent index which should be added
+        """
+        prefix = make_prefix(index_name)
+        put = self.put
+        new_values_prefix = [prefix + term for term in new_values]
+        part_values = []
+        tmp_old_values_prefix = []
+        # split old values from v.index into those with 'prefix' and those without
+        for term in old_values:
+            if term.startswith(prefix):
+                term_without_prefix = re.sub(re_prefix, '', term)
+                part_values.append(term_without_prefix)
+                put(recID, term_without_prefix, -1)
+            else:
+                tmp_old_values_prefix.append(term)
+
+        # remember not to remove words that occur more than once
+        part_values = set(part_values)
+        for value in tmp_old_values_prefix:
+            term_without_prefix = re.sub(re_prefix, '', value)
+            if term_without_prefix in part_values:
+                put(recID, term_without_prefix, 1)
+        for term_without_prefix in new_values:
+            put(recID, term_without_prefix, 1)
+
+        tmp_new_values_prefix = list(tmp_old_values_prefix)
+        tmp_new_values_prefix.extend(new_values_prefix)
+        return tmp_new_values_prefix
+
+    def insert_to_cache_for_record(self, index_name, recID, old_values, new_values):
+        """
+            Updates cache with terms which should be inserted to database.
+            Used in insert_index function. See also: update_cache_for_record
+            which is analogous for update_index function.
+        """
+        prefix = make_prefix(index_name)
+
+        append = old_values.append
+        put = self.put
+        for term in new_values:
+            append(prefix + term)
+            put(recID, term, 1)
+        return old_values
+
+    def remove_from_cache_for_record(self, index_name, recID, old_values):
+        """
+            Updates information in cache with terms which should be removed
+            from virtual table. Used in remove_index function.
+        """
+        prefix = make_prefix(index_name)
+        tmp_rest = []
+        tmp_removed = []
+        tmp_new_values = []
+
+        append_to_new = tmp_new_values.append
+        append_to_rest = tmp_rest.append
+        append_to_removed = tmp_removed.append
+        put = self.put
+        for term in old_values:
+            if term.startswith(prefix):
+                term_without_prefix = re.sub(re_prefix, '', term)
+                append_to_removed(term_without_prefix)
+                put(recID, term_without_prefix, -1)
+            else:
+                append_to_rest(re.sub(re_prefix, '', term))
+                append_to_new(term)
+
+        to_remember = set(tmp_rest) & set(tmp_removed)
+        for term_without_prefix in to_remember:
+            put(recID, term_without_prefix, 1)
+        return tmp_new_values
+
+    def put_into_db(self, mode="normal"):
+        """Updates the current words table in the corresponding DB
+           idxFOO table.  Mode 'normal' means normal execution,
+           mode 'emergency' means words index reverting to old state.
+           """
+        write_message("%s %s wordtable flush started" % (self.table_name, mode))
+        write_message('...updating %d words into %s started' % \
+                (len(self.value), self.table_name))
+        task_update_progress("(%s:%s) flushed %d/%d words" % (self.table_name, self.index_name, 0, len(self.value)))
+
+        self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
+
+        tab_name = self.table_name[:-1] + "R"
+        if mode == "normal":
+            for group in self.recIDs_in_mem:
+                query = """UPDATE %s SET type='TEMPORARY' WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='CURRENT'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+
+        nb_words_total = len(self.value)
+        nb_words_report = int(nb_words_total / 10.0)
+        nb_words_done = 0
+        for word in self.value.keys():
+            self.put_word_into_db(word)
+            nb_words_done += 1
+            if nb_words_report != 0 and ((nb_words_done % nb_words_report) == 0):
+                write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
+                percentage_display = get_percentage_completed(nb_words_done, nb_words_total)
+                task_update_progress("(%s:%s) flushed %d/%d words %s" % (tab_name, self.index_name, nb_words_done, nb_words_total, percentage_display))
+        write_message('...updating %d words into %s ended' % \
+                      (nb_words_total, tab_name))
+
+        write_message('...updating reverse table %s started' % tab_name)
+        if mode == "normal":
+            for group in self.recIDs_in_mem:
+                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+                query = """DELETE FROM %s WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+            write_message('End of updating wordTable into %s' % tab_name, verbose=9)
+        elif mode == "emergency":
+            for group in self.recIDs_in_mem:
+                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+                query = """DELETE FROM %s WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+            write_message('End of emergency flushing wordTable into %s' % tab_name, verbose=9)
+        write_message('...updating reverse table %s ended' % tab_name)
+
+        self.clean()
+        self.recIDs_in_mem = []
+        write_message("%s %s wordtable flush ended" % (self.table_name, mode))
+        task_update_progress("(%s:%s) flush ended" % (self.table_name, self.index_name))
+
+    def put_word_into_db(self, word):
+        """Flush a single word to the database and delete it from memory"""
+        set = self.load_old_recIDs(word)
+        if set is not None: # merge the word recIDs found in memory:
+            hitlist_was_changed = self.merge_with_old_recIDs(word, set)
+            if not hitlist_was_changed:
+                # nothing to update:
+                write_message("......... unchanged hitlist for ``%s''" % word, verbose=9)
+                pass
+            else:
+                # yes there were some new words:
+                write_message("......... updating hitlist for ``%s''" % word, verbose=9)
+                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.table_name), (set.fastdump(), word)) # kwalitee: disable=sql
+
+        else: # the word is new, will create new set:
+            write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
+            set = intbitset(self.value[word].keys())
+            try:
+                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(self.table_name), (word, set.fastdump())) # kwalitee: disable=sql
+            except Exception, e:
+                ## We send this exception to the admin only when is not
+                ## already reparing the problem.
+                register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
+
+        if not set: # never store empty words
+            run_sql("DELETE FROM %s WHERE term=%%s" % wash_table_column_name(self.table_name), (word,)) # kwalitee: disable=sql
+
+    def put(self, recID, word, sign):
+        """Keeps track of changes done during indexing
+           and stores these changes in memory for further use.
+           Indexing process needs this information later while
+           filling in the database.
+
+           @param recID: recID of the record we want to update in memory
+           @param word: word we want to update
+           @param sing: sign of the word, 1 means keep this word in database, -1 remove word from database
+        """
+        value = self.value
+        try:
+            if self.wash_index_terms:
+                word = wash_index_term(word, self.wash_index_terms)
+            if value.has_key(word):
+                # the word 'word' exist already: update sign
+                value[word][recID] = sign
+            else:
+                value[word] = {recID: sign}
+        except Exception as e:
+            print e
+            write_message("Error: Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
+
+    def load_old_recIDs(self, word):
+        """Load existing hitlist for the word from the database index files."""
+        query = "SELECT hitlist FROM %s WHERE term=%%s" % self.table_name
+        res = run_sql(query, (word,))
+        if res:
+            return intbitset(res[0][0])
+        else:
+            return None
+
+    def merge_with_old_recIDs(self, word, set):
+        """Merge the system numbers stored in memory (hash of recIDs with value +1 or -1
+        according to whether to add/delete them) with those stored in the database index
+        and received in set universe of recIDs for the given word.
+
+        Return False in case no change was done to SET, return True in case SET
+        was changed.
+        """
+        oldset = intbitset(set)
+        set.update_with_signs(self.value[word])
+        return set != oldset
+
+    def clean(self):
+        "Cleans the cache."
+        self.value = {}
+
+    def clean_database(self):
+        """Removes all entries from corresponding tables in database"""
+        query = """DELETE FROM %s""" % self.table_name
+        run_sql(query)
+        query = """DELETE FROM %s""" % self.table_name[:-1] + "R"
+        run_sql(query)
+
+    def clean_queue_table(self, index_name):
+        """
+            Cleans queue table (i.e. idxWORD/PAIR/PHRASExxQ) for specific index.
+            It means that function will remove all entries from db from queue table
+            for this index.
+        """
+        query = "DELETE FROM %s WHERE index_name='%s'" % (self.table_name[:-1].lstrip(self.table_prefix) + "Q", index_name)
+        run_sql(query)
+
+    def remove_dependent_index(self, index_name):
+        """
+            Removes dependent index from this virtual index.
+            It means removing all words from all records with prefix:
+            __index_name__ from reversed table, and removing some of
+            them from forward table if they don't appear in another
+            dependent index.
+            @param index_name: name of the dependent index to remove
+        """
+        flush = 10000
+        dependent = self.dependent_indexes.values()
+        if len(dependent) == 0:
+            write_message("Specified index is not virtual...")
+            return
+        if index_name not in dependent:
+            write_message("Dependent index already removed...")
+            return
+        index_id = get_index_id_from_index_name(index_name)
+        records_range = get_records_range_for_index(index_id)
+        write_message("Removing an index: %s" % index_name)
+        if records_range:
+            flush_count = 0
+            chunks = chunk_generator([records_range[0], records_range[1]])
+            try:
+                while True:
+                    task_sleep_now_if_required()
+                    chunk = chunks.next()
+                    self.remove_index(index_id, chunk[0], chunk[1])
+                    flush_count = flush_count + chunk[1] - chunk[0] + 1
+                    self.recIDs_in_mem.append(chunk)
+                    if flush_count >= flush:
+                        flush_count = 0
+                        self.put_into_db()
+            except StopIteration:
+                if flush_count > 0:
+                    self.put_into_db()
+
 
 class WordTable:
     "A class to hold the words table."
@@ -583,15 +1113,15 @@ class WordTable:
         self.index_name = index_name
         self.index_id = index_id
         self.tablename = table_name_pattern % index_id
-        self.old_tablename = table_name_pattern[table_name_pattern.find('idx'):] % index_id
-        self.virtual_tablename_pattern = table_name_pattern[table_name_pattern.find('idx'):-1]
         self.humanname = get_def_name('%s' % (str(index_id),), "idxINDEX")[0][1]
         self.recIDs_in_mem = []
         self.fields_to_index = fields_to_index
+        self.table_type = wordtable_type
+        self.timestamp = datetime.now()
 
         self.value = {}
-        self.virtual_value = {}
-        self._init_virtual_indexes()
+        self.virtual_indexes = get_index_virtual_indexes(self.index_id)
+        self.virtual_index_update_mode = CFG_BIBINDEX_UPDATE_MODE["Update"]
 
         try:
             self.stemming_language = get_index_stemming_language(index_id)
@@ -622,19 +1152,16 @@ class WordTable:
         if self.stemming_language and self.tablename.startswith('idxWORD'):
             write_message('%s has stemming enabled, language %s' % (self.tablename, self.stemming_language))
 
-    def _init_virtual_indexes(self):
-        """
-           Gathers informations about related virtual indexes.
-        """
-        self.is_virtual = is_index_virtual(self.index_id)
-        self.virtual_indexes = get_index_virtual_indexes(self.index_id)
-        for _id, _name in self.virtual_indexes:
-            self.virtual_value[_id] = {}
-
     def turn_off_virtual_indexes(self):
+        """
+            Prevents from reindexing related virtual indexes.
+        """
         self.virtual_indexes = []
 
     def turn_on_virtual_indexes(self):
+        """
+            Turns on indexing related virtual indexes.
+        """
         self.virtual_indexes = get_index_virtual_indexes(self.index_id)
 
     def get_field(self, recID, tag):
@@ -668,71 +1195,60 @@ class WordTable:
 
         self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
 
-        all_indexes = [(self.index_id, self.humanname)]
-        if self.virtual_indexes:
-            all_indexes.extend(self.virtual_indexes)
-        for ind_id, ind_name in all_indexes:
-            tab_name = self.tablename[:-1] + "R"
-            if ind_id != self.index_id:
-                tab_name = self.virtual_tablename_pattern % ind_id + "R"
-            if mode == "normal":
-                for group in self.recIDs_in_mem:
-                    query = """UPDATE %s SET type='TEMPORARY' WHERE id_bibrec
-                    BETWEEN %%s AND %%s AND type='CURRENT'""" % tab_name
-                    write_message(query % (group[0], group[1]), verbose=9)
-                    run_sql(query, (group[0], group[1]))
+        tab_name = self.tablename[:-1] + "R"
+        if mode == "normal":
+            for group in self.recIDs_in_mem:
+                query = """UPDATE %s SET type='TEMPORARY' WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='CURRENT'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
 
-            nb_words_total = len(self.value)
-            nb_words_report = int(nb_words_total / 10.0)
-            nb_words_done = 0
-            for word in self.value.keys():
-                self.put_word_into_db(word, ind_id)
-                nb_words_done += 1
-                if nb_words_report != 0 and ((nb_words_done % nb_words_report) == 0):
-                    write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
-                    percentage_display = get_percentage_completed(nb_words_done, nb_words_total)
-                    task_update_progress("(%s:%s) flushed %d/%d words %s" % (tab_name, ind_name, nb_words_done, nb_words_total, percentage_display))
-            write_message('...updating %d words into %s ended' % \
-                          (nb_words_total, tab_name))
+        nb_words_total = len(self.value)
+        nb_words_report = int(nb_words_total / 10.0)
+        nb_words_done = 0
+        for word in self.value.keys():
+            self.put_word_into_db(word)
+            nb_words_done += 1
+            if nb_words_report != 0 and ((nb_words_done % nb_words_report) == 0):
+                write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
+                percentage_display = get_percentage_completed(nb_words_done, nb_words_total)
+                task_update_progress("(%s:%s) flushed %d/%d words %s" % (tab_name, self.index_name, nb_words_done, nb_words_total, percentage_display))
+        write_message('...updating %d words into %s ended' % \
+                      (nb_words_total, tab_name))
 
-            write_message('...updating reverse table %s started' % tab_name)
-            if mode == "normal":
-                for group in self.recIDs_in_mem:
-                    query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
-                    BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
-                    write_message(query % (group[0], group[1]), verbose=9)
-                    run_sql(query, (group[0], group[1]))
-                    query = """DELETE FROM %s WHERE id_bibrec
-                    BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
-                    write_message(query % (group[0], group[1]), verbose=9)
-                    run_sql(query, (group[0], group[1]))
-                    #if self.is_fulltext_index:
-                        #update_text_extraction_date(group[0], group[1])
-                write_message('End of updating wordTable into %s' % tab_name, verbose=9)
-            elif mode == "emergency":
-                for group in self.recIDs_in_mem:
-                    query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
-                    BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
-                    write_message(query % (group[0], group[1]), verbose=9)
-                    run_sql(query, (group[0], group[1]))
-                    query = """DELETE FROM %s WHERE id_bibrec
-                    BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
-                    write_message(query % (group[0], group[1]), verbose=9)
-                    run_sql(query, (group[0], group[1]))
-                write_message('End of emergency flushing wordTable into %s' % tab_name, verbose=9)
-            write_message('...updating reverse table %s ended' % tab_name)
+        write_message('...updating reverse table %s started' % tab_name)
+        if mode == "normal":
+            for group in self.recIDs_in_mem:
+                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+                query = """DELETE FROM %s WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+            write_message('End of updating wordTable into %s' % tab_name, verbose=9)
+        elif mode == "emergency":
+            for group in self.recIDs_in_mem:
+                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+                query = """DELETE FROM %s WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+            write_message('End of emergency flushing wordTable into %s' % tab_name, verbose=9)
+        write_message('...updating reverse table %s ended' % tab_name)
 
         self.clean()
         self.recIDs_in_mem = []
         write_message("%s %s wordtable flush ended" % (self.tablename, mode))
         task_update_progress("(%s:%s) flush ended" % (self.tablename, self.humanname))
 
-    def load_old_recIDs(self, word, index_id=None):
+    def load_old_recIDs(self, word):
         """Load existing hitlist for the word from the database index files."""
-        tab_name = self.tablename
-        if index_id != self.index_id:
-            tab_name = self.virtual_tablename_pattern % index_id + "F"
-        query = "SELECT hitlist FROM %s WHERE term=%%s" % tab_name
+        query = "SELECT hitlist FROM %s WHERE term=%%s" % self.tablename
         res = run_sql(query, (word,))
         if res:
             return intbitset(res[0][0])
@@ -751,29 +1267,11 @@ class WordTable:
         set.update_with_signs(self.value[word])
         return set != oldset
 
-    def leave_old_recIDs(self, word, set, index_id):
-        """
-            Modifies hitlist for term in virtual index
-            if necessary. It is necessary when we want
-            to remove a word from dependent index but we
-            still need to leave it in virtual index, because
-            word appers in other dependent index for some recIDs.
-        """
-        if self.virtual_value[index_id].has_key(word):
-            set.update_with_signs(self.virtual_value[index_id][word])
-
-    def put_word_into_db(self, word, index_id):
+    def put_word_into_db(self, word):
         """Flush a single word to the database and delete it from memory"""
-        tab_name = self.tablename
-        virtual_index = False
-        if index_id != self.index_id:
-            tab_name = self.virtual_tablename_pattern % index_id + "F"
-            virtual_index = True
-        set = self.load_old_recIDs(word, index_id)
+        set = self.load_old_recIDs(word)
         if set is not None: # merge the word recIDs found in memory:
             hitlist_was_changed = self.merge_with_old_recIDs(word, set)
-            if virtual_index:
-                self.leave_old_recIDs(word, set, index_id)
             if not hitlist_was_changed:
                 # nothing to update:
                 write_message("......... unchanged hitlist for ``%s''" % word, verbose=9)
@@ -781,20 +1279,40 @@ class WordTable:
             else:
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" % word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(tab_name), (set.fastdump(), word)) # kwalitee: disable=sql
+                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.tablename), (set.fastdump(), word)) # kwalitee: disable=sql
 
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
             set = intbitset(self.value[word].keys())
             try:
-                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(tab_name), (word, set.fastdump())) # kwalitee: disable=sql
+                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(self.tablename), (word, set.fastdump())) # kwalitee: disable=sql
             except Exception, e:
                 ## We send this exception to the admin only when is not
                 ## already reparing the problem.
                 register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
 
         if not set: # never store empty words
-            run_sql("DELETE FROM %s WHERE term=%%s" % wash_table_column_name(tab_name), (word,)) # kwalitee: disable=sql
+            run_sql("DELETE FROM %s WHERE term=%%s" % wash_table_column_name(self.tablename), (word,)) # kwalitee: disable=sql
+
+    def notify_virtual_indexes(self, recID_ranges):
+        """
+            Informs all related virtual indexes about index change.
+            Function leaves information about the change for each index
+            in proper table in database (idxSOMETHINGxxQ).
+            @param recID_ranges: low and high recIDs of ranges
+            @type recID_ranges: list [[low_id1, high_id1], [low_id2, high_id2]...]
+        """
+        query = """INSERT INTO %s (runtime, id_bibrec_low, id_bibrec_high, index_name, mode)
+                   VALUES (%%s, %%s, %%s, %%s, %%s)"""
+        for index_id, index_name in self.virtual_indexes:
+            tab_name = "idx%s%02dQ" % (self.table_type, index_id)
+            full_query = query % tab_name
+            for recID_range in recID_ranges:
+                run_sql(full_query, (self.timestamp,
+                                     recID_range[0],
+                                     recID_range[1],
+                                     self.index_name,
+                                     self.virtual_index_update_mode))
 
 
     def display(self):
@@ -836,8 +1354,6 @@ class WordTable:
         them to the wordTable.  The recIDs range list is of the form:
         [[i1_low,i1_high],[i2_low,i2_high], ..., [iN_low,iN_high]].
         """
-        if self.is_virtual:
-            return
         global chunksize, _last_word_table
         flush_count = 0
         records_done = 0
@@ -894,6 +1410,7 @@ class WordTable:
             if self.index_name == 'fulltext' and CFG_SOLR_URL:
                 solr_commit()
             self.log_progress(time_started, records_done, records_to_go)
+        self.notify_virtual_indexes(recIDs)
 
     def add_recID_range(self, recID1, recID2):
         """Add records from RECID1 to RECID2."""
@@ -964,8 +1481,6 @@ class WordTable:
                 write_message("... record %d was declared deleted, removing its word list" % recID, verbose=9)
             write_message("... record %d, termlist: %s" % (recID, wlist[recID]), verbose=9)
 
-        self.index_virtual_indexes_reversed(wlist, recID1, recID2)
-
         if len(wlist) == 0: return 0
         # put words into reverse index table with FUTURE status:
         for recID in recIDs:
@@ -1021,97 +1536,6 @@ class WordTable:
                         phrases.add((recID, string_value))
         return phrases
 
-
-    def index_virtual_indexes_reversed(self, wlist, recID1, recID2):
-        """Inserts indexed words into all virtual indexes connected to
-           this index"""
-        #first: need to take old values from given index to remove
-        #them from virtual indexes
-        query = """SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec
-                   BETWEEN %%s AND %%s""" % wash_table_column_name(self.old_tablename[:-1])
-        old_index_values = run_sql(query, (recID1, recID2))
-        if old_index_values:
-            zipped = zip(*old_index_values)
-            old_index_values = dict(zip(zipped[0], map(deserialize_via_marshal, zipped[1])))
-        else:
-            old_index_values = dict()
-        recIDs = wlist.keys()
-
-        update_termlist_for_virtual_index_record = self.update_termlist_for_virtual_index_record
-        for vindex_id, vindex_name in self.virtual_indexes:
-            #second: need to take old values from virtual index
-            #to have a list of words from which we can remove old values from given index
-            tab_name =  self.virtual_tablename_pattern % vindex_id + "R"
-            query = """SELECT id_bibrec, termlist FROM %s WHERE type='CURRENT' AND id_bibrec
-                       BETWEEN %%s AND %%s""" % tab_name
-            old_virtual_index_values = run_sql(query, (recID1, recID2))
-            if old_virtual_index_values:
-                zipped = zip(*old_virtual_index_values)
-                old_virtual_index_values = dict(zip(zipped[0], map(deserialize_via_marshal, zipped[1])))
-            else:
-                old_virtual_index_values = dict()
-
-            for recID in recIDs:
-                to_serialize = update_termlist_for_virtual_index_record(vindex_id,
-                                                                        recID,
-                                                                        old_virtual_index_values.get(recID) or [],
-                                                                        old_index_values.get(recID) or [],
-                                                                        wlist[recID])
-                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
-                try:
-                    run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
-                except DatabaseError:
-                    pass
-            if len(recIDs) != (recID2 - recID1 + 1):
-                #for records in range(recID1, recID2) which weren't updated:
-                #need to prevent them from being deleted by function: 'put_into_db'
-                #which deletes all records with 'CURRENT' status
-                query = """INSERT INTO %s (id_bibrec, termlist, type)
-                           SELECT id_bibrec, termlist, 'FUTURE' FROM %s
-                           WHERE id_bibrec BETWEEN %%s AND %%s
-                                 AND type='CURRENT'
-                                 AND id_bibrec IN (
-                                        SELECT id_bibrec FROM %s
-                                        WHERE id_bibrec BETWEEN %%s AND %%s
-                                        GROUP BY id_bibrec HAVING COUNT(id_bibrec) = 1
-                                        )
-                        """ % ((wash_table_column_name(tab_name),)*3)
-                run_sql(query, (recID1, recID2, recID1, recID2))
-
-    def update_termlist_for_virtual_index_record(self, index_id, recID, old_vindex_termlist, old_values, new_values):
-        """
-            Prepares new termlist for record in virtual index in reversed table and
-            updates information in memory on what to keep in forward table.
-
-            Example:
-            old_termlist = ['dog', 'dog', 'cat', 'horse'] #we store many copies of the same word
-                                                           if it appears in many dependent indexes
-            old_values = ['dog', 'cat']
-            new_values = ['dogs', 'cat']
-            output termlist:
-            output = ['dog', 'dogs', 'cat', 'horse']
-
-            @param recID: recID of the record to change
-            @param old_vindex_termlist: old values from record from virtual index
-            @param old_values: old values from record from considered dependent index
-            @param new_values: new values for record from considered dependent index
-        """
-        # remove old values
-        for value in old_values:
-            try:
-                old_vindex_termlist.remove(value)
-            except ValueError:
-                write_message("Inconsistency detected for record %s for virtual index conected to this index: %s" % (recID, self.index_name))
-        still_left = set(old_vindex_termlist) & set(old_values)
-        # add new values
-        old_vindex_termlist.extend(new_values)
-        # update memory
-        put = self.put_virtual
-        for value in still_left:
-            put(recID, value, 1, index_id)
-
-        return old_vindex_termlist
-
     def log_progress(self, start, done, todo):
         """Calculate progress and store it.
         start: start time,
@@ -1129,33 +1553,6 @@ class WordTable:
         if time_recs_per_min:
             write_message("Estimated runtime: %.1f minutes" % \
                     ((todo - done) / time_recs_per_min))
-
-    def put_virtual(self, recID, word, sign, virtual_index_id):
-        """Keeps track of changes done during indexing
-           and stores these changes in memory for further use.
-           Indexing process needs this information later while
-           filling in the database.
-           Function is similar to function put() but stores
-           only additional information necessary during indexing
-           virtual indexes i.e. information about terms that should be
-           kept in virtual indexes but not in dependent index.
-
-           @param recID: recID of the record we want to update in memory
-           @param word: word we want to update
-           @param sing: sign of the word, 1 means keep this word in database, -1 remove word from database
-           @param virtual_index_id: id of the virtual index to which these changes apply
-        """
-        value = self.virtual_value[virtual_index_id]
-        try:
-            if self.wash_index_terms:
-                word = wash_index_term(word, self.wash_index_terms)
-            if value.has_key(word):
-                # the word 'word' exist already: update sign
-                value[word][recID] = sign
-            else:
-                value[word] = {recID: sign}
-        except:
-            write_message("Error: Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
 
     def put(self, recID, word, sign):
         """Keeps track of changes done during indexing
@@ -1190,7 +1587,9 @@ class WordTable:
             task_sleep_now_if_required()
             self.del_recID_range(arange[0], arange[1])
             count = count + arange[1] - arange[0]
+        self.virtual_index_update_mode = CFG_BIBINDEX_UPDATE_MODE["Remove"]
         self.put_into_db()
+        self.notify_virtual_indexes(recIDs)
         if self.index_name == 'fulltext' and CFG_SOLR_URL:
             solr_commit()
 
@@ -1380,141 +1779,6 @@ class WordTable:
                     (self.tablename, self.tablename[:-1])
             write_message("EMERGENCY: " + error_message, stream=sys.stderr)
             raise StandardError(error_message)
-
-
-    def remove_dependent_index(self, id_dependent):
-        """Removes terms found in dependent index from virtual index.
-           Function finds words for removal and then removes them from
-           forward and reversed tables term by term.
-           @param id_dependent: id of an index which we want to remove from this
-                                virtual index
-        """
-        if not self.is_virtual:
-            write_message("Index is not virtual...")
-            return
-
-        global chunksize
-        terms_current_counter = 0
-        terms_done = 0
-        terms_to_go = 0
-
-        for_full_removal, for_partial_removal = self.get_words_to_remove(id_dependent, misc_lookup=False)
-        query = """SELECT t.term, m.hitlist FROM %s%02dF as t INNER JOIN %s%02dF as m
-                   ON t.term=m.term""" % (self.tablename[:-3], self.index_id, self.tablename[:-3], id_dependent)
-        terms_and_hitlists = dict(run_sql(query))
-        terms_to_go = len(for_full_removal) + len(for_partial_removal)
-        task_sleep_now_if_required()
-        #full removal
-        for term in for_full_removal:
-            terms_current_counter += 1
-            hitlist = intbitset(terms_and_hitlists[term])
-            for recID in hitlist:
-                self.remove_single_word_reversed_table(term, recID)
-            self.remove_single_word_forward_table(term)
-            if terms_current_counter % chunksize == 0:
-                terms_done += terms_current_counter
-                terms_current_counter = 0
-                write_message("removed %s/%s terms..." % (terms_done, terms_to_go))
-                task_sleep_now_if_required()
-        terms_done += terms_current_counter
-        terms_current_counter = 0
-        #partial removal
-        for term, indexes in for_partial_removal.iteritems():
-            self.value = {}
-            terms_current_counter += 1
-            hitlist = intbitset(terms_and_hitlists[term])
-            if len(indexes) > 0:
-                hitlist -= self._find_common_hitlist(term, id_dependent, indexes)
-            for recID in hitlist:
-                self.remove_single_word_reversed_table(term, recID)
-                if self.value.has_key(term):
-                    self.value[term][recID] = -1
-                else:
-                    self.value[term] = {recID: -1}
-            if self.value:
-                self.put_word_into_db(term, self.index_id)
-            if terms_current_counter % chunksize == 0:
-                terms_done += terms_current_counter
-                terms_current_counter = 0
-                write_message("removed %s/%s terms..." % (terms_done, terms_to_go))
-                task_sleep_now_if_required()
-
-
-    def remove_single_word_forward_table(self, word):
-        """Immediately and irreversibly removes a word from forward table"""
-        run_sql("""DELETE FROM %s WHERE term=%%s""" % self.tablename, (word, )) # kwalitee: disable=sql
-
-    def remove_single_word_reversed_table(self, word, recID):
-        """Removes single word from temlist for given recID"""
-        old_set = run_sql("""SELECT termlist FROM %sR WHERE id_bibrec=%%s""" % \
-                          wash_table_column_name(self.tablename[:-1]), (recID, ))
-        new_set = []
-        if old_set:
-            new_set = deserialize_via_marshal(old_set[0][0])
-            if word in new_set:
-                new_set.remove(word)
-        if new_set:
-            run_sql("""UPDATE %sR SET termlist=%%s
-                       WHERE id_bibrec=%%s AND
-                       type='CURRENT'""" %  \
-                    wash_table_column_name(self.tablename[:-1]), (serialize_via_marshal(new_set), recID))
-
-    def _find_common_hitlist(self, term, id_dependent, indexes):
-        """Checks 'indexes' for records that have 'term' indexed
-           and returns intersection between found records
-           and records that have a 'term' inside index
-           defined by id_dependent parameter"""
-        query = """SELECT m.hitlist FROM idxWORD%02dF as t INNER JOIN idxWORD%02dF as m
-                   ON t.term=m.term WHERE t.term='%s'"""
-        common_hitlist = intbitset([])
-        for _id in indexes:
-            res = run_sql(query % (id_dependent, _id, term))
-            if res:
-                common_hitlist |= intbitset(res[0][0])
-        return common_hitlist
-
-    def get_words_to_remove(self, id_dependent, misc_lookup=False):
-        """Finds words in dependent index which should be removed from virtual index.
-           Example:
-           Virtual index 'A' consists of 'B' and 'C' dependent indexes and we want to
-           remove 'B' from virtual index 'A'.
-           First we need to check if 'B' and 'C' have common words. If they have
-           we need to be careful not to remove common words from 'A', because we want
-           to remove only words from 'B'.
-           Then we need to check common words for 'A' and 'B'. These are potential words
-           for removal. We need to substract common words for 'B' and 'C' from common words
-           for 'A' and 'B' to be sure that correct words are removed.
-           @return: (list, dict), list contains terms/words for full removal, dict
-                    contains words for partial removal together with ids of indexes in which
-                    given term/word also exists
-        """
-
-        query = """SELECT t.term FROM %s%02dF as t INNER JOIN %s%02dF as m
-                   ON t.term=m.term"""
-        dependent_indexes = get_virtual_index_building_blocks(self.index_id)
-        other_ids = list(dependent_indexes and zip(*dependent_indexes)[0] or [])
-        if id_dependent in other_ids:
-            other_ids.remove(id_dependent)
-        if not misc_lookup:
-            misc_id = get_index_id_from_index_name('miscellaneous')
-            if misc_id in other_ids:
-                other_ids.remove(misc_id)
-
-        #intersections between dependent indexes
-        left_in_other_indexes = {}
-        for _id in other_ids:
-            intersection = zip(*run_sql(query % (self.tablename[:-3], id_dependent, self.tablename[:-3], _id))) # kwalitee: disable=sql
-            terms = bool(intersection) and intersection[0] or []
-            for term in terms:
-                if left_in_other_indexes.has_key(term):
-                    left_in_other_indexes[term].append(_id)
-                else:
-                    left_in_other_indexes[term] = [_id]
-
-        #intersection between virtual index and index we want to remove
-        main_intersection = zip(*run_sql(query % (self.tablename[:-3], self.index_id, self.tablename[:-3], id_dependent))) # kwalitee: disable=sql
-        terms_main = set(bool(main_intersection) and main_intersection[0] or [])
-        return list(terms_main - set(left_in_other_indexes.keys())), left_in_other_indexes
 
 
 def main():
@@ -1808,44 +2072,72 @@ def remove_dependent_index(virtual_indexes, dependent_index):
     id_dependent = get_index_id_from_index_name(dependent_index)
     wordTables = get_word_tables(virtual_indexes)
     for index_id, index_name, index_tags in wordTables:
-        wordTable = WordTable(index_name=index_name,
-                              index_id=index_id,
-                              fields_to_index=index_tags,
-                              table_name_pattern='idxWORD%02dF',
-                              wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
-                              wash_index_terms=50)
-        wordTable.remove_dependent_index(id_dependent)
-
-        wordTable.report_on_table_consistency()
+        vit = VirtualIndexTable(index_name,
+                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        vit.remove_dependent_index(dependent_index)
         task_sleep_now_if_required()
 
-        wordTable = WordTable(index_name=index_name,
-                              index_id=index_id,
-                              fields_to_index=index_tags,
-                              table_name_pattern='idxPAIR%02dF',
-                              wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
-                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
-                              wash_index_terms=50)
-        wordTable.remove_dependent_index(id_dependent)
-
-        wordTable.report_on_table_consistency()
+        vit = VirtualIndexTable(index_name,
+                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"])
+        vit.remove_dependent_index(dependent_index)
         task_sleep_now_if_required()
 
-        wordTable = WordTable(index_name=index_name,
-                              index_id=index_id,
-                              fields_to_index=index_tags,
-                              table_name_pattern='idxPHRASE%02dF',
-                              wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
-                              wash_index_terms=50)
-        wordTable.remove_dependent_index(id_dependent)
-
-        wordTable.report_on_table_consistency()
+        vit = VirtualIndexTable(index_name,
+                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"])
+        vit.remove_dependent_index(dependent_index)
+        task_sleep_now_if_required()
 
         query = """DELETE FROM idxINDEX_idxINDEX WHERE id_virtual=%s AND id_normal=%s"""
         run_sql(query, (index_id, id_dependent))
 
+
+def update_virtual_index(virtual_indexes, reindex=False):
+    """
+        Function will update all specified virtual_indexes.
+        @param virtual_indexes: list of index names
+        @param reindex: shall we reindex given v.indexes from scratch?
+    """
+    for index_name in virtual_indexes:
+        if reindex:
+            reindex_prefix = "tmp_"
+            index_id = get_index_id_from_index_name(index_name)
+            init_temporary_reindex_tables(index_id, reindex_prefix)
+            vit = VirtualIndexTable(index_name,
+                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                    table_prefix=reindex_prefix)
+            vit.set_reindex_mode()
+            vit.run_update()
+
+            vit = VirtualIndexTable(index_name,
+                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                                    wash_index_terms=100,
+                                    table_prefix=reindex_prefix)
+            vit.set_reindex_mode()
+            vit.run_update()
+
+            vit = VirtualIndexTable(index_name,
+                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
+                                    wash_index_terms=0,
+                                    table_prefix=reindex_prefix)
+            vit.set_reindex_mode()
+            vit.run_update()
+
+            swap_temporary_reindex_tables(index_id, reindex_prefix)
+            update_index_last_updated([index_name], task_get_task_param('task_starting_time'))
+            task_sleep_now_if_required(can_stop_too=True)
+        else:
+            vit = VirtualIndexTable(index_name,
+                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+            vit.run_update()
+            vit = VirtualIndexTable(index_name,
+                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                                    wash_index_terms=100)
+            vit.run_update()
+            vit = VirtualIndexTable(index_name,
+                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
+                                    wash_index_terms=0)
+            vit.run_update()
+            task_sleep_now_if_required(can_stop_too=True)
 
 def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.
@@ -1857,6 +2149,9 @@ def task_run_core():
     if len(indexes) == 0:
         write_message("Specified indexes can't be found.")
         return True
+    virtual_indexes = filter_for_virtual_indexes(indexes)
+    regular_indexes = list(set(indexes) - set(virtual_indexes))
+
 
     # check tables consistency
     if task_get_option("cmd") == "check":
@@ -1899,15 +2194,20 @@ def task_run_core():
         _last_word_table = None
         return True
 
-    #virtual index: remove dependent index
+    # virtual index: remove dependent index
     if task_get_option("remove-dependent-index"):
         remove_dependent_index(indexes,
                                task_get_option("remove-dependent-index"))
         return True
 
-    #initialization for Words,Pairs,Phrases
-    recIDs_range = get_recIDs_from_cli(indexes)
-    recIDs_for_index = find_affected_records_for_index(indexes,
+    # virtual index: update
+    update_virtual_index(virtual_indexes, task_get_option("reindex"))
+    if len(regular_indexes) == 0:
+        return True
+
+    # regular index: initialization for Words,Pairs,Phrases
+    recIDs_range = get_recIDs_from_cli(regular_indexes)
+    recIDs_for_index = find_affected_records_for_index(regular_indexes,
                                                        recIDs_range,
                                                        (task_get_option("force") or \
                                                        task_get_option("reindex") or \

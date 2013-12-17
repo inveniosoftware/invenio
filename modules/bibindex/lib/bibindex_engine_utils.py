@@ -184,6 +184,19 @@ def is_index_virtual(index_id):
         return True
     return False
 
+def filter_for_virtual_indexes(index_list):
+    """
+        Function removes all non-virtual indexes
+        from given list of indexes.
+        @param index_list: list of index names
+    """
+    try:
+        virtual = zip(*get_all_virtual_indexes())[1]
+        selected = set(virtual) & set(index_list)
+        return list(selected)
+    except KeyError:
+        return []
+    return []
 
 def get_virtual_index_building_blocks(index_id):
     """Returns indexes that made up virtual index of given index_id.
@@ -329,3 +342,26 @@ def remove_inexistent_indexes(indexes, leave_virtual=False):
         if index in correct_indexes:
             cleaned.append(index)
     return cleaned
+
+
+def get_records_range_for_index(index_id):
+    """
+        Get records range for given index.
+    """
+    try:
+        query = """SELECT min(id_bibrec), max(id_bibrec) FROM idxWORD%02dR""" % index_id
+        resp = run_sql(query)
+        if resp:
+            return resp[0]
+        return None
+    except Exception:
+        return None
+
+def make_prefix(index_name):
+    """
+        Creates a prefix for specific index which is added
+        to every word from this index stored in reversed table
+        of corresponding virtual index.
+        @param index_name: name of the dependent index we want to create prefix for
+    """
+    return "__" + index_name + "__"

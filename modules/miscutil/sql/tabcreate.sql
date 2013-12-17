@@ -1798,6 +1798,18 @@ CREATE TABLE IF NOT EXISTS idxWORD01R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxWORD01Q (
+  id mediumint(10) unsigned NOT NULL auto_increment,
+  runtime datetime NOT NULL default '0000-00-00 00:00:00',
+  id_bibrec_low mediumint(9) unsigned NOT NULL,
+  id_bibrec_high mediumint(9) unsigned NOT NULL,
+  index_name varchar(50) NOT NULL default '',
+  mode varchar(50) NOT NULL default 'update',
+  PRIMARY KEY (id),
+  INDEX (index_name),
+  INDEX (runtime)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxWORD02F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(50) default NULL,
@@ -2212,6 +2224,18 @@ CREATE TABLE IF NOT EXISTS idxPAIR01R (
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   KEY type (type),
   PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR01Q (
+  id mediumint(10) unsigned NOT NULL auto_increment,
+  runtime datetime NOT NULL default '0000-00-00 00:00:00',
+  id_bibrec_low mediumint(9) unsigned NOT NULL,
+  id_bibrec_high mediumint(9) unsigned NOT NULL,
+  index_name varchar(50) NOT NULL default '',
+  mode varchar(50) NOT NULL default 'update',
+  PRIMARY KEY (id),
+  INDEX (index_name),
+  INDEX (runtime)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR02F (
@@ -2635,6 +2659,18 @@ CREATE TABLE IF NOT EXISTS idxPHRASE02F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE01Q (
+  id mediumint(10) unsigned NOT NULL auto_increment,
+  runtime datetime NOT NULL default '0000-00-00 00:00:00',
+  id_bibrec_low mediumint(9) unsigned NOT NULL,
+  id_bibrec_high mediumint(9) unsigned NOT NULL,
+  index_name varchar(50) NOT NULL default '',
+  mode varchar(50) NOT NULL default 'update',
+  PRIMARY KEY (id),
+  INDEX (index_name),
+  INDEX (runtime)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE02R (
@@ -4906,5 +4942,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_16_aidPERSONIDDA
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_04_seqSTORE_larger_value',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_redis_sessions',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_24_seqSTORE_larger_value',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_queue_table_virtual_index',NOW());
 
 -- end of file

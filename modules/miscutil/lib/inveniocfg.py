@@ -886,17 +886,19 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/bibdocfile --textify --all" % CFG_PREFIX,
                 "%s/bin/bibindex -u admin" % CFG_PREFIX,
                 "%s/bin/bibindex 2" % CFG_PREFIX,
+                "%s/bin/bibindex -u admin -w global" % CFG_PREFIX,
+                "%s/bin/bibindex 3" % CFG_PREFIX,
                 "%s/bin/bibreformat -u admin -o HB" % CFG_PREFIX,
-                "%s/bin/bibreformat 3" % CFG_PREFIX,
+                "%s/bin/bibreformat 4" % CFG_PREFIX,
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,
-                "%s/bin/webcoll 4" % CFG_PREFIX,
+                "%s/bin/webcoll 5" % CFG_PREFIX,
                 "%s/bin/bibrank -u admin" % CFG_PREFIX,
-                "%s/bin/bibrank 5" % CFG_PREFIX,
+                "%s/bin/bibrank 6" % CFG_PREFIX,
                 "%s/bin/bibsort -u admin -R" % CFG_PREFIX,
-                "%s/bin/bibsort 6" % CFG_PREFIX,
+                "%s/bin/bibsort 7" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
-                "%s/bin/oairepositoryupdater 7" % CFG_PREFIX,
-                "%s/bin/bibupload 8" % CFG_PREFIX,]:
+                "%s/bin/oairepositoryupdater 8" % CFG_PREFIX,
+                "%s/bin/bibupload 9" % CFG_PREFIX,]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
