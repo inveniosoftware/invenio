@@ -472,6 +472,9 @@ class Collection:
                     recIDs = list(intbitset(recIDs) & \
                                   search_pattern_parenthesised(p='collection:"PUBLVIDEOMOVIE"'))
                     of = 'hvp'
+                if self.name in ['General Talks', 'Academic Training Lectures', 'Summer Student Lectures']:
+                    #select only the lectures with material
+                    recIDs = list(self.reclist & search_pattern_parenthesised(p='856:MediaArchive'))
                 # sort some CERN collections specially:
                 if self.name in ['Videos',
                                  'Video Clips',
