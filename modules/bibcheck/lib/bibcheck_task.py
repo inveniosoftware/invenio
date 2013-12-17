@@ -41,7 +41,8 @@ from invenio.bibtask import \
     task_update_progress, \
     task_sleep_now_if_required, \
     get_modified_records_since, \
-    task_low_level_submission
+    task_low_level_submission, \
+    task_get_task_param
 from invenio.config import \
     CFG_VERSION, \
     CFG_ETCDIR, \
@@ -51,7 +52,8 @@ from invenio.config import \
     CFG_CERN_SITE
 from invenio.search_engine import \
     perform_request_search, \
-    search_unit_in_bibxxx
+    search_unit_in_bibxxx, \
+    search_pattern
 from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_xml_output, record_add_field
 from invenio.pluginutils import PluginContainer
@@ -454,11 +456,11 @@ def update_rule_last_run(rule_name):
             or task_get_option('no_tickets', False):
         return   # We don't want to update the database in this case
 
-    updated = run_sql("UPDATE bibcheck_rules SET last_run=NOW() WHERE name=%s;",
-                      (rule_name,))
+    updated = run_sql("UPDATE bibcheck_rules SET last_run=%s WHERE name=%s;",
+                      (task_get_task_param('task_starting_time'), rule_name,))
     if not updated: # rule not in the database, insert it
-        run_sql("INSERT INTO bibcheck_rules(name, last_run) VALUES (%s, NOW())",
-                (rule_name,))
+        run_sql("INSERT INTO bibcheck_rules(name, last_run) VALUES (%s, %s)",
+                (rule_name, task_get_task_param('task_starting_time')))
 
 
 def reset_rule_last_run(rule_name):
@@ -592,13 +594,20 @@ def get_recids_for_rules(rules):
             else:
                 collections = None
             write_message("Performing given search query: '%s'" % query)
-            result = intbitset(perform_request_search(
-                p=query,
-                of='id',
-                wl=rule.get('filter_limit', 0),
-                f=rule.get('filter_field', None),
-                c=collections
-            ))
+            if collections:
+                result = perform_request_search(
+                    p=query,
+                    of='intbitset',
+                    wl=rule.get('filter_limit', 0),
+                    f=rule.get('filter_field', None),
+                    c=collections
+                )
+            else:
+                result = search_pattern(
+                    p=query,
+                    wl=rule.get('filter_limit', 0),
+                    f=rule.get('filter_field', None),
+                )
         else:
             result = intbitset(trailing_bits=True)
 
