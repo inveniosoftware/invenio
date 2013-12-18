@@ -201,9 +201,9 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
         pinfo['claim_in_process'] = True
 
-        prefs = get_user_preferences(req)
-        prefs['precached_viewclaimlink'] = pinfo['claim_in_process']
-        set_user_preferences(pinfo['uid'], prefs)
+        user_info = collect_user_info(req)
+        user_info['precached_viewclaimlink'] = pinfo['claim_in_process']
+        session.dirty = True
 
         if self.person_id != -1:
             pinfo['claimpaper_admin_last_viewed_pid'] = self.person_id
@@ -684,10 +684,9 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         if "merge_ticket" in pinfo and pinfo['merge_ticket']:
             pinfo['merge_ticket'] = []
 
-        prefs = get_user_preferences(req)
-        prefs['precached_viewclaimlink'] = True
-        uid = getUid(req)
-        set_user_preferences(uid, prefs)
+        user_info = collect_user_info(req)
+        user_info['precached_viewclaimlink'] = True
+        session.dirty = True
 
         if "referer" in pinfo and pinfo["referer"]:
             referer = pinfo["referer"]
