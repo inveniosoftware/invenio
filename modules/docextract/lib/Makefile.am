@@ -46,7 +46,8 @@ pylib_DATA = docextract_pdf.py \
              refextract_linker.py \
              refextract_regression_tests.py \
              refextract_unit_tests.py \
-             authorextract_re.py
+             authorextract_re.py \
+             docextract_regression_tests.py
 
 
 EXTRA_DIST = $(pylib_DATA)

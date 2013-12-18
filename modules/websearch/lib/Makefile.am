@@ -48,7 +48,8 @@ pylib_DATA = \
 	websearch_external_collections_unit_tests.py \
 	websearch_external_collections_utils.py \
 	websearch_services.py \
-	websearch_services_regression_tests.py
+	websearch_services_regression_tests.py \
+    search_engine_summarizer_regression_tests.py
 
 
 js_DATA = hepdata.js
