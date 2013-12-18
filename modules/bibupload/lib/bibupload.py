@@ -537,7 +537,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     for i, (code, dummy_value) in enumerate(oai_provenance_field[0]):
                         if code == CFG_OAI_PROVENANCE_ALTERED_SUBFIELD:
                             oai_provenance_field[0][i] = (code, 'true')
-                            tmp_indicators = (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4])
+                            tmp_indicators = (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3] == '_' and ' ' or CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4] == '_' and ' ' or CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4])
                             if tmp_indicators not in affected_tags.get(CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3], []):
                                 if CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3] not in affected_tags:
                                     affected_tags[CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3]] = [tmp_indicators]
