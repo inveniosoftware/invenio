@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2013 CERN.
 ##
@@ -17,8 +16,21 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from .flask_registry import Registry, ExtensionRegistry, ImportPathRegistry, \
-    ModuleRegistry, PackageRegistry, AutoDiscoverRegistry, \
-    AutoDiscoverSubRegistry, \
-    PkgResourcesDiscoverRegistry, EntryPointRegistry, \
-    RegistryProxy, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
+"""
+Customization of default Flask Jinja2 template loader.
+
+By default the Flask Jinja2 template loader is not aware of the order of
+Blueprints as defined by the PACKAGES configuration variable.
+"""
+
+from flask.templating import DispatchingJinjaLoader, blueprint_is_module
+
+
+class OrderAwareDispatchingJinjaLoader(DispatchingJinjaLoader):
+    def _iter_loaders(self, template):
+        for blueprint in self.app.extensions['registry']['blueprints']:
+            if blueprint_is_module(blueprint):
+                continue
+            loader = blueprint.jinja_loader
+            if loader is not None:
+                yield loader, template

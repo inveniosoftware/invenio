@@ -375,6 +375,45 @@ class AutoDiscoverSubRegistry(AutoDiscoverRegistry):
                 self.app.logger.error('Could not import: "%s: %s',
                                       import_str, str(e))
 
+from flask import Blueprint
+
+
+class BlueprintAutoDiscoveryRegistry(AutoDiscoverRegistry):
+    def __init__(self, app=None, module_name=None):
+        super(BlueprintAutoDiscoveryRegistry, self).__init__(
+            module_name or 'views', app=app
+        )
+
+    def _discover_module(self, pkg):
+        import_str = pkg + '.' + self.module_name
+
+        try:
+            view_module = import_string(import_str, self.silent)
+
+            if 'blueprints' in dir(view_module):
+                candidates = getattr(view_module, 'blueprints')
+            elif 'blueprint' in dir(view_module):
+                candidates = [getattr(view_module, 'blueprint')]
+            else:
+                candidates = []
+
+            for candidate in candidates:
+                if isinstance(candidate, Blueprint):
+                    self.app.register_blueprint(
+                        candidate,
+                        url_prefix=self.app.config.get(
+                            'BLUEPRINTS_URL_PREFIXES', {}
+                        ).get(candidate.name)
+                    )
+                    self.register(candidate)
+        except ImportError:
+            pass
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            self.app.logger.error('Could not import: "%s: %s',
+                                  import_str, str(e))
+
 
 class PkgResourcesDiscoverRegistry(AutoDiscoverRegistry):
 
