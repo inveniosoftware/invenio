@@ -26,8 +26,8 @@
 
 from .bccache import BytecodeCacheWithConfig
 from .context_processor import setup_app as context_processor_setup_app
+from .loader import OrderAwareDispatchingJinjaLoader
 from flask import g, request, current_app, _request_ctx_stack, url_for
-from jinja2 import FileSystemLoader, ChoiceLoader
 
 ENV_PREFIX = '_collected_'
 
@@ -140,16 +140,7 @@ def setup_app(app):
             cache_size=app.config.get('JINJA2_BCCACHE_SIZE', -1),
             bytecode_cache=BytecodeCacheWithConfig(app))
 
-    ## Let's customize the template loader to first look into
-    ## /opt/invenio/etc-local/templates and then into
-    ## /opt/invenio/etc/templates
-    CFG_ETCDIR = app.config.get('CFG_ETCDIR', 'etc')
-    jinja_loader = ChoiceLoader([
-        FileSystemLoader([os.path.join(CFG_ETCDIR + '-local', 'templates'),
-                          os.path.join(CFG_ETCDIR, 'templates')]),
-        app.jinja_loader,
-    ])
-    app.jinja_loader = jinja_loader
+    app.jinja_loader = OrderAwareDispatchingJinjaLoader(app)
 
     for ext in app.config.get('JINJA2_EXTENSIONS', []):
         try:

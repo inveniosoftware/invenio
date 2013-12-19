@@ -32,7 +32,7 @@ from .helpers import with_app_context, unicodifier
 from .wrappers import Flask
 from invenio.ext.registry import Registry, ExtensionRegistry, \
     PackageRegistry, ConfigurationRegistry, AutoDiscoverRegistry, \
-    ImportPathRegistry
+    ImportPathRegistry, BlueprintAutoDiscoveryRegistry
 from flask import Blueprint
 
 
@@ -56,38 +56,10 @@ def cleanup_legacy_configuration(app):
     app.config.update(unicodifier(dict(app.config)))
 
 
-def register_blueprints(app):
+def register_legacy_blueprints(app):
     """
-    Register all blueprints found during application assembly
-
-    URL prefix for a blueprint may be overwritten in the configuration::
-
-        BLUEPRINTS_URL_PREFIXES = dict(
-            '<blueprint name>'='<url_prefix>',
-            # ...
-        )
+    Register some legacy blueprints
     """
-    for view_module in app.extensions['registry']['views']:
-        if 'blueprints' in dir(view_module):
-            candidates = getattr(view_module, 'blueprints')
-        elif 'blueprint' in dir(view_module):
-            candidates = [getattr(view_module, 'blueprint')]
-        else:
-            candidates = []
-
-        for candidate in candidates:
-            if isinstance(candidate, Blueprint):
-                app.register_blueprint(
-                    candidate,
-                    url_prefix=app.config.get(
-                        'BLUEPRINTS_URL_PREFIXES', {}
-                    ).get(candidate.name)
-                )
-            else:
-                app.logger.error(
-                    '%s is not a valid blueprint plugin' % view_module.__name__
-                )
-
     @app.route('/testing')
     def testing():
         from flask import render_template
@@ -201,12 +173,10 @@ def create_app(instance_path=None, **kwargs_config):
     # ======================
     # Blueprint registration
     # ======================
-    # Load views modules
-    app.extensions['registry']['views'] = AutoDiscoverRegistry(
-        'views',
-        app=app,
+    app.extensions['registry']['blueprints'] = BlueprintAutoDiscoveryRegistry(
+        app=app
     )
 
-    register_blueprints(app)
+    register_legacy_blueprints(app)
 
     return app
