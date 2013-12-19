@@ -105,3 +105,6 @@ configure.lineno
 .pydevproject
 org.eclipse.core.resources.prefs
 modules/miscutil/bin/inveniomanage
+bower_components/
+node_modules/
+instance/

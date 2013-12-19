@@ -1,0 +1,31 @@
+{
+  "name": "invenio-grunt",
+  "version": "0.1.0",
+  "dependencies": {
+    "bootstrap": "2.2.1",
+    "jquery": "1.8.3",
+    "hogan": "3.0.0"
+  },
+  "devDependencies": {
+    "jquery-tokeninput": "*",
+    "ckeditor": "http://invenio-software.org/download/ckeditor/ckeditor_3.6.6.zip",
+    "MathJax": "v2.1-latest",
+    "jquery_jeditable": "~1.7.4",
+    "jquery.treeview": "1.4.1",
+    "jquery.tablesorter": "http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip",
+    "jquery.ui": "1-8-stable",
+    "jquery.ui.timepicker": "http://invenio-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js",
+    "jquery.multifile": "http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js",
+    "jquery.ajaxpager" : "http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js",
+    "jquery.bookmark": "http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip",
+    "DataTables": "1_9",
+    "jquery-flot": "*",
+    "form": "https://raw.github.com/malsup/form/master/jquery.form.js",
+    "jquery.hotkeys": "*",
+    "uploadify": "*",
+    "json2": "*",
+    "prism": "https://github.com/LeaVerou/prism/blob/gh-pages/prism.js",
+    "swfobject": "https://github.com/swfobject/swfobject/blob/master/swfobject/swfobject.js",
+    "datatables-colvis": "*"
+  }
+}
