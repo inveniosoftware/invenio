@@ -109,7 +109,7 @@
       {% else %}
         {% if collection.reclist %}
         <div class="page-header">
-          <h3>{{ _("Latest additions:") }}</h3>
+          <h3>{{ collection.name + ":" }}</h3>
         </div>
         {%- set of = request.values.get('of', 'hb') -%}
         {% for recid in collection.reclist[-10:]|reverse %}
