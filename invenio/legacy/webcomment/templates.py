@@ -1241,7 +1241,7 @@ class Template:
              'attach_msg': CFG_WEBCOMMENT_MAX_ATTACHED_FILES == 1 and _("Optionally, attach a file to this comment") or \
                            _("Optionally, attach files to this comment"),
              'nb_files_limit_msg': _("Max one file") and CFG_WEBCOMMENT_MAX_ATTACHED_FILES == 1 or \
-                              _("Max %i files") % CFG_WEBCOMMENT_MAX_ATTACHED_FILES,
+                              _("Max %(maxfiles)i files", maxfiles=CFG_WEBCOMMENT_MAX_ATTACHED_FILES),
              'file_size_limit_msg': CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE > 0 and _("Max %(x_nb_bytes)s per file") % {'x_nb_bytes': (CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE < 1024*1024 and (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB') or  (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/(1024*1024)) + 'MB'))} or ''}
 
         editor = get_html_text_editor(name='msg',
