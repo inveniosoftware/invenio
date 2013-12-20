@@ -225,3 +225,8 @@ def usage(recid):
                            viewsimilarity=viewsimilarity,
                            downloadsimilarity=downloadsimilarity,
                            downloadgraph=downloadgraph)
+
+
+@blueprint.route('/', methods=['GET', 'POST'])
+def no_recid():
+    return redirect("/")

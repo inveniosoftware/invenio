@@ -21,13 +21,13 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
 
 (function($) {
     var reloadTab = function(path) {
-        $.post(path, function(data) {
-            $('#record_content').html(data);
-        });
+        $(window).trigger('tabreload', [path]);
         $('#record-links li.active').removeClass('active');
         $('#record-links a[href="'+path+'"]').parent().addClass('active');
-
-        $(window).trigger('tabreloaded', [path]);
+        $.post(path, function(data) {
+            $('#record_content').html(data);
+            $(window).trigger('tabreloaded', [path]);
+        });
     };
 
     $(window).on('load', function() {
