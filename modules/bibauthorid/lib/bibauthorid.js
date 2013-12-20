@@ -38,7 +38,36 @@ var ticketbox = {
         };
     }(),
 
-    app: { debug: false }
+    app: { debug: false, hasFocus: false },
+
+    sureUpdate: function() {
+        var time = 1000;
+        var growth = 0.1;
+        var app = ticketbox.app;
+
+        var poller = function() {
+
+            var failure = function() {
+                    time += time * growth;
+                    window.setTimeout(poller, time);
+                    app.debug && console.log("[SureUpdate] FAILED: Retrying in " + time/1000 + " seconds.");
+            };
+
+            var success = function() {
+                app.debug && console.log("[SureUpdate] Update succeeded after multiple attempts.");
+            };
+
+            if (app.hasFocus) {
+                app.userops.fetch({"on": 'user', "error": failure, "success": success});
+            }
+        };
+
+        return function(coll, resp, opt) {
+            window.setTimeout(poller, time);
+        };
+
+
+    }
 };
 
 /**
@@ -115,9 +144,17 @@ var ticketbox = {
         params.data = {};
         params.data.jsondata = Server.dataOn({}, options.on);
 
-        // Set success and error callbacks
+        var syncCallback = function(jqXHR, status) {
+            var sureUpdate = ticketbox.sureUpdate();
+            if (method != "read") {
+                app.userops.fetch({"on": 'user', "error": sureUpdate});
+            }
+        };
+
+        // Set AJAX callbacks
         params.success = options.success;
         params.error = options.error;
+        params.complete = syncCallback;
 
         var generateRequest = function(type) {
             var requestTypes  = {
@@ -144,7 +181,7 @@ var ticketbox = {
                 app.debug && console.error("[Operation Model] ERROR: No request type defined.");
                 return {};
             }
-        }
+        };
 
         switch (method) {
             case 'create':
@@ -1616,8 +1653,24 @@ jQuery(function($) {
 
     disableLinks($("#person_menu").find("li.disabled"));
 
-    // Stupid polling
-    setInterval(function() { app.userops.fetch({"on": 'user'});}, 15000);
+    // Window focus event binding
+    var updater = (function() {
+        app.hasFocus = true;
+        $(window).focus(function(event) {
+            app.hasFocus = true;
+            var successFocus = function() {
+                app.debug && console.log("[Focus Update] Update succeeded.");
+            };
+
+            var sureUpdate = ticketbox.sureUpdate();
+            app.userops.fetch({"on": 'user', "error": sureUpdate, "success": successFocus});
+            app.debug && console.log("Focus update triggered.");
+        }).blur(function(event) {
+            app.hasFocus = false;
+            app.debug && console.log("Focus lost.");
+        });
+    })();
+
 
 //    // PidSearch test
 //    var searchModel = new PidSearch.SearchModel();
@@ -1627,13 +1680,6 @@ jQuery(function($) {
 //    app.search = searchModel;
 //    app.searchView = searchInterface;
 
-    console.log("Ticketing Loaded.");
-
-    var profilePageRegex = /\/author\/profile\//;
-    var profilePage = profilePageRegex.test(window.location.pathname);
-    if (profilePage) {
-        $("#bai_content").prepend("<div class='well'><h4>Welcome to the improved author profiles!</h4><p>We have revised our author page. Please let us know what you think via <a href='mailto:feedback@inspirehep.net?subject=Revised%20Author%20Profiles'>feedback@inspirehep.net</a></p></div>");
-    }
 
 });
 
