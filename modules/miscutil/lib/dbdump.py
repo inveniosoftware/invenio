@@ -164,6 +164,8 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
     """
     write_message("... writing %s" % (dump_path,))
 
+    partial_dump_path = dump_path + ".part"
+
     # Is mysqldump installed or in the right path?
     cmd_prefix = CFG_PATH_MYSQL + 'dump'
     if not os.path.exists(cmd_prefix):
@@ -196,15 +198,16 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
 
     write_message(dump_cmd, verbose=2)
 
-    exit_code, stdout, stderr = run_shell_command(dump_cmd, None, dump_path)
+    exit_code, stdout, stderr = run_shell_command(dump_cmd, None, partial_dump_path)
 
     if exit_code:
         raise StandardError("ERROR: mysqldump exit code is %s. stderr: %s stdout: %s" % \
                             (repr(exit_code), \
                              repr(stderr), \
                              repr(stdout)))
-
-    write_message("... completed writing %s" % (dump_path,))
+    else:
+        os.rename(partial_dump_path, dump_path)
+        write_message("... completed writing %s" % (dump_path,))
 
 
 def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
