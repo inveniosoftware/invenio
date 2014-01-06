@@ -28,6 +28,7 @@ from .bccache import BytecodeCacheWithConfig
 from .context_processor import setup_app as context_processor_setup_app
 from .loader import OrderAwareDispatchingJinjaLoader
 from flask import g, request, current_app, _request_ctx_stack, url_for
+from jinja2 import FileSystemLoader, ChoiceLoader
 
 ENV_PREFIX = '_collected_'
 
@@ -140,7 +141,13 @@ def setup_app(app):
             cache_size=app.config.get('JINJA2_BCCACHE_SIZE', -1),
             bytecode_cache=BytecodeCacheWithConfig(app))
 
-    app.jinja_loader = OrderAwareDispatchingJinjaLoader(app)
+    ## Let's customize the template loader to look into packages
+    ## and application templates folders.
+    jinja_loader = ChoiceLoader([
+        OrderAwareDispatchingJinjaLoader(app),
+        app.jinja_loader,
+    ])
+    app.jinja_loader = jinja_loader
 
     for ext in app.config.get('JINJA2_EXTENSIONS', []):
         try:
