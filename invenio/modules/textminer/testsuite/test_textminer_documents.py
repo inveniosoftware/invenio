@@ -18,7 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import pkg_resources
-import unittest
+import sys
+pyv = sys.version_info
+if pyv[0] == 2 and pyv[1] < 7:
+    import unittest2 as unittest
+else:
+    import unittest
 try:
     import requests
     from werkzeug.local import LocalProxy

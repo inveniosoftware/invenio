@@ -28,8 +28,11 @@ CFG_TESTUTILS_VERBOSE = 1
 import os
 import sys
 import time
-import unittest
-import unittest2
+pyv = sys.version_info
+if pyv[0] == 2 and pyv[1] < 7:
+    import unittest2 as unittest
+else:
+    import unittest
 import cgi
 import subprocess
 import binascii
@@ -152,7 +155,7 @@ class InvenioFixture(object):
         return dictate
 
 
-class InvenioTestCase(TestCase, unittest2.TestCase):
+class InvenioTestCase(TestCase, unittest.TestCase):
 
     @property
     def config(self):
