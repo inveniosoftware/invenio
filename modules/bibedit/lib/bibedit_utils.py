@@ -577,8 +577,11 @@ def modify_record_timestamp(revision_xml, last_revision_ts):
     @return: marcxml with 005 tag modified
     """
     recstruct = create_record(revision_xml)[0]
-    record_modify_controlfield(recstruct, "005", last_revision_ts,
-                                field_position_local=0)
+    if "005" in recstruct:
+        record_modify_controlfield(recstruct, "005", last_revision_ts,
+                                   field_position_local=0)
+    else:
+        record_add_field(recstruct, '005', controlfield_value=last_revision_ts)
     return record_xml_output(recstruct)
 
 
