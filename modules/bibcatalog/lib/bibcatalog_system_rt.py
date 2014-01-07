@@ -184,12 +184,14 @@ class BibCatalogSystemRT(BibCatalogSystem):
             comment = True
             res = self._ticket_submit(uid=uid, subject=subject,
                                       queue=queue,
-                                      recordid=recordid)
+                                      recordid=recordid,
+                                      requestor=requestor)
         else:
             res = self._ticket_submit(uid=uid, subject=subject,
                                       queue=queue,
                                       text=text,
-                                      recordid=recordid)
+                                      recordid=recordid,
+                                      requestor=requestor)
 
         try:
             # The BibCatalog API returns int if successful or
