@@ -4,6 +4,6 @@ Flask==0.10.1
 WTForms>=1.0.5
 fixture==1.4
 redis==2.8.0
-twill==0.9
+http://darcs.idyll.org/~t/projects/twill-0.9.tar.gz
 unittest2==0.5.1
 webassets==0.7
