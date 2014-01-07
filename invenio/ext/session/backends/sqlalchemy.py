@@ -30,11 +30,15 @@
     - SESSION_BACKEND_SQLALCHEMY_VALUE = 'session_object'
 """
 
+from datetime import datetime
+
 from flask import current_app
+from flask.ext.login import current_user
 from flask.helpers import locked_cached_property
 from werkzeug import import_string
 
 from ..storage import SessionStorage
+from ..model import Session
 
 
 class Storage(SessionStorage):
@@ -59,7 +63,7 @@ class Storage(SessionStorage):
         """Returns SQLAlchemy model."""
         return import_string(current_app.config.get(
             'SESSION_BACKEND_SQLALCHEMY_MODEL',
-            'invenio.ext.session.model:Session'))
+            'invenio.ext.session.model:Session'))()
 
     @locked_cached_property
     def getter(self):
@@ -90,15 +94,11 @@ class Storage(SessionStorage):
         s.session_object = value
         s.session_expiry = session_expiry
         #FIXME REPLACE OR UPDATE
-        db.session.merge(s)
-        db.session.commit()
+        self.db.session.merge(s)
+        self.db.session.commit()
 
     def get(self, name):
         return getattr(self.getter(name), self.value)
-        s = Session.query.filter(db.and_(
-            Session.session_key == name,
-            Session.session_expiry >= db.func.current_timestamp())).one()
-        return s.session_object
 
     def delete(self, name):
         self.getter(name).delete()

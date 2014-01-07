@@ -43,7 +43,7 @@ class Session(db.Model):
         if expired:
             where = db.and_(
                 where, Session.session_expiry >= db.func.current_timestamp())
-        return self.query.filter(where)
+        return self.query.filter(where).one()
 
     def set_session(self, name, value, timeout=None):
         uid = current_user.get_id()
