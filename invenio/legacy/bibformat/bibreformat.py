@@ -33,7 +33,7 @@ try:
          CFG_TMPDIR,\
          CFG_BINDIR
 
-    from invenio.intbitset import intbitset
+    from intbitset import intbitset
     from invenio.legacy.search_engine import perform_request_search, search_pattern
     from invenio.legacy.search_engine import print_record
     from invenio.legacy.bibrank.citation_searcher import get_cited_by

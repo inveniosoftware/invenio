@@ -48,7 +48,7 @@ MAX_ITEM_BEFORE_COLLAPSE = 10
 
 from invenio.base.i18n import gettext_set_language
 
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 
 from invenio.legacy.search_engine import perform_request_search
 from invenio.utils.url import create_html_link

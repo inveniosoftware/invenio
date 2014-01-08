@@ -1176,7 +1176,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_for_successful_query_format_intbitset(self):
         """websearch - search engine Python API for successful query, output format intbitset"""
-        from invenio.intbitset import intbitset
+        from intbitset import intbitset
         from invenio.search_engine import perform_request_search
         self.assertEqual(intbitset([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]),
                          perform_request_search(p='ellis', of='intbitset'))
@@ -1211,7 +1211,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_for_existing_record_format_intbitset(self):
         """websearch - search engine Python API for existing record, output format intbitset"""
-        from invenio.intbitset import intbitset
+        from intbitset import intbitset
         from invenio.search_engine import perform_request_search
         self.assertEqual(intbitset([8]),
                          perform_request_search(recid=8, of='intbitset'))
@@ -1224,7 +1224,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_for_nonexisting_record_format_intbitset(self):
         """websearch - search engine Python API for non-existing record, output format intbitset"""
-        from invenio.intbitset import intbitset
+        from intbitset import intbitset
         from invenio.search_engine import perform_request_search
         self.assertEqual(intbitset(),
                          perform_request_search(recid=16777215, of='intbitset'))
@@ -1392,14 +1392,14 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
 
     def test_search_engine_python_api_for_intersect_results_with_one_collrec(self):
         """websearch - search engine Python API for intersect results with one collrec"""
-        from invenio.intbitset import intbitset
+        from intbitset import intbitset
         from invenio.legacy.search_engine import intersect_results_with_collrecs
         self.assertEqual({'Books & Reports': intbitset([19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34])},
                          intersect_results_with_collrecs(None, intbitset(range(0,110)), ['Books & Reports'], 0, 'id', 0, 'en', False))
 
     def test_search_engine_python_api_for_intersect_results_with_several_collrecs(self):
         """websearch - search engine Python API for intersect results with several collrecs"""
-        from invenio.intbitset import intbitset
+        from intbitset import intbitset
         from invenio.legacy.search_engine import intersect_results_with_collrecs
         self.assertEqual({'Books': intbitset([21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]),
                           'Reports': intbitset([19, 20]),
@@ -1949,7 +1949,7 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
 
     def test_search_engine_web_api_for_failed_query_format_intbitset(self):
         """websearch - search engine Web API for failed query, output format intbitset"""
-        from invenio.intbitset import intbitset
+        from intbitset import intbitset
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=aoeuidhtns&of=intbitset',
                                                expected_text=intbitset().fastdump()))
@@ -1968,7 +1968,7 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
 
     def test_search_engine_web_api_respect_sorting_parameter(self):
         """websearch - search engine Web API for successful query, respect sorting parameters"""
-        from invenio.intbitset import intbitset
+        from intbitset import intbitset
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
                                                expected_text="[84, 85]"))
@@ -1990,7 +1990,7 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
 
     def test_search_engine_web_api_respect_ranking_parameter(self):
         """websearch - search engine Web API for successful query, respect ranking parameters"""
-        from invenio.intbitset import intbitset
+        from intbitset import intbitset
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
                                                expected_text="[84, 85]"))
@@ -4463,7 +4463,7 @@ class WebSearchDateQueryTest(InvenioTestCase):
 
     def setUp(self):
         """Establish variables we plan to re-use"""
-        from invenio.intbitset import intbitset
+        from intbitset import intbitset
         self.empty = intbitset()
 
     def test_search_unit_hits_for_datecreated_previous_millenia(self):

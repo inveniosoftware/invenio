@@ -52,7 +52,7 @@ from invenio.config import CFG_BINDIR, CFG_LOGDIR
 run_sql = lazy_import('invenio.dbquery:run_sql')
 deserialize_via_marshal = lazy_import('invenio.dbquery:deserialize_via_marshal')
 
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 get_record = lazy_import('invenio.search_engine:get_record')
 get_fieldvalues = lazy_import('invenio.search_engine_utils:get_fieldvalues')
 

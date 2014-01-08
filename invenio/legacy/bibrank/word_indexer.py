@@ -34,7 +34,7 @@ from invenio.legacy.bibindex.engine import beautify_range_list, \
     kill_sleepy_mysql_threads, create_range_list
 from invenio.legacy.bibsched.bibtask import write_message, task_get_option, task_update_progress, \
     task_update_status, task_sleep_now_if_required
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.ext.logging import register_exception
 from invenio.utils.text import strip_accents
 from invenio.modules.rank.registry import configuration

@@ -42,7 +42,7 @@ from invenio.bibdocfile import bibdocfile_url_p, \
 from invenio.bibindex_engine_utils import get_idx_indexer
 from invenio.bibtask import write_message
 from invenio.errorlib import register_exception
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 
 

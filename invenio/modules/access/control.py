@@ -39,7 +39,7 @@ from invenio.modules.access.local_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SE
 from invenio.legacy.dbquery import run_sql, ProgrammingError
 from invenio.modules.access.firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize, load_role_definition
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.ext.sqlalchemy import db
 from invenio.modules.access.models import AccAuthorization, AccACTION, \
                                     AccARGUMENT, UserAccROLE

@@ -37,7 +37,7 @@ from invenio.legacy.webpage import adderrorbox
 from invenio.legacy.bibindex.engine_stemmer import stem
 from invenio.legacy.bibindex.engine_stopwords import is_stopword
 from invenio.legacy.bibrank.citation_searcher import get_cited_by, get_cited_by_weight
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.legacy.bibrank.word_searcher import find_similar
 # Do not remove these lines, it is necessary for func_object = globals().get(function)
 from invenio.legacy.bibrank.word_searcher import word_similarity

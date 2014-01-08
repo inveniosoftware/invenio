@@ -26,7 +26,7 @@ import itertools
 
 
 from invenio.config import CFG_SOLR_URL
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.ext.logging import register_exception
 
 

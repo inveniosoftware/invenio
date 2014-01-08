@@ -58,7 +58,7 @@ from invenio.legacy.bibindex.engine_washer import wash_index_term
 from invenio.legacy.bibsched.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, \
     task_update_progress, task_sleep_now_if_required
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibrank.adminlib import get_def_name
 from invenio.solrutils_bibindex_indexer import solr_commit

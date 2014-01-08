@@ -25,7 +25,7 @@ from invenio.utils.date import datetime, strftime
 from invenio.legacy.dbquery import deserialize_via_marshal, \
 serialize_via_marshal, run_sql, Error
 from invenio.legacy.search_engine import get_field_tags, search_pattern
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.legacy.bibsched.bibtask import write_message, task_update_progress, \
 task_sleep_now_if_required
 from invenio.config import CFG_BIBSORT_BUCKETS, CFG_CERN_SITE

@@ -21,7 +21,7 @@ from invenio.testsuite import make_test_suite, \
                               run_test_suite, \
                               test_web_page_content, \
                               nottest
-from invenio import intbitset
+import intbitset
 from invenio.legacy.miscutil.solrutils_bibindex_searcher import solr_get_bitset
 from invenio.solrutils_bibrank_searcher import solr_get_ranked, solr_get_similar_ranked
 from invenio.legacy.search_engine import get_collection_reclist

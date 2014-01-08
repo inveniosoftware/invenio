@@ -89,7 +89,7 @@ from invenio.utils.text import encode_for_xml
 from invenio.legacy.dbquery import run_sql
 
 
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 
 # Some values used for the RXP parsing.
 TAG, ATTRS, CHILDREN = 0, 1, 2

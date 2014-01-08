@@ -73,7 +73,7 @@ from invenio.base.i18n import gettext_set_language
 from invenio.modules.access.control import acc_get_action_id
 from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.ext.logging import register_exception
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.legacy.bibrank.citation_searcher import get_cited_by_count
 from invenio.legacy.bibrecord import record_get_field_instances
 

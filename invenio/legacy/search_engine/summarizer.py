@@ -33,7 +33,7 @@ from invenio.legacy.bibrank.selfcites_indexer import get_self_citations_count
 from StringIO import StringIO
 
 from invenio.legacy.search_engine import search_pattern, perform_request_search
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 
 import invenio.legacy.template
 

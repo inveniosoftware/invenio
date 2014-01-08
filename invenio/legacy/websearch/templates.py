@@ -74,7 +74,7 @@ from invenio.ext.legacy.handler import wash_urlargd
 from invenio.legacy.bibrank.citation_searcher import get_cited_by_count
 from invenio.legacy.webuser import session_param_get
 
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 
 from invenio.legacy.websearch_external_collections import external_collection_get_state, get_external_collection_engine
 from invenio.legacy.websearch_external_collections.utils import get_collection_id
