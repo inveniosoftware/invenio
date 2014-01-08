@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -275,7 +275,8 @@ def perform_delete(ln):
     # TODO
     return websession_templates.tmpl_account_delete(ln = ln)
 
-def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0):
+def perform_set(email, ln, can_config_bibcatalog=False,
+                can_config_profiling=False, verbose=0):
     """Perform_set(email,password): edit your account parameters, email and
     password.
     If can_config_bibcatalog is True, show the bibcatalog dialog (if configured).
@@ -285,13 +286,13 @@ def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0):
         res = run_sql("SELECT id, nickname FROM user WHERE email=%s", (email,))
         uid = res[0][0]
         nickname = res[0][1]
-    except:
+    except IndexError:
         uid = 0
         nickname = ""
 
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
     prefs = get_user_preferences(uid)
-    if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']] is not None:
+    if prefs['login_method'] in CFG_EXTERNAL_AUTHENTICATION and CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']] is not None:
         CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = 3
 
     out = websession_templates.tmpl_user_preferences(
@@ -305,7 +306,7 @@ def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0):
         try:
             uid = run_sql("SELECT id FROM user where email=%s", (email,))
             uid = uid[0][0]
-        except:
+        except IndexError:
             uid = 0
         current_login_method = prefs['login_method']
         methods = CFG_EXTERNAL_AUTHENTICATION.keys()
@@ -358,8 +359,12 @@ def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0):
     if CFG_BIBCATALOG_SYSTEM and can_config_bibcatalog:
         bibcatalog_username = prefs.get('bibcatalog_username', "")
         bibcatalog_password = prefs.get('bibcatalog_password', "")
-        out += websession_templates.tmpl_user_bibcatalog_auth(bibcatalog_username, \
+        out += websession_templates.tmpl_user_bibcatalog_auth(bibcatalog_username,
                                                           bibcatalog_password, ln=ln)
+
+    if can_config_profiling:
+        out += websession_templates.tmpl_user_profiling_settings(ln=ln,
+                                                                 enable_profiling=prefs.get('enable_profiling'))
 
     if verbose >= 9:
         for key, value in prefs.items():

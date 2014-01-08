@@ -51,6 +51,7 @@ from invenio.webuser import get_preferred_user_language, isGuestUser, \
 from invenio.webinterface_handler_wsgi_utils import StringField
 from invenio.session import get_session
 from invenio import web_api_key
+from invenio.access_control_engine import acc_authorize_action
 
 
 ## The following variable is True if the installation make any difference
@@ -287,11 +288,20 @@ def create_handler(root):
         args = {}
         if req.args:
             args = cgi.parse_qs(req.args)
-        if 'profile' in args:
-            if not isUserSuperAdmin(collect_user_info(req)):
-                return _handler(req)
 
-            if 'memory' in args['profile']:
+        user_info = collect_user_info(req)
+
+        # Permissions to run the profiler?
+        if acc_authorize_action(user_info, 'profiling')[0]:
+            return _handler(req)
+
+        if user_info.get('enable_profiling') and 'profile' not in args:
+            args['profile'] = 'cumulative'
+
+        # Profiler enabled?
+        if 'profile' in args:
+
+            if 'memory' in args.get('profile', []):
                 gc.set_debug(gc.DEBUG_LEAK)
                 ret = _handler(req)
                 req.write("\n<pre>%s</pre>" % gc.garbage)
@@ -336,10 +346,9 @@ def create_handler(root):
                 import cProfile
                 pr = cProfile.Profile()
                 ret = pr.runcall(_handler, req)
-                pr.dump_stats(filename)
                 for sort_type in required_sorts:
                     strstream = StringIO()
-                    pstats.Stats(filename, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
+                    pstats.Stats(pr, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
                     profile_dump.append(strstream.getvalue())
             profile_dump = '\n'.join(profile_dump)
             profile_dump += '\nYou can use profile=%s or profile=memory' % existing_sorts

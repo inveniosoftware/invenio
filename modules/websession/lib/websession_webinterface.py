@@ -315,9 +315,12 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         #check if the user should see bibcatalog user name / passwd in the settings
         can_config_bibcatalog = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
+        can_config_profiling = (acc_authorize_action(user_info, 'profiling')[0] == 0)
         return page(title= _("Your Settings"),
                     body=body+webaccount.perform_set(webuser.get_email(uid),
-                                                     args['ln'], can_config_bibcatalog,
+                                                     args['ln'],
+                                                     can_config_bibcatalog,
+                                                     can_config_profiling,
                                                      verbose=args['verbose']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%s Personalize, Your Settings")  % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
@@ -343,6 +346,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'lang' : (str, None),
             'bibcatalog_username' : (str, None),
             'bibcatalog_password' : (str, None),
+            'profiling' : (int, 0),
             })
 
         ## Wash arguments:
@@ -537,13 +541,21 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if args['bibcatalog_username'] or args['bibcatalog_password']:
             act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
-            if ((len(args['bibcatalog_username']) == 0) or (len(args['bibcatalog_password']) == 0)):
+            if len(args['bibcatalog_username']) == 0 or len(args['bibcatalog_password']) == 0:
                 title = _("Editing bibcatalog authorization failed")
                 mess += '<p>' + _("Empty username or password")
             else:
                 title = _("Settings edited")
                 prefs['bibcatalog_username'] = args['bibcatalog_username']
                 prefs['bibcatalog_password'] = args['bibcatalog_password']
+                webuser.set_user_preferences(uid, prefs)
+                mess += '<p>' + _("User settings saved correctly.")
+
+        if 'profiling' in args:
+            user_info = webuser.collect_user_info(req)
+            can_config_profiling = (acc_authorize_action(user_info, 'profiling')[0] == 0)
+            if can_config_profiling:
+                prefs['enable_profiling'] = bool(args['profiling'])
                 webuser.set_user_preferences(uid, prefs)
                 mess += '<p>' + _("User settings saved correctly.")
 
