@@ -81,7 +81,7 @@ from invenio.legacy.search_engine import get_record
 from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibcatalog.api import bibcatalog_system
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.utils.url import make_user_agent_string
 from invenio.config import CFG_BIBDOCFILE_FILEDIR
 from invenio.legacy.bibsched.bibtask import task_init, write_message, \

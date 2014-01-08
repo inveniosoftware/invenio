@@ -45,7 +45,7 @@ from invenio.config import \
 from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_MARCXML_SIZE, \
      CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 from invenio.legacy.search_engine import perform_request_search, get_record, search_unit_in_bibxxx
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibsched.bibtask import \
      task_get_option, \

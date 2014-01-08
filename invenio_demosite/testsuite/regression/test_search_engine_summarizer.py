@@ -20,7 +20,7 @@
 """Regression tests for the search engine summarizer."""
 
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 
 
 class WebSearchSummarizerTests(InvenioTestCase):

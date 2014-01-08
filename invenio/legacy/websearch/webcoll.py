@@ -49,7 +49,7 @@ from invenio.legacy.bibrank.record_sorter import get_bibrank_methods
 from invenio.utils.date import convert_datestruct_to_dategui, strftime
 from invenio.modules.formatter import format_record
 from invenio.utils.shell import mymkdir
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.legacy.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \

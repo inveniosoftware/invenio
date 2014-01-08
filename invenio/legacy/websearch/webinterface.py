@@ -123,7 +123,7 @@ from invenio.modules.access.mailcookie import mail_cookie_create_authorize_actio
 from invenio.modules.formatter import format_records
 from invenio.modules.formatter.engine import get_output_formats
 from invenio.legacy.websearch.webcoll import get_collection
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.legacy.bibupload.engine import find_record_from_sysno
 from invenio.legacy.bibrank.citation_searcher import get_cited_by_list
 from invenio.legacy.bibrank.downloads_indexer import get_download_weight_total
@@ -726,7 +726,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                     # display page not found for URLs like /CFG_SITE_RECORD/foo
                     return None, []
 
-            from invenio.intbitset import __maxelem__
+            from intbitset import __maxelem__
             if recid <= 0 or recid > __maxelem__:
                 # __maxelem__ = 2147483647
                 # display page not found for URLs like /CFG_SITE_RECORD/-5 or /CFG_SITE_RECORD/0 or /CFG_SITE_RECORD/2147483649

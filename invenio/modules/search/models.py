@@ -27,7 +27,7 @@ from operator import itemgetter
 from flask import g, url_for
 from invenio.base.globals import cfg
 try:
-    from invenio.intbitset import intbitset
+    from intbitset import intbitset
 except:
     from intbitset import intbitset
 #from invenio.legacy.search_engine import collection_restricted_p

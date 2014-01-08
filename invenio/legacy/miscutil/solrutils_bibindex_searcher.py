@@ -24,7 +24,7 @@ Solr utilities.
 import urllib2
 import urllib
 import mimetools
-from invenio import intbitset
+import intbitset
 from invenio.utils.url import make_invenio_opener
 from invenio.utils.json import json
 from invenio.config import CFG_SOLR_URL, \

@@ -525,7 +525,7 @@ def cli_cmd_reset_recstruct_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
     will adapt the database to either store or not store the recstruct
     format."""
-    from invenio.intbitset import intbitset
+    from intbitset import intbitset
     from invenio.legacy.dbquery import run_sql, serialize_via_marshal
     from invenio.legacy.search_engine import get_record
     from invenio.legacy.bibsched.cli import server_pid, pidfile

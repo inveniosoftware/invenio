@@ -27,7 +27,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 
 import cgi
 import urllib

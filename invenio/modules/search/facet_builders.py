@@ -29,7 +29,7 @@ from .models import Collection
 
 from invenio.base.globals import cfg
 try:
-    from invenio.intbitset import intbitset
+    from intbitset import intbitset
 except:
     from intbitset import intbitset
 from invenio.base.utils import autodiscover_facets

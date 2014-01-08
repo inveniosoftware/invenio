@@ -36,7 +36,7 @@ from invenio.legacy.search_engine import get_collection_reclist
 from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR, \
     CFG_SITE_RECORD, CFG_SITE_LANGS
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from invenio.legacy.websearch.webcoll import Collection
 from invenio.legacy.bibsched.bibtask import write_message, task_update_progress, task_sleep_now_if_required
 from invenio.utils.text import encode_for_xml

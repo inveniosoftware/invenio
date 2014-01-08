@@ -19,7 +19,7 @@
 
 """WebTag Plugin for search_engine"""
 
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 from flask.ext.login import current_user
 
 from .models import \
