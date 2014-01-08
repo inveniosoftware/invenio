@@ -24,6 +24,8 @@ rarely change.
 
 from invenio.dbquery import run_sql, get_table_update_time
 import time
+from datetime import datetime, timedelta
+
 
 class InvenioDataCacherError(Exception):
     """Error raised by data cacher."""
@@ -39,11 +41,14 @@ class DataCacher(object):
     use cases use a dict internal structure for .cache, but some use
     lists.
     """
-    def __init__(self, cache_filler, timestamp_verifier):
+    def __init__(self, cache_filler, timestamp_verifier, min_cache_time=5):
         """ @param cache_filler: a function that fills the cache dictionary.
             @param timestamp_verifier: a function that returns a timestamp for
                    checking if something has changed after cache creation.
         """
+        # Last time the cache was fetched
+        self.real_timestamp = 0
+
         self.timestamp = 0 # WARNING: may be exposed to clients
         self.cache = {} # WARNING: may be exposed to clients; lazy
                         # clients may even alter this object on the fly
@@ -55,6 +60,7 @@ class DataCacher(object):
         self.timestamp_verifier = timestamp_verifier
         self.is_ok_p = True
         self.create_cache()
+        self.minimum_cache_time = min_cache_time
 
     def clear(self):
         """Clear the cache rebuilding it."""
@@ -67,14 +73,22 @@ class DataCacher(object):
         """
         self.cache = self.cache_filler()
         self.timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        self.real_timestamp = datetime.now()
 
     def recreate_cache_if_needed(self):
         """
         Recreate cache if needed, by verifying the cache timestamp
         against the timestamp verifier function.
         """
-        if self.timestamp_verifier() > self.timestamp:
-            self.create_cache()
+        datecut = datetime.now() - timedelta(seconds=self.minimum_cache_time)
+        if datecut > self.real_timestamp:
+            if self.timestamp_verifier() > self.timestamp:
+                self.create_cache()
+            else:
+                # We nevertheless update the last update time
+                # because we only want to check every 30s
+                self.real_timestamp = datetime.now()
+
 
 class SQLDataCacher(DataCacher):
     """
