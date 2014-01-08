@@ -4097,6 +4097,7 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
     # which should be all be changed to return an empty list.
     if solution_recs and sort_order == 'd':
         solution_recs.reverse()
+        solution_scores.reverse()
 
     return solution_recs, solution_scores, prefix, suffix, comment
 
