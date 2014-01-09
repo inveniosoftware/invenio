@@ -18,23 +18,27 @@
 #}
 
 {# Global CSS #}
-{%- css 'css/bootstrap.css', '00-invenio' -%}
-{%- css 'css/bootstrap-responsive.min.css', '00-invenio' -%}
-{%- css 'css/token-input.css', '00-invenio' -%}
-{%- css 'css/token-input-facebook.css', '00-invenio' -%}
-{%- css url_for('webtag.static', filename='css/tags/popover.css'), '00-invenio' -%}
-{%- if config.CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' %}
-{%- css 'css/'+config.CFG_WEBSTYLE_TEMPLATE_SKIN, '00-invenio' -%}
-{%- endif %}
+{% block global_css %}
+  {%- css 'css/bootstrap.css', '00-invenio' -%}
+  {%- css 'css/bootstrap-responsive.min.css', '00-invenio' -%}
+  {%- css 'css/token-input.css', '00-invenio' -%}
+  {%- css 'css/token-input-facebook.css', '00-invenio' -%}
+  {%- css url_for('webtag.static', filename='css/tags/popover.css'), '00-invenio' -%}
+  {%- if config.CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' %}
+  {%- css 'css/'+config.CFG_WEBSTYLE_TEMPLATE_SKIN, '00-invenio' -%}
+  {%- endif %}
+{% endblock global_css %}
 
 {# Global Javascript files #}
-{%- js 'js/jquery.min.js', '00-invenio' -%}
-{%- js 'js/bootstrap.js', '00-invenio' -%}
-{%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
-{%- js 'js/hogan.js', '00-invenio' -%}
-{%- js 'js/jquery.jeditable.mini.js', '00-invenio' -%}
-{%- js 'js/invenio.js', '00-invenio' -%}
-{%- js 'js/translate.js', '00-invenio' -%}
+{% block global_javascript %}
+  {%- js 'js/jquery.min.js', '00-invenio' -%}
+  {%- js 'js/bootstrap.js', '00-invenio' -%}
+  {%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
+  {%- js 'js/hogan.js', '00-invenio' -%}
+  {%- js 'js/jquery.jeditable.mini.js', '00-invenio' -%}
+  {%- js 'js/invenio.js', '00-invenio' -%}
+  {%- js 'js/translate.js', '00-invenio' -%}
+{% endblock global_javascript %}
 
 {%- if not no_pageheader -%}
 <!DOCTYPE html>
