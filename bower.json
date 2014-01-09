@@ -2,11 +2,12 @@
   "name": "invenio-grunt",
   "version": "0.1.0",
   "dependencies": {
-    "bootstrap": "2.2.1",
-    "jquery": "1.8.3",
-    "hogan": "3.0.0"
+    "bootstrap": "3.0.2",
+    "jquery": "2.0.3"
   },
   "devDependencies": {
+    "typeahead.js": "*",
+    "hogan": "3.0.0",
     "jquery-tokeninput": "*",
     "ckeditor": "http://invenio-software.org/download/ckeditor/ckeditor_3.6.6.zip",
     "MathJax": "v2.1-latest",
@@ -26,6 +27,11 @@
     "json2": "*",
     "prism": "https://github.com/LeaVerou/prism/blob/gh-pages/prism.js",
     "swfobject": "https://github.com/swfobject/swfobject/blob/master/swfobject/swfobject.js",
-    "datatables-colvis": "*"
+    "datatables-colvis": "*",
+    "typeahead.js-bootstrap": "https://raw.github.com/jharding/typeahead.js-bootstrap.css/master/typeahead.js-bootstrap.css",
+    "DataTables-Plugins": "https://github.com/DataTables/Plugins.git"
+  },
+  "resolutions": {
+    "jquery": "2.0.3"
   }
 }
