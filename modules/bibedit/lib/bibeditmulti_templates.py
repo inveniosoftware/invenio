@@ -27,6 +27,7 @@ from invenio.config import CFG_SITE_URL, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSI
                            CFG_SITE_ADMIN_EMAIL, \
                            CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
+from invenio.urlutils import auto_version_url
 
 
 class Template:
@@ -844,8 +845,8 @@ div .boxleft_2 {
 
         result = ""
         for script in scripts:
-            result += '<script type="text/javascript" src="%s/js/%s">' \
-            '</script>\n' % (CFG_SITE_URL, script)
+            result += '<script type="text/javascript" src="%s/%s">' \
+            '</script>\n' % (CFG_SITE_URL, auto_version_url("js/" + script))
 
         return result
 

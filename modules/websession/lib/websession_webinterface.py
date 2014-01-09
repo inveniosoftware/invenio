@@ -815,6 +815,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'p_un': (str, None),
             'p_pw': (str, None),
             'login_method': (str, None),
+            'provider': (str, None),
             'action': (str, ''),
             'remember_me' : (str, ''),
             'referer': (str, '')})
@@ -842,6 +843,22 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         uid = webuser.getUid(req)
 
+        # If user has logged in to ORCID through oauth2, store his ORCID id
+        if uid > 0 and args['login_method'] == 'oauth2' and args['provider'] == 'orcid':
+            from invenio.bibauthorid_webapi import get_pid_from_uid, add_orcid_to_pid
+
+            CFG_EXTERNAL_AUTHENTICATION['oauth2'].auth_user(None, None, req)
+
+            pid = get_pid_from_uid(uid)
+            try:
+                orcid = str(req.g['oauth2_orcid'])
+            except KeyError:
+                return redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_SECURE_URL, pid))
+
+            add_orcid_to_pid(pid, orcid)
+
+            return redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_SECURE_URL, pid))
+
         # If user is already logged in, redirect it to referer or your account
         # page
         if uid > 0:
@@ -856,7 +873,6 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 action, arguments = mail_cookie_check_authorize_action(cookie)
             except InvenioWebAccessMailCookieError:
                 pass
-
         if not CFG_EXTERNAL_AUTH_USING_SSO:
             if (args['p_un'] is None or not args['login_method']) and (not args['login_method'] in ['openid', 'oauth1', 'oauth2']):
                 return page(title=_("Login"),
@@ -1228,8 +1244,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
             provider = OAuth2Service(
                                  name = provider_name,
-                                 consumer_key = config['consumer_key'],
-                                 consumer_secret = config['consumer_secret'],
+                                 client_id = config['consumer_key'],
+                                 client_secret = config['consumer_secret'],
                                  access_token_url = config['access_token_url'],
                                  authorize_url = config['authorize_url']
                                  )
@@ -1258,7 +1274,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         # Construct the authorization url
         params = config.get('authorize_parameters', {})
         params['redirect_uri'] = '%s/youraccount/login?login_method=oauth2\
-&provider=%s' % (CFG_SITE_SECURE_URL, args['provider'])
+&provider=%s' % (CFG_SITE_URL, args['provider'])
         url = provider.get_authorize_url(**params)
 
         redirect_to_url(req, url)

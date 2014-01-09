@@ -34,7 +34,7 @@ from invenio.refextract_api import update_references, \
 class RefextractApiTest(InvenioTestCase):
     def test_no_fulltext(self):
         try:
-            update_references(1000000000000)
+            update_references(2000000)
             self.fail()
         except FullTextNotAvailable:
             # As expected

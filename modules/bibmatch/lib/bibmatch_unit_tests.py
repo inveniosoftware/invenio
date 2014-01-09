@@ -31,8 +31,25 @@ from invenio.bibmatch_validator import compare_fieldvalues_normal, \
                                        compare_fieldvalues_date, \
                                        get_paired_comparisons
 from invenio.testutils import InvenioTestCase
+from invenio.bibmatch_engine import get_longest_words
 
 class BibMatchTest(InvenioTestCase):
+    """Test functions of Bibmatch."""
+
+    def test_get_longest_words(self):
+        """ Testing get_longest_words function """
+        string_to_check = "This is a string containing some long words"
+        list_expected = ["containing", "string", "words"]
+        self.assertEqual(list_expected,
+                         get_longest_words(string_to_check, limit=3))
+
+        string_to_check = 'This is a "string containing some quoted" long words'
+        list_expected = ['"string containing some quoted"', "words"]
+        self.assertEqual(list_expected,
+                         get_longest_words(string_to_check, limit=2))
+
+
+class BibMatchValidationTest(InvenioTestCase):
     """Test functions to check the validator of Bibmatch."""
 
     def test_validation_get_paired_comparisons(self):
@@ -51,7 +68,7 @@ class BibMatchTest(InvenioTestCase):
         original_record_instances = ['Brodsky, Stanley J.']
         matched_record_instances = ['Brodsky, S.J.', 'Not, M E']
         comparisons = get_paired_comparisons(original_record_instances, matched_record_instances)
-        threshold = 0.8
+        threshold = 0.85
         matches_needed = 1
         result, dummy = compare_fieldvalues_authorname(comparisons, threshold, matches_needed)
         self.assertTrue(result)
@@ -136,7 +153,8 @@ class BibMatchTest(InvenioTestCase):
         self.assertTrue(result)
 
 
-TEST_SUITE = make_test_suite(BibMatchTest)
+TEST_SUITE = make_test_suite(BibMatchTest,
+                             BibMatchValidationTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=False)

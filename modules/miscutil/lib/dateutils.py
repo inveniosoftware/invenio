@@ -60,20 +60,28 @@ datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
 
+
 class date(real_date):
     def strftime(self, fmt):
         return strftime(fmt, self)
+
 
 class datetime(real_datetime):
     def strftime(self, fmt):
         return strftime(fmt, self)
 
-    @classmethod
-    def combine(self, date, time):
-        return self(date.year, date.month, date.day, time.hour, time.minute, time.microsecond, time.tzinfo)
+    def __add__(self, other):
+        d = real_datetime.combine(self, self.timetz())
+        d += other
+        return self.combine(d, d.timetz())
 
     def date(self):
         return date(self.year, self.month, self.day)
+
+    @staticmethod
+    def strptime(date_string, format):
+        return datetime(*(time.strptime(date_string, format)[0:6]))
+
 
 def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG, secs=False):
     """
@@ -317,9 +325,9 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=CFG
     out += "</select>\n"
     return out
 
-_RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>[a-z]+)?\s*((?P<begin>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?", re.I)
+_RE_RUNTIMELIMIT_FULL = re.compile(r"(?:(?P<weekday_begin>[a-z]+)(?:-(?P<weekday_end>[a-z]+))?)?\s*((?P<hour_begin>\d\d?(:\d\d?)?)(-(?P<hour_end>\d\d?(:\d\d?)?))?)?", re.I)
 _RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hours>\d\d?)(:(?P<minutes>\d\d?))?')
-def parse_runtime_limit(value):
+def parse_runtime_limit(value, now=None):
     """
     Parsing CLI option for runtime limit, supplied as VALUE.
     Value could be something like: Sunday 23:00-05:00, the format being
@@ -347,30 +355,50 @@ def parse_runtime_limit(value):
         except KeyError:
             raise ValueError("%s is not a good weekday name." % value)
 
-    today = date.today()
+    if now is None:
+        now = datetime.now()
+
+    today = now.date()
     g = _RE_RUNTIMELIMIT_FULL.search(value)
     if not g:
         raise ValueError('"%s" does not seem to be correct format for parse_runtime_limit() [Wee[kday]] [hh[:mm][-hh[:mm]]]).' % value)
     pieces = g.groupdict()
 
-    if pieces['weekday'] is None:
-        ## No weekday specified. So either today or tomorrow
+    if pieces['weekday_begin'] is None:
+        # No weekday specified. So either today or tomorrow
         first_occasion_day = timedelta(days=0)
         next_occasion_delta = timedelta(days=1)
     else:
-        ## Weekday specified. So either this week or next
-        weekday = extract_weekday(pieces['weekday'])
-        days = (weekday - today.weekday()) % 7
-        first_occasion_day = timedelta(days=days)
-        next_occasion_delta = timedelta(days=7)
+        # If given 'Mon' then we transform it to 'Mon-Mon'
+        if pieces['weekday_end'] is None:
+            pieces['weekday_end'] = pieces['weekday_begin']
 
-    if pieces['begin'] is None:
-        pieces['begin'] = '00:00'
-    if pieces['end'] is None:
-        pieces['end'] = '00:00'
+        # Day range
+        weekday_begin = extract_weekday(pieces['weekday_begin'])
+        weekday_end = extract_weekday(pieces['weekday_end'])
 
-    beginning_time = extract_time(pieces['begin'])
-    ending_time = extract_time(pieces['end'])
+        if weekday_begin <= today.weekday() <= weekday_end:
+            first_occasion_day = timedelta(days=0)
+        else:
+            days = (weekday_begin - today.weekday()) % 7
+            first_occasion_day = timedelta(days=days)
+
+        weekday = (now + first_occasion_day).weekday()
+        if weekday < weekday_end:
+            # Fits in the same week
+            next_occasion_delta = timedelta(days=1)
+        else:
+            # The week after
+            days = weekday_begin - weekday + 7
+            next_occasion_delta = timedelta(days=days)
+
+    if pieces['hour_begin'] is None:
+        pieces['hour_begin'] = '00:00'
+    if pieces['hour_end'] is None:
+        pieces['hour_end'] = '00:00'
+
+    beginning_time = extract_time(pieces['hour_begin'])
+    ending_time = extract_time(pieces['hour_end'])
 
     if not ending_time:
         ending_time = beginning_time + timedelta(days=1)
@@ -382,7 +410,7 @@ def parse_runtime_limit(value):
         start_time + first_occasion_day + beginning_time,
         start_time + first_occasion_day + ending_time
     )
-    if datetime.now() > current_range[1]:
+    if now > current_range[1]:
         current_range = tuple(t + next_occasion_delta for t in current_range)
 
     future_range = (
@@ -449,7 +477,7 @@ def _findall(text, substr):
 
 def strftime(fmt, dt):
     if not isinstance(dt, real_date):
-        dt = datetime(dt.tm_year, dt.tm_mon, dt.tm_mday, dt.tm_hour, dt.tm_min, dt.tm_sec)
+        dt = datetime(dt[0], dt[1], dt[2], dt[3], dt[4], dt[5])
     if dt.year >= 1900:
         return time.strftime(fmt, dt.timetuple())
     illegal_formatting = _illegal_formatting.search(fmt)
@@ -482,6 +510,44 @@ def strftime(fmt, dt):
     for site in sites:
         s = s[:site] + syear + s[site+4:]
     return s
+
+
+def get_dst(date_obj):
+    """Determine if dst is locally enabled at this time"""
+    dst = 0
+    if date_obj.year >= 1900:
+        tmp_date = time.mktime(date_obj.timetuple())
+        # DST is 1 so reduce time with 1 hour.
+        dst = time.localtime(tmp_date)[-1]
+    return dst
+
+
+def utc_to_localtime(date_str, fmt="%Y-%m-%d %H:%M:%S", input_fmt="%Y-%m-%dT%H:%M:%SZ"):
+    """
+    Convert UTC to localtime
+
+    Reference:
+     - (1) http://www.openarchives.org/OAI/openarchivesprotocol.html#Dates
+     - (2) http://www.w3.org/TR/NOTE-datetime
+
+    This function works only with dates complying with the
+    "Complete date plus hours, minutes and seconds" profile of
+    ISO 8601 defined by (2), and linked from (1).
+
+    Eg:    1994-11-05T13:15:30Z
+    """
+    date_struct = datetime.strptime(date_str, input_fmt)
+    date_struct += timedelta(hours=get_dst(date_struct))
+    date_struct -= timedelta(seconds=time.timezone)
+    return strftime(fmt, date_struct)
+
+
+def localtime_to_utc(date_str, fmt="%Y-%m-%dT%H:%M:%SZ", input_fmt="%Y-%m-%d %H:%M:%S"):
+    """Convert localtime to UTC"""
+    date_struct = datetime.strptime(date_str, input_fmt)
+    date_struct -= timedelta(hours=get_dst(date_struct))
+    date_struct += timedelta(seconds=time.timezone)
+    return strftime(fmt, date_struct)
 
 
 def strptime(date_string, fmt):

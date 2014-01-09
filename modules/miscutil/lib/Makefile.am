@@ -27,7 +27,7 @@ pylib_DATA = __init__.py \
              data_cacher.py \
              dbdump.py \
              web_api_key.py \
-             web_api_key_unit_tests.py \
+             web_api_key_regression_tests.py \
              dbquery.py \
              dbquery_unit_tests.py \
              dbquery_regression_tests.py \
@@ -94,7 +94,13 @@ pylib_DATA = __init__.py \
              memoiseutils.py \
              memoiseutils_unit_tests.py \
              crossrefutils.py \
-             containerutils.py
+             containerutils.py \
+             sequtils_texkey.py \
+             hepdatautils.py \
+             hepdatadisplayutils.py \
+             hepdatautils_unit_tests.py \
+             filedownloadutils.py \
+             filedownloadutils_unit_tests.py
 
 jsdir=$(localstatedir)/www/js
 
@@ -119,7 +125,6 @@ EXTRA_DIST = $(pylib_DATA) \
              intbitset.h \
              intbitset_impl.c \
              intbitset_setup.py \
-             intbitset.pyx \
              solrutils \
              solrutils/schema.xml \
              solrutils/java_sources.txt \
@@ -142,7 +147,8 @@ all:
 
 install-data-hook:
 	$(PYTHON) $(srcdir)/testimport.py ${prefix}
-	@find ${srcdir} -name intbitset.so -exec cp {} ${pylibdir} \;
+	find ${srcdir} -name intbitset.so -exec cp {} ${pylibdir}/.intbitset.so \;
+	mv ${pylibdir}/.intbitset.so ${pylibdir}/intbitset.so
 
 CLEANFILES = *~ *.tmp *.pyc
 

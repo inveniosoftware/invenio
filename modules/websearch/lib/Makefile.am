@@ -18,6 +18,8 @@
 SUBDIRS = services
 
 pylibdir = $(libdir)/python/invenio
+jsdir=$(localstatedir)/www/js
+webdir=$(localstatedir)/www/img
 
 pylib_DATA = \
 	websearchadminlib.py \
@@ -27,6 +29,7 @@ pylib_DATA = \
 	websearch_web_tests.py \
 	search_engine.py \
 	search_engine_config.py \
+	search_engine_cvifier.py \
 	search_engine_unit_tests.py \
 	search_engine_utils.py \
 	search_engine_query_parser.py \
@@ -47,6 +50,11 @@ pylib_DATA = \
 	websearch_services.py \
 	websearch_services_regression_tests.py
 
-EXTRA_DIST = $(pylib_DATA)
+
+js_DATA = hepdata.js
+
+web_DATA = hepdata.css
+
+EXTRA_DIST = $(pylib_DATA) $(js_DATA) $(web_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

@@ -84,6 +84,7 @@ import re
 import shutil
 import socket
 import sys
+import zlib
 
 
 def print_usage():
@@ -130,7 +131,7 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG',
                        'CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG',
                        'CFG_BIBUPLOAD_STRONG_TAGS',
-                       'CFG_BIBFORMAT_HIDDEN_TAGS',]:
+                       'CFG_BIBFORMAT_HIDDEN_TAGS']:
         # some options are supposed be string even when they look like
         # numeric
         option_value = '"' + option_value + '"'
@@ -181,9 +182,17 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_OPENID_CONFIGURATIONS',
                        'CFG_OAUTH1_CONFIGURATIONS',
                        'CFG_OAUTH2_CONFIGURATIONS',
-                       'CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES',]:
+                       'CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES',
+                       'CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING',
+                       'CFG_BIBSCHED_NON_CONCURRENT_TASKS',
+                       'CFG_BIBSCHED_INCOMPATIBLE_TASKS']:
         try:
             option_value = option_value[1:-1]
+            if option_name == "CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE" and option_value.strip().startswith("{"):
+                print >> sys.stderr, ("""ERROR: CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
+now accepts only a list of tuples, not a dictionary. Check invenio.conf for an example.
+Please, update your invenio-local.conf file accordingly.""")
+                sys.exit(1)
         except TypeError:
             if option_name in ('CFG_WEBSEARCH_FULLTEXT_SNIPPETS',):
                 print >> sys.stderr, """WARNING: CFG_WEBSEARCH_FULLTEXT_SNIPPETS
@@ -229,7 +238,10 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_BIBFIELD_MASTER_FORMATS',
                        'CFG_OPENID_PROVIDERS',
                        'CFG_OAUTH1_PROVIDERS',
-                       'CFG_OAUTH2_PROVIDERS',]:
+                       'CFG_OAUTH2_PROVIDERS',
+                       'CFG_BIBFORMAT_CACHED_FORMATS',
+                       'CFG_BIBEDIT_ADD_TICKET_RT_QUEUES',
+                       'CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS',]:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -270,6 +282,7 @@ You may want to customise your invenio-local.conf configuration accordingly."""
         print >> sys.stderr, ("""ERROR: CFG_BATCHUPLOADER_WEB_ROBOT_AGENT has been dropped in favour of
 CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS.
 Please, update your invenio-local.conf file accordingly.""")
+        sys.exit(1)
         option_value = option_value[1:-1]
     elif option_name in ['CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
                           'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
@@ -292,6 +305,35 @@ def cli_cmd_update_config_py(conf):
     Update new config.py from conf options, keeping previous
     config.py in a backup copy.
     """
+    ## NOTE: the following function exists also in urlutils.py
+    ## However we can't import urlutils here, as it depends on config.py
+    ## to already exist, while we are in the process of creating it.
+    def get_relative_url(url):
+        """
+        Returns the relative URL from a URL. For example:
+
+        'http://web.net' -> ''
+        'http://web.net/' -> ''
+        'http://web.net/1222' -> '/1222'
+        'http://web.net/wsadas/asd' -> '/wsadas/asd'
+
+        It will never return a trailing "/".
+
+        @param url: A url to transform
+        @type url: str
+
+        @return: relative URL
+        """
+        # remove any protocol info before
+        stripped_site_url = url.replace("://", "")
+        baseurl = "/" + "/".join(stripped_site_url.split("/")[1:])
+
+        # remove any trailing slash ("/")
+        if baseurl[-1] == "/":
+            return baseurl[:-1]
+        else:
+            return baseurl
+
     print ">>> Going to update config.py..."
     ## location where config.py is:
     configpyfile = conf.get("Invenio", "CFG_PYLIBDIR") + \
@@ -316,6 +358,9 @@ def cli_cmd_update_config_py(conf):
     if not conf.get("Invenio", "CFG_SITE_SECURE_URL"):
         conf.set("Invenio", "CFG_SITE_SECURE_URL",
                  conf.get("Invenio", "CFG_SITE_URL"))
+    ## Special treatment of base URL, adding CFG_BASE_URL
+    base_url = get_relative_url(conf.get("Invenio", "CFG_SITE_URL"))
+    fdesc.write("CFG_BASE_URL = \"%s\"\n" % (base_url,))
     ## process all the options normally:
     sections = conf.sections()
     sections.sort()
@@ -498,7 +543,7 @@ def cli_cmd_reset_recstruct_cache(conf):
     format."""
     from invenio.intbitset import intbitset
     from invenio.dbquery import run_sql, serialize_via_marshal
-    from invenio.search_engine import get_record
+    from invenio.search_engine import get_record, print_record
     from invenio.bibsched import server_pid, pidfile
     enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
     enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
@@ -516,7 +561,15 @@ def cli_cmd_reset_recstruct_cache(conf):
         tot = len(recids)
         count = 0
         for recid in recids:
-            value = serialize_via_marshal(get_record(recid))
+            try:
+                value = serialize_via_marshal(get_record(recid))
+            except zlib.error, err:
+                print >> sys.stderr, "Looks like XM is corrupted for record %s. Let's recover it from bibxxx" % recid
+                run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='xm'", (recid, ))
+                xm_value = zlib.compress(print_record(recid, 'xm'))
+                run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'xm', NOW(), %s)", (recid, xm_value))
+                value = serialize_via_marshal(get_record(recid))
+
             run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='recstruct'", (recid, ))
             run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), %s)", (recid, value))
             count += 1
@@ -1008,6 +1061,7 @@ def cli_cmd_create_apache_conf(conf):
             os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'tmp', 'attachfile'),
             os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'data', 'comments'),
             os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'data', 'baskets', 'comments'),
+            os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'lib', 'webdoc', 'invenio', 'info'),
             '/tmp'): # BibExport
         if xsendfile_directive_needed:
             xsendfile_directive += '        XSendFilePath %s\n' % path
@@ -1566,6 +1620,7 @@ def prepare_option_parser():
     parser.add_option_group(helper_options)
 
     parser.add_option('--yes-i-know', action='store_true', dest='yes-i-know', help='use with care!')
+    parser.add_option('-x', '--stop', action='store_true', dest='stop_on_error', help='When running tests, stop at first error')
 
     return parser
 
@@ -1606,6 +1661,10 @@ def main(*cmd_args):
     # Parse arguments
     parser = prepare_option_parser()
     (options, dummy_args) = parser.parse_args(list(cmd_args))
+
+    if getattr(options, 'stop_on_error', False):
+        from invenio.testutils import wrap_failfast
+        wrap_failfast()
 
     if getattr(options, 'version', False):
         print_version()

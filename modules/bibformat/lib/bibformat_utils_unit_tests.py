@@ -63,7 +63,7 @@ class WordsStartsWithPatternTest(InvenioTestCase):
         self.assertEqual((True, 2), words_start_with_patterns(['this', 'is', 'a', 'test'], ['this is a']))
         self.assertEqual((False, 0), words_start_with_patterns(['this', 'is', 'a', 'test'], ['no I do not]']))
         self.assertEqual((True, 2), words_start_with_patterns(['this', 'is', 'a', 'test'], ['no I do not]', 'this is a']))
-        self.assertEqual((False,0), words_start_with_patterns(['this', 'is'], ['no I do not', 'this is a']))
+        self.assertEqual((False, 0), words_start_with_patterns(['this', 'is'], ['no I do not', 'this is a']))
 
 
 class SnippetCutOutCoreCreation(InvenioTestCase):
@@ -71,8 +71,8 @@ class SnippetCutOutCoreCreation(InvenioTestCase):
 
     _words = dict()
     _words[0] = ['CERN', 'LIBRARIES,', 'GENEVA', 'SCAN-0005061', 'Development', 'of', 'Photon', 'Beam', 'Diagnostics',
-                 'for','VUV', 'Radiation', 'from', 'a', 'SASE', 'FEL', 'R.', 'Treusch', '1,', 'T.', 'Lokajczyk,', 'W.',
-                 'Xu', '2,','U.', 'Jastrow,', 'U.', 'Hahn,', 'Abstract', 'L.', 'Bittner', 'and', 'J.', 'Feldhaus',
+                 'for', 'VUV', 'Radiation', 'from', 'a', 'SASE', 'FEL', 'R.', 'Treusch', '1,', 'T.', 'Lokajczyk,', 'W.',
+                 'Xu', '2,', 'U.', 'Jastrow,', 'U.', 'Hahn,', 'Abstract', 'L.', 'Bittner', 'and', 'J.', 'Feldhaus',
                  'HASYLAB', 'at', 'DESY,', 'Notkcstr.', '85,', 'D\xe2\x80\x94226`U3', 'Hamburg,', 'Germany', 'For',
                  'the', 'proof-of-principle', 'experiment', 'of', 'self-amplified', 'spontaneous', 'emission', '[SASE)',
                  'at', 'short', 'wavelengths', 'on', 'the', 'VUV', 'FEL', 'at', 'DESY', 'a', 'multi-facetted', 'photon',
@@ -85,7 +85,7 @@ class SnippetCutOutCoreCreation(InvenioTestCase):
     def test_term_cut_out(self):
         """bibformat - term snippet cut out core creation"""
         self.assertEqual(('This', 0, 0), cut_out_snippet_core_creation(['This', 'is', 'a', 'test'], ['This'], 50))
-        self.assertEqual(('This is a test', 0, 3), cut_out_snippet_core_creation(['This', 'is', 'a', 'test'], ['This' ,'test'], 50))
+        self.assertEqual(('This is a test', 0, 3), cut_out_snippet_core_creation(['This', 'is', 'a', 'test'], ['This', 'test'], 50))
         self.assertEqual(('is', 1, 1), cut_out_snippet_core_creation(['This', 'is', 'a', 'test'], ['is'], 50))
         self.assertEqual(('is a new', 1, 3), cut_out_snippet_core_creation(['This', 'is', 'a', 'new', 'test'], ['is', 'new'], 50))
         self.assertEqual(('', -1, -1), cut_out_snippet_core_creation(['This', 'is', 'a', 'test'], ['new'], 50))

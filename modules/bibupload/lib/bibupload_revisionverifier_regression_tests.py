@@ -289,6 +289,18 @@ class RevisionVerifierForConflictingAddition(GenericBibUploadTest):
         <subfield code="a">dumb text</subfield>
         </datafield>
         </record>"""
+        # Rev 2 Update -- Rev2 + different tag 888
+        self.rev2_add_conf_field_diff = """<record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="005">20110101000000.0</controlfield>
+        <datafield tag ="100" ind1=" " ind2=" ">
+        <subfield code="a">Tester, T</subfield>
+        <subfield code="u">DESY</subfield>
+        </datafield>
+        <datafield tag="888" ind1=" " ind2=" ">
+        <subfield code="a">another dumb text</subfield>
+        </datafield>
+        </record>"""
         #Rev 2 Update -- Rev2 + tag 100*
         self.rev2_add_sim_field = """<record>
         <controlfield tag="001">123456789</controlfield>
@@ -346,6 +358,12 @@ class RevisionVerifierForConflictingAddition(GenericBibUploadTest):
                                                         '20110101000000.0', \
                                                         self.data['rev2'][1])
 
+        self.rev2_add_conf_field_diff = self.rev2_add_conf_field_diff.replace(
+                '123456789', self.data['id'][0])
+        self.rev2_add_conf_field_diff = self.rev2_add_conf_field_diff.replace(
+                                                        '20110101000000.0', \
+                                                        self.data['rev2'][1])
+
         self.rev2_add_sim_field = self.rev2_add_sim_field.replace(
                 '123456789', self.data['id'][0])
         self.rev2_add_sim_field = self.rev2_add_sim_field.replace(
@@ -363,17 +381,26 @@ class RevisionVerifierForConflictingAddition(GenericBibUploadTest):
                                                         '20110101000000.0', \
                                                         self.data['rev3'][1])
 
-    def test_add_conflict_field(self):
-        """ BibUpload Revision Verifier - Rev3-100/970/888, Added 888 to Rev2(100/970), Conflict Expected"""
+    def test_add_identical_conflict_field(self):
+        """ BibUpload Revision Verifier - Rev3-100/970/888, Added identical 888 to Rev2(100/970), No conflict Expected"""
         upload_conf_rec = xml_marc_to_records(self.rev2_add_conf_field)
         orig_recs = xml_marc_to_records(self.data['rev3'][0])
-
         rev_verifier = RevisionVerifier()
+        #print "%s %s" % (upload_conf_rec[0], orig_recs[0]), self.data
+        self.assert_(rev_verifier.verify_revision(upload_conf_rec[0], orig_recs[0], 'replace'))
+
+    def test_add_different_conflict_field(self):
+        """ BibUpload Revision Verifier - Rev3-100/970/888, Added different 888 to Rev2(100/970), Conflict Expected"""
+        upload_conf_rec = xml_marc_to_records(self.rev2_add_conf_field_diff)
+        orig_recs = xml_marc_to_records(self.data['rev3'][0])
+        rev_verifier = RevisionVerifier()
+        #print "%s %s" % (upload_conf_rec[0], orig_recs[0]), self.data
         self.assertRaises(InvenioBibUploadConflictingRevisionsError, \
                           rev_verifier.verify_revision, \
                           upload_conf_rec[0], \
                           orig_recs[0], \
                           'replace')
+
 
     def test_conflicting_similarfield(self):
         """ BibUpload Revision Verifier - Rev3-100/970/888, Added 100 to Rev2(100/970), 100 added to Rev3, Conflict Expected"""

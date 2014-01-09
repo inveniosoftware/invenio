@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
 from invenio.access_control_engine import acc_authorize_action
 
 def format_element(bfo, style):
@@ -44,11 +44,11 @@ def format_element(bfo, style):
         if style != '':
             linkattrd['style'] = style
 
-        out += create_html_link(CFG_SITE_URL + '/%s/managedocfiles' % CFG_SITE_RECORD,
-                         urlargd={'ln': bfo.lang,
-                                  'recid': str(bfo.recID)},
-                         link_label=_("Manage Files of This Record"),
-                         linkattrd=linkattrd)
+        out += create_html_link(CFG_BASE_URL + '/%s/managedocfiles' % CFG_SITE_RECORD,
+                                urlargd={'ln': bfo.lang,
+                                         'recid': str(bfo.recID)},
+                                link_label=_("Manage Files of This Record"),
+                                linkattrd=linkattrd)
     return out
 
 def escape_values(bfo):

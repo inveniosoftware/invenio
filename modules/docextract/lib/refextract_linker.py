@@ -17,16 +17,24 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibrank_citation_indexer import INTBITSET_OF_DELETED_RECORDS
+from invenio.bibrank_citation_indexer import get_recids_matching_query as \
+                                                            bibrank_search, \
+                                             standardize_report_number
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM
-from invenio.search_engine import search_pattern
+from invenio.bibrank_tag_based_indexer import load_config
 
 
-def get_recids_matching_query(pvalue, fvalue):
-    """Return list of recIDs matching query for PVALUE and FVALUE."""
-    recids = search_pattern(p=pvalue, f=fvalue, m='e')
-    recids -= INTBITSET_OF_DELETED_RECORDS
+def config_cache(cache={}):
+    if 'config' not in cache:
+        cache['config'] = load_config('citation')
+    return cache['config']
+
+
+def get_recids_matching_query(p, f, m='e'):
+    """Return list of recIDs matching query for pattern and field."""
+    config = config_cache()
+    recids = bibrank_search(p=p.encode('utf-8'), f=f, config=config, m=m)
     return list(recids)
 
 
@@ -36,7 +44,10 @@ def format_journal(format_string, mappings):
     def replace(char, data):
         return data.get(char, char)
 
-    return ''.join(replace(c, mappings) for c in format_string)
+    for c in mappings.keys():
+        format_string = format_string.replace(c, replace(c, mappings))
+
+    return format_string
 
 
 def find_journal(citation_element):
@@ -52,8 +63,8 @@ def find_journal(citation_element):
 
 
 def find_reportnumber(citation_element):
-    reportnumber_string = citation_element['report_num']
-    return get_recids_matching_query(reportnumber_string, 'reportnumber')
+    reportnumber = standardize_report_number(citation_element['report_num'])
+    return get_recids_matching_query(reportnumber, 'reportnumber')
 
 
 def find_doi(citation_element):

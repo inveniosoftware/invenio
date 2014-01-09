@@ -30,18 +30,24 @@ import pprint
 import difflib
 
 from invenio.config import CFG_BIBMATCH_MATCH_VALIDATION_RULESETS, \
-                           CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT
+                           CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT, \
+                           CFG_BIBMATCH_MIN_VALIDATION_COMPARISONS
 from invenio.bibmatch_config import CFG_BIBMATCH_VALIDATION_MATCHING_MODES, \
                                     CFG_BIBMATCH_VALIDATION_RESULT_MODES, \
                                     CFG_BIBMATCH_VALIDATION_COMPARISON_MODES, \
                                     CFG_BIBMATCH_LOGGER
 from invenio.bibrecord import create_records, record_get_field_values
 from invenio.xmlmarc2textmarc import get_sysno_from_record, create_marc_record
-from invenio.bibauthorid_name_utils import compare_names
-from invenio.bibauthorid_name_utils import string_partition
+from invenio.bibauthorid_name_utils import (soft_compare_names,
+                                            string_partition)
 from invenio.textutils import translate_to_ascii
 
 re_valid_tag = re.compile("^[0-9]{3}[a-zA-Z0-9_%]{0,3}$")
+
+
+class BibMatchValidationError(Exception):
+    pass
+
 
 def validate_matches(bibmatch_recid, record, server, result_recids, \
                      collections="", verbose=0, ascii_mode=False):
@@ -87,39 +93,43 @@ def validate_matches(bibmatch_recid, record, server, result_recids, \
     # Generate final rule-set by analyzing the record
     final_ruleset = get_validation_ruleset(record)
     if not final_ruleset:
-        sys.stderr.write("Bad configuration rule-set. \
-Please check that CFG_BIBMATCH_MATCH_VALIDATION_RULESETS is formed correctly.\n")
-        return [], []
+        raise BibMatchValidationError("Bad configuration rule-set." \
+                                      "Please check that CFG_BIBMATCH_MATCH_VALIDATION_RULESETS" \
+                                      " is formed correctly.")
 
     if verbose > 8:
         sys.stderr.write("\nStart record validation:\n\nFinal validation ruleset used:\n")
         pp = pprint.PrettyPrinter(stream=sys.stderr, indent=2)
         pp.pprint(final_ruleset)
+    CFG_BIBMATCH_LOGGER.info("Final validation ruleset used: %s" % (final_ruleset,))
 
     # Fetch all records in MARCXML and convert to BibRec
     found_record_list = []
-    for recid in result_recids:
-        query = "001:%d" % (recid,)
-        if collections:
-            search_params = dict(p=query, of="xm", c=collections)
-        else:
-            search_params = dict(p=query, of="xm")
-        result_marcxml = server.search_with_retry(**search_params)
-        result_record_list = create_records(result_marcxml)
-        # Check if record was found and BibRecord generation was successful
-        if result_record_list == [] or \
-           len(result_record_list) != 1 or \
-           result_record_list[0] == None:
-            # Error fetching a record. Unable to validate and returning with empty list.
-            if verbose > 8:
-                sys.stderr.write("\nError retrieving MARCXML for matched record %s\n" % (str(recid),))
-            return [], []
-        # Add a tuple of record ID (for easy look-up later) and BibRecord structure
-        found_record_list.append((recid, result_record_list[0][0]))
+    query = " OR ".join(["001:%d" % (recid,) for recid in result_recids])
+
+    if collections:
+        search_params = dict(p=query, of="xm", c=collections)
+    else:
+        search_params = dict(p=query, of="xm")
+    CFG_BIBMATCH_LOGGER.info("Fetching records to match: %s" % (str(search_params),))
+    result_marcxml = server.search_with_retry(**search_params)
+    # Check if record was found
+    if result_marcxml:
+        found_record_list = [r[0] for r in create_records(result_marcxml)]
+        # Check if BibRecord generation was successful
+        if not found_record_list:
+            # Error fetching records. Unable to validate. Abort.
+            raise BibMatchValidationError("Error retrieving MARCXML for possible matches from %s. Aborting." \
+                                          % (server.server_url,))
+        if len(found_record_list) < len(result_recids):
+            # Error fetching all records. Will still continue.
+            sys.stderr.write("\nError retrieving all MARCXML for possible matched records from %s.\n" \
+                              % (server.server_url,))
 
     # Validate records one-by-one, adding any matches to the list of matching record IDs
     current_index = 1
-    for recid, matched_record in found_record_list:
+    for matched_record in found_record_list:
+        recid = record_get_field_values(matched_record, tag="001")[0]
         if verbose > 8:
             sys.stderr.write("\n Validating matched record #%d (%s):\n" % \
                              (current_index, recid))
@@ -224,16 +234,22 @@ def validate_match(org_record, matched_record, ruleset, verbose=0, ascii_mode=Fa
             if tag_structure != None:
                 tag, ind1, ind2, code = tag_structure
                 # Fetch all field instances to match
-                original_record_values.extend(record_get_field_values(\
-                                            org_record, tag, ind1, ind2, code))
-                matched_record_values.extend(record_get_field_values(\
-                                            matched_record, tag, ind1, ind2, code))
+                original_values = record_get_field_values(org_record, tag, ind1, ind2, code)
+                original_record_values.extend([value for value in original_values if value])
+                matched_values = record_get_field_values(matched_record, tag, ind1, ind2, code)
+                matched_record_values.extend([value for value in matched_values if value])
 
         if (len(original_record_values) == 0 or len(matched_record_values) == 0):
-            # Any or both records do not have values, ignore.
+            # Both records do not have values, ignore.
             if verbose > 8:
                 sys.stderr.write("\nBoth records do not have this field. Continue.\n")
             continue
+
+        if result_mode != 'joker':
+            # Since joker is a special beast (should have no impact on failure),
+            # We first check if it is the current mode before incrementing number
+            # of matching comparisons / attempts
+            total_number_of_comparisons += 1
 
         if ascii_mode:
             original_record_values = translate_to_ascii(original_record_values)
@@ -264,7 +280,6 @@ def validate_match(org_record, matched_record, ruleset, verbose=0, ascii_mode=Fa
             sys.stderr.write("Total matches needed: %d -> " % (matches_needed,))
 
         ## 2. MATCH MODE
-        total_number_of_comparisons += 1
         comparison_function = None
         if match_mode == 'title':
             # Special title mode
@@ -313,14 +328,13 @@ def validate_match(org_record, matched_record, ruleset, verbose=0, ascii_mode=Fa
                 # Final does not allow failure
                 return 0.0
             elif result_mode == 'joker':
-                # Jokers looks count as a match even if its not
-                total_number_of_matches += 1
                 if verbose > 8:
                     sys.stderr.write("Fields not matching. (Joker)\n")
             else:
                 if verbose > 8:
                     sys.stderr.write("Fields not matching. \n")
-    if total_number_of_matches < 2 or total_number_of_comparisons == 0:
+    if total_number_of_matches < CFG_BIBMATCH_MIN_VALIDATION_COMPARISONS \
+        or total_number_of_comparisons == 0:
         return 0.0
     return total_number_of_matches / float(total_number_of_comparisons)
 
@@ -430,7 +444,7 @@ def compare_fieldvalues_authorname(field_comparisons, threshold, matches_needed)
                                           get_reversed_string_variants(other_value))][0]
             for str1, str2 in author_comparisons:
                 # Author-name comparison - using BibAuthorid function
-                diff = compare_names(str1, str2)
+                diff = soft_compare_names(str1, str2)
                 if diff >= threshold:
                     matches_found += 1
                     break

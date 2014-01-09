@@ -24,11 +24,53 @@ This creates an instance of the class that has been configured for this installa
 or returns None if no ticket system is configured.
 """
 from invenio.config import CFG_BIBCATALOG_SYSTEM
+from invenio.errorlib import register_exception
 
-bibcatalog_system = None
 if CFG_BIBCATALOG_SYSTEM == 'RT':
     from invenio.bibcatalog_system_rt import BibCatalogSystemRT
-    bibcatalog_system = BibCatalogSystemRT()
 elif CFG_BIBCATALOG_SYSTEM == 'EMAIL':
     from invenio.bibcatalog_system_email import BibCatalogSystemEmail
-    bibcatalog_system = BibCatalogSystemEmail()
+
+
+def get_bibcatalog_system():
+    if CFG_BIBCATALOG_SYSTEM == 'RT':
+        try:
+            bc_system = BibCatalogSystemRT()
+            msg = bc_system.check_system()
+            if msg:
+                raise StandardError(msg)
+        except Exception, err:
+            register_exception(alert_admin=True, prefix=err)
+            from invenio.bibcatalog_system_dummy import BibCatalogSystemDummy
+            ## RT has some troubles... let's fall back on the dummy system
+            bc_system = BibCatalogSystemDummy()
+    elif CFG_BIBCATALOG_SYSTEM == 'EMAIL':
+        bc_system = BibCatalogSystemEmail()
+    else:
+        from invenio.bibcatalog_system_dummy import BibCatalogSystemDummy
+        bc_system = BibCatalogSystemDummy()
+
+    return bc_system
+
+
+class BibCatalogProxy(object):
+    def __init__(self):
+        self._bibcatalog_system = None
+
+    def _init(self):
+        self._bibcatalog_system = get_bibcatalog_system()
+
+    def __getattr__(self, *args):
+        if not self._bibcatalog_system:
+            self._init()
+
+        return getattr(self._bibcatalog_system, *args)
+
+    def __repr__(self):
+        if self._bibcatalog_system:
+            return "BibCatalogProxy for %s" % repr(self._bibcatalog_system)
+        else:
+            return object.__repr__(self)
+
+
+BIBCATALOG_SYSTEM = BibCatalogProxy()

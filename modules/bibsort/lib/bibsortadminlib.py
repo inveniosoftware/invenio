@@ -38,7 +38,7 @@ def perform_index(ln, action, bsrcode, sm_name, sm_def_type, sm_def_value, sm_wa
                                %get_admin_guide_link(ln), '#66CCFF')
 
     if not CFG_BIBSORT_BUCKETS:
-        return create_important_box('<p>BibSort is not enabled. In order to enable it, \
+        return create_important_box('<p>BibSort is not configured. In order to enable it, \
                                     CFG_BIBSORT_BUCKETS needs to have a positive value.<br\>\
                                     Please see the %s for more details.</p>' %get_admin_guide_link(ln))
 
@@ -125,7 +125,7 @@ def create_action_add_link():
       });
     </script>'''
 
-    button_style = '''color: #FFFFFF; background: #3366CC; 
+    button_style = '''color: #FFFFFF; background: #3366CC;
                    text-decoration:none; font-weight:bold;
                    font-size:small; padding:5px;'''
 
@@ -268,7 +268,7 @@ def create_action_add_link():
          <tr>
            <td colspan=2 align='right'><input type='submit' value='Add' style="%(button_style)s"/></td>
          </tr>
-       </table> 
+       </table>
     </form>
     </div>
     '''% {'button_style': button_style,

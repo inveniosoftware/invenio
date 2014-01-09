@@ -114,7 +114,7 @@ calculations on it, including intersecting with the search engine output). If yo
 idea of how the data is changing during one day, you can set up the rebalancing only for several
 methods, that contain data that is frequently updated.</p>
 <pre>
-$ ./bibsort -B [--methods=method1,method2]
+$ ./bibsort -R [--methods=method1,method2]
 </pre>
 
 <a name="3.2"></a><h3>3.2. Inserting/Updating/Deleting records in BibSort</h3>

@@ -46,7 +46,8 @@ from invenio.messages import gettext_set_language
 from invenio.textmarc2xmlmarc import transform_file
 from invenio.shellutils import run_shell_command
 from invenio.bibupload import xml_marc_to_records, bibupload
-
+from invenio.access_control_firerole import _ip_matcher_builder, _ipmatch
+from invenio.webinterface_handler_config import HTTP_BAD_REQUEST, HTTP_FORBIDDEN
 import invenio.bibupload as bibupload_module
 
 from invenio.bibrecord import create_records, \
@@ -63,12 +64,22 @@ PERMITTED_MODES = ['-i', '-r', '-c', '-a', '-ir',
 
 _CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS_RE = re.compile(CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS)
 
+_CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS = []
+for _network, _collection in CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS.items():
+    if '/' not in _network:
+        _network += '/32'
+    _CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS.append((_ip_matcher_builder(_network), _collection))
+    del _network
+    del _collection
+
+
+
 def cli_allocate_record(req):
     req.content_type = "text/plain"
     req.send_http_header()
 
     # check IP and useragent:
-    if not _check_client_ip(req):
+    if not _get_client_authorized_collections(_get_client_ip(req)):
         msg = "[ERROR] Sorry, client IP %s cannot use the service." % _get_client_ip(req)
         _log(msg)
         return _write(req, msg)
@@ -84,26 +95,31 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
     """ Robot interface for uploading MARC files
     """
     req.content_type = "text/plain"
-    req.send_http_header()
 
     # check IP and useragent:
-    if not _check_client_ip(req):
+    if not _get_client_authorized_collections(_get_client_ip(req)):
         msg = "[ERROR] Sorry, client IP %s cannot use the service." % _get_client_ip(req)
         _log(msg)
+        req.status = HTTP_FORBIDDEN
         return _write(req, msg)
     if not _check_client_useragent(req):
         msg = "[ERROR] Sorry, the %s useragent cannot use the service." % _get_useragent(req)
         _log(msg)
+        req.status = HTTP_FORBIDDEN
         return _write(req, msg)
 
     arg_mode = mode
     if not arg_mode:
         msg = "[ERROR] Please specify upload mode to use."
         _log(msg)
+        req.status = HTTP_BAD_REQUEST
         return _write(req, msg)
+    if arg_mode == '--insertorreplace':
+        arg_mode = '-ir'
     if not arg_mode in PERMITTED_MODES:
         msg = "[ERROR] Invalid upload mode."
         _log(msg)
+        req.status = HTTP_BAD_REQUEST
         return _write(req, msg)
 
     arg_file = file_content
@@ -113,17 +129,20 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
         if not arg_file:
             msg = "[ERROR] Please provide a body to your request."
             _log(msg)
+            req.status = HTTP_BAD_REQUEST
             return _write(req, msg)
     else:
         if not arg_file:
             msg = "[ERROR] Please specify file body to input."
             _log(msg)
+            req.status = HTTP_BAD_REQUEST
             return _write(req, msg)
         if hasattr(arg_file, "filename"):
             arg_file = arg_file.value
         else:
             msg = "[ERROR] 'file' parameter must be a (single) file"
             _log(msg)
+            req.status = HTTP_BAD_REQUEST
             return _write(req, msg)
 
     # write temporary file:
@@ -137,12 +156,13 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
 
     # check if this client can run this file:
     client_ip = _get_client_ip(req)
-    permitted_dbcollids = CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS[client_ip]
-    if permitted_dbcollids != ['*']: # wildcard
+    permitted_dbcollids = _get_client_authorized_collections(client_ip)
+    if '*' not in permitted_dbcollids: # wildcard
         allow = _check_client_can_submit_file(client_ip, filename, req, 0)
         if not allow:
             msg = "[ERROR] Cannot submit such a file from this IP. (Wrong collection.)"
             _log(msg)
+            req.status = HTTP_FORBIDDEN
             return _write(req, msg)
 
     # check validity of marcxml
@@ -151,6 +171,7 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
     if xmlmarclint_output != 0:
         msg = "[ERROR] MARCXML is not valid."
         _log(msg)
+        req.status = HTTP_BAD_REQUEST
         return _write(req, msg)
     args = ['bibupload', "batchupload", arg_mode, filename]
     # run upload command
@@ -180,9 +201,6 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
     req.send_http_header()
 
     error_codes = {'not_authorized': 1}
-    # write temporary file:
-    if filetype != 'marcxml':
-        metafile = _transform_input_to_marcxml(file_input=metafile)
 
     user_info = collect_user_info(req)
     (fd, filename) = tempfile.mkstemp(prefix="batchupload_" + \
@@ -199,7 +217,8 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
             return (error_codes['not_authorized'], allow[1])
 
     # run upload command:
-    task_arguments = ('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority)
+    task_arguments = ('bibupload', user_info['nickname'], mode,
+                      "--priority=" + priority, "-N", "batchupload")
     if exec_date:
         date = exec_date
         if exec_time:
@@ -327,7 +346,8 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                 user = "batchupload"
             # Execute bibupload with the appropiate mode
 
-            task_arguments = ('bibupload', user, "--" + mode, "--name=" + docfile, "--priority=" + priority)
+            task_arguments = ('bibupload', user, "--" + mode,
+                              "--priority=" + priority, "-N", "batchupload")
 
             if exec_date:
                 date = '--runtime=' + "\'" + exec_date + ' ' + exec_time + "\'"
@@ -491,14 +511,18 @@ def _get_client_ip(req):
     """Return client IP address from req object."""
     return str(req.remote_ip)
 
-def _check_client_ip(req):
+def _get_client_authorized_collections(client_ip):
     """
     Is this client permitted to use the service?
+    Return list of collections for which the client is authorized
     """
-    client_ip = _get_client_ip(req)
-    if client_ip in CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS.keys():
-        return True
-    return False
+    ret = []
+    for network, collection in _CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS:
+        if _ipmatch(client_ip, network):
+            if '*' in collection:
+                return ['*']
+            ret += collection
+    return ret
 
 def _check_client_useragent(req):
     """
@@ -521,6 +545,10 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
     recs = create_records(metafile, 0, 0)
     user_info = collect_user_info(req)
 
+    permitted_dbcollids = _get_client_authorized_collections(client_ip)
+    if '*' in permitted_dbcollids:
+        return True
+
     filename_tag980_values = _detect_980_values_from_marcxml_file(recs)
     for filename_tag980_value in filename_tag980_values:
         if not filename_tag980_value:
@@ -529,7 +557,7 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
             else:
                 return(1, "Invalid collection in tag 980")
         if not webupload:
-            if not filename_tag980_value in CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS[client_ip]:
+            if not filename_tag980_value in permitted_dbcollids:
                 return False
         else:
             auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=filename_tag980_value)
@@ -542,7 +570,7 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
 
     for filename_rec_id_collection in filename_rec_id_collections:
         if not webupload:
-            if not filename_rec_id_collection in CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS[client_ip]:
+            if not filename_rec_id_collection in permitted_dbcollids:
                 return False
         else:
             auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=filename_rec_id_collection)
@@ -647,6 +675,7 @@ def _transform_input_to_marcxml(file_input=""):
         transform_file(filename)
     finally:
         sys.stdout = old_stdout
+
     return new_stdout.getvalue()
 
 def _log(msg, logfile="webupload.log"):

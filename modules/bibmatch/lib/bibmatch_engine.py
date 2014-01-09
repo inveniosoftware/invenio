@@ -25,7 +25,7 @@ if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
     from sets import Set as set #for "&" intersection
     # pylint: enable=W0622
-
+import string
 import os
 import getopt
 import re
@@ -48,12 +48,16 @@ from invenio.bibrecord import create_records, \
     record_get_field_values, record_xml_output, record_modify_controlfield, \
     record_has_field, record_add_field
 from invenio import bibconvert
-from invenio.search_engine import get_fieldcodes
+from invenio.search_engine import get_fieldcodes, \
+    re_pattern_single_quotes, \
+    re_pattern_double_quotes, \
+    re_pattern_regexp_quotes, \
+    re_pattern_spaces_after_colon
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser
 from invenio.dbquery import run_sql
 from invenio.textmarc2xmlmarc import transform_file
 from invenio.bibmatch_validator import validate_matches, transform_record_to_marc, \
-                                       validate_tag
+                                       validate_tag, BibMatchValidationError
 from invenio.textutils import translate_to_ascii, xml_entities_to_utf8
 
 try:
@@ -340,6 +344,8 @@ class Querystring:
         operator_delimiter = " %s " % (self.operator,)
         parser = SearchQueryParenthesisedParser()
         query_parts = parser.parse_query(self.pattern)
+        author_query = []
+        author_operator = None
         # Go through every expression in the query and generate fuzzy searches
         for i in xrange(0, len(query_parts) - 1, 2):
             current_operator = query_parts[i]
@@ -349,16 +355,52 @@ class Querystring:
                 # No reference to record value, add query 'as is'
                 fuzzy_query_list.append((current_operator, current_pattern))
             else:
+                # Each reference will be split into prefix, field-ref and suffix.
+                # Example:
+                # 773__p:"[773__p]" 100__a:/.*[100__a].*/ =>
+                # [('773__p:"', '773__p', '"'), ('100__a:/.*', '100__a', '.*/')]
                 for field_prefix, field_reference, field_suffix in fieldname_list:
-                    for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                    if field_reference == '245__a':
                         new_query = []
-                        # Grab the x longest words in the string and perform boolean AND for each word
-                        # x is determined by the configuration dict and is tag-based. Defaults to 3 words
-                        word_list = get_longest_words(value, limit=CFG_BIBMATCH_FUZZY_WORDLIMITS.get(field_reference, 3))
-                        for word in word_list:
-                            # Create fuzzy query with key + word, including any surrounding elements like quotes, regexp etc.
-                            new_query.append(current_pattern.replace("[%s]" % (field_reference,), word))
-                        fuzzy_query_list.append((current_operator, operator_delimiter.join(new_query)))
+                        for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                            # Grab the x+1 longest words in the string and perform boolean OR
+                            # for all combinations of x words (boolean AND)
+                            # x is determined by the configuration dict and is tag-based. Defaults to 3 words
+                            word_list = get_longest_words(value, limit=CFG_BIBMATCH_FUZZY_WORDLIMITS.get(field_reference, 3)+1)
+                            for i in range(len(word_list)):
+                                words = list(word_list)
+                                words.pop(i)
+                                new_query.append("(" + current_pattern.replace("[%s]" % (field_reference,), " ".join(words)) + ")")
+                            fuzzy_query_list.append((current_operator, " OR ".join(new_query)))
+                    elif field_reference == '100__a':
+                        for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                            author_query.append(current_pattern.replace("[%s]" % (field_reference,), value))
+                            author_operator = current_operator
+                    elif field_reference == '700__a':
+                        for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                            # take only the first 2nd author
+                            author_query.append(current_pattern.replace("[%s]" % (field_reference,), value))
+                            if not author_operator:
+                                author_operator = current_operator
+                            break
+                    # for unique idenifier (DOI, repno) fuzzy search makes no sense
+                    elif field_reference == '037__a':
+                        continue
+                    elif field_reference == '0247_a':
+                        continue
+                    else:
+                        new_query = []
+                        for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                            # Grab the x longest words in the string and perform boolean AND for each word
+                            # x is determined by the configuration dict and is tag-based. Defaults to 3 words
+                            # AND can be overwritten by command line argument -o o
+                            word_list = get_longest_words(value, limit=CFG_BIBMATCH_FUZZY_WORDLIMITS.get(field_reference, 3))
+                            for word in word_list:
+                                # Create fuzzy query with key + word, including any surrounding elements like quotes, regexp etc.
+                                new_query.append(current_pattern.replace("[%s]" % (field_reference,), word))
+                            fuzzy_query_list.append((current_operator, operator_delimiter.join(new_query)))
+        if author_query:
+            fuzzy_query_list.append((author_operator, " OR ".join(author_query)))
         # Return a list of unique queries
         return list(set(fuzzy_query_list))
 
@@ -419,7 +461,7 @@ class Querystring:
         # Find all potential references to record tag values and
         # add to fields-dict as a list of values using field-name tuple as key.
         #
-        # Each reference will be split into prefix, field-ref and suffix. 
+        # Each reference will be split into prefix, field-ref and suffix.
         # Example:
         # 773__p:"[773__p]" 100__a:/.*[100__a].*/ =>
         # [('773__p:"', '773__p', '"'), ('100__a:/.*', '100__a', '.*/')]
@@ -432,7 +474,7 @@ class Querystring:
             field_prefix = field_prefix.lower()
             field_suffix = field_suffix.lower()
             # Find proper MARC tag(s) for the stripped field-name, if fieldname is used.
-            # e.g. author -> [100__a, 700__a] 
+            # e.g. author -> [100__a, 700__a]
             # FIXME: Local instance only!
             tag_list = get_field_tags_from_fieldname(fieldname)
             if len(tag_list) == 0:
@@ -560,7 +602,23 @@ def get_longest_words(wstr, limit=5):
     """
     words = []
     if wstr:
+        # Protect spaces within quotes
+        wstr = re_pattern_single_quotes.sub(
+            lambda x: "'" + string.replace(x.group(1), ' ', '__SPACE__') + "'",
+            wstr)
+        wstr = re_pattern_double_quotes.sub(
+            lambda x: "\"" + string.replace(x.group(1), ' ', '__SPACE__') + "\"",
+            wstr)
+        wstr = re_pattern_regexp_quotes.sub(
+            lambda x: "/" + string.replace(x.group(1), ' ', '__SPACE__') + "/",
+            wstr)
+        # and spaces after colon as well:
+        wstr = re_pattern_spaces_after_colon.sub(
+            lambda x: string.replace(x.group(1), ' ', '__SPACE__'),
+            wstr)
         words = wstr.split()
+        for i in range(len(words)):
+            words[i] = words[i].replace('__SPACE__', ' ')
         words.sort(cmp=bylen)
         words.reverse()
         words = words[:limit]
@@ -621,7 +679,8 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", \
                   verbose=1, server_url=CFG_SITE_SECURE_URL, modify=0, \
                   sleeptime=CFG_BIBMATCH_LOCAL_SLEEPTIME, \
                   clean=False, collections=[], user="", password="", \
-                  fuzzy=True, validate=True, ascii_mode=False):
+                  fuzzy=True, validate=True, ascii_mode=False,
+                  insecure_login=False):
     """
     Match passed records with existing records on a local or remote Invenio
     installation. Returns which records are new (no match), which are matched,
@@ -687,7 +746,8 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", \
     fuzzyrecs = []
     CFG_BIBMATCH_LOGGER.info("-- BibMatch starting match of %d records --" % (len(records),))
     try:
-        server = InvenioConnector(server_url, user=user, password=password)
+        server = InvenioConnector(server_url, user=user, password=password,
+                                  insecure_login=insecure_login)
     except InvenioConnectorAuthError, error:
         if verbose > 0:
             sys.stderr.write("Authentication error when connecting to server: %s" \
@@ -732,7 +792,7 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", \
                 matchedrecs.append((record[0], match_result_output(record_counter, results, server_url, \
                                                                 query, "exact-matched")))
                 if (verbose > 1):
-                    sys.stderr.write("Final result: match - %s/record/%d\n" % (server_url, results[0]))
+                    sys.stderr.write("Final result: match - %s/record/%s\n" % (server_url, str(results[0])))
                 CFG_BIBMATCH_LOGGER.info("Matching of record %d: Completed as 'match'" % (record_counter,))
             else:
                 ambiguousrecs.append((record[0], match_result_output(record_counter, results, server_url, \
@@ -863,7 +923,7 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
         if (verbose > 8):
             sys.stderr.write("\nSearching with values %s\n" %
                              (search_params,))
-
+        CFG_BIBMATCH_LOGGER.info("Searching with values %s" % (search_params,))
         ## Perform the search with retries
         try:
             result_recids = server.search_with_retry(**search_params)
@@ -878,6 +938,7 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
         ## Check results:
         if len(result_recids) > 0:
             # Matches detected
+            CFG_BIBMATCH_LOGGER.info("Results: %s" % (result_recids[:15],))
 
             if len(result_recids) > CFG_BIBMATCH_SEARCH_RESULT_MATCH_LIMIT:
                 # Too many matches, treat as non-match
@@ -896,13 +957,19 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
                                           query,
                                           len(result_recids),
                                           str(result_recids)))
-                exact_matches, fuzzy_matches = validate_matches(bibmatch_recid=bibmatch_recid, \
-                                                                record=record, \
-                                                                server=server, \
-                                                                result_recids=result_recids, \
-                                                                collections=collections, \
-                                                                verbose=verbose, \
-                                                                ascii_mode=ascii_mode)
+                exact_matches = []
+                fuzzy_matches = []
+                try:
+                    exact_matches, fuzzy_matches = validate_matches(bibmatch_recid=bibmatch_recid, \
+                                                                    record=record, \
+                                                                    server=server, \
+                                                                    result_recids=result_recids, \
+                                                                    collections=collections, \
+                                                                    verbose=verbose, \
+                                                                    ascii_mode=ascii_mode)
+                except BibMatchValidationError, e:
+                    sys.stderr.write("ERROR: %s\n" % (str(e),))
+
                 if len(exact_matches) > 0:
                     if (verbose > 8):
                         sys.stderr.write("Match validated\n")
@@ -916,6 +983,7 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
                 else:
                     if (verbose > 8):
                         sys.stderr.write("Match could not be validated\n")
+
             else:
                 # No validation
                 # Ambiguous match
@@ -950,12 +1018,20 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
             ## Fuzzy matching: Analyze all queries and perform individual searches, then intersect results.
             for querystring, complete, field in query_list:
                 result_hitset = None
+                if (verbose > 8):
+                    sys.stderr.write("\n Start new search ------------ \n")
                 fuzzy_query_list = querystring.fuzzy_queries()
                 empty_results = 0
                 # Go through every expression in the query and generate fuzzy searches
                 for current_operator, qry in fuzzy_query_list:
                     current_resultset = None
+                    if qry == "":
+                        if (verbose > 1):
+                            sys.stderr.write("\nEmpty query. Skipping...\n")
+                            # Empty query, no point searching database
+                            continue
                     search_params = dict(p=qry, f=field, of='id', c=collections)
+                    CFG_BIBMATCH_LOGGER.info("Fuzzy searching with values %s" % (search_params,))
                     try:
                         current_resultset = server.search_with_retry(**search_params)
                     except InvenioConnectorAuthError, error:
@@ -963,6 +1039,7 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
                             sys.stderr.write("Authentication error when searching: %s" \
                                              % (str(error),))
                         break
+                    CFG_BIBMATCH_LOGGER.info("Results: %s" % (current_resultset[:15],))
                     if (verbose > 8):
                         if len(current_resultset) > CFG_BIBMATCH_SEARCH_RESULT_MATCH_LIMIT:
                             sys.stderr.write("\nSearching with values %s result=%s\n" %
@@ -988,23 +1065,33 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
                         elif current_operator == '|':
                             result_hitset = list(set(result_hitset) | set(current_resultset))
                 else:
-                    if result_hitset and len(result_hitset) < CFG_BIBMATCH_SEARCH_RESULT_MATCH_LIMIT:
+                    # We did not hit a break in the for-loop: we were allowed to search.
+                    if result_hitset and len(result_hitset) > CFG_BIBMATCH_SEARCH_RESULT_MATCH_LIMIT:
+                        if (verbose > 1):
+                            sys.stderr.write("\nToo many results... %d  " % (len(result_hitset)))
+                    elif result_hitset:
                         # This was a fuzzy match
                         query_out = " ".join(["%s %s" % (op, qu) for op, qu in fuzzy_query_list])
                         if validate:
                             # We can run validation
-                            CFG_BIBMATCH_LOGGER.info("Matching of record %d: Query (%s) found %d records: %s" % \
+                            CFG_BIBMATCH_LOGGER.info("Matching of record %d: Fuzzy query (%s) found %d records: %s" % \
                                                      (bibmatch_recid,
                                                       query_out,
                                                       len(result_hitset),
                                                       str(result_hitset)))
-                            exact_matches, fuzzy_matches = validate_matches(bibmatch_recid=bibmatch_recid, \
-                                                                            record=record, \
-                                                                            server=server, \
-                                                                            result_recids=result_hitset, \
-                                                                            collections=collections, \
-                                                                            verbose=verbose, \
-                                                                            ascii_mode=ascii_mode)
+                            exact_matches = []
+                            fuzzy_matches = []
+                            try:
+                                exact_matches, fuzzy_matches = validate_matches(bibmatch_recid=bibmatch_recid, \
+                                                                                record=record, \
+                                                                                server=server, \
+                                                                                result_recids=result_hitset, \
+                                                                                collections=collections, \
+                                                                                verbose=verbose, \
+                                                                                ascii_mode=ascii_mode)
+                            except BibMatchValidationError, e:
+                                sys.stderr.write("ERROR: %s\n" % (str(e),))
+
                             if len(exact_matches) > 0:
                                 if (verbose > 8):
                                     sys.stderr.write("Match validated\n")

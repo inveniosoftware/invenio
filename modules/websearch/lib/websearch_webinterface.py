@@ -32,33 +32,6 @@ import threading
 MAX_COLLAB_LIST = 10
 MAX_KEYWORD_LIST = 10
 MAX_VENUE_LIST = 10
-#tag constants
-AUTHOR_TAG = "100__a"
-AUTHOR_INST_TAG = "100__u"
-COAUTHOR_TAG = "700__a"
-COAUTHOR_INST_TAG = "700__u"
-VENUE_TAG = "909C4p"
-KEYWORD_TAG = "695__a"
-FKEYWORD_TAG = "6531_a"
-CFG_INSPIRE_UNWANTED_KEYWORDS_START = ['talk',
-                                      'conference',
-                                      'conference proceedings',
-                                      'numerical calculations',
-                                      'experimental results',
-                                      'review',
-                                      'bibliography',
-                                      'upper limit',
-                                      'lower limit',
-                                      'tables',
-                                      'search for',
-                                      'on-shell',
-                                      'off-shell',
-                                      'formula',
-                                      'lectures',
-                                      'book',
-                                      'thesis']
-CFG_INSPIRE_UNWANTED_KEYWORDS_MIDDLE = ['GeV',
-                                        '((']
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -197,22 +170,22 @@ class WebInterfaceUnAPIPages(WebInterfaceDirectory):
 
         formats_dict = get_output_formats(True)
         formats = {}
-        for format in formats_dict.values():
-            if format['attrs']['visibility']:
-                formats[format['attrs']['code'].lower()] = format['attrs']['content_type']
+        for f in formats_dict.values():
+            if f['attrs']['visibility']:
+                formats[f['attrs']['code'].lower()] = f['attrs']['content_type']
         del formats_dict
 
         if argd['id'] and argd['format']:
             ## Translate back common format names
-            format = {
+            f = {
                 'nlm' : 'xn',
                 'marcxml' : 'xm',
                 'dc' : 'xd',
                 'endnote' : 'xe',
                 'mods' : 'xo'
             }.get(argd['format'], argd['format'])
-            if format in formats:
-                redirect_to_url(req, '%s/%s/%s/export/%s' % (CFG_SITE_URL, CFG_SITE_RECORD, argd['id'], format))
+            if f in formats:
+                redirect_to_url(req, '%s/%s/%s/export/%s' % (CFG_SITE_URL, CFG_SITE_RECORD, argd['id'], f))
             else:
                 raise apache.SERVER_RETURN, apache.HTTP_NOT_ACCEPTABLE
         elif argd['id']:
@@ -225,16 +198,16 @@ class WebInterfaceUnAPIPages(WebInterfaceDirectory):
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /CFG_SITE_RECORD/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'multiedit', 'merge', 'plots', 'linkbacks']
+    _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
+                'export', 'citations', 'holdings', 'edit', 'keywords',
+                'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
 
     #_exports.extend(output_formats)
 
-    def __init__(self, recid, tab, format=None):
+    def __init__(self, recid, tab, form=None):
         self.recid = recid
         self.tab = tab
-        self.format = format
+        self.format = form
 
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
@@ -245,6 +218,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.plots = self
+        self.hepdata = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
@@ -258,6 +232,8 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         argd['recid'] = self.recid
 
         argd['tab'] = self.tab
+
+        # do we really enter here ?
 
         if self.format is not None:
             argd['of'] = self.format
@@ -330,9 +306,9 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'multiedit', 'merge', 'plots', 'linkbacks']
+    _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
+                'export', 'citations', 'holdings', 'edit', 'keywords',
+                'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
 
     #_exports.extend(output_formats)
 
@@ -354,8 +330,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
         self.linkbacks = WebInterfaceRecordLinkbacksPages(self.recid)
-
-        return
+        self.hepdata = self
 
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
@@ -737,7 +712,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
                                'references', 'citations', 'holdings', 'edit',
-                               'keywords', 'multiedit', 'merge', 'plots', 'linkbacks']:
+                               'keywords', 'multiedit', 'merge', 'plots',
+                               'linkbacks', 'hepdata']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''
@@ -853,11 +829,10 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                     language=ln,
                     req=req,
                     navmenuid='search')
-    # start display:
-    req.content_type = "text/html"
-    req.send_http_header()
+
     # deduce collection id:
-    colID = get_colID(get_coll_normalised_name(c))
+    normalised_name = get_coll_normalised_name(c)
+    colID = get_colID(normalised_name)
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
         page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
@@ -871,6 +846,13 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                     language=ln,
                     req=req,
                     navmenuid='search')
+
+    if normalised_name != c:
+        redirect_to_url(req, normalised_name, apache.HTTP_MOVED_PERMANENTLY)
+
+    # start display:
+    req.content_type = "text/html"
+    req.send_http_header()
 
     c_body, c_navtrail, c_portalbox_lt, c_portalbox_rt, c_portalbox_tp, c_portalbox_te, \
         c_last_updated = perform_display_collection(colID, c, aas, ln, em,

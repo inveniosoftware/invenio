@@ -29,10 +29,11 @@ from invenio.messages import gettext_set_language
 from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
-from invenio.bibrank_grapher import *
+from invenio.bibrank_grapher import (write_coordinates_in_tmp_file,
+                                     create_temporary_image,
+                                     remove_old_img)
 
-color_line_list = ['9', '19', '10', '15', '21', '18']
-cfg_id_bibdoc_id_bibrec = 5
+CFG_ID_BIBDOC_ID_BIBREC = 5
 
 def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
     """Create graph with citation history for record ID_BIBREC (into a
@@ -64,7 +65,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         history_analysis_results = ()
         if not id_bibdocs:
             pass
-        elif len(id_bibdocs) <= cfg_id_bibdoc_id_bibrec and 0 not in id_bibdocs:
+        elif len(id_bibdocs) <= CFG_ID_BIBDOC_ID_BIBREC and 0 not in id_bibdocs:
             history_analysis_results = draw_downloads_statistics(id_bibrec, list(id_bibdocs))
         else:
             history_analysis_results = draw_downloads_statistics(id_bibrec, [])
@@ -72,7 +73,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
             if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 2:
                 graph_file_history = CFG_WEBDIR + "/img/" + history_analysis_results[0]
                 html_content += """<tr><td valign=center align=center>%s</td>""" % open(graph_file_history).read()
-            else:#gnuplot
+            else:  # gnuplot
                 graph_file_history = CFG_SITE_URL + "/img/" + history_analysis_results[0]
                 html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
             file_to_close_history = history_analysis_results[1]
@@ -105,7 +106,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         if html_content != "":
             out += """<br/><br/><table><tr><td class="blocknote">
                       %s</td></tr><tr><td>
-                      <table border="0" cellspacing="1" cellpadding="1">""" %  _("Download user distribution:")
+                      <table border="0" cellspacing="1" cellpadding="1">""" % _("Download user distribution:")
             out += html_content
             out += "</table></td></tr></table>"
 
@@ -168,12 +169,14 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
             datas_max = create_list_tuple_total(intervals, coordinates_list)
             coordinates_list.append(datas_max)
     #write coordinates_list in a temporary file
-    result2 = write_coordinates_in_tmp_file(coordinates_list)
-
-    fname = result2[0]
-    y_max = result2[1]
+    graph_source_file, y_max = write_coordinates_in_tmp_file(coordinates_list)
     #Use create the graph from the temporary file
-    return create_temporary_image(id_bibrec, 'download_history', fname, ' ', 'Times downloaded', [0, 0], y_max, id_bibdoc_list, docfile_name_list, tic_list)
+    graph_file = create_temporary_image(id_bibrec, 'download_history',
+                                        graph_source_file, ' ',
+                                        'Times downloaded', [0, 0], y_max,
+                                        id_bibdoc_list, docfile_name_list,
+                                        tic_list)
+    return graph_file, graph_source_file
 
 def create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition=""):
     """-Return a list of tuple of the form [('10/2004',3),(..)] used to plot graph
@@ -262,7 +265,7 @@ def add_month(month, year):
     if month == 12:
         month = 1
         year += 1
-    else  :
+    else:
         month += 1
     return (month, year)
 
@@ -282,22 +285,24 @@ def create_users_analysis_graph(id_bibrec, ips):
     other_users = 0
     coordinates_list = []
     #compute users repartition
-    for i in range(len(ips)):
-        if 2307522817 <= ips[i] <= 2307588095 or 2156724481 <= ips[i] <= 2156789759:
+    for ip in ips:
+        if 2307522817 <= ip <= 2307588095 or 2156724481 <= ip <= 2156789759:
             cern_users += 1
-        else :
+        else:
             other_users += 1
     tot = float(cern_users+other_users)
     #prepare coordinates list
     coordinates_list.append((1, str(float(cern_users)/tot*100)))
     coordinates_list.append((3, str(float(other_users)/tot*100)))
     #write coordinates in a temporary file
-    result2 = write_coordinates_in_tmp_file([coordinates_list])
+    graph_source_file, y_max = write_coordinates_in_tmp_file([coordinates_list])
     #result2 example: [/path/to-invenio/var/www/img/tmpeC9GP5,'100.0']
     #the file contains e.g.
     #1 100.0
     #3 0.0
     #plot the graph
-    return create_temporary_image(id_bibrec, 'download_users', result2[0], ' ', 'User distribution', (0, 0), result2[1], [], [], [1, 3])
-
-
+    graph_file = create_temporary_image(id_bibrec, 'download_users',
+                                        graph_source_file, ' ',
+                                        'User distribution', (0, 0), y_max,
+                                        [], [], [1, 3])
+    return graph_file, graph_source_file

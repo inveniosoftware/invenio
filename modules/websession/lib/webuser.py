@@ -235,8 +235,15 @@ def setUid(req, uid, remember_me=False):
     if hasattr(req, '_user_info'):
         del req._user_info
     session = get_session(req)
+    try:
+        guest_personinfo = session['personinfo']
+    except KeyError:
+        guest_personinfo = dict()
     session.invalidate()
     session = get_session(req)
+    # a part of the session before the user logged in (browsing as guest)
+    # is copied to the new session
+    session['guest_personinfo'] = guest_personinfo
     session['uid'] = uid
     if remember_me:
         session.set_timeout(86400)
@@ -536,6 +543,10 @@ def merge_usera_into_userb(id_usera, id_userb):
         ## real transitions
         #for table, dummy in CFG_WEBUSER_USER_TABLES:
             #run_sql("LOCK TABLE %s WRITE" % table)
+
+        ## Special treatment for BibAuthorID
+        from invenio.bibauthorid_dbinterface import webuser_merge_user
+        webuser_merge_user(id_usera, id_userb)
         index = 0
         table = ''
         try:

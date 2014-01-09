@@ -25,7 +25,7 @@ records.
 import cgi
 import re
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_CERN_SITE
+from invenio.config import CFG_BASE_URL, CFG_SITE_LANG, CFG_CERN_SITE
 from invenio.messages import gettext_set_language
 
 _RE_MODERN_ARXIV = re.compile('(arxiv:)?(?P<number>\d{4}.\d{4}(v\d+)?)')
@@ -97,7 +97,7 @@ def create_sciencewise_icon(reportnumber, lang=CFG_SITE_LANG, cds=False):
     <a href="http://sciencewise.info/bookmarks/cds:%(id)s/add" target="_blank" title="%(title)s"><img src="%(siteurl)s/img/sciencewise.png" width="23" height="16" alt="ScienceWise.info icon" /></a>""" % {
                 'id': cgi.escape(reportnumber, True),
                 'title': cgi.escape(_("Add this document to your ScienceWise.info bookmarks"), True),
-                'siteurl': cgi.escape(CFG_SITE_URL, True)
+                'siteurl': cgi.escape(CFG_BASE_URL, True)
             }
     reportnumber = reportnumber.lower()
     g = _RE_BAD_OLD_ARXIV.match(reportnumber)
@@ -110,6 +110,6 @@ def create_sciencewise_icon(reportnumber, lang=CFG_SITE_LANG, cds=False):
     <a href="http://sciencewise.info/bookmarks/%(id)s/add" target="_blank" title="%(title)s"><img src="%(siteurl)s/img/sciencewise.png" width="23" height="16" alt="ScienceWise.info icon" /></a>""" % {
                 'id': cgi.escape(g.group('number'), True),
                 'title': cgi.escape(_("Add this article to your ScienceWise.info bookmarks"), True),
-                'siteurl': cgi.escape(CFG_SITE_URL, True)
+                'siteurl': cgi.escape(CFG_BASE_URL, True)
             }
     return ""

@@ -23,9 +23,11 @@ __revision__ = "$Id$"
 import re
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, compose_format
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD, \
+from invenio.config import CFG_SITE_URL, CFG_BASE_URL, CFG_CERN_SITE, CFG_SITE_RECORD, \
     CFG_BIBFORMAT_HIDDEN_FILE_FORMATS
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
+from invenio.urlutils import get_relative_url
+
 from cgi import escape, parse_qs
 from urlparse import urlparse
 from os.path import basename
@@ -78,7 +80,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
         style = 'class="'+style+'"'
 
     if show_icons.lower() == 'yes':
-        file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_SITE_URL, _("Download fulltext"))
+        file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_BASE_URL, _("Download fulltext"))
     else:
         file_icon = ''
 
@@ -87,11 +89,11 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
 
     additional_str = ''
     if additionals:
-        additional_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/%s/' % CFG_SITE_RECORD + str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
+        additional_str = ' <small>(<a '+style+' href="'+CFG_BASE_URL+'/%s/' % CFG_SITE_RECORD + str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
 
     versions_str = ''
     #if old_versions:
-        #versions_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/CFG_SITE_RECORD/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
+        #versions_str = ' <small>(<a '+style+' href="'+CFG_BASE_URL+'/CFG_SITE_RECORD/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
     if main_urls:
         main_urls_keys = sort_alphanumerically(main_urls.keys())
@@ -108,9 +110,9 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
             urls_dict = {}
             for url, name, url_format in urls:
                 if name not in urls_dict:
-                    urls_dict[name] = [(url, url_format)]
+                    urls_dict[name] = [(get_relative_url(url), url_format)]
                 else:
-                    urls_dict[name].append((url, url_format))
+                    urls_dict[name].append((get_relative_url(url), url_format))
             for name, urls_and_format in urls_dict.items():
                 if len(urls_dict) > 1:
                     print_name = "<em>%s</em> - " % name

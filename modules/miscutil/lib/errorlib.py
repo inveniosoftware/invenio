@@ -35,7 +35,8 @@ from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
     CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, \
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, \
     CFG_SITE_ADMIN_EMAIL_EXCEPTIONS, \
-    CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER
+    CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER, \
+    CFG_PROPAGATE_EXCEPTIONS
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
@@ -122,14 +123,22 @@ def register_emergency(msg, recipients=None):
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES
     """
     from invenio.mailutils import send_email
+    from socket import gethostname
     if not recipients:
         recipients = get_emergency_recipients()
     recipients = set(recipients)
     recipients.add(CFG_SITE_ADMIN_EMAIL)
+    mail_subject = "Emergency notification from " + gethostname() + " at " + CFG_SITE_URL
+    sms_subject = "ALERT"
     for address_str in recipients:
-        send_email(CFG_SITE_SUPPORT_EMAIL, address_str, "Emergency notification", msg)
+        if "sms" in address_str:
+            # Probably an SMS, lets reduce things!
+            subject = sms_subject
+        else:
+            subject = mail_subject
+        send_email(CFG_SITE_SUPPORT_EMAIL, address_str, subject, msg)
 
-def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
+def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, now=None):
     """Parse a list of appropriate emergency email recipients from
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, or from a provided dictionary
     comprised of 'time constraint' => 'comma separated list of addresses'
@@ -145,14 +154,18 @@ def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
 
     from invenio.dateutils import parse_runtime_limit
 
+    if now is None:
+        now = datetime.datetime.now()
+
     recipients = set()
     for time_condition, address_str in recipient_cfg.items():
         if time_condition and time_condition is not '*':
-            (current_range, future_range) = parse_runtime_limit(time_condition)
-            if not current_range[0] <= datetime.datetime.now() <= current_range[1]:
+            current_range, dummy_range = parse_runtime_limit(time_condition,
+                                                             now=now)
+            if not current_range[0] <= now <= current_range[1]:
                 continue
 
-        recipients.update([address_str])
+        recipients.add(address_str)
     return list(recipients)
 
 def find_all_values_to_hide(local_variables, analyzed_stack=None):
@@ -369,7 +382,8 @@ def register_exception(stream='error',
 
     @return: 1 if successfully wrote to stream, 0 if not
     """
-
+    if CFG_PROPAGATE_EXCEPTIONS:
+        raise
 
     try:
         ## Let's extract exception information
@@ -448,14 +462,14 @@ this exception into %s""" % os.path.join(CFG_LOGDIR, 'invenio.' + stream)
         return 0
 
 
-def raise_exception(exception_type = Exception,
-                    msg = '',
-                       stream='error',
-                       req=None,
-                       prefix='',
-                       suffix='',
-                       alert_admin=False,
-                       subject=''):
+def raise_exception(exception_type=Exception,
+                    msg='',
+                    stream='error',
+                    req=None,
+                    prefix='',
+                    suffix='',
+                    alert_admin=False,
+                    subject=''):
     """
     Log error exception to invenio.err and warning exception to invenio.log.
     Errors will be logged together with client information (if req is

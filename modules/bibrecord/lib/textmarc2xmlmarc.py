@@ -358,6 +358,11 @@ def transform_file(filename):
     "Reads ALEPH 500 sequential data file and transforms them into XML format."
 
     re_field_tag = re.compile("^\d\d\d[\s\w]{2}$")
+    # This regexp is good enough for the moment, could be further improved if
+    # needed
+    re_content = re.compile('^(\$\$[a-z0-9].+)+$')
+
+    # These fields will not be checked against the regexp above
     allowed_fields = ["FFT__"]
 
     record_no = 0
@@ -381,6 +386,9 @@ def transform_file(filename):
             if not re_field_tag.match(field) and not field in allowed_fields:
                 raise ParseError(fileinput.lineno(), line,
                     "Field tag \"%s\" does not match format \d\d\d[\s\w]{2}" % field)
+            elif not re_content.match(value) and not field.startswith("00"):
+                raise ParseError(fileinput.lineno(), line,
+                    "Content of field \"%s\" is not well formed" % value)
             if field[0] == " " or field[1] == " " or field[2] == " ":
                 text = "\nRecord %s: Error in field definition %s\n" % (sysno,field)
                 if field[0] == " ":

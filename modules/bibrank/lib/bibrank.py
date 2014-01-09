@@ -71,15 +71,12 @@ __revision__ = "$Id$"
 
 
 import sys
-import traceback
 import ConfigParser
 
 from invenio.config import CFG_ETCDIR
 from invenio.dbquery import run_sql
-from invenio.errorlib import register_exception
 from invenio.bibtask import task_init, write_message, task_get_option, \
-    task_set_option, get_datetime, task_update_status, \
-    task_sleep_now_if_required
+    task_set_option, get_datetime, task_sleep_now_if_required
 
 # pylint: disable=W0611
 # Disabling unused import pylint check, since these are needed to get
@@ -139,37 +136,30 @@ def task_run_core():
     if not task_get_option("run"):
         task_set_option("run", [name[0] for name in run_sql("SELECT name from rnkMETHOD")])
 
-    try:
-        for key in task_get_option("run"):
-            task_sleep_now_if_required(can_stop_too=True)
-            write_message("")
-            filename = CFG_ETCDIR + "/bibrank/" + key + ".cfg"
-            write_message("Getting configuration from file: %s" % filename,
-                verbose=9)
-            config = ConfigParser.ConfigParser()
-            try:
-                config.readfp(open(filename))
-            except StandardError, e:
-                write_message("Cannot find configurationfile: %s. "
-                    "The rankmethod may also not be registered using "
-                    "the BibRank Admin Interface." % filename, sys.stderr)
-                raise StandardError
+    for key in task_get_option("run"):
+        task_sleep_now_if_required(can_stop_too=True)
+        write_message("")
+        filename = CFG_ETCDIR + "/bibrank/" + key + ".cfg"
+        write_message("Getting configuration from file: %s" % filename,
+            verbose=9)
+        config = ConfigParser.ConfigParser()
+        try:
+            config.readfp(open(filename))
+        except StandardError:
+            write_message("Cannot find configuration file: %s. "
+                "The rankmethod may also not be registered using "
+                "the BibRank Admin Interface." % filename, sys.stderr)
+            raise
 
-            #Using the function variable to call the function related to the
-            #rank method
-            cfg_function = config.get("rank_method", "function")
-            func_object = globals().get(cfg_function)
-            if func_object:
-                func_object(key)
-            else:
-                write_message("Cannot run method '%s', no function to call"
-                    % key)
-    except StandardError, e:
-        write_message("\nException caught: %s" % e, sys.stderr)
-        write_message(traceback.format_exc()[:-1])
-        register_exception()
-        task_update_status("ERROR")
-        sys.exit(1)
+        #Using the function variable to call the function related to the
+        #rank method
+        cfg_function = config.get("rank_method", "function")
+        func_object = globals().get(cfg_function)
+        if func_object:
+            func_object(key)
+        else:
+            write_message("Cannot run method '%s', no function to call"
+                % key)
 
     return True
 

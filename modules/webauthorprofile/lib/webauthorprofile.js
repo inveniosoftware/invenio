@@ -18,6 +18,8 @@
  */
 
 $(document).ready(function() {
+    $("a[rel=lightbox]").lightBox();
+
     $('[class^=more-]').hide();
 
     $('[class^=lmore]').each(function() {
@@ -35,82 +37,113 @@ $(document).ready(function() {
         return false;
         });
     });
+    //call name variants
+    data = { 'personId': gPID };
+    funcs = ['create_authorpage_name_variants', 'create_authorpage_combined_papers', 'create_authorpage_keywords', 'create_authorpage_fieldcodes', 'create_authorpage_affiliations',
+                 'create_authorpage_coauthors', 'create_authorpage_pubs', 'create_authorpage_authors_pubs', 'create_authorpage_citations', 'create_authorpage_pubs_graph',
+                 'create_authorpage_hepdata', 'create_authorpage_collaborations', 'create_authorpage_pubs_list'];
+    funcsLength = funcs.length;
+    var count = Math.min( gNumOfWorkers, funcs.length);
+    xhrPool = [];
+    // Send gNumofWorkers requests to server
+    // For every response we get, we send a new request, in order the server to serve maximum gNumofWorkers requests
+    for (currentFunc=0; currentFunc < count; currentFunc++) {
+      createReq(funcs[currentFunc]);
+    }
+    setTimeout("cancelPendingRequests()", gPageTimeout);
 });
 
-function initAjax(){
-  /*
-   * Initialize Ajax.
-   */
-  $.ajaxSetup(
-    {cache: false,
-      dataType: 'json',
-      type: 'POST',
-      url: gBOX_STATUS
+function isProfile() {
+    var profileMatch = /profile=/;
+    return profileMatch.test(window.location.search);
+}
+
+function createReq( calledFunc ) {
+  /* Prepare and send ajax requests */
+  var errorCallback = onAjaxError(calledFunc);
+  $.ajax({
+    cache: false,
+    dataType: 'json',
+    type: 'POST',
+    url: '/author/profile/' + calledFunc,
+    data: isProfile() ? {jsondata: JSON.stringify(data), ajaxProfile: true} : {jsondata: JSON.stringify(data)},
+    success: onAjaxSuccess,
+    error: errorCallback,
+    timeout: gReqTimeout,
+    beforeSend: function(jqXHR) { // before jQuery send the request we will push it to our array
+        xhrPool.push(jqXHR);
+    },
+    complete: function(jqXHR) { // when a request is completed it will be removed from the array
+        xhrPool = $.grep(xhrPool, function(x){return x!=jqXHR;});
     }
-  );
+  });
 }
 
 function add_box_content(id, html_content) {
-    $('#' + id).html(html_content);
+    var $box = $('#' + id);
+    $box.html(html_content);
+    $box.find('[class^=more-]').hide();
+    $box.find('[class^=lmore]').each(function() {
+        $(this).click(function () {
+            var link_class = $(this).prop("className");
+            var content = $("." + "more-" + link_class);
+            if (content.hasClass("hidden")) {
+                content.removeClass("hidden").slideDown();
+                $(this).html("<img src='/img/aid_minus_16.png' alt='hide information' width='11' height='11'> less");
+            }
+            else {
+              content.addClass("hidden").slideUp();
+              $(this).html("<img src='/img/aid_plus_16.png' alt='toggle additional information.' width='11' height='11'> more");
+            }
+        return false;
+        });
+    });
+    if (id == "pubs_list") {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, $box.get(0)]);
+    }
 }
 
 function onAjaxSuccess(json) {
     /* Get info about boxes to update */
     gBOX_STATUS = json['boxes_info'];
-    var stop_ping = true;
     for (var box_id in gBOX_STATUS) {
         var box_info = gBOX_STATUS[box_id];
-        if (box_info['status'] == true)
-            add_box_content(box_id, box_info['html_content'])
-        else
-            stop_ping = false;
-    }
-    if (stop_ping == true)
-        stopPing();
-}
-
-function prepare_json_data() {
-  data = {
-    box_status: gBOX_STATUS
-  };
-  return data;
-}
-
-function createReq() {
-    /*
-     * Perform AJAX request and update page content
-     */
-    var data = prepare_json_data();
-    $.ajax({data: {jsondata: JSON.stringify(data)},
-            success: function(json){
-                      onAjaxSuccess(json);
+        if (box_info['status'] === true) {
+            if (json.hasOwnProperty("profilerStats")) {
+                box_info['html_content'] += "<div class=\"profiler-stats\">" + json['profilerStats'] + "</div>";
             }
-    });
-}
+            add_box_content(box_id, box_info['html_content']);
+        }
 
-function stopPing() {
-    /*
-     * Stop ping to server
-     */
-    clearInterval(intervalId);
-}
-
-function initPing() {
-    /*
-     * Specify the interval to ping the server
-     */
-    intervalId = setInterval("createReq()", 2500);
-}
-
-
-
-$(function(){
-    /*
-     * Init functions
-     */
-    initAjax();
-    if (gBOX_STATUS != 'noAjax') {
-        initPing();
-    	setTimeout("stopPing()", 360000);
     }
-});
+    if ( currentFunc < funcsLength ) {
+      createReq(funcs[currentFunc]);
+      currentFunc++;
+    }
+
+
+}
+
+function onAjaxError(func) {
+  /*
+   * Handle failed ajax requests.
+   */
+   return function (XHR, textStatus, errorThrown) {
+      var callFunc = func;
+      if ( textStatus === "timeout") {
+        createReq(callFunc);
+      }
+      else {}// todo
+   };
+}
+
+function cancelPendingRequests() {
+  /* Cancel all pending requests and display proper message on the loading boxes*/
+  $.each( xhrPool, function( index, jqXHR){
+    jqXHR.abort();
+  });
+  $('.loadingGif').each( function(){
+    $(this).siblings('span').remove();
+    $(this).replaceWith("<span>Data could not be retrieved</span>");
+  });
+}

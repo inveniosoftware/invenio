@@ -22,6 +22,7 @@
 __revision__ = "$Id$"
 
 ## import interesting modules:
+import traceback
 import string
 import os
 import sys
@@ -1754,7 +1755,7 @@ def print_function_calls(req, doctype, action, step, form, start_time,
                                     ## InvenioWebSubmitFunctionError and raise it:
                                     msg = "Unhandled TypeError caught when " \
                                         "calling [%s] WebSubmit function: " \
-                                        "[%s]" % (function_name, str(err))
+                                        "[%s]: \n%s" % (function_name, str(err), traceback.format_exc())
                                     raise InvenioWebSubmitFunctionError(msg)
                         except InvenioWebSubmitFunctionWarning, err:
                             ## There was an unexpected behaviour during the

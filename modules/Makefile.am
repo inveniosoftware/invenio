@@ -45,6 +45,7 @@ SUBDIRS = bibauthorid \
           webaccess \
           webalert \
           webauthorprofile \
+          webauthorlist \
           webbasket \
           webcomment \
           webhelp \
@@ -56,6 +57,7 @@ SUBDIRS = bibauthorid \
           webstat \
           webstyle \
           websubmit \
-          docextract
+          docextract \
+          pdfchecker
 
 CLEANFILES = *~

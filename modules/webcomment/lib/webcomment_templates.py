@@ -31,6 +31,7 @@ from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
+                           CFG_BASE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_NAME, \
                            CFG_SITE_NAME_INTL,\
@@ -556,14 +557,14 @@ class Template:
         out += '''
 <div class="webcomment_review_box">
   <div class="webcomment_review_box_inner">
-    <img src="%(siteurl)s/img/%(star_score_img)s" alt="%(star_score)s/>
+    <img src="%(baseurl)s/img/%(star_score_img)s" alt="%(star_score)s/>
       <div class="webcomment_review_title">%(title)s</div>
       <div class="webcomment_review_label_reviewed">%(reviewed_label)s</div>
       <div class="webcomment_review_label_useful">%(useful_label)s</div>
   %(body)s
   </div>
 </div>
-%(abuse)s''' % {'siteurl'        : CFG_SITE_URL,
+%(abuse)s''' % {'baseurl'      : CFG_BASE_URL,
                'star_score_img': star_score_img,
                'star_score'    : star_score,
                'title'         : cgi.escape(title),
@@ -2110,7 +2111,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        url = '%s/%s/%s/reviews/add?ln=%s&amp;action=%s' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, ln, action)
+        url = '%s/%s/%s/reviews/add?ln=%s&amp;action=%s' % (CFG_BASE_URL, CFG_SITE_RECORD, recID, ln, action)
 
         if avg_score > 0:
             score = _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") % \

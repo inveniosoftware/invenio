@@ -55,6 +55,7 @@ class BibClassifyTestCase(InvenioTestCase):
     def setUp(self):
         """Initialize stuff"""
         #self.tmpdir = invenio.config.CFG_TMPDIR
+        self.original_tmpdir = config.CFG_TMPDIR
         config.CFG_TMPDIR = tempfile.gettempdir()
 
         self.oldstdout = sys.stdout
@@ -68,6 +69,7 @@ class BibClassifyTestCase(InvenioTestCase):
         bconfig.set_global_level(bconfig.logging.CRITICAL)
 
     def tearDown(self):
+        config.CFG_TMPDIR = self.original_tmpdir
         if self.stdout:
             self.unredirect()
         bconfig.set_global_level(self.log_level)

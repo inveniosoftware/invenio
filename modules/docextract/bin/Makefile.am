@@ -15,8 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = docextract refextract
+bin_SCRIPTS = docextract refextract convert_journals
 
-EXTRA_DIST = 
+EXTRA_DIST =
 
 CLEANFILES = *~ *.tmp

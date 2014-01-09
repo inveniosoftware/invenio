@@ -89,7 +89,7 @@
               <dc:type>info:eu-repo/semantics/article</dc:type>
           </xsl:if>
         </xsl:for-each>
-        <dc:identifier><xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')"/></dc:identifier>
+        <dc:identifier><xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')"/></dc:identifier>
         <xsl:for-each select="datafield[@tag=773]">
           <dc:publisher><xsl:value-of select="subfield[@code='p']"/></dc:publisher>
         </xsl:for-each>

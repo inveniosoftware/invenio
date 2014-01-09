@@ -110,15 +110,13 @@ class BatchUploaderRobotUploadTests(GenericBibUploadTest):
         def test_bad_marcxml(self):
             """batchuploader - robotupload bad MARCXML"""
             self.req.add_data("BLABLA")
-            result = urllib2.urlopen(self.req).read()
-            self.assertEqual(result, "[ERROR] MARCXML is not valid.\n")
+            self.assertRaises(urllib2.HTTPError, urllib2.urlopen, self.req)
 
     if CFG_LOCALHOST_OK:
         def test_bad_agent(self):
             """batchuploader - robotupload bad agent"""
             self.req.add_header('User-Agent', 'badagent')
-            result = urllib2.urlopen(self.req).read()
-            self.assertEqual(result, "[ERROR] Sorry, the badagent useragent cannot use the service.\n")
+            self.assertRaises(urllib2.HTTPError, urllib2.urlopen, self.req)
 
     if CFG_LOCALHOST_OK:
         def test_simple_insert(self):

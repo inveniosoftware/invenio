@@ -21,11 +21,13 @@ mod_wsgi Invenio application loader.
 """
 
 # start remote debugger if appropriate:
-try:
-    from invenio import remote_debugger
-    remote_debugger.start_file_changes_monitor()
-except:
-    pass
+from invenio.config import CFG_DEVEL_SITE
+if CFG_DEVEL_SITE:
+    try:
+        from invenio import remote_debugger
+        remote_debugger.start_file_changes_monitor()
+    except:
+        pass
 
 # wrap warnings (usually from sql queries) to log the traceback
 # of their origin for debugging
@@ -39,13 +41,20 @@ except:
 # citation dictionaries are loaded lazily, which is good for CLI
 # processes such as bibsched, but for web user queries we want them to
 # be available right after web server start-up):
-try:
-    from invenio.bibrank_citation_searcher import get_citedby_hitset, \
-         get_refersto_hitset
-    get_citedby_hitset(None)
-    get_refersto_hitset(None)
-except:
-    pass
+#from invenio.bibrank_citation_searcher import get_cited_by_weight
+#get_cited_by_weight([])
+
+# pre-load docextract knowledge bases
+#from invenio.refextract_kbs import get_kbs
+#get_kbs()
+# pre-load docextract author regexp
+#from invenio.authorextract_re import get_author_regexps
+#get_author_regexps()
+# increase compile regexps cache size for further
+# speed improvements in docextract
+import re
+re._MAXCACHE = 2000
+
 
 try:
     from invenio.webinterface_handler_wsgi import application

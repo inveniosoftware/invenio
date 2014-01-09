@@ -17,7 +17,7 @@
 
 """Invenio BibCatalog HTML generator."""
 
-from invenio.bibcatalog import bibcatalog_system
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.messages import wash_language, gettext_set_language
 from invenio.config import CFG_SITE_LANG
 from invenio.webstyle_templates import Template as DefaultTemplate
@@ -31,15 +31,15 @@ class Template(DefaultTemplate):
         """ make a pretty html body of tickets that belong to the user given as param """
         ln = wash_language(ln)
         _ = gettext_set_language(ln)
-        if bibcatalog_system is None:
+        if BIBCATALOG_SYSTEM is None:
             return _("Error: No BibCatalog system configured.")
         #errors? tell what happened and get out
-        bibcat_probs = bibcatalog_system.check_system(uid)
+        bibcat_probs = BIBCATALOG_SYSTEM.check_system(uid)
         if bibcat_probs:
             return _("Error")+" "+bibcat_probs
 
-        tickets = bibcatalog_system.ticket_search(uid, owner=uid) #get ticket id's
-        lines = "" #put result here
+        tickets = BIBCATALOG_SYSTEM.ticket_search(uid, owner=uid) # get ticket id's
+        lines = "" # put result here
         i = 1
 
         lines += (_("You have %i tickets.") % len(tickets)) + "<br/>"
@@ -51,15 +51,15 @@ class Template(DefaultTemplate):
                 newstart = 1
             lines += '<a href="/yourtickets/display?start='+str(newstart)+'">'+_("Previous")+'</a>'
         lines += """<table border="1">"""
-        lastshown = len(tickets) #what was the number of the last shown ticket?
+        lastshown = len(tickets) # what was the number of the last shown ticket?
         for ticket in tickets:
             #get info and show only for those that within the show range
             if (i >= start) and (i < start+self.SHOW_MAX_TICKETS):
-                ticket_info = bibcatalog_system.ticket_get_info(uid, ticket)
+                ticket_info = BIBCATALOG_SYSTEM.ticket_get_info(uid, ticket)
                 subject = ticket_info['subject']
                 status = ticket_info['status']
                 text = ""
-                if ticket_info.has_key('text'):
+                if 'text' in ticket_info:
                     text = ticket_info['text']
                 display = '<a href="'+ticket_info['url_display']+'">'+_("show")+'</a>'
                 close = '<a href="'+ticket_info['url_close']+'">'+_("close")+'</a>'

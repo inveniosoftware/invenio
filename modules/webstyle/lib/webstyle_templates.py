@@ -34,6 +34,7 @@ from invenio.config import \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
+     CFG_BASE_URL, \
      CFG_SITE_URL, \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
@@ -48,6 +49,7 @@ from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.bibformat import format_record
 from invenio import template
+from invenio.htmlutils import get_mathjax_header
 websearch_templates = template.load('websearch')
 
 class Template:
@@ -86,7 +88,7 @@ class Template:
             # return empty string for the Home page
             return out
         else:
-            out += create_html_link(CFG_SITE_URL, {'ln': ln},
+            out += create_html_link(CFG_BASE_URL or "/", {'ln': ln},
                                     _("Home"), {'class': 'navtrail'})
         if previous_links:
             if out:
@@ -112,10 +114,9 @@ class Template:
                   titleprologue="", title="", titleepilogue="",
                   body="", lastupdated=None, pagefooteradd="", uid=0,
                   secure_page_p=0, navmenuid="", metaheaderadd="",
-                  rssurl=CFG_SITE_URL+"/rss",
+                  rssurl=CFG_BASE_URL+"/rss",
                   show_title_p=True, body_css_classes=None,
                   show_header=True, show_footer=True):
-
         """Creates a complete page
 
            Parameters:
@@ -188,7 +189,6 @@ class Template:
 
           - HTML code of the page
         """
-
         # load the right message language
         _ = gettext_set_language(ln)
         out = ''
@@ -262,7 +262,7 @@ class Template:
                         useractivities_menu="", adminactivities_menu="",
                         navtrailbox="", pageheaderadd="", uid=0,
                         secure_page_p=0, navmenuid="admin", metaheaderadd="",
-                        rssurl=CFG_SITE_URL+"/rss", body_css_classes=None):
+                        rssurl=CFG_BASE_URL+"/rss", body_css_classes=None):
 
         """Creates a page header
 
@@ -304,7 +304,14 @@ class Template:
 
           - HTML code of the page headers
         """
-
+        # Including HEPData headers ( Ugly hack but no obvious way to avoid this ...)
+        if CFG_INSPIRE_SITE:
+            hepDataAdditions = """<script type="text/javascript" src="%s/js/hepdata.js"></script>""" \
+            % (CFG_BASE_URL, )
+            hepDataAdditions += """<link rel="stylesheet" href="%s/img/hepdata.css" type="text/css" />""" \
+            % (CFG_BASE_URL, )
+        else:
+            hepDataAdditions = ""
         # load the right message language
         _ = gettext_set_language(ln)
 
@@ -351,6 +358,10 @@ template function generated it.
         else:
             pageheadertitle = headertitle + ' - ' + sitename
 
+        metabase = ""
+        stripped_url = CFG_SITE_URL.replace("://", "")
+        if not CFG_BASE_URL and '/' in stripped_url:
+            metabase = "<base href='%s'>" % (CFG_SITE_URL,)
 
         out = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -358,6 +369,7 @@ template function generated it.
 <html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s" xmlns:og="http://opengraphprotocol.org/schema/" >
 <head>
  <title>%(pageheadertitle)s</title>
+ %(metabase)s
  <link rev="made" href="mailto:%(sitesupportemail)s" />
  <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
  <!--[if lt IE 8]>
@@ -376,6 +388,7 @@ template function generated it.
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
  <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
+ %(hepDataAdditions)s
  %(metaheaderadd)s
 </head>
 <body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
@@ -390,7 +403,7 @@ template function generated it.
     %(userinfobox)s
   </div>
   <div class="headerboxbodylogo">
-   <a href="%(siteurl)s?ln=%(ln)s">%(sitename)s</a>
+   <a href="%(cssurl)s/?ln=%(ln)s">%(sitename)s</a>
   </div>
   </td>
  </tr>
@@ -402,13 +415,13 @@ template function generated it.
              &nbsp;
        </td>
        <td class="headermoduleboxbody%(search_selected)s">
-             <a class="header%(search_selected)s" href="%(siteurl)s/?ln=%(ln)s">%(msg_search)s</a>
+             <a class="header%(search_selected)s" href="%(cssurl)s/?ln=%(ln)s">%(msg_search)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
        <td class="headermoduleboxbody%(submit_selected)s">
-             <a class="header%(submit_selected)s" href="%(siteurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
+             <a class="header%(submit_selected)s" href="%(cssurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -420,7 +433,7 @@ template function generated it.
              &nbsp;
        </td>
        <td class="headermoduleboxbody%(help_selected)s">
-             <a class="header%(help_selected)s" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
+             <a class="header%(help_selected)s" href="%(cssurl)s/help/%(langlink)s">%(msg_help)s</a>
        </td>
        %(adminactivities)s
        <td class="headermoduleboxbodyblanklast">
@@ -440,11 +453,12 @@ template function generated it.
 %(pageheaderadd)s
 </div>
         """ % {
+          'metabase': metabase,
           'rtl_direction': is_language_rtl(ln) and ' dir="rtl"' or '',
-          'siteurl' : CFG_SITE_URL,
+          'siteurl': CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'canonical_and_alternate_urls' : self.tmpl_canonical_and_alternate_urls(uri),
-          'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,
+          'cssurl' : CFG_BASE_URL,
           'cssskin' : CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or '',
           'rssurl': rssurl,
           'ln' : ln,
@@ -481,16 +495,21 @@ template function generated it.
           'msg_help' : _("Help"),
           'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL),
           'linkbackTrackbackLink': headerLinkbackTrackbackLink,
+          'hepDataAdditions': hepDataAdditions,
           'inspect_templates_message' : inspect_templates_message
         }
         return out
 
-    def tmpl_canonical_and_alternate_urls(self, url):
+    def tmpl_canonical_and_alternate_urls(self, url, quote_path=True):
         """
         Return the snippet of HTML to be put within the HTML HEAD tag in order
         to declare the canonical and language alternate URLs of a page.
+
+        @param quote_path: if True, the path section of the given
+                           C{url} is quoted according to RFC 2396.
+                           Useful if reading url from req.unparsed_uri
         """
-        canonical_url, alternate_urls = get_canonical_and_alternates_urls(url)
+        canonical_url, alternate_urls = get_canonical_and_alternates_urls(url, quote_path=quote_path)
         out = """  <link rel="canonical" href="%s" />\n""" % cgi.escape(canonical_url, True)
         for ln, alternate_url in alternate_urls.iteritems():
             ln = ln.replace('_', '-') ## zh_CN -> zh-CN
@@ -548,7 +567,7 @@ template function generated it.
 </body>
 </html>
         """ % {
-          'siteurl': CFG_SITE_URL,
+          'siteurl': CFG_BASE_URL,
           'sitesecureurl': CFG_SITE_SECURE_URL,
           'ln': ln,
           'langlink': '?ln=' + ln,
@@ -743,7 +762,7 @@ URI: http://%(host)s%(page)s
                 'error'     : cgi.escape(error_s).replace('"', '&quot;'),
                 'traceback' : cgi.escape(traceback_s).replace('"', '&quot;'),
                 'sys_error' : cgi.escape(sys_error_s).replace('"', '&quot;'),
-                'siteurl'    : CFG_SITE_URL,
+                'siteurl'    : CFG_BASE_URL,
                 'referer'   : page_s!=info_not_available and \
                                  ("http://" + host_s + page_s) or \
                                  info_not_available
@@ -755,7 +774,8 @@ URI: http://%(host)s%(page)s
                                       show_similar_rec_p=True,
                                       creationdate=None,
                                       modificationdate=None, show_short_rec_p=True,
-                                      citationnum=-1, referencenum=-1, discussionnum=-1):
+                                      citationnum=-1, referencenum=-1, discussionnum=-1,
+                                      include_jquery = False, include_mathjax = False):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
         Returns content as it is if the number of tabs for this record
@@ -846,9 +866,18 @@ URI: http://%(host)s%(page)s
                          <div style="clear:both;height:1px">&nbsp;</div>
                          ''' % {'record_brief': record_brief}
 
+        additional_scripts = ""
+        if include_jquery:
+            additional_scripts += """<script type="text/javascript" src="%s/js/jquery.min.js">' \
+            '</script>\n""" % (CFG_BASE_URL, )
+        if include_mathjax:
+
+            additional_scripts += get_mathjax_header()
+
+
         # Print the content
         out = """
-    <div class="detailedrecordbox">
+        %(additional_scripts)s<div class="detailedrecordbox">
         %(tabs)s
         <div class="detailedrecordboxcontent">
             <div class="top-left-folded"></div>
@@ -857,7 +886,8 @@ URI: http://%(host)s%(page)s
                 <!--<div style="height:0.1em;">&nbsp;</div>
                 <p class="notopgap">&nbsp;</p>-->
                 %(record_brief)s
-                """ % {'tabs':out_tabs,
+                """ % {'additional_scripts': additional_scripts,
+                       'tabs':out_tabs,
                        'record_brief':record_brief}
 
         out = restriction_flag + out
@@ -959,7 +989,7 @@ URI: http://%(host)s%(page)s
         <div class="bottom-left"></div><div class="bottom-right"></div>
         </div>
         """ % {
-        'siteurl': CFG_SITE_URL,
+        'siteurl': CFG_BASE_URL,
         'ln':ln,
         'recid':recid,
         'files': files,

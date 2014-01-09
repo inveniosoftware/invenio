@@ -155,3 +155,14 @@ def task_low_level_submission(name, user, *argv):
     @note: use absolute paths in argv
     """
 </pre>
+
+<h4>bibtask.get_modified_records_since</h4>
+<pre>
+def get_modified_records_since(modification_date):
+    """
+    Return the set of modified record since the given
+    modification_date.
+    @param modification_date: Return records modified after this date
+    @type modification_date datetime
+    """
+</pre>

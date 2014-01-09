@@ -31,11 +31,14 @@ import time
 import unittest
 import cgi
 import subprocess
+import difflib
 
 from warnings import warn
+from functools import wraps
 from urlparse import urlsplit, urlunsplit
 from urllib import urlencode
 from itertools import chain, repeat
+from xml.dom.minidom import parseString
 
 try:
     from selenium import webdriver
@@ -44,11 +47,18 @@ except ImportError:
     # web tests will not be available, but unit and regression tests will:
     pass
 
-from invenio.config import CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL, CFG_PYLIBDIR, \
-     CFG_JSTESTDRIVER_PORT, CFG_WEBDIR, CFG_PREFIX
-from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, \
-     CFG_TESTS_REQUIRE_HTML_VALIDATION
+from invenio.config import (CFG_SITE_URL,
+                            CFG_SITE_SECURE_URL,
+                            CFG_LOGDIR,
+                            CFG_SITE_NAME_INTL,
+                            CFG_PYLIBDIR,
+                            CFG_JSTESTDRIVER_PORT,
+                            CFG_WEBDIR,
+                            CFG_PREFIX,
+                            CFG_BASE_URL)
+from invenio.w3c_validator import (w3c_validate,
+                                   w3c_errors_to_str,
+                                   CFG_TESTS_REQUIRE_HTML_VALIDATION)
 from invenio.pluginutils import PluginContainer
 
 try:
@@ -149,6 +159,17 @@ def make_surl(path, **kargs):
     arguments"""
 
     url = CFG_SITE_SECURE_URL + path
+
+    if kargs:
+        url += '?' + urlencode(kargs, doseq=True)
+
+    return url
+
+def make_rurl(path, **kargs):
+    """ Helper to generate an relative invenio URL with query
+    arguments"""
+
+    url = CFG_BASE_URL + path
 
     if kargs:
         url += '?' + urlencode(kargs, doseq=True)
@@ -497,6 +518,13 @@ class InvenioTestCase(unittest.TestCase):
     "Invenio Test Case class."
     pass
 
+
+try:
+    InvenioTestCase.assertMultiLineEqual
+except AttributeError:
+    InvenioTestCase.assertMultiLineEqual = InvenioTestCase.assertEqual
+
+
 class InvenioWebTestCase(unittest.TestCase):
     """ Helper library of useful web test functions
     for web tests creation.
@@ -622,7 +650,23 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element=element_xpath)
 
-    def find_elements_by_class_name_with_timeout(self, element_class_name, timeout=30):
+    def find_elements_by_class_name_with_timeout(self, elements_class_name, timeout=30):
+        """ Find elements by class name. This waits up to 'timeout' seconds
+        before throwing an InvenioWebTestCaseException or if it finds the element
+        will return it in 0 - timeout seconds.
+        @param elements_class_name: class name of the elements to find
+        @type elements_class_name: string
+        @param timeout: time in seconds before throwing an exception
+        if the element is not found
+        @type timeout: int
+        """
+
+        try:
+            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_elements_by_class_name(elements_class_name))
+        except:
+            raise InvenioWebTestCaseException(element=elements_class_name)
+
+    def find_element_by_class_name_with_timeout(self, element_class_name, timeout=30):
         """ Find an element by class name. This waits up to 'timeout' seconds
         before throwing an InvenioWebTestCaseException or if it finds the element
         will return it in 0 - timeout seconds.
@@ -701,7 +745,7 @@ class InvenioWebTestCase(unittest.TestCase):
 
     @nottest
     def element_value_test(self, element_name="", element_id="", \
-                           expected_element_value="", unexpected_element_value="", in_form=True):
+                           expected_element_value="", unexpected_element_value="", in_form=True, exact_match=True):
         """ Function to check if the value in the given
         element is the expected (unexpected) value or not
         @param element_name: name of the corresponding element in the form
@@ -737,9 +781,15 @@ class InvenioWebTestCase(unittest.TestCase):
         if expected_element_value:
             try:
                 if in_form:
-                    self.assertEqual(q.get_attribute('value'), expected_element_value)
+                    if exact_match:
+                        self.assertEqual(q.get_attribute('value'), expected_element_value)
+                    else:
+                        self.assertNotEqual(-1, q.get_attribute('value').find(expected_element_value))
                 else:
-                    self.assertEqual(q.text, expected_element_value)
+                    if exact_match:
+                        self.assertEqual(q.text, expected_element_value)
+                    else:
+                        self.assertNotEqual(-1, q.text.find(expected_element_value))
             except AssertionError, e:
                 self.errors.append(str(e))
 
@@ -901,6 +951,7 @@ class InvenioWebTestCaseException(Exception):
     find_element_by_partial_link_text_with_timeout()
     find_element_by_id_with_timeout()
     find_element_by_xpath_with_timeout()
+    find_element_by_class_name_with_timeout()
     find_elements_by_class_name_with_timeout()
     find_page_source_with_timeout()
     """
@@ -913,3 +964,32 @@ class InvenioWebTestCaseException(Exception):
     def __str__(self):
         """String representation."""
         return repr(self.message)
+
+
+class InvenioXmlTestCase(InvenioTestCase):
+    def assertXmlEqual(self, got, want):
+        xml_lines = parseString(got).toprettyxml(encoding='utf-8').split('\n')
+        xml = '\n'.join(line for line in xml_lines if line.strip())
+        xml2_lines = parseString(want).toprettyxml(encoding='utf-8').split('\n')
+        xml2 = '\n'.join(line for line in xml2_lines if line.strip())
+        try:
+            self.assertEqual(xml, xml2)
+        except AssertionError:
+            for line in difflib.unified_diff(xml.split('\n'), xml2.split('\n')):
+                print line.strip('\n')
+            raise
+
+
+def failfast(method):
+    @wraps(method)
+    def inner(self, *args, **kw):
+        self.stop()
+        return method(self, *args, **kw)
+    return inner
+
+
+def wrap_failfast():
+    """Makes it so unit tests will fail at the first error"""
+    unittest.TestResult.addError = failfast(unittest.TestResult.addError)
+    unittest.TestResult.addFailure = failfast(unittest.TestResult.addFailure)
+    unittest.TestResult.addUnexpectedSuccess = failfast(unittest.TestResult.addUnexpectedSuccess)

@@ -17,7 +17,7 @@
 
 etcdir = $(sysconfdir)/bibcheck
 
-etc_DATA = sample.cfg
+etc_DATA = example_rules.cfg
 
 EXTRA_DIST = $(etc_DATA)
 

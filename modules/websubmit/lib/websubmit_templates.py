@@ -22,7 +22,7 @@ import re
 import operator
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD, \
-     CFG_SITE_SECURE_URL
+     CFG_SITE_SECURE_URL, CFG_INSPIRE_SITE
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.urlutils import create_html_link
@@ -545,7 +545,7 @@ class Template:
                  'mainmenu' : cgi.escape(mainmenu),
                  'images' : CFG_SITE_URL + '/img',
                  'take_note' : '(1) ' + _("This is your submission access number. It can be used to continue with an interrupted submission in case of problems."),
-                 'explain_summary' : '(2) ' + _("Mandatory fields appear in red in the SUMMARY window."),
+                 'explain_summary' : not CFG_INSPIRE_SITE and  '(2) ' + _("Mandatory fields appear in red in the SUMMARY window.") or ''
                }
         return out
 

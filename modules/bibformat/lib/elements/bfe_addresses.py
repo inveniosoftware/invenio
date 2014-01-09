@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import cgi
 from urllib import quote
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_BASE_URL
 
 def format_element(bfo, separator="; ", print_link="yes"):
     """
@@ -37,7 +37,7 @@ def format_element(bfo, separator="; ", print_link="yes"):
     list_addresses = []
     if print_link.lower() == 'yes':
         for address in addresses:
-            list_addresses.append('<a href="'+CFG_SITE_URL+'/search?f=author&p='+ \
+            list_addresses.append('<a href="'+CFG_BASE_URL+'/search?f=author&p='+ \
                                   quote(address.get('p', "")) + \
                                   '&amp;ln=' + bfo.lang + \
                                   '">'+cgi.escape(address.get('p', "")) + \

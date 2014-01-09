@@ -23,9 +23,9 @@ import cPickle
 import os
 import re
 import time
-import datetime
 import tempfile
 import sys
+import datetime
 if sys.hexversion < 0x2050000:
     from glob import glob as iglob
 else:
@@ -60,11 +60,12 @@ from invenio.config import \
 from invenio.intbitset import intbitset
 from invenio.htmlutils import X, EscapedXMLString
 from invenio.dbquery import run_sql, wash_table_column_name
-from invenio.search_engine import record_exists, get_all_restricted_recids, get_all_field_values, search_unit_in_bibxxx, get_record
+from invenio.search_engine import record_exists, get_all_restricted_recids, get_all_field_values, search_unit_in_bibxxx, get_record, search_pattern
 from invenio.bibformat import format_record
 from invenio.bibrecord import record_get_field_instances
 from invenio.errorlib import register_exception
 from invenio.oai_repository_config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
+from invenio.dateutils import localtime_to_utc, utc_to_localtime
 
 CFG_VERBS = {
     'GetRecord'          : ['identifier', 'metadataPrefix'],
@@ -162,79 +163,6 @@ def get_field(recid, field):
     query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec=%%s AND bx.id=bibx.id_bibxxx AND bx.tag=%%s" % (wash_table_column_name(bibbx), wash_table_column_name(bibx))
 
     return [row[0] for row in run_sql(query, (recid, field))]
-
-def utc_to_localtime(date):
-    """
-    Convert UTC to localtime
-
-    Reference:
-     - (1) http://www.openarchives.org/OAI/openarchivesprotocol.html#Dates
-     - (2) http://www.w3.org/TR/NOTE-datetime
-
-    This function works only with dates complying with the
-    "Complete date plus hours, minutes and seconds" profile of
-    ISO 8601 defined by (2), and linked from (1).
-
-    Eg:    1994-11-05T13:15:30Z
-    """
-    ldate = date.split("T")[0]
-    ltime = date.split("T")[1]
-
-    lhour   = ltime.split(":")[0]
-    lminute = ltime.split(":")[1]
-    lsec    = ltime.split(":")[2]
-    lsec    = lsec[:-1] # Remove trailing "Z"
-
-    lyear   = ldate.split("-")[0]
-    lmonth  = ldate.split("-")[1]
-    lday    = ldate.split("-")[2]
-
-
-    # 1: Build a time as UTC. Since time.mktime() expect a local time :
-    ## 1a: build it without knownledge of dst
-    ## 1b: substract timezone to get a local time, with possibly wrong dst
-    utc_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))
-    local_time = utc_time - time.timezone
-
-    # 2: Fix dst for local_time
-    # Find out the offset for daily saving time of the local
-    # timezone at the time of the given 'date'
-    if time.localtime(local_time)[-1] == 1:
-        local_time = local_time + 3600
-
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(local_time))
-
-def localtime_to_utc(date):
-    """Convert localtime to UTC"""
-
-    ldate = date.split(" ")[0]
-    ltime = date.split(" ")[1]
-
-    lhour   = ltime.split(":")[0]
-    lminute = ltime.split(":")[1]
-    lsec    = ltime.split(":")[2]
-
-    lyear   = ldate.split("-")[0]
-    lmonth  = ldate.split("-")[1]
-    lday    = ldate.split("-")[2]
-
-    # Find out the offset for daily saving time of the local
-    # timezone at the time of the given 'date'
-    #
-    # 1: build time that correspond to local date, without knowledge of dst
-    # 2: determine if dst is locally enabled at this time
-    tmp_date = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))
-    if time.localtime(tmp_date)[-1] == 1:
-        dst = time.localtime(tmp_date)[-1]
-    else:
-        dst = 0
-
-    # 3: Build a new time with knowledge of the dst
-    local_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, dst))
-    # 4: Get the time as UTC
-    utc_time = time.gmtime(local_time)
-
-    return time.strftime("%Y-%m-%dT%H:%M:%SZ", utc_time)
 
 def get_modification_date(recid):
     """Returns the date of last modification for the record 'recid'.
@@ -475,8 +403,10 @@ def oai_list_records_or_identifiers(req, argd):
             argd = cache['argd']
             complete_list = cache['complete_list']
             complete_list = filter_out_based_on_date_range(complete_list, argd.get('from', ''), argd.get('until', ''))
-        except Exception:
-            register_exception(alert_admin=True)
+        except Exception, e:
+            # Ignore cache not found errors
+            if not isinstance(e, IOError) or e.errno != 2:
+                register_exception(alert_admin=True)
             req.write(oai_error(argd, [("badResumptionToken", "ResumptionToken expired or invalid: %s" % argd['resumptionToken'])]))
             return
     else:
@@ -630,14 +560,19 @@ def oai_get_response_date(delay=0):
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + delay))
 
 def oai_get_recid(identifier):
-    """Returns the first database BIB ID for the OAI identifier 'identifier', if it exists."""
-    recid = None
+    """Returns the recid corresponding to the OAI identifier. Prefer a non deleted
+    record if multiple recids matches but some of them are deleted (e.g. in
+    case of merging). Returns None if no record matches."""
     if identifier:
-        query = "SELECT DISTINCT(bb.id_bibrec) FROM bib%sx AS bx, bibrec_bib%sx AS bb WHERE bx.tag=%%s AND bb.id_bibxxx=bx.id AND bx.value=%%s" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2])
-        res = run_sql(query, (CFG_OAI_ID_FIELD, identifier))
-        for row in res:
-            recid = row[0]
-    return recid
+        recids = search_pattern(p=identifier, f=CFG_OAI_ID_FIELD, m='e')
+        if recids:
+            restricted_recids = get_all_restricted_recids()
+            for recid in recids:
+                if record_exists(recid) > 0 and recid not in restricted_recids:
+                    return recid
+            if recid not in restricted_recids:
+                return recid
+    return None
 
 
 def get_set_last_update(set_spec=""):

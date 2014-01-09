@@ -22,11 +22,13 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = \
 	bibsched.py \
 	bibtask.py \
+	bibtask_regression_tests.py \
 	bibtaskex.py \
 	bibtask_config.py \
 	bibtasklet.py \
 	bibsched_webapi.py \
-	bibsched_webinterface.py
+	bibsched_webinterface.py \
+	bibsched_monitor.py
 
 jsdir=$(localstatedir)/www/js
 

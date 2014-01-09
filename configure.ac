@@ -579,17 +579,21 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibauthority/lib/Makefile \
      modules/bibauthority/web/Makefile \
      modules/bibcatalog/Makefile \
+     modules/bibcatalog/bin/Makefile \
+     modules/bibcatalog/bin/bibcatalog \
      modules/bibcatalog/doc/Makefile \
      modules/bibcatalog/doc/admin/Makefile \
      modules/bibcatalog/doc/hacking/Makefile
      modules/bibcatalog/lib/Makefile \
+     modules/bibcatalog/lib/ticket_templates/Makefile \
      modules/bibcheck/Makefile \
      modules/bibcheck/doc/Makefile \
-     modules/bibcheck/doc/admin/Makefile \
      modules/bibcheck/doc/hacking/Makefile \
      modules/bibcheck/etc/Makefile \
-     modules/bibcheck/web/Makefile \
-     modules/bibcheck/web/admin/Makefile \
+     modules/bibcheck/bin/Makefile \
+     modules/bibcheck/lib/Makefile \
+     modules/bibcheck/lib/plugins/Makefile \
+     modules/bibcheck/bin/bibcheck \
      modules/bibcirculation/Makefile \
      modules/bibcirculation/bin/Makefile \
      modules/bibcirculation/bin/bibcircd \
@@ -692,6 +696,10 @@ AC_CONFIG_FILES([config.nice  \
      modules/oairepository/lib/Makefile \
      modules/oairepository/web/Makefile \
      modules/oairepository/web/admin/Makefile \
+     modules/pdfchecker/Makefile \
+     modules/pdfchecker/bin/Makefile \
+     modules/pdfchecker/bin/arxiv-pdf-checker \
+     modules/pdfchecker/lib/Makefile \
      modules/bibindex/Makefile \
      modules/bibindex/bin/Makefile \
      modules/bibindex/bin/bibindex \
@@ -789,6 +797,8 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/bin/dbexec \
      modules/miscutil/bin/inveniocfg \
      modules/miscutil/bin/plotextractor \
+     modules/miscutil/bin/hepdataharvest \
+     modules/miscutil/bin/bibtex \
      modules/miscutil/demo/Makefile \
      modules/miscutil/doc/Makefile \
      modules/miscutil/doc/hacking/Makefile \
@@ -820,6 +830,9 @@ AC_CONFIG_FILES([config.nice  \
      modules/webalert/doc/hacking/Makefile \
      modules/webalert/lib/Makefile \
      modules/webalert/web/Makefile \
+     modules/webauthorlist/Makefile \
+     modules/webauthorlist/lib/Makefile \
+     modules/webauthorlist/web/Makefile \
      modules/webbasket/Makefile \
      modules/webbasket/doc/Makefile \
      modules/webbasket/doc/admin/Makefile \
@@ -915,6 +928,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/docextract/bin/Makefile \
      modules/docextract/bin/docextract \
      modules/docextract/bin/refextract \
+     modules/docextract/bin/convert_journals \
      modules/docextract/doc/Makefile \
      modules/docextract/lib/Makefile \
      modules/docextract/etc/Makefile \

@@ -133,7 +133,7 @@ class WebAlertFilteringRestrictedRecords(InvenioTestCase):
 
     def test_alert_theses_and_poems_for_juliet(self):
         """webalert - Juliet does not get Theses in alert"""
-        self.assert_('-> these records have been filtered out, as user id 6 did not have access:\n[35, 36, 37, 38, 39, 40, 41, 42' in self.alerts['Juliet alert 1'])
+        self.assert_('-> these records have been filtered out, as user id 6 did not have access:\n[105, 42, 41, 40, 39, 38, 37, 36, 35' in self.alerts['Juliet alert 1'])
         self.assert_(CFG_SITE_RECORD + '/35' not in self.alerts['Juliet alert 1'])
         self.assert_(CFG_SITE_RECORD + '/41' not in self.alerts['Juliet alert 1'])
         self.assert_(CFG_SITE_RECORD + '/75' in self.alerts['Juliet alert 1'])

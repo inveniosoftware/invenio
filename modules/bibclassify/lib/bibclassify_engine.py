@@ -48,18 +48,8 @@ from invenio import bibclassify_text_normalizer as normalizer
 from invenio import bibclassify_keyword_analyzer as keyworder
 from invenio import bibclassify_acronym_analyzer as acronymer
 
-try:
-    from invenio.urlutils import make_user_agent_string
-except ImportError:
-    ## Not in Invenio, we simply use default agent
-    def make_user_agent_string(component=None):
-        return bconfig.CFG_BIBCLASSIFY_USER_AGENT
-
-try:
-    from invenio.textutils import encode_for_xml
-except ImportError:
-    ## Not in Invenio, we use a simple workaround
-    encode_for_xml = lambda text: text.replace('&', '&amp;').replace('<', '&lt;')
+from invenio.urlutils import make_user_agent_string
+from invenio.textutils import encode_for_xml
 
 # ---------------------------------------------------------------------
 #                          API
@@ -102,6 +92,8 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
         source = ""
         if os.path.isdir(entry):
             for filename in os.listdir(entry):
+                if filename.startswith('.'):
+                    continue
                 filename = os.path.join(entry, filename)
                 if os.path.isfile(filename):
                     text_lines = extractor.text_lines_from_local_file(filename)

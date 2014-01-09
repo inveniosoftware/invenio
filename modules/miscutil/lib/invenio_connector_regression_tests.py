@@ -59,7 +59,8 @@ class InvenioConnectorTest(InvenioTestCase):
         search_params = dict(p='LBL-28106', c=['Theses'], of='id')
         self.assertRaises(InvenioConnectorAuthError, server.search, **search_params)
 
-        server = InvenioConnector(CFG_SITE_SECURE_URL, user='admin', password='')
+        server = InvenioConnector(CFG_SITE_SECURE_URL, user='admin',
+                                  password='', insecure_login=True)
         result = server.search(p='LBL-28106', c=['Theses'], of='id')
         self.assertTrue(len(result) > 0, \
                         'did not get restricted collection search results.')

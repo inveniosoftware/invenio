@@ -22,7 +22,6 @@ __revision__ = "$Id$"
 
 from invenio.testutils import InvenioTestCase
 import os
-import re
 from datetime import timedelta
 
 from invenio.bibindex_engine import WordTable, \
@@ -47,15 +46,15 @@ from invenio.dbquery import run_sql, deserialize_via_marshal
 from invenio.intbitset import intbitset
 from invenio.search_engine import get_record
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibauthority_engine import get_index_strings_by_control_no, get_control_nos_from_recID
+from invenio.bibauthority_engine import (get_index_strings_by_control_no,
+                                         get_control_nos_from_recID)
 from invenio.bibindex_engine_utils import run_sql_drop_silently
 
-from invenio.bibupload import bibupload, \
-    xml_marc_to_records
+from invenio.bibupload import bibupload, xml_marc_to_records
 from invenio.bibupload_regression_tests import wipe_out_record_from_all_tables
-from invenio.bibrecord import record_get_field_value, \
-    record_xml_output
+from invenio.bibrecord import record_get_field_value
 from invenio.bibsort_engine import get_max_recid
+from invenio.bibtask import task_log_path
 
 
 def reindex_for_type_with_bibsched(index_name, force_all=False, *other_options):
@@ -731,7 +730,6 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         """bibindex - reindexing after recently changed authority record"""
 
         authRecID = 118
-        bibRecID = 9
         index_name = 'author'
         table = "idxWORD%02dF" % get_index_id_from_index_name(index_name)
         reindex_for_type_with_bibsched(index_name)
@@ -739,7 +737,7 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         # run bibindex again
         task_id = reindex_for_type_with_bibsched(index_name, force_all=True)
 
-        filename = os.path.join(CFG_LOGDIR, 'bibsched_task_' + str(task_id) + '.log')
+        filename = task_log_path(task_id, 'log')
         _file = open(filename)
         text = _file.read() # small file
         _file.close()
@@ -1407,7 +1405,7 @@ class BibIndexCLICallTest(InvenioTestCase):
         """bibindex - checks if correct message for wrong index appears"""
         index_name = "titlexrg"
         task_id = reindex_for_type_with_bibsched(index_name, force_all=True)
-        filename = os.path.join(CFG_LOGDIR, 'bibsched_task_' + str(task_id) + '.log')
+        filename = task_log_path(task_id, 'log')
         fl = open(filename)
         text = fl.read() # small file
         fl.close()
@@ -1417,7 +1415,7 @@ class BibIndexCLICallTest(InvenioTestCase):
         """bibindex - checks if correct message for index up to date appears"""
         index_name = "abstract"
         task_id = reindex_for_type_with_bibsched(index_name)
-        filename = os.path.join(CFG_LOGDIR, 'bibsched_task_' + str(task_id) + '.log')
+        filename = task_log_path(task_id, 'log')
         fl = open(filename)
         text = fl.read() # small file
         fl.close()

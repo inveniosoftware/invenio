@@ -26,11 +26,6 @@ __revision__ = "$Id$"
 import os
 from invenio.config import CFG_ETCDIR, CFG_PYLIBDIR
 
-# True if old php format written in EL must be used by Invenio.
-# False if new python format must be used. If set to 'False' but
-# new format cannot be found, old format will be used.
-CFG_BIBFORMAT_USE_OLD_BIBFORMAT = False
-
 # Paths to main formats directories
 CFG_BIBFORMAT_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (CFG_ETCDIR, os.sep, os.sep)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "invenio.bibformat_elements"
@@ -44,19 +39,25 @@ CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION = "bfo"
 # Exceptions: errors
 class InvenioBibFormatError(Exception):
     """A generic error for BibFormat."""
+
     def __init__(self, message):
         """Initialisation."""
+        Exception.__init__(self)
         self.message = message
+
     def __str__(self):
         """String representation."""
-        return repr(self.message)
+        return self.message
 
 # Exceptions: warnings
 class InvenioBibFormatWarning(Exception):
     """A generic warning for BibFormat."""
+
     def __init__(self, message):
         """Initialisation."""
+        Exception.__init__(self)
         self.message = message
+
     def __str__(self):
         """String representation."""
         return repr(self.message)

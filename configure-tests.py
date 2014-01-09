@@ -366,6 +366,25 @@ except ImportError, msg:
     """ % msg
     )
 
+try:
+    import unidecode
+except ImportError, msg:
+    warning_messages.append(
+    """
+    *****************************************************
+    ** IMPORT WARNING %s
+    *****************************************************
+    ** Note that unidecode module is not really        **
+    ** required, but we recommend it you want to       **
+    ** introduce smarter author names matching.        **
+    **                                                 **
+    ** You can safely continue installing Invenio      **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your Invenio installation is put     **
+    ** into production.)                               **
+    *****************************************************
+    """ % msg
+    )
 
 ## 4) check for versions of some important modules:
 if MySQLdb.__version__ < cfg_min_mysqldb_version:

@@ -30,8 +30,6 @@ re_space_closing_square_bracket = re.compile(ur'\s\]', re.UNICODE)
 re_opening_square_bracket_space = re.compile(ur'\[\s', re.UNICODE)
 re_hyphens = re.compile(
     ur'(\\255|\u02D7|\u0335|\u0336|\u2212|\u002D|\uFE63|\uFF0D)', re.UNICODE)
-re_colon_not_followed_by_numeration_tag = \
-                               re.compile(ur':(?!\s*<cds)', re.UNICODE|re.I)
 re_multiple_space = re.compile(ur'\s{2,}', re.UNICODE)
 
 re_group_captured_multiple_space = re.compile(ur'(\s{2,})', re.UNICODE)
@@ -173,7 +171,6 @@ def wash_line(line):
     line = re_space_closing_square_bracket.sub(']', line)
     line = re_opening_square_bracket_space.sub('[', line)
     line = re_hyphens.sub('-', line)
-    line = re_colon_not_followed_by_numeration_tag.sub(' ', line)
     line = re_multiple_space.sub(' ', line)
     return line
 

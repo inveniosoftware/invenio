@@ -19,12 +19,18 @@
 
 """ API to fetch metadata in MARCXML format from crossref site using DOI """
 
-import urllib2
+import urllib, urllib2
+from xml.dom.minidom import parse
+from time import sleep
 
 from invenio.config import CFG_ETCDIR, CFG_CROSSREF_USERNAME, \
- CFG_CROSSREF_PASSWORD
+ CFG_CROSSREF_PASSWORD, CFG_CROSSREF_EMAIL
 from invenio.bibconvert_xslt_engine import convert
+from invenio.bibrecord import record_get_field_value
 
+FIELDS_JOURNAL = 'issn,title,author,volume,issue,page,year,type,doi'.split(',')
+FIELDS_BOOK = ('isbn,ser_title,vol_title,author,volume,edition_number,'
+               + 'page,year,component_number,type,doi').split(',')
 
 # Exceptions classes
 class CrossrefError(Exception):
@@ -74,3 +80,122 @@ def get_marcxml_for_doi(doi):
     output = convert(xmltext=content, \
                     template_filename=xsl_crossref2marc_config)
     return output
+
+def get_doi_for_records(records):
+    """
+    Query crossref to obtain the DOI of a set of records
+
+    @params records: List of records
+    @returns dict {record_id : doi}
+    """
+    from itertools import islice, chain
+
+    def batch(iterable, size):
+        sourceiter = iter(iterable)
+        while True:
+            batchiter = islice(sourceiter, size)
+            yield chain([batchiter.next()], batchiter)
+
+    pipes = []
+    for record in records:
+        data = [
+            "", # ISSN
+            "", # JOURNAL TITLE (773__p)
+            "", # AUTHOR (Family name of 100__a)
+            "", # VOLUME (773__v)
+            "", # ISSUE (773__n)
+            "", # PAGE (773__c)
+            "", # YEAR  (773__y)
+            "", # RESOURCE TYPE
+            "", # KEY
+            ""  # DOI
+        ]
+
+        full_author = record_get_field_value(record, "100", "", "", "a").split(",")
+        if len(full_author) > 0:
+            data[2] = full_author[0]
+
+        data[8] = str(record["001"][0][3])
+
+        for subfield, position in ("p", 1), ("v", 3), ("n", 4), ("c", 5), ("y", 6):
+            for tag, ind1, ind2 in [("773", "", "")]:
+                val = record_get_field_value(record, tag, ind1, ind2, subfield)
+                if val:
+                    data[position] = val
+                    break
+
+        if not data[1] or not data[3] or not data[5]:
+            continue  # We need journal title, volume and page
+
+        pipes.append("|".join(data))
+
+    dois = {}
+    if len(pipes) > 0:
+        for batchpipes in batch(pipes, 10):
+            params = {
+                "usr": CFG_CROSSREF_USERNAME,
+                "pwd": CFG_CROSSREF_PASSWORD,
+                "format": "unixref",
+                "qdata": "\n".join(batchpipes)
+            }
+            url = "http://doi.crossref.org/servlet/query"
+            data = urllib.urlencode(params)
+
+            retry_attempt = 0
+
+            while retry_attempt < 10:
+                try:
+                    document = parse(urllib2.urlopen(url, data))
+                    break
+                except (urllib2.URLError, urllib2.HTTPError):
+                    sleep(5)
+                    retry_attempt += 1
+
+            results = document.getElementsByTagName("doi_record")
+
+            for result in results:
+                record_id = result.getAttribute("key")
+                doi_tags = result.getElementsByTagName("doi")
+                if len(doi_tags) == 1:
+                    dois[record_id] = doi_tags[0].firstChild.nodeValue
+
+            # Avoid sending too many requests
+            sleep(0.5)
+    return dois
+
+
+def get_metadata_for_dois(dois):
+    """
+    Get the metadata associated with
+    """
+    pipes = []
+    for doi in dois:
+        pipes.append("|".join([doi, doi]))
+
+    metadata = {}
+    if len(pipes) > 0:
+        params = {
+            "usr": CFG_CROSSREF_EMAIL,
+            "format": "piped",
+            "qdata": "\n".join(pipes)
+        }
+        url = "http://doi.crossref.org/servlet/query"
+        data = urllib.urlencode(params)
+
+        for line in urllib2.urlopen(url, data):
+            line = line.split("|")
+            if len(line) == 1:
+                pass
+            elif len(line) in (10, 12):
+                is_book = len(line) == 12
+                if is_book:
+                    record_data = dict(zip(FIELDS_BOOK, line))
+                else:
+                    record_data = dict(zip(FIELDS_JOURNAL, line))
+                record_data["is_book"] = is_book
+                metadata[record_data["doi"]] = record_data
+            else:
+                raise CrossrefError("Crossref response not understood")
+
+    return metadata
+

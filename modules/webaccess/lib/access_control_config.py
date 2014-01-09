@@ -349,8 +349,8 @@ CFG_OAUTH1_CONFIGURATIONS = {
 #	for finding where the id, email or nickname is.
 CFG_OAUTH2_CONFIGURATIONS =  {
     'facebook': {
-        'consumer_key': '118319526393',
-        'consumer_secret': '8d675eb0ef89f2f8fbbe4ee56ab473c6',
+        'consumer_key': '',
+        'consumer_secret': '',
         'access_token_url': 'https://graph.facebook.com/oauth/access_token',
         'authorize_url': 'https://www.facebook.com/dialog/oauth',
         'authorize_parameters': {
@@ -404,8 +404,8 @@ CFG_OAUTH2_CONFIGURATIONS =  {
         'nickname': ['user', 'username']
     },
     'orcid': {
-        'consumer_key': '',
-        'consumer_secret': '',
+        'consumer_key': '0000-0002-8651-6707',
+        'consumer_secret': '215e23ca-7421-4543-8306-a105fe0b5688',
         'authorize_url': 'http://sandbox-1.orcid.org/oauth/authorize',
         'access_token_url': 'http://api.sandbox-1.orcid.org/oauth/token',
         'request_url': 'http://api.sandbox-1.orcid.org/{id}/orcid-profile',
@@ -484,6 +484,7 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              ('paperclaimviewers', 'Users who can view "claim my paper" facilities.', 'allow all'),
              ('paperattributionviewers', 'Users who can view "attribute this paper" facilities', 'allow all'),
              ('paperattributionlinkviewers', 'Users who can see attribution links in the search', 'allow all'),
+             ('authorlistusers', 'Users who can user Authorlist tools', 'deny all'),
              )
 
 # Demo site roles
@@ -517,7 +518,8 @@ DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('romeo.montague@cds.cern.ch', 'submit_DEMOJRN_*'),
                        ('juliet.capulet@cds.cern.ch', 'submit_DEMOJRN_*'),
                        ('balthasar.montague@cds.cern.ch', 'atlantiseditor'),
-                       ('romeo.montague@cds.cern.ch', 'poetrycommentreader'))
+                       ('romeo.montague@cds.cern.ch', 'poetrycommentreader'),
+                       ('jekyll@cds.cern.ch', 'authorlistusers'),)
 
 # users
 # list of e-mail addresses
@@ -556,6 +558,7 @@ DEF_ACTIONS = (
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
                ('runbibexport', 'run BibExport', '', 'no'),
+               ('runauthorlist', 'run Authorlist tools', '', 'no'),
                ('referee', 'referee document type doctype/category categ', 'doctype,categ', 'yes'),
                ('submit', 'use webSubmit', 'doctype,act,categ', 'yes'),
                ('viewrestrdoc', 'view restricted document', 'status', 'no'),
@@ -589,7 +592,8 @@ DEF_ACTIONS = (
                ('claimpaper_change_own_data', 'Change data associated to his own person ID', '', 'no'),
                ('claimpaper_change_others_data', 'Change data of any person ID', '', 'no'),
                ('runbibtasklet', 'run BibTaskLet', '', 'no'),
-               ('cfgbibsched', 'configure BibSched', '', 'no')
+               ('cfgbibsched', 'configure BibSched', '', 'no'),
+               ('runinfomanager', 'run Info Space Manager', '', 'no')
               )
 
 # Default authorizations
@@ -601,6 +605,7 @@ DEF_AUTHS = (('basketusers', 'usebaskets', {}),
              ('messageusers', 'usemessages', {}),
              ('holdingsusers', 'viewholdings', {}),
              ('statisticsusers', 'viewstatistics', {}),
+             ('authorlistusers', 'runauthorlist', {}),
              ('claimpaperusers', 'claimpaper_view_pid_universe', {}),
              ('claimpaperoperators', 'claimpaper_view_pid_universe', {}),
              ('claimpaperusers', 'claimpaper_claim_own_papers', {}),
@@ -665,7 +670,8 @@ CFG_ACC_ACTIVITIES_URLS = {
     'cfgbibsort' : (_("Configure BibSort"), "%s/admin/bibsort/bibsortadmin.py?ln=%%s" % CFG_SITE_URL),
     'runbibcirculation' : (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
     'runbatchuploader' : (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
-    'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/person/search?ln=%%s" % CFG_SITE_URL)
+    'runinfomanager' : (_("Run Info Space Manager"), "%s/info/manage?ln=%%s" % CFG_SITE_URL),
+    'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/author/search?ln=%%s" % CFG_SITE_URL)
 }
 
 CFG_WEBACCESS_MSGS = {

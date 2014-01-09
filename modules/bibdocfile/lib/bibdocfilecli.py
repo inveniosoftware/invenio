@@ -49,6 +49,7 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission
 from invenio.textutils import encode_for_xml
 from invenio.websubmit_file_converter import can_perform_ocr
+from invenio.shellutils import retry_mkstemp
 
 def _xml_mksubfield(key, subfield, fft):
     return fft.get(key, None) is not None and '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(str(fft[key]))) or ''
@@ -585,7 +586,9 @@ def bibupload_ffts(ffts, append=False, do_debug=False, interactive=True):
     if xml:
         if interactive:
             print xml
-        tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPSHAREDDIR)
+        tmp_file_fd, tmp_file_name = retry_mkstemp(suffix='.xml',
+                                                   prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"),
+                                                   directory=CFG_TMPSHAREDDIR)
         os.write(tmp_file_fd, xml)
         os.close(tmp_file_fd)
         os.chmod(tmp_file_name, 0644)

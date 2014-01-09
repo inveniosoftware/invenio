@@ -18,15 +18,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-webauthorprofile_cli
-    This module provides a command-line interface for WebAuthorProfile.
+WebAuthorProfile command-line interface
 """
 
 from invenio import bibauthorid_config as bconfig
 
 
 def main():
-    """Main function """
+    """ Main function """
     try:
         from invenio import webauthorprofile_daemon as daemon
     except ImportError:

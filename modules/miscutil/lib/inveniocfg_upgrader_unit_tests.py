@@ -68,7 +68,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
             TestUpgrade('6', ['5', ], 'invenio'),
         ])
 
-        m = InvenioUpgrader()
+        m = InvenioUpgrader(capture_warnings=False)
         self.assertEqual(upgrades_str(m.order_upgrades(upgrades)),
                          "[1, 2, 4, 3, 5, 6]")
 
@@ -94,7 +94,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
             TestUpgrade('f', ['e', ], 'other'),
         ])
 
-        m = InvenioUpgrader()
+        m = InvenioUpgrader(capture_warnings=False)
         self.assertEqual(upgrades_str(m.order_upgrades(upgrades)),
                          "[1, 2, 4, 3, 5, 6, a, b, d, c, e, f]")
 
@@ -111,7 +111,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
             TestUpgrade('6', ['5', ], 'invenio'),
         ])
 
-        m = InvenioUpgrader()
+        m = InvenioUpgrader(capture_warnings=False)
         self.assertRaises(StandardError, m.order_upgrades, upgrades)
 
     def test_missing_dependency(self):
@@ -124,7 +124,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
             TestUpgrade('3', ['1', '0'], 'invenio'),
         ])
 
-        m = InvenioUpgrader()
+        m = InvenioUpgrader(capture_warnings=False)
         self.assertRaises(StandardError, m.order_upgrades, upgrades)
 
     def test_cross_graph_dependency(self):
@@ -140,7 +140,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
             TestUpgrade('c', ['a'], 'other'),
         ])
 
-        m = InvenioUpgrader()
+        m = InvenioUpgrader(capture_warnings=False)
         self.assertRaises(StandardError, m.order_upgrades, upgrades)
 
     def test_history(self):
@@ -157,13 +157,13 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
         ])
 
         history = dictify(['1', '2', '4'], value=1)
-        m = InvenioUpgrader()
+        m = InvenioUpgrader(capture_warnings=False)
         self.assertEqual(
             upgrades_str(m.order_upgrades(upgrades, history)),
                          "[3, 5, 6]")
 
         history = dictify(['3', '5'], value=1)
-        m = InvenioUpgrader()
+        m = InvenioUpgrader(capture_warnings=False)
         self.assertEqual(
             upgrades_str(m.order_upgrades(upgrades, history)), "[6]")
 

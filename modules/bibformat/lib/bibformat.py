@@ -41,166 +41,70 @@ import zlib
 from invenio import bibformat_dblayer
 from invenio import bibformat_engine
 from invenio import bibformat_utils
-from invenio.errorlib import register_exception
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_PATH_PHP, \
      CFG_SITE_URL, \
-     CFG_BIBFORMAT_HIDDEN_TAGS, \
-     CFG_SITE_RECORD, \
-     CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS
-from invenio.bibformat_config import \
-     CFG_BIBFORMAT_USE_OLD_BIBFORMAT
-from invenio.access_control_engine import acc_authorize_action
+     CFG_SITE_RECORD
 import getopt
 import sys
 
 # Functions to format a single record
 ##
-
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
-                  xml_record=None, user_info=None, on_the_fly=False):
+                  xml_record=None, user_info=None, on_the_fly=False,
+                  save_missing=True, force_2nd_pass=False):
     """
-    Format a record in given output format.
+    Returns the formatted record with id 'recID' and format 'of'
 
-    Return a formatted version of the record in the specified
-    language, search pattern, and with the specified output format.
-    The function will define which format template must be applied.
+    If corresponding record does not exist for given output format,
+    returns ''
 
-    The record to be formatted can be specified with its ID (with
-    'recID' parameter) or given as XML representation (with
-    'xml_record' parameter). If 'xml_record' is specified 'recID' is
-    ignored (but should still be given for reference. A dummy recid 0
-    or -1 could be used).
+    ln specifies which language is used for translations.
 
-    'user_info' allows to grant access to some functionalities on a
-    page depending on the user's priviledges. The 'user_info' object
-    makes sense only in the case of on-the-fly formatting. 'user_info'
-    is the same object as the one returned by
-    'webuser.collect_user_info(req)'
+    verbose can be increased to display debug output.
 
-    @param recID: the ID of record to format.
-    @type recID: int
-    @param of: an output format code (or short identifier for the output format)
-    @type of: string
-    @param ln: the language to use to format the record
-    @type ln: string
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
-                                                       5: errors,
-                                                       7: errors and warnings, stop if error in format elements
-                                                       9: errors and warnings, stop if error (debug mode ))
-    @type verbose: int
-    @param search_pattern: list of strings representing the user request in web interface
-    @type search_pattern: list(string)
-    @param xml_record: an xml string represention of the record to format
-    @type xml_record: string or None
-    @param user_info: the information of the user who will view the formatted page (if applicable)
-    @param on_the_fly: if False, try to return an already preformatted version of the record in the database
-    @type on_the_fly: boolean
-    @return: formatted record
-    @rtype: string
+    xml_record can be specified to ignore the recID and use the given xml
+    instead.
+
+    on_the_fly means we always generate the format, ignoring the cache.
+
+    save_missing can be used to specify to never cache a format after it has
+    been generated. By default, we have a list of cached formats and the result
+    of these formats is saved in the database.
+
+    force_2nd_pass forces the 2nd pass which is basically a second formatting.
+    This is used in case a bibformat element generates new BibFormat tags
+    and thus we do not detect them automatically.
+    (the normal way is to use nocache="1" in a template to have it treated
+     in the 2nd pass instead)
+
+    @param recID: the id of the record to fetch
+    @param of: the output format code
+    @return: formatted record as String, or '' if it does not exist
     """
-    from invenio.search_engine import record_exists
-    if search_pattern is None:
-        search_pattern = []
+    out, needs_2nd_pass = bibformat_engine.format_record_1st_pass(
+                                        recID=recID,
+                                        of=of,
+                                        ln=ln,
+                                        verbose=verbose,
+                                        search_pattern=search_pattern,
+                                        xml_record=xml_record,
+                                        user_info=user_info,
+                                        on_the_fly=on_the_fly,
+                                        save_missing=save_missing)
+    if needs_2nd_pass or force_2nd_pass:
+        out = bibformat_engine.format_record_2nd_pass(
+                                    recID=recID,
+                                    of=of,
+                                    template=out,
+                                    ln=ln,
+                                    verbose=verbose,
+                                    search_pattern=search_pattern,
+                                    xml_record=xml_record,
+                                    user_info=user_info)
 
-    out = ""
+    return out
 
-    if verbose == 9:
-        out += """\n<span class="quicknote">
-        Formatting record %i with output format %s.
-        </span>""" % (recID, of)
-    ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
-    if CFG_BIBFORMAT_USE_OLD_BIBFORMAT and CFG_PATH_PHP:
-        return bibformat_engine.call_old_bibformat(recID, of=of, on_the_fly=on_the_fly)
-    ############################# END ##################################
-    if not on_the_fly and \
-       (ln == CFG_SITE_LANG or \
-        of.lower() == 'xm' or \
-        CFG_BIBFORMAT_USE_OLD_BIBFORMAT or \
-        (of.lower() in CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS)) and \
-        record_exists(recID) != -1:
-        # Try to fetch preformatted record. Only possible for records
-        # formatted in CFG_SITE_LANG language (other are never
-        # stored), or of='xm' which does not depend on language.
-        # Exceptions are made for output formats defined in
-        # CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS, which are
-        # always served from the same cache for any language.  Also,
-        # do not fetch from DB when record has been deleted: we want
-        # to return an "empty" record in that case
-        res = bibformat_dblayer.get_preformatted_record(recID, of)
-        if res is not None:
-            # record 'recID' is formatted in 'of', so return it
-            if verbose == 9:
-                last_updated = bibformat_dblayer.get_preformatted_record_date(recID, of)
-                out += """\n<br/><span class="quicknote">
-                Found preformatted output for record %i (cache updated on %s).
-                </span><br/>""" % (recID, last_updated)
-            if of.lower() == 'xm':
-                res = filter_hidden_fields(res, user_info)
-            # try to replace language links in pre-cached res, if applicable:
-            if ln != CFG_SITE_LANG and of.lower() in CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS:
-                # The following statements try to quickly replace any
-                # language arguments in URL links.  Not an exact
-                # science, but should work most of the time for most
-                # of the formats, with not too many false positives.
-                # We don't have time to parse output much here.
-                res = res.replace('?ln=' + CFG_SITE_LANG, '?ln=' + ln)
-                res = res.replace('&ln=' + CFG_SITE_LANG, '&ln=' + ln)
-                res = res.replace('&amp;ln=' + CFG_SITE_LANG, '&amp;ln=' + ln)
-            out += res
-            return out
-        else:
-            if verbose == 9:
-                out += """\n<br/><span class="quicknote">
-                No preformatted output found for record %s.
-                </span>"""% recID
-
-
-    # Live formatting of records in all other cases
-    if verbose == 9:
-        out += """\n<br/><span class="quicknote">
-        Formatting record %i on-the-fly.
-        </span>""" % recID
-
-    try:
-        out += bibformat_engine.format_record(recID=recID,
-                                              of=of,
-                                              ln=ln,
-                                              verbose=verbose,
-                                              search_pattern=search_pattern,
-                                              xml_record=xml_record,
-                                              user_info=user_info)
-        if of.lower() == 'xm':
-            out = filter_hidden_fields(out, user_info)
-        return out
-    except Exception, e:
-        register_exception(prefix="An error occured while formatting record %i in %s" % \
-                           (recID, of),
-                           alert_admin=True)
-        #Failsafe execution mode
-        import invenio.template
-        websearch_templates = invenio.template.load('websearch')
-        if verbose == 9:
-            out += """\n<br/><span class="quicknote">
-            An error occured while formatting record %i. (%s)
-            </span>""" % (recID, str(e))
-        if of.lower() == 'hd':
-            if verbose == 9:
-                out += """\n<br/><span class="quicknote">
-                Formatting record %i with websearch_templates.tmpl_print_record_detailed.
-                </span><br/>""" % recID
-                return out + websearch_templates.tmpl_print_record_detailed(
-                    ln = ln,
-                    recID = recID,
-                    )
-        if verbose == 9:
-            out += """\n<br/><span class="quicknote">
-            Formatting record %i with websearch_templates.tmpl_print_record_brief.
-            </span><br/>""" % recID
-        return out + websearch_templates.tmpl_print_record_brief(ln = ln,
-                                                                 recID = recID,
-                                                                 )
 
 def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     """
@@ -300,9 +204,9 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
 
     #Fill one of the lists with Nones
     if xml_records is not None:
-        recIDs = map(lambda x:None, xml_records)
+        recIDs = [None for dummy in xml_records]
     else:
-        xml_records = map(lambda x:None, recIDs)
+        xml_records = [None for dummy in recIDs]
 
     total_rec = len(recIDs)
     last_iteration = False
@@ -323,8 +227,8 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                     req.write(string_prefix)
 
         #Print formatted record
-        formatted_record = format_record(recIDs[i], of, ln, verbose, \
-                                         search_pattern, xml_records[i],\
+        formatted_record = format_record(recIDs[i], of, ln, verbose,
+                                         search_pattern, xml_records[i],
                                          user_info, on_the_fly)
         formatted_records += formatted_record
         if req is not None:
@@ -359,7 +263,18 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
 
     return prologue + formatted_records + epilogue
 
-def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_info=None):
+
+def format_with_format_template(format_template_filename, bfo,
+                                verbose=0, format_template_code=None):
+    evaluated_format, dummy = bibformat_engine.format_with_format_template(
+                            format_template_filename=format_template_filename,
+                            bfo=bfo,
+                            verbose=verbose,
+                            format_template_code=format_template_code)
+    return evaluated_format
+
+
+def create_excel(recIDs, req=None, ot=None, ot_sep="; ", user_info=None):
     """
     Returns an Excel readable format containing the given recIDs.
     If 'req' is given, also prints the output in 'req' while individual
@@ -411,7 +326,8 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_
         # output. If a field has multiple values, then they are joined
         # into the same cell.
         out = "<table>"
-        if req: req.write("<table>")
+        if req:
+            req.write("<table>")
         for recID in recIDs:
             row = '<tr>'
             row += '<td><a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recID)i">%(recID)i</a></td>' % \
@@ -422,59 +338,23 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_
                        '</td>'
             row += '</tr>'
             out += row
-            if req: req.write(row)
+            if req:
+                req.write(row)
         out += '</table>'
-        if req: req.write('</table>')
+        if req:
+            req.write('</table>')
         return out
 
     #Format the records
     excel_formatted_records = format_records(recIDs, 'excel', ln=CFG_SITE_LANG,
                                              record_separator='\n',
-                                             prologue = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><table>',
-                                             epilogue = footer,
+                                             prologue='<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><table>',
+                                             epilogue=footer,
                                              req=req,
                                              user_info=user_info)
 
     return excel_formatted_records
 
-# Utility functions
-##
-def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDEN_TAGS,
-                         force_filtering=False):
-    """
-    Filter out tags specified by filter_tags from MARCXML. If the user
-    is allowed to run bibedit, then filter nothing, unless
-    force_filtering is set to True.
-
-    @param recxml: marcxml presentation of the record
-    @param user_info: user information; if None, then assume invoked via CLI with all rights
-    @param filter_tags: list of MARC tags to be filtered
-    @param force_filtering: do we force filtering regardless of user rights?
-    @return: recxml without the hidden fields
-    """
-    if force_filtering:
-        pass
-    else:
-        if user_info is None:
-            #by default
-            return recxml
-        else:
-            if (acc_authorize_action(user_info, 'runbibedit')[0] == 0):
-                #no need to filter
-                return recxml
-    #filter..
-    out = ""
-    omit = False
-    for line in recxml.splitlines(True):
-        #check if this block needs to be omitted
-        for htag in filter_tags:
-            if line.count('datafield tag="'+str(htag)+'"'):
-                omit = True
-        if not omit:
-            out += line
-        if omit and line.count('</datafield>'):
-            omit = False
-    return out
 
 def get_output_format_content_type(of, default_content_type="text/html"):
     """
@@ -541,18 +421,18 @@ def main():
     options["recID"] = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:],
-                                   "hVv:yl:i:o:",
-                                   ["help",
-                                    "version",
-                                    "verbose=",
-                                    "onthefly",
-                                    "lang=",
-                                    "id=",
-                                    "output="])
+        opts, dummy_args = getopt.getopt(sys.argv[1:],
+                                         "hVv:yl:i:o:",
+                                         ["help",
+                                          "version",
+                                          "verbose=",
+                                          "onthefly",
+                                          "lang=",
+                                          "id=",
+                                          "output="])
     except getopt.GetoptError, err:
         usage(1, err)
-        pass
+
     try:
         for opt in opts:
             if opt[0] in ["-h", "--help"]:
@@ -561,9 +441,9 @@ def main():
                 print __revision__
                 sys.exit(0)
             elif opt[0] in ["-v", "--verbose"]:
-                options["verbose"]  = int(opt[1])
+                options["verbose"] = int(opt[1])
             elif opt[0] in ["-y", "--onthefly"]:
-                options["onthefly"]    = True
+                options["onthefly"] = True
             elif opt[0] in ["-l", "--lang"]:
                 options["lang"] = opt[1]
             elif opt[0] in ["-i", "--id"]:
@@ -577,9 +457,9 @@ def main():
                         recIDs.append(int(recID))
                 options["recID"] = recIDs
             elif opt[0] in ["-o", "--output"]:
-                options["output"]  = opt[1]
+                options["output"] = opt[1]
 
-        if options["recID"] == None:
+        if options["recID"] is None:
             usage(1, "-i argument is needed")
     except StandardError, e:
         usage(e)

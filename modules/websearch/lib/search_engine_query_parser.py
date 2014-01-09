@@ -23,7 +23,7 @@
 
 import re
 import string
-from datetime import datetime
+from invenio.dateutils import datetime
 
 try:
     import dateutil
@@ -44,7 +44,7 @@ except ImportError:
 from invenio.bibindex_tokenizers.BibIndexAuthorTokenizer import BibIndexAuthorTokenizer as FNT
 from invenio.logicutils import to_cnf
 from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
-from invenio.dateutils import strptime
+from invenio.dateutils import strptime, strftime
 
 
 NameScanner = FNT()
@@ -505,7 +505,7 @@ class SpiresToInvenioSyntaxConverter:
         'j' : 'journal:',
         'published_in' : 'journal:',
         'spicite' : 'journal:',
-        'vol' : 'journal:',
+        'vol' : 'volume:',
         # journal page
         'journal-page' : '773__c:',
         'jp' : '773__c:',
@@ -558,7 +558,8 @@ class SpiresToInvenioSyntaxConverter:
         'hep-topic' : '695__a:',
         'desy-keyword' : '695__a:',
         'dk' : '695__a:',
-
+        # doi
+        'doi': 'doi:',
         # topcite
         'topcit' : 'cited:',
         'topcite' : 'cited:',
@@ -572,7 +573,7 @@ class SpiresToInvenioSyntaxConverter:
         'parx' : '037__c:',
         'primarch' : '037__c:',
         # texkey
-        'texkey' : '035__z:',
+        'texkey' : '035__%:',
         # type code
         'tc' : 'collection:',
         'ty' : 'collection:',
@@ -599,6 +600,7 @@ class SpiresToInvenioSyntaxConverter:
         'continent' : 'region:',
         'deadline' : '046__a:',
         'rank' : 'rank:',
+        'cat' : 'cataloguer:',
 
         # replace all the keywords without match with empty string
         # this will remove the noise from the unknown keywrds in the search
@@ -754,8 +756,9 @@ class SpiresToInvenioSyntaxConverter:
             #leading 'find' is present and SPIRES syntax is switched on
             return True
         if CFG_WEBSEARCH_SPIRES_SYNTAX > 1:
+            query = self._re_pattern_double_quotes.sub('', query)
             for word in query.split(' '):
-                if self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.has_key(word):
+                if word in self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS:
                     return True
         return False
 
@@ -787,7 +790,7 @@ class SpiresToInvenioSyntaxConverter:
             query = self._distribute_keywords_across_combinations(query)
             query = self._distribute_and_quote_second_order_ops(query)
 
-            query = self._convert_dates(query)
+            query = self._convert_all_dates(query)
             query = self._convert_irns_to_spires_irns(query)
             query = self._convert_topcite_to_cited(query)
             query = self._convert_spires_author_search_to_invenio_author_search(query)
@@ -847,9 +850,27 @@ class SpiresToInvenioSyntaxConverter:
 
         return months_match
 
-    def _convert_dates(self, query):
+    def _convert_all_dates(self, query):
         """Tries to find dates in query and make them look like ISO-8601."""
 
+        def mangle_with_dateutils(query):
+            result = ''
+            position = 0
+            for match in self._re_keysubbed_date_expr.finditer(query):
+                result += query[position : match.start()]
+                datestamp = match.group('content')
+                daterange = self.convert_date(datestamp)
+                result += match.group('term') + daterange
+                position = match.end()
+            result += query[position : ]
+            return result
+
+        if GOT_DATEUTIL:
+            query = mangle_with_dateutils(query)
+        # else do nothing with the dates
+        return query
+
+    def convert_date(self, date_str):
         def parse_relative_unit(date_str):
             units = 0
             datemath = self._re_datemath.match(date_str)
@@ -875,7 +896,7 @@ class SpiresToInvenioSyntaxConverter:
             try:
                 d = strptime(date_str, '%Y-%m-%d')
                 d += du_delta(days=relative_units)
-                return datetime.strftime(d, '%Y-%m-%d'), end
+                return strftime('%Y-%m-%d', d), end
             except ValueError:
                 pass
 
@@ -883,21 +904,23 @@ class SpiresToInvenioSyntaxConverter:
                 d = strptime(date_str, '%y-%m-%d')
                 d += du_delta(days=relative_units)
                 d = guess_best_year(d)
-                return datetime.strftime(d, '%Y-%m-%d'), end
+                return strftime('%Y-%m-%d', d), end
             except ValueError:
                 pass
 
-            try:
-                d = strptime(date_str, '%Y-%m')
-                d += du_delta(months=relative_units)
-                return datetime.strftime(d, '%Y-%m'), end
-            except ValueError:
-                pass
+
+            for date_fmt in ('%Y-%m', '%y-%m', '%m/%y', '%m/%Y'):
+                try:
+                    d = strptime(date_str, date_fmt)
+                    d += du_delta(months=relative_units)
+                    return strftime('%Y-%m', d), end
+                except ValueError:
+                    pass
 
             try:
                 d = strptime(date_str, '%Y')
                 d += du_delta(years=relative_units)
-                return datetime.strftime(d, '%Y'), end
+                return strftime('%Y', d), end
             except ValueError:
                 pass
 
@@ -905,14 +928,14 @@ class SpiresToInvenioSyntaxConverter:
                 d = strptime(date_str, '%y')
                 d += du_delta(days=relative_units)
                 d = guess_best_year(d)
-                return datetime.strftime(d, '%Y'), end
+                return strftime('%Y', d), end
             except ValueError:
                 pass
 
             try:
                 d = strptime(date_str, '%b %y')
                 d = guess_best_year(d)
-                return datetime.strftime(d, '%Y-%m'), end
+                return strftime('%Y-%m', d), end
             except ValueError:
                 pass
 
@@ -923,69 +946,55 @@ class SpiresToInvenioSyntaxConverter:
                 begin = datetime.today()
                 begin += du_delta(weekday=relativedelta.SU(-1))
                 end = datetime.today()
-                begin = datetime.strftime(begin, '%Y-%m-%d')
-                end = datetime.strftime(end, '%Y-%m-%d')
+                begin = strftime('%Y-%m-%d', begin)
+                end = strftime('%Y-%m-%d', end)
             elif 'last week' in date_str:
                 # Past monday to today
                 # Same problem as last week
                 begin = datetime.today()
                 begin += du_delta(weekday=relativedelta.SU(-2))
                 end = begin + du_delta(weekday=relativedelta.SA(1))
-                begin = datetime.strftime(begin, '%Y-%m-%d')
-                end = datetime.strftime(end, '%Y-%m-%d')
+                begin = strftime('%Y-%m-%d', begin)
+                end = strftime('%Y-%m-%d', end)
             elif 'this month' in date_str:
                 d = datetime.today()
-                begin = datetime.strftime(d, '%Y-%m')
+                begin = strftime('%Y-%m', d)
             elif 'last month' in date_str:
                 d = datetime.today() - du_delta(months=1)
-                begin = datetime.strftime(d, '%Y-%m')
+                begin = strftime('%Y-%m', d)
             elif 'yesterday' in date_str:
                 d = datetime.today() - du_delta(days=1)
-                begin = datetime.strftime(d, '%Y-%m-%d')
+                begin = strftime('%Y-%m-%d', d)
             elif 'today' in date_str:
                 start = datetime.today()
                 start += du_delta(days=relative_units)
-                begin = datetime.strftime(start, '%Y-%m-%d')
+                begin = strftime('%Y-%m-%d', start)
             elif date_str.strip() == '0':
                 begin = '0'
             else:
                 default = datetime(datetime.today().year, 1, 1)
                 try:
                     d = du_parser.parse(date_str, default=default)
-                except ValueError:
+                except (ValueError, TypeError):
                     begin = date_str
                 else:
-                    begin = datetime.strftime(d, '%Y-%m-%d')
+                    begin = strftime('%Y-%m-%d', d)
 
             return begin, end
 
-        def mangle_with_dateutils(query):
-            result = ''
-            position = 0
-            for match in self._re_keysubbed_date_expr.finditer(query):
-                result += query[position : match.start()]
-                datestamp = match.group('content')
-                if '->' in datestamp:
-                    begin_unit, end_unit = datestamp.split('->', 1)
-                    begin, dummy = parse_date_unit(begin_unit)
-                    end, dummy = parse_date_unit(end_unit)
-                else:
-                    begin, end = parse_date_unit(datestamp)
+        if '->' in date_str:
+            begin_unit, end_unit = date_str.split('->', 1)
+            begin, dummy = parse_date_unit(begin_unit)
+            end, dummy = parse_date_unit(end_unit)
+        else:
+            begin, end = parse_date_unit(date_str)
 
-                if end:
-                    daterange = '%s->%s' % (begin, end)
-                else:
-                    daterange = begin
+        if end:
+            daterange = '%s->%s' % (begin, end)
+        else:
+            daterange = begin
 
-                result += match.group('term') + daterange
-                position = match.end()
-            result += query[position : ]
-            return result
-
-        if GOT_DATEUTIL:
-            query = mangle_with_dateutils(query)
-        # else do nothing with the dates
-        return query
+        return daterange
 
     def _convert_irns_to_spires_irns(self, query):
         """Prefix IRN numbers with SPIRES- so they match the INSPIRE format."""

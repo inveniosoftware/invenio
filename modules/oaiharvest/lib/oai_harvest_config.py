@@ -19,16 +19,6 @@
 
 __revision__ = "$Id$"
 
-## CFG_OAI_POSSIBLE_POSTMODES -- list of possible modes available for
-## OAI harvest post-processing
-CFG_OAI_POSSIBLE_POSTMODES = [\
-         ["c", "convert (c)"], \
-         ["p", "extract plots (p)"], \
-         ["r", "extract references (r)"], \
-         ["a", "extract authors (a)"], \
-         ["t", "attach full-text (t)"], \
-         ["f", "filter (f)"], \
-         ["u", "upload (u)"]]
 
 # Exceptions: warnings
 class InvenioOAIHarvestWarning(Exception):
@@ -36,6 +26,91 @@ class InvenioOAIHarvestWarning(Exception):
     def __init__(self, message):
         """Initialisation."""
         self.message = message
+
     def __str__(self):
         """String representation."""
         return repr(self.message)
+
+
+## CFG_OAI_POSSIBLE_POSTMODES -- list of possible modes available for
+## OAI harvest post-processing along with possible arguments in a list of
+## key => value mappings of argument-name, required, validation checks, etc.
+CFG_OAI_POSSIBLE_POSTMODES = [
+         ["c",
+          "convert (c)",
+          [{'name': 'stylesheet',
+            'required': True,
+            'validation': ["file"],
+            'value': "",
+            'input': "text"}]
+         ],
+         ["p",
+          "extract plots (p)",
+          [{'name': 'extraction-source',
+            'required': True,
+            'validation': None,
+            'value': ["latex"],
+            'input': "checkbox",
+            'labels': ["LaTeX"],
+            'states': [True]}]
+         ],
+         ["r",
+          "extract references (r)",
+          [{'name': 'format',
+            'required': False,
+            'validation': None,
+            'value': "",
+            'input': "text"},
+           {'name': 'kb-journal-file',
+            'required': False,
+            'validation': ["file"],
+            'value': "",
+            'input': "text"},
+           {'name': 'kb-rep-no-file',
+            'required': False,
+            'validation': ["file"],
+            'value': "",
+            'input': "text"}]
+         ],
+         ["a",
+          "extract authors (a)",
+          [{'name': 'rt-queue',
+            'required': False,
+            'validation': None,
+            'value': "",
+            'input': "text"},
+           {'name': 'stylesheet',
+            'required': True,
+            'validation': ["file"],
+            'value': "",
+            'input': "text"}]
+         ],
+         ["t",
+          "attach full-text (t)",
+          [{'name': 'doctype',
+            'required': False,
+            'validation': None,
+            'value': "Fulltext",
+            'input': "text"}]
+         ],
+         ["f",
+          "filter (f)",
+          [{'name': 'filter-file',
+            'required': True,
+            'validation': ["file"],
+            'value': "",
+            'input': "text"}]
+         ],
+         ["u",
+          "upload (u)",
+          [{'name': 'priority',
+            'required': False,
+            'validation': ["int"],
+            'value': "3",
+            'input': "text"},
+           {'name': 'name',
+            'required': False,
+            'validation': None,
+            'value': "oai",
+            'input': "text"}]
+         ]]

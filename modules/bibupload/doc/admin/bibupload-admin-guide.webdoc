@@ -705,7 +705,7 @@ the optional POST field <tt>callback_url</tt> with the same semantic of the <tt>
 command line parameter of bibupload (see the previous paragraph <a href="#3.7">Obtaining feedbacks</a>).</p>
 
 <p>A second more <em>RESTful</em> interface is also available: it will suffice to append to the URL the specific mode (among "<em>insert</em>",
-"<em>append</em>", "<em>correct</em>", "<em>delete</em>", "<em>replace</em>"), as in:
+"<em>append</em>", "<em>correct</em>", "<em>delete</em>", "<em>replace</em>", "<em>insertorreplace</em>"), as in:
 <pre>
 http://cds.cern.ch/batchuploader/robotupload/insert
 </pre>

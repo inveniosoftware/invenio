@@ -27,10 +27,7 @@
 import sys
 
 from invenio.config import CFG_PYLIBDIR
-
-sys.path.append("%s/invenio" % (CFG_PYLIBDIR))
-
-from bibauthorid_cli import main
+from invenio.bibauthorid_cli import main
 
 main()
 

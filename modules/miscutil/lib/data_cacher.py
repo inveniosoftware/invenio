@@ -65,10 +65,6 @@ class DataCacher:
         Create and populate cache by calling cache filler.  Called on
         startup and used later during runtime as needed by clients.
         """
-        # We empty the cache first to force freeing of the variable
-        # this is useful when it is really big like our citations dictionary
-        self.cache = None
-
         self.cache = self.cache_filler()
         self.timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 

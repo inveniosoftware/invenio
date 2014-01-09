@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -233,7 +233,7 @@ class InvenioUpgrader(object):
     CONSOLE_LOG_FMT = '>>> %(prefix)s%(levelname)s: %(message)s'
 
     def __init__(self, paths=None, pluginutils=None,
-                 global_pre_upgrade=[], global_post_upgrade=[]):
+                 global_pre_upgrade=[], global_post_upgrade=[], capture_warnings=True):
         """
         @param path: Path to folder with upgrade. Default is CFG_PREFIX/lib/
             python/invenio/lib/upgrades/ if path is not specified.
@@ -248,6 +248,9 @@ class InvenioUpgrader(object):
         @param global_post_upgrade: List of callables. Each check will be
             executed once per upgrade-batch run. Useful e.g. to tell users
             to start bibsched again.
+        @param capture_warnings: whether warnings should be captured and handled
+            by invenio_upgrader. This should be disabled when e.g. run within
+            nosetest.
         """
         if paths:
             self._paths = paths
@@ -271,6 +274,7 @@ class InvenioUpgrader(object):
             self.global_post_upgrade = [post_check_bibsched]
 
         # Warning related
+        self.capture_warnings = capture_warnings
         self.old_showwarning = None
         self.warning_occured = 0
         self._logger = None
@@ -364,13 +368,14 @@ class InvenioUpgrader(object):
 
             self._logger.addHandler(ch)
 
-            # Replace show warnings (documented in Python manual)
-            def showwarning(message, dummy_category, dummy_filename,
-                            dummy_lineno, *dummy_args):
-                self.warning_occured += 1
-                logger = self.get_logger()
-                logger.warning(message)
-            warnings.showwarning = showwarning
+            if self.capture_warnings:
+                # Replace show warnings (documented in Python manual)
+                def showwarning(message, dummy_category, dummy_filename,
+                                dummy_lineno, *dummy_args):
+                    self.warning_occured += 1
+                    logger = self.get_logger()
+                    logger.warning(message)
+                warnings.showwarning = showwarning
 
             self._teardown_log_prefix()
 
@@ -795,6 +800,8 @@ def pre_check_bibsched():
     is_manual = False
     is_0_running = False
     for line in (output + error).splitlines():
+        if 'BibSched daemon status: DOWN' in line:
+            is_manual = True
         if 'BibSched queue running mode: MANUAL' in line:
             is_manual = True
         if 'Running processes: 0' in line:

@@ -33,6 +33,7 @@ pylib_DATA = bibedit_config.py \
              bibeditmulti_webinterface.py \
              bibeditmulti_engine.py
 
+
 js_DATA = bibedit_display.js \
           bibedit_engine.js \
           bibedit_keys.js \

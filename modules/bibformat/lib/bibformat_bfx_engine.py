@@ -861,7 +861,9 @@ class MARCTranslator:
             parameters = {}
         bfo = BibFormatObject(self.recID)
         format_element = get_format_element(function_name)
-        (value, dummy) = eval_format_element(format_element, bfo, parameters)
+        (value, dummy, dummy) = eval_format_element(format_element,
+                                                    bfo,
+                                                    parameters)
         #to do: check errors from function call
         return value
 

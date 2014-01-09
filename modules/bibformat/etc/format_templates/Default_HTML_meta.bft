@@ -14,17 +14,21 @@
 <BFE_META tag="773__i" tag_name="journal issue" name="citation_issue" />
 <BFE_META tag="773__t" name="citation_conference" />
 <BFE_META tag_name="abstract url" tag="8564_a" name="citation_abstract_url" />
-<BFE_META tag_name="date" tag="269__c" name="citation_date" />
+<BFE_META tag_name="date" tag="269__c,260__c" name="citation_publication_date" />
+<BFE_CREATION_DATE format="%Y/%m/%d" prefix='<meta name="citation_online_date" content="' suffix='">' />
 <BFE_META tag="695__a" name="citation_keywords" />
 <BFE_META tag="037__a" name="citation_technical_report_number" />
 <BFE_META tag="088__9" name="citation_technical_report_institution" />
 <BFE_META tag="088__a" name="citation_technical_report_number" />
 <BFE_META tag="020%_a" name="citation_isbn" />
+<BFE_META tag="0247_a" name="citation_doi" />
+<BFE_META tag="100__u" tag_name="citation_dissertation_institution" name="citation_dissertation_institution" />
+<BFE_META_FILES />
 
 <!-- OpenGraph -->
 <BFE_META tag="245__a" tag_name="title" name="og:title" protocol="opengraph"/>
 <BFE_META tag="980__a" tag_name="collection" name="og:type" kb="DBCOLLID2OPENGRAPHTYPE" kb_default_output="website" protocol="opengraph"/>
-<BFE_META var="recurl" name="og:url" protocol="opengraph"/>
+<BFE_META var="absoluterecurl" name="og:url" protocol="opengraph"/>
 <BFE_META_OPENGRAPH_IMAGE />
 <BFE_META_OPENGRAPH_VIDEO />
 <BFE_META var="CFG_SITE_NAME" name="og:site_name" protocol="opengraph"/>

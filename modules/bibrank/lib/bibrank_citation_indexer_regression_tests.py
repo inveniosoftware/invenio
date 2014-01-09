@@ -21,6 +21,8 @@
 
 from invenio.testutils import InvenioTestCase
 import ConfigParser
+import logging
+import sys
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.config import CFG_ETCDIR
@@ -36,21 +38,19 @@ def load_config():
 CONFIG = load_config()
 
 EXPECTED_DICTS = {
-    'refs': {77: [95], 79: [78], 80: [94], 82: [81], 83: [81], 85: [77, 84], 86: [77, 95], 87: [81], 88: [84], 89: [81], 91: [79, 78, 84], 92: [74, 91], 96: [18]},
-    'selfcites': {},
-    'selfrefs': {},
-    'authorcites': {},
+    'refs': {77: [95], 79: [78], 80: [94], 82: [81], 83: [81], 85: [77, 84], 86: [77, 95], 87: [81], 88: [84], 89: [81], 91: [78, 79, 84], 92: [74, 91], 96: [18]},
     'cites': {18: [96], 74: [92], 77: [85, 86], 78: [79, 91], 79: [91], 81: [82, 83, 87, 89], 84: [85, 88, 91], 91: [92], 94: [80], 95: [77, 86]},
-    'cites_weight': {18: 1, 74: 1, 77: 2, 78: 2, 79: 1, 81: 4, 84: 3, 91: 1, 94: 1, 95: 2}
 }
 
 
-def compare_dicts(tester, dicts):
-    for k, v in EXPECTED_DICTS.iteritems():
-        if False:
-            print 'expected', repr(v)
-            print 'found', repr(dicts[k])
-        tester.assertEqual(v, dicts[k], 'checking %s' % k)
+def compare_dicts(tester, dic, expected):
+    # Clean out empty sets
+    for k, v in dic.items():
+        if not v:
+            del dic[k]
+
+    dic = dict([(k, sorted(list(v))) for k, v in dic.iteritems()])
+    tester.assertEqual(dic, expected)
 
 
 def remove_from_dicts(dicts, recid):
@@ -77,56 +77,65 @@ def remove_from_dicts(dicts, recid):
 
 class TestCitationIndexer(InvenioTestCase):
     """Testing citation indexer."""
+    def setUp(self):
+        logger = logging.getLogger()
+        for handler in logger.handlers:
+            logger.removeHandler(handler)
+
+        formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
+
+        stdout_logger = logging.StreamHandler(sys.stdout)
+        stdout_logger.setFormatter(formatter)
+        # stdout_logger.setLevel(logging.DEBUG)
+        stdout_logger.setLevel(logging.CRITICAL)
+        stderr_logger = logging.StreamHandler(sys.stderr)
+        stderr_logger.setFormatter(formatter)
+        # stderr_logger.setLevel(logging.WARNING)
+        stderr_logger.setLevel(logging.CRITICAL)
+        logger.addHandler(stderr_logger)
+        logger.addHandler(stdout_logger)
+        logger.setLevel(logging.INFO)
+
     def test_basic(self):
         from invenio.bibrank_citation_indexer import process_chunk
-        dicts = {
-            'cites_weight': {},
-            'cites': {},
-            'refs': {},
-            'selfcites': {},
-            'selfrefs': {},
-            'authorcites': {},
-        }
-
-        process_chunk(range(1, 100), CONFIG, dicts)
-        compare_dicts(self, dicts)
+        cites, refs = process_chunk(range(1, 100), CONFIG)
+        compare_dicts(self, cites, EXPECTED_DICTS['cites'])
+        compare_dicts(self, refs, EXPECTED_DICTS['refs'])
 
     def test_adding_record(self):
         "tests adding a record"
         from invenio.bibrank_citation_indexer import process_chunk
-        dicts = EXPECTED_DICTS.copy()
-        remove_from_dicts(dicts, 92)
-        process_chunk([92], CONFIG, dicts)
-        compare_dicts(self, dicts)
+        cites, refs = process_chunk([92], CONFIG)
+        expected_cites = {}
+        compare_dicts(self, cites, expected_cites)
+        expected_refs = {92: [74, 91]}
+        compare_dicts(self, refs, expected_refs)
 
     def test_catchup(self):
-        "tests adding a record"
+        "tests adding a record (with catchup)"
         from invenio.bibrank_citation_indexer import process_chunk
-        dicts = EXPECTED_DICTS.copy()
-        dicts['cites'][95].remove(77)
-        dicts['refs'][77].remove(95)
-        process_chunk([95], CONFIG, dicts)
-        compare_dicts(self, dicts)
+        cites, refs = process_chunk([95], CONFIG)
 
-    def test_removed_refs(self):
-        "test the cascading of removed refs"
-        from invenio.bibrank_citation_indexer import process_chunk
-        dicts = EXPECTED_DICTS.copy()
-        dicts['cites'].setdefault(1, []).append(3)
-        dicts['cites'].setdefault(2, []).append(3)
-        dicts['refs'].setdefault(3, []).extend([1, 2])
-        process_chunk([3], CONFIG, dicts)
-        compare_dicts(self, dicts)
+        expected_cites = {95: [77, 86]}
+        compare_dicts(self, cites, expected_cites)
+        expected_refs = {}
+        compare_dicts(self, refs, expected_refs)
 
-    def test_removed_cites(self):
-        "test the cascading of removed cites"
-        from invenio.bibrank_citation_indexer import process_chunk
-        dicts = EXPECTED_DICTS.copy()
-        dicts['cites'].setdefault(1, []).append(3)
-        dicts['cites'].setdefault(2, []).append(3)
-        dicts['refs'].setdefault(3, []).extend([1, 2])
-        process_chunk([1, 2], CONFIG, dicts)
-        compare_dicts(self, dicts)
+    def test_db_adding_and_removing_records(self):
+        from invenio.bibrank_citation_searcher import get_cited_by
+        from invenio.bibrank_citation_indexer import store_dicts
+        store_dicts([42222],
+                    refs={42222: set([43333])},
+                    cites={42222: set([40000, 40001])})
+        cited_by_42222 = get_cited_by(42222)
+        cited_by_43333 = get_cited_by(43333)
+        store_dicts([42222],
+                    refs={42222: set()},
+                    cites={42222: set()})
+        self.assertEqual(cited_by_42222, set([40000, 40001]))
+        self.assertEqual(cited_by_43333, set([42222]))
+        self.assertEqual(get_cited_by(42222), set())
+        self.assertEqual(get_cited_by(43333), set())
 
 
 class TestCitationIndexerWarnings(InvenioTestCase):

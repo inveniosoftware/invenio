@@ -74,11 +74,11 @@ ReplyToTicket
 4. Using the API
 
 
-from invenio.bibcatalog import bibcatalog_system
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 
-if bibcatalog_system is not None:
+if BIBCATALOG_SYSTEM is not None:
 	uid = 1 #or whatever..
-	x = bibcatalog_system.check_system(uid)
+	x = BIBCATALOG_SYSTEM.check_system(uid)
 	if len(x) > 0:
 	    print "errors: "+str(x)
 	    sys.exit()

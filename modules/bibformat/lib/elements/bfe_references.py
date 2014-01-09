@@ -27,7 +27,7 @@ def format_element(bfo, reference_prefix, reference_suffix):
     @param reference_prefix: a prefix displayed before each reference
     @param reference_suffix: a suffix displayed after each reference
     """
-    from invenio.config import CFG_SITE_URL, CFG_ADS_SITE
+    from invenio.config import CFG_BASE_URL, CFG_ADS_SITE
     from invenio.search_engine import get_mysql_recid_from_aleph_sysno, \
          print_record
 
@@ -60,7 +60,7 @@ def format_element(bfo, reference_prefix, reference_suffix):
                 else:
                     ref_out += '<small>' + reference['r'] + ' (not in ADS)</small>'
             else:
-                ref_out += '<small> [<a href="'+CFG_SITE_URL+'/search?f=reportnumber&amp;p='+ \
+                ref_out += '<small> [<a href="'+CFG_BASE_URL+'/search?f=reportnumber&amp;p='+ \
                        reference['r']+ \
                        '&amp;ln=' + bfo.lang + \
                        '">'+ reference['r']+ "</a>] </small> <br />"

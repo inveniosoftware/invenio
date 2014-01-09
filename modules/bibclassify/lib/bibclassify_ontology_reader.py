@@ -140,8 +140,7 @@ def get_regular_expressions(taxonomy_name, rebuild=False, no_cache=False):
         if os.access(onto_path, os.R_OK):
             if rebuild or no_cache:
                 log.debug("Cache generation was manually forced.")
-                if os.access(onto_path, os.R_OK):
-                    return _build_cache(onto_path, skip_cache=no_cache)
+                return _build_cache(onto_path, skip_cache=no_cache)
         else:
             # ontology file not found. Use the cache instead.
             log.warning("The ontology couldn't be located. However "
@@ -257,7 +256,9 @@ def _discover_ontology(ontology_name):
     @return: absolute path of a file if found, or None
     """
     last_part = os.path.split(os.path.abspath(ontology_name))[1].lower()
-    possible_patterns = [last_part + ".rdf", last_part]
+    possible_patterns = [last_part]
+    if not last_part.endswith('.rdf'):
+        possible_patterns.append(last_part + '.rdf')
     places = [config.CFG_CACHEDIR,
               config.CFG_ETCDIR,
               os.path.join(config.CFG_CACHEDIR, "bibclassify"),
@@ -265,7 +266,7 @@ def _discover_ontology(ontology_name):
               os.path.abspath('.'),
               os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../etc/bibclassify")),
               os.path.join(os.path.dirname(__file__), "bibclassify"),
-              config.CFG_WEBDIR ]
+              config.CFG_WEBDIR]
 
     log.debug("Searching for taxonomy using string: %s" % last_part)
     log.debug("Possible patterns: %s" % possible_patterns)
@@ -539,10 +540,9 @@ def _build_cache(source_file, skip_cache=False):
 
     try:
         if not rdflib:
-            raise ImportError() # will be caught below
+            import rdflib as rdflib_reimport
 
         log.info("Building RDFLib's conjunctive graph from: %s" % source_file)
-
         try:
             store.parse(source_file)
         except urllib2.URLError, exc:
@@ -557,7 +557,7 @@ def _build_cache(source_file, skip_cache=False):
         log.error(traceback.format_exc())
         raise rdflib.exceptions.Error(e)
 
-    except (xml.sax.SAXParseException, ImportError), e:
+    except xml.sax.SAXParseException, e:
         # File is not a RDF file. We assume it is a controlled vocabulary.
         log.error(e)
         log.error("The ontology file is probably not a valid RDF file. \

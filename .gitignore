@@ -33,6 +33,7 @@ po/*.sed
 *.lib
 *.x86f
 modules/webauthorprofile/bin/webauthorprofile
+modules/webauthorlist/bin/webauthorlist
 modules/bibauthorid/bin/bibauthorid
 modules/bibcirculation/bin/bibcircd
 modules/bibclassify/bin/bibclassify
@@ -44,6 +45,7 @@ modules/bibrecord/bin/xmlmarc2textmarc
 modules/bibrecord/bin/xmlmarclint
 modules/docextract/bin/refextract
 modules/docextract/bin/docextract
+modules/docextract/bin/convert_journals
 modules/bibencode/bin/bibencode
 modules/bibexport/bin/bibexport
 modules/bibformat/bin/bibreformat
@@ -70,6 +72,8 @@ modules/miscutil/bin/dbdump
 modules/miscutil/bin/dbexec
 modules/miscutil/bin/inveniocfg
 modules/miscutil/bin/plotextractor
+modules/miscutil/bin/bibtex
+modules/miscutil/bin/hepdataharvest
 modules/miscutil/etc/bash_completion.d/inveniocfg
 modules/miscutil/lib/build
 modules/webaccess/bin/authaction
@@ -86,6 +90,9 @@ modules/websubmit/bin/bibdocfile
 modules/websubmit/bin/inveniounoconv
 modules/websubmit/bin/websubmitadmin
 modules/bibcirculation/bin/bibcircd
+modules/bibcatalog/bin/bibcatalog
+modules/pdfchecker/bin/arxiv-pdf-checker
+modules/bibcheck/bin/bibcheck
 tags
 config.status.lineno
 configure.lineno

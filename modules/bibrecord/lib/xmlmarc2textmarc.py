@@ -287,7 +287,6 @@ def create_marc_record(record, sysno, options):
     for tag in tags:
         for field in record[tag]:
             fields.append((tag, field))
-    record_order_fields(fields)
 
     ## Finally, loop through all fields and display them in the record:
     for field in fields:

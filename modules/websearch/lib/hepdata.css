@@ -1,0 +1,150 @@
+/**
+   Styles for displaying HEPData records
+*/
+
+/**
+   Tables depicting a data set
+*/
+.hepdataTable{
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-collapse: collapse;
+    border-color: #CCCCCC;
+    border-style: solid;
+    border-widht: 2px 0px;
+    font-size: 0.8em;
+    padding: 1ex 0;
+    border-spacing: 0px;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 200px;
+    min-height: 100px;
+}
+
+.hepdataTableQualifierCell{
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.hepdataQualifierLayer{
+    padding: 2px;
+    margin: 1px 5px;
+    background-color: #E9E9E3;
+}
+.hepdataEmptyQualifierLayer{
+    padding: 2px;
+    margin: 1px 10px;
+}
+.hepdataTableHeaderLayer{
+    padding: 2px;
+    margin: 1px 5px;
+    background-color: #D9D9D3;
+}
+
+.hepdataTableEmptyTitleLayer{
+}
+
+.hepdataTableTitleLayer{
+    padding: 2px;
+    margin: 2px 5px;
+    background-color: #D9D9D3;
+
+    vertical-align: top;
+    text-align: center;
+    font-weight: bold;
+}
+
+/**
+ A generic class for all expanders in the page
+*/
+.expander{
+}
+
+/**
+generic settings for all table cells hosting an expander
+*/
+.expanderTableCell{
+    vertical-align: top;
+}
+
+
+/** small layer only encapsulating the data table*/
+.hepdataTablePlaceholder{
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+/**
+   Particular settings for specific expanders
+*/
+
+.masterPlotExpander {
+    -moz-transform: rotate(90deg);
+    -webkit-transform:rotate(90deg);
+    -o-transform: rotate(90deg);
+    white-space: nowrap;
+    display: block;
+    top: -15px;
+    left:2px;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    font-weight: normal;
+    position:relative;
+    color: #7799ff;
+    cursor: pointer;
+};
+
+/** The cell containing an expander for master plot
+*/
+.masterPlotExpanderTableCell{
+    vertical-align: text-top;
+    width: 20px;
+    cursor: pointer;
+}
+
+.detailedDataExpander{
+    color: #7799ff;
+    cursor: pointer;
+}
+
+.hepdataSummary{
+    padding:10px;
+}
+
+.detailedDataExpanderTableCell{
+    text-align: center;
+    cursor: default;
+}
+
+/**
+  Highlighted elements. This class is used when a plot is hovered with a mouse.
+  The class is added to data cells making part of the plot and on the plot itself
+*/
+.dataSelected{
+    background-color: #BEEEEF;
+}
+
+.hepdataDataCell{
+    border-width: 0px;
+    border-color: black;
+    border-style: solid;
+    vertical-align: top;
+}
+
+.hepdataDataLayer{
+    padding: 1px 10px;
+    font-family: "courier";
+}
+
+.hepdataColumnHeader{
+    vertical-align: bottom;
+}
+
+
+.hepdataPlotLink{
+    background-color: white;
+}
+
+.hepdataPlotLink:hover{
+    background-color: white;
+}

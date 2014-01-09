@@ -58,7 +58,9 @@ webdoc_dirs = {'help':('%s/lib/webdoc/invenio/help' % CFG_PREFIX, \
                'admin':('%s/lib/webdoc/invenio/admin' % CFG_PREFIX, \
                         '%s/webdoc/admin-pages' % CFG_CACHEDIR),
                'hacking':('%s/lib/webdoc/invenio/hacking' % CFG_PREFIX, \
-                          '%s/webdoc/hacking-pages' % CFG_CACHEDIR)}
+                          '%s/webdoc/hacking-pages' % CFG_CACHEDIR),
+               'info':('%s/lib/webdoc/invenio/info' % CFG_PREFIX, \
+                          '%s/webdoc/info-pages' % CFG_CACHEDIR)}
 
 # Regular expression for finding text to be translated
 translation_pattern = re.compile(r'_\((?P<word>.*?)\)_', \
@@ -147,7 +149,8 @@ def get_webdoc_parts(webdoc,
                      categ="",
                      update_cache_mode=1,
                      ln=CFG_SITE_LANG,
-                     verbose=0):
+                     verbose=0,
+                     req=None):
     """
     Returns the html of the specified 'webdoc' part(s).
 
@@ -191,7 +194,13 @@ def get_webdoc_parts(webdoc,
 
     for part in parts:
         if categ != "":
-            locations = [webdoc_dirs.get(categ, ('',''))]
+            if categ == 'info':
+                uri_parts = req.uri.split(os.sep)
+                locations = list(webdoc_dirs.get(categ, ('','')))
+                locations[0] = locations[0] + os.sep + os.sep.join(uri_parts[uri_parts.index('info')+1:-1])
+                locations = [tuple(locations)]
+            else:
+                locations = [webdoc_dirs.get(categ, ('',''))]
         else:
             locations = webdoc_dirs.values()
 
@@ -242,11 +251,14 @@ def get_webdoc_parts(webdoc,
             # Could not find/read the folder where cache should
             # be. Generate on-the-fly, get all the parts at the
             # same time, and return
+            dirs = None
+            if categ == "info":
+                dirs = locations
             (webdoc_source_path, \
              webdoc_cache_dir, \
              webdoc_name,\
              webdoc_source_modification_date, \
-             webdoc_cache_modification_date) = get_webdoc_info(webdoc)
+             webdoc_cache_modification_date) = get_webdoc_info(webdoc, dirs=dirs)
             if webdoc_source_path is not None:
                 try:
                     webdoc_source = file(webdoc_source_path, 'r').read()
@@ -436,7 +448,7 @@ def read_webdoc_source(webdoc):
 
     return (webdoc_source, webdoc_cache_dir, webdoc_name)
 
-def get_webdoc_info(webdoc):
+def get_webdoc_info(webdoc, dirs=None):
     """
     Locate the file corresponding to given webdoc and return its
     path, the path to its cache directory (even if it does not exist
@@ -460,7 +472,11 @@ def get_webdoc_info(webdoc):
     webdoc_source_modification_date = 1
     webdoc_cache_modification_date  = 0
 
-    for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs.values():
+    locations = webdoc_dirs.values()
+    if dirs is not None:
+        locations = dirs
+
+    for (_webdoc_source_dir, _web_doc_cache_dir) in locations:
         webdoc_source_path = _webdoc_source_dir + os.sep + \
                              webdoc + '.webdoc'
         if os.path.exists(webdoc_source_path):

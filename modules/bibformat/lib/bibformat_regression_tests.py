@@ -24,15 +24,15 @@ __revision__ = "$Id$"
 from invenio.testutils import InvenioTestCase
 import re
 
-from invenio.config import CFG_SITE_URL, \
-                           CFG_SITE_LANG, \
-                           CFG_SITE_RECORD, \
-                           CFG_SITE_NAME
-from invenio.testutils import make_test_suite, \
-                              run_test_suite, \
-                              test_web_page_content, \
-                              get_authenticated_mechanize_browser, \
-                              make_url
+from invenio.config import (CFG_SITE_URL,
+                            CFG_SITE_LANG,
+                            CFG_SITE_RECORD,
+                            CFG_BASE_URL)
+from invenio.testutils import (make_test_suite,
+                              run_test_suite,
+                              test_web_page_content,
+                              get_authenticated_mechanize_browser,
+                              make_url)
 from invenio.bibformat import format_record
 from invenio.bibformat_engine import BibFormatObject
 from invenio.bibformat_elements import bfe_authority_author
@@ -127,17 +127,17 @@ class BibFormatDetailedHTMLTest(InvenioTestCase):
         self.record_74_hd_title = '''<center><big><big><strong>Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes</strong></big></big></center>'''
 
         self.record_74_hd_authors = '''<a href="%(siteurl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a><small> (Fudan University)</small> ; <a href="%(siteurl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(siteurl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br />'''% \
-                                     {'siteurl' : CFG_SITE_URL,
+                                     {'siteurl' : CFG_BASE_URL,
                                       'lang': CFG_SITE_LANG}
 
-        self.record_74_hd_abstract = '''<small><strong>Abstract: </strong>Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\ddot{o}$m Anti-de Sitter black holes have been computed. These frequencies have close relation to the black hole charge and do not linearly scale withthe black hole temperature as in Schwarzschild Anti-de Sitter case. In terms of AdS/CFT correspondence, we found that the bigger the black hole charge is, the quicker for the approach to thermal equilibrium in the CFT. The propertiesof quasinormal modes for $l&gt;0$ have also been studied.</small><br />'''
+        self.record_74_hd_abstract = '''<small><strong>Abstract: </strong>Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\\ddot{o}$m Anti-de Sitter black holes have been computed. These frequencies have close relation to the black hole charge and do not linearly scale withthe black hole temperature as in Schwarzschild Anti-de Sitter case. In terms of AdS/CFT correspondence, we found that the bigger the black hole charge is, the quicker for the approach to thermal equilibrium in the CFT. The propertiesof quasinormal modes for $l&gt;0$ have also been studied.</small><br />'''
 
         self.record_74_hd_pubinfo = '''<strong>Published in: </strong><a href="https://cds.cern.ch/ejournals.py?publication=Phys.%20Lett.%2C%20B&amp;volume=481&amp;year=2000&amp;page=79">Phys. Lett., B :481 2000 79-88</a>'''
 
         self.record_74_hd_fulltext = '''0003295.pdf"><img style="border:none"'''
 
         self.record_74_hd_citations = '''<strong>Cited by:</strong> try citation search for <a href="%(siteurl)s/search?f=reference&amp;p=hep-th/0003295&amp;ln=%(lang)s">hep-th/0003295</a>'''% \
-                                      {'siteurl' : CFG_SITE_URL,
+                                      {'siteurl' : CFG_BASE_URL,
                                        'lang': CFG_SITE_LANG}
         self.record_74_hd_references = '''<li><small>[17]</small> <small>A. Chamblin, R. Emparan, C. V. Johnson and R. C. Myers, Phys. Rev., D60: 104026 (1999) 5070 90 110 130 150 r+ 130 230 330 50 70 90 110 130 150 r+</small> </li>'''
 
@@ -157,8 +157,8 @@ class BibFormatDetailedHTMLTest(InvenioTestCase):
         self.record_7_hd_abstract = '''<p><span class="blocknote">
  Caption</span><br /> <small>Conference "Internet, Web, What's next?" on 26 June 1998 at CERN : Tim Berners-Lee, inventor of the World-Wide Web and Director of the W3C, explains how the Web came to be and give his views on the future.</small></p><p><span class="blocknote">
  Légende</span><br /><small>Conference "Internet, Web, What's next?" le 26 juin 1998 au CERN: Tim Berners-Lee, inventeur du World-Wide Web et directeur du W3C, explique comment le Web est ne, et donne ses opinions sur l'avenir.</small></p>'''
-        self.record_7_hd_resource = '''<img src="%s/%s/7/files/9806033.gif?subformat=icon" alt="9806033" style="max-width:250px;_width:250px;" />''' % (CFG_SITE_URL, CFG_SITE_RECORD)
-        self.record_7_hd_resource_link = '%s/%s/7/files/9806033.jpeg' %  (CFG_SITE_URL, CFG_SITE_RECORD)
+        self.record_7_hd_resource = '''<img src="%s/%s/7/files/9806033.gif?subformat=icon" alt="9806033" style="max-width:250px;_width:250px;" />''' % (CFG_BASE_URL, CFG_SITE_RECORD)
+        self.record_7_hd_resource_link = '%s/%s/7/files/9806033.jpeg' % (CFG_BASE_URL, CFG_SITE_RECORD)
 
     def test_detailed_html_output(self):
         """bibformat - Detailed HTML output"""
@@ -185,7 +185,8 @@ class BibFormatDetailedHTMLTest(InvenioTestCase):
                                                       self.record_7_hd_date,
                                                       self.record_7_hd_abstract,
                                                       self.record_7_hd_resource,
-                                                      self.record_7_hd_resource_link])
+                                                      self.record_7_hd_resource_link
+                                                      ])
         self.assertEqual([], result)
 
     def test_detailed_html_edit_record(self):
@@ -288,7 +289,7 @@ class BibFormatBriefHTMLTest(InvenioTestCase):
 <br /><small>
 Σα βγεις στον πηγαιμό για την Ιθάκη, <br />
 να εύχεσαι νάναι μακρύς ο δρόμος, <br />
-γεμάτος περιπέτειες, γεμάτος γνώσεις [...] </small>''' % (CFG_SITE_URL, CFG_SITE_LANG)
+γεμάτος περιπέτειες, γεμάτος γνώσεις [...] </small>''' % (CFG_BASE_URL, CFG_SITE_LANG)
 
 
     def test_brief_html_output(self):
@@ -597,6 +598,7 @@ class BibFormatAuthorityRecordsBrowsingTest(InvenioTestCase):
         self.assertEqual([], error_messages)
 
 
+
 TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatDetailedHTMLTest,
                              BibFormatBriefHTMLTest,
@@ -609,7 +611,8 @@ TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatISBNFormattingTest,
                              BibFormatPublInfoFormattingTest,
                              BibFormatAuthorityRecordsTest,
-                             BibFormatAuthorityRecordsBrowsingTest)
+                             BibFormatAuthorityRecordsBrowsingTest,
+                             BibFormatPublInfoFormattingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

@@ -2342,7 +2342,7 @@ def _create_icon(file_path, icon_size, docformat='gif', verbosity=9):
              'multipage-icon': False,
              'multipage-icon-delay': 0,
              'icon-scale': icon_size,
-             'icon-file-format': format,
+             'icon-file-format': docformat,
              'verbosity': verbosity})
         icon_path = icon_dir + os.sep + icon_name
     except InvenioWebSubmitIconCreatorError, e:
