@@ -179,6 +179,7 @@ def process_and_store(recids, config, chunk_size):
         cites_diff = compute_dicts_diff(chunk, refs, cites)
         write_message("Citations balance %s" % cites_diff)
         if citation_loss_limit and cites_diff <= -citation_loss_limit:
+            print_cites_diff(chunk, refs, cites)
             raise Exception('Lost too many references, aborting')
 
         # Store processed citations/references
@@ -1126,6 +1127,21 @@ def compute_cites_diff(recid, new_cites):
     cites_to_add = new_cites - old_cites
     cites_to_delete = old_cites - new_cites
     return len(cites_to_add) - len(cites_to_delete)
+
+
+def print_cites_diff(recids, refs, cites):
+    """
+    Given the new dictionaries for references and citations, computes how
+    many references were added or removed by comparing them to the current
+    stored in the database.
+    """
+    for recid in recids:
+        refs_diff = compute_refs_diff(recid, refs[recid])
+        cites_diff = compute_cites_diff(recid, cites[recid])
+        if refs_diff:
+            write_message('%s lost %s refs' % (recid, refs_diff))
+        if cites_diff:
+            write_message('%s lost %s cites' % (recid, cites_diff))
 
 
 def compute_dicts_diff(recids, refs, cites):
