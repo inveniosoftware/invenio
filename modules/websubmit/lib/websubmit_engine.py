@@ -496,6 +496,7 @@ def interface(req,
 
     for field_instance in form_fields:
         full_field = {}
+
         ## Retrieve the field's description:
         element_descr = get_element_description(field_instance[3])
         try:
@@ -538,18 +539,26 @@ def interface(req,
             try:
                 co = compile (full_field ['htmlcode'].replace("\r\n","\n"), "<string>", "exec")
                 the_globals['text'] = ''
+                the_globals['custom_level'] = None
                 exec co in the_globals
                 text = the_globals['text']
+                # Also get the custom_level if it's define in the element description
+                custom_level = the_globals.get('custom_level')
+                # Make sure custom_level has an appropriate value or default to 'O'
+                if custom_level not in ('M', 'O', None):
+                    custom_level = 'O'
             except:
                 register_exception(req=req, alert_admin=True, prefix="Error in evaluating response element %s with globals %s" % (pprint.pformat(full_field), pprint.pformat(the_globals)))
                 raise
         else:
             text = websubmit_templates.tmpl_submit_field (ln = ln, field = full_field)
+            # Provide a default value for the custom_level
+            custom_level = None
 
         # we now determine the exact type of the created field
         if full_field['type'] not in [ 'D','R']:
             field.append(full_field['name'])
-            level.append(field_instance[5])
+            level.append(custom_level is None and field_instance[5] or custom_level)
             fullDesc.append(field_instance[4])
             txt.append(field_instance[6])
             check.append(field_instance[7])
@@ -593,7 +602,7 @@ def interface(req,
             upload.append(0)
             # field.append(value) - initial version, not working with JS, taking a submitted value
             field.append(field_instance[3])
-            level.append(field_instance[5])
+            level.append(custom_level is None and field_instance[5] or custom_level)
             txt.append(field_instance[6])
             fullDesc.append(field_instance[4])
             check.append(field_instance[7])
