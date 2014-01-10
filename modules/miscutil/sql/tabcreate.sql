@@ -4904,5 +4904,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_bibauthorid_s
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_wapCACHE_object_value_longblob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_16_aidPERSONIDDATA_datablob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_04_seqSTORE_larger_value',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_redis_sessions',NOW());
 
 -- end of file
