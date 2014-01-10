@@ -41,12 +41,12 @@ def dbexec(version=False, interactive=False):
         return 0
 
     params = [
-        '--default-character-set="utf8"',
+        '--default-character-set=utf8',
         '--max_allowed_packet=1G',
-        '--host="%s"' % (cfg['CFG_DATABASE_HOST'], ),
-        '--port="%s"' % (cfg['CFG_DATABASE_PORT'], ),
-        '--user="%s"' % (cfg['CFG_DATABASE_USER'], ),
-        '--password="%s"' % (cfg['CFG_DATABASE_PASS'], ),
+        '--host=%s' % (cfg['CFG_DATABASE_HOST'], ),
+        '--port=%s' % (cfg['CFG_DATABASE_PORT'], ),
+        '--user=%s' % (cfg['CFG_DATABASE_USER'], ),
+        '--password=%s' % (cfg['CFG_DATABASE_PASS'], ),
         cfg['CFG_DATABASE_NAME']
         ]
 
@@ -54,7 +54,7 @@ def dbexec(version=False, interactive=False):
     if not interactive:
         params.insert(0, '-B')
 
-    return subprocess.call([MYSQL] + params, shell=True)
+    return subprocess.call([MYSQL] + params)
 
 
 def main():

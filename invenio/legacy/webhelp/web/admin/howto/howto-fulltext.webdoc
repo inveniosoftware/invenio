@@ -173,7 +173,7 @@ Examples:
 
 <h2>How to convert your fulltext files among different formats</h2>
 <protect><pre>
-Usage: python /opt/invenio/lib/python/invenio/websubmit_file_converter.py [options]
+Usage: python /opt/invenio/lib/python/invenio.legacy.websubmit.file_converter.py [options]
 
 Options:
   -h, --help            show this help message and exit
@@ -200,12 +200,12 @@ Options:
                         en, it, fr...)
 
   Examples:
-    python /opt/invenio/lib/python/invenio/websubmit_file_converter.py \
+    python /opt/invenio/lib/python/invenio.legacy.websubmit.file_converter.py \
               --convert=foo.docx -f pdf
     ## The previous command will generate a PDF/A out of a Microsoft Office
     ## Word document
 
-    python /opt/invenio/lib/python/invenio/websubmit_file_converter.py \
+    python /opt/invenio/lib/python/invenio.legacy.websubmit.file_converter.py \
               --special-pdf2hocr2pdf=scanned-foo.pdf --output=ocred-foo.pdf
     ## The previous command will generate a new PDF with a text stream
     ## extracted via an OCR engine.

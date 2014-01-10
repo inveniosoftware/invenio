@@ -43,7 +43,7 @@ from invenio.legacy.bibrank.word_searcher import find_similar
 from invenio.legacy.bibrank.word_searcher import word_similarity
 from invenio.legacy.miscutil.solrutils_bibrank_searcher import word_similarity_solr
 from invenio.legacy.miscutil.xapianutils_bibrank_searcher import word_similarity_xapian
-from invenio.modules.rank.registry import configuration
+from invenio.modules.ranker.registry import configuration
 
 
 def compare_on_val(first, second):

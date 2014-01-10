@@ -79,7 +79,12 @@ def setup_app(app):
         except HTTPException:
             from flask import current_app
             # FIXME: check if request.path is static
-            return current_app.send_static_file(request.path)
+            try:
+                return current_app.send_static_file(request.path)
+            except NotFound as e:
+                current_app.logger.error(str(e))
+                pass
+        return render_template('404.html'), 404
 
     @app.endpoint('static')
     @app.route(app.static_url_path + '/<path:filename>', methods=['POST', 'PUT'])

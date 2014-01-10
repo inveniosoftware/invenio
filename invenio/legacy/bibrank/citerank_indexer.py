@@ -46,7 +46,7 @@ if sys.hexversion < 0x2040000:
 from invenio.legacy.dbquery import run_sql, serialize_via_marshal, \
         deserialize_via_marshal
 from invenio.legacy.bibsched.bibtask import write_message
-from invenio.modules.rank.registry import configuration
+from invenio.modules.ranker.registry import configuration
 
 
 def get_citations_from_file(filename):

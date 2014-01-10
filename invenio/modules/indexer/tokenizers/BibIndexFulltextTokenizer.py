@@ -33,14 +33,14 @@ from invenio.config import \
      CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
      CFG_BIBINDEX_SPLASH_PAGES
 from invenio.utils.html import get_links_in_html_page
-from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
+from invenio.legacy.websubmit.file_converter import convert_file, get_file_converter_logger
 from invenio.legacy.miscutil.solrutils_bibindex_indexer import solr_add_fulltext
-from invenio.xapianutils_bibindex_indexer import xapian_add
+from invenio.legacy.miscutil.xapianutils_bibindex_indexer import xapian_add
 from invenio.legacy.bibdocfile.api import bibdocfile_url_p, \
      bibdocfile_url_to_bibdoc, download_url, \
      BibRecDocs
 from invenio.legacy.bibindex.engine_utils import get_idx_indexer
-from invenio.bibtask import write_message
+from invenio.legacy.bibsched.bibtask import write_message
 from invenio.ext.logging import register_exception
 from intbitset import intbitset
 from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer

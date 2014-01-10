@@ -86,4 +86,4 @@ def pdf2hocr2pdf(input_file, output_file=None, font="Courier", author=None, keyw
     clean_working_dir(working_dir)
     return output_file
 </pre>
-<p>See <a href="http://invenio-software.org/code-browser/invenio.websubmit_file_converter-module.html">websubmit_file_converter API</a> for a complete API description.</p>
+<p>See <a href="http://invenio-software.org/code-browser/invenio.legacy.websubmit.file_converter-module.html">websubmit_file_converter API</a> for a complete API description.</p>
