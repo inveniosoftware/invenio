@@ -46,7 +46,7 @@ from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_ADDING_RECORDS_ST
     CFG_BIBINDEX_INDEX_TABLE_TYPE, \
     CFG_BIBINDEX_UPDATE_MESSAGE
 
-task_low_level_submission = lazy_import('invenio.bibtask:task_low_level_submission')
+task_low_level_submission = lazy_import('invenio.legacy.bibsched.bibtask:task_low_level_submission')
 from invenio.config import CFG_BINDIR, CFG_LOGDIR
 
 run_sql = lazy_import('invenio.legacy.dbquery:run_sql')

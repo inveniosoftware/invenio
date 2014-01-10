@@ -17,7 +17,7 @@
 
 from invenio.modules.formatter.api import get_tag_from_name
 from invenio.ext.logging import raise_exception
-from invenio.modules.rank.registry import configuration
+from invenio.modules.ranker.registry import configuration
 
 
 CFG_BIBRANK_WRD_CFG_PATH = configuration.get('wrd.cfg', '')

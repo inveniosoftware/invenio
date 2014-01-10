@@ -77,7 +77,7 @@ Modules
 .. automodule:: invenio.modules.oai_harvest
    :members:
 
-.. automodule:: invenio.modules.rank
+.. automodule:: invenio.modules.ranker
    :members:
 
 .. automodule:: invenio.modules.record_editor

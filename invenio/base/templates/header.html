@@ -38,7 +38,7 @@
           <img src="{{ url_for('static', filename='img/logo_white.png') }}" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}" />
       </a>
       </div>
-  
+
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
         {%- for item in current_menu.submenu('main').children if item.visible recursive %}

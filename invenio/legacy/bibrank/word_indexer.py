@@ -37,7 +37,7 @@ from invenio.legacy.bibsched.bibtask import write_message, task_get_option, task
 from intbitset import intbitset
 from invenio.ext.logging import register_exception
 from invenio.utils.text import strip_accents
-from invenio.modules.rank.registry import configuration
+from invenio.modules.ranker.registry import configuration
 
 options = {} # global variable to hold task options
 

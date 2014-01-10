@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 
 from invenio.base.globals import cfg
-from invenio.modules.rank.registry import configuration
+from invenio.modules.ranker.registry import configuration
 from invenio.legacy.bibindex.engine_utils import get_all_index_names_and_column_values
 
 def create_stopwords(filename=None):

@@ -19,22 +19,22 @@
 
 'use strict';
 
+/*jshint laxcomma:true */  // FIXME?
+
+/* global module */
+/* global require */
+
 module.exports = function (grunt) {
-	// show elapsed time at the end
-	require('time-grunt')(grunt);
-	// load all grunt tasks
-	require('load-grunt-tasks')(grunt);
+    // show elapsed time at the end
+    require('time-grunt')(grunt);
+    // load all grunt tasks
+    require('load-grunt-tasks')(grunt);
 
-  var globalConfig = {
+    var globalConfig = {
     bower_path: 'bower_components',
-  };
+    };
 
-  var targets = {
-    develop: 'develop',
-    deploy: 'deploy'
-  };
-
-  var buildConfig = {
+    var buildConfig = {
     develop: 'instance/static',
     deploy: 'invenio/base/static'
     };
@@ -443,368 +443,45 @@ module.exports = function (grunt) {
             grunt.option('target', grunt.option('path'));
             grunt.task.run(['copy', 'uglify', 'cssmin']);
         }
-      },
+    });
 
-			hogan: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= globalConfig.bower_path %>/',
-				src: ['hogan/web/builds/2.0.0/hogan-2.0.0.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				rename: function(dest, src) {
-					return dest + src.substring(0, src.indexOf('-')) + '.js';
-				}
-			},
+    // clean task
+    grunt.renameTask('clean', 'actualclean');
 
-			jqueryUI: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= globalConfig.bower_path %>/',
-				src: ['jquery.ui/jquery-1.8.2.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				rename: function(dest, src) {
-					return dest + src.substring(0, src.indexOf('-')) + '-ui.js';
-				}
-			},
-
-			jqueryTimePicker: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= globalConfig.bower_path %>/',
-				src: ['jquery.ui.timepicker/index.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				rename: function(dest, src) {
-					var res = src.replace(src.substring(0),'jquery-ui-timepicker-addon.js');
-					return dest + res;
-				}
-			},
-
-			MultiFile: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= globalConfig.bower_path %>/',
-				src: ['jquery.multifile/index.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				rename: function(dest, src) {
-					var res = src.replace(src.substring(0),'jquery.MultiFile.pack.js');
-					return dest + res;
-				}
-			},
-
-			ajaxPager: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= globalConfig.bower_path %>/',
-				src: ['jquery.ajaxpager/index.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				rename: function(dest, src) {
-					var res = src.replace(src.substring(0),'jquery.ajaxPager.js');
-					return dest + res;
-				}
-			},
-
-			form: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= globalConfig.bower_path %>/',
-				src: ['form/index.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				rename: function(dest, src) {
-					var res = src.replace(src.substring(0),'jquery.form.js');
-					return dest + res;
-				}
-			},
-
-			prism: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= globalConfig.bower_path %>/',
-				src: ['prism/index.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				rename: function(dest, src) {
-					var res = src.replace(src.substring(0),'prism.js');
-					return dest + res;
-				}
-			},
-
-			swfobject: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= globalConfig.bower_path %>/',
-				src: ['swfobject/index.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				rename: function(dest, src) {
-					var res = src.replace(src.substring(0),'swfobject.js');
-					return dest + res;
-				}
-			},
-
-			MathJax: {
-				expand: true,
-				cwd: '<%= globalConfig.bower_path %>/MathJax/',
-				src: ['**'],
-				dest: '<%= grunt.option(\'target\') %>/MathJax/'
-			},
-
-			ckeditor: {
-				expand: true,
-				cwd: '<%= globalConfig.bower_path %>/ckeditor/',
-				src: ['**', '!**_samples/**', '!**_source/**', '!**php**', '!**_**', '!**pack**', '!**ckeditor.asp'],
-				dest: '<%= grunt.option(\'target\') %>/ckeditor/' 
-			},
-
-			jqueryTreeview: {
-				expand: true,
-				cwd: '<%= globalConfig.bower_path %>/jquery.treeview/',
-				src: ['**'],
-				dest: '<%= grunt.option(\'target\') %>/js/jquery-treeview/'
-			},
-
-			jqueryTableSorter: {
-				expand: true,
-				cwd: '<%= globalConfig.bower_path %>/jquery.tablesorter/',
-				src: ['**'],
-				dest: '<%= grunt.option(\'target\') %>/js/tablesorter/'
-			},
-
-			// jqueryUI 
-			themesUI: {
-				expand: true,
-				cwd: '<%= globalConfig.bower_path %>/jquery.ui/themes/',
-				src: ['**'],
-				dest: '<%= grunt.option(\'target\') %>/img/jquery-ui/'
-			},
-
-			imagesUI: {
-				expand: true,
-				cwd: '<%= globalConfig.bower_path %>/jquery.ui/themes/base/images/',
-				src: ['**'],
-				dest: '<%= grunt.option(\'target\') %>/img/images/'
-			}
-		},
-
-		// minification of the JS files
-		uglify: {
-			jeditable: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= globalConfig.bower_path %>/jquery_jeditable/',
-				src: ['js/jquery.jeditable.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				ext: '.jeditable.mini.js'
-			},
-
-			jqueryUI: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= grunt.option(\'target\') %>/js/',
-				src: ['jquery-ui.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				ext: '.min.js'
-			},
-
-			dataTables: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= grunt.option(\'target\') %>/js/',
-				src: ['jquery.dataTables.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				ext: '.dataTables.min.js'                
-			},
-
-			jqueryFlot: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= grunt.option(\'target\') %>/js/',
-				src: ['jquery.flot.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				ext: '.flot.min.js'   
-			},
-
-			jqueryFlotSelection: {
-				expand: true,
-				flatten: true,
-				cwd: '<%= grunt.option(\'target\') %>/js/',
-				src: ['jquery.flot.selection.js'],
-				dest: '<%= grunt.option(\'target\') %>/js/',
-				ext: '.flot.selection.min.js'   
-			}
-		},
-
-		// minification of the CSS files
-		cssmin: {
-			minify: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/css/',
-				src: ['bootstrap*.css', '!bootstrap*.min.css'],
-				dest: '<%= grunt.option(\'target\') %>/css/',
-				ext: '.min.css'
-			}
-		},
-
-		
-		//// CLEANING... ////
-		actualclean: {
-      css: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/css/',
-				src: ['bootstrap*.css'
-  					 ,'token-input-facebook.css'
-  					 ,'token-input.css'
-  					 ,'jquery.bookmark.css'
-  					 ,'ColVis.css'
-             ,'typeahead.js-bootstrap.css']
-			},
-   		
-      img: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/img/',
-				src: ['bookmarks.png'
-  					 ,'uploadify*'
-  					 ,'button.png']
-			},
-
-			fonts: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/fonts/',
-				src: ['**']
-			},
-					   
-			js: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/js/',
-				src: ['bootstrap.js'
-  					 ,'bootstrap.min.js' 
-  					 ,'typeahead.js'
-  					 ,'typeahead.min.js'
-  					 ,'jquery.min.js'
-  					 ,'jquery.tokeninput.js'
-  					 ,'hogan.js'
-  					 ,'jquery.jeditable.mini.js' 
-  					 ,'jquery-ui*.js' 
-  					 ,'jquery-ui-timepicker-addon.js' 
-  					 ,'jquery.MultiFile.pack.js' 
-  					 ,'jquery.ajaxPager.js' 
-  					 ,'jquery.bookmark.min.js' 
-  					 ,'jquery.dataTables*.js' 
-  					 ,'excanvas.min.js' 
-  					 ,'jquery.flot*.js' 
-  					 ,'jquery.form.js'  
-  					 ,'jquery.hotkeys.js' 
-  					 ,'jquery.uploadify.min.js' 
-  					 ,'json2.js' 
-  					 ,'prism.js' 
-  					 ,'swfobject.js' 
-  					 ,'ColVis.js'] 
-			},
-
-			MathJax: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/MathJax/',
-				src: ['**']
-			},
-
-			ckeditor: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/ckeditor/',
-				src: ["**", '!**plugins/scientificchar/**']
-			},
-
-			jqueryTreeview: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/js/jquery-treeview/',
-				src: ['**']
-			},
-
-			jqueryTableSorter: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/js/tablesorter/',
-				src: ['**']
-			},
-
-			imagesUI: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/img/images/',
-				src: ['**']
-			},
-
-			themesUI: {
-				expand: true,
-				cwd: '<%= grunt.option(\'target\') %>/img/jquery-ui/',
-				src: ['**']
-			},
-
-      //clean the folder if it's empty
-      empty: {
-        src: '<%= grunt.option(\'target\') %>/**/*',
-        filter: function(filepath) {
-          return (grunt.file.isDir(filepath) && require('fs').readdirSync(filepath).length === 0);
+    grunt.registerTask('clean', 'Clean the files.', function () {
+        if (grunt.option('path') === undefined) {
+            if (grunt.option('target') === 'develop') {
+                grunt.option('target', buildConfig.develop);
+            } else if (grunt.option('target') === 'deploy') {
+                grunt.option('target', buildConfig.deploy);
+            } else if (grunt.option('target') === undefined) {
+                grunt.option('target', buildConfig.develop);
+            } else {
+                grunt.task.run('help');
+                return;
+            }
+            grunt.task.run('actualclean');
+        } else {
+            grunt.option('target', grunt.option('path'));
+            grunt.task.run('actualclean');
         }
-      }
-		}
-	});
-	
-  // build task
-  grunt.registerTask('build', 'Set the output folder for the build.', function () {
-    
-    if (grunt.option('path') === undefined) {
-      if (grunt.option('target') === 'develop') {
-        grunt.option('target', buildConfig.develop);
-      } else if (grunt.option('target') === 'deploy') {
-        grunt.option('target', buildConfig.deploy);
-      } else if (grunt.option('target') === undefined) {
-        grunt.option('target', buildConfig.develop);
-      } else {
-        grunt.task.run('help');  
-        return;
-      }
-      grunt.task.run(['copy', 'uglify', 'cssmin']); 
-    } else {
-      grunt.option('target', grunt.option('path'));
-      grunt.task.run(['copy', 'uglify', 'cssmin']);   
-    }
+    });
 
-  });
-
-  // clean task
-  grunt.renameTask('clean', 'actualclean');
-
-  grunt.registerTask('clean', 'Clean the files.', function () {
-
-    if (grunt.option('path') === undefined) {
-      if (grunt.option('target') === 'develop') {
-        grunt.option('target', buildConfig.develop);
-      } else if (grunt.option('target') === 'deploy') {
-        grunt.option('target', buildConfig.deploy);
-      } else if (grunt.option('target') === undefined) {
-        grunt.option('target', buildConfig.develop);
-      } else {
-        grunt.task.run('help');  
-        return;
-      }
-      grunt.task.run('actualclean');
-    } else {
-      grunt.option('target', grunt.option('path'));
-      grunt.task.run('actualclean');
-    }
-
-  });
-
-  // help task
-  grunt.registerTask('help', 'Help menu.', function () {
-    grunt.log.writeln("\nAvailable options for Grunt" + "\n\n" +
-                      "Building:" + "\n" +
-                      "grunt build --target=develop # build for development mode" + "\n" +
-                      "grunt build --target=deploy  # build for deployment mode" + "\n" +
-                      "grunt build                  # build for development mode" + "\n\n" +
-                      "Building with custom paths:" + "\n" +
-                      "grunt build --path='path/to/folder'  # build for custom mode" + "\n\n" +
-                      "Cleaning:" + "\n" +
-                      "grunt clean --target=develop # clean for development mode" + "\n" +
-                      "grunt clean --target=deploy  # clean for deployment mode" + "\n" +
-                      "grunt clean                  # clean for development mode" + "\n\n" +
-                      "Cleaning with custom paths:" + "\n" +
-                      "grunt clean --path='path/to/folder'  # clean for custom mode" + "\n");
-  });
-
+    // help task
+    grunt.registerTask('help', 'Help menu.', function () {
+        grunt.log.writeln(
+            '\nAvailable options for Grunt' + '\n\n' +
+            'Building:' + '\n' +
+            'grunt build --target=develop # build for development mode' + '\n' +
+            'grunt build --target=deploy  # build for deployment mode' + '\n' +
+            'grunt build                  # build for development mode' + '\n\n' +
+            'Building with custom paths:' + '\n' +
+            'grunt build --path=path/to/folder  # build for custom mode' + '\n\n' +
+            'Cleaning:' + '\n' +
+            'grunt clean --target=develop # clean for development mode' + '\n' +
+            'grunt clean --target=deploy  # clean for deployment mode' + '\n' +
+            'grunt clean                  # clean for development mode' + '\n\n' +
+            'Cleaning with custom paths:' + '\n' +
+            'grunt clean --path=path/to/folder  # clean for custom mode' + '\n');
+        });
 };

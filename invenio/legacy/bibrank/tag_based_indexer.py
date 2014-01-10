@@ -38,7 +38,7 @@ from invenio.ext.logging import register_exception
 from invenio.legacy.bibsched.bibtask import task_get_option, write_message, task_sleep_now_if_required
 from invenio.legacy.bibindex.engine import create_range_list
 from intbitset import intbitset
-from invenio.modules.rank.registry import configuration
+from invenio.modules.ranker.registry import configuration
 
 options = {}
 

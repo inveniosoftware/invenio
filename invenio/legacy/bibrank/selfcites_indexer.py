@@ -41,7 +41,7 @@ from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibauthorid.searchinterface import get_personids_from_bibrec
 from invenio.legacy.bibrank.citation_searcher import get_cited_by
-from invenio.modules.rank.registry import configuration
+from invenio.modules.ranker.registry import configuration
 
 
 def load_config_file(key):
