@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL
 
-from invenio.bibauthority_engine import get_low_level_recIDs_from_control_no
+from invenio.legacy.bibauthority.engine import get_low_level_recIDs_from_control_no
 
 def format_element(bfo):
     """

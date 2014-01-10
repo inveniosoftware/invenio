@@ -326,7 +326,7 @@ of the following helper function:
 
 <blockquote>
 <pre>
-$ cat /opt/invenio/lib/python/invenio/testutils.py
+$ cat /opt/invenio/lib/python/invenio.testsuite.py
 [...]
 def test_web_page_content(url, username="guest", expected_text="</html>"):
     """Test whether web page URL as seen by user USERNAME contains

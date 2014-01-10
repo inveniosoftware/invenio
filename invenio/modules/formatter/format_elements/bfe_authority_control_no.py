@@ -21,9 +21,9 @@
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME
 
-from invenio.bibauthority_config import \
+from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
-from invenio.bibauthority_engine import \
+from invenio.legacy.bibauthority.engine import \
     get_low_level_recIDs_from_control_no, \
     get_dependent_records_for_control_no
 
@@ -37,7 +37,7 @@ def format_element(bfo):
     @type brief: 'yes' or 'no'
     """
 
-    from invenio.messages import gettext_set_language
+    from invenio.base.i18n import gettext_set_language
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
     control_nos = [d['a'] for d in bfo.fields('035__')]

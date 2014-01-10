@@ -35,7 +35,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_WEBSTAT_BIBCIRCULATION_START_YEAR
 from invenio.legacy.webstat.config import CFG_WEBSTAT_CONFIG_PATH
-from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
+from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
 from invenio.legacy.search_engine import get_coll_i18nname, \
     wash_index_term
 from invenio.legacy.dbquery import run_sql, wash_table_column_name, ProgrammingError

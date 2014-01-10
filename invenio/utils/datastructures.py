@@ -99,7 +99,7 @@ class LaziestDict(LazyDict):
 
     def reader_discover(key):
         from werkzeug.utils import import_string
-        return import_string('invenio.bibfield_%sreader:reader' % (key))
+        return import_string('invenio.legacy.bibfield.%sreader:reader' % (key))
 
     laziest_dict = LaziestDict(reader_discover)
 

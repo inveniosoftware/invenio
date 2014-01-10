@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.legacy.bibrank.citation_indexer import INTBITSET_OF_DELETED_RECORDS
-from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
+from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM
 from invenio.legacy.search_engine import search_pattern
 

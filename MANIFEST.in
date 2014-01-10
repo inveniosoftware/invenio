@@ -1,7 +1,7 @@
 include requirements*.txt
 recursive-include docs *.xml *.xsl *.xsd *.tpl *.html *.js *.css *.cfg *.bft *.rst *.png *.gif *.ico *.sql
-recursive-include invenio *.xml *.xsl *.xsd *.tpl *.html *.js *.css *.cfg *.bft *.rst *.png *.gif *.ico *.sql
-recursive-include invenio_demosite *.xml *.xsl *.xsd *.tpl *.html *.js *.css *.cfg *.bft *.rst *.ico *.sql
+recursive-include invenio *.xml *.xsl *.xsd *.tpl *.html *.js *.kb *.css *.cfg *.bft *.rst *.png *.gif *.ico *.sql
+recursive-include invenio_demosite *.xml *.xsl *.xsd *.tpl *.html *.js *.kb *.css *.cfg *.bft *.rst *.ico *.sql
 
 include invenio/base/static/img/test*
 include invenio/legacy/elmsubmit/mime.types.edited

@@ -32,7 +32,7 @@ from tempfile import mkstemp
 from .engine import parse_references, get_plaintext_document_body, \
     parse_reference_line, get_kbs
 from .text import extract_references_from_fulltext
-from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
+from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_TAG
 from invenio.legacy.bibrecord import get_fieldvalues

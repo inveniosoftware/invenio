@@ -35,7 +35,7 @@ from invenio.config import CFG_TMPDIR, \
     CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL, \
     CFG_BIBCIRCULATION_REQUEST_STATUS_DONE, \
     CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED
-from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
+from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
 from invenio.utils.url import redirect_to_url
 from invenio.legacy.search_engine import perform_request_search, \
     get_collection_reclist, \

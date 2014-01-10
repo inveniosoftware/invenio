@@ -32,7 +32,7 @@ class BibFieldCoolListDictUnitTests(InvenioTestCase):
 
     def test_cool_list(self):
         """Bibfield Utils, CoolList - Unit tests"""
-        from invenio.bibfield_utils import CoolList
+        from invenio.legacy.bibfield.utils import CoolList
         ll = CoolList()
         ll.append(1)
         ll.append(2)
@@ -56,7 +56,7 @@ class BibFieldCoolListDictUnitTests(InvenioTestCase):
 
     def test_cool_dict(self):
         """Bibfield Utils, CoolDict - Unit tests"""
-        from invenio.bibfield_utils import CoolDict, CoolList
+        from invenio.legacy.bibfield.utils import CoolDict, CoolList
         d = CoolDict()
         d['a'] = 1
         d['b'] = 2
@@ -80,7 +80,7 @@ class BibFieldCoolListDictUnitTests(InvenioTestCase):
 
     def test_cool_list_and_dict(self):
         """Bibfield Utils, CoolList and CoolDict - Unit tests"""
-        from invenio.bibfield_utils import CoolDict, CoolList
+        from invenio.legacy.bibfield.utils import CoolDict, CoolList
         d = CoolDict()
         l = CoolList()
         d['a'] = l
@@ -105,7 +105,7 @@ class BibFieldUtilsUnitTests(InvenioTestCase):
 
     def test_prepare_field_keys(self):
         """BibField Utils, prepare_field_keys - Unit Test"""
-        from invenio.bibfield_utils import prepare_field_keys
+        from invenio.legacy.bibfield.utils import prepare_field_keys
         key = 'authors'
         self.assertEqual(prepare_field_keys(key), ['["authors"]'])
         self.assertEqual(prepare_field_keys(key, write=True), ['["authors"]'])
@@ -125,7 +125,7 @@ class BibFieldUtilsUnitTests(InvenioTestCase):
 
     def test_build_data_structure(self):
         """BibField Utils, build_data_structure - Unit Test"""
-        from invenio.bibfield_utils import build_data_structure
+        from invenio.legacy.bibfield.utils import build_data_structure
         d = dict()
         build_data_structure(d, 'authors')
         self.assertEqual(d, {'authors': None})
@@ -147,7 +147,7 @@ class BibFieldDictUnitTest(InvenioTestCase):
     def test_bibfielddict(self):
         """BibFieldDict - Unit Test"""
         import random
-        from invenio.bibfield_utils import BibFieldDict
+        from invenio.legacy.bibfield.utils import BibFieldDict
         d = BibFieldDict()
         d['foo'] = {'a': 'world', 'b': 'hello'}
         d['a'] = [{'b': 1}, {'b': 2}, {'b': 3}]

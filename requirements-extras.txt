@@ -15,3 +15,6 @@ oauth2client
 apiclient
 urllib3
 python-skydrive
+python-openid
+qrcode
+PIL

@@ -35,7 +35,7 @@ def load():
     """Loads BibField config."""
     print ">>> Going to load BibField config..."
     print ">>> Deprecated: use rediscli flushdb until a new version is ready"
-    # from invenio.bibfield_config_engine import BibFieldParser
+    # from invenio.legacy.bibfield.config_engine import BibFieldParser
     # BibFieldParser().write_to_file()
     print ">>> BibField config load successfully."
 

@@ -55,9 +55,9 @@ from invenio.base.wrappers import lazy_import
 from invenio.utils.hash import md5
 from invenio.utils.shell import run_shell_command
 
-BibRecDocs = lazy_import('invenio.bibdocfile:BibRecDocs')
-BibRelation = lazy_import('invenio.bibdocfile:BibRelation')
-MoreInfo = lazy_import('invenio.bibdocfile:MoreInfo')
+BibRecDocs = lazy_import('invenio.legacy.bibdocfile.api:BibRecDocs')
+BibRelation = lazy_import('invenio.legacy.bibdocfile.api:BibRelation')
+MoreInfo = lazy_import('invenio.legacy.bibdocfile.api:MoreInfo')
 bibupload = lazy_import('invenio.bibupload')
 print_record = lazy_import('invenio.legacy.search_engine:print_record')
 get_record = lazy_import('invenio.legacy.search_engine:get_record')

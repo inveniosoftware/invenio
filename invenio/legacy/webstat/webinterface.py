@@ -26,7 +26,7 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_URL, \
      CFG_SITE_LANG
-from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
+from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.legacy.webpage import page
 from invenio.modules.access.engine import acc_authorize_action

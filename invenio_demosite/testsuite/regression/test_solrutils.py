@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.testutils import InvenioTestCase
+from invenio.testsuite import InvenioTestCase
 from invenio.config import CFG_SOLR_URL, CFG_SITE_URL, CFG_SITE_NAME
 from invenio.testsuite import make_test_suite, \
                               run_test_suite, \

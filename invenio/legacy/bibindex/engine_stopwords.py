@@ -19,56 +19,53 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_BIBRANK_PATH_TO_STOPWORDS_FILE, \
-     CFG_ETCDIR
-from invenio.bibindex_engine_utils import get_all_index_names_and_column_values
+from invenio.base.globals import cfg
+from invenio.modules.rank.registry import configuration
+from invenio.legacy.bibindex.engine_utils import get_all_index_names_and_column_values
 
-def create_stopwords(filename=CFG_BIBRANK_PATH_TO_STOPWORDS_FILE):
+def create_stopwords(filename=None):
     """Create stopword dictionary out of FILENAME."""
-    try:
-        file_descriptor = open(filename, 'r')
-    except IOError:
-        return {}
-    lines = file_descriptor.readlines()
-    file_descriptor.close()
+    filename = filename or cfg['CFG_BIBRANK_PATH_TO_STOPWORDS_FILE']
     stopdict  = {}
-    for line in lines:
-        stopdict[line.rstrip()] = 1
+    with open(configuration[filename], 'r') as file_descriptor:
+        lines = file_descriptor.readlines()
+        file_descriptor.close()
+        for line in lines:
+            stopdict[line.rstrip()] = 1
     return stopdict
 
 
-def map_stopwords_paths_to_stopwords_kb():
+def map_stopwords_names_to_stopwords_kb():
     """
-        Maps paths to stopwords file to stopwords dicts.
+        Maps paths to stopwords filename to stopwords dicts.
         It ensures that given stopwords dict is mapped only once.
         Here is an example of an entry:
-        "/opt/invenio/etc/bibrank/stopwords.kb" : {... ,'of':1, ... }
+        "stopwords.kb" : {... ,'of':1, ... }
         It will always map the default stopwords knowledge base given by
         CFG_BIBRANK_PATH_TO_STOPWORDS_FILE. It is useful for bibrank module.
     """
     stopwords_kb_map = {}
-    stopwords_kb_map[CFG_BIBRANK_PATH_TO_STOPWORDS_FILE] = create_stopwords()
+    stopwords_kb_map[cfg['CFG_BIBRANK_PATH_TO_STOPWORDS_FILE']] = create_stopwords()
     index_stopwords = get_all_index_names_and_column_values("remove_stopwords")
     for index, stopwords in index_stopwords:
         if stopwords and stopwords != 'No':
-            stopwords_path = CFG_ETCDIR + "/bibrank/" + stopwords
-            if not stopwords_kb_map.has_key(stopwords_path):
-                stopwords_kb_map[stopwords_path] = create_stopwords(stopwords_path)
+            if not stopwords_kb_map.has_key(stopwords):
+                stopwords_kb_map[stopwords] = create_stopwords(stopwords)
     return stopwords_kb_map
 
 
-stopwords_kb = map_stopwords_paths_to_stopwords_kb()
+stopwords_kb = map_stopwords_names_to_stopwords_kb()
 
-def is_stopword(word, stopwords_path = CFG_BIBRANK_PATH_TO_STOPWORDS_FILE):
+def is_stopword(word, stopwords=None):
     """Return true if WORD is found among stopwords for given index, false otherwise.
        It searches in the default stopwords knowledge base if stopwords_path is not specified
        which is useful for bibrank module. If one wants to search in diffrent stopwords knowledge base
        he must specify the path to stopwords file.
-       @param word: word we want to check if it's stopword or not
-       @param index: path to stopwords knowledge base we want to search in
+       :param word: word we want to check if it's stopword or not
+       :param stopwords: name of stopwords knowledge base we want to search in
     """
     # note: input word is assumed to be in lowercase
-    if stopwords_kb.has_key(stopwords_path):
-        if stopwords_kb[stopwords_path].has_key(word):
+    if stopwords_kb.has_key(stopwords):
+        if stopwords_kb[stopwords].has_key(word):
             return True
     return False

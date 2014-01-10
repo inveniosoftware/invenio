@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.testutils import InvenioTestCase
+from invenio.testsuite import InvenioTestCase
 import mechanize
 import re
 

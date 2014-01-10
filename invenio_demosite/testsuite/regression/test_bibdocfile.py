@@ -39,9 +39,9 @@ from invenio.config import \
         CFG_PATH_MD5SUM
 from invenio.utils.mimetype import CFG_HAS_MAGIC
 
-MoreInfo = lazy_import('invenio.bibdocfile:MoreInfo')
-Md5Folder = lazy_import('invenio.bibdocfile:Md5Folder')
-guess_format_from_url = lazy_import('invenio.bibdocfile:guess_format_from_url')
+MoreInfo = lazy_import('invenio.legacy.bibdocfile.api:MoreInfo')
+Md5Folder = lazy_import('invenio.legacy.bibdocfile.api:Md5Folder')
+guess_format_from_url = lazy_import('invenio.legacy.bibdocfile.api:guess_format_from_url')
 
 
 class BibDocFsInfoTest(InvenioTestCase):

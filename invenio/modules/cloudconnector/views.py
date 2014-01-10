@@ -125,7 +125,7 @@ def upload(service):
     filesystem = _build_file_system(service)
 
     files = session.pop('files_to_upload')
-    from invenio.bibdocfile import bibdocfile_url_to_bibdocfile
+    from invenio.legacy.bibdocfile.api import bibdocfile_url_to_bibdocfile
 
     try:
         for one in files:
