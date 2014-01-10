@@ -31,7 +31,7 @@ def format_element(bfo, detail='no'):
     @type detail: 'yes' or 'no'
     """
 
-    from invenio.messages import gettext_set_language
+    from invenio.base.i18n import gettext_set_language
     _ = gettext_set_language(bfo.lang)    # load the right message language
     # return value
     out = ""

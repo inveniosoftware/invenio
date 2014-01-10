@@ -23,8 +23,8 @@ BibField Marc21 reader regression tests.
 
 __revision__ = "$Id$"
 
-from invenio.bibfield_utils import BlobWrapper
-from invenio.bibfield_marcreader import MarcReader
+from invenio.legacy.bibfield.utils import BlobWrapper
+from invenio.legacy.bibfield.marcreader import MarcReader
 
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 

@@ -20,7 +20,7 @@
    owned by the library in the real world.
 """
 
-from invenio.bibindex_tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
 
 
 

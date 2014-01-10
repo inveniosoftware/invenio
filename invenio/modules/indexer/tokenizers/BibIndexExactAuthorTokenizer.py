@@ -20,8 +20,8 @@
    in the same form. 
 """
 
-from invenio.bibindex_engine_washer import wash_author_name
-from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
+from invenio.legacy.bibindex.engine_washer import wash_author_name
+from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 
 
 

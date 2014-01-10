@@ -22,14 +22,14 @@
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL
-from invenio.bibauthority_config import \
+from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD, \
     CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
 
-from invenio.bibauthority_engine import \
+from invenio.legacy.bibauthority.engine import \
     get_control_nos_from_recID, \
     guess_main_name_from_authority_recID
-from invenio.search_engine import \
+from invenio.legacy.search_engine import \
     perform_request_search, \
     get_record
     
@@ -40,7 +40,7 @@ def format_element(bfo, detail='no'):
     @param detail: whether the 'detailed' rather than the 'brief' format
     @type detail: 'yes' or 'no'
     """
-    from invenio.messages import gettext_set_language
+    from invenio.base.i18n import gettext_set_language
     _ = gettext_set_language(bfo.lang)    # load the right message language
     
     # return value

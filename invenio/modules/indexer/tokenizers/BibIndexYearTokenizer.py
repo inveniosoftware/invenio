@@ -21,7 +21,7 @@
 
 from invenio.config import \
      CFG_INSPIRE_SITE
-from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 
 
 

@@ -20,8 +20,6 @@
   {% extends "records/base.html" %}
 {%- endif -%}
 
-{%- js url_for('comments.static', filename='js/comments/modal_tweaks.js'), '10-comments' -%}
-
 {% block record_content %}
   <div class="page-header">
     {{ format_record(recid, 'hs', ln=g.ln)|safe }}
@@ -124,24 +122,5 @@
   {%- endif -%}
 
   <div style="clear:both"/></div>
-
-<script>
-$(document).ready(function() {
-// Support for AJAX loaded modal window.
-// Focuses on first input textbox after it loads the window.
-$('[data-toggle="modal"]').click(function(e) {
-  e.preventDefault();
-  var href = $(this).attr('href');
-  if (href.indexOf('#') == 0) {
-    $(href).modal('open');
-  } else {
-    $.get(href, function(data) {
-      $('<div class="modal" >' + data + '</div>').modal();
-    }).success(function() { $('input:text:visible:first').focus(); });
-  }
-});
-
-});
-</script>
 
 {% endblock %}

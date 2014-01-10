@@ -21,20 +21,20 @@
    removes alphanumeric characters and html and latex markup if we want to. Also can stem words for a given language.
 """
 
-from invenio.bibindex_engine_config import \
+from invenio.legacy.bibindex.engine_config import \
      CFG_BIBINDEX_INDEX_TABLE_TYPE
-from invenio.htmlutils import remove_html_markup
+from invenio.utils.html import remove_html_markup
 from invenio.utils.text import wash_for_utf8, strip_accents
-from invenio.bibindex_engine_washer import \
+from invenio.legacy.bibindex.engine_washer import \
      lower_index_term, remove_latex_markup, \
      apply_stemming, remove_stopwords, length_check
-from invenio.bibindex_engine_utils import latex_formula_re, \
+from invenio.legacy.bibindex.engine_utils import latex_formula_re, \
      re_block_punctuation_begin, \
      re_block_punctuation_end, \
      re_punctuation, \
      re_separators, \
      re_arxiv
-from invenio.bibindex_tokenizers.BibIndexTokenizer import BibIndexTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexTokenizer import BibIndexTokenizer
 
 
 

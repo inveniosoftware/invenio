@@ -20,23 +20,23 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibauthority_config import \
+from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD, \
     CFG_BIBAUTHORITY_TYPE_NAMES, \
     CFG_BIBAUTHORITY_PREFIX_SEP
 
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.testsuite import make_test_suite, run_test_suite, \
     InvenioTestCase
 from invenio.importutils import lazy_import
-is_authority_record = lazy_import('invenio.bibauthority_engine:is_authority_record')
-get_dependent_records_for_control_no = lazy_import('invenio.bibauthority_engine:get_dependent_records_for_control_no')
-get_dependent_records_for_recID = lazy_import('invenio.bibauthority_engine:get_dependent_records_for_recID')
-guess_authority_types = lazy_import('invenio.bibauthority_engine:guess_authority_types')
-get_low_level_recIDs_from_control_no = lazy_import('invenio.bibauthority_engine:get_low_level_recIDs_from_control_no')
-get_control_nos_from_recID = lazy_import('invenio.bibauthority_engine:get_control_nos_from_recID')
-get_index_strings_by_control_no = lazy_import('invenio.bibauthority_engine:get_index_strings_by_control_no')
-guess_main_name_from_authority_recID = lazy_import('invenio.bibauthority_engine:guess_main_name_from_authority_recID')
-get_fieldvalues = lazy_import('invenio.search_engine_utils:get_fieldvalues')
+is_authority_record = lazy_import('invenio.legacy.bibauthority.engine:is_authority_record')
+get_dependent_records_for_control_no = lazy_import('invenio.legacy.bibauthority.engine:get_dependent_records_for_control_no')
+get_dependent_records_for_recID = lazy_import('invenio.legacy.bibauthority.engine:get_dependent_records_for_recID')
+guess_authority_types = lazy_import('invenio.legacy.bibauthority.engine:guess_authority_types')
+get_low_level_recIDs_from_control_no = lazy_import('invenio.legacy.bibauthority.engine:get_low_level_recIDs_from_control_no')
+get_control_nos_from_recID = lazy_import('invenio.legacy.bibauthority.engine:get_control_nos_from_recID')
+get_index_strings_by_control_no = lazy_import('invenio.legacy.bibauthority.engine:get_index_strings_by_control_no')
+guess_main_name_from_authority_recID = lazy_import('invenio.legacy.bibauthority.engine:guess_main_name_from_authority_recID')
+get_fieldvalues = lazy_import('invenio.legacy.bibrecord:get_fieldvalues')
 
 class BibAuthorityEngineTest(InvenioTestCase):
     """Check BibEdit web pages whether they are up or not."""

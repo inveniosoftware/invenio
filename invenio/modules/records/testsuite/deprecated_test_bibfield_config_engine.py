@@ -33,7 +33,7 @@ class BibFieldParserUnitTests(InvenioTestCase):
     def setUp(self):
         """Loads bibfield configuration test files"""
         super(BibFieldParserUnitTests, self).setUp()
-        from invenio.bibfield_config_engine import BibFieldParser
+        from invenio.legacy.bibfield.config_engine import BibFieldParser
         parser = BibFieldParser(main_config_file="test_bibfield.cfg")
         self.config_rules = parser.config_rules
 

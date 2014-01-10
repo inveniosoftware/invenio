@@ -25,8 +25,8 @@
    - Phrases
 """
 
-from invenio.dbquery import run_sql
-from invenio.bibindex_tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
+from invenio.legacy.dbquery import run_sql
+from invenio.modules.indexer.tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
 from invenio.config import \
     CFG_CERN_SITE, \
     CFG_INSPIRE_SITE

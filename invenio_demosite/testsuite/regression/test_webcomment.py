@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.testutils import InvenioTestCase
+from invenio.testsuite import InvenioTestCase
 import shutil
 from flask import url_for
 from mechanize import Browser, HTTPError

@@ -95,8 +95,8 @@ from invenio.legacy.bibrecord import create_record, record_xml_output
 from invenio.legacy.bibrank.record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.legacy.bibrank.downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.legacy.bibindex.engine_stemmer import stem
-from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
-from invenio.bibindex_tokenizers.BibIndexCJKTokenizer import BibIndexCJKTokenizer, is_there_any_CJK_character_in_text
+from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexCJKTokenizer import BibIndexCJKTokenizer, is_there_any_CJK_character_in_text
 from invenio.legacy.bibindex.engine_utils import author_name_requires_phrase_search
 from invenio.legacy.bibindex.engine_washer import wash_index_term, lower_index_term, wash_author_name
 from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE

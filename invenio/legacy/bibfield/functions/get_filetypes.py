@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,17 +17,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = admin hacking
+from invenio.legacy.bibdocfile.api import BibRecDocs
 
-#imgdir = $(localstatedir)/www/img/admin
 
-#img_DATA = authority-records-1.png \
-#           authority-records-2.png
+def get_filetypes(recid):
+    """
+        Returns filetypes extensions associated with given record.
 
-webdoclibdir = $(libdir)/webdoc/invenio/help
+        Takes as a parameter the recid of a record.
+        @param url_field: recid of a record
+    """
+    docs = BibRecDocs(recid)
+    return [_get_filetype(d.format) for d in docs.list_latest_files()]
 
-#webdoclib_DATA = authority-records.webdoc
 
-#EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)
-
-CLEANFILES = *~ *.tmp
+def _get_filetype(pre_ext):
+    ext = pre_ext.split(";")[0]
+    return ext[1:]

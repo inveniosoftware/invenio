@@ -41,7 +41,7 @@ import sys
 import zlib
 
 from invenio.base.globals import cfg
-from invenio.messages import wash_language
+from invenio.base.i18n import wash_language
 from invenio.ext.logging import register_exception
 from invenio.ext.template import render_template_to_string
 

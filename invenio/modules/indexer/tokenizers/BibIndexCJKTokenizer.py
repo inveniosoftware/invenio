@@ -23,7 +23,7 @@
 
 import re
 
-from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 
 is_character_from_CJK_set = re.compile(u'[\u3400-\u4DBF\u4E00-\u9FFF]')
 special_CJK_punctuation = re.compile(u'[\uff1a,\uff0c,\u3001,\u3002,\u201c,\u201d]')

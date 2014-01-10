@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_03_20_idxINDEX_synonym_kb']
 

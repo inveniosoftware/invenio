@@ -41,4 +41,4 @@
 
 <p>By properly querying <tt>BibRecDocs</tt> and <tt>BibDoc</tt> you can obtain a <tt>BibDocFile</tt>. This is an object representing all the possible details related a single physical file, like a comment, a description, the path, the related URL, the size, the format, the version, the checksum, the protection...</p>
 
-<p>See <a href="http://invenio-software.org/code-browser/invenio.bibdocfile-module.html">bibdocfile API</a> for a complete API description.</p>
+<p>See <a href="http://invenio-software.org/code-browser/invenio.legacy.bibdocfile.api-module.html">bibdocfile API</a> for a complete API description.</p>

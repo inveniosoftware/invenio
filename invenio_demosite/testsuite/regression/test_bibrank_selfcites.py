@@ -20,7 +20,7 @@
 """Unit tests for the search engine query parsers."""
 
 
-from invenio.testutils import InvenioTestCase
+from invenio.testsuite import InvenioTestCase
 import sys
 from StringIO import StringIO
 from datetime import datetime, timedelta

@@ -18,10 +18,10 @@
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-is_type_isbn10 = lazy_import('invenio.bibfield_functions.is_type_isbn:is_type_isbn10')
-is_type_isbn13 = lazy_import('invenio.bibfield_functions.is_type_isbn:is_type_isbn13')
-is_type_isbn = lazy_import('invenio.bibfield_functions.is_type_isbn:is_type_isbn')
-is_type_issn = lazy_import('invenio.bibfield_functions.is_type_issn:is_type_issn')
+is_type_isbn10 = lazy_import('invenio.legacy.bibfield.functions.is_type_isbn:is_type_isbn10')
+is_type_isbn13 = lazy_import('invenio.legacy.bibfield.functions.is_type_isbn:is_type_isbn13')
+is_type_isbn = lazy_import('invenio.legacy.bibfield.functions.is_type_isbn:is_type_isbn')
+is_type_issn = lazy_import('invenio.legacy.bibfield.functions.is_type_issn:is_type_issn')
 
 
 class ISBNISSNValidationTest(InvenioTestCase):

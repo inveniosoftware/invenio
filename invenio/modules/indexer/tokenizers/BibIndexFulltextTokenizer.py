@@ -32,18 +32,18 @@ from invenio.config import \
      CFG_XAPIAN_ENABLED, \
      CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
      CFG_BIBINDEX_SPLASH_PAGES
-from invenio.htmlutils import get_links_in_html_page
+from invenio.utils.html import get_links_in_html_page
 from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
-from invenio.solrutils_bibindex_indexer import solr_add_fulltext
+from invenio.legacy.miscutil.solrutils_bibindex_indexer import solr_add_fulltext
 from invenio.xapianutils_bibindex_indexer import xapian_add
-from invenio.bibdocfile import bibdocfile_url_p, \
+from invenio.legacy.bibdocfile.api import bibdocfile_url_p, \
      bibdocfile_url_to_bibdoc, download_url, \
      BibRecDocs
-from invenio.bibindex_engine_utils import get_idx_indexer
+from invenio.legacy.bibindex.engine_utils import get_idx_indexer
 from invenio.bibtask import write_message
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from intbitset import intbitset
-from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 
 
 fulltext_added = intbitset() # stores ids of records whose fulltexts have been added

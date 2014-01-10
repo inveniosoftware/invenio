@@ -17,17 +17,17 @@
 
 # pylint: disable=C0103
 """Invenio BibAuthority Engine."""
-from invenio.bibauthority_config import \
+from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD, \
     CFG_BIBAUTHORITY_AUTHORITY_SUBFIELDS_TO_INDEX,\
     CFG_BIBAUTHORITY_PREFIX_SEP
 
 import re
-from invenio.errorlib import register_exception
-from invenio.search_engine import search_pattern, \
+from invenio.ext.logging import register_exception
+from invenio.legacy.search_engine import search_pattern, \
     record_exists
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibauthority_config import \
+from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_IDENTIFIER
 
 def is_authority_record(recID):
@@ -273,7 +273,7 @@ def get_index_strings_by_control_no(control_no):
 
     """
 
-    from invenio.bibindex_engine import list_union
+    from invenio.legacy.bibindex.engine import list_union
 
     #return value
     string_list = []

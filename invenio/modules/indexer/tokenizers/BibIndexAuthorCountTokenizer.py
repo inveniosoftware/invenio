@@ -22,8 +22,8 @@
 """
 
 
-from invenio.bibindex_engine_utils import get_field_count
-from invenio.bibindex_tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
+from invenio.legacy.bibindex.engine_utils import get_field_count
+from invenio.modules.indexer.tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
 
 
 
@@ -37,7 +37,7 @@ class BibIndexAuthorCountTokenizer(BibIndexEmptyTokenizer):
 
 
     def tokenize(self, recID):
-        """Uses get_field_count from bibindex_engine_utils
+        """Uses get_field_count from bibindex.engine_utils
            for finding a number of authors of a publication and pass it in the list"""
         return [str(get_field_count(recID, self.tags)),]
 

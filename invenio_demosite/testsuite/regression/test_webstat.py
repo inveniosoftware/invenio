@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.testutils import InvenioTestCase
+from invenio.testsuite import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL, \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS

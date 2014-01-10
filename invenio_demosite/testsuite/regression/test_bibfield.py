@@ -24,7 +24,7 @@ BibField module regression tests.
 __revision__ = "$Id$"
 
 from invenio.config import CFG_TMPDIR
-from invenio.bibfield import get_record, create_record, create_records
+from invenio.legacy.bibfield import get_record, create_record, create_records
 from invenio.legacy.dbquery import run_sql
 
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
@@ -280,7 +280,7 @@ class BibFieldLegacyTests(InvenioTestCase):
 
     def test_guess_legacy_field_names(self):
         """bibfied - guess legacy fields"""
-        from invenio.bibfield import guess_legacy_field_names
+        from invenio.legacy.bibfield import guess_legacy_field_names
 
         legacy_fields = guess_legacy_field_names(('100__a', '245'))
         self.assertEqual(legacy_fields['100__a'][0], 'authors[0].full_name')

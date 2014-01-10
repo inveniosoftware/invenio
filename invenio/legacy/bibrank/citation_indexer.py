@@ -29,7 +29,7 @@ from datetime import datetime
 
 from invenio.legacy.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
-from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
+from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 from invenio.legacy.search_engine import search_pattern, search_unit

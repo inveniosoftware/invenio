@@ -19,7 +19,7 @@
 
 """ Test unit for the miscutil/sequtils module. """
 
-from invenio.testutils import InvenioTestCase
+from invenio.testsuite import InvenioTestCase
 try:
     from mock import patch
     HAS_MOCK = True

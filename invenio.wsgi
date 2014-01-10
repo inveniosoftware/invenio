@@ -68,7 +68,7 @@ finally:
     ## and a second one to instantiate the application.
     ## Therefore we need to close redundant conenctions that
     ## are allocated on the 1st thread.
-    from invenio.dbquery import close_connection
+    from invenio.legacy.dbquery import close_connection
     close_connection()
 
 if 'werkzeug-debugger' in getattr(config, 'CFG_DEVEL_TOOLS', []):

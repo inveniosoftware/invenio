@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -51,30 +51,42 @@ Links
 
 """
 from __future__ import print_function
-from setuptools import Command, setup, find_packages
-from distutils.extension import Extension
 
-import os
+import re
+import glob
 
-def requirements():
+from setuptools import setup, find_packages
+
+
+def match_feature_name(filename):
+    return re.match(r".*requirements-(\w+).txt$", filename).group(1)
+
+
+def read_requirements(filename='requirements.txt'):
     req = []
     dep = []
-    for filename in ['requirements.txt', 'requirements-extras.txt',
-                     'requirements-flask.txt', 'requirements-flask-ext.txt']:
-        with open(os.path.join(os.path.dirname(__file__), filename), 'r') as f:
-            for line in f.readlines():
-                if line.startswith('#'):
-                    continue
-                if '://' in line:
-                    dep.append(str(line[:-1]))
-                else:
-                    req.append(str(line))
+    with open(filename, 'r') as f:
+        for line in f.readlines():
+            if line.startswith('#'):
+                continue
+            if '://' in line:
+                dep.append(str(line[:-1]))
+            else:
+                req.append(str(line))
     return req, dep
+
+install_requires, dependency_links = read_requirements()
+
+# Finds all `requirements-*.txt` files and prepares dictionary with extra
+# requirements (NOTE: no links are allowed here!)
+extras_require = dict(map(
+    lambda filename: (match_feature_name(filename),
+                      read_requirements(filename)[0]),
+    glob.glob('requirements-*.txt') +
+    glob.glob('invenio/modules/*/requirements-*.txt')))
 
 packages = find_packages(exclude=['docs'])
 packages.append('invenio_docs')
-
-install_requires, dependency_links = requirements()
 
 setup(
     name='Invenio',
@@ -139,6 +151,7 @@ setup(
     },
     install_requires=install_requires,
     dependency_links=dependency_links,
+    extras_require=extras_require,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

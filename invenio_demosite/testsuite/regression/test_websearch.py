@@ -1177,7 +1177,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
     def test_search_engine_python_api_for_successful_query_format_intbitset(self):
         """websearch - search engine Python API for successful query, output format intbitset"""
         from intbitset import intbitset
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual(intbitset([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]),
                          perform_request_search(p='ellis', of='intbitset'))
 
@@ -1212,7 +1212,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
     def test_search_engine_python_api_for_existing_record_format_intbitset(self):
         """websearch - search engine Python API for existing record, output format intbitset"""
         from intbitset import intbitset
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual(intbitset([8]),
                          perform_request_search(recid=8, of='intbitset'))
 
@@ -1225,7 +1225,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
     def test_search_engine_python_api_for_nonexisting_record_format_intbitset(self):
         """websearch - search engine Python API for non-existing record, output format intbitset"""
         from intbitset import intbitset
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual(intbitset(),
                          perform_request_search(recid=16777215, of='intbitset'))
 
@@ -1935,7 +1935,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
     def test_search_engine_python_api_long_author_with_quotes(self):
         """websearch - search engine Python API for p=author:"Abbot, R B"'""" \
         """this test was written along with a bug report, needs fixing."""
-        from invenio.search_engine import perform_request_search
+        from invenio.legacy.search_engine import perform_request_search
         self.assertEqual([16], perform_request_search(p='author:"Abbott, R B"'))
 
 class WebSearchSearchEngineWebAPITest(InvenioTestCase):

@@ -23,10 +23,10 @@ __revision__ = "$Id$"
 import cgi
 from invenio.config import \
     CFG_SITE_URL, CFG_SITE_NAME
-from invenio.bibauthority_config import \
+from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
     
-from invenio.bibauthority_engine import \
+from invenio.legacy.bibauthority.engine import \
     get_low_level_recIDs_from_control_no
 
 def format_element(bfo):

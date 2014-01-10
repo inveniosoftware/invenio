@@ -20,46 +20,46 @@
 
 __revision__ = "$Id$"
 
-from invenio.testutils import InvenioTestCase
+from invenio.testsuite import InvenioTestCase
 import os
 import re
 from datetime import timedelta
 
-from invenio.testutils import make_test_suite, run_test_suite, nottest, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, nottest, InvenioTestCase
 from invenio.importutils import lazy_import
 
-WordTable = lazy_import('invenio.bibindex_engine:WordTable')
-get_word_tables = lazy_import('invenio.bibindex_engine:get_word_tables')
-find_affected_records_for_index = lazy_import('invenio.bibindex_engine:find_affected_records_for_index')
-get_recIDs_by_date_authority = lazy_import('invenio.bibindex_engine:get_recIDs_by_date_authority')
-get_recIDs_by_date_bibliographic = lazy_import('invenio.bibindex_engine:get_recIDs_by_date_bibliographic')
-create_range_list = lazy_import('invenio.bibindex_engine:create_range_list')
-beautify_range_list = lazy_import('invenio.bibindex_engine:beautify_range_list')
-get_last_updated_all_indexes = lazy_import('invenio.bibindex_engine:get_last_updated_all_indexes')
+WordTable = lazy_import('invenio.legacy.bibindex.engine:WordTable')
+get_word_tables = lazy_import('invenio.legacy.bibindex.engine:get_word_tables')
+find_affected_records_for_index = lazy_import('invenio.legacy.bibindex.engine:find_affected_records_for_index')
+get_recIDs_by_date_authority = lazy_import('invenio.legacy.bibindex.engine:get_recIDs_by_date_authority')
+get_recIDs_by_date_bibliographic = lazy_import('invenio.legacy.bibindex.engine:get_recIDs_by_date_bibliographic')
+create_range_list = lazy_import('invenio.legacy.bibindex.engine:create_range_list')
+beautify_range_list = lazy_import('invenio.legacy.bibindex.engine:beautify_range_list')
+get_last_updated_all_indexes = lazy_import('invenio.legacy.bibindex.engine:get_last_updated_all_indexes')
 
-get_index_id_from_index_name = lazy_import('invenio.bibindex_engine_utils:get_index_id_from_index_name')
-get_index_tags = lazy_import('invenio.bibindex_engine_utils:get_index_tags')
-get_tag_indexes = lazy_import('invenio.bibindex_engine_utils:get_tag_indexes')
-get_all_indexes = lazy_import('invenio.bibindex_engine_utils:get_all_indexes')
+get_index_id_from_index_name = lazy_import('invenio.legacy.bibindex.engine_utils:get_index_id_from_index_name')
+get_index_tags = lazy_import('invenio.legacy.bibindex.engine_utils:get_index_tags')
+get_tag_indexes = lazy_import('invenio.legacy.bibindex.engine_utils:get_tag_indexes')
+get_all_indexes = lazy_import('invenio.legacy.bibindex.engine_utils:get_all_indexes')
 
-from invenio.bibindex_engine_config import CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
+from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
     CFG_BIBINDEX_INDEX_TABLE_TYPE, \
     CFG_BIBINDEX_UPDATE_MESSAGE
 
 task_low_level_submission = lazy_import('invenio.bibtask:task_low_level_submission')
 from invenio.config import CFG_BINDIR, CFG_LOGDIR
 
-run_sql = lazy_import('invenio.dbquery:run_sql')
-deserialize_via_marshal = lazy_import('invenio.dbquery:deserialize_via_marshal')
+run_sql = lazy_import('invenio.legacy.dbquery:run_sql')
+deserialize_via_marshal = lazy_import('invenio.legacy.dbquery:deserialize_via_marshal')
 
 from intbitset import intbitset
 get_record = lazy_import('invenio.search_engine:get_record')
-get_fieldvalues = lazy_import('invenio.search_engine_utils:get_fieldvalues')
+get_fieldvalues = lazy_import('invenio.legacy.bibrecord:get_fieldvalues')
 
-get_index_strings_by_control_no = lazy_import('invenio.bibauthority_engine:get_index_strings_by_control_no')
-get_control_nos_from_recID = lazy_import('invenio.bibauthority_engine:get_control_nos_from_recID')
+get_index_strings_by_control_no = lazy_import('invenio.legacy.bibauthority.engine:get_index_strings_by_control_no')
+get_control_nos_from_recID = lazy_import('invenio.legacy.bibauthority.engine:get_control_nos_from_recID')
 
-run_sql_drop_silently = lazy_import('invenio.bibindex_engine_utils:run_sql_drop_silently')
+run_sql_drop_silently = lazy_import('invenio.legacy.bibindex.engine_utils:run_sql_drop_silently')
 
 bibupload = lazy_import('invenio.bibupload:bibupload')
 xml_marc_to_records = lazy_import('invenio.bibupload:xml_marc_to_records')

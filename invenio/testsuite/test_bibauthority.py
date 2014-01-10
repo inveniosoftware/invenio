@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,17 +18,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """Unit Tests for BibAuthority"""
 
-from invenio.bibauthority_config import CFG_BIBAUTHORITY_PREFIX_SEP
+from invenio.testsuite import InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite
 
-from invenio.testutils import InvenioTestCase
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibauthority_engine import get_type_from_control_no
 
 class TestBibAuthorityEngine(InvenioTestCase):
     """Unit tests for bibauthority_engine"""
 
     def test_split_name_parts(self):
         """bibauthority - test get_type_from_authority_id"""
+        from invenio.legacy.bibauthority.config import CFG_BIBAUTHORITY_PREFIX_SEP
+        from invenio.legacy.bibauthority.engine import get_type_from_control_no
         prefix = "JOURNAL"
         control_no = "(CERN)abcd1234" # must start with a '('
         self.assertEqual(get_type_from_control_no(

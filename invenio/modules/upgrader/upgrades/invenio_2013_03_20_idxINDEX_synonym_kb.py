@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2012_10_29_idxINDEX_new_indexer_column']
 
@@ -36,7 +36,7 @@ def do_upgrade():
     run_sql("UPDATE idxINDEX SET synonym_kbrs='INDEX-SYNONYM-TITLE,exact' WHERE name IN ('global','title')")
     #third step: check invenio.conf
     from invenio.config import CFG_BIBINDEX_SYNONYM_KBRS
-    from invenio.bibindex_engine_utils import get_index_id_from_index_name
+    from invenio.legacy.bibindex.engine_utils import get_index_id_from_index_name
     if CFG_BIBINDEX_SYNONYM_KBRS:
         for index in CFG_BIBINDEX_SYNONYM_KBRS:
             index_id = get_index_id_from_index_name(index)

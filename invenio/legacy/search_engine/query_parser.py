@@ -25,7 +25,7 @@ import re
 import string
 from datetime import datetime
 
-from invenio.bibindex_tokenizers.BibIndexAuthorTokenizer import BibIndexAuthorTokenizer as FNT
+from invenio.modules.indexer.tokenizers.BibIndexAuthorTokenizer import BibIndexAuthorTokenizer as FNT
 from invenio.utils.date import GOT_DATEUTIL
 if GOT_DATEUTIL:
     from invenio.utils.date import du_parser, du_delta, relativedelta

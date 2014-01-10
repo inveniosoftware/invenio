@@ -25,11 +25,11 @@ from urllib import quote
 from cgi import escape
 from invenio.config import CFG_SITE_URL
 from invenio.base.i18n import gettext_set_language
-from invenio.bibauthority_config import \
+from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME, \
     CFG_BIBAUTHORITY_TYPE_NAMES, \
     CFG_BIBAUTHORITY_PREFIX_SEP
-from invenio.bibauthority_engine import \
+from invenio.legacy.bibauthority.engine import \
     get_low_level_recIDs_from_control_no
 
 
