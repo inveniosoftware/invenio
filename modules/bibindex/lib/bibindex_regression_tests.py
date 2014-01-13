@@ -111,7 +111,7 @@ def prepare_for_index_update(index_id, parameters={}):
 
 
 @nottest
-def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'test', parameters={}, turn_off_virtual_indexes=True):
+def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'test_', parameters={}, turn_off_virtual_indexes=True):
     """Function for setting up a test enviroment. Reindexes an index with a given name to a
        new temporary table with a given prefix. During the reindexing it changes some parameters
        of chosen index. It's useful for conducting tests concerning the reindexing process.
@@ -128,7 +128,7 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
     query_update = prepare_for_index_update(index_id, parameters)
     last_updated = run_sql("""SELECT last_updated FROM idxINDEX WHERE id=%s""" % index_id)[0][0]
 
-    test_tablename = "%s_idxWORD%02d" % (prefix, index_id)
+    test_tablename = "%sidxWORD%02d" % (prefix, index_id)
     query_drop_forward_index_table = """DROP TABLE IF EXISTS %sF""" % test_tablename
     query_drop_reversed_index_table = """DROP TABLE IF EXISTS %sR""" % test_tablename
 
@@ -145,22 +145,18 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
                                            type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
                                            PRIMARY KEY (id_bibrec,type)
                                            ) ENGINE=MyISAM""" % test_tablename
-
-    run_sql_drop_silently(query_drop_forward_index_table)
-    run_sql_drop_silently(query_drop_reversed_index_table)
-    run_sql(query_create_forward_index_table)
-    run_sql(query_create_reversed_index_table)
+    if not prefix == "":
+        run_sql_drop_silently(query_drop_forward_index_table)
+        run_sql_drop_silently(query_drop_reversed_index_table)
+        run_sql(query_create_forward_index_table)
+        run_sql(query_create_reversed_index_table)
     if query_update:
         run_sql(query_update)
 
-    pattern = 'idxWORD'
-    if prefix:
-        pattern = '%s_idxWORD' % prefix
     wordTable = WordTable(index_name=index_name,
-                          index_id=index_id,
                           fields_to_index=get_index_tags(index_name),
-                          table_name_pattern= pattern + '%02dF',
-                          wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                          table_prefix=prefix,
+                          table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                           tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                           wash_index_terms=50)
     if turn_off_virtual_indexes:
@@ -181,14 +177,14 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
 
 
 @nottest
-def remove_reindexed_word_testtables(index_name, prefix = 'test'):
+def remove_reindexed_word_testtables(index_name, prefix = 'test_'):
     """
         Removes prefix_idxWORDxxx tables created during tests.
         @param index_name: name of the index
         @param prefix: prefix for the tables
     """
     index_id = get_index_id_from_index_name(index_name)
-    test_tablename = "%s_idxWORD%02d" % (prefix, index_id)
+    test_tablename = "%sidxWORD%02d" % (prefix, index_id)
     query_drop_forward_index_table = """DROP TABLE IF EXISTS %sF""" % test_tablename
     query_drop_reversed_index_table = """DROP TABLE IF EXISTS %sR""" % test_tablename
     run_sql(query_drop_forward_index_table)
@@ -818,10 +814,8 @@ def insert_record_one_and_second_revision():
     wtabs = get_word_tables(indexes)
     for index_id, index_name, index_tags in wtabs:
         wordTable = WordTable(index_name=index_name,
-                              index_id=index_id,
                               fields_to_index=index_tags,
-                              table_name_pattern='idxWORD%02dF',
-                              wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                              table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                               tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=50)
         wordTable.add_recIDs([[_id, _id]], 10000)
@@ -865,10 +859,8 @@ def insert_record_two_and_second_revision():
     wtabs = get_word_tables(indexes)
     for index_id, index_name, index_tags in wtabs:
         wordTable = WordTable(index_name=index_name,
-                              index_id=index_id,
                               fields_to_index=index_tags,
-                              table_name_pattern='idxWORD%02dF',
-                              wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                              table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                               tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=50)
         wordTable.add_recIDs([[id_bibrec, id_bibrec]], 10000)
@@ -1038,10 +1030,8 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
             wtabs = get_word_tables(records_for_indexes.keys())
             for index_id, index_name, index_tags in wtabs:
                 wordTable = WordTable(index_name=index_name,
-                                      index_id=index_id,
                                       fields_to_index=index_tags,
-                                      table_name_pattern='idxWORD%02dF',
-                                      wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                      table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                       tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                       wash_index_terms=50)
                 wordTable.add_recIDs([self.records], 10000)
@@ -1059,10 +1049,8 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
             wtabs = get_word_tables(indexes)
             for index_id, index_name, index_tags in wtabs:
                 wordTable = WordTable(index_name=index_name,
-                                      index_id=index_id,
                                       fields_to_index=index_tags,
-                                      table_name_pattern='idxWORD%02dF',
-                                      wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                      table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                       tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                       wash_index_terms=50)
                 wordTable.del_recIDs([self.records])
@@ -1279,10 +1267,8 @@ class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
         wtabs = get_word_tables(self.indexes)
         for index_id, index_name, index_tags in wtabs:
             wordTable = WordTable(index_name=index_name,
-                                  index_id=index_id,
                                   fields_to_index=index_tags,
-                                  table_name_pattern='idxWORD%02dF',
-                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[1, 10]], 1000)
@@ -1302,10 +1288,8 @@ class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
         wtabs = get_word_tables(self.indexes)
         for index_id, index_name, index_tags in wtabs:
             wordTable = WordTable(index_name=index_name,
-                                  index_id=index_id,
                                   fields_to_index=index_tags,
-                                  table_name_pattern='idxWORD%02dF',
-                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             if special_tokenizer == True:
@@ -1377,10 +1361,8 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
             wtabs = get_word_tables(self.indexes)
             for index_id, index_name, index_tags in wtabs:
                 wordTable = WordTable(index_name=index_name,
-                                      index_id=index_id,
                                       fields_to_index=index_tags,
-                                      table_name_pattern='idxWORD%02dF',
-                                      wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                      table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                       tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                                       wash_index_terms=50)
                 wordTable.add_recIDs([[1, 113]], 1000)
@@ -1508,10 +1490,8 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
             run_sql(query)
 
             wordTable = WordTable(index_name=self.index_name,
-                                  index_id=index_id,
                                   fields_to_index=index_tags,
-                                  table_name_pattern='idxWORD%02dF',
-                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[1, 9]], 1000)
@@ -1519,10 +1499,8 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
                                     CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
             vit.run_update()
             wordTable = WordTable(index_name=self.index_name,
-                                  index_id=index_id,
                                   fields_to_index=index_tags,
-                                  table_name_pattern='idxPAIR%02dF',
-                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[6, 9]], 1000)
@@ -1540,10 +1518,8 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
             run_sql(query)
 
             wordTable = WordTable(index_name=self.index_name,
-                                  index_id=index_id,
                                   fields_to_index=index_tags,
-                                  table_name_pattern='idxWORD%02dF',
-                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[1, 9]], 1000)
@@ -1551,10 +1527,8 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
                                     CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
             vit.run_update()
             wordTable = WordTable(index_name=self.index_name,
-                                  index_id=index_id,
                                   fields_to_index=index_tags,
-                                  table_name_pattern='idxPAIR%02dF',
-                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[6, 9]], 1000)
@@ -1646,10 +1620,8 @@ class BibIndexVirtualIndexQueueTableTest(InvenioTestCase):
         index_id = get_index_id_from_index_name(index_name)
         index_tags = get_index_tags(index_name)
         wordTable = WordTable(index_name=index_name,
-                              index_id=index_id,
                               fields_to_index=index_tags,
-                              table_name_pattern='idx' + table_type.upper() + '%02dF',
-                              wordtable_type=table_type,
+                              table_type=table_type,
                               tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=50)
         wordTable.add_recIDs(records_range, 10000)

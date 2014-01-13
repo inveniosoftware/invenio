@@ -28,7 +28,6 @@ import sys
 import time
 import fnmatch
 from datetime import datetime
-from time import strptime
 
 from invenio.config import CFG_SOLR_URL
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
@@ -40,8 +39,7 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_BIBINDEX_UPDATE_MESSAGE, \
      CFG_BIBINDEX_UPDATE_MODE
 from invenio.bibauthority_config import \
-     CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC, \
-     CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD
+     CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
 from invenio.bibauthority_engine import get_index_strings_by_control_no,\
      get_control_nos_from_recID
 from invenio.bibindexadminlib import get_idx_remove_html_markup, \
@@ -61,7 +59,6 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
-from invenio.bibrankadminlib import get_def_name
 from invenio.solrutils_bibindex_indexer import solr_commit
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_TAG, \
@@ -69,17 +66,12 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 from invenio.bibindex_engine_utils import load_tokenizers, \
     get_all_index_names_and_column_values, \
-    get_idx_indexer, \
     get_index_tags, \
-    get_field_tags, \
     get_tag_indexes, \
     get_all_indexes, \
-    get_all_virtual_indexes, \
     get_index_virtual_indexes, \
-    is_index_virtual, \
     get_virtual_index_building_blocks, \
     get_index_id_from_index_name, \
-    get_index_name_from_index_id, \
     run_sql_drop_silently, \
     get_min_last_updated, \
     remove_inexistent_indexes, \
@@ -574,21 +566,182 @@ def chunk_generator(rng):
             current_low += chunksize
 
 
-class VirtualIndexTable:
+class AbstractIndexTable(object):
+    """
+        This class represents an index table in database.
+        An index consists of three different kinds of tables: table which stores
+        only words in db, table which stores pairs of words and table which stores whole phrases.
+        The class represents only one table. Another instance of the class must be created
+        in order to store different type of terms.
+
+        This class is an abstract class. It contains methods to connect to db and
+        methods which facilitate inserting/modifing/removing terms from it. The class
+        also contains methods which help managing the memory. All specific methods for indexing
+        can be found in corresponding classes for virtual and regular indexes.
+    """
+
+    def __init__(self, index_name, table_type, table_prefix="", wash_index_terms=50):
+        self.index_name = index_name
+        self.index_id = get_index_id_from_index_name(index_name)
+        self.table_type = table_type
+        self.wash_index_terms = wash_index_terms
+        self.table_name = wash_table_column_name(table_prefix + "idx" + table_type + ("%02d" % self.index_id) + "F")
+        self.table_prefix = table_prefix
+
+        self.value = {} # cache
+        self.recIDs_in_mem = []
+
+
+    def put_into_db(self, mode="normal"):
+        """Updates the current words table in the corresponding DB
+           idxFOO table.  Mode 'normal' means normal execution,
+           mode 'emergency' means words index reverting to old state.
+        """
+        write_message("%s %s wordtable flush started" % (self.table_name, mode))
+        write_message('...updating %d words into %s started' % \
+                (len(self.value), self.table_name))
+        task_update_progress("(%s:%s) flushed %d/%d words" % (self.table_name, self.index_name, 0, len(self.value)))
+
+        self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
+
+        tab_name = self.table_name[:-1] + "R"
+        if mode == "normal":
+            for group in self.recIDs_in_mem:
+                query = """UPDATE %s SET type='TEMPORARY' WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='CURRENT'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+
+        nb_words_total = len(self.value)
+        nb_words_report = int(nb_words_total / 10.0)
+        nb_words_done = 0
+        for word in self.value.keys():
+            self.put_word_into_db(word)
+            nb_words_done += 1
+            if nb_words_report != 0 and ((nb_words_done % nb_words_report) == 0):
+                write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
+                percentage_display = get_percentage_completed(nb_words_done, nb_words_total)
+                task_update_progress("(%s:%s) flushed %d/%d words %s" % (tab_name, self.index_name, nb_words_done, nb_words_total, percentage_display))
+        write_message('...updating %d words into %s ended' % \
+                      (nb_words_total, tab_name))
+
+        write_message('...updating reverse table %s started' % tab_name)
+        if mode == "normal":
+            for group in self.recIDs_in_mem:
+                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+                query = """DELETE FROM %s WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+            write_message('End of updating wordTable into %s' % tab_name, verbose=9)
+        elif mode == "emergency":
+            for group in self.recIDs_in_mem:
+                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+                query = """DELETE FROM %s WHERE id_bibrec
+                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
+                write_message(query % (group[0], group[1]), verbose=9)
+                run_sql(query, (group[0], group[1]))
+            write_message('End of emergency flushing wordTable into %s' % tab_name, verbose=9)
+        write_message('...updating reverse table %s ended' % tab_name)
+
+        self.clean()
+        self.recIDs_in_mem = []
+        write_message("%s %s wordtable flush ended" % (self.table_name, mode))
+        task_update_progress("(%s:%s) flush ended" % (self.table_name, self.index_name))
+
+    def put_word_into_db(self, word):
+        """Flush a single word to the database and delete it from memory"""
+        set = self.load_old_recIDs(word)
+        if set is not None: # merge the word recIDs found in memory:
+            hitlist_was_changed = self.merge_with_old_recIDs(word, set)
+            if not hitlist_was_changed:
+                # nothing to update:
+                write_message("......... unchanged hitlist for ``%s''" % word, verbose=9)
+                pass
+            else:
+                # yes there were some new words:
+                write_message("......... updating hitlist for ``%s''" % word, verbose=9)
+                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.table_name), (set.fastdump(), word)) # kwalitee: disable=sql
+
+        else: # the word is new, will create new set:
+            write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
+            set = intbitset(self.value[word].keys())
+            try:
+                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(self.table_name), (word, set.fastdump())) # kwalitee: disable=sql
+            except Exception, e:
+                ## We send this exception to the admin only when is not
+                ## already reparing the problem.
+                register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
+
+        if not set: # never store empty words
+            run_sql("DELETE FROM %s WHERE term=%%s" % wash_table_column_name(self.table_name), (word,)) # kwalitee: disable=sql
+
+    def put(self, recID, word, sign):
+        """Keeps track of changes done during indexing
+           and stores these changes in memory for further use.
+           Indexing process needs this information later while
+           filling in the database.
+
+           @param recID: recID of the record we want to update in memory
+           @param word: word we want to update
+           @param sing: sign of the word, 1 means keep this word in database, -1 remove word from database
+        """
+        value = self.value
+        try:
+            if self.wash_index_terms:
+                word = wash_index_term(word, self.wash_index_terms)
+            if value.has_key(word):
+                # the word 'word' exist already: update sign
+                value[word][recID] = sign
+            else:
+                value[word] = {recID: sign}
+        except Exception as e:
+            write_message("Error: Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
+
+    def load_old_recIDs(self, word):
+        """Load existing hitlist for the word from the database index files."""
+        query = "SELECT hitlist FROM %s WHERE term=%%s" % self.table_name
+        res = run_sql(query, (word,))
+        if res:
+            return intbitset(res[0][0])
+        else:
+            return None
+
+    def merge_with_old_recIDs(self, word, set):
+        """Merge the system numbers stored in memory (hash of recIDs with value +1 or -1
+        according to whether to add/delete them) with those stored in the database index
+        and received in set universe of recIDs for the given word.
+
+        Return False in case no change was done to SET, return True in case SET
+        was changed.
+        """
+        oldset = intbitset(set)
+        set.update_with_signs(self.value[word])
+        return set != oldset
+
+    def clean(self):
+        "Cleans the cache."
+        self.value = {}
+
+
+
+class VirtualIndexTable(AbstractIndexTable):
     """
         There are two types of indexes: virtual and regular/normal.
         Check WordTable class for more on normal indexes.
 
-        This class represents a virtual index. Virtual index doesn't store its own terms, it
-        accumulates terms from other indexes. Good example of virtual index is the global index
+        This class represents a single index table for virtual index (see also: AbstractIndexTable).
+        Virtual index doesn't store its own terms, it accumulates terms from other indexes.
+        Good example of virtual index is the global index
         which stores terms from title, abstract, keyword, author and so on.
 
-        Every index consists of three tables in database.
-        Every table stores different types of terms: words, pairs of words and whole phrases
-        which later can be used in search.
-        So to be more precise, this class represents only one of the tables for virtual index and it
-        can put terms only to one table at a time. A new instance of the VirtualIndexTable class need
-        to be created in order to handle other type of table.
+        This class contains methods for indexing virtual indexes. See also: run_update()
     """
 
     def __init__(self, index_name, table_type, table_prefix="", wash_index_terms=50):
@@ -598,17 +751,9 @@ class VirtualIndexTable:
             @param table_type: words, pairs or phrases
             @param table_prefix: add "tmp_" if you want to reindex to temporary table
         """
-        self.index_name = index_name
-        self.index_id = get_index_id_from_index_name(index_name)
-        self.table_type = table_type
-        self.table_name = wash_table_column_name(table_prefix + "idx" + table_type + ("%02d" % self.index_id) + "F")
-        self.table_prefix = table_prefix
+        AbstractIndexTable.__init__(self, index_name, table_type, table_prefix, wash_index_terms)
         self.mode = "normal"
-        self.wash_index_terms = wash_index_terms
-
         self.dependent_indexes = dict(get_virtual_index_building_blocks(self.index_id))
-        self.value = {} # cache
-        self.recIDs_in_mem = []
 
     def set_reindex_mode(self):
         """
@@ -621,7 +766,8 @@ class VirtualIndexTable:
     def run_update(self, flush=10000):
         """
             Function starts all updating processes for virtual index.
-            It will take all information about pending changes, process them
+            It will take all information about pending changes from database
+            from queue tables (idxWORD/PAIR/PHRASExxQ), process them
             and trigger appropriate indexing functions.
             @param flush: how many records we will put in one go into database (at most);
                           see also: opt_flush in WordTable class
@@ -779,7 +925,6 @@ class VirtualIndexTable:
         old_virtual_values = self.retrieve_old_values([recID_low, recID_high])
 
         # update reversed table
-        put = self.put
         for recID in xrange(recID_low, recID_high + 1):
             new_values = new_regular_values.get(recID) or []
             old_values = old_virtual_values.get(recID) or []
@@ -806,11 +951,10 @@ class VirtualIndexTable:
         remove_from_cache_for_record = self.remove_from_cache_for_record
         virtual_tab_name = self.table_name[:-1] + "R"
 
-        # 'take old values' part
+        # take old values
         old_virtual_values = self.retrieve_old_values([recID_low, recID_high])
 
-        # 'update reversed table' part
-        put = self.put
+        # update reversed table
         for recID in xrange(recID_low, recID_high + 1):
             old_values = old_virtual_values.get(recID) or []
             to_serialize = remove_from_cache_for_record(index_name, recID, old_values)
@@ -902,144 +1046,6 @@ class VirtualIndexTable:
             put(recID, term_without_prefix, 1)
         return tmp_new_values
 
-    def put_into_db(self, mode="normal"):
-        """Updates the current words table in the corresponding DB
-           idxFOO table.  Mode 'normal' means normal execution,
-           mode 'emergency' means words index reverting to old state.
-           """
-        write_message("%s %s wordtable flush started" % (self.table_name, mode))
-        write_message('...updating %d words into %s started' % \
-                (len(self.value), self.table_name))
-        task_update_progress("(%s:%s) flushed %d/%d words" % (self.table_name, self.index_name, 0, len(self.value)))
-
-        self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
-
-        tab_name = self.table_name[:-1] + "R"
-        if mode == "normal":
-            for group in self.recIDs_in_mem:
-                query = """UPDATE %s SET type='TEMPORARY' WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='CURRENT'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-
-        nb_words_total = len(self.value)
-        nb_words_report = int(nb_words_total / 10.0)
-        nb_words_done = 0
-        for word in self.value.keys():
-            self.put_word_into_db(word)
-            nb_words_done += 1
-            if nb_words_report != 0 and ((nb_words_done % nb_words_report) == 0):
-                write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
-                percentage_display = get_percentage_completed(nb_words_done, nb_words_total)
-                task_update_progress("(%s:%s) flushed %d/%d words %s" % (tab_name, self.index_name, nb_words_done, nb_words_total, percentage_display))
-        write_message('...updating %d words into %s ended' % \
-                      (nb_words_total, tab_name))
-
-        write_message('...updating reverse table %s started' % tab_name)
-        if mode == "normal":
-            for group in self.recIDs_in_mem:
-                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-                query = """DELETE FROM %s WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-            write_message('End of updating wordTable into %s' % tab_name, verbose=9)
-        elif mode == "emergency":
-            for group in self.recIDs_in_mem:
-                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-                query = """DELETE FROM %s WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-            write_message('End of emergency flushing wordTable into %s' % tab_name, verbose=9)
-        write_message('...updating reverse table %s ended' % tab_name)
-
-        self.clean()
-        self.recIDs_in_mem = []
-        write_message("%s %s wordtable flush ended" % (self.table_name, mode))
-        task_update_progress("(%s:%s) flush ended" % (self.table_name, self.index_name))
-
-    def put_word_into_db(self, word):
-        """Flush a single word to the database and delete it from memory"""
-        set = self.load_old_recIDs(word)
-        if set is not None: # merge the word recIDs found in memory:
-            hitlist_was_changed = self.merge_with_old_recIDs(word, set)
-            if not hitlist_was_changed:
-                # nothing to update:
-                write_message("......... unchanged hitlist for ``%s''" % word, verbose=9)
-                pass
-            else:
-                # yes there were some new words:
-                write_message("......... updating hitlist for ``%s''" % word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.table_name), (set.fastdump(), word)) # kwalitee: disable=sql
-
-        else: # the word is new, will create new set:
-            write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
-            set = intbitset(self.value[word].keys())
-            try:
-                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(self.table_name), (word, set.fastdump())) # kwalitee: disable=sql
-            except Exception, e:
-                ## We send this exception to the admin only when is not
-                ## already reparing the problem.
-                register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
-
-        if not set: # never store empty words
-            run_sql("DELETE FROM %s WHERE term=%%s" % wash_table_column_name(self.table_name), (word,)) # kwalitee: disable=sql
-
-    def put(self, recID, word, sign):
-        """Keeps track of changes done during indexing
-           and stores these changes in memory for further use.
-           Indexing process needs this information later while
-           filling in the database.
-
-           @param recID: recID of the record we want to update in memory
-           @param word: word we want to update
-           @param sing: sign of the word, 1 means keep this word in database, -1 remove word from database
-        """
-        value = self.value
-        try:
-            if self.wash_index_terms:
-                word = wash_index_term(word, self.wash_index_terms)
-            if value.has_key(word):
-                # the word 'word' exist already: update sign
-                value[word][recID] = sign
-            else:
-                value[word] = {recID: sign}
-        except Exception as e:
-            print e
-            write_message("Error: Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
-
-    def load_old_recIDs(self, word):
-        """Load existing hitlist for the word from the database index files."""
-        query = "SELECT hitlist FROM %s WHERE term=%%s" % self.table_name
-        res = run_sql(query, (word,))
-        if res:
-            return intbitset(res[0][0])
-        else:
-            return None
-
-    def merge_with_old_recIDs(self, word, set):
-        """Merge the system numbers stored in memory (hash of recIDs with value +1 or -1
-        according to whether to add/delete them) with those stored in the database index
-        and received in set universe of recIDs for the given word.
-
-        Return False in case no change was done to SET, return True in case SET
-        was changed.
-        """
-        oldset = intbitset(set)
-        set.update_with_signs(self.value[word])
-        return set != oldset
-
-    def clean(self):
-        "Cleans the cache."
-        self.value = {}
-
     def clean_database(self):
         """Removes all entries from corresponding tables in database"""
         query = """DELETE FROM %s""" % self.table_name
@@ -1094,10 +1100,17 @@ class VirtualIndexTable:
                     self.put_into_db()
 
 
-class WordTable:
-    "A class to hold the words table."
+class WordTable(AbstractIndexTable):
+    """
+        This class represents a single index table of regular index (regular means it doesn't
+        accumulates data from other indexes, but it takes data directly from metadata of
+        records which are being indexed; for other type of index check: VirtualIndexTable).
 
-    def __init__(self, index_name, index_id, fields_to_index, table_name_pattern, wordtable_type, tag_to_tokenizer_map, wash_index_terms=50):
+        To start indexing process one need to invoke add_recIDs() method. For furher reading
+        see description of this method.
+    """
+
+    def __init__(self, index_name, fields_to_index, table_type, table_prefix="", tag_to_tokenizer_map={}, wash_index_terms=50):
         """Creates words table instance.
         @param index_name: the index name
         @param index_id: the index integer identificator
@@ -1110,33 +1123,25 @@ class WordTable:
             how many characters do we keep in the index terms; see
             max_char_length parameter of wash_index_term()
         """
-        self.index_name = index_name
-        self.index_id = index_id
-        self.tablename = table_name_pattern % index_id
-        self.humanname = get_def_name('%s' % (str(index_id),), "idxINDEX")[0][1]
-        self.recIDs_in_mem = []
+        AbstractIndexTable.__init__(self, index_name, table_type, table_prefix, wash_index_terms)
         self.fields_to_index = fields_to_index
-        self.table_type = wordtable_type
         self.timestamp = datetime.now()
 
-        self.value = {}
         self.virtual_indexes = get_index_virtual_indexes(self.index_id)
         self.virtual_index_update_mode = CFG_BIBINDEX_UPDATE_MODE["Update"]
 
         try:
-            self.stemming_language = get_index_stemming_language(index_id)
+            self.stemming_language = get_index_stemming_language(self.index_id)
         except KeyError:
             self.stemming_language = ''
-        self.remove_stopwords = get_index_remove_stopwords(index_id)
-        self.remove_html_markup = get_index_remove_html_markup(index_id)
-        self.remove_latex_markup = get_index_remove_latex_markup(index_id)
-        self.tokenizer = get_index_tokenizer(index_id)(self.stemming_language,
-                                                       self.remove_stopwords,
-                                                       self.remove_html_markup,
-                                                       self.remove_latex_markup)
-        self.default_tokenizer_function = self.tokenizer.get_tokenizing_function(wordtable_type)
-        self.wash_index_terms = wash_index_terms
-
+        self.remove_stopwords = get_index_remove_stopwords(self.index_id)
+        self.remove_html_markup = get_index_remove_html_markup(self.index_id)
+        self.remove_latex_markup = get_index_remove_latex_markup(self.index_id)
+        self.tokenizer = get_index_tokenizer(self.index_id)(self.stemming_language,
+                                                            self.remove_stopwords,
+                                                            self.remove_html_markup,
+                                                            self.remove_latex_markup)
+        self.default_tokenizer_function = self.tokenizer.get_tokenizing_function(table_type)
 
         # tagToTokenizer mapping. It offers an indirection level necessary for
         # indexing fulltext.
@@ -1146,11 +1151,11 @@ class WordTable:
                                                                              self.remove_stopwords,
                                                                              self.remove_html_markup,
                                                                              self.remove_latex_markup)
-            special_tokenizer_function = special_tokenizer_for_tag.get_tokenizing_function(wordtable_type)
+            special_tokenizer_function = special_tokenizer_for_tag.get_tokenizing_function(table_type)
             self.tag_to_words_fnc_map[k] = special_tokenizer_function
 
-        if self.stemming_language and self.tablename.startswith('idxWORD'):
-            write_message('%s has stemming enabled, language %s' % (self.tablename, self.stemming_language))
+        if self.stemming_language and self.table_name.startswith('idxWORD'):
+            write_message('%s has stemming enabled, language %s' % (self.table_name, self.stemming_language))
 
     def turn_off_virtual_indexes(self):
         """
@@ -1179,121 +1184,6 @@ class WordTable:
             out.append(row[0])
         return out
 
-    def clean(self):
-        "Cleans the words table."
-        self.value = {}
-
-    def put_into_db(self, mode="normal"):
-        """Updates the current words table in the corresponding DB
-           idxFOO table.  Mode 'normal' means normal execution,
-           mode 'emergency' means words index reverting to old state.
-           """
-        write_message("%s %s wordtable flush started" % (self.tablename, mode))
-        write_message('...updating %d words into %s started' % \
-                (len(self.value), self.tablename))
-        task_update_progress("(%s:%s) flushed %d/%d words" % (self.tablename, self.humanname, 0, len(self.value)))
-
-        self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
-
-        tab_name = self.tablename[:-1] + "R"
-        if mode == "normal":
-            for group in self.recIDs_in_mem:
-                query = """UPDATE %s SET type='TEMPORARY' WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='CURRENT'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-
-        nb_words_total = len(self.value)
-        nb_words_report = int(nb_words_total / 10.0)
-        nb_words_done = 0
-        for word in self.value.keys():
-            self.put_word_into_db(word)
-            nb_words_done += 1
-            if nb_words_report != 0 and ((nb_words_done % nb_words_report) == 0):
-                write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
-                percentage_display = get_percentage_completed(nb_words_done, nb_words_total)
-                task_update_progress("(%s:%s) flushed %d/%d words %s" % (tab_name, self.index_name, nb_words_done, nb_words_total, percentage_display))
-        write_message('...updating %d words into %s ended' % \
-                      (nb_words_total, tab_name))
-
-        write_message('...updating reverse table %s started' % tab_name)
-        if mode == "normal":
-            for group in self.recIDs_in_mem:
-                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-                query = """DELETE FROM %s WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-            write_message('End of updating wordTable into %s' % tab_name, verbose=9)
-        elif mode == "emergency":
-            for group in self.recIDs_in_mem:
-                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-                query = """DELETE FROM %s WHERE id_bibrec
-                BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
-                write_message(query % (group[0], group[1]), verbose=9)
-                run_sql(query, (group[0], group[1]))
-            write_message('End of emergency flushing wordTable into %s' % tab_name, verbose=9)
-        write_message('...updating reverse table %s ended' % tab_name)
-
-        self.clean()
-        self.recIDs_in_mem = []
-        write_message("%s %s wordtable flush ended" % (self.tablename, mode))
-        task_update_progress("(%s:%s) flush ended" % (self.tablename, self.humanname))
-
-    def load_old_recIDs(self, word):
-        """Load existing hitlist for the word from the database index files."""
-        query = "SELECT hitlist FROM %s WHERE term=%%s" % self.tablename
-        res = run_sql(query, (word,))
-        if res:
-            return intbitset(res[0][0])
-        else:
-            return None
-
-    def merge_with_old_recIDs(self, word, set):
-        """Merge the system numbers stored in memory (hash of recIDs with value +1 or -1
-        according to whether to add/delete them) with those stored in the database index
-        and received in set universe of recIDs for the given word.
-
-        Return False in case no change was done to SET, return True in case SET
-        was changed.
-        """
-        oldset = intbitset(set)
-        set.update_with_signs(self.value[word])
-        return set != oldset
-
-    def put_word_into_db(self, word):
-        """Flush a single word to the database and delete it from memory"""
-        set = self.load_old_recIDs(word)
-        if set is not None: # merge the word recIDs found in memory:
-            hitlist_was_changed = self.merge_with_old_recIDs(word, set)
-            if not hitlist_was_changed:
-                # nothing to update:
-                write_message("......... unchanged hitlist for ``%s''" % word, verbose=9)
-                pass
-            else:
-                # yes there were some new words:
-                write_message("......... updating hitlist for ``%s''" % word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.tablename), (set.fastdump(), word)) # kwalitee: disable=sql
-
-        else: # the word is new, will create new set:
-            write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
-            set = intbitset(self.value[word].keys())
-            try:
-                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(self.tablename), (word, set.fastdump())) # kwalitee: disable=sql
-            except Exception, e:
-                ## We send this exception to the admin only when is not
-                ## already reparing the problem.
-                register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
-
-        if not set: # never store empty words
-            run_sql("DELETE FROM %s WHERE term=%%s" % wash_table_column_name(self.tablename), (word,)) # kwalitee: disable=sql
-
     def notify_virtual_indexes(self, recID_ranges):
         """
             Informs all related virtual indexes about index change.
@@ -1313,7 +1203,6 @@ class WordTable:
                                      recID_range[1],
                                      self.index_name,
                                      self.virtual_index_update_mode))
-
 
     def display(self):
         "Displays the word table."
@@ -1380,18 +1269,18 @@ class WordTable:
                     raise
 
                 write_message(CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR % \
-                        (self.tablename, i_low, i_high))
+                        (self.table_name, i_low, i_high))
                 if CFG_CHECK_MYSQL_THREADS:
                     kill_sleepy_mysql_threads()
                 percentage_display = get_percentage_completed(records_done, records_to_go)
-                task_update_progress("(%s:%s) adding recs %d-%d %s" % (self.tablename, self.humanname, i_low, i_high, percentage_display))
+                task_update_progress("(%s:%s) adding recs %d-%d %s" % (self.table_name, self.index_name, i_low, i_high, percentage_display))
                 self.del_recID_range(i_low, i_high)
                 just_processed = self.add_recID_range(i_low, i_high)
                 flush_count = flush_count + i_high - i_low + 1
                 chunksize_count = chunksize_count + i_high - i_low + 1
                 records_done = records_done + just_processed
                 write_message(CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR % \
-                        (self.tablename, i_low, i_high))
+                        (self.table_name, i_low, i_high))
                 if chunksize_count >= chunksize:
                     chunksize_count = 0
                 # flush if necessary:
@@ -1400,7 +1289,7 @@ class WordTable:
                     self.clean()
                     if self.index_name == 'fulltext' and CFG_SOLR_URL:
                         solr_commit()
-                    write_message("%s backing up" % (self.tablename))
+                    write_message("%s backing up" % (self.table_name))
                     flush_count = 0
                     self.log_progress(time_started, records_done, records_to_go)
                 # iterate:
@@ -1484,10 +1373,10 @@ class WordTable:
         if len(wlist) == 0: return 0
         # put words into reverse index table with FUTURE status:
         for recID in recIDs:
-            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(self.tablename[:-1]), (recID, serialize_via_marshal(wlist[recID]))) # kwalitee: disable=sql
+            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal(wlist[recID]))) # kwalitee: disable=sql
             # ... and, for new records, enter the CURRENT status as empty:
             try:
-                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(self.tablename[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 # okay, it's an already existing record, no problem
                 pass
@@ -1597,10 +1486,10 @@ class WordTable:
         """Deletes records with 'recID' system number between low
            and high from memory words index table."""
         write_message("%s fetching existing words for records #%d-#%d started" % \
-                (self.tablename, low, high), verbose=3)
+                (self.table_name, low, high), verbose=3)
         self.recIDs_in_mem.append([low, high])
         query = """SELECT id_bibrec,termlist FROM %sR as bb WHERE bb.id_bibrec
-        BETWEEN %%s AND %%s""" % (self.tablename[:-1])
+        BETWEEN %%s AND %%s""" % (self.table_name[:-1])
         recID_rows = run_sql(query, (low, high))
         for recID_row in recID_rows:
             recID = recID_row[0]
@@ -1608,14 +1497,14 @@ class WordTable:
             for word in wlist:
                 self.put(recID, word, -1)
         write_message("%s fetching existing words for records #%d-#%d ended" % \
-                (self.tablename, low, high), verbose=3)
+                (self.table_name, low, high), verbose=3)
 
     def check_bad_words(self):
         """
         Finds bad words in reverse tables. Returns True in case of bad words.
         """
         query = """SELECT 1 FROM %sR WHERE type IN ('TEMPORARY','FUTURE') LIMIT 1""" \
-                % (self.tablename[:-1],)
+                % (self.table_name[:-1],)
         res = run_sql(query)
         return bool(res)
 
@@ -1625,7 +1514,8 @@ class WordTable:
         Prints small report (no of words, no of bad words).
         """
         # find number of words:
-        query = """SELECT COUNT(1) FROM %s""" % (self.tablename)
+        query = """SELECT COUNT(1) FROM %s""" % (self.table_name)
+
         res = run_sql(query, None, 1)
         if res:
             nb_words = res[0][0]
@@ -1633,14 +1523,14 @@ class WordTable:
             nb_words = 0
 
         # report stats:
-        write_message("%s contains %d words" % (self.tablename, nb_words))
+        write_message("%s contains %d words" % (self.table_name, nb_words))
 
         # find possible bad states in reverse tables:
         if self.check_bad_words():
             write_message("EMERGENCY: %s needs to be repaired" %
-                          (self.tablename, ))
+                          (self.table_name, ))
         else:
-            write_message("%s is in consistent state" % (self.tablename))
+            write_message("%s is in consistent state" % (self.table_name))
 
     def repair(self, opt_flush):
         """Repair the whole table"""
@@ -1649,7 +1539,7 @@ class WordTable:
             return
 
         query = """SELECT id_bibrec FROM %sR WHERE type IN ('TEMPORARY','FUTURE')""" \
-                % (self.tablename[:-1])
+                % (self.table_name[:-1])
         res = intbitset(run_sql(query))
         recIDs = create_range_list(list(res))
 
@@ -1689,23 +1579,23 @@ class WordTable:
         if flush_count > 0:
             self.put_into_db("emergency")
             self.log_progress(time_started, records_done, records_to_go)
-        write_message("%s inconsistencies repaired." % self.tablename)
+        write_message("%s inconsistencies repaired." % self.table_name)
 
     def chk_recID_range(self, low, high):
         """Check if the reverse index table is in proper state"""
         ## check db
         query = """SELECT 1 FROM %sR WHERE type IN ('TEMPORARY','FUTURE')
-        AND id_bibrec BETWEEN %%s AND %%s LIMIT 1""" % self.tablename[:-1]
+        AND id_bibrec BETWEEN %%s AND %%s LIMIT 1""" % self.table_name[:-1]
         res = run_sql(query, (low, high), 1)
         if not res:
-            write_message("%s for %d-%d is in consistent state" % (self.tablename, low, high))
+            write_message("%s for %d-%d is in consistent state" % (self.table_name, low, high))
             return # okay, words table is consistent
 
         ## inconsistency detected!
-        write_message("EMERGENCY: %s inconsistencies detected..." % self.tablename)
+        write_message("EMERGENCY: %s inconsistencies detected..." % self.table_name)
         error_message = "Errors found. You should check consistency of the " \
                 "%s - %sR tables.\nRunning 'bibindex --repair' is " \
-                "recommended." % (self.tablename, self.tablename[:-1])
+                "recommended." % (self.table_name, self.table_name[:-1])
         write_message("EMERGENCY: " + error_message, stream=sys.stderr)
         raise StandardError(error_message)
 
@@ -1725,7 +1615,7 @@ class WordTable:
 
         state = {}
         query = "SELECT id_bibrec,type FROM %sR WHERE id_bibrec BETWEEN %%s AND %%s"\
-                % self.tablename[:-1]
+                % self.table_name[:-1]
         res = run_sql(query, (low, high))
         for row in res:
             if not state.has_key(row[0]):
@@ -1742,7 +1632,7 @@ class WordTable:
                     else:
                         write_message("EMERGENCY: Inconsistency in index record %d detected" % recID)
                         query = """DELETE FROM %sR
-                        WHERE id_bibrec=%%s""" % self.tablename[:-1]
+                        WHERE id_bibrec=%%s""" % self.table_name[:-1]
                         run_sql(query, (recID,))
                         write_message("EMERGENCY: Inconsistency in record %d repaired." % recID)
 
@@ -1752,7 +1642,7 @@ class WordTable:
 
                     # Get the words file
                     query = """SELECT type,termlist FROM %sR
-                    WHERE id_bibrec=%%s""" % self.tablename[:-1]
+                    WHERE id_bibrec=%%s""" % self.table_name[:-1]
                     write_message(query, verbose=9)
                     res = run_sql(query, (recID,))
                     for row in res:
@@ -1767,7 +1657,7 @@ class WordTable:
 
                 else:
                     write_message("EMERGENCY: %s for %d is in inconsistent "
-                            "state. Couldn't repair it." % (self.tablename,
+                            "state. Couldn't repair it." % (self.table_name,
                                 recID), stream=sys.stderr)
                     ok = 0
 
@@ -1776,7 +1666,7 @@ class WordTable:
                     "consistency of the %s - %sR tables. Deleting affected " \
                     "TEMPORARY and FUTURE entries from these tables is " \
                     "recommended; see the BibIndex Admin Guide." % \
-                    (self.tablename, self.tablename[:-1])
+                    (self.table_name, self.table_name[:-1])
             write_message("EMERGENCY: " + error_message, stream=sys.stderr)
             raise StandardError(error_message)
 
@@ -2158,10 +2048,8 @@ def task_run_core():
         wordTables = get_word_tables(indexes)
         for index_id, index_name, index_tags in wordTables:
             wordTable = WordTable(index_name=index_name,
-                                  index_id=index_id,
                                   fields_to_index=index_tags,
-                                  table_name_pattern='idxWORD%02dF',
-                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                                   wash_index_terms=50)
             _last_word_table = wordTable
@@ -2170,10 +2058,8 @@ def task_run_core():
 
 
             wordTable = WordTable(index_name=index_name,
-                                  index_id=index_id,
                                   fields_to_index=index_tags,
-                                  table_name_pattern='idxPAIR%02dF',
-                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=100)
             _last_word_table = wordTable
@@ -2182,10 +2068,8 @@ def task_run_core():
 
 
             wordTable = WordTable(index_name=index_name,
-                                  index_id=index_id,
                                   fields_to_index=index_tags,
-                                  table_name_pattern='idxPHRASE%02dF',
-                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=0)
             _last_word_table = wordTable
@@ -2225,10 +2109,9 @@ def task_run_core():
             init_temporary_reindex_tables(index_id, reindex_prefix)
 
         wordTable = WordTable(index_name=index_name,
-                              index_id=index_id,
                               fields_to_index=index_tags,
-                              table_name_pattern=reindex_prefix + 'idxWORD%02dF',
-                              wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                              table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                              table_prefix=reindex_prefix,
                               tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                               wash_index_terms=50)
         _last_word_table = wordTable
@@ -2240,7 +2123,7 @@ def task_run_core():
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
                     error_message = "Missing IDs of records to delete from " \
-                            "index %s." % wordTable.tablename
+                            "index %s." % wordTable.table_name
                     write_message(error_message, stream=sys.stderr)
                     raise StandardError(error_message)
             elif task_get_option("cmd") == "add":
@@ -2252,7 +2135,7 @@ def task_run_core():
                 task_sleep_now_if_required(can_stop_too=True)
             else:
                 error_message = "Invalid command found processing %s" % \
-                    wordTable.tablename
+                    wordTable.table_name
                 write_message(error_message, stream=sys.stderr)
                 raise StandardError(error_message)
         except StandardError, e:
@@ -2267,10 +2150,9 @@ def task_run_core():
 
         # Let's work on pairs now
         wordTable = WordTable(index_name=index_name,
-                              index_id=index_id,
                               fields_to_index=index_tags,
-                              table_name_pattern=reindex_prefix + 'idxPAIR%02dF',
-                              wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                              table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                              table_prefix=reindex_prefix,
                               tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=100)
         _last_word_table = wordTable
@@ -2282,7 +2164,7 @@ def task_run_core():
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
                     error_message = "Missing IDs of records to delete from " \
-                            "index %s." % wordTable.tablename
+                            "index %s." % wordTable.table_name
                     write_message(error_message, stream=sys.stderr)
                     raise StandardError(error_message)
             elif task_get_option("cmd") == "add":
@@ -2294,7 +2176,7 @@ def task_run_core():
                 task_sleep_now_if_required(can_stop_too=True)
             else:
                 error_message = "Invalid command found processing %s" % \
-                        wordTable.tablename
+                        wordTable.table_name
                 write_message(error_message, stream=sys.stderr)
                 raise StandardError(error_message)
         except StandardError, e:
@@ -2309,10 +2191,9 @@ def task_run_core():
 
         # Let's work on phrases now
         wordTable = WordTable(index_name=index_name,
-                              index_id=index_id,
                               fields_to_index=index_tags,
-                              table_name_pattern=reindex_prefix + 'idxPHRASE%02dF',
-                              wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
+                              table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
+                              table_prefix=reindex_prefix,
                               tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=0)
         _last_word_table = wordTable
@@ -2324,7 +2205,7 @@ def task_run_core():
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
                     error_message = "Missing IDs of records to delete from " \
-                            "index %s." % wordTable.tablename
+                            "index %s." % wordTable.table_name
                     write_message(error_message, stream=sys.stderr)
                     raise StandardError(error_message)
             elif task_get_option("cmd") == "add":
@@ -2338,7 +2219,7 @@ def task_run_core():
                 task_sleep_now_if_required(can_stop_too=True)
             else:
                 error_message = "Invalid command found processing %s" % \
-                        wordTable.tablename
+                        wordTable.table_name
                 write_message(error_message, stream=sys.stderr)
                 raise StandardError(error_message)
         except StandardError, e:

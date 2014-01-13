@@ -68,7 +68,8 @@ from invenio.intbitset import intbitset
 from invenio.search_engine import intersect_results_with_collrecs
 from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
 from invenio.search_engine_query_parser_unit_tests import DATEUTIL_AVAILABLE
-from invenio.bibindex_regression_tests import reindex_word_tables_into_testtables
+from invenio.bibindex_engine_utils import get_index_tags
+from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
 
 if 'fr' in CFG_SITE_LANGS:
     lang_french_configured = True
@@ -908,27 +909,38 @@ class WebSearchCJKTokenizedSearchTest(InvenioTestCase):
 
     test_counter = 0
     reindexed = False
+    index_name = 'title'
 
     @classmethod
     def setUp(self):
         if not self.reindexed:
-            self.last_updated = reindex_word_tables_into_testtables('title',
-                                                                [[104,104]],
-                                                                      False,
-                                        {'tokenizer':'BibIndexCJKTokenizer',
-                                         'last_updated':'0000-00-00 00:00:00'})
+            from invenio.bibindex_engine import WordTable, AbstractIndexTable
+            query = """SELECT last_updated FROM idxINDEX WHERE name='%s'""" % self.index_name
+            self.last_updated = run_sql(query)[0][0]
+            query = """UPDATE idxINDEX SET tokenizer='BibIndexCJKTokenizer', last_updated='0000-00-00 00:00:00'
+                       WHERE name='%s'""" % self.index_name
+            run_sql(query)
             self.reindexed = True
+            wordTable = WordTable(index_name=self.index_name,
+                                  fields_to_index=get_index_tags(self.index_name),
+                                  table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+            wordTable.turn_off_virtual_indexes()
+            wordTable.add_recIDs([[104, 104]], 10000)
 
     @classmethod
     def tearDown(self):
         self.test_counter += 1
         if self.test_counter == 2:
-            reindex_word_tables_into_testtables(
-                'title',
-                [[104,104]],
-                False,
-                {'tokenizer':'BibIndexDefaultTokenizer',
-                 'last_updated':self.last_updated})
+            from invenio.bibindex_engine import WordTable, AbstractIndexTable
+            query = """UPDATE idxINDEX SET tokenizer='BibIndexDefaultTokenizer', last_updated='%s'
+                       WHERE name='%s'""" % (self.last_updated, self.index_name)
+            run_sql(query)
+            wordTable = WordTable(index_name=self.index_name,
+                                  fields_to_index=get_index_tags(self.index_name),
+                                  table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+            wordTable.turn_off_virtual_indexes()
+            wordTable.add_recIDs([[104, 104]], 10000)
+
 
 
     def test_title_cjk_tokenized_two_characters(self):
