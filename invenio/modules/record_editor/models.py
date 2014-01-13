@@ -233,8 +233,7 @@ class HstRECORD(db.Model):
     job_person = db.Column(db.String(255), nullable=False, index=True)
     job_date = db.Column(db.DateTime, nullable=False, index=True)
     job_details = db.Column(db.iBinary, nullable=False)
-    affected_fields = db.Column(db.Text(), nullable=False,
-                                server_default='')
+    affected_fields = db.Column(db.Text, nullable=True)
 
 
 # GENERATED
