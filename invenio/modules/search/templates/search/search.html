@@ -86,9 +86,6 @@
   font-size: 90%;
 }
 
-#facet_list {
-}
-
 #facet_list.affix {
   top: 60px;
 }
@@ -123,18 +120,16 @@ body {
 {% else %}
 
 <div class="row">
-  <div class="col-md-2 visible-md">
-    <div class="row">
+  <div class="col-md-3 col-lg-2 visible-md visible-lg">
     <div
-      class="accordion col-md-2 facet"
+      class="facet"
       id="facet_list">
-    </div>
     </div>
   </div>
 
-  <div class="col-md-10">
+  <div class="col-md-9 col-lg-10">
 
-    <div class="row visible-md">
+    <div class="row visible-md visible-lg">
       <div class="col-md-10">
         <div class="well" id="facet_filter" style="clear:both; display: none;">
           <input type="hidden" value="{{ request.args.get('p', '') }}" name="p" />
@@ -142,7 +137,7 @@ body {
       </div>
     </div>
     <div class="row">
-      <div id="search_results" class="col-md-10">
+      <div id="search_results" class="col-md-12">
       {% block search_results %}
         {{ render_search_results(recids, collection, pagination, format_record) }}
       {% endblock search_results %}
@@ -179,9 +174,9 @@ body {
     offset: {
       top: function () {
         var $s = $('#search-box-main'),
-            h = $s.height(),
             y = $s.offset()['top']
-        return $(window).width() <= 980 ? 165 : h }
+        return y;
+      }
     , bottom: 170
     }
   })

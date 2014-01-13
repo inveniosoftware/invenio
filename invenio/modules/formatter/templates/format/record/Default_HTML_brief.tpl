@@ -61,11 +61,12 @@
 
       {% if record['keywords']|length %} | <i class="glyphicon glyphicon-tag"></i>
       {% for keyword in record['keywords'] %}
-      <span class="label">
+      <span class="label label-default">
         <a href="{{ url_for('search.search', p='keyword:' + keyword['term']) }}">
           {{ keyword['term'] }}
         </a>
       </span>
+      &nbsp
       {% endfor %}
       {% endif %}
 
