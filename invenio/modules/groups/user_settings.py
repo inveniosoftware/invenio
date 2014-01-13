@@ -61,7 +61,7 @@ class WebGroupSettings(Settings):
 {{ _('You are involved in following groups:') }}
 <div>
   {%- for ug in usergroups -%}
-  <span class="label">
+  <span class="label label-default">
     {{ ug.usergroup.name }}
   </span>
   {%- endfor -%}

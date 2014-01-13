@@ -18,6 +18,7 @@
 #}
 
 {% macro render_search_pagination(pagination) %}
+
   {%- set args = request.args.copy().to_dict() -%}
   {%- set form_args = request.form.copy().to_dict() -%}
   {%- if form_args|length() and 'filter' in form_args -%}
@@ -27,129 +28,150 @@
   {%- else -%}
     {%- set hash_tag = '' -%}
   {%- endif -%}
-  <div style="margin:0px;" class="pagination pull-right">
-    <ul>
-      <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
-        {%- do args.update({'jrec': 1}) -%}
-        <a title="first" href="{{ url_for('search.search', **args)+hash_tag }}">«</a></li>
-      <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
-        {%- set jrec = (pagination.page-1)*pagination.per_page if pagination.has_prev else 1 -%}
-        {%- do args.update({'jrec': jrec}) -%}
-        <a title="prev" href="{{ url_for('search.search', **args)+hash_tag }}">&lsaquo;</a></li>
-      {%- for page in pagination.iter_pages() %}
-        {%- if page -%}
-      <li{{ ' class="active"'|safe if page == pagination.page }}>
-        {%- do args.update({'jrec': (page-1)*pagination.per_page+1}) -%}
+  <ul class="pagination">
+    <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
+      {%- do args.update({'jrec': 1}) -%}
+      <a title="first" href="{{ url_for('search.search', **args)+hash_tag }}">«</a>
+    </li>
+    <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
+      {%- set jrec = (pagination.page-1)*pagination.per_page if pagination.has_prev else 1 -%}
+      {%- do args.update({'jrec': jrec}) -%}
+      <a title="prev" href="{{ url_for('search.search', **args)+hash_tag }}">&lsaquo;</a>
+    </li>
+    {%- for page in pagination.iter_pages() %}
+      {%- if page -%}
+        <li{{ ' class="active"'|safe if page == pagination.page }}>
+      {%- do args.update({'jrec': (page-1)*pagination.per_page+1}) -%}
         <a href="{{ url_for('search.search', **args)+hash_tag }}">{{ page }}</a>
       </li>
-        {%- else -%}
-          <li class="disabled"><a href="{{ hash_tag|default('#', true) }}">...</a></li>
-        {%- endif -%}
-      {%- endfor -%}
-      <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
-        {%- set jrec = (pagination.page+1)*pagination.per_page if pagination.has_next else (pagination.pages-1)*pagination.per_page+1 -%}
-        {%- do args.update({'jrec': jrec}) -%}
+      {%- else -%}
+        <li class="disabled"><a href="{{ hash_tag|default('#', true) }}">...</a></li>
+      {%- endif -%}
+    {%- endfor -%}
+    <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
+      {%- set jrec = (pagination.page+1)*pagination.per_page if pagination.has_next else (pagination.pages-1)*pagination.per_page+1 -%}
+      {%- do args.update({'jrec': jrec}) -%}
+      <a href="{{ url_for('search.search', **args)+hash_tag }}">&rsaquo;</a>
+    </li>
+    <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
+      {%- do args.update({'jrec': (pagination.pages-1)*pagination.per_page+1}) -%}
+      <a title="last" href="{{ url_for('search.search', **args)+hash_tag }}">»</a>
+    </li>
+  </ul>
+{% endmacro %}
 
-        <a href="{{ url_for('search.search', **args)+hash_tag }}">&rsaquo;</a></li>
-      <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
-        {%- do args.update({'jrec': (pagination.pages-1)*pagination.per_page+1}) -%}
-        <a title="last" href="{{ url_for('search.search', **args)+hash_tag }}">»</a>
-      </li>
-    </ul>
+{% macro results_actions() %}
+  <div class="form-group">
+    <span class="btn-group" class="col-sm-4">
+      <span class="btn btn-default" onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
+            class="btn">
+        <i class="glyphicon glyphicon-check"
+           rel="tooltip"
+           title="{{ _('Toggle all') }}"></i>
+      </span>
+      {% if current_user.precached_usebaskets %}
+        <button name="action" value="addtobasket" class="btn btn-default">
+          <i class="glyphicon glyphicon-bookmark"
+             rel="tooltip"
+             title="{{ _('Add to basket') }}"></i>
+          <span style="display: none">{{ _('Add to basket') }}</span>
+        </button>
+      {% endif %}
+    </span>
   </div>
 {% endmacro %}
 
 
 {% macro render_search_results(recids, collection, pagination, format_record) %}
-      <form class="clearfix form-horizontal" name="" action="{{ url_for('search.dispatch') }}" method="post">
-        <span class="btn-group">
-          <span onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
-                class="btn">
-            <i class="glyphicon glyphicon-check"
-               rel="tooltip"
-               title="{{ _('Toggle all') }}"></i>
-          </span>
-          {% if current_user.precached_usebaskets %}
-          <button name="action" value="addtobasket" class="btn">
-            <i class="glyphicon glyphicon-bookmark"
-               rel="tooltip"
-               title="{{ _('Add to basket') }}"></i>
-            <span style="display: none">{{ _('Add to basket') }}</span>
-          </button>
-          {% endif %}
-        </span>
-        <p class="help-inline hidden-xs">
-          {%- set r_from = (pagination.page-1)*pagination.per_page+1 -%}
-          {%- set r_to = pagination.page*pagination.per_page -%}
-          {%- set r_of = recids|length -%}
-          {%- set r_to = r_to if r_to < r_of else r_of -%}
-          {{ _('Showing records %d to %d out of %d results.') % (r_from, r_to, r_of) }}
-        </p>
-        <div class="btn-group pull-right">
+  <style>
+    .pagination {
+      margin: 0px;
+      vertical-align: middle;
+    }
 
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="glyphicon glyphicon-random"></i> {{ _('Sort by') }}
-            <span class="caret"></span>
-          </a>
-
-          {%- set args = request.values.copy().to_dict() -%}
-          {%- set form_args = request.form.copy().to_dict() -%}
-          {%- if form_args|length() and 'filter' in form_args -%}
-            {%- do form_args.pop('filter') -%}
-            {%- do args.update(form_args) -%}
-          {%- endif -%}
-          {%- set new_args = args.copy() -%}
-          {%- if 'so' in new_args -%}
-            {%- do new_args.pop('so') -%}
-          {%- endif -%}
-          {%- if 'rm' in new_args -%}
-            {%- do new_args.pop('rm') -%}
-          {%- endif -%}
-
-          <ul class="dropdown-menu">
-          {%- for (k,v,vv) in [('Most recent', 'rm', ''), ('Most cited', 'rm', 'citation'), ('Most relevant', 'rm', 'wrd')] -%}
-            {%- set active = request.values.get(v,'') == vv -%}
-            {%- set used_args = new_args.copy() -%}
-            {%- do used_args.update({v:vv}) -%}
-            <li>
-            <a href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
-               class="{{ 'active' if active }}">
-              <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if active }}"></i>
-                {{ _(k) }}
-            </a>
-            </li>
-          {%- endfor -%}
-          {% if collection.rnkMETHODs|length %}
-            <li class="divider"></li>
-          {% for rnk_method in collection.rnkMETHODs %}
-            {%- set used_args = new_args.copy() -%}
-            {%- do used_args.update({'rm': rnk_method.rnkMETHOD.name }) -%}
-            <li><a href="{{ url_for('search.search', **used_args) }}">
-              {{ rnk_method.rnkMETHOD.get_name_ln() }}
-            </a></li>
-          {% endfor %}
-          {% endif %}
-          </ul>
+    /* fix for text in dropdowns - not to be aligned to right */
+    .form-group.pull-right {
+      text-align: left;
+    }
+  </style>
+      <form class="form-inline" name="" action="{{ url_for('search.dispatch') }}" method="post">
+        {{ results_actions() }}
+        <div class="form-group">
+          <p class="help-block hidden-xs">
+            {%- set r_from = (pagination.page-1)*pagination.per_page+1 -%}
+            {%- set r_to = pagination.page*pagination.per_page -%}
+            {%- set r_of = recids|length -%}
+            {%- set r_to = r_to if r_to < r_of else r_of -%}
+            {{ _('Showing records %d to %d out of %d results.') % (r_from, r_to, r_of) }}
+          </p>
         </div>
+        <div class="form-group pull-right">
+          <div class="btn-group">
 
-        <div class="btn-group pull-right" style="margin-right: 5px;">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="glyphicon glyphicon-th"></i> {{ _('Display') }}
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-          {%- for i in collection.formatoptions if i.content_type == 'text/html' and i.visibility == 1 -%}
-            {%- set used_args = new_args.copy() -%}
-            {%- do used_args.update({'of':i.code}) -%}
-            <li><a
-               href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
-               class="{{ ' active' if active }}">
-              <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if of==i.code }}"></i>
-              {{ i.name }}
-            </a></li>
-          {%- endfor -%}
-          <!-- dropdown menu links -->
-          </ul>
+            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="glyphicon glyphicon-random"></i> {{ _('Sort by') }}
+              <span class="caret"></span>
+            </a>
+
+            {%- set args = request.values.copy().to_dict() -%}
+            {%- set form_args = request.form.copy().to_dict() -%}
+            {%- if form_args|length() and 'filter' in form_args -%}
+              {%- do form_args.pop('filter') -%}
+              {%- do args.update(form_args) -%}
+            {%- endif -%}
+            {%- set new_args = args.copy() -%}
+            {%- if 'so' in new_args -%}
+              {%- do new_args.pop('so') -%}
+            {%- endif -%}
+            {%- if 'rm' in new_args -%}
+              {%- do new_args.pop('rm') -%}
+            {%- endif -%}
+
+            <ul class="dropdown-menu">
+            {%- for (k,v,vv) in [('Most recent', 'rm', ''), ('Most cited', 'rm', 'citation'), ('Most relevant', 'rm', 'wrd')] -%}
+              {%- set active = request.values.get(v,'') == vv -%}
+              {%- set used_args = new_args.copy() -%}
+              {%- do used_args.update({v:vv}) -%}
+              <li>
+                <a href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
+                   class="{{ 'active' if active }}">
+                  <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if active }}"></i>
+                    {{ _(k) }}
+                </a>
+              </li>
+            {%- endfor -%}
+            {% if collection.rnkMETHODs|length %}
+              <li class="divider"></li>
+            {% for rnk_method in collection.rnkMETHODs %}
+              {%- set used_args = new_args.copy() -%}
+              {%- do used_args.update({'rm': rnk_method.rnkMETHOD.name }) -%}
+              <li><a href="{{ url_for('search.search', **used_args) }}">
+                {{ rnk_method.rnkMETHOD.get_name_ln() }}
+              </a></li>
+            {% endfor %}
+            {% endif %}
+            </ul>
+          </div>
+
+          <div class="btn-group">
+            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="glyphicon glyphicon-th"></i> {{ _('Display') }}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+            {%- for i in collection.formatoptions if i.content_type == 'text/html' and i.visibility == 1 -%}
+              {%- set used_args = new_args.copy() -%}
+              {%- do used_args.update({'of':i.code}) -%}
+              <li><a
+                 href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
+                 class="{{ ' active' if active }}">
+                <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if of==i.code }}"></i>
+                {{ i.name }}
+              </a></li>
+            {%- endfor -%}
+            <!-- dropdown menu links -->
+            </ul>
+          </div>
         </div>
 
 
@@ -158,14 +180,14 @@
         {%- for recid in recids[(pagination.page-1)*rg:pagination.page*rg] -%}
           {%- if of[0] == 'h' -%}
             <div class="row">
-              <div class="col-md-1">
+              <div class="col-sm-1 col-xs-1">
                 <label class="checkbox">
                   <input name="recid" type="checkbox" value="{{ recid }}" />
                   <abbr class="unapi-id" title="{{ recid }}"></abbr>
                   {{ loop.index+(pagination.page-1)*rg }}
                 </label>
               </div>
-              <div class="col-md-10">
+              <div class="col-sm-11 col-xs-11">
                 {{ format_record(recid, of, ln=g.ln, qid=qid)|safe }}
                 {{ '<hr/>'|safe if not loop.last }}
               </div>
@@ -176,37 +198,27 @@
         {%- endfor -%}
         <hr/>
         <div class="row clearfix">
-          <div class="col-md-10">
-            <span class="pull-left btn-group clearfix">
-            <span onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
-                  class="btn">
-              <i class="glyphicon glyphicon-check"
-                 rel="tooltip"
-                 title="{{ _('Toggle all') }}"></i>
-            </span>
-            {% if current_user.precached_usebaskets %}
-            <button name="action" value="addtobasket" class="btn">
-              <i class="glyphicon glyphicon-bookmark"
-                 rel="tooltip"
-                 title="{{ _('Add to basket') }}"></i>
-                 <span style="display: none">{{ _('Add to basket') }}</span>
-            </button>
-            {% endif %}
-           </span>
-            <span class="col-md-4">
-              <select name="of" class="col-md-2">
+          <div class="col-md-12">
+            {{ results_actions() }}
+            <div class="form-group">
+              <select name="of" class="col-md-2 form-control">
               {%- for i in export_formats -%}
                 <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
               {%- endfor -%}
               </select>
-             <button name="action" value="export" class="btn">
-              <i class="glyphicon glyphicon-download-alt"
-                 rel="tooltip"
-                 title="{{ _('Export') }}"></i> {{ _('Export') }}
-             </button>
-            </span>
-
-            {{ render_search_pagination(pagination) }}
+            </div>
+            <div class="form-group">
+              <button name="action" value="export" class="btn btn-default">
+                <i class="glyphicon glyphicon-download-alt"
+                   rel="tooltip"
+                   title="{{ _('Export') }}">
+                </i>
+                {{ _('Export') }}
+              </button>
+            </div>
+            <div class="form-group pull-right">
+              {{ render_search_pagination(pagination) }}
+            </div>
           </div>
         </div>
       </form>
