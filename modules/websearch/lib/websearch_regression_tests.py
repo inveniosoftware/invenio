@@ -1230,7 +1230,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
         """websearch - search engine Python API for successful query, respect sorting parameters"""
         self.assertEqual([77, 84, 85],
                          perform_request_search(p='klebanov'))
-        self.assertEqual([84, 85, 77],
+        self.assertEqual([77, 85, 84],
                          perform_request_search(p='klebanov', sf='909C4v'))
 
     def test_search_engine_python_api_respect_ranking_parameter(self):
@@ -2021,11 +2021,11 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
                                                expected_text="[85, 84, 77]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&sf=909C4v',
-                                               expected_text="[85, 84]"))
+                                               expected_text="[84, 85]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&sf=909C4v',
                                                username="admin",
-                                               expected_text="[77, 85, 84]"))
+                                               expected_text="[84, 85, 77]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=intbitset&sf=909C4v',
                                                username="admin",

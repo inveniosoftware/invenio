@@ -4101,15 +4101,17 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
 
     return solution_recs, solution_scores, prefix, suffix, comment
 
+def sort_records_latest(recIDs, jrec, rg, sort_order):
+    if sort_order == 'd':
+        recIDs.reverse()
+    return slice_records(recIDs, jrec, rg)
+
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, sorting_methods=SORTING_METHODS):
     """Initial entry point for sorting records, acts like a dispatcher.
        (i) sort_field is in the bsrMETHOD, and thus, the BibSort has sorted the data for this field, so we can use the cache;
        (ii)sort_field is not in bsrMETHOD, and thus, the cache does not contain any information regarding this sorting method"""
 
     _ = gettext_set_language(ln)
-
-    # Calculate the min index on the reverted list
-    index_min = jrec
 
     #bibsort does not handle sort_pattern for now, use bibxxx
     if sort_pattern:
@@ -4122,9 +4124,9 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         if use_sorting_buckets:
             return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
         else:
-            return recIDs[index_min:]
+            return sort_records_latest(recIDs, jrec, rg, sort_order)
 
-    sort_fields = string.split(sort_field, ",")
+    sort_fields = sort_field.split(",")
     if len(sort_fields) == 1:
         # we have only one sorting_field, check if it is treated by BibSort
         for sort_method in sorting_methods:
@@ -4143,8 +4145,8 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         else:
             if of.startswith('h'):
                 write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
-            return recIDs[index_min:]
-    if tags:
+            return slice_records(recIDs, jrec, rg)
+    elif tags:
         for sort_method in sorting_methods:
             definition = sorting_methods[sort_method]
             if definition.startswith('MARC') \
@@ -4154,8 +4156,8 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                 return sort_records_bibsort(req, recIDs, sort_method, sort_field, sort_order, verbose, of, ln, rg, jrec)
         #we do not have this sort_field in BibSort tables -> do the old fashion sorting
         return sort_records_bibxxx(req, recIDs, tags, sort_field, sort_order, sort_pattern, verbose, of, ln, rg, jrec)
-
-    return recIDs[index_min:]
+    else:
+        return slice_records(recIDs, jrec, rg)
 
 
 def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=1, sort_or_rank='s', sorting_methods=SORTING_METHODS):
@@ -4248,6 +4250,15 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
         return solution
 
 
+def slice_records(recIDs, jrec, rg):
+    if not jrec:
+        jrec = 1
+    if rg:
+        recIDs = recIDs[jrec-1:jrec-1+rg]
+    else:
+        recIDs = recIDs[jrec-1:]
+    return recIDs
+
 def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
     """OLD FASHION SORTING WITH NO CACHE, for sort fields that are not run in BibSort
        Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
@@ -4257,34 +4268,33 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
 
     _ = gettext_set_language(ln)
 
-    #we should return sorted records up to irec_max(exclusive)
-    dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
-    #calculate the min index on the reverted list
-    index_min = max(len(recIDs) - irec_max, 0) #just to be sure that the min index is not negative
-
     ## check arguments:
     if not sort_field:
-        return recIDs[index_min:]
+        return slice_records(recIDs, jrec, rg)
+
     if len(recIDs) > CFG_WEBSEARCH_NB_RECORDS_TO_SORT:
         if of.startswith('h'):
             write_warning(_("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % CFG_WEBSEARCH_NB_RECORDS_TO_SORT, "Warning", req=req)
-        return recIDs[index_min:]
+        return slice_records(recIDs, jrec, rg)
+
     recIDs_dict = {}
     recIDs_out = []
 
     if not tags:
         # tags have not been camputed yet
-        sort_fields = string.split(sort_field, ",")
+        sort_fields = sort_field.split(',')
         tags, error_field = get_tags_from_sort_fields(sort_fields)
         if error_field:
             if of.startswith('h'):
                 write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
-            return recIDs[index_min:]
+            return slice_records(recIDs, jrec, rg)
+
     if verbose >= 3 and of.startswith('h'):
         write_warning("Sorting by tags %s." % cgi.escape(repr(tags)), req=req)
         if sort_pattern:
             write_warning("Sorting preferentially by %s." % cgi.escape(sort_pattern), req=req)
-     ## check if we have sorting tag defined:
+
+    ## check if we have sorting tag defined:
     if tags:
         # fetch the necessary field values:
         for recID in recIDs:
@@ -4306,34 +4316,28 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
                         val = v
                         break
                 if not bingo: # sort_pattern not present, so add other vals after spaces
-                    val = sort_pattern + "          " + string.join(vals)
+                    val = sort_pattern + "          " + ''.join(vals)
             else:
                 # no sort pattern defined, so join them all together
-                val = string.join(vals)
+                val = ''.join(vals)
             val = strip_accents(val.lower()) # sort values regardless of accents and case
             if val in recIDs_dict:
                 recIDs_dict[val].append(recID)
             else:
                 recIDs_dict[val] = [recID]
-        # sort them:
-        recIDs_dict_keys = recIDs_dict.keys()
-        recIDs_dict_keys.sort()
-        # now that keys are sorted, create output array:
-        for k in recIDs_dict_keys:
-            for s in recIDs_dict[k]:
-                recIDs_out.append(s)
+
+        # create output array:
+        for k in sorted(recIDs_dict.keys()):
+            recIDs_out.extend(recIDs_dict[k])
+
         # ascending or descending?
-        if sort_order == 'a':
+        if sort_order == 'd':
             recIDs_out.reverse()
-        # okay, we are done
-        # return only up to the maximum that we need to sort
-        if len(recIDs_out) != len(recIDs):
-            dummy, irec_max = get_interval_for_records_to_sort(len(recIDs_out), jrec, rg)
-            index_min = max(len(recIDs_out) - irec_max, 0) #just to be sure that the min index is not negative
-        return recIDs_out[index_min:]
-    else:
-        # good, no sort needed
-        return recIDs[index_min:]
+
+        recIDs = recIDs_out
+
+    # return only up to the maximum that we need
+    return slice_records(recIDs, jrec, rg)
 
 def get_interval_for_records_to_sort(nb_found, jrec=None, rg=None):
     """calculates in which interval should the sorted records be
@@ -6330,7 +6334,6 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
             results_final_relevances = []
             results_final_relevances_prologue = ""
             results_final_relevances_epilogue = ""
-
             if rm: # do we have to rank?
                 results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                              rank_records(req, rm, 0, results_final[coll],
@@ -6344,7 +6347,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                     # rank_records failed and returned some error message to display:
                     write_warning(results_final_relevances_prologue, req=req)
                     write_warning(results_final_relevances_epilogue, req=req)
-            elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
+            else:
                 results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
 
 
