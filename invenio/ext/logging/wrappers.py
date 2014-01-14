@@ -503,7 +503,7 @@ def wrap_warn():
     def wrapper(showwarning):
         @wraps(showwarning)
         def new_showwarning(message=None, category=None, filename=None, lineno=None, file=None, line=None):
-            invenio_err = open(os.path.join(CFG_LOGDIR, 'invenio.err'), "a")
+            invenio_err = open(os.path.join(cfg['CFG_LOGDIR'], 'invenio.err'), "a")
             print >> invenio_err, "* %(time)s -> WARNING: %(category)s: %(message)s (%(file)s:%(line)s)\n" % {
             'time': time.strftime("%Y-%m-%d %H:%M:%S"),
             'category': category,
