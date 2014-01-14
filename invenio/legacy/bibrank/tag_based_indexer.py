@@ -173,8 +173,13 @@ def single_tag_rank(config):
 
     write_message("Reading knowledgebase file: %s" % \
                    config.get(config.get("rank_method", "function"), "kb_src"))
-    input = open(config.get(config.get("rank_method", "function"), "kb_src"), 'r')
-    data = input.readlines()
+
+    kb_src = config.get(config.get("rank_method", "function"), "kb_src").strip()
+    kb_src_clean = kb_src.replace("@prefix@", CFG_PREFIX)
+
+    with open(kb_src_clean, 'r') as kb_file:
+        data = kb_file.readlines()
+
     for line in data:
         if not line[0:1] == "#":
             kb_data[string.strip((string.split(string.strip(line), "---"))[0])] = (string.split(string.strip(line), "---"))[1]
