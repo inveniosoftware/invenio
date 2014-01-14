@@ -52,7 +52,7 @@ class SQLAlchemyStorage(Storage):
     @locked_cached_property
     def db(self):
         """Returns SQLAlchemy database object."""
-        if isinstance(self.__db, basestring)
+        if isinstance(self.__db, basestring):
             return import_string(self.__db)
         return self.__db
 

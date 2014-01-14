@@ -24,8 +24,6 @@ import math
 import re
 import ConfigParser
 
-from invenio.config import \
-     CFG_SITE_LANG, \
 from invenio.legacy.search_engine import perform_request_search, wash_index_term
 from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.legacy.bibindex.engine_stemmer import is_stemmer_available_for_language, stem
@@ -1168,12 +1166,14 @@ def get_from_reverse_index(records, start, stop, table):
     #for (word, count) in gwfp.iteritems():
         #print "\t-> %s - %s" % (word, count)
 
-def getName(methname, ln=CFG_SITE_LANG, type='ln'):
+def getName(methname, ln=None, type='ln'):
     """Returns the name of the rank method, either in default language or given language.
     methname = short name of the method
     ln - the language to get the name in
     type - which name "type" to get."""
-
+    from invenio.config import CFG_SITE_LANG
+    if ln is None:
+        ln = CFG_SITE_LANG
     try:
         rnkid = run_sql("SELECT id FROM rnkMETHOD where name='%s'" % methname)
         if rnkid:

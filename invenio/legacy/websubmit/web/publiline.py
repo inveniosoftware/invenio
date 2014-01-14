@@ -33,7 +33,7 @@ __revision__ = "$Id$"
 import os
 import re
 
-from invenio.base.globals imoprt cfg
+from invenio.base.globals import cfg
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \

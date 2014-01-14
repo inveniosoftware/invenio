@@ -315,11 +315,11 @@ def _get_ckw_span(fulltext, spans):
     # There is no inclusion.
     return None
 
-def _contains_span(span0, col-md-1):
-    """Return true if span0 contains col-md-1, False otherwise."""
-    if (span0 == col-md-1 or
-        span0[0] > col-md-1[0] or
-        span0[1] < col-md-1[1]):
+def _contains_span(span0, span1):
+    """Return true if span0 contains span1, False otherwise."""
+    if (span0 == span1 or
+        span0[0] > span1[0] or
+        span0[1] < span1[1]):
         return False
     return True
 
