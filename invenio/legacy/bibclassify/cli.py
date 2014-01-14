@@ -35,7 +35,7 @@ log = bconfig.get_logger("bibclassify.cli")
 
 
 from invenio import bibclassify_engine as engine
-from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader as reader
+from invenio.legacy.bibclassify import ontology_reader as reader
 
 daemon = None
 
