@@ -160,7 +160,7 @@ class Template:
         <script type="text/javascript" src="%(site_url)s/%(script)s"></script>
         """ % {'site_url':CFG_SITE_URL,
                'script': auto_version_url(
-                   url_for('uploader.static', filename="js/uploader/batchuploader.js")}
+                   url_for('uploader.static', filename="js/uploader/batchuploader.js"))}
 
         return styles
 
