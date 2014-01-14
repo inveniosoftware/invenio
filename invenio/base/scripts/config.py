@@ -20,8 +20,8 @@
 import StringIO
 import errno
 import imp
-import os
 import sys
+import types
 
 from pprint import pformat
 from flask import current_app
@@ -96,7 +96,10 @@ def set_(name, value, filename='invenio.cfg'):
 
     try:
         type_ = type(current_app.config.get(name, value))
-        value = type_(value)
+        if type_ in [types.DictType, types.ListType]:
+            value = eval(value)
+        else:
+            value = type_(value)
     except:
         print '>>> Using default type ...'
 
@@ -134,12 +137,15 @@ def update(filename='invenio.cfg', silent=True):
         while True:
             new_value = raw_input(prmt)
             try:
-                if type_ is not type(None):
-                    new_value = type_(new_value or value)
-                else:
+                if type_ in [types.DictType, types.ListType]:
+                    new_value = eval(new_value) if new_value else value
+                elif isinstance(None, type_):
                     new_value = new_value if new_value != '' else None
+                else:
+                    new_value = type_(new_value or value)
                 break
-            except:
+            except Exception as e:
+                print e
                 pass
         print '>>>', key, '=', pformat(new_value)
         print >>new_config, key, '=', pformat(new_value)
