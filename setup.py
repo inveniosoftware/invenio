@@ -61,16 +61,26 @@ from setuptools import setup, find_packages
 def match_feature_name(filename):
     return re.match(r".*requirements-(\w+).txt$", filename).group(1)
 
+def match_egg_name_and_version(dependency_link, version='=='):
+    return version.join(
+        re.sub(
+            r'.+://.*[@#&]egg=([^&]*)&?.*$',
+            r'\1',
+            dependency_link
+        ).rsplit('-', 1))
+
 
 def read_requirements(filename='requirements.txt'):
     req = []
     dep = []
     with open(filename, 'r') as f:
         for line in f.readlines():
+            line = line.strip('\n')
             if line.startswith('#'):
                 continue
             if '://' in line:
-                dep.append(str(line[:-1]))
+                dep.append(str(line))
+                req.append(match_egg_name_and_version(str(line)))
             else:
                 req.append(str(line))
     return req, dep
