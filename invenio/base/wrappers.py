@@ -43,17 +43,25 @@
     ===================== ====================================================
 
 """
+import os
 
 from functools import wraps
-from flask import Flask as FlaskBase, current_app
+from flask import Flask as FlaskBase, current_app, send_file
 from werkzeug import import_string
 from werkzeug.exceptions import NotFound
 from werkzeug.local import LocalProxy
+from invenio.utils.datastructures import LazyDict
 
 
 def _decorate_url_adapter_build(f):
     @wraps(f)
     def decorator(*args, **kwargs):
+        # Overwrites blueprint static url.
+        # NOTE: Custom blueprint 'static' endpoint will not work!
+        args = list(args)
+        if args[0].endswith('.static'):
+            args[0] = 'static'
+
         url_scheme_prefixes = {
             'http': current_app.config['CFG_SITE_URL'],
             'https': current_app.config['CFG_SITE_SECURE_URL']
@@ -68,6 +76,37 @@ def _decorate_url_adapter_build(f):
     return decorator
 
 
+def get_static_map():
+    """Generates static map from all static folders."""
+
+    out = {}
+
+    def generator(app, directory, files):
+        prefix = app.static_folder
+        for f in files:
+            path = os.path.join(directory, f)
+            if os.path.isdir(path):
+                continue
+            filename = os.path.relpath(path, prefix.rstrip('/'))
+            if filename not in out:
+                out[filename] = path
+            else:
+                current_app.logger.info('Filename "%s" already exists: "%s" (%s)',
+                                        path, out[filename], app.name)
+
+    if current_app.has_static_folder:
+        os.path.walk(current_app.static_folder, generator, current_app)
+
+    for blueprint in current_app.blueprints.values():
+        if not blueprint.has_static_folder:
+            continue
+        os.path.walk(blueprint.static_folder, generator, blueprint)
+
+    return out
+
+static_map = LazyDict(get_static_map)
+
+
 class Flask(FlaskBase):
     """For more information about :class:`Flask` see :class:`~flask.Flask`."""
 
@@ -77,23 +116,10 @@ class Flask(FlaskBase):
             url_adapter.build = _decorate_url_adapter_build(url_adapter.build)
         return url_adapter
 
-    def static_dispatchers(self):
-        yield super(self.__class__, self).send_static_file
-        for blueprint in self.blueprints.values():
-            if blueprint.has_static_folder:
-                yield blueprint.send_static_file
-
     def send_static_file(self, filename):
-        last_exception = NotFound
-        for static_dispatcher in self.static_dispatchers():
-            try:
-                return static_dispatcher(filename)
-            except NotFound as e:
-                last_exception = e
-            except Exception as e:
-                self.logger.error(e)
-                last_exception = e
-        raise last_exception
+        if not filename in static_map:
+            raise NotFound
+        return send_file(static_map[filename])
 
 
 def lazy_import(name):

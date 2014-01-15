@@ -148,3 +148,6 @@ def register_manager(manager):
     port = parsed_url.port or 80
     host = parsed_url.hostname or '127.0.0.1'
     manager.add_command("runserver", Server(host=host, port=port))
+
+    from invenio.ext.collect import collect
+    collect.init_script(manager)
