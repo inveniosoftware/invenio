@@ -25,6 +25,7 @@ pylib_DATA = __init__.py \
 	bfe_affiliation.py \
 	bfe_aid_authors.py \
 	bfe_appears_in_collections.py \
+	bfe_arxiv_link.py \
 	bfe_authority_author.py \
 	bfe_authority_control_no.py \
 	bfe_authority_institute.py \
