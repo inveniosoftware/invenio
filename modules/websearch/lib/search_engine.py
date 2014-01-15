@@ -54,6 +54,7 @@ if sys.hexversion < 0x2040000:
 from invenio.config import \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
+     CFG_SCOAP3_SITE, \
      CFG_OAI_ID_FIELD, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBSEARCH_CALL_BIBFORMAT, \
@@ -1147,11 +1148,11 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
             if c:
                 temp = []
                 temp.append({'value': CFG_SITE_NAME,
-                             'text': '*** %s ***' % _("any public collection")
+                             'text': '*** %s ***' % (CFG_SCOAP3_SITE and _("any publisher or journal") or _("any public collection"))
                             })
                 # this field is used to remove the current collection from the ones to be searched.
                 temp.append({'value': '',
-                             'text': '*** %s ***' % _("remove this collection")
+                             'text': '*** %s ***' % (CFG_SCOAP3_SITE and _("remove this publisher or journal") or _("remove this collection"))
                             })
                 for val in colls_nice:
                     # print collection:
@@ -1162,11 +1163,11 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
                                     })
                 coll_selects.append(temp)
         coll_selects.append([{'value': '',
-                              'text' : '*** %s ***' % _("add another collection")
+                              'text' : '*** %s ***' % (CFG_SCOAP3_SITE and _("add another publisher or journal") or _("add another collection"))
                              }] + colls_nice)
     else: # we searched in CFG_SITE_NAME, so print 'any public collection' heading
         coll_selects.append([{'value': CFG_SITE_NAME,
-                              'text' : '*** %s ***' % _("any public collection")
+                              'text' : '*** %s ***' % (CFG_SCOAP3_SITE and _("any publisher or journal") or _("any public collection"))
                              }] + colls_nice)
 
     ## ranking methods

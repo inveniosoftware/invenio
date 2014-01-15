@@ -40,7 +40,8 @@ from invenio.config import \
      CFG_SITE_LANGS, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
-     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
+     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
+     CFG_SCOAP3_SITE
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
 from invenio.dbquery import run_sql, Error, get_table_update_time
@@ -226,7 +227,10 @@ class Collection:
             if box_type == "v":
                 i18name = _('Focus on:')
             elif box_type == "r":
-                i18name = _('Narrow by collection:')
+                if CFG_SCOAP3_SITE:
+                    i18name = _('Narrow by publisher/journal:')
+                else:
+                    i18name = _('Narrow by collection:')
             elif box_type == "l":
                 i18name = _('Latest additions:')
 
@@ -651,7 +655,7 @@ class Collection:
                         fieldname = 'sc',
                         css_class = 'address',
                         values = [
-                                  {'value' : '1' , 'text' : _("split by collection")},
+                                  {'value' : '1' , 'text' : CFG_SCOAP3_SITE and _("split by publisher/journal") or _("split by collection")},
                                   {'value' : '0' , 'text' : _("single list")}
                                  ]
                        )
