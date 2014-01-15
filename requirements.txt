@@ -25,4 +25,4 @@ unidecode
 python-openid
 qrcode
 PIL
-https://h5py.googlecode.com/files/h5py-2.0.1.tar.gz
+h5py==2.0.1
