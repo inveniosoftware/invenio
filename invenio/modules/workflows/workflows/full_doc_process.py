@@ -15,7 +15,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111 1307, USA.
 
-
 from ..tasks.marcxml_tasks import (convert_record_with_repository,
                                    plot_extract,
                                    convert_record_to_bibfield,
@@ -24,17 +23,37 @@ from ..tasks.marcxml_tasks import (convert_record_with_repository,
                                    author_list,
                                    upload_step,
                                    quick_match_record,
-                                   approve_record
+                                   inspire_filter_custom,
+                                   bibclassify
                                    )
 
-from workflow.patterns import IF_ELSE
+from ..tasks.workflows_tasks import (log_info)
+
+from ..tasks.logic_tasks import (workflow_if,
+                                 workflow_else
+                                 )
+from ..models import DATA_TYPES
+
+from invenio.config import CFG_PREFIX
+
 
 class full_doc_process(object):
-    workflow = [convert_record_with_repository("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield,
-                IF_ELSE(quick_match_record, [], [plot_extract(["latex"]),
-                                                 fulltext_download, refextract, author_list, approve_record,
-                                                 upload_step
-                ]),
-    ]
-    #workflow =[convert_record("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield, author_list, upload_step]
-
+    object_type = DATA_TYPES.RECORD
+    workflow = [convert_record_with_repository("oaiarXiv2inspire_nofilter.xsl"), convert_record_to_bibfield,
+                inspire_filter_category(category_widgeted=["gr-qc"], category_accepted=['*'], widget="approval_widget"),
+                workflow_if(quick_match_record, True),
+                [
+                    plot_extract(["latex"]),
+                    fulltext_download,
+                    inspire_filter_custom(fields=["report_number", "arxiv_category"], custom_accepted=["*"],
+                                          widget="approval_widget"),
+                    bibclassify(taxonomy=CFG_PREFIX + "/etc/bibclassify/HEP.rdf",
+                                output_mode="dict", match_mode="partial"),
+                    refextract, author_list,
+                    upload_step,
+                ],
+                workflow_else,
+                [
+                    log_info("Record already into database"),
+                ],
+                ]

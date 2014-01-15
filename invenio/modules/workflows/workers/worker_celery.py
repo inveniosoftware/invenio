@@ -31,16 +31,32 @@ def celery_run(workflow_name, data, **kwargs):
     """
     Runs the workflow with Celery
     """
-
     from ..worker_engine import run_worker
     from ..utils import BibWorkflowObjectIdContainer
-
-
     if isinstance(data, list):
         for i in range(0, len(data)):
-            if isinstance(data[i], BibWorkflowObjectIdContainer):
-                data[i] = data[i].get_object()
-                stack = data[i].get_extra_data().items()
+            if isinstance(data[i], dict):
+                if str(BibWorkflowObjectIdContainer().__class__) in data[i]:
+                    data[i] = BibWorkflowObjectIdContainer().from_dict(data[i]).get_object()
+                    stack = data[i].get_extra_data().items()
+                    while stack:
+                        k, v = stack.pop()
+                        if isinstance(v, dict):
+                            stack.extend(iteritems(v))
+                        elif isinstance(v, db.Model):
+                            # try except pass to maintain compatibility in case SQLAlchemy is fixed
+                            try:
+                                db.session.merge(data[i].extra_data["repository"])
+                                db.session.add(data[i].extra_data["repository"])
+                                db.session.commit()
+                            except Exception as e:
+                                print("Celery : SQLAlchemy decoherence data object")
+                                print(e.message)
+    else:
+        if isinstance(data, dict):
+            if str(BibWorkflowObjectIdContainer().__class__) in data:
+                data = BibWorkflowObjectIdContainer().from_dict(data).get_object()
+                stack = data.get_extra_data().items()
                 while stack:
                     k, v = stack.pop()
                     if isinstance(v, dict):
@@ -48,29 +64,12 @@ def celery_run(workflow_name, data, **kwargs):
                     elif isinstance(v, db.Model):
                         # try except pass to maintain compatibility in case SQLAlchemy is fixed
                         try:
-                            db.session.merge(data[i].extra_data["repository"])
-                            db.session.add(data[i].extra_data["repository"])
+                            db.session.merge(data.extra_data["repository"])
+                            db.session.add(data.extra_data["repository"])
                             db.session.commit()
                         except Exception as e:
                             print("Celery : SQLAlchemy decoherence data object")
                             print(e.message)
-    else:
-        if isinstance(data, BibWorkflowObjectIdContainer):
-            data = data.get_object()
-            stack = data.get_extra_data().items()
-            while stack:
-                k, v = stack.pop()
-                if isinstance(v, dict):
-                    stack.extend(iteritems(v))
-                elif isinstance(v, db.Model):
-                    # try except pass to maintain compatibility in case SQLAlchemy is fixed
-                    try:
-                        db.session.merge(data.extra_data["repository"])
-                        db.session.add(data.extra_data["repository"])
-                        db.session.commit()
-                    except Exception as e:
-                        print("Celery : SQLAlchemy decoherence data object")
-                        print(e.message)
     run_worker(workflow_name, data, **kwargs)
 
 
@@ -81,9 +80,8 @@ def celery_restart(wid, **kwargs):
     Restarts the workflow with Celery
     """
     from ..worker_engine import restart_worker
+
     restart_worker(wid, **kwargs)
-
-
 
 
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.continue_worker')
@@ -93,6 +91,7 @@ def celery_continue(oid, restart_point, **kwargs):
     Restarts the workflow with Celery
     """
     from ..worker_engine import continue_worker
+
     continue_worker(oid, restart_point, **kwargs)
 
 
