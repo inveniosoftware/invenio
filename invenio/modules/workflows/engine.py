@@ -24,7 +24,6 @@ from datetime import datetime
 from six import iteritems
 from uuid import uuid1 as new_uuid
 
-
 import base64
 
 from workflow.engine import (GenericWorkflowEngine,
@@ -50,7 +49,6 @@ DEBUG = CFG_DEVEL_SITE > 0
 
 
 class BibWorkflowEngine(GenericWorkflowEngine):
-
     def __init__(self, name=None, uuid=None, curr_obj=0,
                  workflow_object=None, id_user=0, module_name="Unknown",
                  **kwargs):
@@ -187,9 +185,9 @@ BibWorkflowEngine
                 # do nothing
                 obj.log.info("object saving process : was already existing")
                 continue
-            # Set the current workflow id in the object
+                # Set the current workflow id in the object
             if obj.version == CFG_OBJECT_VERSION.INITIAL \
-                    and obj.id_workflow is not None:
+                and obj.id_workflow is not None:
                 obj.log.info("object saving process : was already existing")
                 pass
             else:
@@ -325,7 +323,7 @@ BibWorkflowEngine
                     if DEBUG:
                         self.log.debug("Processing was stopped: '%s' "
                                        "(object: %s)" %
-                                      (str(callbacks), repr(obj)))
+                                       (str(callbacks), repr(obj)))
                         obj.log.debug("Processing has stopped")
                     break
                 except JumpTokenBack as step:
@@ -370,14 +368,11 @@ BibWorkflowEngine
                     else:
                         raise WorkflowHalt(e)
                 except Exception as e:
-                    self.log.error("Unexpected error: %s", sys.exc_info()[0])
-                    self.log.error(e.message)
-                    obj.log.error("Something terribly wrong"
-                                  " happend to this object")
+                    obj.log.error("Something terribly wrong happend to this object")
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
                     raise
-            # We save the object once it is fully run through
+                # We save the object once it is fully run through
             obj.save(CFG_OBJECT_VERSION.FINAL)
             obj.log.info("Object proccesing is finished")
             self.increase_counter_finished()
@@ -388,6 +383,8 @@ BibWorkflowEngine
         """Executes the callback - override this method to implement logging"""
         obj.data = obj.get_data()
         obj.extra_data = obj.get_extra_data()
+        obj.extra_data["_last_task_name"] = self.get_current_taskname()
+        self.log.info(obj.extra_data["_last_task_name"])
         self.extra_data = self.get_extra_data()
         try:
             callback(obj, self)
@@ -406,18 +403,6 @@ BibWorkflowEngine
             for i in self.getCurrTaskId():
                 callback_list = callback_list[i]
             return callback_list.func_name
-
-        # callback_list = self.getCallbacks()
-        # if callback_list:
-        #     try:
-        #         current_tasks = callback_list[0]
-        #         current_task_idx = self.getCurrTaskId()[-1]
-        #     except IndexError:
-        #         # We hit an IndexError which probably means callbacks
-        #         # or task id was empty
-        #         return None
-        #     func = current_tasks[current_task_idx]
-        #     return func.func_name
 
     def get_current_object(self):
         """
@@ -462,4 +447,3 @@ BibWorkflowEngine
         for key, value in iteritems(kwargs):
             tmp[key] = value
         self.set_extra_data(tmp)
-

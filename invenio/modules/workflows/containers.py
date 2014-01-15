@@ -54,7 +54,7 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None,
                     bwobject_list_tmp.append(bwo)
                 elif bwo.id_workflow == sSearch:
                     bwobject_list_tmp.append(bwo)
-                elif extra_data['last_task_name'] == sSearch:
+                elif extra_data['_last_task_name'] == sSearch:
                     bwobject_list_tmp.append(bwo)
                 else:
                     try:

@@ -62,7 +62,6 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
                        wfe.get_current_taskname() or "Unknown",
                        e.message)
             wfe.log.warning(message)
-
             if stop_on_halt:
                 break
         except Exception as e:
@@ -79,12 +78,13 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
                                                   id_workflow=wfe.uuid)
             wfe.save(CFG_WORKFLOW_STATUS.ERROR)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
-
-            if stop_on_halt or stop_on_error:
+            # if stop_on_halt or stop_on_error:
+            if isinstance(e, WorkflowError):
+                raise e
+            else:
                 raise WorkflowError(message=msg,
                                     id_workflow=wfe.uuid,
                                     id_object=wfe.getCurrObjId())
-
 
 
 def continue_execution(wfe, data, restart_point="restart_task",

@@ -108,10 +108,10 @@ def start_delayed(workflow_name, data, **kwargs):
     if isinstance(data, list):
         for i in range(0, len(data)):
             if isinstance(data[i], BibWorkflowObject):
-                data[i] = BibWorkflowObjectIdContainer(data[i])
+                data[i] = BibWorkflowObjectIdContainer(data[i]).to_dict()
     else:
         if isinstance(data, BibWorkflowObject):
-            data = BibWorkflowObjectIdContainer(data)
+            data = BibWorkflowObjectIdContainer(data).to_dict()
     return WORKER().run_worker(workflow_name, data, **kwargs)
 
 

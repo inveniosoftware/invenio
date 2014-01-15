@@ -54,53 +54,6 @@ def write_something_bibsched(messagea="This is the default message"):
     return _write_something_bibsched
 
 
-def write_something_generic(messagea, func):
-    """
-    This function allows to send a message to bibsched...
-    This messages will be store into log.
-    """
-
-    def _write_something_generic(obj, eng):
-
-        if isinstance(messagea, six.string_types):
-            if isinstance(func,list):
-                for function in func:
-                    function(messagea)
-            else:
-                func(messagea)
-            return None
-
-        if not isinstance(messagea, list):
-            if callable(messagea):
-                I = messagea
-                while callable(I):
-                    I = I(obj, eng)
-                if isinstance(func,list):
-                    for function in func:
-                        function(I)
-                else:
-                    func(I)
-            return None
-
-        if len(messagea) > 0:
-            temp = ""
-            for I in messagea:
-                if callable(I):
-                    while callable(I):
-                        I = I(obj, eng)
-                    temp += str(I)
-                elif isinstance(I, six.string_types):
-                    temp += I
-            if isinstance(func,list):
-                for function in func:
-                    function(temp)
-            else:
-                func(temp)
-            return None
-
-    return _write_something_generic
-
-
 def task_update_progress(msg):
     def _task_update_progress(obj, eng):
         """Updates progress information in the BibSched task table."""
