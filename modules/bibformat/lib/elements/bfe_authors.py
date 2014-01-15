@@ -42,7 +42,8 @@ def format_element(bfo, limit, separator=' ; ',
            highlight="no",
            link_author_pages="no",
            link_mobile_pages="no",
-           relator_code_pattern=None):
+           relator_code_pattern=None,
+           multiple_affiliations="no"):
     """
     Prints the list of authors of a record.
 
@@ -58,6 +59,7 @@ def format_element(bfo, limit, separator=' ; ',
     @param link_author_pages: should we link to author pages if print_links in on?
     @param link_mobile_pages: should we link to mobile app pages if print_links in on?
     @param relator_code_pattern: a regular expression to filter authors based on subfield $4 (relator code)
+    @param multiple_affiliations: whether all affiliations should be displayed
     """
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
@@ -72,8 +74,10 @@ def format_element(bfo, limit, separator=' ; ',
     for author in authors:
         if 'a' in author:
             author['a'] = author['a'][0]
-        if 'u' in author:
+        if 'u' in author and multiple_affiliations == 'no':
             author['u'] = author['u'][0]
+        if 'v' in author and multiple_affiliations == 'no':
+            author['v'] = author['v'][0]
         pattern = '%s' + CFG_BIBAUTHORITY_PREFIX_SEP + "("
         for control_no in author.get('0', []):
             if pattern % (CFG_BIBAUTHORITY_TYPE_NAMES["INSTITUTE"]) in control_no:
@@ -123,7 +127,7 @@ def format_element(bfo, limit, separator=' ; ',
                                   '&amp;ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'
 
-        if author.has_key('u'):
+        if author.has_key('u') or author.has_key('v'):
             if print_affiliations == "yes":
                 if 'u0' in author:
                     recIDs = get_low_level_recIDs_from_control_no(author['u0'])
@@ -131,12 +135,20 @@ def format_element(bfo, limit, separator=' ; ',
                     # thus displaying the authority record's page should
                     # contain a warning that there are multiple authority
                     # records with the same control number
+                    if isinstance(author['u'], (list, tuple)):
+                        author['u'] = author['u'][0]
                     if len(recIDs):
                         author['u'] = '<a href="' + CFG_BASE_URL + '/' + CFG_SITE_RECORD + '/' + \
                                       str(recIDs[0]) + \
                                       '?ln=' + bfo.lang + \
                                       '">' + author['u'] + '</a>'
-                author['u'] = affiliation_prefix + author['u'] + \
+                if not 'u' in author and 'v' in author:
+                    author['u'] = author['v']
+                if isinstance(author['u'], (list, tuple)):
+                    author['u'] = ' '.join([affiliation_prefix + aff + \
+                              affiliation_suffix for aff in author['u']])
+                else:
+                    author['u'] = affiliation_prefix + author['u'] + \
                               affiliation_suffix
 
     # Flatten author instances
