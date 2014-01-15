@@ -82,7 +82,7 @@ def setup_app(app):
             try:
                 return current_app.send_static_file(request.path)
             except NotFound as e:
-                current_app.logger.error(str(e))
+                current_app.logger.error(str(e) + " " + request.path)
                 pass
         return render_template('404.html'), 404
 
