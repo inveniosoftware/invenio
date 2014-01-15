@@ -42,15 +42,27 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
         except WorkflowHalt as e:
             # Processing was halted. Lets save current object and continue.
 
-            if e.widget:
-                wfe._objects[wfe.getCurrObjId()].extra_data["widget"] = e.widget
-            wfe.log.error("Processing halted: %s (%s)" %
-                         (str(e.message), e.to_dict()))
-            wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED,
-                                                  wfe.getCurrTaskId(),
-                                                  id_workflow=wfe.uuid)
-            wfe.save(CFG_WORKFLOW_STATUS.HALTED)
+            # Save current object progress
+            current_obj = wfe.get_current_object()
+            if current_obj:
+                if e.widget:
+                    current_obj.add_widget(e.widget, e.message)
+                current_obj.save(version=CFG_OBJECT_VERSION.HALTED,
+                                 task_counter=wfe.getCurrTaskId(),
+                                 id_workflow=wfe.uuid)
+            else:
+                wfe.log.warning("No active object found!")
+
+            # Save workflow progress
+            wfe.save(status=CFG_WORKFLOW_STATUS.HALTED)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
+
+            message = "Workflow '%s' halted at task %s with message: %s" % \
+                      (wfe.name,
+                       wfe.get_current_taskname() or "Unknown",
+                       e.message)
+            wfe.log.warning(message)
+
             if stop_on_halt:
                 break
         except Exception as e:

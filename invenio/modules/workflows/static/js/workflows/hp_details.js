@@ -38,7 +38,7 @@ function action_buttons (url_restart_record, url_restart_record_prev, url_contin
             url: url_restart_record_prev,
             data: bwo_id,
             success: function(json){
-                bootstrap_alert('Object restarted from previous task');        
+                bootstrap_alert('Object restarted from previous task');
             }
         });
     });
@@ -50,7 +50,7 @@ function action_buttons (url_restart_record, url_restart_record_prev, url_contin
             url: url_continue,
             data: bwo_id,
             success: function(json){
-                bootstrap_alert('Object continued from next task');        
+                bootstrap_alert('Object continued from next task');
             }
         });
     });

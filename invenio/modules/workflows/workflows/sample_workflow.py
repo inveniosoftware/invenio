@@ -16,13 +16,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.modules.workflows.tasks.sample_tasks import add_data, print_data
+from ..tasks.sample_tasks import (add_data,
+                                  print_data)
+from ..tasks.logic_tasks import execute_if
+from ..tasks.marcxml_tasks import approve_record
 
 
 class sample_workflow(object):
     """
     This is a sample workflow.
     """
-    workflow = [add_data(1),
+    workflow = [execute_if(add_data(1), lambda obj, eng: False),
+                approve_record,
                 print_data]
     title = "Sample workflow"

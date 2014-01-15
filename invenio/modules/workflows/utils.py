@@ -58,6 +58,16 @@ class BibWorkflowObjectIdContainer(object):
         return "BibWorkflowObject(%s)" % (str(self.id),)
 
 
+class WorkflowsTaskResult(object):
+    """
+    Class to contain the current task results.
+    """
+
+    def __init__(self, name, result):
+        self.name = name
+        self.result = result
+
+
 def get_workflow_definition(name):
     """ Tries to load the given workflow from the system. """
     from .loader import workflows

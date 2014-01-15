@@ -30,7 +30,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from invenio.ext.sqlalchemy import db
 from invenio.base.globals import cfg
 from .config import CFG_OBJECT_VERSION
-from .utils import redis_create_search_entry
+from .utils import redis_create_search_entry, WorkflowsTaskResult
 
 from .logger import (get_logger,
                      BibWorkflowLogHandler)
@@ -329,9 +329,26 @@ BibWorkflowObject
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def add_task_result(self, task_name, result):
+    def add_task_result(self, task_name, name, result):
+        """
+        Adds given task results to extra_data in order to be accessed
+        and displayed later on by Holding Pen templates.
+        """
+        res_obj = WorkflowsTaskResult(name, result)
         extra_data = self.get_extra_data()
-        extra_data["tasks_results"][task_name] = result
+        extra_data["tasks_results"][task_name] = res_obj
+        self.set_extra_data(extra_data)
+
+    def add_widget(self, widget, message):
+        extra_data = self.get_extra_data()
+        extra_data["widget"] = widget
+        extra_data["message"] = message
+        self.set_extra_data(extra_data)
+
+    def remove_widget(self):
+        extra_data = self.get_extra_data()
+        extra_data["widget"] = None
+        extra_data["message"] = ""
         self.set_extra_data(extra_data)
 
     def change_status(self, message):

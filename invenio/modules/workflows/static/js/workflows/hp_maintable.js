@@ -39,7 +39,7 @@ function init_urls(url_) {
 
     init_datatable();
 }
-    
+
 function init_datatable(){
     oTable = $('#example').dataTable({
         "sDom": 'lf<"clear">rtip',
