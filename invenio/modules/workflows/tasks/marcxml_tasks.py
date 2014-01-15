@@ -107,10 +107,8 @@ def approve_record(obj, eng):
 
     obj.extra_data["last_task_name"] = 'Record Approval'
     try:
-        obj.extra_data['message'] = 'Record needs approval. Click on widget to resolve.'
-        eng.log.info("Adding the approval widget to %s" % obj.id)
-        obj.extra_data['widget'] = 'approval_widget'
-        eng.halt("Record needs approval")
+        eng.halt(widget="approval_widget",
+                 msg='Record needs approval')
     except KeyError:
         # Log the error
         obj.extra_data["error_msg"] = 'Could not assign widget'
@@ -130,7 +128,6 @@ def convert_record_to_bibfield(obj, eng):
     obj.extra_data["last_task_name"] = "last task name: convert_record_to_bibfield"
     obj.data = create_record(obj.data).dumps()
     eng.log.info("Conversion succeed")
-    eng.halt(widget="approval_widget", msg="omg")
 
 
 def init_harvesting(obj, eng):

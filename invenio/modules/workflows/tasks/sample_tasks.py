@@ -24,8 +24,16 @@ def add_data(a):
     """ Task using closure to allow parameters """
     def _add_data(obj, eng):
         """Function task_a docstring"""
-        obj.data = datetime.datetime.now()
+        obj.data += a
     return _add_data
+
+
+def add_datetime(a):
+    """ Task using closure to allow parameters """
+    def _add_datetime(obj, eng):
+        """Function task_a docstring"""
+        obj.data += datetime.timedelta(days=2)
+    return _add_datetime
 
 
 def check_data(obj, eng):
@@ -36,7 +44,7 @@ def check_data(obj, eng):
 
 def print_data(obj, eng):
     """ Static task with no parameters """
-    print(obj.data + datetime.timedelta(days=2))
+    print(obj.data)
 
 
 def set_data(obj, eng):

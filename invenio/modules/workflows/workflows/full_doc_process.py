@@ -23,7 +23,8 @@ from ..tasks.marcxml_tasks import (convert_record_with_repository,
                                    refextract,
                                    author_list,
                                    upload_step,
-                                   quick_match_record
+                                   quick_match_record,
+                                   approve_record
                                    )
 
 from workflow.patterns import IF_ELSE
@@ -31,7 +32,7 @@ from workflow.patterns import IF_ELSE
 class full_doc_process(object):
     workflow = [convert_record_with_repository("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield,
                 IF_ELSE(quick_match_record, [], [plot_extract(["latex"]),
-                                                 fulltext_download, refextract, author_list,
+                                                 fulltext_download, refextract, author_list, approve_record,
                                                  upload_step
                 ]),
     ]

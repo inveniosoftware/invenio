@@ -101,3 +101,12 @@ def get_obj_data(obj, eng):
     eng.log.info("last task name: get_obj_data")
     return obj.data
 
+
+def execute_if(fun, *args):
+    def _execute_if(obj, eng):
+        for rule in args:
+            res = rule(obj, eng)
+            if not res:
+                eng.jumpCallForward(1)
+        fun(obj, eng)
+    return _execute_if

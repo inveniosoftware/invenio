@@ -36,12 +36,10 @@ class approval_widget(Form):
     def render(self, bwobject_list, bwparent_list, info_list,
                logtext_list, w_metadata_list,
                workflow_func_list, *args, **kwargs):
-        from ..views.holdingpen import _entry_data_preview
-
         data_preview_list = []
         # setting up approval widget
         for bwo in bwobject_list:
-            data_preview_list.append(_entry_data_preview(bwo.get_data()))
+            data_preview_list.append(bwo.get_formatted_data())
 
         return ('workflows/hp_approval_widget.html',
                 {'bwobject_list': bwobject_list,
@@ -62,15 +60,11 @@ class approval_widget(Form):
         from ..api import continue_oid_delayed
         from ..views.holdingpen import _delete_from_db
         from ..models import BibWorkflowObject
-        from invenio.sqlalchemyutils import db
 
         bwobject = BibWorkflowObject.query.get(bwobject_id)
 
         if request.form['decision'] == 'Accept':
-            extra_data_dict = bwobject.get_extra_data()
-            extra_data_dict['widget'] = None
-            bwobject.set_extra_data(extra_data_dict)
-            db.session.commit()
+            bwobject.remove_widget()
             continue_oid_delayed(bwobject_id)
             flash('Record Accepted')
             
