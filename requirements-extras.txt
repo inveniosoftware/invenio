@@ -1,6 +1,8 @@
-# More requirements files are needed, since e.g gnuplot-py import numpy in its setup.py,
-# which means it has to be installed in a second step.
+# More requirements files are needed, since e.g gnuplot-py and h5py
+# import numpy in their setup.py, which means they have to be
+# installed in a second step.
 gnuplot-py==1.8
+h5py==2.0.1
 
 # Following packages are optional (if you do development you probably want to install them):
 pylint

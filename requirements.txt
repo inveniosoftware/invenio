@@ -25,4 +25,3 @@ unidecode
 python-openid
 qrcode
 PIL
-h5py==2.0.1
