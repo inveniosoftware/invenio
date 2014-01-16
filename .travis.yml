@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,3 +19,14 @@
 
 notifications:
   email: false
+
+python:
+  - "2.6"
+
+install:
+  - sudo apt-get update
+  - git clone https://github.com/tiborsimko/invenio-devscripts /tmp/invenio-devscripts
+  - CFG_INVENIO_SRCDIR=$(pwd) /tmp/invenio-devscripts/invenio-kickstart --yes-i-know --yes-i-really-know
+
+script:
+  - sudo -u www-data nosetests /opt/invenio/lib/python/invenio/*_tests.py
