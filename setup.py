@@ -61,7 +61,7 @@ from setuptools import setup, find_packages
 def match_feature_name(filename):
     return re.match(r".*requirements-(\w+).txt$", filename).group(1)
 
-def match_egg_name_and_version(dependency_link, version='=='):
+def match_egg_name_and_version(dependency_link, version='>='):
     return version.join(
         re.sub(
             r'.+://.*[@#&]egg=([^&]*)&?.*$',
