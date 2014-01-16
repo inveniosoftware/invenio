@@ -23,6 +23,8 @@
 
 """
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy import SQLAlchemyStorage
 from invenio.modules.jsonalchemy.parser import FieldParser
 from invenio.modules.jsonalchemy.registry import readers
@@ -49,7 +51,7 @@ class Record(SmartJson):
         try:
             json = cls.storage_engine.get_one(recid)
             return Record(json)
-        except:
+        except NoResultFound:
             # try to retrieve the record from the master format if any
             # this might be deprecated in the near future as soon as json will
             # become the master format, until then ...

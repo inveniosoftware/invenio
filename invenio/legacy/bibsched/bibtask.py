@@ -58,11 +58,12 @@ import logging
 import logging.handlers
 import random
 
+from flask import current_app
 from socket import gethostname
 
 from invenio.legacy.dbquery import run_sql, _db_login
 from invenio.modules.access.engine import acc_authorize_action
-from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_LOGDIR, \
+from invenio.config import CFG_BINDIR, CFG_LOGDIR, \
     CFG_BIBSCHED_PROCESS_USER, CFG_TMPDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.ext.logging import register_exception
 
@@ -923,7 +924,10 @@ def _task_run(task_run_fnc):
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
     check_running_process_user()
     try:
-        pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
+        CFG_BIBTASK_RUN_DIR = os.path.join(current_app.instance_path, 'run')
+        if not os.path.exists(CFG_BIBTASK_RUN_DIR):
+            os.mkdir(CFG_BIBTASK_RUN_DIR)
+        pidfile_name = os.path.join(CFG_BIBTASK_RUN_DIR,
             'bibsched_task_%d.pid' % _TASK_PARAMS['task_id'])
         pidfile = open(pidfile_name, 'w')
         pidfile.write(str(os.getpid()))

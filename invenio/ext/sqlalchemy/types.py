@@ -48,9 +48,9 @@ class JSONEncodedTextDict(TypeDecorator):
         return value
 
     def process_result_value(self, value, dialect):
-        if value is not None:
-            value = json.loads(value)
-        return value
+        if value:
+            return json.loads(value)
+        return None
 
 
 class MarshalBinary(TypeDecorator):
