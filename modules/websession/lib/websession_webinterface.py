@@ -40,7 +40,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_CERN_SITE, \
      CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
-     CFG_OPENAIRE_SITE
+     CFG_OPENAIRE_SITE, \
+     CFG_WEBMESSAGE_ENABLE_MAIL_NOTIFICATION
 from invenio import webuser
 from invenio.webpage import page
 from invenio import webaccount
@@ -342,6 +343,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'login_method': (str, ""),
             'group_records' : (int, None),
             'latestbox' : (int, None),
+            'hidden_webmessage_field' : (str, None),
+            'mailcheckbox' : (int, None),
             'helpbox' : (int, None),
             'lang' : (str, None),
             'bibcatalog_username' : (str, None),
@@ -536,6 +539,21 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
             mess += '<p>' + _("User settings saved correctly.")
+
+        ## Change weather to receive mail notification for new messages
+        if CFG_WEBMESSAGE_ENABLE_MAIL_NOTIFICATION:
+            if args['mailcheckbox'] or args['hidden_webmessage_field']:
+                act = "/youraccount/display?ln=%s" % args['ln']
+                title = _("Settings edited")
+                linkname = _("Show account")
+                prefs = webuser.get_user_preferences(uid)
+                if args['mailcheckbox'] == 1:
+                    prefs['webmessage_mail_notification'] = 1
+                elif args['hidden_webmessage_field']:
+                    prefs['webmessage_mail_notification'] = 0
+                webuser.set_user_preferences(uid,prefs)
+                mess += '<p>' + _("User settings saved correctly.")
+
 
         ## Edit cataloging-related settings:
         if args['bibcatalog_username'] or args['bibcatalog_password']:

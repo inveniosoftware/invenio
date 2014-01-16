@@ -28,11 +28,15 @@ from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
                                       InvenioWebMessageError
 from invenio.config import CFG_SITE_LANG, \
-     CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE
+     CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE, \
+     CFG_WEBMESSAGE_ENABLE_MAIL_NOTIFICATION, \
+     CFG_SITE_ADMIN_EMAIL, \
+     CFG_SITE_URL
 from invenio.messages import gettext_set_language
 from invenio.dateutils import datetext_default, get_datetext
 from invenio.htmlutils import escape_html
 from invenio.webuser import list_users_in_roles
+from invenio.mailutils import send_email
 try:
     import invenio.template
     webmessage_templates = invenio.template.load('webmessage')
@@ -191,7 +195,6 @@ def perform_request_write(uid,
     @type ln: string
     @return: body with warnings.
     """
-    warnings = []
     body = ""
     _ = gettext_set_language(ln)
     msg_from_nickname = ""
@@ -451,6 +454,18 @@ def perform_request_send(uid,
 
         if len(uids_from_group) != len(uid_problem):
             infos.append(_("Your message has been sent."))
+            # Check if the option to send mail to the message recipients and
+            # send messages to all users that haven't exceeded their quota.
+            if CFG_WEBMESSAGE_ENABLE_MAIL_NOTIFICATION:
+                uids_without_problem = [i for i in uids_from_group if i not in uid_problem]
+                user_emails = db.get_emails_of_users_that_want_webmessage_notifications(uids_without_problem)
+                for user_email in user_emails:
+                    message_url = "%s/yourmessages/display_msg?msgid=%s" % (CFG_SITE_URL, msg_id)
+                    send_email(CFG_SITE_ADMIN_EMAIL,
+                                user_email,
+                               _("You have a new message"),
+                               _("Please visit %s to reply to the message\n\n   Subject: %s\n   %s")
+                                    % (message_url, msg_subject, msg_body))
         else:
             db.check_if_need_to_delete_message_permanently([msg_id])
         body = perform_request_display(uid, warnings,

@@ -31,7 +31,8 @@ from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_WEBMESSAGE_ENABLE_MAIL_NOTIFICATION
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTH_DEFAULT
@@ -347,6 +348,12 @@ def perform_set(email, ln, can_config_bibcatalog=False,
                 ln = ln,
                 preferred_lang = preferred_lang
                 )
+    if CFG_WEBMESSAGE_ENABLE_MAIL_NOTIFICATION:
+        show_mailcheckbox = prefs.get('webmessage_mail_notification', False)
+        out += websession_templates.tmpl_send_mail_on_message(
+                    ln = ln,
+                    show_mailcheckbox = show_mailcheckbox
+                    )
 
     keys_info = web_api_key.show_web_api_keys(uid=uid)
     out+=websession_templates.tmpl_user_api_key(

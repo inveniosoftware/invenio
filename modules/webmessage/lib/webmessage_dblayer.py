@@ -27,7 +27,8 @@ from time import localtime, mktime
 from invenio.config import \
      CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
      CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
-from invenio.dbquery import run_sql, OperationalError
+from invenio.dbquery import run_sql, OperationalError, \
+                            deserialize_via_marshal
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA
 from invenio.dateutils import datetext_default, \
@@ -467,6 +468,29 @@ def send_message(uids_to, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW']):
             run_sql(query, tuple(query_params))
     return user_problem
 
+def get_emails_of_users_that_want_webmessage_notifications(uids_to):
+    """
+    Get emails of user that have enabled notification of new webmessage via email
+    @param uids_to: list of uids to search for enabled email notifications
+    """
+    emails = []
+    if not(type(uids_to) in (list,tuple)):
+        uids_to = [uids_to]
+    if len(uids_to) > 0:
+        query = """SELECT email,settings
+                    FROM user
+                    WHERE id IN (%s)"""
+        query %= ', '.join(['%s'] * len(uids_to))
+        res = run_sql(query, uids_to)
+        for email,prefs in res:
+            try:
+                user_settings = deserialize_via_marshal(prefs)
+                if user_settings.has_key('webmessage_mail_notification') \
+                and user_settings['webmessage_mail_notification'] == 1:
+                    emails.append(email)
+            except:
+                pass
+    return emails
 
 def check_quota(nb_messages):
     """

@@ -443,6 +443,29 @@ class Template:
             }
         return out
 
+    def tmpl_send_mail_on_message(self, ln, show_mailcheckbox = False):
+        _ = gettext_set_language(ln)
+        out = """
+            <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_webmail_settings">
+            <input id='hidden_webmessage_field'  type='hidden' value='No' name='hidden_webmessage_field'>
+              <p><big><strong class="headline">%(edit_webmail_settings)s</strong></big></p>
+              <table>
+                <tr><td align="right"><input type="checkbox" %(checked_mailbox)s value="1" name="mailcheckbox" id="mailcheckbox"/></td>
+                <td valign="top"><b><label for="latestbox">%(show_mailcheckbox)s</label></b></td></tr>
+        """ % {
+          'sitesecureurl' : CFG_SITE_SECURE_URL,
+          'edit_webmail_settings' : _("Edit message-related settings"),
+          'show_mailcheckbox' : _("Receive an email notification for every new message"),
+          'checked_mailbox' : show_mailcheckbox and 'checked="checked"' or '',
+          }
+        out += """<tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
+              </table>
+            </form>""" % {
+                'update_settings' : _("Update settings"),
+            }
+        return out
+
+
 
     def tmpl_user_external_auth(self, ln, methods, current, method_disabled):
         """
