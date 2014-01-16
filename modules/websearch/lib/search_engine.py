@@ -898,7 +898,8 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         # Add metadata in meta tags for Google scholar-esque harvesting...
         # only if we have a detailed meta format and we are looking at a
         # single record
-        if (recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT):
+        if recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT and \
+          record_exists(recID) == 1:
             metaheaderadd += format_record(recID, \
                                            CFG_WEBSEARCH_DETAILED_META_FORMAT, \
                                            ln = ln)
