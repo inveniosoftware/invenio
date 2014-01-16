@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,9 +31,8 @@ import os
 from .helpers import with_app_context, unicodifier
 from .wrappers import Flask
 from invenio.ext.registry import Registry, ExtensionRegistry, \
-    PackageRegistry, ConfigurationRegistry, AutoDiscoverRegistry, \
+    PackageRegistry, ConfigurationRegistry, \
     ImportPathRegistry, BlueprintAutoDiscoveryRegistry
-from flask import Blueprint
 
 
 __all__ = ['create_app', 'with_app_context']
@@ -84,7 +83,7 @@ def register_secret_key(app):
 
 def create_app(instance_path=None, **kwargs_config):
     """
-    Prepare WSGI Invenio application based on Flask.
+    Prepare Invenio application based on Flask.
 
     Invenio consists of a new Flask application with legacy support for
     the old WSGI legacy application and the old Python legacy
@@ -170,5 +169,53 @@ def create_app(instance_path=None, **kwargs_config):
     )
 
     register_legacy_blueprints(app)
+
+    return app
+
+
+def create_wsgi_app(*args, **kwargs):
+    """
+    """
+    # wrap warnings (usually from sql queries) to log the traceback
+    # of their origin for debugging
+    try:
+        from invenio.ext.logging import wrap_warn
+        wrap_warn()
+    except:
+        pass
+
+    app = create_app(*args, **kwargs)
+
+    ## Start remote debugger if appropriate:
+    if app.config.get('CFG_REMOTE_DEBUGGER_ENABLED'):
+        try:
+            from invenio.utils import remote_debugger
+            remote_debugger.start_file_changes_monitor()
+            if app.config.get('CFG_REMOTE_DEBUGGER_WSGI_LOADING'):
+                remote_debugger.start()
+        except Exception as e:
+            app.logger.error('Remote debugger is not working', e)
+
+    @app.before_first_request
+    def pre_load():
+        """
+        Pre-load citation dictionaries upon WSGI application start-up (the
+        citation dictionaries are loaded lazily, which is good for CLI
+        processes such as bibsched, but for web user queries we want them to
+        be available right after web server start-up)
+        """
+        #FIXME: move to invenio.modules.ranker.views when its created
+        try:
+            from invenio.legacy.bibrank.citation_searcher import \
+                get_citedby_hitset, \
+                get_refersto_hitset
+            get_citedby_hitset(None)
+            get_refersto_hitset(None)
+        except:
+            pass
+
+    if 'werkzeug-debugger' in app.config.get('CFG_DEVEL_TOOLS', []):
+        from werkzeug.debug import DebuggedApplication
+        app = DebuggedApplication(app, evalex=True)
 
     return app

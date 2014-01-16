@@ -502,17 +502,15 @@ def wrap_warn():
 
     def wrapper(showwarning):
         @wraps(showwarning)
-        def new_showwarning(message=None, category=None, filename=None, lineno=None, file=None, line=None):
-            invenio_err = open(os.path.join(cfg['CFG_LOGDIR'], 'invenio.err'), "a")
-            print >> invenio_err, "* %(time)s -> WARNING: %(category)s: %(message)s (%(file)s:%(line)s)\n" % {
-            'time': time.strftime("%Y-%m-%d %H:%M:%S"),
-            'category': category,
-            'message': message,
-            'file': filename,
-            'line': lineno}
-            print >> invenio_err, "** Traceback details\n"
-            traceback.print_stack(file=invenio_err)
-            print >> invenio_err, "\n"
+        def new_showwarning(message=None, category=None, filename=None,
+                            lineno=None, file=None, line=None):
+            current_app.logger.warning("* %(time)s -> WARNING: %(category)s: %(message)s (%(file)s:%(line)s)\n" % {
+                'time': time.strftime("%Y-%m-%d %H:%M:%S"),
+                'category': category,
+                'message': message,
+                'file': filename,
+                'line': lineno} + "** Traceback details\n" +
+                str(traceback.format_stack()) + "\n")
         return new_showwarning
 
     warnings.showwarning = wrapper(warnings.showwarning)

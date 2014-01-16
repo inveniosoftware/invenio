@@ -62,8 +62,8 @@ WSGIRestrictStdout Off
         ServerAdmin {{ config.CFG_SITE_ADMIN_EMAIL }}
     {%- endblock server -%}
     {%- block directory_web %}
-        DocumentRoot {{ config.CFG_WEBDIR }}
-        <Directory {{ config.CFG_WEBDIR }}>
+        DocumentRoot {{ config.COLLECT_STATIC_ROOT }}
+        <Directory {{ config.COLLECT_STATIC_ROOT }}>
            Options FollowSymLinks MultiViews
            AllowOverride None
            Order allow,deny
@@ -78,23 +78,11 @@ WSGIRestrictStdout Off
     {%- endblock logging -%}
     {%- block aliases %}
         DirectoryIndex index.en.html index.html
-        Alias /static/ {{ config.CFG_WEBDIR }}/static/
-        Alias /img/ {{ config.CFG_WEBDIR }}/img/
-        Alias /css/ {{ config.CFG_WEBDIR }}/css/
-        Alias /js/ {{ config.CFG_WEBDIR }}/js/
-        Alias /flash/ {{ config.CFG_WEBDIR }}/flash/
-        Alias /export/ {{ config.CFG_WEBDIR }}/export/
-        Alias /MathJax/ {{ config.CFG_WEBDIR }}/MathJax/
-        Alias /jsCalendar/ {{ config.CFG_WEBDIR }}/jsCalendar/
-        Alias /ckeditor/ {{ config.CFG_WEBDIR }}/ckeditor/
-        Alias /mediaelement/ {{ config.CFG_WEBDIR }}/mediaelement/
+        # Auto-generated aliasses
+        {% for alias in aliases -%}
+        Alias {{ alias }} {{ config.COLLECT_STATIC_ROOT+alias }}
+        {% endfor %}
         AliasMatch /sitemap-(.*) {{ config.CFG_WEBDIR }}/sitemap-$1
-        Alias /robots.txt {{ config.CFG_WEBDIR }}/robots.txt
-        Alias /favicon.ico {{ config.CFG_WEBDIR }}/favicon.ico
-        Alias /apple-touch-icon-144-precomposed.png {{ config.CFG_WEBDIR }}/apple-touch-icon-144-precomposed.png
-        Alias /apple-touch-icon-114-precomposed.png {{ config.CFG_WEBDIR }}/apple-touch-icon-114-precomposed.png
-        Alias /apple-touch-icon-72-precomposed.png {{ config.CFG_WEBDIR }}/apple-touch-icon-72-precomposed.png
-        Alias /apple-touch-icon-57-precomposed.png {{ config.CFG_WEBDIR }}/apple-touch-icon-57-precomposed.png
     {%- endblock aliases -%}
     {%- block wsgi %}
         WSGIScriptAlias / {{ config.CFG_WSGIDIR }}/invenio.wsgi

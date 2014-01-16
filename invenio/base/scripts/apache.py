@@ -42,16 +42,17 @@ def version(separator='\n'):
     return separator.join(out)
 
 
-@manager.option('-f', '--force', dest='force')
-@manager.option('--no-ssl', dest='no_ssl')
+@manager.option('-f', '--force', dest='force', action='store_true')
+@manager.option('--no-ssl', dest='no_ssl', action='store_true')
 @change_command_name
-def create_config(force=False, no_ssl=True):
+def create_config(force=False, no_ssl=False):
     """
     Create Apache configuration files for this site, keeping previous
     files in a backup copy.
     """
     import os
     import pwd
+    import pkg_resources
     import sys
     import shutil
     from flask import current_app
@@ -105,6 +106,17 @@ def create_config(force=False, no_ssl=True):
         if vhost_site_url_port != '80' or vhost_site_secure_url_port != '443':
             listen_directive_needed = True
 
+        static_root = current_app.config['COLLECT_STATIC_ROOT']
+        if not os.path.exists(static_root):
+            os.mkdir(static_root)
+
+        def prepare_alias(filename):
+            if os.path.isdir(os.path.join(static_root, filename)):
+                return '/%s/' % (filename, )
+            return '/%s' % (filename, )
+
+        aliases = map(prepare_alias, os.listdir(static_root))
+
         apc1 = {'vhost_site_url_port': vhost_site_url_port,
                 'servername': vhost_site_url,
                 'serveralias': vhost_site_url.split('.')[0],
@@ -112,6 +124,7 @@ def create_config(force=False, no_ssl=True):
                 _detect_ip_address() or '*',
                 'wsgi_socket_directive_needed': wsgi_socket_directive_needed,
                 'listen_directive_needed': listen_directive_needed,
+                'aliases': aliases,
                 }
 
         apc2 = {'vhost_site_url_port': vhost_site_secure_url_port,
@@ -130,6 +143,7 @@ def create_config(force=False, no_ssl=True):
                 '#SSLCertificateKeyFile %s' % ssl_key_path or
                 'SSLCertificateKeyFile %s' % ssl_key_path,
                 'listen_directive_needed': listen_directive_needed,
+                'aliases': aliases,
                 }
 
         return [apc1, apc2]
@@ -137,9 +151,10 @@ def create_config(force=False, no_ssl=True):
     current_app.config.update(
         CFG_RUNNING_AS_USER=pwd.getpwuid(os.getuid())[0],
         CFG_EXTERNAL_AUTH_USING_SSO=CFG_EXTERNAL_AUTH_USING_SSO,
-        CFG_WSGIDIR=os.path.join(CFG_PREFIX, 'var', 'www-wsgi'))
+        CFG_WSGIDIR=os.path.abspath(
+            pkg_resources.resource_filename('invenio', '')))
 
-    apache_conf_dir = current_app.config.get('CFG_ETCDIR') + os.sep + 'apache'
+    apache_conf_dir = current_app.instance_path + os.sep + 'apache'
 
     print ">>> Going to create Apache conf files..."
     conf_files = ['invenio-apache-vhost.conf', 'invenio-apache-vhost-ssl.conf']
@@ -174,12 +189,10 @@ your httpd.conf:\n
 
 %s
 
-%s
-
-
 Please see the INSTALL file for more details.
-    """ % tuple(map(lambda x: "Include " + apache_conf_dir.encode('utf-8') + os.sep + x,
-                    list(conf_files))))
+    """ % '\n\n'.join(tuple(map(
+        lambda x: "Include " + apache_conf_dir.encode('utf-8') + os.sep + x,
+        list(conf_files[:1 if no_ssl else 2])))))
     print ">>> Apache conf files created."
 
 
