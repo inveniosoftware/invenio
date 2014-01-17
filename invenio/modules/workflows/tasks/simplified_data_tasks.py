@@ -17,8 +17,6 @@
 
 """Basic simplified data test functions - NOT FOR XML """
 
-from ..config import CFG_OBJECT_STATUS
-
 
 def task_a(a):
     def _task_a(obj, eng):
@@ -32,8 +30,6 @@ def task_b(obj, eng):
     """Function task_b docstring"""
     eng.log.info("executing task b")
     if obj.data < 20:
-        obj.change_status(CFG_OBJECT_STATUS.ERROR)
-        eng.log.info("Object status %s" % (obj.db_obj.status,))
         eng.log.info("data < 20")
         obj.add_task_result("task_b", {'a': 12, 'b': 13, 'c': 14})
         eng.halt("Value of filed: data in object is too small.")

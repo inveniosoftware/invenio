@@ -21,7 +21,7 @@ function data_preview(url_preview, bwoid, format) {
     jQuery.ajax({
         url: url_preview,
         data: {'oid': bwoid,
-               'recformat': format},
+               'of': format},
         success: function(json){
             if(format == "xm" || format == "marcxml"){
                 if( json.data === ""){

@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,11 +40,9 @@ from ..tasks.bibsched_tasks import write_something_bibsched
 
 from invenio.base.config import CFG_TMPSHAREDDIR
 
-from ..models import DATA_TYPES
-
 
 class generic_harvesting_workflow(object):
-    object_type = DATA_TYPES.HARVEST
+    object_type = "harvest"
     workflow = [init_harvesting,
                 foreach(get_repositories_list(['arxivb']), "repository"),
                 [
@@ -62,6 +61,6 @@ class generic_harvesting_workflow(object):
                 end_for,
                 wait_for_workflows_to_complete,
                 write_something_bibsched("the end"),
-                workflows_reviews
+                workflows_reviews()
     ]
 

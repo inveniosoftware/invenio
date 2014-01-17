@@ -1,6 +1,26 @@
 span.glyphicon-link {
     font-size: 1.2em;
 }
+    
+.editField{
+    width: 50px;
+}
+
+.dropdown-headline {
+    font-weight: bold;
+}
+
+#slide-down-menu{
+    background-color:black;
+    opacity: 75%;
+    width:400px;
+    height:100px;
+    margin:0 auto; 
+}
+
+.slide-down-btns{
+    
+}
 
 .mini-approval-btn{
     text-decoration: none;
@@ -10,6 +30,10 @@ span.glyphicon-link {
 .mini-approval-btn:hover{
     text-decoration: none;
     color: #fff
+}
+
+.maintablerowhover{
+    background-color: #ffa;
 }
 
 .active2 {
@@ -25,8 +49,11 @@ span.glyphicon-link {
 .tag-alert{
     width: 120px;
     padding: 4px;
-    font-size: 14px;
+    font-size: 12px;
+    font-weight: bold;
+    margin:  10px;
 }
+
 
 .close-btn:hover{
     text-decoration:none;
@@ -100,7 +127,6 @@ span.glyphicon-link {
     padding-top: 10px;
     padding-left: 50px;
     width: 750px;
-    height: 700px;
     overflow: auto;
 }
 

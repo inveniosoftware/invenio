@@ -16,7 +16,6 @@
 // along with Invenio; if not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
 var bwoid;
 var datapreview = "hd";
 var number_of_objs = $(".theform").length;
@@ -59,13 +58,32 @@ function approveAll() {
     var acceptBtn = '<button type="button" class="btn btn-success">'+
                     '<a id="accept-multi" href="javascript:void(0)" class="mini-approval-btn">'+
                     'Accept</a></button>';
-    $('#multi-approval').append(rejectBtn, acceptBtn);
-    $('#accept-multi').click( function(){
+
+    if(!$('#batch-btn').exists()){    
+        var accept_link = "<a id='drop-down-accept' class='drop-down-btns btn' href='#'>Accept All</a>";
+        var reject_link = "<a id='drop-down-reject' class='drop-down-btns btn' href='#'>Reject All</a>";
+
+        var batch_btn = '<li class="dropdown">'+
+              '<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>'+
+              '<ul class="dropdown-menu">'+
+                '<li>'+accept_link+'</li>'+
+                '<li>'+reject_link+'</li>'+
+                '<li class="divider"></li>'+
+                '<li><a href="#">Go to Widget</a></li>'+
+              '</ul>'+
+            '</li>';
+
+        $('#navbar-right').append(batch_btn);
+        $('.dropdown-toggle').dropdown();
+    }
+
+    $('#drop-down-accept').on('click', function(){
         for(i=0; i<recordsToApprove.length; i++){
+            console.log(recordsToApprove[i]);
             jQuery.ajax({
                 type: "POST",
                 url: url.resolve_widget,
-                data: {'bwobject_id': recordsToApprove[i],
+                data: {'objectid': recordsToApprove[i],
                        'widget': 'approval_widget',
                        'decision': 'Accept'},
                 success: function(json){
@@ -76,15 +94,31 @@ function approveAll() {
             });
         }
     });
-};
 
-function mini_approval(decision, event){
-    var bwobject_id = event.currentTarget.parentElement.parentElement.cells[1].innerText;
+    $('#drop-down-reject').on('click', function(){
+        for(i=0; i<recordsToApprove.length; i++){
+            console.log(recordsToApprove[i]);
+            jQuery.ajax({
+                type: "POST",
+                url: url.resolve_widget,
+                data: {'objectid': recordsToApprove[i],
+                       'widget': 'approval_widget',
+                       'decision': 'Reject'},
+                success: function(json){
+                    recordsToApprove = [];
+                    $('#refresh_button').click();
+                    checkRecordsToApprove();
+                }
+            });
+        }
+    });
+}
 
+function mini_approval(decision, event, objectid){
     jQuery.ajax({
         type: "POST",
         url: url.resolve_widget,
-        data: {'bwobject_id': bwobject_id,
+        data: {'objectid': objectid,
                'widget': "approval_widget",
                'decision': decision},
         success: function(json){
@@ -102,7 +136,7 @@ function deleteRecords(bwolist){
         console.log(bwolist[i]);
         jQuery.ajax({
             url: url.delete_single,
-            data: {'bwobject_id': bwolist[i]},
+            data: {'objectid': bwolist[i]},
             success: function(){
                 $('#refresh_button').click();
             }
@@ -112,17 +146,21 @@ function deleteRecords(bwolist){
 
 $(document).ready(function(){
     $(".message").hide();
+    $("#batch-btn").popover();
 
     $('.theform #submitButton').click( function(event) {
         event.preventDefault();
 
-        var form_id = $(this)[0].form.parentElement.previousElementSibling.id;
-        id_number = form_id.substring(form_id.indexOf("d")+1);
-        btn_div_id = "decision-btns"+id_number;
-        hr_id = "hr"+id_number;
+        var form_name = $(this)[0].form.name;
+        var bwo_id = form_name.substring(form_name.indexOf('bwobject_id')+12);
+        var form_id = $(this)[0].form.id.substring(4);
+
+        btn_div_id = "decision-btns"+form_id;
+        hr_id = "hr"+form_id;
         
         formdata = $(this)[0].value;
         formurl = event.currentTarget.parentElement.name;
+        console.log(formurl);
         $.ajax({
             type: "POST",
             url: formurl,
@@ -148,8 +186,8 @@ $(document).ready(function(){
     window.setDataPreview = function(dp, id){
         bwoid = id;
         datapreview = dp;
-        console.log(url_preview);
-        data_preview(url_preview, bwoid, datapreview);
+        console.log(url.preview);
+        data_preview(url.preview, bwoid, datapreview);
     }
 
     $('#submitButtonMini').click( function (event){
@@ -170,22 +208,4 @@ $(document).ready(function(){
                 '<a class="btn btn-danger" href="#" data-dismiss="modal" onclick="disapproveRecords()">Delete Records</a>'+
             '</div>'+
         '</div>');
-    // $.ajax({
-    //     url: "hp_maintable.html",
-    //     success: function (data) { $('body').append(
-    //         '<div id="confirmationModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
-    //             '<div class="modal-header">'+
-    //                 '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>'+
-    //                 '<h3 id="myModalLabel">Please Confirm</h3>'+
-    //             '</div>'+
-    //             '<div class="modal-body">'+
-    //                 '<p>Are you sure you want to delete the selected records?</p>'+
-    //             '</div>'+
-    //             '<div class="modal-footer">'+
-    //                 '<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>'+
-    //                 '<a class="btn btn-danger" href="#" data-dismiss="modal" onclick="disapproveRecords()">Delete Records</a>'+
-    //             '</div>'+
-    //         '</div>'); },
-    //     dataType: 'html'
-    // });
 });

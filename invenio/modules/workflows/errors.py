@@ -94,6 +94,7 @@ class WorkflowError(Exception):
         return "WorkflowError(%s, id_workflow: %s, id_object: %s, payload: %r)" % \
                (self.message, str(self.id_workflow), str(self.id_object), repr(self.payload))
 
+
 class WorkflowDefinitionError(Exception):
     """Raised when workflow definition is missing."""
 
@@ -134,3 +135,24 @@ class WorkflowWorkerError(Exception):
         """String representation."""
         return "WorkflowDefinitionError(%s, worker_name: %s, payload: %r)" % \
                (repr(self.message), self.worker_name, repr(self.payload) or "None")
+
+
+class WorkflowObjectVersionError(Exception):
+    """ Raised when workflow object has an unknown or missing version """
+    
+    def __init__(self, message, id_object, obj_version):
+        self.message = message
+        self.obj_version = obj_version
+        self.id_object = id_object
+
+    def to_dict(self):
+        rv = {}
+        rv['message'] = self.message
+        rv['obj_version'] = self.obj_version
+        rv['id_object'] = self.id_object
+        return rv
+
+    def __str__(self):
+        """String representation."""
+        return "WorkflowObjectVersionError(%s, obj_version: %s, id_object: %s)" % \
+               (self.message, str(self.obj_version), str(self.id_object))

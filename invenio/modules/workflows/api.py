@@ -286,13 +286,12 @@ def resume_objects_in_workflow(id_workflow, start_point="continue_next",
 
     @yield: BibWorkflowEngine that ran the workflow
     """
-    from .models import BibWorkflowObject
-    from .config import CFG_OBJECT_VERSION
+    from .models import BibWorkflowObject, ObjectVersion
 
     # Resume workflow if there are objects to resume
     objects = BibWorkflowObject.query.filter(
         BibWorkflowObject.id_workflow == id_workflow,
-        BibWorkflowObject.version == CFG_OBJECT_VERSION.HALTED
+        BibWorkflowObject.version == ObjectVersion.HALTED
     ).all()
     for obj in objects:
         yield continue_oid(oid=obj.id, start_point=start_point,

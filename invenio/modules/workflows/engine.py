@@ -37,10 +37,10 @@ from invenio.ext.sqlalchemy import db
 from invenio.config import CFG_DEVEL_SITE
 from .models import (Workflow,
                      BibWorkflowObject,
-                     BibWorkflowEngineLog)
-from .utils import dictproperty, get_workflow_definition
-from .config import (CFG_WORKFLOW_STATUS,
-                     CFG_OBJECT_VERSION)
+                     BibWorkflowEngineLog,
+                     ObjectVersion)
+from .utils import (dictproperty,
+                    get_workflow_definition)
 from .logger import (get_logger,
                      BibWorkflowLogHandler)
 from .errors import WorkflowHalt
@@ -48,7 +48,22 @@ from .errors import WorkflowHalt
 DEBUG = CFG_DEVEL_SITE > 0
 
 
+class WorkflowStatus(object):
+    NEW, RUNNING, HALTED, ERROR, FINISHED, COMPLETED = range(6)
+
+
 class BibWorkflowEngine(GenericWorkflowEngine):
+    """
+    Subclass of GenericWorkflowEngine representing a workflow in
+    the workflows module.
+
+    Adds a SQLAlchemy database model to save workflow states and
+    workflow data.
+
+    Overrides key functions in GenericWorkflowEngine to implement
+    logging and certain workarounds for storing data before/after
+    task calls (This part will be revisited in the future).
+    """
     def __init__(self, name=None, uuid=None, curr_obj=0,
                  workflow_object=None, id_user=0, module_name="Unknown",
                  **kwargs):
@@ -186,7 +201,7 @@ BibWorkflowEngine
                 obj.log.info("object saving process : was already existing")
                 continue
                 # Set the current workflow id in the object
-            if obj.version == CFG_OBJECT_VERSION.INITIAL \
+            if obj.version == ObjectVersion.INITIAL \
                 and obj.id_workflow is not None:
                 obj.log.info("object saving process : was already existing")
                 pass
@@ -199,9 +214,9 @@ BibWorkflowEngine
     def after_processing(objects, self):
         self._i = [-1, [0]]
         if self.has_completed():
-            self.save(CFG_WORKFLOW_STATUS.COMPLETED)
+            self.save(WorkflowStatus.COMPLETED)
         else:
-            self.save(CFG_WORKFLOW_STATUS.FINISHED)
+            self.save(WorkflowStatus.FINISHED)
 
     def _create_db_obj(self):
         db.session.add(self.db_obj)
@@ -219,12 +234,12 @@ BibWorkflowEngine
         """
         number_of_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == self.uuid,
-            BibWorkflowObject.version.in_([CFG_OBJECT_VERSION.HALTED,
-                                           CFG_OBJECT_VERSION.RUNNING])
+            BibWorkflowObject.version.in_([ObjectVersion.HALTED,
+                                           ObjectVersion.RUNNING])
         ).count()
         return number_of_objects == 0
 
-    def save(self, status=CFG_WORKFLOW_STATUS.NEW):
+    def save(self, status=WorkflowStatus.NEW):
         """
         Save the workflow instance to database.
         Just storing the necessary data.
@@ -238,8 +253,8 @@ BibWorkflowEngine
             self._create_db_obj()
         else:
             # This workflow continues a previous execution.
-            if status in (CFG_WORKFLOW_STATUS.FINISHED,
-                          CFG_WORKFLOW_STATUS.HALTED):
+            if status in (WorkflowStatus.FINISHED,
+                          WorkflowStatus.HALTED):
                 self.db_obj.current_object = 0
             self.db_obj.modified = datetime.now()
             self.db_obj.status = status
@@ -373,7 +388,7 @@ BibWorkflowEngine
                     obj.set_extra_data(extra_data)
                     raise
                 # We save the object once it is fully run through
-            obj.save(CFG_OBJECT_VERSION.FINAL)
+            obj.save(ObjectVersion.FINAL)
             obj.log.info("Object proccesing is finished")
             self.increase_counter_finished()
             self.log.info("Done saving object: %i" % (obj.id, ))
@@ -400,6 +415,8 @@ BibWorkflowEngine
         """
         callback_list = self.getCallbacks()
         if callback_list:
+            self.log.info(str(self.getCallbacks()))
+            self.log.info(str(self.getCurrTaskId()))
             for i in self.getCurrTaskId():
                 callback_list = callback_list[i]
             return callback_list.func_name
@@ -419,6 +436,15 @@ BibWorkflowEngine
         raise WorkflowHalt(message=msg,
                            widget=widget,
                            id_workflow=self.uuid)
+
+    def get_default_data_type(self):
+        """
+        Returns default data type from workflow
+        definition.
+        """
+        return getattr(self.workflow_definition,
+                       "object_type",
+                       "")
 
     def set_counter_initial(self, obj_count):
         self.db_obj.counter_initial = obj_count

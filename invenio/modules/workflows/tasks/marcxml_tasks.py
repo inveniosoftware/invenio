@@ -43,7 +43,7 @@ from invenio.legacy.bibsched.bibtask import (task_sleep_now_if_required,
                                              task_low_level_submission
                                              )
 from invenio.modules.oaiharvester.models import OaiHARVEST
-from invenio.modules.records.api import Record
+from invenio.modules.records.api import Record, create_record
 from invenio.modules.workflows.errors import WorkflowError
 from invenio.legacy.refextract.api import extract_references_from_file_xml
 from invenio.legacy.bibrecord import (create_records,
@@ -85,9 +85,9 @@ def add_metadata_to_extra_data(obj, eng):
     @param eng:
     """
     obj.extra_data["_last_task_name"] = "add_metadata_to_extra_data"
-    from invenio.legacy.bibrecord import create_record, record_get_field_value
+    from invenio.legacy.bibrecord import create_record as old_create_record, record_get_field_value
 
-    record = create_record(obj.data)
+    record = old_create_record(obj.data)
 
     obj.extra_data['redis_search']['category'] = \
         record_get_field_value(record[0], '037', code='c')
@@ -310,6 +310,7 @@ def convert_record_to_bibfield(obj, eng):
     Convert a record in data log.errorinto a 'dictionary'
     thanks to BibField
     """
+    obj.extra_data["last_task_name"] = "last task name: convert_record_to_bibfield"
     obj.data = create_record(obj.data, master_format="marc").dumps()
     eng.log.info("Field conversion succeeded")
 
@@ -571,9 +572,8 @@ def fulltext_download(obj, eng):
                                  'doctype': doctype}
             updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>\n' + fulltext_xml + \
                           '</record>\n</collection>'
-            from invenio.modules.records.api import create_record
 
-            new_dict_representation = create_record(updated_xml).dumps()
+            new_dict_representation = create_record(updated_xml, master_format="marc").dumps()
             try:
                 obj.data['fft'].append(new_dict_representation["fft"])
             except (KeyError, TypeError):
@@ -711,10 +711,9 @@ def plot_extract(plotextractor_types):
                 marc_xml += "\n</collection>"
 
                 if marc_xml:
-                    from invenio.modules.records.api import create_record
                     # We store the path to the directory  the tarball contents live
                     # Read and grab MARCXML from plotextractor run
-                    new_dict_representation = create_record(marc_xml).dumps()
+                    new_dict_representation = create_record(marc_xml, master_format="marc").dumps()
                     try:
                         obj.data['fft'].append(new_dict_representation["fft"])
                     except KeyError:
@@ -754,9 +753,7 @@ def refextract(obj, eng):
             updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>' + references_xml.group(1) + \
                           "</record>\n</collection>"
 
-            from invenio.modules.records.api import create_record
-
-            new_dict_representation = create_record(updated_xml).dumps()
+            new_dict_representation = create_record(updated_xml, master_format="marc").dumps()
             try:
                 obj.data['reference'].append(new_dict_representation["reference"])
             except KeyError:
@@ -834,10 +831,9 @@ def author_list(obj, eng):
         updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' + record_xml_output(authorlist_record) \
                       + '</collection>'
         if not None == updated_xml:
-            from invenio.base.records.api import create_record
             # We store the path to the directory  the tarball contents live
             # Read and grab MARCXML from plotextractor run
-            new_dict_representation = create_record(updated_xml).dumps()
+            new_dict_representation = create_record(updated_xml, master_format="marc").dumps()
             obj.data['authors'] = new_dict_representation["authors"]
             obj.data['number_of_authors'] = new_dict_representation["number_of_authors"]
             obj.add_task_result("authors", new_dict_representation["authors"])

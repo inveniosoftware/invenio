@@ -1,5 +1,6 @@
-{% extends "workflows/hp_layout.html" %}
+{% extends "workflows/hp_detailed_layout.html" %}
 {% import 'workflows/hp_utils.html' as utils %}
+{% import 'workflows/edit_field_macro.html' as field_macro %}
 
 {% block header%}
     {{ super() }}
@@ -17,163 +18,66 @@
         $(document).ready(function(){
             var bwoid = "{{bwobject.id}}";
             var format = "hd";
-            var url_preview = "{{ url_for('holdingpen.entry_data_preview') }}";
-            var url_restart_record = "{{ url_for('holdingpen.restart_record') }}";
-            var url_restart_record_prev = "{{ url_for('holdingpen.restart_record_prev') }}";
-            var url_continue_record = "{{ url_for('holdingpen.continue_record') }}";
+            url = new Object();
+            url.url_preview = "{{ url_for('holdingpen.entry_data_preview') }}";
+            url.url_restart_record = "{{ url_for('holdingpen.restart_record') }}";
+            url.url_restart_record_prev = "{{ url_for('holdingpen.restart_record_prev') }}";
+            url.url_continue_record = "{{ url_for('holdingpen.continue_record') }}"; 
+            url.url_resolve_edit = "{{ url_for('holdingpen.resolve_edit') }}"
 
             $('button.preview').click(function() {
+                bwoid = $(this).attr('data-id');
                 format = $(this).attr('name');
-                data_preview(url_preview, bwoid, format);
+                data_preview(url.url_preview, bwoid, format);
+                $('button.preview').each(function() {
+                    $(this).removeClass('active');
+                });
+                $(this).addClass('active');
             });
 
-            data_preview(url_preview, bwoid, format);
-            action_buttons(url_restart_record, url_restart_record_prev, url_continue_record);
+            data_preview(url.url_preview, bwoid, format);
+            action_buttons(url, bwoid);
         });
     </script>
 {% endblock javascript %}
 
 {% block hpbody %}
-    <nav class="navbar navbar-default navbar-static-top" role="navigation">  
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav">
-            <li><a href="{{url_for('holdingpen.maintable')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> Back</a>
-            </li>
-            <li class="active">
-                <a href="#">Details</a>
-            </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions<b class="caret"></b></a>
-                <ul class="dropdown-menu" role="menu">
-                    <li><button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-repeat"></i>Restart</button></li>
-                    <li><button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-backward"></i>Restart Task</button></li>
-                    <li><button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-forward"></i>Skip Task</button></li>
-                    <li><a id="delete_btn" class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#confirmationModal" role="button"><i class="icon-trash"></i>Delete</a></li>
-                </ul>
-            </li>
-
-            <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-              <div class="modal-dialog">  
-                <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="myModalLabel">Please Confirm</h3>
-                    </div>
-                    <div class="modal-body">
-                      <p>Are you sure you want to delete record #{{bwobject.id}}</p>
-                    </div>
-                    <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-                      <a class="btn btn-danger" href="{{ url_for('holdingpen.delete_from_db', bwobject_id=bwobject.id) }}" >Delete Record</a>
-                    </div>
-                </div>
-              </div>
-            </div>
-
-        </ul>
+    
+    {% block navbar_right %}
         <ul class="nav navbar-nav pull-right">
             <li>
                 {% if bwobject.get_extra_data()['widget'] %}
-                <a href="{{ url_for('holdingpen.show_widget', bwobject_id=bwobject.id, widget=info['widget']) }}" ><i class="icon-wrenchwhite icon-wrench"></i>Widget</a>
+                <a href="{{ url_for('holdingpen.show_widget', objectid=bwobject.id) }}" ><i class="icon-wrenchwhite icon-wrench"></i>Action needed</a>
                 {% else %}
                 
                 {% endif %}
             </li>
-        </ul>    
-      </div>
-    </nav>
+        </ul>
+    {% endblock navbar_right %}
+    
+    {% block hp_navbar %}
+        {{ super() }}
+    {% endblock hp_navbar %}
 
     <div class="container" style="padding-left:0px;">
         <div class="row">
-            <div class="col-md-3">
-                
+            <div class="col-md-3"> 
                 <div class="well">
-                    <div class="muted">Workflow: <b>{{workflow.name}}</b></div>
-                    <span type="button" class="pull-right" style="cursor:pointer" data-toggle="collapse" data-target="#workflow-definition"><span class="caret"></span></span>
-                    <div id="workflow-definition" class="collapse">
-                        <table class="table table-striped">
-                            <tbody>
-                                <div class="muted"><b>Workflow Tasks:</b></div>
-                                {{ utils.function_display(workflow_func, bwobject.get_extra_data()['last_task_name'], bwobject.version) }}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="well">
-                    <div class="muted"><b>Error Message:</b></div>
-                    {% if bwobject.get_extra_data()['error_msg'] != "" %}
-                        {{ info['last task name'] }} {{ bwobject.get_extra_data()['error_msg'] }}
-                        <div class="text-right">
-                            <h6 id="show-more" class="text-right"><a href="#moreinfoModal" role="button" data-toggle="modal" class="pull-right">Show More</a>
-                            </h6>
-                        </div>
-                    {% else %}
-                        There were no errors.
-                    {% endif %}
-                    
-                    <div id="moreinfoModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                        <h3 id="myModalLabel">Error Log</h3>
-                      </div>
-                      <div class="modal-body">
-                        {% for key, value in log.items() %}
-                        {{key}}: {{value}}
+                    <form id="edit_form" class="form-horizontal" role="form" method="POST" name="">
+                        {% for field in edit_record_widget %}
+                            {{ field_macro.render_field(field) }}
                         {% endfor %}
-                      </div>
-                      <div class="modal-footer">
-                        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                      </div>
-                    </div>
+                    </form>
                 </div>
 
-                <div class="well">
-                    <div class="muted"><b>Record Metadata</b>
-                        <span type="button" class="pull-right" style="cursor:pointer" data-toggle="collapse" data-target="#record-metadata-table"><span class="caret"></span></span>
-                    </div>
-                </br>
-                    <div id="record-metadata-table" class="collapse">
-                        <table class="table table-striped">
-                            <tbody>
-                                {% for key, value in info.items() %}
-                                    <b>{{ key }}</b> = {{ value }}
-                                    <hr>
-                                {% endfor %}
+                {% block hpbody_details %}
+                    {{ super() }}
+                {% endblock hpbody_details %}
 
-                                {% if bwobject.version == 1 %}
-                                    <span class="badge badge-success">Final</span>
-                                {% elif bwobject.version == 2 %}
-                                    <span class="badge badge-warning">Halted</span>
-                                {% else %}
-                                    <span class="badge badge-info">Initial</span>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
-            <div class="col-md-9">
-                Show as:
-                <div class="btn-group" name="object_preview_btn" data-toggle="buttons-radio">
-                    <button class="preview btn btn-xs btn-primary active" name="hd">HTML</button>
-                    <button class="preview btn btn-xs btn-primary" name="xm">MARCXML</button>
-                    <button class="preview btn btn-xs btn-primary" name="tm">MARC</button>
-                </div>
-                <!-- <div class="btn-group pull" name="data_version" data-toggle="buttons-radio">
-                    <button class="btn btn-xs active" name="initial" onclick="">Initial</button>
-                    {% if bwobject.version == 1 %}
-                        <button class="btn btn-xs" name="final" onclick="">Final</button>
-                    {% else %}
-                        <button class="btn btn-xs disabled" name="final">Final</button>                        
-                    {% endif %}
-                    {% if bwobject.version == 2 %}
-                        <button class="btn btn-xs" name="error" onclick="">Error</button>
-                    {% else %}
-                        <button class="btn btn-xs disabled" name="error">Error</button>
-                    {% endif %}
-                </div> -->
 
+            <div class="col-md-9">
+               
                 {% if 'message' in bwobject.get_extra_data() and 
                     bwobject.get_extra_data()['widget'] != None %}
                     <div id="usermessage" class="alert alert-warning alert-dismissable">
@@ -182,16 +86,16 @@
                     </div>
                 {% endif %}
 
+                {% block hp_preview %}
+                    {{ super() }}
+                {% endblock %}
+
                 {% if bwobject.version == 1 %}
                     <div id="successmessage" class="alert alert-success">
                         Record ran workflow successfully.
                         <a class="close" data-dismiss="alert">×</a>
                     </div>
                 {% endif %}
-
-                <div id="object_preview_container{{bwobject.id}}">
-                    {{ data_preview|safe }}
-                </div>
             </div>
         </div>
     </div>

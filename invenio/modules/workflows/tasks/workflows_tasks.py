@@ -1,9 +1,24 @@
-from invenio.modules.workflows.models import (BibWorkflowObject,
-                                              BibWorkflowEngineLog,
-                                              DATA_TYPES
-                                              )
-from invenio.modules.workflows.api import start_delayed
+# -*- coding: utf-8 -*-
+## This file is part of Invenio.
+## Copyright (C) 2013,2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of t
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111 1307, USA.
 
+from invenio.modules.workflows.models import (BibWorkflowObject,
+                                              BibWorkflowEngineLog)
+from invenio.modules.workflows.api import start_delayed
 from invenio.modules.workflows.errors import WorkflowError
 
 from time import sleep
@@ -64,7 +79,7 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
             myobject.data = data
         extra = myobject.get_extra_data()
         myobject.set_extra_data(extra)
-        myobject.data_type = DATA_TYPES.RECORD
+        myobject.data_type = "record"
         myobject.save()
         workflow_id = start_delayed(workflow_to_run, data=[myobject],
                                     stop_on_error=True, **kwargs)

@@ -28,7 +28,6 @@ function get_redis_data(url){
                 url: url,
                 data: {'key': a},
                 success: function(json){
-                    alert(json)}
                 })
 }
 

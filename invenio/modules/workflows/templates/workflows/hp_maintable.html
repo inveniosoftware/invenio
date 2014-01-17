@@ -5,11 +5,14 @@
     {{ super() }}
     {% css url_for('static', filename='css/ColVis.css') %}
     {% css url_for('static', filename='css/dataTables.bootstrap.css') %}
+    {% css url_for('workflows.static', filename='css/workflows/style.css'), '20-workflows' %}
 {% endblock header %}
 
 {% js url_for('static', filename='js/jquery.dataTables.min.js'), '30-datatables' %}
 {% js url_for('static', filename='js/ColVis.js'), '30-datatables' %}
+{% js url_for('static', filename='js/bootstrap.js'), '30-datatables' %}
 {% js url_for('static', filename='js/dataTables.bootstrap.js'), '30-datatables' %}
+{% js url_for('static', filename='js/bootstrap-tagsinput.min.js'), '30-datatables' %}
 {% js url_for('workflows.static', filename='js/workflows/hp_maintable.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/widgets/approval.js'), '50-workflows' %}
 
@@ -19,6 +22,7 @@
     <script type="text/javascript">
         $(document).ready(function(){
             url = new Object();
+            // console.log(url);
             url.load_table = "{{ url_for('holdingpen.load_table')|safe }}";
             url.batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
             url.resolve_widget = "{{ url_for('holdingpen.resolve_widget') }}";
@@ -27,9 +31,12 @@
             url.widget = "{{ url_for('holdingpen.show_widget') }}";
             url.details = "{{ url_for('holdingpen.details')|safe }}";
             url.batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
+            url.preview = "{{ url_for('holdingpen.entry_data_preview') }}";
+            version_showing = "{{version_showing}}";
 
             init_urls(url);
             init_urls_approval(url);
+            oTable = init_datatable(version_showing);
         });
     </script>
 {% endblock javascript %}
@@ -41,62 +48,58 @@
       <!-- Brand and toggle get grouped for better mobile display -->
 
       <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-            <li class="active">
-                <a href="#">Home</a>
-            </li>
            <!--  <li><a href="#">Assigned to me</a></li> -->
             <p class="navbar-text" style="margin-right:0px; color:light gray;">Show Records by:</p>
             <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Actions<b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                {% set i = 0 %}
-                {% for task in widget_list.iterkeys() %}
-                    <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{task}}: {{widget_list[task][0]}}</a></li>
-                    {% set i = i+1 %}
-                {% endfor %}
-                </ul>
+                <a class="dropdown-toggle dropdown-headline" data-toggle="dropdown" href="#">Actions<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    {% if user_list %}
+                        {% set i = 0 %}
+                        {% for task, object_count in widget_list.iteritems() %}
+                            <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{task}}: {{object_count}}</a></li>
+                            {% set i = i+1 %}
+                        {% endfor %}
+                    {% else %}
+                            <li><a class="task-btn">No actions left</a></li>
+                    {% endif %}
+                    </ul>
             </li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Status<b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">Status<b class="caret"></b></a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a id="version-halted" class="version-selection" name="Halted">Halted</a></li>
-                    <li><a id="version-final" class="version-selection" name="Final">Final</a></li>
+                    <li><a id="version-final" class="version-selection" name="Final">Completed</a></li>
                     <li><a id="version-running" class="version-selection" name="Running">Running</a></li>
                 </ul>
             </li>
         </ul>
-        <ul class="nav navbar-nav pull-right">
-          <li><button id="refresh_button" type="button" class="btn btn-default navbar-btn">Refresh!</button></li>    
-        </ul>
       </div>
     </nav>
 
-    <div id="tag-area" class="row">
-    </div>
+    <input id="tagsinput" type="text" data-role="tagsinput" placeholder="Add new tag"/>
+    </br>
 
     <div class="container">
         <div class="row">
-            <table id="example" cellpadding="0" cellspacing="0" border="0" class="table table-bordered">
+            <table id="maintable" cellpadding="0" cellspacing="0" border="0" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th><input id="select-all" type="checkbox"></th>
                         <th>Id</th>
+                        <th><input id="select-all" type="checkbox"></th>
                         <th>Title</th>
                         <th>Source</th>
                         <th>Category</th>
-                        <th>Workflow ID</th>
-                        <th>Owner</th>
                         <th>Created</th>
-                        <th>Version</th>
+                        <th>Status</th>
+                        <th>Type</th>
                         <th>Details</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>

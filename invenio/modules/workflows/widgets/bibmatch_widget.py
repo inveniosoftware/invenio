@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,34 +17,29 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from invenio.base.i18n import _
 from ..hp_field_widgets import bootstrap_accept
 from wtforms import SubmitField, Form
 __all__ = ['bibmatch_widget']
 
 
 class bibmatch_widget(Form):
-    accept = SubmitField(label='Accept', widget=bootstrap_accept)
+    accept = SubmitField(label=_('Accept'), widget=bootstrap_accept)
 
     def render(self, bwobject_list, *args, **kwargs):
-        from ..models import BibWorkflowObject
-        from ..views.holdingpen import _entry_data_preview
+        # FIXME: Currently not working
 
         # setting up bibmatch widget
         bwobject = bwobject_list[0]
+        results = bwobject.get_extra_data()['_tasks_results']
 
-        try:
-            matches = bwobject.get_extra_data()['tasks_results']['match_record']
-        except:
-            pass
-
+        matches = []
         match_preview = []
-        # adding dummy matches
-        match_preview.append(BibWorkflowObject.query.filter(
-            BibWorkflowObject.id == bwobject.id).first())
-        match_preview.append(BibWorkflowObject.query.filter(
-            BibWorkflowObject.id == bwobject.id).first())
+        for res in results:
+            if res.name == "matcher":
+                matches.append(res.result)
 
-        data_preview = _entry_data_preview(bwobject.get_data())
+        data_preview = None
 
         return ('workflows/hp_bibmatch_widget.html',
                 {'bwobject': bwobject,
