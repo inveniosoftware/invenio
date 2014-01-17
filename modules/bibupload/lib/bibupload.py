@@ -1752,8 +1752,8 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
         return True
 
     def _process_document_moreinfos(more_infos, docname, version, docformat, mode):
-        if not mode in ('correct', 'append', 'replace_or_insert', 'replace', 'correct', 'insert'):
-            print "exited because the mode is incorrect"
+        if not mode in ('correct', 'append', 'replace_or_insert', 'replace', 'insert'):
+            #print "exited because the mode is incorrect"
             return
 
         docid = None
