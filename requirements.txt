@@ -25,3 +25,4 @@ unidecode
 python-openid
 qrcode
 PIL
+jinja2
