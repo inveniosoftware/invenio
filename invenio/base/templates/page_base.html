@@ -17,6 +17,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
+{% from "_macros.html" import messages %}
+
 {# Global CSS #}
 {% block global_css %}
   {%- css 'css/bootstrap.css', '00-invenio' -%}
@@ -163,23 +165,16 @@
 {%- block page_body -%}
     <div class="container">
       {% block title %}
-      {% if title %}
-        <div class="page-header">
-          <h1>{{ title }}</h1>
-        </div>
-      {% endif %}
-      {% endblock title %}
-      {% block messages %}
-        {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['', 'info', 'error', 'warning', 'success']) %}
-          <div class="alert alert-{{ category }}">
-            <a class="close" data-dismiss="alert" href="#">×</a>
-            {{ msg|safe }}
+        {% if title %}
+          <div class="page-header">
+            <h1>{{ title }}</h1>
           </div>
-        {% endfor %}
-        {% endblock messages %}
-        {% block body %}
+        {% endif %}
+      {% endblock title %}
+      {{ messages() }}
+      {% block body %}
         {{ body }}
-        {% endblock body %}
+      {% endblock body %}
     </div>
 {%- endblock page_body -%}
 {%- endif -%}
