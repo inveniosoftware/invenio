@@ -16,15 +16,21 @@
 // along with Invenio; if not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+url = new Object();
+var bwoid;
 
-function action_buttons (url_restart_record, url_restart_record_prev, url_continue) {
+function init_url_details(url_, bwoid_){
+    url = url_;
+    bwoid = bwoid_;
+}
+
+
+function action_buttons(url, bwoid) {
 
     $('#restart_button').on('click', function() {
-        bwo_id = $(this).attr('name');
-        console.log(bwo_id);
         jQuery.ajax({
-            url: url_restart_record,
-            data: bwo_id,
+            url: url.url_restart_record,
+            data: {'bwobject_id': bwoid},
             success: function(json){
                 bootstrap_alert('Object restarted');
             }
@@ -32,11 +38,10 @@ function action_buttons (url_restart_record, url_restart_record_prev, url_contin
     });
 
     $('#restart_button_prev').on('click', function() {
-        bwo_id = $(this).attr('name');
-        console.log(bwo_id);
+        console.log(bwoid);
         jQuery.ajax({
-            url: url_restart_record_prev,
-            data: bwo_id,
+            url: url.url_restart_record_prev,
+            data: {'bwobject_id': bwoid},
             success: function(json){
                 bootstrap_alert('Object restarted from previous task');
             }
@@ -44,31 +49,49 @@ function action_buttons (url_restart_record, url_restart_record_prev, url_contin
     });
 
     $('#continue_button').on('click', function() {
-        bwo_id = $(this).attr('name');
-        console.log(bwo_id);
         jQuery.ajax({
-            url: url_continue,
-            data: bwo_id,
+            url: url.url_continue,
+            data: {'bwobject_id': bwoid},
             success: function(json){
                 bootstrap_alert('Object continued from next task');
             }
         });
     });
+
+    $('#edit_form').on('submit', function(event){
+        event.preventDefault();
+        var form_data = new Object;
+        $("#edit_form input").each(function() {
+            console.log($(this)[0].name);
+            if($(this)[0].name != 'submitButton'){
+                if($(this)[0].name == 'core'){
+                    form_data[$(this)[0].name] = $(this)[0].checked;
+                }
+                else{
+                    form_data[$(this)[0].name] = $(this)[0].value;
+                }
+            }
+        });
+
+        console.log(form_data);
+        jQuery.ajax({
+            type: 'POST',
+            url: url.url_resolve_edit,
+            data: {'objectid': bwoid,
+                   'data': form_data},
+            success: function(json){
+                bootstrap_alert('Record successfully edited');
+            }
+        });
+    });
 }
 
-// function bootstrap_alert(message) {
-//     $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>');
-// }
-
-// window.setTimeout(function() {
-//     $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
-//     });
-// }, 2000);
+function bootstrap_alert(message) {
+    $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>');
+}
 
 if ( window.addEventListener ) {
     $("div.btn-group[name='data_version']").bind('click', function(event){
         version = event.target.name;
     });
 }
-
-// bwoid = getURLParameter('bwobject_id');

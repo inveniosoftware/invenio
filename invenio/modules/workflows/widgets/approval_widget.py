@@ -21,17 +21,19 @@ from ..hp_field_widgets import (bootstrap_accept, bootstrap_accept_mini,
                                 bootstrap_reject, bootstrap_reject_mini)
 
 from wtforms import SubmitField, Form
+from invenio.base.i18n import _
+
 
 __all__ = ['approval_widget']
 
 
 class approval_widget(Form):
-    reject = SubmitField(label='Reject', widget=bootstrap_reject)
-    accept = SubmitField(label='Accept', widget=bootstrap_accept)
+    reject = SubmitField(label=_('Reject'), widget=bootstrap_reject)
+    accept = SubmitField(label=_('Accept'), widget=bootstrap_accept)
 
     class mini_widget(Form):
-        reject = SubmitField(label='Reject', widget=bootstrap_reject_mini)
-        accept = SubmitField(label='Accept', widget=bootstrap_accept_mini)
+        reject = SubmitField(label=_('Reject'), widget=bootstrap_reject_mini)
+        accept = SubmitField(label=_('Accept'), widget=bootstrap_accept_mini)
 
     def render(self, bwobject_list, bwparent_list, info_list,
                logtext_list, w_metadata_list,
@@ -52,24 +54,23 @@ class approval_widget(Form):
                  'w_metadata_list': w_metadata_list,
                  'workflow_func_list': workflow_func_list})
 
-    def run_widget(self, bwobject_id, request):
+    def run_widget(self, objectid, request):
         """
         Resolves the action taken in the approval widget
         """
-        from flask import request, flash, redirect, url_for
+        from flask import request, flash
         from ..api import continue_oid_delayed
-        from ..views.holdingpen import _delete_from_db
         from ..models import BibWorkflowObject
 
-        bwobject = BibWorkflowObject.query.get(bwobject_id)
+        bwobject = BibWorkflowObject.query.get(objectid)
 
         if request.form['decision'] == 'Accept':
             bwobject.remove_widget()
-            continue_oid_delayed(bwobject_id)
+            continue_oid_delayed(objectid)
             flash('Record Accepted')
-            
+
         elif request.form['decision'] == 'Reject':
-            _delete_from_db(bwobject_id)
+            BibWorkflowObject.delete(objectid)
             flash('Record Rejected')
 
 approval_widget.__title__ = 'Approve Record'

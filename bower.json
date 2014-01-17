@@ -33,7 +33,8 @@
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
     "plupload": "*",
     "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",
-    "font-awesome": "*"
+    "font-awesome": "*",
+    "bootstrap-tagsinput": "*"
   },
   "resolutions": {
     "jquery": "2.1.0"

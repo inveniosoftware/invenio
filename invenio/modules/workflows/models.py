@@ -29,11 +29,17 @@ from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from invenio.ext.sqlalchemy import db
 from invenio.base.globals import cfg
-from .config import CFG_OBJECT_VERSION
-from .utils import redis_create_search_entry, WorkflowsTaskResult
 
+from .utils import redis_create_search_entry, WorkflowsTaskResult
 from .logger import (get_logger,
                      BibWorkflowLogHandler)
+
+
+class ObjectVersion(object):
+    INITIAL = 0
+    FINAL = 1
+    HALTED = 2
+    RUNNING = 3
 
 
 def get_default_data():
@@ -46,12 +52,13 @@ def get_default_extra_data():
     """ Returns the base64 representation of the extra_data default value """
     extra_data_default = {"_tasks_results": [],
                           "owner": {},
-                          "task_counter": {},
+                          "_task_counter": {},
                           "error_msg": "",
                           "_last_task_name": "",
                           "latest_object": -1,
                           "widget": None,
-                          "redis_search": {}}
+                          "redis_search": {},
+                          "source": ""}
     return base64.b64encode(cPickle.dumps(extra_data_default))
 
 
@@ -67,7 +74,9 @@ class Workflow(db.Model):
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
     id_user = db.Column(db.Integer, default=0, nullable=False)
-    _extra_data = db.Column(db.LargeBinary, nullable=False, default=get_default_extra_data())
+    _extra_data = db.Column(db.LargeBinary,
+                            nullable=False,
+                            default=get_default_extra_data())
     status = db.Column(db.Integer, default=0, nullable=False)
     current_object = db.Column(db.Integer, default="0", nullable=False)
     objects = db.relationship("BibWorkflowObject", backref="bwlWORKFLOW")
@@ -188,7 +197,9 @@ class Workflow(db.Model):
         elif callable(setter):
             setter(extra_data)
 
-        Workflow.get(Workflow.uuid == self.uuid).update({'_extra_data': base64.b64encode(cPickle.dumps(extra_data))})
+        Workflow.get(Workflow.uuid == self.uuid).update(
+            {'_extra_data': base64.b64encode(cPickle.dumps(extra_data))}
+        )
 
     @classmethod
     def delete(cls, uuid=None):
@@ -203,13 +214,17 @@ class BibWorkflowObject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # Our internal data column. Default is encoded dict.
-    _data = db.Column(db.LargeBinary, nullable=False, default=get_default_data())
-    _extra_data = db.Column(db.LargeBinary, nullable=False, default=get_default_extra_data())
+    _data = db.Column(db.LargeBinary,
+                      nullable=False,
+                      default=get_default_data())
+    _extra_data = db.Column(db.LargeBinary,
+                            nullable=False,
+                            default=get_default_extra_data())
 
     id_workflow = db.Column(db.String(36),
                             db.ForeignKey("bwlWORKFLOW.uuid"), nullable=True)
     version = db.Column(db.Integer(3),
-                        default=CFG_OBJECT_VERSION.RUNNING, nullable=False)
+                        default=ObjectVersion.RUNNING, nullable=False)
     id_parent = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"),
                           default=None)
     child_objects = db.relationship("BibWorkflowObject",
@@ -218,10 +233,9 @@ class BibWorkflowObject(db.Model):
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
     status = db.Column(db.String(255), default="", nullable=False)
-    persistent_ids = db.Column(db.JSON, default= {} ,nullable=True)
-    data_type = db.Column(db.String(150), default=DATA_TYPES.ANY,
+    persistent_ids = db.Column(db.JSON, default={}, nullable=True)
+    data_type = db.Column(db.String(150), default="",
                           nullable=True)
-
     uri = db.Column(db.String(500), default="")
     id_user = db.Column(db.Integer, default=0, nullable=False)
     child_logs = db.relationship("BibWorkflowObjectLog")
@@ -235,7 +249,8 @@ class BibWorkflowObject(db.Model):
     def log(self):
         if not self._log:
             db_handler_obj = BibWorkflowLogHandler(BibWorkflowObjectLog, "id")
-            self._log = get_logger(logger_name="object.%s_%s" % (self.id_workflow, self.id),
+            self._log = get_logger(logger_name="object.%s_%s" %
+                                               (self.id_workflow, self.id),
                                    db_handler_obj=db_handler_obj,
                                    loglevel=logging.DEBUG,
                                    obj=self)
@@ -277,41 +292,6 @@ class BibWorkflowObject(db.Model):
                   str(self.version), str(self.id_parent), str(self.created),
                   str(self.get_extra_data()))
 
-    def __str__(self, log=False):
-        return """
--------------------------------
-BibWorkflowObject
--------------------------------
-    Extra object class:
-    Self status: %s
--------------------------------
-    BibWorkflowObject:
-
-        Id: %s
-        Parent id: %s
-        Workflow id: %s
-        Created: %s
-        Modified: %s
-        Version: %s
-        DB_obj status: %s
-        Data type: %s
-        URI: %s
-        Data: %s
-        Extra data: %s
--------------------------------
-""" % (str(self.status),
-       str(self.id),
-       str(self.id_parent),
-       str(self.id_workflow),
-       str(self.created),
-       str(self.modified),
-       str(self.version),
-       str(self.status),
-       str(self.data_type),
-       str(self.uri),
-       str(self.get_data()),
-       str(self.get_extra_data),)
-
     def __eq__(self, other):
         if isinstance(other, BibWorkflowObject):
             if self._data == other._data and \
@@ -339,12 +319,33 @@ BibWorkflowObject
         self.extra_data["_tasks_results"].append(res_obj)
 
     def add_widget(self, widget, message):
+        """
+        Assign a widget to this object for an action to be taken
+        in holdingpen. The widget is reffered to by a string with
+        the filename minus extension. Ex: approval_widget.
+
+        A message is also needed to tell the user the action
+        required.
+        """
         extra_data = self.get_extra_data()
         extra_data["_widget"] = widget
         extra_data["_message"] = message
         self.set_extra_data(extra_data)
 
+    def get_widget(self):
+        """
+        Retrive the currently assigned widget, if any.
+        """
+        try:
+            return self.get_extra_data()["_widget"]
+        except KeyError:
+            # No widget
+            return None
+
     def remove_widget(self):
+        """
+        Removes the currently assigned widget.
+        """
         extra_data = self.get_extra_data()
         extra_data["_widget"] = None
         extra_data["_message"] = ""
@@ -354,7 +355,16 @@ BibWorkflowObject
         self.status = message
 
     def get_current_task(self):
-        return self.get_extra_data()["task_counter"]
+        """
+        Returns the current progress structure from the workflow
+        engine for this object.
+        """
+        extra_data = self.get_extra_data()
+        try:
+            return extra_data["_task_counter"]
+        except KeyError:
+            # Assume old version "task_counter"
+            return extra_data["task_counter"]
 
     def _create_version_obj(self, id_workflow, version, id_parent=None,
                             no_update=False):
@@ -369,7 +379,7 @@ BibWorkflowObject
 
         db.session.add(obj)
         db.session.commit()
-        if version is CFG_OBJECT_VERSION.INITIAL and not no_update:
+        if version is ObjectVersion.INITIAL and not no_update:
             self.id_parent = obj.id
             db.session.commit()
         return obj.id
@@ -395,7 +405,7 @@ BibWorkflowObject
 
         if version:
             self.version = version
-            if version in (CFG_OBJECT_VERSION.FINAL, CFG_OBJECT_VERSION.HALTED):
+            if version in (ObjectVersion.FINAL, ObjectVersion.HALTED):
                 redis_create_search_entry(self)
             self._update_db()
 
@@ -454,7 +464,8 @@ BibWorkflowObject
                 new_dict_representation = Record(data)
                 data = new_dict_representation.legacy_export_as_marc()
             except Exception as e:
-                raise e
+                # Maybe not, submission?
+                return data
 
         if isinstance(data, six.string_types):
             # Its a string type, lets try to convert
@@ -485,6 +496,11 @@ BibWorkflowObject
             return data
         # Not any of the above types. How juicy!
         return data
+
+    @classmethod
+    def delete(cls, oid):
+        cls.get(BibWorkflowObject.id == oid).delete()
+        db.session.commit()
 
 
 class BibWorkflowObjectLog(db.Model):
@@ -571,4 +587,5 @@ class BibWorkflowEngineLog(db.Model):
         db.session.commit()
 
 
-__all__ = ['Workflow', 'BibWorkflowObject', 'BibWorkflowObjectLog', 'BibWorkflowEngineLog']
+__all__ = ['Workflow', 'BibWorkflowObject',
+           'BibWorkflowObjectLog', 'BibWorkflowEngineLog']

@@ -17,22 +17,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
-function bind_object_preview(url_prefix, entry_id) {
-    $("div.btn-group[name='object_preview_btn']").bind('click', function(event){
-          var format = event.target.name;
-          jQuery.ajax({
-                url: url_prefix,
-                data: {'oid': entry_id,
-                       'format': format},
-                success: function(json){
-                    if(format == 'xm' || format == 'marcxml'){
-                        $('div[name="object_preview"]').wrapAll('<debug>').text(json);
-                    }else{
-                        $('div[name="object_preview"]').html(json);
+function($){
+    function bind_object_preview(url_prefix, entry_id) {
+        $("div.btn-group[name='object_preview_btn']").bind('click', function(event){
+            var format = event.target.name;
+            jQuery.ajax({
+                    url: url_prefix,
+                    data: {'oid': entry_id,
+                          'format': format},
+                    success: function(json){
+                        if(format == 'xm' || format == 'marcxml'){
+                            $('div[name="object_preview"]').wrapAll('<debug>').text(json);
+                        }else{
+                            $('div[name="object_preview"]').html(json);
+                        }
                     }
-                }
-         })
-    });
-}
+            })
+        });
+    }
 

@@ -39,9 +39,8 @@ from invenio.ext.restful import UTCISODateTime
 from invenio.base.helpers import unicodifier
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.workflows.config import CFG_OBJECT_VERSION, CFG_WORKFLOW_STATUS
-from invenio.modules.workflows.models import BibWorkflowObject, Workflow
-from invenio.modules.workflows.engine import BibWorkflowEngine
+from invenio.modules.workflows.models import BibWorkflowObject, Workflow, ObjectVersion
+from invenio.modules.workflows.engine import BibWorkflowEngine, WorkflowStatus
 from invenio.modules.workflows.api import continue_oid
 
 from . import forms
@@ -449,11 +448,11 @@ class DepositionType(object):
         # Only reinitialize if really needed (i.e. you can only
         # reinitialize a fully completed workflow).
         wo = deposition.workflow_object
-        if wo.version == CFG_OBJECT_VERSION.FINAL and \
-           wo.workflow.status == CFG_WORKFLOW_STATUS.COMPLETED:
+        if wo.version == ObjectVersion.FINAL and \
+           wo.workflow.status == WorkflowStatus.COMPLETED:
 
-            wo.version = CFG_OBJECT_VERSION.RUNNING
-            wo.workflow.status = CFG_WORKFLOW_STATUS.RUNNING
+            wo.version = ObjectVersion.RUNNING
+            wo.workflow.status = WorkflowStatus.RUNNING
 
             # Clear deposition drafts
             deposition.drafts = {}
@@ -462,14 +461,14 @@ class DepositionType(object):
     def stop_workflow(cls, deposition):
         # Only stop workflow if really needed
         wo = deposition.workflow_object
-        if wo.version != CFG_OBJECT_VERSION.FINAL and \
-           wo.workflow.status != CFG_WORKFLOW_STATUS.COMPLETED:
+        if wo.version != ObjectVersion.FINAL and \
+           wo.workflow.status != WorkflowStatus.COMPLETED:
 
             # Only workflows which has been fully completed once before
             # can be stopped
             if deposition.has_sip():
-                wo.version = CFG_OBJECT_VERSION.FINAL
-                wo.workflow.status = CFG_WORKFLOW_STATUS.COMPLETED
+                wo.version = ObjectVersion.FINAL
+                wo.workflow.status = WorkflowStatus.COMPLETED
 
                 # Clear all drafts
                 deposition.drafts = {}
@@ -931,7 +930,7 @@ class Deposition(object):
             self.workflow_object = BibWorkflowObject(
                 id_workflow=self.engine.uuid,
                 id_user=user_id,
-                version=CFG_OBJECT_VERSION.RUNNING,
+                version=ObjectVersion.RUNNING,
             )
             self.workflow_object.set_data({})
         else:
@@ -1065,9 +1064,9 @@ class Deposition(object):
         """
         self.update()
         if self.engine:
-            self.engine.save(status=CFG_WORKFLOW_STATUS.RUNNING)
+            self.engine.save(status=WorkflowStatus.RUNNING)
         self.workflow_object.save(
-            version=self.workflow_object.version or CFG_OBJECT_VERSION.RUNNING
+            version=self.workflow_object.version or ObjectVersion.RUNNING
         )
 
     def delete(self):
@@ -1102,7 +1101,7 @@ class Deposition(object):
         running the workflow, using the save() method.
         """
         current_status = self.workflow_object.workflow.status
-        if current_status == CFG_WORKFLOW_STATUS.COMPLETED:
+        if current_status == WorkflowStatus.COMPLETED:
             return self.type.api_final(self) if headless \
                 else self.type.render_final(self)
 
@@ -1110,13 +1109,13 @@ class Deposition(object):
         status = self.type.run_workflow(self).status
         self.reload()
 
-        if status == CFG_WORKFLOW_STATUS.ERROR:
+        if status == WorkflowStatus.ERROR:
             return self.type.api_error(self) if headless else \
                 self.type.render_error(self)
-        elif status != CFG_WORKFLOW_STATUS.COMPLETED:
+        elif status != WorkflowStatus.COMPLETED:
             return self.type.api_step(self) if headless else \
                 self.type.render_step(self)
-        elif status == CFG_WORKFLOW_STATUS.COMPLETED:
+        elif status == WorkflowStatus.COMPLETED:
             return self.type.api_completed(self) if headless else \
                 self.type.render_completed(self)
 
@@ -1166,9 +1165,9 @@ class Deposition(object):
         """
         try:
             status = self.workflow_object.workflow.status
-            if status == CFG_WORKFLOW_STATUS.ERROR:
+            if status == WorkflowStatus.ERROR:
                 return "error"
-            elif status == CFG_WORKFLOW_STATUS.COMPLETED:
+            elif status == WorkflowStatus.COMPLETED:
                 return "done"
         except AttributeError:
             pass

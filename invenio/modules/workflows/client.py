@@ -18,8 +18,8 @@
 
 import traceback
 from .errors import (WorkflowHalt, WorkflowError)
-from .config import (CFG_OBJECT_VERSION,
-                     CFG_WORKFLOW_STATUS)
+from .models import ObjectVersion
+from .engine import WorkflowStatus
 
 
 def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
@@ -47,14 +47,14 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
             if current_obj:
                 if e.widget:
                     current_obj.add_widget(e.widget, e.message)
-                current_obj.save(version=CFG_OBJECT_VERSION.HALTED,
+                current_obj.save(version=ObjectVersion.HALTED,
                                  task_counter=wfe.getCurrTaskId(),
                                  id_workflow=wfe.uuid)
             else:
                 wfe.log.warning("No active object found!")
 
             # Save workflow progress
-            wfe.save(status=CFG_WORKFLOW_STATUS.HALTED)
+            wfe.save(status=WorkflowStatus.HALTED)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
 
             message = "Workflow '%s' halted at task %s with message: %s" % \
@@ -73,10 +73,10 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
             # Changing counter should be moved to wfe object
             # together with default exception handling
             wfe.increase_counter_error()
-            wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED,
+            wfe._objects[wfe.getCurrObjId()].save(ObjectVersion.HALTED,
                                                   wfe.getCurrTaskId(),
                                                   id_workflow=wfe.uuid)
-            wfe.save(CFG_WORKFLOW_STATUS.ERROR)
+            wfe.save(WorkflowStatus.ERROR)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
             # if stop_on_halt or stop_on_error:
             if isinstance(e, WorkflowError):

@@ -61,7 +61,6 @@ class BibWorkflowObjectIdContainer(object):
     def to_dict(self):
         return {str(self.__class__): self.__dict__}
 
-
     def __str__(self):
         return "BibWorkflowObject(%s)" % (str(self.id),)
 

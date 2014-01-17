@@ -16,12 +16,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from .config import CFG_OBJECT_VERSION
+from .models import ObjectVersion
 from .loader import widgets
 
 
 def create_hp_containers(iSortCol_0=None, sSortDir_0=None,
-                         sSearch=None, version_showing=[CFG_OBJECT_VERSION.HALTED]):
+                         sSearch=None, version_showing=[ObjectVersion.HALTED],
+                         type_showing=[]):
     """
     Looks for related HPItems and groups them together in HPContainers
 
@@ -33,15 +34,12 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None,
     if iSortCol_0:
         iSortCol_0 = int(iSortCol_0)
 
-    print '************************version_showing', version_showing
-
     bwobject_list = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id_parent != 0 and \
-        BibWorkflowObject.version.in_(version_showing)).all()
+        BibWorkflowObject.id_parent != 0 and
+        not version_showing or BibWorkflowObject.version.in_(version_showing)
+    ).all()
 
-    print 'GOT THAT MANY RECORDS HERE:', len(bwobject_list)
     if sSearch:
-        print sSearch
         if len(sSearch) < 4:
             pass
         else:
@@ -58,8 +56,9 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None,
                     bwobject_list_tmp.append(bwo)
                 else:
                     try:
-                        widget = widgets[extra_data['widget']]
-                        if sSearch in widget.__title__ or sSearch in extra_data['widget']:
+                        widget_name = bwo.get_widget()
+                        widget = widgets[widget_name]
+                        if sSearch in widget.__title__ or sSearch in widget_name:
                             bwobject_list_tmp.append(bwo)
                     except:
                         pass
@@ -77,12 +76,5 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None,
     if iSortCol_0 == -6:
         if sSortDir_0 == 'desc':
             bwobject_list.reverse()
-    
-    return bwobject_list
 
-try:
-    bwolist = create_hp_containers(version_showing=current_app.config['VERSION_SHOWING'])
-    print "try succeded"
-except:    
-    print "try failed"
-    bwolist = create_hp_containers()
+    return bwobject_list

@@ -4,48 +4,65 @@
     {% set flag = 0 %}
     {% for w in fun %}
         {% if w is not iterable %}
-            <!-- {{ comma2() }} -->
-            </br>
-            {% if w.__title__ == task_counter and version == 2 %}
-                <b>
-            {% endif %}
-
-            <a href="#infoModal{{i}}" data-toggle="modal">{{ w.__title__ }}</a>
-
-            {% if w.__title__ == task_counter %}
+            {{ function_display_inner(w, task_counter, version, flag) }}
+            {% if w.func_name == task_counter and version == 2 %}
                 {% set flag = 1 %}
-                {% if version == 2 or version == 3  %}
-                    </b><i class="icon-remove"></i>
-                {% else %}
-                    <i class="icon-ok"></i>
-                {% endif %}    
-            {% else %}
-                {% if flag == 0 %}
-                    <i class="icon-ok"></i>
-                {% endif %}
-                
             {% endif %}
-            
-            <div id="infoModal{{i}}" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="myModalLabel">{{ w.__title__ }}</h3>
-              </div>
-              <div class="modal-body">
-                  {% if w.func_closure is defined %}
-                      {% if w.func_closure is iterable %}
-                          {% set comma = joiner(", ") %}
-                          {% for arg in w.func_closure %}
-                              {{ comma() }}
-                              <b>Parameter: {{ arg.cell_contents }}</b>
-                          {% endfor %}
-                          </br>
-                      {% endif %}
-                  {% endif %}
-                {{ w.func_doc }}
-              </div>
-            </div>
-            {% set i = i + 1 %}
+        {% else %}
+            {{ function_display(w, task_counter, version) }}
         {% endif %}
+            <!-- {{ comma2() }} -->
+        {% set i = i + 1 %}
     {% endfor %}
+{%- endmacro %}
+
+{% macro function_display_inner(w, task_counter, version, flag) -%}
+  </br>
+
+  {% if flag == 0 %}
+
+  <button type="button" class="btn btn-default btn-sm" href="#" data-toggle="modal" data-target="#infoModal{{i}}">
+    <span class="glyphicon glyphicon-ok-sign"></span>
+    {% if w.func_name == task_counter and version == 2 %}
+        <strong>{{ w.func_name }}</strong>
+    {% else %}
+        {{ w.func_name }}
+    {% endif %}
+  </button>
+
+  {% else %}
+
+  <button type="button" class="btn btn-default btn-sm" href="#" data-toggle="modal" data-target="#infoModal{{i}}">
+    {{ w.func_name }}
+  </button>
+
+  {% endif %}
+  
+  <div class="modal fade" id="infoModal{{i}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">{{ w.func_name }}</h4>
+        </div>
+        <div class="modal-body">
+          {% if w.func_closure is defined %}
+            {% if w.func_closure is iterable %}
+                {% set comma = joiner(", ") %}
+                {% for arg in w.func_closure %}
+                    {{ comma() }}
+                    <b>Parameter: {{ arg.cell_contents }}</b>
+                {% endfor %}
+                </br>
+            {% endif %}
+          {% endif %}
+          {{ w.func_doc }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
 {%- endmacro %}

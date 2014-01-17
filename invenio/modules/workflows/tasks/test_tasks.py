@@ -18,7 +18,6 @@
 """Basic test functions - NOT FOR XML """
 
 import time
-from ..config import CFG_OBJECT_STATUS
 
 
 def task_a(a):
@@ -37,8 +36,6 @@ def task_b(obj, eng):
     """Function task_b docstring"""
     eng.log.info("executing task b")
     if obj.data['data'] < 20:
-        obj.change_status(CFG_OBJECT_STATUS.ERROR)
-        eng.log.info("Object status %s" % (obj.status,))
         eng.log.info("data < 20")
         obj.add_task_result("task_b", {'a': 12, 'b': 13, 'c': 14})
         obj.extra_data['redis_search']['category'] = "lower_than_20"

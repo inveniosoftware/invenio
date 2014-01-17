@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013,2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,21 +33,18 @@ from ..tasks.workflows_tasks import (log_info)
 from ..tasks.logic_tasks import (workflow_if,
                                  workflow_else
                                  )
-from ..models import DATA_TYPES
-
 from invenio.config import CFG_PREFIX
 
 
 class full_doc_process(object):
-    object_type = DATA_TYPES.RECORD
+    object_type = "record"
     workflow = [convert_record_with_repository("oaiarXiv2inspire_nofilter.xsl"), convert_record_to_bibfield,
-                inspire_filter_category(category_widgeted=["gr-qc"], category_accepted=['*'], widget="approval_widget"),
                 workflow_if(quick_match_record, True),
                 [
                     plot_extract(["latex"]),
                     fulltext_download,
                     inspire_filter_custom(fields=["report_number", "arxiv_category"], custom_accepted=["*"],
-                                          widget="approval_widget"),
+                                          custom_refused="gr-qc", widget="approval_widget"),
                     bibclassify(taxonomy=CFG_PREFIX + "/etc/bibclassify/HEP.rdf",
                                 output_mode="dict", match_mode="partial"),
                     refextract, author_list,

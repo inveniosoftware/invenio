@@ -34,7 +34,8 @@ module.exports = {
                ,'jquery.bookmark/jquery.bookmark.css'
                ,'datatables-colvis/media/css/ColVis.css'
                ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.css'
-               ,'prism/prism.css'],
+               ,'prism/prism.css'
+               ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.css'],
         dest: '<%= globalConfig.installation_path %>/css/'
     },
     jquery_css: {
@@ -82,7 +83,9 @@ module.exports = {
              ,'json2/json2.js'
              ,'datatables-colvis/media/js/ColVis.js'
              ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js'
-             ,'prism/prism.js'],
+             ,'prism/prism.js'
+             ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js'
+             ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js.map'],
         dest: '<%= globalConfig.installation_path %>/js/'
     },
     fonts: {

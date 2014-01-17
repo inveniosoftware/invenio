@@ -1,0 +1,137 @@
+{%- css url_for('workflows.static', filename='css/workflows/style.css'), '20-workflows' -%}
+{% extends "workflows/hp_layout.html" %}
+
+{% block hpbody_details %}
+        <div class="well">
+            <div class="muted">Workflow: <b>{{workflow.name}}</b></div>
+            <span type="button" class="pull-right" style="cursor:pointer" data-toggle="collapse" data-target="#workflow-definition"><span class="caret"></span></span>
+            <div id="workflow-definition" class="collapse">
+                <table class="table table-striped">
+                    <tbody>
+                        <div class="muted"><b>Workflow Tasks:</b></div>
+                        {{ utils.function_display(workflow_func, bwobject.get_extra_data()['last_task_name'], bwobject.version) }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="well">
+            <div class="muted"><b>Error Message:</b></div>
+             {% if bwobject.get_extra_data()['error_msg'] != "" %}
+                {{ info['last task name'] }} {{ bwobject.get_extra_data()['error_msg'] }}
+                <div class="text-right">
+                    <h6 id="show-more" class="text-right"><a href="#moreinfoModal" role="button" data-toggle="modal" class="float-right">Show More</a>
+                    </h6>
+                </div>
+            {% else %}
+                There were no errors.
+            {% endif %}
+
+            <div id="moreinfoModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="myModalLabel">Error Log</h3>
+              </div>
+              <div class="modal-body">
+                {% for key, value in log.iteritems() %}
+                {{key}}: {{value}}
+                {% endfor %}
+              </div>
+              <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+              </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <div class="muted"><b>Record Metadata</b>
+                <span type="button" class="pull-right" style="cursor:pointer" data-toggle="collapse" data-target="#record-metadata-table"><span class="caret"></span></span>
+            </div>
+            </br>
+            <div id="record-metadata-table" class="collapse">
+                <table class="table table-striped">
+                    <tbody>
+                        <!-- {% block record_metadata_table %} -->
+                        {% for key, value in info.iteritems() %}
+                            <b>{{ key }}</b> = {{ value }}
+                            <hr>
+                        {% endfor %}
+
+                        {% if bwobject.version == 1 %}
+                            <span class="label label-success">Final</span>
+                        {% elif bwobject.version == 2 %}
+                            <span class="label label-warning">Halted</span>
+                        {% else %}
+                            <span class="label label-info">Initial</span>
+                        {% endif %}
+                        <!-- {% endblock record_metadata_table %} -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+{% endblock %}
+
+{% block hp_navbar %}
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">  
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+            <li><a href="{{url_for('holdingpen.maintable')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> Back</a>
+            </li>
+            <li class="active">
+                <a href="#">Details</a>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions<b class="caret"></b></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-repeat"></i>Restart</button></li>
+                    <li><button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-backward"></i>Restart Task</button></li>
+                    <li><button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-forward"></i>Skip Task</button></li>
+                    <li><a id="delete_btn" class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#confirmationModal" role="button"><i class="icon-trash"></i>Delete</a></li>
+                </ul>
+            </li>
+
+            <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+              <div class="modal-dialog">  
+                <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      <h3 id="myModalLabel">Please Confirm</h3>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure you want to delete record #{{bwobject.id}}</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                      <a class="btn btn-danger" href="{{ url_for('holdingpen.delete_from_db', bwobject_id=bwobject.id) }}" >Delete Record</a>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </ul>
+        {% block navbar_right %}
+        {% endblock navbar_right %}
+      </div>
+    </nav>
+{% endblock %}
+
+
+{% block hp_preview %}
+    <div class="col-md-9">
+        Show as:
+        <div class="btn-group" name="object_preview_btn" data-toggle="buttons-radio">
+
+            <button class="preview btn btn-xs btn-primary active"
+                    data-id="{{ bwobject.id }}"
+                    name="hd">HTML</button>
+            <button class="preview btn btn-xs btn-primary"
+                    data-id="{{ bwobject.id }}"
+                    name="xm">MARCXML</button>
+            <button class="preview btn btn-xs btn-primary"
+                    data-id="{{ bwobject.id }}"
+                    name="tm">MARC</button>
+        </div>
+        <div id="object_preview_container{{bwobject.id}}" class="object_preview_container">
+            {{ data_preview|safe }}
+        </div>
+    </div>
+{% endblock %}

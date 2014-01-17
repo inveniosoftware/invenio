@@ -1,46 +1,48 @@
-#checkbox$
-<input type="checkbox">
-#id$
-{{record.id}}
-#title$
-{% if record.get_extra_data()['redis_search'].has_key('title') %}{{ record.get_extra_data()['redis_search']['title'] }}
-{% else %}None
-{% endif %}
-#source$
-{% if record.get_extra_data()['redis_search'].has_key('source') %}{{ record.get_extra_data()['redis_search']['source'] }}
-{% else %}None
-{% endif %}
-#category$
-{% if record.get_extra_data()['redis_search'].has_key('category') %}{{ record.get_extra_data()['redis_search']['category'] }}
-{% else %}None
-{% endif %}
-#workflow_id$
-{{record.id_workflow}}
-#owner$
-{% if record.get_extra_data()['owner'] == None %}None{% endif %}
-#pretty_date$
-{{ pretty_date(record.created)}}
-#version$
-{% if record.version == 1 %}<span class="label label-success">Final</span>
-{% elif record.version == 2 %}<span class="label label-warning">Halted</span>
+<td id="id">
+{{object.id}}
+</td>
+<td id="checkbox">
+<input type="checkbox" class="hp-check">
+</td>
+<td id="title">
+{{ record.get('title', {}) }}
+</td>
+<td id="source">
+{{ extra_data.get('source', "No source") }}
+</td>
+<td id="category">
+{{ ", ".join(categories) or "No category" }}
+</td>
+<td id="pretty_date">
+{{ pretty_date(object.created)}}
+</td>
+<td id="version">
+{% if object.version == 1 %}<span class="label label-success">Completed</span>
+{% elif object.version == 2 %}<span class="label label-warning">Halted</span>
 {% else %}<span class="label label-info">Running</span>
 {% endif %}
-#details$
+</td>
+<td id="type">
+{{object.data_type}}
+</td>
+<td id="details">
 {% if widget == None %}
-	<a href="{{url_for('holdingpen.details', bwobject_id=record.id)}}">Details</a>
+    <a href="{{url_for('holdingpen.details', objectid=object.id)}}">Details</a>
 {% else %}
 {% set widget_instance = widget() %}
-	<a href="{{url_for('holdingpen.show_widget', bwobject_id=record.id, widget=widget_instance.__class__.__name__)}}">Details</a>
+    <a href="{{url_for('holdingpen.show_widget', objectid=object.id)}}">Details</a>
 {% endif %}
-#widget$
+</td>
+<td id="widget">
 {% if widget != None %}
-	{% set widget = widget() %}
-	{% if mini_widget != None %}
-		{% set mini_widget = mini_widget() %}
-		{% for field in mini_widget %}
-	    	{{ field }}
-		{% endfor %}
-	{% endif %}
+    {% set widget = widget() %}
+    {% if mini_widget != None %}
+        {% set mini_widget = mini_widget() %}
+        {% for field in mini_widget %}
+            {{ field(objectid=object.id) }}
+        {% endfor %}
+    {% endif %}
 {% else %}
 N/A
 {% endif %}
+</td>

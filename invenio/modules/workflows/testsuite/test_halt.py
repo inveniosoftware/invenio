@@ -30,9 +30,9 @@ class WorkflowTestBranch(InvenioTestCase):
     def test_halt(self):
         from invenio.modules.workflows.loader import workflows
         from invenio.modules.workflows.api import start
-        from invenio.modules.workflows.config import CFG_OBJECT_VERSION, \
-            CFG_WORKFLOW_STATUS
-        from invenio.modules.workflows.models import BibWorkflowObjectLog
+        from invenio.modules.workflows.engine import WorkflowStatus
+        from invenio.modules.workflows.models import (BibWorkflowObjectLog,
+                                                      ObjectVersion)
 
         halt_engine = lambda obj, eng: eng.halt("Test")
 
@@ -45,8 +45,8 @@ class WorkflowTestBranch(InvenioTestCase):
         eng = start('halttest', data)
         idx, obj = list(eng.getObjects())[0]
 
-        assert obj.version == CFG_OBJECT_VERSION.HALTED
-        assert eng.status == CFG_WORKFLOW_STATUS.FINISHED
+        assert obj.version == ObjectVersion.HALTED
+        assert eng.status == WorkflowStatus.FINISHED
         assert BibWorkflowObjectLog.get(
             id_object=obj.id, log_type=logging.ERROR).count() == 0
 
@@ -54,10 +54,9 @@ class WorkflowTestBranch(InvenioTestCase):
         from workflow.patterns import IF_ELSE
         from invenio.modules.workflows.loader import workflows
         from invenio.modules.workflows.api import start
-        from invenio.modules.workflows.config import CFG_OBJECT_VERSION, \
-            CFG_WORKFLOW_STATUS
-        from invenio.modules.workflows.models import BibWorkflowObjectLog
-
+        from invenio.modules.workflows.engine import WorkflowStatus
+        from invenio.modules.workflows.models import (BibWorkflowObjectLog,
+                                                      ObjectVersion)
         always_true = lambda obj, eng: True
         halt_engine = lambda obj, eng: eng.halt("Test")
 
@@ -72,8 +71,8 @@ class WorkflowTestBranch(InvenioTestCase):
         eng = start('branchtest', data)
         idx, obj = list(eng.getObjects())[0]
 
-        assert obj.version == CFG_OBJECT_VERSION.HALTED
-        assert eng.status == CFG_WORKFLOW_STATUS.FINISHED
+        assert obj.version == ObjectVersion.HALTED
+        assert eng.status == WorkflowStatus.FINISHED
         assert BibWorkflowObjectLog.get(
             id_object=obj.id, log_type=logging.ERROR).count() == 0
 
