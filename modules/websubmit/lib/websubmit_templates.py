@@ -678,7 +678,7 @@ class Template:
             out += "  el = document.forms[0].elements['%s'];\n" % fieldname
             # If the field must be checked we call the checking function
             if check[i] != "":
-                out += """if (%(check)s(el.value) == 0) {
+                out += """if (el !== undefined && %(check)s(el.value) == 0) {
                             el.focus();
                             return 0;
                           } """ % {
