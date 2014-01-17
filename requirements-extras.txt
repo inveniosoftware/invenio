@@ -1,0 +1,17 @@
+# More requirements files are needed, since e.g gnuplot-py and h5py
+# import numpy in their setup.py, which means they have to be
+# installed in a second step.
+gnuplot-py==1.8
+
+# Following packages are optional (if you do development you probably want to install them):
+pylint
+http://sourceforge.net/projects/pychecker/files/pychecker/0.8.19/pychecker-0.8.19.tar.gz/download
+pep8
+selenium
+winpdb
+mock
+ipython
+cython
+nose
+nosexcover
+flake8
