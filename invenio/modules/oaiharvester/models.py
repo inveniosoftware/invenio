@@ -25,11 +25,24 @@ Oai harvest database models.
 from sqlalchemy import event
 from invenio.ext.sqlalchemy import db
 
-# Create your models here.
-from invenio.utils.serializers import deserialize_via_marshal
-#from websearch_model import Collection
 from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.scheduler.models import SchTASK
+
+
+def get_default_arguments():
+    """ Returns the base64 representation of the extra_data default value """
+    arguments_default = {'c_stylesheet': '',
+                         'r_kb-rep-no-file': '',
+                         'r_format': '',
+                         'u_name': '',
+                         'a_rt-queue': '',
+                         'r_kb-journal-file': '',
+                         'u_priority': '',
+                         'a_stylesheet': '',
+                         't_doctype': '',
+                         'f_filter-file': '',
+                         'p_extraction-source': []}
+    return arguments_default
 
 
 class OaiHARVEST(db.Model):
@@ -42,26 +55,19 @@ class OaiHARVEST(db.Model):
     baseurl = db.Column(db.String(255), nullable=False, server_default='')
     metadataprefix = db.Column(db.String(255), nullable=False,
                                server_default='oai_dc')
-    arguments = db.Column(db.LargeBinary, nullable=True)
+    arguments = db.Column(db.MarshalBinary(default_value=get_default_arguments(),
+                                           force_type=dict), nullable=False)
     comment = db.Column(db.Text, nullable=True)
     name = db.Column(db.String(255), nullable=False)
-    #repository = db.Column(db.String(255), nullable=False)
     lastrun = db.Column(db.DateTime, nullable=True)
     postprocess = db.Column(db.String(20), nullable=False,
                             server_default='h')
     workflows = db.Column(db.String(255), nullable=True)
     setspecs = db.Column(db.Text, nullable=False)
 
-    def get_arguments(self):
-        return deserialize_via_marshal(self.arguments)
-
     def to_dict(self):
         dict_representation = self.__dict__
         del dict_representation["_sa_instance_state"]
-        try:
-            dict_representation["arguments"] = deserialize_via_marshal( dict_representation["arguments"])
-        except TypeError:
-            dict_representation["arguments"] = {}
         return dict_representation
 
     @classmethod
