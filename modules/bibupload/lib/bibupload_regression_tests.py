@@ -3869,6 +3869,7 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
@@ -3885,6 +3886,12 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
+        # get the bibdocid of latest file inserted
+        # only ony file is added so we don't have to additionally check
+        # if it's really the last file added
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
@@ -3920,6 +3927,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
@@ -3936,6 +3944,12 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
+        # get the bibdocid of latest file inserted
+        # only ony file is added so we don't have to additionally check
+        # if it's really the last file added
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
@@ -3975,6 +3989,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
@@ -3994,6 +4009,12 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
+        # get the bibdocid of latest file inserted
+        # only ony file is added so we don't have to additionally check
+        # if it's really the last file added
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
@@ -4051,7 +4072,8 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-         <subfield code="s">4</subfield>
+          <subfield code="8">987654321</subfield>
+          <subfield code="s">4</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/test.ps.Z</subfield>
          </datafield>
         </record>
@@ -4082,6 +4104,13 @@ allow any</subfield>
         recs = bibupload.xml_marc_to_records(testrec_to_append)
         dummy, recid, dummy = bibupload.bibupload_records(recs, opt_mode='append')[0]
         self.check_record_consistency(recid)
+
+        # get the bibdocid of latest file inserted
+        # only ony file is added so we don't have to additionally check
+        # if it's really the last file added
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
@@ -4135,12 +4164,14 @@ allow any</subfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
           <subfield code="t">SuperMain</subfield>
+          <subfield code="c">Copyright Holder||1234||CopyrightMessage||jekyll@cds.cern.ch</subfield>
           <subfield code="d">This is a description</subfield>
           <subfield code="z">This is a comment</subfield>
           <subfield code="n">CIDIESSE</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/rss.png</subfield>
+          <subfield code="l">License||www.license.url.com||license body</subfield>
           <subfield code="t">SuperMain</subfield>
           <subfield code="f">.jpeg</subfield>
           <subfield code="d">This is a description</subfield>
@@ -4159,13 +4190,28 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="540" ind1=" " ind2=" ">
+          <subfield code="8">9876543211</subfield>
+          <subfield code="a">License</subfield>
+          <subfield code="b">www.license.url.com</subfield>
+          <subfield code="u">license body</subfield>
+         </datafield>
+         <datafield tag="542" ind1=" " ind2=" ">
+          <subfield code="8">9876543211</subfield>
+          <subfield code="d">Copyright Holder</subfield>
+          <subfield code="e">jekyll@cds.cern.ch</subfield>
+          <subfield code="f">CopyrightMessage</subfield>
+          <subfield code="g">1234</subfield>
+         </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543211</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.gif</subfield>
           <subfield code="y">This is a description</subfield>
           <subfield code="z">This is a comment</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543212</subfield>
           <subfield code="s">530</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.jpeg</subfield>
           <subfield code="y">This is a description</subfield>
@@ -4186,6 +4232,16 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_url2 = testrec_expected_url1.replace('123456789',
                                                           str(recid))
+
+        # get the bibdocid of latest file inserted
+        bibdocids = [x.get_bibdocid() for x in BibRecDocs(recid).list_latest_files()]
+        # replace test buffers with real bibdocid of inserted test file:
+
+        testrec_expected_xm = testrec_expected_xm.replace('9876543211',
+                                                          str(min(bibdocids)))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543212',
+                                                          str(max(bibdocids)))
+
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
@@ -4237,10 +4293,12 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543211</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543212</subfield>
           <subfield code="s">79</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
@@ -4271,6 +4329,16 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_icon = testrec_expected_icon.replace('123456789',
                                                           str(recid))
+
+        # get the bibdocids of latest file inserted
+        bibdocids = [x.get_bibdocid() for x in BibRecDocs(recid).list_latest_files()]
+        # replace test buffers with real bibdocid of inserted test file:
+
+        testrec_expected_xm = testrec_expected_xm.replace('9876543211',
+                                                          str(min(bibdocids)))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543212',
+                                                          str(max(bibdocids)))
+
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
@@ -4311,10 +4379,12 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543211</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543212</subfield>
           <subfield code="s">79</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
@@ -4336,6 +4406,16 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_icon = testrec_expected_icon.replace('123456789',
                                                           str(recid))
+
+        # get the bibdocids of latest file inserted
+        bibdocids = [x.get_bibdocid() for x in BibRecDocs(recid).list_latest_files()]
+        # replace test buffers with real bibdocid of inserted test file:
+
+        testrec_expected_xm = testrec_expected_xm.replace('9876543211',
+                                                          str(min(bibdocids)))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543212',
+                                                          str(max(bibdocids)))
+
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
@@ -4380,18 +4460,22 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543211</subfield>
           <subfield code="s">295078</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/9809057.pdf</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543212</subfield>
           <subfield code="s">%(sizeofdemobibdata)s</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/demobibdata.xml</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543213</subfield>
           <subfield code="s">208</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543214</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
@@ -4410,6 +4494,17 @@ allow any</subfield>
         testrec_expected_urls = []
         for files in ('site_logo.gif', 'head.gif', '9809057.pdf', 'demobibdata.xml'):
             testrec_expected_urls.append('%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)s/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD, 'files' : files, 'recid' : recid})
+
+        # replace test buffers with real bibdocid of inserted test files:
+        bibdocids = dict((x.get_full_name(), x.get_bibdocid()) for x in BibRecDocs(recid).list_latest_files())
+        testrec_expected_xm = testrec_expected_xm.replace('9876543211',
+                                                          str(bibdocids.get('9809057.pdf')))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543212',
+                                                          str(bibdocids.get('demobibdata.xml')))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543213',
+                                                          str(bibdocids.get('head.gif')))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543214',
+                                                          str(bibdocids.get('site_logo.gif')))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
 
@@ -4461,6 +4556,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">79</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
@@ -4483,6 +4579,13 @@ allow any</subfield>
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload_records(recs, opt_mode='correct')[0]
         self.check_record_consistency(recid)
+
+        # get the bibdocid of latest file inserted
+        # only ony file is added so we don't have to additionally check
+        # if it's really the last file added
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
@@ -4560,23 +4663,28 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543211</subfield>
           <subfield code="s">35</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/line.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543212</subfield>
           <subfield code="s">626</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/line.png</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543213</subfield>
           <subfield code="s">432</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/rss.png</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543214</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
           <subfield code="y">a second description</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543215</subfield>
           <subfield code="s">786</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.png</subfield>
           <subfield code="y">another second description</subfield>
@@ -4616,6 +4724,19 @@ allow any</subfield>
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload(recs[0], opt_mode='correct')
         self.check_record_consistency(recid)
+
+        # replace test buffers with real bibdocid of inserted test file:
+        bibdocids = dict((x.get_full_name(), x.get_bibdocid()) for x in BibRecDocs(recid).list_latest_files())
+        testrec_expected_xm = testrec_expected_xm.replace('9876543211',
+                                                          str(bibdocids.get('line.gif')))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543212',
+                                                          str(bibdocids.get('line.png')))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543213',
+                                                          str(bibdocids.get('rss.png')))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543214',
+                                                          str(bibdocids.get('site_logo.gif')))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543215',
+                                                          str(bibdocids.get('site_logo.png')))
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
@@ -4659,6 +4780,7 @@ allow any</subfield>
         <controlfield tag="001">123456789</controlfield>
         <controlfield tag="003">SzGeCERN</controlfield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
           <subfield code="y">a description</subfield>
@@ -4678,6 +4800,12 @@ allow any</subfield>
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload(recs[0], opt_mode='correct')
 
+        # get the bibdocid of latest file inserted
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        # replace test buffers with real bibdocid of inserted test file:
+
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
@@ -4729,11 +4857,13 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543211</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
           <subfield code="y">a description</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543212</subfield>
           <subfield code="s">786</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.png</subfield>
           <subfield code="y">another second description</subfield>
@@ -4760,6 +4890,14 @@ allow any</subfield>
         err, recid, msg = bibupload.bibupload(recs[0], opt_mode='append')
         self.check_record_consistency(recid)
 
+        # get the bibdocids of latest file inserted
+        bibdocids = [x.get_bibdocid() for x in BibRecDocs(recid).list_latest_files()]
+        # replace test buffers with real bibdocid of inserted test file:
+
+        testrec_expected_xm = testrec_expected_xm.replace('9876543211',
+                                                          str(min(bibdocids)))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543212',
+                                                          str(max(bibdocids)))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(try_url_download(testrec_expected_url))
@@ -4931,6 +5069,7 @@ allow any</subfield>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/head.gif</subfield>
+          <subfield code="c">Copyright Holder||1234</subfield>
           <subfield code="n">site_logo</subfield>
           <subfield code="m">patata</subfield>
           <subfield code="d">Next Try</subfield>
@@ -4949,7 +5088,13 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="542" ind1=" " ind2=" ">
+          <subfield code="8">987654321</subfield>
+          <subfield code="d">Copyright Holder</subfield>
+          <subfield code="g">1234</subfield>
+         </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">208</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif</subfield>
           <subfield code="y">Next Try</subfield>
@@ -4979,6 +5124,15 @@ allow any</subfield>
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload_records(recs, opt_mode='correct')
         self.check_record_consistency(recid)
+
+        # get the bibdocid of latest file inserted
+        # only ony file is added so we don't have to additionally check
+        # if it's really the last file added
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        # replace test buffers with real bibdocid of inserted test file:
+
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
@@ -5028,6 +5182,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif</subfield>
           <subfield code="y">Try</subfield>
@@ -5056,6 +5211,10 @@ allow any</subfield>
         bibupload.bibupload_records(recs, opt_mode='correct')[0]
         self.check_record_consistency(recid)
 
+        # get the bibdocid of latest file inserted
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
 
@@ -5096,6 +5255,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
@@ -5123,6 +5283,11 @@ allow any</subfield>
         bibupload.bibupload_records(recs, opt_mode='append')[0]
         self.check_record_consistency(recid)
 
+        # get the bibdocid of latest file inserted
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
+
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
@@ -5139,6 +5304,16 @@ allow any</subfield>
          <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="540" ind1=" " ind2=" ">
+          <subfield code="a">General License</subfield>
+          <subfield code="b">www.license.url.com</subfield>
+         </datafield>
+         <datafield tag="542" ind1=" " ind2=" ">
+          <subfield code="d">General Copyright Holder</subfield>
+          <subfield code="e">jekyll@cds.cern.ch</subfield>
+          <subfield code="f">CopyrightMessage</subfield>
+          <subfield code="g">2000</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
@@ -5163,6 +5338,7 @@ allow any</subfield>
         <controlfield tag="001">123456789</controlfield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(siteurl)s/img/loading.gif</subfield>
+          <subfield code="l">License||www.license.url.com||license body</subfield>
           <subfield code="n">site_logo</subfield>
           <subfield code="m">patata</subfield>
           <subfield code="f">.gif</subfield>
@@ -5181,7 +5357,24 @@ allow any</subfield>
           <subfield code="a">Test, John</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
+         <datafield tag="540" ind1=" " ind2=" ">
+          <subfield code="a">General License</subfield>
+          <subfield code="b">www.license.url.com</subfield>
+         </datafield>
+         <datafield tag="540" ind1=" " ind2=" ">
+          <subfield code="8">987654321</subfield>
+          <subfield code="a">License</subfield>
+          <subfield code="b">www.license.url.com</subfield>
+          <subfield code="u">license body</subfield>
+         </datafield>
+         <datafield tag="542" ind1=" " ind2=" ">
+          <subfield code="d">General Copyright Holder</subfield>
+          <subfield code="e">jekyll@cds.cern.ch</subfield>
+          <subfield code="f">CopyrightMessage</subfield>
+          <subfield code="g">2000</subfield>
+         </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">9427</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif</subfield>
          </datafield>
@@ -5208,6 +5401,10 @@ allow any</subfield>
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload_records(recs, opt_mode='correct')[0]
         self.check_record_consistency(recid)
+        # get the bibdocid of latest file inserted
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
@@ -5269,10 +5466,12 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543211</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">9876543212</subfield>
           <subfield code="s">208</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
          </datafield>
@@ -5303,7 +5502,14 @@ allow any</subfield>
         bibupload.bibupload_records(recs, opt_mode='correct')
         self.check_record_consistency(recid)
 
+        # get the bibdocid of latest file inserted
+        bibdocids = [x.get_bibdocid() for x in BibRecDocs(recid).list_latest_files()]
+        # replace test buffers with real bibdocid of inserted test file:
 
+        testrec_expected_xm = testrec_expected_xm.replace('9876543211',
+                                                          str(min(bibdocids)))
+        testrec_expected_xm = testrec_expected_xm.replace('9876543212',
+                                                          str(max(bibdocids)))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(try_url_download(testrec_expected_url))
@@ -5371,6 +5577,7 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">171</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
@@ -5400,6 +5607,13 @@ allow any</subfield>
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload_records(recs, opt_mode='correct')
         self.check_record_consistency(recid)
+
+        # get the bibdocid of latest file inserted
+        # only ony file is added so we don't have to additionally check
+        # if it's really the last file added
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
 
         # revert test record with new FFT:
         recs = bibupload.xml_marc_to_records(test_to_revert)
@@ -5484,6 +5698,7 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">208</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
          </datafield>
@@ -5513,6 +5728,13 @@ allow any</subfield>
         recs = bibupload.xml_marc_to_records(test_to_replace)
         bibupload.bibupload_records(recs, opt_mode='replace')
         self.check_record_consistency(recid)
+
+        # get the bibdocid of latest file inserted
+        # only ony file is added so we don't have to additionally check
+        # if it's really the last file added
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
@@ -5585,6 +5807,7 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="8">987654321</subfield>
           <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
@@ -5608,6 +5831,13 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_url2 = testrec_expected_url2.replace('123456789',
                                                           str(recid))
+
+        # get the bibdocid of latest file inserted
+        # only ony file is added so we don't have to additionally check
+        # if it's really the last file added
+        bibdocid = BibRecDocs(recid).list_latest_files()[0].get_bibdocid()
+        testrec_expected_xm = testrec_expected_xm.replace('987654321',
+                                                          str(bibdocid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))

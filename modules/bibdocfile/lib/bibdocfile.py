@@ -787,6 +787,7 @@ class BibRecDocs(object):
             url = afile.get_url()
             description = afile.get_description()
             comment = afile.get_comment()
+            out += '\t\t<subfield code="8">%s</subfield>\n' % afile.get_bibdocid()
             if url:
                 out += '\t\t<subfield code="u">%s</subfield>\n' % encode_for_xml(url)
             if description:
@@ -1121,7 +1122,8 @@ class BibRecDocs(object):
 
     def add_new_file(self, fullpath, doctype="Main", docname=None,
                      never_fail=False, description=None, comment=None,
-                     docformat=None, flags=None, modification_date=None):
+                     copyright=None, license=None, docformat=None,
+                     flags=None, modification_date=None):
         """
         Directly add a new file to this record.
 
@@ -1152,6 +1154,10 @@ class BibRecDocs(object):
         @type description: string
         @param comment: an optional comment to the file.
         @type comment: string
+        @param copyright: an optional copyright of the file.
+        @type copyright: string
+        @param license: an optional license of the file.
+        @type license: string
         @param format: the extension of the file. If not specified it will
             be guessed (see L{guess_format_from_url}).
         @type format: string
@@ -1173,7 +1179,7 @@ class BibRecDocs(object):
         except InvenioBibDocFileError:
             # bibdoc doesn't already exists!
             bibdoc = self.add_bibdoc(doctype, docname, False)
-            bibdoc.add_file_new_version(fullpath, description=description, comment=comment, docformat=docformat, flags=flags, modification_date=modification_date)
+            bibdoc.add_file_new_version(fullpath, description=description, comment=comment, copyright=copyright, license=license, docformat=docformat, flags=flags, modification_date=modification_date)
         else:
             try:
                 bibdoc.add_file_new_format(fullpath, description=description, comment=comment, docformat=docformat, flags=flags, modification_date=modification_date)
@@ -1181,12 +1187,12 @@ class BibRecDocs(object):
                 # Format already exist!
                 if never_fail:
                     bibdoc = self.add_bibdoc(doctype, docname, True)
-                    bibdoc.add_file_new_version(fullpath, description=description, comment=comment, docformat=docformat, flags=flags, modification_date=modification_date)
+                    bibdoc.add_file_new_version(fullpath, description=description, comment=comment, copyright=copyright, license=license, docformat=docformat, flags=flags, modification_date=modification_date)
                 else:
                     raise
         return bibdoc
 
-    def add_new_version(self, fullpath, docname=None, description=None, comment=None, docformat=None, flags=None):
+    def add_new_version(self, fullpath, docname=None, description=None, comment=None, copyright=None, license=None, docformat=None, flags=None):
         """
         Adds a new file to an already existent document object as a new
         version.
@@ -1200,6 +1206,10 @@ class BibRecDocs(object):
         @type description: string
         @param comment: an optional comment to the file.
         @type comment: string
+        @param copyright: an optional copyright of the file.
+        @type copyright: string
+        @param license: an optional license of the file.
+        @type license: string
         @param format: the extension of the file. If not specified it will
             be guessed (see L{guess_format_from_url}).
         @type format: string
@@ -1221,7 +1231,7 @@ class BibRecDocs(object):
         if 'pdfa' in get_subformat_from_format(docformat).split(';') and not 'PDF/A' in flags:
             flags.append('PDF/A')
         bibdoc = self.get_bibdoc(docname=docname)
-        bibdoc.add_file_new_version(fullpath, description=description, comment=comment, docformat=docformat, flags=flags)
+        bibdoc.add_file_new_version(fullpath, description=description, comment=comment, copyright=copyright, license=license, docformat=docformat, flags=flags)
         return bibdoc
 
     def add_new_format(self, fullpath, docname=None, description=None, comment=None, docformat=None, flags=None, modification_date=None):
@@ -1962,7 +1972,7 @@ class BibDoc(object):
             self.status = new_status
             self.touch('status')
 
-    def add_file_new_version(self, filename, description=None, comment=None, docformat=None, flags=None, modification_date=None):
+    def add_file_new_version(self, filename, description=None, comment=None, copyright=None, license=None, docformat=None, flags=None, modification_date=None):
         """
         Add a new version of a file. If no physical file is already attached
         to the document a the given file will have version 1. Otherwise the
@@ -1974,6 +1984,10 @@ class BibDoc(object):
         @type description: string
         @param comment: an optional comment to the file.
         @type comment: string
+        @param copyright: an optional copyright of the file.
+        @type copyright: string
+        @param license: an optional license of the file.
+        @type license: string
         @param format: the extension of the file. If not specified it will
             be retrieved from the filename (see L{decompose_file}).
         @type format: string
@@ -2008,6 +2022,8 @@ class BibDoc(object):
                 raise InvenioBibDocFileError("Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e))
             self.more_info.set_description(description, docformat, myversion)
             self.more_info.set_comment(comment, docformat, myversion)
+            self.more_info.set_copyright(copyright)
+            self.more_info.set_license(license)
             if flags is None:
                 flags = []
             if 'pdfa' in get_subformat_from_format(docformat).split(';') and not 'PDF/A' in flags:
@@ -2029,7 +2045,7 @@ class BibDoc(object):
         run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, myversion, docformat, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
         run_sql("UPDATE bibdocfsinfo SET last_version=false WHERE id_bibdoc=%s AND version<%s", (self.id, myversion))
 
-    def add_file_new_format(self, filename, version=None, description=None, comment=None, docformat=None, flags=None, modification_date=None):
+    def add_file_new_format(self, filename, version=None, description=None, comment=None, copyright=None, license=None, docformat=None, flags=None, modification_date=None):
         """
         Add a file as a new format.
 
@@ -2042,6 +2058,10 @@ class BibDoc(object):
         @type description: string
         @param comment: an optional comment to the file.
         @type comment: string
+        @param copyright: an optional copyright of the file.
+        @type copyright: string
+        @param license: an optional license of the file.
+        @type license: string
         @param format: the extension of the file. If not specified it will
             be retrieved from the filename (see L{decompose_file}).
         @type format: string
@@ -2077,6 +2097,10 @@ class BibDoc(object):
                 raise InvenioBibDocFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
             self.more_info.set_comment(comment, docformat, version)
             self.more_info.set_description(description, docformat, version)
+            if version == 1:
+                # only when the new BibDoc is created, we modify copyright, license while adding new format
+                self.more_info.set_copyright(copyright)
+                self.more_info.set_license(license)
             if flags is None:
                 flags = []
             if 'pdfa' in get_subformat_from_format(docformat).split(';') and not 'PDF/A' in flags:
@@ -2127,6 +2151,8 @@ class BibDoc(object):
                 if afile.get_version() < version:
                     self.more_info.unset_comment(afile.get_format(), afile.get_version())
                     self.more_info.unset_description(afile.get_format(), afile.get_version())
+                    # since the last format is not erased, we don't unset
+                    # the copyright and license here
                     for flag in CFG_BIBDOCFILE_AVAILABLE_FLAGS:
                         self.more_info.unset_flag(flag, afile.get_format(), afile.get_version())
                     try:
@@ -2173,7 +2199,13 @@ class BibDoc(object):
         version = int(version)
         docfiles = self.list_version_files(version)
         if docfiles:
-            self.add_file_new_version(docfiles[0].get_full_path(), description=docfiles[0].get_description(), comment=docfiles[0].get_comment(), docformat=docfiles[0].get_format(), flags=docfiles[0].flags)
+            self.add_file_new_version(docfiles[0].get_full_path(),
+                                      description=docfiles[0].get_description(),
+                                      comment=docfiles[0].get_comment(),
+                                      copyright=docfiles[0].get_copyright(),
+                                      license=docfiles[0].get_license(),
+                                      docformat=docfiles[0].get_format(),
+                                      flags=docfiles[0].flags)
         for docfile in docfiles[1:]:
             self.add_file_new_format(docfile.filename, description=docfile.get_description(), comment=docfile.get_comment(), docformat=docfile.get_format(), flags=docfile.flags)
 
@@ -2373,6 +2405,28 @@ class BibDoc(object):
         self.more_info.set_description(description, docformat, version)
         self.dirty = True
 
+    def set_copyright(self, copyright):
+        """
+        Updates the copyright of the document.
+
+        @param copyright: the new copyright.
+        @type copyright: dict
+        """
+        self.more_info.set_copyright(copyright)
+        self.touch()
+        self._build_file_list('init')
+
+    def set_license(self, license):
+        """
+        Updates the license of the document.
+
+        @param license: the new license.
+        @type license: dict
+        """
+        self.more_info.set_license(license)
+        self.touch()
+        self._build_file_list('init')
+
     def set_flag(self, flagname, docformat, version=None):
         """
         Sets a flag for a specific format/version of the document.
@@ -2466,6 +2520,18 @@ class BibDoc(object):
             version = self.get_latest_version()
         docformat = normalize_format(docformat)
         return self.more_info.get_description(docformat, version)
+
+    def get_copyright(self):
+        """
+        Retrieve the copyright of a document.
+        """
+        return self.more_info.get_copyright()
+
+    def get_license(self):
+        """
+        Retrieve the license of a document.
+        """
+        return self.more_info.get_license()
 
     def hidden_p(self, docformat, version=None):
         """
@@ -2951,10 +3017,14 @@ class BibDocFile(object):
             self.description = more_info.get_description(docformat, version)
             self.comment = more_info.get_comment(docformat, version)
             self.flags = more_info.get_flags(docformat, version)
+            self.copyright = more_info.get_copyright()
+            self.license = more_info.get_license()
         else:
             self.description = None
             self.comment = None
             self.flags = []
+            self.copyright = {}
+            self.license = {}
         self.format = normalize_format(docformat)
         self.superformat = get_superformat_from_format(self.format)
         self.subformat = get_subformat_from_format(self.format)
@@ -3118,6 +3188,12 @@ class BibDocFile(object):
 
     def get_comment(self):
         return self.comment
+
+    def get_copyright(self):
+        return self.copyright
+
+    def get_license(self):
+        return self.license
 
     def get_content(self):
         """Returns the binary content of the file."""
@@ -4318,10 +4394,13 @@ class BibDocMoreInfo(MoreInfo):
     This class wraps contextual information of the documents, such as the
         - comments
         - descriptions
-        - flags.
+        - flags
+        - copyright
+        - license.
     Such information is kept separately per every format/version instance of
-    the corresponding document and is searialized in the database, ready
-    to be retrieved (but not searched).
+    the corresponding document (except for the copyright and license which are
+    the same for each version and format of a bibdoc) and is searialized in
+    the database, ready to be retrieved (but not searched).
 
     @param docid: the document identifier.
     @type docid: integer
@@ -4350,6 +4429,10 @@ class BibDocMoreInfo(MoreInfo):
             self['comments'] = {}
         if 'flags' not in self:
             self['flags'] = {}
+        if 'copyright' not in self:
+            self['copyright'] = {}
+        if 'license' not in self:
+            self['license'] = {}
         if DBG_LOG_QUERIES:
             from invenio.bibtask import write_message
             write_message("Creating BibDocMoreInfo :" + repr(self["comments"]))
@@ -4390,6 +4473,26 @@ class BibDocMoreInfo(MoreInfo):
         else:
             raise ValueError, "%s is not in %s" % \
                 (flagname, CFG_BIBDOCFILE_AVAILABLE_FLAGS)
+
+    def get_copyright(self):
+        """
+        Returns the copyright.
+        """
+        try:
+            return self['copyright']
+        except:
+            register_exception()
+            raise
+
+    def get_license(self):
+        """
+        Returns the license.
+        """
+        try:
+            return self['license']
+        except:
+            register_exception()
+            raise
 
     def get_comment(self, docformat, version):
         """
@@ -4528,6 +4631,49 @@ class BibDocMoreInfo(MoreInfo):
             register_exception()
             raise
 
+    def set_copyright(self, copyright):
+        """
+        Set the copyright
+
+        @param copyright: dictionary with copyright information
+        @type copyright: dictionary
+        """
+        try:
+            if copyright == KEEP_OLD_VALUE:
+                copyright = self.get_copyright()
+            if not copyright:
+                self.unset_copyright()
+                return
+
+            # Just to make sure that dictionary has proper keys
+            if set(('copyright_holder', 'copyright_date', 'copyright_message', 'copyright_holder_contact')) <= set(copyright):
+                self['copyright'] = copyright
+                self.set_data("", 'copyright', copyright)
+        except:
+            register_exception()
+            raise
+
+    def set_license(self, license):
+        """
+        Set the license
+
+        @param license: dictionary with license information
+        @type license: dictionary
+        """
+        try:
+            if license == KEEP_OLD_VALUE:
+                license = self.get_license()
+            if not license:
+                self.unset_license()
+                return
+            # Just to make sure that dictionary has proper keys
+            if set(('license', 'license_url', 'license_body')) <= set(license):
+                self['license'] = license
+                self.set_data("", 'license', license)
+        except:
+            register_exception()
+            raise
+
     def unset_comment(self, docformat, version):
         """
         Unset a comment.
@@ -4564,6 +4710,26 @@ class BibDocMoreInfo(MoreInfo):
             self['descriptions'] = descriptions
         except KeyError:
             pass
+        except:
+            register_exception()
+            raise
+
+    def unset_copyright(self):
+        """
+        Unset a copyright.
+        """
+        try:
+            copyright = {}
+        except:
+            register_exception()
+            raise
+
+    def unset_license(self):
+        """
+        Unset a license.
+        """
+        try:
+            license = {}
         except:
             register_exception()
             raise

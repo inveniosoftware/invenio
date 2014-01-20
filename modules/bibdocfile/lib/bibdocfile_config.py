@@ -22,6 +22,8 @@ try:
 except ImportError:
     CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC = {
         'can_revise_doctypes': ['*'],
+        'can_change_copyright_doctypes': ['*'],
+        'can_change_advanced_copyright_doctypes': ['*'],
         'can_comment_doctypes': ['*'],
         'can_describe_doctypes': ['*'],
         'can_delete_doctypes': ['*'],

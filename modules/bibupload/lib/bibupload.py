@@ -80,6 +80,9 @@ from invenio.bibrecord import create_records, \
                               record_extract_dois, \
                               record_has_field, \
                               records_identical, \
+                              filter_field_instances, \
+                              create_field, \
+                              record_add_fields, \
                               record_drop_duplicate_fields
 from invenio.search_engine import get_record, record_exists, search_pattern
 from invenio.dateutils import convert_datestruct_to_datetext
@@ -97,8 +100,6 @@ from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioBibDocFileError, \
     bibdocfile_url_p, CFG_BIBDOCFILE_AVAILABLE_FLAGS, guess_format_from_url, \
     BibRelation, MoreInfo
-
-from invenio.search_engine import search_pattern
 
 from invenio.bibupload_revisionverifier import RevisionVerifier, \
                                                InvenioBibUploadConflictingRevisionsError, \
@@ -499,6 +500,14 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                             affected_tags['856'] = [('4', ' ')]
                         elif ('4', ' ') not in affected_tags['856']:
                             affected_tags['856'].append(('4', ' '))
+                    # 540 and 542 fields have been replaced too
+                    # TODO this may be improved with a function that checks
+                    # if those fields have been replaced with different values
+                    # than before
+                    if '540' not in affected_tags:
+                        affected_tags['540'] = [(' ', ' ')]
+                    if '542' not in affected_tags:
+                        affected_tags['542'] = [(' ', ' ')]
                     write_message("     -Modified field list updated with FFT details: %s" % str(affected_tags), verbose=2)
             except Exception, e:
                 register_exception(alert_admin=True)
@@ -1435,6 +1444,7 @@ def synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=False):
         for afile in latest_files:
             url = afile.get_url()
             ret[url] = {'u': url}
+            ret[url]['8'] = str(afile.get_bibdocid())
             description = afile.get_description()
             comment = afile.get_comment()
             subformat = afile.get_subformat()
@@ -1448,6 +1458,95 @@ def synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=False):
             ret[url]['s'] = str(size)
 
         return ret
+
+    def merge_copyright_and_license_info_marc():
+        """
+        Removes old copyright and license fields from MARC and replaces them
+        with new fields from BibDocs
+        """
+        copyright_fields = record_get_field_instances(record, '542', '%', '%')
+        license_fields = record_get_field_instances(record, '540', '%', '%')
+        # remove fields that have subfield $8 (we will recreate that fields
+        # based on the data from BibDocs)
+        copyrights_to_remove = filter_field_instances(copyright_fields, '8', '.*', 'r')
+        licenses_to_remove = filter_field_instances(license_fields, '8', '.*', 'r')
+        # Store copyrights and licenses in separate list
+        for field in copyrights_to_remove:
+            write_message("Removing %s field" % (field, ), verbose=9)
+            record_delete_field(record, '542', '', '', field[4])
+        for field in licenses_to_remove:
+            write_message("Removing %s field" % (field, ), verbose=9)
+            record_delete_field(record, '540', '', '', field[4])
+
+        copyright_fields = create_copyright_fields()
+        write_message("Adding 542 fields: %s" % (copyright_fields, ), verbose=9)
+        record_add_fields(record, '542', copyright_fields)
+        license_fields = create_license_fields()
+        write_message("Adding 540 fields: %s" % (license_fields, ), verbose=9)
+        record_add_fields(record, '540', license_fields)
+
+    def create_copyright_fields():
+        """
+        Reads copyright from each BibDoc in BibRecDoc, uses them to create
+        a list of new fields, that can be added to the MARC, using
+        create_field() function and returns that list
+        """
+        fields = []
+        bibrecdocs = BibRecDocs(rec_id)
+        bibdocs = bibrecdocs.list_bibdocs()
+        for bibdoc in bibdocs:
+            bibdocid = bibdoc.get_id()
+            subfields = []
+            subfields.append(('8', str(bibdocid)))
+            copyright = bibdoc.get_copyright()
+            copyright_holder = copyright.get('copyright_holder')
+            copyright_date = copyright.get('copyright_date')
+            copyright_message = copyright.get('copyright_message')
+            copyright_holder_contact = copyright.get('copyright_holder_contact')
+            if copyright_holder:
+                subfields.append(('d', copyright_holder))
+            if copyright_holder_contact:
+                subfields.append(('e', copyright_holder_contact))
+            if copyright_message:
+                subfields.append(('f', copyright_message))
+            if copyright_date:
+                subfields.append(('g', copyright_date))
+            if len(subfields) > 1:
+                # Len > 1 means that we actually have something more that just
+                # bibdocid in the subfield, so we can add this subfield to the MARC
+                fields.append(create_field(subfields))
+
+        return fields
+
+    def create_license_fields():
+        """
+        Reads license from each BibDoc in BibRecDoc, uses them to create
+        a list of new fields, that can be added to the MARC, using
+        create_field() function and returns that list
+        """
+        fields = []
+        bibrecdocs = BibRecDocs(rec_id)
+        bibdocs = bibrecdocs.list_bibdocs()
+        for bibdoc in bibdocs:
+            bibdocid = bibdoc.get_id()
+            subfields = []
+            subfields.append(('8', str(bibdocid)))
+            license = bibdoc.get_license()
+            license_name = license.get('license')
+            license_url = license.get('license_url')
+            license_body = license.get('license_body')
+            if license_name:
+                subfields.append(('a', license_name))
+            if license_url:
+                subfields.append(('b', license_url))
+            if license_body:
+                subfields.append(('u', license_body))
+            if len(subfields) > 1:
+                # Len > 1 means that we actually have something more that just
+                # bibdocid in the subfield, so we can add this subfield to the MARC
+                fields.append(create_field(subfields))
+
+        return fields
 
     write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
     tags856s = record_get_field_instances(record, '856', '%', '%')
@@ -1489,6 +1588,9 @@ def synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=False):
         subfields.sort()
         record_add_field(record, '856', '4', ' ', subfields=subfields)
 
+    # Synchronize copyright and license fields in MARC from BibDocs
+    write_message("Synchronizing 542 and 540 fields with BibDocs", verbose=9)
+    merge_copyright_and_license_info_marc()
     write_message('Final record: %s' % record, verbose=9)
     return record
 
@@ -1708,34 +1810,37 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
     """
 
     # Let's define some handy sub procedure.
-    def _add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, modification_date, pretend=False):
+    def _add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, modification_date, pretend=False):
         """Adds a new format for a given bibdoc. Returns True when everything's fine."""
-        write_message('Add new format to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, flags: %s, modification_date: %s' % (repr(bibdoc), url, docformat, docname, doctype, newname, description, comment, flags, modification_date), verbose=9)
+        write_message('Add new format to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s,  copyright: %s, license: %s, flags: %s, modification_date: %s' % (repr(bibdoc), url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, modification_date), verbose=9)
         try:
-            if not url: # Not requesting a new url. Just updating comment & description
-                return _update_description_and_comment(bibdoc, docname, docformat, description, comment, flags, pretend=pretend)
+            if not url: # Not requesting a new url. Just updating comment, description, copyright and license
+                return (_update_description_and_comment(bibdoc, docname, docformat, description, comment, flags, pretend=pretend) and
+                        _update_copyright_and_license(bibdoc, docname, copyright, license))
             try:
                 if not pretend:
-                    bibdoc.add_file_new_format(url, description=description, comment=comment, flags=flags, modification_date=modification_date)
+                    bibdoc.add_file_new_format(url, description=description, comment=comment, copyright=copyright, license=license, flags=flags, modification_date=modification_date)
             except StandardError, e:
-                write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, docformat, docname, doctype, newname, description, comment, flags, modification_date, e), stream=sys.stderr)
+                write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, modification_date, e), stream=sys.stderr)
                 raise
         except Exception, e:
             write_message("ERROR: in adding '%s' as a new format because of: %s" % (url, e), stream=sys.stderr)
             raise
         return True
 
-    def _add_new_version(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, modification_date, pretend=False):
+    def _add_new_version(bibdoc, url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, modification_date, pretend=False):
         """Adds a new version for a given bibdoc. Returns True when everything's fine."""
-        write_message('Add new version to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, flags: %s' % (repr(bibdoc), url, docformat, docname, doctype, newname, description, comment, flags), verbose=9)
+        write_message('Add new version to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, copyright: %s, license: %s, flags: %s' % (repr(bibdoc), url, docformat, docname, doctype, newname, description, comment, copyright, license, flags), verbose=9)
         try:
             if not url:
-                return _update_description_and_comment(bibdoc, docname, docformat, description, comment, flags, pretend=pretend)
+                # Not requesting a new url. Just updating comment, description, copyright and license
+                return (_update_description_and_comment(bibdoc, docname, docformat, description, comment, flags, pretend=pretend) and
+                        _update_copyright_and_license(bibdoc, docname, copyright, license))
             try:
                 if not pretend:
-                    bibdoc.add_file_new_version(url, description=description, comment=comment, flags=flags, modification_date=modification_date)
+                    bibdoc.add_file_new_version(url, description=description, comment=comment, copyright=copyright, license=license, flags=flags, modification_date=modification_date)
             except StandardError, e:
-                write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, docformat, docname, doctype, newname, description, comment, flags, modification_date, e), stream=sys.stderr)
+                write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, modification_date, e), stream=sys.stderr)
                 raise
         except Exception, e:
             write_message("ERROR: in adding '%s' as a new version because of: %s" % (url, e), stream=sys.stderr)
@@ -1756,6 +1861,16 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         bibdoc.unset_flag(flag, docformat)
         except StandardError, e:
             write_message("('%s', '%s', '%s', '%s', '%s') description and comment not updated because '%s'." % (docname, docformat, description, comment, flags, e))
+            raise
+        return True
+
+    def _update_copyright_and_license(bibdoc, docname, copyright, license):
+        write_message('Just updating copyright and license for %s with copyright %s, license %s' % (docname, copyright, license), verbose=9)
+        try:
+            bibdoc.set_copyright(copyright)
+            bibdoc.set_license(license)
+        except StandardError, e :
+            write_message("('%s', '%s', '%s') copyright and license not updated because '%s'." % (docname, copyright, license, e))
             raise
         return True
 
@@ -1949,7 +2064,48 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 else:
                     restriction = KEEP_OLD_VALUE
 
+            # Let's discover the copyright
+            copyright = field_get_subfield_values(fft, 'c')
+            if copyright != []:
+                # copyright information should be separated with ||
+                copyright = copyright[0].split("||")
+                # There should be 4 pieces of information about the copyright:
+                # copyright holder, date, message and holder contact
+                # If some of them is missing, fill the list with empty items
+                if len(copyright) < 4:
+                    copyright.extend((4-len(copyright))*[''])
+                # Create copyright dictionary
+                copyright = {'copyright_holder' : copyright[0],
+                             'copyright_date' : copyright[1],
+                             'copyright_message' : copyright[2],
+                             'copyright_holder_contact' : copyright[3]}
+            else:
+                if mode == 'correct' and doctype != 'FIX-MARC':
+                    ## See comment on description
+                    copyright = ''
+                else:
+                    copyright = KEEP_OLD_VALUE
 
+            # Let's discover the license
+            license = field_get_subfield_values(fft, 'l')
+            if license != []:
+                # license information should be separated with ||
+                license = license[0].split("||")
+                # There should be 3 pieces of information about the license:
+                # license itself, url and license body
+                # If some of them is missing, fill the list with empty items
+                if len(license) < 3:
+                    license.extend((3-len(license))*[''])
+                # Create license dictionary
+                license = {'license' : license[0],
+                           'license_url' : license[1],
+                           'license_body' : license[2]}
+            else:
+                if mode == 'correct' and doctype != 'FIX-MARC':
+                    ## See comment on description
+                    license = ''
+                else:
+                    license = KEEP_OLD_VALUE
             document_moreinfo = _get_subfield_value(fft, 'w')
             version_moreinfo = _get_subfield_value(fft, 'p')
             version_format_moreinfo = _get_subfield_value(fft, 'b')
@@ -1983,20 +2139,20 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                     raise StandardError, "fft '%s' specifies a different restriction from previous fft with docname '%s'" % (str(fft), name)
                 if version2 != version:
                     raise StandardError, "fft '%s' specifies a different version than the previous fft with docname '%s'" % (str(fft), name)
-                for (dummyurl2, format2, dummydescription2, dummycomment2, dummyflags2, dummytimestamp2) in urls:
+                for (dummyurl2, format2, dummydescription2, dummycomment2, dummycopyright2, dummylicense2, dummyflags2, dummytimestamp2) in urls:
                     if docformat == format2:
                         raise StandardError, "fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, docformat, name)
                 if url or docformat:
-                    urls.append((url, docformat, description, comment, flags, timestamp))
+                    urls.append((url, docformat, description, comment, copyright, license, flags, timestamp))
                 if icon:
-                    urls.append((icon, icon[len(file_strip_ext(icon)):] + ';icon', description, comment, flags, timestamp))
+                    urls.append((icon, icon[len(file_strip_ext(icon)):] + ';icon', description, comment, copyright, license, flags, timestamp))
             else:
                 if url or docformat:
-                    docs[name] = (doctype, newname, restriction, version, [(url, docformat, description, comment, flags, timestamp)], [document_moreinfo, version_moreinfo, version_format_moreinfo, format_moreinfo], bibdoc_tmpid, bibdoc_tmpver)
+                    docs[name] = (doctype, newname, restriction, version, [(url, docformat, description, comment, copyright, license, flags, timestamp)], [document_moreinfo, version_moreinfo, version_format_moreinfo, format_moreinfo], bibdoc_tmpid, bibdoc_tmpver)
                     if icon:
-                        docs[name][4].append((icon, icon[len(file_strip_ext(icon)):] + ';icon', description, comment, flags, timestamp))
+                        docs[name][4].append((icon, icon[len(file_strip_ext(icon)):] + ';icon', description, comment, copyright, license, flags, timestamp))
                 elif icon:
-                    docs[name] = (doctype, newname, restriction, version, [(icon, icon[len(file_strip_ext(icon)):] + ';icon', description, comment, flags, timestamp)], [document_moreinfo, version_moreinfo, version_format_moreinfo, format_moreinfo], bibdoc_tmpid, bibdoc_tmpver)
+                    docs[name] = (doctype, newname, restriction, version, [(icon, icon[len(file_strip_ext(icon)):] + ';icon', description, comment, copyright, license, flags, timestamp)], [document_moreinfo, version_moreinfo, version_format_moreinfo, format_moreinfo], bibdoc_tmpid, bibdoc_tmpver)
                 else:
                     docs[name] = (doctype, newname, restriction, version, [], [document_moreinfo, version_moreinfo, version_format_moreinfo, format_moreinfo], bibdoc_tmpid, bibdoc_tmpver)
 
@@ -2020,7 +2176,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 bibdoc = None
 
             new_revision_needed = False
-            for url, docformat, description, comment, flags, timestamp in urls:
+            for url, docformat, description, comment, copyright, license, flags, timestamp in urls:
                 if url:
                     try:
                         downloaded_url = download_url(url, docformat)
@@ -2029,27 +2185,27 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         write_message("ERROR: in downloading '%s' because of: %s" % (url, err), stream=sys.stderr)
                         raise
                     if mode == 'correct' and bibdoc is not None and not new_revision_needed:
-                        downloaded_urls.append((downloaded_url, docformat, description, comment, flags, timestamp))
+                        downloaded_urls.append((downloaded_url, docformat, description, comment, copyright, license, flags, timestamp))
                         if not bibrecdocs.check_file_exists(downloaded_url, docformat):
                             new_revision_needed = True
                         else:
                             write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
                     elif mode == 'append' and bibdoc is not None:
                         if not bibrecdocs.check_file_exists(downloaded_url, docformat):
-                            downloaded_urls.append((downloaded_url, docformat, description, comment, flags, timestamp))
+                            downloaded_urls.append((downloaded_url, docformat, description, comment, copyright, license, flags, timestamp))
                         else:
                             write_message("WARNING: %s is already attached to bibdoc %s for recid %s" % (url, docname, rec_id), stream=sys.stderr)
                     else:
-                        downloaded_urls.append((downloaded_url, docformat, description, comment, flags, timestamp))
+                        downloaded_urls.append((downloaded_url, docformat, description, comment, copyright, license, flags, timestamp))
                 else:
-                    downloaded_urls.append(('', docformat, description, comment, flags, timestamp))
+                    downloaded_urls.append(('', docformat, description, comment, copyright, license, flags, timestamp))
             if mode == 'correct' and bibdoc is not None and not new_revision_needed:
                 ## Since we don't need a new revision (because all the files
                 ## that are being uploaded are different)
                 ## we can simply remove the urls but keep the other information
                 write_message("No need to add a new revision for docname %s for recid %s" % (docname, rec_id), verbose=2)
-                docs[docname] = (doctype, newname, restriction, version, [('', docformat, description, comment, flags, timestamp) for (dummy, docformat, description, comment, flags, timestamp) in downloaded_urls], more_infos, bibdoc_tmpid, bibdoc_tmpver)
-                for downloaded_url, dummy, dummy, dummy, dummy, dummy in downloaded_urls:
+                docs[docname] = (doctype, newname, restriction, version, [('', docformat, description, comment, copyright, license, flags, timestamp) for (dummy, docformat, description, comment, copyright, license, flags, timestamp) in downloaded_urls], more_infos, bibdoc_tmpid, bibdoc_tmpver)
+                for downloaded_url, _, _, _, _, _, _, _ in downloaded_urls:
                     ## Let's free up some space :-)
                     if downloaded_url and os.path.exists(downloaded_url):
                         os.remove(downloaded_url)
@@ -2082,8 +2238,8 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 except Exception, e:
                     write_message("('%s', '%s', '%s') not inserted because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
                     raise e
-                for (url, docformat, description, comment, flags, timestamp) in urls:
-                    assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
+                for (url, docformat, description, comment, copyright, license, flags, timestamp) in urls:
+                    assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, timestamp, pretend=pretend))
             elif mode == 'replace_or_insert': # to be thought as correct_or_insert
                 try:
                     bibdoc = bibrecdocs.get_bibdoc(docname)
@@ -2143,18 +2299,18 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         # bump the version by pushing the first new file
                         # then pushing the other files.
                         if urls:
-                            (first_url, first_format, first_description, first_comment, first_flags, first_timestamp) = urls[0]
+                            (first_url, first_format, first_description, first_comment, first_copyright, first_license, first_flags, first_timestamp) = urls[0]
                             other_urls = urls[1:]
-                            assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags, first_timestamp, pretend=pretend))
-                            for (url, docformat, description, comment, flags, timestamp) in other_urls:
-                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
+                            assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_copyright, first_license, first_flags, first_timestamp, pretend=pretend))
+                            for (url, docformat, description, comment, copyright, license, flags, timestamp) in other_urls:
+                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, timestamp, pretend=pretend))
                     ## Let's refresh the list of bibdocs.
                 if not found_bibdoc:
                     if not pretend:
                         bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
                         bibdoc.set_status(restriction)
-                        for (url, docformat, description, comment, flags, timestamp) in urls:
-                            assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp))
+                        for (url, docformat, description, comment, copyright, license, flags, timestamp) in urls:
+                            assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, timestamp))
             elif mode == 'correct':
                 try:
                     bibdoc = bibrecdocs.get_bibdoc(docname)
@@ -2196,7 +2352,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         pass
                     elif doctype == 'DELETE-FILE':
                         if urls:
-                            for (url, docformat, description, comment, flags, timestamp) in urls:
+                            for (url, docformat, description, comment, copyright, license, flags, timestamp) in urls:
                                 if not pretend:
                                     bibdoc.delete_file(docformat, version)
                     elif doctype == 'REVERT':
@@ -2214,11 +2370,11 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                             if not pretend:
                                 bibdoc.change_doctype(doctype)
                         if urls:
-                            (first_url, first_format, first_description, first_comment, first_flags, first_timestamp) = urls[0]
+                            (first_url, first_format, first_description, first_comment, first_copyright, first_license, first_flags, first_timestamp) = urls[0]
                             other_urls = urls[1:]
-                            assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags, first_timestamp, pretend=pretend))
-                            for (url, docformat, description, comment, flags, timestamp) in other_urls:
-                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
+                            assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_copyright, first_license, first_flags, first_timestamp, pretend=pretend))
+                            for (url, docformat, description, comment, copyright, license, flags, timestamp) in other_urls:
+                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, timestamp, pretend=pretend))
                 if not found_bibdoc:
                     if doctype in ('PURGE', 'DELETE', 'EXPUNGE', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE', 'REVERT'):
                         write_message("('%s', '%s', '%s') not performed because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
@@ -2227,8 +2383,8 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         if not pretend:
                             bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
                             bibdoc.set_status(restriction)
-                            for (url, docformat, description, comment, flags, timestamp) in urls:
-                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp))
+                            for (url, docformat, description, comment, copyright, license, flags, timestamp) in urls:
+                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, copyright, license, flags, timestamp))
             elif mode == 'append':
                 found_bibdoc = False
                 try:
@@ -2237,15 +2393,15 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 except InvenioBibDocFileError:
                     found_bibdoc = False
                 else:
-                    for (url, docformat, description, comment, flags, timestamp) in urls:
-                        assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
+                    for (url, docformat, description, comment, copyright, license,  flags, timestamp) in urls:
+                        assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, copyright, license,  flags, timestamp, pretend=pretend))
                 if not found_bibdoc:
                     try:
                         if not pretend:
                             bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
                             bibdoc.set_status(restriction)
-                            for (url, docformat, description, comment, flags, timestamp) in urls:
-                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp))
+                            for (url, docformat, description, comment, copyright, license,  flags, timestamp) in urls:
+                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, copyright, license,  flags, timestamp))
                     except Exception, e:
                         register_exception()
                         write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)

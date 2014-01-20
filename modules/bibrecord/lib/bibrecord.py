@@ -210,6 +210,8 @@ def filter_field_instances(field_instances, filter_subcode, filter_value, filter
         'e' - looking for exact match in subfield value
         's' - looking for substring in subfield value
         'r' - looking for regular expression in subfield value
+        'n' - looking for fields where subfield doesn't exist (this mode
+              ignores the filter_value)
 
         Example:
         record_filter_field(record_get_field_instances(rec, '999', '%', '%'), 'y', '2001')
@@ -220,7 +222,7 @@ def filter_field_instances(field_instances, filter_subcode, filter_value, filter
         @type filter_subcode: string
         @param filter_value: value of the subfield
         @type filter_value: string
-        @param filter_mode: 'e','s' or 'r'
+        @param filter_mode: 'e','s', 'r' or 'n'
     """
     matched = []
     if filter_mode == 'e':
@@ -243,6 +245,11 @@ def filter_field_instances(field_instances, filter_subcode, filter_value, filter
                    reg_exp.match(subfield[1]) is not None:
                     matched.append(instance)
                     break
+    elif filter_mode == 'n':
+        for instance in field_instances:
+            if filter_subcode not in [subfield[0] for subfield in instance[0]]:
+                matched.append(instance)
+
     return matched
 
 def record_drop_duplicate_fields(record):

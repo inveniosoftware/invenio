@@ -1114,7 +1114,7 @@ class RevisionVerifierHistoryOfAffectedFields(GenericBibUploadTest):
         """Checks if corrected record has affected fields in hstRECORD table"""
         query = "SELECT affected_fields from hstRECORD where id_bibrec=12 ORDER BY job_date DESC"
         res = run_sql(query)
-        self.assertEqual(res[0][0], "005__%,8564_%,909C0%,909C1%,909C5%,909CO%,909CS%")
+        self.assertEqual(res[0][0], "005__%,540__%,542__%,8564_%,909C0%,909C1%,909C5%,909CO%,909CS%")
 
 
     def test_append_to_record_affected_tags(self):
