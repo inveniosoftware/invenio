@@ -1,6 +1,6 @@
 /**
 This file is part of Invenio.
-Copyright (C) 2013 CERN.
+Copyright (C) 2013, 2014 CERN.
 
 Invenio is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
@@ -19,13 +19,21 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
 
 'use strict';
 
+var $ = window.jQuery;  // FIXME
+
 $(document).ready(function() {
-    $('.collapse').on('show', function(e) {
+    $('.collapse').on('shown.bs.collapse', function(e) {
+        $('[data-target="#' + e.target.id + '"').children()
+            .removeClass('glyphicon-chevron-right')
+            .addClass('glyphicon-chevron-down');
         $.get($(this).attr('data-action'));
         e.stopPropagation();
     });
 
-    $('.collapse').on('hide', function(e) {
+    $('.collapse').on('hidden.bs.collapse', function(e) {
+        $('[data-target="#' + e.target.id + '"').children()
+            .removeClass('glyphicon-chevron-down')
+            .addClass('glyphicon-chevron-right');
         $.get($(this).attr('data-action')).fail(function() { return; });
         e.stopPropagation();
     });

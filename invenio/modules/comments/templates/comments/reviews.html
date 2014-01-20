@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,7 +32,7 @@
       {% if current_user.is_guest %}
         <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
       {% else %}
-        <a class="btn btn-default pull-right" data-toggle="modal" href="{{ url_for('comments.add_review', recid=recid) }}">
+        <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_review', recid=recid) }}">
       {% endif %}
           <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
         </a>
@@ -107,11 +107,11 @@
   </ul>
 
   {% if current_user.is_guest %}
-        <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+        <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
           <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
         </a>
       {% else %}
-        <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_review', recid=recid) }}">
+        <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_review', recid=recid) }}">
           <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
         </a>
       {% endif %}
