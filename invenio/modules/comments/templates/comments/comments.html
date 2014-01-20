@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -36,7 +36,7 @@
         {% if current_user.is_guest %}
           <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
         {% else %}
-          <a class="btn btn-default pull-right" data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid) }}">
+          <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_comment', recid=recid) }}">
         {% endif %}
             <i class="glyphicon glyphicon-pencil"></i> {{ _('write comment') }}
           </a>
@@ -46,7 +46,7 @@
 
   {%- if comments -%}
 
-  <ul class="comments unstyled">
+  <ul class="comments list-unstyled">
   {%- for c in comments recursive -%}
   <li name="{{ c.id }}">
     <a class="collapse-comment pull-left{{ ' collapsed' if c.is_collapsed(current_user.get_id()) }}"
@@ -54,7 +54,12 @@
        data-toggle="collapse"
        data-target="#collapse-{{ c.id }}"
        href="{#{ url_for('comments.toggle', recid=recid, id=c.id) }#}">
-      <i class="glyphicon glyphicon-chevron-down"></i>
+      {%- if c.is_collapsed(current_user.get_id()) -%}
+        <i class="glyphicon glyphicon-chevron-right">
+      {%- else -%}
+        <i class="glyphicon glyphicon-chevron-down">
+      {%- endif -%}
+        </i>
     </a>
 
     <h4>
@@ -100,7 +105,7 @@
         {% if current_user.is_guest %}
           <a href="{{ url_for('webaccount.login', referer=url_for('comments.add_comment', recid=recid, in_reply=c.id)) }}">
         {% else %}
-          <a data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid, in_reply=c.id) }}">
+          <a data-toggle="modal" data-target="#" href="{{ url_for('comments.add_comment', recid=recid, in_reply=c.id) }}">
         {% endif %}
             {{ _('reply') }}
           </a>
@@ -139,9 +144,9 @@
   </ul>
 
   {% if current_user.is_guest %}
-    <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+    <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
   {% else %}
-    <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid) }}">
+    <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_comment', recid=recid) }}">
   {% endif %}
       <i class="glyphicon glyphicon-pencil"></i> {{ _('write comment') }}
     </a>

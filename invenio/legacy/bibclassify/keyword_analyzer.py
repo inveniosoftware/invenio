@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -152,8 +152,8 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans):
             else:
                 previous_spans = spans[index]
 
-            for new_span in [(span0, col-md-1) for span0 in previous_spans
-                                            for col-md-1 in spans[index + 1]]:
+            for new_span in [(span0, colmd1) for span0 in previous_spans
+                                            for colmd1 in spans[index + 1]]:
                 span = _get_ckw_span(fulltext, new_span)
                 if span is not None:
                     ckw_spans.append(span)
@@ -162,8 +162,8 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans):
             if index > 0 and ckw_spans:
                 _ckw_spans = []
                 for _span in ckw_spans[len_ckw:]: # new spans
-                    for _col-md-2 in ckw_spans[:len_ckw]:
-                        s = _span_overlapping(_span, _col-md-2)
+                    for _colmd2 in ckw_spans[:len_ckw]:
+                        s = _span_overlapping(_span, _colmd2)
                         if s:
                             _ckw_spans.append(s)
                 ckw_spans = _ckw_spans
