@@ -29,7 +29,7 @@ class InvenioDataCacherError(Exception):
     """Error raised by data cacher."""
     pass
 
-class DataCacher:
+class DataCacher(object):
     """
     DataCacher is an abstract cacher system, for caching informations
     that are slow to retrieve but that don't change too much during
