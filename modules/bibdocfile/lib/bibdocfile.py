@@ -2486,7 +2486,7 @@ class BibDoc(object):
         return self.id
 
 
-    def get_file(self, docformat, version=""):
+    def get_file(self, docformat, version="", exact_docformat=False):
         """
         Returns a L{BibDocFile} instance of this document corresponding to the
         specific format and version.
@@ -2496,6 +2496,9 @@ class BibDoc(object):
         @param version: the specific version for which the description should
             be retrieved. If not specified the last version will be used.
         @type version: integer
+        @param exact_docformat: if True, consider always the
+            complete docformat (including subformat if any)
+        @type exact_docformat: bool
         @return: the L{BibDocFile} instance.
         @rtype: BibDocFile
         """
@@ -2513,10 +2516,11 @@ class BibDoc(object):
 
         ## Let's skip the subformat specification and consider just the
         ## superformat
-        superformat = get_superformat_from_format(docformat)
-        for docfile in docfiles:
-            if get_superformat_from_format(docfile.get_format()) == superformat:
-                return docfile
+        if not exact_docformat:
+            superformat = get_superformat_from_format(docformat)
+            for docfile in docfiles:
+                if get_superformat_from_format(docfile.get_format()) == superformat:
+                    return docfile
 
         raise InvenioBibDocFileError("No file for doc %i of format '%s', version '%s'" % (self.id, docformat, version))
 
