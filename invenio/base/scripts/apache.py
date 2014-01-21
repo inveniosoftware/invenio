@@ -59,7 +59,6 @@ def create_config(force=False, no_ssl=False):
     from jinja2 import TemplateNotFound
     from invenio.ext.template import render_template_to_string
     from invenio.utils.text import wrap_text_in_a_box
-    from invenio.modules.access.local_config import CFG_EXTERNAL_AUTH_USING_SSO
 
     CFG_PREFIX = current_app.config.get('CFG_PREFIX', '')
 
@@ -150,7 +149,6 @@ def create_config(force=False, no_ssl=False):
 
     current_app.config.update(
         CFG_RUNNING_AS_USER=pwd.getpwuid(os.getuid())[0],
-        CFG_EXTERNAL_AUTH_USING_SSO=CFG_EXTERNAL_AUTH_USING_SSO,
         CFG_WSGIDIR=os.path.abspath(
             pkg_resources.resource_filename('invenio', '')))
 

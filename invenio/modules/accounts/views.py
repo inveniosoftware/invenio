@@ -33,8 +33,8 @@ from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from flask.ext.breadcrumbs import register_breadcrumb
-from invenio.ext.login import login_user, logout_user, UserInfo, \
-    reset_password
+from invenio.ext.login import login_user, logout_user, authenticate, \
+    reset_password, login_redirect
 from flask.ext.menu import register_menu
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
@@ -49,18 +49,6 @@ from invenio.utils.url import rewrite_to_secure_url
 blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
                       template_folder='templates',
                       static_folder='static')
-
-
-def update_login(nickname, password=None, remember_me=False):
-    where = [db.or_(User.nickname == nickname, User.email == nickname)]
-    if password is not None:
-        where.append(User.password == password)
-    try:
-        user = User.query.filter(*where).one()
-    except:
-        return None
-    login_user(UserInfo(user.id), remember=remember_me)
-    return user
 
 
 @blueprint.route('/login/', methods=['GET', 'POST'])
@@ -91,57 +79,14 @@ def login(nickname=None, password=None, login_method=None, action='',
                                         request.values]),
                      csrf_enabled=False)
     try:
-        user = None
-        from invenio.modules.access.local_config import \
-            CFG_EXTERNAL_AUTH_USING_SSO
-        if not CFG_EXTERNAL_AUTH_USING_SSO:
-            if login_method == 'Local':
-                if form.validate_on_submit():
-                    user = update_login(nickname, password, remember_me)
-            elif login_method in ['openid', 'oauth1', 'oauth2']:
-                pass
-                req = request.get_legacy_request()
-                (iden, nickname, password, msgcode) = webuser.loginUser(req, nickname,
-                                                                        password,
-                                                                        login_method)
-                if iden:
-                    user = update_login(nickname)
-            else:
-                flash(_('Invalid login method.'), 'error')
+        if login_method == 'Local' and form.validate_on_submit() and \
+                authenticate(nickname, password, login_method=login_method):
 
-        else:
-            req = request.get_legacy_request()
-            # Fake parameters for p_un & p_pw because SSO takes them from the environment
-            (iden, nickname, password, msgcode) = webuser.loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
-            if iden:
-                user = update_login(nickname)
-
-        if user:
-            if user.note == '2':  # account is not confirmed
-                logout_user()
-                flash(_("You have not yet confirmed the email address for the \
-                        '%(login_method)s' authentication method.", login_method=login_method), 'warning')
-            else:  # account is valid
-                flash(_("You are logged in as %(nick)s.", nick=user.nickname), "info")
-                if referer:
-                    from urlparse import urlparse
-                    # we should not redirect to these URLs after login
-                    blacklist = [url_for('webaccount.register'),
-                                 url_for('webaccount.logout'),
-                                 url_for('webaccount.login'),
-                                 url_for('webaccount.lost')]
-                    if not urlparse(referer).path in blacklist:
-                        # Change HTTP method to https if needed.
-                        referer = rewrite_to_secure_url(referer)
-                        return redirect(referer)
-                return redirect('/')
+            flash(_("You are logged in as %(nick)s.", nick=nickname), "info")
+            return login_redirect(referer)
     except Exception as e:
         current_app.logger.error('Exception during login process: %s', str(e))
         flash(_("Problem with login."), "error")
-
-    #current_app.config.update(dict((k, v) for k, v in
-    #                          vars(websession_config).iteritems()
-    #                          if "CFG_" == k[:4]))
 
     return render_template('accounts/login.html', form=form)
 
