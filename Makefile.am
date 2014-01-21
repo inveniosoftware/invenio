@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -389,7 +389,7 @@ install-plupload-plugin:
 	rm -rf /tmp/plupload-plugin
 	mkdir /tmp/plupload-plugin
 	(cd /tmp/plupload-plugin && \
-	wget -O plupload-plugin.zip 'http://plupload.com/downloads/plupload_1_5_5.zip' && \
+	wget -O plupload-plugin.zip 'http://invenio-software.org/download/jquery/plupload-1.5.5.zip' && \
 	unzip -u plupload-plugin.zip && \
 	mkdir -p ${prefix}/var/www/js/plupload/i18n/ && \
 	cp -R plupload/js/jquery.plupload.queue ${prefix}/var/www/js/plupload/ && \
