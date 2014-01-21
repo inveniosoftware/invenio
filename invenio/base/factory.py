@@ -27,6 +27,8 @@ import warnings
 import sys
 import os
 
+from pkg_resources import iter_entry_points, resource_listdir
+
 #from invenio.ext.logging import register_exception
 from .helpers import with_app_context, unicodifier
 from .wrappers import Flask
@@ -81,6 +83,22 @@ def register_secret_key(app):
     app.config["SECRET_KEY"] = SECRET_KEY
 
 
+def load_site_config(app):
+    """
+    Load default site-configuration via entry points.
+    """
+    entry_points = list(iter_entry_points("invenio.config"))
+    if len(entry_points) > 1:
+        warnings.warn(
+            "Found multiple site configurations. This may lead to unexpected "
+            "results.",
+            UserWarning
+        )
+
+    for ep in entry_points:
+        app.config.from_object(ep.module_name)
+
+
 def create_app(instance_path=None, **kwargs_config):
     """
     Prepare Invenio application based on Flask.
@@ -131,6 +149,9 @@ def create_app(instance_path=None, **kwargs_config):
 
     # Load default configuration
     app.config.from_object('invenio.base.config')
+
+    # Load site specific default configuration from entry points
+    load_site_config(app)
 
     # Load invenio.cfg from instance folder
     app.config.from_pyfile('invenio.cfg', silent=True)
