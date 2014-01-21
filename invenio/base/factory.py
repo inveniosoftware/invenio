@@ -27,7 +27,7 @@ import warnings
 import sys
 import os
 
-from pkg_resources import iter_entry_points, resource_listdir
+from pkg_resources import iter_entry_points
 
 #from invenio.ext.logging import register_exception
 from .helpers import with_app_context, unicodifier
@@ -235,7 +235,7 @@ def create_wsgi_app(*args, **kwargs):
         except:
             pass
 
-    if 'werkzeug-debugger' in app.config.get('CFG_DEVEL_TOOLS', []):
+    if app.debug:
         from werkzeug.debug import DebuggedApplication
         app = DebuggedApplication(app, evalex=True)
 
