@@ -146,7 +146,7 @@ WSGIRestrictStdout Off
     {%- endblock deflate_directive -%}
     {%- block auth_shibboleth -%}
         {%- if config.CFG_EXTERNAL_AUTH_USING_SSO %}
-        <Location ~ "/youraccount/login|Shibboleth.sso/">
+        <Location ~ "{{ config.SSO_LOGIN_URL }}|Shibboleth.sso/">
             SSLRequireSSL   # The modules only work using HTTPS
             AuthType shibboleth
             ShibRequireSession On

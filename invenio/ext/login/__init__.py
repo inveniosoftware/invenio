@@ -26,7 +26,7 @@
 """
 
 from .legacy_user import UserInfo
-from flask import request, flash, g
+from flask import request, flash, g, url_for, redirect
 from flask.ext.login import LoginManager, current_user, \
     login_user as flask_login_user, logout_user, login_required, UserMixin
 
@@ -69,6 +69,63 @@ def reset_password(email, ln=None):
         return False  # mail could not be sent
 
     return True  # password reset email send successfully
+
+
+def login_redirect(referer=None):
+    if referer is None:
+        referer = request.values.get('referer')
+    if referer:
+        from urlparse import urlparse
+        # we should not redirect to these URLs after login
+        blacklist = [url_for('webaccount.register'),
+                     url_for('webaccount.logout'),
+                     url_for('webaccount.login'),
+                     url_for('webaccount.lost')]
+        if not urlparse(referer).path in blacklist:
+            # Change HTTP method to https if needed.
+            from invenio.utils.url import rewrite_to_secure_url
+            referer = rewrite_to_secure_url(referer)
+            return redirect(referer)
+    return redirect('/')
+
+
+def authenticate(nickname_or_email=None, password=None,
+                 login_method='Local'):
+    """
+    Finds user identified by given information and login method.
+
+    :param nickname_or_email: User nickname or email address
+    :param password: Password used only in login methods that need it
+    :param login_method: Login method (default: 'Local')
+    :return: UserInfo
+    """
+
+    from invenio.base.i18n import _
+    from invenio.ext.sqlalchemy import db
+    from invenio.modules.accounts.models import User
+
+    where = [db.or_(User.nickname == nickname_or_email,
+                    User.email == nickname_or_email)]
+    if login_method == 'Local' and password is not None:
+        where.append(User.password == password)
+    try:
+        user = User.query.filter(*where).one()
+    except:
+        return None
+
+    if user.settings['login_method'] != login_method:
+        flash(
+            _("You are not authorized to use '%(x_login_method)s' login method.",
+              x_login_method=login_method), 'error')
+        return None
+
+    if user.note == '2':  # account is not confirmed
+        logout_user()
+        flash(_("You have not yet confirmed the email address for the \
+            '%(login_method)s' authentication method.",
+            login_method=login_method), 'warning')
+
+    return login_user(user.id)
 
 
 def setup_app(app):

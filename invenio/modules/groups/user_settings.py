@@ -17,31 +17,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebAccount Flask Blueprint"""
+"""WebAccount User Settings"""
 
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
-from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
+from flask import url_for
 from invenio.base.i18n import _
-from invenio.ext.legacy.handler import wash_urlargd
-from invenio.config import CFG_SITE_LANG
-from invenio.modules.access.local_config import \
-     CFG_EXTERNAL_AUTH_USING_SSO, \
-     CFG_EXTERNAL_AUTH_LOGOUT_SSO
 
-from invenio.legacy.websession.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
-      CFG_WEBSESSION_USERGROUP_STATUS, \
-      CFG_WEBSESSION_GROUP_JOIN_POLICY, \
-      InvenioWebSessionError, \
-      InvenioWebSessionWarning
-
-from invenio.ext.sqlalchemy import db
 from invenio.ext.template import render_template_to_string
 from flask.ext.login import current_user
+from invenio.modules.account.models import UserUsergroup
 from invenio.modules.dashboard.settings import Settings
 
-class WebGroupSettings(Settings):
 
+class WebGroupSettings(Settings):
 
     def __init__(self):
         super(WebGroupSettings, self).__init__()
