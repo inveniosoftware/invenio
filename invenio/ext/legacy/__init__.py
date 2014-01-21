@@ -35,13 +35,12 @@ from .request_class import LegacyRequest
 
 
 def setup_app(app):
-
     ## Legacy config support
     USE_X_SENDFILE = app.config.get('CFG_BIBDOCFILE_USE_XSENDFILE')
     DEBUG = app.config.get('CFG_DEVEL_SITE', 0) > 0
     app.config.setdefault('USE_X_SENDFILE', USE_X_SENDFILE)
     app.config.setdefault('DEBUG', DEBUG)
-    app.debug = DEBUG
+    app.debug = app.config['DEBUG']
 
     class LegacyAppMiddleware(object):
         def __init__(self, app):
