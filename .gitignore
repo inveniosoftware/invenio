@@ -39,6 +39,7 @@ dist
 docs/_build
 docs/db
 docs/static
+dump.rdb
 install-sh
 instance/
 invenio-autotools.conf
