@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,12 +31,11 @@ from invenio.base.i18n import gettext_set_language
 from urllib import quote
 from invenio.utils.html import escape_html
 import config as bconfig
-from invenio.legacy.bibclassify import ontology_reader as reader
+
 log = bconfig.get_logger("bibclassify.template")
 
 
 class Template:
-
     def tmpl_page(self,
                   keywords=None,
                   top='',
@@ -66,23 +65,23 @@ class Template:
 
         if navbar is None:
             navbar = self.tmpl_snippet_sorting_options(keywords,
-                                      ln=ln,
-                                      generate=generate,
-                                      sorting=sorting,
-                                      type=type,
-                                      numbering=numbering,
-                                      showall=showall)
+                                                       ln=ln,
+                                                       generate=generate,
+                                                       sorting=sorting,
+                                                       type=type,
+                                                       numbering=numbering,
+                                                       showall=showall)
 
 
         # well, integration with other moduels needs to get better (but for now this will do)
         bottom += self.call_external_modules(keywords=keywords,
-                                              req=req,
-                                              ln=ln,
-                                              generate=generate,
-                                              sorting=sorting,
-                                              type=type,
-                                              numbering=numbering,
-                                              showall=showall)
+                                             req=req,
+                                             ln=ln,
+                                             generate=generate,
+                                             sorting=sorting,
+                                             type=type,
+                                             numbering=numbering,
+                                             showall=showall)
         #thread_id, cache = reader.test_cache()
         #bottom += 'This is thread id: %s, cache id: %s, main cache: %s' % (thread_id, id(cache), id(reader._CACHE))
 
@@ -101,13 +100,13 @@ class Template:
         return self.tmpl_page(middle=msg)
 
     def tmpl_page_tagcloud(self, keywords,
-                          req=None,
-                          ln=None,
-                          generate=None,
-                          sorting=None,
-                          type=None,
-                          numbering=None,
-                          showall=None):
+                           req=None,
+                           ln=None,
+                           generate=None,
+                           sorting=None,
+                           type=None,
+                           numbering=None,
+                           showall=None):
         """Writes the html of the tag cloud
         @var keywords: dictionary of KeywordToken objects
             key is a KeywordToken object
@@ -129,10 +128,9 @@ class Template:
         <span class=\"keyword composite\">composite</span>, <span class=\"keyword author-kw\">author</span>,\
         and <span class=\"keyword other-kw\">other keywords</span>.")
 
-
         cloud = []
 
-        cloud.append('<div class="tagcloud" levels="%s">' % (' '.join(map(lambda x: '%spx' %x, fonts))))
+        cloud.append('<div class="tagcloud" levels="%s">' % (' '.join(map(lambda x: '%spx' % x, fonts))))
 
         format_link = self.tmpl_href
         max = config.CFG_BIBCLASSIFY_WEB_MAXKW or 1000
@@ -141,15 +139,14 @@ class Template:
         if numbering == 'on':
             for kw, info in keywords.items()[0:max]:
                 cloud.append('<span style="font-size: %spx;">%s&nbsp;(%s)</span>' %
-                    (fonts[info[-1]],
-                     format_link(kw, ln),
-                     len(info[0])))
+                             (fonts[info[-1]],
+                              format_link(kw, ln),
+                              len(info[0])))
         else:
             for kw, info in keywords.items()[0:max]:
                 cloud.append('<span style="font-size: %spx;">%s&nbsp;</span>' %
-                    (fonts[info[-1]],
-                    format_link(kw, ln)))
-
+                             (fonts[info[-1]],
+                              format_link(kw, ln)))
 
         cloud.append('</div>')
 
@@ -168,22 +165,22 @@ class Template:
 
 
     def tmpl_page_list(self, keywords,
-                        req=None,
-                        ln=None,
-                        generate=None,
-                        sorting=None,
-                        type=None,
-                        numbering=None,
-                        showall=None):
+                       req=None,
+                       ln=None,
+                       generate=None,
+                       sorting=None,
+                       type=None,
+                       numbering=None,
+                       showall=None):
         """Page with keywords as a list"""
         _ = gettext_set_language(ln)
         kw = self.tmpl_list_of_keywords(keywords,
-                                          ln=ln,
-                                          generate=generate,
-                                          sorting=sorting,
-                                          type=type,
-                                          numbering=numbering,
-                                          showall=showall)
+                                        ln=ln,
+                                        generate=generate,
+                                        sorting=sorting,
+                                        type=type,
+                                        numbering=numbering,
+                                        showall=showall)
         msg = _(_("Automatically generated <span class=\"keyword single\">single</span>,\
         <span class=\"keyword composite\">composite</span>, <span class=\"keyword author-kw\">author</span>,\
         and <span class=\"keyword other-kw\">other keywords</span>."))
@@ -197,21 +194,21 @@ class Template:
                               showall=showall)
 
     def tmpl_page_xml_output(self, keywords, xml=None,
-                                req=None,
-                                ln=None,
-                                generate=None,
-                                sorting=None,
-                                type=None,
-                                numbering=None,
-                                showall=None):
+                             req=None,
+                             ln=None,
+                             generate=None,
+                             sorting=None,
+                             type=None,
+                             numbering=None,
+                             showall=None):
         kw = '<pre class="bibclassify-marcxml"><code>%s</code></pre>' % escape_html(xml)
         return self.tmpl_page(keywords, middle=kw,
-                                          ln=ln,
-                                          generate=generate,
-                                          sorting=sorting,
-                                          type=type,
-                                          numbering=numbering,
-                                          showall=showall)
+                              ln=ln,
+                              generate=generate,
+                              sorting=sorting,
+                              type=type,
+                              numbering=numbering,
+                              showall=showall)
 
     def tmpl_page_generate_keywords(self,
                                     req=None,
@@ -289,7 +286,8 @@ class Template:
                         _("Show more...")))
 
         half = int(len(out) / 2)
-        out = '<div class="kw-list">%s</div><div class="kw-list">%s</div>' % ('<br/>'.join(out[0:half]), '<br/>'.join(out[half:]))
+        out = '<div class="kw-list">%s</div><div class="kw-list">%s</div>' % (
+            '<br/>'.join(out[0:half]), '<br/>'.join(out[half:]))
 
         return '''
         <div class="bibclassify-kwlist">
@@ -299,17 +297,16 @@ class Template:
 
 
     def tmpl_format_list_of_keywords(self, keywords,
-                                      ln=None,
-                                      generate=None,
-                                      sorting=None,
-                                      type=None,
-                                      numbering=None,
-                                      showall=None):
+                                     ln=None,
+                                     generate=None,
+                                     sorting=None,
+                                     type=None,
+                                     numbering=None,
+                                     showall=None):
         """Formats the list of keywords"""
 
         _ = gettext_set_language(ln)
         format_link = self.tmpl_href
-
 
         sorted_keywords = _get_sorted_keywords(keywords)
 
@@ -343,17 +340,19 @@ class Template:
             ln)
 
     def tmpl_href(self, keyword, ln):
-        return '<a href="%s" class="keyword %s %s">%s</a>' % (self.tmpl_search_link(keyword, ln), keyword.getType(), keyword.isComposite() and 'composite' or 'single', cgi.escape(str(keyword)))
+        return '<a href="%s" class="keyword %s %s">%s</a>' % (
+            self.tmpl_search_link(keyword, ln), keyword.getType(), keyword.isComposite() and 'composite' or 'single',
+            cgi.escape(str(keyword)))
 
 
     def tmpl_snippet_sorting_options(self, keywords,
-                                      ln=None,
-                                      generate=None,
-                                      sorting=None,
-                                      type=None,
-                                      numbering=None,
-                                      showall=None
-                                     ):
+                                     ln=None,
+                                     generate=None,
+                                     sorting=None,
+                                     type=None,
+                                     numbering=None,
+                                     showall=None
+    ):
         """Returns the HTML view of the sorting options. Takes care of
         enabling only some options based on the page shown."""
 
@@ -365,9 +364,9 @@ class Template:
         out = '<b>%s:</b>\n' % _('Keywords')
 
         for (_type, label) in ( ('tagcloud', _('tag cloud')),
-                               ('list', _('list')),
-                               ('xml', _('XML')) ):
-            k = {'langlink' : ln, 'type': _type, 'sorting' : sorting, 'label' : _(label)}
+                                ('list', _('list')),
+                                ('xml', _('XML')) ):
+            k = {'langlink': ln, 'type': _type, 'sorting': sorting, 'label': _(label)}
             if _type not in type:
                 out += '[ <a href="?ln=%(langlink)s&type=%(type)s&sorting=%(sorting)s">%(label)s</a> ]' % k
             else:
@@ -386,7 +385,7 @@ class Template:
                 out += '[ %(label)s ]' % k
         """
 
-        return('''<div class="nav-links">
+        return ('''<div class="nav-links">
         %s
         </div>''' % out)
 
@@ -397,7 +396,7 @@ class Template:
 
         _modules = bconfig.CFG_EXTERNAL_MODULES
         out = ''
-        for m,v in _modules.items():
+        for m, v in _modules.items():
             try:
                 if not callable(v):
                     x = __import__(m, globals=globals(), locals={})
@@ -405,7 +404,7 @@ class Template:
                         v = getattr(x, v)
                         _modules[m] = v
                     else:
-                        raise Exception("The registered call %s does not exist in the module %s" % (v,m))
+                        raise Exception("The registered call %s does not exist in the module %s" % (v, m))
                 result = v('bibclassify', **kwargs)
                 if result and isinstance(result, str):
                     out += result
@@ -414,9 +413,8 @@ class Template:
             except Exception, msg:
                 log.error("Error importing module: %s" % (m))
                 log.error(msg)
-                del(_modules[m])
+                del (_modules[m])
         return out
-
 
 
 def _get_sorted_keywords(keywords):
@@ -426,7 +424,7 @@ def _get_sorted_keywords(keywords):
     sorted_keywords = {
         'unweighted': {'single': [], 'composite': []},
         'weighted': {'single': [], 'composite': []}
-        }
+    }
 
     for k, info in keywords.items():
         if len(info[0]) > 0:
@@ -439,12 +437,13 @@ def _get_sorted_keywords(keywords):
             sorted_keywords[state]['single'].append([k, info])
 
     for type in ('single', 'composite'):
-        sorted_keywords['unweighted'][type].sort(key= lambda x: str(x[0]).lower()) #keyword label
-        sorted_keywords['weighted'][type].sort(key= lambda x: len(x[1][0])) # number of spans
+        sorted_keywords['unweighted'][type].sort(key=lambda x: str(x[0]).lower()) #keyword label
+        sorted_keywords['weighted'][type].sort(key=lambda x: len(x[1][0])) # number of spans
 
     return sorted_keywords
 
-def _get_font_levels(keywords, no_steps = 8):
+
+def _get_font_levels(keywords, no_steps=8):
     """Takes keywords dictionary {keyw1: [[], ]....}
      computes the fontlevel and adds it to the dictionary
      @return: nothing, it changes keywords dictionary directly"""

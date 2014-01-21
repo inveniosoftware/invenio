@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,38 +20,27 @@
 This module is NOT standalone safe - this component is never expected
 to run in a standalone mode, but always inside invenio."""
 
-
 import os
 from cgi import escape
-from urllib import quote
-import time
+
 from invenio.legacy import bibupload
 
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.bibdocfile.api import BibRecDocs
-from invenio.ext.legacy.handler import WebInterfaceDirectory
-from invenio.legacy.webpage import pageheaderonly, pagefooteronly
-from invenio.legacy.search_engine import get_colID, \
-    guess_primary_collection_of_a_record, create_navtrail_links, \
-    perform_request_search, get_record, print_record
-from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
+from invenio.legacy.search_engine import get_record
 from invenio.legacy.template import load
 from invenio.ext.legacy.handler import wash_urlargd
-from invenio.legacy.webuser import collect_user_info
 import invenio.modules.access.engine as acce
 from invenio.legacy import dbquery
 from invenio.legacy.bibsched import bibtask
 from invenio.legacy import bibrecord
-
 from invenio.legacy.bibclassify import config as bconfig
-from invenio.legacy.bibclassify import text_extractor
 from invenio.legacy.bibclassify import engine as bibclassify_engine
 from invenio.legacy.bibclassify import ontology_reader as bor
 
 log = bconfig.get_logger("bibclassify.webinterface")
 
 template = load('bibclassify')
-
 
 
 def main_page(req, recid, tabs, ln, template):
@@ -71,13 +60,12 @@ def main_page(req, recid, tabs, ln, template):
         'type': (str, 'tagcloud'),
         'numbering': (str, 'off'),
         'showall': (str, 'off'),
-        })
-    for k,v in argd.items():
+    })
+
+    for k, v in argd.items():
         argd[k] = escape(v)
 
-
     req.write(template.detailed_record_container_top(recid, tabs, ln))
-
 
     # Get the keywords from MARC (if any)
     success, keywords, marcrec = record_get_keywords(recid)
@@ -106,12 +94,11 @@ def main_page(req, recid, tabs, ln, template):
         write_keywords_body(keywords, req, recid, argd, marcrec=marcrec)
 
     req.write(template.detailed_record_container_bottom(recid,
-        tabs, ln))
+                                                        tabs, ln))
 
 
 def write_keywords_body(keywords, req, recid, argd, marcrec=None):
     """Writes the bibclassify keyword output into req object"""
-
 
     if not keywords:
         req.write(template.tmpl_page_no_keywords(req=req, **argd))
@@ -141,9 +128,8 @@ def write_keywords_body(keywords, req, recid, argd, marcrec=None):
         req.write(template.tmpl_page(top=_('Unknown type: %(x_type)s', x_type=argd['type']), **argd))
 
 
-
 def record_get_keywords(record, main_field=bconfig.CFG_MAIN_FIELD,
-                                others=bconfig.CFG_OTHER_FIELDS):
+                        others=bconfig.CFG_OTHER_FIELDS):
     """Returns a dictionary of keywordToken objects from the marc
     record. Weight is set to (0,0) if no weight can be found.
 
@@ -188,7 +174,7 @@ def record_get_keywords(record, main_field=bconfig.CFG_MAIN_FIELD,
                     type = subfield[1]
             if keyword:
                 found += 1
-                keywords[bor.KeywordToken(keyword, type=type)] = [[(0,0) for x in range(weight)]]
+                keywords[bor.KeywordToken(keyword, type=type)] = [[(0, 0) for x in range(weight)]]
 
     if others:
         for field_no in others:
@@ -199,10 +185,11 @@ def record_get_keywords(record, main_field=bconfig.CFG_MAIN_FIELD,
                 for subfield in field[0]:
                     if subfield[0] == 'a':
                         keyword = subfield[1]
-                        keywords[bor.KeywordToken(keyword, type=type)] = [[(0,0)]]
+                        keywords[bor.KeywordToken(keyword, type=type)] = [[(0, 0)]]
                         break
 
     return found, keywords, rec
+
 
 def generate_keywords(req, recid, argd):
     """Extracts keywords from the fulltexts (if found) for the
@@ -251,20 +238,19 @@ def generate_keywords(req, recid, argd):
             return 0, keywords, None
         else: # after user clicked on "generate" button
             if inprogress:
-                req.write(template.tmpl_page_msg(msg='<div class="warningbox">%s</div>' % _(msg) ))
+                req.write(template.tmpl_page_msg(msg='<div class="warningbox">%s</div>' % _(msg)))
             else:
                 schedule_extraction(recid, taxonomy=bconfig.CFG_EXTRACTION_TAXONOMY)
                 req.write(template.tmpl_page_msg(msg='<div class="warningbox">%s</div>' %
-                                                 _('We have registered your request, the automated'
-                'keyword extraction will run after some time. Please return back in a while.')))
+                                                     _('We have registered your request, the automated'
+                                                       'keyword extraction will run after some time. Please return back in a while.')))
 
     else:
         req.write(template.tmpl_page_msg(msg='<div class="warningbox">%s</div>' %
-                    _("Unfortunately, we don't have a PDF fulltext for this record in the storage, \
+                                             _("Unfortunately, we don't have a PDF fulltext for this record in the storage, \
                     keywords cannot be generated using an automated process.")))
 
     return 0, keywords, None
-
 
 
 def upload_keywords(filename, mode='correct', recids=None):
@@ -299,12 +285,13 @@ def upload_keywords(filename, mode='correct', recids=None):
     if recids and len(recids) == 1:
         user_title = 'extract:%d' % recids[0]
     bibtask.task_low_level_submission('bibupload',
-                user_title, '-n', m, filename)
+                                      user_title, '-n', m, filename)
 
 
 def schedule_extraction(recid, taxonomy):
     bibtask.task_low_level_submission('bibclassify',
-                'extract:%s' % recid, '-k', taxonomy, '-i', '%s' % recid)
+                                      'extract:%s' % recid, '-k', taxonomy, '-i', '%s' % recid)
+
 
 def _doc_already_submitted(recid):
     # check extraction was already registered
@@ -319,31 +306,30 @@ def _doc_already_submitted(recid):
         AND (status='WAITING' OR status='RUNNING')"
     if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already processed, '
-                        'it will take a while for it to be ingested.')
+                      'it will take a while for it to be ingested.')
 
     # or the task was run and is already archived
     sql = "SELECT COUNT(proc) FROM hstTASK WHERE proc='bibupload' AND user=%s"
     if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already processed, '
-                        'at this moment, the automated extraction is not available.')
+                      'at this moment, the automated extraction is not available.')
 
     # or the task was already ran
     sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibclassify' AND user=%s\
         AND (status='DONE')"
     if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already processed, '
-                        'but automated extraction identified no suitable keywords.')
+                      'but automated extraction identified no suitable keywords.')
 
     # or the extraction is in error stat
     sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibclassify' AND user=%s\
         AND (status='ERROR')"
     if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already scheduled, '
-                        'but an error happened. This requires an'
-                        'administrator\'s intervention. Unfortunately, '
-                        'for the moment we cannot display any data.')
+                      'but an error happened. This requires an'
+                      'administrator\'s intervention. Unfortunately, '
+                      'for the moment we cannot display any data.')
     return (False, None)
-
 
 
 def filter_marcrec(marcrec, main_field=bconfig.CFG_MAIN_FIELD,

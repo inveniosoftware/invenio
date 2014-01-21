@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,15 +25,16 @@ import glob
 import traceback
 import codecs
 
-from invenio import bibclassify_config as bconfig
-from invenio import bibclassify_engine as engine
+from invenio.legacy.bibclassify import config as bconfig
+from invenio.legacy.bibclassify import engine as engine
+
 log = bconfig.get_logger("bibclassify.microtest")
 
 
 def run(glob_patterns,
         verbose=20,
-        plevel = 1
-        ):
+        plevel=1
+):
     """Execute microtests"""
 
     if verbose is not None:
@@ -68,7 +69,7 @@ def run_microtest_suite(test_cases, results={}, plevel=1):
     config = {}
     if 'config' in test_cases:
         config = test_cases['config']
-        del(test_cases['config'])
+        del (test_cases['config'])
     if 'taxonomy' not in config:
         config['taxonomy'] = ['HEP']
 
@@ -77,9 +78,10 @@ def run_microtest_suite(test_cases, results={}, plevel=1):
         try:
             log.debug('section: %s' % test_name)
             phrase = test['phrase'][0]
-            (skw, ckw, akw, acr) = engine.get_keywords_from_text(test['phrase'], config['taxonomy'][0], output_mode="raw")
+            (skw, ckw, akw, acr) = engine.get_keywords_from_text(test['phrase'], config['taxonomy'][0],
+                                                                 output_mode="raw")
 
-            details = analyze_results(test, (skw, ckw) )
+            details = analyze_results(test, (skw, ckw))
             if details["plevel"] < plevel:
                 log.error("\n" + format_test_case(test))
                 log.error("results\n" + format_details(details))
@@ -101,11 +103,12 @@ def run_microtest_suite(test_cases, results={}, plevel=1):
 def summarize_results(results, plevel):
     total = 0
     success = 0
-    for k,v in results.items():
+    for k, v in results.items():
         total += len(v)
         success += len(filter(lambda x: x["plevel"] >= plevel, v))
     log.info("Total number of micro-tests run: %s" % total)
-    log.info("Success/failure: %d/%d" % (success, total-success))
+    log.info("Success/failure: %d/%d" % (success, total - success))
+
 
 def format_details(details):
     plevel = details["plevel"]
@@ -114,8 +117,8 @@ def format_details(details):
     details["plevel"] = plevel
     return out
 
-def format_test_case(test_case):
 
+def format_test_case(test_case):
     padding = 13
 
     keys = ["phrase", "expected", "unwanted"]
@@ -125,9 +128,9 @@ def format_test_case(test_case):
     for key in test_case.keys():
         phrase = "\n".join(map(lambda x: (" " * (padding + 1) ) + str(x), test_case[key]))
         if key in keys:
-            out[keys.index(key)] = "%s=%s" % (key.rjust(padding-1), phrase[padding:])
+            out[keys.index(key)] = "%s=%s" % (key.rjust(padding - 1), phrase[padding:])
         else:
-            out2.append("%s=%s" % (key.rjust(padding-1), phrase[padding:]))
+            out2.append("%s=%s" % (key.rjust(padding - 1), phrase[padding:]))
 
     if filter(len, out) and filter(len, out2):
         return "%s\n%s" % ("\n".join(filter(len, out)), "\n".join(out2))
@@ -135,14 +138,12 @@ def format_test_case(test_case):
         return "%s%s" % ("\n".join(filter(len, out)), "\n".join(out2))
 
 
-
 def analyze_results(test_case, results):
-
     skw = results[0]
     ckw = results[1]
 
-    details = {"correct" : [], "incorrect": [],
-               "plevel" : 0}
+    details = {"correct": [], "incorrect": [],
+               "plevel": 0}
 
     responses_total = len(skw) + len(ckw)
     expected_total = len(test_case["expected"])
@@ -165,6 +166,7 @@ def analyze_results(test_case, results):
     details["plevel"] = ((responses_total + expected_total) - incorrect_responses) / (responses_total + expected_total)
 
     return details
+
 
 def load_microtest_definition(cfgfile, **kwargs):
     """Loads data from the microtest definition file
@@ -196,8 +198,10 @@ def load_microtest_definition(cfgfile, **kwargs):
     fo.close()
     return config
 
+
 if __name__ == "__main__":
     import os, sys
+
     test_paths = []
     if len(sys.argv) > 1 and sys.argv[1] == "demo":
         test_paths.append(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -217,11 +221,11 @@ if __name__ == "__main__":
                     test_paths.append(os.path.join(bconfig.CFG_PREFIX, p))
                     log.warning('Resolving relative path %s -> %s' % (p, test_paths[-1]))
                 else:
-                    raise Exception ('Please check the glob pattern: %s\n\
+                    raise Exception('Please check the glob pattern: %s\n\
                             it seems to be a relative path, but not relative to the script, nor to the invenio rootdir' % p)
         run(test_paths)
     else:
         print 'Usage: %s glob_pattern [glob_pattern...]\nExample: %s %s/etc/bibclassify/microtest*.cfg' % (sys.argv[0],
-                                                                         sys.argv[0],
-                                                                         bconfig.CFG_PREFIX,
-                                                                         )
+                                                                                                           sys.argv[0],
+                                                                                                           bconfig.CFG_PREFIX,
+        )
