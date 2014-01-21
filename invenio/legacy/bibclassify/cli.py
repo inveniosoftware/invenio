@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,15 +29,15 @@ This module is STANDALONE safe
 import getopt
 import sys
 
+from invenio.legacy.bibclassify import config as bconfig
 
-from invenio import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.cli")
 
-
-from invenio import bibclassify_engine as engine
+from invenio.legacy.bibclassify import engine
 from invenio.legacy.bibclassify import ontology_reader as reader
 
 daemon = None
+
 
 def get_recids_list(recids_string):
     """Returns a list of recIDs."""
@@ -66,16 +66,16 @@ def get_recids_list(recids_string):
 
     return recids.keys()
 
+
 def main():
     """Main function """
     arguments = sys.argv
     for index, argument in enumerate(arguments):
         if 'bibclassify' in argument:
-            arguments = arguments[index+1:]
+            arguments = arguments[index + 1:]
             break
     else:
         arguments = arguments[1:]
-
 
     run_as_daemon = False
 
@@ -93,7 +93,8 @@ def main():
                 run_as_daemon = True
 
     if run_as_daemon:
-        from invenio import bibclassify_daemon as daemon
+        from invenio.legacy.bibclassify import daemon
+
         if daemon:
             daemon.bibclassify_daemon()
         else:
@@ -103,18 +104,18 @@ def main():
 
         if options['check_taxonomy']:
             reader.check_taxonomy(options['taxonomy'])
-
         engine.output_keywords_for_sources(options["text_files"],
-            options["taxonomy"],
-            rebuild_cache=options["rebuild_cache"],
-            no_cache=options["no_cache"],
-            output_mode=options["output_mode"],
-            output_limit=options["output_limit"],
-            spires=options["spires"],
-            match_mode=options["match_mode"],
-            with_author_keywords=options["with_author_keywords"],
-            extract_acronyms=options["extract_acronyms"],
-            only_core_tags=options["only_core_tags"])
+                                           options["taxonomy"],
+                                           rebuild_cache=options["rebuild_cache"],
+                                           no_cache=options["no_cache"],
+                                           output_mode=options["output_mode"],
+                                           output_limit=options["output_limit"],
+                                           spires=options["spires"],
+                                           match_mode=options["match_mode"],
+                                           with_author_keywords=options["with_author_keywords"],
+                                           extract_acronyms=options["extract_acronyms"],
+                                           only_core_tags=options["only_core_tags"])
+
 
 def _display_help():
     """Prints the help message for this module."""
@@ -180,14 +181,17 @@ Examples (daemon mode):
 """
     sys.exit(1)
 
+
 def _display_version():
     """Display BibClassify version and exit."""
     try:
         from invenio.config import CFG_VERSION
+
         print "\nInvenio/%s bibclassify/%s\n" % (CFG_VERSION, CFG_VERSION)
     except ImportError:
         print "Invenio bibclassify/standalone"
     sys.exit(1)
+
 
 def _read_options(options_string):
     """Reads the options, test if the specified values are consistent and
@@ -212,10 +216,10 @@ def _read_options(options_string):
     try:
         short_flags = "m:f:k:o:n:m:v:rsqhVde"
         long_flags = ["taxonomy=", "output-mode=", "verbose=", "spires",
-            "keywords-number=", "matching-mode=", "help", "version", "file",
-            "rebuild-cache", "no-limit", "no-cache", "check-taxonomy",
-            "detect-author-keywords", "id:", "collection:", "modified:",
-            "extract-acronyms", "acronyms-file=", "only-core-tags"]
+                      "keywords-number=", "matching-mode=", "help", "version", "file",
+                      "rebuild-cache", "no-limit", "no-cache", "check-taxonomy",
+                      "detect-author-keywords", "id:", "collection:", "modified:",
+                      "extract-acronyms", "acronyms-file=", "only-core-tags"]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
         print >> sys.stderr, "Options problem: %s" % err1
@@ -268,7 +272,6 @@ def _read_options(options_string):
             # that case.
             log.error("option unrecognized -- %s" % option)
 
-
     # Collect the text inputs.
     options["text_files"] = args
 
@@ -285,13 +288,22 @@ def _read_options(options_string):
         sys.exit(0)
     # Output mode is correct?
     elif options["output_mode"]:
-        options["output_mode"] = options["output_mode"].lower() # sanity
-        if options["output_mode"] not in ("text", "marcxml", "html"):
-            log.error("Output (-o) should be TEXT, MARCXML or HTML.")
-            sys.exit(0)
+        options["output_mode"] = options["output_mode"].lower()  # sanity
+        options["output_mode"] = options["output_mode"].split(",")
+        if not isinstance(options["output_mode"], list):
+            if options["output_mode"] not in ("text", "marcxml", "html", "raw", "dict"):
+                log.error("Output (-o) should be TEXT, MARCXML or HTML.")
+                sys.exit(0)
+        else:
+            for i in options["output_mode"]:
+                i = i.lower()
+                if i not in ("text", "marcxml", "html", "raw", "dict"):
+                    log.error("Output (-o) should be TEXT, MARCXML or HTML.")
+                    sys.exit(0)
+
     # Match mode is correct?
     elif options["match_mode"]:
-        options["match_mode"] = options["match_mode"].lower() # sanity
+        options["match_mode"] = options["match_mode"].lower()  # sanity
         if options["match_mode"] not in ("full", "partial"):
             log.error("Mode (-m) should be FULL or PARTIAL.")
             sys.exit(0)
@@ -306,6 +318,7 @@ def _read_options(options_string):
         sys.exit(0)
 
     return options
+
 
 if __name__ == '__main__':
     main()
