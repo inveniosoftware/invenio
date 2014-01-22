@@ -2,7 +2,7 @@
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009,
-##               2010, 2011, 2012, 2013 CERN.
+##               2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -47,6 +47,7 @@ from invenio.bibauthority_config import \
     CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
 from invenio.bibauthority_engine import \
      get_control_nos_from_recID
+from invenio.bibauthorid_dbinterface import get_author_canonical_ids_for_recid
 from invenio.search_engine import perform_request_search, \
      get_index_stemming_language, \
      get_synonym_terms, \
@@ -171,26 +172,6 @@ def get_associated_subfield_value(recID, tag, value, associated_subfield_code):
                 out = row[2]
                 break
     return out
-
-
-def get_author_canonical_ids_for_recid(recID):
-    """
-    Return list of author canonical IDs (e.g. `J.Ellis.1') for the
-    given record.  Done by consulting BibAuthorID module.
-    """
-    from invenio.bibauthorid_dbinterface import get_data_of_papers
-    lwords = []
-    res = get_data_of_papers([recID])
-    if res is None:
-        ## BibAuthorID is not enabled
-        return lwords
-    else:
-        dpersons, dpersoninfos = res
-    for aid in dpersoninfos.keys():
-        author_canonical_id = dpersoninfos[aid].get('canonical_id', '')
-        if author_canonical_id:
-            lwords.append(author_canonical_id)
-    return lwords
 
 
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
