@@ -25,3 +25,5 @@ python-openid==2.2.5
 qrcode==4.0.4
 pillow==2.3.0
 jinja2==2.7.2
+redis==2.9.0
+nydus==0.10.6
