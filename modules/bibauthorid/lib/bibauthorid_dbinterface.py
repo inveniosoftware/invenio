@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -703,6 +703,16 @@ def get_all_papers():   ### get_all_bibrecs
     @rtype: set set(int,)
     '''
     return set([i[0] for i in _select_from_aidpersonidpapers_where(select=['bibrec'])])
+
+
+def get_author_canonical_ids_for_recid(recID):
+    """
+    Return list of author canonical IDs (e.g. `J.Ellis.1') for the
+    given record.  Done by consulting BibAuthorID module.
+    """
+    return [word[0] for word in run_sql("""SELECT data FROM aidPERSONIDDATA
+        JOIN aidPERSONIDPAPERS USING (personid) WHERE bibrec=%s AND
+        tag='canonical_name' AND flag>-2""", (recID, ))]
 
 
 def get_all_paper_data_of_author(pid):
