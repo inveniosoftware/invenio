@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ from sqlalchemy import event
 from sqlalchemy.pool import Pool
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 from invenio.utils.hash import md5
-from invenio.ext.registry import RegistryProxy, AutoDiscoverRegistry
+from flask_registry import RegistryProxy, ModuleAutoDiscoveryRegistry
 
 
 def _include_sqlalchemy(obj, engine=None):
@@ -180,7 +180,7 @@ db = SQLAlchemy()
     Provides access to :class:`~.SQLAlchemy` instance.
 """
 
-models = RegistryProxy('models', AutoDiscoverRegistry, 'models')
+models = RegistryProxy('models', ModuleAutoDiscoveryRegistry, 'models')
 
 
 def setup_app(app):

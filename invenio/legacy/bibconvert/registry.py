@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,18 +19,21 @@
 
 import os
 
-from invenio.ext.registry import PkgResourcesDiscoverRegistry, AutoDiscoverRegistry, RegistryProxy
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+    ModuleAutoDiscoveryRegistry, RegistryProxy
 from invenio.utils.datastructures import LazyDict
 
-converterext = RegistryProxy('converterext', AutoDiscoverRegistry, 'converterext')
+converterext = RegistryProxy(
+    'converterext', ModuleAutoDiscoveryRegistry, 'converterext'
+)
 
 kb = LazyDict(lambda: dict((os.path.basename(f), f)
               for f in RegistryProxy('converterext.kb',
-                                     PkgResourcesDiscoverRegistry,
+                                     PkgResourcesDirDiscoveryRegistry,
                                      'kb', registry_namespace=converterext)))
 
 templates = LazyDict(lambda: dict((os.path.basename(f), f)
                      for f in RegistryProxy('converterext.templates',
-                                            PkgResourcesDiscoverRegistry,
-                                            'templates', registry_namespace=converterext)))
-
+                                            PkgResourcesDirDiscoveryRegistry,
+                                            'templates',
+                                            registry_namespace=converterext)))

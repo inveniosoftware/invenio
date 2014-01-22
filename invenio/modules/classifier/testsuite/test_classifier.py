@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,14 +34,17 @@ import time
 import stat
 import shutil
 
-from invenio.ext.registry import PkgResourcesDiscoverRegistry, ImportPathRegistry, RegistryProxy
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+    ImportPathRegistry, RegistryProxy
 from invenio.testsuite import make_test_suite, run_test_suite, nottest, \
     InvenioTestCase
 
 TEST_PACKAGE = 'invenio.modules.classifier.testsuite'
+
 test_registry = RegistryProxy('test_registry', ImportPathRegistry,
                               initial=[TEST_PACKAGE])
-taxonomies_registry = lambda: PkgResourcesDiscoverRegistry(
+
+taxonomies_registry = lambda: PkgResourcesDirDiscoveryRegistry(
     'taxonomies', registry_namespace=test_registry)
 
 
@@ -66,8 +69,8 @@ class BibClassifyTestCase(InvenioTestCase):
         self.log = bconfig.get_logger("bibclassify.tests")
         self.log_level = bconfig.logging_level
         bconfig.set_global_level(bconfig.logging.CRITICAL)
-        self.app.extensions['registry']['classifierext.taxonomies'] = taxonomies_registry()
-
+        self.app.extensions['registry']['classifierext.taxonomies'] = \
+            taxonomies_registry()
 
     def tearDown(self):
         from invenio import config

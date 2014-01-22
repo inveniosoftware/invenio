@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,8 +30,9 @@ import sys
 from invenio.base.globals import cfg
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
-from invenio.ext.registry import RegistryProxy, ImportPathRegistry, \
-    AutoDiscoverSubRegistry, PkgResourcesDiscoverRegistry
+from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
+from flask_registry import PkgResourcesDirDiscoveryRegistry, RegistryProxy, \
+    ImportPathRegistry
 
 bibformat = lazy_import('invenio.modules.formatter')
 bibformat_engine = lazy_import('invenio.modules.formatter.engine')
@@ -48,10 +49,10 @@ TEST_PACKAGE = 'invenio.modules.formatter.testsuite'
 test_registry = RegistryProxy('test_registry', ImportPathRegistry,
                               initial=[TEST_PACKAGE])
 
-format_templates_registry = lambda: PkgResourcesDiscoverRegistry(
+format_templates_registry = lambda: PkgResourcesDirDiscoveryRegistry(
     'format_templates', registry_namespace=test_registry)
-format_elements_registry = lambda: AutoDiscoverSubRegistry(
-    'format_elements', registry_namespace=test_registry)
+format_elements_registry = lambda: ModuleAutoDiscoverySubRegistry(
+    'format_elements', registry_namespace=test_registry, silent=True)
 
 class FormatTemplateTest(InvenioTestCase):
     """ bibformat - tests on format templates"""

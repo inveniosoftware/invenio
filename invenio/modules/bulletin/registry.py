@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,10 +19,12 @@
 
 import pkg_resources
 
-from invenio.ext.registry import AutoDiscoverRegistry, RegistryProxy
+from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
 from invenio.utils.datastructures import LazyDict
 
-bulletinext = RegistryProxy('bulletinext', AutoDiscoverRegistry, 'bulletinext')
+bulletinext = RegistryProxy(
+    'bulletinext', ModuleAutoDiscoveryRegistry, 'bulletinext'
+)
 
 journals = LazyDict(lambda: dict(
     (f, pkg_resources.resource_filename(l.__name__, f))

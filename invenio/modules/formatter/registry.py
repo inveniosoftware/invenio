@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,20 +19,28 @@
 
 import os
 
-from invenio.ext.registry import PkgResourcesDiscoverRegistry, AutoDiscoverRegistry, RegistryProxy, AutoDiscoverSubRegistry
+from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+    ModuleAutoDiscoveryRegistry, RegistryProxy
 from invenio.utils.datastructures import LazyDict
 
-format_elements = RegistryProxy('format_elements',
-                                AutoDiscoverSubRegistry,
-                                'format_elements')
+format_elements = RegistryProxy(
+    'format_elements',
+    ModuleAutoDiscoverySubRegistry,
+    'format_elements'
+)
 
-format_templates_directories = RegistryProxy('format_templates_directories',
-                                             AutoDiscoverRegistry,
-                                             'format_templates')
+format_templates_directories = RegistryProxy(
+    'format_templates_directories',
+    ModuleAutoDiscoveryRegistry,
+    'format_templates'
+)
 
-format_templates = RegistryProxy('format_templates',
-                                 PkgResourcesDiscoverRegistry,
-                                 '.', registry_namespace=format_templates_directories)
+format_templates = RegistryProxy(
+    'format_templates',
+    PkgResourcesDirDiscoveryRegistry,
+    '.', registry_namespace=format_templates_directories
+)
 
 
 def create_format_templates_lookup():
