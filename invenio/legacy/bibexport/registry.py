@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,12 +19,17 @@
 
 import os
 
-from invenio.ext.registry import PkgResourcesDiscoverRegistry, AutoDiscoverRegistry, RegistryProxy
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+    ModuleAutoDiscoveryRegistry, RegistryProxy
 from invenio.utils.datastructures import LazyDict
 
-exportext = RegistryProxy('exportext', AutoDiscoverRegistry, 'exportext')
+exportext = RegistryProxy(
+    'exportext', ModuleAutoDiscoveryRegistry, 'exportext'
+)
 
-configurations = LazyDict(lambda: dict((os.path.basename(f), f)
-                          for f in RegistryProxy('exportext.configurations',
-                                     PkgResourcesDiscoverRegistry,
-                                     'configurations', registry_namespace=exportext)))
+configurations = LazyDict(
+    lambda: dict((os.path.basename(f), f)
+                 for f in RegistryProxy('exportext.configurations',
+                                        PkgResourcesDirDiscoveryRegistry,
+                                        'configurations',
+                                        registry_namespace=exportext)))

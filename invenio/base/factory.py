@@ -32,9 +32,8 @@ from pkg_resources import iter_entry_points
 #from invenio.ext.logging import register_exception
 from .helpers import with_app_context, unicodifier
 from .wrappers import Flask
-from invenio.ext.registry import Registry, ExtensionRegistry, \
-    PackageRegistry, ConfigurationRegistry, \
-    ImportPathRegistry, BlueprintAutoDiscoveryRegistry
+from flask_registry import Registry, ExtensionRegistry, \
+    PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
 
 
 __all__ = ['create_app', 'with_app_context']

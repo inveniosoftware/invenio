@@ -17,6 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
-from invenio.ext.registry import AutoDiscoverSubRegistry, RegistryProxy
+from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
+from flask_registry import RegistryProxy
 
-tokenizers = RegistryProxy('tokenizers', AutoDiscoverSubRegistry, 'tokenizers')
+tokenizers = RegistryProxy(
+    'tokenizers', ModuleAutoDiscoverySubRegistry, 'tokenizers'
+)

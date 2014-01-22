@@ -25,9 +25,10 @@ __revision__ = \
 import os
 import tempfile
 
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+    ImportPathRegistry, RegistryProxy
+
 from invenio.base.wrappers import lazy_import
-from invenio.ext.registry import RegistryProxy, ImportPathRegistry, \
-        PkgResourcesDiscoverRegistry
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 Field_parser = lazy_import('invenio.modules.jsonalchemy.parser:FieldParser')
@@ -40,9 +41,9 @@ TEST_PACKAGE = 'invenio.modules.jsonalchemy.testsuite'
 test_registry = RegistryProxy('testsuite', ImportPathRegistry,
                               initial=[TEST_PACKAGE])
 
-field_definitions = lambda: PkgResourcesDiscoverRegistry(
+field_definitions = lambda: PkgResourcesDirDiscoveryRegistry(
     'fields', registry_namespace=test_registry)
-model_definitions = lambda: PkgResourcesDiscoverRegistry(
+model_definitions = lambda: PkgResourcesDirDiscoveryRegistry(
     'models', registry_namespace=test_registry)
 
 
