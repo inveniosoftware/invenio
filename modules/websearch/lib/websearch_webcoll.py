@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -999,7 +999,7 @@ def get_database_last_updated_timestamp():
     database_tables_timestamps.append(get_table_update_time('bibrec'))
     ## In INSPIRE bibfmt is on innodb and there is not such configuration
     bibfmt_last_update = run_sql("SELECT max(last_updated) FROM bibfmt")
-    if bibfmt_last_update:
+    if bibfmt_last_update and bibfmt_last_update[0][0]:
         database_tables_timestamps.append(str(bibfmt_last_update[0][0]))
     try:
         database_tables_timestamps.append(get_table_update_time('idxWORD%'))
