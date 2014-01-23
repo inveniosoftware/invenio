@@ -45,7 +45,8 @@ from invenio.textutils import \
      translate_to_ascii, \
      strip_accents, \
      transliterate_ala_lc, \
-     escape_latex
+     escape_latex, \
+     show_diff
 
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -468,6 +469,92 @@ class TestStripping(InvenioTestCase):
         self.assertEqual("OE",
                          strip_accents('Œ'))
 
+class TestDiffering(InvenioTestCase):
+    """Test for differing two strings."""
+
+    string1 = """Lorem ipsum dolor sit amet, consectetur adipiscing
+elit. Donec fringilla tellus eget fringilla sagittis. Pellentesque
+posuere lacus id erat tristique pulvinar. Morbi volutpat, diam
+eget interdum lobortis, lacus mi cursus leo, sit amet porttitor
+neque est vitae lectus. Donec tempor metus vel tincidunt fringilla.
+Nam iaculis lacinia nisl, enim sollicitudin
+convallis. Morbi ut mauris velit. Proin suscipit dolor id risus
+placerat sodales nec id elit. Morbi vel lacinia lectus, eget laoreet
+dui. Nunc commodo neque porttitor eros placerat, sed ultricies purus
+accumsan. In velit nisi, accumsan molestie gravida a, rutrum in augue.
+Nulla pharetra purus nec dolor ornare, ut aliquam odio placerat.
+Aenean ultrices condimentum quam vitae pharetra."""
+
+    string2 = """Lorem ipsum dolor sit amet, consectetur adipiscing
+elit. Donec fringilla tellus eget fringilla sagittis. Pellentesque
+posuere lacus id erat.
+eget interdum lobortis, lacus mi cursus leo, sit amet porttitor
+neque est vitae lectus. Donec tempor metus vel tincidunt fringilla.
+Nam iaculis lacinia nisl, consectetur viverra enim sollicitudin
+convallis. Morbi ut mauris velit. Proin suscipit dolor id risus
+placerat sodales nec id elit. Morbi vel lacinia lectus, eget laoreet
+placerat sodales nec id elit. Morbi vel lacinia lectus, eget laoreet
+dui. Nunc commodo neque porttitor eros placerat, sed ultricies purus
+accumsan. In velit nisi, lorem ipsum lorem gravida a, rutrum in augue.
+Nulla pharetra purus nec dolor ornare, ut aliquam odio placerat.
+Aenean ultrices condimentum quam vitae pharetra."""
+
+    def test_show_diff_plain_text(self):
+        """textutils - show_diff() with plain text"""
+
+        expected_result = """
+ Lorem ipsum dolor sit amet, consectetur adipiscing
+ elit. Donec fringilla tellus eget fringilla sagittis. Pellentesque
+-posuere lacus id erat.
++posuere lacus id erat tristique pulvinar. Morbi volutpat, diam
+ eget interdum lobortis, lacus mi cursus leo, sit amet porttitor
+ neque est vitae lectus. Donec tempor metus vel tincidunt fringilla.
+-Nam iaculis lacinia nisl, consectetur viverra enim sollicitudin
++Nam iaculis lacinia nisl, enim sollicitudin
+ convallis. Morbi ut mauris velit. Proin suscipit dolor id risus
+ placerat sodales nec id elit. Morbi vel lacinia lectus, eget laoreet
+-placerat sodales nec id elit. Morbi vel lacinia lectus, eget laoreet
+ dui. Nunc commodo neque porttitor eros placerat, sed ultricies purus
+-accumsan. In velit nisi, lorem ipsum lorem gravida a, rutrum in augue.
++accumsan. In velit nisi, accumsan molestie gravida a, rutrum in augue.
+ Nulla pharetra purus nec dolor ornare, ut aliquam odio placerat.
+ Aenean ultrices condimentum quam vitae pharetra.
+"""
+
+        self.assertEqual(show_diff(self.string1, self.string2), expected_result)
+
+    def test_show_diff_html(self):
+        """textutils - show_diff() with plain text"""
+
+        expected_result = """<pre>
+Lorem ipsum dolor sit amet, consectetur adipiscing
+elit. Donec fringilla tellus eget fringilla sagittis. Pellentesque
+<strong class="diff_field_deleted">posuere lacus id erat.</strong>
+<strong class="diff_field_added">posuere lacus id erat tristique pulvinar. Morbi volutpat, diam</strong>
+eget interdum lobortis, lacus mi cursus leo, sit amet porttitor
+neque est vitae lectus. Donec tempor metus vel tincidunt fringilla.
+<strong class="diff_field_deleted">Nam iaculis lacinia nisl, consectetur viverra enim sollicitudin</strong>
+<strong class="diff_field_added">Nam iaculis lacinia nisl, enim sollicitudin</strong>
+convallis. Morbi ut mauris velit. Proin suscipit dolor id risus
+placerat sodales nec id elit. Morbi vel lacinia lectus, eget laoreet
+<strong class="diff_field_deleted">placerat sodales nec id elit. Morbi vel lacinia lectus, eget laoreet</strong>
+dui. Nunc commodo neque porttitor eros placerat, sed ultricies purus
+<strong class="diff_field_deleted">accumsan. In velit nisi, lorem ipsum lorem gravida a, rutrum in augue.</strong>
+<strong class="diff_field_added">accumsan. In velit nisi, accumsan molestie gravida a, rutrum in augue.</strong>
+Nulla pharetra purus nec dolor ornare, ut aliquam odio placerat.
+Aenean ultrices condimentum quam vitae pharetra.
+</pre>"""
+
+        self.assertEqual(show_diff(self.string1,
+                                   self.string2,
+                                   prefix="<pre>", suffix="</pre>",
+                                   prefix_unchanged='',
+                                   suffix_unchanged='',
+                                   prefix_removed='<strong class="diff_field_deleted">',
+                                   suffix_removed='</strong>',
+                                   prefix_added='<strong class="diff_field_added">',
+                                   suffix_added='</strong>'), expected_result)
+
 
 class TestALALC(InvenioTestCase):
     """Test for handling ALA-LC transliteration."""
@@ -494,7 +581,7 @@ class LatexEscape(InvenioTestCase):
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
                              WashForXMLTest, WashForUTF8Test, DecodeToUnicodeTest,
                              Latex2UnicodeTest, TestStripping,
-                             TestALALC)
+                             TestALALC, TestDiffering)
 
 
 if __name__ == "__main__":

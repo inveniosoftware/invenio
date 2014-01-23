@@ -686,15 +686,31 @@ def strip_accents(x):
     return y.encode("utf-8")
 
 
-def show_diff(original, modified, prefix="<pre>", sufix="</pre>"):
+def show_diff(original, modified, prefix='', suffix='',
+            prefix_unchanged=' ',
+            suffix_unchanged='',
+            prefix_removed='-',
+            suffix_removed='',
+            prefix_added='+',
+            suffix_added=''):
     """
-    Returns the diff view between source and changed strings.
+    Returns the diff view between original and modified strings.
     Function checks both arguments line by line and returns a string
-    with additional css classes for difference view
+    with a:
+    - prefix_unchanged when line is common to both sequences
+    - prefix_removed when line is unique to sequence 1
+    - prefix_added when line is unique to sequence 2
+    and a corresponding suffix in each line
     @param original: base string
     @param modified: changed string
     @param prefix: prefix of the output string
-    @param sufix: sufix of the output string
+    @param suffix: suffix of the output string
+    @param prefix_unchanged: prefix of the unchanged line
+    @param suffix_unchanged: suffix of the unchanged line
+    @param prefix_removed: prefix of the removed line
+    @param suffix_removed: suffix of the removed line
+    @param prefix_added: prefix of the added line
+    @param suffix_added: suffix of the added line
 
     @return: string with the comparison of the records
     @rtype: string
@@ -705,17 +721,16 @@ def show_diff(original, modified, prefix="<pre>", sufix="</pre>"):
     result = [prefix]
     for line in differ.compare(modified.splitlines(), original.splitlines()):
         if line[0] == ' ':
-            result.append(line.strip())
+            # Mark as unchanged
+            result.append(prefix_unchanged + line[2:].strip() + suffix_unchanged)
         elif line[0] == '-':
-            # Mark as deleted
-            result.append('<strong class="diff_field_deleted">' + line[2:].strip() + "</strong>")
+            # Mark as removed
+            result.append(prefix_removed + line[2:].strip() + suffix_removed)
         elif line[0] == '+':
             # Mark as added/modified
-            result.append('<strong class="diff_field_added">' + line[2:].strip() + "</strong>")
-        else:
-            continue
+            result.append(prefix_added + line[2:].strip() + suffix_added)
 
-    result.append(sufix)
+    result.append(suffix)
     return '\n'.join(result)
 
 
