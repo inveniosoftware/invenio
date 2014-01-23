@@ -1520,7 +1520,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
     @return: strucured content of output format
     """
     _ = gettext_set_language(CFG_SITE_LANG)
-    output_format = {'rules':[], 'default':""}
+    output_format = {'rules': [], 'default': ""}
     filename = resolve_output_format_filename(code, verbose)
 
     if filename is None:
@@ -1548,7 +1548,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
         if with_attributes:
             output_format['attrs'] = get_output_format_attrs(code, verbose)
 
-        path = "%s%s%s" % (CFG_BIBFORMAT_OUTPUTS_PATH, os.sep, filename )
+        path = registry.output_formats_lookup[filename]
         format_file = open(path)
 
         current_tag = ''
@@ -1670,11 +1670,13 @@ def get_output_formats(with_attributes=False):
     @return: the list of output formats
     """
     output_formats = {}
-    files = os.listdir(CFG_BIBFORMAT_OUTPUTS_PATH)
 
-    for filename in files:
+    for filename in registry.output_formats_lookup.values():
+        filename = os.path.basename(filename)
         if filename.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
             code = "".join(filename.split(".")[:-1])
+            if filename in output_formats:
+                continue
             output_formats[filename] = get_output_format(code, with_attributes)
 
     return output_formats
@@ -1740,10 +1742,10 @@ def resolve_output_format_filename(code, verbose=0):
     if not code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
         code = re.sub(r"\W", "", code)
         code += "."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
-
-    files = os.listdir(CFG_BIBFORMAT_OUTPUTS_PATH)
-    for filename in files:
-        if filename.upper() == code.upper():
+    code = code.upper()
+    print registry.output_formats_lookup.keys()
+    for filename in registry.output_formats_lookup.keys():
+        if filename.upper() == code:
             return filename
 
     # No output format with that name found
@@ -1813,26 +1815,25 @@ def get_fresh_output_format_filename(code):
     if len(code) > 6:
         code = code[:6]
 
+    def _get_fullname(filename):
+        return filename + '.' + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
+
     filename = code
-    path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename \
-           + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
     index = 2
-    while os.path.exists(path):
+    while _get_fullname(filename) in registry.output_formats_lookup:
         filename = code + str(index)
         if len(filename) > 6:
             filename = code[:-(len(str(index)))]+str(index)
         index += 1
-        path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename \
-               + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
         # We should not try more than 99999... Well I don't see how we
         # could get there.. Sanity check.
         if index >= 99999:
             try:
                 raise InvenioBibFormatError(_('Could not find a fresh name for output format %s.') % code)
-            except InvenioBibFormatError, exc:
+            except InvenioBibFormatError:
                 register_exception()
 
-            sys.exit("Output format cannot be named as %s"%code)
+            sys.exit("Output format cannot be named as %s" % code)
 
     return (filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, filename)
 

@@ -42,6 +42,17 @@ format_templates = RegistryProxy(
     '.', registry_namespace=format_templates_directories
 )
 
+output_formats_directories = RegistryProxy(
+    'output_formats_directories',
+    ModuleAutoDiscoveryRegistry,
+    'output_formats'
+)
+
+output_formats = RegistryProxy(
+    'output_formats',
+    PkgResourcesDirDiscoveryRegistry,
+    '.', registry_namespace=output_formats_directories
+)
 
 def create_format_templates_lookup():
     out = {}
@@ -63,3 +74,16 @@ def create_format_templates_lookup():
 
 
 format_templates_lookup = LazyDict(create_format_templates_lookup)
+
+
+def create_output_formats_lookup():
+    out = {}
+
+    for f in output_formats:
+        of = os.path.basename(f)
+        if of in out:
+            continue
+        out[of] = f
+    return out
+
+output_formats_lookup = LazyDict(create_output_formats_lookup)

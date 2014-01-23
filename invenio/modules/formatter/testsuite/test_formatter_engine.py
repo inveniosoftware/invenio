@@ -31,7 +31,7 @@ from invenio.base.globals import cfg
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
-from flask_registry import PkgResourcesDirDiscoveryRegistry, RegistryProxy, \
+from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, RegistryProxy, \
     ImportPathRegistry
 
 bibformat = lazy_import('invenio.modules.formatter')
@@ -40,8 +40,6 @@ bibformat_utils = lazy_import('invenio.modules.formatter.utils')
 bibformat_config = lazy_import('invenio.modules.formatter.config')
 bibformatadminlib = lazy_import('invenio.legacy.bibformat.adminlib')
 format_templates = lazy_import('invenio.modules.formatter.testsuite.format_templates')
-format_elements = lazy_import('invenio.modules.formatter.testsuite.format_elements')
-output_formats = lazy_import('invenio.modules.formatter.testsuite.output_formats')
 
 TEST_PACKAGE = 'invenio.modules.formatter.testsuite'
 
@@ -51,8 +49,13 @@ test_registry = RegistryProxy('test_registry', ImportPathRegistry,
 
 format_templates_registry = lambda: PkgResourcesDirDiscoveryRegistry(
     'format_templates', registry_namespace=test_registry)
+
 format_elements_registry = lambda: ModuleAutoDiscoverySubRegistry(
     'format_elements', registry_namespace=test_registry, silent=True)
+
+output_formats_registry = lambda: PkgResourcesDirDiscoveryRegistry(
+    'output_formats', registry_namespace=test_registry, silent=True)
+
 
 class FormatTemplateTest(InvenioTestCase):
     """ bibformat - tests on format templates"""
@@ -260,11 +263,14 @@ class OutputFormatTest(InvenioTestCase):
     """ bibformat - tests on output formats"""
 
     def setUp(self):
-        self.old_outputs_path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = output_formats.__path__[0]
+        self.app.extensions['registry']['output_formats'] = output_formats_registry()
+        from invenio.modules.formatter.registry import output_formats_lookup
+        output_formats_lookup.expunge()
 
     def tearDown(self):
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
+        from invenio.modules.formatter.registry import output_formats_lookup
+        output_formats_lookup.expunge()
+        del self.app.extensions['registry']['output_formats']
 
     def test_get_output_format(self):
         """ bibformat - output format parsing and returned structure """
@@ -345,6 +351,8 @@ class OutputFormatTest(InvenioTestCase):
 
     def test_get_fresh_output_format_filename(self):
         """ bibformat - getting fresh filename for output format"""
+        from invenio.modules.formatter.registry import output_formats_lookup
+
         filename_and_name_1 = bibformat_engine.get_fresh_output_format_filename("test")
         self.assert_(len(filename_and_name_1) >= 2)
         self.assertEqual(filename_and_name_1[0], "TEST.bfo")
@@ -356,15 +364,13 @@ class OutputFormatTest(InvenioTestCase):
         filename_and_name_2 = bibformat_engine.get_fresh_output_format_filename("test1")
         self.assert_(len(filename_and_name_2) >= 2)
         self.assert_(filename_and_name_2[0] != "TEST1.bfo")
-        path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename_and_name_2[0]
-        self.assert_(not os.path.exists(path))
+        self.assert_(filename_and_name_2[0] not in output_formats_lookup)
 
         filename_and_name_3 = bibformat_engine.get_fresh_output_format_filename("test1testlong")
         self.assert_(len(filename_and_name_3) >= 2)
         self.assert_(filename_and_name_3[0] != "TEST1TESTLONG.bft")
         self.assert_(len(filename_and_name_3[0]) <= 6 + 1 + len(bibformat_config.CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION))
-        path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename_and_name_3[0]
-        self.assert_(not os.path.exists(path))
+        self.assert_(filename_and_name_3[0] not in output_formats_lookup)
 
 class PatternTest(InvenioTestCase):
     """ bibformat - tests on re patterns"""
@@ -718,8 +724,7 @@ class FormatTest(InvenioTestCase):
         <record>
         <controlfield tag="001">555</controlfield>
         </record>'''
-        self.old_outputs_path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = output_formats.__path__[0]
+        self.app.extensions['registry']['output_formats'] = output_formats_registry()
         self.app.extensions['registry']['format_elements'] = format_elements_registry()
         #self.old_import_path = cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH']
         #cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH'] = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
@@ -728,7 +733,9 @@ class FormatTest(InvenioTestCase):
 
     def tearDown(self):
         sys.path.pop()
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
+        del self.app.extensions['registry']['output_formats']
+        from invenio.modules.formatter.registry import output_formats_lookup
+        output_formats_lookup.expunge()
         del self.app.extensions['registry']['format_elements']
         #cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH'] = self.old_import_path
         cfg['CFG_BIBFORMAT_TEMPLATES_PATH'] = self.old_templates_path
@@ -790,7 +797,11 @@ class FormatTest(InvenioTestCase):
 
     def test_format_with_format_template(self):
         """ bibformat - correct formatting with given template"""
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
+        del self.app.extensions['registry']['output_formats']
+        from invenio.modules.formatter.registry import output_formats_lookup, \
+            output_formats
+        output_formats_lookup.expunge()
+        list(output_formats)
         template = bibformat_engine.get_format_template("Test3.bft")
         result = bibformat_engine.format_with_format_template(format_template_filename = None,
                                                               bfo=self.bfo_1,

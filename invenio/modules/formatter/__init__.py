@@ -41,9 +41,6 @@ import sys
 import zlib
 
 from invenio.base.globals import cfg
-from invenio.base.i18n import wash_language
-from invenio.ext.logging import register_exception
-from invenio.ext.template import render_template_to_string
 
 # Functions to format a single record
 ##
@@ -169,6 +166,7 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
             out = filter_hidden_fields(out, user_info)
         return out
     except Exception, e:
+        from invenio.ext.logging import register_exception
         register_exception(prefix="An error occured while formatting record %i in %s" % \
                            (recID, of),
                            alert_admin=True)
@@ -527,6 +525,8 @@ def print_records(recIDs, of='hb', ln=None, verbose=0,
     import time
     from math import ceil
     from flask import request
+    from invenio.base.i18n import wash_language
+    from invenio.ext.template import render_template_to_string
     from invenio.modules.formatter.engine import format_record
     from invenio.modules.search.models import Format
     from invenio.utils.pagination import Pagination
