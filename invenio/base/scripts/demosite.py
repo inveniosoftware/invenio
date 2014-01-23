@@ -38,8 +38,12 @@ option_jobid = manager.option('-j', '--job-id', dest='job_id', type=int,
 option_extrainfo = manager.option('-e', '--extra-info', dest='extra_info',
                                   action='append',
                                   help='extraneous parameters')
+option_packages = manager.option('-p', '--packages', dest='packages',
+                                  action='append',
+                                  help='package import name (repeteable)')
 
 
+@option_packages
 @option_default_data
 @option_file
 @option_jobid
@@ -92,7 +96,7 @@ def populate(packages=['invenio_demosite'], default_data=True, files=None,
     print ">>> Demo records loaded successfully."
 
 
-@manager.command
+@option_packages
 def create(packages=['invenio_demosite']):
     """Populate database with demo site data."""
 
