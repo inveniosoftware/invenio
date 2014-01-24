@@ -85,14 +85,12 @@ def setup_app(app):
                 pass
         return render_template('404.html'), 404
 
-    @app.endpoint('static')
-    @app.route(app.static_url_path + '/<path:filename>', methods=['POST', 'PUT'])
-    def static_handler_with_legacy_publisher(*args, **kwargs):
+    @app.route('/admin/<module>/<action>.py', methods=['GET', 'POST', 'PUT'])
+    @app.route('/admin/<module>/<action>.py/<path:arguments>',
+               methods=['GET', 'POST', 'PUT'])
+    def web_admin(module, action, arguments=None):
         """
-        Adds support for legacy publisher.
-
-        NOTE: It changes order of url page lookup. First, the invenio_handler
-        will be called and on 404 error the mp_legacy_publisher is called.
+        Adds support for legacy mod publisher.
         """
         from invenio.legacy.wsgi import \
             is_mp_legacy_publisher_path, mp_legacy_publisher, \
@@ -104,17 +102,18 @@ def setup_app(app):
                 mp_legacy_publisher(req, possible_module, possible_handler)
             return legacy_application(request.environ, g.start_response,
                                       handler=legacy_publisher)
+        return render_template('404.html'), 404
 
+
+    @app.endpoint('static')
+    def static_handler_with_legacy_publisher(*args, **kwargs):
+        """
+        Serves static files from instance path.
+        """
         # Static file serving for devserver
         # ---------------------------------
         # Apache normally serve all static files, but if we are using the
-        # devserver we need to serve static files here. Werkzeugs default
-        # behaviour is to return a '405 Method not allowed' for POST requests
-        # to static files. However, if we abort all POST requests with 405, the
-        # legacy_application (see page_not_found()) will not be given a chance
-        # to serve static files as it only get's invokved when we abort with a
-        # 404. Hence, on POST requests, we first check if the static file exists,
-        # and if it does we return we abort the request with a 405.
+        # devserver we need to serve static files here.
         if not app.config.get('CFG_FLASK_SERVE_STATIC_FILES'):
             abort(404)
         else:
@@ -123,10 +122,7 @@ def setup_app(app):
             except NotFound:
                 static_file_response = send_from_directory(
                     safe_join(app.instance_path, 'static'), kwargs['filename'])
-            if request.method in ['POST', 'PUT']:
-                abort(405)
-            else:
-                return static_file_response
+            return static_file_response
 
     try:
         # pylint: disable=E0611

@@ -527,17 +527,20 @@ def is_mp_legacy_publisher_path(path):
     @return: the path of the module to load and the function to call there.
     @rtype: tuple
     """
+    from invenio.legacy.registry import webadmin
     path = path.split('/')
+    module = ''
     for index, component in enumerate(path):
         if component.endswith('.py'):
-            possible_module = os.path.abspath(CFG_WEBDIR + os.path.sep + os.path.sep.join(path[:index + 1]))
+            possible_module = webadmin.get(module+component[:-3])
             possible_handler = '/'.join(path[index + 1:]).strip()
             if possible_handler.startswith('_'):
                 return None, None
             if not possible_handler:
                 possible_handler = 'index'
-            if os.path.exists(possible_module) and possible_module.startswith(CFG_WEBDIR):
-                return (possible_module, possible_handler)
+            if possible_module and os.path.exists(possible_module.__file__):
+                return (possible_module.__file__, possible_handler)
+        module = component + '/'
     else:
         return None, None
 
@@ -547,6 +550,8 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     """
     from invenio.legacy.websession.session import get_session
     from invenio.ext.legacy.handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
+    if possible_module.endswith('.pyc'):
+        possible_module = possible_module[:-1]
     the_module = open(possible_module).read()
     module_globals = {}
     exec(the_module, module_globals)

@@ -27,7 +27,7 @@ from invenio.base.i18n import _
 from invenio.base.globals import cfg as config
 
 # VALUES TO BE EXPORTED
-# CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
+# CURRENTLY USED BY THE FILES access_control_engine.py modules.access.control.py webaccessadmin_lib.py
 
 # name of the role giving superadmin rights
 SUPERADMINROLE = 'superadmin'

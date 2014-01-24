@@ -29,5 +29,10 @@ legacy_modules = RegistryProxy('legacy', ImportPathRegistry,
 
 webadmin_proxy = RegistryProxy('legacy.webadmin', \
         ModuleAutoDiscoverySubRegistry, 'web.admin', registry_namespace=legacy_modules)
-webadmin = LazyDict(lambda: dict((module.__name__.split('.')[-1], module)
+
+def _admin_handler_name(name):
+    parts = name.split('.')
+    return '%s/%s' % (parts[2], parts[5])
+
+webadmin = LazyDict(lambda: dict((_admin_handler_name(module.__name__), module)
                                  for module in webadmin_proxy))

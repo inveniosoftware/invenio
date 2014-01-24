@@ -35,7 +35,7 @@ from invenio.ext.logging import register_exception
 from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 
 import invenio.legacy.template
-oaiharvest_templates = invenio.legacy.template.load('oai_harvest')
+oaiharvest_templates = invenio.legacy.template.load('oaiharvest')
 webstyle_templates = invenio.legacy.template.load('webstyle')
 
 tmppath = CFG_TMPDIR + '/oairepositoryadmin.' + str(os.getpid())

@@ -60,13 +60,13 @@ from invenio.legacy.oaiharvest.dblayer import (get_month_logs_size,
 from invenio.legacy.search_engine import get_record
 
 import invenio.legacy.template
-from invenio import oai_harvest_daemon
+from invenio.legacy.oaiharvest import daemon as oai_harvest_daemon
 from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
 from invenio.legacy.bibrecord import create_record
 from invenio.utils.url import create_html_link
 
 webstyle_templates = invenio.legacy.template.load('webstyle')
-oaiharvest_templates = invenio.legacy.template.load('oai_harvest')
+oaiharvest_templates = invenio.legacy.template.load('oaiharvest')
 from invenio.base.i18n import gettext_set_language
 
 tmppath = CFG_TMPDIR + '/oaiharvestadmin.' + str(os.getpid())

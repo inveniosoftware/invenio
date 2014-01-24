@@ -41,7 +41,7 @@ from invenio.config import \
     CFG_SITE_ADMIN_EMAIL, \
     CFG_SITE_SECURE_URL
 import invenio.modules.access.engine as acce
-import invenio.access_control_admin as acca
+import invenio.modules.access.control as acca
 from invenio.ext.email import send_email
 from invenio.legacy.bibrank.adminlib import addadminbox, tupletotable, \
         tupletotable_onlyselected, addcheckboxes, createhiddenform
