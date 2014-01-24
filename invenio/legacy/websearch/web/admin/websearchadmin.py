@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import invenio.websearchadminlib as wsc
+import invenio.legacy.websearch.adminlib as wsc
 from invenio.legacy.bibrank.adminlib import check_user
 from invenio.legacy.webpage import page, adderrorbox, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME
