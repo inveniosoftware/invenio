@@ -32,7 +32,7 @@ def get_default_user_preferences():
         CFG_EXTERNAL_AUTH_DEFAULT
 
     user_preference = {
-        'login_method': ''}
+        'login_method': 'Local'}
 
     if CFG_EXTERNAL_AUTH_DEFAULT in CFG_EXTERNAL_AUTHENTICATION:
         user_preference['login_method'] = CFG_EXTERNAL_AUTH_DEFAULT
