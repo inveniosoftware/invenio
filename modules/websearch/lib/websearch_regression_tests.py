@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -815,7 +815,7 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     def test_search_engine_python_api_for_nonexisting_record(self):
         """websearch - search engine Python API for non-existing record"""
         self.assertEqual([],
-                         perform_request_search(recid=1234567809))
+                         perform_request_search(recid=12345678))
 
     def test_search_engine_python_api_for_nonexisting_collection(self):
         """websearch - search engine Python API for non-existing collection"""
@@ -873,7 +873,7 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     def test_search_engine_web_api_for_nonexisting_record(self):
         """websearch - search engine Web API for non-existing record"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?recid=123456789&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?recid=12345678&of=id',
                                                expected_text="[]"))
 
     def test_search_engine_web_api_for_nonexisting_collection(self):
