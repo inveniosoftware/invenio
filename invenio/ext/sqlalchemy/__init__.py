@@ -26,7 +26,7 @@
 """
 
 from .expressions import AsBINARY
-from .types import JSONEncodedTextDict, MarshalBinary, PickleBinary
+from .types import JSONEncodedTextDict, MarshalBinary, PickleBinary, GUID
 from .utils import get_model_type
 import sqlalchemy
 from flask.ext.sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
@@ -75,6 +75,7 @@ def _include_sqlalchemy(obj, engine=None):
     setattr(obj, 'iBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iLargeBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iMediumBinary', sqlalchemy.types.LargeBinary)
+    setattr(obj, 'UUID', GUID)
 
     if engine == 'mysql':
         from .engines import mysql as dummy_mysql
