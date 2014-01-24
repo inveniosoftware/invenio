@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+-- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -4652,7 +4652,7 @@ CREATE TABLE IF NOT EXISTS collection_bsrMETHOD (
 CREATE TABLE IF NOT EXISTS seqSTORE (
   id int(15) NOT NULL auto_increment,
   seq_name varchar(15),
-  seq_value varchar(60),
+  seq_value varchar(255),
   PRIMARY KEY (id),
   UNIQUE KEY seq_name_value (seq_name, seq_value)
 ) ENGINE=MyISAM;
@@ -4905,5 +4905,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_wapCACHE_obje
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_16_aidPERSONIDDATA_datablob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_04_seqSTORE_larger_value',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_redis_sessions',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_24_seqSTORE_larger_value',NOW());
 
 -- end of file
