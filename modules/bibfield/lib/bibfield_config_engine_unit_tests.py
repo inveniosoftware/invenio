@@ -23,7 +23,8 @@ BibFieldParser Unit tests.
 
 from invenio.testutils import InvenioTestCase
 
-from invenio.bibfield_config_engine import BibFieldParser
+from invenio.bibfield_config_engine import BibFieldParser, \
+        guess_legacy_field_names, get_producer_rules
 
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -35,8 +36,10 @@ class BibFieldParserUnitTests(InvenioTestCase):
     """
     def setUp(self):
         """Loads bibfield configuration test files"""
-        parser = BibFieldParser(main_config_file="test_bibfield.cfg")
-        self.config_rules = parser.config_rules
+        BibFieldParser._field_definitions = {}
+        BibFieldParser._legacy_field_matchings = {}
+        parser = BibFieldParser(main_config_file="test_bibfield.cfg")._create()
+        self.config_rules = BibFieldParser.field_definitions()
 
     def test_bibfield_rules_parser(self):
         """BibField - configuration rules building process"""
@@ -52,24 +55,31 @@ class BibFieldParserUnitTests(InvenioTestCase):
         self.assertTrue(self.config_rules['doi']['persistent_identifier'])
         #Check if derived and calulated are well parserd
         self.assertTrue('dummy' in self.config_rules)
-        self.assertTrue(self.config_rules['dummy']['type'] == 'derived')
-        self.assertTrue(self.config_rules['dummy']['persistent_identifier'])
-        self.assertTrue(self.config_rules['_number_of_copies']['type'] == 'calculated')
-        self.assertTrue(self.config_rules['authors[0]']['type'] == 'real')
-        self.assertTrue(self.config_rules['_random']['rules']['do_not_cache'])
-        self.assertFalse(self.config_rules['_number_of_copies']['rules']['do_not_cache'])
+        self.assertEquals(self.config_rules['dummy']['persistent_identifier'], 2)
+        self.assertEquals(self.config_rules['dummy']['rules'].keys(), ['derived'])
+        self.assertTrue(self.config_rules['_random'])
         #Check inheritance
         self.assertTrue('main_author' in self.config_rules)
         self.assertEqual(self.config_rules['main_author']['rules'],
                          self.config_rules['authors[0]']['rules'])
+        #Check json
+        self.assertTrue('json_ext' in self.config_rules['modification_date'])
+        #Check override
+        value = {'a':'a', 'b':'b', 'k':'k'}
+        self.assertEquals(eval(self.config_rules['title']['rules']['marc'][0]['value']),
+                {'form': 'k', 'subtitle': 'b', 'title': 'a'})
 
-    def test_bibfield_docytpes_parser(self):
-        #TODO: next iteration will come with this
-        pass
+    def test_guess_legacy_field_names(self):
+        """BibField - check legacy field names"""
+        self.assertEquals(guess_legacy_field_names(('100__a', '245'), 'marc'),
+                {'100__a':['authors[0].full_name'], '245':['title']})
+        self.assertEquals(guess_legacy_field_names('foo', 'bar'), {'foo': []})
 
-    def test_writing_bibfield_config_file(self):
-        #TODO: tests
-        pass
+    def test_get_producer_rules(self):
+        """BibField - check producer rules"""
+        self.assertTrue(get_producer_rules('authors[0]', 'json_for_marc')[0] in get_producer_rules('authors', 'json_for_marc'))
+        self.assertTrue(len(get_producer_rules('keywords', 'json_for_marc')) == 1)
+        self.assertRaises(KeyError, lambda: get_producer_rules('foo', 'json_for_marc'))
 
 
 TEST_SUITE = make_test_suite(BibFieldParserUnitTests)

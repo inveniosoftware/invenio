@@ -23,65 +23,82 @@
 
 __revision__ = "$Id$"
 
+import re
 
-from invenio.bibfield_jsonreader import JsonReader
-from invenio.bibfield_utils import CoolDict, CoolList
+from invenio.bibfield_reader import Reader
 
 
-class MarcReader(JsonReader):
-    """
-    Reader class that understands MARC21 as base format
-    """
+class MarcReader(Reader):
+    """Marc reader"""
+
+    __master_format__ = 'marc'
+
+    split_marc = re.compile('<record.*?>.*?</record>', re.DOTALL)
+
+    def __init__(self, blob=None, **kwargs):
+        """
+        :param blob:
+        """
+        super(MarcReader, self).__init__(blob=blob, **kwargs)
+        self._additional_info['master_format'] = 'marc'
 
     @staticmethod
-    def split_blob(blob, schema):
+    def split_blob(blob, schema=None, **kwargs):
         """
         Splits the blob using <record.*?>.*?</record> as pattern.
 
-        Note 1: Taken from invenio.bibrecord:create_records
+        Note 1: Taken from invenio.legacy.bibrecord:create_records
         Note 2: Use the DOTALL flag to include newlines.
         """
-        import re
-        regex = re.compile('<record.*?>.*?</record>', re.DOTALL)
-        return regex.findall(blob)
+        if schema in (None, 'xml'):
+            for match in MarcReader.split_marc.finditer(blob):
+                yield match.group()
+        else:
+            raise StopIteration()
 
-    def _prepare_blob(self):
-        """
-        Transforms the blob into rec_tree structure to use it in the standar
-        translation phase inside C{JsonReader}
-        """
-        self.rec_tree = CoolDict()
-        try:
-            if self.blob_wrapper.schema.lower().startswith('file:'):
-                self.blob_wrapper.blob = open(self.blob_wrapper.blob_file_name, 'r').read()
-            if self.blob_wrapper.schema.lower() in ['recstruct']:
-                self.__create_rectree_from_recstruct()
-            elif self.blob_wrapper.schema.lower() in ['xml', 'file:xml']:
-                #TODO: Implement translation directrly from xml
-                from invenio.bibrecord import create_record
-                self.blob_wrapper.blob = create_record(self.blob_wrapper.blob)[0]
-                self.__create_rectree_from_recstruct()
-        except AttributeError:
-            #Assume marcxml
-            from invenio.bibrecord import create_record
-            self.blob_wrapper.blob = create_record(self.blob_wrapper.blob)[0]
-            self.__create_rectree_from_recstruct()
+    def _get_elements_from_blob(self, regex_key):
+        if regex_key in ('entire_record', '*'):
+            return self.rec_tree
+        elements = []
+        for k in regex_key:
+            regex = re.compile(k)
+            keys = filter(regex.match, self.rec_tree.keys())
+            values = []
+            for key in keys:
+                values.append(self.rec_tree.get(key))
+            elements.extend(values)
+        return elements
 
-    def __create_rectree_from_recstruct(self):
-        """
-        Using rectruct as base format it creates the intermediate structure that
-        _translate will use.
-        """
-        for key, values in self.blob_wrapper.blob.iteritems():
+    def _prepare_blob(self, *args, **kwargs):
+        #FIXME stop using recstruct!
+        from invenio.bibrecord import create_record
+
+        class SaveDict(dict):
+            __getitem__ = dict.get
+
+        def dict_extend_helper(d, key, value):
+            """
+            If the key is present inside the dictionary it creates a list (it not
+            present) and extends it with the new value. Almost as in C{list.extend}
+            """
+            if key in d:
+                current_value = d.get(key)
+                if not isinstance(current_value, list):
+                    current_value = [current_value]
+                current_value.append(value)
+                value = current_value
+            d[key] = value
+
+        self.rec_tree = SaveDict()
+        tmp = create_record(self.blob)[0]
+        for key, values in tmp.iteritems():
             if key < '010' and key.isdigit():
-                #Control field, it assumes controlfields are numeric only
-                self.rec_tree[key] = CoolList([value[3] for value in values])
+                self.rec_tree[key] = [value[3] for value in values]
             else:
                 for value in values:
-                    field = CoolDict()
+                    field = SaveDict()
                     for subfield in value[0]:
-                        field.extend(subfield[0], subfield[1])
-                    self.rec_tree.extend((key + value[1] + value[2]).replace(' ', '_'), field)
+                        dict_extend_helper(field, subfield[0], subfield[1])
+                    dict_extend_helper(self.rec_tree, (key + value[1] + value[2]).replace(' ', '_'), field)
 
-## Compulsory plugin interface
-readers = MarcReader
+reader = MarcReader

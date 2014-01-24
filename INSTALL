@@ -131,6 +131,8 @@ Contents
              <http://numpy.scipy.org/>
           - (recommended) magic, for full-text file handling:
              <http://www.darwinsys.com/file/>
+          - (recommended) cerberus, extensible validation for Python dictionaries.
+             <http://cerberus.readthedocs.org/>
           - (optional) chardet, for character encoding detection:
              <http://chardet.feedparser.org/>
           - (optional) 4suite, slower alternative to PyRXP and

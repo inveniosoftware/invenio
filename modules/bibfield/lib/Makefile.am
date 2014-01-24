@@ -20,14 +20,14 @@ SUBDIRS = functions
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibfield.py \
-             bibfield_regression_tests.py \
+			 bibfield_reader.py \
              bibfield_config_engine.py \
              bibfield_config_engine_unit_tests.py \
              bibfield_jsonreader.py \
              bibfield_marcreader.py \
-             bibfield_marcreader_regression_tests.py \
-             bibfield_utils.py \
-             bibfield_utils_unit_tests.py
+             bibfield_marcreader_unit_tests.py \
+             bibfield_regression_tests.py \
+             bibfield_utils.py
 
 EXTRA_DIST = $(pylib_DATA)
 

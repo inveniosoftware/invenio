@@ -108,3 +108,36 @@ def import_related_module(package, pkg_path, related_name):
         __import__('%s' % (package), globals(), locals(), [related_name]),
         related_name
     )
+
+
+def try_to_eval(string, context={}, **general_context):
+    """
+    This method takes care of evaluating the python expression, and, if an
+    exception happens, it tries to import the needed module.
+
+    @param string: String to evaluate
+    @param context: Context needed, in some cases, to evaluate the string
+
+    @return: The value of the expression inside string
+    """
+    if not string:
+        return None
+
+    res = None
+    imports = []
+    general_context.update(context)
+
+    while (True):
+        try:
+            res = eval(string, globals().update(general_context), locals())  # kwalitee: disable=eval
+        except NameError, err:
+            import_name = str(err).split("'")[1]
+            if not import_name in imports:
+                if import_name in context:
+                    globals()[import_name] = context[import_name]
+                else:
+                    globals()[import_name] = __import__(import_name)
+                imports.append(import_name)
+                continue
+            raise ImportError("Can't import the needed module to evaluate %s" (string, ))
+        return res

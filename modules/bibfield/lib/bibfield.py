@@ -24,27 +24,29 @@ BibField engine
 __revision__ = "$Id$"
 
 import os
-
-try:
-    import cPickle as pickle
-except:
-    import pickle
+import msgpack
 
 from invenio.config import CFG_PYLIBDIR
 from invenio.dbquery import run_sql
 from invenio.pluginutils import PluginContainer
+from invenio.containerutils import SmartDict
 
-from invenio.bibfield_jsonreader import JsonReader
-from invenio.bibfield_utils import BlobWrapper, BibFieldDict
+from invenio.bibfield_reader import Reader
+from invenio.bibfield_utils import SmartJson
+
+class Record(SmartJson):
+    """
+    Default/Base record class
+    """
 
 # Plug-in utils
 
 
 def plugin_builder(plugin_name, plugin_code):
-    if 'readers' in dir(plugin_code):
-        candidate = getattr(plugin_code, 'readers')
+    if 'reader' in dir(plugin_code):
+        candidate = getattr(plugin_code, 'reader')
         try:
-            if issubclass(candidate, JsonReader):
+            if issubclass(candidate, Reader):
                 return candidate
         except:
             pass
@@ -57,6 +59,8 @@ CFG_BIBFIELD_READERS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
 # end Plug-in utils
 
 
+
+
 def create_record(blob, master_format='marc', verbose=0, **additional_info):
     """
     Creates a record object from the blob description using the apropiate reader
@@ -64,9 +68,10 @@ def create_record(blob, master_format='marc', verbose=0, **additional_info):
 
     @return Record object
     """
-    blob_wrapper = BlobWrapper(blob=blob, master_format=master_format, **additional_info)
 
-    return CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)](blob_wrapper, check=True)
+    reader = CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)](blob, **additional_info)
+
+    return Record(reader.translate())
 
 
 def create_records(blob, master_format='marc', verbose=0, **additional_info):
@@ -98,63 +103,36 @@ def get_record(recid, reset_cache=False, fields=()):
         res = run_sql("SELECT value FROM bibfmt WHERE id_bibrec=%s AND format='recjson'",
                       (recid,))
         if res:
-            record = JsonReader(BlobWrapper(pickle.loads(res[0][0])))
+            try:
+                record = Record(msgpack.loads(res[0][0]))
+            except:
+                #Maybe the cached version is broken
+                record = None
 
     #There is no version cached or we want to renew it
     #Then retrieve information and blob
     if not record or reset_cache:
-        blob_wrapper = _build_wrapper(recid)
-        if not blob_wrapper:
+        try:
+            master_format = run_sql("SELECT master_format FROM bibrec WHERE id=%s", (recid,))[0][0]
+        except:
             return None
-        record = CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (blob_wrapper.master_format,)](blob_wrapper)
+        schema = 'xml'
+        master_format = 'marc'
+        try:
+            from invenio.search_engine import print_record
+            blob = print_record(recid, format='xm')
+        except:
+            return None
 
+        reader = CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)](blob, schema=schema)
+        record = Record(reader.translate())
         #Update bibfmt for future uses
         run_sql("REPLACE INTO bibfmt(id_bibrec, format, last_updated, value) VALUES (%s, 'recjson', NOW(), %s)",
-                (recid, pickle.dumps((record.rec_json))))
+                (recid, msgpack.dumps(record.dumps())))
 
     if fields:
-        chunk = BibFieldDict()
+        chunk = SmartDict()
         for key in fields:
             chunk[key] = record.get(key)
         record = chunk
     return record
-
-
-def guess_legacy_field_names(fields, master_format='marc'):
-    """
-    Using the legacy rules written in the config file (@legacy) tries to find
-    the equivalent json field for one or more legacy fields.
-
-    >>> guess_legacy_fields(('100__a', '245'), 'marc')
-    {'100__a':['authors[0].full_name'], '245':['title']}
-    """
-    from invenio.bibfield_config import legacy_rules
-
-    res = {}
-    if isinstance(fields, basestring):
-        fields = (fields, )
-    for field in fields:
-        try:
-            res[field] = legacy_rules[master_format].get(field, [])
-        except:
-            res[field] = []
-    return res
-
-
-def _build_wrapper(recid):
-    #TODO: update to look inside mongoDB for the parameters and the blob
-    # Now is just working for marc and recstruct
-    try:
-        master_format = run_sql("SELECT master_format FROM bibrec WHERE id=%s", (recid,))[0][0]
-    except:
-        return None
-
-    schema = 'recstruct'
-
-    if master_format == 'marc':
-        from invenio.search_engine import get_record as se_get_record
-        blob = se_get_record(recid)
-    else:
-        return None
-
-    return BlobWrapper(blob, master_format=master_format, schema=schema)

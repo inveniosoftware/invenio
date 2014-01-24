@@ -23,7 +23,7 @@ def get_persistent_identifiers_keys(keys):
     Acording with @persistent_identifier it recollects all the fields that
     could be considered as persistent identifiers
     """
-    from invenio.bibfield_config import config_rules
+    from invenio.bibfield_config_engine import BibFieldParser
 
     def smart_set_element(the_list, index, value):
         try:
@@ -36,13 +36,13 @@ def get_persistent_identifiers_keys(keys):
     tmp = []
     for key in keys:
         try:
-            if not config_rules[key]['persistent_identifier'] is None:
-                smart_set_element(tmp, config_rules[key]['persistent_identifier'], key)
+            if not BibFieldParser.field_definitions()[key]['persistent_identifier'] is None:
+                smart_set_element(tmp, BibFieldParser.field_definitions()[key]['persistent_identifier'], key)
         except TypeError:
             # Work arround for [0] and [n]
-            for kkey in config_rules[key]:
-                if config_rules[kkey]['persistent_identifier']:
-                    smart_set_element(tmp, config_rules[key]['persistent_identifier'], key)
+            for kkey in BibFieldParser.field_definitions()[key]:
+                if BibFieldParser.field_definitions()[kkey]['persistent_identifier']:
+                    smart_set_element(tmp, BibFieldParser.field_definitions()[key]['persistent_identifier'], key)
         except:
             continue
 

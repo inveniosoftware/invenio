@@ -611,6 +611,7 @@ def cli_cmd_reset_recjson_cache(conf):
         print ">>> Generating recjson cache..."
         tot = len(recids)
         count = 0
+        cli_cmd_load_bibfield_config(conf)
         for recid in recids:
             run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='recjson'", (recid,))
             #TODO: Update the cache or wait for the first access
@@ -831,7 +832,7 @@ def cli_cmd_load_webstat_conf(conf):
 def cli_cmd_load_bibfield_config(conf):
     print ">>> Going to load BibField config..."
     from invenio.bibfield_config_engine import BibFieldParser
-    BibFieldParser().write_to_file()
+    BibFieldParser.reparse()
     print ">>> BibField config load successfully."
 
 def cli_cmd_drop_tables(conf):

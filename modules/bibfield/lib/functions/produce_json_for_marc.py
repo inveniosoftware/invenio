@@ -17,7 +17,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
 def produce_json_for_marc(self, fields=None):
     """
     Export the record in marc format.
@@ -25,8 +24,7 @@ def produce_json_for_marc(self, fields=None):
     @param tags: list of tags to include in the output, if None or
                 empty list all available tags will be included.
     """
-    from invenio.bibfield_utils import get_producer_rules
-
+    from invenio.bibfield_config_engine import get_producer_rules
     if not fields:
         fields = self.keys()
 
@@ -46,7 +44,8 @@ def produce_json_for_marc(self, fields=None):
                 for f in field:
                     for r in rule[1]:
                         tmp_dict = {}
-                        for key, subfield in r.iteritems():
+                        #FIXME: check field meta_metadata
+                        for key, subfield in r[1].iteritems():
                             if not subfield:
                                 tmp_dict[key] = f
                             else:
@@ -55,7 +54,7 @@ def produce_json_for_marc(self, fields=None):
                                 except:
                                     try:
                                         tmp_dict[key] = self._try_to_eval(subfield, value=f)
-                                    except Exception,e:
+                                    except Exception as e:
                                         self['__error_messages.cerror[n]'] = 'Producer CError - Unable to produce %s - %s' % (field, str(e))
                         if tmp_dict:
                             out.append(tmp_dict)

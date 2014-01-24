@@ -19,6 +19,8 @@
 This module contains functions for basic containers (dict, list, str)
 """
 
+import re
+
 def get_substructure(data, path):
     """
     Tries to retrieve a sub-structure within some data. If the path does not
@@ -96,3 +98,179 @@ except:
         def __repr__(self):
             return 'defaultdict(%s, %s)' % (self.default_factory,
                                              dict.__repr__(self))
+
+
+class SmartDict(object):
+    """
+    This dictionary allows to do some 'smart queries' to its content::
+
+        >>> d = SmartDict()
+
+        >>> d['foo'] = {'a': 'world', 'b':'hello'}
+        >>> d['a'] = [ {'b':1}, {'b':2}, {'b':3} ]
+
+        >>> d['a']
+        [ {'b':1}, {'b':2}, {'b':3} ]
+        >>> d['a[0]']
+        {'b':1}
+        >>> d['a.b']
+        [1,2,3]
+        >>> d['a[1:]']
+        [{'b':2}, {'b':3}]
+    """
+
+    split_key_pattern = re.compile('\.|\[')
+    main_key_pattern = re.compile('\..*|\[.*')
+
+    def __init__(self, d=None):
+        self._dict = d if not d is None else dict()
+
+    def __getitem__(self, key):
+        """
+        As in C{dict.__getitem__} but using 'smart queries'
+        """
+        def getitem(k, v):
+            if isinstance(v, dict):
+                return v[k]
+            elif ']' in k:
+                k = k[:-1].replace('n', '-1')
+                #Work around for list indexes and slices
+                try:
+                    return v[int(k)]
+                except ValueError:
+                    return v[slice(*map(lambda x: int(x.strip()) if x.strip() else None, k.split(':')))]
+            else:
+                tmp = []
+                for inner_v in v:
+                    tmp.append(getitem(k, inner_v))
+                return tmp
+
+
+        #Check if we are using python regular keys
+        try:
+            return self._dict[key]
+        except KeyError:
+            pass
+
+        keys = SmartDict.split_key_pattern.split(key)
+        value = self._dict
+        for k in keys:
+            value = getitem(k, value)
+        return value
+
+    def __setitem__(self, key, value, extend=False):
+        #TODO: Check repeatable fields
+        if '.' not in key and ']' not in key and not extend:
+            self._dict[key] = value
+        else:
+            keys = SmartDict.split_key_pattern.split(key)
+            self.__setitem(self._dict, keys[0], keys[1:], value, extend)
+
+    def __delitem__(self, key):
+        """Note: It only works with first keys"""
+        del self._dict[key]
+
+    def __contains__(self, key):
+
+        if '.' not in key and '[' not in key:
+            return key in self._dict
+        try:
+            self[key]
+        except:
+            return False
+        return True
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__)
+                and self._dict == other._dict)
+
+    def __iter__(self):
+        return iter(self._dict)
+
+    def __len__(self):
+        return len(self._dict)
+
+    def keys(self):
+        return self._dict.keys()
+
+    def items(self):
+        return self._dict.items()
+
+    def iteritems(self):
+        return self._dict.iteritems()
+
+    def iterkeys(self):
+        return self._dict.iterkeys()
+
+    def itervalues(self):
+        return self._dict.itervalues()
+
+    def has_key(self, key):
+        return key in self
+
+    def __repr__(self):
+        return repr(self._dict)
+
+    def __setitem(self, chunk, key, keys, value, extend=False):
+        """ Helper function to fill up the dictionary"""
+
+        def setitem(chunk):
+            if keys:
+                return self.__setitem(chunk, keys[0], keys[1:], value, extend)
+            else:
+                return value
+
+        if ']' in key:  # list
+            key = int(key[:-1].replace('n', '-1'))
+            if extend:
+                if chunk is None:
+                    chunk = [None, ]
+                else:
+                    if not isinstance(chunk, list):
+                        chunk = [chunk, ]
+                    if key != -1:
+                        chunk.insert(key, None)
+                    else:
+                        chunk.append(None)
+            else:
+                if chunk is None:
+                    chunk = [None, ]
+            chunk[key] = setitem(chunk[key])
+        else: # dict
+            if extend:
+                if chunk is None:
+                    chunk = {}
+                    chunk[key] = None
+                    chunk[key] = setitem(chunk[key])
+                elif not key in chunk:
+                    chunk[key] = None
+                    chunk[key] = setitem(chunk[key])
+                else:
+                    if keys:
+                        chunk[key] = setitem(chunk[key])
+                    else:
+                        if not isinstance(chunk[key], list):
+                            chunk[key] = [chunk[key],]
+                        chunk[key].append(None)
+                        chunk[key][-1] = setitem(chunk[key][-1])
+            else:
+                if chunk is None:
+                    chunk = {}
+                if key not in chunk:
+                    chunk[key] = None
+                chunk[key] = setitem(chunk[key])
+
+        return chunk
+
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def set(self, key, value, extend=False):
+        self.__setitem__(key, value, extend)
+
+    def update(self, E, **F):
+        self._dict.update(E, **F)
