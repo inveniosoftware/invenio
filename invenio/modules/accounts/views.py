@@ -51,7 +51,7 @@ blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
                       static_folder='static')
 
 
-@blueprint.route('/login/', methods=['GET', 'POST'])
+@blueprint.route('/login', methods=['GET', 'POST'])
 @wash_arguments({'nickname': (unicode, None),
                  'password': (unicode, None),
                  'login_method': (wash_login_method, 'Local'),
@@ -62,7 +62,6 @@ blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
 @ssl_required
 def login(nickname=None, password=None, login_method=None, action='',
           remember_me=False, referer=None):
-
     if cfg.get('CFG_ACCESS_CONTROL_LEVEL_SITE') > 0:
         return abort(401)  # page is not authorized
 
@@ -74,12 +73,12 @@ def login(nickname=None, password=None, login_method=None, action='',
             action, arguments = mail_cookie_check_authorize_action(action)
         except InvenioWebAccessMailCookieError:
             pass
-    form = LoginForm(CombinedMultiDict([ImmutableMultiDict({'referer': referer}
-                                        if referer else {}),
-                                        request.values]),
-                     csrf_enabled=False)
+    form = LoginForm(CombinedMultiDict(
+        [ImmutableMultiDict({'referer': referer, 'login_method': 'Local'}
+                            if referer else {'login_method': 'Local'}),
+                            request.values]), csrf_enabled=False)
     try:
-        if login_method == 'Local' and form.validate_on_submit() and \
+        if login_method == 'Local' and \
                 authenticate(nickname, password, login_method=login_method):
 
             flash(_("You are logged in as %(nick)s.", nick=nickname), "info")

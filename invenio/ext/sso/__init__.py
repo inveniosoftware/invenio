@@ -109,7 +109,8 @@ def setup_app(app):
         or `User` was not found in database.
         """
         from invenio.modules.accounts.models import User
-        from invenio.ext.login import authenticate, login_user, login_redirect
+        from invenio.ext.login import (authenticate, login_user,
+                                       login_redirect, current_user)
         from invenio.ext.sqlalchemy import db
 
         user_info['groups'] = fetch_groups(user_info['groups'])
@@ -130,8 +131,8 @@ def setup_app(app):
             flash('Problem with login (%s)' % (str(user_info)), 'error')
             return redirect('/')
 
-        #FIXME add groups information
-        #current_user['settings'].update(user_info)
+        groups = current_user.get('groups', [])
+        current_user.info['groups'] = groups + user_info['groups']
 
         return login_redirect()
 
