@@ -67,8 +67,10 @@ CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE = (
 
 #: Default attribute map
 SSO_ATTRIBUTE_MAP = {
+    'ADFS_AUTHLEVEL': (False, 'authlevel'),
     'ADFS_GROUP': (True, 'groups'),
     'ADFS_LOGIN': (True, 'nickname'),
+    'ADFS_ROLE': (False, 'role'),
     'ADFS_EMAIL': (True, 'email'),
     'ADFS_IDENTITYCLASS': (False, 'external'),
     'HTTP_SHIB_AUTHENTICATION_METHOD': (False, 'authmethod'),
@@ -113,11 +115,12 @@ def setup_app(app):
                                        login_redirect, current_user)
         from invenio.ext.sqlalchemy import db
 
-        user_info['groups'] = fetch_groups(user_info['groups'])
+        user_info['groups'] = fetch_groups(user_info['groups']).values()
         user_info['external'] = fetch_external(user_info.get('external'))
-
+        print user_info
         try:
-            if not authenticate(user_info['email'], login_method='SSO'):
+            auth = authenticate(user_info['email'], login_method='SSO')
+            if auth is None:
                 user = User()
                 user.nickname = user_info['nickname']
                 user.email = user_info['email']
@@ -127,12 +130,12 @@ def setup_app(app):
                 db.session.commit()
                 login_user(User.query.filter_by(
                     email=user_info['email']).one().id)
+            elif auth:
+                groups = current_user.get('group', [])
+                current_user.info['groups'] = groups + user_info['groups']
         except:
             flash('Problem with login (%s)' % (str(user_info)), 'error')
             return redirect('/')
-
-        groups = current_user.get('groups', [])
-        current_user.info['groups'] = groups + user_info['groups']
 
         return login_redirect()
 
