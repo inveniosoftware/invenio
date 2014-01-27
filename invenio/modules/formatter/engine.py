@@ -1743,7 +1743,6 @@ def resolve_output_format_filename(code, verbose=0):
         code = re.sub(r"\W", "", code)
         code += "."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
     code = code.upper()
-    print registry.output_formats_lookup.keys()
     for filename in registry.output_formats_lookup.keys():
         if filename.upper() == code:
             return filename
