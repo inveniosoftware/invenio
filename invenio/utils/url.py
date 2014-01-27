@@ -47,6 +47,7 @@ except ImportError:
 
 from invenio.base.globals import cfg
 from invenio.utils.hash import sha1, md5, HASHLIB_IMPORTED
+from invenio.utils.text import wash_for_utf8
 from invenio.utils import apache
 
 
@@ -289,7 +290,7 @@ def create_html_link(urlbase, urlargd, link_label, linkattrd=None,
             attributes = [str(key) + '="' + str(linkattrd[key]) + '"'
                                 for key in linkattrd.keys()]
         output += attributes_separator.join(attributes)
-    output += '>' + str(link_label) + '</a>'
+    output += '>' + wash_for_utf8(link_label) + '</a>'
     return output
 
 
