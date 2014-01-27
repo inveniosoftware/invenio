@@ -105,6 +105,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         """
         Saves modified data pernamently for logged users.
         """
+        print 'save', self.info
         if not self.is_guest and self.modified:
             timeout = current_app.config.get(
                 'CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT', 0)*3600

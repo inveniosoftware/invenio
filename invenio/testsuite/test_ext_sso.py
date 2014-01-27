@@ -60,16 +60,37 @@ class TestSSO(InvenioTestCase):
             with request_environ_set(self.app, data):
                 with self.app.test_client() as c:
                     c.get(self.app.config['SSO_LOGIN_URL'])
+                    print current_user
                     current_user['email'] == expected_data['email']
+                    current_user['groups'] == expected_data['groups']
 
         data = {
-            'ADFS_GROUP': 'CERN Registered',
+            'ADFS_GROUP': 'CERN Registered;project-invenio-devel;cern-personnel',
             'ADFS_LOGIN': 'admin',
             'ADFS_EMAIL': self.app.config['CFG_SITE_ADMIN_EMAIL'],
         }
-        expected_data = {'email': self.app.config['CFG_SITE_ADMIN_EMAIL']}
+        expected_data = {
+            'email': self.app.config['CFG_SITE_ADMIN_EMAIL'],
+            'groups': [
+                'project-invenio-devel (Group)', 'CERN Registered (Group)',
+                'cern-personnel (Group)'
+            ],
+        }
+
+        #FIXME mock user table
+        from invenio.ext.sqlalchemy import db
+        from invenio.modules.accounts.models import User
+        admin = User.query.get(1)
+        old_settings = admin.settings
+        admin.settings = {'login_method': 'SSO'}
+        db.session.merge(admin)
+        db.session.commit()
 
         run(data, expected_data)
+
+        admin.settings = old_settings
+        db.session.merge(admin)
+        db.session.commit()
 
 TEST_SUITE = make_test_suite(TestSSO)
 
