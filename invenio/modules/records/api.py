@@ -61,11 +61,13 @@ class Record(SmartJson):
                 return None
             additional_info = record_model.additional_info \
                     if record_model.additional_info else {'master_format': 'marc'}
-            record = cls.create(blob, record_model.master_format, **additional_info)
+            record = cls.create(blob, **additional_info)
             record._save()
             record_model.additional_info = \
                     record.get('__meta_metadata__.__additional_info__', {'master_format': 'marc'})
-            record_model.commit()
+            from invenio.ext.sqlalchemy import db
+            db.session.merge(record_model)
+            db.session.commit()
             return record
 
     @staticmethod
