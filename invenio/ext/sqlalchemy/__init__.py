@@ -170,7 +170,8 @@ class SQLAlchemy(FlaskSQLAlchemy):
         super(self.__class__, self).apply_driver_hacks(app, info, options)
         if info.drivername == 'mysql':
             options.setdefault('execution_options', {'autocommit': True,
-                                                     'use_unicode': False  # , 'charset': 'utf8'
+                                                     'use_unicode': False,
+                                                     'charset': 'utf8mb4',
                                                      })
             event.listen(Pool, 'checkin', autocommit_on_checkin)
 
