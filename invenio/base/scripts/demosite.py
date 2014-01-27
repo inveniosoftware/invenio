@@ -39,8 +39,9 @@ option_extrainfo = manager.option('-e', '--extra-info', dest='extra_info',
                                   action='append',
                                   help='extraneous parameters')
 option_packages = manager.option('-p', '--packages', dest='packages',
-                                  action='append',
-                                  help='package import name (repeteable)')
+                                 action='append',
+                                 default=['invenio_demosite'],
+                                 help='package import name (repeteable)')
 
 
 @option_packages
