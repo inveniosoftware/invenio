@@ -231,6 +231,7 @@ class FieldParser(object):
     """Dictionary containing matching between the legacy master format and the current json"""
 
     def __init__(self, namespace):
+        #Autodiscover cfg files
         self.files = list(fields_definitions(namespace))
         self.__namespace = namespace
         self.__inherit_rules = []
@@ -240,12 +241,19 @@ class FieldParser(object):
 
     @classmethod
     def field_definitions(cls, namespace):
+        """
+        From a given namespace gets all the field definitions from it.
+        If the namespace does not exist, it tries to create it first
+        """
         if namespace not in cls._field_definitions:
             cls.reparse(namespace)
         return cls._field_definitions.get(namespace)
 
     @classmethod
     def field_definition_model_based(cls, field_name, model_name, namespace):
+        """
+        Based on a model name (and namespace) it gets the real field definition.
+        """
         if model_name in ModelParser.model_definitions(namespace):
             field_name = ModelParser.model_definitions(namespace)[model_name] \
                     ['fields'].get(field_name, field_name)
@@ -253,12 +261,22 @@ class FieldParser(object):
 
     @classmethod
     def legacy_field_matchings(cls, namespace):
+        """
+        Gets all the legacy mappings for a given namespace.
+        If the namespace does not exist, it tries to create it first
+
+        :see: guess_legacy_field_names()
+        """
         if namespace not in cls._legacy_field_matchings:
             cls.reparse(namespace)
-        return cls._legacy_field_matchings
+        return cls._legacy_field_matchings.get(namespace)
 
     @classmethod
     def reparse(cls, namespace):
+        """
+        Invalidates the cached version of all the fields inside the given
+        namespace and parse them again.
+        """
         cls._field_definitions[namespace] = {}
         cls._legacy_field_matchings = {}
         cls(namespace)._create()
@@ -421,7 +439,7 @@ class FieldParser(object):
                                                'extend'       : extend,
                                               }
 
-        self.__resolve_parser_extensions(rule)
+        self.__resolve_parser_extensions(rule, override, extend)
 
 
     def _create_legacy_rules(self, legacy_rules, json_id, source_format=None):
@@ -437,17 +455,18 @@ class FieldParser(object):
         """
         if not legacy_rules:
             return
+        if self.__namespace not in self.__class__._legacy_field_matchings:
+            self.__class__._legacy_field_matchings[self.__namespace] = {}
         for legacy_rule in legacy_rules:
             legacy_rule = eval(legacy_rule[0])
 
             if source_format in ('derived', 'calculated'):
                 inner_source_format = legacy_rule[0]
-                legacy_rule = legacy_rule[1]
+                legacy_rule = legacy_rule[1:]
             else:
                 inner_source_format = source_format
-
-            if not inner_source_format in self.__class__._legacy_field_matchings:
-                self.__class__._legacy_field_matchings[inner_source_format] = {}
+            if not inner_source_format in self.__class__._legacy_field_matchings[self.__namespace]:
+                self.__class__._legacy_field_matchings[self.__namespace][inner_source_format] = {}
 
             for field_legacy_rule in legacy_rule:
                 #Allow string and tuple in the config file
@@ -456,11 +475,11 @@ class FieldParser(object):
                 if field_legacy_rule[-1]:
                     json_field = '.'.join((json_field, field_legacy_rule[-1]))
                 for legacy_field in legacy_fields:
-                    if not legacy_field in self.__class__._legacy_field_matchings[inner_source_format]:
-                        self.__class__._legacy_field_matchings[inner_source_format][legacy_field] = []
-                    self.__class__._legacy_field_matchings[inner_source_format][legacy_field].append(json_field)
+                    if not legacy_field in self.__class__._legacy_field_matchings[self.__namespace][inner_source_format]:
+                        self.__class__._legacy_field_matchings[self.__namespace][inner_source_format][legacy_field] = []
+                    self.__class__._legacy_field_matchings[self.__namespace][inner_source_format][legacy_field].append(json_field)
 
-    def __resolve_parser_extensions(self, rule):
+    def __resolve_parser_extensions(self, rule, override=False, extend=False):
         """
         For each of the extension available it tries to apply it in the incoming
         rule
@@ -470,7 +489,7 @@ class FieldParser(object):
         for parser_extension in parsers:
             if getattr(rule, parser_extension.parser.__name__, None):
                 self.__class__._field_definitions[self.__namespace][json_id][parser_extension.parser.__name__] = \
-                        parser_extension.parser.create_element(rule, self.__namespace)
+                        parser_extension.parser.create_element(rule, override, extend, self.__namespace)
 
     #FIXME: it might be nice to have the decorators also extendibles
     def __create_decorators_content(self, rule):
@@ -549,7 +568,7 @@ class ModelParser(object):
     """Record model parser"""
 
     _model_definitions = {}
-    """ """
+    """Contains all the model definitions order by namespace"""
 
     def __init__(self, namespace):
         #Autodiscover .cfg files
@@ -558,12 +577,20 @@ class ModelParser(object):
 
     @classmethod
     def model_definitions(cls, namespace):
+        """
+        From a given namespace gets all the model definitions from it.
+        If the namespace does not exist, it tries to create it first
+        """
         if namespace not in cls._model_definitions:
             cls.reparse(namespace)
         return cls._model_definitions.get(namespace)
 
     @classmethod
     def reparse(cls, namespace):
+        """
+        Invalidates the cached version of all the models inside the given
+        namespace and parse it again.
+        """
         cls._model_definitions[namespace] = {}
         cls(namespace)._create()
 
@@ -653,7 +680,7 @@ class ModelParser(object):
         for parser_extension in parsers:
             if getattr(model_def, parser_extension.parser.__name__, None):
                 self.__class__._model_definitions[self.__namespace][model_name][parser_extension.parser.__name__] = \
-                        parser_extension.parser.create_element(model_def, self.__namespace)
+                        parser_extension.parser.create_element(model_def, False, False, self.__namespace)
 
 def guess_legacy_field_names(fields, master_format, namespace):
     """
@@ -674,7 +701,29 @@ def guess_legacy_field_names(fields, master_format, namespace):
     return res
 
 def get_producer_rules(field, code, namespace):
-    """docstring for get_producer_rules"""
+    """
+    From the field definitions gets all the producer rules related with the
+    field and the code (using also the namespace).
+
+    >>> get_producer_rules('author', 'json_for_marc', 'recordext')
+    [('authors[0]',
+      [((),
+        {'100__a': 'full_name',
+         '100__e': 'relator_name',
+         '100__h': 'CCID',
+         '100__i': 'INSPIRE_number',
+         '100__u': 'affiliation'})]),
+     ('authors[1:]',
+      [((),
+        {'700__a': 'full_name',
+         '700__e': 'relator_name',
+         '700__h': 'CCID',
+         '700__i': 'INSPIRE_number',
+         '700__u': 'affiliation'})])]
+    >>> get_producer_rules('title', 'json_for_marc', 'recordext')
+    [('title',
+      [((), {'245__a': 'title', '245__b': 'subtitle', '245__k': 'form'})])]
+    """
 
     rule = FieldParser.field_definitions(namespace)[field]
     if isinstance(rule, list):
@@ -704,7 +753,7 @@ class BaseExtensionParser(object):
         raise NotImplemented
 
     @classmethod
-    def create_element(cls, rule, namespace):
+    def create_element(cls, rule, override, extend, namespace):
         """
         Once the extension is parsed defines the actions that have to be taken
         to store inside the field_definitions the information needed or useful.

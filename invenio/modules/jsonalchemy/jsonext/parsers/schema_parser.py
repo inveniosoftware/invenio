@@ -37,7 +37,7 @@ class SchemaParser(BaseExtensionParser):
 
 
     @classmethod
-    def create_element(cls, rule, namespace):
+    def create_element(cls, rule, override, extend, namespace):
         return eval(rule.schema)
 
 SchemaParser.__name__ = 'schema'

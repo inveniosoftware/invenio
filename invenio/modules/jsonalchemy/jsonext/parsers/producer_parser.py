@@ -43,11 +43,12 @@ class ProducerParser(BaseExtensionParser):
                 .setResultsName('producer')
 
     @classmethod
-    def create_element(cls, rule, namespace):
+    def create_element(cls, rule, override, extend, namespace):
         json_id = rule.json_id[0]
         assert json_id in FieldParser.field_definitions(namespace)
 
-        producers = {}
+        producers = {} if not extend else \
+            FieldParser.field_definitions(namespace)[json_id].get('producer', {})
         for producer in rule.producer:
             if producer.producer_code[0] not in producers:
                 producers[producer.producer_code[0]] = []
