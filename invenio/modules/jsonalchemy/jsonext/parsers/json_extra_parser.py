@@ -56,8 +56,9 @@ class JsonExtraParser(BaseExtensionParser):
                 .setParseAction(lambda toks: toks[0][0])
 
     @classmethod
-    def create_element(cls, rule, namespace):
+    def create_element(cls, rule, override, extend, namespace):
         json_id = rule.json_id[0]
+        assert json_id in FieldParser.field_definitions(namespace)
 
         return {'loads': try_to_eval(rule.json_ext.loads.strip(), functions(namespace)),
                 'dumps': try_to_eval(rule.json_ext.dumps.strip(), functions(namespace))}

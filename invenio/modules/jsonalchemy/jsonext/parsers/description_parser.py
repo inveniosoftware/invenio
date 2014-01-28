@@ -38,7 +38,7 @@ class DescriptionParser(BaseExtensionParser):
 
 
     @classmethod
-    def create_element(cls, rule, namespace):
+    def create_element(cls, rule, override, extend, namespace):
         return rule.description
 
 DescriptionParser.__name__ = 'description'

@@ -42,7 +42,7 @@ class CheckerParser(BaseExtensionParser):
                 .setParseAction(lambda toks: toks[0])
 
     @classmethod
-    def create_element(cls, rule, namespace):
+    def create_element(cls, rule, override, extend, namespace):
         return None
 
 CheckerParser.__name__ = 'checker'

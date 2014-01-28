@@ -128,6 +128,7 @@ authors[n], contributor:
         self.assertTrue('dummy' in Field_parser.field_definitions('testsuite'))
         self.assertEquals(Field_parser.field_definitions('testsuite')['dummy']['persistent_identifier'], 2)
         self.assertEquals(Field_parser.field_definitions('testsuite')['dummy']['rules'].keys(), ['derived'])
+        self.assertTrue(len(Field_parser.field_definitions('testsuite')['dummy']['producer']), 2)
         self.assertTrue(Field_parser.field_definitions('testsuite')['_random'])
         #Check inheritance
         self.assertTrue('main_author' in Field_parser.field_definitions('testsuite'))
