@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,8 +24,8 @@
 
     <div class="well">
         <span class="pull-right">
-            <button class="btn hide" data-toggle="tooltip" title="" ><i class="glyphicon glyphicon-pencil"></i> Edit</button>
-            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn btn-primary" data-toggle="tooltip" title=""><i class="glyphicon glyphicon-eye-open"></i> Live version</a>
+            <a href="{{url_for('deposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn hide" data-toggle="tooltip" title="" ><i class="glyphicon glyphicon-pencil"></i> {{ _('Edit') }}</a>
+            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn" data-toggle="tooltip" title=""><i class="glyphicon glyphicon-eye-open"></i> Live version</a>
         </span>
         <span class="clearfix"></span>
     </div>

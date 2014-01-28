@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ from ..processor_utils import datacite_lookup
 __all__ = ['DOIField']
 
 
-def missing_doi_warning(dummy_form, field, dummy_submit=False):
+def missing_doi_warning(dummy_form, field, submit=False, fields=None):
     """
     Field processor, checking for existence of a DOI, and otherwise
     asking people to provide it.

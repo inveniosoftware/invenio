@@ -198,14 +198,14 @@ class WebDepositField(Field):
             stop = False
             for p in (self.processors or []):
                 try:
-                    p(form, self, submit)
+                    p(form, self, submit=submit, fields=formfields)
                 except StopIteration:
                     stop = True
                     break
 
             if not stop:
                 for p in (extra_processors or []):
-                    p(form, self, submit)
+                    p(form, self, submit=submit, fields=formfields)
 
     def perform_autocomplete(self, form, name, term, limit=50):
         """

@@ -207,7 +207,7 @@ $(document).ready(function() {
     var save_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}';
     var save_all_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, all='1') }}';
     var complete_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}';
-    var autocomplete_url = '{{ url_for(".autocomplete", form_type=form.type, field_name="__FIELDNAME__") }}';
+    var autocomplete_url = '{{ url_for(".autocomplete", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, field_name="__FIELDNAME__") }}';
 
     webdeposit_init_plupload(
         '{{config.CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',

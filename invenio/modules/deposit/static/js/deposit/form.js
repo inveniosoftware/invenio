@@ -74,7 +74,9 @@ function serialize_form(selector){
         $('#'+instance).val(editor.getData());
     }
     fields = $(selector).serializeArray();
-    fields.push({name: 'files', value: serialize_files('#filelist')});
+    if(uploader !== null){
+        fields.push({name: 'files', value: serialize_files('#filelist')});
+    }
     return serialize_object(fields);
 }
 
@@ -274,6 +276,11 @@ function webdeposit_handle_field_values(name, value) {
             if(CKEDITOR.instances[name].getData(value) != value) {
                 CKEDITOR.instances[name].setData(value);
             }
+        } else if (field_lists !== undefined && name in field_lists &&
+                   value instanceof Array) {
+            for(var i = 0; i < value.length; i++){
+                field_lists[name].update_element(value[i], i);
+            }
         } else {
             if($('[name=' + name + ']').val() != value) {
                 $('[name=' + name + ']').val(value);
@@ -412,6 +419,11 @@ function webdeposit_check_status(url){
  * Initialize PLUpload
  */
 function webdeposit_init_plupload(max_size, selector, save_url, url, delete_url, get_file_url, db_files, dropbox_url, uuid, newdep_url, continue_url) {
+    if($(selector).length === 0){
+        uploader = null;
+        return;
+    }
+
     var had_error = false;
     uploader = new plupload.Uploader({
         // General settings
@@ -633,23 +645,46 @@ function webdeposit_init_plupload(max_size, selector, save_url, url, delete_url,
     });
 
     uploader.bind('FilesAdded', function(up, files) {
+        var remove_files = [];
+        $.each(up.files, function(i, file) {
+
+        });
+
         $(selector).show();
         $('#uploadfiles').removeClass("disabled");
         $('#file-table').show('slow');
         up.total.reset();
+        var filename_already_exists = [];
         $.each(files, function(i, file) {
-            $('#filelist').append(tpl_file_entry.render({
-                    id: file.id,
-                    filename: file.name,
-                    filesize: getBytesWithUnit(file.size),
-                    removeable: true,
-                    progress: 0
-            }));
-            $('#filelist #' + file.id).show('fast');
-            $('#' + file.id + ' .rmlink').on("click", function(event){
-                uploader.removeFile(file);
-            });
+            // Check for existing file
+            var removed = false;
+            for(var j = 0; j<up.files.length; j++){
+                existing_file = up.files[j];
+                if(existing_file.id != file.id && file.name == existing_file.name){
+                    filename_already_exists.push(file.name);
+                    up.removeFile(file);
+                    var removed = true;
+                }
+            }
+            if(!removed){
+                $('#filelist').append(tpl_file_entry.render({
+                        id: file.id,
+                        filename: file.name,
+                        filesize: getBytesWithUnit(file.size),
+                        removeable: true,
+                        progress: 0
+                }));
+                $('#filelist #' + file.id).show('fast');
+                $('#' + file.id + ' .rmlink').on("click", function(event){
+                    uploader.removeFile(file);
+                });
+            }
         });
+        if(filename_already_exists.length > 0) {
+            $('#upload-errors').hide();
+            $('#upload-errors').append('<div class="alert alert-warning"><a class="close" data-dismiss="alert" href="#">&times;</a><strong>Warning:</strong>' + filename_already_exists.join(", ") + " already exist.</div>");
+            $('#upload-errors').show('fast');
+        }
     });
 
     uploader.bind('FileUploaded', function(up, file, responseObj) {
@@ -839,9 +874,7 @@ function webdeposit_submit(url, form_selector, dialog){
     };
 
     $(selector).each(function(){
-        field_lists[$(this).attr('id')] = {
-            append_element: $(this).fieldlist(opts)
-        };
+        field_lists[$(this).attr('id')] = $(this).fieldlist(opts);
     });
 }
 
@@ -1164,11 +1197,7 @@ $.fn.fieldlist = function(opts) {
                 $.each(newdata, function(field, value){
                     var input = root.find(selector_prefix+field);
                     if(input.length !== 0) {
-                        // Keep old value
-                        if(input.is(":focus")){
-                            console.log(selector_prefix+field + " has focus");
-                        }
-                        input.val(input.val()+value);
+                        input.val(value);
                     }
                 });
             } else {
@@ -1233,6 +1262,20 @@ $.fn.fieldlist = function(opts) {
         // Callback
         if (options.updated) {
             options.updated(options, ui.item);
+        }
+    };
+
+    var update_element = function (data, idx){
+        //
+        // Update action
+        //
+
+        // Update elements indexes of all other elements
+        var all_elements = $('#' + options.prefix + " ." + options.element_css_class);
+        var num_elements = all_elements.length;
+        if (idx < num_elements){
+            element = $(all_elements[idx]);
+            update_element_values(element, data, idx, '#'+options.prefix+options.sep+idx+options.sep);
         }
     };
 
@@ -1347,7 +1390,11 @@ $.fn.fieldlist = function(opts) {
 
     create(this);
 
-    return append_element;
+    return {
+        append_element: append_element,
+        update_element: update_element,
+        options: options,
+    };
 };
 
 /** Field list plugin defaults */

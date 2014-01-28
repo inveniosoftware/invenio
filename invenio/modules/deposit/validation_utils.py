@@ -111,6 +111,10 @@ class NotRequiredIf(RequiredIf):
             pass
 
 
+class Unchangeable(object):
+    def __call__(self, form, field):
+        field.data = field.object_data
+
 
 def number_validate(form, field, submit=False,
                     error_message='It must be a number!'):
@@ -185,6 +189,38 @@ class InvalidDOIPrefix(object):
                 raise ValidationError(self.message_testing)
 
 
+class MintedDOIValidator(object):
+    """
+    Validates if DOI
+    """
+    def __init__(self, prefix='10.5072', message=None):
+        """
+        @param doi_prefix: DOI prefix, e.g. 10.5072
+        """
+        self.doi_prefix = prefix
+        # Remove trailing slash
+        if self.doi_prefix[-1] == '/':
+            self.doi_prefix = self.doi_prefix[:-1]
+
+        if not message:
+            self.message = 'You cannot change an already registered DOI.'
+
+        ctx = dict(
+            prefix=prefix,
+            CFG_SITE_NAME=CFG_SITE_NAME
+        )
+        self.message = self.message % ctx
+
+    def __call__(self, form, field):
+        if field.object_data and \
+           field.object_data.startswith("%s/" % self.doi_prefix):
+            # We have a DOI and it's our own DOI.
+            if field.data != field.object_data:
+                raise ValidationError(self.message)
+            else:
+                raise StopValidation()
+
+
 class PreReservedDOI(object):
     """
     Validate that user did not edit pre-reserved DOI.
@@ -226,7 +262,9 @@ class PidValidator(object):
 #
 required_if = RequiredIf
 not_required_if = NotRequiredIf
+unchangeable = Unchangeable
 list_length = ListLength
 invalid_doi_prefix_validator = InvalidDOIPrefix
+minted_doi_validator = MintedDOIValidator
 pre_reserved_doi_validator = PreReservedDOI
 pid_validator = PidValidator

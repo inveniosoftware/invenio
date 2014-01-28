@@ -33,6 +33,7 @@ from flask import current_app, Blueprint, \
     abort, \
     make_response
 from flask.ext.login import current_user, login_required
+from werkzeug.datastructures import MultiDict
 from werkzeug.utils import secure_filename
 
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
@@ -43,7 +44,7 @@ from ..signals import template_context_created
 from ..models import Deposition, DepositionType, \
     DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
     DraftDoesNotExists, FormDoesNotExists, DepositionNotDeletable, \
-    DepositionDraftCacheManager
+    DepositionDraftCacheManager, FilenameAlreadyExists, ForbiddenAction
 from ..storage import ChunkedDepositionStorage, \
     DepositionStorage, ExternalFile, UploadError
 
@@ -63,22 +64,27 @@ def deposition_error_handler(endpoint='.index'):
         def inner(*args, **kwargs):
             try:
                 return f(*args, **kwargs)
-            except InvalidDepositionType, dummy_e:
+            except InvalidDepositionType:
                 if request.is_xhr:
                     abort(400)
                 flash(_("Invalid deposition type."), 'error')
                 return redirect(url_for(endpoint))
-            except (DepositionDoesNotExists,), dummy_e:
+            except (DepositionDoesNotExists,):
                 flash(_("Deposition does not exists."), 'error')
                 return redirect(url_for(endpoint))
-            except (DepositionNotDeletable,), dummy_e:
+            except (DepositionNotDeletable,):
                 flash(_("Deposition cannot be deleted."), 'error')
                 return redirect(url_for(endpoint))
-            except (DraftDoesNotExists,), dummy_e:
+            except (DraftDoesNotExists,):
                 abort(400)
-            except (FormDoesNotExists,), dummy_e:
+            except (FormDoesNotExists,):
                 abort(400)
-            except (UploadError,), dummy_e:
+            except (UploadError,):
+                abort(400)
+            except (ForbiddenAction,):
+                flash(_("Not allowed."), 'error')
+                return redirect(url_for(endpoint))
+            except (UploadError,):
                 abort(400)
         return inner
     return decorator
@@ -118,6 +124,7 @@ def index():
 
 @blueprint.route('/<depositions:deposition_type>')
 @login_required
+@register_breadcrumb(blueprint, '.type', _('Type')) # deptype.name_plural
 def deposition_type_index(deposition_type):
     if len(DepositionType.keys()) <= 1 and DepositionType.get_default():
         abort(404)
@@ -125,10 +132,6 @@ def deposition_type_index(deposition_type):
     deptype = DepositionType.get(deposition_type)
     if not deptype.is_enabled():
         abort(404)
-
-    #current_app.config['breadcrumbs_map'][request.endpoint] = \
-    #    [(_('Home'), '')] + blueprint.breadcrumbs + \
-    #     [(deptype.name_plural, None)]
 
     draft_cache = DepositionDraftCacheManager.from_request()
     draft_cache.save()
@@ -229,8 +232,8 @@ def save(deposition_type=None, uuid=None, draft_id=None):
     is_submit = request.args.get('submit') == '1'
     is_complete_form = request.args.get('all') == '1'
 
-    data = request.json
-    if 'files' in data:
+    data = request.json or MultiDict({})
+    if data and 'files' in data:
         deposition.sort_files(data['files'])
 
     # get_draft() and process() will raise an exception if draft doesn't exist
@@ -297,22 +300,59 @@ def run(deposition_type=None, uuid=None):
     #)
     #current_app.config['breadcrumbs_map'][request.endpoint] = breadcrumb
 
-    # If normal form handling should be supported, it can be handled here with
-    # something like::
-    #
-    # if request.method == 'POST':
-    #     # draft_id should be sent from the form.
-    #     draft = deposition.get_draft(draft_id)
-    #     dummy_form, validated, dummy_results = draft.process(request.form)
-    #     if validated:
-    #         draft.complete()
-    #     deposition.save()
-
     return deposition.run_workflow()
 
 
-#@blueprint.route('/%s/<uuid>/<draft_id>/status/' % deptypes,
-#                 methods=['GET', 'POST'])
+@blueprint.route('/<depositions:deposition_type>/<uuid>/edit/',
+                 methods=['GET', 'POST'])
+@blueprint.route('/<uuid>/edit/', methods=['GET', 'POST'])
+@login_required
+@deposition_error_handler()
+def edit(deposition_type=None, uuid=None):
+    """
+    Reinitialize a completed workflow (i.e. prepare it for editing)
+    """
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
+    deposition.reinitialize_workflow()
+    deposition.save()
+
+    return redirect(url_for(
+        ".run",
+        deposition_type=(
+            None if deposition.type.is_default()
+            else deposition.type.get_identifier()
+        ),
+        uuid=deposition.id
+    ))
+
+
+@blueprint.route('/<depositions:deposition_type>/<uuid>/discard/',
+                 methods=['GET', 'POST'])
+@blueprint.route('/<uuid>/discard/', methods=['GET', 'POST'])
+@login_required
+@deposition_error_handler()
+def discard(deposition_type=None, uuid=None):
+    """
+    Stop an inprogress workflow (i.e. discard editing changes)
+
+    Only possible, if workflow already has a sip.
+    """
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
+    deposition.stop_workflow()
+    deposition.save()
+
+    return redirect(url_for(
+        ".run",
+        deposition_type=(
+            None if deposition.type.is_default()
+            else deposition.type.get_identifier()
+        ),
+        uuid=deposition.id
+    ))
+
+
+@blueprint.route('/<depositions:deposition_type>/<uuid>/<draft_id>/status/',
+                 methods=['GET', 'POST'])
 @blueprint.route('/<uuid>/<draft_id>/status/', methods=['GET', 'POST'])
 @login_required
 @deposition_error_handler()
@@ -343,6 +383,10 @@ def upload_url(deposition_type=None, uuid=None):
     )
 
     df = DepositionFile(backend=DepositionStorage(deposition.id))
+
+    for f in deposition.files:
+        if f.name == url_file.filename:
+            raise FilenameAlreadyExists(f.name)
 
     if df.save(url_file, filename=secure_filename(url_file.filename)):
         deposition.add_file(df)
@@ -382,8 +426,13 @@ def upload_file(deposition_type=None, uuid=None):
     df = DepositionFile(backend=backend)
 
     if df.save(uploaded_file, filename=filename, **kwargs):
-        deposition.add_file(df)
-        deposition.save()
+        try:
+            deposition.add_file(df)
+            deposition.save()
+        except FilenameAlreadyExists as e:
+            df.delete()
+            raise e
+
         return jsonify(
             dict(filename=df.name, id=df.uuid, checksum=df.checksum)
         )
@@ -409,8 +458,8 @@ def delete_file(deposition_type=None, uuid=None):
         deposition.save()
 
         return ('', 200)
-    except Exception, e:
-        print "DEBUG", e
+    except Exception as e:
+        current_app.logger.error('Deposition: delete file error', e)
         return ('', 400)
 
 
@@ -436,21 +485,26 @@ def get_file(deposition_type=None, uuid=None):
         return redirect(df.get_url())
 
 
-@blueprint.route('/autocomplete/<form_type>/<field_name>',
-                 methods=['GET', 'POST'])
+@blueprint.route(
+    '/<depositions:deposition_type>/<uuid>/<draft_id>/<field_name>/',
+    methods=['GET', 'POST'])
+@blueprint.route('/<uuid>/<draft_id>/<field_name>/', methods=['GET', 'POST'])
 @login_required
-def autocomplete(form_type, field_name):
+def autocomplete(deposition_type=None, uuid=None, draft_id=None,
+                 field_name=None):
     """
     Auto-complete a form field
     """
     term = request.args.get('term')  # value
     limit = request.args.get('limit', 50, type=int)
 
-    try:
-        form = getattr(forms, form_type)()
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
+    formclass = deposition.type.draft_definitions.get(draft_id)
+    if formclass:
+        form = formclass()
         result = form.autocomplete(field_name, term, limit=limit)
         result = result if result is not None else []
-    except KeyError:
+    else:
         result = []
 
     # jsonify doesn't return lists as top-level items.

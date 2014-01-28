@@ -29,12 +29,15 @@ class WebDepositFormTest(InvenioTestCase):
         from invenio.modules.deposit import fields
         from werkzeug import MultiDict
 
-        def reset_processor(form, field, submit):
+        def reset_processor(form, field, submit=False, fields=None):
             field.data = 'RESET'
 
         def dummy_autocomplete(form, field, term, limit=50):
             if term == 'test':
-                return map(lambda x: field.name + '-' + str(x), range(0, 100))[:limit]
+                return map(
+                    lambda x: field.name + '-' + str(x),
+                    range(0, 100)
+                )[:limit]
             return []
 
         class IdentifierTestForm(WebDepositForm):
@@ -44,7 +47,8 @@ class WebDepositFormTest(InvenioTestCase):
             )
             identifier = fields.TextField()
 
-            def post_process_identifier(self, form, field, submit):
+            def post_process_identifier(self, form, field, submit=False,
+                                        fields=None):
                 form.scheme.data = field.data
 
         class TestForm(WebDepositForm):
@@ -160,6 +164,14 @@ class WebDepositFormTest(InvenioTestCase):
         # For field enclosures values may also be sent as a json structure
         form = self.form_class(formdata=self.multidict(self.object_data))
         self.assertEqual(form.data, self.object_data)
+        self.assertTrue(form.validate())
+
+    def test_loading_invalid_jsondata(self):
+        data = self.object_data
+        data['unknownkey'] = "Test"
+        # For field enclosures values may also be sent as a json structure
+        form = self.form_class(formdata=self.multidict(data))
+        self.assertFalse(form.validate())
 
     def test_loading_formdata(self):
         form = self.form_class(formdata=self.form_data)
@@ -392,9 +404,21 @@ class WebDepositFormTest(InvenioTestCase):
 
         form = TestForm(formdata=self.multidict(object_data))
         self.assertEqual(form.data, object_data)
+        self.assertTrue(form.validate())
 
         form = TestForm(formdata=self.multidict(formdata))
         self.assertEqual(form.data, object_data)
+        self.assertTrue(form.validate())
+
+        data = object_data.copy()
+        data['fieldlist'] = {'somefield': 'should have been a list'}
+        form = TestForm(formdata=self.multidict(data))
+        self.assertFalse(form.validate())
+
+        data = object_data.copy()
+        data['formfield'] = "should have been a dict"
+        form = TestForm(formdata=self.multidict(data))
+        self.assertFalse(form.validate())
 
 
 TEST_SUITE = make_test_suite(WebDepositFormTest)
