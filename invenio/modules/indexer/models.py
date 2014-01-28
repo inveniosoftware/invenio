@@ -783,8 +783,7 @@ class IdxPHRASE01F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE01R(db.Model):
@@ -809,8 +808,7 @@ class IdxPHRASE02F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE02R(db.Model):
@@ -835,8 +833,7 @@ class IdxPHRASE03F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE03R(db.Model):
@@ -861,8 +858,7 @@ class IdxPHRASE04F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE04R(db.Model):
@@ -887,8 +883,7 @@ class IdxPHRASE05F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE05R(db.Model):
@@ -913,8 +908,7 @@ class IdxPHRASE06F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE06R(db.Model):
@@ -939,8 +933,7 @@ class IdxPHRASE07F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE07R(db.Model):
@@ -965,8 +958,7 @@ class IdxPHRASE08F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE08R(db.Model):
@@ -991,8 +983,7 @@ class IdxPHRASE09F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE09R(db.Model):
@@ -1017,8 +1008,7 @@ class IdxPHRASE10F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE10R(db.Model):
@@ -1043,8 +1033,7 @@ class IdxPHRASE11F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE11R(db.Model):
@@ -1069,8 +1058,7 @@ class IdxPHRASE12F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE12R(db.Model):
@@ -1095,8 +1083,7 @@ class IdxPHRASE13F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE13R(db.Model):
@@ -1121,8 +1108,7 @@ class IdxPHRASE14F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE14R(db.Model):
@@ -1147,8 +1133,7 @@ class IdxPHRASE15F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE15R(db.Model):
@@ -1173,8 +1158,7 @@ class IdxPHRASE16F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE16R(db.Model):
@@ -1199,8 +1183,7 @@ class IdxPHRASE17F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE17R(db.Model):
@@ -1225,8 +1208,7 @@ class IdxPHRASE18F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE18R(db.Model):
@@ -1251,8 +1233,7 @@ class IdxPHRASE19F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE19R(db.Model):
@@ -1277,8 +1258,7 @@ class IdxPHRASE20F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE20R(db.Model):
@@ -1303,8 +1283,7 @@ class IdxPHRASE21F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE21R(db.Model):
@@ -1329,8 +1308,7 @@ class IdxPHRASE22F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE22R(db.Model):
@@ -1355,8 +1333,7 @@ class IdxPHRASE23F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE23R(db.Model):
@@ -1381,8 +1358,7 @@ class IdxPHRASE24F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE24R(db.Model):
@@ -1407,8 +1383,7 @@ class IdxPHRASE25F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE25R(db.Model):
@@ -1433,8 +1408,7 @@ class IdxPHRASE26F(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True,
                 autoincrement=True)
-    term = db.Column(db.String(100), nullable=True,
-                unique=True)
+    term = db.Column(db.Text, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE26R(db.Model):
