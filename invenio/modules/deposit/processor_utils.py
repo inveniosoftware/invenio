@@ -34,8 +34,18 @@ def replace_field_data(field_name, getter=None):
     Returns a processor, which will replace the given field names value with
     the value from the field where the processor is installed.
     """
-    def _inner(form, field, submit=False):
-        getattr(form, field_name).data = getter(field) if getter else field.data
+    def _inner(form, field, submit=False, fields=None):
+        getattr(form, field_name).data = getter(field) if getter else \
+            field.data
+    return _inner
+
+
+def set_flag(flag_name):
+    """
+    Returns a processor, which will set a given flag on a field.
+    """
+    def _inner(form, field, submit=False, fields=None):
+        setattr(field.flags, flag_name, True)
     return _inner
 
 
@@ -49,11 +59,13 @@ class PidSchemeDetection(object):
     def __init__(self, set_field=None):
         self.set_field = set_field
 
-    def __call__(self, form, field, submit=False):
+    def __call__(self, form, field, submit=False, fields=None):
         if field.data:
             schemes = pidutils.detect_identifier_schemes(field.data)
             if schemes:
                 getattr(form, self.set_field).data = schemes[0]
+            else:
+                getattr(form, self.set_field).data = ''
 
 
 class PidNormalize(object):
@@ -63,9 +75,10 @@ class PidNormalize(object):
     def __init__(self, scheme_field=None):
         self.scheme_field = scheme_field
 
-    def __call__(self, form, field, submit=False):
+    def __call__(self, form, field, submit=False, fields=None):
         scheme = getattr(form, self.scheme_field).data
-        field.data = pidutils.normalize_pid(field.data, scheme=scheme)
+        if scheme:
+            field.data = pidutils.normalize_pid(field.data, scheme=scheme)
 
 
 #
@@ -97,13 +110,17 @@ class DataCiteLookup(object):
         self.mapping_func = mapping_func or datacite_dict_mapper
         self.prefix = exclude_prefix
 
-    def __call__(self, form, field, submit=False):
-        if not field.errors and field.data and not field.data.startswith(self.prefix + '/'):
+    def __call__(self, form, field, submit=False, fields=None):
+        if not field.errors and field.data \
+           and not field.data.startswith(self.prefix + '/'):
             try:
                 datacite = DataciteMetadata(field.data)
                 if datacite.error:
                     if self.display_info:
-                        field.add_message("DOI metadata could not be retrieved.", state='info')
+                        field.add_message(
+                            "DOI metadata could not be retrieved.",
+                            state='info'
+                        )
                     return
                 if self.mapping_func:
                     self.mapping_func(datacite, form, self.mapping)

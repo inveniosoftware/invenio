@@ -30,7 +30,8 @@ Default group metadata.
 
 CFG_FIELD_FLAGS = [
     'hidden',
-    'disabled'
+    'disabled',
+    'touched',
 ]
 """
 List of WTForm field flags to be saved in draft.
@@ -106,8 +107,11 @@ class WebDepositForm(Form):
                     if field_name in ['-', ]:
                         fields.append(field_name)
                     else:
-                        fields.append(self[field_name])
-                        fields_included.add(field_name)
+                        try:
+                            fields.append(self[field_name])
+                            fields_included.add(field_name)
+                        except KeyError:
+                            pass
 
                 if len(group) == 3:
                     group_obj['meta'].update(group[2])

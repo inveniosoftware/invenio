@@ -22,15 +22,20 @@ work with the data attributes.
 """
 
 from uuid import uuid4
+import copy
 import json
 import os
 from datetime import datetime
+from dateutil.tz import tzutc
 
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
 from werkzeug.utils import secure_filename
-from flask import redirect, render_template, flash, url_for, request, session
+from flask import redirect, render_template, flash, url_for, request, \
+    session
 from flask.ext.login import current_user
+from flask.ext.restful import fields, marshal
+from invenio.ext.restful import UTCISODateTime
 
 from invenio.ext.sqlalchemy import db
 from invenio.modules.workflows.config import CFG_OBJECT_VERSION, CFG_WORKFLOW_STATUS
@@ -41,7 +46,7 @@ from invenio.modules.workflows.api import continue_oid
 from . import forms
 from .form import CFG_FIELD_FLAGS, DataExporter
 from .signals import file_uploaded
-from .storage import Storage
+from .storage import Storage, DepositionStorage
 
 
 #
@@ -72,10 +77,32 @@ class FormDoesNotExists(DepositionError):
     pass
 
 
+class FileDoesNotExists(DepositionError):
+    """ Raised when a draft does not exists """
+    pass
+
+
 class DepositionNotDeletable(DepositionError):
     """ Raised when a deposition cannot be deleted """
     pass
 
+
+class FilenameAlreadyExists(DepositionError):
+    """ Raised when an identical filename is already present in a deposition"""
+    pass
+
+
+class ForbiddenAction(DepositionError):
+    """
+    Raised when an action on a deposition, draft or file is not
+    authorized
+    """
+    pass
+
+
+class InvalidApiAction(DepositionError):
+    """ Raised when an invalid API action is requested """
+    pass
 
 
 #
@@ -116,11 +143,12 @@ class DepositionType(object):
     """ Plural version of display name for this deposition type """
 
     enabled = False
-    """ Determines if type is enabled """
+    """ Determines if type is enabled - TODO: REMOVE"""
 
     default = False
     """
     Determines if type is the default - warnings are issed if conflicts exsists
+    TODO: remove
     """
 
     deletable = False
@@ -128,8 +156,61 @@ class DepositionType(object):
     Determine if a deposition is deletable after submission.
     """
 
+    editable = False
+    """
+    Determine if a deposition is editable after submission.
+    """
+
+    stopable = False
+    """
+    Determine if a deposition workflow can be stopped (i.e. discard changes).
+    """
+
     group = None
     """ Name of group to include this type in. """
+
+    api = False
+    """
+    Determines if API is enabled for this type (requires workflow to be
+    compatible with the API).
+    """
+
+    draft_definitions = {'_default': None}
+    """
+    Dictionary of all drafts for this deposition type
+    """
+
+    marshal_file_fields = dict(
+        checksum=fields.String,
+        filename=fields.String(attribute='name'),
+        id=fields.String(attribute='uuid'),
+        filesize=fields.String(attribute='size'),
+    )
+    """ REST API structure of a file """
+
+    marshal_draft_fields = dict(
+        metadata=fields.Raw(attribute='values'),
+        completed=fields.Boolean,
+        id=fields.String,
+    )
+    """ REST API structure of a draft """
+
+    marshal_deposition_fields = dict(
+        id=fields.Integer,
+        title=fields.String,
+        created=UTCISODateTime,
+        modified=UTCISODateTime,
+        owner=fields.Integer(attribute='user_id'),
+        state=fields.String,
+        submitted=fields.Boolean,
+        files=fields.Nested(marshal_file_fields),
+        drafts=fields.Nested(marshal_draft_fields, attribute='drafts_list'),
+    )
+    """ REST API structure of a deposition """
+
+    @classmethod
+    def default_draft_id(cls, deposition):
+        return '_default'
 
     @classmethod
     def render_error(cls, dummy_deposition):
@@ -170,7 +251,8 @@ class DepositionType(object):
     @classmethod
     def render_completed(cls, dummy_deposition):
         """
-        Render page when deposition was successfully completed
+        Render page when deposition was successfully completed (i.e workflow
+        just finished successfully).
 
         Method can be overwritten by subclasses to provide custom
         user interface.
@@ -178,6 +260,156 @@ class DepositionType(object):
         flash('%(name)s was successfully finished.' %
               {'name': cls.name}, 'success')
         return redirect(url_for('.index'))
+
+    @classmethod
+    def render_final(cls, deposition):
+        """
+        Render page when deposition was *already* successfully completed (i.e
+        a finished workflow is being executed a second time).
+
+        This allows you render e.g. a preview of the record. The distinction
+        between render_completed and render_final is primarily useful for the
+        REST API (see api_final and api_completed)
+
+        Method can be overwritten by subclasses to provide custom
+        user interface.
+        """
+        return cls.render_completed(deposition)
+
+    @classmethod
+    def api_completed(cls, deposition):
+        """
+        Workflow just finished processing so return an 202 Accepted, since
+        usually further background processing may happen.
+        """
+        return deposition.marshal(), 202
+
+    @classmethod
+    def api_final(cls, deposition):
+        """
+        Workflow already finished, and the user tries to re-execute the
+        workflow, so send a 400 Bad Request back.
+        """
+        return dict(
+            message="Deposition workflow already completed",
+            status=400,
+        ), 400
+
+    @classmethod
+    def api_step(cls, deposition):
+        """
+        Workflow was halted during processing. The workflow task that halted
+        processing is expected to provide a response to send back to the
+        client.
+
+        The default response code is 500 Internal Server Error. A workflow task
+        is expected to use Deposition.set_render_context() with a dictionary
+        which is returned to the client. Set the key 'status', to change the
+        status code, e.g.::
+
+            d.set_render_context(dict(status=400, message="Bad request"))
+
+        If no response is provided by the workflow task, it is regarded as
+        an internal server error.
+        """
+        ctx = deposition.get_render_context()
+        if ctx:
+            return ctx.get('response', {}), ctx.get('status', 500)
+        return cls.api_error(deposition)
+
+    @classmethod
+    def api_error(cls, deposition):
+        return dict(message='Internal Server Error', status=500), 500
+
+    @classmethod
+    def api_action(cls, deposition, action_id):
+        if action_id == 'run':
+            return deposition.run_workflow(headless=True)
+        elif action_id == 'reinitialize':
+            deposition.reinitialize_workflow()
+            return deposition.run_workflow(headless=True)
+        elif action_id == 'stop':
+            deposition.stop_workflow()
+            return deposition.run_workflow(headless=True)
+        raise InvalidApiAction(action_id)
+
+    @classmethod
+    def api_metadata_schema(cls, draft_id):
+        """
+        Get the input validation schema for this draft_id
+
+        Allows you to override API defaults.
+        """
+        from wtforms.fields.core import FieldList, FormField
+
+        if draft_id in cls.draft_definitions:
+            schema = dict()
+            formclass = cls.draft_definitions[draft_id]
+            for fname, fclass in formclass()._fields.items():
+
+                if isinstance(fclass, FieldList):
+                    schema[fname] = dict(type='list')
+                elif isinstance(fclass, FormField):
+                    schema[fname] = dict(type='dict')
+                else:
+                    schema[fname] = dict(type='any')
+            return dict(type='dict', schema=schema)
+        return None
+
+    @classmethod
+    def marshal_deposition(cls, obj):
+        """
+        Generate a JSON representation for REST API of a Deposition
+        """
+        return marshal(obj, cls.marshal_deposition_fields)
+
+    @classmethod
+    def marshal_draft(cls, obj):
+        """
+        Generate a JSON representation for REST API of a DepositionDraft
+        """
+        return marshal(obj, cls.marshal_draft_fields)
+
+    @classmethod
+    def marshal_file(cls, obj):
+        """
+        Generate a JSON representation for REST API of a DepositionFile
+        """
+        return marshal(obj, cls.marshal_file_fields)
+
+    @classmethod
+    def authorize(cls, deposition, action):
+        if action == 'create':
+            return True  # Any authenticated user
+        elif action == 'delete':
+            if deposition.has_sip():
+                return deposition.type.deletable
+            return True
+        elif action == 'reinitialize':
+            return deposition.type.editable
+        elif action == 'stop':
+            return deposition.type.stopable
+        elif action in ['add_file', 'remove_file', 'sort_files']:
+            # Don't allow to add/remove/sort files after first submission
+            return not deposition.has_sip()
+        elif action in ['add_draft', ]:
+            # Allow adding drafts when inprogress (independent of SIP exists
+            # or not).
+            return deposition.state == 'inprogress'
+        else:
+            return not deposition.has_sip()
+
+    @classmethod
+    def authorize_draft(cls, deposition, draft, action):
+        if action == 'update':
+            # If deposition allows adding  a draft, then allow editing the
+            # draft.
+            return cls.authorize(deposition, 'add_draft')
+        return cls.authorize(deposition, 'add_draft')
+
+    @classmethod
+    def authorize_file(cls, deposition, deposition_file, action):
+        return cls.authorize(deposition, 'add_file')
 
     @classmethod
     def get_identifier(cls):
@@ -204,12 +436,47 @@ class DepositionType(object):
         Run workflow for the given BibWorkflowObject.
 
         Usually not invoked directly, but instead indirectly through
-        Deposition.run().
+        Deposition.run_workflow().
         """
         return continue_oid(
             deposition.id,
             start_point="restart_task",
         )
+
+    @classmethod
+    def reinitialize_workflow(cls, deposition):
+        # Only reinitialize if really needed (i.e. you can only
+        # reinitialize a fully completed workflow).
+        wo = deposition.workflow_object
+        if wo.version == CFG_OBJECT_VERSION.FINAL and \
+           wo.workflow.status == CFG_WORKFLOW_STATUS.COMPLETED:
+
+            wo.version = CFG_OBJECT_VERSION.RUNNING
+            wo.workflow.status = CFG_WORKFLOW_STATUS.RUNNING
+
+            # Clear deposition drafts
+            deposition.drafts = {}
+
+    @classmethod
+    def stop_workflow(cls, deposition):
+        # Only stop workflow if really needed
+        wo = deposition.workflow_object
+        if wo.version != CFG_OBJECT_VERSION.FINAL and \
+           wo.workflow.status != CFG_WORKFLOW_STATUS.COMPLETED:
+
+            # Only workflows which has been fully completed once before
+            # can be stopped
+            if deposition.has_sip():
+                wo.version = CFG_OBJECT_VERSION.FINAL
+                wo.workflow.status = CFG_WORKFLOW_STATUS.COMPLETED
+
+                # Clear all drafts
+                deposition.drafts = {}
+
+                # Set title - FIXME: find better way to set title
+                sip = deposition.get_latest_sip(sealed=True)
+                title = sip.metadata.get('title', 'Untitled')
+                deposition.title = title
 
     @classmethod
     def all(cls):
@@ -239,6 +506,10 @@ class DepositionType(object):
         """ Get a list of deposition type names """
         from .loader import deposition_default
         return deposition_default
+
+    def __unicode__(self):
+        """ Return a name for this class """
+        return self.get_identifier()
 
 
 class DepositionFile(FactoryMixin):
@@ -290,7 +561,7 @@ class DepositionFile(FactoryMixin):
         self.name = ''
 
     def __getstate__(self):
-        # TODO: Add checksum and content_type attributes
+        # TODO: Add content_type attributes
         return dict(
             id=self.uuid,
             path=self.path,
@@ -404,15 +675,12 @@ class DepositionDraftCacheManager(object):
         """
         return bool(self.data)
 
-    def fill_draft(self, deposition, draft_id, form_class=None, clear=True):
+    def fill_draft(self, deposition, draft_id, clear=True):
         """
         Fill a draft with cached draft values
         """
-        draft = deposition.get_or_create_draft(
-            draft_id, form_class=form_class
-        )
-
-        draft.process(self.data, complete_form=True)
+        draft = deposition.get_or_create_draft(draft_id)
+        draft.process(self.data)
 
         if clear:
             self.data = {}
@@ -438,7 +706,6 @@ class DepositionDraft(FactoryMixin):
     def __getstate__(self):
         return dict(
             completed=self.completed,
-            type=self.form_class.__name__ if self.form_class else None,
             values=self.values,
             flags=self.flags,
             validate=self.validate,
@@ -446,7 +713,11 @@ class DepositionDraft(FactoryMixin):
 
     def __setstate__(self, state):
         self.completed = state['completed']
-        self.form_class = getattr(forms, state['type']) if state['type'] else None
+        self.form_class = None
+        if self._deposition_ref:
+            self.form_class = self._deposition_ref.type.draft_definitions.get(
+                self.id
+            )
         self.values = state['values']
         self.flags = state['flags']
         self.validate = state.get('validate', True)
@@ -456,6 +727,13 @@ class DepositionDraft(FactoryMixin):
 
     def has_form(self):
         return self.form_class is not None
+
+    def authorize(self, action):
+        if not self._deposition_ref:
+            return True  # Not connected to deposition so authorize anything.
+        return self._deposition_ref.type.authorize_draft(
+            self._deposition_ref, self, action
+        )
 
     def complete(self):
         """
@@ -467,16 +745,19 @@ class DepositionDraft(FactoryMixin):
         """
         Update draft values and flags with data from form.
         """
-        json_data = dict((key, value) for key, value in form.json_data.items()
-                         if value is not None)
+        data = dict((key, value) for key, value in form.data.items()
+                    if value is not None)
 
-        self.values = json_data
+        self.values = data
         self.flags = form.get_flags()
 
     def process(self, data, complete_form=False):
         """
         Process, validate and store incoming form data and return response.
         """
+        if not self.authorize('update'):
+            raise ForbiddenAction('update', self)
+
         if not self.has_form():
             raise FormDoesNotExists(self.id)
 
@@ -575,9 +856,11 @@ class DepositionDraft(FactoryMixin):
         # are only submitting a single field in JSON via AJAX requests. We
         # therefore reset non-submitted fields to the draft_data value with
         # form.reset_field_data().
-        draft_data = self.values if load_draft else {}
-        if formdata:
-            formdata = MultiDict(formdata)
+        from invenio.webinterface_handler_flask_utils import unicodifier
+
+        # WTForms deal with unicode - we deal with UTF8 so convert all
+        draft_data = unicodifier(self.values) if load_draft else {}
+        formdata = MultiDict(formdata or {})
 
         form = self.form_class(
             formdata=formdata, **draft_data
@@ -628,7 +911,7 @@ class Deposition(object):
     """
     Wraps a BibWorkflowObject
 
-    Basically an interface to work BibWorkflowObject data attribute in an
+    Basically an interface to work with BibWorkflowObject data attribute in an
     easy manner.
     """
     def __init__(self, workflow_object, type=None, user_id=None):
@@ -658,6 +941,9 @@ class Deposition(object):
             self.__setstate__(workflow_object.get_data())
             self.engine = None
 
+    #
+    # Properties proxies to BibWorkflowObject
+    #
     @property
     def id(self):
         return self.workflow_object.id
@@ -674,7 +960,38 @@ class Deposition(object):
     def modified(self):
         return self.workflow_object.modified
 
+    @property
+    def drafts_list(self):
+        # Needed for easy marshaling by API
+        return self.drafts.values()
+
+    #
+    # Proxy methods
+    #
+    def authorize(self, action):
+        """
+        Determine if certain action is authorized
+
+        Delegated to deposition type to allow overwriting default behavior.
+        """
+        return self.type.authorize(self, action)
+
+    #
+    #  Serialization related methods
+    #
+    def marshal(self):
+        """
+        API representation of an object.
+
+        Delegated to the DepositionType, to allow overwriting default
+        behaviour.
+        """
+        return self.type.marshal_deposition(self)
+
     def __getstate__(self):
+        """
+        Serialize deposition state for storing in the BibWorkflowObject
+        """
         # The bibworkflow object id and owner is implicit, as the Deposition
         # object only wraps the data attribute of a BibWorkflowObject.
 
@@ -695,10 +1012,17 @@ class Deposition(object):
         )
 
     def __setstate__(self, state):
+        """
+        Deserialize deposition from state stored in BibWorkflowObject
+        """
         self.type = DepositionType.get(state['type'])
         self.title = state['title']
         self.files = [
-            DepositionFile.factory(f_state, uuid=f_state['id'])
+            DepositionFile.factory(
+                f_state,
+                uuid=f_state['id'],
+                backend=DepositionStorage(self.id),
+            )
             for f_state in state['files']
         ]
         self.drafts = dict(
@@ -711,6 +1035,9 @@ class Deposition(object):
             for s_state in state.get('sips', [])
         ]
 
+    #
+    # Persistence related methods
+    #
     def update(self):
         """
         Update workflow object with latest data.
@@ -750,7 +1077,7 @@ class Deposition(object):
         """
         Delete the current deposition
         """
-        if not self.type.deletable and self.is_finished():
+        if not self.authorize('delete'):
             raise DepositionNotDeletable(self)
 
         for f in self.files:
@@ -767,47 +1094,92 @@ class Deposition(object):
             db.session.remove(self.workflow_object)
         db.session.commit()
 
-    def run_workflow(self):
+    #
+    # Workflow execution
+    #
+    def run_workflow(self, headless=False):
         """
         Execute the underlying workflow
 
         If you made modifications to the deposition you must save if before
         running the workflow, using the save() method.
         """
-        if self.workflow_object.version == CFG_OBJECT_VERSION.FINAL:
-            return self.type.render_completed(self)
+        current_status = self.workflow_object.workflow.status
+        if current_status == CFG_WORKFLOW_STATUS.COMPLETED:
+            return self.type.api_final(self) if headless \
+                else self.type.render_final(self)
 
         self.update()
         status = self.type.run_workflow(self).status
         self.reload()
 
         if status == CFG_WORKFLOW_STATUS.ERROR:
-            return self.type.render_error(self)
+            return self.type.api_error(self) if headless else \
+                self.type.render_error(self)
         elif status != CFG_WORKFLOW_STATUS.COMPLETED:
-            return self.type.render_step(self)
-        elif status in [CFG_WORKFLOW_STATUS.FINISHED,
-                        CFG_WORKFLOW_STATUS.COMPLETED]:
-            return self.type.render_completed(self)
+            return self.type.api_step(self) if headless else \
+                self.type.render_step(self)
+        elif status == CFG_WORKFLOW_STATUS.COMPLETED:
+            return self.type.api_completed(self) if headless else \
+                self.type.render_completed(self)
 
-    def is_finished(self):
+    def reinitialize_workflow(self):
         """
-        Check if deposition finished
+        Reinitialize a workflow object (i.e. prepare it for editing)
         """
-        return self.workflow_object.version == CFG_OBJECT_VERSION.FINAL
+        if self.state != 'done':
+            raise DepositionError("Action only allowed for depositions in "
+                                  "state 'done'.")
+
+        if not self.authorize('reinitialize'):
+            raise ForbiddenAction('reinitialize', self)
+
+        self.type.reinitialize_workflow(self)
+
+    def stop_workflow(self):
+        """
+        Stop a running workflow object (e.g. discard changes while editing).
+        """
+        if self.state != 'inprogress' or not self.submitted:
+            raise DepositionError("Action only allowed for depositions in "
+                                  "state 'inprogress'.")
+
+        if not self.authorize('stop'):
+            raise ForbiddenAction('stop', self)
+
+        self.type.stop_workflow(self)
 
     def set_render_context(self, ctx):
         """
         Set rendering context - used in workflow tasks to set what is to be
-        rendered.
+        rendered (either by API or UI)
         """
         self.workflow_object.deposition_context = ctx
 
     def get_render_context(self):
         """
-        Get rendering context - used by DepositionType.render_step
+        Get rendering context - used by DepositionType.render_step/api_step
         """
         return getattr(self.workflow_object, 'deposition_context', {})
 
+    @property
+    def state(self):
+        """
+        Return simplified workflow state - inprogress, done or error
+        """
+        try:
+            status = self.workflow_object.workflow.status
+            if status == CFG_WORKFLOW_STATUS.ERROR:
+                return "error"
+            elif status == CFG_WORKFLOW_STATUS.COMPLETED:
+                return "done"
+        except AttributeError:
+            pass
+        return "inprogress"
+
+    #
+    # Draft related methods
+    #
     def get_draft(self, draft_id):
         """
         Get draft
@@ -816,24 +1188,48 @@ class Deposition(object):
             raise DraftDoesNotExists(draft_id)
         return self.drafts[draft_id]
 
-    def get_or_create_draft(self, draft_id, form_class=None):
+    def get_or_create_draft(self, draft_id):
         """
         Get or create a draft for given draft_id
         """
         if draft_id not in self.drafts:
+            if draft_id not in self.type.draft_definitions:
+                raise DraftDoesNotExists(draft_id)
+
+            if not self.authorize('add_draft'):
+                raise ForbiddenAction('add_draft', self)
+
             self.drafts[draft_id] = DepositionDraft(
-                draft_id, form_class=form_class, deposition_ref=self
+                draft_id,
+                form_class=self.type.draft_definitions[draft_id],
+                deposition_ref=self,
             )
         return self.drafts[draft_id]
 
-    def get_latest_sip(self, include_sealed=True):
+    def get_default_draft_id(self):
         """
-        Get the latest *unsealed* submission information package
+        Get the default draft id for this deposition.
+        """
+        return self.type.default_draft_id(self)
+
+    #
+    # Submission information package related methods
+    #
+    def get_latest_sip(self, sealed=None):
+        """
+        Get the latest submission information package
+
+        :param sealed: Set to true to only returned latest sealed SIP. Set to
+            False to only return latest unsealed SIP.
         """
         if len(self.sips) > 0:
-            sip = self.sips[-1]
-            if include_sealed or not sip.is_sealed():
-                return sip
+            for sip in reversed(self.sips):
+                if sealed is None:
+                    return sip
+                elif sealed and sip.is_sealed():
+                    return sip
+                elif not sealed and not sip.is_sealed():
+                    return sip
         return None
 
     def create_sip(self):
@@ -852,6 +1248,23 @@ class Deposition(object):
 
         return sip
 
+    def has_sip(self, sealed=True):
+        """
+        Determine if deposition has a sealed submission information package.
+        """
+        for sip in self.sips:
+            if (sip.is_sealed() and sealed) or \
+               (not sealed and not sip.is_sealed()):
+                return True
+        return False
+
+    @property
+    def submitted(self):
+        return self.has_sip()
+
+    #
+    # File related methods
+    #
     def get_file(self, file_id):
         for f in self.files:
             if f.uuid == file_id:
@@ -859,12 +1272,23 @@ class Deposition(object):
         return None
 
     def add_file(self, deposition_file):
+        if not self.authorize('add_file'):
+            raise ForbiddenAction('add_file', self)
+
+        for f in self.files:
+            if f.name == deposition_file.name:
+                raise FilenameAlreadyExists(deposition_file.name)
         self.files.append(deposition_file)
         file_uploaded.send(
-            self.type, deposition=self, deposition_file=deposition_file
+            self.type.get_identifier(),
+            deposition=self,
+            deposition_file=deposition_file,
         )
 
     def remove_file(self, file_id):
+        if not self.authorize('remove_file'):
+            raise ForbiddenAction('remove_file', self)
+
         idx = None
         for i, f in enumerate(self.files):
             if f.uuid == file_id:
@@ -878,6 +1302,9 @@ class Deposition(object):
         """
         Order the files according the list of ids provided to this function.
         """
+        if not self.authorize('sort_files'):
+            raise ForbiddenAction('sort_files', self)
+
         search_dict = dict(
             [(f, i) for i, f in enumerate(file_id_list)]
         )
@@ -894,6 +1321,9 @@ class Deposition(object):
 
         self.files = sorted(self.files, _sort_files_cmp)
 
+    #
+    # Class methods
+    #
     @classmethod
     def create(cls, user, type=None):
         """
@@ -905,6 +1335,12 @@ class Deposition(object):
         @param user: The owner of the deposition
         @param type: Deposition type identifier.
         """
+        t = DepositionType.get(type) if type else \
+            DepositionType.get_default()
+
+        if not t.authorize(None, 'create'):
+            raise ForbiddenAction('create')
+
         obj = cls(None, type=type, user_id=user.get_id())
         return obj
 
@@ -915,7 +1351,7 @@ class Deposition(object):
 
         @param object_id: The BibWorkflowObject id.
         @param user: Owner of the BibWorkflowObject
-        @param type: Depostion type identifier.
+        @param type: Deposition type identifier.
         """
         if type:
             type = DepositionType.get(type)
@@ -936,11 +1372,13 @@ class Deposition(object):
         return obj
 
     @classmethod
-    def get_depositions(cls, user, type=None):
+    def get_depositions(cls, user=None, type=None):
         params = [
             Workflow.module_name == 'webdeposit',
-            Workflow.id_user == user.get_id()
         ]
+
+        if user:
+            params.append(BibWorkflowObject.id_user == user.get_id())
 
         if type:
             params.append(Workflow.name == type.get_identifier())
@@ -962,12 +1400,26 @@ class Deposition(object):
 
 
 class SubmissionInformationPackage(FactoryMixin):
+    """
+    Submission information package (SIP)
+
+    :param uuid: Unique identifier for this SIP
+    :param metadata: Metadata in JSON for this submission information package
+    :param package: Full generated metadata for this package (i.e. normally
+        MARC for records, but could anything).
+    :param timestamp: UTC timestamp in ISO8601 format of when package was
+        sealed.
+    :param agents: List of agents for this package (e.g. creator, ...)
+    :param task_ids: List of task ids submitted to ingest this package (may be
+        appended to after SIP has been sealed).
+    """
     def __init__(self, uuid=None, metadata={}):
         self.uuid = uuid or str(uuid4())
         self.metadata = metadata
         self.package = ""
         self.timestamp = None
         self.agents = []
+        self.task_ids = []
 
     def __getstate__(self):
         return dict(
@@ -975,6 +1427,7 @@ class SubmissionInformationPackage(FactoryMixin):
             metadata=self.metadata,
             package=self.package,
             timestamp=self.timestamp,
+            task_ids=self.task_ids,
             agents=[a.__getstate__() for a in self.agents],
         )
 
@@ -985,9 +1438,10 @@ class SubmissionInformationPackage(FactoryMixin):
         self.timestamp = state.get('timestamp', None)
         self.agents = [Agent.factory(a_state)
                        for a_state in state.get('agents', [])]
+        self.task_ids = state.get('task_ids', [])
 
     def seal(self):
-        self.timestamp = datetime.now().isoformat()
+        self.timestamp = datetime.now(tzutc()).isoformat()
 
     def is_sealed(self):
         return self.timestamp is not None
