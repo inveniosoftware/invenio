@@ -117,7 +117,6 @@ def setup_app(app):
 
         user_info['groups'] = fetch_groups(user_info['groups']).values()
         user_info['external'] = fetch_external(user_info.get('external'))
-        print user_info
         try:
             auth = authenticate(user_info['email'], login_method='SSO')
             if auth is None:

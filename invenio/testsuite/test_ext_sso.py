@@ -60,7 +60,6 @@ class TestSSO(InvenioTestCase):
             with request_environ_set(self.app, data):
                 with self.app.test_client() as c:
                     c.get(self.app.config['SSO_LOGIN_URL'])
-                    print current_user
                     current_user['email'] == expected_data['email']
                     current_user['groups'] == expected_data['groups']
 
