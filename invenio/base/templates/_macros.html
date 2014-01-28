@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{%- macro messages() -%}
+{%- macro flashed_messages() -%}
   {% block messages %}
     {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['', 'info', 'error', 'warning', 'success']) %}
       <div class="alert alert-{{ category }}">

@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% from "_macros.html" import messages %}
+{% from "_macros.html" import flashed_messages %}
 
 {# Global CSS #}
 {% block global_css %}
@@ -171,7 +171,7 @@
           </div>
         {% endif %}
       {% endblock title %}
-      {{ messages() }}
+      {{ flashed_messages() }}
       {% block body %}
         {{ body }}
       {% endblock body %}
