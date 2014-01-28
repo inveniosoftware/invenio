@@ -139,8 +139,7 @@ def request_record(f):
                         record=record,
                         tabs=tabs,
                         title=title,
-                        get_mini_reviews=lambda *args, **kwargs:
-                        get_mini_reviews(*args, **kwargs).decode('utf8'),
+                        get_mini_reviews=get_mini_reviews,
                         collection=collection,
                         format_record=_format_record
                         )
