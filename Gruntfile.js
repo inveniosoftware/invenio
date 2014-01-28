@@ -375,7 +375,9 @@ module.exports = function (grunt) {
                      ,'prism.js'
                      ,'swfobject.js'
                      ,'ColVis.js'
-                     ,'dataTables.bootstrap.js']
+                     ,'dataTables.bootstrap.js'
+                     ,'jquery.min.map'
+                     ]
             },
 
             MathJax: {
