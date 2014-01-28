@@ -31,7 +31,7 @@ class JsonReader(Reader):
 
     __master_format__ = 'json'
 
-    def __init__(self, blob, **kwargs):
+    def __init__(self, blob=None, **kwargs):
         """
         :param blob:
         """
