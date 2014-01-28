@@ -21,6 +21,7 @@ EXTENSIONS = [
     'invenio.ext.logging',
     'invenio.ext.gravatar',
     'invenio.ext.collect',
+    'invenio.ext.restful',
     'flask.ext.menu:Menu',
     'flask.ext.breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
