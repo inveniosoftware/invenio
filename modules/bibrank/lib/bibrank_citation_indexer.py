@@ -484,6 +484,7 @@ def get_citation_informations(recid_list, tags, config,
         'doi': {},
         'hdl': {},
         'isbn': {},
+        'record_id': {},
     }
 
     references_info = {
@@ -509,6 +510,7 @@ def get_citation_informations(recid_list, tags, config,
             task_update_progress(mesg)
 
         record = get_record(recid)
+        records_info['record_id'][recid] = [unicode(recid)]
 
         function = config.get("rank_method", "function")
         if config.get(function, 'collections'):
@@ -883,8 +885,11 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
     for thisrecid, refs in references_info['record_id'].iteritems():
         step("Record ID references", thisrecid, done, len(references_info['record_id']))
         done += 1
+        field = "001"
         for recid in (r for r in refs if r):
-            valid = get_recids_matching_query(p=recid, f="001", config=config)
+            valid = get_recids_matching_query(p=recid, f=field, config=config)
+            write_message("These match searching %s in %s: %s"
+                                 % (recid, field, list(valid)), verbose=9)
             if valid:
                 add_to_refs(thisrecid, valid[0])
 
@@ -1046,6 +1051,23 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
             for recid in recids:
                 add_to_cites(recid, thisrecid)
 
+    write_message("Phase 12: Record ID catchup")
+    done = 0
+    t12 = os.times()[4]
+    for thisrecid, record_ids in records_info['record_id'].iteritems():
+        step("Record ID catchup", thisrecid, done, len(records_info['record_id']))
+        done += 1
+
+        for record_id in record_ids:
+            recids = get_recids_matching_query(p=record_id,
+                                               f=tags['refs_record_id'],
+                                               config=config)
+            write_message("These records match %s in %s: %s"
+                            % (record_id, tags['refs_record_id'], list(recids)), verbose=9)
+
+            for recid in recids:
+                add_to_cites(recid, thisrecid)
+
     mesg = "done fully"
     write_message(mesg)
     task_update_progress(mesg)
@@ -1059,7 +1081,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
         write_message(dict(islice(references.iteritems(), 10)))
         write_message("size: %s" % len(references))
 
-    t12 = os.times()[4]
+    t13 = os.times()[4]
 
     write_message("Execution time for analyzing the citation information "
                   "generating the dictionary:")
@@ -1074,7 +1096,8 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
     write_message("... checking rec DOI: %.2f sec" % (t10-t9))
     write_message("... checking rec HDL: %.2f sec" % (t11-t10))
     write_message("... checking rec ISBN: %.2f sec" % (t12-t11))
-    write_message("... total time of ref_analyze: %.2f sec" % (t12-t1))
+    write_message("... checking rec Record ID: %.2f sec" % (t13-t12))
+    write_message("... total time of ref_analyze: %.2f sec" % (t13-t1))
 
     return citations, references
 
