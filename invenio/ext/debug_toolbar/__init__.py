@@ -39,7 +39,7 @@ Name                                  Description                             De
 For more information see http://flask-debugtoolbar.readthedocs.org/en/latest/
 """
 
-from flask_debugtoolbar import DebugToolbarExtension
+from flask.ext.debugtoolbar import DebugToolbarExtension
 
 
 def setup_app(app):
@@ -48,6 +48,8 @@ def setup_app(app):
     """
     # Enable Flask Debug Toolbar early to also catch HTTPS redirects
     if app.debug:
+        from flask.ext.debugtoolbar import module
+        module.static_folder = 'static'
         DebugToolbarExtension(app)
 
     return app

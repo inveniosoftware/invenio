@@ -24,6 +24,8 @@
 {% block title %}
 {% endblock title %}
 
+{%- js url_for('record.static', filename='js/records/records.js'), '20-record' -%}
+
 {% block metaheader %}
   {% if recid != -1 and config.CFG_WEBSEARCH_DETAILED_META_FORMAT %}
   {{ format_record(recid, of=config.CFG_WEBSEARCH_DETAILED_META_FORMAT, ln = g.ln)|safe }}
@@ -64,11 +66,6 @@
   </div>
 <div style="clear: both;"></div>
 {% endblock %}
-
-{% block javascript %}
-  {{ super() }}
-  {%- js url_for('record.static', filename='js/records/records.js'), '20-record' -%}
-{% endblock javascript %}
 
 {% block _top_assets %}
 {% assets get_js_bundle() %}
