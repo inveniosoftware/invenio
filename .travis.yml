@@ -36,14 +36,11 @@ install:
   - "sudo a2enmod rewrite"
   - "sudo mkdir /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/apache2/ssl/apache.pem"
-#  - sudo pip install --upgrade pip
-  - sudo pip install --upgrade setuptools
-  - sudo pip install --upgrade distribute
-  - sudo pip install --upgrade virtualenvwrapper
+  - "travis_retry sudo pip install --upgrade virtualenvwrapper"
   - ". `which virtualenvwrapper.sh`"
-  - mkvirtualenv invenio
-  - workon invenio
-  - "pip install . --process-dependency-links --allow-all-external"
+  - "mkvirtualenv invenio"
+  - "workon invenio"
+  - "travis_retry pip install . --process-dependency-links --allow-all-external"
   - "pybabel compile -f -d invenio/base/translations/"
   - "inveniomanage config create secret-key"
   - "inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail"
