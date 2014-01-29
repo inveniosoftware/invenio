@@ -174,6 +174,66 @@ class BibRecordParsersTest(InvenioTestCase):
             record = bibrecord._create_record_minidom(self.xmltext)
             self.assertEqual(record, self.expected_record)
 
+class BibRecordDropDuplicateFieldsTest(InvenioTestCase):
+    def test_drop_duplicate_fields(self):
+        """bibrecord - testing record_drop_duplicate_fields()"""
+        record = """
+        <record>
+        <controlfield tag="001">123</controlfield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="u">Foo University</subfield>
+        <subfield code="a">Doe, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        <subfield code="a">Doe, John</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield cde="a">On the foo and bar</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        </datafield>
+        </record>
+        """
+        record_result = """
+        <record>
+        <controlfield tag="001">123</controlfield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="u">Foo University</subfield>
+        <subfield code="a">Doe, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        <subfield code="a">Doe, John</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield cde="a">On the foo and bar</subfield>
+        </datafield>
+        </record>
+        """
+        rec = bibrecord.create_record(record)[0]
+        rec = bibrecord.record_drop_duplicate_fields(rec)
+        rec2 = bibrecord.create_record(record_result)[0]
+        self.maxDiff = None
+        self.assertEqual(rec, rec2)
+
+
 class BibRecordBadInputTreatmentTest(InvenioTestCase):
     """ bibrecord - testing for bad input treatment """
     def test_empty_collection(self):
@@ -1669,6 +1729,7 @@ TEST_SUITE = make_test_suite(
     BibRecordSingletonTest,
     BibRecordNumCharRefTest,
     BibRecordExtractIdentifiersTest,
+    BibRecordDropDuplicateFieldsTest
     )
 
 if __name__ == '__main__':

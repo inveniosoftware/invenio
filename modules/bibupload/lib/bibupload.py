@@ -79,7 +79,8 @@ from invenio.bibrecord import create_records, \
                               record_extract_oai_id, \
                               record_extract_dois, \
                               record_has_field, \
-                              records_identical
+                              records_identical, \
+                              record_drop_duplicate_fields
 from invenio.search_engine import get_record, record_exists, search_pattern
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
@@ -523,6 +524,11 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     record_delete_field(record, tag, data_tuple[1], data_tuple[2])
 
         write_message(lambda: "     Record after cleaning up fields to be deleted:\n%s" % record_xml_output(record), verbose=9)
+
+        if opt_mode == 'append':
+            write_message("Stage 3b: Drop duplicate fields in append mode.", verbose=2)
+            record = record_drop_duplicate_fields(record)
+            write_message(lambda: "     Record after dropping duplicate fields:\n%s" % record_xml_output(record), verbose=9)
 
         # Update of the BibFmt
         write_message("Stage 4: Start (Update bibfmt).", verbose=2)
