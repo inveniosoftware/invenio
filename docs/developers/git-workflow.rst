@@ -670,14 +670,11 @@ R2a. Commit message format
 Invenio git commit log messages are usually formatted in the following
 way:
 
-* commit message headline providing short summary (up to about 50
-     chars) formatted in the style of `ModuleName: short
-     description`. (using nouns)
+* commit message headline providing short summary (up to about 50 chars) formatted in the style of `ModuleName: short description`. (using mostly nouns, no verbs)
 
 * empty line
 
-* commit message body with detailed description of what this patch
-     does, formatted as a bulletted list. (using present tense)
+* commit message body with detailed description of what this patch does, formatted as a bulletted list. (using present tense)
 
 Here is an example: changeset:b98f24bf38b95dd7366d57e8d6d90804957099e5::
 
