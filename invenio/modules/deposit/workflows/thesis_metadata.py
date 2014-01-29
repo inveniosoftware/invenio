@@ -25,10 +25,11 @@ __all__ = ['Thesis']
 
 
 class Thesis(DepositionType):
-    workflow = [
-        render_form(forms.ThesisForm),
-    ]
+    workflow = [render_form(draft_id='default'), ]
     name = "Thesis"
     name_plural = "Theses"
     group = "Articles & Preprints"
     enabled = True
+    draft_definitions = {
+        'default': forms.ThesisForm,
+    }

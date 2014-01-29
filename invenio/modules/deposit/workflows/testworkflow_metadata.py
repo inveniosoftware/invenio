@@ -25,8 +25,11 @@ __all__ = ['TestWorkflow']
 
 
 class TestWorkflow(DepositionType):
-    workflow = [render_form(forms.ArticleForm)]
+    workflow = [render_form(draft_id='default'), ]
     name = "TestWorkflow"
     name_plural = "TestWorkflows"
     group = ""
     enabled = False
+    draft_definitions = {
+        'default': forms.ArticleForm,
+    }
