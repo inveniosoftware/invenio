@@ -25,9 +25,13 @@ __all__ = ['Article']
 
 
 class Article(DepositionType):
-    workflow = [render_form(forms.ArticleForm),
-                ]
+    workflow = [
+        render_form(draft_id='default'),
+    ]
     name = "Article"
     name_plural = "Articles"
     group = "Articles & Preprints"
     enabled = True
+    draft_definitions = {
+        'default': forms.ArticleForm,
+    }

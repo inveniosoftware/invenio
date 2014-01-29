@@ -25,9 +25,12 @@ __all__ = ['Poetry']
 
 
 class Poetry(DepositionType):
-    workflow = [render_form(forms.PoemForm), ]
+    workflow = [render_form(draft_id='default'), ]
     name = "Poetry"
     name_plural = "Poems"
     group = "Multimedia & Arts"
     enabled = True
     default = False
+    draft_definitions = {
+        'default': forms.PoemForm,
+    }

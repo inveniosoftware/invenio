@@ -25,8 +25,11 @@ __all__ = ['Preprint']
 
 
 class Preprint(DepositionType):
-    workflow = [render_form(forms.PreprintForm), ]
+    workflow = [render_form(draft_id='default'), ]
     name = "Preprint"
     name_plural = "Preprints"
     group = "Articles & Preprints"
     enabled = True
+    draft_definitions = {
+        'default': forms.PreprintForm,
+    }

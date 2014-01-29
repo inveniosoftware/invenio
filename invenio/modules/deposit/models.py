@@ -36,6 +36,7 @@ from flask import redirect, render_template, flash, url_for, request, \
 from flask.ext.login import current_user
 from flask.ext.restful import fields, marshal
 from invenio.ext.restful import UTCISODateTime
+from invenio.base.helpers import unicodifier
 
 from invenio.ext.sqlalchemy import db
 from invenio.modules.workflows.config import CFG_OBJECT_VERSION, CFG_WORKFLOW_STATUS
@@ -856,7 +857,6 @@ class DepositionDraft(FactoryMixin):
         # are only submitting a single field in JSON via AJAX requests. We
         # therefore reset non-submitted fields to the draft_data value with
         # form.reset_field_data().
-        from invenio.webinterface_handler_flask_utils import unicodifier
 
         # WTForms deal with unicode - we deal with UTF8 so convert all
         draft_data = unicodifier(self.values) if load_draft else {}

@@ -25,8 +25,11 @@ __all__ = ['Photo']
 
 
 class Photo(DepositionType):
-    workflow = [render_form(forms.PhotoForm), ]
+    workflow = [render_form(draft_id='default'), ]
     name = "Photo"
     name_plural = "Photos"
     group = "Multimedia & Arts"
     enabled = True
+    draft_definitions = {
+        'default': forms.PhotoForm,
+    }
