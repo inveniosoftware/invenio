@@ -555,7 +555,8 @@ def perform_request_holdingpen(request_type, recId, changeId=None):
             template_to_merge = extend_record_with_template(recId)
             if template_to_merge:
                 merged_record = merge_record_with_template(holdingPenRecord,
-                                                           template_to_merge)
+                                                           template_to_merge,
+                                                           is_hp_record=True)
                 if merged_record:
                     holdingPenRecord = merged_record
 
