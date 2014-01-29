@@ -114,7 +114,6 @@ from invenio.config import CFG_SITE_URL, \
     CFG_SITE_RECORD, CFG_PYLIBDIR, \
     CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS, \
     CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE, \
-    CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
     CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING, \
     CFG_BIBCATALOG_SYSTEM
@@ -1553,10 +1552,9 @@ class BibRecDocs(object):
         for bibdoc in self.list_bibdocs():
             if hasattr(bibdoc, 'has_text'):
                 if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
-                    re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
-                    perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
+                    perform_ocr = hasattr(bibdoc, 'is_ocr_required') and bibdoc.is_ocr_required()
                     from invenio.bibtask import write_message
-                    write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
+                    write_message("... will extract words from %s %s" % (bibdoc, perform_ocr and 'with OCR' or ''), verbose=2)
                     bibdoc.extract_text(perform_ocr=perform_ocr)
                 texts.append(bibdoc.get_text())
 

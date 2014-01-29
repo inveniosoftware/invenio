@@ -18,12 +18,16 @@
 
 """BibObject Module providing BibObject prividing features for documents containing text (not necessarily as the main part of the content)"""
 
+import os
+import re
+from datetime import datetime
 
+from invenio.config import CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES
 from invenio.bibdocfile import BibDoc, InvenioBibDocFileError
 from invenio.dbquery import run_sql
-from datetime import datetime
 from invenio.errorlib import register_exception
-import os
+
+_RE_PERFORM_OCR = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
 
 class BibTextDoc(BibDoc):
     def get_text(self, version=None):
@@ -41,6 +45,15 @@ class BibTextDoc(BibDoc):
             return open(os.path.join(self.basedir, '.text;%i' % version)).read()
         else:
             return ""
+
+    def is_ocr_required(self):
+        """
+        Return True if this document require OCR in order to extract text from it.
+        """
+        for bibrec_link in self.bibrec_links:
+            if _RE_PERFORM_OCR.match(bibrec_link['docname']):
+                return True
+        return False
 
     def get_text_path(self, version=None):
         """
