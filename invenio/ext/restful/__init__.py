@@ -30,12 +30,11 @@ import six
 from datetime import date
 from dateutil import parser
 from dateutil.tz import tzlocal, tzutc
-from flask import request
+from flask import request, current_app
 from flask.ext import restful
 from flask.ext.restful import fields
+from flask.ext.registry import ModuleAutoDiscoveryRegistry
 from functools import wraps
-
-from . import registry
 
 error_codes = dict(
     validation_error=10,
@@ -99,8 +98,8 @@ def require_api_auth(f):
         @wraps(fn)
         def auth_key(*args, **kwargs):
             if 'apikey' in request.values:
-                from invenio.web_api_key_model import WebAPIKey
-                from invenio.webuser_flask import login_user
+                from invenio.modules.apikeys.models import WebAPIKey
+                from flask.ext.login import login_user
 
                 user_id = WebAPIKey.acc_get_uid_from_request()
                 if user_id == -1:
@@ -112,18 +111,23 @@ def require_api_auth(f):
         return auth_key
     return authenticate_key(f)
 
-api = restful.Api()
 """
 Global restful API object.
 """
 
-
 def setup_app(app):
     """Setup api extension."""
+    api = restful.Api()
     api.init_app(app)
     app.extensions['restful'] = api
 
-    for m in registry.restful:
-        register_func = getattr(m, 'setup_app', None)
-        if register_func and callable(register_func):
-            register_func(app)
+    class RestfulRegistry(ModuleAutoDiscoveryRegistry):
+        setup_func_name = 'setup_app'
+
+        def register(self, module, *args, **kwargs):
+            return super(RestfulRegistry, self).register(module, app, api,
+                                                         *args, **kwargs)
+
+    app.extensions['registry']['restful'] = RestfulRegistry(
+        'restful', app=app, with_setup=True
+    )
