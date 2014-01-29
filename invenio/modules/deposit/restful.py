@@ -25,7 +25,7 @@ from flask.ext.restful.utils import unpack
 from functools import wraps
 from werkzeug.utils import secure_filename
 
-from invenio.ext.restful import api, require_api_auth, error_codes
+from invenio.ext.restful import require_api_auth, error_codes
 from invenio.modules.deposit.models import Deposition, DepositionType, \
     DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
     DraftDoesNotExists, FormDoesNotExists, DepositionNotDeletable, \
@@ -591,7 +591,7 @@ class DepositionFileResource(Resource):
 #
 # Register API resources
 #
-def setup_app(app):
+def setup_app(app, api):
     api.add_resource(
         DepositionListResource,
         '/api/deposit/depositions/',
