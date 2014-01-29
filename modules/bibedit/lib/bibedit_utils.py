@@ -57,7 +57,7 @@ from invenio.bibrecord import create_record, create_records, \
     record_add_field, field_get_subfield_codes, field_add_subfield, \
     field_get_subfield_values, record_delete_fields, record_add_fields, \
     record_get_field_values, print_rec, record_modify_subfield, \
-    record_modify_controlfield
+    record_modify_controlfield, record_make_all_subfields_volatile
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -785,13 +785,15 @@ def extend_record_with_template(recid=0, recstruct=None):
     return False
 
 
-def merge_record_with_template(rec, template_name):
+def merge_record_with_template(rec, template_name, is_hp_record=False):
     """ Extend the record rec with the contents of the template and return it"""
     template = get_record_template(template_name)
     if not template:
         return
     template_bibrec = create_record(template)[0]
-
+    # if the record is a holding pen record make all subfields volatile
+    if is_hp_record:
+        record_make_all_subfields_volatile(template_bibrec)
     for field_tag in template_bibrec:
         if not record_has_field(rec, field_tag):
             for field_instance in template_bibrec[field_tag]:
