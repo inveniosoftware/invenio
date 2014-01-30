@@ -29,6 +29,7 @@ from invenio.bibauthorid_webapi import search_person_ids_by_name #emitting #pyli
 from invenio.bibauthorid_webapi import get_papers_by_person_id #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_dbinterface import get_names_of_author #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_dbinterface import get_existing_authors #emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_dbinterface import get_authors_by_name #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_frontinterface import get_confirmed_papers_of_author #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_dbinterface import get_title_of_paper #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_dbinterface import get_orcid_id_of_author #emitting #pylint: disable-msg=W0611
