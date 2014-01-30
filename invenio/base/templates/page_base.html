@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% from "_macros.html" import flashed_messages %}
+{% from "_macros.html" import flashed_messages, js_bundle, css_bundle with context %}
 
 {# Global CSS #}
 {% block global_css %}
@@ -84,11 +84,9 @@
     {% block metaheader %}
     {% endblock metaheader %}
   {% endblock header %}
-  {% for bundle in get_css_bundle(iterate=True) %}
-  {% assets bundle %}
-    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
-  {% endassets %}
-  {% endfor %}
+
+  {{ css_bundle() }}
+
   {% block _top_assets %}{% endblock _top_assets %}
   {% block css %}{% endblock css %}
   <style>
@@ -189,11 +187,7 @@
   {%- include 'footer.html' -%}
 </footer>
 {% block _bottom_assets %}
-{% for bundle in get_js_bundle(iterate=True) %}
-{% assets bundle %}
-  <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
-{% endfor %}
+{{ js_bundle() }}
 {% endblock _bottom_assets %}
 {% block javascript %}{% endblock javascript %}
 </body>
