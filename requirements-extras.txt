@@ -5,7 +5,6 @@ pep8
 selenium
 winpdb
 mock
-ipython
 cython
 nose
 nosexcover
@@ -16,5 +15,3 @@ apiclient
 urllib3
 python-skydrive
 python-openid
-qrcode
-PIL
