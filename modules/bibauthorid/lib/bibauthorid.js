@@ -381,7 +381,7 @@ var ticketbox = {
 
         events: {
             'click .removeOp': 'removeOperation',
-            'click select': 'bibrefSelected'
+            'change select': 'bibrefSelected'
         },
 
         initialize: function(){
