@@ -43,8 +43,22 @@ class Record(SmartJson):
 
     @classmethod
     def create(cls, blob, master_format, **kwargs):
-        reader = readers[master_format](blob, namespace='recordext', **kwargs)
+        if 'namespace' not in kwargs:
+            kwargs['namespace'] = 'recordext'
+
+        reader = readers[master_format](blob, **kwargs)
         return cls(reader.translate())
+
+    @classmethod
+    def create_many(cls, blobs, master_format, **kwargs):
+        if 'namespace' not in kwargs:
+            kwargs['namespace'] = 'recordext'
+
+        reader = readers[master_format]
+
+        for blob in reader.split_blob(blobs, **kwargs):
+            yield cls.create(blob, master_format, **kwargs)
+        raise StopIteration()
 
     @classmethod
     def get_record(cls, recid):
@@ -86,7 +100,9 @@ class Record(SmartJson):
 
 # Functional interface
 create_record = Record.create
+create_records = Record.create_many
 get_record = Record.get_record
+get_record_blob = Record.get_blob
 
 
 

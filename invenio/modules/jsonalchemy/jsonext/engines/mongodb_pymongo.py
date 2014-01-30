@@ -86,12 +86,12 @@ class MongoDBStorage(Storage):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_many`"""
         return self.__collection.find({'_id': {'$in':ids}})
 
-    def get_field_values(ids, field, repetitive_values=True, count=False,
+    def get_field_values(self, ids, field, repetitive_values=True, count=False,
             include_recid=False, split_by=0):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_field_values`"""
         raise NotImplementedError()
 
-    def get_fields_values(ids, fields, repetitive_values=True, count=False,
+    def get_fields_values(self, ids, fields, repetitive_values=True, count=False,
             include_recid=False, split_by=0):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_fields_values`"""
         raise NotImplementedError()

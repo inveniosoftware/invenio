@@ -66,7 +66,7 @@ class Storage(object):
         """Returns an iterable of json objects which id is inside ids"""
         raise NotImplemented
 
-    def get_field_values(ids, field, repetitive_values=True, count=False,
+    def get_field_values(self, ids, field, repetitive_values=True, count=False,
                          include_recid=False, split_by=0):
         """
         Returns a list of field values for field for the given ids.
@@ -80,7 +80,7 @@ class Storage(object):
         """
         raise NotImplemented
 
-    def get_fields_values(ids, fields, repetitive_values=True, count=False,
+    def get_fields_values(self, ids, fields, repetitive_values=True, count=False,
                           include_recid=False, split_by=0):
         """
         As in :meth:`get_field_values` but in this case returns a dictionary
@@ -88,7 +88,7 @@ class Storage(object):
         """
         raise NotImplemented
 
-    def search(query):
+    def search(self, query):
         """
         Retrieves all entries which match the query JSON prototype document.
         This method should not be used on storage engines without native JSON

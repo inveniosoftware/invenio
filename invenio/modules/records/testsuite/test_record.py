@@ -17,23 +17,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Unit tests for the parser engine."""
-
-__revision__ = \
-    "$Id$"
+import os
+import pkg_resources
 
 from invenio.base.wrappers import lazy_import
 from flask_registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
+Record = lazy_import('invenio.modules.records.api:Record')
+
 Field_parser = lazy_import('invenio.modules.jsonalchemy.parser:FieldParser')
 Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
-guess_legacy_field_names = lazy_import('invenio.modules.jsonalchemy.parser:guess_legacy_field_names')
-get_producer_rules = lazy_import('invenio.modules.jsonalchemy.parser:get_producer_rules')
-readers = lazy_import('invenio.modules.jsonalchemy.registry:readers')
 
-TEST_PACKAGE = 'invenio.modules.jsonalchemy.testsuite'
+TEST_PACKAGE = 'invenio.modules.records.testsuite'
 
 test_registry = RegistryProxy('testsuite', ImportPathRegistry,
                               initial=[TEST_PACKAGE])
@@ -44,9 +41,18 @@ model_definitions = lambda: PkgResourcesDirDiscoveryRegistry(
     'models', registry_namespace=test_registry)
 
 
-class TestReaders(InvenioTestCase):
+class TestRecord(InvenioTestCase):
+    """Record - demo file parsing test"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Invalidate any previous field definition"""
+        Field_parser._field_definitions = {}
+        Field_parser._legacy_field_matchings = {}
+        Model_parser._model_definitions = {}
 
     def setUp(self):
+        """Initialize stuff"""
         self.app.extensions['registry']['testsuite.fields'] = field_definitions()
         self.app.extensions['registry']['testsuite.models'] = model_definitions()
 
@@ -54,13 +60,56 @@ class TestReaders(InvenioTestCase):
         del self.app.extensions['registry']['testsuite.fields']
         del self.app.extensions['registry']['testsuite.models']
 
-    def test_marc_reader_translate(self):
-        """JsonAlchemy - Marc reader"""
+    def test_records_created(self):
+        """Record - demo file how many records are created """
+        xmltext = pkg_resources.resource_string('invenio.testsuite',
+                os.path.join('data', 'demo_record_marc_data.xml'))
+        recs = [record for record in Record.create_many(xmltext, master_format='marc')]
+        self.assertEqual(141, len(recs))
+
+    def test_accented_unicode_letterst_test(self):
+        """Record - accented Unicode letters"""
+        xml = '''<record>
+          <controlfield tag="001">33</controlfield>
+          <datafield tag="041" ind1=" " ind2=" ">
+            <subfield code="a">eng</subfield>
+          </datafield>
+          <datafield tag="100" ind1=" " ind2=" ">
+            <subfield code="a">Döè1, John</subfield>
+          </datafield>
+          <datafield tag="245" ind1=" " ind2=" ">
+            <subfield code="a">Пушкин</subfield>
+          </datafield>
+        </record>
+        '''
+        rec = Record.create(xml, master_format='marc', namespace='testsuite')
+        self.assertEquals(rec['authors[0].full_name'], 'Döè1, John')
+        self.assertEquals(rec['title.title'], 'Пушкин')
+
+
+class TestMarcRecordCreation(InvenioTestCase):
+    """Records from marc"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Invalidate any previous field definition"""
+        Field_parser._field_definitions = {}
+        Field_parser._legacy_field_matchings = {}
+        Model_parser._model_definitions = {}
+
+    def setUp(self):
+        """Initialize stuff"""
+        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
+        self.app.extensions['registry']['testsuite.models'] = model_definitions()
+
+    def tearDown(self):
+        del self.app.extensions['registry']['testsuite.fields']
+        del self.app.extensions['registry']['testsuite.models']
+
+    def test_rec_json_creation_from_marcxml(self):
+        """Record - recjson from marcxml"""
         xml = """
-            <collection>
             <record>
-                <controlfield tag="001">8</controlfield>
-                <controlfield tag="003">SzGeCERN</controlfield>
                 <datafield tag="037" ind1=" " ind2=" ">
                 <subfield code="a">astro-ph/9812226</subfield>
                 </datafield>
@@ -380,45 +429,21 @@ class TestReaders(InvenioTestCase):
                 <subfield code="s">Astrophys. J. 488 (1997) 1</subfield>
                 </datafield>
             </record>
-            <record>
-                <controlfield tag="001">33</controlfield>
-                <datafield tag="041" ind1=" " ind2=" ">
-                <subfield code="a">eng</subfield>
-                </datafield>
-            </record>
-            </collection>
         """
-        blob = list(readers['marc'].split_blob(xml, schema='foo'))
-        self.assertTrue(len(blob) == 0)
-        blob = list(readers['marc'].split_blob(xml))[0]
-        reader = readers['marc'](blob=blob, namespace='testsuite')
-        json = reader.translate()
-        self.assertIsNotNone(json)
-        self.assertTrue('__meta_metadata__' in json)
-        self.assertTrue(json['__meta_metadata__']['__additional_info__']['master_format'] == 'marc')
-        self.assertTrue('authors' in json)
-        self.assertTrue(json['authors'][0]['full_name'] == "Efstathiou, G P")
-        self.assertTrue(len(json['authors']) == 5)
-        self.assertTrue('title' in json)
-        self.assertTrue(json['title']['title'] == "Constraints on $\Omega_{\Lambda}$ and $\Omega_{m}$from Distant Type 1a Supernovae and Cosmic Microwave Background Anisotropies")
-        self.assertTrue('abstract' in json)
-        self.assertTrue(json['abstract']['summary'] == "We perform a combined likelihood analysis of the latest cosmic microwave background anisotropy data and distant Type 1a Supernova data of Perlmutter etal (1998a). Our analysis is restricted tocosmological models where structure forms from adiabatic initial fluctuations characterised by a power-law spectrum with negligible tensor component. Marginalizing over other parameters, our bestfit solution gives Omega_m = 0.25 (+0.18, -0.12) and Omega_Lambda = 0.63 (+0.17, -0.23) (95 % confidence errors) for the cosmic densities contributed by matter and a cosmological constantrespectively. The results therefore strongly favour a nearly spatially flat Universe with a non-zero cosmological constant.")
-        self.assertTrue('reference' in json)
-        self.assertTrue(len(json['reference']) == 36)
+        r = Record.create(xml, master_format='marc', namespace='testsuite', schema='xml')
 
-        reader = readers['marc'](blob=blob, model='test_model', namespace='testsuite')
-        json = reader.translate()
-        self.assertTrue(json['__meta_metadata__']['__additional_info__']['model'] == 'test_model')
-        self.assertTrue(json['__meta_metadata__']['__additional_info__']['namespace'] == 'testsuite')
-        self.assertTrue('title_article' in json)
+        self.assertTrue(r['__meta_metadata__.__additional_info__.master_format'] == 'marc')
+        self.assertTrue('authors' in r)
+        self.assertTrue(r['authors[0].full_name'] == "Efstathiou, G P")
+        self.assertTrue(len(r['authors']) == 5)
+        self.assertTrue('title.title' in r)
+        self.assertTrue(r['title.title'] == "Constraints on $\Omega_{\Lambda}$ and $\Omega_{m}$from Distant Type 1a Supernovae and Cosmic Microwave Background Anisotropies")
+        self.assertTrue('abstract.summary' in r)
+        self.assertTrue(r['abstract.summary'] == "We perform a combined likelihood analysis of the latest cosmic microwave background anisotropy data and distant Type 1a Supernova data of Perlmutter etal (1998a). Our analysis is restricted tocosmological models where structure forms from adiabatic initial fluctuations characterised by a power-law spectrum with negligible tensor component. Marginalizing over other parameters, our bestfit solution gives Omega_m = 0.25 (+0.18, -0.12) and Omega_Lambda = 0.63 (+0.17, -0.23) (95 % confidence errors) for the cosmic densities contributed by matter and a cosmological constantrespectively. The results therefore strongly favour a nearly spatially flat Universe with a non-zero cosmological constant.")
+        self.assertTrue('reference' in r)
+        self.assertTrue(len(r['reference']) == 36)
 
-
-    def test_json_reader(self):
-        """JsonAlchemy - Json reader"""
-        pass
-
-
-TEST_SUITE = make_test_suite(TestReaders)
+TEST_SUITE = make_test_suite(TestRecord, )
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)

@@ -55,7 +55,7 @@ python_allowed_expr = (dict_def ^ list_def ^ dict_access ^ \
         list_access ^ function_call ^ restOfLine)\
         .setResultsName("value", listAllMatches=True)
 
-def _create_record_field_parser():
+def _create_field_parser():
     """
     Creates the base parser that can handle field definitions and adds any
     extension placed inside jsonext.parsers.
@@ -188,19 +188,19 @@ def _create_record_field_parser():
     return OneOrMore(rule | include | comment.suppress())
 
 
-def _create_record_model_parser():
+def _create_model_parser():
     """
     Creates a parser that can handle model definitions.
 
     BFN like grammar::
 
-        record_model ::= python_comment | fields
+        model ::= python_comment | fields
         fields ::= "fields:" INDENT [inherit_from] [list_of_fields]
         inherit_from ::= "@inherit_from(" json_id+  ")"
         list_of_fields ::= json_id [ "=" json_id ] # new field name = existing field name
 
     Note: Unlike the field configuration files where you can specify more than
-    one field inside each file for the record models only one definition is
+    one field inside each file for the models only one definition is
     allowed by file.
     """
     indent_stack = [1]
@@ -281,7 +281,7 @@ class FieldParser(object):
         cls._legacy_field_matchings = {}
         cls(namespace)._create()
         # It invalidates the Model definitions too as they relay on the field definitions
-        ModelParser.reparse(namespace)
+        # ModelParser.reparse(namespace)
 
     def _create(self):
         """
@@ -296,8 +296,11 @@ class FieldParser(object):
         """
         already_included = [os.path.basename(f) for f in self.files]
         for field_file in self.files:
-            parser = _create_record_field_parser()
-            field_descs = parser.parseFile(field_file, parseAll=True)
+            parser = _create_field_parser()
+            try:
+                field_descs = parser.parseFile(field_file, parseAll=True)
+            except ParseException as e:
+                raise FieldParserException("Cannot parse file '%s',\n, %s" % (field_file, e.msg))
             for include in field_descs.includes:
                 if include[0] in already_included:
                     continue
@@ -529,7 +532,7 @@ class FieldParser(object):
                 if inherit_json_id not in self.__class__._field_definitions[self.__namespace]:
                     raise FieldParserException("Unable to solve %s inheritance" % (inherit_json_id,))
                 if inherit_json_id in self.__unresolved_inheritence:
-                    self._resolve_inheritance(inherit_json_id)
+                    resolve_inheritance(inherit_json_id)
                     self.__unresolved_inheritence.remove(inherit_json_id)
                 inherit_rule = self.__class__._field_definitions[self.__namespace][inherit_json_id]
                 for format in inherit_rule['rules']:
@@ -543,8 +546,13 @@ class FieldParser(object):
 
         #Resolve inheritance
         for i in xrange(len(self.__unresolved_inheritence) - 1, -1, -1):
-            resolve_inheritance(self.__unresolved_inheritence[i])
-            del self.__unresolved_inheritence[i]
+            try:
+                inherit_json_id = self.__unresolved_inheritence[i]
+                resolve_inheritance(inherit_json_id)
+                self.__unresolved_inheritence.remove(inherit_json_id)
+            except IndexError:
+                # This field has been already parsed
+                continue
 
 
     def __resolve_override_rules(self):
@@ -586,6 +594,36 @@ class ModelParser(object):
         return cls._model_definitions.get(namespace)
 
     @classmethod
+    def resolve_models(cls, model_list, namespace):
+        """
+        From a given list of model definitions resolves all the field conflicts
+        and returns a new model definition containing all the information from
+        the model list.
+        The field definitions are resolved from left-to-right.
+
+        :param model_list: It could be also a string, in which case the model
+        definition is returned as it is.
+
+        :return: Dictionary containing the union of the model definitions.
+        """
+        if model_list == '__default__':
+            return {}
+
+        if namespace not in cls._model_definitions:
+            cls.reparse(namespace)
+
+        if isinstance(model_list, six.string_types):
+            return cls.model_definitions(namespace).get(model_list, {})
+
+        new_model = {'fields': dict(), 'inherit_from': list()}
+        for model in model_list:
+            model_def = cls.model_definitions(namespace).get(model, {})
+            new_model['fields'].update(model_def.get('fields', {}))
+            new_model['inherit_from'].extend(model_def.get('inherit_from', []))
+
+        return new_model
+
+    @classmethod
     def reparse(cls, namespace):
         """
         Invalidates the cached version of all the models inside the given
@@ -620,20 +658,23 @@ class ModelParser(object):
                  (helpful if we use inheritance) or in case of unknown field name.
         """
         for model_file in self.files:
-            parser = _create_record_model_parser()
+            parser = _create_model_parser()
             model_name = os.path.basename(model_file).split('.')[0]
             if model_name in self.__class__._model_definitions[self.__namespace]:
-                raise ModelParserException("Already defined record model: %s" % (model_name,))
+                raise ModelParserException("Already defined model: %s" % (model_name,))
             self.__class__._model_definitions[self.__namespace][model_name] = {'fields': {},
-                                                             'super': [],
-                                                            }
-            model_definition = parser.parseFile(model_file, parseAll=True)
+                                                             'inherit_from': [], }
+            try:
+                model_definition = parser.parseFile(model_file, parseAll=True)
+            except ParseException as e:
+                raise ModelParserException("Cannot parse file '%s',\n, %s" % (model_file, e.msg))
+
 
             if not model_definition.fields:
                 raise ModelParserException("Field definition needed")
             for field_def in model_definition.fields[0]:
                 if field_def.inherit_from:
-                    self.__class__._model_definitions[self.__namespace][model_name]['super'].extend(eval(field_def[0]))
+                    self.__class__._model_definitions[self.__namespace][model_name]['inherit_from'].extend(eval(field_def[0]))
                 else:
                     if len(field_def) == 1:
                         json_id = field_def[0]
@@ -655,19 +696,19 @@ class ModelParser(object):
         """
         Resolves the inheritance
 
-        :param model: name of the super model
+        :param model: name of the inherit_from model
         :type model: string
 
         :return: List of new fields to be added to the son model
-        :raises: ModelParserException if the super model does not exist.
+        :raises: ModelParserException if the inherit_from model does not exist.
         """
         try:
             model_definition = self.__class__._model_definitions[self.__namespace][model]
         except KeyError:
             raise ModelParserException("Missing model definition for %s" % (model,))
         fields = {}
-        for super_model in model_definition['super']:
-            fields.update(self.__resolve_inheritance(super_model))
+        for inherit_from in model_definition['inherit_from']:
+            fields.update(self.__resolve_inheritance(inherit_from))
         fields.update(model_definition['fields'])
         return fields
 
@@ -687,9 +728,10 @@ def guess_legacy_field_names(fields, master_format, namespace):
     Using the legacy rules written in the config file (@legacy) tries to find
     the equivalent json field for one or more legacy fields.
 
-    >>> guess_legacy_fields(('100__a', '245'), 'marc')
+    >>> guess_legacy_fields(('100__a', '245'), 'marc', 'recordext')
     {'100__a':['authors[0].full_name'], '245':['title']}
     """
+    #FIXME: check problems with keywords[n]
     res = {}
     if isinstance(fields, six.string_types):
         fields = (fields, )
@@ -750,7 +792,7 @@ class BaseExtensionParser(object):
 
         :return: pyparsing ParseElement
         """
-        raise NotImplemented
+        raise NotImplementedError()
 
     @classmethod
     def create_element(cls, rule, override, extend, namespace):
@@ -760,7 +802,7 @@ class BaseExtensionParser(object):
 
         :return: content of the key cls.__name__ inside the field_definitions
         """
-        raise NotImplemented
+        raise NotImplementedError()
 
     @classmethod
     def add_info_to_field(cls, json_id, info):
