@@ -100,7 +100,7 @@ packages.append('invenio_docs')
 
 setup(
     name='Invenio',
-    version='1.9999-dev',
+    version='1.9999',
     url='http://invenio-sofrware.org/repo/invenio',
     license='GPLv2',
     author='CERN',
