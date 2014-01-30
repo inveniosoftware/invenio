@@ -124,3 +124,7 @@
   <div style="clear:both"/></div>
 
 {% endblock %}
+
+{%- if request.is_xhr -%}
+  <script type="text/javascript"> bindModals(); </script>
+{%- endif -%}

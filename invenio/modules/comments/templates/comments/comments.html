@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
+{% from "_macros.html" import js_bundle, css_bundle with context %}
+
 {%- if not request.is_xhr -%}
   {% extends "records/base.html" %}
 {%- endif -%}
@@ -27,7 +29,6 @@
   <div class="page-header">
     {{ format_record(recid, 'hs', ln=g.ln)|safe }}
   </div>
-
 
   <div class="page-header">
     <h4>
@@ -181,3 +182,8 @@
   {%- endif -%}
 
 {% endblock %}
+
+{%- if request.is_xhr -%}
+  {{ css_bundle() }}
+  {{ js_bundle() }}
+{%- endif -%}
