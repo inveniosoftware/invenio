@@ -47,6 +47,12 @@ model_definitions = lambda: PkgResourcesDirDiscoveryRegistry(
     'models', registry_namespace=test_registry)
 
 
+def clean_field_model_definitions():
+    Field_parser._field_definitions = {}
+    Field_parser._legacy_field_matchings = {}
+    Model_parser._model_definitions = {}
+
+
 class TestParser(InvenioTestCase):
 
     def setUp(self):
@@ -112,13 +118,121 @@ authors[n], contributor:
         self.tmp_file_1.close()
         self.tmp_file_2.close()
 
+    def test_wrong_indent(self):
+        """JSONAlchemy - wrong indent"""
+        from invenio.modules.jsonalchemy.parser import _create_field_parser
+        import pyparsing
+        parser = _create_field_parser()
+        test = """
+        foo:
+            creator:
+        bar, '1', foo()
+        """
+        self.assertRaises(pyparsing.ParseException, parser.parseString, test)
+
+        from invenio.modules.jsonalchemy.errors import FieldParserException
+        tmp_file = tempfile.NamedTemporaryFile()
+        config = """
+        foo:
+            creator:
+        bar, '1', foo()
+        """
+        tmp_file.write(config)
+        tmp_file.flush()
+
+        self.app.extensions['registry']['testsuite.fields'].register(tmp_file.name)
+        clean_field_model_definitions()
+        self.assertRaises(FieldParserException, Field_parser.reparse, 'testsuite')
+        tmp_file.close()
+        clean_field_model_definitions()
+
+    def test_not_existing_file(self):
+        """JSONAlchemy - not existing file"""
+        from invenio.modules.jsonalchemy.errors import FieldParserException
+        tmp_file_3 = tempfile.NamedTemporaryFile()
+        config_3 = '''
+        include "non_exisintg.cfg"
+        '''
+        tmp_file_3.write(config_3)
+        tmp_file_3.flush()
+
+        clean_field_model_definitions()
+        self.app.extensions['registry']['testsuite.fields'].register(tmp_file_3.name)
+        self.assertRaises(FieldParserException, Field_parser.reparse, 'testsuite')
+        tmp_file_3.close()
+        clean_field_model_definitions()
+
+    def test_wrong_field_definitions(self):
+        """JSONAlchemy - wrong field definitions"""
+        from invenio.modules.jsonalchemy.errors import FieldParserException
+        tmp_file_4 = tempfile.NamedTemporaryFile()
+        config_4 = '''
+        title:
+            creator:
+                marc, '245__', value
+        '''
+        tmp_file_4.write(config_4)
+        tmp_file_4.flush()
+        clean_field_model_definitions()
+        self.app.extensions['registry']['testsuite.fields'].register(tmp_file_4.name)
+        self.assertRaises(FieldParserException, Field_parser.reparse, 'testsuite')
+        tmp_file_4.close()
+        clean_field_model_definitions()
+
+    def test_wrong_field_inheritance(self):
+        """JSONAlchmey - not parent field definition"""
+        from invenio.modules.jsonalchemy.errors import FieldParserException
+        tmp_file_5 = tempfile.NamedTemporaryFile()
+        config_5 = '''
+        @extend
+        wrong_field:
+            """ Desc """
+        '''
+        tmp_file_5.write(config_5)
+        tmp_file_5.flush()
+        clean_field_model_definitions()
+        self.app.extensions['registry']['testsuite.fields'].register(tmp_file_5.name)
+        self.assertRaises(FieldParserException, Field_parser.reparse, 'testsuite')
+        tmp_file_5.close()
+        clean_field_model_definitions()
+
+        tmp_file_6 = tempfile.NamedTemporaryFile()
+        config_6 = '''
+        @inherit_from(('wrong_field', ))
+        wrong_field_new:
+            """ Desc """
+        '''
+        tmp_file_6.write(config_6)
+        tmp_file_6.flush()
+        del self.app.extensions['registry']['testsuite.fields']
+        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
+        self.app.extensions['registry']['testsuite.fields'].register(tmp_file_6.name)
+        self.assertRaises(FieldParserException, Field_parser.reparse, 'testsuite')
+        tmp_file_6.close()
+        clean_field_model_definitions()
+
+        tmp_file_7 = tempfile.NamedTemporaryFile()
+        config_7 = '''
+        @inherit_from(('wrong_field', ))
+        wrong_field:
+            """ Desc """
+        '''
+        tmp_file_7.write(config_7)
+        tmp_file_7.flush()
+        del self.app.extensions['registry']['testsuite.fields']
+        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
+        self.app.extensions['registry']['testsuite.fields'].register(tmp_file_7.name)
+        self.assertRaises(FieldParserException, Field_parser.reparse, 'testsuite')
+        tmp_file_7.close()
+        clean_field_model_definitions()
+
     def test_field_rules(self):
         """JsonAlchemy - field parser"""
         self.assertTrue(len(Field_parser.field_definitions('testsuite')) >= 22)
         #Check that all files are parsed
         self.assertTrue('authors' in Field_parser.field_definitions('testsuite'))
         self.assertTrue('title' in Field_parser.field_definitions('testsuite'))
-        #Check work arroung for [n] and [0]
+        #Check work around for [n] and [0]
         self.assertTrue(len(Field_parser.field_definitions('testsuite')['authors']) == 2)
         self.assertEqual(Field_parser.field_definitions('testsuite')['authors'], ['authors[0]', 'authors[n]'])
         self.assertTrue('authors[0]' in Field_parser.field_definitions('testsuite'))
@@ -145,6 +259,22 @@ authors[n], contributor:
         Field_parser.reparse('testsuite')
         self.assertEquals(len(Field_parser.field_definitions('testsuite')), len(tmp))
 
+    def test_wrong_field_name_inside_model(self):
+        """JSONAlchmey - wrong field name inside model"""
+        from invenio.modules.jsonalchemy.errors import ModelParserException
+        tmp_file_8 = tempfile.NamedTemporaryFile()
+        config_8 = '''
+        fields:
+            not_existing_field
+        '''
+        tmp_file_8.write(config_8)
+        tmp_file_8.flush()
+        clean_field_model_definitions()
+        self.app.extensions['registry']['testsuite.models'].register(tmp_file_8.name)
+        self.assertRaises(ModelParserException, Model_parser.reparse, 'testsuite')
+        tmp_file_8.close()
+        clean_field_model_definitions()
+
     def test_model_definitions(self):
         """JsonAlchemy - model parser"""
         self.assertTrue(len(Model_parser.model_definitions('testsuite')) >= 2)
@@ -152,6 +282,24 @@ authors[n], contributor:
         tmp = Model_parser.model_definitions('testsuite')
         Model_parser.reparse('testsuite')
         self.assertEquals(len(Model_parser.model_definitions('testsuite')), len(tmp))
+
+    def test_resolve_several_models(self):
+        """JSONAlchemy - test resolve several models"""
+        self.assertEquals(Model_parser.resolve_models('__default__', 'testsuite'), {})
+        test_model = Model_parser.model_definitions('testsuite')['test_model']
+        del test_model['description']
+        self.assertEquals(Model_parser.resolve_models('test_model', 'testsuite'),
+                test_model)
+        self.assertEquals(Model_parser.resolve_models(['base', 'test_model'], 'testsuite'),
+                test_model)
+        self.assertEquals(Model_parser.resolve_models(['foo', 'test_model'], 'testsuite'),
+                test_model)
+
+    def test_field_name_model_based(self):
+        """JSONAlchemy - field name model based"""
+        self.assertEqual(Field_parser.field_definition_model_based('title_article', 'test_model', 'testsuite'),
+                Field_parser.field_definitions('testsuite')['title'])
+
 
     def test_guess_legacy_field_names(self):
         """JsonAlchemy - check legacy field names"""

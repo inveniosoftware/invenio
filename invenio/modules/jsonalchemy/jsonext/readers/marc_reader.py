@@ -23,6 +23,9 @@
 
 """
 import re
+from werkzeug.utils import import_string
+
+from invenio.base.globals import cfg
 
 from invenio.modules.jsonalchemy.reader import Reader
 
@@ -53,6 +56,20 @@ class MarcReader(Reader):
                 yield match.group()
         else:
             raise StopIteration()
+
+    def guess_model_from_input(self):
+        guess_function = cfg.get('CFG_MARC_MODEL_GUESSER', None)
+
+        if guess_function:
+            return import_string(guess_function)(self)
+
+        try:
+            return [coll['a'].lower() for coll in self.rec_tree.get('980__') if 'a' in coll]
+        except TypeError:
+            try:
+                return self.rec_tree.get('980__', {})['a']
+            except:
+                return '__default__'
 
     def _get_elements_from_blob(self, regex_key):
         if regex_key in ('entire_record', '*'):
@@ -86,7 +103,6 @@ class MarcReader(Reader):
                 current_value.append(value)
                 value = current_value
             d[key] = value
-
         self.rec_tree = SaveDict()
         tmp = create_record(self.blob)[0]
         for key, values in tmp.iteritems():

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -51,6 +51,10 @@ class Reader(object):
         if self._additional_info['namespace'] is None:
             raise ReaderException('A namespace is needed to instantiate a reader')
 
+        if self._additional_info['model'] != '__default__' and \
+                isinstance(self._additional_info['model'], six.string_types):
+            self._additional_info['model'] = [self._additional_info['model'], ]
+
         self._parsed = []
 
     @staticmethod
@@ -63,17 +67,28 @@ class Reader(object):
 
     @property
     def field_definitions(self):
-        return FieldParser.field_definitions(self._additional_info['namespace'])
+        """Helper property to get the field definitions from the current namespace"""
+        return FieldParser.field_definitions(self.json_additional_info['namespace'])
 
     @property
     def model_definitions(self):
-        return ModelParser.model_definitions(self._additional_info['namespace'])
+        """Helper property to get the model definitions from the current namespace"""
+        return ModelParser.model_definitions(self.json_additional_info['namespace'])
 
     @property
     def functions(self):
-        return functions(self._additional_info['namespace'])
+        """Helper property to get the functions from the current namespace"""
+        return functions(self.json_additional_info['namespace'])
 
-    def translate(self):
+    @property
+    def json_additional_info(self):
+        """Helper property to get the additional infor from the current json obj"""
+        try:
+            return self.json['__meta_metadata__']['__additional_info__']
+        except KeyError:
+            return self._additional_info
+
+    def translate(self, blob=None):
         """
         It transforms the incoming blob into a json structure using the rules
         described into the field and model definitions.
@@ -82,6 +97,10 @@ class Reader(object):
 
         :return: Json structure (typically a dictionary)
         """
+        if blob is not None:
+            self.blob = blob
+            self.json = None
+
         if not self.blob:
             raise ReaderException("To perform a 'translate' operation a blob is needed")
 
@@ -91,22 +110,14 @@ class Reader(object):
 
         self.json = {}
         self.json['__meta_metadata__'] = {}
-        self.json['__meta_metadata__']['__additional_info__'] = self._additional_info
+        self.json['__meta_metadata__']['__additional_info__'] = self.json_additional_info
         self.json['__meta_metadata__']['__aliases__'] = {}
         self.json['__meta_metadata__']['__errors__'] = []
         self.json['__meta_metadata__']['__continuable_errors__'] = []
-        if self._additional_info['model'] == '__default__' or \
-                self._additional_info['model'] not in self.model_definitions:
-            self.json['__meta_metadata__']['__continuable_errors__']\
-                    .append("Warning - Using 'default' model for 'transalte', given model: '%s'" % (self._additional_info['model'], ))
-            fields = dict(zip(self.field_definitions.keys(), self.field_definitions.keys()))
-        else:
-            fields = self.model_definitions[self._additional_info['model']]['fields']
 
-        self.add(self.json, self.blob, fields)
-        return self.json._dict
+        return self.add(self.json, self.blob)
 
-    def add(self, json, blob, fields):
+    def add(self, json, blob, fields=None):
         """Adds the list of fields to the json structure"""
         self.json = json if isinstance(json, SmartDict) else SmartDict(json)
         self.blob = blob
@@ -114,72 +125,76 @@ class Reader(object):
         if not self.blob or not self.json:
             raise ReaderException("To perform an 'add' operation a json structure and a blob are needed")
 
+        self._prepare_blob()
+
+        if self.json_additional_info['model'] == '__default__':
+            self.json_additional_info['model'] = \
+                self.guess_model_from_input()
+
         if not isinstance(fields, dict):
             if isinstance(fields, six.string_types):
                 fields = (fields, )
-            try:
-                model = self.json['__meta_metadata__']['__additional_info__']['model']
-            except KeyError as e:
-                raise ReaderException('The json structure must contain a model (%s)' % (e, ))
-
-            if model == '__default__' or model not in self.model_definitions:
-                self.json['__meta_metadata__']['__continuable_errors__']\
-                    .append("Warning - Using 'default' model for 'add', given model: '%s'" % (model, ))
-                fields = dict(zip(fields, fields))
-            else:
-                fields = dict((field, self.model_definitions[model]['fields'].get(field, field))
-                        for field in fields)
-
-        self._prepare_blob()
+            fields = self._get_fields_from_model(fields)
 
         for field_name, json_id in fields.items():
             self._unpack_rule(json_id, field_name)
 
         self._post_process_json()
 
+        return self.json._dict
 
-    def set(self, json, field):
+    def set(self, json, field, value=None):
         """
-
+        When adding a new field to the json object tries to find as much information
+        about this field as possible and attaches it to the json object.
+        ``self.json['__meta_metadata__'][field]``
         """
         self.json = json if isinstance(json, SmartDict) else SmartDict(json)
+
+        if field in self.json['__meta_metadata__']:
+            if value:
+                self.json[field] = value
+            return self.json._dict
+
         try:
-            model = self.json['__meta_metadata__']['__additional_info__']['model']
+            model = self.json_additional_info['model']
         except KeyError as e:
             raise ReaderException('The json structure must contain a model (%s)' % (e, ))
 
-        if model == '__default__' or model not in self.model_definitions:
-            self.json['__meta_metadata__']['__continuable_errors__']\
-                    .append("Warning - Using 'default' model for 'add', given model: '%s'" % (model, ))
-            json_id = field
-        else:
-            json_id = self.model_definitions[model]['fields'].get(field, field)
+        json_id = ModelParser.resolve_models(model, self.json_additional_info['namespace']).get(field, field)
 
         try:
-            rule = self.field_definitions[json_id]
+            #FIXME: find solution for cases like authors or keywords
+            rule_def = self.field_definitions[json_id]
         except KeyError:
-            rule = {}
+            rule_def = {}
             self.json['__meta_metadata__']['__continuable_errors__']\
                     .append("Adding a new field '%s' without definition" % (field))
 
         try:
-            if self.json['__meta_metadata__']['__additional_info__']['master_format'] in rule['rules']:
-                rule_def = rule['rules'][self.json['__meta_metadata__']['__additional_info__']['master_format']][0]
+            if self.json_additional_info['master_format'] in rule_def['rules']:
+                rule = rule_def['rules'][self.json_additional_info['master_format']][0]
                 rule_type = 'creator'
-            elif 'derived' in rule['rules']:
-                rule_def = rule['rules']['derived'][0]
+            elif 'derived' in rule_def['rules']:
+                rule = rule_def['rules']['derived'][0]
                 rule_type = 'derived'
-            elif 'calculated' in rule['rules']:
-                rule_def = rule['rules']['calculated'][0]
+            elif 'calculated' in rule_def['rules']:
+                rule = rule_def['rules']['calculated'][0]
                 rule_type = 'calculated'
             else:
-                rule_def = {}
+                rule = {}
                 rule_type = 'UNKNOWN'
         except KeyError:
-            rule_def = {}
+            rule = {}
             rule_type = 'UNKNOWN'
 
-        self.json['__meta_metadata__'][field] = self._find_meta_metadata(json_id, field, rule_type, rule, rule_def)
+        self.json['__meta_metadata__'][field] = \
+                self._find_meta_metadata(json_id, field, rule_type, rule, rule_def)
+
+        if value:
+            self.json[field] = value
+
+        return self.json._dict
 
     def update(self, json, blob, fields=None):
         """
@@ -188,71 +203,92 @@ class Reader(object):
         the json structure.
         """
 
-        if not blob or not blob:
-            raise ReaderException("To perform an 'add' operation a json structure and a blob are needed")
+        if not blob or not json:
+            raise ReaderException("To perform an 'update' operation a json structure and a blob are needed")
+
+        self.json = json if isinstance(json, SmartDict) else SmartDict(json)
+        self.blob = blob
 
         try:
-            model = json['__meta_metadata__']['__additional_info__']['model']
+            model = self.json_additional_info['model']
         except KeyError as e:
             raise ReaderException('The json structure must contain a model (%s)' % (e, ))
 
         if not fields:
             fields = dict(zip(json.keys(), json.keys()))
-            if model == '__default__' or model not in self.model_definitions:
-                json['__meta_metadata__']['__continuable_errors__']\
-                    .append("Warning - Using 'default' model for 'update', given model: '%s'" % (model, ))
-            else:
-                fields = dict(fields, **self.model_definitions[model]['fields'])
+            fields.update(ModelParser.resolve_models(model,
+                self.json_additional_info['namespace']).get('fields', {}))
         elif not isinstance(fields, dict):
             if isinstance(fields, six.string_types):
                 fields = (fields, )
-            if model == '__default__' or model not in self.model_definitions:
-                json['__meta_metadata__']['__continuable_errors__']\
-                    .append("Warning - Using 'default' model for 'update', given model: '%s'" % (model, ))
-                fields = dict(zip(fields, fields))
-            else:
-                fields = dict((field, self.model_definitions[model]['fields'].get(field, field))
-                        for field in fields)
 
-#         for key in fields.keys():
-#             del json['key']
+            fields = dict((field, ModelParser.resolve_models(model,
+                self.json_additional_info['namespace']).get('fields', {}).get(field, field))
+                          for field in fields)
 
-        self.add(json, blob, fields)
+        return self.add(json, blob, fields)
 
+    def guess_model_from_input(self):
+        """
+        Dummy method to guess the model of a given input.
+        Should be redefined in the dedicated readers.
 
-    def validate(self, reset=True):
-        """docstring for validate"""
-        pass
+        .. seealso:: modules :py:mod:`invenio.modules.jsonalchemy.jsonext.readers`
+        """
+        return '__default__'
 
     def _prepare_blob(self, *args, **kwargs):
         """
         Responsible of doing any kind of transformation over the blob before the
         translation begins
+
+        .. seealso:: modules :py:mod:`invenio.modules.jsonalchemy.jsonext.readers`
         """
-        raise NotImplemented
+        raise NotImplementedError()
 
     def _get_elements_from_blob(self, regex_key):
         """
         Should handle 'entire_record' and '*'
         Not an iterator!
-        """
-        raise NotImplemented
 
+        .. seealso:: modules :py:mod:`invenio.modules.jsonalchemy.jsonext.readers`       
+        """
+        raise NotImplementedError()
+
+    def _get_fields_from_model(self, fields=None):
+        """
+        Helper function to get all the fields from the current model (if any)
+
+        :param fields: List containing the name of the fields to disambiguate.
+            If None searches for all possible fields.
+        """
+        if self.json_additional_info['model'] == '__default__' or \
+                all(model not in self.model_definitions for model in self.json_additional_info['model']):
+            if not fields:
+                return dict(zip(self.field_definitions.keys(), self.field_definitions.keys()))
+            else:
+                return dict(zip(fields, fields))
+        else:
+            full_model = ModelParser.resolve_models(self.json_additional_info['model'],
+                    self.json_additional_info['namespace'])
+            if not fields:
+                return full_model['fields']
+            else:
+                return dict((field, full_model.get(field, field))
+                            for field in fields)
+        return dict()
 
     def _unpack_rule(self, json_id, field_name=None):
         """From the field definitions extract the rules an tries to apply them"""
         try:
             rule_def = self.field_definitions[json_id]
         except KeyError as e:
-            self.json['__meta_metadata__']['__continuable_errors__'].append("Error - Unable to find '%s' field definition" % (json_id, ))
+            self.json['__meta_metadata__']['__continuable_errors__']\
+                    .append("Error - Unable to find '%s' field definition" % (json_id, ))
             return False
 
         if not field_name:
-            model = self.json['__meta_metadata__']['__additional_info__']['model']
-            if model == '__default__' or model not in self.model_definitions:
-                field_name = json_id
-            else:
-                field_name = self.model_definitions[model].get(json_id, json_id)
+            field_name = self._get_fields_from_model((json_id, ))[json_id]
 
         # Undo the workaround for [0] and [n]
         if isinstance(rule_def, list):
@@ -263,14 +299,15 @@ class Reader(object):
             return field_name in self.json
 
         self._parsed.append((json_id, field_name))
-        return self._apply_rules(json_id, field_name, rule_def) or \
-                self._apply_virtual_rules(json_id, field_name, rule_def)
+        apply_rule = self._apply_rules(json_id, field_name, rule_def)
+        apply_virtual_rule = self._apply_virtual_rules(json_id, field_name, rule_def)
+        return  apply_rule or apply_virtual_rule
 
     def _apply_rules(self, json_id, field_name, rule_def):
         """Tries to apply a 'creator' rule"""
         applied = False
         for rule in rule_def['rules'].get(
-                self.json['__meta_metadata__']['__additional_info__']['master_format'], []):
+                self.json_additional_info['master_format'], []):
             elements = self._get_elements_from_blob(rule['source_tag'])
             if not elements:
                 self._set_default_value(json_id, field_name)
@@ -298,12 +335,15 @@ class Reader(object):
                     applied = False
                     for e in element:
                         if rule['only_if_master_value'] and \
-                           not all(try_to_eval(rule['only_if_master_value'], self.functions, value=e, self=self.json)):
+                           not all(try_to_eval(rule['only_if_master_value'],
+                               self.functions, value=e, self=self.json)):
                             applied = applied or False
                         else:
                             try:
-                                value = try_to_eval(rule['value'], self.functions, value=e, self=self.json)
-                                info = self._find_meta_metadata(json_id, field_name, 'creator', rule, rule_def)
+                                value = try_to_eval(rule['value'], self.functions,
+                                        value=e, self=self.json)
+                                info = self._find_meta_metadata(json_id,
+                                        field_name, 'creator', rule, rule_def)
                                 if 'json_ext' in rule_def:
                                     value = rule_def['json_ext']['dumps'](value)
                                 self.json.set(field_name, value, extend=True)
@@ -387,11 +427,14 @@ class Reader(object):
         return info
 
     def _set_default_value(self, json_id, field_name):
-        """
-        Finds the default value inside the schema, if any
+        """Finds the default value inside the schema, if any"""
+        def remove_metadata(field_name):
+            """Handy closure to remove metadata when not needed"""
+            try:
+                del self.json['__meta_metadata__'][field_name]
+            except KeyError:
+                pass
 
-        :return: tuple containing if the value is required and the default value.
-        """
         schema = self.field_definitions[json_id].get('schema', {}).get(json_id)
         if schema and 'default' in schema:
             try:
@@ -404,7 +447,9 @@ class Reader(object):
             except Exception, e:
                 self.json['__meta_metadata__']['__continuable_errors__']\
                         .append('Default Value CError - Unable to set default value for %s - %s' % (field_name, str(e)))
+                remove_metadata(field_name)
 
+        remove_metadata(field_name)
 
     def _post_process_json(self):
         """
@@ -413,6 +458,7 @@ class Reader(object):
         singletons.
         """
         def remove_none_values(obj):
+            """Handy closure to remove recursively None values from obj"""
             if isinstance(obj, dict):
                 for key, value in obj.items():
                     if value is None:

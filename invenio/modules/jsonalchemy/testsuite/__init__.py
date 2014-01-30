@@ -16,8 +16,3 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-from .test_parser import *
-from .test_reader import *
-from .test_storage_engine import *
-from .test_wrapper import *

@@ -19,7 +19,7 @@
 
 def produce(self, fields=None):
     """
-    Export the record in marc format.
+    Export the json in marc format.
 
     @param tags: list of tags to include in the output, if None or
                 empty list all available tags will be included.

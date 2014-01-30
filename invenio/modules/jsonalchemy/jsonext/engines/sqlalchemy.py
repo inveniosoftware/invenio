@@ -98,22 +98,22 @@ class SQLAlchemyStorage(Storage):
     def get_many(self, ids):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_many`"""
         for json in self.db.session.query(self.model.json)\
-                .filter(RecordMetadata.id.in_(ids))\
+                .filter(self.model.id.in_(ids))\
                 .all():
             yield json[0]
 
-    def get_field_values(recids, field, repetitive_values=True, count=False,
+    def get_field_values(self, recids, field, repetitive_values=True, count=False,
             include_recid=False, split_by=0):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_field_values`"""
         #TODO
         raise NotImplementedError()
 
-    def get_fields_values(recids, fields, repetitive_values=True, count=False,
+    def get_fields_values(self, recids, fields, repetitive_values=True, count=False,
             include_recid=False, split_by=0):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_fields_values`"""
         #TODO
         raise NotImplementedError()
 
-    def search(query):
+    def search(self, query):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.search`"""
         raise NotImplementedError()
