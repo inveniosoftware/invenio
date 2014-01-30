@@ -1118,7 +1118,7 @@ def get_authors_by_name_regexp(name_regexp):   ### get_all_personids_by_name
                       (name_regexp,) )
 
 
-def get_authors_by_name(name):   ### find_pids_by_exact_name
+def get_authors_by_name(name, limit_to_recid=False):   ### find_pids_by_exact_name
     '''
     Gets all authors who have records with the specified name.
 
@@ -1128,8 +1128,14 @@ def get_authors_by_name(name):   ### find_pids_by_exact_name
     @return: author identifiers
     @rtype: set set((int),)
     '''
-    return set(_select_from_aidpersonidpapers_where(select=['personid'], name=name))
-
+    if limit_to_recid:
+        pids = run_sql("select personid from aidPERSONIDPAPERS where name=%s and bibrec=%s and flag>-2",
+                       (name, limit_to_recid))
+        return set(pids)
+    else:
+        pids = run_sql("select personid from aidPERSONIDPAPERS where name=%s and flag>-2",
+                       (name,))
+        return set(pids)
 
 def get_paper_to_author_and_status_mapping():   ### get_bibrefrec_to_pid_flag_mapping
     '''
