@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,18 +18,26 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Common fields in all the documents inside any Invenio installation.
+    invenio.modules.documents.errors
+    --------------------------------
+
+    Defines exceptions raised by Document API.
 """
 
-fields:
-    _id = uuid
-    creator
-    version
-    deleted
-    source
-    uri
-    restriction
-    parent
-    parent_uuid
-    creation_date
-    modification_date
+
+class DocumentError(Exception):
+    """
+    General document exception.
+    """
+
+
+class DocumentNotFound(DocumentError):
+    """
+    Document has not been found in database.
+    """
+
+
+class DeletedDocument(DocumentNotFound):
+    """
+    Document has not been found because it has been previously deleted.
+    """
