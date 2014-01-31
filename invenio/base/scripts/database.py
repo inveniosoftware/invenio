@@ -211,6 +211,22 @@ def create(default_data=True):
     populate(default_data)
 
 
+@manager.command
+def diff():
+    """Diff database against SQLAlchemy models"""
+
+    try:
+        from migrate.versioning import schemadiff
+    except ImportError:
+        print ">>> Required package sqlalchemy-migrate is not installed. " \
+            "Please install with:"
+        print ">>> pip install sqlalchemy-migrate"
+        return
+
+    from invenio.ext.sqlalchemy import db
+    print db.schemadiff()
+
+
 @option_yes_i_know
 @option_default_data
 def recreate(yes_i_know=False, default_data=True):
