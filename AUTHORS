@@ -32,9 +32,6 @@ The CERN development team currently consists of:
  - Ludmila Marian <ludmila.marian@gmail.com>
      Citerank family of ranking methods.  Fixes to numerous modules.
 
- - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
-     Improvements to the BibCirculation module.
-
  - Flavio Costa <flavio.costa@cern.ch>
      Contributions to the Italian translation.
 
@@ -42,16 +39,13 @@ The CERN development team currently consists of:
      Fix for demo site installation.  Contributions to the Czech
      translation.
 
+ - Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
+     Updates to mail cookie expiration mechanism.
+
  - Jan Aage Lavik <jan.age.lavik@cern.ch>
      Improvements to BibMatch with remote matching capabilities,
      improvements to plot extractor, improvements to harvesting and
      other small fixes.
-
- - Piotr Praczyk <piotr.praczyk@gmail.com>
-     OAI harvesting from arXiv.  Test harvesting interface, for
-     BibHarvest.  Record comparison library functions, for BibRecord.
-     Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
-     undo/redo.
 
  - Samuele Carli <samuele.carli@cern.ch>
      Fixes for basket export facility and adding external items to
@@ -84,9 +78,6 @@ currently consists of:
  - Alberto Accomazzi <aaccomazzi@cfa.harvard.edu>
      Team leader.
 
- - Giovanni Di Milia <gdimilia@cfa.harvard.edu>
-     Recognition of /record/sysno URLs, ADS formatting.
-
  - Jay Luker <lbjay@reallywow.com>
      Improvements to the emergency notification sending facility.
 
@@ -97,6 +88,18 @@ Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project since 2002.  In an approximately decreasing chronological
 order:
+
+ - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
+     Improvements to the BibCirculation module.
+
+ - Piotr Praczyk <piotr.praczyk@gmail.com>
+     OAI harvesting from arXiv.  Test harvesting interface, for
+     BibHarvest.  Record comparison library functions, for BibRecord.
+     Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
+     undo/redo.
+
+ - Giovanni Di Milia <gdimilia@cfa.harvard.edu>
+     Recognition of /record/sysno URLs, ADS formatting.
 
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photo management.

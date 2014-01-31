@@ -6,6 +6,32 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.6 -- released 2014-01-31
+-------------------------------------
+
+ *) BatchUploader: avoid tempfile.tempdir redefinition (#1594)
+
+ *) BibRank: temporary file storage in CFG_TMPDIR (#1594)
+
+ *) BibUpload: FFT replace warning in guide
+
+ *) dbquery: closes redundant connection
+
+ *) global: language value always in link URLs
+
+ *) installation: fix autotools rsync instructions; pip requirements;
+    pip requirement version updates
+
+ *) intbitset: no crash when intbitset is on rhs (#1287)
+
+ *) WebSearch: asciification of `oe` grapheme (#1582); correct record
+    sums from hosted colls (#1651); nonexisting record API test case
+    fix (#1692); space between records in MARC HTML
+
+ *) WebSession: fix mail cookie expiration (#1596)
+
+ *) WebSubmit: fix for typo in Shared_Functions
+
 CDS Invenio v0.99.9 -- released 2014-01-31
 ------------------------------------------
 

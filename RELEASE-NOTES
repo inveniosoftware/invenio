@@ -1,54 +1,46 @@
 --------------------------------------------------------------------
-Invenio v1.0.5 is released
-August 19, 2013
+Invenio v1.0.6 is released
+January 31, 2014
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.0.5 was released on August 19, 2013.
+Invenio v1.0.6 was released on January 31, 2014.
 
 This is a bugfix release update for Invenio v1.0 release series.  It
-is recommended to all Invenio sites using v1.0.4 or previous releases.
+is recommended to all Invenio sites using v1.0.5 or previous releases.
 
 What's new:
 -----------
 
- *) BibClassify: escape keywords in tag cloud and MARCXML
+ *) BatchUploader: avoid tempfile.tempdir redefinition (#1594)
 
- *) BibDocFile: support new magic library
+ *) BibRank: temporary file storage in CFG_TMPDIR (#1594)
 
- *) BibFormat: additional fulltext file display in HB; fix CLI call to
-    old PHP-based formatter; format_element initialisation fix
+ *) BibUpload: FFT replace warning in guide
 
- *) BibIndex: better wording for stemming in admin UI
+ *) dbquery: closes redundant connection
 
- *) BibKnowledge: /kb/export 500 error fix
+ *) global: language value always in link URLs
 
- *) BibUpload: FMT regression test case fix; indicators in strong tags
+ *) installation: fix autotools rsync instructions; pip requirements;
+    pip requirement version updates
 
- *) errorlib: hiding bibcatalog info in exception body
+ *) intbitset: no crash when intbitset is on rhs (#1287)
 
- *) global: test suite nosification
+ *) WebSearch: asciification of `oe` grapheme (#1582); correct record
+    sums from hosted colls (#1651); nonexisting record API test case
+    fix (#1692); space between records in MARC HTML
 
- *) installation: fix collectiondetailedrecordpagetabs; support for
-    Apache-2.4
+ *) WebSession: fix mail cookie expiration (#1596)
 
- *) WebAccess: IP-based rules and offline user fix; replacement of CDS
-    Invenio by InveniO
-
- *) WebComment: escape review "title"
-
- *) WebSearch: respect default `rg` in Advanced Search
-
- *) WebSession: fix for list of admin activities; login_method changes
-
- *) WebSubmit: new websubmitadmin CLI
+ *) WebSubmit: fix for typo in Shared_Functions
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.0.5.tar.gz>
-  <http://invenio-software.org/download/invenio-1.0.5.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.0.5.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.0.6.tar.gz>
+  <http://invenio-software.org/download/invenio-1.0.6.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.0.6.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -58,31 +50,28 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from Invenio v1.0.4, then:
+If you are upgrading from Invenio v1.0.5, then:
 
  a) Stop your bibsched queue and your Apache server.
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.0.5.tar.gz
-     $ cd invenio-1.0.5
+     $ tar xvfz invenio-1.0.6.tar.gz
+     $ cd invenio-1.0.6
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
      $ make check-custom-templates
-     $ make update-v1.0.4-tables
+     $ make update-v1.0.5-tables
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
          --exclude invenio-autotools.conf \
-         --exclude bibformat/format_templates/Default_HTML_brief.bft \
          /opt/invenio/etc/
 
  c) Restart your Apache server and your bibsched queue.
 
-*** NOTE The items below will go into v1.0.6 release announcement ***
-
- x) If your records may contain `oe` UTF-8 graphemes, please schedule
+ d) If your records may contain `oe` UTF-8 graphemes, please schedule
     reindexing of concerned indexes at a convenient time, for example:
 
      $ sudo -u www-data /opt/invenio/bin/bibindex -w title -f100000 -R
