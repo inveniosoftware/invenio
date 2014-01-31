@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -190,7 +190,7 @@ class TestPerformance(InvenioTestCase):
 
     def test_response_speed_oai(self):
         """oairepository - speed of response for oai_dc output"""
-        allowed_seconds_per_record_oai = 0.09
+        allowed_seconds_per_record_oai = 0.15
 
         # Test oai ListRecords performance
         t0 = time.time()
@@ -203,7 +203,7 @@ Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_o
 
     def test_response_speed_marcxml(self):
         """oairepository - speed of response for marcxml output"""
-        allowed_seconds_per_record_marcxml = 0.05
+        allowed_seconds_per_record_marcxml = 0.15
 
         # Test marcxml ListRecords performance
         t0 = time.time()
