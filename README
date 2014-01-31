@@ -1,19 +1,23 @@
-CDS Invenio README
-==================
+Invenio README
+==============
 
-Revision: $Id$
+Invenio is a free software suite enabling you to run your own digital
+library or document repository on the web.  The technology offered by
+the software covers all aspects of digital library management, from
+document ingestion through classification, indexing, and curation up
+to document dissemination.  Invenio complies with standards such as
+the Open Archives Initiative and uses MARC 21 as its underlying
+bibliographic format.  The flexibility and performance of Invenio make
+it a comprehensive solution for management of document repositories of
+moderate to large sizes.
 
-CDS Invenio enables you to run your own electronic preprint server,
-your own online library catalogue or a digital document system on the
-web.  It complies with the Open Archive Initiative metadata harvesting
-protocol and uses MARC21 as its underlying bibliographic standard.
-
-CDS Invenio is developed at, and maintained by, the CERN Document
-Server Software Consortium.  At CERN, CDS Invenio installation manages
-over 600 collections of data, consisting of over 800,000 bibliographic
-records, including 400,000 fulltext documents, covering preprints,
-articles, books, journals, photographs, videos, and more.  Please
-consult <http://cdsweb.cern.ch/> for details.
+Invenio has been originally developed at CERN to run the CERN document
+server, managing over 1,000,000 bibliographic records in high-energy
+physics since 2002, covering articles, books, journals, photos,
+videos, and more.  Invenio is nowadays co-developed by an
+international collaboration comprising institutes such as CERN, DESY,
+EPFL, FNAL, SLAC and is being used by many more scientific
+institutions worldwide.
 
 We aim at user friendliness and speed.  Among the features are:
 
@@ -21,14 +25,14 @@ We aim at user friendliness and speed.  Among the features are:
 
     . Documents organised in collections
     . Regular and virtual collection trees
-    . Customizable portalboxes for each collection
-    . At CERN, over 800,000 documents in 500 collections
+    . Customisable portal pages for each collection
+    . At CERN, over 1,000,000 documents in 700 collections
 
   - Powerful search engine
 
-    . Specially designed indexes to provide Google-like search speeds
-      for repositories of up to 1,500,000 records
-    . Customizable simple and advanced search interfaces
+    . Specially designed indexes to provide fast search speed
+      for repositories of up to 3,000,000 records
+    . Customisable simple and advanced search interfaces
     . Combined metadata, fulltext and citation search in one go
     . Results clustering by collection
 
@@ -37,34 +41,32 @@ We aim at user friendliness and speed.  Among the features are:
     . Standard metadata format (MARC)
     . Handling articles, books, theses, photos, videos, museum objects
       and more
-    . Customizable batch imports and web submission lines
-    . Customizable output display and linking rules
+    . Customisable batch import and web submission workflows
+    . Customisable output format display and linking rules
 
-  - Collaborative features and personalization
+  - Collaborative features and personalisation
 
     . User-defined document baskets
-    . User-defined automated email notification alerts
-    . Basket-sharing within user groups
-    . Messaging between users
-    . Open peer commentin and reviewing of repository documents and in
-      group-shared baskets
+    . User-defined email notification alerts
+    . Personalised RSS queries
+    . Sharing documents of interest in user groups
+    . Peer reviewing and group commenting on documents
 
-The CDS Invenio is free software licenced under terms of GNU General
-Public Licence (GPL).  It is provided on an "as is" basis.  However,
-please note that a support contract can be arranged with the CDS
-Development Group in which we, the developers, can help you to
-install, configure, and maintain the system (featuring email and
-telnet support throughout the year), including development of new
-local features should such a need arise.  If you are interested in
-concluding a support contract with us, please contact the CDS
-Development Group at <cds.support@cern.ch>.
+Invenio is free software licenced under the terms of the GNU General
+Public Licence (GPL).  It is provided on an "as is" basis, in the hope
+that it will be useful, but without any warranty.  There is a
+possibility to get commercial support in case of interest.
 
-CDS Invenio runs on Unix-like systems and requires MySQL database
-server and Apache/Python web application server.  Please consult the
-INSTALL file for more information.
+Invenio runs on Unix-like systems and requires MySQL database server
+and Apache/Python web application server.  Please consult the INSTALL
+file for more information.
 
-Good luck, and thanks for choosing CDS Invenio.
+Good luck and thanks for choosing Invenio.
 
-       - CDS Development Group
-         <cds.support@cern.ch>
-         <http://cdsware.cern.ch/>
+       - Invenio Development Team
+
+         Email: info@invenio-software.org
+         IRC: #invenio on irc.freenode.net
+         Twitter: http://twitter.com/inveniosoftware
+         Github: http://github.com/inveniosoftware
+         URL: http://invenio-software.org

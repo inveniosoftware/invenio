@@ -1,4 +1,31 @@
-CDS Invenio v0.99.7 (released 2013-08-19)
+CDS Invenio v0.99.9 (released 2014-01-31)
+=========================================
+
+2014-01-31  Tibor Simko  <tibor.simko@cern.ch>
+
+	I18N: PO file update for the release of v0.99.9
+
+2013-12-05  Tibor Simko  <tibor.simko@cern.ch>
+
+	installation: empty Travis configuration
+
+2013-11-27  Jerome Caffaro  <jerome.caffaro@cern.ch>
+
+	BibRank: temporary file storage in CFG_TMPDIR
+	* Stores temporary data files used for plotting in CFG_TMPDIR
+	  instead of CFG_WEBDIR.
+	  Adds explicit 'bibrank_grapher_' prefix.
+	  This is not helping, but nor worsening the creation and
+	  servicing of graphs in load-balanced setups.
+
+	* Temporary directory set using 'dir' parameter instead of
+	  'tempfile.tempdir'.  (addresses #1594)
+
+	* Makes use of safer tempfile.mkstemp (instead of tempfile.mktemp).
+
+	Reviewed-by: Tibor Simko <tibor.simko@cern.ch>
+
+CDS Invenio v0.99.8 (released 2013-08-19)
 =========================================
 
 2013-08-19  Tibor Simko  <tibor.simko@cern.ch>

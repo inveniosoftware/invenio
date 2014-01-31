@@ -31,7 +31,7 @@ Contents
 ===================================================
 
       $ cd /usr/local/src/cds-invenio-0.90
- 
+
           Change to the directory where you have configured and built
           the CDS Invenio.
 
@@ -46,10 +46,10 @@ Contents
           @prefix@.
 
       $ cd ..
-  
+
           Go to the parent directory.
 
-      $ rm -rf cds-invenio-0.90.tar.gz cds-invenio-0.90      
+      $ rm -rf cds-invenio-0.90.tar.gz cds-invenio-0.90
 
           Wipe out the downloaded tarball and all the CDS Invenio sources.
 
@@ -64,7 +64,11 @@ Contents
 Thanks for testing CDS Invenio.  We would be glad to hear from you
 about your CDS Invenio experience.  Please tell us what you think to
 help us to improve the system.  Thanks!
-  
-       - CDS Development Group
-         <cds.support@cern.ch>
-         <http://cdsware.cern.ch/>
+
+      - Invenio Development Team
+
+        Email: info@invenio-software.org
+        IRC: #invenio on irc.freenode.net
+        Twitter: http://twitter.com/inveniosoftware
+        Github: http://github.com/inveniosoftware
+        URL: http://invenio-software.org
