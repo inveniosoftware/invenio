@@ -111,14 +111,10 @@ def require_api_auth(f):
         return auth_key
     return authenticate_key(f)
 
-"""
-Global restful API object.
-"""
 
 def setup_app(app):
     """Setup api extension."""
-    api = restful.Api()
-    api.init_app(app)
+    api = restful.Api(app=app)
     app.extensions['restful'] = api
 
     class RestfulRegistry(ModuleAutoDiscoveryRegistry):
