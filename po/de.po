@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.5\n"
+"Project-Id-Version: Invenio 1.0.6\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2013-08-19 17:24+0200\n"
+"POT-Creation-Date: 2014-01-31 15:12+0100\n"
 "PO-Revision-Date: 2012-08-30 11:59+0200\n"
 "Last-Translator: Alexander Wagner <a.wagner@fz-juelich.de>\n"
 "Language-Team: DE <info@invenio-software.org>\n"
@@ -37,7 +37,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:665
 #: modules/websearch/doc/search-guide.webdoc:768
 #: modules/websearch/doc/search-guide.webdoc:803
-#: modules/websearch/lib/search_engine.py:1112
+#: modules/websearch/lib/search_engine.py:1116
 #: modules/websearch/lib/websearch_templates.py:1163
 msgid "AND NOT"
 msgstr "UND NICHT"
@@ -80,7 +80,7 @@ msgstr "Administration"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:4502
+#: modules/websearch/lib/search_engine.py:4510
 #: modules/websearch/lib/websearch_templates.py:804
 #: modules/websearch/lib/websearch_templates.py:882
 #: modules/websearch/lib/websearch_templates.py:1005
@@ -149,7 +149,7 @@ msgstr "Volltext"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
-#: modules/websearch/lib/search_engine.py:1134
+#: modules/websearch/lib/search_engine.py:1138
 #: modules/websearch/lib/websearch_templates.py:1119
 msgid "Regular expression:"
 msgstr "Regulärer Ausdruck:"
@@ -166,7 +166,7 @@ msgstr "Regulärer Ausdruck:"
 #: modules/websearch/doc/search-guide.webdoc:740
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/websearch/lib/search_engine.py:1130
+#: modules/websearch/lib/search_engine.py:1134
 #: modules/websearch/lib/websearch_templates.py:1111
 msgid "All of the words:"
 msgstr "Alle Worte:"
@@ -242,7 +242,7 @@ msgstr "Thema"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#: modules/websearch/lib/search_engine.py:1133
+#: modules/websearch/lib/search_engine.py:1137
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "Partial phrase:"
 msgstr "Partielle Phrase:"
@@ -528,7 +528,7 @@ msgstr "Experiment"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:777
 #: modules/websearch/doc/search-guide.webdoc:812
-#: modules/websearch/lib/search_engine.py:1131
+#: modules/websearch/lib/search_engine.py:1135
 #: modules/websearch/lib/websearch_templates.py:1113
 msgid "Any of the words:"
 msgstr "Eines der Worte:"
@@ -1087,7 +1087,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:742
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#: modules/websearch/lib/search_engine.py:1132
+#: modules/websearch/lib/search_engine.py:1136
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "Exact phrase:"
 msgstr "Genaue Phrase:"
@@ -1105,10 +1105,10 @@ msgstr "Hinweise zum Eintragen"
 #: modules/websearch/doc/search-guide.webdoc:664
 #: modules/websearch/doc/search-guide.webdoc:767
 #: modules/websearch/doc/search-guide.webdoc:802
-#: modules/websearch/lib/search_engine.py:956
-#: modules/websearch/lib/search_engine.py:1111
+#: modules/websearch/lib/search_engine.py:960
+#: modules/websearch/lib/search_engine.py:1115
 #: modules/websearch/lib/websearch_templates.py:1162
-#: modules/websearch/lib/websearch_webcoll.py:588
+#: modules/websearch/lib/websearch_webcoll.py:591
 msgid "OR"
 msgstr "ODER"
 
@@ -1120,7 +1120,7 @@ msgstr "ODER"
 #: modules/websearch/doc/search-guide.webdoc:663
 #: modules/websearch/doc/search-guide.webdoc:766
 #: modules/websearch/doc/search-guide.webdoc:801
-#: modules/websearch/lib/search_engine.py:1110
+#: modules/websearch/lib/search_engine.py:1114
 #: modules/websearch/lib/websearch_templates.py:1161
 msgid "AND"
 msgstr "UND"
@@ -2254,7 +2254,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket.py:181
 #: modules/webbasket/lib/webbasket.py:784
 #: modules/webbasket/lib/webbasket.py:879
-#: modules/websession/lib/webuser.py:303
+#: modules/websession/lib/webuser.py:304
 #: modules/webstyle/lib/webstyle_templates.py:577
 msgid "N/A"
 msgstr "keine Angabe"
@@ -2338,7 +2338,7 @@ msgid "Apr"
 msgstr "Apr"
 
 #: modules/miscutil/lib/dateutils.py:205 modules/miscutil/lib/dateutils.py:219
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:888
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "May"
 msgstr "Mai"
@@ -2372,67 +2372,67 @@ msgid "Dec"
 msgstr "Dez"
 
 #: modules/miscutil/lib/dateutils.py:215
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:887
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "January"
 msgstr "Januar"
 
 #: modules/miscutil/lib/dateutils.py:216
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:887
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "February"
 msgstr "Februar"
 
 #: modules/miscutil/lib/dateutils.py:217
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:887
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "March"
 msgstr "März"
 
 #: modules/miscutil/lib/dateutils.py:218
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:887
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "April"
 msgstr "April"
 
 #: modules/miscutil/lib/dateutils.py:220
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:888
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "June"
 msgstr "Juni"
 
 #: modules/miscutil/lib/dateutils.py:221
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:888
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "July"
 msgstr "Juli"
 
 #: modules/miscutil/lib/dateutils.py:222
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:888
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "August"
 msgstr "August"
 
 #: modules/miscutil/lib/dateutils.py:223
-#: modules/websearch/lib/search_engine.py:885
+#: modules/websearch/lib/search_engine.py:889
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "September"
 msgstr "September"
 
 #: modules/miscutil/lib/dateutils.py:224
-#: modules/websearch/lib/search_engine.py:885
+#: modules/websearch/lib/search_engine.py:889
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "October"
 msgstr "Oktober"
 
 #: modules/miscutil/lib/dateutils.py:225
-#: modules/websearch/lib/search_engine.py:885
+#: modules/websearch/lib/search_engine.py:889
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "November"
 msgstr "November"
 
 #: modules/miscutil/lib/dateutils.py:226
-#: modules/websearch/lib/search_engine.py:885
+#: modules/websearch/lib/search_engine.py:889
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "December"
 msgstr "Dezember"
@@ -2561,8 +2561,8 @@ msgstr "Benötigen Sie Unterstützung? Kontaktieren Sie"
 
 #: modules/webaccess/lib/access_control_config.py:262
 #: modules/websession/lib/websession_templates.py:1087
-#: modules/websession/lib/webuser.py:884 modules/websession/lib/webuser.py:893
-#: modules/websession/lib/webuser.py:894
+#: modules/websession/lib/webuser.py:889 modules/websession/lib/webuser.py:898
+#: modules/websession/lib/webuser.py:899
 msgid "Run Record Editor"
 msgstr "Record Editor ausführen"
 
@@ -2572,7 +2572,7 @@ msgid "Run Multi-Record Editor"
 msgstr "Multi-Record Editor ausführen"
 
 #: modules/webaccess/lib/access_control_config.py:264
-#: modules/websession/lib/webuser.py:885
+#: modules/websession/lib/webuser.py:890
 msgid "Run Document File Manager"
 msgstr "Dateimmanager ausführen"
 
@@ -4941,60 +4941,60 @@ msgstr "Sie sind nicht berechtigt Nachrichten zu nutzen."
 msgid "Read a message"
 msgstr "Lesen Sie eine Nachricht"
 
-#: modules/websearch/lib/search_engine.py:746
-#: modules/websearch/lib/search_engine.py:773
-#: modules/websearch/lib/search_engine.py:4525
-#: modules/websearch/lib/search_engine.py:4578
+#: modules/websearch/lib/search_engine.py:750
+#: modules/websearch/lib/search_engine.py:777
+#: modules/websearch/lib/search_engine.py:4533
+#: modules/websearch/lib/search_engine.py:4586
 msgid "Search Results"
 msgstr "Suchergebnisse"
 
-#: modules/websearch/lib/search_engine.py:876
+#: modules/websearch/lib/search_engine.py:880
 #: modules/websearch/lib/websearch_templates.py:1185
 msgid "any day"
 msgstr "beliebiger Tag"
 
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:886
 #: modules/websearch/lib/websearch_templates.py:1197
 msgid "any month"
 msgstr "beliebiger Monat"
 
-#: modules/websearch/lib/search_engine.py:890
+#: modules/websearch/lib/search_engine.py:894
 #: modules/websearch/lib/websearch_templates.py:1211
 msgid "any year"
 msgstr "beliebiges Jahr"
 
-#: modules/websearch/lib/search_engine.py:931
-#: modules/websearch/lib/search_engine.py:950
+#: modules/websearch/lib/search_engine.py:935
+#: modules/websearch/lib/search_engine.py:954
 msgid "any public collection"
 msgstr "alle öffentlichen Sammlungen"
 
-#: modules/websearch/lib/search_engine.py:935
+#: modules/websearch/lib/search_engine.py:939
 msgid "remove this collection"
 msgstr "Diese Sammlung entfernen"
 
-#: modules/websearch/lib/search_engine.py:946
+#: modules/websearch/lib/search_engine.py:950
 msgid "add another collection"
 msgstr "Neue Sammlung hinzufügen"
 
-#: modules/websearch/lib/search_engine.py:956
-#: modules/websearch/lib/websearch_webcoll.py:588
+#: modules/websearch/lib/search_engine.py:960
+#: modules/websearch/lib/websearch_webcoll.py:591
 msgid "rank by"
 msgstr "sortieren nach"
 
-#: modules/websearch/lib/search_engine.py:976
+#: modules/websearch/lib/search_engine.py:980
 msgid "HTML brief"
 msgstr "kurze HTML Ausgabe"
 
-#: modules/websearch/lib/search_engine.py:1089
-#: modules/websearch/lib/websearch_webcoll.py:558
+#: modules/websearch/lib/search_engine.py:1093
+#: modules/websearch/lib/websearch_webcoll.py:561
 msgid "latest first"
 msgstr "das Letzte zuerst"
 
-#: modules/websearch/lib/search_engine.py:1694
+#: modules/websearch/lib/search_engine.py:1702
 msgid "No values found."
 msgstr "Keine Werte gefunden."
 
-#: modules/websearch/lib/search_engine.py:1817
+#: modules/websearch/lib/search_engine.py:1825
 #, fuzzy, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
@@ -5003,7 +5003,7 @@ msgstr ""
 "Achtung: Volltext-Suche ist nur verfügbar für eine Teilmenge von Dokumenten, "
 "für die meisten ab 2006-2011."
 
-#: modules/websearch/lib/search_engine.py:1821
+#: modules/websearch/lib/search_engine.py:1829
 #, fuzzy, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
@@ -5012,7 +5012,7 @@ msgstr ""
 "Achtung: Bildunterschriften-Suche ist nur verfügbar für eine Teilmenge von "
 "Dokumenten, für die meisten ab from 2008-2011."
 
-#: modules/websearch/lib/search_engine.py:1830
+#: modules/websearch/lib/search_engine.py:1838
 #, fuzzy
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
@@ -5020,25 +5020,25 @@ msgstr ""
 "Derzeit kein Phrasen-Index  für Volltext verfügbar, es wird nach "
 "Wordkombinationen geschaut..."
 
-#: modules/websearch/lib/search_engine.py:1870
+#: modules/websearch/lib/search_engine.py:1878
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "Kein exakte Übereinstimmung für %(x_query1)s gefunden, %(x_query2)s wird "
 "stattdessen verwendet..."
 
-#: modules/websearch/lib/search_engine.py:1880
-#: modules/websearch/lib/search_engine.py:1889
-#: modules/websearch/lib/search_engine.py:4497
-#: modules/websearch/lib/search_engine.py:4535
-#: modules/websearch/lib/search_engine.py:4586
+#: modules/websearch/lib/search_engine.py:1888
+#: modules/websearch/lib/search_engine.py:1897
+#: modules/websearch/lib/search_engine.py:4505
+#: modules/websearch/lib/search_engine.py:4543
+#: modules/websearch/lib/search_engine.py:4594
 #: modules/websubmit/lib/websubmit_webinterface.py:110
 #: modules/websubmit/lib/websubmit_webinterface.py:145
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:327
 msgid "Requested record does not seem to exist."
 msgstr "Angefragter Datensatz scheint nicht zu existieren."
 
-#: modules/websearch/lib/search_engine.py:2011
+#: modules/websearch/lib/search_engine.py:2019
 #, fuzzy
 msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
@@ -5047,7 +5047,7 @@ msgstr ""
 "Such-Syntax missverstanden. Ignoriere alle Klammern in der Anfrage. Wenn das "
 "nicht hilft, bitte die Suchanfrage überprüfen und erneut versuchen"
 
-#: modules/websearch/lib/search_engine.py:2333
+#: modules/websearch/lib/search_engine.py:2341
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -5056,7 +5056,7 @@ msgstr ""
 "Kein Resultat in der Sammlung %(x_collection)s gefunden. Andere öffentliche "
 "Sammlungen ergaben %(x_url_open)s%(x_nb_hits)d Ergebnisse%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:2342
+#: modules/websearch/lib/search_engine.py:2350
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -5065,27 +5065,27 @@ msgstr ""
 "Sie private Dokumente durchsuchen möchten, wählen Sie bitte zuerst eine "
 "private Sammlung aus."
 
-#: modules/websearch/lib/search_engine.py:2459
+#: modules/websearch/lib/search_engine.py:2467
 #, python-format
 msgid "There are no records referring to %s."
 msgstr "Es gibt keine Datensätze, die %s referenzieren."
 
-#: modules/websearch/lib/search_engine.py:2461
+#: modules/websearch/lib/search_engine.py:2469
 #, python-format
 msgid "There are no records cited by %s."
 msgstr "Es gibt keine Datensätze, die zitiert werden durch %s."
 
-#: modules/websearch/lib/search_engine.py:2466
+#: modules/websearch/lib/search_engine.py:2474
 #, python-format
 msgid "No word index is available for %s."
 msgstr "Es steht kein Wortindex zur Verfügung für %s."
 
-#: modules/websearch/lib/search_engine.py:2477
+#: modules/websearch/lib/search_engine.py:2485
 #, fuzzy, python-format
 msgid "No phrase index is available for %s."
 msgstr "Es steht kein Phrasen-Index zur Verfügung für %s."
 
-#: modules/websearch/lib/search_engine.py:2522
+#: modules/websearch/lib/search_engine.py:2530
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -5094,7 +5094,7 @@ msgstr ""
 "Zu Suchbegriff %(x_term)s im Index %(x_index)s wurden keine passenden "
 "Datensätze gefunden. Die ähnlichsten Begriffe in allen Sammlungen sind:"
 
-#: modules/websearch/lib/search_engine.py:2526
+#: modules/websearch/lib/search_engine.py:2534
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
@@ -5102,7 +5102,7 @@ msgstr ""
 "Suchbegriff %s hat keine passenden Datensätze gefunden. Die ähnlichsten "
 "Begriffe in allen Sammlungen sind:"
 
-#: modules/websearch/lib/search_engine.py:3282
+#: modules/websearch/lib/search_engine.py:3290
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -5110,7 +5110,7 @@ msgid ""
 msgstr ""
 "Sortierung ist nur für %d Datensäzte erlaubt. Standard Sortierung verwendet."
 
-#: modules/websearch/lib/search_engine.py:3306
+#: modules/websearch/lib/search_engine.py:3314
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -5118,28 +5118,28 @@ msgid ""
 msgstr ""
 "%s schein keine gültige Sortieroption zu sein. Sortierung nach Titel gewählt."
 
-#: modules/websearch/lib/search_engine.py:3499
-#: modules/websearch/lib/search_engine.py:3828
-#: modules/websearch/lib/search_engine.py:4006
-#: modules/websearch/lib/search_engine.py:4029
+#: modules/websearch/lib/search_engine.py:3507
+#: modules/websearch/lib/search_engine.py:3836
+#: modules/websearch/lib/search_engine.py:4014
 #: modules/websearch/lib/search_engine.py:4037
 #: modules/websearch/lib/search_engine.py:4045
-#: modules/websearch/lib/search_engine.py:4091
+#: modules/websearch/lib/search_engine.py:4053
+#: modules/websearch/lib/search_engine.py:4099
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:325
 msgid "The record has been deleted."
 msgstr "Der Datensatz wurde gelöscht."
 
-#: modules/websearch/lib/search_engine.py:3727
+#: modules/websearch/lib/search_engine.py:3735
 msgid "Use different search terms."
 msgstr "Unterschiedliche Suchabfragen verwenden"
 
-#: modules/websearch/lib/search_engine.py:4807
+#: modules/websearch/lib/search_engine.py:4815
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Kein Resultat in der eingegebene Zeitbeschränkung, Bedingung wird "
 "ignoriert..."
 
-#: modules/websearch/lib/search_engine.py:4834
+#: modules/websearch/lib/search_engine.py:4842
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Kein Resultat in der eingegebene Suchbeschränkung, Bedingung wird "
@@ -5349,27 +5349,27 @@ msgid "Limit to:"
 msgstr "Limitieren auf:"
 
 #: modules/websearch/lib/websearch_templates.py:2266
-#: modules/websearch/lib/websearch_webcoll.py:606
+#: modules/websearch/lib/websearch_webcoll.py:609
 msgid "results"
 msgstr "Ergebnisse"
 
 #: modules/websearch/lib/websearch_templates.py:2302
-#: modules/websearch/lib/websearch_webcoll.py:576
+#: modules/websearch/lib/websearch_webcoll.py:579
 msgid "asc."
 msgstr "aufw."
 
 #: modules/websearch/lib/websearch_templates.py:2305
-#: modules/websearch/lib/websearch_webcoll.py:577
+#: modules/websearch/lib/websearch_webcoll.py:580
 msgid "desc."
 msgstr "abw."
 
 #: modules/websearch/lib/websearch_templates.py:2311
-#: modules/websearch/lib/websearch_webcoll.py:621
+#: modules/websearch/lib/websearch_webcoll.py:624
 msgid "single list"
 msgstr "einzige Liste"
 
 #: modules/websearch/lib/websearch_templates.py:2314
-#: modules/websearch/lib/websearch_webcoll.py:620
+#: modules/websearch/lib/websearch_webcoll.py:623
 msgid "split by collection"
 msgstr "In Sammlungen verteilen"
 
@@ -5650,7 +5650,7 @@ msgstr "%s Resultate gefunden"
 msgid "%s seconds"
 msgstr "%s Sekunden"
 
-#: modules/websearch/lib/websearch_webcoll.py:642
+#: modules/websearch/lib/websearch_webcoll.py:645
 msgid "brief"
 msgstr "kurz"
 
@@ -6675,49 +6675,49 @@ msgstr ""
 "Die Release Notes von http://invenio-software.org/repo/invenio/tree/RELEASE-"
 "NOTES können nicht heruntergeladen oder nicht ausgewertet werden"
 
-#: modules/websession/lib/webuser.py:153
+#: modules/websession/lib/webuser.py:154
 msgid "Database problem"
 msgstr "Datenbankproblem"
 
-#: modules/websession/lib/webuser.py:301
+#: modules/websession/lib/webuser.py:302
 #: modules/websession/lib/webgroup_dblayer.py:314
 msgid "user"
 msgstr "Benutzer"
 
-#: modules/websession/lib/webuser.py:472
+#: modules/websession/lib/webuser.py:477
 #, python-format
 msgid "Account registration at %s"
 msgstr "Konto registriert am %s"
 
-#: modules/websession/lib/webuser.py:705
+#: modules/websession/lib/webuser.py:710
 #, fuzzy
 msgid "New account on"
 msgstr "Neues Konto auf"
 
-#: modules/websession/lib/webuser.py:707
+#: modules/websession/lib/webuser.py:712
 msgid "PLEASE ACTIVATE"
 msgstr "Bitte aktivieren"
 
-#: modules/websession/lib/webuser.py:708
+#: modules/websession/lib/webuser.py:713
 #, fuzzy
 msgid "A new account has been created on"
 msgstr "Ihr neues Konto wurde erstellt auf"
 
-#: modules/websession/lib/webuser.py:710
+#: modules/websession/lib/webuser.py:715
 msgid " and is awaiting activation"
 msgstr " und wartet auf die Aktivierung"
 
-#: modules/websession/lib/webuser.py:712
+#: modules/websession/lib/webuser.py:717
 msgid "   Username/Email"
 msgstr "   Benutzername/E-Mail"
 
-#: modules/websession/lib/webuser.py:713
+#: modules/websession/lib/webuser.py:718
 #, fuzzy
 msgid "You can approve or reject this account request at"
 msgstr ""
 "Sie können die Anfrage nach dem Benutzerkonto bestätigen oder ablehnen über"
 
-#: modules/websession/lib/webuser.py:895 modules/websession/lib/webuser.py:896
+#: modules/websession/lib/webuser.py:900 modules/websession/lib/webuser.py:901
 msgid "Run File Manager"
 msgstr ""
 
@@ -7476,9 +7476,10 @@ msgid "add format"
 msgstr "Format hinzufügen"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:178
+#, fuzzy
 msgid ""
-"Note that your submission as been inserted into the bibliographic task queue "
-"and is waiting for execution.\n"
+"Note that your submission has been inserted into the bibliographic task "
+"queue and is waiting for execution.\n"
 msgstr ""
 "Ihre Eintragungen wurden für die automatische bibliografische Bearbeitung "
 "übermittelt und wartet auf die Ausführung.\n"
@@ -11517,29 +11518,29 @@ msgstr "Exportieren mit BibSword: Schritt 4/4"
 msgid "Export with BibSword: Acknowledgement"
 msgstr "Exportieren mit BibSword: Bestätigung"
 
-#: modules/bibupload/lib/batchuploader_engine.py:203
+#: modules/bibupload/lib/batchuploader_engine.py:202
 msgid "More than one possible recID, ambiguous behaviour"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:203
+#: modules/bibupload/lib/batchuploader_engine.py:202
 msgid "No records match that file name"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:204
+#: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "File already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:204
+#: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "A file with the same name and format already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:205
+#: modules/bibupload/lib/batchuploader_engine.py:204
 #, python-format
 msgid "No rights to upload to collection '%s'"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:415
-#: modules/bibupload/lib/batchuploader_engine.py:428
+#: modules/bibupload/lib/batchuploader_engine.py:413
+#: modules/bibupload/lib/batchuploader_engine.py:426
 #, python-format
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
