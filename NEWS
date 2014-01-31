@@ -6,6 +6,11 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+CDS Invenio v0.99.9 -- released 2014-01-31
+------------------------------------------
+
+ *) temporary file storage in CFG_TMPDIR (BibRank)
+
 Invenio v1.0.5 -- released 2013-08-19
 -------------------------------------
 
