@@ -98,6 +98,8 @@ config.status.lineno
 configure.lineno
 *.kdevelop
 *.kdevses
+.kdev4/
+*.kdev4
 .project
 .settings
 .pydevproject
