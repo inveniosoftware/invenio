@@ -248,7 +248,7 @@ module.exports = function (grunt) {
                 expand: true,
                 cwd: '<%= globalConfig.bower_path %>/jquery.ui/themes/',
                 src: ['**'],
-                dest: '<%= grunt.option(\'target\') %>/img/jquery-ui/'
+                dest: '<%= grunt.option(\'target\') %>/img/jquery-ui/themes'
             },
 
             imagesUI: {
@@ -269,6 +269,13 @@ module.exports = function (grunt) {
                     }
                     return dest + src;
                 }
+            },
+
+            plupload: {
+                expand: true,
+                cwd: '<%= globalConfig.bower_path %>/plupload/js',
+                src: ['**'],
+                dest: '<%= grunt.option(\'target\') %>/plupload/'
             }
 
         },
@@ -413,6 +420,12 @@ module.exports = function (grunt) {
             themesUI: {
                 expand: true,
                 cwd: '<%= grunt.option(\'target\') %>/img/jquery-ui/',
+                src: ['**']
+            },
+
+            plupload: {
+                expand: true,
+                cwd: '<%= grunt.option(\'target\') %>/plupload/',
                 src: ['**']
             },
 

@@ -47,7 +47,7 @@
     {{ super() }}
     {%- block webdeposit_assets %}
         {% js 'js/jquery-ui.min.js', '20-jquery-ui' %}
-        {% js 'js/plupload/plupload.full.js', '50-webdeposit' %}
+        {% js 'plupload/plupload.full.min.js', '50-webdeposit' %}
         {% js url_for('webdeposit.static', filename='js/deposit/form.js'), '50-webdeposit' %}
         {% js 'js/hogan.js', '40-webdeposit-hogan' %}
         {% js url_for('webdeposit.static', filename='js/deposit/templates.js'), '50-webdeposit' %}
