@@ -45,8 +45,8 @@ Recommendations for writing upgrades
    afterwards. If you want to correct a mistake, make an new upgrade instead.
  * All upgrades must depend on a previous upgrade (except for your first
    upgrade).
- * For every software release, make a '<repository>_release_<x>_<y>_<z>.py' that
-   depends on all upgrades between the previous release and the new, so
+ * For every software release, make a '<repository>_release_<x>_<y>_<z>.py'
+   that depends on all upgrades between the previous release and the new, so
    future upgrades can depend on this upgrade. The command
    --upgrade-create-release-recipe can help you with this.
  * Upgrades may query for user input, but must be able to run in unattended
@@ -77,7 +77,8 @@ The upgrade engine expects that Invenio upgrades are located in
 in $(top_srcdir)/modules/miscutil/lib/upgrades/ and
 CFG_PREFIX/lib/python/invenio/upgrades/ respectively.
 
-An upgrade can only depend on upgrades in the same repository (i.e. same graph).
+An upgrade can only depend on upgrades in the same repository (i.e. the same
+graph).
 
 A note on upgrade pre-checks prior to installation
 ----------------------------------------------------
@@ -99,15 +100,24 @@ the upgrade will be loaded, but the pre-check will fail and the user will be
 properly notified.
 """
 
-from datetime import date
+from __future__ import absolute_import
+
+from datetime import date, datetime
 import logging
 import os
+import os.path
+import re
 import subprocess
 import sys
 import warnings
 
-from invenio.legacy.dbquery import run_sql
-from invenio.legacy import template as webstyle_template_module
+from sqlalchemy import desc
+from werkzeug.utils import import_string
+from flask import current_app
+from invenio.ext.sqlalchemy import db
+
+from .models import Upgrade
+
 
 UPGRADE_TEMPLATE = """# -*- coding: utf-8 -*-
 ##
@@ -129,26 +139,33 @@ UPGRADE_TEMPLATE = """# -*- coding: utf-8 -*-
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import warnings
-from invenio.legacy.dbquery import run_sql
+from sqlalchemy import *
+from invenio.ext.sqlalchemy import db
 from invenio.utils.text import wait_for_user
+
 
 depends_on = %(depends_on)s
 
+
 def info():
     return "Short description of upgrade displayed to end-user"
+
 
 def do_upgrade():
     \"\"\" Implement your upgrades here  \"\"\"
     pass
 
+
 def estimate():
     \"\"\"  Estimate running time of upgrade in seconds (optional). \"\"\"
     return 1
+
 
 def pre_upgrade():
     \"\"\"  Run pre-upgrade checks (optional). \"\"\"
     # Example of raising errors:
     # raise RuntimeError("Description of error 1", "Description of error 2")
+
 
 def post_upgrade():
     \"\"\"  Run post-upgrade checks (optional). \"\"\"
@@ -222,14 +239,14 @@ class InvenioUpgrader(object):
     a situation where an upgrade id will exist in two repositories. One
     repository will simply overwrite the other on install.
     """
-    FILE_LOG_FMT = '*%(prefix)s %(asctime)s %(levelname)-8s %(plugin_id)s%(message)s'
+    FILE_LOG_FMT = '*%(prefix)s %(asctime)s %(levelname)-8s ' \
+                   '%(plugin_id)s%(message)s'
     CONSOLE_LOG_INFO_FMT = '>>> %(prefix)s%(message)s'
     CONSOLE_LOG_FMT = '>>> %(prefix)s%(levelname)s: %(message)s'
 
-    def __init__(self, packages=None, global_pre_upgrade=[], global_post_upgrade=[]):
+    def __init__(self, packages=None, global_pre_upgrade=None,
+                 global_post_upgrade=None):
         """
-        @param packages: Path to package with upgrades. Default is
-        `invenio.modules.upgrader` if package is not specified.
         @param global_pre_upgrade: List of callables. Each check will be
             executed once per upgrade-batch run. Useful e.g. to check if
             bibsched is running.
@@ -237,25 +254,19 @@ class InvenioUpgrader(object):
             executed once per upgrade-batch run. Useful e.g. to tell users
             to start bibsched again.
         """
-        if packages:
-            self.packages = packages
-        else:
-            self.packages = ['invenio.modules.upgrader']
-
         self.upgrades = None
         self.history = {}
         self.ordered_history = []
 
-        self.global_pre_upgrade = global_pre_upgrade
-        if not self.global_pre_upgrade:
-            # Default global pre-upgrade checks
-            self.global_pre_upgrade = [pre_check_custom_templates,
-                                       pre_check_bibsched]
+        self.global_pre_upgrade = global_pre_upgrade or [
+            pre_check_bibsched
+        ]
+        self.global_post_upgrade = global_post_upgrade or [
+            post_check_bibsched
+        ]
 
-        self.global_post_upgrade = global_post_upgrade
-        if not self.global_post_upgrade:
-            # Default global post-upgrade checks
-            self.global_post_upgrade = [post_check_bibsched]
+        self.packages = packages or \
+            current_app.extensions['registry']['packages']
 
         # Warning related
         self.old_showwarning = None
@@ -426,10 +437,10 @@ class InvenioUpgrader(object):
 
     def post_upgrade_checks(self, upgrades):
         """
-        Run post-upgrade checks after applying all pending upgrades. Post checks
-        may be used to emit warnings encountered when applying an upgrade, but
-        post-checks can also be used to advice the user to run re-indexing
-        or similar long running processes.
+        Run post-upgrade checks after applying all pending upgrades. Post
+        checks may be used to emit warnings encountered when applying an
+        upgrade, but post-checks can also be used to advice the user to run
+        re-indexing or similar long running processes.
 
         Post-checks may query for user-input, but should respect the
         --yes-i-know option to run in an unattended mode.
@@ -483,9 +494,11 @@ class InvenioUpgrader(object):
                 logger = self.get_logger()
                 logger.error("\n".join(msg))
 
-                raise RuntimeError("Upgrade '%s' failed. Your installation is in an"
-                                   " inconsistent state. Please manually review the upgrade "
-                                   "and resolve inconsistencies." % upgrade['id'])
+                raise RuntimeError(
+                    "Upgrade '%s' failed. Your installation is in an"
+                    " inconsistent state. Please manually review the upgrade "
+                    "and resolve inconsistencies." % upgrade['id']
+                )
         finally:
             self._teardown_log_prefix()
 
@@ -496,44 +509,27 @@ class InvenioUpgrader(object):
         If upgrade table does not exists, the history is assumed to be empty.
         """
         if not self.history:
-            stmt = "SELECT upgrade, applied FROM upgrade ORDER BY applied DESC"
-            try:
-                res = run_sql(stmt)
+            query = Upgrade.query.order_by(desc(Upgrade.applied))
 
-                for upgrade, applied in res:
-                    self.history[upgrade] = applied
-                    self.ordered_history.append(upgrade)
-            except Exception:
-                res = run_sql("SHOW TABLES LIKE 'upgrade'")
-                if res:
-                    raise RuntimeError("There seem to be a problem with the "
-                                       "upgrade-table. Please validate it manually (following "
-                                       "statement couldn't be executed %s)." % stmt)
+            for u in query.all():
+                self.history[u.upgrade] = u.applied
+                self.ordered_history.append(u.upgrade)
 
     def latest_applied_upgrade(self, repository='invenio'):
         """
         Get the latest applied upgrade for a repository.
         """
-        stmt = "SELECT upgrade FROM upgrade WHERE upgrade LIKE %s " \
-            "ORDER BY applied DESC LIMIT 1"
-        try:
-            res = run_sql(stmt, param=["%s_%%" % repository])
-            if res:
-                return res[0][0]
-        except Exception, e:
-            print e
-            res = run_sql("SHOW TABLES LIKE 'upgrade'")
-            if res:
-                raise RuntimeError("There seem to be a problem with the "
-                                   "upgrade-table. Please validate it manually"
-                                   " (following statement couldn't be executed"
-                                   " %s)." % stmt)
-        return None
+        u = Upgrade.query.filter(
+            Upgrade.upgrade.like("%s_%%" % repository)
+        ).order_by(desc(Upgrade.applied)).first()
+
+        return u.upgrade if u else None
 
     def register_success(self, upgrade):
         """ Register a successful upgrade """
-        run_sql("INSERT INTO upgrade (upgrade, applied) "
-                "VALUES (%s,NOW())", (upgrade['id'],))
+        u = Upgrade(upgrade=upgrade['id'], applied=datetime.now())
+        db.session.add(u)
+        db.session.commit()
 
     def get_history(self):
         """ Get history of applied upgrades """
@@ -581,9 +577,14 @@ class InvenioUpgrader(object):
             data['repository'] = self._parse_plugin_id(plugin_id)
             return plugin_id, data
 
-        # Load all upgrades
-        plugins = dict(map(builder, import_submodules_from_packages(
-            'upgrades', packages=self.packages)))
+        # Load all upgrades from installed packages
+        plugins = dict(map(
+            builder,
+            import_submodules_from_packages(
+                'upgrades',
+                packages=self.packages
+            )
+        ))
 
         return plugins
 
@@ -591,12 +592,15 @@ class InvenioUpgrader(object):
         """
         Determine repository from plugin id
         """
-        try:
-            repository, dummy_tail = plugin_id.split("_", 1)
-            return repository
-        except ValueError:
-            raise RuntimeError("Repository could not be determined from "
-                               "the upgrade identifier: %s." % plugin_id)
+        m = re.match("(.+)(_\d{4}_\d{2}_\d{2}_)(.+)", plugin_id)
+        if m:
+            return m.group(1)
+        m = re.match("(.+)(_release_)(.+)", plugin_id)
+        if m:
+            return m.group(1)
+
+        raise RuntimeError("Repository could not be determined from "
+                           "the upgrade identifier: %s." % plugin_id)
 
     def get_upgrades(self, remove_applied=True):
         """
@@ -701,10 +705,6 @@ class InvenioUpgrader(object):
                 if d not in graph_incoming:
                     raise RuntimeError("Upgrade %s depends on an unknown"
                                        " upgrade %s" % (node_id, d))
-                if upgrades[node_id]['repository'] != upgrades[d]['repository']:
-                    raise RuntimeError("Upgrade %s depends on an upgrade from "
-                                       "another repository %s" % (node_id,
-                                       upgrades[d]['repository']))
 
         # Nodes with no incoming edges
         start_nodes = filter(lambda x: len(graph_incoming[x]) == 0,
@@ -736,21 +736,6 @@ class InvenioUpgrader(object):
 #
 # Global pre/post-checks
 #
-
-def pre_check_custom_templates():
-    """
-    Check custom templates
-
-    Will only run prior to Invenio being installed
-    """
-    logger = logging.getLogger('invenio_upgrader')
-    logger.info("Checking custom templates...")
-    messages = webstyle_template_module.check(None, None)
-    if messages:
-        webstyle_template_module.print_messages(messages)
-    return True
-
-
 def pre_check_bibsched():
     """
     Check if bibsched is running
@@ -795,13 +780,6 @@ def cmd_upgrade_check(upgrader=None):
     if not upgrader:
         upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
-
-    try:
-        from invenio.ext.sqlalchemy import db
-    except ImportError:
-        logger.error("make check-upgrade is unfortunately not supported for "
-                     "non-SQLAlchemy based Invenio installations")
-        sys.exit(1)
 
     try:
         # Run upgrade pre-checks
@@ -864,7 +842,8 @@ def cmd_upgrade(upgrader=None):
         estimate = upgrader.human_estimate(upgrades)
 
         wait_for_user(wrap_text_in_a_box(
-            """WARNING: You are going to upgrade your installation (estimated time: %s)!""" % estimate))
+            "WARNING: You are going to upgrade your installation "
+            "(estimated time: %s)!" % estimate))
 
         for u in upgrades:
             title = u['__doc__']
@@ -896,13 +875,6 @@ def cmd_upgrade_show_pending(upgrader=None):
     if not upgrader:
         upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
-
-    try:
-        from invenio.ext.sqlalchemy import db
-    except ImportError:
-        logger.error("make check-upgrade is unfortunately not supported for "
-                     "non-SQLAlchemy based Invenio installations")
-        sys.exit(1)
 
     try:
         upgrades = upgrader.get_upgrades()
@@ -948,7 +920,8 @@ def cmd_upgrade_show_applied(upgrader=None):
         sys.exit(1)
 
 
-def cmd_upgrade_create_release_recipe(path, repository='invenio', upgrader=None):
+def cmd_upgrade_create_release_recipe(pkg_path, repository=None,
+                                      output_path=None, upgrader=None):
     """
     Create a new release upgrade recipe (for developers).
     """
@@ -963,14 +936,15 @@ def cmd_upgrade_create_release_recipe(path, repository='invenio', upgrader=None)
             logger.error("No upgrades found.")
             sys.exit(1)
 
-        try:
-            depends_on = endpoints[repository]
-        except KeyError:
-            raise RuntimeError("No upgrades found for repository '%s'" % repository)
+        depends_on = []
+        for repo, upgrades in endpoints.items():
+            depends_on.extend(upgrades)
 
-        return cmd_upgrade_create_standard_recipe(path, repository,
+        return cmd_upgrade_create_standard_recipe(pkg_path,
+                                                  repository=repository,
                                                   depends_on=depends_on,
                                                   release=True,
+                                                  output_path=output_path,
                                                   upgrader=upgrader)
     except RuntimeError, e:
         for msg in e.args:
@@ -978,9 +952,9 @@ def cmd_upgrade_create_release_recipe(path, repository='invenio', upgrader=None)
         sys.exit(1)
 
 
-def cmd_upgrade_create_standard_recipe(path, repository='invenio',
+def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
                                        depends_on=None, release=False,
-                                       upgrader=None):
+                                       upgrader=None, output_path=None):
     """
     Create a new upgrade recipe (for developers).
     """
@@ -989,30 +963,42 @@ def cmd_upgrade_create_standard_recipe(path, repository='invenio',
     logger = upgrader.get_logger()
 
     try:
-        path = _upgrade_recipe_parse_path(path)
+        path, found_repository = _upgrade_recipe_find_path(pkg_path)
+
+        if output_path:
+            path = output_path
+
+        if not repository:
+            repository = found_repository
 
         if not os.path.exists(path):
             raise RuntimeError("Path does not exists: %s" % path)
         if not os.path.isdir(path):
             raise RuntimeError("Path is not a directory: %s" % path)
 
-        # Check repository name.
-        if "_" in repository or not repository:
-            raise RuntimeError("'%s' is an invalid repository name" %
-                               repository)
-
         # Generate upgrade filename
         if release:
-            filename = "%s_%s.py" % (repository, 'release_x_y_z')
+            filename = "%s_release_x_y_z.py" % repository
         else:
             filename = "%s_%s_%s.py" % (repository,
                                         date.today().strftime("%Y_%m_%d"),
                                         'rename_me')
+
+        # Check if generated repository name can be parsed
+        test_repository = upgrader._parse_plugin_id(filename[:-3])
+        if repository != test_repository:
+            raise RuntimeError(
+                "Generated repository name cannot be parsed. "
+                "Please override it with --repository option."
+            )
+
         upgrade_file = os.path.join(path, filename)
 
         if os.path.exists(upgrade_file):
-            raise RuntimeError("Could not generate upgrade - %s already exists."
-                               % upgrade_file)
+            raise RuntimeError(
+                "Could not generate upgrade - %s already exists."
+                % upgrade_file
+            )
 
         # Determine latest installed upgrade
         if depends_on is None:
@@ -1039,15 +1025,35 @@ def cmd_upgrade_create_standard_recipe(path, repository='invenio',
 #
 # Invenio helper functions
 #
+def _upgrade_recipe_find_path(import_str, create=True):
+    """
+    Determine repository name and path for new upgrade, based on package
+    import path.
+    """
+    try:
+        # Import package
+        m = import_string(import_str)
 
-def _upgrade_recipe_parse_path(path):
-    srcdir = os.getenv('CFG_INVENIO_SRCDIR', None)
+        # Check if package or module
+        if m.__package__ is not None:
+            raise RuntimeError(
+                "Expected package but found module at '%s'." % import_str
+            )
 
-    if not path:
-        if srcdir:
-            path = os.path.join(srcdir, 'invenio/modules/upgrader/upgrades/')
-        else:
-            path = os.getcwd()
+        # Create upgrade directory if it does not exists
+        path = os.path.join(os.path.dirname(m.__file__), "upgrades")
+        if not os.path.exists(path) and create:
+            os.makedirs(path)
 
-    path = os.path.expandvars(os.path.expanduser(path))
-    return path
+        # Create init file if it does not exists
+        init = os.path.join(path, "__init__.py")
+        if not os.path.exists(init) and create:
+            open(init, 'a').close()
+
+        repository = m.__name__.split(".")[-1]
+
+        return (path, repository)
+    except ImportError:
+        raise RuntimeError("Could not find module '%s'." % import_str)
+    except SyntaxError:
+        raise RuntimeError("Module '%s' has syntax errors." % import_str)

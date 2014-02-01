@@ -58,7 +58,8 @@ def applied():
     """
     Command for showing all upgrades already applied.
     """
-    from invenio.modules.upgrader.engine import cmd_upgrade_show_applied
+    from invenio.modules.upgrader.engine import \
+        cmd_upgrade_show_applied
     cmd_upgrade_show_applied()
 
 
@@ -72,21 +73,34 @@ def release(path, repository):
     """
     Create a new release upgrade recipe (for developers).
     """
-    from invenio.modules.upgrader.engine import cmd_upgrade_create_release_recipe
+    from invenio.modules.upgrader.engine import \
+        cmd_upgrade_create_release_recipe
     cmd_upgrade_create_release_recipe(path, repository)
 
 
-@create.option('-p', '--path', dest='path')
-@create.option('-r', '--repository', dest='repository', default='invenio')
-@create.option('-d', '--depends_on', dest='depends_on')
+@create.option('-p', '--package', dest='package', required=True,
+               help="Import path of module where to create recipe (required).")
+@create.option('-o', '--path', dest='output_path',
+               help="Override output path.")
+@create.option('-r', '--repository', dest='repository',
+               help="Override repository name")
+@create.option('-d', '--depends_on', dest='depends_on',
+               help="List of recipes to depend on.")
 @create.option('--release', dest='release', action='store_true')
-def recipe(path, repository, depends_on=None, release=False):
+def recipe(package, repository=None, depends_on=None, release=False,
+           output_path=None):
     """
     Create a new upgrade recipe (for developers).
     """
-    from invenio.modules.upgrader.engine import cmd_upgrade_create_standard_recipe
-    cmd_upgrade_create_standard_recipe(path, repository, depends_on=depends_on,
-                                       release=release)
+    from invenio.modules.upgrader.engine import \
+        cmd_upgrade_create_standard_recipe
+    cmd_upgrade_create_standard_recipe(
+        package,
+        depends_on=depends_on,
+        repository=repository,
+        release=release,
+        output_path=output_path,
+    )
 
 
 def main():
