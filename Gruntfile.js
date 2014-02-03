@@ -77,8 +77,6 @@ module.exports = function (grunt) {
                 cwd: '<%= globalConfig.bower_path %>/',
                 src: ['bootstrap/dist/js/bootstrap.js'
                      ,'bootstrap/dist/js/bootstrap.min.js'
-                     ,'typeahead.js/dist/typeahead.js'
-                     ,'typeahead.js/dist/typeahead.min.js'
                      ,'jquery/jquery.min.js'
                      ,'jquery/jquery.min.map'
                      ,'jquery-tokeninput/src/jquery.tokeninput.js'
@@ -101,6 +99,17 @@ module.exports = function (grunt) {
                 cwd: '<%= globalConfig.bower_path %>/',
                 src: ['bootstrap/dist/fonts/glyphicons-halflings-regular.*'],
                 dest: '<%= grunt.option(\'target\') %>/fonts/'
+            },
+
+            typeahead: {
+                expand: true,
+                flatten: true,
+                cwd: '<%= globalConfig.bower_path %>/',
+                src: ['typeahead.js/dist/typeahead.bundle.min.js'],
+                dest: '<%= grunt.option(\'target\') %>/js/',
+                rename: function(dest, src) {
+                    return dest + src.replace(src.substring(0), 'typeahead.js');
+                }
             },
 
             typeaheadJSbootstrap: {
