@@ -223,7 +223,7 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
 
     def test_create(self):
         """ Test creation of upgrades """
-        from invenio.modules.upgrader.engine import \
+        from invenio.modules.upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         cmd_upgrade_create_standard_recipe(
@@ -253,7 +253,7 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
 
     def test_create_load_engine(self):
         """ Test creation and loading of upgrades with engine """
-        from invenio.modules.upgrader.engine import \
+        from invenio.modules.upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         cmd_upgrade_create_standard_recipe(
@@ -274,7 +274,7 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
 
     def test_double_create(self):
         """ Test creation of upgrades """
-        from invenio.modules.upgrader.engine import \
+        from invenio.modules.upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         cmd_upgrade_create_standard_recipe('invenio_upgrader_test')
@@ -287,7 +287,7 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
         )
 
     def test_create_with_module(self):
-        from invenio.modules.upgrader.engine import \
+        from invenio.modules.upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         # Module instead of package
@@ -299,7 +299,7 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
 
     def test_invalid_path(self):
         """ Test creation of upgrades """
-        from invenio.modules.upgrader.engine import \
+        from invenio.modules.upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         self.assertRaises(
@@ -311,7 +311,8 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
 
     def test_create_release(self):
         """ Test creation of upgrades """
-        from invenio.modules.upgrader.engine import InvenioUpgrader, \
+        from invenio.modules.upgrader.engine import InvenioUpgrader
+        from invenio.modules.upgrader.commands import \
             cmd_upgrade_create_standard_recipe, \
             cmd_upgrade_create_release_recipe
 
