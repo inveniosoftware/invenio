@@ -389,7 +389,7 @@ def call_old_bibformat(recID, of="HD", on_the_fly=False, verbose=0):
         return out
 
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
-                  search_pattern=None, xml_record=None, user_info=None, qid=""):
+                  search_pattern=None, xml_record=None, user_info=None, qid="", extra_context={}):
     """
     Formats a record given output format. Main entry function of
     bibformat engine.
@@ -441,7 +441,6 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
 
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
-
     if verbose == 9 and template is not None:
         out += """\n<br/><span class="quicknote">
         Using %s template for record %i.
@@ -481,7 +480,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
         return out
 
     # Format with template
-    out_ = format_with_format_template(template, bfo, verbose, qid=qid)
+    out_ = format_with_format_template(template, bfo, verbose, qid=qid, extra_context=extra_context)
 
     out += out_
 
@@ -528,7 +527,7 @@ def decide_format_template(bfo, of):
         return None
 
 def format_with_format_template(format_template_filename, bfo,
-                                verbose=0, format_template_code=None, qid=""):
+                                verbose=0, format_template_code=None, qid="", extra_context={}):
     """ Format a record given a
     format template.
 
@@ -601,13 +600,17 @@ def format_with_format_template(format_template_filename, bfo,
             bfo.recID = bfo.recID if bfo.recID else 0
         record.__getitem__ = encode_utf8(record.__getitem__)
         record.get = encode_utf8(record.get)
+
+        ctx = TEMPLATE_CONTEXT_FUNCTIONS_CACHE.functions
+        ctx.update(extra_context)
+
         evaluated_format = render_template_to_string(
             'format/record/'+format_template_filename,
             recid=bfo.recID,
             record=record,
             format_record=_format_record,
             qid=qid,
-            bfo=bfo, **TEMPLATE_CONTEXT_FUNCTIONS_CACHE.functions).encode('utf-8')
+            bfo=bfo, **ctx).encode('utf-8')
         #except Exception:
         #    register_exception()
 
@@ -631,7 +634,6 @@ def format_with_format_template(format_template_filename, bfo,
                 evaluated_format = evaluated_format.encode('utf8')
             except:
                 evaluated_format = '<!-- Error -->'.encode('utf8')
-
     return evaluated_format
 
 
