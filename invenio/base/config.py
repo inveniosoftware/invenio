@@ -33,7 +33,9 @@ PACKAGES = [
     'invenio.modules.*'
 ]
 
-PACKAGES_EXCLUDE = []
+PACKAGES_EXCLUDE = [
+    'invenio.modules.communities'
+]
 
 CFG_PREFIX = distutils.sysconfig.get_config_var("prefix")
 

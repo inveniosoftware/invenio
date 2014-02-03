@@ -30,6 +30,7 @@ from .loader import OrderAwareDispatchingJinjaLoader
 from flask import g, request, current_app, _request_ctx_stack, url_for
 from jinja2 import FileSystemLoader, ChoiceLoader
 
+
 ENV_PREFIX = '_collected_'
 
 
