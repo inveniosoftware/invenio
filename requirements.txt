@@ -58,3 +58,4 @@ Flask-WTF==0.9.3
 Cerberus==0.5
 git+git://github.com/jirikuncar/Flask-Collect.git@app-static-files#egg=Flask-Collect-0.2.2
 Sphinx
+alembic==0.6.2
