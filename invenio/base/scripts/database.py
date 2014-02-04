@@ -165,9 +165,11 @@ def create(default_data=True):
     from invenio.ext.sqlalchemy import db, models
     try:
         test_db_connection()
-    except:
+    except Exception as e:
         from invenio.ext.logging import get_tracestack
+        print 'Cannot connect with the db:', e.message
         print get_tracestack()
+        return
 
     list(models)
 
@@ -273,7 +275,6 @@ def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
         for m in models.values():
             db.session.execute("TRUNCATE %s" % (m.__tablename__, ))
         db.session.commit()
-
     data.setup()
     db.session.commit()
 
