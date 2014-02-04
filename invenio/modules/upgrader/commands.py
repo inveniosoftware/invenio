@@ -54,7 +54,7 @@ from sqlalchemy import *
 from invenio.ext.sqlalchemy import db
 from invenio.modules.upgrader.api import op
 from invenio.utils.text import wait_for_user
-
+%(imports)s
 
 depends_on = %(depends_on)s
 
@@ -266,7 +266,7 @@ def cmd_upgrade_create_release_recipe(pkg_path, repository=None,
 def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
                                        depends_on=None, release=False,
                                        upgrader=None, output_path=None,
-                                       auto=False):
+                                       auto=False, overwrite=False, name=None):
     """
     Create a new upgrade recipe (for developers).
     """
@@ -294,7 +294,7 @@ def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
         else:
             filename = "%s_%s_%s.py" % (repository,
                                         date.today().strftime("%Y_%m_%d"),
-                                        'rename_me')
+                                        name or 'rename_me')
 
         # Check if generated repository name can be parsed
         test_repository = upgrader._parse_plugin_id(filename[:-3])
@@ -307,10 +307,11 @@ def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
         upgrade_file = os.path.join(path, filename)
 
         if os.path.exists(upgrade_file):
-            raise RuntimeError(
-                "Could not generate upgrade - %s already exists."
-                % upgrade_file
-            )
+            if not overwrite:
+                raise RuntimeError(
+                    "Could not generate upgrade - %s already exists."
+                    % upgrade_file
+                )
 
         # Determine latest installed upgrade
         if depends_on is None:
@@ -335,15 +336,15 @@ def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
 #
 def _write_template(upgrade_file, depends_on, repository, auto=False):
     if auto:
-        operations_str = produce_upgrade_operations()
-        operations_str = "# Auto-generated. Please adjust!\n" + operations_str
+        # Ensure all models are loaded
+        from invenio.ext.sqlalchemy import models
+        list(models)
+        template_args = produce_upgrade_operations()
+        operations_str = template_args['upgrades']
+        import_str = template_args['imports']
     else:
-        operations_str = "pass"
-
-    # Indent
-    operations_str = "\n".join(
-        ["    %s" % x for x in operations_str.split('\n')]
-    )
+        operations_str = "    pass"
+        import_str = ""
 
     with open(upgrade_file, 'w') as f:
         f.write(UPGRADE_TEMPLATE % {
@@ -351,6 +352,7 @@ def _write_template(upgrade_file, depends_on, repository, auto=False):
             'repository': repository,
             'year': date.today().year,
             'operations': operations_str,
+            'imports': import_str
         })
 
 

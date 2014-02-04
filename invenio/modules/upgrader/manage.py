@@ -84,13 +84,16 @@ def release(path, repository):
                help="Override output path.")
 @create.option('-r', '--repository', dest='repository',
                help="Override repository name")
+@create.option('-n', '--name', dest='name',
+               help="Name of upgrade file")
 @create.option('-d', '--depends_on', dest='depends_on',
                help="List of recipes to depend on.")
 @create.option('-a', '--auto', dest='auto', action='store_true',
                help="Auto-generate upgrade (default: False).")
 @create.option('--release', dest='release', action='store_true')
+@create.option('--overwrite', dest='overwrite', action='store_true')
 def recipe(package, repository=None, depends_on=None, release=False,
-           output_path=None, auto=False):
+           output_path=None, auto=False, overwrite=False, name=None):
     """
     Create a new upgrade recipe (for developers).
     """
@@ -103,6 +106,8 @@ def recipe(package, repository=None, depends_on=None, release=False,
         release=release,
         output_path=output_path,
         auto=auto,
+        overwrite=overwrite,
+        name=name,
     )
 
 
