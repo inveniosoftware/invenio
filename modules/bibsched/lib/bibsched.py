@@ -1096,11 +1096,14 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None): # py
     daemon_status = server_pid() and "UP" or "DOWN"
     write_message("BibSched daemon status: %s" % daemon_status)
 
-    r = run_sql('SELECT value FROM schSTATUS WHERE name = "auto_mode"')
-    try:
-        mode = bool(int(r[0][0]))
-    except (ValueError, IndexError):
-        mode = True
+    if run_sql("show tables like 'schSTATUS'"):
+        r = run_sql('SELECT value FROM schSTATUS WHERE name = "auto_mode"')
+        try:
+            mode = bool(int(r[0][0]))
+        except (ValueError, IndexError):
+            mode = True
+    else:
+        mode = False
 
     mode_str = mode and 'AUTOMATIC' or 'MANUAL'
     write_message("BibSched queue running mode: %s" % mode_str)
