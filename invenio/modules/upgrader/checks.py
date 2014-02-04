@@ -22,6 +22,8 @@ Checks to run before and/or after a complete upgrade to ensure certain
 pre-/post-conditions are met (e.g. BibSched not running).
 """
 
+from __future__ import absolute_import
+
 import logging
 import subprocess
 

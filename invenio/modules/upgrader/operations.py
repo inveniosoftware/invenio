@@ -24,13 +24,9 @@ Objects for inspect and manipulating the database structure. Based on Alembic.
 from __future__ import absolute_import
 
 from werkzeug.local import LocalProxy
-from sqlalchemy import MetaData
 from alembic.environment import EnvironmentContext
 from alembic.operations import Operations
-from alembic.autogenerate import compare_metadata
-from alembic.autogenerate.api import \
-    _autogen_context, \
-    _produce_upgrade_commands
+from alembic.autogenerate.api import _produce_migration_diffs
 from alembic.config import Config
 from invenio.ext.sqlalchemy import db
 
@@ -43,8 +39,12 @@ def create_migration_ctx(**kwargs):
     """
     Create an alembic migration context.
     """
-    env = EnvironmentContext(Config(), None, **kwargs)
-    env.configure(connection=db.engine.connect())
+    env = EnvironmentContext(Config(), None)
+    env.configure(
+        connection=db.engine.connect(),
+        sqlalchemy_module_prefix='db.',
+        **kwargs
+    )
     return env.get_context()
 
 
@@ -57,37 +57,27 @@ def create_operations(ctx=None, **kwargs):
     return Operations(ctx)
 
 
-def produce_diffs(ctx=None, metadata=None, **kwargs):
-    """
-    Generate diff between models and actual database.
-    """
-    if ctx is None:
-        ctx = create_migration_ctx(**kwargs)
-    if metadata is None:
-        metadata = MetaData(bind=db.engine)
-        metadata.reflect()
-
-    # Create diff
-    diff = compare_metadata(ctx, metadata)
-
-    # Remove 'alembic_version' table.
-    try:
-        if diff[0][1].name == 'alembic_version':
-            return diff[1:]
-    except Exception:
-        pass
-    return diff
-
-
-def produce_upgrade_operations(ctx=None, metadata=None, **kwargs):
+def produce_upgrade_operations(
+        ctx=None, metadata=None, include_symbol=None, include_object=None,
+        **kwargs):
     """
     Produce a list of upgrade statements
     """
+    if metadata is None:
+        # Note, all SQLAlchemy models must have been loaded to produce
+        # accurate results.
+        metadata = db.metadata
     if ctx is None:
-        ctx = create_migration_ctx(**kwargs)
+        ctx = create_migration_ctx(target_metadata=metadata, **kwargs)
 
-    autogen_context, dummy = _autogen_context(ctx, set())
+    template_args = {}
+    imports = set()
 
-    diffs = produce_diffs(ctx=ctx, metadata=metadata)
+    _produce_migration_diffs(
+        ctx, template_args, imports,
+        include_object=include_object,
+        include_symbol=include_symbol,
+        **kwargs
+    )
 
-    return _produce_upgrade_commands(diffs, autogen_context)
+    return template_args
