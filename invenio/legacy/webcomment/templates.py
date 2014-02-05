@@ -124,7 +124,7 @@ class Template:
             # output
             if nb_comments_total > 0:
                 out = warnings
-                comments_label = len(comments) > 1 and _("Showing the latest %i comments:") % len(comments) \
+                comments_label = len(comments) > 1 and _("Showing the latest %(x_num)i comments:", x_num=len(comments)) \
                                  or ""
                 out += """
 <div class="video_content_clear"></div>
@@ -180,15 +180,15 @@ class Template:
         """
         _ = gettext_set_language(ln)
         if status == 'inexistant':
-            body = _("Sorry, the record %s does not seem to exist.") % (recID,)
+            body = _("Sorry, the record %(x_rec)s does not seem to exist.", x_rec=(recID,))
         elif status in ('nan', 'invalid'):
-            body = _("Sorry, %s is not a valid ID value.") % (recID,)
+            body = _("Sorry, %(x_rec)s is not a valid ID value.", x_rec=(recID,))
         else:
             body = _("Sorry, no record ID was provided.")
 
         body += "<br /><br />"
         link = "<a href=\"%s?ln=%s\">%s</a>." % (CFG_SITE_URL, ln, CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME))
-        body += _("You may want to start browsing from %s") % link
+        body += _("You may want to start browsing from %(x_link)s", x_link=link)
         return body
 
     def tmpl_get_first_comments_with_ranking(self, recID, ln, comments=None, nb_comments_total=None, avg_score=None, warnings=[]):
@@ -288,10 +288,9 @@ class Template:
             score += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") % \
                 {'x_nb_score': '</b><img src="' + CFG_SITE_URL + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
                  'x_nb_reviews': nb_comments_total}
-            useful_label = _("Readers found the following %s reviews to be most helpful.")
-            useful_label %= len(comments) > 1 and len(comments) or ""
+            useful_label = _("Readers found the following %(x_name)s reviews to be most helpful.", x_name=len(comments) if len(comments) > 0 else '')
             view_all_comments_link ='<a class"webcomment_view_all_reviews" href="%s/%s/%s/reviews/display?ln=%s&amp;do=hh">' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, ln)
-            view_all_comments_link += _("View all %s reviews") % nb_comments_total
+            view_all_comments_link += _("View all %(x_name)s reviews", x_name=nb_comments_total)
             view_all_comments_link += '</a><br />'
 
             out = warnings + """
@@ -314,7 +313,7 @@ class Template:
                 'score_label'           : score,
                 'useful_label'          : useful_label,
                 'recID'                 : recID,
-                'view_all_comments'     : _("View all %s reviews") % (nb_comments_total,),
+                'view_all_comments'     : _("View all %(x_name)s reviews", x_name=(nb_comments_total,)),
                 'write_comment'         : _("Write a review"),
                 'comment_rows'          : comment_rows,
                 'tab'                   : '&nbsp;'*4,
@@ -913,10 +912,10 @@ class Template:
                                                   button = reviews and _('Write a review') or _('Write a comment'))
 
         if reviews:
-            total_label = _("There is a total of %s reviews")
+            total_label = _("There is a total of %(x_num)s reviews", x_num=total_nb_comments)
         else:
-            total_label = _("There is a total of %s comments")
-        total_label %= total_nb_comments
+            total_label = _("There is a total of %(x_num)s comments", x_num=total_nb_comments)
+        #total_label %= total_nb_comments
 
         review_or_comment_first = ''
         if reviews == 0 and total_nb_comments == 0 and can_send_comments:
@@ -1318,8 +1317,8 @@ class Template:
         #from search_engine import print_record
         #record_details = print_record(recID=recID, format='hb', ln=ln)
         if nickname:
-            note_label = _("Note: Your nickname, %s, will be displayed as the author of this review.")
-            note_label %= ('<i>' + nickname + '</i>')
+            note_label = _("Note: Your nickname, %(x_name)s, will be displayed as the author of this review.",
+            x_name=('<i>' + nickname + '</i>'))
         else:
             (uid, nickname, display) = get_user_info(uid)
             link = '<a href="%s/youraccount/edit">' % CFG_SITE_SECURE_URL
@@ -1619,10 +1618,10 @@ class Template:
 
         user_rows = ""
         for utuple in users_data:
-            com_label = _("View all %s reported comments") % utuple[u_comment_reports]
+            com_label = _("View all %(x_name)s reported comments", x_name=utuple[u_comment_reports])
             com_link = '''<a href="%s/admin/webcomment/webcommentadmin.py/comments?ln=%s&amp;uid=%s&amp;reviews=0">%s</a><br />''' % \
                           (CFG_SITE_URL, ln, utuple[u_uid], com_label)
-            rev_label = _("View all %s reported reviews") % utuple[u_reviews_reports]
+            rev_label = _("View all %(x_name)s reported reviews", x_name=utuple[u_reviews_reports])
             rev_link = '''<a href="%s/admin/webcomment/webcommentadmin.py/comments?ln=%s&amp;uid=%s&amp;reviews=1">%s</a>''' % \
                           (CFG_SITE_URL, ln, utuple[u_uid], rev_label)
             if not utuple[u_nickname]:
@@ -1708,10 +1707,10 @@ class Template:
         """ outputs information about a review """
         _ = gettext_set_language(ln)
         if reviews:
-            reported_label = _("This review has been reported %i times")
+            reported_label = _("This review has been reported %(x_num)i times", x_num=int(nb_reports))
         else:
-            reported_label = _("This comment has been reported %i times")
-        reported_label %= int(nb_reports)
+            reported_label = _("This comment has been reported %(x_num)i times", x_num=int(nb_reports))
+        # reported_label %= int(nb_reports)
         out = """
 %(reported_label)s<br />
 <a href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(rec_id)i?ln=%(ln)s">%(rec_id_label)s</a><br />
@@ -1996,15 +1995,15 @@ class Template:
         if uid > 0:
             header = '<br />'
             if reviews:
-                header += _("Here are the reported reviews of user %s") %  uid
+                header += _("Here are the reported reviews of user %(x_name)s", x_name=uid)
             else:
-                header += _("Here are the reported comments of user %s") %  uid
+                header += _("Here are the reported comments of user %(x_name)s", x_name=uid)
             header += '<br /><br />'
         if comID > 0 and recID <= 0 and uid <= 0:
             if reviews:
-                header = '<br />' +_("Here is review %s")% comID + '<br /><br />'
+                header = '<br />' +_("Here is review %(x_name)s", x_name=comID) + '<br /><br />'
             else:
-                header = '<br />' +_("Here is comment %s")% comID + '<br /><br />'
+                header = '<br />' +_("Here is comment %(x_name)s", x_name=comID) + '<br /><br />'
         if uid > 0 and comID > 0 and recID <= 0:
             if reviews:
                 header = '<br />' + _("Here is review %(x_cmtID)s written by user %(x_user)s") % {'x_cmtID': comID, 'x_user': uid}
@@ -2022,10 +2021,10 @@ class Template:
         elif recID > 0:
             header = '<br />'
             if reviews:
-                header += _("Here are all reviews for record %i, sorted by the most reported" % recID)
+                header += _("Here are all reviews for record %(x_num)i, sorted by the most reported", x_num=recID)
                 header += '<br /><a href="%s/admin/webcomment/webcommentadmin.py/delete?comid=&recid=%s&amp;reviews=0">%s</a>' % (CFG_SITE_URL, recID, _("Show comments"))
             else:
-                header += _("Here are all comments for record %i, sorted by the most reported" % recID)
+                header += _("Here are all comments for record %(x_num)i, sorted by the most reported", x_num=recID)
                 header += '<br /><a href="%s/admin/webcomment/webcommentadmin.py/delete?comid=&recid=%s&amp;reviews=1">%s</a>' % (CFG_SITE_URL, recID, _("Show reviews"))
 
                 header += "<br /><br />"
@@ -2342,10 +2341,10 @@ class Template:
                                                 ('ro', _('Records only')),
                                                 ('co', _('Comments only')),
                                                 )
-        your_comments_display_number_options = (('20', _("%s items") % 20),
-                                                ('50', _("%s items") % 50),
-                                                ('100', _("%s items") % 100),
-                                                ('500',_("%s items") % 500),
+        your_comments_display_number_options = (('20', _("%(x_i)s items", x_i = 20)),
+                                                ('50', _("%(x_i)s items", x_i = 50)),
+                                                ('100', _("%(x_i)s items", x_i = 100)),
+                                                ('500',_("%(x_i)s items", x_i = 500)),
                                                 ('all', _('All items')),
                                                 )
         out = ""
@@ -2498,9 +2497,9 @@ class Template:
                selected_order_by_option in ('ocf', 'lcf'):
             # We just have an approximation here (we count by
             # comments, not record...)
-            page_links += (_("%i comments found in total (not shown on this page)") % nb_total_results) + '&nbsp;'
+            page_links += (_("%(x_num)i comments found in total (not shown on this page)", x_num=nb_total_results)) + '&nbsp;'
         else:
-            page_links += (_("%i items found in total") % nb_total_results) + '&nbsp;'
+            page_links += (_("%(x_num)i items found in total", x_num=nb_total_results)) + '&nbsp;'
         if selected_display_number_option != 'all':
             # Previous
             if page_number != 1:

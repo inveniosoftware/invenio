@@ -424,7 +424,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                             # upload again
                             file_too_big = True
                             try:
-                                raise InvenioWebCommentWarning(_('The size of file \\"%s\\" (%s) is larger than maximum allowed file size (%s). Select files again.') % (cgi.escape(filename), str(file_size/1024) + 'KB', str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
+                                raise InvenioWebCommentWarning(_('The size of file \\"%(x_file)s\\" (%(x_size)s) is larger than maximum allowed file size (%(x_max)s). Select files again.',
+                                        x_file=cgi.escape(filename), x_size=str(file_size/1024) + 'KB', x_max=str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
                             except InvenioWebCommentWarning, exc:
                                 register_exception(stream='warning')
                                 warning_msgs.append((exc.message, ''))
@@ -917,8 +918,8 @@ class WebInterfaceYourCommentsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description=_("%s View your previously submitted comments") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    description=_("%(x_name)s View your previously submitted comments", x_name=CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME)),
+                    keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME)),
                     uid=uid,
                     language=argd['ln'],
                     req=req,

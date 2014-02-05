@@ -60,7 +60,7 @@ def validate_nickname_or_email(form, field):
             User.query.filter(User.email == field.data).one()
         except SQLAlchemyError:
             raise validators.ValidationError(
-                _('Not valid nickname or email: %s') % (field.data, ))
+                _('Not valid nickname or email: %(x_data)s', x_data=(field.data, )))
 
 
 def validate_nickname(nickname):
@@ -76,7 +76,7 @@ def validate_nickname(nickname):
        nickname.lower() != 'guest':
         if re_invalid_nickname.match(nickname) is not None:
             raise validators.ValidationError(
-                _("Desired nickname %s is invalid.") % nickname
+                _("Desired nickname %(x_name)s is invalid.", x_name=nickname)
             )
 
 
@@ -90,10 +90,10 @@ def validate_email(email):
         'CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN')
     if (email.find("@") <= 0) or (email.find(" ") > 0):
         raise validators.ValidationError(
-            _("Supplied email address %s is invalid.") % email
+            _("Supplied email address %(x_addr)s is invalid.", x_addr=email)
         )
     elif CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN:
         if not email.endswith(CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN):
             raise validators.ValidationError(
-                _("Supplied email address %s is invalid.") % email
+                _("Supplied email address %(x_addr)s is invalid.", x_addr=email)
             )

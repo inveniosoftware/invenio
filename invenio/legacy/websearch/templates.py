@@ -689,8 +689,8 @@ class Template:
             out += self.tmpl_input_hidden(field, value)
 
 
-        header = _("Search %s records for:") % \
-                 self.tmpl_nbrecs_info(record_count, "", "")
+        header = _("Search %(x_name)s records for:",
+                    x_name=self.tmpl_nbrecs_info(record_count, "", ""))
         asearchurl = self.build_search_interface_url(c=collection_id,
                                                      aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                      ln=ln)
@@ -838,8 +838,8 @@ class Template:
             out += self.tmpl_input_hidden(field, value)
 
 
-        header = _("Search %s records for:") % \
-                 self.tmpl_nbrecs_info(record_count, "", "")
+        header = _("Search %(x_name)s records for:",
+                    x_name=self.tmpl_nbrecs_info(record_count, "", ""))
         asearchurl = self.build_search_interface_url(c=collection_id,
                                                      aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                      ln=ln)
@@ -935,8 +935,8 @@ class Template:
             out += self.tmpl_input_hidden(field, value)
 
 
-        header = _("Search %s records for") % \
-                 self.tmpl_nbrecs_info(record_count, "", "")
+        header = _("Search %(x_rec)s records for",
+                 x_rec=self.tmpl_nbrecs_info(record_count, "", ""))
         header += ':'
         ssearchurl = self.build_search_interface_url(c=collection_id, aas=min(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES), ln=ln)
 
@@ -1634,7 +1634,7 @@ class Template:
                                                               sp=sp,
                                                               rm=rm,
                                                               ln=ln),
-                                        {}, _("Cited by %i records") % num_timescited, {'class': "moreinfo"})
+                                        {}, _("Cited by %(x_num)i records", x_num=num_timescited), {'class': "moreinfo"})
 
         return out
 
@@ -2468,12 +2468,12 @@ class Template:
         if not middle_only:
             out += """<td class="searchresultsboxheader" align="center">
                       %(recs_found)s &nbsp;""" % {
-                     'recs_found' : _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>')
+                     'recs_found' : _("%(x_rec)s records found", x_rec=('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>'))
                    }
         else:
             out += "<small>"
             if nb_found > rg:
-                out += "" + cgi.escape(collection_name) + " : " + _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>') + " &nbsp; "
+                out += "" + cgi.escape(collection_name) + " : " + _("%(x_rec)s records found", x_rec=('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>')) + " &nbsp; "
 
         if nb_found > rg: # navig.arrows are needed, since we have many hits
 
@@ -2557,7 +2557,7 @@ class Template:
         if not middle_only:
             if cpu_time > -1:
                 out += """<td class="searchresultsboxheader" align="right"><small>%(time)s</small>&nbsp;</td>""" % {
-                         'time' : _("Search took %s seconds.") % ('%.2f' % cpu_time),
+                         'time' : _("Search took %(x_sec)s seconds.", x_sec=('%.2f' % cpu_time)),
                        }
             out += "</tr></table>"
         else:
@@ -2651,7 +2651,7 @@ class Template:
             if nb_found != -963:
                 out += """<td class="searchresultsboxheader" align="center">
                           %(recs_found)s &nbsp;""" % {
-                         'recs_found' : _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>')
+                         'recs_found' : _("%(x_rec)s records found", x_rec=('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>'))
                        }
             #elif nb_found = -963:
             #    out += """<td class="searchresultsboxheader" align="center">
@@ -2663,7 +2663,7 @@ class Template:
             # we do not care about timed out hosted collections here, because the bumber of records found will never be bigger
             # than rg anyway, since it's negative
             if nb_found > rg:
-                out += "" + cgi.escape(collection_name) + " : " + _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>') + " &nbsp; "
+                out += "" + cgi.escape(collection_name) + " : " + _("%(x_rec)s records found", x_rec=('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>')) + " &nbsp; "
 
         if nb_found > rg: # navig.arrows are needed, since we have many hits
 
@@ -2747,7 +2747,7 @@ class Template:
         if not middle_only:
             if cpu_time > -1:
                 out += """<td class="searchresultsboxheader" align="right"><small>%(time)s</small>&nbsp;</td>""" % {
-                         'time' : _("Search took %s seconds.") % ('%.2f' % cpu_time),
+                         'time' : _("Search took %(x_sec)s seconds.", x_sec=('%.2f' % cpu_time)),
                        }
             out += "</tr></table>"
         else:
@@ -3003,8 +3003,7 @@ class Template:
                                       {'collclass' : count > cfg['CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT'] and 'class="morecollslist" style="display:none"' or '',
                                        'coll' : coll['id'],
                                        'coll_name' : cgi.escape(coll['name']),
-                                       'number' : _("%s records found") % \
-                                       ('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>')}
+                                       'number' : _("%(x_rec)s records found", x_rec=('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>'))}
             # the following is used for hosted collections that have timed out,
             # i.e. for which we don't know the exact number of results yet.
             elif results_final_nb.has_key(coll['code']) and results_final_nb[coll['code']] == -963:
@@ -3014,8 +3013,7 @@ class Template:
                                       {'collclass' : count > cfg['CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT'] and 'class="morecollslist" style="display:none"' or '',
                                        'coll' : coll['id'],
                                        'coll_name' : cgi.escape(coll['name']),
-                                       'number' : _("%s records found") % \
-                                       ('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>')}
+                                       'number' : _("%(x_rec)s records found", x_rec=('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>'))}
         if count > cfg['CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT']:
             out += """<a class="lesscolls" style="display:none; color:red; font-size:small" href="#"><i>%s</i></a>""" % _("Show less collections")
             out += """<a class="morecolls" style="color:red; font-size:small" href="#"><i>%s</i></a>""" % _("Show all collections")
@@ -3567,7 +3565,7 @@ class Template:
         Create page title for cases when unexisting collection was asked for.
         """
         _ = gettext_set_language(ln)
-        out = _("Collection %s Not Found") % cgi.escape(colname)
+        out = _("Collection %(x_name)s Not Found", x_name=cgi.escape(colname))
         return out
 
     def tmpl_collection_not_found_page_body(self, colname, ln=CFG_SITE_LANG):
@@ -3579,11 +3577,10 @@ class Template:
                  <p>%(sorry)s</p>
                  <p>%(you_may_want)s</p>
               """ % { 'title': self.tmpl_collection_not_found_page_title(colname, ln),
-                      'sorry': _("Sorry, collection %s does not seem to exist.") % \
-                                ('<strong>' + cgi.escape(colname) + '</strong>'),
-                      'you_may_want': _("You may want to start browsing from %s.") % \
-                                 ('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + \
-                                        cgi.escape(CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)) + '</a>')}
+                      'sorry': _("Sorry, collection %(x_name)s does not seem to exist.",
+                                 x_name=('<strong>' + cgi.escape(colname) + '</strong>')),
+                      'you_may_want': _("You may want to start browsing from %(x_name)s.",
+                                        x_name=('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + cgi.escape(CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)) + '</a>'))}
         return out
 
     def tmpl_alert_rss_teaser_box_for_query(self, id_query, ln, display_email_alert_part=True):
@@ -3721,7 +3718,7 @@ class Template:
                 # to display only next and last links
                 out += '''<div><span class="moreinfo" style="margin-right:10px;">
                                     %(numrec)s %(totalrec)s %(next)s %(last)s </span></div> ''' % {
-                                'numrec': _("%s of") % ('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>'),
+                                'numrec': _("%(x_name)s of", x_name=('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>')),
                                 'totalrec': ("%s") % ('<strong>' + self.tmpl_nice_number(totalrec, ln) + '</strong>'),
                                 'next': create_html_link(self.build_search_url(recid=recIDnext, ln=ln),
                                         {}, ('<font size="4">&rsaquo;</font>'), {'class': "moreinfo"}),
@@ -3737,7 +3734,7 @@ class Template:
                                             {}, ('<font size="4">&laquo;</font>'), {'class': "moreinfo"}),
                                 'previous': create_html_link(self.build_search_url(recid=recIDprev, ln=ln),
                                             {}, ('<font size="4">&lsaquo;</font>'), {'class': "moreinfo"}),
-                                'numrec': _("%s of") % ('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>'),
+                                'numrec': _("%(x_name)s of", x_name=('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>')),
                                 'totalrec': ("%s") % ('<strong>' + self.tmpl_nice_number(totalrec, ln) + '</strong>')}
             else:
                 # to display all links
@@ -3753,7 +3750,7 @@ class Template:
                                             {'class': "moreinfo"}),
                                 'previous': create_html_link(self.build_search_url(recid=recIDprev, ln=ln),
                                             {}, ('<font size="4">&lsaquo;</font>'), {'class': "moreinfo"}),
-                                'numrec': _("%s of") % ('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>'),
+                                'numrec': _("%(x_name)s of", x_name=('<strong>' + self.tmpl_nice_number(numrec, ln) + '</strong>')),
                                 'totalrec': ("%s") % ('<strong>' + self.tmpl_nice_number(totalrec, ln) + '</strong>'),
                                 'next': create_html_link(self.build_search_url(recid=recIDnext, ln=ln),
                                             {}, ('<font size="4">&rsaquo;</font>'), {'class': "moreinfo"}),
@@ -3921,7 +3918,7 @@ class Template:
 
         if CFG_BIBRANK_SHOW_CITATION_STATS and citinglist is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen(
-                _("Cited by: %s records") % len (citinglist), citinglist, ln)
+                _("Cited by: %(x_num)s records", x_num=len(citinglist)), citinglist, ln)
 
             out += '''
                     <tr><td>
@@ -3988,7 +3985,7 @@ class Template:
 
         if CFG_BIBRANK_SHOW_CITATION_STATS and cociting is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
-                _("Co-cited with: %s records") % len (cociting), cociting, ln)
+                _("Co-cited with: %(x_num)s records", x_num=len (cociting)), cociting, ln)
 
             out = '''
                     <tr><td>
@@ -4030,7 +4027,7 @@ class Template:
                 tmp = [s, weight]
                 sc_scorelist.append(tmp)
             scite = self.tmpl_print_record_list_for_similarity_boxen (
-                _(".. of which self-citations: %s records") % len (selfcited), sc_scorelist, ln)
+                _(".. of which self-citations: %(x_rec)s records", x_rec=len (selfcited)), sc_scorelist, ln)
             out = '<tr><td>' + scite + '</td></tr>'
         return out
 

@@ -2059,11 +2059,11 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         if bsu_f and len(bsu_f) < 2:
             if of.startswith("h"):
-                write_warning(_("There is no index %s.  Searching for %s in all fields." % (bsu_f, bsu_p)), req=req)
+                write_warning(_("There is no index %(x_name)s.  Searching for %(x_text)s in all fields.", x_name=bsu_f, x_text=bsu_p), req=req)
             bsu_f = ''
             bsu_m = 'w'
             if of.startswith("h") and verbose:
-                write_warning(_('Instead searching %s.' % str([bsu_o, bsu_p, bsu_f, bsu_m])), req=req)
+                write_warning(_('Instead searching %(x_name)s.', x_name=str([bsu_o, bsu_p, bsu_f, bsu_m])), req=req)
         try:
             basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m, wl)
         except InvenioWebSearchWildcardLimitError, excp:
@@ -3170,15 +3170,15 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
             t = 'w'
     # special indexes:
     if f == 'refersto':
-        return _("There are no records referring to %s.") % cgi.escape(p)
+        return _("There are no records referring to %(x_rec)s.", x_rec=cgi.escape(p))
     if f == 'citedby':
-        return _("There are no records cited by %s.") % cgi.escape(p)
+        return _("There are no records cited by %(x_rec)s.", x_rec=cgi.escape(p))
     # look for nearest terms:
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
-            return _("No word index is available for %s.") % \
-                   ('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln, False)) + '</em>')
+            return _("No word index is available for %(x_name)s.",
+                   x_name=('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln, False)) + '</em>'))
     else:
         nearest_terms = []
         if index_id:
@@ -3188,8 +3188,8 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         if not nearest_terms:
             nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
         if not nearest_terms:
-            return _("No phrase index is available for %s.") % \
-                   ('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln, False)) + '</em>')
+            return _("No phrase index is available for %(x_name)s.",
+                   x_name=('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln, False)) + '</em>'))
 
     terminfo = []
     for term in nearest_terms:
@@ -3231,8 +3231,8 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
                      {'x_term': "<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>",
                       'x_index': "<em>" + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln, False)) + "</em>"}
         else:
-            intro = _("Search term %s did not match any record. Nearest terms in any collection are:") % \
-                     ("<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>")
+            intro = _("Search term %(x_name)s did not match any record. Nearest terms in any collection are:",
+                     x_name=("<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>"))
 
     return websearch_templates.tmpl_nearest_term_box(p=p, ln=ln, f=f, terminfo=terminfo,
                                                      intro=intro)
@@ -4042,7 +4042,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
             return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
         else:
             if of.startswith('h'):
-                write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
+                write_warning(_("Sorry, %(x_name)s does not seem to be a valid sort option. The records will not be sorted.", x_name=cgi.escape(error_field)), "Error", req=req)
             return recIDs[index_min:]
     if tags:
         for sort_method in sorting_methods:
@@ -4147,7 +4147,7 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
         return recIDs[index_min:]
     if len(recIDs) > CFG_WEBSEARCH_NB_RECORDS_TO_SORT:
         if of.startswith('h'):
-            write_warning(_("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % CFG_WEBSEARCH_NB_RECORDS_TO_SORT, "Warning", req=req)
+            write_warning(_("Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using default sort order.", x_name=CFG_WEBSEARCH_NB_RECORDS_TO_SORT), "Warning", req=req)
         return recIDs[index_min:]
     recIDs_dict = {}
     recIDs_out = []
@@ -4158,7 +4158,7 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
         tags, error_field = get_tags_from_sort_fields(sort_fields)
         if error_field:
             if of.startswith('h'):
-                write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
+                write_warning(_("Sorry, %(x_name)s does not seem to be a valid sort option. The records will not be sorted.", x_name=cgi.escape(error_field)), "Error", req=req)
             return recIDs[index_min:]
     if verbose >= 3 and of.startswith('h'):
         write_warning("Sorting by tags %s." % cgi.escape(repr(tags)), req=req)
@@ -4404,7 +4404,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         write_warning(_("The record has been deleted."), req=req)
                         merged_recid = get_merged_recid(recIDs[irec])
                         if merged_recid:
-                            write_warning(_("The record %d replaces it." % merged_recid), req=req)
+                            write_warning(_("The record %(x_rec)d replaces it.", x_rec=merged_recid), req=req)
                         continue
                     unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
                                                             recIDs[irec], ln=ln)
@@ -4760,7 +4760,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
             # was record deleted-but-merged ?
             merged_recid = get_merged_recid(recID)
             if merged_recid:
-                out += ' ' + _("The record %d replaces it." % merged_recid)
+                out += ' ' + _("The record %(x_rec)d replaces it.", x_rec=merged_recid)
         else:
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
                                   user_info=user_info, verbose=verbose)

@@ -198,7 +198,8 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                     ## There must be a broken link somewhere.
                                     ## Maybe it's good to alert the admin
                                     register_exception(req=req, alert_admin=True)
-                                warn += write_warning(_("The format %s does not exist for the given version: %s") % (cgi.escape(docformat), cgi.escape(str(msg))))
+                                warn += write_warning(_("The format %(x_form)s does not exist for the given version: %(x_vers)s",
+                                            x_form=cgi.escape(docformat), x_vers=cgi.escape(str(msg))))
                                 break
                             (auth_code, auth_message) = docfile.is_restricted(user_info)
                             if auth_code != 0 and not is_user_owner_of_record(user_info, self.recid):
@@ -391,7 +392,7 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
 
             # Confirm modifications
             body += '<p style="color:#0f0">%s</p>' % \
-                    (_('Your modifications to record #%i have been submitted') % argd['recid'])
+                    (_('Your modifications to record #%(x_num)i have been submitted', x_num=argd['recid']))
         elif argd['cancel']:
             # Clean temporary directory
             working_dir = os.path.join(CFG_TMPSHAREDDIR,
@@ -399,7 +400,7 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
                                        argd['access'])
             shutil.rmtree(working_dir)
             body += '<p style="color:#c00">%s</p>' % \
-                    (_('Your modifications to record #%i have been cancelled') % argd['recid'])
+                    (_('Your modifications to record #%(x_num)i have been cancelled', x_num=argd['recid']))
 
         if not argd['recid'] or argd['do'] != 0:
             body += '''
@@ -426,7 +427,7 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
             % {'CFG_SITE_URL': CFG_SITE_URL,
                'title': title,
                'manage_files': _("Document File Manager"),
-               'record': _("Record #%i") % argd['recid'],
+               'record': _("Record #%(x_rec)i", x_rec=argd['recid']),
                'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
             body += create_file_upload_interface(\
@@ -459,7 +460,7 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
 
             body += websubmit_templates.tmpl_page_do_not_leave_submission_js(argd['ln'], enabled=True)
 
-        return page(title = _("Document File Manager") + (argd['recid'] and (': ' + _("Record #%i") % argd['recid']) or ''),
+        return page(title = _("Document File Manager") + (argd['recid'] and (': ' + _("Record #%(x_rec)i", x_rec=argd['recid'])) or ''),
                     navtrail=navtrail,
                     navtrail_append_title_p=0,
                     metaheaderadd = get_upload_file_interface_javascript(form_url_params='?access='+access) + \

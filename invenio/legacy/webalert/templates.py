@@ -450,8 +450,7 @@ class Template:
             out += '<p>' + msg + '</p>'
         else:
             # permanent="y"
-            msg = _("Here are the %s most popular searches.")
-            msg %= ('<b>' + str(len(queries)) + '</b>')
+            msg = _("Here are the %(x_name)s most popular searches.", x_name=('<b>' + str(len(queries)) + '</b>'))
             out += '<p>' + msg + '</p>'
 
         # display the list of searches

@@ -349,7 +349,7 @@ def perform_request_touchset(oai_set_id=None, ln=CFG_SITE_LANG, func=0):
         if func in ["0", 0]:
 
             if oai_set:
-                question = _("""Do you want to touch the OAI set %s? Note that this will force all clients to re-harvest the whole set.""") % cgi.escape(oai_set_spec)
+                question = _("""Do you want to touch the OAI set %(x_name)s? Note that this will force all clients to re-harvest the whole set.""", x_name=cgi.escape(oai_set_spec))
                 text = oaiharvest_templates.tmpl_print_info(ln, question)
                 out += createform(action="touchset",
                                     text=text,
@@ -360,7 +360,7 @@ def perform_request_touchset(oai_set_id=None, ln=CFG_SITE_LANG, func=0):
                 return oaiharvest_templates.tmpl_print_info(ln, _("OAI set does not exist."))
         elif func in ["1", 1]:
             touch_oai_set(oai_set_spec)
-            out += oaiharvest_templates.tmpl_print_info(ln, _("OAI set %s touched.") % cgi.escape(oai_set_spec))
+            out += oaiharvest_templates.tmpl_print_info(ln, _("OAI set %(x_name)s touched.", x_name=cgi.escape(oai_set_spec)))
     out += "<br />"
     out += "<br /><br />"
     out += create_html_link(urlbase=oai_rep_admin_url + \

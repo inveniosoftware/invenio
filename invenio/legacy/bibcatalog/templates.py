@@ -42,7 +42,7 @@ class Template(DefaultTemplate):
         lines = "" #put result here
         i = 1
 
-        lines += (_("You have %i tickets.") % len(tickets)) + "<br/>"
+        lines += (_("You have %(x_num)i tickets.", x_num=len(tickets))) + "<br/>"
 
         #make a prev link if needed
         if (start > 1):

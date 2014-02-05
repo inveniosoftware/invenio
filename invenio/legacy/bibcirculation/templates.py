@@ -2084,7 +2084,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
               </tr>
             </thead>
           <tbody>
-        """ % (_("%i items found.") % number_of_results, _("Title"),
+        """ % (_("%(x_num)i items found.", x_num=number_of_results), _("Title"),
                _("Author"), _("Publisher"),
                _("# copies"))
 
@@ -4381,7 +4381,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
                 <br />
                 <br />
                 </div>
-""" % (_("The due date has been updated. New due date: %s" % (new_due_date)),
+""" % (_("The due date has been updated. New due date: %(x_name)s", x_name=(new_due_date)),
     CFG_SITE_URL, ln, borrower_id, cgi.escape(_("Back to borrower's loans"), True))
 
 
@@ -6974,7 +6974,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                    _("ISBN"),
                    book_isbn,
                    str(book_cover),
-                   _("Copies of %s" % book_title))
+                   _("Copies of %(x_name)s", x_name=book_title))
 
 
         out += """
@@ -7546,7 +7546,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                    _("ISBN"),
                    book_isbn,
                    str(book_cover),
-                   _("Copies of %s" % book_title))
+                   _("Copies of %(x_name)s", x_name=book_title))
 
 
         out += """

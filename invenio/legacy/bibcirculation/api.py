@@ -188,7 +188,7 @@ def perform_get_holdings_information(recid, req, action="borrowal", ln=CFG_SITE_
                 pub_date = time.strptime(publication_date, '%d %b %Y')
                 pub_date = datetime.date(pub_date[0], pub_date[1], pub_date[2])
                 if cur_date < pub_date:
-                    msg += _("The publication date of this book is %s.") % (publication_date)
+                    msg += _("The publication date of this book is %(x_date)s.", x_date=(publication_date))
                     msg += "<br /><br />"
                 else:
                     msg += _("This book has no copies in the library. ")

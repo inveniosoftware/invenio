@@ -51,7 +51,7 @@ def check_alert_name(alert_name, uid, ln=CFG_SITE_LANG):
            where id_user=%s and alert_name=%s"""
     res =  run_sql(sql, (uid, alert_name.strip()))
     if len(res) > 0:
-        raise AlertError( _("You already have an alert named %s.") % ('<b>' + cgi.escape(alert_name) + '</b>',) )
+        raise AlertError( _("You already have an alert named %(x_name)s.", x_name=('<b>' + cgi.escape(alert_name) + '</b>',)))
 
 def get_textual_query_info_from_urlargs(urlargs, ln=CFG_SITE_LANG):
     """Return nicely formatted search pattern and catalogue from urlargs of the search query.
@@ -234,8 +234,8 @@ def perform_add_alert(alert_name, frequency, notification,
               frequency, convert_datestruct_to_datetext(time.localtime()),
               alert_name, notification)
     run_sql(query, params)
-    out = _("The alert %s has been added to your profile.")
-    out %= '<b>' + cgi.escape(alert_name) + '</b>'
+    out = _("The alert %(x_name)s has been added to your profile.", x_name='<b>' + cgi.escape(alert_name) + '</b>')
+    # out %= '<b>' + cgi.escape(alert_name) + '</b>'
     out += perform_list_alerts(uid, ln=ln)
     return out
 
@@ -373,7 +373,7 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
 
     run_sql(query, params)
 
-    out += _("The alert %s has been successfully updated.") % ("<b>" + cgi.escape(alert_name) + "</b>",)
+    out += _("The alert %(x_name)s has been successfully updated.", x_name=("<b>" + cgi.escape(alert_name) + "</b>",))
     out += "<br /><br />\n" + perform_list_alerts(uid, ln=ln)
     return out
 

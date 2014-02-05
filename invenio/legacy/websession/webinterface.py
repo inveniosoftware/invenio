@@ -229,7 +229,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             return page(title=_("Your Account"),
                         body=webaccount.perform_info(req, args['ln']),
                         description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                        keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                         uid=uid,
                         req=req,
                         secure_page_p = 1,
@@ -252,7 +252,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title=_("Your Account"),
                     body=webaccount.perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, sbms, appr, admn, args['ln'], comments),
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                    keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     uid=uid,
                     req=req,
                     secure_page_p = 1,
@@ -320,8 +320,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                      args['ln'], can_config_bibcatalog,
                                                      verbose=args['verbose']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
-                    description=_("%s Personalize, Your Settings")  % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                    description=_("%(x_name)s Personalize, Your Settings", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
+                    keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     uid=uid,
                     req=req,
                     secure_page_p = 1,
@@ -410,17 +410,18 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     else:
                         email = None
                     if not email:
-                        mess += '<p>' + _("Unable to switch to external login method %s, because your email address is unknown.") % cgi.escape(args['login_method'])
+                        mess += '<p>' + _("Unable to switch to external login method %(x_name)s, because your email address is unknown.",
+                                    x_name=cgi.escape(args['login_method']))
                     else:
                         try:
                             if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']].user_exists(email):
-                                mess += '<p>' +  _("Unable to switch to external login method %s, because your email address is unknown to the external login system.") % cgi.escape(args['login_method'])
+                                mess += '<p>' +  _("Unable to switch to external login method %(x_meth)s, because your email address is unknown to the external login system.", x_meth=cgi.escape(args['login_method']))
                             else:
                                 prefs['login_method'] = args['login_method']
                                 webuser.set_user_preferences(uid, prefs)
                                 mess += '<p>' + _("Login method successfully selected.")
                         except AttributeError:
-                            mess += '<p>' + _("The external login method %s does not support email address based logins.  Please contact the site administrators.") % cgi.escape(args['login_method'])
+                            mess += '<p>' + _("The external login method %(x_name)s does not support email address based logins.  Please contact the site administrators.", x_name=% cgi.escape(args['login_method']))
 
         ## Change email or nickname:
         if args['email'] or args['nickname']:
@@ -455,26 +456,26 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 linkname = _("Show account")
                 title = _("Settings edited")
             elif args['nickname'] is not None and not webuser.nickname_valid_p(args['nickname']):
-                mess += '<p>' + _("Desired nickname %s is invalid.") % cgi.escape(args['nickname'])
+                mess += '<p>' + _("Desired nickname %(x_name)s is invalid.", x_name=cgi.escape(args['nickname']))
                 mess += " " + _("Please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif not webuser.email_valid_p(args['email']):
-                mess += '<p>' + _("Supplied email address %s is invalid.") % cgi.escape(args['email'])
+                mess += '<p>' + _("Supplied email address %(x_name)s is invalid.", x_name=cgi.escape(args['email']))
                 mess += " " + _("Please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif uid2 == -1 or uid2 != uid and not uid2 == 0:
-                mess += '<p>' + _("Supplied email address %s already exists in the database.") % cgi.escape(args['email'])
+                mess += '<p>' + _("Supplied email address %(x_email)s already exists in the database.", x_email=cgi.escape(args['email']))
                 mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
                 mess += " " + _("Or please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif uid_with_the_same_nickname == -1 or uid_with_the_same_nickname != uid and not uid_with_the_same_nickname == 0:
-                mess += '<p>' + _("Desired nickname %s is already in use.") % cgi.escape(args['nickname'])
+                mess += '<p>' + _("Desired nickname %(x_name)s is already in use.", x_name=cgi.escape(args['nickname']))
                 mess += " " + _("Please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
@@ -561,7 +562,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     body=webaccount.perform_back(mess, act, linkname, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                    keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     uid=uid,
                     req=req,
                     secure_page_p = 1,
@@ -584,7 +585,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     body=webaccount.perform_lost(args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                    keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     uid=uid,
                     req=req,
                     secure_page_p = 1,
@@ -613,7 +614,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 return page(title=_("Your Account"),
                             body=webaccount.perform_emailMessage(eMsg, args['ln']),
                             description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                            keywords=_("%s, personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
+                            keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                             uid=uid, req=req,
                             secure_page_p = 1,
                             language=args['ln'],
@@ -629,7 +630,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             return page(title=_("Your Account"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
                         description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                        keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                         uid=uid, req=req,
                         secure_page_p = 1,
                         language=args['ln'],
@@ -647,7 +648,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             return page(title=_("Incorrect email address"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
                         description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                        keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                         uid=uid,
                         req=req,
                         secure_page_p = 1,
@@ -657,7 +658,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title=_("Reset password link sent"),
                     body=webaccount.perform_emailSent(args['p_email'], args['ln']),
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                    keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
@@ -680,7 +681,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     body=webaccount.perform_youradminactivities(user_info, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                    keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     uid=uid,
                     req=req,
                     secure_page_p = 1,
@@ -703,7 +704,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     body=webaccount.perform_delete(args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                    keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     uid=uid,
                     req=req,
                     secure_page_p = 1,
@@ -729,7 +730,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     body=webaccount.perform_logout(req, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                    keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     uid=uid,
                     req=req,
                     secure_page_p = 1,
@@ -939,7 +940,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             return  page(title=_("Register"),
                          body=webaccount.create_register_page_box(args['referer'], args['ln']),
                          navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
-                         description=_("%s  Personalize, Main page") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                         description=_("%(x_name)s  Personalize, Main page", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                          keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                          uid=uid,
                          req=req,
@@ -974,23 +975,23 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 1:
-            mess = _("Supplied email address %s is invalid.") % cgi.escape(args['p_email'])
+            mess = _("Supplied email address %(x_addr)s is invalid.", x_addr=cgi.escape(args['p_email']))
             mess += " " + _("Please try again.")
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 2:
-            mess = _("Desired nickname %s is invalid.") % cgi.escape(args['p_nickname'])
+            mess = _("Desired nickname %(x_name)s is invalid.", x_name=cgi.escape(args['p_nickname']))
             mess += " " + _("Please try again.")
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 3:
-            mess = _("Supplied email address %s already exists in the database.") % cgi.escape(args['p_email'])
+            mess = _("Supplied email address %(x_addr)s already exists in the database.", x_addr=cgi.escape(args['p_email']))
             mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
             mess += " " + _("Or please try again.")
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 4:
-            mess = _("Desired nickname %s already exists in the database.") % cgi.escape(args['p_nickname'])
+            mess = _("Desired nickname %(x_name)s already exists in the database.", x_name=cgi.escape(args['p_nickname']))
             mess += " " + _("Please try again.")
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
@@ -1011,7 +1012,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title=title,
                     body=webaccount.perform_back(mess,act, _("register"), args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
-                    description=_("%s  Personalize, Main page") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                    description=_("%(x_name)s  Personalize, Main page", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,
                     req=req,

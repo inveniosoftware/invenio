@@ -3742,9 +3742,9 @@ def send_account_activated_message(account_email, send_to, password, ln=CFG_SITE
     """Send an email to the address given by send_to about the new activated
     account."""
     _ = gettext_set_language(ln)
-    sub = _("Your account on '%s' has been activated") % CFG_SITE_NAME
-    body = _("Your account earlier created on '%s' has been activated:") \
-           % CFG_SITE_NAME + '\n\n'
+    sub = _("Your account on '%(x_name)s' has been activated", x_name=CFG_SITE_NAME)
+    body = _("Your account earlier created on '%(x_name)s' has been activated:",
+             x_name=CFG_SITE_NAME) + '\n\n'
     body += '   ' + _("Username/Email:") + " %s\n" % account_email
     body += '   ' + _("Password:") + " %s\n" % ("*" * len(str(password)))
     body += "\n---------------------------------"
@@ -3756,8 +3756,8 @@ def send_new_user_account_warning(new_account_email, send_to, password, ln=CFG_S
     """Send an email to the address given by send_to about the new account
     new_account_email."""
     _ = gettext_set_language(ln)
-    sub = _("Account created on '%s'") % CFG_SITE_NAME
-    body = _("An account has been created for you on '%s':") % CFG_SITE_NAME + '\n\n'
+    sub = _("Account created on '%(x_name)s'", x_name=CFG_SITE_NAME)
+    body = _("An account has been created for you on '%(x_name)s':", x_name=CFG_SITE_NAME) + '\n\n'
     body += '   ' + _("Username/Email:") + " %s\n" % new_account_email
     body += '   ' + _("Password:") + " %s\n" % ("*" * len(str(password)))
     body += "\n---------------------------------"
@@ -3769,10 +3769,10 @@ def send_account_rejected_message(new_account_email, send_to, ln=CFG_SITE_LANG):
     """Send an email to the address given by send_to about the new account
     new_account_email."""
     _ = gettext_set_language(ln)
-    sub = _("Account rejected on '%s'") % CFG_SITE_NAME
-    body = _("Your request for an account has been rejected on '%s':") \
-        % CFG_SITE_NAME + '\n\n'
-    body += '   ' + _("Username/Email: %s") % new_account_email + "\n"
+    sub = _("Account rejected on '%(x_name)s'", x_name=CFG_SITE_NAME)
+    body = _("Your request for an account has been rejected on '%(x_name)s':",
+             x_name=CFG_SITE_NAME) + '\n\n'
+    body += '   ' + _("Username/Email: %(x_email)s", x_email=new_account_email) + "\n"
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
 
@@ -3782,8 +3782,8 @@ def send_account_deleted_message(new_account_email, send_to, ln=CFG_SITE_LANG):
     """Send an email to the address given by send_to about the new account
     new_account_email."""
     _ = gettext_set_language(ln)
-    sub = _("Account deleted on '%s'") % CFG_SITE_NAME
-    body = _("Your account on '%s' has been deleted:") % CFG_SITE_NAME + '\n\n'
+    sub = _("Account deleted on '%(x_name)s'", x_name=CFG_SITE_NAME)
+    body = _("Your account on '%(x_name)s' has been deleted:", x_name=CFG_SITE_NAME) + '\n\n'
     body += '   ' + _("Username/Email:") + " %s\n" % new_account_email
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME

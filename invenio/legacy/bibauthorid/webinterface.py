@@ -2388,7 +2388,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         pstr = 'Person ID missing or invalid'
         if person != '-1':
             pstr = person
-        title = _('You are going to claim papers for: %s' % pstr)
+        title = _('You are going to claim papers for: %(x_name)s', x_name=pstr)
 
         return page(title=title,
                     metaheaderadd=self._scripts(kill_browser_cache=True),

@@ -138,7 +138,7 @@ def write_keywords_body(keywords, req, recid, argd, marcrec=None):
                                                 req=req, **argd))
     else:
         _ = gettext_set_language(argd['ln'])
-        req.write(template.tmpl_page(top=_('Unknown type: %s')  % argd['type'], **argd))
+        req.write(template.tmpl_page(top=_('Unknown type: %(x_type)s', x_type=argd['type']), **argd))
 
 
 

@@ -62,22 +62,22 @@ class WebInterfaceErrorPages(WebInterfaceDirectory):
 
         if argd['client'] == "NA":
             return page(title=_("Sorry"),
-                        body=_("Cannot send error request, %s parameter missing.") % 'client',
+                        body=_("Cannot send error request, %(x_name)s parameter missing.", x_name='client'),
                         lastupdated=__lastupdated__,
                         req=req)
         elif argd['url'] == "NA":
             return page(title=_("Sorry"),
-                        body=_("Cannot send error request, %s parameter missing.") % 'url',
+                        body=_("Cannot send error request, %(x_name)s parameter missing.", x_name='url'),
                         lastupdated=__lastupdated__,
                         req=req)
         elif argd['time'] == "NA":
             return page(title=_("Sorry"),
-                        body=_("Cannot send error request, %s parameter missing.") % 'time',
+                        body=_("Cannot send error request, %(x_name)s parameter missing.", x_name='time'),
                         lastupdated=__lastupdated__,
                         req=req)
         elif argd['error'] == "NA":
             return page(title=_("Sorry"),
-                        body=_("Cannot send error request, %s parameter missing.") % 'error',
+                        body=_("Cannot send error request, %(x_name)s parameter missing.".x_name='error'),
                         lastupdated=__lastupdated__,
                         req=req)
         else:

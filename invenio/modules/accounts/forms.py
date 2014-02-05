@@ -120,8 +120,7 @@ class ChangePasswordForm(InvenioBaseForm):
         CFG_ACCOUNT_MIN_PASSWORD_LENGTH = 6
         if len(field.data) < CFG_ACCOUNT_MIN_PASSWORD_LENGTH:
             raise validators.ValidationError(
-                _("Password must be at least %d characters long." % (
-                    CFG_ACCOUNT_MIN_PASSWORD_LENGTH, )))
+                _("Password must be at least %(x_pass)d characters long.", x_pass=(CFG_ACCOUNT_MIN_PASSWORD_LENGTH, )))
 
     def validate_password2(self, field):
         if field.data != self.password.data:
@@ -175,8 +174,7 @@ class RegisterForm(Form):
         CFG_ACCOUNT_MIN_PASSWORD_LENGTH = 6
         if len(field.data) < CFG_ACCOUNT_MIN_PASSWORD_LENGTH:
             raise validators.ValidationError(
-                _("Password must be at least %d characters long." % (
-                    CFG_ACCOUNT_MIN_PASSWORD_LENGTH, )))
+                _("Password must be at least %(x_pass)d characters long.", x_pass=(CFG_ACCOUNT_MIN_PASSWORD_LENGTH, )))
 
     def validate_password2(self, field):
         if field.data != self.password.data:

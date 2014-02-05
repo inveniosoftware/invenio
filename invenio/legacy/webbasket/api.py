@@ -1788,7 +1788,7 @@ def perform_request_add(uid,
                 #validated_recids.remove(recid)
                 recids_to_remove.append(recid)
                 try:
-                    raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights to add record #%i.') % recid)
+                    raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights to add record #%(x_id)i.', x_id=recid))
                 except InvenioWebBasketWarning, exc:
                     register_exception(stream='warning')
                     #warnings.append(exc.message)

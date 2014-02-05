@@ -248,8 +248,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
         errors.append(("", error))
         return errors, info
     err_desc = {1: _("More than one possible recID, ambiguous behaviour"), 2: _("No records match that file name"),
-                3: _("File already exists"), 4: _("A file with the same name and format already exists"),
-                5: _("No rights to upload to collection '%s'")}
+                3: _("File already exists"), 4: _("A file with the same name and format already exists")}
     # Create directory DONE/ if doesn't exist
     folder = (folder[-1] == "/") and folder or (folder + "/")
     files_done_dir = folder + "DONE/"
@@ -294,7 +293,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                 file_collection = guess_collection_of_a_record(int(rec_id))
                 auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=file_collection)
                 if auth_code != 0:
-                    error_msg = err_desc[5] % file_collection
+                    error_msg = _("No rights to upload to collection '%(x_name)s'", x_name=file_collection)
                     errors.append((docfile, error_msg))
                     continue
             # Move document to be uploaded to temporary folder

@@ -1044,7 +1044,7 @@ class Template:
                 out += """<tr><td>%(name)s</td><td>%(score)s</td><td>%(result)s</td></tr>""" % {
                           'name' : function['name'],
                           'score' : function['score'],
-                          'result' : function['error'] and (_("Function %s does not exist.") % function['name'] + "<br />") or function['text']
+                          'result' : function['error'] and (_("Function %(x_name)s does not exist.", x_name=function['name']) + "<br />") or function['text']
                         }
             out += "</table>"
         else:

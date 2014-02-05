@@ -564,7 +564,7 @@ class Template:
         """ Display results from the document upload """
         _ = gettext_set_language(ln)
         body_content = "<br/>"
-        body_content += _("<b>%s documents</b> have been found." % info[0])
+        body_content += _("<b>%(x_num)s documents</b> have been found.", x_num=info[0])
         body_content += "<br/><br/>"
         body_content += _("The following files have been successfully queued:")
         body_content += "<ul>"

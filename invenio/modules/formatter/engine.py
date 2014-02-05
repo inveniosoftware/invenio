@@ -811,7 +811,7 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
                 escape_mode = apply(escape_function, (), {'bfo': bfo})
             except Exception, e:
                 try:
-                    raise InvenioBibFormatError(_('Escape mode for format element %s could not be retrieved. Using default mode instead.') % name)
+                    raise InvenioBibFormatError(_('Escape mode for format element %(x_name)s could not be retrieved. Using default mode instead.', x_name=name))
                 except InvenioBibFormatError, exc:
                     register_exception(req=bfo.req)
                     errors.append(exc.message)
@@ -883,7 +883,7 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
             except:
                 name = format_element['attrs']['name']
                 try:
-                    raise InvenioBibFormatError(_('"nbMax" parameter for %s must be an "int".') % name)
+                    raise InvenioBibFormatError(_('"nbMax" parameter for %(x_param)s must be an "int".', x_param=name))
                 except InvenioBibFormatError, exc:
                     register_exception(req=bfo.req)
                     errors.append(exc.message)
@@ -1828,11 +1828,11 @@ def get_fresh_output_format_filename(code):
         # could get there.. Sanity check.
         if index >= 99999:
             try:
-                raise InvenioBibFormatError(_('Could not find a fresh name for output format %s.') % code)
+                raise InvenioBibFormatError(_('Could not find a fresh name for output format %(x_code)s.', x_code=code))
             except InvenioBibFormatError:
                 register_exception()
 
-            sys.exit("Output format cannot be named as %s" % code)
+            sys.exit("Output format cannot be named as %(x_code)s", x_code=code)
 
     return (filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, filename)
 

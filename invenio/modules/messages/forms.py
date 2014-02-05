@@ -60,7 +60,7 @@ def validate_group_names(form, field):
         diff = test.difference(comp)
         if len(diff)>0:
             raise validators.ValidationError(
-                _('Not valid groups: %s') % (', '.join(diff)))
+                _('Not valid groups: %(x_group)s', x_group=(', '.join(diff))))
 
 
 class AddMsgMESSAGEForm(InvenioBaseForm):

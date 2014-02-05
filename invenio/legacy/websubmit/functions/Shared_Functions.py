@@ -176,7 +176,7 @@ def get_nice_bibsched_related_message(curdir, ln=CFG_SITE_LANG):
     pre = _("Note that your submission as been inserted into the bibliographic task queue and is waiting for execution.\n")
     if server_pid():
         ## BibSched is up and running
-        msg = _("The task queue is currently running in automatic mode, and there are currently %s tasks waiting to be executed. Your record should be available within a few minutes and searchable within an hour or thereabouts.\n") % (len(res))
+        msg = _("The task queue is currently running in automatic mode, and there are currently %(x_num)s tasks waiting to be executed. Your record should be available within a few minutes and searchable within an hour or thereabouts.\n", x_num=(len(res)))
     else:
         msg = _("Because of a human intervention or a temporary problem, the task queue is currently set to the manual mode. Your submission is well registered but may take longer than usual before it is fully integrated and searchable.\n")
 

@@ -447,9 +447,8 @@ URI: http://%(host)s%(page)s
                 'sys1'  : cgi.escape(str((sys.exc_info()[0] or ''))).replace('"', '&quot;'),
                 'sys2'  : cgi.escape(str((sys.exc_info()[1] or ''))).replace('"', '&quot;'),
                 'contact'   : \
-                   _("Please contact %s quoting the following information:") % \
-                     ('<a href="mailto:' + urllib.quote(CFG_SITE_SUPPORT_EMAIL) +'">' + \
-                       CFG_SITE_SUPPORT_EMAIL + '</a>'),
+                    _("Please contact %(x_name)s quoting the following information:",
+                      x_name=('<a href="mailto:' + urllib.quote(CFG_SITE_SUPPORT_EMAIL) +'">' + CFG_SITE_SUPPORT_EMAIL + '</a>')),
                 'host'      : cgi.escape(host_s),
                 'page'      : cgi.escape(page_s),
                 'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),
@@ -463,7 +462,6 @@ URI: http://%(host)s%(page)s
                                  ("http://" + host_s + page_s) or \
                                  info_not_available
               }
-
         return out
 
     def detailed_record_container_top(self, recid, tabs, ln=CFG_SITE_LANG,
