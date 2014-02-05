@@ -317,13 +317,13 @@ class Template:
         out = []
         for type in ('composite', 'single'):
             if sorted_keywords['unweighted'][type]:
-                out.append('<b>%s</b>' % _('Unweighted %s keywords:' % type))
+                out.append('<b>%s</b>' % _('Unweighted %(x_name)s keywords:', x_name=type))
                 for keyword, info in sorted_keywords['unweighted'][type]:
                     out.append(format_link(keyword, ln))
 
         for type in ('composite', 'single'):
             if sorted_keywords['weighted'][type]:
-                out.append('<b>%s</b>' % _('Weighted %s keywords:' % type))
+                out.append('<b>%s</b>' % _('Weighted %(x_name)s keywords:', x_name=type))
                 for keyword, info in sorted_keywords['weighted'][type]:
                     if _numbering:
                         out.append("%s (%d)" % (format_link(keyword, ln), len(info[0])))

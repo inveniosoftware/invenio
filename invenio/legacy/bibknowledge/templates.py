@@ -191,10 +191,9 @@ class Template:
             out += _("This knowledge base already has a taxonomy file.")+" "
             out += _("If you upload another file, the current version will be replaced.")
             out += "<br/>"
-            out += _("The current taxonomy can be accessed with this URL: %s") % \
-                   ('<a href="'+webname+'">'+webname+"</a>")
+            out += _("The current taxonomy can be accessed with this URL: %(x_url)s", x_url=('<a href="'+webname+'">'+webname+"</a>"))
         else:
-            out += _("Please upload the RDF file for taxonomy %s") % cgi.escape(kb_name)
+            out += _("Please upload the RDF file for taxonomy %(x_name)s", x_name=cgi.escape(kb_name))
         out += """
           <br/>
           <!-- enctype="multipart/form-data"-->
@@ -697,13 +696,14 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
         """
         _ = gettext_set_language(ln)    # load the right message language
 
-        gen = _("Your rule: %s") % (' <code style="border:1px solid #999">'+cgi.escape(left)+'</code> =&gt; <code style="border:1px solid #999">'+cgi.escape(right)+"</pre><p>")
+        gen = _("Your rule: %(x_rule)s",
+                x_rule=(' <code style="border:1px solid #999">'+cgi.escape(left)+'</code> =&gt; <code style="border:1px solid #999">'+cgi.escape(right)+"</pre><p>"))
         if (leftorright=='left'):
-            gen += _("The left side of the rule (%s) already appears in these knowledge bases:") % \
-                   ('<code>' + cgi.escape(left) + '</code>')
+            gen += _("The left side of the rule (%(x_rule)s) already appears in these knowledge bases:",
+                        x_rule=('<code>' + cgi.escape(left) + '</code>'))
         else:
-            gen += _("The right side of the rule (%s) already appears in these knowledge bases:") % \
-                   ('<code>' + cgi.escape(right) + '</code>')
+            gen += _("The right side of the rule (%(x_rule)s) already appears in these knowledge bases:",
+                        x_rule=('<code>' + cgi.escape(right) + '</code>'))
         gen += "<br/>"
         inkbs = []
         dontdoit = False

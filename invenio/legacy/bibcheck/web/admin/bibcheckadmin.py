@@ -76,11 +76,11 @@ def _perform_request_index(ln, search=""):
     _ = gettext_set_language(ln)
     mydir = CFG_ETCDIR+"/bibcheck"
     if not os.path.exists(mydir):
-        return _("ERROR: %s does not exist") % mydir
+        return _("ERROR: %(x_name)s does not exist", x_name=mydir)
     if not os.path.isdir(mydir):
-        return  _("ERROR: %s is not a directory") % mydir
+        return  _("ERROR: %(x_name)s is not a directory", x_name=mydir)
     if not os.access(mydir, os.W_OK):
-        return  _("ERROR: %s is not writable") % mydir
+        return  _("ERROR: %(x_name)s is not writable", x_name=mydir)
     myfiles = os.listdir(mydir)
     if search:
         #include only files that match
@@ -162,7 +162,7 @@ def verify(req, fname, ln=CFG_SITE_LANG):
     errstr = ""
     path_to_bibcheck_cli = CFG_BINDIR + os.sep + 'bibcheck'
     if not os.path.exists(path_to_bibcheck_cli):
-        errors = _("File %s does not exist.") % path_to_bibcheck_cli
+        errors = _("File %(x_name)s does not exist.", x_name=path_to_bibcheck_cli)
     if not errors:
         #first check where we have stderr now so that we can assign it back
         try:
@@ -265,16 +265,16 @@ def save(req, ln, fname, code, wasnew=0):
         myfile = CFG_ETCDIR+"/bibcheck/"+fname
         #check if the file exists if this was new
         if wasnew and os.path.exists(myfile):
-            msg = _("File %s already exists.") % cgi.escape(fname)
+            msg = _("File %(x_name)s already exists.", x_name=cgi.escape(fname))
         else:
             #write code into file
-            msg = _("File %s: written OK.") % cgi.escape(fname)
+            msg = _("File %(x_name)s: written OK.", x_name=cgi.escape(fname))
             try:
                 outfile = file(myfile, 'w')
                 outfile.write(code)
                 outfile.close()
             except IOError:
-                msg = _("File %s: write failed.") % cgi.escape(fname)
+                msg = _("File %(x_name)s: write failed.", x_name=cgi.escape(fname))
         #print message
         return page(title=_("Save BibCheck config file"),
                 body= msg,
@@ -309,9 +309,9 @@ def delete(req, ln, fname):
         except:
             success = 0
         if success:
-            msg = _("File %s deleted.") % cgi.escape(fname)
+            msg = _("File %(x_name)s deleted.", x_name=cgi.escape(fname))
         else:
-            msg = _("File %s: delete failed.") % cgi.escape(fname)
+            msg = _("File %(x_name)s: delete failed.", x_name=cgi.escape(fname))
         #print message
         return page(title=_("Delete BibCheck config file"),
                 body= msg,

@@ -636,7 +636,7 @@ class Template:
         <strong>%(results_overview_label)s:</strong> %(items_found_label)s
         </td>
       </tr>""" % {'results_overview_label': _('Results overview'),
-                  'items_found_label': _('%i matching items') % total_no_search_results}
+                  'items_found_label': _('%(x_num)i matching items', x_num=total_no_search_results)}
                 if total_no_personal_search_results:
                     out += """
       <tr>
@@ -703,7 +703,7 @@ class Template:
         </td>
       </tr>""" % {'personal_baskets_label': _('Personal baskets'),
                   'personal_baskets_name': "P",
-                  'items_found_label': _('%i matching items') % total_no_personal_search_results}
+                  'items_found_label': _('%(x_num)i matching items', x_num=total_no_personal_search_results)}
 
             # For every basket print a link to the basket and the number of items
             # found in that basket
@@ -809,7 +809,7 @@ class Template:
         </td>
       </tr>""" % {'group_baskets_label': _('Group baskets'),
                   'group_baskets_name': "G",
-                  'items_found_label': _('%i matching items') % total_no_group_search_results}
+                  'items_found_label': _('%(x_num)i matching items', x_num=total_no_group_search_results)}
 
             # For every basket print a link to the basket and the number of items
             # found in that basket
@@ -918,7 +918,7 @@ class Template:
         </td>
       </tr>""" % {'public_baskets_label': _('Public baskets'),
                   'public_baskets_name': "E",
-                  'items_found_label': _('%i matching items') % total_no_public_search_results}
+                  'items_found_label': _('%(x_num)i matching items', x_num=total_no_public_search_results)}
 
             for bskid in public_search_results.keys():
                 basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;bskid=%(bskid)i&amp;ln=%(ln)s">%(basket_name)s</a>""" % \
@@ -1022,7 +1022,7 @@ class Template:
         </td>
       </tr>""" % {'all_public_baskets_label': _('All public baskets'),
                   'all_public_baskets_name': "A",
-                  'items_found_label': _('%i matching items') % total_no_all_public_search_results}
+                  'items_found_label': _('%(x_num)i matching items', x_num=total_no_all_public_search_results)}
 
             for bskid in all_public_search_results.keys():
                 basket_link = """<a href="%(url)s/yourbaskets/display_public?bskid=%(bskid)i&amp;ln=%(ln)s">%(basket_name)s</a>""" % \
@@ -1797,11 +1797,11 @@ class Template:
         _ = gettext_set_language(ln)
         message = _("Are you sure you want to delete this basket?")
         if nb_users:
-            message += '<p>' + _("%i users are subscribed to this basket.")% nb_users + '</p>'
+            message += '<p>' + _("%(x_num)i users are subscribed to this basket.", x_num=nb_users) + '</p>'
         if nb_groups:
-            message += '<p>' + _("%i user groups are subscribed to this basket.")% nb_groups + '</p>'
+            message += '<p>' + _("%(x_num)i user groups are subscribed to this basket.", x_num=nb_groups) + '</p>'
         if nb_alerts:
-            message += '<p>' + _("You have set %i alerts on this basket.")% nb_alerts + '</p>'
+            message += '<p>' + _("You have set %(x_num)i alerts on this basket.", x_num=nb_alerts) + '</p>'
         out = """
 <table class="confirmoperation">
   <tr>
@@ -2315,11 +2315,11 @@ class Template:
         _ = gettext_set_language(ln)
 
         optional_colspan = nb_items and user_can_view_content and ' colspan="3"' or ''
-        records_field = '<br />' + _('%i items') % nb_items
-        comments_field = user_can_view_notes and (nb_comments and (', ' + _('%i notes') % nb_comments) or ', ' + _('no notes yet')) or ''
+        records_field = '<br />' + _('%(x_num)i items', x_num=nb_items)
+        comments_field = user_can_view_notes and (nb_comments and (', ' + _('%(x_num)i notes', x_num=nb_comments)) or ', ' + _('no notes yet')) or ''
         subscribers_field = selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] and \
                             share_level == 0 and \
-                            ', ' + (_('%i subscribers') % nb_subscribers) or \
+                            ', ' + (_('%(x_sub)i subscribers', x_sub=nb_subscribers)) or \
                             ''
         last_update_field = '<br />' + _('last update') + ': ' + date_modification
 
@@ -3353,9 +3353,9 @@ class Template:
         _ = gettext_set_language(ln)
 
         optional_colspan = nb_items and ' colspan="3"' or ''
-        records_field = '<br />' + _('%i items') % nb_items
+        records_field = '<br />' + _('%(x_num)i items', x_num=nb_items)
         comments_field = user_can_view_comments and \
-                         (nb_comments and ', ' + (_('%i notes') % nb_comments) or ', ' + _('no notes yet')) \
+                         (nb_comments and ', ' + (_('%(x_notes)i notes', x_notes=nb_comments)) or ', ' + _('no notes yet')) \
                          or ''
         last_update_field = '<br />' + _('last update') + ': ' + date_modification
 

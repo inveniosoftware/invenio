@@ -519,7 +519,8 @@ class Template:
                                 'x_url_close' : '</a>'}) + " "
         else:
             out += "<p>" + _("Note that if you have been using an external login system, then we cannot do anything and you have to ask there.") + " "
-        out += _("Alternatively, you can ask %s to change your login system from external to internal.") % ("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : CFG_SITE_SUPPORT_EMAIL }) + "</p>"
+        out += _("Alternatively, you can ask %(x_name)s to change your login system from external to internal.",
+              x_name=("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : CFG_SITE_SUPPORT_EMAIL })) + "</p>"
 
 
         return out
@@ -546,7 +547,8 @@ class Template:
                  <blockquote>
                  <dl>
               """ % {
-                'account_offer' : _("%s offers you the possibility to personalize the interface, to set up your own personal library of documents, or to set up an automatic alert query that would run periodically and would notify you of search results by email.") % CFG_SITE_NAME_INTL[ln],
+                'account_offer' : _("%(x_name)s offers you the possibility to personalize the interface, to set up your own personal library of documents, or to set up an automatic alert query that would run periodically and would notify you of search results by email.",
+                        x_name=CFG_SITE_NAME_INTL[ln]),
               }
 
         if not guest:
@@ -889,7 +891,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out =""
-        out += _("Okay, a password reset link has been emailed to %s.") % email
+        out += _("Okay, a password reset link has been emailed to %(x_email)s.", x_email=email)
         return out
 
     def tmpl_account_delete(self, ln):
@@ -975,7 +977,8 @@ class Template:
                     # how to get one, or be silent about register
                     # facility if account level is more than 4:
                     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 5:
-                        out += "<p>" + _("If you don't own an account yet, please contact %s.") % ('<a href="mailto:%s">%s</a>' % (cgi.escape(CFG_SITE_SUPPORT_EMAIL, True), cgi.escape(CFG_SITE_SUPPORT_EMAIL))) + "</p>"
+                        out += "<p>" + _("If you don't own an account yet, please contact %(x_name)s.",
+                            x_name=('<a href="mailto:%s">%s</a>' % (cgi.escape(CFG_SITE_SUPPORT_EMAIL, True), cgi.escape(CFG_SITE_SUPPORT_EMAIL)))) + "</p>"
 
         else:
             out += "<p>%s</p>" % msg
@@ -1178,11 +1181,12 @@ class Template:
                 'password_contain' : _("The password phrase may contain punctuation, spaces, etc."),
                 'retype' : _("Retype Password"),
                 'register' : _("register"),
-                'explain_acc' : _("Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.") % CFG_SITE_NAME,
+                'explain_acc' : _("Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %(x_name)s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.", x_name=CFG_SITE_NAME),
               }
         else:
             # level >=2, so users cannot register accounts
-            out += "<p>" + _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL)) + "</p>"
+            out += "<p>" + _("It is not possible to create an account yourself. Contact %(x_name)s if you want an account.",
+                x_name=('<a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL))) + "</p>"
         return out
 
     def tmpl_account_adminactivities(self, ln, uid, guest, roles, activities):
@@ -1673,7 +1677,7 @@ class Template:
                                        'grpID' : grpID,
                                        'ln': ln,
                                        'img':"webbasket_usergroup.png",
-                                       'text':_("Edit %s members") % '',
+                                       'text':_("Edit %(x_num)s members", x_num=''),
                                        'action':"members"
                                        }
             out += """
@@ -1846,7 +1850,7 @@ class Template:
             action = CFG_SITE_URL + '/yourgroups/edit'
             button_label = _("Update group")
             button_name = "update"
-            label = _('Edit group %s') % cgi.escape(group_name)
+            label = _('Edit group %(x_name)s', x_name=cgi.escape(group_name))
             delete_text = """<input type="submit" value="%s" class="formbutton" name="%s" />"""
             delete_text %= (_("Delete group"),"delete")
             if grpID is not None:
@@ -2207,7 +2211,7 @@ class Template:
             "%s/yourmessages/write" % CFG_SITE_URL,
             {
                 'ln' : ln,
-                'msg_subject' : _('Invitation to join "%s" group' % escape_html(group_name)),
+                'msg_subject' : _('Invitation to join "%(x_name)s" group', x_name=escape_html(group_name)),
                 'msg_body' : _("""\
 Hello:
 
@@ -2226,7 +2230,7 @@ Best regards.
             {'x_url_open': link_open,
              'x_url_close': '</a>'}
         action = CFG_SITE_URL + '/yourgroups/members?ln=' + ln
-        out %= {'title':_('Group: %s') % escape_html(group_name),
+        out %= {'title':_('Group: %(x_name)s', x_name=escape_html(group_name)),
                 'member_text' : member_text,
                 'pending_text' :pending_text,
                 'action':action,
@@ -2503,11 +2507,11 @@ Best regards.
         - 'ln' *string* - The language to display the interface in
         """
         _ = gettext_set_language(ln)
-        subject = _("Group %s: New membership request") % group_name
+        subject = _("Group %(x_name)s: New membership request", x_name=group_name)
         url = CFG_SITE_URL + "/yourgroups/members?grpID=%s&ln=%s"
         url %= (grpID, ln)
         # FIXME: which user?  We should show his nickname.
-        body = (_("A user wants to join the group %s.") % group_name) + '<br />'
+        body = (_("A user wants to join the group %(x_name)s.", x_name=group_name)) + '<br />'
         body += _("Please %(x_url_open)saccept or reject%(x_url_close)s this user's request.") % {'x_url_open': '<a href="' + url + '">',
                                                                                                   'x_url_close': '</a>'}
         body += '<br />'
@@ -2525,11 +2529,11 @@ Best regards.
         """
         _ = gettext_set_language(ln)
         if accepted:
-            subject = _("Group %s: Join request has been accepted") % (group_name)
-            body = _("Your request for joining group %s has been accepted.") % (group_name)
+            subject = _("Group %(x_name)s: Join request has been accepted", x_name=group_name)
+            body = _("Your request for joining group %(x_name)s has been accepted.", x_name=group_name)
         else:
-            subject = _("Group %s: Join request has been rejected") % (group_name)
-            body = _("Your request for joining group %s has been rejected.") % (group_name)
+            subject = _("Group %(x_name)s: Join request has been rejected", x_name=group_name)
+            body = _("Your request for joining group %(x_name)s has been rejected.", x_name=group_name)
         url = CFG_SITE_URL + "/yourgroups/display?ln=" + ln
         body += '<br />'
         body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">',
@@ -2546,9 +2550,9 @@ Best regards.
         - 'ln' *string* - The language to display the interface in
         """
         _ = gettext_set_language(ln)
-        subject = _("Group %s has been deleted") % group_name
+        subject = _("Group %(x_name)s has been deleted", x_name=group_name)
         url = CFG_SITE_URL + "/yourgroups/display?ln=" + ln
-        body = _("Group %s has been deleted by its administrator.") % group_name
+        body = _("Group %(x_name)s has been deleted by its administrator.", x_name=group_name)
         body += '<br />'
         body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">',
                                                                                               'x_url_close': '</a>'}
@@ -2620,7 +2624,8 @@ Best regards.
 
         if "email_auto_generated" in warning_list:
             message += "<p><font color=red>"
-            message += _("Your e-mail is auto-generated by the system. Please change your e-mail from <a href='%s/youraccount/edit?ln=%s'>account settings</a>.") % (CFG_SITE_SECURE_URL, ln)
+            message += _("Your e-mail is auto-generated by the system. Please change your e-mail from <a href='%(x_site)s/youraccount/edit?ln=%(x_link)s'>account settings</a>.",
+                  x_site=CFG_SITE_SECURE_URL, x_link=ln)
             message += "</font></p>"
 
         return message

@@ -384,9 +384,9 @@ def create_login_page_box(referer='', ln=CFG_SITE_LANG):
         (re.compile(r"/search"), "<p>" + _("This collection is restricted.  If you think you have right to access it, please authenticate yourself.") + "</p>"),
         (re.compile(r"/%s/\d+/files/.+" % CFG_SITE_RECORD), "<p>" + _("This file is restricted.  If you think you have right to access it, please authenticate yourself.") + "</p>"),
         (re.compile(r"openid-invalid"), "<p>" + _("The OpenID identifier is invalid") + "</p>"),
-        (re.compile(r"openid-python"), "<p>%s</p><p>%s</p>" % (_("python-openid package must be installed: run make install-openid-package or download manually from https://github.com/openid/python-openid/"), _("Please inform the <a href='mailto%s'>administator</a>" % CFG_SITE_ADMIN_EMAIL))),
-        (re.compile(r"oauth-rauth"), "<p>%s</p><p>%s</p>" % (_("rauth package must be installed: run make install-oauth-package or download manually from https://github.com/litl/rauth/"), _("Please inform the <a href='mailto%s'>administator</a>" % CFG_SITE_ADMIN_EMAIL))),
-        (re.compile(r"oauth-config"), "<p>%s</p><p>%s</p>" % (_("The configuration isn't set properly"), _("Please inform the <a href='mailto%s'>administator</a>" % CFG_SITE_ADMIN_EMAIL))),
+        (re.compile(r"openid-python"), "<p>%s</p><p>%s</p>" % (_("python-openid package must be installed: run make install-openid-package or download manually from https://github.com/openid/python-openid/"), _("Please inform the <a href='mailto%(x_email)s'>administator</a>", x_email=CFG_SITE_ADMIN_EMAIL))),
+        (re.compile(r"oauth-rauth"), "<p>%s</p><p>%s</p>" % (_("rauth package must be installed: run make install-oauth-package or download manually from https://github.com/litl/rauth/"), _("Please inform the <a href='mailto%(x_email)s'>administator</a>", x_email=CFG_SITE_ADMIN_EMAIL))),
+        (re.compile(r"oauth-config"), "<p>%s</p><p>%s</p>" % (_("The configuration isn't set properly"), _("Please inform the <a href='mailto%(x_email)s'>administator</a>", x_email=CFG_SITE_ADMIN_EMAIL))),
         (re.compile(r"connection-error"), "<p>%s</p>" % (_("Cannot connect the provider. Please try again later."))),
     )
 

@@ -138,7 +138,7 @@ def kb_upload(req, kb, ln=CFG_SITE_LANG):
         #get the name and the file..
         fn = str(kb_id)+".rdf"
         open(uploaddir+"/"+fn, 'w').write(fileitem.read())
-        body = (_("File %s uploaded.") % ('kbfiles/' + cgi.escape(fn)))
+        body = (_("File %(x_name)s uploaded.", x_name=('kbfiles/' + cgi.escape(fn))))
         body += " <a href='"+CFG_SITE_SECURE_URL+"/kb'>%s</a>" % _("Back")
         return(page(title=_("File uploaded"),
                     body = body,
@@ -189,7 +189,7 @@ def kb_show(req, kb, sortby="to", ln=CFG_SITE_LANG, startat=0, search=""):
                         errors = [("ERR_KB_ID_UNKNOWN", kb)],
                         lastupdated=__lastupdated__,
                         req=req)
-        return page(title=_("Knowledge Base %s" % kb_name),
+        return page(title=_("Knowledge Base %(x_name)s", x_name=kb_name),
                 body=bibknowledgeadminlib.perform_request_knowledge_base_show(ln=ln,
                 kb_id=kb_id, sortby=sortby, startat=startat,
                 search_term=search),
@@ -236,7 +236,7 @@ def kb_show_attributes(req, kb, ln=CFG_SITE_LANG, sortby="to"):
                         req=req)
 
 
-        return page(title=_("Knowledge Base %s Attributes" % kb_name),
+        return page(title=_("Knowledge Base %(x_name)s Attributes", x_name=kb_name),
                 body=bibknowledgeadminlib.perform_request_knowledge_base_show_attributes(ln=ln,
                                           kb_id=kb_id,
                                           sortby=sortby),
@@ -322,7 +322,7 @@ def kb_show_dependencies(req, kb, ln=CFG_SITE_LANG, sortby="to"):
                         req=req)
 
 
-        return page(title=_("Knowledge Base %s Dependencies" % kb_name),
+        return page(title=_("Knowledge Base %(x_name)s Dependencies", x_name=kb_name),
                 body=bibknowledgeadminlib.perform_request_knowledge_base_show_dependencies(ln=ln,
                                           kb_id=kb_id,
                                           sortby=sortby),

@@ -183,7 +183,7 @@ def output_format_show(req, bfo, ln=CFG_SITE_LANG,
 
         if not bibformatadminlib.can_read_output_format(bfo): #No read permission
             try:
-                raise InvenioBibFormatError(_('Output format %s cannot not be read. %s') % (bfo, ""))
+                raise InvenioBibFormatError(_('Output format %(x_name)s cannot not be read. %(x_text)s', x_name=bfo, x_text=""))
             except InvenioBibFormatError, exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Output Format"),
@@ -211,7 +211,7 @@ def output_format_show(req, bfo, ln=CFG_SITE_LANG,
                               navtrail=navtrail_previous_links,
                               options=[ _("Ok")])
 
-        return page(title=_('Output Format %s Rules' % name),
+        return page(title=_('Output Format %(x_name)s Rules', x_name=name),
                     body=bibformatadminlib.perform_request_output_format_show(bfo=bfo,
                                                                               ln=ln,
                                                                               r_fld=r_fld,
@@ -254,7 +254,7 @@ def output_format_show_attributes(req, bfo, ln=CFG_SITE_LANG):
 
         if not bibformatadminlib.can_read_output_format(bfo): #No read permission
             try:
-                raise InvenioBibFormatError(_('Output format %s cannot not be read. %s') % (bfo, ""))
+                raise InvenioBibFormatError(_('Output format %(x_name)s cannot not be read. %(x_text)s', x_name=bfo, x_text=""))
             except InvenioBibFormatError, exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Output Format"),
@@ -269,7 +269,7 @@ def output_format_show_attributes(req, bfo, ln=CFG_SITE_LANG):
                                                            with_attributes=True)
         name = output_format['attrs']['names']['generic']
 
-        return page(title=_("Output Format %s Attributes" % name),
+        return page(title=_("Output Format %(x_name)s Attributes", x_name=name),
                     body=bibformatadminlib.perform_request_output_format_show_attributes(bfo, ln=ln),
                     uid=uid,
                     language=ln,
@@ -304,7 +304,7 @@ def output_format_show_dependencies(req, bfo, ln=CFG_SITE_LANG):
 
         if not bibformatadminlib.can_read_output_format(bfo): #No read permission
             try:
-                raise InvenioBibFormatError(_('Output format %s cannot not be read. %s') % (bfo, ""))
+                raise InvenioBibFormatError(_('Output format %(x_name)s cannot not be read. %(x_text)s', x_name=bfo, x_text=""))
             except InvenioBibFormatError, exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Output Format"),
@@ -317,7 +317,7 @@ def output_format_show_dependencies(req, bfo, ln=CFG_SITE_LANG):
 
         format_name = bibformat_engine.get_output_format_attrs(bfo)['names']['generic']
 
-        return page(title=_("Output Format %s Dependencies" % format_name),
+        return page(title=_("Output Format %(x_name)s Dependencies", x_name=format_name),
                     body=bibformatadminlib.perform_request_output_format_show_dependencies(bfo, ln=ln),
                     uid=uid,
                     language=ln,
@@ -519,7 +519,7 @@ def format_template_show(req, bft, code=None, ln=CFG_SITE_LANG,
         pattern_preview = wash_url_argument(pattern_for_preview, 'str')
         if not bibformatadminlib.can_read_format_template(bft): #No read permission
             try:
-                raise InvenioBibFormatError(_('Format template %s cannot not be read. %s') % (format_template, ""))
+                raise InvenioBibFormatError(_('Format template %(x_name)s cannot not be read. %(x_text)s', x_name=format_template, x_text=""))
             except InvenioBibFormatError, exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Format Template"),
@@ -545,7 +545,7 @@ def format_template_show(req, bft, code=None, ln=CFG_SITE_LANG,
 
         if bft.endswith('.xsl'):
             format_name += ' (XSL)'
-        return page(title=_("Format Template %s"%format_name),
+        return page(title=_("Format Template %(x_name)s", x_name=format_name),
                 body=bibformatadminlib.perform_request_format_template_show(format_template,
                                                           code=code,
                                                           ln=ln,
@@ -594,7 +594,7 @@ def format_template_show_attributes(req, bft, ln=CFG_SITE_LANG, new=0):
 
         if not bibformatadminlib.can_read_format_template(bft): #No read permission
             try:
-                raise InvenioBibFormatError(_('Format template %s cannot not be read. %s') % (format_template, ""))
+                raise InvenioBibFormatError(_('Format template %(x_name)s cannot not be read. %(x_text)s', x_name=format_template, x_text=""))
             except InvenioBibFormatError, exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Format Template"),
@@ -605,7 +605,7 @@ def format_template_show_attributes(req, bft, ln=CFG_SITE_LANG, new=0):
                             lastupdated=__lastupdated__,
                             req=req)
 
-        return page(title=_("Format Template %s Attributes"%format_name),
+        return page(title=_("Format Template %(x_name)s Attributes", x_name=format_name),
                     body=bibformatadminlib.perform_request_format_template_show_attributes(bft, ln=ln, new=is_new),
                     uid=uid,
                     language=ln,
@@ -639,7 +639,7 @@ def format_template_show_dependencies(req, bft, ln=CFG_SITE_LANG):
         format_template = wash_url_argument(bft, 'str')
         format_name = bibformat_engine.get_format_template_attrs(bft)['name']
 
-        return page(title=_("Format Template %s Dependencies" % format_name),
+        return page(title=_("Format Template %(x_name)s Dependencies", x_name=format_name),
                     body=bibformatadminlib.perform_request_format_template_show_dependencies(bft, ln=ln),
                     uid=uid,
                     language=ln,
@@ -927,7 +927,7 @@ def format_element_show_dependencies(req, bfe, ln=CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         bfe = wash_url_argument(bfe, 'str')
-        return page(title=_("Format Element %s Dependencies" % bfe),
+        return page(title=_("Format Element %(x_name)s Dependencies", x_name=bfe),
                 body=bibformatadminlib.perform_request_format_element_show_dependencies(bfe=bfe, ln=ln),
                 uid=uid,
                 language=ln,
@@ -960,7 +960,7 @@ def format_element_test(req, bfe, ln=CFG_SITE_LANG, param_values=None):
         bfe = wash_url_argument(bfe, 'str')
         user_info = collect_user_info(req)
         uid = user_info['uid']
-        return page(title=_("Test Format Element %s" % bfe),
+        return page(title=_("Test Format Element %(x_name)s", x_name=bfe),
                 body=bibformatadminlib.perform_request_format_element_test(bfe=bfe,
                                                                            ln=ln,
                                                                            param_values=param_values,
@@ -1009,7 +1009,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
 
             if not bibformatadminlib.can_read_output_format(bfo): #No read permission
                 try:
-                    raise InvenioBibFormatError(_('Output format %s cannot not be read. %s') % (bfo, ""))
+                    raise InvenioBibFormatError(_('Output format %(x_name)s cannot not be read. %(x_text)s', x_name=bfo, x_text=""))
                 except InvenioBibFormatError, exc:
                     register_exception(req=req)
                     return page(title=_("Restricted Output Format"),
@@ -1023,7 +1023,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
             output_format = bibformat_engine.get_output_format(code=bfo,
                                                                with_attributes=True)
             name = output_format['attrs']['names']['generic']
-            title = _("Validation of Output Format %s" % name)
+            title = _("Validation of Output Format %(x_name)s", x_name=name)
 
         elif bft is not None: #Format template validation
             bft = wash_url_argument(bft, 'str')
@@ -1031,7 +1031,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
 
             if not bibformatadminlib.can_read_format_template(bft): #No read permission
                 try:
-                    raise InvenioBibFormatError(_('Format template %s cannot not be read. %s') % (bft, ""))
+                    raise InvenioBibFormatError(_('Format template %(x_tem)s cannot not be read. %(x_text)s', x_tem=bft, x_text=""))
                 except InvenioBibFormatError, exc:
                     register_exception(req=req)
                     return page(title=_("Restricted Format Template"),
@@ -1042,7 +1042,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
                             lastupdated=__lastupdated__,
                             req=req)
             name = bibformat_engine.get_format_template_attrs(bft)['name']
-            title = _("Validation of Format Template %s" % name)
+            title = _("Validation of Format Template %(x_name)s", x_name=name)
 
         elif bfe is not None: #Format element validation
             bfe = wash_url_argument(bfe, 'str')
@@ -1051,7 +1051,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
             if not bibformatadminlib.can_read_format_element(bfe) and \
                    not bibformat_dblayer.tag_exists_for_name(bfe): #No read permission
                 try:
-                    raise InvenioBibFormatError(_('Format element %s cannot not be read. %s') % (bfe, ""))
+                    raise InvenioBibFormatError(_('Format element %(x_name)s cannot not be read. %(x_text)s', x_name=bfe, x_text=""))
                 except InvenioBibFormatError, exc:
                     register_exception(req=req)
                     return page(title=_("Restricted Format Element"),
@@ -1061,7 +1061,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
                             navtrail = navtrail_previous_links,
                             lastupdated=__lastupdated__,
                             req=req)
-            title = _("Validation of Format Element %s" % bfe)
+            title = _("Validation of Format Element %(x_name)s", x_name=bfe)
 
         else: #No format specified
             try:

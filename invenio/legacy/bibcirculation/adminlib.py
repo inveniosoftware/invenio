@@ -2593,7 +2593,7 @@ def add_new_copy_step4(req, barcode, library, location, collection, description,
     libraries = db.get_internal_libraries()
 
     if db.barcode_in_use(barcode):
-        infos.append(_("The given barcode <strong>%s</strong> is already in use." % barcode))
+        infos.append(_("The given barcode <strong>%(x_name)s</strong> is already in use.", x_name=barcode))
         title = _("Add new copy") + " - III"
         body  = bc_templates.tmpl_add_new_copy_step3(recid=recid,
                                                     result=result,
@@ -2665,7 +2665,7 @@ def add_new_copy_step5(req, barcode, library, location, collection, description,
                         loan_period, status, expected_arrival_date)
         update_requests_statuses(barcode)
     else:
-        infos.append(_("The given barcode <strong>%s</strong> is already in use.") % barcode)
+        infos.append(_("The given barcode <strong>%(x_name)s</strong> is already in use.", x_name=barcode))
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -2712,7 +2712,7 @@ def delete_copy_step1(req, barcode, ln):
                                                    ln=ln)
 
     else:
-        message = _("""The barcode <strong>%s</strong> was not found""") % (barcode)
+        message = _("""The barcode <strong>%(x_name)s</strong> was not found""", x_name=(barcode))
         infos.append(message)
         title = _("Item search")
         body = bc_templates.tmpl_item_search(infos=infos, ln=ln)
@@ -2741,9 +2741,9 @@ def delete_copy_step2(req, barcode, ln):
         #recid = recid[0]
 
         if db.delete_copy(barcode)==1:
-            message = _("The copy with barcode <strong>%s</strong> has been deleted.") % (barcode)
+            message = _("The copy with barcode <strong>%(x_name)s</strong> has been deleted.", x_name=barcode)
         else:
-            message = _('It was NOT possible to delete the copy with barcode <strong>%s</strong>') % (barcode)
+            message = _('It was NOT possible to delete the copy with barcode <strong>%(x_name)s</strong>', x_name=barcode)
 
         infos.append(message)
 
@@ -2767,7 +2767,7 @@ def delete_copy_step2(req, barcode, ln):
                                         infos=infos, ln=ln)
 
     else:
-        message = _("The barcode <strong>%s</strong> was not found") % (barcode)
+        message = _("The barcode <strong>%(x_name)s</strong> was not found", x_name=barcode)
         infos.append(message)
         title = _("Item search")
         body = bc_templates.tmpl_item_search(infos=infos, ln=ln)
@@ -2886,7 +2886,7 @@ def update_item_info_step4(req, barcode, ln=CFG_SITE_LANG):
     if recid == None:
         _ = gettext_set_language(ln)
         infos = []
-        infos.append(_("Barcode <strong>%s</strong> not found" % barcode))
+        infos.append(_("Barcode <strong>%(x_name)s</strong> not found", x_name=barcode))
         return item_search(req, infos, ln)
 
 
@@ -2963,7 +2963,7 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
 
     if not is_on_loan and status == CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN:
         status = db.get_copy_details(barcode)[7]
-        infos.append(_("Item <strong>[%s]</strong> updated, but the <strong>status was not modified</strong>.") % (old_barcode))
+        infos.append(_("Item <strong>[%(x_name)s]</strong> updated, but the <strong>status was not modified</strong>.",x_name=old_barcode))
 
     # update item information.
     db.update_item_info(old_barcode, library_id, collection, location, description.strip(),
@@ -2975,12 +2975,13 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
 
     if barcode != old_barcode:
         if db.barcode_in_use(barcode):
-            infos.append(_("Item <strong>[%s]</strong> updated, but the <strong>barcode was not modified</strong> because it is already in use.") % (old_barcode))
+            infos.append(_("Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was not modified</strong> because it is already in use.", x_name=old_barcode))
         else:
             if db.update_barcode(old_barcode, barcode):
-                infos.append(_("Item <strong>[%s]</strong> updated to <strong>[%s]</strong> with success.") % (old_barcode, barcode))
+                infos.append(_("Item <strong>[%(x_name)s]</strong> updated to <strong>[%(x_new)s]</strong> with success.",
+                        x_name=old_barcode, x_new=barcode))
             else:
-                infos.append(_("Item <strong>[%s]</strong> updated, but the <strong>barcode was not modified</strong> because it was not found (!?).") % (old_barcode))
+                infos.append(_("Item <strong>[%(x_name)s]</strong> updated, but the <strong>barcode was not modified</strong> because it was not found (!?).", x_name=old_barcode))
 
         copies = db.get_item_copies_details(recid)
         requests = db.get_item_requests(recid)

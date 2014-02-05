@@ -39,7 +39,7 @@ $(document).ready(function() {
     </a>
   </li>
   <li>
-    <a rel="tooltip" title="{{ _('connect a user to role %s.') % role.name }}" href="{{ url_for('.adduserrole', id_role=role.id) }}">
+    <a rel="tooltip" title="{{ _('connect a user to role %(x_name)s.', x_name=role.name) }}" href="{{ url_for('.adduserrole', id_role=role.id) }}">
       <i class="glyphicon glyphicon-user"></i> {{ _("Connect user") }}
     </a>
   </li>

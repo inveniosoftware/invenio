@@ -230,14 +230,14 @@ class BFXParser:
                 else:
                     if node.localName in self.known_operators:
                         try:
-                            raise InvenioBibFormatBfxError(_('Note for programmer: you have not implemented operator %s.') % name)
+                            raise InvenioBibFormatBfxError(_('Note for programmer: you have not implemented operator %(x_name)s.', x_name=name))
                         except InvenioBibFormatBfxError, exc:
                             register_exception()
                             logging.error(exc.message)
 #                        print 'Note for programmer: you haven\'t implemented operator %s.' % (name)
                     else:
                         try:
-                            raise InvenioBibFormatBfxError(_('Name %s is not recognised as a valid operator name.') % name)
+                            raise InvenioBibFormatBfxError(_('Name %(x_name)s is not recognised as a valid operator name.',x_name=name))
                         except InvenioBibFormatBfxError, exc:
                             register_exception()
                             logging.error(exc.message)
@@ -271,7 +271,7 @@ class BFXParser:
             name = attrs['name']
             if self.templates.has_key(name):
                 try:
-                    raise InvenioBibFormatBfxError(_('Duplicate name: %s.') % name)
+                    raise InvenioBibFormatBfxError(_('Duplicate name: %(x_name)s.', x_name=name))
                 except InvenioBibFormatBfxError, exc:
                     register_exception()
                     logging.error(exc.message)
@@ -305,7 +305,7 @@ class BFXParser:
             name = attrs['name']
             if self.templates.has_key(name):
                 try:
-                    raise InvenioBibFormatBfxError(_('Duplicate name: %s.') % name)
+                    raise InvenioBibFormatBfxError(_('Duplicate name: %(x_name)s.', x_name=name))
                 except InvenioBibFormatBfxError, exc:
                     register_exception()
                     logging.error(exc.message)
@@ -427,7 +427,7 @@ class BFXParser:
         var = attrs['name']
         if not self.translator.is_defined(var):
             try:
-                raise InvenioBibFormatBfxError(_('Field %s is not defined.') % var)
+                raise InvenioBibFormatBfxError(_('Field %(x_field)s is not defined.', x_field=var))
             except InvenioBibFormatBfxError, exc:
                 register_exception()
                 logging.error(exc.message)
@@ -483,7 +483,7 @@ class BFXParser:
         name = attrs['object']
         if not self.translator.is_defined(name):
             try:
-                raise InvenioBibFormatBfxError(_('Field %s is not defined.') % name)
+                raise InvenioBibFormatBfxError(_('Field %(x_field)s is not defined.',x_field=name))
             except InvenioBibFormatBfxError, exc:
                 register_exception()
                 logging.error(exc.message)
@@ -534,7 +534,7 @@ class BFXParser:
         var = attrs['name']
         if not self.translator.is_defined(var):
             try:
-                raise InvenioBibFormatBfxError(_('Field %s is not defined.') % var)
+                raise InvenioBibFormatBfxError(_('Field %(x_field)s is not defined.',x_field=var))
             except InvenioBibFormatBfxError, exc:
                 register_exception()
                 logging.error(exc.message)
@@ -601,7 +601,7 @@ class BFXParser:
                 result = expr.match(value)
             except:
                 try:
-                    raise InvenioBibFormatBfxError(_('Invalid regular expression: %s.') % pattern)
+                    raise InvenioBibFormatBfxError(_('Invalid regular expression: %(x_patt)s.',x_patt=pattern))
                 except InvenioBibFormatBfxError, exc:
                     register_exception()
                     logging.error(exc.message)
@@ -720,7 +720,7 @@ class MARCTranslator:
                 match = expr.match(address)
                 if not match:
                     try:
-                        raise InvenioBibFormatBfxError(_('Invalid address: %s %s') % (name, address))
+                        raise InvenioBibFormatBfxError(_('Invalid address: %(x_name)s %(x_addr)s', x_name=name, x_addr=address))
                     except InvenioBibFormatBfxError, exc:
                         register_exception()
                         logging.error(exc.message)
@@ -730,7 +730,7 @@ class MARCTranslator:
                     if parent_name:
                         if not self.memory.has_key(parent_name):
                             try:
-                                raise InvenioBibFormatBfxError(_('Field %s is not defined.') % parent_name)
+                                raise InvenioBibFormatBfxError(_('Field %(x_field)s is not defined.',x_field=parent_name))
                             except InvenioBibFormatBfxError, exc:
                                 register_exception()
                                 logging.error(exc.message)
@@ -950,7 +950,7 @@ class MARCTranslator:
             output = tag + ind1 + ind2
         else:
             try:
-                raise InvenioBibFormatBfxError(_('Invalid display type. Must be one of: value, tag, ind1, ind2, code; received: %s.') % display_type)
+                raise InvenioBibFormatBfxError(_('Invalid display type. Must be one of: value, tag, ind1, ind2, code; received: %(x_type)s.', x_type=display_type))
             except InvenioBibFormatBfxError, exc:
                 register_exception()
                 logging.error(exc.message)

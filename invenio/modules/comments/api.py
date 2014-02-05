@@ -1178,7 +1178,7 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
     if titles:
         title = titles[0]
     else:
-        title = _("Record %i") % recID
+        title = _("Record %(x_rec)i", x_rec=recID)
 
     # Get report number
     report_numbers = get_fieldvalues(recID, "037__a")

@@ -285,7 +285,7 @@ def format_element(bfo, limit, separator='; ',
 
         </script>
         ''' % {'show_less':_("Hide"),
-               'show_more':_("Show all %i authors") % nb_authors,
+               'show_more':_("Show all %(x_num)i authors", x_num=nb_authors),
                'extension':extension}
 
 #        out += '<a name="show_hide" />'

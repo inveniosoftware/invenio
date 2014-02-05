@@ -96,7 +96,7 @@ class Template:
         middle_text = ""
         if additional_text != "":
             middle_text = " " + additional_text
-        return self.tmpl_heading(cgi.escape(_('Linkbacks%s: %s')) % (middle_text, len(linkbacks)))
+        return self.tmpl_heading(cgi.escape(_('Linkbacks%(x_name)s: %(x_num)s', x_name=middle_text, x_num=len(linkbacks))))
 
     def tmpl_heading(self, text):
         """

@@ -129,7 +129,7 @@ def sorted_by(model=None, cols=None):
                             x.property.table.columns, y), sort_keys[1:],
                             getattr(model, sort_keys[0])))
                 except:
-                    flash(g._("Invalid sorting key '%s'.") % sort_by)
+                    flash(g._("Invalid sorting key '%(x_key)s'.", x_key=sort_by))
             kwargs['sort'] = sort
             return f(*args, **kwargs)
         return decorated_function
@@ -178,7 +178,7 @@ def filtered_by(model=None, columns=None, form=None, filter_empty=False):
                         else:
                             where.append(op(cond, value))
                 except:
-                    flash(g._("Invalid filtering key '%s'.") % column)
+                    flash(g._("Invalid filtering key '%(x_key)s'.", x_key=column))
             if form is not None:
                 filter_form = form(request.values)
 

@@ -627,7 +627,7 @@ class Template:
         else:
             addition = ''
         if len(citedbylist):
-            line1 = "<strong>" + _("Citations%s:" % addition) + "</strong>"
+            line1 = "<strong>" + _("Citations %(x_name)s:", x_name=addition) + "</strong>"
             line2 = ""
 
             if not pubs:

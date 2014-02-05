@@ -382,8 +382,8 @@ def perform_request_send(uid,
         problem = True
 
     if len(msg_body) > CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE:
-        warnings.append(_("Your message is too long, please edit it. Maximum size allowed is %i characters.") % \
-                            (CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,))
+        warnings.append(_("Your message is too long, please edit it. Maximum size allowed is %(x_size)i characters.",
+                    x_size=(CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,)))
         problem = True
 
     if use_email_address == 0:
@@ -397,8 +397,7 @@ def perform_request_send(uid,
     gids_to = []
     for (group_name, group_id) in groups_to:
         if not(group_id):
-            warnings.append(_("Group %s does not exist.") % \
-                            (escape_html(group_name)))
+            warnings.append(_("Group %(x_name)s does not exist.", x_name=(escape_html(group_name))))
             problem = 1
         else:
             gids_to.append(group_id)
@@ -422,8 +421,7 @@ def perform_request_send(uid,
                     uids_from_group.append(user_nick)
                     tmp_dict[user_nick] = None
             else:
-                warnings.append(_("User %s does not exist.")% \
-                                (escape_html(user_nick)))
+                warnings.append(_("User %(x_name)s does not exist.", x_name=(escape_html(user_nick))))
                 problem = True
     if problem:
         body = webmessage_templates.tmpl_write(msg_to=users_to_str,
