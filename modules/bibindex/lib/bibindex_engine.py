@@ -180,7 +180,7 @@ def get_author_canonical_ids_for_recid(recID):
     """
     return [word[0] for word in run_sql("""SELECT data FROM aidPERSONIDDATA
         JOIN aidPERSONIDPAPERS USING (personid) WHERE bibrec=%s AND
-        tag='canonical_name'""", (recID, ))]
+        tag='canonical_name' AND flag>-2""", (recID, ))]
 
 
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
