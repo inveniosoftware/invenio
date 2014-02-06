@@ -396,6 +396,7 @@ def register_exception(stream='error',
         ## Let's extract exception information
         exc_info = sys.exc_info()
         exc_name = exc_info[0].__name__
+
         output = get_pretty_traceback(
             req=req, exc_info=exc_info, skip_frames=2)
         if output:
@@ -442,7 +443,10 @@ def register_exception(stream='error',
 
             ## let's log the exception and see whether we should report it.
             pretty_notification_info = get_pretty_notification_info(exc_name, filename, line_no)
-            if exception_should_be_notified(exc_name, filename, line_no) and (CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or
+            #dont report KeyboardInterrupt exceptions
+            if exc_name == "KeyboardInterrupt":
+                return 1
+            elif exception_should_be_notified(exc_name, filename, line_no) and (CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or
                 (alert_admin and CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 0) or
                 not written_to_log):
                 ## If requested or if it's impossible to write in the log
