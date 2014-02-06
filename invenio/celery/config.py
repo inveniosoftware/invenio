@@ -24,7 +24,7 @@ def default_config(config):
     """
     ## Broker settings
     ## ---------------
-    config.setdefault("BROKER_URL", "redis://localhost:6379/1")
+    config.setdefault("BROKER_URL", "amqp://guest:guest@localhost:5672//")
 
     # Extra modules with tasks which should be loaded
     # The Invenio Celery loader automatically takes care of loading tasks
@@ -36,8 +36,8 @@ def default_config(config):
 
     ## Result backend
     ## --------------
-    config.setdefault("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
-    config.setdefault("CELERY_RESULT_SERIALIZER", "pickle")
+    config.setdefault("CELERY_RESULT_BACKEND", "amqp://guest:guest@localhost:5672//")
+    config.setdefault("CELERY_RESULT_SERIALIZER", "msgpack")
 
     ## Routing
     ## -------
@@ -47,7 +47,7 @@ def default_config(config):
     ## --------------
     config.setdefault("CELERY_ALWAYS_EAGER", False)
     config.setdefault("CELERY_IGNORE_RESULT", False)
-    config.setdefault("CELERY_TASK_SERIALIZER", "pickle")
+    config.setdefault("CELERY_TASK_SERIALIZER", "msgpack")
 
     ## Worker
     ## ------
