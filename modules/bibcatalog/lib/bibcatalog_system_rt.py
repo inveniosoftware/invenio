@@ -217,7 +217,8 @@ class BibCatalogSystemRT(BibCatalogSystem):
         subjectset = ""
         requestorset = ""
         if subject:
-            subjectset = " subject=" + escape_shell_arg(subject)
+            cleaned_subject = " ".join(str(subject).splitlines())
+            subjectset = " subject=" + escape_shell_arg(cleaned_subject)
         recidset = " CF-RecordID=" + escape_shell_arg(str(recordid))
         if priority:
             priorityset = " priority=" + escape_shell_arg(str(priority))
