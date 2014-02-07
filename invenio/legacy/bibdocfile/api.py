@@ -1711,7 +1711,7 @@ class BibDoc(object):
 
         bibdoc_plugins = filter(None, map(
             plugin_bldr, import_submodules_from_packages(
-                'bibdocfile_plugins', packages=['invenio'])))
+                'plugins', packages=['invenio.legacy.bibdocfile'])))
 
 
         # Loading an appropriate plugin (by default a generic BibDoc)
