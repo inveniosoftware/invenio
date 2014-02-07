@@ -23,17 +23,17 @@ from flask_registry import PkgResourcesDirDiscoveryRegistry, \
     ModuleAutoDiscoveryRegistry, RegistryProxy
 from invenio.utils.datastructures import LazyDict
 
-converterext = RegistryProxy(
+classifierext = RegistryProxy(
     'classifierext', ModuleAutoDiscoveryRegistry, 'classifierext'
 )
 
 kb = LazyDict(lambda: dict((os.path.basename(f), f)
               for f in RegistryProxy('converterext.kb',
                                      PkgResourcesDirDiscoveryRegistry,
-                                     'kb', registry_namespace=converterext)))
+                                     'kb', registry_namespace=classifierext)))
 
 templates = LazyDict(lambda: dict((os.path.basename(f), f)
                      for f in RegistryProxy('converterext.templates',
                                             PkgResourcesDirDiscoveryRegistry,
                                             'templates',
-                                            registry_namespace=converterext)))
+                                            registry_namespace=classifierext)))
