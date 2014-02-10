@@ -32,7 +32,8 @@ module.exports = {
                ,'jquery-tokeninput/styles/token-input.css'
                ,'jquery.bookmark/jquery.bookmark.css'
                ,'datatables-colvis/media/css/ColVis.css'
-               ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.css'],
+               ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.css'
+               ,'prism/prism.css'],
         dest: '<%= globalConfig.installation_path %>/css/'
     },
     img: {
@@ -64,7 +65,8 @@ module.exports = {
              ,'uploadify/jquery.uploadify.min.js'
              ,'json2/json2.js'
              ,'datatables-colvis/media/js/ColVis.js'
-             ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js'],
+             ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js'
+             ,'prism/prism.js'],
         dest: '<%= globalConfig.installation_path %>/js/'
     },
     fonts: {
@@ -163,17 +165,6 @@ module.exports = {
         rename: function(dest, src) {
             var res = src.replace(src.substring(0),
                                   'jquery.form.js');
-            return dest + res;
-        }
-    },
-    prism: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['prism/index.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            var res = src.replace(src.substring(0), 'prism.js');
             return dest + res;
         }
     },
