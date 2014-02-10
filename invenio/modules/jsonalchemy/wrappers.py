@@ -91,8 +91,8 @@ class SmartJson(SmartDict):
         if main_key in self:
             self._dict_bson.__setitem__(key, value, extend)
         else:
-            reader = readers[self['__meta_metadata__']['__additional_info__']['master_format']]\
-                (namespace=self['__meta_metadata__']['__additional_info__']['namespace'])
+            reader = readers[self.additional_info['master_format']]\
+                (namespace=self.additional_info['namespace'])
             reader.set(self, main_key)
             self._dict_bson.__setitem__(key, value, extend)
 
@@ -101,6 +101,10 @@ class SmartJson(SmartDict):
     def items(self):
         for key in self.keys():
             yield (key, self[key])
+
+    @property
+    def additional_info(self):
+        return self['__meta_metadata__']['__additional_info__']
 
     @property
     def validation_errors(self):
@@ -130,28 +134,28 @@ class SmartJson(SmartDict):
     def validate(self):
 
         def find_schema(json_id):
-            schema = FieldParser.field_definitions(self['__meta_metadata__']['__additional_info__']['namespace']).get(json_id, {})
+            schema = FieldParser.field_definitions(self.additional_info['namespace']).get(json_id, {})
             if isinstance(schema, list):
                 for jjson_id in schema:
-                    yield FieldParser.field_definitions(self['__meta_metadata__']['__additional_info__']['namespace']).get(jjson_id, {}).get('schema', {})
+                    yield FieldParser.field_definitions(self.additional_info['namespace']).get(jjson_id, {}).get('schema', {})
                 raise StopIteration()
             yield schema.get('schema', {})
 
         if self._validator is None:
             schema = {}
-            model_fields = ModelParser.model_definitions(self['__meta_metadata__']['__additional_info__']['namespace']).get(fields, {})
+            model_fields = ModelParser.model_definitions(self.additional_info['namespace']).get('fields', {})
             if model_fields:
-                for field in self.document.keys():
+                for field in self.keys():
                     if field not in model_fields:
                         model_fields[field] = field
                 model_field = [json_id for json_id in model_fields.values()]
             else:
-                model_fields = self.document.keys()
+                model_fields = self.keys()
 
             for json_id in model_fields:
-                for schema in find_schema(json_id):
-                    self.schema.update(schema)
-            self._validator = Validator(schema=shema)
+                for new_schema in find_schema(json_id):
+                    schema.update(new_schema)
+            self._validator = Validator(schema=schema)
 
         return self._validator.validate(self)
 
@@ -160,7 +164,7 @@ class SmartJson(SmartDict):
         try:
             self._dict[field] = reduce(lambda obj, key: obj[key], \
                     self._dict['__meta_metadata__'][field]['dumps'], \
-                    FieldParser.field_definitions(self['__meta_metadata__']['__additional_info__']['namespace']))(self._dict_bson[field])
+                    FieldParser.field_definitions(self.additional_info['namespace']))(self._dict_bson[field])
         except (KeyError, IndexError):
             if self['__meta_metadata__'][field]['memoize'] or \
                     self['__meta_metadata__'][field]['type'] in ('derived', 'creator', 'UNKNOWN'):
@@ -171,7 +175,7 @@ class SmartJson(SmartDict):
         try:
             self._dict_bson[field] = reduce(lambda obj, key: obj[key], \
                     self._dict['__meta_metadata__'][field]['loads'], \
-                    FieldParser.field_definition(self['__meta_metadata__']['__additional_info__']['namespace']))(self._dict[field])
+                    FieldParser.field_definitions(self.additional_info['namespace']))(self._dict[field])
         except (KeyError, IndexError):
             self._dict_bson[field] = self._dict[field]
 
@@ -182,9 +186,9 @@ class SmartJson(SmartDict):
         if self._dict['__meta_metadata__'][field]['memoize'] is None:
             func = reduce(lambda obj, key: obj[key], \
                     self._dict['__meta_metadata__'][field]['function'], \
-                    FieldParser.field_definitions(self['__meta_metadata__']['__additional_info__']['namespace']))
+                    FieldParser.field_definitions(self.additional_info['namespace']))
             self._dict_bson[field] = try_to_eval(func,
-                    functions(self['__meta_metadata__']['__additional_info__']['namespace']),
+                    functions(self.additional_info['namespace']),
                     self=self)
         else:
             live_time = datetime.timedelta(0, self._dict['__meta_metadata__'][field]['memoize'])
@@ -193,9 +197,9 @@ class SmartJson(SmartDict):
                 old_value = self._dict_bson[field]
                 func = reduce(lambda obj, key: obj[key], \
                     self._dict['__meta_metadata__'][field]['function'], \
-                    FieldParser.field_definitions(self['__meta_metadata__']['__additional_info__']['namespace']))
+                    FieldParser.field_definitions(self.additional_info['namespace']))
                 self._dict_bson[field] = try_to_eval(func,
-                        functions(self['__meta_metadata__']['__additional_info__']['namespace']),
+                        functions(self.additional_info['namespace']),
                         self=self)
                 if not old_value == self._dict_bson[field]:
                     #FIXME: trigger update in DB and fire signal to update others

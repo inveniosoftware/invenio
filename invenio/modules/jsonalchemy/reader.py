@@ -402,8 +402,24 @@ class Reader(object):
             return False
         return True
 
-    def _find_meta_metadata(self, json_id, field_name, rule_type, rule, rule_def):
+    def _find_meta_metadata(self, json_id, field_name, rule_type=None, rule=None, rule_def=None):
         """Given one rule fills up the parallel dictionary with the needed meta-metadata"""
+        if rule_def is None:
+            rule_def = self.field_definitions[json_id]
+        if rule is None or rule_type is None:
+            if self.json_additional_info['master_format'] in rule_def['rules']:
+                rule = rule_def['rules'][self.json_additional_info['master_format']][0]
+                rule_type = 'creator'
+            elif 'derived' in rule_def['rules']:
+                rule = rule_def['rules']['derived'][0]
+                rule_type = 'derived'
+            elif 'calculated' in rule_def['rules']:
+                rule = rule_def['rules']['calculated'][0]
+                rule_type = 'calculated'
+            else:
+                rule = {}
+                rule_type = 'UNKNOWN'
+
         for alias in rule_def.get('aliases', []):
             self.json['__meta_metadata__.__aliases__.%s' % (alias, )] = field_name
         info = {}
@@ -444,12 +460,14 @@ class Reader(object):
                 except KeyError:
                     pass
                 self.json.set(field_name, value, extend=True)
+                self.json['__meta_metadata__.%s' % (SmartDict.main_key_pattern.sub('', field_name), )] = \
+                        self._find_meta_metadata(json_id, field_name)
             except Exception, e:
                 self.json['__meta_metadata__']['__continuable_errors__']\
                         .append('Default Value CError - Unable to set default value for %s - %s' % (field_name, str(e)))
                 remove_metadata(field_name)
-
-        remove_metadata(field_name)
+        else:
+            remove_metadata(field_name)
 
     def _post_process_json(self):
         """
