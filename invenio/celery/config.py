@@ -61,7 +61,7 @@ def default_config(config):
         try:
             ADMINS = [
                 ('', x.strip()) for x in
-                config["CFG_SITE_EMERGENCY_EMAIL_ADDRESSES"]['*'].explode(",")
+                config["CFG_SITE_EMERGENCY_EMAIL_ADDRESSES"]['*'].split(",")
             ]
             config.setdefault("ADMINS", ADMINS)
         except Exception:
