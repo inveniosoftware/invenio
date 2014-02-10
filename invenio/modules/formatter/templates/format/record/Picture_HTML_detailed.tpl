@@ -3,11 +3,11 @@
 </div>
 <hr />
 <div style="padding-left:10px;padding-right:10px">
-{{ bfe_title(bfo, prefix="<center><big><big><strong>", separator="<br/><br/>", suffix="</strong></big></big></center>") }}
+{{ bfe_title(bfo, separator="<br/><br/>") }}
 
-{{ bfe_notes(bfo, ) }}
+{{ bfe_notes(bfo) }}
 {{ bfe_date(bfo, prefix="<center>", suffix="</center>") }}
-{{ bfe_contact(bfo, ) }}
+{{ bfe_contact(bfo) }}
 <center>
 {{ bfe_authors(bfo, prefix="Photographer:<small> ", suffix="</small>", print_links="yes", print_affiliations="yes", limit="10", interactive="yes") }}
 
