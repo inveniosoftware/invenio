@@ -59,6 +59,7 @@
 {%- endblock header %}
 
 {%- block css %}
+  {{ super() }}
 <style>
 .ui-autocomplete-loading {
     background: white url('{{ url_for('static', filename='img/loading.gif') }}') right top no-repeat;
