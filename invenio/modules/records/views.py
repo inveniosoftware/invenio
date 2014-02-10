@@ -94,7 +94,7 @@ def request_record(f):
         if record is None:
             return render_template('404.html')
 
-        title = record.get('title.title', '')
+        title = record.get(cfg.get('RECORDS_BREADCRUMB_TITLE_KEY'), '')
 
         # b = [(_('Home'), '')] + collection.breadcrumbs()[1:]
         # b += [(title, 'record.metadata', dict(recid=recid))]
