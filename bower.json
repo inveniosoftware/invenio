@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "dependencies": {
     "bootstrap": "3.0.2",
-    "jquery": "2.0.3"
+    "jquery": "2.0.3",
+    "font-awesome": "~4.0.3",
+    "ckeditor": "latest"
   },
   "devDependencies": {
     "typeahead.js": "*",
     "hogan": "3.0.0",
     "jquery-tokeninput": "*",
-    "ckeditor": "http://invenio-software.org/download/ckeditor/ckeditor_3.6.6.zip",
     "MathJax": "v2.1-latest",
     "jquery_jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
     "jquery.treeview": "1.4.1",
