@@ -300,7 +300,7 @@ class FieldParser(object):
             try:
                 field_descs = parser.parseFile(field_file, parseAll=True)
             except ParseException as e:
-                raise FieldParserException("Cannot parse file '%s',\n, %s" % (field_file, e.msg))
+                raise FieldParserException("Cannot parse file '%s',\n%s" % (field_file, str(e)))
             for include in field_descs.includes:
                 if include[0] in already_included:
                     continue
@@ -667,9 +667,7 @@ class ModelParser(object):
             try:
                 model_definition = parser.parseFile(model_file, parseAll=True)
             except ParseException as e:
-                raise ModelParserException("Cannot parse file '%s',\n, %s" % (model_file, e.msg))
-
-
+                raise ModelParserException("Cannot parse file %s,\n%s" % (model_file, str(e)))
             if not model_definition.fields:
                 raise ModelParserException("Field definition needed")
             for field_def in model_definition.fields[0]:
