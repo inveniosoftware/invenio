@@ -116,3 +116,12 @@ record_after_update = _signals.signal(
 """
 This signal is sent after record is updated.
 """
+
+pre_template_render = _signals.signal('pre-template-render')
+"""
+This signal is sent before *some* templates are rendered, an allows
+customization of the template context.
+
+Sender is the blueprint view name (e.g. 'record.metadata'). Extra data
+passed in depends on blueprint view.
+"""
