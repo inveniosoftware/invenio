@@ -25,16 +25,16 @@ __revision__ = "$Id: webmessage_webinterface.py,v 1.13 2008/03/12 16:48:08 tibor
 __lastupdated__ = """$Date: 2008/03/12 16:48:08 $"""
 
 import re
-from invenio.webpage import page
-from invenio.webinterface_handler import WebInterfaceDirectory, \
+from invenio.legacy.webpage import page
+from invenio.ext.legacy.handler import WebInterfaceDirectory, \
                                          wash_urlargd
-from invenio.urlutils import redirect_to_url
+from invenio.utils.url import redirect_to_url
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL
-from invenio.dateutils import convert_datestruct_to_datetext, \
+from invenio.utils.date import convert_datestruct_to_datetext, \
                               convert_datetext_to_datestruct
-from invenio.messages import gettext_set_language
-from invenio.bibexport_method_fieldexporter import get_css, \
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.bibexport.fieldexporter import get_css, \
                                         get_navigation_menu, \
                                         perform_request_edit_query, \
                                         perform_request_edit_job, \
@@ -53,12 +53,12 @@ from invenio.bibexport_method_fieldexporter import get_css, \
                                         perform_request_display_job_result, \
                                         perform_request_download_job_result, \
                                         AccessDeniedError
-from invenio.bibexport_method_fieldexporter_dblayer import Job, \
+from invenio.legacy.bibexport.fieldexporter_dblayer import Job, \
                                                            Query, \
                                                            JobResult
-from invenio.webuser import collect_user_info, \
+from invenio.legacy.webuser import collect_user_info, \
                             page_not_authorized
-from invenio.access_control_engine import acc_authorize_action
+from invenio.modules.access.engine import acc_authorize_action
 
 class WebInterfaceFieldExporterPages(WebInterfaceDirectory):
     """Defines the set of /fieldexporter pages."""

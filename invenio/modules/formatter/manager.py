@@ -29,7 +29,7 @@ generates new Jinja2 templates in CFG_BIBFORMAT_JINJA_TEMPLATE_PATH.
 import os
 import re
 import shutil
-from invenio.scriptutils import Manager
+from invenio.ext.script import Manager
 
 manager = Manager(usage="Perform migration operations")
 
@@ -46,18 +46,19 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
 
     ## Import all invenio modules inside to avoid side-efects ouside
     ## Flask application context.
-    from invenio.bibformat_config import CFG_BIBFORMAT_OUTPUTS_PATH, \
+    from invenio.modules.formatter.config import CFG_BIBFORMAT_OUTPUTS_PATH, \
         CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, \
         CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
         CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
         CFG_BIBFORMAT_JINJA_TEMPLATE_PATH
-    from invenio.bibformat_engine import get_format_element, \
+    from invenio.modules.formatter.engine import get_format_element, \
         get_output_formats, \
         pattern_function_params, \
         pattern_tag, pattern_lang, \
         translation_pattern, \
         ln_pattern, get_format_templates
-    from invenio.bibformatadminlib import update_output_format_rules
+    from invenio.legacy.bibformat.adminlib import \
+        update_output_format_rules
 
     only_template = re.compile(only_template_re) \
         if only_template_re is not None else None
@@ -238,8 +239,8 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
                 default="HB", help="Specify output format/s (default HB)")
 def expunge(output_format="HB"):
     """Remove static output formats from cache."""
-    from invenio.sqlalchemyutils import db
-    from invenio.bibedit_model import Bibfmt
+    from invenio.ext.sqlalchemy import db
+    from invenio.modules.record_editor.models import Bibfmt
 
     # Make it uppercased as it is stored in database.
     output_format = output_format.upper()
@@ -255,8 +256,8 @@ def expunge(output_format="HB"):
 
 
 def main():
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app()
+    from invenio.base.factory import create_app
+    app = create_app()
     manager.app = app
     manager.run()
 

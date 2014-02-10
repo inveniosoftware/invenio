@@ -23,11 +23,10 @@ Provide API-callable functions for knowledge base management (using kb's).
 
 import os
 import re
+import json
 
-from invenio import bibknowledge_dblayer
-from invenio.jsonutils import json
-from invenio.bibformat_config  import CFG_BIBFORMAT_ELEMENTS_PATH
-from invenio.config import CFG_WEBDIR
+from . import dblayer as bibknowledge_dblayer
+from invenio.base.globals import cfg
 
 processor_type = 0
 try:
@@ -248,10 +247,11 @@ def get_elements_that_use_kb(name):
 
     format_elements = {}
     #Retrieve all elements in files
-    files = os.listdir(CFG_BIBFORMAT_ELEMENTS_PATH)
-    for filename in files:
+    from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
+    for element in TEMPLATE_CONTEXT_FUNCTIONS_CACHE.bibformat_elements().values():
+        path = element.__file__
+        filename = os.path.basename(element.__file__)
         if filename.endswith(".py"):
-            path = CFG_BIBFORMAT_ELEMENTS_PATH + os.sep + filename
             formatf = open(path, 'r')
             code = formatf.read()
             formatf.close()
@@ -345,7 +345,7 @@ def get_kbd_values(kbname, searchwith=""):
     @param kbname:     name of the knowledge base
     @param searchwith: a term to search with
     """
-    from invenio import search_engine
+    import invenio.legacy.search_engine
 
     #first check that the kb in question is dynamic
     kbid = bibknowledge_dblayer.get_kb_id(kbname)
@@ -510,7 +510,7 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     if not kb_id:
         return []
     #get the rdf file..
-    rdfname = CFG_WEBDIR+"/kbfiles/"+str(kb_id)+".rdf"
+    rdfname = cfg['CFG_WEBDIR'] + "/kbfiles/" + str(kb_id) + ".rdf"
     if not os.path.exists(rdfname):
         return []
     #parse the doc with static xslt

@@ -43,13 +43,13 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
-    CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
+from invenio.legacy.bibedit.config import CFG_BIBEDIT_FILENAME, \
+    CFG_BIBEDIT_TO_MERGE_SUFFIX, \
+    CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_CACHEDIR
-from invenio.bibedit_dblayer import get_record_last_modification_date, \
+from invenio.legacy.bibedit.db_layer import get_record_last_modification_date, \
     delete_hp_change
-from invenio.bibrecord import create_record, create_records, \
+from invenio.legacy.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
     record_order_subfields, record_get_field_instances, \
@@ -57,33 +57,33 @@ from invenio.bibrecord import create_record, create_records, \
     field_get_subfield_values, record_delete_fields, record_add_fields, \
     record_get_field_values, print_rec, record_modify_subfield, \
     record_modify_controlfield
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, \
     CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
     CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE, CFG_INSPIRE_SITE
-from invenio.dateutils import convert_datetext_to_dategui
-from invenio.textutils import wash_for_xml
-from invenio.bibedit_dblayer import get_bibupload_task_opts, \
+from invenio.utils.date import convert_datetext_to_dategui
+from invenio.utils.text import wash_for_xml
+from invenio.legacy.bibedit.db_layer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
     get_info_of_record_revision
-from invenio.search_engine import print_record, record_exists, get_colID, \
+from invenio.legacy.search_engine import print_record, record_exists, get_colID, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.webuser import get_user_info, getUid, get_email
-from invenio.dbquery import run_sql
-from invenio.websearchadminlib import get_detailed_page_tabs
-from invenio.access_control_engine import acc_authorize_action
-from invenio.refextract_api import extract_references_from_record_xml, \
+from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.legacy.webuser import get_user_info, getUid, get_email
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.legacy.refextract.api import extract_references_from_record_xml, \
                                    extract_references_from_string_xml, \
                                    extract_references_from_url_xml
-from invenio.textmarc2xmlmarc import transform_file, ParseError
-from invenio.bibauthorid_name_utils import split_name_parts, \
+from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file, ParseError
+from invenio.legacy.bibauthorid.name_utils import split_name_parts, \
                                         create_normalized_name
-from invenio.bibknowledge import get_kbr_values
-
+from invenio.modules.knowledge.api import get_kbr_values
+from invenio.modules.editor.registry import field_templates, record_templates
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_BIBEDIT_CACHEDIR)
 re_xmlfilename_suffix = re.compile('_(\d+)_\d+\.xml$')
@@ -570,15 +570,14 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent = Fa
     """Return list of templates [filename, name, description, content*]
        the extractContent variable indicated if the parsed content should
        be included"""
-    template_fnames = fnmatch.filter(os.listdir(
-            templatesDir), '*.xml')
+    template_fnames = fnmatch.filter(templatesDir, '*.xml')
 
     templates = []
-    for fname in template_fnames:
-        filepath = '%s%s%s' % (templatesDir, os.sep, fname)
+    for filepath in template_fnames:
         template_file = open(filepath,'r')
         template = template_file.read()
         template_file.close()
+        fname = os.path.basename(filepath)
         fname_stripped = os.path.splitext(fname)[0]
         mo_name = tmpl_name.search(template)
         mo_description = tmpl_description.search(template)
@@ -607,17 +606,18 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent = Fa
 
 def get_field_templates():
     """Returns list of field templates [filename, name, description, content]"""
-    return get_templates(CFG_BIBEDIT_FIELD_TEMPLATES_PATH, re_ftmpl_name, re_ftmpl_description, True)
+    return get_templates(field_templates, re_ftmpl_name, re_ftmpl_description, True)
 
 # Record templates
 def get_record_templates():
     """Return list of record template [filename, name, description]  ."""
-    return get_templates(CFG_BIBEDIT_RECORD_TEMPLATES_PATH, re_tmpl_name, re_tmpl_description, False)
+    return get_templates(record_templates, re_tmpl_name, re_tmpl_description, False)
 
 
 def get_record_template(name):
     """Return an XML record template."""
-    filepath = '%s%s%s.xml' % (CFG_BIBEDIT_RECORD_TEMPLATES_PATH, os.sep, name)
+    filepath = filter(lambda n: n.endswith('%s.xml' % (name, )),
+                      record_templates)[-1]
     if os.path.isfile(filepath):
         template_file = open(filepath, 'r')
         template = template_file.read()
@@ -896,7 +896,7 @@ def add_record_cnum(recid, uid):
     @rtype: None or string
     """
     # Import placed here to avoid circular dependency
-    from invenio.sequtils_cnum import CnumSeq, ConferenceNoStartDateError
+    from invenio.modules.sequencegenerator.cnum import CnumSeq, ConferenceNoStartDateError
 
     record_revision, record, pending_changes, deactivated_hp_changes, \
     undo_list, redo_list = get_cache_file_contents(recid, uid)[1:]

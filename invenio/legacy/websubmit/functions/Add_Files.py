@@ -18,7 +18,7 @@
 __revision__ = "$Id$"
 
 import os
-from invenio.bibdocfile import BibRecDocs, decompose_file
+from invenio.legacy.bibdocfile.api import BibRecDocs, decompose_file
 
 def Add_Files(parameters, curdir, form, user_info=None):
     """DEPRECATED: Use FFT instead."""

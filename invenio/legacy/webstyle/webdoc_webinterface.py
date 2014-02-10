@@ -26,12 +26,12 @@ __lastupdated__ = """$Date$"""
 
 import cgi
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_LANGS
-from invenio.messages import gettext_set_language
-from invenio.webpage import page
-from invenio.webuser import getUid
-from invenio.webdoc import get_webdoc_parts, get_webdoc_topics
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.webpage import page
+from invenio.legacy.webuser import getUid
+from invenio.legacy.webstyle.webdoc import get_webdoc_parts, get_webdoc_topics
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
+from invenio.utils.url import redirect_to_url
 
 class WebInterfaceDocumentationPages(WebInterfaceDirectory):
     """Defines the set of documentation pages, usually installed under /help."""
@@ -156,8 +156,9 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
                      'hacking': '<a class="navtrail" href="/help/hacking%s">%s</a>' % \
                      (ln_link, _("Hacking Invenio"))}
         body = '<div class="container" ><div class="row">' + \
-               '<div  class="span8"><h5>' + \
-              _('Table of contents of the %(x_category)s pages.') % {'x_category': categ}
+               '<div  class="col-md-8"><h5>' + \
+              _('Table of contents of the %(x_category)s pages.',
+                x_category=_(categ))
         if categ != 'help':
             body += ' <small>' + _('See also') + ' ' + \
                               ', '.join([ link for (category, link) in \
@@ -166,7 +167,7 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
 
         body += '</h5>' + get_webdoc_topics(sort_by='name', sc=1,
                                           categ=[categ], ln=ln) + \
-                '</div><div  class="span4">' + \
+                '</div><div  class="col-md-4">' + \
                 '<h5>'+_("Latest modifications:") + '</h5>' + \
                 get_webdoc_topics(sort_by='date', sc=0, limit=5,
                                   categ=[categ], ln=ln)+'</div></div></div>'
@@ -178,7 +179,7 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
     # set page title:
     page_title = page_parts.get('title', '')
     if not page_title:
-        page_title = _("Page %s Not Found") % cgi.escape(webdocname)
+        page_title = _("Page %(page)s Not Found", page=cgi.escape(webdocname))
 
     # set page navtrail:
     page_navtrail = page_parts.get('navtrail', '')
@@ -186,14 +187,15 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
     # set page body:
     page_body = page_parts.get('body' , '')
     if not page_body:
-        page_body = '<p>' + (_("Sorry, page %s does not seem to exist.") % \
-                    ('<strong>' + cgi.escape(webdocname) + '</strong>')) + \
+        page_body = '<p>' + \
+                    _("Sorry, page %(page)s does not seem to exist.",
+                      page='<strong>' + cgi.escape(webdocname) + '</strong>') + \
                     '</p>'
-        page_body += '<p>' + (_("You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)s.") % \
-                              {'x_category': _(categ),
-                               'x_url_open': '<a href="%s/help/%scontents%s">' % \
-                               (CFG_SITE_URL, ((categ != 'help' and categ + '/') or ''), ln_link),
-                               'x_url_close': '</a>'}) + \
+        page_body += '<p>' + \
+                     _("You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)s.",
+                       x_category=_(categ),
+                       x_url_open='<a href="%s/help/%scontents%s">' % (CFG_SITE_URL, ((categ != 'help' and categ + '/') or ''), ln_link),
+                       x_url_close='</a>') + \
                      '</p>'
 
     # set page description:

@@ -24,12 +24,12 @@ Xapian utilities.
 
 import os
 from invenio.config import CFG_CACHEDIR, CFG_XAPIAN_ENABLED
-from invenio.bibtask import write_message, task_get_option
-from invenio.dbquery import run_sql
-from invenio.search_engine import get_fieldvalues
-from invenio.xapianutils_config import DATABASES, XAPIAN_DIR, XAPIAN_DIR_NAME, INDEXES
-from invenio.bibdocfile import BibRecDocs
-from invenio.bibrank_bridge_config import CFG_MARC_ABSTRACT, \
+from invenio.legacy.bibsched.bibtask import write_message, task_get_option
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.search_engine import get_fieldvalues
+from invenio.legacy.miscutil.xapianutils_config import DATABASES, XAPIAN_DIR, XAPIAN_DIR_NAME, INDEXES
+from invenio.legacy.bibdocfile.api import BibRecDocs
+from invenio.legacy.bibrank.bridge_config import CFG_MARC_ABSTRACT, \
                                           CFG_MARC_AUTHOR_NAME, \
                                           CFG_MARC_ADDITIONAL_AUTHOR_NAME, \
                                           CFG_MARC_KEYWORD, \

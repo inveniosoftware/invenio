@@ -1,0 +1,77 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{# Base template for preview
+##
+## Can overwrite previews/top.html
+## and previews/bottom.html.
+## Base has a bottom and Embed has
+## top and bottom.
+##
+## For preview templates you can replace block head
+## and body when extending this base.
+#}
+
+{# Global CSS files #}
+{%- css 'css/bootstrap.css', '00-invenio' -%}
+{%- css 'css/bootstrap-responsive.min.css', '00-invenio' -%}
+{%- css 'css/token-input.css', '00-invenio' -%}
+{%- css 'css/token-input-facebook.css', '00-invenio' -%}
+
+{# Global Javascript files #}
+{%- js 'js/jquery.min.js', '00-invenio' -%}
+{%- js 'js/bootstrap.js', '00-invenio' -%}
+{%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
+{%- js 'js/invenio.js', '00-invenio' -%}
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Preview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% for bundle in get_css_bundle(iterate=True) %}
+    {% assets bundle %}
+      <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
+    {% endassets %}
+    {% endfor %}
+
+    {% for bundle in get_js_bundle(iterate=True) %}
+    {% assets bundle %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% endfor %}
+
+    {% block head %}
+    {% endblock %}
+  </head>
+  <body>
+      {# currently still has a wrapper div to use when pushing bottom to the bottom #}
+      <div id="wrap">
+        {% if embed %}
+          {% include 'previews/top.html' %}
+        {% endif %}
+        {% block body %}
+        {% endblock %}
+      </div>
+      {% include 'previews/bottom.html' %}
+  </body>
+</html>

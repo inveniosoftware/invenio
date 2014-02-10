@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField, ValidationError
-from invenio.webdeposit_field import WebDepositField
+from invenio.modules.deposit.field_base import WebDepositField
 
 __all__ = ['TitleField']
 
@@ -37,8 +37,9 @@ def validate_title(form, field):
 class TitleField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-book',
+            icon='book',
             export_key='title.title',
+            widget_classes="form-control"
             #FIXMEvalidators=[validate_title]
         )
         defaults.update(kwargs)

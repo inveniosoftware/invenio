@@ -18,17 +18,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
 from invenio.celery import celery
-from invenio.config import CFG_VERSION
-from invenio.sqlalchemyutils import db
 
 
 @celery.task
 def invenio_version():
     """ Task that will return the current running Invenio version """
+    from invenio.config import CFG_VERSION
     return CFG_VERSION
 
 
 @celery.task
 def invenio_db_test(num):
     """ Task will execute a simple query in the database"""
+    from invenio.ext.sqlalchemy import db
     return db.engine.execute("select %s" % int(num)).scalar()

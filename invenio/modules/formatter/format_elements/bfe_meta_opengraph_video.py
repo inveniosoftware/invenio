@@ -21,7 +21,7 @@
 
 import cgi
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_CERN_SITE
-from invenio.bibdocfile import BibRecDocs, get_superformat_from_format
+from invenio.legacy.bibdocfile.api import BibRecDocs, get_superformat_from_format
 from invenio.config import CFG_WEBSEARCH_ENABLE_OPENGRAPH
 
 def format_element(bfo):

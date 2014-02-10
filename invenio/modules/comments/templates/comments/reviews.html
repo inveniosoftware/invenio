@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 {%- if not request.is_xhr -%}
-  {% extends "record.html" %}
+  {% extends "records/base.html" %}
 {%- endif -%}
 
 {% block record_content %}
@@ -30,21 +30,20 @@
       {{ _("Reviews") }}
       <small>
       {% if current_user.is_guest %}
-        <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
-          <i class="icon-pencil"></i> {{ _('write review') }}
-        </a>
+        <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
       {% else %}
-        <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_review', recid=recid) }}">
-          <i class="icon-pencil"></i> {{ _('write review') }}
-        </a>
+        <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_review', recid=recid) }}">
       {% endif %}
+          <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
+        </a>
+
       </small>
     </h4>
   </div>
 
   {%- if comments -%}
 
-  <ul class="unstyled">
+  <ul class="list-unstyled">
   {%- for c in comments -%}
   <li name="{{ c.id }}">
     <div>
@@ -52,7 +51,7 @@
     {{ c.title }}
     <small>
        /
-      {{ ('<i class="icon-star"></i>'|safe) * (c.star_score) }}{{ ('<i class="icon-star-empty"></i>'|safe) * ((5-c.star_score)) }} &nbsp;
+      {{ ('<i class="glyphicon glyphicon-star"></i>'|safe) * (c.star_score) }}{{ ('<i class="glyphicon glyphicon-star-empty"></i>'|safe) * ((5-c.star_score)) }} &nbsp;
       {%- if c.nb_votes_total > 0 -%}
         {%- set votes = c.nb_votes_yes-(c.nb_votes_total-c.nb_votes_yes) -%}
         {%- if votes > 0 -%}
@@ -79,25 +78,25 @@
         <img src="/img/user-icon-1-16x16.gif" alt="avatar"/>
           {{ _('Guest') }}
         {%- endif -%} &nbsp;
-        - <i class="icon-time"></i> {{ c.date_creation }}
-        - <i class="icon-question-sign"></i> {{ _('Was it helpful?') }}
-          <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=1,
+        - <i class="glyphicon glyphicon-time"></i> {{ c.date_creation }}
+        - <i class="glyphicon glyphicon-question-sign"></i> {{ _('Was it helpful?') }}
+          <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=1,
             referer=request.url
           ) }}">
-          <i class="icon-thumbs-up"></i>
+          <i class="glyphicon glyphicon-thumbs-up"></i>
           {{ _('yes') }}
           </a> /
-          <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=-1,
+          <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=-1,
             referer=request.url
           ) }}">
-          <i class="icon-thumbs-down"></i>
+          <i class="glyphicon glyphicon-thumbs-down"></i>
           {{ _('no') }}
           </a>
           -
-          <a href="{{ url_for('webcomment.report', recid=recid, id=c.id,
+          <a href="{{ url_for('comments.report', recid=recid, id=c.id,
             referer=request.url
           ) }}">
-            <i class="icon-exclamation-sign"></i>
+            <i class="glyphicon glyphicon-exclamation-sign"></i>
             {{ _('report abuse') }}
           </a>
       </small>
@@ -108,12 +107,12 @@
   </ul>
 
   {% if current_user.is_guest %}
-        <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
-          <i class="icon-pencil"></i> {{ _('write review') }}
+        <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+          <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
         </a>
       {% else %}
-        <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_review', recid=recid) }}">
-          <i class="icon-pencil"></i> {{ _('write review') }}
+        <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_review', recid=recid) }}">
+          <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
         </a>
       {% endif %}
   {%- else -%}
@@ -124,23 +123,8 @@
 
   <div style="clear:both"/></div>
 
-<script>
-$(document).ready(function() {
-// Support for AJAX loaded modal window.
-// Focuses on first input textbox after it loads the window.
-$('[data-toggle="modal"]').click(function(e) {
-  e.preventDefault();
-  var href = $(this).attr('href');
-  if (href.indexOf('#') == 0) {
-    $(href).modal('open');
-  } else {
-    $.get(href, function(data) {
-      $('<div class="modal" >' + data + '</div>').modal();
-    }).success(function() { $('input:text:visible:first').focus(); });
-  }
-});
-
-});
-</script>
-
 {% endblock %}
+
+{%- if request.is_xhr -%}
+  <script type="text/javascript"> bindModals(); </script>
+{%- endif -%}

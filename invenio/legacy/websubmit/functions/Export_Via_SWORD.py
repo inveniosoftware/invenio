@@ -43,14 +43,14 @@ __revision__ = "$Id$"
 
 import os
 import re
-from invenio.bibsword_client import list_collections_from_server, \
+from invenio.legacy.bibsword.client import list_collections_from_server, \
                                     list_mandated_categories, \
                                     list_optional_categories, \
                                     get_marcxml_from_record, \
                                     get_media_list, \
                                     perform_submission_process
-from invenio.bibsword_client_templates import BibSwordTemplate
-from invenio.websubmit_config import InvenioWebSubmitFunctionStop
+from invenio.legacy.bibsword.client_templates import BibSwordTemplate
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionStop
 
 
 def Export_Via_SWORD(parameters, curdir, form, user_info=None):

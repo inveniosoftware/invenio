@@ -1,0 +1,89 @@
+body {
+	padding-top: 70px;
+}
+
+footer a, footer a:hover {
+  color: #666;
+}
+footer, footer p {
+  font-size: 11px;
+  color: #333;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+	font-weight: bold;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+  footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+.navbar-brand img {
+	height: 20px;
+	opacity: 0.6;
+}
+
+.navbar-brand:hover img {
+	opacity: 0.95;
+}
+
+/* to display icon inline with text at a button */
+
+.btn-inline-icon-hide-sm span {
+	display: inline !important; /* to overwrite bootstrap's important */
+}
+
+@media (max-width: 992px) {
+	.btn-inline-icon-hide-sm span {
+		display: none !important; /* to overwrite important above*/
+	}	
+}
+
+/* to make inline sub-forms fields stick togeter */
+
+.right-not-rounded {
+	border-bottom-right-radius: 0px;
+	border-top-right-radius: 0px;
+}
+
+.left-not-rounded {
+	border-bottom-left-radius: 0px;
+	border-top-left-radius: 0px;
+}
+
+.no-padding {
+	padding: 0px;
+}
+
+/* END */
+
+/* typeahead fixes  */
+/* source http://www.aureliomerenda.com/install-typeahead-bootstrap-3-fix-css-overlay-width-100/ */
+
+.twitter-typeahead {
+     width: 100%;
+}
+
+.twitter-typeahead .tt-hint {
+    display: block;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.428571429;
+    border: 1px solid transparent;
+    border-radius:4px;
+    width: 100%;
+}
+
+.tt-dropdown-menu
+{
+    width: 100%;
+}
+
+/* END typeahead fixes END */

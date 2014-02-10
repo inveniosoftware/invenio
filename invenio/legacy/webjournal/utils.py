@@ -41,12 +41,13 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_DEVEL_SITE, \
      CFG_CERN_SITE
-from invenio.dbquery import run_sql
-from invenio.bibformat_engine import BibFormatObject
-from invenio.search_engine import search_pattern, record_exists
-from invenio.messages import gettext_set_language
-from invenio.errorlib import register_exception
-from invenio.urlutils import make_invenio_opener
+from invenio.legacy.dbquery import run_sql
+from invenio.modules.formatter.engine import BibFormatObject
+from invenio.legacy.search_engine import search_pattern, record_exists
+from invenio.base.i18n import gettext_set_language
+from invenio.ext.logging import register_exception
+from invenio.utils.url import make_invenio_opener
+from invenio.modules.bulletin.registry import journals as journals_registry
 
 WEBJOURNAL_OPENER = make_invenio_opener('WebJournal')
 
@@ -519,8 +520,8 @@ def get_xml_from_config(nodes, journal_name):
     if cached_parsed_xml_config.has_key(journal_name):
         config_file = cached_parsed_xml_config[journal_name]
     else:
-        config_path = '%s/webjournal/%s/%s-config.xml' % \
-                      (CFG_ETCDIR, journal_name, journal_name)
+        config_path = os.path.join(journals_registry[journal_name],
+                                   'config.xml')
         config_file = minidom.Document
         try:
             config_file = minidom.parse("%s" % config_path)
@@ -667,7 +668,7 @@ def get_journal_collection_to_refresh_on_release(journal_name):
     Returns the list of collection to update (WebColl) upon release of
     an issue.
     """
-    from invenio.search_engine import collection_reclist_cache
+    from invenio.legacy.search_engine import collection_reclist_cache
     config_strings = get_xml_from_config(["update_on_release/collection"], journal_name)
     return [coll for coll in config_strings.get('update_on_release/collection', []) if \
             collection_reclist_cache.cache.has_key(coll)]
@@ -677,7 +678,7 @@ def get_journal_index_to_refresh_on_release(journal_name):
     Returns the list of indexed to update (BibIndex) upon release of
     an issue.
     """
-    from invenio.bibindex_engine_utils import get_index_id_from_index_name
+    from invenio.legacy.bibindex.engine import get_index_id_from_index_name
     config_strings = get_xml_from_config(["update_on_release/index"], journal_name)
     return [index for index in config_strings.get('update_on_release/index', []) if \
             get_index_id_from_index_name(index) != '']
@@ -687,7 +688,7 @@ def get_journal_template(template, journal_name, ln=CFG_SITE_LANG):
     Returns the journal templates name for the given template type
     Raise an exception if template cannot be found.
     """
-    from invenio.webjournal_config import \
+    from invenio.legacy.webjournal.config import \
          InvenioWebJournalTemplateNotFoundError
     config_strings = get_xml_from_config([template], journal_name)
 
@@ -1202,7 +1203,7 @@ def get_journal_id(journal_name, ln=CFG_SITE_LANG):
     from cache.
     """
     journal_id = None
-    from invenio.webjournal_config import InvenioWebJournalJournalIdNotFoundDBError
+    from invenio.legacy.webjournal.config import InvenioWebJournalJournalIdNotFoundDBError
 
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
         # do not connect to the database as the site is closed for
@@ -1249,8 +1250,8 @@ def guess_journal_name(ln, journal_name=None):
     not providing a name for the journal, or if given journal name
     does not match case of original journal.
     """
-    from invenio.webjournal_config import InvenioWebJournalNoJournalOnServerError
-    from invenio.webjournal_config import InvenioWebJournalNoNameError
+    from invenio.legacy.webjournal.config import InvenioWebJournalNoJournalOnServerError
+    from invenio.legacy.webjournal.config import InvenioWebJournalNoNameError
 
     journals_id_and_names = get_journals_ids_and_names()
     if len(journals_id_and_names) == 0:
@@ -1605,7 +1606,7 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln, bfo=No
 
     if CFG_CERN_SITE and bfo:
         try:
-            from invenio.bibformat_elements import bfe_webjournal_cern_toolbar
+            from invenio.modules.formatter.format_elements import bfe_webjournal_cern_toolbar
             cached_file = NOT_FOR_ALERT_COMMENTS_RE.sub(bfe_webjournal_cern_toolbar.format_element(bfo), cached_file, 1)
         except ImportError, e:
             pass

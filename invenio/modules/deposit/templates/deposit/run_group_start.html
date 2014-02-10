@@ -1,9 +1,9 @@
-<div class="accordion-group">
-    <div class="accordion-heading">
+<div class="panel panel-default">
+    <div class="panel-heading">
         {% if group.meta.indication %}
-            <span class="accordion-toggle muted pull-right">{{ group.meta.indication }}</span>
+            <span class="text-muted pull-right">{{ group.meta.indication }}</span>
         {% endif %}
-        <a class="accordion-toggle" data-toggle="collapse" href="#collapse-{{ idx }}"> {{ group.name }} <b class="caret" style="margin-top: 8px;"></b></a>
+        <a data-toggle="collapse" href="#collapse-{{ idx }}"> {{ group.name }} <b class="caret"></b></a>
     </div>
-    <div id="collapse-{{ idx }}" class="accordion-body collapse {{ 'in' if group.meta.classes is none else group.meta.classes }}">
-    <div class="accordion-inner">
+    <div id="collapse-{{ idx }}" class="panel-collapse collapse {{ 'in' if group.meta.classes is none else group.meta.classes }}">
+    <div class="panel-body">

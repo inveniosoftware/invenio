@@ -22,12 +22,12 @@
 __revision__ = "$Id$"
 
 import os
-from invenio.errorlib import register_exception
-from invenio.textutils import wash_for_xml
+from invenio.ext.logging import register_exception
+from invenio.utils.text import wash_for_xml
 from invenio.config import \
      CFG_BINDIR, \
      CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 
 CFG_WEBSUBMIT_DUMMY_XML_NAME = "dummy_marcxml_rec"
 

@@ -42,12 +42,12 @@ from invenio.config import \
      CFG_OAI_PREVIOUS_SET_FIELD, \
      CFG_SITE_NAME, \
      CFG_TMPDIR
-from invenio.oai_repository_config import CFG_OAI_REPOSITORY_MARCXML_SIZE, \
+from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_MARCXML_SIZE, \
      CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
-from invenio.search_engine import perform_request_search, get_record, search_unit_in_bibxxx
-from invenio.intbitset import intbitset
-from invenio.dbquery import run_sql
-from invenio.bibtask import \
+from invenio.legacy.search_engine import perform_request_search, get_record, search_unit_in_bibxxx
+from intbitset import intbitset
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.bibsched.bibtask import \
      task_get_option, \
      task_set_option, \
      write_message, \
@@ -55,7 +55,7 @@ from invenio.bibtask import \
      task_init, \
      task_sleep_now_if_required, \
      task_low_level_submission
-from invenio.bibrecord import \
+from invenio.legacy.bibrecord import \
      record_get_field_value, \
      record_get_field_values, \
      record_add_field, \

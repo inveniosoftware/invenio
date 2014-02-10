@@ -24,7 +24,6 @@ from fixture import DataSet
 
 
 class CollectionData(DataSet):
-
     class siteCollection:
         id = 1
         name = CFG_SITE_NAME
@@ -227,6 +226,11 @@ class FieldData(DataSet):
         code = u'miscellaneous'
         id = 39
         name = u'miscellaneous'
+
+    class Field_40:
+        code = u'tag'
+        id = 40
+        name = u'tag'
 
 
 class TagData(DataSet):

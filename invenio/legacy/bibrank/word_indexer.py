@@ -24,20 +24,18 @@ import math
 import re
 import ConfigParser
 
-from invenio.config import \
-     CFG_SITE_LANG, \
-     CFG_ETCDIR
-from invenio.search_engine import perform_request_search, wash_index_term
-from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
-from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
-from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.bibindex_engine import beautify_range_list, \
+from invenio.legacy.search_engine import perform_request_search, wash_index_term
+from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
+from invenio.legacy.bibindex.engine_stemmer import is_stemmer_available_for_language, stem
+from invenio.legacy.bibindex.engine_stopwords import is_stopword
+from invenio.legacy.bibindex.engine import beautify_range_list, \
     kill_sleepy_mysql_threads, create_range_list
-from invenio.bibtask import write_message, task_get_option, task_update_progress, \
+from invenio.legacy.bibsched.bibtask import write_message, task_get_option, task_update_progress, \
     task_update_status, task_sleep_now_if_required
-from invenio.intbitset import intbitset
-from invenio.errorlib import register_exception
-from invenio.textutils import strip_accents
+from intbitset import intbitset
+from invenio.ext.logging import register_exception
+from invenio.utils.text import strip_accents
+from invenio.modules.ranker.registry import configuration
 
 options = {} # global variable to hold task options
 
@@ -752,11 +750,11 @@ def word_index(run):
         method_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         write_message("Running rank method: %s" % getName(rank_method_code))
         try:
-            file = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
+            config_file = configuration.get(rank_method_code + '.cfg', '')
             config = ConfigParser.ConfigParser()
-            config.readfp(open(file))
+            config.readfp(open(config_file))
         except StandardError, e:
-            write_message("Cannot find configurationfile: %s" % file, sys.stderr)
+            write_message("Cannot find configurationfile: %s" % config_file, sys.stderr)
             raise StandardError
         options["current_run"] = rank_method_code
         options["modified_words"] = {}
@@ -1168,12 +1166,14 @@ def get_from_reverse_index(records, start, stop, table):
     #for (word, count) in gwfp.iteritems():
         #print "\t-> %s - %s" % (word, count)
 
-def getName(methname, ln=CFG_SITE_LANG, type='ln'):
+def getName(methname, ln=None, type='ln'):
     """Returns the name of the rank method, either in default language or given language.
     methname = short name of the method
     ln - the language to get the name in
     type - which name "type" to get."""
-
+    from invenio.config import CFG_SITE_LANG
+    if ln is None:
+        ln = CFG_SITE_LANG
     try:
         rnkid = run_sql("SELECT id FROM rnkMETHOD where name='%s'" % methname)
         if rnkid:

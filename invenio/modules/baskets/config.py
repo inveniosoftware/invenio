@@ -63,13 +63,3 @@ CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH = 1
 CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS = 3
 
 CFG_WEBBASKET_MAX_NUMBER_OF_NOTES = 100
-
-# Exceptions: warnings
-class InvenioWebBasketWarning(Exception):
-    """A generic warning for WebBasket."""
-    def __init__(self, message):
-        """Initialisation."""
-        self.message = message
-    def __str__(self):
-        """String representation."""
-        return repr(self.message)

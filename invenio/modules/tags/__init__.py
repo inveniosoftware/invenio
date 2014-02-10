@@ -1,4 +1,4 @@
-#!@PYTHON@
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2013 CERN.
@@ -16,18 +16,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
 """
-Invenio configuration CLI-ng tool.
+    invenio.modules.tags
+    --------------------
+
+    Supports private tags for logged-in users (a) attaching and detaching
+    tags to records, (b) tag management in `/yourtags`.
 """
-
-__revision__ = "$Id$"
-
-try:
-    from invenio.inveniomanage import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
-
-main()

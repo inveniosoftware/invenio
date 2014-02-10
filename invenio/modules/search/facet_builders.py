@@ -17,23 +17,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import os
 from operator import itemgetter
 from itertools import groupby
 from werkzeug.utils import cached_property
-from flask import g, url_for, request, abort, current_app
+from flask import g, url_for, request
+from flask.ext.login import current_user
 
-from invenio.websearch_cache import search_results_cache, \
-                                    get_search_results_cache_key_from_qid
-from invenio.intbitset import intbitset
-from invenio.config import CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT, CFG_PYLIBDIR
-from invenio.importutils import autodiscover_modules
-from invenio.webuser_flask import current_user
-from invenio.websearch_model import Collection
-from invenio.search_engine import search_pattern, \
-                                  get_field_tags, \
-                                  get_records_that_can_be_displayed, \
-                                  get_most_popular_field_values
+from .cache import search_results_cache, \
+    get_search_results_cache_key_from_qid
+from .models import Collection
+
+from invenio.base.globals import cfg
+try:
+    from intbitset import intbitset
+except:
+    from intbitset import intbitset
+from invenio.base.utils import autodiscover_facets
 
 
 def get_current_user_records_that_can_be_displayed(qid):
@@ -44,8 +43,11 @@ def get_current_user_records_that_can_be_displayed(qid):
 
     @return: records in intbitset
     """
+    CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT = cfg.get(
+        'CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT')
     @search_results_cache.memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
     def get_records_for_user(qid, uid):
+        from invenio.legacy.search_engine import get_records_that_can_be_displayed
         key = get_search_results_cache_key_from_qid(qid)
         data = search_results_cache.get(key)
         if data is None:
@@ -100,13 +102,12 @@ def faceted_results_filter(recids, filter_data, facets):
 
 def _facet_plugin_checker(plugin_code):
     """
-    Handy function to bridge importutils with (Invenio) facets.
+    Handy function to check facet plugin.
     """
     if 'facet' in dir(plugin_code):
         candidate = getattr(plugin_code, 'facet')
         if isinstance(candidate, FacetBuilder):
             return candidate
-    raise ValueError('%s is not a valid facet plugin' % plugin_code.__name__)
 
 
 class FacetLoader(object):
@@ -114,9 +115,7 @@ class FacetLoader(object):
     @cached_property
     def plugins(self):
         """Loaded facet plugins."""
-        return map(_facet_plugin_checker,
-                   autodiscover_modules(['invenio.websearch_facets'],
-                                        'facet_.+\.py'))
+        return filter(None, map(_facet_plugin_checker, autodiscover_facets()))
 
     @cached_property
     def elements(self):
@@ -165,12 +164,15 @@ class FacetBuilder(object):
         return self.get_recids_intbitset(qid).tolist()
 
     def get_facets_for_query(self, qid, limit=20, parent=None):
+        from invenio.legacy.search_engine import get_most_popular_field_values,\
+            get_field_tags
         return get_most_popular_field_values(self.get_recids(qid),
                                              get_field_tags(self.name)
                                              )[0:limit]
 
     #@blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT / 2)
     def get_value_recids(self, value):
+        from invenio.legacy.search_engine import search_pattern
         if isinstance(value, unicode):
             value = value.encode('utf8')
         p = '"' + str(value) + '"'

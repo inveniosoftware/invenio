@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,28 +19,29 @@
 
 """WebAccess Admin Flask Blueprint"""
 
-from flask import redirect, url_for
-from invenio.webaccess_model import AccACTION, AccROLE
-from invenio.websession_model import User
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+from flask import redirect, url_for, Blueprint
+from flask.ext.login import login_required
+from invenio.modules.access.models import AccACTION, AccROLE
+from invenio.modules.accounts.models import User
+from invenio.base.i18n import _
+from invenio.base.decorators import templated, sorted_by
+from flask.ext.menu import register_menu
+from flask.ext.breadcrumbs import register_breadcrumb
+from invenio.ext.principal import permission_required
+#from invenio.modules.access.local_config import \
+#FIXME
+WEBACCESSACTION = 'cfgwebaccess'
 
-from invenio.access_control_config import \
-    WEBACCESSACTION
-
-blueprint = InvenioBlueprint('webaccess_admin', __name__,
-                             url_prefix="/admin/webaccess",
-                             config='invenio.access_control_config',
-                             breadcrumbs=[(_('Administration'), 'help.admin'),
-                                          (_('WebAccess'), 'webaccesss_admin.index')],
-                             menubuilder=[('main.admin.webaccess',
-                                          _('Configure WebAccess'),
-                                          'webaccess_admin.index', 90)])
+blueprint = Blueprint('webaccess_admin', __name__,
+                             url_prefix="/admin/webaccess")
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized(WEBACCESSACTION)
-@blueprint.invenio_templated('webaccess_admin_index.html')
+@login_required
+@permission_required(WEBACCESSACTION)
+@templated('access/admin_index.html')
+@register_menu(blueprint, 'main.admin.webaccess', _('Configure WebAccess'))
+@register_breadcrumb(blueprint, 'admin.webaccess_admin', _('WebAccess'))
 def index():
     actions = [
         dict(url=url_for('.rolearea'),
@@ -69,10 +70,10 @@ def index():
 
 
 @blueprint.route('/actionarea', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized(WEBACCESSACTION)
-@blueprint.invenio_sorted(AccACTION)
-@blueprint.invenio_templated('webaccess_admin_actionarea.html')
+@login_required
+@permission_required(WEBACCESSACTION)
+@sorted_by(AccACTION)
+@templated('access/admin_actionarea.html')
 def actionarea(sort=False, filter=None):
     if sort is False:
         sort = AccACTION.name
@@ -81,10 +82,10 @@ def actionarea(sort=False, filter=None):
 
 
 @blueprint.route('/rolearea', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized(WEBACCESSACTION)
-@blueprint.invenio_sorted(AccROLE)
-@blueprint.invenio_templated('webaccess_admin_rolearea.html')
+@login_required
+@permission_required(WEBACCESSACTION)
+@sorted_by(AccROLE)
+@templated('access/admin_rolearea.html')
 def rolearea(sort=False, filter=None):
     if sort is False:
         sort = AccROLE.name
@@ -93,18 +94,18 @@ def rolearea(sort=False, filter=None):
 
 
 @blueprint.route('/showroledetails/<int:id_role>', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized(WEBACCESSACTION)
-@blueprint.invenio_templated('webaccess_admin_showroledetails.html')
+@login_required
+@permission_required(WEBACCESSACTION)
+@templated('access/admin_showroledetails.html')
 def showroledetails(id_role):
     return dict(role=AccROLE.query.get_or_404(id_role))
 
 
 @blueprint.route('/userarea', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized(WEBACCESSACTION)
-@blueprint.invenio_sorted(User)
-@blueprint.invenio_templated('webaccess_admin_userarea.html')
+@login_required
+@permission_required(WEBACCESSACTION)
+@sorted_by(User)
+@templated('access/admin_userarea.html')
 def userarea(sort=False, filter=None):
     if sort is False:
         sort = User.nickname

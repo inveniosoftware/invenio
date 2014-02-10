@@ -22,20 +22,20 @@ __revision__ = "$Id$"
 import sys
 
 from invenio.config import CFG_SITE_LANG
-from invenio.messages import gettext_set_language
-from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       CFG_WEBSESSION_USERGROUP_STATUS, \
       CFG_WEBSESSION_GROUP_JOIN_POLICY, \
       InvenioWebSessionError, \
       InvenioWebSessionWarning
-from invenio.webuser import nickname_valid_p, get_user_info
-from invenio.webmessage import perform_request_send
-from invenio.errorlib import register_exception
-import invenio.webgroup_dblayer as db
-from invenio.dbquery import IntegrityError
+from invenio.legacy.webuser import nickname_valid_p, get_user_info
+from invenio.legacy.webmessage.api import perform_request_send
+from invenio.ext.logging import register_exception
+import invenio.legacy.websession.dblayer as db
+from invenio.legacy.dbquery import IntegrityError
 try:
-    import invenio.template
-    websession_templates = invenio.template.load('websession')
+    import invenio.legacy.template
+    websession_templates = invenio.legacy.template.load('websession')
 except ImportError:
     pass
 
@@ -835,7 +835,7 @@ def synchronize_groups_with_login_method():
     least one external group for a given login_method, ask, if possible, for
     his group memberships and merge them.
     """
-    from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
+    from invenio.modules.access.local_config import CFG_EXTERNAL_AUTHENTICATION
     for login_method, authorizer in CFG_EXTERNAL_AUTHENTICATION.items():
         if authorizer:
             try:

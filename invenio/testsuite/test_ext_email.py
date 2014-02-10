@@ -23,12 +23,13 @@ Test unit for the miscutil/mailutils module.
 
 import os
 import sys
+import pkg_resources
 from base64 import encodestring
 from StringIO import StringIO
 from flask import current_app
 
-from invenio.mailutils import send_email
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.ext.email import send_email
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class MailTestCase(InvenioTestCase):
@@ -86,7 +87,7 @@ To: to@example.com"""
         """
         Test email text template engine.
         """
-        from invenio.jinja2utils import render_template_to_string
+        from invenio.ext.template import render_template_to_string
 
         contexts = {
             'ctx1': {'content': 'Content 1'},
@@ -115,7 +116,7 @@ To: to@example.com"""
         """
         Test email html template engine.
         """
-        from invenio.jinja2utils import render_template_to_string
+        from invenio.ext.template import render_template_to_string
 
         contexts = {
             'ctx1': {'html_content': '<b>Content 1</b>'},
@@ -146,9 +147,11 @@ To: to@example.com"""
         """
         Test sending html message with an image.
         """
-        from invenio.config import CFG_WEBDIR
         html_images = {
-            'img1': os.path.join(CFG_WEBDIR, 'img', 'journal_water_dog.gif')
+            'img1': pkg_resources.resource_filename(
+                'invenio.base',
+                os.path.join('static', 'img', 'journal_water_dog.gif')
+            )
         }
         send_email('from@example.com', ['to@example.com'],
                    subject='Subject', content='Content Text',
@@ -165,9 +168,11 @@ To: to@example.com"""
         """
         Test sending email with an attachment.
         """
-        from invenio.config import CFG_WEBDIR
         attachments = [
-            os.path.join(CFG_WEBDIR, 'img', 'journal_header.png')
+            pkg_resources.resource_filename(
+                'invenio.base',
+                os.path.join('static', 'img', 'journal_header.png')
+            )
         ]
         send_email('from@example.com', ['to@example.com'],
                    subject='Subject', content='Content Text',
@@ -209,7 +214,7 @@ To: Undisclosed.Recipients:"""
 
 class TestAdminMailBackend(MailTestCase):
 
-    EMAIL_BACKEND = 'invenio.mailutils_backend_adminonly.ConsoleMail'
+    EMAIL_BACKEND = 'invenio.ext.email.backends.console_adminonly.Mail'
     ADMIN_MESSAGE = "This message would have been sent to the following recipients"
 
     def test_simple_email_header(self):
@@ -217,7 +222,7 @@ class TestAdminMailBackend(MailTestCase):
         Test simple email header.
         """
         from invenio.config import CFG_SITE_ADMIN_EMAIL
-        from invenio.jinja2utils import render_template_to_string
+        from invenio.ext.template import render_template_to_string
 
         msg_content = """Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
@@ -228,9 +233,10 @@ To: %s""" % (CFG_SITE_ADMIN_EMAIL, )
 
         msg = render_template_to_string('mail_text.tpl', content='Content')
 
+        self.flush_mailbox()
         send_email('from@example.com', ['to@example.com'], subject='Subject',
                    content='Content')
-        email = sys.stdout.getvalue()
+        email = self.stream.getvalue()
         self.assertIn(msg_content, email)
         self.assertIn(self.ADMIN_MESSAGE, email)
         self.assertNotIn('Bcc:', email)
@@ -239,7 +245,7 @@ To: %s""" % (CFG_SITE_ADMIN_EMAIL, )
 
         send_email('from@example.com', 'to@example.com', subject='Subject',
                    content='Content')
-        email = sys.stdout.getvalue()
+        email = self.stream.getvalue()
         self.assertIn(msg_content, email)
         self.assertIn(self.ADMIN_MESSAGE, email)
         self.assertNotIn('Bcc:', email)
@@ -261,7 +267,7 @@ To: %s""" % (CFG_SITE_ADMIN_EMAIL, )
 
         send_email('from@example.com', ['to@example.com', 'too@example.com'],
                    subject='Subject', content='Content')
-        email = sys.stdout.getvalue()
+        email = self.stream.getvalue()
         self.assertIn(msg_content, email)
         self.assertIn(self.ADMIN_MESSAGE, email)
         self.assertIn('to@example.com,too@example.com', email)
@@ -270,7 +276,7 @@ To: %s""" % (CFG_SITE_ADMIN_EMAIL, )
 
         send_email('from@example.com', 'to@example.com, too@example.com',
                    subject='Subject', content='Content')
-        email = sys.stdout.getvalue()
+        email = self.stream.getvalue()
         self.assertIn(msg_content, email)
         self.assertIn(self.ADMIN_MESSAGE, email)
         self.assertIn('to@example.com,too@example.com', email)

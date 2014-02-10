@@ -27,8 +27,8 @@ def format_element(bfo, type='xml', encodeForXML='yes'):
     @param type: the type of xml. Can be 'xml', 'oai_dc', 'marcxml', 'xd'
     @param encodeForXML: if 'yes', replace all < > and & with html corresponding escaped characters.
     """
-    from invenio.bibformat_utils import record_get_xml
-    from invenio.textutils import encode_for_xml
+    from invenio.modules.formatter.utils import record_get_xml
+    from invenio.utils.text import encode_for_xml
     #Can be used to output various xml flavours.
 
     out = record_get_xml(bfo.recID, format=type, on_the_fly=True)

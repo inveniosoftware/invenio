@@ -58,23 +58,24 @@ import logging
 import logging.handlers
 import random
 
+from flask import current_app
 from socket import gethostname
 
-from invenio.dbquery import run_sql, _db_login
-from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_LOGDIR, \
+from invenio.legacy.dbquery import run_sql, _db_login
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.config import CFG_BINDIR, CFG_LOGDIR, \
     CFG_BIBSCHED_PROCESS_USER, CFG_TMPDIR, CFG_SITE_SUPPORT_EMAIL
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
-from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
+from invenio.modules.access.local_config import CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTHENTICATION
-from invenio.webuser import get_user_preferences, get_email
-from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
+from invenio.legacy.webuser import get_user_preferences, get_email
+from invenio.legacy.bibsched.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBTASK_DEFAULT_TASK_SETTINGS, CFG_BIBTASK_FIXEDTIMETASKS
-from invenio.dateutils import parse_runtime_limit
-from invenio.shellutils import escape_shell_arg
-from invenio.mailutils import send_email
-from invenio.bibsched import bibsched_set_host, \
+from invenio.utils.date import parse_runtime_limit
+from invenio.utils.shell import escape_shell_arg
+from invenio.ext.email import send_email
+from invenio.legacy.bibsched.cli import bibsched_set_host, \
                              bibsched_get_host
 
 
@@ -407,7 +408,7 @@ def task_init(
     if task_name not in CFG_BIBTASK_VALID_TASKS or os.path.realpath(os.path.join(CFG_BINDIR, task_name)) != os.path.realpath(sys.argv[0]):
         raise OSError("%s is not in the allowed modules" % sys.argv[0])
 
-    from invenio.errorlib import wrap_warn
+    from invenio.ext.logging import wrap_warn
     wrap_warn()
 
     if type(argv) is dict:
@@ -604,7 +605,10 @@ def task_set_option(key, value):
 def task_get_option(key, default=None):
     """Returns the value corresponding to key in the option dictionary of the task"""
     try:
-        return _OPTIONS.get(key, default)
+        if key is None:
+            return _OPTIONS
+        else:
+            return _OPTIONS.get(key, default)
     except NameError:
         return default
 
@@ -618,7 +622,10 @@ def task_has_option(key):
 def task_get_task_param(key, default=None):
     """Returns the value corresponding to the particular task param"""
     try:
-        return _TASK_PARAMS.get(key, default)
+        if key is None:
+            return _TASK_PARAMS
+        else:
+            return _TASK_PARAMS.get(key, default)
     except NameError:
         return default
 
@@ -760,6 +767,10 @@ def authenticate(user, authorization_action, authorization_msg=""):
     Return user name upon authorization success,
     do system exit upon authorization failure.
     """
+
+    #FIXME
+    return user
+
     # With SSO it's impossible to check for pwd
     if CFG_EXTERNAL_AUTH_USING_SSO or os.path.basename(sys.argv[0]) in CFG_VALID_PROCESSES_NO_AUTH_NEEDED:
         return user
@@ -909,11 +920,14 @@ def _task_run(task_run_fnc):
     False in case of errors.
     Return True in case of success and False in case of failure."""
 
-    from invenio.bibtasklet import _TASKLETS
+    from invenio.legacy.bibsched.bibtasklet import _TASKLETS
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
     check_running_process_user()
     try:
-        pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
+        CFG_BIBTASK_RUN_DIR = os.path.join(current_app.instance_path, 'run')
+        if not os.path.exists(CFG_BIBTASK_RUN_DIR):
+            os.mkdir(CFG_BIBTASK_RUN_DIR)
+        pidfile_name = os.path.join(CFG_BIBTASK_RUN_DIR,
             'bibsched_task_%d.pid' % _TASK_PARAMS['task_id'])
         pidfile = open(pidfile_name, 'w')
         pidfile.write(str(os.getpid()))

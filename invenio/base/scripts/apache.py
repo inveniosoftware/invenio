@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.scriptutils import Manager, change_command_name
+from invenio.ext.script import Manager, change_command_name
 
 manager = Manager(usage="Perform Apache operations.")
 
@@ -31,8 +31,8 @@ def version(separator='\n'):
     returned format is 'apache_version [apache_path]'.)  Return empty
     list if no success.
     """
-    from invenio.inveniocfg import _grep_version_from_executable
-    from invenio.shellutils import run_shell_command
+    from invenio.legacy.inveniocfg import _grep_version_from_executable
+    from invenio.utils.shell import run_shell_command
     out = []
     dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
     for apache in cmd_out.split("\n"):
@@ -42,28 +42,28 @@ def version(separator='\n'):
     return separator.join(out)
 
 
-@manager.option('-f', '--force', dest='force')
-@manager.option('--no-ssl', dest='no_ssl')
+@manager.option('-f', '--force', dest='force', action='store_true')
+@manager.option('--no-ssl', dest='no_ssl', action='store_true')
 @change_command_name
-def create_config(force=False, no_ssl=True):
+def create_config(force=False, no_ssl=False):
     """
     Create Apache configuration files for this site, keeping previous
     files in a backup copy.
     """
     import os
     import pwd
+    import pkg_resources
     import sys
     import shutil
     from flask import current_app
     from jinja2 import TemplateNotFound
-    from invenio.jinja2utils import render_template_to_string
-    from invenio.textutils import wrap_text_in_a_box
-    from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
+    from invenio.ext.template import render_template_to_string
+    from invenio.utils.text import wrap_text_in_a_box
 
     CFG_PREFIX = current_app.config.get('CFG_PREFIX', '')
 
     def get_context():
-        from invenio.inveniocfg import _detect_ip_address
+        from invenio.legacy.inveniocfg import _detect_ip_address
 
         conf = current_app.config
 
@@ -105,6 +105,17 @@ def create_config(force=False, no_ssl=True):
         if vhost_site_url_port != '80' or vhost_site_secure_url_port != '443':
             listen_directive_needed = True
 
+        static_root = current_app.config['COLLECT_STATIC_ROOT']
+        if not os.path.exists(static_root):
+            os.mkdir(static_root)
+
+        def prepare_alias(filename):
+            if os.path.isdir(os.path.join(static_root, filename)):
+                return '/%s/' % (filename, )
+            return '/%s' % (filename, )
+
+        aliases = map(prepare_alias, os.listdir(static_root))
+
         apc1 = {'vhost_site_url_port': vhost_site_url_port,
                 'servername': vhost_site_url,
                 'serveralias': vhost_site_url.split('.')[0],
@@ -112,6 +123,7 @@ def create_config(force=False, no_ssl=True):
                 _detect_ip_address() or '*',
                 'wsgi_socket_directive_needed': wsgi_socket_directive_needed,
                 'listen_directive_needed': listen_directive_needed,
+                'aliases': aliases,
                 }
 
         apc2 = {'vhost_site_url_port': vhost_site_secure_url_port,
@@ -130,16 +142,17 @@ def create_config(force=False, no_ssl=True):
                 '#SSLCertificateKeyFile %s' % ssl_key_path or
                 'SSLCertificateKeyFile %s' % ssl_key_path,
                 'listen_directive_needed': listen_directive_needed,
+                'aliases': aliases,
                 }
 
         return [apc1, apc2]
 
     current_app.config.update(
         CFG_RUNNING_AS_USER=pwd.getpwuid(os.getuid())[0],
-        CFG_EXTERNAL_AUTH_USING_SSO=CFG_EXTERNAL_AUTH_USING_SSO,
-        CFG_WSGIDIR=os.path.join(CFG_PREFIX, 'var', 'www-wsgi'))
+        CFG_WSGIDIR=os.path.abspath(
+            pkg_resources.resource_filename('invenio', '')))
 
-    apache_conf_dir = current_app.config.get('CFG_ETCDIR') + os.sep + 'apache'
+    apache_conf_dir = current_app.instance_path + os.sep + 'apache'
 
     print ">>> Going to create Apache conf files..."
     conf_files = ['invenio-apache-vhost.conf', 'invenio-apache-vhost-ssl.conf']
@@ -174,18 +187,16 @@ your httpd.conf:\n
 
 %s
 
-%s
-
-
 Please see the INSTALL file for more details.
-    """ % tuple(map(lambda x: "Include " + apache_conf_dir.encode('utf-8') + os.sep + x,
-                    list(conf_files))))
+    """ % '\n\n'.join(tuple(map(
+        lambda x: "Include " + apache_conf_dir.encode('utf-8') + os.sep + x,
+        list(conf_files[:1 if no_ssl else 2])))))
     print ">>> Apache conf files created."
 
 
 def main():
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app()
+    from invenio.base.factory import create_app
+    app = create_app()
     manager.app = app
     manager.run()
 

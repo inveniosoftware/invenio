@@ -1,0 +1,112 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% from "_formhelpers.html" import th with context %}
+{% from "_formhelpers.html" import render_filter_form with context %}
+{% extends "page.html" %}
+{% set title = _("Your Cloud Apps") %}
+{% import "cloudconnector/macros.html" as macros %}
+
+{% block body %}
+
+<div class="row">
+  <div class="span3">
+    {{ macros.menu(active=service) }}
+  </div>
+
+  <div class="span9">
+  {% if not service %}
+    {{ _('Select service from menu.') }}
+  {% endif %}
+
+  {% if account_info %}
+    <h4>
+      <a href={{account_info['cloud_storage_url']}}>{{service_name[1]}}</a>
+      <small>{{ account_info.user_name }}</small>
+      <strong class="pull-right">
+      {{ '%.2f%%'|format(account_info.quota) }}
+      </strong>
+    </h4>
+    <div class="progress">
+      <div class="bar" style="width: {{ account_info.quota }}%;"></div>
+    </div>
+    {% if request.args.has_key('path') and request.args.get('path') != ""  -%}
+      <a class="btn"
+         href="{{ url_for('cloudutils.index', service=service, path=parent) }}">
+        <i class="icon-arrow-up"></i> {{ _('Up') }}
+      </a>
+	  {% endif %}
+  {% endif %}
+
+  {% if folder_metadata %}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th class="span3">{{ _('Filename') }}</th>
+          <th class="span2">{{ _('Size') }}</th>
+          <th class="span3">{{ _('Modified') }}</th>
+          <th class="span1">{{ _(' ') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for row in folder_metadata %}
+        <tr>
+          <td>
+            {% if row[1]["isdir"] %}
+              <a href="{{ url_for('cloudutils.index', service=service, path=row[1]['path']) }}" >
+                <i class="icon-folder-close"></i>
+                {{ row[1]['title'] }}
+              </a>
+            {% else %}
+              <i class="icon-file"></i>
+               {{ row[1]['title'] }}
+            {% endif %}
+            <span class="label pull-right">
+              rev:{{ row[1]['revision']}}
+            </span>
+          </td>
+          <td>{{ row[1]['size'] }}</td>
+          <td>{{ row[1]['modified'] }}</td>
+          <td class="text-center">
+            <a title="remove"
+               href="{{ url_for('cloudutils.delete', service=service, path=row[1]['path']) }}" >
+              <i class="icon-remove"></i>
+            </a>
+            {% if not row[1]["isdir"] %}
+            <a target="_blank" title="download"
+               href="{{ url_for('cloudutils.download', service=service, path=row[1]['path']) }}"
+               download="{{row[1]['title']}}">
+              <i class="icon-download"></i>
+            </a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {{macros.pagination(request, number_of_pages, current_page)}}
+  {% endif %}
+  </div>
+</div>
+
+
+
+{% endblock %}
+
+
+

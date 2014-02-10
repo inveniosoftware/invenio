@@ -28,16 +28,16 @@ __revision__ = "$Id$"
 
 
 from invenio.config import CFG_INSPIRE_SITE
-from invenio.bibrank_citation_searcher import get_cited_by_list
-from invenio.bibrank_selfcites_indexer import get_self_citations_count
+from invenio.legacy.bibrank.citation_searcher import get_cited_by_list
+from invenio.legacy.bibrank.selfcites_indexer import get_self_citations_count
 from StringIO import StringIO
 
-from invenio.search_engine import search_pattern, perform_request_search
-from invenio.intbitset import intbitset
+from invenio.legacy.search_engine import search_pattern, perform_request_search
+from intbitset import intbitset
 
-import invenio.template
+import invenio.legacy.template
 
-websearch_templates = invenio.template.load('websearch')
+websearch_templates = invenio.legacy.template.load('websearch')
 
 
 ## CFG_CITESUMMARY_COLLECTIONS -- how do we break down cite summary

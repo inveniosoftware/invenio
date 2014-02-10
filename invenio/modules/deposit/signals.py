@@ -28,10 +28,10 @@ Sender is the blueprint. Extra data pass is:
  * context
 """
 
-file_uploaded = _signals.signal('file_uploaded')
+file_uploaded = _signals.signal('file-uploaded')
 """
 This signal is sent right after a file has been uploaded.
-Sender is the deposition type.. Extra data pass is:
+Sender is the deposition type. Extra data pass is:
 
  * user_id: Id of user uploading the file.
  * uuid: Workflow id.
@@ -40,4 +40,6 @@ Sender is the deposition type.. Extra data pass is:
  * size: Size of file
  * id: unique file id
  * content_type:
+ * deposition: The deposition object to which the file belongs
+ * deposition_file: The DepositionFile object
 """

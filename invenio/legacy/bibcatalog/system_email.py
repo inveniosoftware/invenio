@@ -25,11 +25,11 @@ This is a subclass of BibCatalogSystem
 
 import datetime
 from time import mktime
-import invenio.webuser
-from invenio.shellutils import escape_shell_arg
-from invenio.bibcatalog_system import BibCatalogSystem
-from invenio.mailutils import send_email
-from invenio.errorlib import register_exception
+import invenio.legacy.webuser
+from invenio.utils.shell import escape_shell_arg
+from invenio.legacy.bibcatalog.system import BibCatalogSystem
+from invenio.ext.email import send_email
+from invenio.ext.logging import register_exception
 
 EMAIL_SUBMIT_CONFIGURED = False
 import invenio.config
@@ -82,7 +82,7 @@ class BibCatalogSystemEmail(BibCatalogSystem):
         if requestor:
             requestorset = " requestor:" + escape_shell_arg(requestor) + '\n'
         if owner:
-            ownerprefs = invenio.webuser.get_user_preferences(owner)
+            ownerprefs = invenio.legacy.webuser.get_user_preferences(owner)
             if ownerprefs.has_key("bibcatalog_username"):
                 owner = ownerprefs["bibcatalog_username"]
             ownerset = " owner:" + escape_shell_arg(owner) + '\n'

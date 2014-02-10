@@ -19,142 +19,55 @@
 
 import os
 import tempfile
-import json
 import cPickle
 import base64
+import logging
+import six
 
-from sqlalchemy import desc
-from sqlalchemy.orm.exc import NoResultFound
 from datetime import datetime
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
-from invenio.sqlalchemyutils import db
-from invenio.bibworkflow_config import CFG_OBJECT_VERSION,\
-    CFG_LOG_TYPE
-from invenio.config import CFG_TMPSHAREDDIR
-from invenio.bibworkflow_utils import determineDataType, redis_create_search_entry
+from invenio.ext.sqlalchemy import db
+from invenio.base.globals import cfg
+from .config import CFG_OBJECT_VERSION
+from .utils import redis_create_search_entry
+
+from .logger import (get_logger,
+                     BibWorkflowLogHandler)
 
 
-class WorkflowLogging(db.Model):
-    __tablename__ = "bwlWORKFLOWLOGGING"
-    id = db.Column(db.Integer, primary_key=True)
-    id_workflow = db.Column(db.String(255), nullable=False)
-    log_type = db.Column(db.Integer, default=0, nullable=False)
-    created = db.Column(db.DateTime, default=datetime.now)
-    message = db.Column(db.TEXT, default="", nullable=False)
-    error_msg = db.Column(db.TEXT, default="", nullable=False)
-    extra_data = db.Column(db.JSON, default={})
-
-    def __repr__(self):
-        return "<WorkflowLog(%i, %s, %s, %s)>" % \
-               (self.id, self.id_workflow, self.message, self.created)
-
-    @classmethod
-    def get(cls, *criteria, **filters):
-        """ A wrapper for the filter and filter_by functions of sqlalchemy.
-        Define a dict with which columns should be filtered by which values.
-
-        e.g. Workflow.get(uuid=uuid)
-             Workflow.get(Workflow.uuid != uuid)
-
-        The function supports also "hybrid" arguments.
-        e.g. Workflow.get(Workflow.module_name != 'i_hate_this_module',
-                          user_id=user_id)
-
-        look up also sqalchemy BaseQuery's filter and filter_by documentation
-        """
-        return cls.query.filter(*criteria).filter_by(**filters)
+def get_default_data():
+    """ Returns the base64 representation of the data default value """
+    data_default = {}
+    return base64.b64encode(cPickle.dumps(data_default))
 
 
-    @classmethod
-    def get_most_recent(cls, *criteria, **filters):
-        """ Returns the most recently modified workflow. """
-
-        most_recent = cls.get(*criteria, **filters).\
-                              order_by(desc(WorkflowLogging.created)).first()
-        if most_recent is None:
-            raise NoResultFound
-        else:
-            return most_recent
-
-    @classmethod
-    def delete(cls, uuid=None):
-        cls.get(WorkflowLogging.id_workflow == uuid).delete()
-        db.session.commit()
-
-
-class BibWorkflowObjectLogging(db.Model):
-    """
-    This class represent a record of a log emit by an object
-    into the database the object must be saved before using
-    this class. Indeed it needs the id of the object into
-    the database.
-    """
-    #db table definition
-    __tablename__ = 'bwlOBJECTLOGGING'
-    id = db.Column(db.Integer, primary_key=True)
-    id_bibworkflowobject = db.Column(db.Integer(255),
-                                     db.ForeignKey('bwlOBJECT.id'),
-                                     nullable=False)
-    log_type = db.Column(db.Integer, default=0, nullable=False)
-    created = db.Column(db.DateTime, default=datetime.now)
-    message = db.Column(db.TEXT, default="", nullable=False)
-    error_msg = db.Column(db.TEXT, default="", nullable=False)
-    extra_data = db.Column(db.JSON, default={})
-
-    ###
-    #This function should be use only for debug purpose
-    #Normal log acces should be done throught the database
-    #That's all
-    ###
-    def __repr__(self):
-        return "<ObjectLog(%i, %s, %s, %s)>" % \
-               (self.id, self.id_bibworkflowobject, self.message, self.created)
-
-    @classmethod
-    def get(cls, *criteria, **filters):
-        """ A wrapper for the filter and filter_by functions of sqlalchemy.
-        Define a dict with which columns should be filtered by which values.
-
-        e.g. Workflow.get(uuid=uuid)
-             Workflow.get(Workflow.uuid != uuid)
-
-        The function supports also "hybrid" arguments.
-        e.g. Workflow.get(Workflow.module_name != 'i_hate_this_module',
-                          user_id=user_id)
-
-        look up also sqalchemy BaseQuery's filter and filter_by documentation
-        """
-        return cls.query.filter(*criteria).filter_by(**filters)
-
-    @classmethod
-    def get_most_recent(cls, *criteria, **filters):
-        """ Returns the most recently modified workflow. """
-
-        most_recent = cls.get(*criteria, **filters).\
-                              order_by(desc(BibWorkflowObjectLogging.created)).first()
-        if most_recent is None:
-            raise NoResultFound
-        else:
-            return most_recent
-
-    @classmethod
-    def delete(cls, id=None):
-        cls.get(BibWorkflowObjectLogging.id_bibworkflowobject == id).delete()
-        db.session.commit()
+def get_default_extra_data():
+    """ Returns the base64 representation of the extra_data default value """
+    extra_data_default = {"tasks_results": {},
+                          "owner": {},
+                          "task_counter": {},
+                          "error_msg": "",
+                          "last_task_name": "",
+                          "latest_object": -1,
+                          "widget": None,
+                          "redis_search": {}}
+    return base64.b64encode(cPickle.dumps(extra_data_default))
 
 
 class Workflow(db.Model):
+
     __tablename__ = "bwlWORKFLOW"
+
     uuid = db.Column(db.String(36), primary_key=True, nullable=False)
+
     name = db.Column(db.String(255), default="Default workflow",
                      nullable=False)
     created = db.Column(db.DateTime, default=datetime.now, nullable=False)
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
     id_user = db.Column(db.Integer, default=0, nullable=False)
-    extra_data = db.Column(db.MutableDict.as_mutable(db.PickleType),
-                           nullable=False, default={})
+    _extra_data = db.Column(db.LargeBinary, nullable=False, default=get_default_extra_data())
     status = db.Column(db.Integer, default=0, nullable=False)
     current_object = db.Column(db.Integer, default="0", nullable=False)
     objects = db.relationship("BibWorkflowObject", backref="bwlWORKFLOW")
@@ -198,7 +111,7 @@ class Workflow(db.Model):
                              str(self.counter_halted),
                              str(self.counter_error),
                              str(self.counter_finished),
-                             str(self.extra_data),)
+                             str(self._extra_data),)
 
     @classmethod
     def get(cls, *criteria, **filters):
@@ -237,8 +150,7 @@ class Workflow(db.Model):
         """ Returns the objects of the workflow """
         return cls.get(Workflow.uuid == uuid).one().objects
 
-    @classmethod
-    def get_extra_data(cls, user_id=0, uuid=None, key=None, getter=None):
+    def get_extra_data(self, user_id=0, uuid=None, key=None, getter=None):
         """Returns a json of the column extra_data or
         if any of the other arguments are defined,
         a specific value.
@@ -248,16 +160,16 @@ class Workflow(db.Model):
         @param getter: a callable that takes a dict as param and returns a
         value
         """
-        extra_data = cls.get(Workflow.id_user == user_id,
-                             Workflow.uuid == uuid).one().extra_data
+        extra_data = Workflow.get(Workflow.id_user == self.id_user,
+                                  Workflow.uuid == self.uuid).one()._extra_data
 
+        extra_data = cPickle.loads(base64.b64decode(extra_data))
         if key is not None:
             return extra_data[key]
         elif callable(getter):
             return getter(extra_data)
 
-    @classmethod
-    def set_extra_data(cls, user_id=0, uuid=None,
+    def set_extra_data(self, user_id=0, uuid=None,
                        key=None, value=None, setter=None):
         """Modifies the json of the column extra_data or
         if any of the other arguments are defined,
@@ -268,15 +180,15 @@ class Workflow(db.Model):
         @param value: the new value
         @param setter: a callable that takes a dict as param and modifies it
         """
-        extra_data = cls.get(Workflow.id_user == user_id,
-                             Workflow.uuid == uuid).one().extra_data
-
+        extra_data = Workflow.get(Workflow.id_user == user_id,
+                                  Workflow.uuid == uuid).one()._extra_data
+        extra_data = cPickle.loads(base64.b64decode(extra_data))
         if key is not None and value is not None:
             extra_data[key] = value
         elif callable(setter):
             setter(extra_data)
 
-        cls.get(Workflow.uuid == uuid).update({'extra_data': extra_data})
+        Workflow.get(Workflow.uuid == self.uuid).update({'_extra_data': base64.b64encode(cPickle.dumps(extra_data))})
 
     @classmethod
     def delete(cls, uuid=None):
@@ -287,19 +199,15 @@ class Workflow(db.Model):
 class BibWorkflowObject(db.Model):
     # db table definition
     __tablename__ = "bwlOBJECT"
+
     id = db.Column(db.Integer, primary_key=True)
-    _data = db.Column(db.LargeBinary, nullable=False)
-    extra_data = db.Column(db.MutableDict.as_mutable(db.PickleType),
-                           nullable=False, default={"tasks_results": {},
-                                                    "owner": {},
-                                                    "task_counter": {},
-                                                    "error_msg": "",
-                                                    "last_task_name": "",
-                                                    "latest_object": -1,
-                                                    "widget": None,
-                                                    "redis_search": {}})
+
+    # Our internal data column. Default is encoded dict.
+    _data = db.Column(db.LargeBinary, nullable=False, default=get_default_data())
+    _extra_data = db.Column(db.LargeBinary, nullable=False, default=get_default_extra_data())
+
     id_workflow = db.Column(db.String(36),
-                            db.ForeignKey("bwlWORKFLOW.uuid"), nullable=False)
+                            db.ForeignKey("bwlWORKFLOW.uuid"), nullable=True)
     version = db.Column(db.Integer(3),
                         default=CFG_OBJECT_VERSION.RUNNING, nullable=False)
     id_parent = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"),
@@ -310,19 +218,34 @@ class BibWorkflowObject(db.Model):
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
     status = db.Column(db.String(255), default="", nullable=False)
-    data_type = db.Column(db.String(50), default=determineDataType,
-                          nullable=False)
+
+    data_type = db.Column(db.String(150), default="",
+                          nullable=True)
+
     uri = db.Column(db.String(500), default="")
     id_user = db.Column(db.Integer, default=0, nullable=False)
-    child_logs = db.relationship("BibWorkflowObjectLogging")
+    child_logs = db.relationship("BibWorkflowObjectLog")
     workflow = db.relationship(
         Workflow, foreign_keys=[id_workflow], remote_side=Workflow.uuid
     )
+
+    _log = None
+
+    @property
+    def log(self):
+        if not self._log:
+            db_handler_obj = BibWorkflowLogHandler(BibWorkflowObjectLog, "id")
+            self._log = get_logger(logger_name="object.%s_%s" % (self.id_workflow, self.id),
+                                   db_handler_obj=db_handler_obj,
+                                   loglevel=logging.DEBUG,
+                                   obj=self)
+        return self._log
 
     def get_data(self):
         """
         Main method to retrieve data saved to the object.
         """
+
         return cPickle.loads(base64.b64decode(self._data))
 
     def set_data(self, value):
@@ -331,29 +254,17 @@ class BibWorkflowObject(db.Model):
         """
         self._data = base64.b64encode(cPickle.dumps(value))
 
-    def log_info(self, message, error_msg=""):
-        log_obj = BibWorkflowObjectLogging(id_bibworkflowobject=self.id,
-                                           log_type=CFG_LOG_TYPE.INFO,
-                                           message=message,
-                                           error_msg=error_msg,
-                                           extra_data=self.extra_data)
-        db.session.add(log_obj)
+    def get_extra_data(self):
+        """
+        Main method to retrieve data saved to the object.
+        """
+        return cPickle.loads(base64.b64decode(self._extra_data))
 
-    def log_error(self, message, error_msg=""):
-        log_obj = BibWorkflowObjectLogging(id_bibworkflowobject=self.id,
-                                           log_type=CFG_LOG_TYPE.ERROR,
-                                           message=message,
-                                           error_msg=error_msg,
-                                           extra_data=self.extra_data)
-        db.session.add(log_obj)
-
-    def log_debug(self, message, error_msg=""):
-        log_obj = BibWorkflowObjectLogging(id_bibworkflowobject=self.id,
-                                           log_type=CFG_LOG_TYPE.DEBUG,
-                                           message=message,
-                                           error_msg=error_msg,
-                                           extra_data=self.extra_data)
-        db.session.add(log_obj)
+    def set_extra_data(self, value):
+        """
+        Main method to update data saved to the object.
+        """
+        self._extra_data = base64.b64encode(cPickle.dumps(value))
 
     def _create_db_obj(self):
         db.session.add(self)
@@ -364,7 +275,7 @@ class BibWorkflowObject(db.Model):
                "version = %s, id_parent = %s, created = %s, extra_data = %s)" \
                % (str(self.id), str(self.get_data()), str(self.id_workflow),
                   str(self.version), str(self.id_parent), str(self.created),
-                  str(self.extra_data))
+                  str(self.get_extra_data()))
 
     def __str__(self, log=False):
         return """
@@ -399,13 +310,12 @@ BibWorkflowObject
        str(self.data_type),
        str(self.uri),
        str(self.get_data()),
-       str(self.extra_data),)
-       # str(self.extra_object_class),
+       str(self.get_extra_data),)
 
     def __eq__(self, other):
         if isinstance(other, BibWorkflowObject):
             if self._data == other._data and \
-                    self.extra_data == other.extra_data and \
+                    self._extra_data == other._extra_data and \
                     self.id_workflow == other.id_workflow and \
                     self.version == other.version and \
                     self.id_parent == other.id_parent and \
@@ -420,23 +330,27 @@ BibWorkflowObject
         return not self.__eq__(other)
 
     def add_task_result(self, task_name, result):
-        self.extra_data["tasks_results"][task_name] = result
+        extra_data = self.get_extra_data()
+        extra_data["tasks_results"][task_name] = result
+        self.set_extra_data(extra_data)
 
     def change_status(self, message):
         self.status = message
 
     def get_current_task(self):
-        return self.extra_data["task_counter"]
+        return self.get_extra_data()["task_counter"]
 
     def _create_version_obj(self, id_workflow, version, id_parent=None,
                             no_update=False):
+
         obj = BibWorkflowObject(_data=self._data,
                                 id_workflow=id_workflow,
                                 version=version,
                                 id_parent=id_parent,
-                                extra_data=self.extra_data,
+                                _extra_data=self._extra_data,
                                 status=self.status,
                                 data_type=self.data_type)
+
         db.session.add(obj)
         db.session.commit()
         if version is CFG_OBJECT_VERSION.INITIAL and not no_update:
@@ -447,11 +361,6 @@ BibWorkflowObject
     def _update_db(self):
         db.session.add(self)
         db.session.commit()
-        self.log_info("Object saved")
-
-        #if self.extra_object_class:
-        #    extra_obj = self.extra_object_class(self)
-        #    extra_obj.update()
 
     def save(self, version=None, task_counter=[0], id_workflow=None):
         """
@@ -460,7 +369,10 @@ BibWorkflowObject
         if not self.id:
             db.session.add(self)
             db.session.commit()
-        self.extra_data["task_counter"] = task_counter
+
+        extra_data = self.get_extra_data()
+        extra_data["task_counter"] = task_counter
+        self.set_extra_data(extra_data)
 
         if not id_workflow:
             id_workflow = self.id_workflow
@@ -471,8 +383,8 @@ BibWorkflowObject
                 redis_create_search_entry(self)
             self._update_db()
 
-    def save_to_file(self, directory=CFG_TMPSHAREDDIR,
-                     prefix="bibworkflow_object_data_", suffix=".obj"):
+    def save_to_file(self, directory=None,
+                     prefix="workflow_object_data_", suffix=".obj"):
         """
         Saves the contents of self.data['data'] to file.
 
@@ -480,49 +392,167 @@ BibWorkflowObject
 
         Warning: Currently assumes non-binary content.
         """
+        if directory is None:
+            directory = cfg['CFG_TMPSHAREDIR']
         tmp_fd, filename = tempfile.mkstemp(dir=directory,
                                             prefix=prefix,
                                             suffix=suffix)
-        os.write(tmp_fd, self._data)
+        os.write(tmp_fd, self.get_data())
         os.close(tmp_fd)
         return filename
 
     def __getstate__(self):
-        return {"_data": self._data,
-                "id_workflow": self.id_workflow,
-                "version": self.version,
-                "id_parent": self.id_parent,
-                "created": self.created,
-                "modified": self.modified,
-                "status": self.status,
-                "data_type": self.data_type,
-                "uri": self.uri,
-                "extra_data": self.extra_data}
+        return self.__dict__
 
     def __setstate__(self, state):
-        self._data = state["_data"]
-        self.id_workflow = state["id_workflow"]
-        self.version = state["version"]
-        self.id_parent = state["id_parent"]
-        self.created = state["created"]
-        self.modified = state["modified"]
-        self.extra_data = state["extra_data"]
-        self.status = state["status"]
-        self.data_type = state["data_type"]
-        self.uri = state["uri"]
+        self.__dict__ = state
 
     def copy(self, other):
         """Copies data and metadata except id and id_workflow"""
         self._data = other._data
-        self.extra_data = other.extra_data
+        self._extra_data = other._extra_data
         self.version = other.version
         self.id_parent = other.id_parent
         self.created = other.created
-        self.modified = datetime.now()
-        self.owner = other.owner
+        self.modified = other.modified
         self.status = other.status
         self.data_type = other.data_type
         self.uri = other.uri
 
-__all__ = ['Workflow', 'BibWorkflowObject', 'WorkflowLogging',
-           'BibWorkflowObjectLogging']
+    def get_formatted_data(self, format=None, formatter=None):
+        """
+        Returns the data in some chewable format.
+        """
+        from invenio.modules.records.api import Record
+        from invenio.modules.formatter.engine import format_record
+
+        data = self.get_data()
+
+        if formatter:
+            # A seperate formatter is supplied
+            return formatter(data)
+
+        if isinstance(data, dict):
+            # Dicts are cool on its own, but maybe its SmartJson (record)
+            try:
+                new_dict_representation = Record(data)
+                data = new_dict_representation.legacy_export_as_marc()
+            except Exception as e:
+                raise e
+
+        if isinstance(data, six.string_types):
+            # Its a string type, lets try to convert
+            if format:
+                # We can try formatter!
+                # If already XML, format_record does not like it.
+                if format != 'xm':
+                    try:
+                        return format_record(recID=None,
+                                             of=format,
+                                             xml_record=data)
+                    except TypeError as e:
+                        # Wrong kind of type
+                        pass
+                else:
+                    # So, XML then
+                    from xml.dom.minidom import parseString
+                    try:
+                        pretty_data = parseString(data)
+                        return pretty_data.toprettyxml()
+                    except TypeError:
+                        # Probably not proper XML string then
+                        return "Data cannot be parsed: %s" % (data,)
+                    except Exception:
+                        # Some other parsing error
+                        pass
+            # Just return raw string
+            return data
+        # Not any of the above types. How juicy!
+        return data
+
+
+class BibWorkflowObjectLog(db.Model):
+    """
+    This class represent a record of a log emit by an object
+    into the database the object must be saved before using
+    this class. Indeed it needs the id of the object into
+    the database.
+    """
+    __tablename__ = 'bwlOBJECTLOGGING'
+    id = db.Column(db.Integer, primary_key=True)
+    id_object = db.Column(db.Integer(255),
+                          db.ForeignKey('bwlOBJECT.id'),
+                          nullable=False)
+    log_type = db.Column(db.Integer, default=0, nullable=False)
+    created = db.Column(db.DateTime, default=datetime.now)
+    message = db.Column(db.TEXT, default="", nullable=False)
+
+    def __repr__(self):
+        return "<BibWorkflowObjectLog(%i, %s, %s, %s)>" % \
+               (self.id, self.id_object, self.message, self.created)
+
+    @classmethod
+    def get(cls, *criteria, **filters):
+        """ A wrapper for the filter and filter_by functions of sqlalchemy.
+        Define a dict with which columns should be filtered by which values.
+
+        look up also sqalchemy BaseQuery's filter and filter_by documentation
+        """
+        return cls.query.filter(*criteria).filter_by(**filters)
+
+    @classmethod
+    def get_most_recent(cls, *criteria, **filters):
+        """ Returns the most recently created log. """
+
+        most_recent = cls.get(*criteria, **filters).\
+            order_by(desc(BibWorkflowObjectLog.created)).first()
+        if most_recent is None:
+            raise NoResultFound
+        else:
+            return most_recent
+
+    @classmethod
+    def delete(cls, id=None):
+        cls.get(BibWorkflowObjectLog.id == id).delete()
+        db.session.commit()
+
+
+class BibWorkflowEngineLog(db.Model):
+    __tablename__ = "bwlWORKFLOWLOGGING"
+    id = db.Column(db.Integer, primary_key=True)
+    id_object = db.Column(db.String(255), nullable=False)
+    log_type = db.Column(db.Integer, default=0, nullable=False)
+    created = db.Column(db.DateTime, default=datetime.now)
+    message = db.Column(db.TEXT, default="", nullable=False)
+
+    def __repr__(self):
+        return "<BibWorkflowEngineLog(%i, %s, %s, %s)>" % \
+               (self.id, self.id_object, self.message, self.created)
+
+    @classmethod
+    def get(cls, *criteria, **filters):
+        """ A wrapper for the filter and filter_by functions of sqlalchemy.
+        Define a dict with which columns should be filtered by which values.
+
+        look up also sqalchemy BaseQuery's filter and filter_by documentation
+        """
+        return cls.query.filter(*criteria).filter_by(**filters)
+
+    @classmethod
+    def get_most_recent(cls, *criteria, **filters):
+        """ Returns the most recently created log. """
+
+        most_recent = cls.get(*criteria, **filters).\
+            order_by(desc(BibWorkflowEngineLog.created)).first()
+        if most_recent is None:
+            raise NoResultFound
+        else:
+            return most_recent
+
+    @classmethod
+    def delete(cls, uuid=None):
+        cls.get(BibWorkflowEngineLog.id == uuid).delete()
+        db.session.commit()
+
+
+__all__ = ['Workflow', 'BibWorkflowObject', 'BibWorkflowObjectLog', 'BibWorkflowEngineLog']

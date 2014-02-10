@@ -20,8 +20,8 @@
 WebJournal Element - return trackback auto discovery tag
 """
 import cgi
-from invenio.webjournal_utils import parse_url_string
-from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
+from invenio.legacy.webjournal.utils import parse_url_string
+from invenio.legacy.weblinkback.templates import get_trackback_auto_discovery_tag
 from invenio.config import CFG_WEBLINKBACK_TRACKBACK_ENABLED
 
 def format_element(bfo):

@@ -28,22 +28,18 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.config import CFG_SITE_SECURE_URL
-from invenio.access_control_admin import \
+from invenio.modules.access.control import \
     acc_find_possible_roles,\
     acc_is_user_in_role, \
     acc_is_user_in_any_role, \
     CFG_SUPERADMINROLE_ID, acc_get_role_users, \
     acc_get_roles_emails
-from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
-from invenio.webuser import collect_user_info
-from invenio.access_control_firerole import deserialize, load_role_definition, acc_firerole_extract_emails
-from invenio.urlutils import make_canonical_urlargd
-from invenio.cache import cache
-from invenio.webuser_flask import current_user
+from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
+from invenio.legacy.webuser import collect_user_info
+from invenio.modules.access.firerole import load_role_definition, acc_firerole_extract_emails
+from flask.ext.login import current_user
 
 
-#@cache.memoize(3600)
 def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **arguments):
     """
     Given the request object (or the user_info dictionary, or the uid), checks
@@ -53,7 +49,7 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
     authorization will be granted.
     Returns (0, msg) when the authorization is granted, (1, msg) when it's not.
     """
-    from invenio.webuser_flask import UserInfo
+    from invenio.ext.login import UserInfo
     if isinstance(req, UserInfo):
         user_info = req
         uid = user_info.get_id()

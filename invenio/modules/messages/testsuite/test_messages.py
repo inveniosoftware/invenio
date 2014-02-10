@@ -23,9 +23,9 @@ __revision__ = \
     "$Id$"
 
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-webmessage_mailutils = lazy_import('invenio.webmessage_mailutils')
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+webmessage_mailutils = lazy_import('invenio.utils.mail')
 
 
 class TestQuotingMessage(InvenioTestCase):

@@ -17,9 +17,9 @@
 
 from redis import Redis
 from rq.decorators import job
-from invenio.bibworkflow_worker_engine import (run_worker,
-                                               restart_worker,
-                                               continue_worker)
+from ..worker_engine import (run_worker,
+                             restart_worker,
+                             continue_worker)
 
 #FIXME: add configuration variables
 redis_conn = Redis()

@@ -2,7 +2,7 @@
 ## Comments and reviews for records.
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ __lastupdated__ = """$Date$"""
 __revision__ = """$Id$"""
 
 import cgi
-from invenio.webcomment import check_recID_is_in_range, \
+from invenio.modules.comments.api import check_recID_is_in_range, \
                                perform_request_display_comments_or_remarks, \
                                perform_request_add_comment_or_remark, \
                                perform_request_vote, \
@@ -58,34 +58,34 @@ from invenio.config import \
      CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
      CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
      CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
-from invenio.webpage import page, pageheaderonly, pagefooteronly
-from invenio.search_engine import create_navtrail_links, \
+from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
+from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
+from invenio.legacy.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
      get_colID
-from invenio.urlutils import redirect_to_url, \
+from invenio.utils.url import redirect_to_url, \
                              make_canonical_urlargd
-from invenio.htmlutils import get_mathjax_header
-from invenio.errorlib import register_exception
-from invenio.messages import gettext_set_language
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
-from invenio.access_control_config import VIEWRESTRCOLL
-from invenio.access_control_mailcookie import \
+from invenio.utils.html import get_mathjax_header
+from invenio.ext.logging import register_exception
+from invenio.base.i18n import gettext_set_language
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
+from invenio.modules.access.local_config import VIEWRESTRCOLL
+from invenio.modules.access.mailcookie import \
      mail_cookie_create_authorize_action, \
      mail_cookie_create_common, \
      mail_cookie_check_common, \
      InvenioWebAccessMailCookieDeletedError, \
      InvenioWebAccessMailCookieError
-from invenio.webcomment_config import \
+from invenio.modules.comments.config import \
      InvenioWebCommentError, \
      InvenioWebCommentWarning
-import invenio.template
-webstyle_templates = invenio.template.load('webstyle')
-websearch_templates = invenio.template.load('websearch')
+import invenio.legacy.template
+webstyle_templates = invenio.legacy.template.load('webstyle')
+websearch_templates = invenio.legacy.template.load('websearch')
 import os
-from invenio import webinterface_handler_config as apache
-from invenio.bibdocfile import \
+from invenio.utils import apache
+from invenio.legacy.bibdocfile.api import \
      stream_file, \
      decompose_file, \
      propose_next_docname

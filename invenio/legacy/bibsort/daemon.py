@@ -53,21 +53,25 @@ __revision__ = "$Id$"
 
 import sys
 import optparse
+import pkg_resources
 import time
 import ConfigParser
-from invenio.dateutils import strftime
-from invenio.dbquery import run_sql, Error
+from invenio.utils.date import strftime
+from invenio.legacy.dbquery import run_sql, Error
+from invenio.base.globals import cfg
 from invenio.config import CFG_ETCDIR
-from invenio.bibsort_engine import run_bibsort_update, \
+from invenio.legacy.bibsort.engine import run_bibsort_update, \
                             run_bibsort_rebalance
-from invenio.bibtask import task_init, write_message, \
+from invenio.legacy.bibsched.bibtask import task_init, write_message, \
     task_set_option, task_get_option
 
 
 def load_configuration():
     """Loads the configuration for the bibsort.cfg file into the database"""
-    config_file = CFG_ETCDIR + "/bibsort/bibsort.cfg"
-    write_message('Reading config data from: %s' %config_file)
+    config_file = cfg.get('CFG_SORTER_CONFIGURATION',
+                          pkg_resources.resource_filename(
+                              'invenio.legacy.bibsort', 'bibsort.cfg'))
+    write_message('Reading config data from: %s' % (config_file, ))
     config = ConfigParser.ConfigParser()
     try:
         config.readfp(open(config_file))

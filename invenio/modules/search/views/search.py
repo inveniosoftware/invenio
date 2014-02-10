@@ -25,42 +25,39 @@ import functools
 import cStringIO
 from math import ceil
 from flask import make_response, g, request, flash, jsonify, \
-    redirect, url_for, current_app, abort, session
+    redirect, url_for, current_app, abort, session, Blueprint
+from flask.ext.login import current_user
 
-from invenio import bibindex_model as BibIndex
-from invenio import websearch_receivers
-from invenio.bibindex_engine import get_index_id_from_index_name
-from invenio.bibformat import get_output_format_content_type, print_records
-from invenio.cache import cache
-from invenio.config import CFG_WEBSEARCH_RSS_TTL, \
-    CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
-from invenio.websearch_cache import \
-    get_search_query_id, get_collection_name_from_cache
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_config import VIEWRESTRCOLL
-from invenio.intbitset import intbitset
-from invenio.signalutils import websearch_before_browse, websearch_before_search
-from invenio.websearch_forms import EasySearchForm
-from invenio.websearch_model import Collection
-from invenio.websearch_webinterface import wash_search_urlargd
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
+from .. import receivers
+from ..cache import get_search_query_id, get_collection_name_from_cache
+from ..facet_builders import get_current_user_records_that_can_be_displayed, \
+    faceted_results_filter, FacetLoader
+from ..forms import EasySearchForm
+from ..models import Collection
+from ..washers import wash_search_urlargd
+from flask.ext.menu import register_menu
+from invenio.base.signals import websearch_before_browse, websearch_before_search
+from invenio.modules.indexer import models as BibIndex
+from invenio.modules.formatter import format_record
+from invenio.base.i18n import _
+from invenio.base.decorators import wash_arguments, templated
+from flask.ext.breadcrumbs import \
+    register_breadcrumb, current_breadcrumbs, default_breadcrumb_root
+from invenio.ext.template.context_processor import \
     register_template_context_processor
-from invenio.webuser_flask import current_user
-from invenio.websearch_facet_builders import \
-    get_current_user_records_that_can_be_displayed, faceted_results_filter, \
-    FacetLoader
-from invenio.search_engine import get_creation_date, perform_request_search,\
-    print_record, create_nearest_terms_box, browse_pattern_phrases
-from invenio.paginationutils import Pagination
-    
-blueprint = InvenioBlueprint('search', __name__, url_prefix="",
-                             config='invenio.search_engine_config',
-                             breadcrumbs=[],
-                             menubuilder=[('main.search', _('Search'),
-                                           'search.index', 1)])
+from invenio.utils.pagination import Pagination
 
+blueprint = Blueprint('search', __name__, url_prefix="",
+                      template_folder='../templates',
+                      static_url_path='',  # static url path has to be empty
+                                           # if url_prefix is empty
+                      static_folder='../static')
+
+default_breadcrumb_root(blueprint, '.')
 
 FACETS = FacetLoader()
+
+
 def collection_name_from_request():
     collection = request.values.get('cc')
     if collection is None and len(request.values.getlist('c')) == 1:
@@ -95,6 +92,8 @@ def check_collection(method=None, name_getter=collection_name_from_request,
             return abort(404)
 
         if collection.is_restricted:
+            from invenio.modules.access.engine import acc_authorize_action
+            from invenio.modules.access.local_config import VIEWRESTRCOLL
             (auth_code, auth_msg) = acc_authorize_action(uid, VIEWRESTRCOLL,
                                                          collection=collection.name)
             if auth_code:
@@ -110,6 +109,7 @@ def check_collection(method=None, name_getter=collection_name_from_request,
 
 
 def response_formated_records(recids, collection, of, **kwargs):
+    from invenio.modules.formatter import get_output_format_content_type, print_records
     response = make_response(print_records(recids, collection=collection,
                                            of=of, **kwargs))
     response.mimetype = get_output_format_content_type(of)
@@ -118,7 +118,9 @@ def response_formated_records(recids, collection, of, **kwargs):
 
 @blueprint.route('/index.py', methods=['GET', 'POST'])
 @blueprint.route('/', methods=['GET', 'POST'])
-@blueprint.invenio_templated('websearch_index.html')
+@templated('search/index.html')
+@register_menu(blueprint, 'main.search', _('Search'), order=1)
+@register_breadcrumb(blueprint, '.', _('Home'))
 def index():
     """ Renders homepage. """
 
@@ -130,31 +132,27 @@ def index():
         return redirect(url_for('.collection', name=c, ln=g.ln))
 
     collection = Collection.query.get_or_404(1)
-    # inject functions to the template
 
     @register_template_context_processor
     def index_context():
         return dict(
             easy_search_form=EasySearchForm(csrf_enabled=False),
-            format_record=print_record,
-            get_creation_date=get_creation_date
+            format_record=format_record,
         )
     return dict(collection=collection)
 
 
 @blueprint.route('/collection/<name>', methods=['GET', 'POST'])
-@blueprint.invenio_templated('websearch_collection.html')
+@templated('search/collection.html')
 def collection(name):
     collection = Collection.query.filter(Collection.name == name).first_or_404()
-    b = [(_('Home'), '.index')] + collection.breadcrumbs(ln=g.ln)[1:]
-    current_app.config['breadcrumbs_map'][request.endpoint] = b
 
     @register_template_context_processor
     def index_context():
         return dict(
-            format_record=print_record,
+            format_record=format_record,
             easy_search_form=EasySearchForm(csrf_enabled=False),
-            get_creation_date=get_creation_date)
+            breadcrumbs=current_breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:])
     return dict(collection=collection)
 
 
@@ -208,21 +206,22 @@ class SearchUrlargs(object):
 
 
 def _create_neareset_term_box(argd_orig):
-    #try:
-    p = argd_orig.pop('p', '')#.encode('utf-8')
-    f = argd_orig.pop('f', '')#.encode('utf-8')
-    if 'rg' in argd_orig and not 'rg' in request.values:
-        del argd_orig['rg']
-    if f == '' and ':' in p:
-        fx, px = p.split(':', 1)
-        from invenio.search_engine import get_field_name
-        if get_field_name(fx) != "":
-            f, p = fx, px
+    try:
+        p = argd_orig.pop('p', '')#.encode('utf-8')
+        f = argd_orig.pop('f', '')#.encode('utf-8')
+        if 'rg' in argd_orig and not 'rg' in request.values:
+            del argd_orig['rg']
+        if f == '' and ':' in p:
+            fx, px = p.split(':', 1)
+            from invenio.legacy.search_engine import get_field_name
+            if get_field_name(fx) != "":
+                f, p = fx, px
 
-    return create_nearest_terms_box(argd_orig,
-        p=p, f=f.lower(), ln=g.ln, intro_text_p=True)
-    #except:
-    #return '<!-- not found -->'
+        from invenio.legacy.search_engine import create_nearest_terms_box
+        return create_nearest_terms_box(argd_orig,
+            p=p, f=f.lower(), ln=g.ln, intro_text_p=True)
+    except:
+        return '<!-- not found -->'
 
 
 def sort_and_rank_records(recids, so=None, rm=None, p=''):
@@ -230,7 +229,7 @@ def sort_and_rank_records(recids, so=None, rm=None, p=''):
     if so:
         output.reverse()
     elif rm:
-        from invenio.bibrank_record_sorter import rank_records
+        from invenio.legacy.bibrank.record_sorter import rank_records
         ranked = rank_records(rm, 0, output, p.split())
         if ranked[0]:
             output = ranked[0]
@@ -246,7 +245,8 @@ def crumb_builder(url):
     def _crumb_builder(collection):
         qargs = request.args.to_dict()
         qargs['cc'] = collection.name
-        return (collection.name_ln, url, qargs)
+        #return (collection.name_ln, url, qargs)
+        return dict(text=collection.name_ln, url=url_for(url, **qargs))
     return _crumb_builder
 
 
@@ -260,13 +260,13 @@ def collection_breadcrumbs(collection, endpoint=None):
         del qargs[k]
         b = [(_('Home'), endpoint, qargs)] + collection.breadcrumbs(
             builder=crumb_builder(endpoint), ln=g.ln)[1:]
-    current_app.config['breadcrumbs_map'][request.endpoint] = b
+    return b
 
 
 @blueprint.route('/browse', methods=['GET', 'POST'])
-@blueprint.invenio_set_breadcrumb(_('Browse results'))
-@blueprint.invenio_templated('websearch_browse.html')
-@blueprint.invenio_wash_urlargd({'p': (unicode, ''),
+@register_breadcrumb(blueprint, '.browse', _('Browse results'))
+@templated('search/browse.html')
+@wash_arguments({'p': (unicode, ''),
                                  'f': (unicode, None),
                                  'of': (unicode, 'hb'),
                                  'so': (unicode, None),
@@ -276,10 +276,8 @@ def collection_breadcrumbs(collection, endpoint=None):
 @check_collection(default_collection=True)
 def browse(collection, p, f, of, so, rm, rg, jrec):
 
-    from invenio.websearch_webinterface import wash_search_urlargd
+    from invenio.legacy.search_engine import browse_pattern_phrases
     argd = argd_orig = wash_search_urlargd(request.args)
-
-    collection_breadcrumbs(collection)
 
     colls = [collection.name] + request.args.getlist('c')
     if f is None and ':' in p[1:]:
@@ -301,22 +299,23 @@ def browse(collection, p, f, of, so, rm, rg, jrec):
                     pagination=Pagination(int(ceil(jrec / float(rg))), rg, len(records)),
                     rg=rg, p=p, f=f,
                     easy_search_form=EasySearchForm(csrf_enabled=False),
+                    breadcrumbs=current_breadcrumbs+collection_breadcrumbs(collection)
                     )
 
     return dict(records=records)
 
-websearch_before_browse.connect(websearch_receivers.websearch_before_browse_handler)
+websearch_before_browse.connect(receivers.websearch_before_browse_handler)
 
 
 @blueprint.route('/rss', methods=['GET'])
 # FIXME caching issue of response object
-#@cache.cached(timeout=CFG_WEBSEARCH_RSS_TTL)
-@blueprint.invenio_wash_urlargd({'p': (unicode, ''),
-                                 'jrec': (int, 1),
-                                 'so': (unicode, None),
-                                 'rm': (unicode, None)})
+@wash_arguments({'p': (unicode, ''),
+                 'jrec': (int, 1),
+                 'so': (unicode, None),
+                 'rm': (unicode, None)})
 @check_collection(default_collection=True)
 def rss(collection, p, jrec, so, rm):
+    from invenio.legacy.search_engine import perform_request_search
     of = 'xr'
     argd = argd_orig = wash_search_urlargd(request.args)
     argd['of'] = 'id'
@@ -339,16 +338,17 @@ def rss(collection, p, jrec, so, rm):
 
 
 @blueprint.route('/search', methods=['GET', 'POST'])
-@blueprint.invenio_set_breadcrumb(_('Search results'))
-@blueprint.invenio_wash_urlargd({'p': (unicode, ''),
-                                 'of': (unicode, 'hb'),
-                                 'so': (unicode, None),
-                                 'rm': (unicode, None)})
+@register_breadcrumb(blueprint, '.browse', _('Search results'))
+@wash_arguments({'p': (unicode, ''),
+                 'of': (unicode, 'hb'),
+                 'so': (unicode, None),
+                 'rm': (unicode, None)})
 @check_collection(default_collection=True)
 def search(collection, p, of, so, rm):
     """
     Renders search pages.
     """
+    from invenio.legacy.search_engine import perform_request_search
 
     if 'action_browse' in request.args \
             or request.args.get('action', '') == 'browse':
@@ -358,7 +358,6 @@ def search(collection, p, of, so, rm):
             and len(request.args.getlist('c')) == 1:
         return redirect(url_for('.collection', name=request.args.get('c')))
 
-    from invenio.websearch_webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)
     argd['of'] = 'id'
 
@@ -380,7 +379,7 @@ def search(collection, p, of, so, rm):
     if request and not isinstance(request.get_legacy_request(), cStringIO.OutputType):
         # store the last search results page
         session['websearch-last-query'] = request.get_legacy_request().unparsed_uri
-        if len(recids) > CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
+        if len(recids) > current_app.config['CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT']:
             last_query_hits = None
         else:
             last_query_hits = recids
@@ -423,10 +422,10 @@ def facet(name, qid):
 
 
 @blueprint.route('/results/<qid>', methods=['GET', 'POST'])
-@blueprint.invenio_wash_urlargd({'p': (unicode, ''),
-                                 'of': (unicode, 'hb'),
-                                 'so': (unicode, None),
-                                 'rm': (unicode, None)})
+@wash_arguments({'p': (unicode, ''),
+                 'of': (unicode, 'hb'),
+                 'so': (unicode, None),
+                 'rm': (unicode, None)})
 def results(qid, p, of, so, rm):
     """
     Generates results for cached query using POSTed filter.
@@ -459,7 +458,7 @@ def results(qid, p, of, so, rm):
 
 
 @blueprint.route('/list/<any(exactauthor, keyword, affiliation, reportnumber, collaboration):field>', methods=['GET', 'POST'])
-@blueprint.invenio_wash_urlargd({'q': (min_length(3), '')})
+@wash_arguments({'q': (min_length(3), '')})
 def autocomplete(field, q):
     """
     Autocompletes data from indexes.
@@ -472,7 +471,7 @@ def autocomplete(field, q):
 
     @return: list of values matching query.
     """
-
+    from invenio.legacy.bibindex.engine import get_index_id_from_index_name
     IdxPHRASE = BibIndex.__getattribute__('IdxPHRASE%02dF' %
                                           get_index_id_from_index_name(field))
 
@@ -503,13 +502,12 @@ def dispatch():
         # only the first element of a list is passed to webbasket.add
         # (however, this url works in 'master' with the same webbasket module)
 
-
     flash("Not implemented action " + action, 'error')
     return redirect(request.referrer)
 
 
 @blueprint.route('/export', methods=['GET', 'POST'])
-@blueprint.invenio_wash_urlargd({'of': (unicode, 'xm')})
+@wash_arguments({'of': (unicode, 'xm')})
 @check_collection(default_collection=True)
 def export(collection, of):
     """

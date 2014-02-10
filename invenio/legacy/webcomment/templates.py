@@ -25,10 +25,10 @@ __revision__ = "$Id$"
 import cgi
 
 # Invenio imports
-from invenio.urlutils import create_html_link, create_url
-from invenio.webuser import get_user_info, collect_user_info, isGuestUser, get_email
-from invenio.dateutils import convert_datetext_to_dategui
-from invenio.webmessage_mailutils import email_quoted_txt2html
+from invenio.utils.url import create_html_link, create_url
+from invenio.legacy.webuser import get_user_info, collect_user_info, isGuestUser, get_email
+from invenio.utils.date import convert_datetext_to_dategui
+from invenio.utils.mail import email_quoted_txt2html
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_SITE_LANG, \
@@ -44,12 +44,12 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_RECORD, \
                            CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
                            CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE
-from invenio.htmlutils import get_html_text_editor, create_html_select
-from invenio.messages import gettext_set_language
-from invenio.bibformat import format_record
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_get_user_roles_from_user_info, acc_get_role_id
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.utils.html import get_html_text_editor, create_html_select
+from invenio.base.i18n import gettext_set_language
+from invenio.modules.formatter import format_record
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.control import acc_get_user_roles_from_user_info, acc_get_role_id
+from invenio.legacy.bibrecord import get_fieldvalues
 
 class Template:
     """templating class, refer to webcomment.py for examples of call"""
@@ -361,7 +361,7 @@ class Template:
         @param collapsed_p: if the comment should be collapsed or not
         @return: html table of comment
         """
-        from invenio.search_engine import guess_primary_collection_of_a_record
+        from invenio.legacy.search_engine import guess_primary_collection_of_a_record
         # load the right message language
         _ = gettext_set_language(ln)
         user_info = collect_user_info(req)
@@ -495,7 +495,7 @@ class Template:
         @param recID: recID where the comment is posted
         @return: html table of review
         """
-        from invenio.search_engine import guess_primary_collection_of_a_record
+        from invenio.legacy.search_engine import guess_primary_collection_of_a_record
         # load the right message language
         _ = gettext_set_language(ln)
 
@@ -626,7 +626,7 @@ class Template:
         current_user_fullname = ""
         override_nickname_p = False
         if CFG_CERN_SITE:
-            from invenio.search_engine import get_all_collections_of_a_record
+            from invenio.legacy.search_engine import get_all_collections_of_a_record
             user_info = collect_user_info(uid)
             if 'atlas-readaccess-active-members [CERN]' in user_info['group']:
                 # An ATLAS member is never anonymous to its colleagues
@@ -812,7 +812,7 @@ class Template:
                 else:
                     (uid, _nickname, display) = get_user_info(comment[c_user_id])
                 messaging_link = self.create_messaging_link(_nickname, comment_user_fullname or display, ln)
-                from invenio.webcomment import get_attached_files # FIXME
+                from invenio.modules.comments.api import get_attached_files # FIXME
                 files = get_attached_files(recID, comment[c_id])
                 # do NOT delete the HTML comment below. It is used for parsing... (I plead unguilty!)
                 comments_rows += """
@@ -1201,7 +1201,8 @@ class Template:
         if not nickname:
             (uid, nickname, display) = get_user_info(uid)
         if nickname:
-            note = _("Note: Your nickname, %s, will be displayed as author of this comment.") % ('<i>' + nickname + '</i>')
+            note = _("Note: Your nickname, %(nick)s, will be displayed as author of this comment.",
+                     nick='<i>' + nickname + '</i>')
         else:
             (uid, nickname, display) = get_user_info(uid)
             link = '<a href="%s/youraccount/edit">' % CFG_SITE_SECURE_URL
@@ -1212,7 +1213,7 @@ class Template:
 
         if not CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR:
             note +=  '<br />' + '&nbsp;'*10 + cgi.escape('You can use some HTML tags: <a href>, <strong>, <blockquote>, <br />, <p>, <em>, <ul>, <li>, <b>, <i>')
-        #from invenio.search_engine import print_record
+        #from invenio.legacy.search_engine import print_record
         #record_details = print_record(recID=recID, format='hb', ln=ln)
 
         warnings = self.tmpl_warnings(warnings, ln)
@@ -1240,7 +1241,7 @@ class Template:
              'attach_msg': CFG_WEBCOMMENT_MAX_ATTACHED_FILES == 1 and _("Optionally, attach a file to this comment") or \
                            _("Optionally, attach files to this comment"),
              'nb_files_limit_msg': _("Max one file") and CFG_WEBCOMMENT_MAX_ATTACHED_FILES == 1 or \
-                              _("Max %i files") % CFG_WEBCOMMENT_MAX_ATTACHED_FILES,
+                              _("Max %(maxfiles)i files", maxfiles=CFG_WEBCOMMENT_MAX_ATTACHED_FILES),
              'file_size_limit_msg': CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE > 0 and _("Max %(x_nb_bytes)s per file") % {'x_nb_bytes': (CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE < 1024*1024 and (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB') or  (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/(1024*1024)) + 'MB'))} or ''}
 
         editor = get_html_text_editor(name='msg',
@@ -1547,7 +1548,7 @@ class Template:
         else:
             out += _("Comments and reviews are disabled") + '<br />'
         out += '</ol>'
-        from invenio.bibrankadminlib import addadminbox
+        from invenio.legacy.bibrank.adminlib import addadminbox
         return addadminbox('<b>%s</b>'% _("Menu"), [out])
 
     def tmpl_admin_delete_form(self, ln, warnings):

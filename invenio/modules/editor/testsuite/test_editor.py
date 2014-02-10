@@ -21,10 +21,10 @@
 
 import re
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-get_xml_from_textmarc = lazy_import('invenio.bibedit_utils:get_xml_from_textmarc')
-perform_doi_search = lazy_import('invenio.bibedit_engine:perform_doi_search')
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+get_xml_from_textmarc = lazy_import('invenio.legacy.bibedit.utils:get_xml_from_textmarc')
+perform_doi_search = lazy_import('invenio.legacy.bibedit.engine:perform_doi_search')
 
 class TextmarcToXMLTests(InvenioTestCase):
     """ Test utility functions to convert textmarc to XML """

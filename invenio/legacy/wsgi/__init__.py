@@ -29,17 +29,17 @@ from urlparse import urlparse, urlunparse
 
 from wsgiref.util import FileWrapper
 
-from invenio.webinterface_handler_wsgi_utils import table
-from invenio.webinterface_handler_config import \
+from invenio.legacy.wsgi.utils import table
+from invenio.utils.apache import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
-from invenio.errorlib import register_exception
-from invenio.datastructures import flatten_multidict
+from invenio.ext.logging import register_exception
+from invenio.utils.datastructures import flatten_multidict
 ## TODO for future reimplementation of stream_file
-#from invenio.bibdocfile import StreamFileException
+#from invenio.legacy.bibdocfile.api import StreamFileException
 from flask import request, after_this_request
 
 
@@ -441,7 +441,7 @@ def application(environ, start_response, handler=None):
 
     try:
         if handler is None:
-            from invenio.webinterface_layout import invenio_handler
+            from invenio.ext.legacy.layout import invenio_handler
             invenio_handler(req)
         else:
             handler(req)
@@ -497,8 +497,8 @@ def generate_error_page(req, admin_was_alerted=True, page_already_started=False)
     """
     Returns an iterable with the error page to be sent to the user browser.
     """
-    from invenio.webpage import page
-    from invenio import template
+    from invenio.legacy.webpage import page
+    from invenio.legacy import template
     webstyle_templates = template.load('webstyle')
     ln = req.form.get('ln', CFG_SITE_LANG)
     if page_already_started:
@@ -527,17 +527,20 @@ def is_mp_legacy_publisher_path(path):
     @return: the path of the module to load and the function to call there.
     @rtype: tuple
     """
+    from invenio.legacy.registry import webadmin
     path = path.split('/')
+    module = ''
     for index, component in enumerate(path):
         if component.endswith('.py'):
-            possible_module = os.path.abspath(CFG_WEBDIR + os.path.sep + os.path.sep.join(path[:index + 1]))
+            possible_module = webadmin.get(module+component[:-3])
             possible_handler = '/'.join(path[index + 1:]).strip()
             if possible_handler.startswith('_'):
                 return None, None
             if not possible_handler:
                 possible_handler = 'index'
-            if os.path.exists(possible_module) and possible_module.startswith(CFG_WEBDIR):
-                return (possible_module, possible_handler)
+            if possible_module and os.path.exists(possible_module.__file__):
+                return (possible_module.__file__, possible_handler)
+        module = component + '/'
     else:
         return None, None
 
@@ -545,13 +548,15 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     """
     mod_python legacy publisher minimum implementation.
     """
-    from invenio.session import get_session
-    from invenio.webinterface_handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
+    from invenio.legacy.websession.session import get_session
+    from invenio.ext.legacy.handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
+    if possible_module.endswith('.pyc'):
+        possible_module = possible_module[:-1]
     the_module = open(possible_module).read()
     module_globals = {}
     exec(the_module, module_globals)
     if possible_handler in module_globals and callable(module_globals[possible_handler]):
-        from invenio.webinterface_handler import _check_result
+        from invenio.ext.legacy.handler import _check_result
         ## req is the required first parameter of any handler
         expected_args = list(inspect.getargspec(module_globals[possible_handler])[0])
         if not expected_args or 'req' != expected_args[0]:
@@ -576,7 +581,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 form[key] = value
 
         if (CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and get_session(req).need_https) and not req.is_https():
-            from invenio.urlutils import redirect_to_url
+            from invenio.utils.url import redirect_to_url
             # We need to isolate the part of the URI that is after
             # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
             original_parts = urlparse(req.unparsed_uri)
@@ -619,47 +624,3 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 raise
     else:
         raise SERVER_RETURN, HTTP_NOT_FOUND
-
-def check_wsgiref_testing_feasability():
-    """
-    In order to use wsgiref for running Invenio, CFG_SITE_URL and
-    CFG_SITE_SECURE_URL must not use HTTPS because SSL is not supported.
-    """
-    if CFG_SITE_URL.lower().startswith('https'):
-        print >> sys.stderr, """
-ERROR: SSL is not supported by the wsgiref simple server implementation.
-Please set CFG_SITE_URL not to start with "https".
-Currently CFG_SITE_URL is set to: "%s".""" % CFG_SITE_URL
-        sys.exit(1)
-    if CFG_SITE_SECURE_URL.lower().startswith('https'):
-        print >> sys.stderr, """
-ERROR: SSL is not supported by the wsgiref simple server implementation.
-Please set CFG_SITE_SECURE_URL not to start with "https".
-Currently CFG_SITE_SECURE_URL is set to: "%s".""" % CFG_SITE_SECURE_URL
-        sys.exit(1)
-
-def wsgi_handler_test(port=80):
-    """
-    Simple WSGI testing environment based on wsgiref.
-    """
-    check_wsgiref_testing_feasability()
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app(wsgi_serve_static_files=True)
-    app.run(debug=True, port=port)
-
-def main():
-    from optparse import OptionParser
-    parser = OptionParser()
-    parser.add_option('-t', '--test', action='store_true',
-                      dest='test', default=False,
-                      help="Run a WSGI test server via wsgiref (not using Apache).")
-    parser.add_option('-p', '--port', type='int', dest='port', default='80',
-                      help="The port where the WSGI test server will listen. [80]")
-    (options, args) = parser.parse_args()
-    if options.test:
-        wsgi_handler_test(options.port)
-    else:
-        parser.print_help()
-
-if __name__ == "__main__":
-    main()

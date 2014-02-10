@@ -24,23 +24,26 @@ WebSearch database models.
 # General imports.
 import re
 from operator import itemgetter
-from flask import g
-from invenio.config import CFG_SITE_LANG
-from invenio.intbitset import intbitset
-#from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
-#from invenio.search_engine import collection_restricted_p
-from invenio.sqlalchemyutils import db
+from flask import g, url_for
+from invenio.base.globals import cfg
+try:
+    from intbitset import intbitset
+except:
+    from intbitset import intbitset
+#from invenio.legacy.search_engine import collection_restricted_p
+from invenio.ext.sqlalchemy import db
 from sqlalchemy.orm.collections import InstrumentedList
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
 from sqlalchemy.ext.orderinglist import ordering_list
-#from invenio.websearch_external_collections_searcher import \
+#from invenio.legacy.websearch_external_collections.searcher import \
 #    external_collections_dictionary
 
 # Create your models here.
 
-from invenio.websession_model import User
+from invenio.modules.accounts.models import User
+from invenio.modules.formatter.models import Format
 
 
 class IntbitsetPickle(object):
@@ -201,7 +204,7 @@ class Collection(db.Model):
 
     @property
     def name_ln(self):
-        from invenio.search_engine import get_coll_i18nname
+        from invenio.legacy.search_engine import get_coll_i18nname
         return get_coll_i18nname(self.name, g.ln).decode('utf-8')
         # Another possible implementation with cache memoize
         # @cache.memoize
@@ -232,7 +235,7 @@ class Collection(db.Model):
     @property
     #@cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def is_restricted(self):
-        from invenio.search_engine import collection_restricted_p
+        from invenio.legacy.search_engine import collection_restricted_p
         return collection_restricted_p(self.name)
 
     @property
@@ -320,13 +323,12 @@ class Collection(db.Model):
         """
         Collect search within options.
         """
-        from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
         default = [('', g._('any field'))]
         found = [(o.field.code, o.field.name_ln) for o in self._search_within]
         if not found:
             found = [(f.name.replace(' ', ''), f.name_ln)
                 for f in Field.query.filter(Field.name.in_(
-                    CFG_WEBSEARCH_SEARCH_WITHIN)).all()]
+                    cfg['CFG_WEBSEARCH_SEARCH_WITHIN'])).all()]
         return default + sorted(found, key=itemgetter(1))
 
     @property
@@ -396,8 +398,9 @@ class Collection(db.Model):
     #    else:
     #        self._externalcollections = data
 
-    def breadcrumbs(self, builder=None, ln=CFG_SITE_LANG):
+    def breadcrumbs(self, builder=None, ln=None):
         """Retunds breadcrumbs for collection."""
+        ln = cfg.get('CFG_SITE_LANG') if ln is None else ln
         breadcrumbs = []
         # Get breadcrumbs for most specific dad if it exists.
         if self.most_specific_dad is not None:
@@ -407,9 +410,10 @@ class Collection(db.Model):
         if builder is not None:
             crumb = builder(self)
         else:
-            crumb = (self.name_ln,
-                     'search.collection',
-                     dict(name=self.name))
+            crumb = dict(
+                text=self.name_ln,
+                url=url_for('search.collection', name=self.name))
+
         breadcrumbs.append(crumb)
         return breadcrumbs
 
@@ -551,7 +555,7 @@ class Externalcollection(db.Model):
 
     @property
     def engine(self):
-        from invenio.websearch_external_collections_searcher import external_collections_dictionary
+        from invenio.legacy.websearch_external_collections.searcher import external_collections_dictionary
 
         if self.name in external_collections_dictionary:
             return external_collections_dictionary[self.name]
@@ -586,27 +590,6 @@ class CollectionExternalcollection(db.Model):
     externalcollection = db.relationship(Externalcollection)
 
 
-class Format(db.Model):
-    """Represents a Format record."""
-    __tablename__ = 'format'
-    id = db.Column(db.MediumInteger(9, unsigned=True),
-                primary_key=True, autoincrement=True)
-    name = db.Column(db.String(255), nullable=False)
-    code = db.Column(db.String(6), nullable=False, unique=True)
-    description = db.Column(db.String(255), server_default='')
-    content_type = db.Column(db.String(255), server_default='')
-    visibility = db.Column(db.TinyInteger(4), nullable=False,
-                server_default='1')
-    last_updated = db.Column(db.DateTime, nullable=True)
-
-    @classmethod
-    def get_export_formats(cls):
-        return cls.query.filter(db.and_(
-            Format.content_type != 'text/html',
-            Format.visibility == 1)
-        ).order_by(Format.name).all()
-
-
 class CollectionFormat(db.Model):
     """Represents a CollectionFormat record."""
     __tablename__ = 'collection_format'
@@ -620,19 +603,6 @@ class CollectionFormat(db.Model):
                 order_by=db.desc(score))
     format = db.relationship(Format, backref='collections',
                 order_by=db.desc(score))
-
-
-class Formatname(db.Model):
-    """Represents a Formatname record."""
-    __tablename__ = 'formatname'
-    id_format = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Format.id), primary_key=True)
-    ln = db.Column(db.Char(5), primary_key=True,
-                server_default='')
-    type = db.Column(db.Char(3), primary_key=True,
-                server_default='sn')
-    value = db.Column(db.String(255), nullable=False)
-    format = db.relationship(Format, backref='names')
 
 
 class Field(db.Model):
@@ -655,7 +625,7 @@ class Field(db.Model):
 
     @property
     def name_ln(self):
-        from invenio.search_engine import get_field_i18nname
+        from invenio.legacy.search_engine import get_field_i18nname
         return get_field_i18nname(self.name, g.ln)
         #try:
         #    return db.object_session(self).query(Fieldname).\
@@ -792,9 +762,7 @@ __all__ = ['Collection',
            'CollectionPortalbox',
            'Externalcollection',
            'CollectionExternalcollection',
-           'Format',
            'CollectionFormat',
-           'Formatname',
            'Field',
            'Fieldvalue',
            'Fieldname',

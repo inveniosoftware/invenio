@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,165 +17,24 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+    invenio.ext.sqlalchemy
+    ----------------------
+
+    This module provides initialization and configuration for
+    `flask.ext.sqlalchemy` module.
+"""
+
+from .expressions import AsBINARY
+from .types import JSONEncodedTextDict, MarshalBinary, PickleBinary, GUID
+from .utils import get_model_type
 import sqlalchemy
-import base64
-import json
+from flask.ext.sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
 from sqlalchemy import event
 from sqlalchemy.pool import Pool
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
-from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.orm import class_mapper, properties
-from sqlalchemy.types import TypeDecorator, TEXT, LargeBinary
-from sqlalchemy.sql.expression import FunctionElement
-from invenio.importutils import autodiscover_modules
-from invenio.intbitset import intbitset
-from invenio.errorlib import register_exception
-from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
-from invenio.hashutils import md5
-
-try:
-    from flask.ext.sqlalchemy import SQLAlchemy
-except:
-    from flaskext.sqlalchemy import SQLAlchemy
-
-
-def autodiscover_models():
-    """Makes sure that all tables are loaded in `db.metadata.tables`."""
-    return autodiscover_modules(['invenio'], related_name_re=".+_model\.py")
-
-
-def getRelationships(self):
-    retval = list()
-    mapper = class_mapper(self)
-    actualNameToSynonym = dict()
-    relationships = set()
-
-    for prop in mapper.iterate_properties:
-        if isinstance(prop, properties.SynonymProperty):
-            actualNameToSynonym[prop.name] = prop.key
-            # dictionary <_userName, userName, userGroup, _userGroup>
-
-        elif isinstance(prop, properties.RelationshipProperty):
-            relationships.add(prop.key)
-            #set with _userGroup, and rest of relationships
-
-    for relationship in relationships:
-        retval.append(actualNameToSynonym[relationship])
-
-    return retval
-
-
-def todict(self):
-    def convert_datetime(value):
-        try:
-            return value.strftime("%Y-%m-%d %H:%M:%S")
-        except:
-            return ''
-
-    for c in self.__table__.columns:
-        #NOTE   This hack is not needed if you redefine types.TypeDecorator for
-        #       desired classes (Binary, LargeBinary, ...)
-
-        value = getattr(self, c.name)
-        if value is None:
-            continue
-        if isinstance(c.type, sqlalchemy.Binary):
-            value = base64.encodestring(value)
-        elif isinstance(c.type, sqlalchemy.DateTime):
-            value = convert_datetime(value)
-        elif isinstance(value, intbitset):
-            value = value.tolist()
-        yield(c.name, value)
-
-
-def fromdict(self, args):
-    """
-    """
-    #NOTE Why not to do things simple ...
-    self.__dict__.update(args)
-
-    #for c in self.__table__.columns:
-    #    name = str(c).split('.')[1]
-    #    try:
-    #        d = args[name]
-    #    except:
-    #        continue
-    #
-    #    setattr(self, c.name, d)
-
-
-def iterfunc(self):
-    """Returns an iterable that supports .next()
-        so we can do dict(sa_instance)
-
-    """
-    return self.todict()
-
-
-class AsBINARY(FunctionElement):
-    name = 'AsBINARY'
-
-
-@compiles(AsBINARY)
-def compile(element, compiler, **kw):
-    return "BINARY %s" % compiler.process(element.clauses)
-
-
-from sqlalchemy.ext.mutable import MutableDict
-@MutableDict.as_mutable
-class JSONEncodedTextDict(TypeDecorator):
-    """
-    Represents an immutable structure as a json-encoded string.
-
-    @see: http://docs.sqlalchemy.org/en/latest/core/types.html#marshal-json-strings
-    """
-
-    impl = TEXT
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            value = json.dumps(value)
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value is not None:
-            value = json.loads(value)
-        return value
-
-
-class MarshalBinary(TypeDecorator):
-
-    impl = LargeBinary
-
-    def __init__(self, default_value, force_type=None, *args, **kwargs):
-        super(MarshalBinary, self).__init__(*args, **kwargs)
-        self.default_value = default_value
-        self.force_type = force_type if force_type is not None else lambda x: x
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            value = serialize_via_marshal(self.force_type(value))
-            return value
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value is not None:
-            try:
-                value = deserialize_via_marshal(value)
-            except:
-                value = None
-        return value if value is not None else \
-            (self.default_value() if callable(self.default_value) else
-             self.default_value)
-
-
-#@compiles(sqlalchemy.types.LargeBinary, "postgresql")
-#def compile_binary_postgresql(type_, compiler, **kw):
-#    return "BYTEA"
-
-#@compiles(sqlalchemy.types.LargeBinary, "mysql")
-#def compile_binary_postgresql(type_, compiler, **kw):
-#    return "BYTEA"
+from invenio.utils.hash import md5
+from flask_registry import RegistryProxy, ModuleAutoDiscoveryRegistry
 
 
 def _include_sqlalchemy(obj, engine=None):
@@ -216,9 +75,10 @@ def _include_sqlalchemy(obj, engine=None):
     setattr(obj, 'iBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iLargeBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iMediumBinary', sqlalchemy.types.LargeBinary)
+    setattr(obj, 'UUID', GUID)
 
     if engine == 'mysql':
-        import invenio.sqlalchemyutils_mysql
+        from .engines import mysql as dummy_mysql
     #    module = invenio.sqlalchemyutils_mysql
     #    for key in module.__dict__:
     #        setattr(obj, key,
@@ -233,6 +93,7 @@ def _include_sqlalchemy(obj, engine=None):
     obj.Enum.__init__ = default_enum(obj.Enum.__init__)
     obj.AsBINARY = AsBINARY
     obj.MarshalBinary = MarshalBinary
+    obj.PickleBinary = PickleBinary
 
     ## Overwrite :meth:`MutableDick.update` to detect changes.
     from sqlalchemy.ext.mutable import MutableDict
@@ -261,24 +122,24 @@ def autocommit_on_checkin(dbapi_con, con_record):
     try:
         dbapi_con.autocommit(True)
     except:
-        register_exception()
+        pass
+        #FIXME
+        #from invenio.ext.logging import register_exception
+        #register_exception()
 
 ## Possibly register globally.
 #event.listen(Pool, 'checkin', autocommit_on_checkin)
 
 
-class InvenioDB(SQLAlchemy):
-    """Invenio database object."""
+class SQLAlchemy(FlaskSQLAlchemy):
+    """Database object."""
 
     PasswordComparator = PasswordComparator
 
     def init_app(self, app):
-        super(InvenioDB, self).init_app(app)
+        super(self.__class__, self).init_app(app)
         engine = app.config.get('CFG_DATABASE_TYPE', 'mysql')
-        self.Model.todict = todict
-        self.Model.fromdict = fromdict
-        self.Model.__iter__ = iterfunc
-        self.Model.__table_args__ = {}
+        self.Model = get_model_type(self.Model)
         if engine == 'mysql':
             self.Model.__table_args__ = {'keep_existing':    True,
                                          'extend_existing':  False,
@@ -306,12 +167,39 @@ class InvenioDB(SQLAlchemy):
         This method is called before engine creation.
         """
         # Don't forget to apply hacks defined on parent object.
-        super(InvenioDB, self).apply_driver_hacks(app, info, options)
+        super(self.__class__, self).apply_driver_hacks(app, info, options)
         if info.drivername == 'mysql':
             options.setdefault('execution_options', {'autocommit': True,
-                                                     'use_unicode': False  # , 'charset': 'utf8'
+                                                     'use_unicode': False,
+                                                     'charset': 'utf8mb4',
                                                      })
             event.listen(Pool, 'checkin', autocommit_on_checkin)
 
 
-db = InvenioDB()
+db = SQLAlchemy()
+"""
+    Provides access to :class:`~.SQLAlchemy` instance.
+"""
+
+models = RegistryProxy('models', ModuleAutoDiscoveryRegistry, 'models')
+
+
+def setup_app(app):
+    """Setup SQLAlchemy extension."""
+    if 'SQLALCHEMY_DATABASE_URI' not in app.config:
+        from sqlalchemy.engine.url import URL
+        cfg = app.config
+
+        app.config['SQLALCHEMY_DATABASE_URI'] = URL(
+            cfg.get('CFG_DATABASE_TYPE', 'mysql'),
+            username=cfg.get('CFG_DATABASE_USER'),
+            password=cfg.get('CFG_DATABASE_PASS'),
+            host=cfg.get('CFG_DATABASE_HOST'),
+            database=cfg.get('CFG_DATABASE_NAME'),
+            port=cfg.get('CFG_DATABASE_PORT'),
+            )
+
+    ## Let's initialize database.
+    db.init_app(app)
+
+    return app

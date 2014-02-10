@@ -35,18 +35,18 @@ import sys
 
 WARN_SKIP = True
 
-from invenio.elmsubmit_filename_generator import calculate_filename_extension as _calculate_filename_extension
-# from invenio.elmsubmit_filename_generator import generate_filename as _generate_filename
-from invenio.elmsubmit_misc import write_to_and_return_tempfile_name as _write_to_and_return_tempfile_name
-from invenio.elmsubmit_misc import provide_dir_with_perms_then_exec as _provide_dir_with_perms_then_exec
-from invenio.elmsubmit_misc import dirtree as _dirtree
-from invenio.elmsubmit_misc import count_dotdot as _count_dotdot
-from invenio.elmsubmit_misc import random_alphanum_string as _random_alphanum_string
-from invenio.elmsubmit_misc import backup_directory as _backup_directory
-from invenio.elmsubmit_misc import open_tempfile as _open_tempfile
-from invenio.elmsubmit_misc import split_common_path as _split_common_path
-from invenio.elmsubmit_misc import recursive_dir_contents as _recursive_dir_contents
-from invenio.elmsubmit_misc import mkdir_parents as _mkdir_parents
+from invenio.legacy.elmsubmit.filename_generator import calculate_filename_extension as _calculate_filename_extension
+# from invenio.legacy.elmsubmit.filename_generator import generate_filename as _generate_filename
+from invenio.legacy.elmsubmit.misc import write_to_and_return_tempfile_name as _write_to_and_return_tempfile_name
+from invenio.legacy.elmsubmit.misc import provide_dir_with_perms_then_exec as _provide_dir_with_perms_then_exec
+from invenio.legacy.elmsubmit.misc import dirtree as _dirtree
+from invenio.legacy.elmsubmit.misc import count_dotdot as _count_dotdot
+from invenio.legacy.elmsubmit.misc import random_alphanum_string as _random_alphanum_string
+from invenio.legacy.elmsubmit.misc import backup_directory as _backup_directory
+from invenio.legacy.elmsubmit.misc import open_tempfile as _open_tempfile
+from invenio.legacy.elmsubmit.misc import split_common_path as _split_common_path
+from invenio.legacy.elmsubmit.misc import recursive_dir_contents as _recursive_dir_contents
+from invenio.legacy.elmsubmit.misc import mkdir_parents as _mkdir_parents
 
 # Store all files written out in two lists:
 # 1. remove_always is for temporary files, which we try to remove regardless.

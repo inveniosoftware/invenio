@@ -21,10 +21,10 @@ __revision__ = "$Id$"
 
 import re
 
-from invenio.dbquery import run_sql, get_table_update_time, OperationalError, \
+from invenio.legacy.dbquery import run_sql, get_table_update_time, OperationalError, \
         deserialize_via_marshal
-from invenio.intbitset import intbitset
-from invenio.data_cacher import DataCacher
+from intbitset import intbitset
+from invenio.legacy.miscutil.data_cacher import DataCacher
 
 class CitationDictsDataCacher(DataCacher):
     """

@@ -27,7 +27,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 
 import cgi
 import urllib
@@ -38,38 +38,36 @@ import re
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
      CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
-from invenio.messages import gettext_set_language
-from invenio.dateutils import convert_datetext_to_dategui, \
+from invenio.base.i18n import gettext_set_language
+from invenio.base.globals import cfg
+from invenio.utils.date import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
                               convert_datestruct_to_dategui
-from invenio.bibformat import format_record
-from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
-                                     CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
-                                     CFG_WEBBASKET_CATEGORIES, \
-                                     InvenioWebBasketWarning
-from invenio.urlutils import get_referer
-from invenio.webuser import isGuestUser, collect_user_info
-from invenio.search_engine import \
+from invenio.modules.formatter import format_record
+from invenio.utils.url import get_referer
+from invenio.legacy.webuser import isGuestUser, collect_user_info
+from invenio.legacy.search_engine import \
      record_exists, \
      get_merged_recid, \
      check_user_can_view_record, \
      print_records_prologue, \
      print_records_epilogue
 #from invenio.webcomment import check_user_can_attach_file_to_comments
-import invenio.webbasket_dblayer as db
+import invenio.legacy.webbasket.db_layer as db
 try:
-    import invenio.template
-    webbasket_templates = invenio.template.load('webbasket')
+    import invenio.legacy.template
+    webbasket_templates = invenio.legacy.template.load('webbasket')
 except ImportError:
     pass
-from invenio.websearch_external_collections_utils import get_collection_name_by_id
-from invenio.websearch_external_collections import select_hosted_search_engines
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
-from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
-from invenio.errorlib import register_exception
-from invenio.search_engine import search_unit
-from invenio.htmlutils import remove_html_markup, unescape
+from invenio.legacy.websearch_external_collections.utils import get_collection_name_by_id
+from invenio.legacy.websearch_external_collections import select_hosted_search_engines
+from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.legacy.websearch_external_collections.getter import HTTPAsyncPageGetter, async_download
+from invenio.ext.logging import register_exception
+from invenio.legacy.search_engine import search_unit
+from invenio.utils.html import remove_html_markup, unescape
 
+from .errors import InvenioWebBasketWarning
 ########################################
 ### Display public baskets and notes ###
 ########################################
@@ -252,7 +250,7 @@ def __display_public_basket(bskid,
                                                   basket_name,
                                                   last_update,
                                                   nb_items,
-                                                  (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'],),),
+                                                  (check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'],),),
                                                   nb_total_notes,
                                                   records,
                                                   id_owner,
@@ -324,8 +322,8 @@ def __display_public_basket_single_item(bskid,
     body = webbasket_templates.tmpl_public_basket_single_item(bskid,
                                                               basket_name,
                                                               nb_items,
-                                                              (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                                               check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])),
+                                                              (check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT']),
+                                                               check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])),
                                                               item,
                                                               notes,
                                                               previous_item_recid,
@@ -379,7 +377,7 @@ def perform_request_list_public_baskets(uid,
                                                                 ln)
 
     search_box = __create_search_box(uid=uid,
-                                     category=CFG_WEBBASKET_CATEGORIES['ALLPUBLIC'],
+                                     category=cfg['CFG_WEBBASKET_CATEGORIES']['ALLPUBLIC'],
                                      ln=ln)
 
     body = webbasket_templates.tmpl_display(content=body, search_box=search_box)
@@ -521,7 +519,7 @@ def perform_request_save_public_note(uid,
 ### Display baskets and notes ###
 #################################
 def perform_request_display(uid,
-                            selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                            selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                             selected_topic="",
                             selected_group_id=0,
                             selected_bskid=0,
@@ -561,7 +559,7 @@ def perform_request_display(uid,
         body = webbasket_templates.tmpl_warnings(category_warnings, ln)
         return (body, category_warnings, navtrail)
 
-    if selected_category == CFG_WEBBASKET_CATEGORIES['ALLPUBLIC']:
+    if selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['ALLPUBLIC']:
         if of == 'xm':
             return ("", None. None)
         # TODO: Send the correct title of the page as well.
@@ -570,7 +568,7 @@ def perform_request_display(uid,
     personal_info = db.get_all_user_personal_basket_ids_by_topic(uid)
     personal_baskets_info = ()
 
-    if personal_info and selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+    if personal_info and selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE']:
         # Create a dictionary that has the valid topics for keys and the basket
         # ids in each topic (string, ids separated by commas) as values.
         personal_info_dict = {}
@@ -615,7 +613,7 @@ def perform_request_display(uid,
                 for personal_basket_info in personal_baskets_info:
                     if personal_basket_info[0] == selected_bskid:
                         selected_basket_info = list(personal_basket_info)
-                        selected_basket_info.append(CFG_WEBBASKET_SHARE_LEVELS['MANAGE'])
+                        selected_basket_info.append(cfg['CFG_WEBBASKET_SHARE_LEVELS']['MANAGE'])
                         break
             else:
                 try:
@@ -633,7 +631,7 @@ def perform_request_display(uid,
     group_baskets_info = ()
     selected_group_name = ""
 
-    if group_info and selected_category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+    if group_info and selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP']:
         # Create a dictionary that has the valid group as keys and the basket
         # ids in each group (string, ids separated by commas) as values.
         group_info_dict = {}
@@ -686,7 +684,7 @@ def perform_request_display(uid,
                         # rights to the owner of the basket even when through
                         # the group view of the basket.
                         #if group_basket_info[7] == uid:
-                        #    selected_basket_info[6] = CFG_WEBBASKET_SHARE_LEVELS['MANAGE']
+                        #    selected_basket_info[6] = cfg['CFG_WEBBASKET_SHARE_LEVELS']['MANAGE']
                         selected_basket_info.pop(7)
                         break
             else:
@@ -702,7 +700,7 @@ def perform_request_display(uid,
             selected_bskid = 0
 
     public_info = db.get_all_external_basket_ids_and_names(uid)
-    if public_info and selected_category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
+    if public_info and selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL']:
         valid_category_choice = True
         if selected_bskid:
             valid_bskids = [(valid_basket[0], valid_basket[3]) for valid_basket in public_info]
@@ -731,13 +729,13 @@ def perform_request_display(uid,
 
     if not valid_category_choice:
         if personal_info:
-            selected_category = CFG_WEBBASKET_CATEGORIES['PRIVATE']
+            selected_category = cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE']
         elif group_info:
-            selected_category = CFG_WEBBASKET_CATEGORIES['GROUP']
+            selected_category = cfg['CFG_WEBBASKET_CATEGORIES']['GROUP']
         elif public_info:
-            selected_category = CFG_WEBBASKET_CATEGORIES['EXTERNAL']
+            selected_category = cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL']
         else:
-            selected_category = CFG_WEBBASKET_CATEGORIES['ALLPUBLIC']
+            selected_category = cfg['CFG_WEBBASKET_CATEGORIES']['ALLPUBLIC']
 
     if not of.startswith('x'):
         directory_box = webbasket_templates.tmpl_create_directory_box(selected_category,
@@ -828,7 +826,7 @@ def __display_basket(uid, bskid,
                      nb_subscribers,
                      share_rights,
                      share_level,
-                     selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                     selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                      selected_topic="",
                      selected_group_id=0,
                      of="hb",
@@ -922,12 +920,12 @@ def __display_basket(uid, bskid,
                                                last_update,
                                                nb_items,
                                                nb_subscribers,
-                                               (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
-                                                check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']),
-                                                check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                                check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
-                                                check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDITM']),
-                                                check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['DELITM'])),
+                                               (check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READITM']),
+                                                check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['MANAGE']),
+                                                check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT']),
+                                                check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT']),
+                                                check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDITM']),
+                                                check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELITM'])),
                                                nb_total_notes,
                                                share_level,
                                                selected_category,
@@ -948,7 +946,7 @@ def __display_basket_single_item(uid, bskid,
                                  last_update,
                                  nb_items,
                                  share_rights,
-                                 selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                 selected_category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                                  selected_topic="",
                                  selected_group_id=0,
                                  optional_params={},
@@ -1032,10 +1030,10 @@ def __display_basket_single_item(uid, bskid,
     body = webbasket_templates.tmpl_basket_single_item(bskid,
                                                basket_name,
                                                nb_items,
-                                               (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
-                                                check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                                check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
-                                                check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
+                                               (check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READITM']),
+                                                check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT']),
+                                                check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT']),
+                                                check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELCMT'])),
                                                selected_category,
                                                selected_topic,
                                                selected_group_id,
@@ -1073,9 +1071,9 @@ def perform_request_search(uid,
     # if a valid category was returned we use it as the selected category.
     if b_category:
         selected_category = b_category
-        if selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+        if selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE']:
             selected_topic = b_topic_or_grpid
-        elif selected_category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+        elif selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP']:
             selected_group_id = b_topic_or_grpid
     # if no category was returned and there were warnings it means there was a
     # bad input, send the warning to the user and return the page.
@@ -1099,14 +1097,14 @@ def perform_request_search(uid,
             body = webbasket_templates.tmpl_warnings(category_warnings, ln)
             return (body, navtrail)
 
-    if selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and selected_topic:
+    if selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] and selected_topic:
         (selected_topic, topic_warnings) = wash_topic(uid, selected_topic)
         if not selected_topic and topic_warnings:
             navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
             body = webbasket_templates.tmpl_warnings(topic_warnings, ln)
             return (body, navtrail)
 
-    if selected_category == CFG_WEBBASKET_CATEGORIES['GROUP'] and selected_group_id:
+    if selected_category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] and selected_group_id:
         (selected_group_id, group_warnings) = wash_group(uid, selected_group_id)
         if not selected_group_id and group_warnings:
             navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
@@ -1254,8 +1252,8 @@ def perform_request_search(uid,
                 local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
-                    share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
-                    share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                    share_rights_view_notes = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'])
+                    share_rights_add_notes  = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                     share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
                     group_search_results[bskid] = [basket_name, grpid, group_name, share_rights_notes, len(intsec), list(intsec)]
                     total_no_group_search_results += len(intsec)
@@ -1279,8 +1277,8 @@ def perform_request_search(uid,
                         group_search_results[bskid][4] += 1
                         group_search_results[bskid][5].append(recid)
                     else:
-                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
-                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_view_notes = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                         share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
                         group_search_results[bskid] = [basket_name, grpid, group_name, share_rights_notes, 1, [recid]]
                     total_no_group_search_results += 1
@@ -1301,8 +1299,8 @@ def perform_request_search(uid,
                         group_search_results[bskid][4] = len(group_search_results[bskid][5])
                         total_no_group_search_results += ( group_search_results[bskid][4] - no_group_search_results_per_basket_so_far )
                     else:
-                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
-                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_view_notes = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                         share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
                         group_search_results[bskid] = [basket_name, grpid, group_name, share_rights_notes, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
                         total_no_group_search_results += len(recids_per_basket_by_matching_notes)
@@ -1341,8 +1339,8 @@ def perform_request_search(uid,
                 local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
-                    share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
-                    share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                    share_rights_view_notes = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'])
+                    share_rights_add_notes  = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                     share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
                     public_search_results[bskid] = [basket_name, share_rights_notes, len(intsec), list(intsec)]
                     total_no_public_search_results += len(intsec)
@@ -1364,8 +1362,8 @@ def perform_request_search(uid,
                         public_search_results[bskid][2] += 1
                         public_search_results[bskid][3].append(recid)
                     else:
-                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
-                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_view_notes = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                         share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
                         public_search_results[bskid] = [basket_name, share_rights_notes, 1, [recid]]
                     total_no_public_search_results += 1
@@ -1384,8 +1382,8 @@ def perform_request_search(uid,
                         public_search_results[bskid][2] = len(public_search_results[bskid][3])
                         total_no_public_search_results += ( public_search_results[bskid][2] - no_public_search_results_per_basket_so_far )
                     else:
-                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
-                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_view_notes = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                         share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
                         public_search_results[bskid] = [basket_name, share_rights_notes, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
                         total_no_public_search_results += len(recids_per_basket_by_matching_notes)
@@ -1424,8 +1422,8 @@ def perform_request_search(uid,
                 local_recids_per_basket = intbitset(map(int, recid_list.strip(',').split(',')))
                 intsec = local_search_results.intersection(local_recids_per_basket)
                 if intsec:
-                    share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
-                    share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                    share_rights_view_notes = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'])
+                    share_rights_add_notes  = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                     share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
                     all_public_search_results[bskid] = [basket_name, share_rights_notes, len(intsec), list(intsec)]
                     total_no_all_public_search_results += len(intsec)
@@ -1447,8 +1445,8 @@ def perform_request_search(uid,
                         all_public_search_results[bskid][2] += 1
                         all_public_search_results[bskid][3].append(recid)
                     else:
-                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
-                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_view_notes = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                         share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
                         all_public_search_results[bskid] = [basket_name, share_rights_notes, 1, [recid]]
                     total_no_all_public_search_results += 1
@@ -1467,8 +1465,8 @@ def perform_request_search(uid,
                         all_public_search_results[bskid][2] = len(all_public_search_results[bskid][3])
                         total_no_all_public_search_results += ( all_public_search_results[bskid][2] - no_all_public_search_results_per_basket_so_far )
                     else:
-                        share_rights_view_notes = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'])
-                        share_rights_add_notes  = check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
+                        share_rights_view_notes = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['READCMT'])
+                        share_rights_add_notes  = check_sufficient_rights(share_rights, cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'])
                         share_rights_notes = (share_rights_view_notes, share_rights_add_notes)
                         all_public_search_results[bskid] = [basket_name, share_rights_notes, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
                         total_no_all_public_search_results += len(recids_per_basket_by_matching_notes)
@@ -1522,7 +1520,7 @@ def perform_request_search(uid,
     return (body, navtrail)
 
 def perform_request_write_note(uid,
-                               category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                               category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                                topic="",
                                group_id=0,
                                bskid=0,
@@ -1583,7 +1581,7 @@ def perform_request_write_note(uid,
     return (body, navtrail)
 
 def perform_request_save_note(uid,
-                              category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                              category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                               topic="",
                               group_id=0,
                               bskid=0,
@@ -1661,7 +1659,7 @@ def perform_request_save_note(uid,
     return (body, navtrail)
 
 def perform_request_delete_note(uid,
-                                category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                                 topic="",
                                 group_id=0,
                                 bskid=0,
@@ -1675,7 +1673,7 @@ def perform_request_delete_note(uid,
     #warnings_notes = []
     warnings_html = ""
 
-    if not __check_user_can_perform_action(uid, bskid, CFG_WEBBASKET_SHARE_LEVELS['DELCMT']):
+    if not __check_user_can_perform_action(uid, bskid, cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELCMT']):
         try:
             raise InvenioWebBasketWarning(_('You do not have permission to delete this note.'))
         except InvenioWebBasketWarning, exc:
@@ -1895,7 +1893,7 @@ def perform_request_add(uid,
                 if not b_warnings:
                     if not(__check_user_can_perform_action(uid,
                                                            bskid,
-                                                           CFG_WEBBASKET_SHARE_LEVELS['ADDITM'])):
+                                                           cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDITM'])):
                         try:
                             raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
                         except InvenioWebBasketWarning, exc:
@@ -1907,7 +1905,7 @@ def perform_request_add(uid,
                     # To move an item, user needs add and delete permissions
                     if move_from_basket > 0 and not(__check_user_can_perform_action(uid,
                                                     move_from_basket,
-                                                    CFG_WEBBASKET_SHARE_LEVELS['DELITM'])):
+                                                    cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELITM'])):
                         try:
                             raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
                         except InvenioWebBasketWarning, exc:
@@ -1989,7 +1987,7 @@ def perform_request_add(uid,
         if colid >= 0 and validated_recids:
             (body, navtrail) = perform_request_add(uid=uid,
                                                    recids=validated_recids,
-                                                   category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                                   category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                                                    bskid=bskid,
                                                    colid=colid,
                                                    referer=referer,
@@ -2023,7 +2021,7 @@ def perform_request_add(uid,
     return (body, navtrail)
 
 def perform_request_delete(uid, bskid, confirmed=0,
-                           category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                           category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                            selected_topic="", selected_group_id=0,
                            ln=CFG_SITE_LANG):
     """Delete a given basket.
@@ -2067,7 +2065,7 @@ def delete_record(uid, bskid, recid):
     """
     if __check_user_can_perform_action(uid,
                                        bskid,
-                                       CFG_WEBBASKET_SHARE_LEVELS['DELITM']):
+                                       cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELITM']):
         db.delete_item(bskid, recid)
 
 def move_record(uid, bskid, recid, direction):
@@ -2079,7 +2077,7 @@ def move_record(uid, bskid, recid, direction):
     """
     if __check_user_can_perform_action(uid,
                                        bskid,
-                                       CFG_WEBBASKET_SHARE_LEVELS['MANAGE']):
+                                       cfg['CFG_WEBBASKET_SHARE_LEVELS']['MANAGE']):
         db.move_item(bskid, recid, direction)
 
 def perform_request_edit(uid, bskid, topic="", new_name='',
@@ -2108,7 +2106,7 @@ def perform_request_edit(uid, bskid, topic="", new_name='',
     _ = gettext_set_language(ln)
 
     rights = db.get_max_user_rights_on_basket(uid, bskid)
-    if rights != CFG_WEBBASKET_SHARE_LEVELS['MANAGE']:
+    if rights != cfg['CFG_WEBBASKET_SHARE_LEVELS']['MANAGE']:
         try:
             raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
         except InvenioWebBasketWarning, exc:
@@ -2178,7 +2176,7 @@ def perform_request_edit_topic(uid, topic='', new_name='', ln=CFG_SITE_LANG):
     #warnings = []
 
     #rights = db.get_max_user_rights_on_basket(uid, bskid)
-    #if rights != CFG_WEBBASKET_SHARE_LEVELS['MANAGE']:
+    #if rights != cfg['CFG_WEBBASKET_SHARE_LEVELS']['MANAGE']:
     #    errors.append(('ERR_WEBBASKET_NO_RIGHTS',))
     #    return (body, errors, warnings)
     if not(new_name):
@@ -2211,7 +2209,7 @@ def perform_request_add_group(uid, bskid, topic="", group_id=0, ln=CFG_SITE_LANG
     if group_id:
         db.share_basket_with_group(bskid,
                                    group_id,
-                                   CFG_WEBBASKET_SHARE_LEVELS['READITM'])
+                                   cfg['CFG_WEBBASKET_SHARE_LEVELS']['READITM'])
     else:
         groups = db.get_groups_user_member_of(uid)
         body = webbasket_templates.tmpl_add_group(bskid, topic, groups, ln)
@@ -2355,10 +2353,10 @@ def perform_request_unsubscribe(uid,
 
 def check_user_can_comment(uid, bskid):
     """ Private function. check if a user can comment """
-    min_right = CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']
+    min_right = cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT']
     rights = db.get_max_user_rights_on_basket(uid, bskid)
     if rights:
-        if CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights) >= CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_right):
+        if cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(rights) >= cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(min_right):
             return 1
     return 0
 
@@ -2367,15 +2365,15 @@ def __check_user_can_perform_action(uid, bskid, rights):
     min_right = rights
     rights = db.get_max_user_rights_on_basket(uid, bskid)
     if rights:
-        if CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights) >= CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_right):
+        if cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(rights) >= cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(min_right):
             return 1
     return 0
 
 def check_sufficient_rights(rights_user_has, rights_needed):
     """Private function, check if the rights are sufficient."""
     try:
-        out = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_user_has) >= \
-              CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_needed)
+        out = cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(rights_user_has) >= \
+              cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(rights_needed)
     except ValueError:
         out = 0
     return out
@@ -2383,10 +2381,10 @@ def check_sufficient_rights(rights_user_has, rights_needed):
 def can_add_notes_to_public_basket_p(bskid):
     """ Private function. Checks if notes can be added to the given public basket."""
 
-    min_right = CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']
+    min_right = cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT']
     rights = db.get_rights_on_public_basket(bskid)
     if rights:
-        if CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights[0][0]) >= CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_right):
+        if cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(rights[0][0]) >= cfg['CFG_WEBBASKET_SHARE_LEVELS_ORDERED'].index(min_right):
             return True
     return False
 
@@ -2412,19 +2410,19 @@ def create_personal_baskets_selection_box(uid,
                                         ln)
 
 def create_basket_navtrail(uid,
-                           category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                           category=cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'],
                            topic="", group=0,
                            bskid=0, ln=CFG_SITE_LANG):
     """display navtrail for basket navigation.
     @param uid: user id (int)
-    @param category: selected category (see CFG_WEBBASKET_CATEGORIES)
+    @param category: selected category (see cfg['CFG_WEBBASKET_CATEGORIES'])
     @param topic: selected topic if personal baskets
     @param group: selected group id for displaying (int)
     @param bskid: basket id (int)
     @param ln: language"""
     _ = gettext_set_language(ln)
     out = ''
-    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+    if category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE']:
         category_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
                         (CFG_SITE_URL,
                          'category=' + category + '&amp;ln=' + ln,
@@ -2450,7 +2448,7 @@ def create_basket_navtrail(uid,
                                    cgi.escape(basket[1]))
                     out += basket_html
 
-    elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+    elif category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP']:
         category_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
                         (CFG_SITE_URL,
                          'category=' + category + '&amp;ln=' + ln,
@@ -2478,7 +2476,7 @@ def create_basket_navtrail(uid,
                                    cgi.escape(basket[1]))
                     out += basket_html
 
-    elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
+    elif category == cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL']:
         category_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
                         (CFG_SITE_URL,
                          'category=' + category + '&amp;ln=' + ln,
@@ -2507,7 +2505,7 @@ def create_webbasket_navtrail(uid,
                               ln=CFG_SITE_LANG):
     """Create the navtrail for navigation withing WebBasket.
     @param uid: user id (int)
-    @param category: selected category (see CFG_WEBBASKET_CATEGORIES)
+    @param category: selected category (see cfg['CFG_WEBBASKET_CATEGORIES'])
     @param topic: selected topic (str)
     @param group: selected group (int)
     @param bskid: selected basket id (int)
@@ -2543,41 +2541,41 @@ def create_webbasket_navtrail(uid,
                (CFG_SITE_URL, ln, _("Add to basket"))
 
     else:
-        if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+        if category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE']:
             out += " &gt; "
             out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;ln=%s">%s</a>""" % \
-                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], ln, _("Personal baskets"))
+                   (CFG_SITE_URL, cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'], ln, _("Personal baskets"))
             if topic:
                 topic_names = map(lambda x: x[0], db.get_personal_topics_infos(uid))
                 if topic in topic_names:
                     out += " &gt; "
                     out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;ln=%s">%s</a>""" % \
-                           (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], urllib.quote(topic), ln, cgi.escape(topic, True))
+                           (CFG_SITE_URL, cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'], urllib.quote(topic), ln, cgi.escape(topic, True))
                     if bskid:
                         basket = db.get_basket_name(bskid)
                         if basket:
                             out += " &gt; "
                             out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;bskid=%i&amp;ln=%s">%s</a>""" % \
-                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], urllib.quote(topic), bskid, ln, cgi.escape(basket, True))
+                                   (CFG_SITE_URL, cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'], urllib.quote(topic), bskid, ln, cgi.escape(basket, True))
 
-        elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+        elif category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP']:
             out += " &gt; "
             out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;ln=%s">%s</a>""" % \
-                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], ln, _("Group baskets"))
+                   (CFG_SITE_URL, cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'], ln, _("Group baskets"))
             if group:
                 group_names = map(lambda x: x[0] == group and x[1], db.get_group_infos(uid))
                 if group_names and group_names[0]:
                     out += " &gt; "
                     out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;group=%i&amp;ln=%s">%s</a>""" % \
-                           (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, ln, cgi.escape(group_names[0], True))
+                           (CFG_SITE_URL, cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'], group, ln, cgi.escape(group_names[0], True))
                     if bskid:
                         basket = db.get_basket_name(bskid)
                         if basket:
                             out += " &gt; "
                             out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;bskid=%i&amp;ln=%s">%s</a>""" % \
-                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, bskid, ln, cgi.escape(basket, True))
+                                   (CFG_SITE_URL, cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'], group, bskid, ln, cgi.escape(basket, True))
 
-        elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
+        elif category == cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL']:
             out += " &gt; "
             out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;ln=%s">%s</a>""" % \
                    (CFG_SITE_URL, category, ln, _("Public baskets"))
@@ -2598,15 +2596,15 @@ def account_list_baskets(uid, ln=CFG_SITE_LANG):
     base_url = CFG_SITE_URL + '/yourbaskets/display?category=%s&amp;ln=' + ln
     personal_text = personal
     if personal:
-        url = base_url % CFG_WEBBASKET_CATEGORIES['PRIVATE']
+        url = base_url % cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE']
         personal_text = link % (url, personal_text)
     group_text = group
     if group:
-        url = base_url % CFG_WEBBASKET_CATEGORIES['GROUP']
+        url = base_url % cfg['CFG_WEBBASKET_CATEGORIES']['GROUP']
         group_text = link % (url, group_text)
     external_text = external
     if external:
-        url = base_url % CFG_WEBBASKET_CATEGORIES['EXTERNAL']
+        url = base_url % cfg['CFG_WEBBASKET_CATEGORIES']['EXTERNAL']
     else:
         url = CFG_SITE_URL + '/yourbaskets/list_public_baskets?ln=' + ln
     external_text = link % (url, external_text)
@@ -2792,7 +2790,7 @@ def wash_b_search(b):
 
     b = b.split('_', 1)
     b_category = b[0].upper()
-    valid_categories = CFG_WEBBASKET_CATEGORIES.values()
+    valid_categories = cfg['CFG_WEBBASKET_CATEGORIES'].values()
     valid_categories.append('')
     if b_category not in valid_categories:
         try:
@@ -2802,7 +2800,7 @@ def wash_b_search(b):
             return ("", "", exc.message)
         #return ("", "", ['WRN_WEBBASKET_INVALID_CATEGORY'])
     if len(b) == 2:
-        if b_category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] or b_category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+        if b_category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] or b_category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP']:
             return (b_category, b[1], None)
         # TODO: send a warning when the user has sent a second argument
         # specifying a category other than PRIVATE or GROUP
@@ -2816,7 +2814,7 @@ def wash_b_add(b):
 
     b = b.split('_', 1)
     b_category = b[0].upper()
-    valid_categories = (CFG_WEBBASKET_CATEGORIES['PRIVATE'], CFG_WEBBASKET_CATEGORIES['GROUP'])
+    valid_categories = (cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'], cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'])
     if b_category not in valid_categories or len(b) != 2 or not b[1]:
         try:
             raise InvenioWebBasketWarning(_('Cannot add items to the selected basket. Invalid parameters.'))
@@ -2830,7 +2828,7 @@ def wash_category(category):
     _ = gettext_set_language(CFG_SITE_LANG)
 
     category = category.upper()
-    valid_categories = CFG_WEBBASKET_CATEGORIES.values()
+    valid_categories = cfg['CFG_WEBBASKET_CATEGORIES'].values()
     valid_categories.append('')
     if category not in valid_categories:
         try:
@@ -2880,14 +2878,14 @@ def wash_bskid(uid, category, bskid):
             return (0, exc.message)
         #return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET'])
     bskid = int(bskid)
-    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and not db.is_personal_basket_valid(uid, bskid):
+    if category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] and not db.is_personal_basket_valid(uid, bskid):
         try:
             raise InvenioWebBasketWarning(_('The selected basket does not exist or you do not have access to it.'))
         except InvenioWebBasketWarning, exc:
             register_exception(stream='warning')
             return (0, exc.message)
         #return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET'])
-    if category == CFG_WEBBASKET_CATEGORIES['GROUP'] and not db.is_group_basket_valid(uid, bskid):
+    if category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] and not db.is_group_basket_valid(uid, bskid):
         try:
             raise InvenioWebBasketWarning(_('The selected basket does not exist or you do not have access to it.'))
         except InvenioWebBasketWarning, exc:

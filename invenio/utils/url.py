@@ -36,6 +36,8 @@ import urllib2
 from urllib import urlencode, quote_plus, quote, FancyURLopener
 from urlparse import urlparse, urlunparse
 from cgi import parse_qs, parse_qsl, escape
+from werkzeug import cached_property
+from werkzeug.local import LocalProxy
 
 try:
     import BeautifulSoup
@@ -43,13 +45,11 @@ try:
 except ImportError:
     BEAUTIFUL_SOUP_IMPORTED = False
 
-from invenio.hashutils import sha1, md5, HASHLIB_IMPORTED
+from invenio.base.globals import cfg
+from invenio.utils.hash import sha1, md5, HASHLIB_IMPORTED
+from invenio.utils.text import wash_for_utf8
+from invenio.utils import apache
 
-from invenio import webinterface_handler_config as apache
-from invenio.config import \
-     CFG_SITE_URL, CFG_SITE_SECURE_URL, \
-     CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE, \
-     CFG_WEBDIR, CFG_SITE_NAME,  CFG_VERSION, CFG_SITE_LANGS
 
 def wash_url_argument(var, new_type):
     """
@@ -179,13 +179,15 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
     raise apache.SERVER_RETURN, apache.DONE
 
 
-def rewrite_to_secure_url(url, secure_base=CFG_SITE_SECURE_URL):
+def rewrite_to_secure_url(url, secure_base=None):
     """
     Rewrite URL to a Secure URL
 
     @param url URL to be rewritten to a secure URL.
     @param secure_base: Base URL of secure site (defaults to CFG_SITE_SECURE_URL).
     """
+    if secure_base is None:
+        secure_base = cfg.get('CFG_SITE_SECURE_URL')
     url_parts = list(urlparse(url))
     url_secure_parts = urlparse(secure_base)
     url_parts[0] = url_secure_parts[0]
@@ -288,15 +290,13 @@ def create_html_link(urlbase, urlargd, link_label, linkattrd=None,
             attributes = [str(key) + '="' + str(linkattrd[key]) + '"'
                                 for key in linkattrd.keys()]
         output += attributes_separator.join(attributes)
-    output += '>' + link_label + '</a>'
+    output += '>' + wash_for_utf8(link_label) + '</a>'
     return output
 
 
 def create_html_mailto(email, subject=None, body=None, cc=None, bcc=None,
-        link_label="%(email)s", linkattrd=None,
-        escape_urlargd=True, escape_linkattrd=True,
-        email_obfuscation_mode=CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE):
-
+        link_label="%(email)s", linkattrd=None, escape_urlargd=True,
+        escape_linkattrd=True, email_obfuscation_mode=None):
     """Creates a W3C compliant 'mailto' link.
 
     Encode/encrypt given email to reduce undesired automated email
@@ -331,7 +331,7 @@ def create_html_mailto(email, subject=None, body=None, cc=None, bcc=None,
     Available modes ([t] means "transparent" for the user):
 
          -1: hide all emails, excepted CFG_SITE_ADMIN_EMAIL and
-              CFG_SITE_SUPPORT_EMAIL.
+             CFG_SITE_SUPPORT_EMAIL.
 
       [t] 0 : no protection, email returned as is.
                 foo@example.com => foo@example.com
@@ -357,6 +357,10 @@ def create_html_mailto(email, subject=None, body=None, cc=None, bcc=None,
     ## [t] 6 : if user can see (controlled by WebAccess), display. Else
     ##         ask to login to see email. If user cannot see, display
     ##         form submission.
+
+    if email_obfuscation_mode is None:
+        email_obfuscation_mode = cfg.get(
+            'CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE')
 
     if linkattrd is None:
         linkattrd = {}
@@ -406,10 +410,10 @@ def create_html_mailto(email, subject=None, body=None, cc=None, bcc=None,
         # GIFs-based
         email = email.replace('.',
             '<img src="%s/img/dot.gif" alt=" [dot] " '
-            'style="vertical-align:bottom"  />' % CFG_SITE_URL)
+            'style="vertical-align:bottom"  />' % cfg.get('CFG_SITE_URL'))
         email = email.replace('@',
             '<img src="%s/img/at.gif" alt=" [at] " '
-            'style="vertical-align:baseline" />' % CFG_SITE_URL)
+            'style="vertical-align:baseline" />' % cfg.get('CFG_SITE_URL'))
         return email
 
     # All other cases, including mode -1:
@@ -434,7 +438,7 @@ def get_canonical_and_alternates_urls(url, drop_ln=True, washed_argd=None):
     language code -> alternate URL
     """
     dummy_scheme, dummy_netloc, path, dummy_params, query, fragment = urlparse(url)
-    canonical_scheme, canonical_netloc = urlparse(CFG_SITE_URL)[0:2]
+    canonical_scheme, canonical_netloc = urlparse(cfg.get('CFG_SITE_URL'))[0:2]
     parsed_query = washed_argd or parse_qsl(query)
     no_ln_parsed_query = [(key, value) for (key, value) in parsed_query if key != 'ln']
     if drop_ln:
@@ -444,7 +448,7 @@ def get_canonical_and_alternates_urls(url, drop_ln=True, washed_argd=None):
     canonical_query = urlencode(canonical_parsed_query)
     canonical_url = urlunparse((canonical_scheme, canonical_netloc, path, dummy_params, canonical_query, fragment))
     alternate_urls = {}
-    for ln in CFG_SITE_LANGS:
+    for ln in cfg.get('CFG_SITE_LANGS'):
         alternate_query = urlencode(no_ln_parsed_query + [('ln', ln)])
         alternate_url = urlunparse((canonical_scheme, canonical_netloc, path, dummy_params, alternate_query, fragment))
         alternate_urls[ln] = alternate_url
@@ -535,26 +539,32 @@ def get_title_of_page(url):
     else:
         return "Title not available"
 
+
 def make_user_agent_string(component=None):
     """
     Return a nice and uniform user-agent string to be used when Invenio
     act as a client in HTTP requests.
     """
-    ret = "Invenio-%s (+%s; \"%s\")" % (CFG_VERSION, CFG_SITE_URL, CFG_SITE_NAME)
+    ret = "Invenio-%s (+%s; \"%s\")" % (cfg.get('CFG_VERSION'), cfg.get('CFG_SITE_URL'), cfg.get('CFG_SITE_NAME'))
     if component:
         ret += " %s" % component
     return ret
 
+
 class InvenioFancyURLopener(FancyURLopener):
-    ## Provide default user agent string
-    version = make_user_agent_string()
+    """Provide default user agent string."""
+
+    @cached_property
+    def version(self):
+        return make_user_agent_string()
+
     def prompt_user_passwd(self, host, realm):
         """Don't prompt"""
         return None, None
 
 ## Let's override default useragent string
 ## See: http://docs.python.org/release/2.4.4/lib/module-urllib.html
-urllib._urlopener = InvenioFancyURLopener()
+urllib._urlopener = LocalProxy(lambda: InvenioFancyURLopener())
 
 def make_invenio_opener(component=None):
     """
@@ -668,7 +678,7 @@ def create_AWS_request_url(base_url, argd, _amazon_secret_access_key,
             try:
                 raise Exception("Module hashlib not installed. Please install it.")
             except:
-                from invenio.errorlib import register_exception
+                from invenio.ext.logging import register_exception
                 register_exception(stream='warning', alert_admin=True, subject='Cannot create AWS signature')
                 return ""
         else:
@@ -760,7 +770,7 @@ def create_Indico_request_url(base_url, indico_what, indico_loc, indico_id, indi
         try:
             raise Exception("Module hashlib not installed. Please install it.")
         except:
-            from invenio.errorlib import register_exception
+            from invenio.ext.logging import register_exception
             register_exception(stream='warning', alert_admin=True, subject='Cannot create AWS signature')
     if not items:
         return url
@@ -817,7 +827,7 @@ class _MyHashlibAlgo(object):
             return setattr(self._obj, name, value)
 
 if HASHLIB_IMPORTED:
-    from invenio.hashutils import sha256
+    from invenio.utils.hash import sha256
 
 
     class _MySHA256(_MyHashlibAlgo):
@@ -838,7 +848,7 @@ def auto_version_url(file_path):
     """
     file_md5 = ""
     try:
-        file_md5 = md5(open(CFG_WEBDIR + os.sep + file_path).read()).hexdigest()
+        file_md5 = md5(open(cfg.get('CFG_WEBDIR') + os.sep + file_path).read()).hexdigest()
     except IOError:
         pass
     return file_path + "?%s" % file_md5

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.scriptutils import Manager
+from invenio.ext.script import Manager
 
 manager = Manager(usage="Perform upgrade engine operations.")
 
@@ -27,7 +27,7 @@ def run():
     """
     Command for applying upgrades
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade
+    from invenio.modules.upgrader.commands import cmd_upgrade
     cmd_upgrade()
 
 
@@ -36,7 +36,7 @@ def check():
     """
     Command for checking upgrades
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_check
+    from invenio.modules.upgrader.commands import cmd_upgrade_check
     cmd_upgrade_check()
 
 
@@ -49,7 +49,7 @@ def pending():
     """
     Command for showing upgrades ready to be applied
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_show_pending
+    from invenio.modules.upgrader.commands import cmd_upgrade_show_pending
     cmd_upgrade_show_pending()
 
 
@@ -58,7 +58,8 @@ def applied():
     """
     Command for showing all upgrades already applied.
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_show_applied
+    from invenio.modules.upgrader.commands import \
+        cmd_upgrade_show_applied
     cmd_upgrade_show_applied()
 
 
@@ -72,26 +73,47 @@ def release(path, repository):
     """
     Create a new release upgrade recipe (for developers).
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_create_release_recipe
+    from invenio.modules.upgrader.commands import \
+        cmd_upgrade_create_release_recipe
     cmd_upgrade_create_release_recipe(path, repository)
 
 
-@create.option('-p', '--path', dest='path')
-@create.option('-r', '--repository', dest='repository', default='invenio')
-@create.option('-d', '--depends_on', dest='depends_on')
+@create.option('-p', '--package', dest='package', required=True,
+               help="Import path of module where to create recipe (required).")
+@create.option('-o', '--path', dest='output_path',
+               help="Override output path.")
+@create.option('-r', '--repository', dest='repository',
+               help="Override repository name")
+@create.option('-n', '--name', dest='name',
+               help="Name of upgrade file")
+@create.option('-d', '--depends_on', dest='depends_on',
+               help="List of recipes to depend on.")
+@create.option('-a', '--auto', dest='auto', action='store_true',
+               help="Auto-generate upgrade (default: False).")
 @create.option('--release', dest='release', action='store_true')
-def recipe(path, repository, depends_on=None, release=False):
+@create.option('--overwrite', dest='overwrite', action='store_true')
+def recipe(package, repository=None, depends_on=None, release=False,
+           output_path=None, auto=False, overwrite=False, name=None):
     """
     Create a new upgrade recipe (for developers).
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_create_standard_recipe
-    cmd_upgrade_create_standard_recipe(path, repository, depends_on=depends_on,
-                                       release=release)
+    from invenio.modules.upgrader.commands import \
+        cmd_upgrade_create_standard_recipe
+    cmd_upgrade_create_standard_recipe(
+        package,
+        depends_on=depends_on,
+        repository=repository,
+        release=release,
+        output_path=output_path,
+        auto=auto,
+        overwrite=overwrite,
+        name=name,
+    )
 
 
 def main():
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app()
+    from invenio.base.factory import create_app
+    app = create_app()
     manager.app = app
     manager.run()
 

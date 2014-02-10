@@ -22,7 +22,7 @@ This element return the full MARCXML representation of a record with the marc
 prefix and namespace and adding the leader.
 """
 
-from invenio.bibformat_dblayer import get_preformatted_record
+from invenio.modules.formatter.api import get_preformatted_record
 
 def format_element(bfo):
     """

@@ -19,15 +19,15 @@
 
 import re
 
-from invenio.refextract_config import \
+from invenio.legacy.refextract.config import \
     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL, \
     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL, \
     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
     CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID
 
-from invenio.docextract_text import remove_and_record_multiple_spaces_in_line
+from invenio.legacy.docextract.text import remove_and_record_multiple_spaces_in_line
 
-from invenio.refextract_re import \
+from invenio.legacy.refextract.regexs import \
     re_ibid, \
     re_doi, \
     re_raw_url, \
@@ -63,7 +63,7 @@ from invenio.refextract_re import \
     re_pos_year_num, \
     RE_OLD_ARXIV
 
-from invenio.authorextract_re import re_auth, \
+from invenio.legacy.authorextract.regexs import re_auth, \
                                      re_extra_auth, \
                                      re_auth_near_miss, \
                                      re_etal, \
@@ -71,7 +71,7 @@ from invenio.authorextract_re import re_auth, \
                                      re_ed_notation
 
 
-from invenio.docextract_text import wash_line
+from invenio.legacy.docextract.text import wash_line
 
 
 def tag_reference_line(line, kbs, record_titles_count):

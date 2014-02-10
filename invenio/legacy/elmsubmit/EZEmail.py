@@ -112,18 +112,18 @@ try:
 except ImportError:
     pass
 
-import invenio.elmsubmit_richtext2txt as _richtext2txt
-import invenio.elmsubmit_enriched2txt as _enriched2txt
-import invenio.elmsubmit_html2txt as _html2txt
+import invenio.legacy.elmsubmit.richtext2txt as _richtext2txt
+import invenio.legacy.elmsubmit.enriched2txt as _enriched2txt
+import invenio.legacy.elmsubmit.html2txt as _html2txt
 
-from invenio.elmsubmit_misc import concat as _concat
-from invenio.elmsubmit_misc import cr2lf as _cr2lf
-from invenio.elmsubmit_misc import random_alphanum_string as _random_alphanum_string
-from invenio.elmsubmit_misc import wrap_text as _wrap_text
+from invenio.legacy.elmsubmit.misc import concat as _concat
+from invenio.legacy.elmsubmit.misc import cr2lf as _cr2lf
+from invenio.legacy.elmsubmit.misc import random_alphanum_string as _random_alphanum_string
+from invenio.legacy.elmsubmit.misc import wrap_text as _wrap_text
 
-from invenio.elmsubmit_filename_generator import generate_filename as _generate_filename
+from invenio.legacy.elmsubmit.filename_generator import generate_filename as _generate_filename
 
-import invenio.elmsubmit_EZArchive as elmsubmit_EZArchive
+import invenio.legacy.elmsubmit.EZArchive as elmsubmit_EZArchive
 
 # Message Parsing:
 

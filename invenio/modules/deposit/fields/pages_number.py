@@ -18,8 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from invenio.webdeposit_field import WebDepositField
-#from invenio.webdeposit_validation_utils import number_validate
+from invenio.modules.deposit.field_base import WebDepositField
+#from ..validation_utils import number_validate
 
 __all__ = ['PagesNumberField']
 
@@ -27,7 +27,8 @@ __all__ = ['PagesNumberField']
 class PagesNumberField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-th',
+            icon='th',
+            widget_classes="form-control"
             #FIXMEvalidators=[number_validate(error_message='Pages must be a number!')] #FIXME
         )
         defaults.update(kwargs)

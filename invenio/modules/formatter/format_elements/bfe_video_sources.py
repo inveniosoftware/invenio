@@ -19,7 +19,7 @@
 """BibFormat element - Creates <source> elements for html5 videos
 """
 
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 
 def format_element(bfo, subformat="480p"):
     """ Creates HTML5 source elements for the given subformat. 

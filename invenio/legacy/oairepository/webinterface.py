@@ -23,20 +23,23 @@ import os
 import time
 import cStringIO
 
-from invenio import webinterface_handler_config as apache
-from invenio import oai_repository_server
-from invenio.errorlib import register_exception
+from invenio.utils import apache
+from invenio.legacy.oairepository import server as oai_repository_server
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_CACHEDIR, CFG_OAI_SLEEP, CFG_DEVEL_SITE, \
     CFG_ETCDIR
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 
 CFG_VALIDATE_RESPONSES = False
 OAI_PMH_VALIDATOR = None
 
 if CFG_DEVEL_SITE:
     try:
+        import pkg_resources
         from lxml import etree
-        OAI_PMH_VALIDATOR = etree.XMLSchema(etree.parse(open(os.path.join(CFG_ETCDIR, 'oairepository', 'OAI-PMH.xsd'))))
+        OAI_PMH_VALIDATOR = etree.XMLSchema(etree.parse(open(
+            pkg_resources.resource_filename('invenio.legacy.oairepository',
+                                            'OAI-PMH.xsd'))))
         CFG_VALIDATE_RESPONSES = True
     except ImportError:
         pass

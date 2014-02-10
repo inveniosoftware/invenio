@@ -18,13 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
 from wtforms.validators import Required
-from invenio.webdeposit_form import WebDepositForm as Form
-from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
+from invenio.modules.deposit.form import WebDepositForm as Form
+from invenio.base.i18n import _
+from ..field_widgets import date_widget, plupload_widget, \
                                              bootstrap_submit
 
 # Import custom fields
-from invenio.webdeposit_load_fields import fields
+from invenio.modules.deposit import fields
 __all__ = ['ThesisForm']
 
 
@@ -34,7 +34,7 @@ class ThesisForm(Form):
                               validators=[Required()])
     subtitle = fields.TitleField(label=_('Original Thesis Subtitle'),
                                  export_key='title.subtitle')
-    author = fields.AuthorField(label=_('Author'),)
+    author = fields.AuthorField(label=_('Author'))
     supervisor = fields.AuthorField(label=_('Thesis Supervisor'))
     abstract = fields.AbstractField(label=_('Abstract'))
 
@@ -60,7 +60,8 @@ class ThesisForm(Form):
 
     funded_choices = [("yes", _("Yes")), ("no", _("No"))]
     funded = fields.SelectField(label=_("Has your thesis been funded by the CERN Doctoral Student Program?"),
-                                choices=funded_choices)
+                                choices=funded_choices,
+                                widget_classes="form-control")
 
     file_field = fields.FileUploadField(widget=plupload_widget)
     submit = fields.SubmitField(label=_('Submit Thesis'), widget=bootstrap_submit)

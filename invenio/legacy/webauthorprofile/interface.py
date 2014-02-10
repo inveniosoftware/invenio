@@ -17,6 +17,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.webauthorprofile_dbapi import expire_all_cache_for_person as expire_all_cache_for_personid #exporting
+from .dbapi import expire_all_cache_for_person as expire_all_cache_for_personid #exporting
 
 

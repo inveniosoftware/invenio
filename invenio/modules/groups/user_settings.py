@@ -17,31 +17,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebAccount Flask Blueprint"""
+"""WebAccount User Settings"""
 
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
-from invenio.websession_model import User, Usergroup, UserUsergroup
-from invenio.webinterface_handler_flask_utils import _
-from invenio.webinterface_handler import wash_urlargd
-from invenio.config import CFG_SITE_LANG
-from invenio.access_control_config import \
-     CFG_EXTERNAL_AUTH_USING_SSO, \
-     CFG_EXTERNAL_AUTH_LOGOUT_SSO
+from flask import url_for
+from invenio.base.i18n import _
 
-from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
-      CFG_WEBSESSION_USERGROUP_STATUS, \
-      CFG_WEBSESSION_GROUP_JOIN_POLICY, \
-      InvenioWebSessionError, \
-      InvenioWebSessionWarning
+from invenio.ext.template import render_template_to_string
+from flask.ext.login import current_user
+from invenio.modules.account.models import UserUsergroup
+from invenio.modules.dashboard.settings import Settings
 
-from invenio.sqlalchemyutils import db
-from invenio.jinja2utils import render_template_to_string
-from invenio.webuser_flask import current_user
-from invenio.settings import Settings
 
 class WebGroupSettings(Settings):
-
 
     def __init__(self):
         super(WebGroupSettings, self).__init__()
@@ -61,7 +48,7 @@ class WebGroupSettings(Settings):
 {{ _('You are involved in following groups:') }}
 <div>
   {%- for ug in usergroups -%}
-  <span class="label">
+  <span class="label label-default">
     {{ ug.usergroup.name }}
   </span>
   {%- endfor -%}

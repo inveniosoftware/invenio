@@ -24,7 +24,8 @@ import functools
 from functools import wraps
 from flask import flash
 from flask.ext.script import Manager as FlaskExtManager
-from invenio.signalutils import pre_command, post_command
+from werkzeug.utils import import_string, find_modules
+from invenio.base.signals import pre_command, post_command
 
 
 def change_command_name(method=None, new_name=None):
@@ -61,7 +62,7 @@ def check_for_software_updates(flash_message=False):
              or None if server was not reachable.
     """
     from invenio.config import CFG_VERSION
-    from invenio.webinterface_handler_flask_utils import _
+    from invenio.base.i18n import _
     try:
         find = re.compile('Invenio v[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])?'
                           ' is released')
@@ -134,25 +135,19 @@ def register_manager(manager):
     """
     from urlparse import urlparse
     from flask.ext.script.commands import Shell, Server, ShowUrls  # , Clean
-    #from invenio.errorlib import register_exception
-    from invenio.config import CFG_SITE_URL
-    from invenio.importutils import autodiscover_modules
 
-    # Call add_command() in inveniomanage module to register managers.
-    modules = autodiscover_modules(['invenio'],
-                                   '.+_manager\.py')
-    for m in modules:
-        name = m.__name__[len('invenio.'):-len('_manager')]
-        if 'manager' in dir(m):
-            candidate = getattr(m, 'manager')
-            if isinstance(candidate, FlaskExtManager):
-                manager.add_command(name, candidate)
+    for script in find_modules('invenio.base.scripts'):
+        manager.add_command(script.split('.')[-1],
+                            import_string(script + ':manager'))
 
     #FIXME clean command is broken
     #manager.add_command("clean", Clean())
     manager.add_command("show-urls", ShowUrls())
     manager.add_command("shell", Shell())
-    parsed_url=  urlparse(CFG_SITE_URL)
+    parsed_url=  urlparse(manager.app.config.get('CFG_SITE_URL'))
     port = parsed_url.port or 80
     host = parsed_url.hostname or '127.0.0.1'
     manager.add_command("runserver", Server(host=host, port=port))
+
+    from invenio.ext.collect import collect
+    collect.init_script(manager)

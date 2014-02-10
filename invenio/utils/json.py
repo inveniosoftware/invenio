@@ -92,7 +92,7 @@ def wash_for_js(text):
     and take note that returned value is no longer enclosed into
     quotes.
     """
-    from invenio.htmlutils import escape_javascript_string
+    from invenio.utils.html import escape_javascript_string
     if isinstance(text, basestring):
         return '"%s"' % escape_javascript_string(text,
                                                  escape_for_html=False,

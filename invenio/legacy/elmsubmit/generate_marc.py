@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-import invenio.elmsubmit_config as elmsubmit_config
+import invenio.legacy.elmsubmit.config as elmsubmit_config
 
 def generate_marc(submission_dict):
     """ method generates a marc xml file from the submission dict

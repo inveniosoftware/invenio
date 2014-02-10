@@ -23,37 +23,37 @@
     use the data base. It should have an interface for
     all other files in the module.
 '''
-import invenio.bibauthorid_config as bconfig
+import invenio.legacy.bibauthorid.config as bconfig
 import numpy
 import cPickle
 from cPickle import UnpicklingError
-from invenio.htmlutils import X
+from invenio.utils.html import X
 
 import os
 import gc
 
 #python2.4 compatibility
-from invenio.bibauthorid_general_utils import bai_all as all
+from invenio.legacy.bibauthorid.general_utils import bai_all as all
 
 from itertools import groupby, count, ifilter, chain, imap
 from operator import itemgetter
 
-from invenio.search_engine import perform_request_search
-from invenio.access_control_engine import acc_authorize_action
+from invenio.legacy.search_engine import perform_request_search
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL
 
-from invenio.bibauthorid_name_utils import split_name_parts
-from invenio.bibauthorid_name_utils import create_canonical_name
-from invenio.bibauthorid_name_utils import create_normalized_name
-from invenio.bibauthorid_general_utils import bibauthor_print
-from invenio.bibauthorid_general_utils import update_status \
+from invenio.legacy.bibauthorid.name_utils import split_name_parts
+from invenio.legacy.bibauthorid.name_utils import create_canonical_name
+from invenio.legacy.bibauthorid.name_utils import create_normalized_name
+from invenio.legacy.bibauthorid.general_utils import bibauthor_print
+from invenio.legacy.bibauthorid.general_utils import update_status \
                                     , update_status_final
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 try:
     from collections import defaultdict
 except:
-    from invenio.containerutils import defaultdict
+    from invenio.utils.container import defaultdict
 
 
 MARC_100_700_CACHE = None
@@ -2244,7 +2244,7 @@ def check_duplicated_papers(printer, repair=False):
 
     if repair and bibrecs_to_reassign:
         printer("Reassigning deleted bibrecs %s" % str(bibrecs_to_reassign))
-        from invenio.bibauthorid_rabbit import rabbit
+        from invenio.legacy.bibauthorid.rabbit import rabbit
         rabbit(bibrecs_to_reassign)
 
     return all_ok
@@ -2284,7 +2284,7 @@ def check_duplicated_signatures(printer, repair=False):
 
     if repair and bibrecs_to_reassign:
         printer("Reassigning deleted duplicates %s" % str(bibrecs_to_reassign))
-        from invenio.bibauthorid_rabbit import rabbit
+        from invenio.legacy.bibauthorid.rabbit import rabbit
         rabbit(bibrecs_to_reassign)
     return all_ok
 
@@ -2424,7 +2424,7 @@ def check_wrong_rejection(printer, repair=False):
 
     if repair and (to_reassign or to_deal_with):
 
-        from invenio.bibauthorid_rabbit import rabbit
+        from invenio.legacy.bibauthorid.rabbit import rabbit
 
         if to_reassign:
             #Rabbit is not designed to reassign signatures which are rejected but not assigned:

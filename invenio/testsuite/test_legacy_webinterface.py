@@ -21,9 +21,8 @@ __revision__ = "$Id$"
 
 
 import cgi
-from invenio.config import CFG_SITE_LANG
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 # SLIPPERY SLOPE AHEAD
 #
@@ -73,10 +72,10 @@ class _FakeReq(object):
         self.method = "GET"
         return
 
-FieldStorage = lazy_import('invenio.webinterface_handler_wsgi_utils:FieldStorage')
+FieldStorage = lazy_import('invenio.legacy.wsgi.utils:FieldStorage')
 # --------------------------------------------------
 
-webinterface_handler = lazy_import('invenio.webinterface_handler')
+webinterface_handler = lazy_import('invenio.ext.legacy.handler')
 
 
 class TestWashArgs(InvenioTestCase):
@@ -88,6 +87,7 @@ class TestWashArgs(InvenioTestCase):
         result = webinterface_handler.wash_urlargd(form, default)
 
         if not 'ln' in expected:
+            from invenio.config import CFG_SITE_LANG
             expected['ln'] = CFG_SITE_LANG
 
         self.failUnlessEqual(result, expected)

@@ -1,6 +1,21 @@
-{% extends "bibworkflow_layout.html" %}
-{%- js 'js/bibworkflow_index.js' -%}
-{% block body2 %}
+{% extends "workflows/layout.html" %}
+
+{% js url_for('workflows.static', filename='js/workflows/index.js') %}
+
+{% block javascript %}
+    {{ super() }}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var url_redis_get = "{{ url_for('workflows.get_redis_keys') }}";
+            var url_entry_details = "{{ url_for('workflows.entry_details') }}";
+            var url_workflow_details = "{{ url_for('workflows.workflow_details') }}";
+
+            init_index(url_redis_get, url_entry_details, url_workflow_details);
+        });
+    </script>
+{% endblock javascript %}
+
+{% block workflowbody %}
     <div class="alert alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <h4>Warning!</h4>

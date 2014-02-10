@@ -23,9 +23,9 @@ __revision__ = "$Id$"
 import cgi
 import datetime
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_CERN_SITE
-from invenio.htmlutils import nmtoken_from_string
-from invenio.urlutils import create_html_link
-from invenio.messages import gettext_set_language
+from invenio.utils.html import nmtoken_from_string
+from invenio.utils.url import create_html_link
+from invenio.base.i18n import gettext_set_language
 
 oai_harvest_admin_url = CFG_SITE_URL + \
                         "/admin/oaiharvest/oaiharvestadmin.py"
@@ -536,7 +536,7 @@ class Template:
 
         return """ %(scriptsstring)s
     <link rel="stylesheet" href="%(baseurl)s/js/jquery-treeview/jquery.treeview.css" />
-    <link rel="stylesheet" href="%(baseurl)s/img/jquery.ajaxPager.css" />
+    <link rel="stylesheet" href="%(baseurl)s/css/jquery.ajaxPager.css" />
     <script type="text/javascript">
         var serverAddress = '%(baseurl)s';
     </script>

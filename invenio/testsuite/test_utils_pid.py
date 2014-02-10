@@ -21,8 +21,8 @@
 Persistent identifier utilities tests
 """
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-from invenio import pidutils
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.utils import persistentid as pidutils
 
 identifiers = [
     ('urn:isbn:0451450523', ['urn', ], ''),

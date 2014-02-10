@@ -28,17 +28,17 @@ import ConfigParser
 
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_ETCDIR, \
      CFG_PREFIX
-from invenio.search_engine import perform_request_search
-from invenio.bibrank_citation_indexer import get_citation_weight, print_missing, get_cit_dict, insert_into_cit_db
-from invenio.bibrank_downloads_indexer import *
-from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
+from invenio.legacy.search_engine import perform_request_search
+from invenio.legacy.bibrank.citation_indexer import get_citation_weight, print_missing, get_cit_dict, insert_into_cit_db
+from invenio.legacy.bibrank.downloads_indexer import *
+from invenio.legacy.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
      wash_table_column_name, get_table_update_time
-from invenio.errorlib import register_exception
-from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
-from invenio.bibindex_engine import create_range_list
-from invenio.intbitset import intbitset
+from invenio.ext.logging import register_exception
+from invenio.legacy.bibsched.bibtask import task_get_option, write_message, task_sleep_now_if_required
+from invenio.legacy.bibindex.engine import create_range_list
+from intbitset import intbitset
+from invenio.modules.ranker.registry import configuration
 
 options = {}
 
@@ -173,8 +173,14 @@ def single_tag_rank(config):
 
     write_message("Reading knowledgebase file: %s" % \
                    config.get(config.get("rank_method", "function"), "kb_src"))
-    input = open(config.get(config.get("rank_method", "function"), "kb_src"), 'r')
-    data = input.readlines()
+
+    kb_src = config.get(config.get("rank_method", "function"), "kb_src").strip()
+    # Find path from configuration registry by knowledge base name.
+    kb_src_clean = configuration.get(kb_src)
+
+    with open(kb_src_clean, 'r') as kb_file:
+        data = kb_file.readlines()
+
     for line in data:
         if not line[0:1] == "#":
             kb_data[string.strip((string.split(string.strip(line), "---"))[0])] = (string.split(string.strip(line), "---"))[1]
@@ -337,12 +343,12 @@ def bibrank_engine(run):
             cfg_name = getName(rank_method_code)
             write_message("Running rank method: %s." % cfg_name)
 
-            file = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
+            config_file = configuration.get(rank_method_code + '.cfg', '')
             config = ConfigParser.ConfigParser()
             try:
-                config.readfp(open(file))
+                config.readfp(open(config_file))
             except StandardError, e:
-                write_message("Cannot find configurationfile: %s" % file, sys.stderr)
+                write_message("Cannot find configurationfile: %s" % config_file, sys.stderr)
                 raise StandardError
 
             cfg_short = rank_method_code

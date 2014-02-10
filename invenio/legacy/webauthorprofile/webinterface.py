@@ -22,37 +22,38 @@
 # pylint: disable=W0613
 
 import sys
+from flask import url_for
 from operator import  itemgetter
 
-from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id, \
+from invenio.legacy.bibauthorid.webauthorprofileinterface import is_valid_canonical_id, \
     get_person_id_from_paper, get_person_id_from_canonical_id, \
     search_person_ids_by_name, get_papers_by_person_id, get_person_redirect_link
 
-from invenio.webauthorprofile_corefunctions import get_pubs, get_person_names_dicts, \
+from .corefunctions import get_pubs, get_person_names_dicts, \
     get_institute_pub_dict, get_coauthors, get_summarize_records, \
     get_total_downloads, get_cited_by_list, get_kwtuples, get_venuetuples, \
     get_veryfy_my_pubs_list_link, get_hepnames_data, get_self_pubs, \
     get_collabtuples, get_person_oldest_date, expire_all_cache_for_person
 
 
-#from invenio.bibauthorid_config import EXTERNAL_CLAIMED_RECORDS_KEY
+#from invenio.legacy.bibauthorid.config import EXTERNAL_CLAIMED_RECORDS_KEY
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID
-from invenio.webpage import pageheaderonly
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url
-from invenio.jsonutils import json_unicode_to_utf8
+from invenio.legacy.webpage import pageheaderonly
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
+from invenio.utils.url import redirect_to_url
+from invenio.utils.json import json_unicode_to_utf8
 
 import datetime
 
 
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
-webauthorprofile_templates = invenio.template.load('webauthorprofile')
-bibauthorid_template = invenio.template.load('bibauthorid')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
+webauthorprofile_templates = invenio.legacy.template.load('webauthorprofile')
+bibauthorid_template = invenio.legacy.template.load('bibauthorid')
 
-from invenio.search_engine import page_end
+from invenio.legacy.search_engine import page_end
 JSON_OK = False
 
 if sys.hexversion < 0x2060000:
@@ -246,7 +247,8 @@ class WebAuthorPages(WebInterfaceDirectory):
         else:
             req.content_type = "text/html"
         req.send_http_header()
-        metaheaderadd = '<script type="text/javascript" src="%s/js/webauthorprofile.js"> </script>' % (CFG_SITE_URL)
+        metaheaderadd = '<script type="text/javascript" src="%s"> </script>' % (
+            url_for('authorprofile.static', filename='js/authorprofile/base.js'), )
         metaheaderadd += """
         <style>
         .hidden {

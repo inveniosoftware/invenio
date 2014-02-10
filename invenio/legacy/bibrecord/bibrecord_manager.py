@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.scriptutils import Manager
+from invenio.ext.script import Manager
 
 manager = Manager(usage="Perform BibRecord operations")
 
@@ -31,11 +31,11 @@ manager.add_command("cache", bibrecord_cache)
 @bibrecord_cache.command
 def reset(split_by=1000):
     """Reset bibrecord structure cache."""
-    from invenio.bibedit_model import Bibfmt
-    from invenio.cache_manager import reset_rec_cache
-    from invenio.dbquery import run_sql, serialize_via_marshal
-    from invenio.search_engine import get_record
-    from invenio.sqlalchemyutils import db
+    from invenio.modules.record_editor.models import Bibfmt
+    from invenio.base.scripts.cache import reset_rec_cache
+    from invenio.legacy.dbquery import run_sql, serialize_via_marshal
+    from invenio.legacy.search_engine import get_record
+    from invenio.ext.sqlalchemy import db
 
     def get_recstruct_record(recid):
         value = serialize_via_marshal(get_record(recid))
@@ -48,8 +48,8 @@ def reset(split_by=1000):
 
 
 def main():
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app()
+    from invenio.base.factory import create_app
+    app = create_app()
     manager.app = app
     manager.run()
 

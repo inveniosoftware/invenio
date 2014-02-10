@@ -21,7 +21,7 @@
 
 import sys
 import StringIO
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class Catcher(object):
@@ -91,8 +91,8 @@ class InveniomanageTest(InvenioTestCase):
 
     def test_upgrade_show_applied_cmd(self):
         """ Test `upgrade show applied` command. """
-        from invenio.upgrade_manager import main
-        out, dummy_exit_code = run('upgrade show applied', main)
+        from invenio.modules.upgrader.manage import main
+        out, dummy_exit_code = run('upgrader show applied', main)
 
         expected = ['>>> Following upgrade(s) have been applied:',
                     '>>> No upgrades have been applied.']
@@ -101,8 +101,8 @@ class InveniomanageTest(InvenioTestCase):
 
     def test_upgrade_show_pending_cmd(self):
         """ Test `upgrade show pending` command. """
-        from invenio.upgrade_manager import main
-        out, dummy_exit_code = run('upgrade show pending', main)
+        from invenio.modules.upgrader.manage import main
+        out, dummy_exit_code = run('upgrader show pending', main)
 
         lines = out.split('\n')
         expected = ['>>> Following upgrade(s) are ready to be applied:',
@@ -113,9 +113,9 @@ class InveniomanageTest(InvenioTestCase):
 
     def test_signals_usage(self):
         """ Test signal handling. """
-        from invenio.database_manager import main as db_main
-        from invenio.signalutils import pre_command, post_command
-        from invenio.inveniomanage import main, version as im_version
+        from invenio.base.scripts.database import main as db_main
+        from invenio.base.signals import pre_command, post_command
+        from invenio.base.manage import main, version as im_version
 
         def pre_handler_version(sender, *args, **kwargs):
             print '>>> pre_handler_version'

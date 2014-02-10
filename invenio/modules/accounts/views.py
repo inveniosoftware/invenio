@@ -19,150 +19,85 @@
 
 """WebAccount Flask Blueprint"""
 
-from werkzeug import CombinedMultiDict, ImmutableMultiDict, MultiDict
+from werkzeug import CombinedMultiDict, ImmutableMultiDict
 from flask import render_template, request, flash, redirect, url_for, \
-    g, abort, current_app
+    g, abort, current_app, Blueprint
+from flask.ext.login import current_user, login_required
 
-from invenio import websession_config
-from invenio import webuser
-from invenio.access_control_config import \
-    CFG_EXTERNAL_AUTH_USING_SSO, \
-    CFG_EXTERNAL_AUTH_LOGOUT_SSO
-from invenio.access_control_mailcookie import \
-    InvenioWebAccessMailCookieError, \
-    mail_cookie_check_authorize_action
-from invenio.config import \
-    CFG_SITE_URL, \
-    CFG_SITE_SECURE_URL, \
-    CFG_ACCESS_CONTROL_LEVEL_SITE, \
-    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
-    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
-from invenio.datastructures import LazyDict, flatten_multidict
-from invenio.importutils import autodiscover_modules
-from invenio.sqlalchemyutils import db
-from invenio.webaccount_forms import \
-    LoginForm, \
-    RegisterForm, \
-    LostPasswordForm
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.websession_model import User
-from invenio.websession_webinterface import wash_login_method
-from invenio.webuser_flask import \
-    login_user, \
-    logout_user, \
-    current_user, \
-    UserInfo, \
-    reset_password
+#from invenio import websession_config
+from invenio.legacy import webuser
+from .forms import LoginForm, RegisterForm, LostPasswordForm
+from .models import User
+from .validators import wash_login_method
+from invenio.base.decorators import wash_arguments
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
+from flask.ext.breadcrumbs import register_breadcrumb
+from invenio.ext.login import login_user, logout_user, authenticate, \
+    reset_password, login_redirect
+from flask.ext.menu import register_menu
+from invenio.ext.sqlalchemy import db
+from invenio.ext.sslify import ssl_required
+from invenio.modules.access.mailcookie import mail_cookie_check_mail_activation
+from invenio.utils.datastructures import LazyDict, flatten_multidict
+from invenio.utils.url import rewrite_to_secure_url
 
 
-CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
-CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
+#CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
+#CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
-blueprint = InvenioBlueprint('webaccount', __name__,
-                             url_prefix="/youraccount",
-                             breadcrumbs=[(_("Your Account"),
-                                           'webaccount.index')],
-                             menubuilder=[('personalize', _('Personalize'),
-                                           'webaccount.index')])
+blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
+                      template_folder='templates',
+                      static_folder='static')
 
 
-def update_login(nickname, password=None, remember_me=False):
-    where = [db.or_(User.nickname == nickname, User.email == nickname)]
-    if password is not None:
-        where.append(User.password == password)
-    try:
-        user = User.query.filter(*where).one()
-    except:
-        return None
-    login_user(UserInfo(user.id), remember=remember_me)
-    return user
-
-
-@blueprint.route('/login/', methods=['GET', 'POST'])
-@blueprint.invenio_wash_urlargd({'nickname': (unicode, None),
-                                 'password': (unicode, None),
-                                 'login_method': (wash_login_method, 'Local'),
-                                 'action': (unicode, ''),
-                                 'remember_me': (bool, False),
-                                 'referer': (unicode, None)})
-@blueprint.invenio_set_breadcrumb(_("Login"))
-@blueprint.invenio_force_https
+@blueprint.route('/login', methods=['GET', 'POST'])
+@wash_arguments({'nickname': (unicode, None),
+                 'password': (unicode, None),
+                 'login_method': (wash_login_method, 'Local'),
+                 'action': (unicode, ''),
+                 'remember_me': (bool, False),
+                 'referer': (unicode, None)})
+@register_breadcrumb(blueprint, '.login', _('Login'))
+@ssl_required
 def login(nickname=None, password=None, login_method=None, action='',
           remember_me=False, referer=None):
-
-    if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
+    if cfg.get('CFG_ACCESS_CONTROL_LEVEL_SITE') > 0:
         return abort(401)  # page is not authorized
 
     if action:
+        from invenio.modules.access.mailcookie import \
+            InvenioWebAccessMailCookieError, \
+            mail_cookie_check_authorize_action
         try:
             action, arguments = mail_cookie_check_authorize_action(action)
         except InvenioWebAccessMailCookieError:
             pass
-    form = LoginForm(CombinedMultiDict([ImmutableMultiDict({'referer': referer}
-                                        if referer else {}),
-                                        request.values]),
-                     csrf_enabled=False)
+    form = LoginForm(CombinedMultiDict(
+        [ImmutableMultiDict({'referer': referer, 'login_method': 'Local'}
+                            if referer else {'login_method': 'Local'}),
+                            request.values]), csrf_enabled=False)
     try:
-        user = None
-        if not CFG_EXTERNAL_AUTH_USING_SSO:
-            if login_method == 'Local':
-                if form.validate_on_submit():
-                    user = update_login(nickname, password, remember_me)
-            elif login_method in ['openid', 'oauth1', 'oauth2']:
-                pass
-                req = request.get_legacy_request()
-                (iden, nickname, password, msgcode) = webuser.loginUser(req, nickname,
-                                                                        password,
-                                                                        login_method)
-                if iden:
-                    user = update_login(nickname)
-            else:
-                flash(_('Invalid login method.'), 'error')
+        if login_method == 'Local' and \
+                authenticate(nickname, password, login_method=login_method):
 
-        else:
-            req = request.get_legacy_request()
-            # Fake parameters for p_un & p_pw because SSO takes them from the environment
-            (iden, nickname, password, msgcode) = webuser.loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
-            if iden:
-                user = update_login(nickname)
-
-        if user:
-            if user.note == '2':  # account is not confirmed
-                logout_user()
-                flash(_("You have not yet confirmed the email address for the \
-                        '%s' authentication method.") % login_method, 'warning')
-            else:  # account is valid
-                flash(_("You are logged in as %s.") % user.nickname, "info")
-                if referer is not None:
-                    from urlparse import urlparse
-                    # we should not redirect to these URLs after login
-                    blacklist = [url_for('webaccount.register'),
-                                 url_for('webaccount.logout'),
-                                 url_for('webaccount.login'),
-                                 url_for('webaccount.lost')]
-                    if not urlparse(referer).path in blacklist:
-                        # Change HTTP method to https if needed.
-                        referer = referer.replace(CFG_SITE_URL, CFG_SITE_SECURE_URL)
-                        return redirect(referer)
-                    return redirect('/')
-    except:
+            flash(_("You are logged in as %(nick)s.", nick=nickname), "info")
+            return login_redirect(referer)
+    except Exception as e:
+        current_app.logger.error('Exception during login process: %s', str(e))
         flash(_("Problem with login."), "error")
 
-    current_app.config.update(dict((k, v) for k, v in
-                              vars(websession_config).iteritems()
-                              if "CFG_" == k[:4]))
-
-    return render_template('webaccount_login.html', form=form)
+    return render_template('accounts/login.html', form=form)
 
 
 @blueprint.route('/register', methods=['GET', 'POST'])
-@blueprint.invenio_set_breadcrumb(_("Register"))
-@blueprint.invenio_force_https
+@register_breadcrumb(blueprint, '.register', _('Register'))
+@ssl_required
 def register():
     req = request.get_legacy_request()
 
     # FIXME
-    if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
+    if cfg.get('CFG_ACCESS_CONTROL_LEVEL_SITE') > 0:
         return webuser.page_not_authorized(req, "../youraccount/register?ln=%s" % g.ln,
                                            navmenuid='youraccount')
 
@@ -182,12 +117,12 @@ def register():
             title = _("Account created")
             messages.append(_("Your account has been successfully created."))
             state = "success"
-            if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
+            if cfg.get('CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT') == 1:
                 messages.append(_("In order to confirm its validity, an email message containing an account activation key has been sent to the given email address."))
                 messages.append(_("Please follow instructions presented there in order to complete the account registration process."))
-            if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
+            if cfg.get('CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS') >= 1:
                 messages.append(_("A second email will be sent when the account has been activated and can be used."))
-            elif CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT != 1:
+            elif cfg.get('CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT') != 1:
                 user = User.query.filter(User.email == form.email.data.lower()).one()
                 login_user(user.get_id())
                 messages.append(_("You can now access your account."))
@@ -204,25 +139,29 @@ def register():
                 messages.append(_("The error has been logged and will be taken in consideration as soon as possible."))
             else:
                 # Errors [-2, (1), 2, 3, 4] taken care of by form validation
-                messages.append(_("Internal error %s") % ruid)
+                messages.append(_("Internal error %(ruid)s", ruid=ruid))
     elif request.method == 'POST':
         title = _("Registration failure")
         state = "warning"
 
-    return render_template('webaccount_register.html', form=form, title=title,
+    return render_template('accounts/register.html', form=form, title=title,
                            messages=messages, state=state)
 
 
 @blueprint.route('/logout', methods=['GET', 'POST'])
-@blueprint.invenio_set_breadcrumb(_("Logout"))
-@blueprint.invenio_authenticated
+@register_breadcrumb(blueprint, '.logout', _('Logout'))
+@login_required
 def logout():
     logout_user()
+
+    from invenio.modules.access.local_config import \
+        CFG_EXTERNAL_AUTH_USING_SSO, \
+        CFG_EXTERNAL_AUTH_LOGOUT_SSO
 
     if CFG_EXTERNAL_AUTH_USING_SSO:
         return redirect(CFG_EXTERNAL_AUTH_LOGOUT_SSO)
 
-    return render_template('webaccount_logout.html',
+    return render_template('accounts/logout.html',
                            using_sso=CFG_EXTERNAL_AUTH_USING_SSO,
                            logout_sso=CFG_EXTERNAL_AUTH_LOGOUT_SSO)
 
@@ -231,14 +170,21 @@ def load_user_settings():
     """
     Handy function to populate LazyDic with user settings.
     """
-    from invenio.settings import Settings
-    modules = autodiscover_modules(['invenio'],
-                                   related_name_re='.+_user_settings\.py')
+    from invenio.modules.dashboard.settings import Settings
+    from invenio.base.utils import autodiscover_user_settings
+    modules = autodiscover_user_settings()
     user_settings = {}
     for module in modules:
-        candidate = getattr(module, 'settings')
-        if candidate is not None and issubclass(candidate, Settings):
-            user_settings[candidate.__name__] = candidate
+        candidates = getattr(module, 'settings')
+        if candidates is not None:
+            if type(candidates) is not list:
+                candidates = [candidates]
+            for candidate in candidates:
+                if issubclass(candidate, Settings):
+                    if candidate.__name__ in user_settings:
+                        raise Exception(candidate.__name__,
+                                        'duplicate user settings')
+                    user_settings[candidate.__name__] = candidate
     return user_settings
 
 _USER_SETTINGS = LazyDict(load_user_settings)
@@ -246,7 +192,9 @@ _USER_SETTINGS = LazyDict(load_user_settings)
 
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/display', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
+@register_menu(blueprint, 'personalize', _('Personalize'))
+@register_breadcrumb(blueprint, '.', _('Your account'))
 def index():
     # load plugins
     plugins = filter(lambda x: x.is_authorized and x.widget,
@@ -258,7 +206,7 @@ def index():
 
     if current_user.is_super_admin:
         # Check for a new release of Invenio
-        from invenio.scriptutils import check_for_software_updates
+        from invenio.ext.script import check_for_software_updates
         check_for_software_updates(flash_message=True)
 
     if dashboard_settings:
@@ -281,13 +229,13 @@ def index():
     else:
         plugins = sorted(plugins, key=lambda w: plugin_sort(w, plugins))
         plugins = [plugins[i:i+3] for i in range(0, len(plugins), 3)]
-    return render_template('webaccount_index.html',
+    return render_template('accounts/index.html',
                            plugins=plugins, closed_plugins=closed_plugins)
 
 
 @blueprint.route('/edit/<name>', methods=['GET', 'POST'])
-@blueprint.invenio_set_breadcrumb(_("Edit"))
-@blueprint.invenio_authenticated
+@register_breadcrumb(blueprint, '.edit', _('Edit'))
+@login_required
 def edit(name):
     if name not in _USER_SETTINGS:
         flash(_('Invalid plugin name'), 'error')
@@ -320,32 +268,50 @@ def edit(name):
         form = plugin.build_form()
 
     return render_template(getattr(plugin, 'edit_template', '') or
-                           'webaccount_edit.html', plugin=plugin, form=form)
+                           'accounts/edit.html', plugin=plugin, form=form)
 
 
 @blueprint.route('/view', methods=['GET'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'name': (unicode, "")})
+@login_required
+@wash_arguments({'name': (unicode, "")})
 def view(name):
     if name not in _USER_SETTINGS:
         return "1", 406
 
     widget = _USER_SETTINGS[name]()
     if widget.is_authorized and widget.widget:
-        return render_template('webaccount_widget.html', widget=widget)
+        return render_template('accounts/widget.html', widget=widget)
     else:
         return "2", 406
 
 
 @blueprint.route('/lost', methods=['GET', 'POST'])
-@blueprint.invenio_set_breadcrumb(_("Lost"))
-@blueprint.invenio_force_https
+@register_breadcrumb(blueprint, '.edit', _('Edit'))
+@ssl_required
 def lost():
     form = LostPasswordForm(request.values)
     if form.validate_on_submit():
         if reset_password(request.values['email'], g.ln):
-            flash(_('A password reset link has been sent to %s') % request.values['email'], 'success')
+            flash(_('A password reset link has been sent to %(whom)s',
+                    whom=request.values['email']), 'success')
     else:
         pass
     logout_user()  # makes no sense to have the user logged-in here
-    return render_template('webaccount_lost.html', form=form)
+    return render_template('accounts/lost.html', form=form)
+
+
+@blueprint.route('/access', methods=['GET', 'POST'])
+@ssl_required
+def access():
+    try:
+        mail = mail_cookie_check_mail_activation(request.values['mailcookie'])
+        User.query.filter(User.email == mail).one().note = 1
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            flash(_('Authorization failled.'), 'error')
+        flash(_('Your email has been validated.'), 'success')
+    except:
+        flash(_('The authorization token is invalid.'), 'error')
+    return redirect('/')

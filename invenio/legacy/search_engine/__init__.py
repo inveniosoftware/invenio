@@ -51,6 +51,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 ## import Invenio stuff:
+from invenio.base.globals import cfg
 from invenio.config import \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
@@ -75,7 +76,6 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
-     CFG_BIBFORMAT_HIDDEN_TAGS, \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_SOLR_URL, \
@@ -87,75 +87,73 @@ from invenio.config import \
      CFG_XAPIAN_ENABLED, \
      CFG_BIBINDEX_CHARS_PUNCTUATION
 
-from invenio.search_engine_config import \
+from invenio.modules.search.errors import \
      InvenioWebSearchUnknownCollectionError, \
-     InvenioWebSearchWildcardLimitError, \
-     CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
-     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH, \
-     CFG_SEARCH_RESULTS_CACHE_PREFIX
-from invenio.search_engine_utils import get_fieldvalues, get_fieldvalues_alephseq_like
-from invenio.bibrecord import create_record, record_xml_output
-from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
-from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
-from invenio.bibindex_engine_stemmer import stem
-from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
-from invenio.bibindex_tokenizers.BibIndexCJKTokenizer import BibIndexCJKTokenizer, is_there_any_CJK_character_in_text
-from invenio.bibindex_engine_utils import author_name_requires_phrase_search
-from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
-from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
-from invenio.bibindex_engine_utils import get_idx_indexer
-from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
-from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
-from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
-from invenio.bibknowledge import get_kbr_values
-from invenio.data_cacher import DataCacher
-from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
-from invenio.access_control_admin import acc_get_action_id
-from invenio.access_control_config import VIEWRESTRCOLL, \
+     InvenioWebSearchWildcardLimitError
+from invenio.legacy.bibrecord import get_fieldvalues, get_fieldvalues_alephseq_like
+from invenio.legacy.bibrecord import create_record, record_xml_output
+from invenio.legacy.bibrank.record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
+from invenio.legacy.bibrank.downloads_similarity import register_page_view_event, calculate_reading_similarity_list
+from invenio.legacy.bibindex.engine_stemmer import stem
+from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexCJKTokenizer import BibIndexCJKTokenizer, is_there_any_CJK_character_in_text
+from invenio.legacy.bibindex.engine_utils import author_name_requires_phrase_search
+from invenio.legacy.bibindex.engine_washer import wash_index_term, lower_index_term, wash_author_name
+from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
+from invenio.legacy.bibindex.adminlib import get_idx_indexer
+from invenio.modules.formatter import format_record, format_records, get_output_format_content_type, create_excel
+from invenio.modules.formatter.config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
+from invenio.legacy.bibrank.downloads_grapher import create_download_history_graph_and_box
+from invenio.modules.knowledge.api import get_kbr_values
+from invenio.legacy.miscutil.data_cacher import DataCacher
+from invenio.legacy.websearch_external_collections import print_external_results_overview, perform_external_collection_search
+from invenio.modules.access.control import acc_get_action_id
+from invenio.modules.access.local_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS, \
     CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
-from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
-from invenio.intbitset import intbitset
-from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
-from invenio.access_control_engine import acc_authorize_action
-from invenio.errorlib import register_exception
-from invenio.textutils import encode_for_xml, wash_for_utf8, strip_accents
-from invenio.htmlutils import get_mathjax_header
-from invenio.htmlutils import nmtoken_from_string
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
+from intbitset import intbitset
+from invenio.legacy.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.ext.logging import register_exception
+from invenio.ext.cache import cache
+from invenio.utils.text import encode_for_xml, wash_for_utf8, strip_accents
+from invenio.utils.html import get_mathjax_header
+from invenio.utils.html import nmtoken_from_string
 
-import invenio.template
-webstyle_templates = invenio.template.load('webstyle')
-webcomment_templates = invenio.template.load('webcomment')
+import invenio.legacy.template
+webstyle_templates = invenio.legacy.template.load('webstyle')
+webcomment_templates = invenio.legacy.template.load('webcomment')
 
-from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
+from invenio.legacy.bibrank.citation_searcher import calculate_cited_by_list, \
     calculate_co_cited_with_list, get_records_with_num_cites, get_self_cited_by, \
     get_refersto_hitset, get_citedby_hitset
-from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
+from invenio.legacy.bibrank.citation_grapher import create_citation_history_graph_and_box
 
 
-from invenio.dbquery import run_sql, run_sql_with_limit, wash_table_column_name, \
+from invenio.legacy.dbquery import run_sql, run_sql_with_limit, wash_table_column_name, \
                             get_table_update_time
-from invenio.webuser import getUid, collect_user_info, session_param_set
-from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box, write_warning
-from invenio.messages import gettext_set_language
-from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
+from invenio.legacy.webuser import getUid, collect_user_info, session_param_set
+from invenio.legacy.webpage import pageheaderonly, pagefooteronly, create_error_box, write_warning
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.search_engine.query_parser import SearchQueryParenthesisedParser, \
     SpiresToInvenioSyntaxConverter
 
-from invenio import webinterface_handler_config as apache
-from invenio.solrutils_bibindex_searcher import solr_get_bitset
-from invenio.xapianutils_bibindex_searcher import xapian_get_bitset
+from invenio.utils import apache
+from invenio.legacy.miscutil.solrutils_bibindex_searcher import solr_get_bitset
+from invenio.legacy.miscutil.xapianutils_bibindex_searcher import xapian_get_bitset
 
 
 try:
-    import invenio.template
-    websearch_templates = invenio.template.load('websearch')
+    import invenio.legacy.template
+    websearch_templates = invenio.legacy.template.load('websearch')
 except:
     pass
 
-from invenio.websearch_external_collections import calculate_hosted_collections_results, do_calculate_hosted_collections_results
-from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH
-from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+from invenio.legacy.websearch_external_collections import calculate_hosted_collections_results, do_calculate_hosted_collections_results
+from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH
+from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
+from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
 VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
 
@@ -542,7 +540,7 @@ def get_available_output_formats(visible_only=False):
     return formats
 
 # Flask cache for search results.
-from invenio.websearch_cache import search_results_cache, get_search_results_cache_key
+from invenio.modules.search.cache import search_results_cache, get_search_results_cache_key
 
 class CollectionI18nNameDataCacher(DataCacher):
     """
@@ -2027,7 +2025,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         t1 = os.times()[4]
     basic_search_units_hitsets = []
     #prepare hiddenfield-related..
-    myhiddens = CFG_BIBFORMAT_HIDDEN_TAGS
+    myhiddens = cfg['CFG_BIBFORMAT_HIDDEN_TAGS']
     can_see_hidden = False
     if req:
         user_info = collect_user_info(req)
@@ -2339,7 +2337,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
         # we are doing search by the citation count
         hitset = search_unit_refersto(p)
     elif f == 'rawref':
-        from invenio.refextract_api import search_from_reference
+        from invenio.legacy.refextract.api import search_from_reference
         field, pattern = search_from_reference(p)
         return search_unit(pattern, field)
     elif f == 'citedby':
@@ -2348,6 +2346,18 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     elif f == 'collection':
         # we are doing search by the collection name or MARC field
         hitset = search_unit_collection(p, m, wl=wl)
+    elif f == 'tag':
+        module_found = False
+        try:
+            from invenio.modules.tags.search_units import search_unit_in_tags
+            module_found = True
+        except:
+            # WebTag module is disabled, so ignore 'tag' selector
+            pass
+
+        if module_found:
+            return search_unit_in_tags(p)
+
     elif m == 'a' or m == 'r':
         # we are doing either phrase search or regexp search
         if f == 'fulltext':
@@ -2382,7 +2392,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
 def get_idxpair_field_ids():
     """Returns the list of ids for the fields that idxPAIRS should be used on"""
     index_dict = dict(run_sql("SELECT name, id FROM idxINDEX"))
-    return [index_dict[field] for field in index_dict if field in CFG_WEBSEARCH_IDXPAIRS_FIELDS]
+    return [index_dict[field] for field in index_dict if field in cfg['CFG_WEBSEARCH_IDXPAIRS_FIELDS']]
 
 
 def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
@@ -2572,7 +2582,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
         raise InvenioWebSearchWildcardLimitError(result_set)
 
     # check if we need to eliminate the false positives
-    if CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH and do_exact_search:
+    if cfg['CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH'] and do_exact_search:
         # we need to eliminate the false positives
         idxphrase_table_washed = wash_table_column_name("idxPHRASE%02dR" % index_id)
         not_exact_search = intbitset()
@@ -4599,7 +4609,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         if len(tabs) > 0:
                             # Add the mini box at bottom of the page
                             if CFG_WEBCOMMENT_ALLOW_REVIEWS:
-                                from invenio.webcomment import get_mini_reviews
+                                from invenio.modules.comments.api import get_mini_reviews
                                 reviews = get_mini_reviews(recid = recIDs[irec], ln=ln)
                             else:
                                 reviews = ''
@@ -4780,7 +4790,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         elif ot:
             # field-filtered output was asked for; print only some fields
             if not can_see_hidden:
-                ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
+                ot = list(set(ot) - set(cfg['CFG_BIBFORMAT_HIDDEN_TAGS']))
             out += record_xml_output(get_record(recID), ot)
         else:
             # record 'recID' is not formatted in 'format' or we ask
@@ -4835,7 +4845,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                             # print field tag, unless hidden
                             printme = True
                             if not can_see_hidden:
-                                for htag in CFG_BIBFORMAT_HIDDEN_TAGS:
+                                for htag in cfg['CFG_BIBFORMAT_HIDDEN_TAGS']:
                                     ltag = len(htag)
                                     samelenfield = field[0:ltag]
                                     if samelenfield == htag:
@@ -5064,7 +5074,7 @@ def call_bibformat(recID, format="HD", ln=CFG_SITE_LANG, search_pattern=None, us
     BibFormat will decide by itself if old or new BibFormat must be used.
     """
 
-    from invenio.bibformat_utils import get_pdf_snippets
+    from invenio.modules.formatter.utils import get_pdf_snippets
 
     keywords = []
     if search_pattern is not None:
@@ -6077,7 +6087,7 @@ def prs_summarize_records(kwargs=None, req=None, p=None, f=None, aas=None,
                        p1=None, p2=None, p3=None, f1=None, f2=None, f3=None, op1=None, op2=None,
                        ln=None, results_final_for_all_selected_colls=None, of='hcs', **dummy):
     # feed the current search to be summarized:
-    from invenio.search_engine_summarizer import summarize_records
+    from invenio.legacy.search_engine.summarizer import summarize_records
     search_p = p
     search_f = f
     if not p and (aas == 1 or p1 or p2 or p3):
@@ -6675,3 +6685,17 @@ def perform_external_collection_search_with_em(req, current_collection, pattern_
                             print_search_info=em == "" or EM_REPOSITORY["search_info"] in em,
                             print_see_also_box=em == "" or EM_REPOSITORY["see_also_box"] in em,
                             print_body=em == "" or EM_REPOSITORY["body"] in em)
+
+@cache.memoize(timeout=5)
+def get_fulltext_terms_from_search_pattern(search_pattern):
+    keywords = []
+    if search_pattern is not None:
+        for unit in create_basic_search_units(None, search_pattern.encode('utf-8'), None):
+            bsu_o, bsu_p, bsu_f, bsu_m = unit[0], unit[1], unit[2], unit[3]
+            if (bsu_o != '-' and bsu_f in [None, 'fulltext']):
+                if bsu_m == 'a' and bsu_p.startswith('%') and bsu_p.endswith('%'):
+                    # remove leading and training `%' representing partial phrase search
+                    keywords.append(bsu_p[1:-1])
+                else:
+                    keywords.append(bsu_p)
+    return keywords

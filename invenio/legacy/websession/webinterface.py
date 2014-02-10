@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from invenio.webstat import register_customevent
+from invenio.legacy.webstat.api import register_customevent
 
 """Invenio ACCOUNT HANDLING"""
 
@@ -41,42 +41,42 @@ from invenio.config import \
      CFG_CERN_SITE, \
      CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
      CFG_OPENAIRE_SITE
-from invenio import webuser
-from invenio.webpage import page
-from invenio import webaccount
-from invenio import webbasket
-from invenio import webalert
-from invenio.dbquery import run_sql
-from invenio.webmessage import account_new_mail
-from invenio.access_control_engine import acc_authorize_action
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd
-from invenio import webgroup
-from invenio import webgroup_dblayer
-from invenio.messages import gettext_set_language, wash_language
-from invenio.mailutils import send_email
-from invenio.errorlib import register_exception
-from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
+from invenio.legacy import webuser
+from invenio.legacy.webpage import page
+from invenio.legacy.websession import webaccount
+from invenio.legacy.webbasket import api as webbasket
+from invenio.legacy.webalert import api as webalert
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.webmessage.api import account_new_mail
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
+from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
+from invenio.utils.url import redirect_to_url, make_canonical_urlargd
+from invenio.legacy.websession import webgroup
+from invenio.legacy.websession import dblayer as webgroup_dblayer
+from invenio.base.i18n import gettext_set_language, wash_language
+from invenio.ext.email import send_email
+from invenio.ext.logging import register_exception
+from invenio.modules.access.mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
     mail_cookie_create_pw_reset, mail_cookie_check_role, \
     mail_cookie_check_mail_activation, InvenioWebAccessMailCookieError, \
     InvenioWebAccessMailCookieDeletedError, mail_cookie_check_authorize_action
-from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, \
+from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS, \
     CFG_EXTERNAL_AUTH_USING_SSO, CFG_EXTERNAL_AUTH_LOGOUT_SSO, \
     CFG_EXTERNAL_AUTHENTICATION, CFG_EXTERNAL_AUTH_SSO_REFRESH, \
     CFG_OPENID_CONFIGURATIONS, CFG_OAUTH2_CONFIGURATIONS, \
     CFG_OAUTH1_CONFIGURATIONS, CFG_OAUTH2_PROVIDERS, CFG_OAUTH1_PROVIDERS, \
     CFG_OPENID_PROVIDERS, CFG_OPENID_AUTHENTICATION, \
     CFG_OAUTH1_AUTHENTICATION, CFG_OAUTH2_AUTHENTICATION
-from invenio.session import get_session
+from invenio.legacy.websession.session import get_session
 
-from invenio import web_api_key
+from invenio.modules import apikeys as web_api_key
 
 
-import invenio.template
-websession_templates = invenio.template.load('websession')
-bibcatalog_templates = invenio.template.load('bibcatalog')
+import invenio.legacy.template
+websession_templates = invenio.legacy.template.load('websession')
+bibcatalog_templates = invenio.legacy.template.load('bibcatalog')
 
 
 
@@ -752,7 +752,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         """
         Implement authentication method for external service providers.
         """
-        from invenio.external_authentication import InvenioWebAccessExternalAuthError
+        from invenio.legacy.external_authentication import InvenioWebAccessExternalAuthError
         args = wash_urlargd(form, {
             'login_method': (str, None),
             'remember_me' : (str, ''),
@@ -822,7 +822,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if CFG_OPENAIRE_SITE:
             from invenio.config import CFG_OPENAIRE_PORTAL_URL
             if CFG_OPENAIRE_PORTAL_URL:
-                from invenio.urlutils import create_url
+                from invenio.utils.url import create_url
                 from base64 import encodestring
                 invenio_loginurl = args['referer'] or '%s/youraccount/display?ln=%s' % (CFG_SITE_SECURE_URL, args['ln'])
                 loginurl = create_url(CFG_OPENAIRE_PORTAL_URL, {"option": "com_openaire", "view": "login", "return": encodestring(invenio_loginurl)})

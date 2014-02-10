@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 class Template:
 

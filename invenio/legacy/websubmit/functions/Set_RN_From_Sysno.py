@@ -20,9 +20,9 @@
 """
 import os, cgi
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
-from invenio.search_engine import get_fieldvalues, record_exists
-from invenio.websubmit_functions.Shared_Functions import ParamFromFile
-from invenio.websubmit_functions.Get_Recid import is_record_matching_pattern
+from invenio.legacy.search_engine import get_fieldvalues, record_exists
+from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
+from invenio.legacy.websubmit.functions.Get_Recid import is_record_matching_pattern
 
 ## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
 ## when a record does not exist or has been deleted.

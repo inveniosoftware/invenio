@@ -23,7 +23,7 @@ import os, sys, inspect, getopt, new, cgi, warnings
 try:
     # This tool can be run before Invenio is installed:
     # invenio files might then not exist.
-    from invenio import config
+    from invenio.base.globals import cfg
     from invenio.config import \
          CFG_WEBSTYLE_TEMPLATE_SKIN, \
          CFG_PREFIX
@@ -91,7 +91,7 @@ def method_wrapper(module, old_method, method_name, self, *args, **kwds):
     else:
         return ret
 
-def load(module=''):
+def load(module='', prefix=''):
     """ Load and returns a template class, given a module name (like
         'websearch', 'webbasket',...).  The module corresponding to
         the currently selected template model (see invenio.conf,
@@ -101,8 +101,13 @@ def load(module=''):
     local = {}
     # load the right template based on the CFG_WEBSTYLE_TEMPLATE_SKIN and the specified module
     if CFG_WEBSTYLE_TEMPLATE_SKIN == "default":
-        mymodule = __import__("invenio.%s_templates" % (module), local, local,
-                              ["invenio.templates.%s" % (module)])
+        try:
+            mymodule = __import__("invenio.%s_%stemplates" % (module, prefix), local,
+                                  local, ["invenio.templates.%s" % (module)])
+        except ImportError:
+            mymodule = __import__("invenio.legacy.%s.%stemplates" % (module, prefix),
+                                  local, local,
+                                  ["invenio.templates.%s" % (module)])
     else:
         try:
             mymodule = __import__("invenio.%s_templates_%s" % (module, CFG_WEBSTYLE_TEMPLATE_SKIN), local, local,
@@ -110,7 +115,7 @@ def load(module=''):
         except ImportError:
             mymodule = __import__("invenio.%s_templates" % (module), local, local,
                                   ["invenio.templates.%s" % (module)])
-    if 'inspect-templates' in getattr(config, 'CFG_DEVEL_TOOLS', []):
+    if 'inspect-templates' in cfg.get('CFG_DEVEL_TOOLS', []):
         for method_name in dir(mymodule.Template):
             if method_name.startswith('tmpl_'):
                 enhance_method(module, mymodule.Template, method_name, method_wrapper)

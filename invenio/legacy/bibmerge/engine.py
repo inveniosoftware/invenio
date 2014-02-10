@@ -21,27 +21,27 @@
 
 import os
 
-from invenio.bibmerge_merger import merge_field_group, replace_field, \
+from invenio.legacy.bibmerge.merger import merge_field_group, replace_field, \
                                     add_field, delete_field, merge_field, \
                                     add_subfield, replace_subfield, \
                                     delete_subfield, copy_R2_to_R1, merge_record
-from invenio.search_engine import print_record, perform_request_search, \
+from invenio.legacy.search_engine import print_record, perform_request_search, \
         record_exists
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibedit_utils import cache_exists, cache_expired, \
+from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.legacy.bibedit.utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_cache_file_contents, \
     get_cache_mtime, latest_record_revision, record_locked_by_other_user, \
     record_locked_by_queue, save_xml_record, touch_cache_file, \
     update_cache_file_contents, _get_file_path, \
     get_record_revision_ids, revision_format_valid_p, split_revid, \
     get_marcxml_of_revision_id
-from invenio.htmlutils import remove_html_markup
-from invenio.bibrecord import create_record, record_xml_output, record_add_field, \
+from invenio.utils.html import remove_html_markup
+from invenio.legacy.bibrecord import create_record, record_xml_output, record_add_field, \
                               record_order_subfields
-from invenio.bibedit_config import CFG_BIBEDIT_TO_MERGE_SUFFIX
+from invenio.legacy.bibedit.config import CFG_BIBEDIT_TO_MERGE_SUFFIX
 
-import invenio.template
-bibmerge_templates = invenio.template.load('bibmerge')
+import invenio.legacy.template
+bibmerge_templates = invenio.legacy.template.load('bibmerge')
 
 def perform_request_init():
     """Handle the initial request.

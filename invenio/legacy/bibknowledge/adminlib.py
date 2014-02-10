@@ -23,10 +23,11 @@ Handle requests from the web interface for Knowledge Base related
 """
 
 from invenio.config import CFG_SITE_LANG
-from invenio import bibknowledge, bibknowledge_dblayer
+from invenio.modules.knowledge import dblayer as bibknowledge_dblayer
+from invenio.modules.knowledge import api as bibknowledge
 
-import invenio.template
-bibknowledge_templates = invenio.template.load('bibknowledge')
+import invenio.legacy.template
+bibknowledge_templates = invenio.legacy.template.load('bibknowledge')
 
 
 def perform_request_knowledge_bases_management(ln=CFG_SITE_LANG, search="",
@@ -103,7 +104,7 @@ def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to",
     dyn_config = None
     collections = None
     if kb_type == 'd':
-        from invenio.search_engine import get_alphabetically_ordered_collection_list
+        from invenio.legacy.search_engine import get_alphabetically_ordered_collection_list
         dyn_config = bibknowledge_dblayer.get_kb_dyn_config(kb_id)
         collections = []
         collitems = get_alphabetically_ordered_collection_list()

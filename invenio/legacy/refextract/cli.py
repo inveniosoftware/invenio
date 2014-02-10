@@ -31,13 +31,13 @@ import optparse
 import sys
 import os
 
-from invenio.refextract_config import \
+from invenio.legacy.refextract.config import \
             CFG_REFEXTRACT_XML_VERSION, \
             CFG_REFEXTRACT_XML_COLLECTION_OPEN, \
             CFG_REFEXTRACT_XML_COLLECTION_CLOSE
-from invenio.docextract_utils import write_message, setup_loggers
-from invenio.bibtask import task_update_progress
-from invenio.refextract_api import extract_references_from_file_xml, \
+from invenio.legacy.docextract.utils import write_message, setup_loggers
+from invenio.legacy.bibsched.bibtask import task_update_progress
+from invenio.legacy.refextract.api import extract_references_from_file_xml, \
                                    extract_references_from_string_xml
 
 # Is refextract running standalone? (Default = yes)

@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import SelectField
-from invenio.webdeposit_field import WebDepositField
+from invenio.modules.deposit.field_base import WebDepositField
 from wtforms.validators import optional
 
 __all__ = ['LanguageField']
@@ -26,8 +26,9 @@ __all__ = ['LanguageField']
 
 class LanguageField(WebDepositField, SelectField):
     def __init__(self, **kwargs):
-        defaults = dict(icon='icon-flag',
+        defaults = dict(icon='flag',
                         export_key='language',
-                        validators=[optional()])
+                        validators=[optional()],
+                        widget_classes="form-control")
         defaults.update(kwargs)
         super(LanguageField, self).__init__(**defaults)

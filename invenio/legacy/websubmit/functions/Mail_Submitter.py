@@ -44,10 +44,10 @@ from invenio.config import CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_RECORD
 
-from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.websubmit_functions.Shared_Functions import get_nice_bibsched_related_message, ParamFromFile
-from invenio.mailutils import scheduled_send_email
-from invenio.bibtask import bibtask_allocate_sequenceid
+from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+from invenio.legacy.websubmit.functions.Shared_Functions import get_nice_bibsched_related_message, ParamFromFile
+from invenio.ext.email import scheduled_send_email
+from invenio.legacy.bibsched.bibtask import bibtask_allocate_sequenceid
 
 def Mail_Submitter(parameters, curdir, form, user_info=None):
     """

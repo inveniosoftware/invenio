@@ -75,7 +75,7 @@ from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident
 
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
 
@@ -84,18 +84,18 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.shellutils import escape_shell_arg
-from invenio.dbquery import run_sql, DatabaseError
-from invenio.errorlib import register_exception
-from invenio.bibrecord import record_get_field_instances, \
+from invenio.utils.shell import escape_shell_arg
+from invenio.legacy.dbquery import run_sql, DatabaseError
+from invenio.ext.logging import register_exception
+from invenio.legacy.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
     encode_for_xml
-from invenio.urlutils import create_url, make_user_agent_string
-from invenio.textutils import nice_size
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
-from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user
-from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS
+from invenio.utils.url import create_url, make_user_agent_string
+from invenio.utils.text import nice_size
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.control import acc_is_user_in_role, acc_get_role_id
+from invenio.modules.access.firerole import compile_role_definition, acc_firerole_check_user
+from invenio.modules.access.local_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import CFG_SITE_URL, \
     CFG_WEBDIR, CFG_BIBDOCFILE_FILEDIR,\
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
@@ -111,14 +111,14 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES
 
-from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
+from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
-from invenio.pluginutils import PluginContainer
-from invenio.hashutils import md5
+from invenio.base.utils import import_submodules_from_packages
+from invenio.utils.hash import md5
 
-import invenio.template
+import invenio.legacy.template
 
-bibdocfile_templates = invenio.template.load('bibdocfile')
+bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 ## The above flag controls whether HTTP range requests are supported or not
 ## when serving static files via Python. This is disabled by default as
 ## it currently breaks support for opening PDF files on Windows platforms
@@ -718,7 +718,7 @@ class BibRecDocs(object):
         @return: True if the correxsponding record has been deleted.
         @rtype: bool
         """
-        from invenio.search_engine import record_exists
+        from invenio.legacy.search_engine import record_exists
         return record_exists(self.id) == -1
 
     def get_xml_8564(self):
@@ -729,7 +729,7 @@ class BibRecDocs(object):
         @return: the MARCXML representation.
         @rtype: string
         """
-        from invenio.search_engine import get_record
+        from invenio.legacy.search_engine import get_record
         out = ''
         record = get_record(self.id)
         fields = record_get_field_instances(record, '856', '4', ' ')
@@ -1518,7 +1518,7 @@ class BibRecDocs(object):
                 if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
                     re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
                     perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
-                    from invenio.bibtask import write_message
+                    from invenio.legacy.bibsched.bibtask import write_message
                     write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
                     bibdoc.extract_text(perform_ocr=perform_ocr)
                 texts.append(bibdoc.get_text())
@@ -1700,24 +1700,24 @@ class BibDoc(object):
             extensions = data["extensions"]
 
         # now check if the doctypype is supported by any particular plugin
-        def plugin_bldr(dummy, plugin_code):
+        def plugin_bldr(plugin_code):
             """Preparing the plugin dictionary structure"""
+            if not plugin_code.__name__.split('.')[-1].startswith('bom_'):
+                return
             ret = {}
             ret['create_instance'] = getattr(plugin_code, "create_instance", None)
             ret['supports'] = getattr(plugin_code, "supports", None)
             return ret
 
-
-        bibdoc_plugins = PluginContainer(
-            os.path.join(CFG_PYLIBDIR,
-                     'invenio', 'bibdocfile_plugins', 'bom_*.py'),
-            plugin_builder=plugin_bldr)
+        bibdoc_plugins = filter(None, map(
+            plugin_bldr, import_submodules_from_packages(
+                'bibdocfile_plugins', packages=['invenio'])))
 
 
         # Loading an appropriate plugin (by default a generic BibDoc)
         used_plugin = None
 
-        for dummy, plugin in bibdoc_plugins.iteritems():
+        for plugin in bibdoc_plugins:
             if plugin['supports'](doctype, extensions):
                 used_plugin = plugin
 
@@ -2100,7 +2100,7 @@ class BibDoc(object):
         run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
         run_sql('DELETE FROM bibdoc_bibdoc WHERE id_bibdoc1=%s OR id_bibdoc2=%s', (self.id, self.id))
         run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
-        run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, doctimestamp) VALUES("EXPUNGE", %s, NOW())', (self.id, ))
+        run_sql('INSERT INTO hstDOCUMENT(action, id_bibdoc, doctimestamp) VALUES("EXPUNGE", %s, NOW())', (self.id, ))
         run_sql('DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s', (self.id, ))
         del self.docfiles
         del self.id
@@ -2137,7 +2137,7 @@ class BibDoc(object):
         from the MARCXML stored in the database.
         """
         ## Let's get the record
-        from invenio.search_engine import get_record
+        from invenio.legacy.search_engine import get_record
         if record is None:
             record = get_record(self.id)
 
@@ -2617,9 +2617,9 @@ class BibDoc(object):
             """Log an action into the bibdoclog table."""
             try:
                 if timestamp:
-                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)', (action, docid, docname, docformat, version, size, checksum, timestamp))
+                    run_sql('INSERT INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)', (action, docid, docname, docformat, version, size, checksum, timestamp))
                 else:
-                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, NOW())', (action, docid, docname, docformat, version, size, checksum))
+                    run_sql('INSERT INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, NOW())', (action, docid, docname, docformat, version, size, checksum))
             except DatabaseError:
                 register_exception()
 
@@ -2788,7 +2788,7 @@ class BibDoc(object):
         docformat = docformat.upper()
         if not version:
             version = self.get_latest_version()
-        return run_sql("INSERT DELAYED INTO rnkDOWNLOADS "
+        return run_sql("INSERT INTO rnkDOWNLOADS "
             "(id_bibrec,id_bibdoc,file_version,file_format,"
             "id_user,client_host,download_time) VALUES "
             "(%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
@@ -4009,7 +4009,7 @@ class MoreInfo(object):
             ( column, where_str, )
 
         if DBG_LOG_QUERIES:
-            from invenio.bibtask import write_message
+            from invenio.legacy.bibsched.bibtask import write_message
             write_message("Executing query: " + query_str + "   ARGS: " + repr(where_args))
             print "Executing query: " + query_str + "   ARGS: " + repr(where_args)
 
@@ -4053,7 +4053,7 @@ class MoreInfo(object):
                           (columns_str, values_str)
 
             if DBG_LOG_QUERIES:
-                from invenio.bibtask import write_message
+                from invenio.legacy.bibsched.bibtask import write_message
                 write_message("Executing query: " + query_str + " ARGS: " + repr(query_args))
                 print "Executing query: " + query_str + " ARGS: " + repr(query_args)
 
@@ -4065,7 +4065,7 @@ class MoreInfo(object):
             query_args =  [str(serialised_val)] + where_args
 
             if DBG_LOG_QUERIES:
-                from invenio.bibtask import write_message
+                from invenio.legacy.bibsched.bibtask import write_message
                 write_message("Executing query: " + query_str + " ARGS: " + repr(query_args))
                 print "Executing query: " + query_str + " ARGS: " + repr(query_args)
 
@@ -4082,7 +4082,7 @@ class MoreInfo(object):
         res = run_sql(query_str, where_args)
 
         if DBG_LOG_QUERIES:
-            from invenio.bibtask import write_message
+            from invenio.legacy.bibsched.bibtask import write_message
             write_message("Executing query: " + query_str  + "  ARGS: " + repr(where_args) + "WITH THE RESULT: " + str(res))
             s_ = ""
             if res:
@@ -4101,7 +4101,7 @@ class MoreInfo(object):
         where_str, where_args = self._generate_where_query_args(namespace = namespace, data_key = key)
         query_str = "DELETE FROM bibdocmoreinfo WHERE " + where_str
         if DBG_LOG_QUERIES:
-            from invenio.bibtask import write_message
+            from invenio.legacy.bibsched.bibtask import write_message
             write_message("Executing query: " + query_str + "   ARGS: " + repr(where_args))
             print "Executing query: " + query_str + "   ARGS: " + repr(where_args)
         run_sql(query_str, where_args)
@@ -4197,7 +4197,7 @@ class MoreInfo(object):
             query_str = "DELETE FROM bibdocmoreinfo WHERE %s" % (where_str, )
 
             if DBG_LOG_QUERIES:
-                from invenio.bibtask import write_message
+                from invenio.legacy.bibsched.bibtask import write_message
                 write_message("Executing query: " + query_str + "   ARGS: " + repr(query_args))
                 print "Executing query: " + query_str + "   ARGS: " + repr(query_args)
             run_sql(query_str, query_args)
@@ -4271,7 +4271,7 @@ class BibDocMoreInfo(MoreInfo):
         if 'flags' not in self:
             self['flags'] = {}
         if DBG_LOG_QUERIES:
-            from invenio.bibtask import write_message
+            from invenio.legacy.bibsched.bibtask import write_message
             write_message("Creating BibDocMoreInfo :" + repr(self["comments"]))
             print "Creating BibdocMoreInfo :" + repr(self["comments"])
 

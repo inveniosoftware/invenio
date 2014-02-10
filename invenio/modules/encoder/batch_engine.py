@@ -26,40 +26,40 @@ import shutil
 import uuid
 from pprint import pformat
 
-from invenio.bibtask import (
+from invenio.legacy.bibsched.bibtask import (
                              task_update_progress,
                              write_message,
                              task_low_level_submission
                              )
-from invenio.bibdocfile import BibRecDocs, compose_file, compose_format, decompose_file
-from invenio.search_engine import (
+from invenio.legacy.bibdocfile.api import BibRecDocs, compose_file, compose_format, decompose_file
+from invenio.legacy.search_engine import (
                                    record_exists,
                                    get_collection_reclist,
                                    search_pattern,
                                    get_fieldvalues
                                    )
-from invenio.bibencode_encode import encode_video, assure_quality
-from invenio.bibencode_extract import extract_frames
-from invenio.bibencode_profiles import (
+from invenio.modules.encoder.encode import encode_video, assure_quality
+from invenio.modules.encoder.extract import extract_frames
+from invenio.modules.encoder.profiles import (
                                         get_encoding_profile,
                                         get_extract_profile
                                         )
-from invenio.bibdocfilecli import cli_fix_marc
-from invenio.bibencode_utils import chose2
-from invenio.bibencode_metadata import (
+from invenio.legacy.bibdocfile.cli import cli_fix_marc
+from invenio.modules.encoder.utils import chose2
+from invenio.modules.encoder.metadata import (
                                         pbcore_metadata
                                         )
-from invenio.bibencode_utils import getval, chose2, generate_timestamp
-from invenio.bibencode_config import (
+from invenio.modules.encoder.utils import getval, chose2, generate_timestamp
+from invenio.modules.encoder.config import (
                                       CFG_BIBENCODE_DAEMON_DIR_NEWJOBS,
                                       CFG_BIBENCODE_PBCORE_MARC_XSLT,
                                       CFG_BIBENCODE_ASPECT_RATIO_MARC_FIELD
                                       )
-from invenio.mailutils import send_email
-from invenio.messages import gettext_set_language
-from invenio.webuser import emailUnique, get_user_preferences
-from invenio.bibformat_xslt_engine import format
-from invenio.jsonutils import json, json_decode_file
+from invenio.ext.email import send_email
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.webuser import emailUnique, get_user_preferences
+from invenio.modules.formatter.engines.xslt import format
+from invenio.utils.json import json, json_decode_file
 import invenio.config
 
 ## Stored messages for email notifications

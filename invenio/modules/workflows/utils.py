@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 ## This file is part of Invenio.
 ## Copyright (C) 2012, 2013 CERN.
 ##
@@ -18,47 +18,51 @@
 
 import re
 import redis
+import traceback
 
-from invenio.bibrecord import create_record
-from invenio.errorlib import register_exception
-from invenio.sqlalchemyutils import db
+from invenio.ext.logging import register_exception
+
+from .errors import WorkflowDefinitionError
 
 
 REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
 
 
-class InvenioWorkflowDefinitionError(Exception):
-    pass
+class BibWorkflowObjectIdContainer(object):
+    """
+    This class is only made to be able to store a workflow ID and
+    to retrieve easily the workflow from this ID. It is used maily
+    to overide some problem with SQLAlchemy when we change of
+    execution thread ( for example Celery )
+    """
 
+    def __init__(self, bibworkflowobject=None):
+        if bibworkflowobject is not None:
+            self.id = bibworkflowobject.id
+        else:
+            self.id = None
 
-def create_objects(path_to_file):
-    from invenio.bibworkflow_model import BibWorkflowObject
+    def get_object(self):
+        from invenio.modules.workflows.models import BibWorkflowObject
 
-    list_of_bwo = []
-    f = open(path_to_file, "r")
-    records = f.read()
-    f.close()
+        if self.id is not None:
+            return BibWorkflowObject.query.filter(BibWorkflowObject.id == self.id).one()
+        else:
+            return None
 
-    record_xmls = REGEXP_RECORD.findall(records)
-    for record_xml in record_xmls:
-        rec = "<record>"
-        rec += record_xml
-        rec += "</record>"
-        rec = create_record(rec)[0]
-        #check for errors, if record is empty
-
-        bwo = BibWorkflowObject(rec, "bibrecord")
-        list_of_bwo.append(bwo)
-    return list_of_bwo
+    def __str__(self):
+        return "BibWorkflowObject(%s)" % (str(self.id),)
 
 
 def get_workflow_definition(name):
-    from invenio.bibworkflow_load_workflows import workflows
-    if name in workflows:
+    """ Tries to load the given workflow from the system. """
+    from .loader import workflows
+    try:
         return workflows[name]
-    else:
-        raise InvenioWorkflowDefinitionError("Cannot find workflow %s"
-                                             % (name,))
+    except Exception as e:
+        raise WorkflowDefinitionError("Error with workflow '%s': %s\n%s" %
+                                      (name, str(e), traceback.format_exc()),
+                                      workflow_name=name)
 
 
 def determineDataType(data):
@@ -70,12 +74,12 @@ def determineDataType(data):
         else:
             data_type = 'dict'
     else:
-        from magic import Magic
-        mime_checker = Magic(mime=True)
 
         # If data is not a dictionary, we try to guess MIME type
         # by using magic library
         try:
+            from magic import Magic
+            mime_checker = Magic(mime=True)
             data_type = mime_checker.from_buffer(data)  # noqa
         except:
             register_exception(stream="warning", prefix=
@@ -126,51 +130,24 @@ class dictproperty(object):
         return self._proxy(obj, self._fget, self._fset, self._fdel)
 
 
-def create_hp_containers(iSortCol_0=None, sSortDir_0=None):
-    """
-    Looks for related HPItems and groups them together in HPContainers
-
-    @type hpitems: list
-    @return: A list containing all the HPContainers.
-    """
-    from invenio.bibworkflow_model import BibWorkflowObject
-
-    print '-----------------------Setting up HPCONTAINERS!'
-
-    if iSortCol_0:
-        iSortCol_0 = int(iSortCol_0)
-
-    if iSortCol_0 == 6:
-        column = 'created'
-        if sSortDir_0 == 'desc':
-            bwobject_list = BibWorkflowObject.query.order_by(
-                db.desc(column)).all()
-        elif sSortDir_0 == 'asc':
-            bwobject_list = BibWorkflowObject.query.order_by(db.asc(
-                column)).all()
-
-        return bwobject_list
-    else:
-        return BibWorkflowObject.query.filter(
-            BibWorkflowObject.id_parent != 0).all()
-
-
 def redis_create_search_entry(bwobject):
     redis_server = set_up_redis()
 
+    extra_data = bwobject.get_extra_data()
     #creates database entries to not loose key value pairs in redis
-    for key, value in bwobject.extra_data["redis_search"].iteritems():
+
+    for key, value in extra_data["redis_search"].iteritems():
         redis_server.sadd("holdingpen_sort", str(key))
         redis_server.sadd("holdingpen_sort:%s" % (str(key),), str(value))
         redis_server.sadd("holdingpen_sort:%s:%s" % (str(key), str(value),),
                           bwobject.id)
 
     redis_server.sadd("holdingpen_sort", "owner")
-    redis_server.sadd("holdingpen_sort:owner", bwobject.extra_data['owner'])
-    redis_server.sadd("holdingpen_sort:owner:%s" % (bwobject.extra_data['owner'],),
+    redis_server.sadd("holdingpen_sort:owner", extra_data['owner'])
+    redis_server.sadd("holdingpen_sort:owner:%s" % (extra_data['owner'],),
                       bwobject.id)
-    redis_server.sadd("holdingpen_sort:last_task_name:%s" % (bwobject.extra_data['last_task_name'],),
-                      bwobject.id)
+    redis_server.sadd("holdingpen_sort:last_task_name:%s" %
+                     (extra_data['last_task_name'],), bwobject.id)
 
 
 def filter_holdingpen_results(key, *args):
@@ -200,8 +177,6 @@ def set_up_redis():
     """
     Sets up the redis server for the saving of the HPContainers
 
-    @type url: string
-    @param url: address to setup the Redis server
     @return: Redis server object.
     """
     from flask import current_app
@@ -209,3 +184,71 @@ def set_up_redis():
         current_app.config.get('CACHE_REDIS_URL', 'redis://localhost:6379')
     )
     return redis_server
+
+
+def empty_redis():
+    redis_server = set_up_redis()
+    redis_server.flushall()
+
+
+def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
+    if iSortCol_0 == 0:
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.id, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.id, reverse=False)
+    elif iSortCol_0 == 1:
+        pass
+        # if sSortDir_0 == 'desc':
+        #     bwolist.sort(key=lambda x: x.id_user, reverse=True)
+        # else:
+        #     bwolist.sort(key=lambda x: x.id_user, reverse=False)
+    elif iSortCol_0 == 2:
+        pass
+        # if sSortDir_0 == 'desc':
+        #     bwolist.sort(key=lambda x: x.id_user, reverse=True)
+        # else:
+        #     bwolist.sort(key=lambda x: x.id_user, reverse=False)
+    elif iSortCol_0 == 3:
+        pass
+        # if sSortDir_0 == 'desc':
+        #     bwolist.sort(key=lambda x: x.id_user, reverse=True)
+        # else:
+        #     bwolist.sort(key=lambda x: x.id_user, reverse=False)
+    elif iSortCol_0 == 4:
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.id_workflow, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.id_workflow, reverse=False)
+    elif iSortCol_0 == 5:
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.id_user, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.id_user, reverse=False)
+    elif iSortCol_0 == 6:
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.created, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.created, reverse=False)
+    elif iSortCol_0 == 7:
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.version, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.version, reverse=False)
+    elif iSortCol_0 == 8:
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.version, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.version, reverse=False)
+    elif iSortCol_0 == 9:
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.version, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.version, reverse=False)
+
+    return bwolist
+
+
+def parse_bwids(bwolist):
+    import ast
+    return list(ast.literal_eval(bwolist))

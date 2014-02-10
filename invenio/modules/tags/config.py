@@ -38,63 +38,42 @@ C{select floor((767 - sum(
 Using utf8_bin collation to treat tags as case and umlaut sensitive. I.e., treat
 'uber', 'über', 'Über' and 'UBER' as four different tags."""
 
-## MySQL (as of version 5.4) only supports the Basic Multilingual Plane (BMP)
-## of Unicode Version 3.0, i.e., up to code point U+FFFF.
-CFG_WEBTAG_LAST_MYSQL_CHARACTER = 65535
-
 #
 # Tag Names
 #
+CFG_TAGS_NAME_MAX_LENGTH = 253
 
-CFG_WEBTAG_NAME_MAX_LENGTH = 253
+## MySQL (as of version 5.4) only supports the Basic Multilingual Plane (BMP)
+## of Unicode Version 3.0, i.e., up to code point U+FFFF.
+CFG_TAGS_MAX_CHARACTER = 65535
 
+#
 # Replacements:
+#
 # List of pairs (regular expression, replacement) that
 # will be applied to tag name
 # Order: SILENT, then BLOCKING
 
 # Applied first. If these are the only changes to the name, tag is saved
 # with changed name
-CFG_WEBTAG_NAME_REPLACEMENTS_SILENT = [
+CFG_TAGS_NAME_REPLACEMENTS_SILENT = [
     (r'\s+', ' '),       # merge multiple spaces
     (r'^\s+|\s+$', '')   # remove leading / trailing spaces
 ]
 
 # Applied after SILENT. If anything is matched here, name is considered invalid
-CFG_WEBTAG_NAME_REPLACEMENTS_BLOCKING = [
+CFG_TAGS_NAME_REPLACEMENTS_BLOCKING = [
     (r'[^\w\s]', ' '),   # remove non-alphanumeric (but not whitespaces)
     (r'\s+', ' '),       # merge multiple spaces
     (r'^\s+|\s+$', '')   # remove leading / trailing spaces
 ]
 
 #
-# Access Rights
+# User settings
 #
-CFG_WEBTAG_ACCESS_NAMES = {
-    0: 'Nothing',
-    10: 'View',
-    20: 'Add',
-    30: 'Add and remove',
-    40: 'Manage',
+
+CFG_WEBTAG_DEFAULT_USER_SETTINGS = {
+    'display_tags': True,
+    'display_tags_group': True,
+    'display_tags_public': True,
 }
-
-CFG_WEBTAG_ACCESS_LEVELS = \
-    dict((v, k) for (k, v) in CFG_WEBTAG_ACCESS_NAMES.iteritems())
-
-CFG_WEBTAG_ACCESS_RIGHTS = {
-    0: [],
-    10: ['view'],
-    20: ['view', 'add'],
-    30: ['view', 'add', 'remove'],
-    40: ['view', 'add', 'remove', 'edit'],
-}
-
-CFG_WEBTAG_ACCESS_OWNER_DEFAULT = CFG_WEBTAG_ACCESS_LEVELS['Manage']
-
-#
-# Access Rights
-#
-
-class WebTagNameTakenException(Exception):
-    pass
-

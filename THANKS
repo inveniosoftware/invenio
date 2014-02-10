@@ -222,7 +222,4 @@ The Flask SSLify plugin was adapted from the original version developed
 by Kenneth Reitz <_@kennethreitz.com>.
 <https://github.com/kennethreitz/flask-sslify>
 
-The bootstrap theme for jQuery's DataTables used in holdingpen was taken from
-<http://datatables.net/media/blog/bootstrap_2/DT_bootstrap.css>
-
 - end of file -

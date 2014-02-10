@@ -21,8 +21,7 @@ import re
 import MySQLdb
 import urllib
 
-from invenio.dbquery import CFG_DATABASE_HOST, \
-                            CFG_DATABASE_NAME
+from invenio.base.globals import cfg
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_CERN_SITE, \
@@ -32,20 +31,20 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      CFG_SITE_RECORD
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.local_config import CFG_EXTERNAL_AUTHENTICATION, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTH_DEFAULT
-from invenio.dbquery import run_sql
-from invenio.webuser import getUid, get_user_preferences, \
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.webuser import getUid, get_user_preferences, \
         collect_user_info
-from invenio.access_control_admin import acc_find_user_role_actions
-from invenio.messages import gettext_set_language
-from invenio.external_authentication import InvenioWebAccessExternalAuthError
+from invenio.modules.access.control import acc_find_user_role_actions
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.external_authentication import InvenioWebAccessExternalAuthError
 
-import invenio.template
-websession_templates = invenio.template.load('websession')
+import invenio.legacy.template
+websession_templates = invenio.legacy.template.load('websession')
 
-from invenio import web_api_key
+from invenio.modules import apikeys as web_api_key
 
 def perform_info(req, ln):
     """Display the main features of CDS personalize"""
@@ -177,7 +176,7 @@ def superuser_account_warnings():
 
     #Try and connect to the mysql database with the default invenio password
     try:
-        conn = MySQLdb.connect (host = CFG_DATABASE_HOST,
+        conn = MySQLdb.connect (host = cfg['CFG_DATABASE_HOST'],
                                 user = "root",
                                 passwd = "my123p$ss",
                                 db = "mysql")
@@ -188,10 +187,10 @@ def superuser_account_warnings():
 
     #Try and connect to the invenio database with the default invenio password
     try:
-        conn = MySQLdb.connect (host = CFG_DATABASE_HOST,
+        conn = MySQLdb.connect (host = cfg['CFG_DATABASE_HOST'],
                                 user = "invenio",
                                 passwd = "my123p$ss",
-                                db = CFG_DATABASE_NAME)
+                                db = cfg['CFG_DATABASE_NAME'])
         conn.close ()
         warning_array.append("warning_invenio_password_equal_to_default")
     except:
@@ -458,7 +457,7 @@ def external_user_warning(uid):
 
     @rtype: ''|'email_auto_generated'
     """
-    from invenio.access_control_config import CFG_TEMP_EMAIL_ADDRESS
+    from invenio.modules.access.local_config import CFG_TEMP_EMAIL_ADDRESS
 
     query = """
         SELECT      email

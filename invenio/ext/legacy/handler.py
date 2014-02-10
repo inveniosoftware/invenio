@@ -29,7 +29,7 @@ __revision__ = "$Id$"
 
 ## Import the remote debugger as a first thing, if allowed
 try:
-    import invenio.remote_debugger as remote_debugger
+    import invenio.utils.remote_debugger as remote_debugger
 except:
     remote_debugger = None
 
@@ -40,19 +40,17 @@ import re
 import os
 import gc
 
-from flask import current_app, session
-from invenio import webinterface_handler_config as apache
-from invenio import config
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR, \
+from flask import session
+from invenio.utils import apache
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, \
     CFG_SITE_RECORD, CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.messages import wash_language
-from invenio.urlutils import redirect_to_url
-from invenio.errorlib import register_exception
-from invenio.webuser import get_preferred_user_language, isGuestUser, \
+from invenio.base.i18n import wash_language
+from invenio.utils.url import redirect_to_url
+from invenio.ext.logging import register_exception
+from invenio.legacy.webuser import get_preferred_user_language, isGuestUser, \
     getUid, isUserSuperAdmin, collect_user_info, setUid
-from invenio.webinterface_handler_wsgi_utils import StringField
-from invenio.session import get_session
-from invenio import web_api_key
+from invenio.legacy.wsgi.utils import StringField
+from invenio.modules import apikeys as web_api_key
 
 
 ## The following variable is True if the installation make any difference
@@ -371,8 +369,8 @@ def wash_urlargd(form, content):
     content. Content is a dictionary containing the field names as a
     key, and a tuple (type, default) as value.
 
-    'type' can be list, str, invenio.webinterface_handler_wsgi_utils.StringField, int, tuple, or
-    invenio.webinterface_handler_wsgi_utils.Field (for
+    'type' can be list, str, invenio.legacy.wsgi.utils.StringField, int, tuple, or
+    invenio.legacy.wsgi.utils.Field (for
     file uploads).
 
     The specification automatically includes the 'ln' field, which is

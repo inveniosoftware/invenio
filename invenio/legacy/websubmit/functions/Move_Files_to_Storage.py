@@ -18,21 +18,21 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibdocfile import \
+from invenio.legacy.bibdocfile.api import \
      BibRecDocs, \
      decompose_file, \
      InvenioBibDocFileError, \
      CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 import os
 import re
-from invenio.websubmit_icon_creator import create_icon
-from invenio.websubmit_config import InvenioWebSubmitFunctionWarning
-from invenio.websubmit_functions.Shared_Functions import get_dictionary_from_string, \
+from invenio.legacy.websubmit.icon_creator import create_icon
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionWarning
+from invenio.legacy.websubmit.functions.Shared_Functions import get_dictionary_from_string, \
      createRelatedFormats
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_BINDIR
-from invenio.dbquery import run_sql
-from invenio.shellutils import run_shell_command
+from invenio.legacy.dbquery import run_sql
+from invenio.utils.shell import run_shell_command
 
 def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
     """

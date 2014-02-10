@@ -18,8 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_autocomplete_utils import orcid_authors
+from invenio.modules.deposit.field_base import WebDepositField
+from ..autocomplete_utils import orcid_authors
 
 __all__ = ['AuthorField']
 
@@ -27,9 +27,10 @@ __all__ = ['AuthorField']
 class AuthorField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-user',
+            icon='user',
             export_key='authors[0].full_name',
-            autocomplete=orcid_authors
+            autocomplete=orcid_authors,
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(AuthorField, self).__init__(**defaults)

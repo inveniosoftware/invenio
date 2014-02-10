@@ -25,7 +25,7 @@ import datetime
 import time
 import sys
 from urllib import quote
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 import threading
 
 #maximum number of collaborating authors etc shown in GUI
@@ -85,19 +85,19 @@ from invenio.config import \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_WILDCARD_LIMIT, \
      CFG_SITE_RECORD
-from invenio.dbquery import Error
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
-from invenio.htmlutils import get_mathjax_header
-from invenio.htmlutils import nmtoken_from_string
-from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
+from invenio.legacy.dbquery import Error
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
+from invenio.utils.url import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
+from invenio.utils.html import get_mathjax_header
+from invenio.utils.html import nmtoken_from_string
+from invenio.legacy.webuser import getUid, page_not_authorized, get_user_preferences, \
     collect_user_info, logoutUser, isUserSuperAdmin
-from invenio.webcomment_webinterface import WebInterfaceCommentsPages
-from invenio.weblinkback_webinterface import WebInterfaceRecordLinkbacksPages
-from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
-from invenio.webpage import page, pageheaderonly, create_error_box
-from invenio.messages import gettext_set_language
-from invenio.search_engine import check_user_can_view_record, \
+from invenio.legacy.webcomment.webinterface import WebInterfaceCommentsPages
+from invenio.legacy.weblinkback.webinterface import WebInterfaceRecordLinkbacksPages
+from invenio.legacy.bibcirculation.webinterface import WebInterfaceHoldingsPages
+from invenio.legacy.webpage import page, pageheaderonly, create_error_box
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.search_engine import check_user_can_view_record, \
      collection_reclist_cache, \
      collection_restricted_p, \
      create_similarly_named_authors_link_box, \
@@ -114,30 +114,30 @@ from invenio.search_engine import check_user_can_view_record, \
      restricted_collection_cache, \
      get_coll_normalised_name, \
      EM_REPOSITORY
-from invenio.websearch_webcoll import perform_display_collection
-from invenio.search_engine_utils import get_fieldvalues, \
+from invenio.legacy.websearch.webcoll import perform_display_collection
+from invenio.legacy.bibrecord import get_fieldvalues, \
      get_fieldvalues_alephseq_like
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_config import VIEWRESTRCOLL
-from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
-from invenio.bibformat import format_records
-from invenio.bibformat_engine import get_output_formats
-from invenio.websearch_webcoll import get_collection
-from invenio.intbitset import intbitset
-from invenio.bibupload import find_record_from_sysno
-from invenio.bibrank_citation_searcher import get_cited_by_list
-from invenio.bibrank_downloads_indexer import get_download_weight_total
-from invenio.search_engine_summarizer import summarize_records
-from invenio.errorlib import register_exception
-from invenio.bibedit_webinterface import WebInterfaceEditPages
-from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
-from invenio.bibmerge_webinterface import WebInterfaceMergePages
-from invenio.bibdocfile_webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
-from invenio.search_engine import get_record
-from invenio.shellutils import mymkdir
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.local_config import VIEWRESTRCOLL
+from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
+from invenio.modules.formatter import format_records
+from invenio.modules.formatter.engine import get_output_formats
+from invenio.legacy.websearch.webcoll import get_collection
+from intbitset import intbitset
+from invenio.legacy.bibupload.engine import find_record_from_sysno
+from invenio.legacy.bibrank.citation_searcher import get_cited_by_list
+from invenio.legacy.bibrank.downloads_indexer import get_download_weight_total
+from invenio.legacy.search_engine.summarizer import summarize_records
+from invenio.ext.logging import register_exception
+from invenio.legacy.bibedit.webinterface import WebInterfaceEditPages
+from invenio.legacy.bibeditmulti.webinterface import WebInterfaceMultiEditPages
+from invenio.legacy.bibmerge.webinterface import WebInterfaceMergePages
+from invenio.legacy.bibdocfile.webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
+from invenio.legacy.search_engine import get_record
+from invenio.utils.shell import mymkdir
 
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
 
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
@@ -302,7 +302,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
                 text=auth_msg, \
                 navmenuid='search')
 
-        from invenio.search_engine import record_exists, get_merged_recid
+        from invenio.legacy.search_engine import record_exists, get_merged_recid
         # check if the current record has been deleted
         # and has been merged, case in which the deleted record
         # will be redirect to the new one
@@ -726,7 +726,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                     # display page not found for URLs like /CFG_SITE_RECORD/foo
                     return None, []
 
-            from invenio.intbitset import __maxelem__
+            from intbitset import __maxelem__
             if recid <= 0 or recid > __maxelem__:
                 # __maxelem__ = 2147483647
                 # display page not found for URLs like /CFG_SITE_RECORD/-5 or /CFG_SITE_RECORD/0 or /CFG_SITE_RECORD/2147483649
@@ -859,11 +859,11 @@ def display_collection(req, c, aas, verbose, ln, em=""):
     # deduce collection id:
     colID = get_colID(get_coll_normalised_name(c))
     if type(colID) is not int:
-        page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
-        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
+        page_body = '<p>' + (_("Sorry, collection %(x_colname)s does not seem to exist.", x_colname='<strong>' + str(c) + '</strong>',)) + '</p>'
+        page_body = '<p>' + (_("You may want to start browsing from %(x_sitehref)s.", x_sitehref='<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
         if req.method == 'HEAD':
             raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
-        return page(title=_("Collection %s Not Found") % cgi.escape(c),
+        return page(title=_("Collection %(x_colname)s Not Found", x_colname=cgi.escape(c)),
                     body=page_body,
                     description=(CFG_SITE_NAME + ' - ' + _("Not found") + ': ' + cgi.escape(str(c))),
                     keywords="%s" % CFG_SITE_NAME,

@@ -24,6 +24,8 @@
 __revision__ = "$Id$"
 
 import os
+import pkg_resources
+
 from invenio.config import CFG_ETCDIR, CFG_PYLIBDIR
 
 # True if old php format written in EL must be used by Invenio.
@@ -33,11 +35,13 @@ CFG_BIBFORMAT_USE_OLD_BIBFORMAT = False
 
 # Paths to main formats directories
 CFG_BIBFORMAT_TEMPLATES_DIR = "format_templates"
-CFG_BIBFORMAT_TEMPLATES_PATH = os.path.join(CFG_ETCDIR, 'bibformat', CFG_BIBFORMAT_TEMPLATES_DIR)
+CFG_BIBFORMAT_TEMPLATES_PATH = pkg_resources.resource_filename('invenio.modules.formatter', CFG_BIBFORMAT_TEMPLATES_DIR)
 CFG_BIBFORMAT_JINJA_TEMPLATE_PATH = os.path.join(CFG_ETCDIR, 'templates', CFG_BIBFORMAT_TEMPLATES_DIR)
-CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "invenio.bibformat_elements"
-CFG_BIBFORMAT_ELEMENTS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibformat_elements')
-CFG_BIBFORMAT_OUTPUTS_PATH = os.path.join(CFG_ETCDIR, 'bibformat', 'output_formats')
+CFG_BIBFORMAT_OUTPUTS_PATH = pkg_resources.resource_filename('invenio.modules.formatter', 'output_formats')
+
+# CFG_BIBFORMAT_HIDDEN_TAGS -- list of MARC tags that
+# are not shown to users not having cataloging authorizations.
+CFG_BIBFORMAT_HIDDEN_TAGS = [595,]
 
 # File extensions of formats
 CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION = "bft"

@@ -26,10 +26,10 @@ import httplib
 import socket
 import re
 
-from invenio.errorlib import register_exception
-from invenio.external_authentication import ExternalAuth, \
+from invenio.ext.logging import register_exception
+from invenio.legacy.external_authentication import ExternalAuth, \
         InvenioWebAccessExternalAuthError
-from invenio.external_authentication_cern_wrapper import AuthCernWrapper
+from invenio.legacy.external_authentication.cern_wrapper import AuthCernWrapper
 
 
 # Tunable list of settings to be hidden

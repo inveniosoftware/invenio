@@ -25,10 +25,10 @@ from time import localtime
 from zlib import decompress
 
 from invenio.config import CFG_SITE_LANG
-from invenio.dbquery import run_sql, OperationalError
-from invenio.dateutils import convert_datestruct_to_datetext
-from invenio.messages import gettext_set_language
-from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
+from invenio.legacy.dbquery import run_sql, OperationalError
+from invenio.utils.date import convert_datestruct_to_datetext
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
 
 
 def get_groups_by_user_status(uid, user_status, login_method='INTERNAL'):

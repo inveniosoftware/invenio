@@ -24,17 +24,17 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import urllib
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.access_control_engine import acc_authorize_action
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_LANG, \
      CFG_CERN_SITE
-from invenio.webuser import getUid
-from invenio.urlutils import redirect_to_url
-from invenio.errorlib import register_exception
-from invenio.webjournal_config import \
+from invenio.legacy.webuser import getUid
+from invenio.utils.url import redirect_to_url
+from invenio.ext.logging import register_exception
+from invenio.legacy.webjournal.config import \
      InvenioWebJournalNoJournalOnServerError, \
      InvenioWebJournalNoNameError, \
      InvenioWebJournalNoCurrentIssueError, \
@@ -45,11 +45,11 @@ from invenio.webjournal_config import \
      InvenioWebJournalNoPopupRecordError, \
      InvenioWebJournalIssueNotFoundDBError, \
      InvenioWebJournalNoCategoryError
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      get_current_issue, \
      get_recid_from_legacy_number, \
      get_journal_categories
-from invenio.webjournal_washer import \
+from invenio.legacy.webjournal.washer import \
      wash_category, \
      wash_issue_number, \
      wash_journal_name, \
@@ -57,16 +57,16 @@ from invenio.webjournal_washer import \
      wash_article_number, \
      wash_popup_record, \
      wash_archive_date
-from invenio.webjournal import \
+from invenio.legacy.webjournal.api import \
      perform_request_index, \
      perform_request_article, \
      perform_request_contact, \
      perform_request_popup, \
      perform_request_search
-from invenio.webstat import register_customevent
+from invenio.legacy.webstat.api import register_customevent
 
-import invenio.template
-webjournal_templates = invenio.template.load('webjournal')
+import invenio.legacy.template
+webjournal_templates = invenio.legacy.template.load('webjournal')
 
 class WebInterfaceJournalPages(WebInterfaceDirectory):
     """Defines the set of /journal pages."""

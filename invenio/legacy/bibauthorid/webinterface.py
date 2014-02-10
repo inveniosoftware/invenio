@@ -29,33 +29,33 @@ from pprint import pformat
 from operator import itemgetter
 
 try:
-    from invenio.jsonutils import json, CFG_JSON_AVAILABLE
+    from invenio.utils.json import json, CFG_JSON_AVAILABLE
 except:
     CFG_JSON_AVAILABLE = False
     json = None
 
-from invenio.bibauthorid_config import AID_ENABLED, CLAIMPAPER_ADMIN_ROLE, CLAIMPAPER_USER_ROLE, \
+from invenio.legacy.bibauthorid.config import AID_ENABLED, CLAIMPAPER_ADMIN_ROLE, CLAIMPAPER_USER_ROLE, \
                             PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT, \
                             BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, CFG_INSPIRE_SITE #, CFG_SITE_SECURE_URL
 
-from invenio.webpage import page, pageheaderonly, pagefooteronly
-from invenio.messages import gettext_set_language #, wash_language
-from invenio.template import load
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url
-from invenio.webuser import getUid, page_not_authorized, collect_user_info, set_user_preferences, \
+from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
+from invenio.base.i18n import gettext_set_language #, wash_language
+from invenio.legacy.template import load
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
+from invenio.utils.url import redirect_to_url
+from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, set_user_preferences, \
                             email_valid_p, emailUnique, get_email_from_username, get_uid_from_email, \
                             isUserSuperAdmin
-from invenio.access_control_admin import acc_find_user_role_actions, acc_get_user_roles, acc_get_role_id
-from invenio.search_engine import perform_request_search
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.modules.access.control import acc_find_user_role_actions, acc_get_user_roles, acc_get_role_id
+from invenio.legacy.search_engine import perform_request_search
+from invenio.legacy.bibrecord import get_fieldvalues
 
-import invenio.bibauthorid_webapi as webapi
-from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
+import invenio.legacy.bibauthorid.webapi as webapi
+from invenio.legacy.bibauthorid.frontinterface import get_bibrefrec_name_string
 from flask import session
-from invenio.bibauthorid_backinterface import update_personID_external_ids
+from invenio.legacy.bibauthorid.backinterface import update_personID_external_ids
 
 TEMPLATE = load('bibauthorid')
 

@@ -22,18 +22,18 @@ WebJournal - Main Public interface of the WebJournals
 
 import datetime
 import time
-from invenio.bibformat_engine import \
+from invenio.modules.formatter.engine import \
      BibFormatObject, \
      format_with_format_template
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.urlutils import redirect_to_url
-from invenio.webuser import collect_user_info
-from invenio.webjournal_config import \
+from invenio.utils.url import redirect_to_url
+from invenio.legacy.webuser import collect_user_info
+from invenio.legacy.webjournal.config import \
      InvenioWebJournalTemplateNotFoundError
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      get_article_page_from_cache, \
      cache_article_page, \
      get_current_issue, \

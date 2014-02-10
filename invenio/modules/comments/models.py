@@ -23,14 +23,14 @@ WebComment database models.
 
 # General imports.
 from sqlalchemy import event
-from invenio.sqlalchemyutils import db
-from invenio.webuser_flask import current_user
+from invenio.ext.sqlalchemy import db
+from flask.ext.login import current_user
 
 # Create your models here.
 
-from invenio.bibedit_model import Bibrec
-from invenio.websession_model import User
-from invenio.signalutils import record_after_update
+from invenio.modules.records.models import Record as Bibrec
+from invenio.modules.accounts.models import User
+from invenio.base.signals import record_after_update
 
 
 class CmtRECORDCOMMENT(db.Model):
@@ -67,7 +67,7 @@ class CmtRECORDCOMMENT(db.Model):
     bibrec = db.relationship(Bibrec, backref='recordcomments')
     user = db.relationship(User, backref='recordcomments')
     replies = db.relationship('CmtRECORDCOMMENT', backref=db.backref(
-        'parent', remote_side=[id]))
+        'parent', remote_side=[id], order_by=date_creation))
 
     @property
     def is_deleted(self):
@@ -107,7 +107,7 @@ def after_insert(mapper, connection, target):
     """Updates reply order cache  and send record-after-update signal."""
     record_after_update.send(CmtRECORDCOMMENT, recid=target.id_bibrec)
 
-    from invenio.webcomment import get_reply_order_cache_data
+    from .api import get_reply_order_cache_data
     if target.in_reply_to_id_cmtRECORDCOMMENT > 0:
         parent = CmtRECORDCOMMENT.query.get(
             target.in_reply_to_id_cmtRECORDCOMMENT)

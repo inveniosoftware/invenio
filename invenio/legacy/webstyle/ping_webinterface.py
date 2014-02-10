@@ -20,7 +20,7 @@ HTTP ping web interface. Useful to be called by load-balancer (e.g.
 HAProxy) to see whether Invenio WSGI app is up and running.
 """
 
-from invenio.webinterface_handler import WebInterfaceDirectory
+from invenio.ext.legacy.handler import WebInterfaceDirectory
 
 class WebInterfacePingPages(WebInterfaceDirectory):
     _exports = [""]

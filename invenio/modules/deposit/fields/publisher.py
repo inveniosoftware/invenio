@@ -18,9 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_processor_utils import sherpa_romeo_publisher_process
-from invenio.webdeposit_autocomplete_utils import sherpa_romeo_publishers
+from invenio.modules.deposit.field_base import WebDepositField
+from ..processor_utils import sherpa_romeo_publisher_process
+from ..autocomplete_utils import sherpa_romeo_publishers
 
 __all__ = ['PublisherField']
 
@@ -28,9 +28,10 @@ __all__ = ['PublisherField']
 class PublisherField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-certificate',
+            icon='certificate',
             processors=[sherpa_romeo_publisher_process],
-            autocomplete=sherpa_romeo_publishers
+            autocomplete=sherpa_romeo_publishers,
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(PublisherField, self).__init__(**defaults)

@@ -20,9 +20,9 @@
 
 """Unit tests for bibcatalog_system_rt library."""
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-bibcatalog_system_rt = lazy_import('invenio.bibcatalog_system_rt')
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+bibcatalog_system_rt = lazy_import('invenio.legacy.bibcatalog.system_rt')
 
 
 class BibCatalogSystemRTTest(InvenioTestCase):

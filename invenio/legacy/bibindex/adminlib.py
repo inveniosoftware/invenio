@@ -25,17 +25,17 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
      CFG_BINDIR
-from invenio.bibrankadminlib import write_outcome, modify_translations, \
+from invenio.legacy.bibrank.adminlib import write_outcome, modify_translations, \
         get_def_name, get_name, get_languages, addadminbox, tupletotable, \
         createhiddenform
-from invenio.access_control_engine import acc_authorize_action
-from invenio.dbquery import run_sql, get_table_status_info, wash_table_column_name
-from invenio.bibindex_engine_stemmer import get_stemming_language_map
-import invenio.template
-from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE, \
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.legacy.dbquery import run_sql, get_table_status_info, wash_table_column_name
+from invenio.legacy.bibindex.engine_stemmer import get_stemming_language_map
+import invenio.legacy.template
+from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE, \
                                            CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
-from invenio.bibknowledge_dblayer import get_all_kb_names
-from invenio.bibindex_engine_utils import load_tokenizers, \
+from invenio.modules.knowledge.dblayer import get_all_kb_names
+from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     get_idx_indexer, \
     get_all_indexes, \
     get_all_virtual_indexes, \
@@ -44,11 +44,10 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     get_all_index_names_and_column_values, \
     is_index_virtual
 
-
 _TOKENIZERS = load_tokenizers()
 
+websearch_templates = invenio.legacy.template.load('websearch')
 
-websearch_templates = invenio.template.load('websearch')
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""

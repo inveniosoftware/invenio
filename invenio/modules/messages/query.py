@@ -22,19 +22,20 @@
 from time import localtime, mktime
 from datetime import datetime
 
-from invenio.config import \
-     CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
-     CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
-from invenio.dbquery import run_sql, OperationalError
-from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
-                                      CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA
-from invenio.dateutils import datetext_default, \
-                              convert_datestruct_to_datetext
-from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
+from invenio.legacy.dbquery import run_sql, OperationalError
+from invenio.modules.messages.config import \
+    CFG_WEBMESSAGE_STATUS_CODE, \
+    CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
+    CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
+    CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
 
-from invenio.sqlalchemyutils import db
-from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
-from invenio.websession_model import User
+from invenio.utils.date import datetext_default, \
+                              convert_datestruct_to_datetext
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
+
+from invenio.ext.sqlalchemy import db
+from invenio.modules.messages.models import MsgMESSAGE, UserMsgMESSAGE
+from invenio.modules.accounts.models import User
 
 def filter_messages_from_user_with_status(uid, status):
     """
@@ -432,8 +433,8 @@ def check_quota(nb_messages):
     @param nb_messages: max number of messages a user can have
     @return: a dictionary of users over-quota
     """
-    from invenio.webuser import collect_user_info
-    from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
+    from invenio.legacy.webuser import collect_user_info
+    from invenio.modules.access.control import acc_is_user_in_role, acc_get_role_id
     no_quota_role_ids = [acc_get_role_id(role) for role in CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA]
     res = {}
     for uid, n in run_sql("SELECT id_user_to, COUNT(id_user_to) FROM user_msgMESSAGE GROUP BY id_user_to HAVING COUNT(id_user_to) > %s", (nb_messages, )):

@@ -32,7 +32,9 @@ Requirements:
 
 """
 import os
-from invenio.bibencode_config import (
+import pkg_resources
+
+from invenio.modules.encoder.config import (
                     CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_DIR,
                     CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_FNAME
                     )
@@ -69,7 +71,7 @@ def websubmit_singlepage(curdir, doctype, uid, access, session_id):
     """ Creates a single websubmit response element for the submission
         prototype
     """
-    external_js_path = os.path.join(CFG_PYLIBDIR, "invenio", "bibencode_websubmit.js")
+    external_js_path = pkg_resources.resource_filename('invenio.modules.encoder', 'websubmit.js')
     external_js_fh = open(external_js_path)
     external_js = external_js_fh.read()
     external_js_fh.close()

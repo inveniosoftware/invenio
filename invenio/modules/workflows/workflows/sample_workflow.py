@@ -16,10 +16,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibworkflow_tasks.my_tasks import add_data, print_data
+from invenio.modules.workflows.tasks.sample_tasks import add_data, print_data
 
 
-class my_workflow(object):
+class sample_workflow(object):
     """
     This is a sample workflow.
     """

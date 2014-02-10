@@ -22,10 +22,10 @@ BibSort database models.
 """
 
 # General imports.
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
 # Create your models here.
-from invenio.websearch_model import Collection
+from invenio.modules.search.models import Collection
 
 class BsrMETHOD(db.Model):
     """Represents a BsrMETHOD record."""

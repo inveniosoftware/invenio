@@ -29,17 +29,10 @@ import datetime
 import re
 import inspect
 from cStringIO import StringIO
+from flask import current_app
 
-from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
-    CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, \
-    CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, \
-    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, \
-    CFG_SITE_ADMIN_EMAIL_EXCEPTIONS, \
-    CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER
-from invenio.urlutils import wash_url_argument
-from invenio.messages import wash_language, gettext_set_language
-from invenio.dateutils import convert_datestruct_to_datetext
-from invenio.dbquery import run_sql
+from invenio.base.globals import cfg
+from .models import HstEXCEPTION
 
 
 ## Regular expression to match possible password related variable that should
@@ -47,28 +40,11 @@ from invenio.dbquery import run_sql
 RE_PWD = re.compile(r"pwd|pass|p_pw", re.I)
 
 
-def get_client_info(req):
-    """
-    Returns a dictionary with client information
-    @param req: mod_python request
-    """
-    try:
-        return {
-            'host': req.hostname,
-            'url': req.unparsed_uri,
-            'time': convert_datestruct_to_datetext(time.localtime()),
-            'browser': 'User-Agent' in req.headers_in and \
-                          req.headers_in['User-Agent'] or "N/A",
-            'client_ip': req.remote_ip}
-    except:
-        return {}
-
-
 def get_pretty_wide_client_info(req):
     """Return in a pretty way all the avilable information about the current
     user/client"""
     if req:
-        from invenio.webuser import collect_user_info
+        from invenio.legacy.webuser import collect_user_info
         user_info = collect_user_info(req)
         keys = user_info.keys()
         keys.sort()
@@ -115,21 +91,23 @@ def get_tracestack():
                     str(trace_tuple[3]) or ""}
     return tracestack_pretty
 
+
 def register_emergency(msg, recipients=None):
     """Launch an emergency. This means to send email messages to each
     address in 'recipients'. By default recipients will be obtained via
     get_emergency_recipients() which loads settings from
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES
     """
-    from invenio.mailutils import send_email
+    from invenio.ext.email import send_email
     if not recipients:
         recipients = get_emergency_recipients()
     recipients = set(recipients)
-    recipients.add(CFG_SITE_ADMIN_EMAIL)
+    recipients.add(cfg['CFG_SITE_ADMIN_EMAIL'])
     for address_str in recipients:
-        send_email(CFG_SITE_SUPPORT_EMAIL, address_str, "Emergency notification", msg)
+        send_email(cfg['CFG_SITE_SUPPORT_EMAIL'], address_str, "Emergency notification", msg)
 
-def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
+
+def get_emergency_recipients(recipient_cfg=None):
     """Parse a list of appropriate emergency email recipients from
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, or from a provided dictionary
     comprised of 'time constraint' => 'comma separated list of addresses'
@@ -143,7 +121,9 @@ def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
         '*': 'john.doe.phone@foo.com'}
     """
 
-    from invenio.dateutils import parse_runtime_limit
+    from invenio.utils.date import parse_runtime_limit
+    if recipient_cfg is None:
+        recipient_cfg = cfg['CFG_SITE_EMERGENCY_EMAIL_ADDRESSES']
 
     recipients = set()
     for time_condition, address_str in recipient_cfg.items():
@@ -155,12 +135,12 @@ def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
         recipients.update([address_str])
     return list(recipients)
 
+
 def find_all_values_to_hide(local_variables, analyzed_stack=None):
     """Return all the potential password to hyde."""
     ## Let's add at least the DB password.
     if analyzed_stack is None:
-        from invenio.dbquery import CFG_DATABASE_PASS
-        ret = set([CFG_DATABASE_PASS])
+        ret = set([cfg['CFG_DATABASE_PASS']])
         analyzed_stack = set()
     else:
         ret = set()
@@ -179,6 +159,7 @@ def find_all_values_to_hide(local_variables, analyzed_stack=None):
         ## :-)
         ret.remove('')
     return ret
+
 
 def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
     """
@@ -290,52 +271,6 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
     else:
         return ""
 
-def _is_pow_of_2(n):
-    """
-    Return True if n is a power of 2
-    """
-    while n > 1:
-        if n % 2:
-            return False
-        n = n / 2
-    return True
-
-def exception_should_be_notified(name, filename, line):
-    """
-    Return True if the exception should be notified to the admin.
-    This actually depends on several considerations, e.g. wethever
-    it has passed some since the last time this exception has been notified.
-    """
-    try:
-        exc_log = run_sql("SELECT id,last_notified,counter,total FROM hstEXCEPTION WHERE name=%s AND filename=%s AND line=%s", (name, filename, line))
-        if exc_log:
-            exc_id, last_notified, counter, total = exc_log[0]
-            delta = datetime.datetime.now() - last_notified
-            counter += 1
-            total += 1
-            if (delta.seconds + delta.days * 86400) >= CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER:
-                run_sql("UPDATE hstEXCEPTION SET last_seen=NOW(), last_notified=NOW(), counter=1, total=%s WHERE id=%s", (total, exc_id))
-                return True
-            else:
-                run_sql("UPDATE hstEXCEPTION SET last_seen=NOW(), counter=%s, total=%s WHERE id=%s", (counter, total, exc_id))
-                return _is_pow_of_2(counter)
-        else:
-            run_sql("INSERT INTO hstEXCEPTION(name, filename, line, last_seen, last_notified, counter, total) VALUES(%s, %s, %s, NOW(), NOW(), 1, 1)", (name, filename, line))
-            return True
-    except:
-        raise
-        return True
-
-def get_pretty_notification_info(name, filename, line):
-    """
-    Return a sentence describing when this exception was already seen.
-    """
-    exc_log = run_sql("SELECT last_notified,last_seen,total FROM hstEXCEPTION WHERE name=%s AND filename=%s AND line=%s", (name, filename, line))
-    if exc_log:
-        last_notified, last_seen, total = exc_log[0]
-        return "This exception has already been seen %s times\n    last time it was seen: %s\n    last time it was notified: %s\n" % (total, last_seen.strftime("%Y-%m-%d %H:%M:%S"), last_notified.strftime("%Y-%m-%d %H:%M:%S"))
-    else:
-        return "It is the first time this exception has been seen.\n"
 
 def register_exception(stream='error',
                        req=None,
@@ -406,37 +341,43 @@ def register_exception(stream='error',
                 email_text = email_text[:-1]
 
             ## Preparing the exception dump
-            stream = stream=='error' and 'err' or 'log'
+            if stream=='error':
+                logger_method = current_app.logger.error
+            else:
+                logger_method = current_app.logger.info
 
             ## We now have the whole trace
             written_to_log = False
             try:
                 ## Let's try to write into the log.
-                open(os.path.join(CFG_LOGDIR, 'invenio.' + stream), 'a').write(
-                    log_text)
+                logger_method(log_text)
                 written_to_log = True
             except:
                 written_to_log = False
             filename, line_no, function_name = _get_filename_and_line(exc_info)
 
             ## let's log the exception and see whether we should report it.
-            pretty_notification_info = get_pretty_notification_info(exc_name, filename, line_no)
-            if exception_should_be_notified(exc_name, filename, line_no) and (CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or
-                (alert_admin and CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 0) or
-                not written_to_log):
+            log = HstEXCEPTION.get_or_create(exc_name, filename, line_no)
+            if log.exception_should_be_notified and (
+                    cfg['CFG_SITE_ADMIN_EMAIL_EXCEPTIONS'] > 1 or
+                    (alert_admin and
+                     cfg['CFG_SITE_ADMIN_EMAIL_EXCEPTIONS'] > 0) or
+                    not written_to_log):
                 ## If requested or if it's impossible to write in the log
-                from invenio.mailutils import send_email
+                from invenio.ext.email import send_email
                 if not subject:
-                    subject = 'Exception (%s:%s:%s)' % (filename, line_no, function_name)
-                subject = '%s at %s' % (subject, CFG_SITE_URL)
-                email_text = "\n%s\n%s" % (pretty_notification_info, email_text)
+                    subject = 'Exception (%s:%s:%s)' % (
+                        filename, line_no, function_name)
+                subject = '%s at %s' % (subject, cfg['CFG_SITE_URL'])
+                email_text = "\n%s\n%s" % (log.pretty_notification_info,
+                                           email_text)
                 if not written_to_log:
                     email_text += """\
 Note that this email was sent to you because it has been impossible to log
-this exception into %s""" % os.path.join(CFG_LOGDIR, 'invenio.' + stream)
+this exception into %s""" % os.path.join(cfg['CFG_LOGDIR'], 'invenio.' + stream)
                 send_email(
-                    CFG_SITE_ADMIN_EMAIL,
-                    CFG_SITE_ADMIN_EMAIL,
+                    cfg['CFG_SITE_ADMIN_EMAIL'],
+                    cfg['CFG_SITE_ADMIN_EMAIL'],
                     subject=subject,
                     content=email_text)
             return 1
@@ -444,18 +385,13 @@ this exception into %s""" % os.path.join(CFG_LOGDIR, 'invenio.' + stream)
             return 0
     except Exception, err:
         print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (
-            CFG_LOGDIR + '/invenio.' + stream, err)
+            cfg['CFG_LOGDIR'] + '/invenio.' + stream, err)
         return 0
 
 
-def raise_exception(exception_type = Exception,
-                    msg = '',
-                       stream='error',
-                       req=None,
-                       prefix='',
-                       suffix='',
-                       alert_admin=False,
-                       subject=''):
+def raise_exception(exception_type=Exception, msg='', stream='error',
+                    req=None, prefix='', suffix='', alert_admin=False,
+                    subject=''):
     """
     Log error exception to invenio.err and warning exception to invenio.log.
     Errors will be logged together with client information (if req is
@@ -483,7 +419,7 @@ def raise_exception(exception_type = Exception,
 
     @param alert_admin: wethever to send the exception to the administrator via
         email. Note this parameter is bypassed when
-                CFG_SITE_ADMIN_EMAIL_EXCEPTIONS is set to a value different than 1
+               CFG_SITE_ADMIN_EMAIL_EXCEPTIONS is set to a value different than 1
     @param subject: overrides the email subject
 
     @return: 1 if successfully wrote to stream, 0 if not
@@ -506,8 +442,8 @@ def send_error_report_to_admin(header, url, time_msg,
     Sends an email to the admin with client info and tracestack
     """
     from_addr = '%s Alert Engine <%s>' % (
-        CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
-    to_addr = CFG_SITE_ADMIN_EMAIL
+        cfg['CFG_SITE_NAME'], cfg['CFG_WEBALERT_ALERT_ENGINE_EMAIL'])
+    to_addr = cfg['CFG_SITE_ADMIN_EMAIL']
     body = """
 The following error was seen by a user and sent to you.
 %(contact)s
@@ -531,22 +467,23 @@ Please see the %(logdir)s/invenio.err for traceback details.""" % {
         'error': error,
         'sys_error': sys_error,
         'traceback': traceback_msg,
-        'logdir': CFG_LOGDIR,
+        'logdir': cfg['CFG_LOGDIR'],
         'contact': "Please contact %s quoting the following information:" %
-            (CFG_SITE_SUPPORT_EMAIL, )}
-    from invenio.mailutils import send_email
+            (cfg['CFG_SITE_SUPPORT_EMAIL'], )}
+    from invenio.ext.email import send_email
     send_email(from_addr, to_addr, subject="Error notification", content=body)
 
+
 def _get_filename_and_line(exc_info):
-    """
-    Return the filename, the line and the function_name where the exception happened.
-    """
+    """Return the filename, the line and the function_name where
+    the exception happened."""
     tb = exc_info[2]
     exception_info = traceback.extract_tb(tb)[-1]
     filename = os.path.basename(exception_info[0])
     line_no = exception_info[1]
     function_name = exception_info[2]
     return filename, line_no, function_name
+
 
 def _truncate_dynamic_string(val, maxlength=500):
     """
@@ -565,17 +502,15 @@ def wrap_warn():
 
     def wrapper(showwarning):
         @wraps(showwarning)
-        def new_showwarning(message=None, category=None, filename=None, lineno=None, file=None, line=None):
-            invenio_err = open(os.path.join(CFG_LOGDIR, 'invenio.err'), "a")
-            print >> invenio_err, "* %(time)s -> WARNING: %(category)s: %(message)s (%(file)s:%(line)s)\n" % {
-            'time': time.strftime("%Y-%m-%d %H:%M:%S"),
-            'category': category,
-            'message': message,
-            'file': filename,
-            'line': lineno}
-            print >> invenio_err, "** Traceback details\n"
-            traceback.print_stack(file=invenio_err)
-            print >> invenio_err, "\n"
+        def new_showwarning(message=None, category=None, filename=None,
+                            lineno=None, file=None, line=None):
+            current_app.logger.warning("* %(time)s -> WARNING: %(category)s: %(message)s (%(file)s:%(line)s)\n" % {
+                'time': time.strftime("%Y-%m-%d %H:%M:%S"),
+                'category': category,
+                'message': message,
+                'file': filename,
+                'line': lineno} + "** Traceback details\n" +
+                str(traceback.format_stack()) + "\n")
         return new_showwarning
 
     warnings.showwarning = wrapper(warnings.showwarning)

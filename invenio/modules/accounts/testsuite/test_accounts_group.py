@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 
 import sys
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622

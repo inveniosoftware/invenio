@@ -18,7 +18,7 @@
 
 """ Implements a workflow for testing """
 
-from invenio.bibworkflow_tasks.test_tasks import task_a, task_b
+from invenio.modules.workflows.tasks.test_tasks import task_a, task_b
 
 
 class test_workflow(object):

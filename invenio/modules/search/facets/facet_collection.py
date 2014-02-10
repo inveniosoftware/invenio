@@ -19,6 +19,6 @@
 
 """Collection Facet"""
 
-from invenio.websearch_facet_builders import CollectionFacetBuilder
+from ..facet_builders import CollectionFacetBuilder
 
 facet = CollectionFacetBuilder('collection', order=1)

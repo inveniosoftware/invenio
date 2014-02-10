@@ -18,11 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Test unit for the miscutil/importutils module.
+Test unit for the invenio.utils.mimetype module.
 """
 
-from invenio.mimetypeutils import file_strip_ext
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.utils.mimetype import file_strip_ext
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class TestMimeTypeUtils(InvenioTestCase):

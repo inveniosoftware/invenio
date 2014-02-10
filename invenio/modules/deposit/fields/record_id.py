@@ -18,8 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_processor_utils import record_id_process
+from invenio.modules.deposit.field_base import WebDepositField
+from ..processor_utils import record_id_process
 
 __all__ = ['RecordIDField']
 
@@ -29,9 +29,10 @@ class RecordIDField(WebDepositField, TextField):
 
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-barcode',
+            icon='barcode',
             export_key='recid',
-            processors=[record_id_process]
+            processors=[record_id_process],
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(RecordIDField, self).__init__(**defaults)

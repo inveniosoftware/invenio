@@ -27,7 +27,7 @@ engine.
 __revision__ = "$Id$"
 
 import re
-#from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+#from .config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 CFG_EXTERNAL_COLLECTION_MAXRESULTS = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 
@@ -37,8 +37,8 @@ try:
 except ImportError:
     CFG_BEAUTIFULSOUP_INSTALLED = False
 
-from invenio.bibformat import format_record
-from invenio.websearch_external_collections_getter import fetch_url_content
+from invenio.modules.formatter import format_record
+from .getter import fetch_url_content
 import cgi
 
 xml_parser_type = 0

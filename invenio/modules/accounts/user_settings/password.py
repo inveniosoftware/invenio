@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,16 +19,12 @@
 
 """WebAccount Password Settings"""
 
-from flask import \
-    Blueprint, session, make_response, g, render_template, request, flash, \
-    jsonify, redirect, url_for, current_app
-from invenio.websession_model import User
-from invenio.webinterface_handler_flask_utils import _
-from invenio.webuser_flask import current_user
-from invenio.jinja2utils import render_template_to_string
-from invenio.settings import \
-    Settings, UserSettingsStorage, ModelSettingsStorageBuilder
-from invenio.webaccount_forms import ChangePasswordForm
+from flask import url_for
+from invenio.modules.accounts.models import User
+from invenio.ext.login import current_user
+from invenio.modules.dashboard.settings import Settings, \
+    ModelSettingsStorageBuilder
+from invenio.modules.accounts.forms import ChangePasswordForm
 
 
 class WebAccountPasswordSettings(Settings):

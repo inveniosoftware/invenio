@@ -25,7 +25,7 @@ import cgi
 import random
 import time
 import sys
-from invenio.dateutils import strftime
+from invenio.utils.date import strftime
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -44,7 +44,7 @@ from invenio.config import \
      CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_INSPIRE_SITE, \
      CFG_CERN_SITE
-from invenio.bibrankadminlib import \
+from invenio.legacy.bibrank.adminlib import \
      write_outcome, \
      modify_translations, \
      get_def_name, \
@@ -53,29 +53,29 @@ from invenio.bibrankadminlib import \
      addadminbox, \
      tupletotable, \
      createhiddenform
-from invenio.dbquery import \
+from invenio.legacy.dbquery import \
      run_sql, \
      get_table_update_time
-from invenio.websearch_external_collections import \
+from invenio.legacy.websearch_external_collections import \
      external_collections_dictionary, \
      external_collection_sort_engine_by_name, \
      external_collection_get_state, \
      external_collection_get_update_state_list, \
      external_collection_apply_changes
-from invenio.websearch_external_collections_utils import \
+from invenio.legacy.websearch_external_collections.utils import \
      get_collection_descendants
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_STATES_NAME
-#from invenio.bibformat_elements import bfe_references
-#from invenio.bibformat_engine import BibFormatObject
-from invenio.bibdocfile import BibRecDocs
-from invenio.messages import gettext_set_language
-#from invenio.bibrank_citation_searcher import get_cited_by
-from invenio.access_control_admin import acc_get_action_id
-from invenio.access_control_config import VIEWRESTRCOLL
-from invenio.errorlib import register_exception
-from invenio.intbitset import intbitset
-from invenio.bibrank_citation_searcher import get_cited_by_count
-from invenio.bibrecord import record_get_field_instances
+from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_STATES_NAME
+#from invenio.modules.formatter.format_elements import bfe_references
+#from invenio.modules.formatter.engine import BibFormatObject
+from invenio.legacy.bibdocfile.api import BibRecDocs
+from invenio.base.i18n import gettext_set_language
+#from invenio.legacy.bibrank.citation_searcher import get_cited_by
+from invenio.modules.access.control import acc_get_action_id
+from invenio.modules.access.local_config import VIEWRESTRCOLL
+from invenio.ext.logging import register_exception
+from intbitset import intbitset
+from invenio.legacy.bibrank.citation_searcher import get_cited_by_count
+from invenio.legacy.bibrecord import record_get_field_instances
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
@@ -2476,7 +2476,7 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
 def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
     """Check the configuration of the collections."""
 
-    from invenio.search_engine import collection_restricted_p, restricted_collection_cache
+    from invenio.legacy.search_engine import collection_restricted_p, restricted_collection_cache
 
     subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#6">?</a>]""" % CFG_SITE_URL
     output  = ""
@@ -3477,7 +3477,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             tabs['plots']['enabled'] = False
 
         if CFG_CERN_SITE:
-            from invenio.search_engine import get_collection_reclist
+            from invenio.legacy.search_engine import get_collection_reclist
             if recID in get_collection_reclist("Books & Proceedings"):
                 tabs['holdings']['visible'] = True
                 tabs['holdings']['enabled'] = True
@@ -3508,7 +3508,7 @@ def get_detailed_page_tabs_counts(recID):
                    'Comments' : 0,
                    'Reviews' : 0
                    }
-    from invenio.search_engine import get_field_tags, get_record
+    from invenio.legacy.search_engine import get_field_tags, get_record
     if CFG_BIBRANK_SHOW_CITATION_LINKS:
         tabs_counts['Citations'] = get_cited_by_count(recID)
     if not CFG_CERN_SITE:#FIXME:should be replaced by something like CFG_SHOW_REFERENCES
@@ -3520,7 +3520,7 @@ def get_detailed_page_tabs_counts(recID):
         if reftag and len(reftag) > 4:
             tabs_counts['References'] = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
     # obtain number of comments/reviews
-    from invenio.webcommentadminlib import get_nb_reviews, get_nb_comments
+    from invenio.legacy.webcomment.adminlib import get_nb_reviews, get_nb_comments
     if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
         num_comments = get_nb_comments(recID, count_deleted=False)
     if CFG_WEBCOMMENT_ALLOW_REVIEWS and CFG_WEBSEARCH_SHOW_REVIEW_COUNT:

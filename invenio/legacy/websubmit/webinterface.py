@@ -37,33 +37,33 @@ from invenio.config import \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_PREFIX, \
      CFG_CERN_SITE
-from invenio import webinterface_handler_config as apache
-from invenio.dbquery import run_sql
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_role
-from invenio.webpage import warning_page
-from invenio.webuser import getUid, page_not_authorized, collect_user_info, \
+from invenio.utils import apache
+from invenio.legacy.dbquery import run_sql
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.control import acc_is_role
+from invenio.legacy.webpage import warning_page
+from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, \
                             isGuestUser
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import make_canonical_urlargd, redirect_to_url
-from invenio.messages import gettext_set_language
-from invenio.bibdocfile import stream_file, \
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
+from invenio.utils.url import make_canonical_urlargd, redirect_to_url
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.bibdocfile.api import stream_file, \
     decompose_file, propose_next_docname
-from invenio.errorlib import register_exception
-from invenio.htmlutils import is_html_text_editor_installed
-from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
-from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
-import invenio.template
-websubmit_templates = invenio.template.load('websubmit')
-from invenio.websearchadminlib import get_detailed_page_tabs
-from invenio.jsonutils import json, CFG_JSON_AVAILABLE
-import invenio.template
+from invenio.ext.logging import register_exception
+from invenio.utils.html import is_html_text_editor_installed
+from invenio.legacy.websubmit.icon_creator import create_icon, InvenioWebSubmitIconCreatorError
+from invenio.legacy.ckeditor.connector import process_CKEditor_upload, send_response
+import invenio.legacy.template
+websubmit_templates = invenio.legacy.template.load('websubmit')
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
+from invenio.utils.json import json, CFG_JSON_AVAILABLE
+import invenio.legacy.template
 from flask import session
 
-webstyle_templates = invenio.template.load('webstyle')
-websearch_templates = invenio.template.load('websearch')
+webstyle_templates = invenio.legacy.template.load('webstyle')
+websearch_templates = invenio.legacy.template.load('websearch')
 
-from invenio.websubmit_engine import home, action, interface, endaction, makeCataloguesTable
+from invenio.legacy.websubmit.engine import home, action, interface, endaction, makeCataloguesTable
 
 class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
@@ -238,12 +238,12 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 a, b = b % a, a
             return b
 
-        from invenio.bibencode_extract import extract_frames
-        from invenio.bibencode_config import CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_DIR, CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_FNAME
-        from invenio.bibencode_encode import determine_aspect
-        from invenio.bibencode_utils import probe
-        from invenio.bibencode_metadata import ffprobe_metadata
-        from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
+        from invenio.modules.encoder.extract import extract_frames
+        from invenio.modules.encoder.config import CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_DIR, CFG_BIBENCODE_WEBSUBMIT_ASPECT_SAMPLE_FNAME
+        from invenio.modules.encoder.encode import determine_aspect
+        from invenio.modules.encoder.utils import probe
+        from invenio.modules.encoder.metadata import ffprobe_metadata
+        from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
 
         argd = wash_urlargd(form, {
             'doctype': (str, ''),

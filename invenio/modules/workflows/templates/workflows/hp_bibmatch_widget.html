@@ -1,34 +1,47 @@
-{% extends "bibworkflow_hp_layout.html" %}
-{% block body2 %}
+{% extends "workflows/hp_layout.html" %}
+
+{%- block header%}
+    {{ super() }}
+    {% css url_for('static', filename='css/prettify.css') %}
+{%- endblock header %}
+
+{%- block javascript %}
+    {{ super() }}
+    {%- block widget_assets %}
+        {% js url_for('static', filename='js/google-code-prettify/run_prettify.js'), '50-workflows' %}
+    {%- endblock widget_assets %}
+{%- endblock javascript %}
+
+{% block hpbody %}
     <h1>Bibmatch Widget</h1>
-    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&amp;skin=desert"></script>
 
     <div class="container">
-        <div class="row-fluid">
-            <div class="span12">
-                <div class="row-fluid">
-                    {% set widget = widget() %}
-                    <div class="span6">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6">
                         <div id="record_preview_container">
                             Submitted Record
-                            <pre id="record_preview" name="object_preview" class="prettyprint span12">
+                            <pre id="record_preview" name="object_preview" class="prettyprint col-md-12">
                                 {{ data_preview }}
                             </pre>
                         </div>
                     </div>
 
-                    <div class="span6">
+                    <div class="col-md-6">
                         {% set i = 0 %}
                         {% for match in match_preview %}
                         {% if match %}
-                        
+
                         <strong>Match {{i+1}} </strong>
                         <div id="match_preview">
                             <pre class="prettyprint">
                                 {{ match.get_data() }}
                             </pre>
                         </div>
-                        {{ widget.accept }}
+                        <div id="accept-btn-bibmatch">
+                            {{ widget.accept }}
+                        </div>
                         </br>
 
                         {% set i = i+1 %}
@@ -36,7 +49,7 @@
                         {% endfor %}
                     </div>
                 </div>
-            </div>    
+            </div>
         </div>
     </div>
 {% endblock %}

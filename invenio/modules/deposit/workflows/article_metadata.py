@@ -17,19 +17,21 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.webdeposit_load_forms import forms
-from invenio.webdeposit_models import DepositionType
-from invenio.webdeposit_workflow_tasks import render_form
+from invenio.modules.deposit.models import DepositionType
+from invenio.modules.deposit.tasks import render_form
+from invenio.modules.deposit import forms
 
 __all__ = ['Article']
 
-ArticleForm = forms['ArticleForm']
-
 
 class Article(DepositionType):
-    workflow = [render_form(ArticleForm),
-                ]
+    workflow = [
+        render_form(draft_id='default'),
+    ]
     name = "Article"
     name_plural = "Articles"
     group = "Articles & Preprints"
     enabled = True
+    draft_definitions = {
+        'default': forms.ArticleForm,
+    }

@@ -41,8 +41,8 @@ in the last month.
 """
 
 from invenio.config import CFG_WEBDIR, CFG_ETCDIR
-from invenio.bibtask import write_message
-from invenio.search_engine import perform_request_search, print_record
+from invenio.legacy.bibsched.bibtask import write_message
+from invenio.legacy.search_engine import perform_request_search, print_record
 from ConfigParser import ConfigParser
 import os
 import gzip

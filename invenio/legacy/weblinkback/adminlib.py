@@ -20,10 +20,10 @@
 """WebLinkback - Administrative Lib"""
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
-from invenio.urlutils import wash_url_argument
-from invenio.messages import gettext_set_language, wash_language
-from invenio.webuser import collect_user_info
-from invenio.weblinkback_dblayer import get_all_linkbacks, \
+from invenio.utils.url import wash_url_argument
+from invenio.base.i18n import gettext_set_language, wash_language
+from invenio.legacy.webuser import collect_user_info
+from invenio.legacy.weblinkback.db_layer import get_all_linkbacks, \
                                         approve_linkback,\
                                         reject_linkback, \
                                         remove_url, \
@@ -31,20 +31,20 @@ from invenio.weblinkback_dblayer import get_all_linkbacks, \
                                         url_exists, \
                                         get_urls,\
                                         get_url_title
-from invenio.weblinkback_config import CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME, \
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME, \
                                        CFG_WEBLINKBACK_ADMIN_MODERATION_ACTION, \
                                        CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_ACTION_RETURN_CODE
-from invenio.bibrankadminlib import addadminbox, \
+from invenio.legacy.bibrank.adminlib import addadminbox, \
                                     tupletotable
-from invenio.dateutils import convert_datetext_to_dategui
-from invenio.bibformat import format_record
+from invenio.utils.date import convert_datetext_to_dategui
+from invenio.modules.formatter import format_record
 
 import cgi
 import urllib
 
-import invenio.template
-weblinkback_templates = invenio.template.load('weblinkback')
+import invenio.legacy.template
+weblinkback_templates = invenio.legacy.template.load('weblinkback')
 
 
 def get_navtrail(previous = '', ln=CFG_SITE_LANG):

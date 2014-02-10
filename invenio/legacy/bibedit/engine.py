@@ -29,13 +29,15 @@ import copy
 import urllib
 import urllib2
 import cookielib
+import json
 
-from invenio import bibformat
+from flask import url_for
+from invenio.modules import formatter as bibformat
 
-from invenio.jsonutils import json, CFG_JSON_AVAILABLE
-from invenio.urlutils import auto_version_url
-from invenio.xmlmarc2textmarc import create_marc_record
-from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
+from invenio.utils.json import CFG_JSON_AVAILABLE
+from invenio.utils.url import auto_version_url
+from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
+from invenio.legacy.bibedit.config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION, \
@@ -54,13 +56,13 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
-from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
+from invenio.legacy.bibedit.db_layer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
     get_record_last_modification_date, get_record_revision_author, \
     get_marcxml_of_record_revision, delete_related_holdingpen_changes, \
     get_record_revisions
 
-from invenio.bibedit_utils import cache_exists, cache_expired, \
+from invenio.legacy.bibedit.utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_bibrecord, \
     get_cache_file_contents, get_cache_mtime, get_record_templates, \
     get_record_template, latest_record_revision, record_locked_by_other_user, \
@@ -74,7 +76,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     record_locked_by_user_details, crossref_process_template, \
     modify_record_timestamp
 
-from invenio.bibrecord import create_record, print_rec, record_add_field, \
+from invenio.legacy.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
     record_delete_subfield_from, \
     record_modify_subfield, record_move_subfield, \
@@ -87,28 +89,28 @@ from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
     CFG_INSPIRE_SITE
-from invenio.search_engine import record_exists, perform_request_search
-from invenio.webuser import session_param_get, session_param_set
-from invenio.bibcatalog import bibcatalog_system
-from invenio.webpage import page
-from invenio.htmlutils import get_mathjax_header
-from invenio.textutils import wash_for_xml, show_diff
-from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
+from invenio.legacy.search_engine import record_exists, perform_request_search
+from invenio.legacy.webuser import session_param_get, session_param_set
+from invenio.legacy.bibcatalog.api import bibcatalog_system
+from invenio.legacy.webpage import page
+from invenio.utils.html import get_mathjax_header
+from invenio.utils.text import wash_for_xml, show_diff
+from invenio.modules.knowledge.api import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit, kb_exists
 
-from invenio.batchuploader_engine import perform_upload_check
+from invenio.legacy.batchuploader.engine import perform_upload_check
 
-from invenio.bibcirculation_dblayer import get_number_copies, has_copies
-from invenio.bibcirculation_utils import create_item_details_url
+from invenio.legacy.bibcirculation.db_layer import get_number_copies, has_copies
+from invenio.legacy.bibcirculation.utils import create_item_details_url
 
-from invenio.refextract_api import FullTextNotAvailable
-from invenio import xmlmarc2textmarc as xmlmarc2textmarc
-from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
+from invenio.legacy.refextract.api import FullTextNotAvailable
+from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmarc
+from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 
-from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
+from invenio.utils.crossref import get_marcxml_for_doi, CrossrefError
 
-import invenio.template
-bibedit_templates = invenio.template.load('bibedit')
+import invenio.legacy.template
+bibedit_templates = invenio.legacy.template.load('bibedit')
 
 re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
@@ -201,8 +203,8 @@ def perform_request_init(uid, ln, req, lastupdated):
 
 
     body += '<link rel="stylesheet" type="text/css" href="/img/jquery-ui.css" />'
-    body += '<link rel="stylesheet" type="text/css" href="%s/%s" />' % (CFG_SITE_URL,
-            auto_version_url("img/" + 'bibedit.css'))
+    body += '<link rel="stylesheet" type="text/css" href="%s" />' % (
+        url_for('editor.static', filename='editor/base.css'), )
 
     if CFG_CERN_SITE:
         cern_site = 'true'
@@ -252,14 +254,20 @@ def perform_request_init(uid, ln, req, lastupdated):
             "   var fieldTemplates = %s\n" % (json.dumps(fieldTemplates), ) + \
             "</script>\n"
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jquery-ui.min.js',  'jquery.jeditable.mini.js', 'jquery.hotkeys.js',
-               'json2.js', 'bibedit_refextract.js', 'bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
-               'bibedit_menu.js', 'bibedit_holdingpen.js', 'marcxml.js',
-               'bibedit_clipboard.js']
+    scripts = ['jquery-ui.min.js',  'jquery.jeditable.mini.js',
+               'jquery.hotkeys.js', 'json2.js']
+    bibedit_scripts = ['refextract.js', 'display.js', 'engine.js', 'keys.js',
+                       'menu.js', 'holdingpen.js', 'marcxml.js',
+                       'clipboard.js']
 
     for script in scripts:
-        body += '    <script type="text/javascript" src="%s/%s">' \
-            '</script>\n' % (CFG_SITE_URL, auto_version_url("js/" + script))
+        body += '    <script type="text/javascript" src="%s">' \
+            '</script>\n' % (url_for('static', filename='js/' + script), )
+
+    for script in bibedit_scripts:
+        body += '    <script type="text/javascript" src="%s">' \
+            '</script>\n' % (url_for('editor.static',
+                                     filename='js/editor/' + script), )
 
     # Init BibEdit
     body += '<script>$(init_bibedit);</script>'
@@ -1620,13 +1628,17 @@ def perform_request_init_template_interface():
     body += '    </script>\n'
 
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jquery-ui.min.js',
-               'json2.js', 'bibedit_display.js',
-               'bibedit_template_interface.js']
+    scripts = ['jquery-ui.min.js', 'json2.js']
+    bibedit_scripts = ['display.js', 'template_interface.js']
 
     for script in scripts:
-        body += '    <script type="text/javascript" src="%s/js/%s">' \
-            '</script>\n' % (CFG_SITE_URL, script)
+        body += '    <script type="text/javascript" src="%s">' \
+            '</script>\n' % (url_for('static', filename='js/' + script), )
+
+    for script in bibedit_scripts:
+        body += '    <script type="text/javascript" src="%s">' \
+            '</script>\n' % (url_for('editor.static',
+                                     filename='js/editor/' + script), )
 
     body += '    <div id="bibEditTemplateList"></div>\n'
     body += '    <div id="bibEditTemplateEdit"></div>\n'

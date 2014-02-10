@@ -22,11 +22,11 @@ CERN Bulletin articles.
 """
 import re
 import types
-from invenio.htmlutils import HTMLWasher
-from invenio.messages import gettext_set_language
-from invenio.urlutils import create_html_mailto
+from invenio.utils.html import HTMLWasher
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.url import create_html_mailto
 from invenio.config import CFG_CERN_SITE
-from invenio.bibformat_elements import bfe_fulltext
+from invenio.modules.formatter.format_elements import bfe_fulltext
 
 def format_element(bfo, separator='<br/>', max_chars=""):
     """
@@ -101,7 +101,7 @@ def format_element(bfo, separator='<br/>', max_chars=""):
 
     # 2. prepare regex's for the elements
     #=====================================================
-    from invenio.webjournal_utils import \
+    from invenio.legacy.webjournal.utils import \
          image_pattern, \
          para_pattern, \
          header_pattern

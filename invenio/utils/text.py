@@ -27,8 +27,8 @@ import sys
 import re
 import textwrap
 import htmlentitydefs
-import invenio.template
-from invenio.config import CFG_ETCDIR
+import pkg_resources
+from invenio.base.globals import cfg
 try:
     import chardet
     CHARDET_AVAILABLE = True
@@ -139,6 +139,11 @@ re_latex_uppercase_u = re.compile("\\\\[\"H'`~^vu=k]\\{?U\\}?")
 re_latex_uppercase_y = re.compile("\\\\[\"']\\{?Y\\}?")
 re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
 re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
+
+
+def get_kb_filename(filename='latex-to-unicode.kb'):
+    return pkg_resources.resource_filename('invenio.utils.data', filename)
+
 
 def indent_text(text,
                 nb_tabs=0,
@@ -309,6 +314,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         ret += [tab_str + bottom_border]
     return (prefix + '\n'.join(ret) + suffix).encode('utf-8')
 
+
 def wait_for_user(msg=""):
     """
     Print MSG and a confirmation prompt, waiting for user's
@@ -329,6 +335,7 @@ def wait_for_user(msg=""):
         sys.exit(1)
     return
 
+
 def guess_minimum_encoding(text, charsets=('ascii', 'latin1', 'utf8')):
     """Try to guess the minimum charset that is able to represent the given
     text using the provided charsets. text is supposed to be encoded in utf8.
@@ -346,6 +353,7 @@ def guess_minimum_encoding(text, charsets=('ascii', 'latin1', 'utf8')):
         except (UnicodeEncodeError, UnicodeDecodeError):
             pass
     return (text_in_unicode.encode('utf8'), 'utf8')
+
 
 def encode_for_xml(text, wash=False, xml_version='1.0', quote=False):
     """Encodes special characters in a text so that it would be
@@ -370,6 +378,7 @@ except ValueError:
     RE_ALLOWED_XML_1_0_CHARS = re.compile(u'[^\U00000009\U0000000A\U0000000D\U00000020-\U0000D7FF\U0000E000-\U0000FFFD]')
     RE_ALLOWED_XML_1_1_CHARS = re.compile(u'[^\U00000001-\U0000D7FF\U0000E000-\U0000FFFD]')
 
+
 def wash_for_xml(text, xml_version='1.0'):
     """
     Removes any character which is not in the range of allowed
@@ -389,6 +398,7 @@ def wash_for_xml(text, xml_version='1.0'):
         return RE_ALLOWED_XML_1_0_CHARS.sub('', unicode(text, 'utf-8')).encode('utf-8')
     else:
         return RE_ALLOWED_XML_1_1_CHARS.sub('', unicode(text, 'utf-8')).encode('utf-8')
+
 
 def wash_for_utf8(text, correct=True):
     """Return UTF-8 encoded binary string with incorrect characters washed away.
@@ -414,6 +424,36 @@ def wash_for_utf8(text, correct=True):
     ret.append(text)
     return ''.join(ret)
 
+
+def nice_number(number, thousands_separator=',', max_ndigits_after_dot=None):
+    """
+    Return nicely printed number NUMBER in language LN using
+    given THOUSANDS_SEPARATOR character.
+    If max_ndigits_after_dot is specified and the number is float, the
+    number is rounded by taking in consideration up to max_ndigits_after_dot
+    digit after the dot.
+
+    This version does not pay attention to locale.  See
+    tmpl_nice_number_via_locale().
+    """
+    if type(number) is float:
+        if max_ndigits_after_dot is not None:
+            number = round(number, max_ndigits_after_dot)
+        int_part, frac_part = str(number).split('.')
+        return '%s.%s' % (nice_number(int(int_part), thousands_separator),
+                          frac_part)
+    else:
+        chars_in = list(str(number))
+        number = len(chars_in)
+        chars_out = []
+        for i in range(0, number):
+            if i % 3 == 0 and i != 0:
+                chars_out.append(thousands_separator)
+            chars_out.append(chars_in[number - i - 1])
+        chars_out.reverse()
+        return ''.join(chars_out)
+
+
 def nice_size(size):
     """
     @param size: the size.
@@ -421,7 +461,6 @@ def nice_size(size):
     @return: a nicely printed size.
     @rtype: string
     """
-    websearch_templates = invenio.template.load('websearch')
     unit = 'B'
     if size > 1024:
         size /= 1024.0
@@ -432,7 +471,8 @@ def nice_size(size):
             if size > 1024:
                 size /= 1024.0
                 unit = 'GB'
-    return '%s %s' % (websearch_templates.tmpl_nice_number(size, max_ndigits_after_dot=2), unit)
+    return '%s %s' % (nice_number(size, max_ndigits_after_dot=2), unit)
+
 
 def remove_line_breaks(text):
     """
@@ -440,6 +480,7 @@ def remove_line_breaks(text):
     separator', 'paragraph separator', and 'next line' characters.
     """
     return unicode(text, 'utf-8').replace('\f', '').replace('\n', '').replace('\r', '').replace(u'\xe2\x80\xa8', '').replace(u'\xe2\x80\xa9', '').replace(u'\xc2\x85', '').encode('utf-8')
+
 
 def decode_to_unicode(text, default_encoding='utf-8'):
     """
@@ -483,8 +524,16 @@ def decode_to_unicode(text, default_encoding='utf-8'):
         dummy, detected_encoding = guess_minimum_encoding(text)
     return text.decode(detected_encoding)
 
-def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb" % \
-                            (CFG_ETCDIR,)):
+
+def to_unicode(text):
+    if isinstance(text, unicode):
+        return text
+    if isinstance(text, basestring):
+        return decode_to_unicode(text)
+    return unicode(text)
+
+
+def translate_latex2unicode(text, kb_file=None):
     """
     This function will take given text, presumably containing LaTeX symbols,
     and attempts to translate it to Unicode using the given or default KB
@@ -504,6 +553,8 @@ def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb"
     @return: Unicode representation of translated text
     @rtype: unicode
     """
+    if kb_file is None:
+        kb_file = get_kb_filename()
     # First decode input text to Unicode
     try:
         text = decode_to_unicode(text)
@@ -522,8 +573,8 @@ def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb"
     # Return Unicode representation of translated text
     return text
 
-def _load_latex2unicode_constants(kb_file="%s/bibconvert/KB/latex-to-unicode.kb" % \
-                            (CFG_ETCDIR,)):
+
+def _load_latex2unicode_constants(kb_file=None):
     """
     Load LaTeX2Unicode translation table dictionary and regular expression object
     from KB to a global dictionary.
@@ -536,6 +587,9 @@ def _load_latex2unicode_constants(kb_file="%s/bibconvert/KB/latex-to-unicode.kb"
                             'table': dict of LaTeX -> Unicode mappings}
     @rtype: dict
     """
+    if kb_file is None:
+        kb_file = get_kb_filename()
+
     try:
         data = open(kb_file)
     except IOError:
@@ -553,6 +607,7 @@ def _load_latex2unicode_constants(kb_file="%s/bibconvert/KB/latex-to-unicode.kb"
     data.close()
     CFG_LATEX_UNICODE_TRANSLATION_CONST['regexp_obj'] = re.compile("|".join(latex_symbols))
     CFG_LATEX_UNICODE_TRANSLATION_CONST['table'] = translation_table
+
 
 def translate_to_ascii(values):
     """
@@ -585,6 +640,7 @@ def translate_to_ascii(values):
             ascii_text = unidecode(unicode_text).encode('ascii')
         values[index] = ascii_text
     return values
+
 
 def xml_entities_to_utf8(text, skip=('lt', 'gt', 'amp')):
     """
@@ -620,6 +676,7 @@ def xml_entities_to_utf8(text, skip=('lt', 'gt', 'amp')):
                     pass
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
+
 
 def strip_accents(x):
     """

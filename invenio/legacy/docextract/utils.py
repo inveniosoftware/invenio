@@ -22,7 +22,7 @@ VERBOSITY = None
 import sys
 from datetime import datetime
 
-from invenio.bibtask import write_message as bibtask_write_message
+from invenio.legacy.bibsched.bibtask import write_message as bibtask_write_message
 
 
 def setup_loggers(verbosity):

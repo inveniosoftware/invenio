@@ -18,23 +18,23 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
 from wtforms.validators import Required
-from invenio.webdeposit_form import WebDepositForm as Form
-from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_field_widgets import plupload_widget, date_widget, \
+from invenio.modules.deposit.form import WebDepositForm as Form
+from invenio.base.i18n import _
+from ..field_widgets import plupload_widget, date_widget, \
                                              bootstrap_submit
 
 # Import custom fields
-from invenio.webdeposit_load_fields import fields
+from invenio.modules.deposit import fields
 __all__ = ['PreprintForm']
 
 
 class PreprintForm(Form):
 
-    author = fields.AuthorField(label=_('Author'), validators=[Required()])
+    author = fields.AuthorField(label=_('Author'), validators=[Required()], widget_classes="form-control")
     subject_category = fields.TitleField(label=_('Subject category'),
                                                 validators=[Required()])
     note = fields.NotesField(label=_('Note'))
-    institution = fields.TextField(label=_('Institution'))
+    institution = fields.TextField(label=_('Institution'), widget_classes="form-control")
     languages = [("en", _("English")),
                  ("fre", _("French")),
                  ("ger", _("German")),

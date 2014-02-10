@@ -20,8 +20,8 @@
 import os
 import re
 
-from invenio.shellutils import run_shell_command, run_process_with_timeout, Timeout
-from invenio.plotextractor_output_utils import get_converted_image_name, \
+from invenio.utils.shell import run_shell_command, run_process_with_timeout, Timeout
+from .output_utils import get_converted_image_name, \
                                                write_message
 
 def untar(original_tarball, sdir):

@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 import cgi
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
-from invenio.websubmitadmin_config import WEBSUBMITADMINURL, FUNCTIONS_WITH_FILE_PARAMS, WEBSUBMITADMINURL_OLD
+from invenio.legacy.websubmit.admin_config import WEBSUBMITADMINURL, FUNCTIONS_WITH_FILE_PARAMS, WEBSUBMITADMINURL_OLD
 
 def create_html_table_from_tuple(tableheader=None, tablebody=None, start="", end=""):
     """Create a table from a tuple or a list.

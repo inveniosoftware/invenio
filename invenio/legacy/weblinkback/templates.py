@@ -20,19 +20,19 @@
 
 """WebLinkback - Web Templates"""
 
-from invenio.weblinkback_dblayer import get_all_linkbacks, \
+from invenio.legacy.weblinkback.db_layer import get_all_linkbacks, \
                                         get_url_title
-from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_LATEST_COUNT_VALUES, \
                                        CFG_WEBLINKBACK_ACTION_RETURN_CODE
-from invenio.weblinkback import generate_redirect_url
-from invenio.messages import gettext_set_language
-from invenio.dateutils import convert_datetext_to_dategui
+from invenio.legacy.weblinkback.api import generate_redirect_url
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.date import convert_datetext_to_dategui
 from invenio.config import CFG_SITE_RECORD, \
                            CFG_SITE_URL, \
                            CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS
-from invenio.htmlutils import get_mathjax_header
-from invenio.bibformat import format_record
+from invenio.utils.html import get_mathjax_header
+from invenio.modules.formatter import format_record
 
 import cgi
 
@@ -274,7 +274,7 @@ class Template:
 
 
         out += '</ol>'
-        from invenio.bibrankadminlib import addadminbox
+        from invenio.legacy.bibrank.adminlib import addadminbox
         return addadminbox('<b>%s</b>'% _("Menu"), [out])
 
 

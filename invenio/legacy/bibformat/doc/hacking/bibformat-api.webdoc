@@ -1,0 +1,901 @@
+## -*- mode: html; coding: utf-8; -*-
+
+## This file is part of Invenio.
+## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: BibFormat API -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> &gt; <a class="navtrail" href="bibformat-internals">BibFormat Internals</a> -->
+<!-- WebDoc-Page-Revision: $Id$ -->
+
+<protect>
+<pre>
+****************************************************************************
+** IMPORTANT NOTE: Note that this documentation is an updated version of  **
+** an earlier technical draft of BibFormat specifications. Please first   **
+** refer to the BibFormat admin guide.                                    **
+****************************************************************************
+
+Technical Overview of the new BibFormat
+=======================================
+
+Contents:
+1. Python API
+2. The philosophy behind BibFormat
+3. Differences between the old PHP version and the new Pythonic version
+4. Migrating from the previous PHP BibFormat version to the new Pythonic version
+5. Specifications of the new BibFormat configuration files.
+
+
+1. Python API
+
+The APIs of bibformat.py consists in these functions:
+
+ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
+                   search_pattern=None, xml_record=None, user_info=None,
+                   on_the_fly=False):
+     """
+     Formats a record given its ID (or its XML representation)
+     and an output format.
+
+     Returns a formatted version of the record in the specified
+     language, with pattern context, and specified output format.
+     The function will define by itself which format template must be
+     applied.
+
+     Parameters that allow contextual formatting (like 'search_pattern'
+     and 'user_info') are useful only when doing on-the-fly
+     formatting, or when caching with care (e.g. caching all formatted
+     versions of a record for each possible 'ln').
+
+     The arguments are as follows:
+
+               recID -  the ID of the record to format. If ID does not exist
+                        the function returns empty string or an error
+                        string, depending on level of verbosity.
+                        If 'xml_record' parameter is specified, 'recID'
+                        is ignored
+
+                  of -  an output format code. If 'of' does not exist as code in
+                        output format, the function returns empty
+                        string or an error string, depending on level
+                        of verbosity.  ;of' is case insensitive.
+
+                  ln -  the language to use to format the record. If
+                        'ln' is an unknown language, or translation
+                        does not exist, default CFG_SITE_LANG language
+                        will be applied whenever possible.
+                        Allows contextual formatting.
+
+             verbose -  the level of verbosity in case of errors/warnings
+                        0 - Silent mode
+                        5 - Prints only errors
+                        9 - Prints errors and warnings
+
+      search_pattern -  the pattern used as search query when asked to
+                        format this record (User request in web
+                        interface). Allows contextual formatting.
+
+          xml_record -  an XML string representation of the record to
+                        format.  If it is specified, recID parameter is
+                        ignored. The XML must be pasable by BibRecord.
+
+           user_info - allows to grant access to some functionalities
+                       on a page depending on the user's
+                       priviledges. 'user_info' is the same structure
+                       as the one returned by webuser.collect_user_info(req),
+                       (that is a dictionary).
+
+          on_the_fly - if False, try to return an already preformatted
+                       version of the record in the database.
+
+     """
+
+
+ Example:
+   >> from invenio.modules.formatter import format_record
+   >> format_record(5, "hb", "fr")
+
+
+ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
+                    xml_records=None, user_info=None, record_prefix=None,
+                    record_separator=None, record_suffix=None,
+                    prologue="", epilogue="", req=None, on_the_fly=False):
+     """
+     Returns a list of formatted records given by a list of record IDs or a
+     list of records as xml.
+     Adds a prefix before each record, a suffix after each record,
+     plus a separator between records.
+
+     Also add optional prologue and epilogue to the complete formatted list.
+
+     You can either specify a list of record IDs to format, or a list of
+     xml records, but not both (if both are specified recIDs is ignored).
+
+     'record_separator' is a function that returns a string as separator between
+     records. The function must take an integer as unique parameter,
+     which is the index in recIDs (or xml_records) of the record that has
+     just been formatted. For example separator(i) must return the separator
+     between recID[i] and recID[i+1]. Alternatively separator can be a single
+     string, which will be used to separate all formatted records.
+     The same applies to 'record_prefix' and 'record_suffix'.
+
+     'req' is an optional parameter on which the result of the function
+     are printed lively (prints records after records) if it is given.
+     Note that you should set 'req' content-type by yourself, and send
+     http header before calling this function as it will not do it.
+
+     This function takes the same parameters as 'format_record' except for:
+
+               recIDs -  a list of record IDs to format
+
+          xml_records -  a list of xml string representions of the records to
+                         format. If this list is specified, 'recIDs' is ignored.
+
+        record_prefix - a string or a function the takes the index of the record
+                        in 'recIDs' or 'xml_records' for which the function must
+                        return a string.
+                        Printed before each formatted record.
+
+     record_separator - either a string or a function that returns string to
+                        separate formatted records. The function takes the index
+                        of the record in 'recIDs' or 'xml_records' that is being
+                        formatted.
+
+        record_prefix - a string or a function the takes the index of the record
+                        in 'recIDs' or 'xml_records' for which the function must
+                        return a string.
+                        Printed after each formatted record
+
+                  req - an optional request object on which formatted records
+                        can be printed (for "live" output )
+
+             prologue - a string printed before all formatted records string
+
+             epilogue - a string printed after all formatted records string
+
+           on_the_fly - if False, try to return an already preformatted version
+                        of the records in the database
+     """
+
+
+ def get_output_format_content_type(of):
+     """
+     Returns the content type (eg. 'text/html' or 'application/ms-excel') \
+     of the given output format.
+
+     The function takes this mandatory parameter:
+
+     of - the code of output format for which we want to get the content type
+     """
+
+
+ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
+     """
+     Returns an XML string of the record given by recID.
+
+     The function builds the XML directly from the database,
+     without using the standard formatting process.
+
+     'format' allows to define the flavour of XML:
+        - 'xm' for standard XML
+        - 'marcxml' for MARC XML
+        - 'oai_dc' for OAI Dublin Core
+        - 'xd' for XML Dublin Core
+
+     If record does not exist, returns empty string.
+
+     The function takes the following parameters:
+
+          recID - the id of the record to retrieve
+
+         format - the XML flavor in which we want to get the record
+
+     decompress _ a function used to decompress the record from the database
+    """
+
+The API of the BibFormat Object ('bfo') given as a parameter to
+format function of format elements consist in the following
+functions. This API is to be used only inside format elements.
+
+ def control_field(self, tag, escape='0'):
+    """
+    Returns the value of control field given by tag in record.
+
+    If the value does not exist, returns empty string
+    The returned value is always a string.
+
+    'escape' parameter allows to escape special characters
+    of the field. The value of escape can be:
+          0 - no escaping
+          1 - escape all HTML characters
+          2 - remove unsafe HTML tags (Eg. keep &lt;br />)
+          3 - Mix of mode 1 and 2. If value of field starts with
+              &lt;!-- HTML -->, then use mode 2. Else use mode 1.
+          4 - Remove all HTML tags
+          5 - Same as 2, with more tags allowed (like &lt;img>)
+          6 - Same as 3, with more tags allowed (like &lt;img>)
+          7 - Mix of mode 0 and mode 1. If field_value starts
+              with &lt;!-- HTML -->, then use mode 0. Else use mode 1.
+          8. Same as mode 1, but also escape double-quotes
+          9. Same as mode 4, but also escape double-quotes
+
+    The arguments are:
+
+         tag    -  the marc code of a field
+         escape -  1 if returned value should be escaped. Else 0.
+                   (see above for other modes)
+    """
+
+ def field(self, tag, escape='0'):
+    """
+    Returns the value of the field corresponding to tag in the
+    current record.
+
+    If the value does not exist, returns empty string
+    Else returns the same as bfo.fields(..)[0] (see docstring below).
+
+    'escape' parameter allows to escape special characters
+    of the field. The value of escape can be:
+          0 - no escaping
+          1 - escape all HTML characters
+          2 - remove unsafe HTML tags (Eg. keep &lt;br />)
+          3 - Mix of mode 1 and 2. If value of field starts with
+              &lt;!-- HTML -->, then use mode 2. Else use mode 1.
+          4 - Remove all HTML tags
+          5 - Same as 2, with more tags allowed (like &lt;img>)
+          6 - Same as 3, with more tags allowed (like &lt;img>)
+          7 - Mix of mode 0 and mode 1. If field_value starts
+              with &lt;!-- HTML -->, then use mode 0. Else use mode 1.
+          8 - Same as mode 1, but also escape double-quotes
+          9 - Same as mode 4, but also escape double-quotes
+
+    The arguments are:
+
+         tag  -  the marc code of a field
+         escape -  1 if returned value should be escaped. Else 0.
+                   (see above for other modes)
+    """
+
+
+ def fields(self, tag, escape='0', repeatable_subfields_p=False):
+    """
+    Returns the list of values corresonding to "tag".
+
+    If tag has an undefined subcode (such as 999C5),
+    the function returns a list of dictionaries, whoose keys
+    are the subcodes and the values are the values of tag.subcode.
+    If the tag has a subcode, simply returns list of values
+    corresponding to tag.
+    Eg. for given MARC:
+        999C5 $a value_1a $b value_1b
+        999C5 $b value_2b
+        999C5 $b value_3b $b value_3b_bis
+
+        >> bfo.fields('999C5b')
+        >> ['value_1b', 'value_2b', 'value_3b', 'value_3b_bis']
+        >> bfo.fields('999C5')
+        >> [{'a':'value_1a', 'b':'value_1b'},
+            {'b':'value_2b'},
+            {'b':'value_3b'}]
+    By default the function returns only one value for each
+    subfield (that is it considers that repeatable subfields are
+    not allowed). It is why in the above example 'value3b_bis' is
+    not shown for bfo.fields('999C5').  (Note that it is not
+    defined which of value_3b or value_3b_bis is returned).  This
+    is to simplify the use of the function, as most of the time
+    subfields are not repeatable (in that way we get a string
+    instead of a list).  You can allow repeatable subfields by
+    setting 'repeatable_subfields_p' parameter to True. In
+    this mode, the above example would return:
+        >> bfo.fields('999C5b', repeatable_subfields_p=True)
+        >> ['value_1b', 'value_2b', 'value_3b']
+        >> bfo.fields('999C5', repeatable_subfields_p=True)
+        >> [{'a':['value_1a'], 'b':['value_1b']},
+            {'b':['value_2b']},
+            {'b':['value_3b', 'value3b_bis']}]
+    NOTICE THAT THE RETURNED STRUCTURE IS DIFFERENT.  Also note
+    that whatever the value of 'repeatable_subfields_p' is,
+    bfo.fields('999C5b') always show all fields, even repeatable
+    ones. This is because the parameter has no impact on the
+    returned structure (it is always a list).
+
+    'escape' parameter allows to escape special characters
+     of the fields. The value of escape can be:
+                  0 - no escaping
+                  1 - escape all HTML characters
+                  2 - remove unsafe HTML tags (Eg. keep &lt;br />)
+                  3 - Mix of mode 1 and 2. If value of field starts with
+                      &lt;!-- HTML -->, then use mode 2. Else use mode 1.
+                  4 - Remove all HTML tags
+                  5 - Same as 2, with more tags allowed (like &lt;img>)
+                  6 - Same as 3, with more tags allowed (like &lt;img>)
+                  7 - Mix of mode 0 and mode 1. If field_value starts
+                      with &lt;!-- HTML -->, then use mode 0. Else use mode 1.
+                  8 - Same as mode 1, but also escape double-quotes
+                  9 - Same as mode 4, but also escape double-quotes
+
+    The arguments are:
+
+          tag  -  the marc code of a field
+          escape -  1 if returned value should be escaped. Else 0.
+                   (see above for other modes)
+          repeatable_subfields_p - if True, returns the list of
+                                   subfields in the dictionary @return
+                                   values of field tag in record """
+
+ def kb(self, kb, string, default=""):
+    """
+    Returns the value of the "string" in the knowledge base "kb".
+
+    If kb does not exist or string does not exist in kb,
+    returns 'default' string or empty string if not specified
+
+    The arguments are as follows:
+
+          kb  -  the knowledge base name in which we want to find the mapping.
+                 If it does not exist the function returns the original
+                 'string' parameter value. The name is case insensitive (Uses
+                 the SQL 'LIKE' syntax to retrieve value).
+
+      string  -  the value for which we want to find a translation-
+                 If it does not exist the function returns 'default' string.
+                 The string is case insensitive (Uses the SQL 'LIKE' syntax
+                 to retrieve value).
+
+     default  -  a default value returned if 'string' not found in 'kb'.
+
+    """
+
+ def get_record(self):
+    """
+    Returns the record encapsulated in bfo as a BibRecord structure.
+    You can get full access to the record through bibrecord.py functions.
+    """
+
+  Example (from inside BibFormat element):
+  >> bfo.field("520.a")
+  >> 'We present a quantitative appraisal of the physics potential
+      for neutrino experiments.'
+  >>
+  >> bfo.control_field("001")
+  >> '12'
+  >>
+  >> bfo.fields("700.a")
+  >>['Alekhin, S I', 'Anselmino, M', 'Ball, R D', 'Boglione, M']
+  >>
+  >> bfo.kb("DBCOLLID2COLL", "ARTICLE")
+  >> 'Published Article'
+  >>
+  >> bfo.kb("DBCOLLID2COLL", "not in kb", "My Value")
+  >> 'My Value'
+
+Moreover you can have access to the language requested for the
+formatting, the search pattern used by the user in the web
+interface and the userID by directly getting the attribute from 'bfo':
+
+    bfo.lang
+    """
+    Returns the language that was asked to be used for the
+    formatting. Always returns a string.
+    """
+
+    bfo.search_pattern
+    """
+    Returns the search pattern specified by the user when
+    the record had to be formatted. Always returns a string.
+    """
+
+    bfo.user_info
+    """
+    Returns a dictionary with information about current user.
+    The returned dictionary has the following structure:
+        user_info = {
+            'remote_ip' : '',
+            'remote_host' : '',
+            'referer' : '',
+            'uri' : '',
+            'agent' : '',
+            'uid' : -1,
+            'nickname' : '',
+            'email' : '',
+            'group' : [],
+            'guest' : '1'
+        }
+    """
+
+    bfo.uid
+    """
+    ! DEPRECATED: use bfo.user_info['uid'] instead
+    """
+
+    bfo.recID
+    """
+    Returns the id of the record
+    """
+
+    bfo.req
+    """
+    ! DEPRECATED: use bfo.user_info instead
+    """
+
+    bfo.format
+    """
+    ! DEPRECATED: use bfo.output_format instead
+    """
+
+    bfo.output_format
+    """
+    Returns the format in which the record is being formatted
+    """
+
+  Example (from inside BibFormat element):
+  >> bfo.lang
+  >> 'en'
+  >>
+  >> bfo.search_pattern
+  >> 'mangano and neutrino and factory'
+
+
+2. The philosophy behind BibFormat
+
+BibFormat is in charge of formatting the bibliographic records that
+are displayed to your users. As you potentially have a huge amount of
+bibliographic records, you cannot specify manually for each of them
+how it should be formatted. This is why you can define rules that will
+allow BibFormat to understand which kind of formatting to apply to a given
+record. You define this set of rules in what is called an "output
+format".
+
+You can have different output formats, each with its own characteristics.
+For example you certainly want that when multiple bibliographic records are
+displayed at the same time (as it happens in search results), only
+short versions are shown to the user, while a detailed record is
+preferable when a single record is displayed. You might also want to
+let your users decide which kind of output they want. For example you
+might need to display HTML for regular web browsing, but would also
+give a BibTeX version of the bibliographic reference for direct
+inclusion in a LaTeX document.
+See section 5.1 to learn how to create or modify output formats.
+
+While output formats define what kind of formatting must be applied,
+they do not define HOW the formatting is done. This is the role of the
+"format templates", which define the layout and look of a
+bibliographic reference. These format templates are rather easy to
+write if you know a little bit of HTML (see section 5.2 "Format
+templates specifications"). You will certainly have to create
+different format templates, for different kinds of records. For
+example you might want records that contain pictures to display them,
+maybe with captions, while records that do not have pictures limited
+to printing a title and an abstract.
+
+In summary, you have different output formats (like 'brief HTML',
+'detailed HTML' or 'BibTeX') that call different format templates
+according to some criteria.
+
+There is still one kind of configuration file that we have not talked
+about: the "format elements". These are the "bricks" that you use in
+format templates, to get the values of a record. You will learn to use
+them in your format template in section 5.2 "Format templates
+specifications", but you will mostly not need to modify them or create
+new ones. However if you do need to edit one, read section 5.3 "Format
+elements specifications" (And if you know Python it will be easy, as
+they are written in Python).
+
+Finally BibFormat can make use of mapping tables called "knowledge
+bases". Their primary use is to act like a translation table, to
+normalize records before displaying them. For example, you can say
+that records that have value "Phys Rev D" or "Physical Review D" for
+field "published in" must display "Phys Rev : D." to users. See
+section 5.4 to learn how to edit knowledge bases.
+
+In summary, there are three layers.  Output formats:
+
++-----------------------------------------------------+
+|                    Output Format                    | (Layer 1)
+|                    eg: HTML_Brief.bfo               |
++-----------------------------------------------------+
+
+call one of several `format templates':
+
++-------------------------+ +-------------------------+
+|     Format Template     | |     Format Template     | (Layer 2)
+|     eg: preprint.bft    | |     eg: default.bft     |
++-------------------------+ +-------------------------+
+
+that use one or several format elements:
+
++--------------+ +----------------+ +-----------------+
+|Format Element| |Format Element  | | Format Element  | (Layer 3)
+|eg: authors.py| |eg: abstract.py | | eg: title.py    |
++--------------+ +----------------+ +-----------------+
+
+
+3. Differences between the old PHP version and the new Pythonic version
+
+The most noticeable differences are:
+
+ a) "Behaviours" have been renamed "Output formats".
+ b) "Formats" have been renamed "Format templates". They are now
+     written in HTML.
+ c) "User defined functions" have been dropped.
+ d) "Extraction rules" have been dropped.
+ e) "Link rules" have been dropped.
+ f) "File formats" have been dropped.
+ g) "Format elements" have been introduced. They are written in Python,
+     and can simulate c), d) and e).
+ h)  Formats can be managed through web interface or through
+     human-readable config files.
+ i)  Introduction of tools like validator and dependencies checker.
+ j)  Better support for multi-language formatting.
+
+Some of the advantages are:
+
+ + Management of formats is much clearer and easier (less concepts,
+   more tools).
+ + Writing formats is easier to learn : less concepts
+   to learn, redesigned work-flow, use of existing well known and
+   well documented languages.
+ + Editing formats is easier: You can use your preferred HTML editor such as
+   Emacs, Dreamweaver or Frontpage to modify templates, or any text
+   editor for output formats and format elements. You can also use the
+   simplified web administration interface.
+ + Faster and more powerful templating system.
+ + Separation of business logic (output formats, format elements)
+   and presentation layer (format templates). This makes the management
+   of formats simpler.
+
+The disadvantages are:
+
+ - No backward compatibility with old formats.
+ - Stricter separation of business logic and presentation layer:
+   no more use of statements such as if(), forall() inside templates,
+   and this requires more work to put logic inside format elements.
+
+
+4. Migrating from the previous PHP BibFormat version to the new Pythonic version
+
+Old BibFormat formats are no longer compatible with the new BibFormat
+files. If you have not modified the "Formats" or modified only a
+little bit the "Behaviours", then the transition will be painless and
+automatic. Otherwise you will have to manually rewrite some of the
+formats. This should however not be a big problem. Firstly because the
+Invenio installation will provide both versions of BibFormat for
+some time. Secondly because both BibFormat versions can run side by
+side, so that you can migrate your formats while your server still
+works with the old formats.  Thirdly because we provide a migration
+kit that can help you go through this process. Finally because the
+migration is not so difficult, and because it will be much easier for
+you to customize how BibFormat formats your bibliographic data.
+
+Concerning the migration kit it can:
+ a) Effortlessly migrate your behaviours, unless they include complex
+    logic, which usually they don't.
+ b) Help you migrate formats to format templates and format elements.
+ c) Effortlessly migrate your knowledge bases.
+
+Point b) is the most difficult to achieve: previous formats did mix
+business logic and code for the presentation, and could use PHP
+functions. The new BibFormat separates business logic and
+presentation, and does not support PHP. The transition kit will try to
+move business logic to the format elements, and the presentation to
+the format templates. These files will be created for you, includes
+the original code and, if possible, a proposal of Python
+translation. We recommend that you do not to use the transition kit to
+translate formats, especially if you have not modified default
+formats, or only modified default formats in some limited places. You
+will get cleaner code if you write format elements and format
+templates yourself.
+
+
+5. Specifications of the new BibFormat configuration files.
+
+   BibFormat uses human readable configuration files. However (apart
+   from format elements) these files can be edited and managed through
+   a web interface.
+
+5.1 Output formats specifications
+
+Output formats specify rules that define which format template
+to use to format a record.
+While the syntax of output formats is basic, we recommend that you use
+the web interface do edit them, to be sure that you make no error.
+
+The syntax of output format is the following one. First you
+define which field code you put as the conditon for the rule.
+You suffix it with a column. Then on next lines, define the values of
+the condition, followed by --- and then the filename of the template
+to use:
+
+  tag 980.a:
+  PICTURE --- PICTURE_HTML_BRIEF.bft
+  PREPRINT --- PREPRINT_HTML_BRIEF.bft
+  PUBLICATION --- PUBLICATION_HTML_BRIEF.bft
+
+This means that if value of field 980.a is equal to PICTURE, then we
+will use format template PICTURE_HTML_BRIEF.bft. Note that you must
+use the filename of the template, not the name. Also note that spaces
+at the end or beginning are not considered. On the following lines,
+you can either put other conditions on tag 980.a, or add another tag on
+which you want to put conditions.
+
+At the end you can add a default condition:
+
+   default: PREPRINT_HTML_BRIEF.bft
+
+which means that if no condition is matched, a format suitable for
+Preprints will be used to format the current record.
+
+The output format file could then look like this:
+
+  tag 980.a:
+  PICTURE --- PICTURE_HTML_BRIEF.bft
+  PREPRINT --- PREPRINT_HTML_BRIEF.bft
+  PUBLICATION --- PUBLICATION_HTML_BRIEF.bft
+
+  tag 8560.f:
+  .*@cern.ch --- SPECIAL_MEMBER_FORMATTING.bft
+
+  default: PREPRINT_HTML_BRIEF.bft
+
+You can add as many rules as you want. Keep in mind that they are read
+in the order they are defined, and that only first rule that
+matches will be used.
+Notice the condition on tag 8560.f: it uses a regular expression to
+match any email address that ends with @cern.ch (the regular
+expression must be understandable by Python)
+
+Some other considerations on the management of output formats:
+- Format outputs must be placed inside directory
+  /etc/bibformat/outputs/ of your Invenio installation.
+- Note that as long as you have not provided a name to an output
+  THROUGH the web interface, it will not be available as a choice
+  for your users in some parts of Invenio.
+- You should remove output formats THROUGH the web interface.
+- The format extension of output format is .bfo
+
+
+5.2 Format templates specifications
+
+Format templates are written in HTML-like syntax. You can use the
+standard HTML and CSS markup languague to do the formatting. The best
+thing to do is to create a page in your favourite editor, and once you
+are glad with it, add the dynamic part of the page, that is print the
+fields of the records. Let's say you have defined this page:
+
+  &lt;h1>Some title&lt;/h1>
+  &lt;p>&lt;i>Abstract: &lt;/i>Some abstract&lt;/p>
+
+Then you want that instead of "Some title" and "Some abstract", the
+value of the current record that is being displayed is used. To do so,
+you must use a format element brick. Either you know the name of the
+brick by heart, or you look for it in the elements documentation (see
+section 5.3). For example you would find there that you can print the
+title of the record by writting the HTML tag &lt;BFE_TITLE /> in your
+format template, with parameter 'default' for a default value.
+
+  &lt;h1>&lt;BFE_TITLE default="No Title"/>&lt;/h1>
+  &lt;p>&lt;BFE_ABSTRACT limit="1" prefix="&lt;i>Abstract: &lt;/i>"
+  default="No abstract"/>&lt;/p>
+
+Notice that &lt;BFE_ABSTRACT /> has a parameter "limit" that &lt;BFE_title/>
+ had not ("limit" allows to limit the number of sentences of the
+abstract, according to the documentation). Note that while format
+elements might have different parameters, they always can take the the
+three following ones: "prefix" and "suffix", whose values are printed
+only if the element is not empty, and "default", which is printed only
+if element is an empty string. We have used "prefix" for the abstract,
+so that the label "&lt;i>Abstract: &lt;/i>" is only printed if the record
+has an abstract.
+
+You should also provide these tags in all of your templates:
+ -&lt;name>a name for this template in the admin web interface&lt;/name>
+ -&lt;description>a description to be used in admin web interface for
+  this template&lt;/description>
+
+Another feature of the templates is the support for multi-languages
+outputs. You can include &lt;lang> tags, which contain tags labeled with
+the names of the languages supported in Invenio. For example, one
+might write:
+
+  &lt;lang>&lt;en>A record:&lt;/en>&lt;fr>Une notice:&lt;/fr>&lt;/lang>
+  &lt;h1>&lt;BFE_TITLE default="No Title"/>&lt;/h1>
+  &lt;p>&lt;BFE_ABSTRACT limit="1" prefix="&lt;i>Abstract: &lt;/i>"
+  default="No abstract"/>&lt;/p>
+
+When doing this you should at least make sure that the default
+language of your server installation is available in each &lt;lang>
+tag. It is the one that is used if the requested language to display
+the record is not available. Note that we could also provide a
+translation in a similar way for the "No Title" default value inside
+&lt;BFE_Title /> tag.
+
+Some other considerations on the use of elements inside templates:
+ -Format elements names are not case sensitive
+ -Format elements names always start with &lt;BFE_
+ -Format elements parameters can contain '&lt;' characters,
+  and quotes different from the kind that delimit parameters (you can
+  for example have &lt;BFE_Title default='&lt;a href="#">No Title&lt;/a>'/> )
+ -Format templates must be placed inside the directory
+  /etc/bibformat/templates/ of your Invenio installation
+ -The format extension of a template is .bft
+
+Trick: you can use the &lt;BFE_FIELD tag="245__a" /> to print the value
+of any field 245 $a in your templates.  This practice is however not
+recommended because it would necessitate to revise all format
+templates if you change meaning of the MARC code schema.
+
+5.3 Format elements specifications
+
+Format elements are the bricks used in format templates to provide the
+dynamic contents inside format templates.
+
+For the most basic format elements, you do not even need to write
+them: as long as you define `tag names' for MARC tags in the BibIndex
+Admin's Manage logical fields interface (database table tag),
+BibFormat knows which field must be printed when &lt;BFE_tag_name/> is
+used inside a template.
+
+However for more complex processing, you will need to write a format
+element. A format element is written in Python. Therefore its file
+extension is ".py". The name you choose for the file is the one that
+will be used inside format template to call the element, so choose it
+carefully such that it is not too long, but self explanatory (you can
+prefix the filename with BFE or not, but the element will always be
+called with prefix &lt;BFE_ inside templates).  Then you just need to
+drop the file in the lib/python/invenio/bibformat_elements/ directory
+of your Invenio installation. Inside your file you have to define
+a function named "format_element", which takes at least a "bfo"
+parameter (bfo for BibFormat Object). The function must return a
+string:
+
+  def format_element(bfo):
+      out = ""
+
+      return out
+
+You can have as many parameters as you want, as long as you make sure
+that parameter bfo is here. Let's see how to define an element that
+will print a brief title. It will take a parameter 'limit' that will
+limit the number of characters printed. We can provide some
+documentation for the elemen in the docstring of the
+function.
+
+ def format_element(bfo, limit="10"):
+      """
+      Prints a short title
+
+      @param limit a limit for the number of printed characters
+      """
+
+      out = ""
+
+      return out
+
+Note that we put a default value of 10 in the 'limit' parameter.  To
+get some value of a field, we must request the 'bfo' object. For
+example we can get the value of field 245.a (field "title"):
+
+ def format_element(bfo, limit="10"):
+      """
+      Prints a short title
+
+      @param limit a limit for the number of printed characters
+      """
+
+      title = bfo.field('245.a')
+
+      limit = int(limit)
+      if limit > len(title):
+          limit = len(title)
+
+      return title[:limit]
+
+As format elements are written in Python, we have decided not to give
+permission to edit elements through the web interface. Firstly for
+security reasons. Secondly because Python requires correct indentation,
+which is difficult to achieve through a web interface.
+
+You can have access to the documentation of your element through a web
+interface. This is very useful when you are writing a format template,
+to see which elements are available, what they do, which parameters they
+take, what are the default values of parameters, etc. The
+documentation is automatically extracted from format elements.
+Here follows an sample documentation generated for the element
+&lt;BFE_TITLE />:
+
++--------------------------------------------------------------------------------------------+
+|  TITLE                                                                                     |
+|  -----                                                                                     |
+|  &lt;BFE_TITLE separator="..." prefix="..." suffix="..." default="..." />                  |
+|                                                                                            |
+|      Prints the title of a record.                                                         |
+|                                                                                            |
+|      Parameters:                                                                           |
+|            separator - separator between the different titles.                             |
+|            prefix - A prefix printed only if the record has a value for this element.      |
+|            suffix - A suffix printed only if the record has a value for this element.      |
+|            default - A default value printed if the record has no value for this element.  |
+|                                                                                            |
+|       See also:                                                                            |
+|            Format templates that use this element                                          |
+|            The Python code of this element                                                 |
++--------------------------------------------------------------------------------------------+
+
+The more you provide documentation in the docstring of your elements,
+the easier it will be to write format template afterwards.
+
+Some remarks concerning format elements:
+ -parameters are always string values
+ -if no value is given as parameter in format the template, then the
+  value of parameter is "" (emtpy string)
+ -the docstring should contain a description, followed by
+  "@param parameter: some description for parameter" for each
+  parameter (to give description for each parameter
+  in element documentation), and @see an_element.py, another_element.py
+  (to link to other elements in the documentation). Similar to JavaDoc.
+ -the following names cannot be used as parameters:
+  "default", "prefix", "suffix" and escape. They can however always be
+  used in the format template for any element.
+
+Another important remark concerns the 'escaping' of output of format
+elements. In most cases, format elements output is to be used for
+HTML/XML. Therefore special characters such as < or & have to be
+'escaped', replaced by '&lt;' and '&amp;'. This is why all outputs
+produced by format elements are automatically escaped by BibFormat,
+unless specified otherwise.  This means that you do not have to care
+about meta-data that would break your HTML displaying or XML export
+such as a physics formula like 'a < b'. Please also note that value
+given in 'prefix', 'suffix' and 'default' parameters are not escaped,
+such that you can safely use HTML tags for these.
+
+There are always cases where the default 'escaping' behaviour of
+BibFormat is not desired. For example when you explicitely output HTML
+text, like links: you do not want to see them escaped.  The first way
+to avoid this is to modify the call to your format element in the
+format template, by setting the default 'escape' parameter to 0:
+
+ <BFE_ABSTRACT escape='0'>
+
+This is however inconvenient as you have to possibly need to modify a
+lot of templates. The other way of doing is to add another function to
+your format element, named 'escape':
+
+ def escape_values(bfo):
+     """
+     Called by BibFormat in order to check if output of this element
+     should be escaped.
+     """
+     return 0
+
+In that way all calls to your format element will produce unescaped
+output.  You will have to take care of escaping values "manually" in
+your format element code, in order to avoid non valid outputs or XSS
+vulnerabilities. There are methods to ease the escaping in your code
+described in section 1.
+Please also note that if you use this method, your element can still
+be escaped if a call to your element from a format template
+explicitely specifies to escape value using parameter 'escape'.
+
+
+5.4 Knowledge bases specifications
+
+Knowledge bases cannot be managed through configuration files.
+You can very easily add new bases and mappings using the given web GUI.
+
+ -- End of file --
+</pre>
+</protect>

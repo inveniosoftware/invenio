@@ -36,28 +36,27 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_DEVEL_SITE, \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_USE_MATHJAX
 
-from invenio.dbquery import Error
-from invenio.access_control_engine import acc_authorize_action
-from invenio.webpage import page, error_page, warning_page
-from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser, \
+from invenio.legacy.dbquery import Error
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.legacy.webpage import page, error_page, warning_page
+from invenio.legacy.webuser import getUid, get_email, collect_user_info, isGuestUser, \
                             page_not_authorized
-from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES, \
+from invenio.legacy.websubmit.config import CFG_RESERVED_SUBMISSION_FILENAMES, \
     InvenioWebSubmitFunctionError, InvenioWebSubmitFunctionStop, \
     InvenioWebSubmitFunctionWarning
-from invenio.messages import gettext_set_language, wash_language
-from invenio.webstat import register_customevent
-from invenio.errorlib import register_exception
-from invenio.urlutils import make_canonical_urlargd, redirect_to_url
-from invenio.websubmitadmin_engine import string_is_alphanumeric_including_underscore
-from invenio.htmlutils import get_mathjax_header
+from invenio.base.i18n import gettext_set_language, wash_language
+from invenio.legacy.webstat.api import register_customevent
+from invenio.ext.logging import register_exception
+from invenio.utils.url import make_canonical_urlargd, redirect_to_url
+from invenio.legacy.websubmit.admin_engine import string_is_alphanumeric_including_underscore
+from invenio.utils.html import get_mathjax_header
 
-from invenio.websubmit_dblayer import \
+from invenio.legacy.websubmit.db_layer import \
      get_storage_directory_of_action, \
      get_longname_of_doctype, \
      get_longname_of_action, \
@@ -87,8 +86,8 @@ from invenio.websubmit_dblayer import \
      get_submissions_at_level_X_with_score_above_N, \
      submission_is_finished
 
-import invenio.template
-websubmit_templates = invenio.template.load('websubmit')
+import invenio.legacy.template
+websubmit_templates = invenio.legacy.template.load('websubmit')
 
 def interface(req,
               c=CFG_SITE_NAME,
@@ -1491,7 +1490,8 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
     doctype_details = get_doctype_details(doctype)
     if doctype_details is None:
         ## Doctype doesn't exist - raise error:
-        return warning_page(_("Unable to find document type: %s") % escape(str(doctype)), req, ln)
+        return warning_page(_("Unable to find document type: %(doctype)s",
+                              doctype=escape(str(doctype))), req, ln)
     else:
         docFullDesc  = doctype_details[0]
         # Also update the doctype as returned by the database, since
@@ -1700,10 +1700,14 @@ def print_function_calls(req, doctype, action, step, form, start_time,
                 'error' : 0,
                 'text' : '',
                 }
-                if os.path.exists("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name)):
+                #FIXME: deprecated
+                from invenio.legacy.websubmit import functions as legacy_functions
+                function_path = os.path.join(legacy_functions.__path__[0],
+                                             function_name + '.py')
+                if os.path.exists(function_path):
                     # import the function itself
-                    #function = getattr(invenio.websubmit_functions, function_name)
-                    execfile("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name), the_globals)
+                    #function = getattr(invenio.legacy.websubmit.functions, function_name)
+                    execfile(function_path, the_globals)
                     if function_name not in the_globals:
                         currfunction['error'] = 1
                     else:

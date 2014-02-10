@@ -23,24 +23,24 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.webinterface_handler_wsgi_utils import Field
+from invenio.legacy.wsgi.utils import Field
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.urlutils import redirect_to_url
-from invenio.messages import gettext_set_language
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
-from invenio.webinterface_handler_wsgi_utils import handle_file_post
-from invenio.webuser import getUid, page_not_authorized, get_email
-from invenio.webpage import page
+from invenio.utils.url import redirect_to_url
+from invenio.base.i18n import gettext_set_language
+from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
+from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
+from invenio.legacy.wsgi.utils import handle_file_post
+from invenio.legacy.webuser import getUid, page_not_authorized, get_email
+from invenio.legacy.webpage import page
 
-from invenio.batchuploader_engine import metadata_upload, cli_upload, \
+from invenio.legacy.batchuploader.engine import metadata_upload, cli_upload, \
      get_user_metadata_uploads, get_user_document_uploads, document_upload, \
      get_daemon_doc_files, get_daemon_meta_files, cli_allocate_record, \
      user_authorization, perform_upload_check
 
 try:
-    import invenio.template
-    batchuploader_templates = invenio.template.load('batchuploader')
+    import invenio.legacy.template
+    batchuploader_templates = invenio.legacy.template.load('batchuploader')
 except:
     pass
 

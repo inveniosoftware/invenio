@@ -21,11 +21,11 @@
 __revision__ = "$Id$"
 
 import re
-from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, compose_format
-from invenio.messages import gettext_set_language
+from invenio.legacy.bibdocfile.api import BibRecDocs, file_strip_ext, normalize_format, compose_format
+from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD, \
     CFG_BIBFORMAT_HIDDEN_FILE_FORMATS
-from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
+from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
 from cgi import escape, parse_qs
 from urlparse import urlparse
 from os.path import basename
@@ -105,7 +105,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
                 # rather study doc type, and base ourselves on
                 # Main/Additional/Plot etc.
                 continue
-            out += ['<li class="nav-header"><strong>%s:</strong></li>' % descr]
+            out += ['<li class="dropdown-header"><strong>%s:</strong></li>' % descr]
             urls_dict = {}
             for url, name, url_format in urls:
                 if name not in urls_dict:
@@ -115,7 +115,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
             for name, urls_and_format in urls_dict.items():
                 if len(urls_dict) > 1:
                     print_name = "<em>%s</em>" % name
-                    url_list = ['<li class="nav-header">' + print_name + "</li>"]
+                    url_list = ['<li class="dropdown-header">' + print_name + "</li>"]
                 else:
                     url_list = []
                 for url, url_format in urls_and_format:

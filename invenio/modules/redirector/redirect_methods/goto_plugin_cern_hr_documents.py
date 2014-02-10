@@ -25,9 +25,9 @@ Server. It's useful as a reference on how goto plugins could be implemented.
 import time
 import re
 
-from invenio.search_engine import perform_request_search
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.search_engine import perform_request_search
+from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.legacy.bibdocfile.api import BibRecDocs
 
 def make_cern_ssr_docname(lang, edition, modif=0):
     if modif:
@@ -128,7 +128,7 @@ def register_hr_redirections():
     Run this only once
     """
 
-    from invenio.goto_engine import register_redirection
+    from invenio.modules.redirector.api import register_redirection
     plugin = 'goto_plugin_cern_hr_documents'
 
     ## Staff rules and regulations

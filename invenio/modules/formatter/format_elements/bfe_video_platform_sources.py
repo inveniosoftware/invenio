@@ -25,7 +25,7 @@
 * Based on bfe_video_selector.py
 """
 
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 
 def format_element(bfo):
     """ Format element function to create the select and option elements

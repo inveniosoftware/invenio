@@ -19,15 +19,15 @@
 
 """RefExtract configuration"""
 
-
-from invenio.config import CFG_VERSION, CFG_ETCDIR
+import pkg_resources
+from invenio.config import CFG_VERSION
 
 # pylint: disable=C0301
 
 # Version number:
 CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" % (CFG_VERSION, '1.4')
 # Module config directory
-CFG_CONF_DIR = '%s/docextract' % CFG_ETCDIR
+CFG_CONF_DIR = pkg_resources.resource_filename('invenio.legacy.refextract', 'kbs')
 
 CFG_REFEXTRACT_KBS = {
    'journals'        : "%s/journal-titles.kb" % CFG_CONF_DIR,

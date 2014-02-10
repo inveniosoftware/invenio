@@ -21,6 +21,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_ETCDIR
+import pkg_resources
 
-CFG_WEBSTAT_CONFIG_PATH = CFG_ETCDIR + "/webstat/webstat.cfg"
+CFG_WEBSTAT_CONFIG_PATH = pkg_resources.resource_filename('invenio.legacy.webstat', 'webstat.cfg')

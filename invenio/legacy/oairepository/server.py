@@ -30,6 +30,7 @@ if sys.hexversion < 0x2050000:
     from glob import glob as iglob
 else:
     from glob import iglob
+from flask import url_for
 
 from invenio.config import \
      CFG_OAI_DELETED_POLICY, \
@@ -57,14 +58,14 @@ from invenio.config import \
      CFG_OAI_PROVENANCE_HARVESTDATE_SUBFIELD, \
      CFG_OAI_PROVENANCE_ALTERED_SUBFIELD
 
-from invenio.intbitset import intbitset
-from invenio.htmlutils import X, EscapedXMLString
-from invenio.dbquery import run_sql, wash_table_column_name
-from invenio.search_engine import record_exists, get_all_restricted_recids, get_all_field_values, search_unit_in_bibxxx, get_record
-from invenio.bibformat import format_record
-from invenio.bibrecord import record_get_field_instances
-from invenio.errorlib import register_exception
-from invenio.oai_repository_config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
+from intbitset import intbitset
+from invenio.utils.html import X, EscapedXMLString
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
+from invenio.legacy.search_engine import record_exists, get_all_restricted_recids, get_all_field_values, search_unit_in_bibxxx, get_record
+from invenio.modules.formatter import format_record
+from invenio.legacy.bibrecord import record_get_field_instances
+from invenio.ext.logging import register_exception
+from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 
 CFG_VERBS = {
     'GetRecord'          : ['identifier', 'metadataPrefix'],
@@ -126,7 +127,9 @@ def oai_header(argd, verb):
     """
 
     out = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n"
-    out += "<?xml-stylesheet type=\"text/xsl\" href=\"%s/css/oai2.xsl.v1.0\" ?>\n" % CFG_SITE_URL
+    out += "<?xml-stylesheet type=\"text/xsl\" href=\"%s\" ?>\n" % (
+        url_for('oairepository.static',
+                filename='xsl/oairepository/oai2.xsl.v1.0'))
     out += "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n"
 
     #out += "<responseDate>%s</responseDate>" % get_utc_now()
@@ -177,6 +180,9 @@ def utc_to_localtime(date):
 
     Eg:    1994-11-05T13:15:30Z
     """
+    if date is None or len(date) == 0:
+        return
+
     ldate = date.split("T")[0]
     ltime = date.split("T")[1]
 
@@ -206,6 +212,8 @@ def utc_to_localtime(date):
 
 def localtime_to_utc(date):
     """Convert localtime to UTC"""
+    if date is None or len(date) == 0:
+        return
 
     ldate = date.split(" ")[0]
     ltime = date.split(" ")[1]
@@ -744,8 +752,13 @@ def oai_cache_gc():
     """
     OAI Cache Garbage Collector.
     """
-    for file_ in os.listdir(os.path.join(CFG_CACHEDIR, 'RTdata')):
-        filename = os.path.join(os.path.join(CFG_CACHEDIR, 'RTdata', file_))
+    cache_dir = os.path.join(CFG_CACHEDIR, 'RTdata')
+
+    if not os.path.isdir(cache_dir):
+        os.makedirs(cache_dir)
+
+    for file_ in os.listdir(cache_dir):
+        filename = os.path.join(cache_dir, file_)
         # cache entry expires when not modified during a specified period of time
         if ((time.time() - os.path.getmtime(filename)) > CFG_OAI_EXPIRE):
             try:

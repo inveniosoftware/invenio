@@ -17,9 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.sherpa_romeo import SherpaRomeoSearch
-from invenio.orcid import OrcidSearch
-from invenio.bibknowledge import get_kb_mappings
+from invenio.utils.sherpa_romeo import SherpaRomeoSearch
+from invenio.utils.orcid import OrcidSearch
 
 
 def kb_autocomplete(name, mapper=None):
@@ -31,6 +30,7 @@ def kb_autocomplete(name, mapper=None):
                    autocomplete entry.
     """
     def inner(dummy_form, dummy_field, term, limit=50):
+        from invenio.modules.knowledge.api import get_kb_mappings
         result = get_kb_mappings(name, '', term)[:limit]
         return map(mapper, result) if mapper is not None else result
     return inner

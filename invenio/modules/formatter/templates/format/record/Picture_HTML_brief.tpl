@@ -1,4 +1,4 @@
-{% extends 'format_templates/Default_HTML_brief.tpl' %}
+{% extends 'format/record/Default_HTML_brief.tpl' %}
 
 {% block record_header %}
 <h4 class="media-heading">
@@ -6,7 +6,7 @@
         {{ record.get('title.title', '') }}
     </a>
     {{ '/' if record.get('title_parallel.title') }}
-    <small class="muted">
+    <small class="text-muted">
         {{ record.get('title_parallel.title', '')}}
     </small>
 </h4>

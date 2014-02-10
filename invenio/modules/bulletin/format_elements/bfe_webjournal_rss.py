@@ -21,14 +21,14 @@
 WebJournal widget - Display the index of the lastest articles,
 including 'breaking news'.
 """
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      get_journal_categories, \
      get_category_query
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL
-from invenio.urlutils import create_html_link
-from invenio.dbquery import run_sql
+from invenio.utils.url import create_html_link
+from invenio.legacy.dbquery import run_sql
 from urllib import quote
 
 def format_element(bfo, categories, label="Subscribe by RSS",

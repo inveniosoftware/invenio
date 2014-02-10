@@ -82,6 +82,7 @@ from ConfigParser import ConfigParser
 from optparse import OptionParser, OptionGroup, IndentedHelpFormatter, Option, \
     OptionError
 import os
+import pkg_resources
 import random
 import re
 import shutil
@@ -300,6 +301,10 @@ Please, update your invenio-local.conf file accordingly.""")
 
 
 def update_config_py(conf):
+    print '>>> NOT NEEDED!!!'
+    print '>>> quiting ...'
+    return
+
     import sys
     print ">>> Going to update config.py..."
     ## location where config.py is:
@@ -369,7 +374,7 @@ def cli_cmd_update_config_py(conf):
     config.py in a backup copy.
     """
     update_config_py(conf)
-    # from invenio.config_manager import main
+    # from invenio.base.scripts.config import main
 
     # warn('inveniocfg --update-config-py is deprecated. Using instead: inveniomanage config update')
 
@@ -441,7 +446,7 @@ def cli_cmd_update_bibconvert_tpl(conf):
     from conf file.  Note: this edits tpl files in situ, taking a
     backup first.  Use only when you know what you are doing.
     """
-    from invenio.bibconvert_manager import main
+    from invenio.legacy.bibconvert.manager import main
 
     warn('inveniocfg --update-bibconvert-tpl is deprecated. Using instead: inveniomanage bibconvert update')
 
@@ -495,7 +500,7 @@ def cli_cmd_reset_sitename(conf):
     CFG_SITE_NAME_INTL* read from conf files.
     """
     print ">>> Going to reset CFG_SITE_NAME and CFG_SITE_NAME_INTL..."
-    from invenio.dbquery import run_sql, IntegrityError
+    from invenio.legacy.dbquery import run_sql, IntegrityError
     # reset CFG_SITE_NAME:
     sitename = conf.get("Invenio", "CFG_SITE_NAME")
     try:
@@ -504,8 +509,8 @@ def cli_cmd_reset_sitename(conf):
     except IntegrityError:
         run_sql("""UPDATE collection SET name=%s WHERE id=1""", (sitename,))
     # reset CFG_SITE_NAME_INTL:
-    for lang in conf.get("Invenio", "CFG_SITE_LANGS").split(","):
-        sitename_lang = conf.get("Invenio", "CFG_SITE_NAME_INTL_" + lang)
+    for lang in conf.get("Invenio", "CFG_SITE_LANGS"):
+        sitename_lang = conf.get("Invenio", "CFG_SITE_NAME_INTL")[lang]
         try:
             run_sql("""INSERT INTO collectionname (id_collection, ln, type, value) VALUES
                          (%s,%s,%s,%s)""", (1, lang, 'ln', sitename_lang))
@@ -520,10 +525,10 @@ def cli_cmd_reset_recstruct_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
     will adapt the database to either store or not store the recstruct
     format."""
-    from invenio.intbitset import intbitset
-    from invenio.dbquery import run_sql, serialize_via_marshal
-    from invenio.search_engine import get_record
-    from invenio.bibsched import server_pid, pidfile
+    from intbitset import intbitset
+    from invenio.legacy.dbquery import run_sql, serialize_via_marshal
+    from invenio.legacy.search_engine import get_record
+    from invenio.legacy.bibsched.cli import server_pid, pidfile
     enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
     enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
     pid = server_pid(ping_the_process=False)
@@ -558,7 +563,7 @@ def cli_cmd_reset_recjson_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
     will adapt the database to either store or not store the recjson
     format."""
-    from invenio.bibfield_manager import main
+    from invenio.legacy.bibfield.bibfield_manager import main
 
     warn('inveniocfg --reset-recjson-cache is deprecated. Using instead: inveniomanage bibfield reset')
 
@@ -574,7 +579,7 @@ def cli_cmd_reset_siteadminemail(conf):
     Reset user-related tables with new CFG_SITE_ADMIN_EMAIL read from conf files.
     """
     print ">>> Going to reset CFG_SITE_ADMIN_EMAIL..."
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     siteadminemail = conf.get("Invenio", "CFG_SITE_ADMIN_EMAIL")
     run_sql("DELETE FROM user WHERE id=1")
     run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
@@ -590,8 +595,8 @@ def cli_cmd_reset_fieldnames(conf):
     are taken from the PO files.
     """
     print ">>> Going to reset I18N field names..."
-    from invenio.messages import gettext_set_language, language_list_long
-    from invenio.dbquery import run_sql, IntegrityError
+    from invenio.base.i18n import gettext_set_language, language_list_long
+    from invenio.legacy.dbquery import run_sql, IntegrityError
 
     ## get field id and name list:
     field_id_name_list = run_sql("SELECT id, name FROM field")
@@ -653,8 +658,8 @@ def cli_check_openoffice(conf):
     If OpenOffice.org integration is enabled, checks whether the system is
     properly configured.
     """
-    from invenio.bibtask import check_running_process_user
-    from invenio.websubmit_file_converter import can_unoconv, get_file_converter_logger
+    from invenio.legacy.bibsched.bibtask import check_running_process_user
+    from invenio.legacy.websubmit.file_converter import can_unoconv, get_file_converter_logger
     logger = get_file_converter_logger()
     for handler in logger.handlers:
         logger.removeHandler(handler)
@@ -672,15 +677,16 @@ def test_db_connection():
     Useful to be called during table creation.
     """
     print "Testing DB connection...",
-    from invenio.textutils import wrap_text_in_a_box
-    from invenio.dbquery import run_sql, Error
+    from invenio.utils.text import wrap_text_in_a_box
+    from invenio.legacy.dbquery import run_sql, Error
 
     ## first, test connection to the DB server:
     try:
         run_sql("SHOW TABLES")
     except Error, err:
-        from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_PORT, \
-             CFG_DATABASE_NAME, CFG_DATABASE_USER, CFG_DATABASE_PASS
+        from invenio.dbquery_config import CFG_DATABASE_HOST, \
+            CFG_DATABASE_PORT, CFG_DATABASE_NAME, CFG_DATABASE_USER, \
+            CFG_DATABASE_PASS
         print wrap_text_in_a_box("""\
 DATABASE CONNECTIVITY ERROR %(errno)d: %(errmsg)s.\n
 
@@ -751,7 +757,7 @@ before continuing.""" % err)
 def cli_cmd_create_secret_key(conf):
     """Generate and append CFG_SITE_SECRET_KEY to invenio-local.conf.
     Useful for the installation process."""
-    from invenio.config_manager import main
+    from invenio.base.scripts.config import main
 
     warn('inveniocfg --create-secret-key is deprecated. Using instead: inveniomanage config create secret-key')
 
@@ -763,7 +769,7 @@ def cli_cmd_create_secret_key(conf):
 
 def cli_cmd_create_tables(conf):
     """Create and fill Invenio DB tables.  Useful for the installation process."""
-    from invenio.database_manager import main
+    from invenio.base.scripts.database import main
 
     warn('inveniocfg --create-tables is deprecated. Using instead: inveniomanage database create')
 
@@ -784,7 +790,7 @@ def cli_cmd_load_webstat_conf(conf):
 
 
 def cli_cmd_load_bibfield_config(conf):
-    from invenio.bibfield_manager import main
+    from invenio.legacy.bibfield.bibfield_manager import main
 
     warn('inveniocfg --load-bibfield-conf is deprecated. Using instead: inveniomanage bibfield config load')
 
@@ -798,7 +804,7 @@ def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
     print ">>> Going to drop tables and related data on filesystem ..."
 
-    from invenio.database_manager import main
+    from invenio.base.scripts.database import main
 
     warn('inveniocfg --drop-tables is deprecated. Using instead: inveniomanage database drop')
 
@@ -814,7 +820,7 @@ def cli_cmd_create_demo_site(conf):
     """Create demo site.  Useful for testing purposes."""
     print ">>> Going to create demo site..."
     from invenio.config import CFG_PREFIX
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     run_sql("TRUNCATE schTASK")
     run_sql("TRUNCATE session")
     run_sql("DELETE FROM user WHERE email=''")
@@ -837,10 +843,11 @@ def cli_cmd_create_demo_site(conf):
 def cli_cmd_load_demo_records(conf):
     """Load demo records.  Useful for testing purposes."""
     from invenio.config import CFG_PREFIX
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     print ">>> Going to load demo records..."
     run_sql("TRUNCATE schTASK")
-    for cmd in ["%s/bin/bibupload -u admin -i %s/var/tmp/demobibdata.xml" % (CFG_PREFIX, CFG_PREFIX),
+    for cmd in ["%s/bin/bibupload -u admin -i %s" % (CFG_PREFIX,
+                    pkg_resources.resource_filename('invenio.testsuite', os.path.join('data','demo_record_marc_data.xml'))),
                 "%s/bin/bibupload 1" % CFG_PREFIX,
                 "%s/bin/bibdocfile --textify --with-ocr --recid 97" % CFG_PREFIX,
                 "%s/bin/bibdocfile --textify --all" % CFG_PREFIX,
@@ -866,8 +873,8 @@ def cli_cmd_remove_demo_records(conf):
     """Remove demo records.  Useful when you are finished testing."""
     print ">>> Going to remove demo records..."
     from invenio.config import CFG_PREFIX
-    from invenio.dbquery import run_sql
-    from invenio.textutils import wrap_text_in_a_box, wait_for_user
+    from invenio.legacy.dbquery import run_sql
+    from invenio.utils.text import wrap_text_in_a_box, wait_for_user
     wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
 your records and documents!"""))
     if os.path.exists(CFG_PREFIX + os.sep + 'var' + os.sep + 'data'):
@@ -884,7 +891,7 @@ your records and documents!"""))
 def cli_cmd_drop_demo_site(conf):
     """Drop demo site completely.  Useful when you are finished testing."""
     print ">>> Going to drop demo site..."
-    from invenio.textutils import wrap_text_in_a_box, wait_for_user
+    from invenio.utils.text import wrap_text_in_a_box, wait_for_user
     wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
 your site and documents!"""))
     cli_cmd_drop_tables(conf)
@@ -894,31 +901,31 @@ your site and documents!"""))
 
 def cli_cmd_run_unit_tests(conf):
     """Run unit tests, usually on the working demo site."""
-    from invenio.testutils import build_and_run_unit_test_suite
+    from invenio.testsuite import build_and_run_unit_test_suite
     if not build_and_run_unit_test_suite():
         sys.exit(1)
 
 def cli_cmd_run_js_unit_tests(conf):
     """Run JavaScript unit tests, usually on the working demo site."""
-    from invenio.testutils import build_and_run_js_unit_test_suite
+    from invenio.testsuite import build_and_run_js_unit_test_suite
     if not build_and_run_js_unit_test_suite():
         sys.exit(1)
 
 def cli_cmd_run_regression_tests(conf):
     """Run regression tests, usually on the working demo site."""
-    from invenio.testutils import build_and_run_regression_test_suite
+    from invenio.testsuite import build_and_run_regression_test_suite
     if not build_and_run_regression_test_suite():
         sys.exit(1)
 
 def cli_cmd_run_web_tests(conf):
     """Run web tests in a browser. Requires Firefox with Selenium."""
-    from invenio.testutils import build_and_run_web_test_suite
+    from invenio.testsuite import build_and_run_web_test_suite
     if not build_and_run_web_test_suite():
         sys.exit(1)
 
 def cli_cmd_run_flask_tests(conf):
     """Run flask tests."""
-    from invenio.testutils import build_and_run_flask_test_suite
+    from invenio.testsuite import build_and_run_flask_test_suite
     build_and_run_flask_test_suite()
 
 def _detect_ip_address():
@@ -958,7 +965,7 @@ def cli_cmd_get(conf, varname):
     third-party programs to access values of conf options such as
     CFG_PREFIX.  Return None if VARNAME is not found.
     """
-    from invenio.config_manager import main
+    from invenio.base.scripts.config import main
 
     warn('inveniocfg --get="%(varname)s" is deprecated. '
          'Using instead: inveniomanage config get "%(varname)s"' % {
@@ -979,7 +986,7 @@ def cli_cmd_list(conf):
     """
     Print a list of all conf options and values from CONF.
     """
-    from invenio.config_manager import main
+    from invenio.base.scripts.config import main
 
     warn('inveniocfg --list is deprecated. '
          'Using instead: inveniomanage config list')
@@ -996,7 +1003,7 @@ def _grep_version_from_executable(path_to_exec, version_regexp):
     PATH_TO_EXEC and looking for VERSION_REGEXP.  Return program
     version as a string.  Return empty string if not succeeded.
     """
-    from invenio.shellutils import run_shell_command
+    from invenio.utils.shell import run_shell_command
     exec_version = ""
     if os.path.exists(path_to_exec):
         dummy1, cmd2_out, dummy2 = run_shell_command("strings %s | grep %s",
@@ -1014,7 +1021,7 @@ def cli_cmd_detect_system_details(conf):
     Detect and print system details such as Apache/Python/MySQL
     versions etc.  Useful for debugging problems on various OS.
     """
-    from invenio.inveniomanage import main
+    from invenio.base.manage import main
 
     warn('inveniocfg --detect-system-name is deprecated. Using instead: inveniomanage detect-system-name')
 
@@ -1028,12 +1035,12 @@ def cli_cmd_upgrade(conf):
     """
     Command for applying upgrades
     """
-    from invenio.upgrade_manager import main
+    from invenio.modules.upgrader.manage import main
 
     warn('inveniocfg --upgrade-check is deprecated. Using instead: inveniomanage upgrade run')
 
     sys_argv = sys.argv
-    sys.argv = 'upgrade_manager.py run'.split()
+    sys.argv = 'modules.upgrader.manage.py run'.split()
     main()
     sys.argv = sys_argv
 
@@ -1042,12 +1049,12 @@ def cli_cmd_upgrade_check(conf):
     """
     Command for running pre-upgrade checks
     """
-    from invenio.upgrade_manager import main
+    from invenio.modules.upgrader.manage import main
 
     warn('inveniocfg --upgrade-check is deprecated. Using instead: inveniomanage upgrade check')
 
     sys_argv = sys.argv
-    sys.argv = 'upgrade_manager.py check'.split()
+    sys.argv = 'modules.upgrader.manage.py check'.split()
     main()
     sys.argv = sys_argv
 
@@ -1056,12 +1063,12 @@ def cli_cmd_upgrade_show_pending(conf):
     """
     Command for showing upgrades ready to be applied
     """
-    from invenio.upgrade_manager import main
+    from invenio.modules.upgrader.manage import main
 
     warn('inveniocfg --upgrade-show-pending is deprecated. Using instead: inveniomanage upgrade show pending')
 
     sys_argv = sys.argv
-    sys.argv = 'upgrade_manager.py show pending'.split()
+    sys.argv = 'modules.upgrader.manage.py show pending'.split()
     main()
     sys.argv = sys_argv
 
@@ -1070,12 +1077,12 @@ def cli_cmd_upgrade_show_applied(conf):
     """
     Command for showing all upgrades already applied.
     """
-    from invenio.upgrade_manager import main
+    from invenio.modules.upgrader.manage import main
 
     warn('inveniocfg --upgrade-show-applied is deprecated. Using instead: inveniomanage upgrade show applied')
 
     sys_argv = sys.argv
-    sys.argv = 'upgrade_manager.py show applied'.split()
+    sys.argv = 'modules.upgrader.manage.py show applied'.split()
     main()
     sys.argv = sys_argv
 
@@ -1200,28 +1207,11 @@ def prepare_option_parser():
 
 def prepare_conf(options):
     """ Read configuration files """
+    from flask import current_app
     conf = ConfigParser()
-    confdir = getattr(options, 'conf_dir', None)
-
-    if confdir is None:
-        ## try to detect path to conf dir (relative to this bin dir):
-        confdir = re.sub(r'/bin$', '/etc', sys.path[0])
-
-    if confdir and not os.path.exists(confdir):
-        raise Exception("ERROR: bad --conf-dir option value - directory does not exists.")
-        sys.exit(1)
-
-    ## read conf files:
-    for conffile in [confdir + os.sep + 'invenio.conf',
-                     confdir + os.sep + 'invenio-autotools.conf',
-                     confdir + os.sep + 'invenio-local.conf', ]:
-
-        if os.path.exists(conffile):
-            conf.read(conffile)
-        else:
-            if not conffile.endswith("invenio-local.conf"):
-                # invenio-local.conf is optional, otherwise stop
-                raise Exception("ERROR: Badly guessed conf file location %s (Please use --conf-dir option.)" % conffile)
+    conf.add_section('Invenio')
+    for (k, v) in current_app.config.iteritems():
+        conf.set('Invenio', k, v)
     return conf
 
 
@@ -1236,11 +1226,11 @@ def main(*cmd_args):
     (options, dummy_args) = parser.parse_args(list(cmd_args))
 
     if getattr(options, 'version', False):
-        from invenio import inveniomanage
+        from invenio.base import manage
         warn('inveniocfg --version is deprecated. Using instead: inveniomanage version')
         sys_argv = sys.argv
         sys.argv = 'inveniomanage.py version'.split()
-        inveniomanage.main()
+        manage.main()
         sys.argv = sys_argv
     else:
         # Read configuration

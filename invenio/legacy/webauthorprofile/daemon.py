@@ -24,9 +24,9 @@ WebAuthorProfile daemon
 import sys
 from invenio import bibtask
 
-from invenio.bibauthorid_dbinterface import get_existing_personids
-from invenio.webauthorprofile_dbapi import get_expired_person_ids
-from invenio.webauthorprofile_corefunctions import _compute_cache_for_person
+from invenio.legacy.bibauthorid.dbinterface import get_existing_personids
+from .dbapi import get_expired_person_ids
+from .corefunctions import _compute_cache_for_person
 
 def webauthorprofile_daemon():
     """Constructs the webauthorprofile bibtask."""

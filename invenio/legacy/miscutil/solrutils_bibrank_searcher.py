@@ -26,8 +26,8 @@ import itertools
 
 
 from invenio.config import CFG_SOLR_URL
-from invenio.intbitset import intbitset
-from invenio.errorlib import register_exception
+from intbitset import intbitset
+from invenio.ext.logging import register_exception
 
 
 if CFG_SOLR_URL:
@@ -137,7 +137,7 @@ def word_similarity_solr(pattern, hitset, params, verbose, explicit_field, ranke
 
     if pattern:
         pattern = " ".join(map(str, pattern))
-        from invenio.search_engine import create_basic_search_units
+        from invenio.legacy.search_engine import create_basic_search_units
         search_units = create_basic_search_units(None, pattern, explicit_field)
     else:
         return (None, "Records not ranked. The query is not detailed enough, or not enough records found, for ranking to be possible.", "", voutput)

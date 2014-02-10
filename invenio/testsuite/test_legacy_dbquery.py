@@ -22,15 +22,18 @@
 
 __revision__ = "$Id$"
 
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-from invenio import dbquery
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+dbquery = lazy_import('invenio.legacy.dbquery')
+
 
 class TableUpdateTimesTest(InvenioTestCase):
     """Test functions related to the update_times of MySQL tables."""
 
     def _check_table_update_time(self, tablename):
         """Helper function to check update time of TABLENAME."""
+        from invenio.base.globals import cfg
         # detect MySQL version number:
         res = dbquery.run_sql("SELECT VERSION()")
         mysql_server_version = res[0][0]
@@ -38,7 +41,7 @@ class TableUpdateTimesTest(InvenioTestCase):
             # MySQL-5 provides INFORMATION_SCHEMA:
             query = """SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES
                         WHERE table_name='%s' AND table_schema='%s'""" \
-                        % (tablename, dbquery.CFG_DATABASE_NAME)
+                        % (tablename, cfg['CFG_DATABASE_NAME'])
             tablename_update_time = str(dbquery.run_sql(query)[0][0])
         elif mysql_server_version.startswith("4.1"):
             # MySQL-4.1 has it on 12th position:

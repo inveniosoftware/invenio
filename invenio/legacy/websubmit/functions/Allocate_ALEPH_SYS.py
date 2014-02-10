@@ -32,8 +32,8 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_WEBSUBMIT_COUNTERSDIR, \
      CFG_SITE_SUPPORT_EMAIL
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
-from invenio.mailutils import send_email
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
+from invenio.ext.email import send_email
 
 CFG_WARNING_MAX_SYS_APPROACHING = 2000
 CFG_MAX_AGE_LOCKFILE = 300 ## (300 seconds is the maximum age that we allow for a lockfile)

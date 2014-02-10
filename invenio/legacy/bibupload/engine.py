@@ -51,15 +51,15 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS, \
      CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE
 
-from invenio.jsonutils import json, CFG_JSON_AVAILABLE
-from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
+from invenio.utils.json import json, CFG_JSON_AVAILABLE
+from invenio.legacy.bibupload.config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
     CFG_BIBUPLOAD_SPECIAL_TAGS, \
     CFG_BIBUPLOAD_DELETE_CODE, \
     CFG_BIBUPLOAD_DELETE_VALUE, \
     CFG_BIBUPLOAD_OPT_MODES
-from invenio.dbquery import run_sql, \
+from invenio.legacy.dbquery import run_sql, \
                             Error
-from invenio.bibrecord import create_records, \
+from invenio.legacy.bibrecord import create_records, \
                               record_add_field, \
                               record_delete_field, \
                               record_xml_output, \
@@ -77,25 +77,25 @@ from invenio.bibrecord import create_records, \
                               record_extract_dois, \
                               record_has_field,\
                               records_identical
-from invenio.search_engine import get_record
-from invenio.dateutils import convert_datestruct_to_datetext
-from invenio.errorlib import register_exception
-from invenio.bibcatalog import bibcatalog_system
-from invenio.intbitset import intbitset
-from invenio.urlutils import make_user_agent_string
+from invenio.legacy.search_engine import get_record
+from invenio.utils.date import convert_datestruct_to_datetext
+from invenio.ext.logging import register_exception
+from invenio.legacy.bibcatalog.api import bibcatalog_system
+from intbitset import intbitset
+from invenio.utils.url import make_user_agent_string
 from invenio.config import CFG_BIBDOCFILE_FILEDIR
-from invenio.bibtask import task_init, write_message, \
+from invenio.legacy.bibsched.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress, task_sleep_now_if_required, fix_argv_paths
-from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
+from invenio.legacy.bibdocfile.api import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, check_valid_url, download_url, \
     KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioBibDocFileError, \
     bibdocfile_url_p, CFG_BIBDOCFILE_AVAILABLE_FLAGS, guess_format_from_url, \
     BibRelation, MoreInfo
 
-from invenio.search_engine import search_pattern
+from invenio.legacy.search_engine import search_pattern
 
-from invenio.bibupload_revisionverifier import RevisionVerifier, \
+from invenio.legacy.bibupload.revisionverifier import RevisionVerifier, \
                                                InvenioBibUploadConflictingRevisionsError, \
                                                InvenioBibUploadInvalidRevisionError, \
                                                InvenioBibUploadMissing005Error, \
@@ -708,7 +708,7 @@ def submit_ticket_for_holding_pen(rec_id, err, msg):
     msg: verbose message
     """
     from invenio import bibtask
-    from invenio.webuser import get_email_from_username, get_uid_from_email
+    from invenio.legacy.webuser import get_email_from_username, get_uid_from_email
     user = task_get_task_param("user")
     uid = None
     if user:
@@ -952,7 +952,8 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
     """Retrieve the record Id from a record by using tag 001 or SYSNO or OAI ID or DOI
     tag. opt_mod is the desired mode.
 
-    @param post_phase Tells if we are calling this method in the postprocessing phase. If true, we accept presence of 001 fields even in the insert mode
+    @param post_phase Tells if we are calling this method in the postprocessing phase. If true, we accept presence of
+    001 fields even in the insert mode
     @type post_phase boolean
     """
 
@@ -965,9 +966,9 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
         rec_id = tag_001[0][3]
         # if we are in insert mode => error
         if opt_mode == 'insert' and not post_phase:
-            write_message("   Failed: tag 001 found in the xml" \
-                          " submitted, you should use the option replace," \
-                          " correct or append to replace an existing" \
+            write_message("   Failed: tag 001 found in the xml"
+                          " submitted, you should use the option replace,"
+                          " correct or append to replace an existing"
                           " record. (-h for help)",
                           verbose=1, stream=sys.stderr)
             return -1
@@ -983,11 +984,11 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
                     # requested to replace records. Therefore we create on the fly
                     # a empty record allocating the recid.
                     write_message("   Warning: tag 001 found in the xml with"
-                                " value %(rec_id)s, but rec_id %(rec_id)s does"
-                                " not exist. Since the mode replace was"
-                                " requested the rec_id %(rec_id)s is allocated"
-                                " on-the-fly." % {"rec_id": rec_id},
-                                stream=sys.stderr)
+                                  " value %(rec_id)s, but rec_id %(rec_id)s does"
+                                  " not exist. Since the mode replace was"
+                                  " requested the rec_id %(rec_id)s is allocated"
+                                  " on-the-fly." % {"rec_id": rec_id},
+                                  stream=sys.stderr)
                     return create_new_record(rec_id=rec_id, pretend=pretend)
                 else:
                     # Since --force was not used we are going to raise an error
@@ -997,7 +998,7 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
                                   " exists. If you want to really create"
                                   " such record, please use the --force"
                                   " parameter when calling bibupload." % {
-                                    "rec_id": rec_id}, stream=sys.stderr)
+                                  "rec_id": rec_id}, stream=sys.stderr)
                     return -1
             else:
                 # The record doesn't exist yet. We shall have try to check
@@ -1111,18 +1112,18 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
                 # Oops, this record refers to DOI existing in multiple records.
                 # Dunno which one to choose.
                 write_message("   Failed: Multiple records found in the" \
-                          " database %s that match the DOI(s) in the input" \
-                          " MARCXML %s" % (repr(matching_recids), repr(record_dois)),
-                          verbose=1, stream=sys.stderr)
+                              " database %s that match the DOI(s) in the input" \
+                              " MARCXML %s" % (repr(matching_recids), repr(record_dois)),
+                              verbose=1, stream=sys.stderr)
                 return -1
             elif len(matching_recids) == 1:
                 rec_id = matching_recids.pop()
                 if opt_mode == 'insert':
                     write_message("   Failed: DOI tag matching record #%s found in the xml" \
-                          " submitted, you should use the option replace," \
-                          " correct or append to replace an existing" \
-                          " record. (-h for help)" % rec_id,
-                          verbose=1, stream=sys.stderr)
+                                  " submitted, you should use the option replace," \
+                                  " correct or append to replace an existing" \
+                                  " record. (-h for help)" % rec_id,
+                                  verbose=1, stream=sys.stderr)
                     return -1
             else:
                 write_message("   - Tag DOI value not found in database.",
@@ -2858,7 +2859,7 @@ def bibupload_records(records, opt_mode=None, opt_notimechange=0,
                     results_for_callback['results'].append({'recid': error[1], 'success': False, 'error_message': error[2]})
             elif error[0] == 0:
                 if callback_url:
-                    from invenio.search_engine import print_record
+                    from invenio.legacy.search_engine import print_record
                     results_for_callback['results'].append({'recid': error[1], 'success': True, "marcxml": print_record(error[1], 'xm'), 'url': "%s/%s/%s" % (CFG_SITE_URL, CFG_SITE_RECORD, error[1])})
             else:
                 if callback_url:

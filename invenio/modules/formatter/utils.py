@@ -36,12 +36,11 @@ from invenio.config import \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS, \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR
-from invenio.dbquery import run_sql
-from invenio.urlutils import string_to_numeric_char_reference
-from invenio.textutils import encode_for_xml
-from invenio.shellutils import run_shell_command
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.solrutils_bibindex_searcher import solr_get_snippet
+from invenio.legacy.dbquery import run_sql
+from invenio.utils.url import string_to_numeric_char_reference
+from invenio.utils.text import encode_for_xml
+from invenio.utils.shell import run_shell_command
+from invenio.legacy.bibrecord import get_fieldvalues
 
 def highlight_matches(text, compiled_pattern, \
                       prefix_tag='<strong>', suffix_tag="</strong>"):
@@ -186,7 +185,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
     @param decompress: the library to use to decompress cache from DB
     @return: the xml string of the record
     """
-    from invenio.search_engine import record_exists
+    from invenio.legacy.search_engine import record_exists
 
     def get_creation_date(recID, fmt="%Y-%m-%d"):
         "Returns the creation date of the record 'recID'."
@@ -255,7 +254,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
                             CFG_OAI_ID_FIELD[5:6],
                             oai_ids[0])
                 out += "<datafield tag=\"980\" ind1=\" \" ind2=\" \"><subfield code=\"c\">DELETED</subfield></datafield>\n"
-                from invenio.search_engine import get_merged_recid
+                from invenio.legacy.search_engine import get_merged_recid
                 merged_recid = get_merged_recid(recID)
                 if merged_recid: # record was deleted but merged to other record, so display this information:
                     out += "<datafield tag=\"970\" ind1=\" \" ind2=\" \"><subfield code=\"d\">%d</subfield></datafield>\n" % merged_recid
@@ -595,7 +594,7 @@ def get_pdf_snippets(recID, patterns, user_info):
     @param max_snippets: max number of snippets to include
     @return: snippet
     """
-    from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization
+    from invenio.legacy.bibdocfile.api import BibRecDocs, check_bibdoc_authorization
 
     text_path = ""
     text_path_courtesy = ""
@@ -625,10 +624,11 @@ def get_pdf_snippets(recID, patterns, user_info):
             out = get_text_snippets(text_path, patterns, nb_chars, max_snippets)
             if not out:
                 # no hit, so check stemmed versions:
-                from invenio.bibindex_engine_stemmer import stem
+                from invenio.legacy.bibindex.engine_stemmer import stem
                 stemmed_patterns = [stem(p, 'en') for p in patterns]
                 out = get_text_snippets(text_path, stemmed_patterns, nb_chars, max_snippets)
         elif CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR == 'SOLR':
+            from invenio.legacy.miscutil.solrutils_bibindex_searcher import solr_get_snippet
             out = solr_get_snippet(patterns, recID, nb_chars, max_snippets)
 
         if out:

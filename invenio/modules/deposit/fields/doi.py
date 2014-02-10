@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,15 +18,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_validation_utils import doi_syntax_validator
-from invenio.webdeposit_filter_utils import strip_prefixes, strip_string
-from invenio.webdeposit_processor_utils import datacite_lookup
+from invenio.modules.deposit.field_base import WebDepositField
+from ..validation_utils import doi_syntax_validator
+from ..filter_utils import strip_prefixes, strip_string
+from ..processor_utils import datacite_lookup
 
 __all__ = ['DOIField']
 
 
-def missing_doi_warning(dummy_form, field, dummy_submit=False):
+def missing_doi_warning(dummy_form, field, submit=False, fields=None):
     """
     Field processor, checking for existence of a DOI, and otherwise
     asking people to provide it.
@@ -39,7 +39,7 @@ def missing_doi_warning(dummy_form, field, dummy_submit=False):
 class DOIField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-barcode',
+            icon='barcode',
             validators=[
                 doi_syntax_validator,
             ],
@@ -52,6 +52,7 @@ class DOIField(WebDepositField, TextField):
                 datacite_lookup(display_info=True),
             ],
             placeholder="e.g. 10.1234/foo.bar...",
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(DOIField, self).__init__(**defaults)

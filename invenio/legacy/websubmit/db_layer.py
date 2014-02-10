@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 
 def get_storage_directory_of_action(action):

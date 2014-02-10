@@ -28,10 +28,10 @@ __revision__ = \
 import requests
 from urllib import urlencode
 
-from invenio.jsonutils import json_unicode_to_utf8
+from invenio.utils.json import json_unicode_to_utf8
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.external_authentication import ExternalAuth
-from invenio.containerutils import get_substructure
+from invenio.legacy.external_authentication import ExternalAuth
+from invenio.utils.container import get_substructure
 
 class ExternalOAuth2(ExternalAuth):
     """
@@ -58,14 +58,14 @@ class ExternalOAuth2(ExternalAuth):
         @type password: str
 
         @param req: request
-        @type req: invenio.webinterface_handler_wsgi.SimulatedModPythonRequest
+        @type req: invenio.legacy.wsgi.SimulatedModPythonRequest
 
         @rtype: str|NoneType, str|NoneType
         """
-        from invenio.webinterface_handler import wash_urlargd
-        from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
+        from invenio.ext.legacy.handler import wash_urlargd
+        from invenio.modules.access.local_config import CFG_OAUTH2_CONFIGURATIONS
         from rauth.service import OAuth2Service
-        from invenio.access_control_config import CFG_OAUTH2_PROVIDERS
+        from invenio.modules.access.local_config import CFG_OAUTH2_PROVIDERS
 
         self.__init_req(req)
 
@@ -186,11 +186,11 @@ class ExternalOAuth2(ExternalAuth):
         @type password: str
 
         @param req: Isn't used in this function
-        @type req: invenio.webinterface_handler_wsgi.SimulatedModPythonRequest
+        @type req: invenio.legacy.wsgi.SimulatedModPythonRequest
 
         @rtype: str or NoneType
         """
-        from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
+        from invenio.modules.access.local_config import CFG_OAUTH2_CONFIGURATIONS
 
         if req.g['oauth2_provider_name'] and req.g['oauth2_response']:
             path = None
@@ -216,7 +216,7 @@ class ExternalOAuth2(ExternalAuth):
 
         @rtype str|NoneType, str|NoneType
         """
-        from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
+        from invenio.modules.access.local_config import CFG_OAUTH2_CONFIGURATIONS
 
         identity = None
         email = None
@@ -244,7 +244,7 @@ class ExternalOAuth2(ExternalAuth):
         Since we are dealing with orcid we can fetch tons of information
         from the user profile.
         """
-        from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
+        from invenio.modules.access.local_config import CFG_OAUTH2_CONFIGURATIONS
 
         profile = requests.get(CFG_OAUTH2_CONFIGURATIONS['orcid']['request_url'].format(id=req.g['oauth2_orcid']), headers={'Accept': 'application/orcid+json', 'Authorization': 'Bearer %s' % req.g['oauth2_access_token']})
         orcid_record = req.g['orcid_record'] = json_unicode_to_utf8(profile.json)['orcid-profile']

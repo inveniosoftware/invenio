@@ -42,16 +42,15 @@ from invenio.config import \
 	CFG_PATH_PS2PDF, \
 	CFG_PATH_GFILE,\
 	CFG_PATH_PDFLATEX
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_TMPDIR
 from invenio.config import CFG_ETCDIR
 
 CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR = \
-                        "%s/websubmit/file_stamper_templates" % CFG_ETCDIR
+        pkg_resources.resource_filename('invenio.legacy.websubmit', 'file_stamper_templates')
 from invenio.config import CFG_PATH_PDFTK
-from invenio.config import CFG_PATH_PDF2PS
-from invenio.shellutils import escape_shell_arg
-from invenio.websubmit_config import InvenioWebSubmitFileStamperError
+from invenio.utils.shell import escape_shell_arg
+from invenio.legacy.websubmit.config import InvenioWebSubmitFileStamperError
 
 
 ## ***** Functions related to the creation of the PDF Stamp file: *****

@@ -22,26 +22,23 @@
  services.
 """
 
-from invenio.websession_model import User
-from invenio.config import CFG_SITE_NAME
-from invenio.importutils import autodiscover_modules
-from invenio.datastructures import LaziestDict
-from invenio.cloudutils_config import CFG_CLOUD_UTILS_ENABLED_SERVICES
+from invenio.utils.datastructures import LaziestDict
+from invenio.modules.cloudconnector.config import CFG_CLOUD_UTILS_ENABLED_SERVICES
 from werkzeug.utils import import_string
-from invenio.webuser_flask import current_user
+from flask.ext.login import current_user
 from flask import session, request
 
-from invenio.cloudutils import CloudRedirectUrl, \
-                               ErrorBuildingFS
+from invenio.modules.cloudconnector.errors import ErrorBuildingFS
 from flask.helpers import url_for
-                               
+
 def _find_factory(key):
     if key in CFG_CLOUD_UTILS_ENABLED_SERVICES:
-        return import_string('invenio.cloudutils_factories.%s_factory:Factory' % key)
+        return import_string('invenio.modules.cloudconnector.fsopeners.%s_factory:Factory' % key)
     else:
         raise ErrorBuildingFS("Unknown File system")
-    
-FACTORIES = LaziestDict( _find_factory )
+
+FACTORIES = LaziestDict(_find_factory)
+
 
 class CloudServiceFactory(object):
     def get_fs(self, uri):
@@ -50,24 +47,22 @@ class CloudServiceFactory(object):
         cloudutils_settings = current_user.get('cloudutils_settings', {})
         credentials = cloudutils_settings.get(service_name, {})
 
-        #Fix, if credentials are None, this will never happen when using this 
+        #Fix, if credentials are None, this will never happen when using this
         # software but can happen if someone manually sets stuff
-        if( credentials == None ):
+        if credentials == None:
             credentials = {}
-                
+
         #Get the root directory, every user can have his own root directory inside of
         # every service settings
         if(root == None or root == "/" or root == ""):
             root = credentials.get("root", "/")
-        
+
         Factory = FACTORIES.get(service_name)()
         callback_url = url_for('cloudutils.callback', service=service_name, _external = True)
-        
-        filesystem = Factory.build_fs(current_user, credentials, 
-                                  root, callback_url, 
+
+        filesystem = Factory.build_fs(current_user, credentials,
+                                  root, callback_url,
                                   request, session
                                   )
 
         return filesystem
-    
-    

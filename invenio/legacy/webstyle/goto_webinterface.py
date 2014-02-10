@@ -22,12 +22,12 @@ Implements persistent URLs
 import inspect
 
 from invenio.config import CFG_SITE_URL
-from invenio.webinterface_handler import WebInterfaceDirectory
-from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
-from invenio.urlutils import redirect_to_url
-from invenio.goto_engine import get_redirection_data
-from invenio.webuser import collect_user_info
-from invenio.errorlib import register_exception
+from invenio.ext.legacy.handler import WebInterfaceDirectory
+from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
+from invenio.utils.url import redirect_to_url
+from invenio.modules.redirector.api import get_redirection_data
+from invenio.legacy.webuser import collect_user_info
+from invenio.ext.logging import register_exception
 
 class WebInterfaceGotoPages(WebInterfaceDirectory):
     def _lookup(self, component, path):

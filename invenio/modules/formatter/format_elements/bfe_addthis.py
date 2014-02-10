@@ -25,7 +25,7 @@ try:
 except ImportError:
     CFG_BIBFORMAT_ADDTHIS_ID = None
 
-from invenio.search_engine import record_public_p
+from invenio.legacy.search_engine import record_public_p
 def format_element(bfo, only_public_records=1, addthis_id=CFG_BIBFORMAT_ADDTHIS_ID):
     """
     Prints the AddThis box from the <http://www.addthis.com/> service.

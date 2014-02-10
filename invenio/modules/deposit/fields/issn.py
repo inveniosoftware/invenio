@@ -18,16 +18,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from invenio.webdeposit_field import WebDepositField
-#from invenio.webdeposit_processor_utils import sherpa_romeo_issn_validate
+from invenio.modules.deposit.field_base import WebDepositField
+#from ..processor_utils import sherpa_romeo_issn_validate
 
 __all__ = ['ISSNField']
 
 class ISSNField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-barcode',
+            icon='barcode',
             export_key='issn',
+            widget_classes="form-control",
             #validators=[sherpa_romeo_issn_validate] #FIXME
         )
         defaults.update(kwargs)

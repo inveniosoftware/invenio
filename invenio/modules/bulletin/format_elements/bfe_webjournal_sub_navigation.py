@@ -21,9 +21,9 @@
 WebJournal element - Displays vertical subnavigation menu in detailed
 article pages.
 """
-from invenio.bibformat_engine import BibFormatObject
-from invenio.messages import gettext_set_language
-from invenio.webjournal_utils import \
+from invenio.modules.formatter.engine import BibFormatObject
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      make_journal_url, \
      get_journal_articles,\

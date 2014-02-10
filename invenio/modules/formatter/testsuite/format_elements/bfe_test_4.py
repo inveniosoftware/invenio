@@ -19,6 +19,7 @@
 
 __revision__ = "$Id$"
 
+
 def format_element(bfo, param1, param2='default value'):
     """
     Prints test

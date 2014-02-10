@@ -24,17 +24,17 @@ __revision__ = "$Id$"
 import datetime
 import cgi
 from time import localtime
-import invenio.dateutils as dateutils
-from invenio.urlutils import create_html_link
-from invenio.messages import gettext_set_language
-from invenio.search_engine import get_fieldvalues
+import invenio.utils.date as dateutils
+from invenio.utils.url import create_html_link
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.search_engine import get_fieldvalues
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_CERN_SITE, CFG_SITE_SECURE_URL, CFG_SITE_RECORD, \
      CFG_SITE_NAME
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
-import invenio.bibcirculation_dblayer as db
-from invenio.bibcirculation_utils import get_book_cover, \
+import invenio.legacy.bibcirculation.db_layer as db
+from invenio.legacy.bibcirculation.utils import get_book_cover, \
       book_information_from_MARC, \
       book_title_from_MARC, \
       renew_loan_for_X_days, \
@@ -42,7 +42,7 @@ from invenio.bibcirculation_utils import get_book_cover, \
       all_copies_are_missing, \
       is_periodical, \
       looks_like_dictionary
-from invenio.bibcirculation_config import \
+from invenio.legacy.bibcirculation.config import \
     CFG_BIBCIRCULATION_ITEM_LOAN_PERIOD, \
     CFG_BIBCIRCULATION_COLLECTION, \
     CFG_BIBCIRCULATION_LIBRARY_TYPE, \
@@ -289,7 +289,7 @@ class Template:
         @param holdings_info: book's information (all copies)
         @type holdings_info: list
         """
-        from invenio.bibcirculationadminlib import is_adminuser
+        from invenio.legacy.bibcirculation.adminlib import is_adminuser
 
         (auth_code, _auth_message) = is_adminuser(req)
 
@@ -337,7 +337,7 @@ class Template:
             return out
 
         out = """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             """
@@ -602,7 +602,7 @@ class Template:
 
         else:
             out += """
-                      <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                      <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                       <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                       <script type="text/javascript">
                       $(document).ready(function() {
@@ -676,7 +676,7 @@ class Template:
         else:
             out += """
                    <h1 class="headline">%s</h1>
-                   <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                   <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                    <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                    <script type="text/javascript">
                    $(document).ready(function() {
@@ -757,7 +757,7 @@ class Template:
         else:
             out += """
                    <h1 class="headline">%s</h1>
-                   <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                   <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                    <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                    <script type="text/javascript">
                    $(document).ready(function() {
@@ -831,7 +831,7 @@ class Template:
 
         out = """<div class="bibcirctop_bottom">
                     <br /> <br />
-                    <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                    <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                     <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                     <script type="text/javascript">
                     $(document).ready(function(){
@@ -915,7 +915,7 @@ class Template:
         more_1_year = (today + gap_1yr).strftime('%Y-%m-%d')
 
         out = """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
@@ -1589,7 +1589,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
                     <table class="bibcirctable">
                         <th class="bibcirctableheader" align='left'>%s</th>
                     </table>
-                    <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                    <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                     <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                         <tr>
                             <th width="80">%s</th>
@@ -1645,7 +1645,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         if result:
             out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
@@ -1914,7 +1914,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         else:
             out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom" align="center">
         </form>
         <br />
@@ -2063,7 +2063,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 ### por aqui voy ###
         else:
             out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <br />
         <table class="bibcirctable">
@@ -2294,7 +2294,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         out += """
             <div class="bibcircbottom">
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <form name="step2_form" action="%s/admin2/bibcirculation/loan_on_desk_step3"
                   method="get" >
               <br />
@@ -2408,7 +2408,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         out += """
             <div class="bibcircbottom">
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <script type="text/javascript" language='JavaScript'>
             function groupDatePicker(){
                 var index = 0;
@@ -2651,7 +2651,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
         out += self.tmpl_infobox(infos, ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
             <tr>
@@ -2900,7 +2900,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
             id_string = _("CCID")
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
 
             <div class="bibcircbottom">
 
@@ -3331,7 +3331,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <br />
         <br />
@@ -3561,7 +3561,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
         out += load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom">
             <form name="step2_form" action="%s/admin2/bibcirculation/place_new_request_step3"
                   method="post" >
@@ -3808,7 +3808,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <br />
           <table class="bibcirctable">
@@ -4045,7 +4045,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
         out += load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom">
             <form name="step2_form" action="%s/admin2/bibcirculation/place_new_loan_step3"
                   method="post" >
@@ -5292,7 +5292,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         out += """
             <style type="text/css">
-                @import url("/img/tablesorter.css");
+                @import url("/css/tablesorter.css");
             </style>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
 
@@ -5681,7 +5681,7 @@ onClick="location.href='%s/admin2/bibcirculation/list_purchase?ln=%s&status=%s&r
 
         else:
             out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
@@ -5796,7 +5796,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         else:
             out += """
             <div class="bibcircbottom">
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
@@ -5952,7 +5952,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         else:
             out += """
              <div class="bibcircbottom">
-             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+             <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
@@ -6041,7 +6041,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """<div class="bibcircbottom">
-                  <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                  <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                   <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                   <script type="text/javascript">
                   $(document).ready(function() {
@@ -6421,7 +6421,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
         out += """
-           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+           <style type="text/css"> @import url("/css/tablesorter.css"); </style>
            <form name="update_item_info_step4_form"
                  action="%s/admin2/bibcirculation/update_item_info_step5" method="get" >
            <div class="bibcircbottom">
@@ -6645,7 +6645,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom">
             <form name="update_item_info_step5_form"
                   action="%s/admin2/bibcirculation/update_item_info_step6" method="get" >
@@ -6876,7 +6876,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         out += """
             <style type="text/css">
-                @import url("/img/tablesorter.css");
+                @import url("/css/tablesorter.css");
             </style>
 
             <style type="text/css">
@@ -7284,7 +7284,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom">
             <form name="add_new_copy_step4_form"
                   action="%s/admin2/bibcirculation/add_new_copy_step5"
@@ -7446,7 +7446,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         out += """
             <style type="text/css">
-                @import url("/img/tablesorter.css");
+                @import url("/css/tablesorter.css");
             </style>
 
             <style type="text/css">
@@ -7740,7 +7740,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <form name="return_form" action="%s/admin2/bibcirculation/register_new_loan"
                   method="post" >
             <div class="bibcircbottom">
@@ -7901,7 +7901,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom">
 
             <br />
@@ -8157,7 +8157,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         else:
             out += """
-         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+         <style type="text/css"> @import url("/css/tablesorter.css"); </style>
          <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
          <script type="text/javascript">
            $(document).ready(function() {
@@ -8270,7 +8270,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         <input type=hidden name=borrower_id value="%s">
         <div class="bibcircbottom">
 
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
@@ -8438,7 +8438,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         else:
             out += """<div class="bibcircbottom">
                     <br /> <br />
-                    <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                    <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                     <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                     <script type="text/javascript">
                       $(document).ready(function() {
@@ -8526,7 +8526,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         else:
             out += """<div class="bibcircbottom">
-                      <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                      <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                       <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                       <script type="text/javascript">
                         $(document).ready(function() {
@@ -8630,7 +8630,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out = load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <form name="borrower_notification"
               action="%s/admin2/bibcirculation/borrower_notification"
               method="get" >
@@ -9178,7 +9178,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out = load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
@@ -9334,7 +9334,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         out += """
            <div align="center">
-           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+           <style type="text/css"> @import url("/css/tablesorter.css"); </style>
            <form name="update_item_info_step4_form" action="%s/record/%s/holdings/ill_register_request_with_recid" method="post" >
                 <table class="bibcirctable">
                   <tr align="center">
@@ -9388,7 +9388,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                    book_isbn)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
             """% CFG_SITE_URL
 
@@ -9533,7 +9533,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                    _("Please fill the following form."))
 
         out += """
-          <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+          <style type="text/css"> @import url("/css/tablesorter.css"); </style>
            <form name="display_ill_form" action="%s" method="get">
            """ % (form_url)
         out += """
@@ -9730,7 +9730,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
          <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step2" method="get" >
         <br />
@@ -10022,7 +10022,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
             out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <form name="step3_form1" action="%s" method="post" >
         <br />
@@ -10310,7 +10310,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         else:
             out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <form name="search_form"
               action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step1"
@@ -10416,7 +10416,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
           <div class="bibcircbottom" align="center">
           <br />
           <br />
-          <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+          <style type="text/css"> @import url("/css/tablesorter.css"); </style>
           """
         out += """
            <form name="display_ill_form" action="%s" method="%s">
@@ -10622,7 +10622,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
          <form name="step1_form1"
                action="%s/admin2/bibcirculation/register_ill_article_request_step2"
@@ -10920,7 +10920,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += """
           <div class="bibcircbottom" align="center">
           <br />
-          <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+          <style type="text/css"> @import url("/css/tablesorter.css"); </style>
           """
         out += """
             <form name="display_ill_form" action="%s" method="post">
@@ -11161,7 +11161,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
          <form name="step2_form1"
                action="%s/admin2/bibcirculation/register_purchase_request_step2"
@@ -11577,7 +11577,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out = load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <script type="text/javascript" language='JavaScript'
                     src="%s/js/ui.datepicker.min.js"></script>
             """% CFG_SITE_URL
@@ -11713,7 +11713,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
             if str(request_type) == 'book':
                 out += """
-                <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                 <form name="ill_req_form"
                       action="%s/admin2/bibcirculation/ill_request_details_step2"
                       method="get">
@@ -11800,7 +11800,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
             # for articles
             elif str(request_type) == 'article':
                 out += """
-                <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                 <form name="ill_req_form"
                       action="%s/admin2/bibcirculation/ill_request_details_step2" method="get" >
                    <div class="bibcircbottom">
@@ -11907,7 +11907,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
             elif str(request_type) == 'acq-book':
                 out += """
-                <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                 <form name="ill_req_form"
                       action="%s/admin2/bibcirculation/ill_request_details_step2"
                       method="get">
@@ -12552,7 +12552,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out = load_menu(ln)
 
         out += """
-            <style  type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style  type="text/css"> @import url("/css/tablesorter.css"); </style>
             <script type="text/javascript" language='JavaScript'
                     src="%s/js/ui.datepicker.min.js"></script>
             """% CFG_SITE_URL
@@ -12688,7 +12688,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
             if str(request_type) in CFG_BIBCIRCULATION_ACQ_TYPE or \
                str(request_type) in CFG_BIBCIRCULATION_PROPOSAL_TYPE:
                 out += """
-                <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                <style type="text/css"> @import url("/css/tablesorter.css"); </style>
                 <form name="ill_req_form"
                       action="%s/admin2/bibcirculation/purchase_details_step2"
                       method="get">
@@ -13496,7 +13496,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
@@ -13628,7 +13628,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
@@ -13747,7 +13747,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
@@ -13867,7 +13867,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
@@ -13963,7 +13963,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <br />
         """
@@ -14144,7 +14144,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out = load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <br />
         """
@@ -14368,7 +14368,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out = load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
             <form name="add_new_library_step1_form"
                   action="%s/admin2/bibcirculation/add_new_library_step2" method="get" >
@@ -14636,7 +14636,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out = load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom" align="center">
         <br />
         <table class="bibcirctable">
@@ -14697,7 +14697,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
             <form name="update_library_info_step3_form"
                   action="%s/admin2/bibcirculation/update_library_info_step4" method="get" >
@@ -14791,7 +14791,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out = load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
             <form name="update_library_info_step4_form" action="%s/admin2/bibcirculation/update_library_info_step5" method="get" >
               <br />
@@ -14984,7 +14984,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         else:
             out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom" align="center">
         <br />
         <table class="bibcirctable">
@@ -15046,7 +15046,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <br />
         """
@@ -15269,7 +15269,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
             <form name="add_new_vendor_step1_form" action="%s/admin2/bibcirculation/add_new_vendor_step2" method="get" >
               <br />
@@ -15348,7 +15348,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
             <form name="add_new_vendor_step2_form" action="%s/admin2/bibcirculation/add_new_vendor_step3" method="get" >
               <br />
@@ -15521,7 +15521,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom" align="center">
         <br />
         <table class="bibcirctable">
@@ -15588,7 +15588,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
             <form name="update_vendor_info_step3_form" action="%s/admin2/bibcirculation/update_vendor_info_step4" method="get" >
              <input type=hidden name=vendor_id value="%s">
@@ -15667,7 +15667,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <style type="text/css"> @import url("/css/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
             <form name="update_vendor_info_step4_form" action="%s/admin2/bibcirculation/update_vendor_info_step5" method="get" >
               <br />
@@ -15845,7 +15845,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += load_menu(ln)
 
         out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <div class="bibcircbottom" align="center">
         <br />
         <table class="bibcirctable">
@@ -15911,7 +15911,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         out += """
         <div class="bibcircbottom" align="center">
         <br />
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         """
         (vendor_id, name, address, email, phone, notes) = vendor_details
 

@@ -27,15 +27,15 @@ from logging import DEBUG
 from invenio.config import \
      CFG_PATH_CONVERT, \
      CFG_SITE_LANG
-from invenio.bibdocfile import decompose_file
-from invenio.errorlib import register_exception
-from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats, get_file_converter_logger
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
-from invenio.dbquery import run_sql
-from invenio.bibsched import server_pid
-from invenio.messages import gettext_set_language
-from invenio.search_engine import get_record
-from invenio.bibrecord import record_get_field_values, record_get_field_value
+from invenio.legacy.bibdocfile.api import decompose_file
+from invenio.ext.logging import register_exception
+from invenio.legacy.websubmit.file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats, get_file_converter_logger
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.bibsched.cli import server_pid
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.search_engine import get_record
+from invenio.legacy.bibrecord import record_get_field_values, record_get_field_value
 
 def createRelatedFormats(fullpath, overwrite=True, debug=False):
     """Given a fullpath, this function extracts the file's extension and

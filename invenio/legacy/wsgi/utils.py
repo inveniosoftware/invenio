@@ -56,7 +56,7 @@ import cStringIO
 import tempfile
 from types import TypeType, ClassType, BuiltinFunctionType, MethodType, ListType
 from invenio.config import CFG_TMPDIR, CFG_TMPSHAREDDIR
-from invenio.webinterface_handler_config import \
+from invenio.utils.apache import \
     SERVER_RETURN, \
     HTTP_LENGTH_REQUIRED, \
     HTTP_BAD_REQUEST, \
@@ -830,7 +830,7 @@ def handle_file_post(req, allowed_mimetypes=None):
     and it's mimetype as provided by the request.
     @rtype: (string, string)
     """
-    from invenio.bibdocfile import decompose_file, md5
+    from invenio.legacy.bibdocfile.api import decompose_file, md5
     ## We retrieve the length
     clen = req.headers_in["Content-Length"]
     if clen is None:

@@ -25,10 +25,10 @@ __revision__ = \
     "$Id: search_engine_tests.py,v 1.20 2008/08/11 12:49:27 kaplun Exp $"
 
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-QueryResult = lazy_import('invenio.bibexport_method_fieldexporter_dblayer:QueryResult')
+QueryResult = lazy_import('invenio.legacy.bibexport.fieldexporter_dblayer:QueryResult')
 
 
 def _create_record_marc_xml():

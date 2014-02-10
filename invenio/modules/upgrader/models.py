@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,13 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02D111-1307, USA.
 
 """
-inveniocfg_upgrade database model.
+Upgrade engine database model for keeping log of which upgrades have been
+applied to to a given database.
 """
 
-# General imports.
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
-# Create your models here.
 
 class Upgrade(db.Model):
     """Represents an Upgrade record."""
@@ -32,4 +31,3 @@ class Upgrade(db.Model):
 
     upgrade = db.Column(db.String(255), primary_key=True, nullable=False)
     applied = db.Column(db.DateTime, nullable=False)
-

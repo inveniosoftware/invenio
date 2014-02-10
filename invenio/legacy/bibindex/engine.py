@@ -31,42 +31,42 @@ from datetime import datetime
 from time import strptime
 
 from invenio.config import CFG_SOLR_URL
-from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
+from invenio.legacy.bibindex.engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_MYSQL_THREAD_TIMEOUT, \
      CFG_CHECK_MYSQL_THREADS, \
      CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
      CFG_BIBINDEX_INDEX_TABLE_TYPE, \
      CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
      CFG_BIBINDEX_UPDATE_MESSAGE
-from invenio.bibauthority_config import \
+from invenio.legacy.bibauthority.config import \
      CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC, \
      CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD
-from invenio.bibauthority_engine import get_index_strings_by_control_no,\
+from invenio.legacy.bibauthority.engine import get_index_strings_by_control_no,\
      get_control_nos_from_recID
-from invenio.bibindexadminlib import get_idx_remove_html_markup, \
+from invenio.legacy.bibindex.adminlib import get_idx_remove_html_markup, \
                                      get_idx_remove_latex_markup, \
                                      get_idx_remove_stopwords
-from invenio.bibdocfile import BibRecDocs
-from invenio.search_engine import perform_request_search, \
+from invenio.legacy.bibdocfile.api import BibRecDocs
+from invenio.legacy.search_engine import perform_request_search, \
      get_index_stemming_language, \
      get_synonym_terms, \
      search_pattern, \
      search_unit_in_bibrec
-from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
+from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
      deserialize_via_marshal, wash_table_column_name
-from invenio.bibindex_engine_washer import wash_index_term
-from invenio.bibtask import task_init, write_message, get_datetime, \
+from invenio.legacy.bibindex.engine_washer import wash_index_term
+from invenio.legacy.bibsched.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, \
     task_update_progress, task_sleep_now_if_required
-from invenio.intbitset import intbitset
-from invenio.errorlib import register_exception
-from invenio.bibrankadminlib import get_def_name
-from invenio.solrutils_bibindex_indexer import solr_commit
-from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
+from intbitset import intbitset
+from invenio.ext.logging import register_exception
+from invenio.legacy.bibrank.adminlib import get_def_name
+from invenio.legacy.miscutil.solrutils_bibindex_indexer import solr_commit
+from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_TAG, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
-from invenio.bibindex_engine_utils import load_tokenizers, \
+from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     get_all_index_names_and_column_values, \
     get_idx_indexer, \
     get_index_tags, \
@@ -82,9 +82,9 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     run_sql_drop_silently, \
     get_min_last_updated, \
     remove_inexistent_indexes
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibfield import get_record
-from invenio.memoiseutils import Memoise
+from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.modules.records.api import get_record
+from invenio.utils.memoise import Memoise
 
 
 if sys.hexversion < 0x2040000:
@@ -175,7 +175,7 @@ def get_author_canonical_ids_for_recid(recID):
     Return list of author canonical IDs (e.g. `J.Ellis.1') for the
     given record.  Done by consulting BibAuthorID module.
     """
-    from invenio.bibauthorid_dbinterface import get_persons_from_recids
+    from invenio.legacy.bibauthorid.dbinterface import get_persons_from_recids
     lwords = []
     res = get_persons_from_recids([recID])
     if res is None:
@@ -1587,7 +1587,7 @@ def get_recIDs_by_date_bibliographic(dates, index_name, force_all=False):
     # special case of author indexes where we need to re-index
     # those records that were affected by changed BibAuthorID attributions:
     if index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
-        from invenio.bibauthorid_personid_maintenance import get_recids_affected_since
+        from invenio.legacy.bibauthorid.personid_maintenance import get_recids_affected_since
         # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
         rec_list_author = intbitset(get_recids_affected_since(dates[0]))
         res = res | rec_list_author

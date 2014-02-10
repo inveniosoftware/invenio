@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,8 +41,7 @@
 
 
 from flask import request, redirect
-from invenio import config
-from invenio.urlutils import rewrite_to_secure_url
+from invenio.utils.url import rewrite_to_secure_url
 
 YEAR_IN_SECS = 31536000
 
@@ -89,7 +88,7 @@ class SSLify(object):
         criteria = [
             request.is_secure,
             request.headers.get('X-Forwarded-Proto', 'http') == 'https',
-            'no-https-redirect' in getattr(config, 'CFG_DEVEL_TOOLS', []),
+            'no-https-redirect' in self.app.config.get('CFG_DEVEL_TOOLS', []),
         ]
 
         if self.criteria_callback is not None:

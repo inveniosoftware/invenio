@@ -47,8 +47,10 @@ from datetime import date as real_date, \
                      datetime as real_datetime, \
                      time as real_time, \
                      timedelta
-from invenio.config import CFG_SITE_LANG
-from invenio.messages import gettext_set_language
+from flask.ext.babel import format_datetime as babel_format_datetime
+from invenio.base.globals import cfg
+from invenio.base.i18n import gettext_set_language, _
+from invenio.ext.babel import set_locale
 
 try:
     from mx.DateTime import Parser
@@ -75,6 +77,7 @@ except ImportError:
 datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
+default_ln = lambda ln: cfg['CFG_SITE_LANG'] if ln is None else ln
 
 class date(real_date):
     def strftime(self, fmt):
@@ -91,7 +94,7 @@ class datetime(real_datetime):
     def date(self):
         return date(self.year, self.month, self.day)
 
-def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG, secs=False):
+def convert_datetext_to_dategui(datetext, ln=None, secs=False):
     """
     Convert:
     '2005-11-16 15:11:57' => '16 nov 2005, 15:11'
@@ -99,19 +102,21 @@ def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG, secs=False):
     '2005-11-16 15:11:57' => '16 nov 2005, 15:11:57'
     Month is internationalized
     """
-    try:
-        datestruct = convert_datetext_to_datestruct(datetext)
-        if datestruct == datestruct_default:
-            raise ValueError
-        month = get_i18n_month_name(datestruct[1], ln=ln)
-        if secs:
-            output_format = "%d " + month + " %Y, %H:%M:%S"
-        else:
-            output_format = "%d " + month + " %Y, %H:%M"
-        return strftime(output_format, datestruct)
-    except:
-        _ = gettext_set_language(ln)
-        return _("N/A")
+    ln = default_ln(ln)
+    with set_locale(ln):
+        try:
+            datestruct = convert_datetext_to_datestruct(datetext)
+            if datestruct == datestruct_default:
+                raise ValueError
+
+            if secs:
+                output_format = "d MMM Y, H:mm:ss"
+            else:
+                output_format = "d MMM Y, H:mm"
+            dt = datetime.fromtimestamp(time.mktime(datestruct))
+            return babel_format_datetime(dt, output_format).encode('utf8')
+        except ValueError:
+            return _("N/A").encode('utf8')
 
 def convert_datetext_to_datestruct(datetext):
     """
@@ -123,22 +128,23 @@ def convert_datetext_to_datestruct(datetext):
     except:
         return datestruct_default
 
-def convert_datestruct_to_dategui(datestruct, ln=CFG_SITE_LANG):
+def convert_datestruct_to_dategui(datestruct, ln=None):
     """
     Convert:
     (2005, 11, 16, 15, 11, 44, 2, 320, 0) => '16 nov 2005, 15:11'
     Month is internationalized
     """
-    try:
-        if datestruct[0] and datestruct[1] and datestruct[2]:
-            month = get_i18n_month_name(datestruct[1], ln=ln)
-            output_format = "%d " + month + " %Y, %H:%M"
-            return strftime(output_format, datestruct)
-        else:
-            raise ValueError
-    except:
-        _ = gettext_set_language(ln)
-        return _("N/A")
+    ln = default_ln(ln)
+    with set_locale(ln):
+        try:
+            if datestruct[0] and datestruct[1] and datestruct[2]:
+                output_format = "d MMM Y, H:mm"
+                dt = datetime.fromtimestamp(time.mktime(datestruct))
+                return babel_format_datetime(dt, output_format).encode('utf8')
+            else:
+                raise ValueError
+        except:
+            return _("N/A").encode('utf8')
 
 def convert_datestruct_to_datetext(datestruct):
     """
@@ -191,7 +197,7 @@ def get_datestruct(year, month, day):
     except ValueError or TypeError:
         return datestruct_default
 
-def get_i18n_day_name(day_nb, display='short', ln=CFG_SITE_LANG):
+def get_i18n_day_name(day_nb, display='short', ln=None):
     """
     get the string representation of a weekday, internationalized
     @param day_nb: number of weekday UNIX like.
@@ -199,6 +205,7 @@ def get_i18n_day_name(day_nb, display='short', ln=CFG_SITE_LANG):
     @param ln: language for output
     @return: the string representation of the day
     """
+    ln = default_ln(ln)
     _ = gettext_set_language(ln)
     if display == 'short':
         days = {0: _("Sun"),
@@ -219,7 +226,7 @@ def get_i18n_day_name(day_nb, display='short', ln=CFG_SITE_LANG):
 
     return days[day_nb]
 
-def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
+def get_i18n_month_name(month_nb, display='short', ln=None):
     """
     get a non-numeric representation of a month, internationalized.
     @param month_nb: number of month, (1 based!)
@@ -227,6 +234,7 @@ def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
     @param ln: language for output
     @return: the string representation of month
     """
+    ln = default_ln(ln)
     _ = gettext_set_language(ln)
     if display == 'short':
         months = {0: _("Month"),
@@ -258,7 +266,7 @@ def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
                    12: _("December")}
     return months[month_nb].strip()
 
-def create_day_selectbox(name, selected_day=0, ln=CFG_SITE_LANG):
+def create_day_selectbox(name, selected_day=0, ln=None):
     """
     Creates an HTML menu for day selection. (0..31 values).
     @param name: name of the control (i.e. name of the var you'll get)
@@ -266,6 +274,7 @@ def create_day_selectbox(name, selected_day=0, ln=CFG_SITE_LANG):
     @param ln: language of the menu
     @return: html a string
     """
+    ln = default_ln(ln)
     _ = gettext_set_language(ln)
     out = "<select name=\"%s\">\n"% name
     for i in range(0, 32):
@@ -279,7 +288,7 @@ def create_day_selectbox(name, selected_day=0, ln=CFG_SITE_LANG):
     out += "</select>\n"
     return out
 
-def create_month_selectbox(name, selected_month=0, ln=CFG_SITE_LANG):
+def create_month_selectbox(name, selected_month=0, ln=None):
     """
     Creates an HTML menu for month selection. Value of selected field is numeric
     @param name: name of the control (your form will be sent with name=value...)
@@ -287,6 +296,7 @@ def create_month_selectbox(name, selected_month=0, ln=CFG_SITE_LANG):
     @param ln: language of the menu
     @return: html as string
     """
+    ln = default_ln(ln)
     out = "<select name=\"%s\">\n"% name
 
     for i in range(0, 13):
@@ -307,7 +317,7 @@ def create_year_inputbox(name, value=0):
     out = "<input type=\"text\" name=\"%s\" value=\"%i\" maxlength=\"4\" size=\"4\"/>\n"% (name, value)
     return out
 
-def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=CFG_SITE_LANG):
+def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=None):
     """
     Creates an HTML menu (dropdownbox) for year selection.
     @param name: name of control( i.e. name of the variable you'll get)
@@ -317,6 +327,7 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=CFG
     @param ln: language
     @return: html as string
     """
+    ln = default_ln(ln)
     _ = gettext_set_language(ln)
     if from_year < 0:
         from_year = time.localtime()[0]
@@ -447,13 +458,14 @@ def get_time_estimator(total):
         return t3, t3 + t1
     return estimate_needed_time
 
-def pretty_date(ugly_time=False, ln=CFG_SITE_LANG):
+def pretty_date(ugly_time=False, ln=None):
     """
     Get a datetime object or a int() Epoch timestamp and return a
     pretty string like 'an hour ago', 'Yesterday', '3 months ago',
     'just now', etc.
     """
 
+    ln = default_ln(ln)
     _ = gettext_set_language(ln)
 
     now = real_datetime.now()
@@ -572,3 +584,9 @@ def strftime(fmt, dt):
 
 def strptime(date_string, fmt):
     return real_datetime(*(time.strptime(date_string, fmt)[:6]))
+
+
+def convert_datetime_to_utc_string(datetime_object, fmt="%Y-%m-%dT%H:%M:%SZ"):
+    return time.strftime(
+        fmt,
+        time.gmtime(time.mktime(datetime_object.timetuple())))

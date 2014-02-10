@@ -1,18 +1,18 @@
-{% css 'css/bibworkflow_style.css', '20-bibworkflow' %}
+{% css url_for('workflows.static', filename='css/workflows/style.css'), '20-workflows' %}
 {% extends "page.html" %}
 {% block body %}
-    <div class="row-fluid">
-        <div class="span2">
+    <div class="row">
+        <div class="col-md-2">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li><a href="{{ url_for('bibworkflow.index') }}"
-                        {% if request.path == url_for('bibworkflow.index') %}
+                    <li><a href="{{ url_for('workflows.index') }}"
+                        {% if request.path == url_for('workflows.index') %}
                             class="active"
                         {% endif %}>
                         Running workflows
                     </a></li>
-                    <li><a href="{{ url_for('bibworkflow.show_workflows') }}"
-                    {% if request.path == url_for('bibworkflow.show_workflows') %}
+                    <li><a href="{{ url_for('workflows.show_workflows') }}"
+                    {% if request.path == url_for('workflows.show_workflows') %}
                         class="active"
                     {% endif %}>
                         Defined workflows
@@ -21,8 +21,8 @@
                 </ul>
             </div>
         </div>
-        <div class="span10">
-            {% block body2 %}{% endblock %}
+        <div class="col-md-10">
+            {% block workflowbody %}{% endblock %}
         </div>
     <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     </div>

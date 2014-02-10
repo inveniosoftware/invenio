@@ -20,6 +20,7 @@ __revision__ = "$Id$"
 import urllib
 import cgi
 
+from invenio.base.wrappers import lazy_import
 from invenio.config import \
      CFG_CERN_SITE, \
      CFG_SITE_LANG, \
@@ -34,16 +35,23 @@ from invenio.config import \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_SITE_RECORD
-from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
-        CFG_EXTERNAL_AUTH_LOGOUT_SSO, CFG_WEB_API_KEY_STATUS, \
-        CFG_OPENID_PROVIDERS, CFG_OAUTH2_PROVIDERS, \
-        CFG_OAUTH1_PROVIDERS, CFG_OPENID_AUTHENTICATION, \
-        CFG_OAUTH2_AUTHENTICATION, CFG_OAUTH1_AUTHENTICATION
 
-from invenio.urlutils import make_canonical_urlargd, create_url, create_html_link
-from invenio.htmlutils import escape_html, nmtoken_from_string
-from invenio.messages import gettext_set_language, language_list_long
-from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
+CFG_EXTERNAL_AUTH_USING_SSO = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTH_USING_SSO')
+CFG_EXTERNAL_AUTH_USING_SSO = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTH_LOGOUT_SSO')
+CFG_OPENID_PROVIDERS = lazy_import('invenio.modules.access.local_config:CFG_OPENID_PROVIDERS')
+CFG_OAUTH2_PROVIDERS = lazy_import('invenio.modules.access.local_config:CFG_OAUTH2_PROVIDERS')
+CFG_OAUTH1_PROVIDERS = lazy_import('invenio.modules.access.local_config:CFG_OAUTH1_PROVIDERS')
+CFG_OPENID_AUTHENTICATION = lazy_import('invenio.modules.access.local_config:CFG_OPENID_AUTHENTICATION')
+CFG_OAUTH2_AUTHENTICATION = lazy_import('invenio.modules.access.local_config:CFG_OAUTH2_AUTHENTICATION')
+CFG_OAUTH1_AUTHENTICATION = lazy_import('invenio.modules.access.local_config:CFG_OAUTH1_AUTHENTICATION')
+
+from invenio.utils.url import make_canonical_urlargd, create_url, create_html_link
+from invenio.utils.html import escape_html, nmtoken_from_string
+from invenio.base.i18n import gettext_set_language, language_list_long
+from invenio.modules.apikeys.models import WebAPIKey
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
+
+
 class Template:
     def tmpl_back_form(self, ln, message, url, link):
         """
@@ -96,10 +104,10 @@ class Template:
         """ % {
             'external_user_settings' : _('External account settings'),
             'html_settings' : html_settings,
-            'consult_external_groups' : _('You can consult the list of your external groups directly in the %(x_url_open)sgroups page%(x_url_close)s.') % {
+            'consult_external_groups' : _('You can consult the list of your external groups directly in the %(x_url_open)sgroups page%(x_url_close)s.', **{
                 'x_url_open' : '<a href="../yourgroups/display?ln=%s#external_groups">' % ln,
                 'x_url_close' : '</a>'
-            },
+            }),
             'external_user_groups' : _('External user groups'),
         }
         return out
@@ -163,7 +171,7 @@ class Template:
                               'key_label': _("API key"),
                               'remove_key' : _("Delete key"),
                               'sitesecureurl': CFG_SITE_SECURE_URL,
-                              'input_type': ("submit", "hidden")[key_info[2] == CFG_WEB_API_KEY_STATUS['REVOKED']]
+                              'input_type': ("submit", "hidden")[key_info[2] == WebAPIKey.CFG_WEB_API_KEY_STATUS['REVOKED']]
                               }
             out += "</table>"
 
@@ -318,11 +326,11 @@ class Template:
                     'sitesecureurl': CFG_SITE_SECURE_URL,
                 }
         elif not CFG_EXTERNAL_AUTH_USING_SSO and CFG_CERN_SITE:
-            out += "<p>" + _("""If you are using a lightweight CERN account you can
-                %(x_url_open)sreset the password%(x_url_close)s.""") % \
-                    {'x_url_open' : \
-                        '<a href="http://cern.ch/LightweightRegistration/ResetPassword.aspx%s">' \
-                        % (make_canonical_urlargd({'email': email, 'returnurl' : CFG_SITE_SECURE_URL + '/youraccount/edit' + make_canonical_urlargd({'lang' : ln}, {})}, {})), 'x_url_close' : '</a>'} + "</p>"
+            out += "<p>" + _("""If you are using a lightweight CERN account you can %(x_url_open)sreset the password%(x_url_close)s.""",
+                    {'x_url_open' : '<a href="http://cern.ch/LightweightRegistration/ResetPassword.aspx%s">'
+                        % (make_canonical_urlargd({'email': email,
+                                                   'returnurl': CFG_SITE_SECURE_URL + '/youraccount/edit' + make_canonical_urlargd({'lang' : ln}, {})}, {})),
+                     'x_url_close' : '</a>'}) + "</p>"
         elif CFG_EXTERNAL_AUTH_USING_SSO and CFG_CERN_SITE:
             out += "<p>" + _("""You can change or reset your CERN account password by means of the %(x_url_open)sCERN account system%(x_url_close)s.""") % \
                 {'x_url_open' : '<a href="https://cern.ch/login/password.aspx">', 'x_url_close' : '</a>'} + "</p>"
@@ -476,7 +484,7 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        out = "<p>" + _("If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a password reset link emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'sitename' : CFG_SITE_NAME_INTL[ln]} + "</p>"
+        out = "<p>" + _("If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a password reset link emailed to you.", **{'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'sitename' : CFG_SITE_NAME_INTL[ln]}) + "</p>"
 
         out += """
           <blockquote>
@@ -503,8 +511,12 @@ class Template:
           }
 
         if CFG_CERN_SITE:
-            out += "<p>" + _("If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, then you can recover your password through the %(x_url_open)sCERN authentication system%(x_url_close)s.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'x_url_open' : '<a href="https://cern.ch/lightweightregistration/ResetPassword.aspx%s">' \
-            % make_canonical_urlargd({'lf': 'auth', 'returnURL' : CFG_SITE_SECURE_URL + '/youraccount/login?ln='+ln}, {}), 'x_url_close' : '</a>'} + " "
+            out += "<p>" + _("If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, then you can recover your password through the %(x_url_open)sCERN authentication system%(x_url_close)s.",
+                             **{'x_fmt_open' : '<em>',
+                                'x_fmt_close' : '</em>',
+                                'x_url_open' : '<a href="https://cern.ch/lightweightregistration/ResetPassword.aspx%s">' % make_canonical_urlargd(
+                                    {'lf': 'auth', 'returnURL': CFG_SITE_SECURE_URL + '/youraccount/login?ln='+ln}, {}),
+                                'x_url_close' : '</a>'}) + " "
         else:
             out += "<p>" + _("Note that if you have been using an external login system, then we cannot do anything and you have to ask there.") + " "
         out += _("Alternatively, you can ask %s to change your login system from external to internal.") % ("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : CFG_SITE_SUPPORT_EMAIL }) + "</p>"
@@ -616,8 +628,8 @@ class Template:
             msg = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
         elif (type=='alerts'):
             msg = _("You are logged in as a guest user, so your alerts will disappear at the end of the current session.") + ' '
-        msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") % {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
-                                                                                               'x_url_close': '</a>'}
+        msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.", **{'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
+                                                                                                'x_url_close': '</a>'})
         return """<table class="errorbox" summary="">
                             <tr>
                              <th class="errorboxheader">%s</th>
@@ -858,7 +870,7 @@ class Template:
                     'mailcookie' : address_activation_key
                 }, {})),
             'outro' : _("in order to confirm the validity of this request."),
-            'outro2' : _("Please note that this URL will remain valid for about %(days)s days only.") % {'days' : CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS},
+            'outro2' : _("Please note that this URL will remain valid for about %(days)s days only.", days=CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS),
         }
         return out
 
@@ -2740,10 +2752,10 @@ type="text" name="identifier" value="" >
         """
         Template for external login buttons
         """
-        from invenio.websession_config import CFG_EXTERNAL_LOGIN_LARGE
-        from invenio.websession_config import CFG_EXTERNAL_LOGIN_BUTTON_ORDER
-        from invenio.websession_config import CFG_EXTERNAL_LOGIN_FORM_LABELS
-        from invenio.access_control_config import CFG_OPENID_CONFIGURATIONS
+        from invenio.legacy.websession.websession_config import CFG_EXTERNAL_LOGIN_LARGE
+        from invenio.legacy.websession.websession_config import CFG_EXTERNAL_LOGIN_BUTTON_ORDER
+        from invenio.legacy.websession.websession_config import CFG_EXTERNAL_LOGIN_FORM_LABELS
+        from invenio.modules.access.local_config import CFG_OPENID_CONFIGURATIONS
 
         def construct_button(provider, size, button_class):
             """

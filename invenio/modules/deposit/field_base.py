@@ -76,7 +76,7 @@ Auto-complete
 """
 
 from wtforms import Field
-from invenio.webdeposit_form import CFG_FIELD_FLAGS
+from .form import CFG_FIELD_FLAGS
 
 
 __all__ = ['WebDepositField']
@@ -92,7 +92,7 @@ class WebDepositField(Field):
         Initialize WebDeposit field.
 
         Every field is associated with a marc field. To define this association you
-        have to specify the `export_key` for the bibfield's `JsonReader` or
+        have to specify the `export_key` for the recordext `Reader` or
         the `cook_function` (for more complicated fields).
 
         @param placeholder: str, Placeholder text for input fields.
@@ -198,14 +198,14 @@ class WebDepositField(Field):
             stop = False
             for p in (self.processors or []):
                 try:
-                    p(form, self, submit)
+                    p(form, self, submit=submit, fields=formfields)
                 except StopIteration:
                     stop = True
                     break
 
             if not stop:
                 for p in (extra_processors or []):
-                    p(form, self, submit)
+                    p(form, self, submit=submit, fields=formfields)
 
     def perform_autocomplete(self, form, name, term, limit=50):
         """

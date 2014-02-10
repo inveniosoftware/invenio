@@ -22,7 +22,7 @@
 {% macro collection_tree(collection, children ) %}
 
 <ul class="nav nav-list">
-  <li class="nav-header">{{ collection.name }}</li>
+  <li class="dropdown-header">{{ collection.name }}</li>
   <li>
   <ul {{ kwargs|xmlattr }}  data-id="{{ collection.id }}">
     {% for c in collection|attr(children)|sort(attribute='score') recursive %}

@@ -29,17 +29,17 @@ __revision__ = "$Id$"
 import zlib
 import copy
 
-from invenio.bibrecord import record_get_field_value, \
+from invenio.legacy.bibrecord import record_get_field_value, \
                                 record_get_field_instances, \
                                 record_add_field, \
                                 record_delete_field, \
                                 create_record
 
-from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
+from invenio.legacy.bibupload.config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
                                      CFG_BIBUPLOAD_DELETE_CODE, \
                                      CFG_BIBUPLOAD_DELETE_VALUE
 
-from invenio.bibedit_dblayer import get_marcxml_of_record_revision, \
+from invenio.legacy.bibedit.db_layer import get_marcxml_of_record_revision, \
                                     get_record_revisions
 
 class RevisionVerifier:

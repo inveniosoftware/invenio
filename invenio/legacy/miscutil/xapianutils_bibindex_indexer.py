@@ -24,7 +24,7 @@ Xapian utilities.
 
 import os
 from invenio.config import CFG_CACHEDIR, CFG_XAPIAN_ENABLED
-from invenio.xapianutils_config import XAPIAN_DIR, XAPIAN_DIR_NAME
+from invenio.legacy.miscutil.xapianutils_config import XAPIAN_DIR, XAPIAN_DIR_NAME
 
 
 if CFG_XAPIAN_ENABLED:

@@ -32,10 +32,10 @@ __revision__ = "$Id$"
 
 import re
 import os
-from invenio.access_control_engine import acc_authorize_action
-from invenio.websubmit_config import InvenioWebSubmitFunctionStop
-from invenio.websubmit_functions.Retrieve_Data import Get_Field
-from invenio.websubmit_functions.Shared_Functions import write_file
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionStop
+from invenio.legacy.websubmit.functions.Retrieve_Data import Get_Field
+from invenio.legacy.websubmit.functions.Shared_Functions import write_file
 
 def Is_Original_Submitter(parameters, curdir, form, user_info=None):
     """

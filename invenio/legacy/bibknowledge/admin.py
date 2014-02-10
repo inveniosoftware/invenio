@@ -21,12 +21,13 @@ import os
 import cgi
 import sys
 
-from invenio import bibknowledge, bibknowledgeadminlib
-from invenio.bibrankadminlib import check_user
-from invenio.webpage import page, error_page
-from invenio.webuser import getUid, page_not_authorized
-from invenio.messages import wash_language, gettext_set_language
-from invenio.urlutils import wash_url_argument, redirect_to_url
+from invenio.legacy.bibknowledge import adminlib as bibknowledgeadminlib
+from invenio.modules.knowledge import api as bibknowledge
+from invenio.legacy.bibrank.adminlib import check_user
+from invenio.legacy.webpage import page, error_page
+from invenio.legacy.webuser import getUid, page_not_authorized
+from invenio.base.i18n import wash_language, gettext_set_language
+from invenio.utils.url import wash_url_argument, redirect_to_url
 from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, \
                            CFG_SITE_NAME, CFG_WEBDIR
 
@@ -768,7 +769,7 @@ def dialog_box(req, url="", ln=CFG_SITE_LANG, navtrail="",
     @param options the list of labels for the buttons given as choice to user
     """
     import invenio
-    bibformat_templates = invenio.template.load('bibformat')
+    bibformat_templates = invenio.legacy.template.load('bibformat')
 
     if not options:
         options = []

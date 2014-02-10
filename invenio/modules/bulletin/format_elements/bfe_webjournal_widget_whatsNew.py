@@ -24,21 +24,21 @@ including 'breaking news'.
 import time
 import os
 
-from invenio.search_engine import search_pattern, record_exists
-from invenio.bibformat_engine import BibFormatObject
+from invenio.legacy.search_engine import search_pattern, record_exists
+from invenio.modules.formatter.engine import BibFormatObject
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_CACHEDIR, \
      CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      parse_url_string, \
      make_journal_url, \
      get_journal_info_path, \
      get_journal_categories, \
      get_journal_articles, \
      get_current_issue
-from invenio.messages import gettext_set_language
-from invenio.errorlib import register_exception
+from invenio.base.i18n import gettext_set_language
+from invenio.ext.logging import register_exception
 
 def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
            link_category_headers='yes', display_categories='', hide_when_only_new_records="no"):

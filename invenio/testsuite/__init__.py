@@ -28,13 +28,18 @@ CFG_TESTUTILS_VERBOSE = 1
 import os
 import sys
 import time
-import unittest2
+pyv = sys.version_info
+if pyv[0] == 2 and pyv[1] < 7:
+    import unittest2 as unittest
+else:
+    import unittest
 import cgi
 import subprocess
 import binascii
 import StringIO
 
-from flask import request, url_for
+from flask import url_for
+from functools import wraps
 from warnings import warn
 from urlparse import urlsplit, urlunsplit
 from urllib import urlencode
@@ -47,25 +52,18 @@ except ImportError:
     # web tests will not be available, but unit and regression tests will:
     pass
 
-import unittest
+#try:
+#    from nose.tools import nottest
+#except ImportError:
+#    def nottest(f):
+#        """Helper decorator to mark a function as not to be tested by nose."""
+#        f.__test__ = False
+#        return f
 
-from invenio.config import CFG_SITE_URL, \
-    CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL, CFG_PYLIBDIR, \
-    CFG_JSTESTDRIVER_PORT, CFG_WEBDIR, CFG_PREFIX
-from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, \
-    CFG_TESTS_REQUIRE_HTML_VALIDATION
-from invenio.pluginutils import PluginContainer
-
-try:
-    from nose.tools import nottest
-except ImportError:
-    def nottest(f):
-        """Helper decorator to mark a function as not to be tested by nose."""
-        f.__test__ = False
-        return f
+nottest = unittest.skip('nottest')
 
 
-@nottest
+#@nottest
 def warn_user_about_tests(test_suite_type='regression'):
     """
     Display a standard warning about running tests that might modify
@@ -123,29 +121,17 @@ Please confirm by typing 'Yes, I know!': """ % test_suite_type)
     return
 
 
-@nottest
+#@nottest
 def make_test_suite(*test_cases):
     """ Build up a test suite given separate test cases"""
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                                for case in test_cases])
 
-#from invenio.config import *
-from invenio.dbquery import CFG_DATABASE_HOST, \
-    CFG_DATABASE_PORT, \
-    CFG_DATABASE_NAME, \
-    CFG_DATABASE_USER, \
-    CFG_DATABASE_PASS, \
-    CFG_DATABASE_TYPE, \
-    CFG_DATABASE_SLAVE
-from invenio.webinterface_handler_flask import create_invenio_flask_app, \
-    with_app_context
-from invenio.urlutils import rewrite_to_secure_url
+from invenio.base.factory import create_app
 import pyparsing  # pylint: disable=W0611
                   # pyparsinf needed to import here before flask.ext.testing
                   # in order to avoid pyparsing troubles due to twill
 from flask.ext.testing import TestCase
-from sqlalchemy.engine.url import URL
-from functools import wraps
 
 
 class InvenioFixture(object):
@@ -169,30 +155,32 @@ class InvenioFixture(object):
         return dictate
 
 
-class InvenioTestCase(TestCase, unittest2.TestCase):
-
-    engine = CFG_DATABASE_TYPE
-    username = CFG_DATABASE_USER
-    password = CFG_DATABASE_PASS
-    host = CFG_DATABASE_HOST
-    database = CFG_DATABASE_NAME
+class InvenioTestCase(TestCase, unittest.TestCase):
 
     @property
-    def SQLALCHEMY_DATABASE_URI(self):
-        return URL(self.engine,
-                   username=self.username,
-                   password=self.password,
-                   host=self.host,
-                   database=self.database
-                   )
+    def config(self):
+        cfg = {
+            'engine': 'CFG_DATABASE_TYPE',
+            'host': 'CFG_DATABASE_HOST',
+            'port': 'CFG_DATABASE_PORT',
+            'username': 'CFG_DATABASE_USER',
+            'password': 'CFG_DATABASE_PASS',
+            'database': 'CFG_DATABASE_NAME',
+        }
+        out = {}
+        for (k, v) in cfg.iteritems():
+            if hasattr(self, k):
+                out[v] = getattr(self, k)
+        return out
 
     def create_app(self):
-        app = create_invenio_flask_app(CFG_DATABASE_TYPE=self.engine,
-                                       SQLALCHEMY_DATABASE_URI=self.SQLALCHEMY_DATABASE_URI)
+        app = create_app(**self.config)
         app.testing = True
         return app
 
     def login(self, username, password):
+        from invenio.config import CFG_SITE_SECURE_URL
+        #from invenio.utils.url import rewrite_to_secure_url
         return self.client.post(url_for('webaccount.login'),
                                 base_url=CFG_SITE_SECURE_URL,
                                 #rewrite_to_secure_url(request.base_url),
@@ -200,25 +188,29 @@ class InvenioTestCase(TestCase, unittest2.TestCase):
                                 follow_redirects=True)
 
     def logout(self):
+        from invenio.config import CFG_SITE_SECURE_URL
         return self.client.get(url_for('webaccount.logout'),
                                base_url=CFG_SITE_SECURE_URL,
                                follow_redirects=True)
+
+    def shortDescription(self):
+        return
 
 
 class FlaskSQLAlchemyTest(InvenioTestCase):
 
     def setUp(self):
-        from invenio.sqlalchemyutils import db
+        from invenio.ext.sqlalchemy import db
         db.create_all()
 
     def tearDown(self):
-        from invenio.sqlalchemyutils import db
+        from invenio.ext.sqlalchemy import db
         db.session.expunge_all()
         db.session.rollback()
         db.drop_all()
 
 
-@nottest
+#@nottest
 def make_flask_test_suite(*test_cases):
     """ Build up a Flask test suite given separate test cases"""
     from operator import add
@@ -239,13 +231,14 @@ def run_test_suite(testsuite, warn_user=False):
     """
     if warn_user:
         warn_user_about_tests()
-    res = unittest.TextTestRunner(verbosity=2).run(testsuite)
+    res = unittest.TextTestRunner(descriptions=False, verbosity=2).run(testsuite)
     return res.wasSuccessful()
 
 
 def make_url(path, **kargs):
     """ Helper to generate an absolute invenio URL with query
     arguments"""
+    from invenio.config import CFG_SITE_URL
 
     url = CFG_SITE_URL + path
 
@@ -259,6 +252,7 @@ def make_surl(path, **kargs):
     """ Helper to generate an absolute invenio Secure URL with query
     arguments"""
 
+    from invenio.config import CFG_SITE_SECURE_URL
     url = CFG_SITE_SECURE_URL + path
 
     if kargs:
@@ -331,12 +325,11 @@ def make_pdf_fixture(filename, text=None):
 
 
 class InvenioTestUtilsBrowserException(Exception):
-
     """Helper exception for the regression test suite browser."""
     pass
 
 
-@nottest
+#@nottest
 def test_web_page_existence(url):
     """
     Test whether URL exists and is well accessible.
@@ -365,6 +358,7 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
     browser.set_handle_robots(False)  # ignore robots.txt, since we test gently
     if username == "guest":
         return browser
+    from invenio.config import CFG_SITE_SECURE_URL
     browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
     browser.select_form(nr=0)
     browser['nickname'] = username
@@ -379,7 +373,7 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
     return browser
 
 
-@nottest
+#@nottest
 def test_web_page_content(url,
                           username="guest",
                           password="",
@@ -387,7 +381,7 @@ def test_web_page_content(url,
                           unexpected_text="",
                           expected_link_target=None,
                           expected_link_label=None,
-                          require_validate_p=CFG_TESTS_REQUIRE_HTML_VALIDATION):
+                          require_validate_p=None):
     """Test whether web page URL as seen by user USERNAME contains
        text EXPECTED_TEXT and, eventually, contains a link to
        EXPECTED_LINK_TARGET (if set) labelled EXPECTED_LINK_LABEL (if
@@ -407,6 +401,10 @@ def test_web_page_content(url,
        messages that may have been encountered during processing of
        page.
     """
+    from invenio.utils.w3c_validator import w3c_validate, w3c_errors_to_str, \
+        CFG_TESTS_REQUIRE_HTML_VALIDATION
+    if require_validate_p is None:
+        require_validate_p = CFG_TESTS_REQUIRE_HTML_VALIDATION
     try:
         import mechanize
     except ImportError:
@@ -499,6 +497,7 @@ def test_web_page_content(url,
                 error_text = 'ERROR: Page %s (login %s) does not validate:\n %s' % \
                     (url, username, w3c_errors_to_str(
                      errors, warnings))
+                from invenio.config import CFG_LOGDIR
                 open('%s/w3c-markup-validator.log' %
                      CFG_LOGDIR, 'a').write(error_text)
                 raise InvenioTestUtilsBrowserException, error_text
@@ -511,6 +510,7 @@ def test_web_page_content(url,
 
     try:
         # logout after tests:
+        from invenio.config import CFG_SITE_SECURE_URL
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/logout")
         browser.response().read()
         browser.close()
@@ -540,13 +540,15 @@ def merge_error_messages(error_messages):
     return out
 
 
-@nottest
+#@nottest
 def build_and_run_unit_test_suite():
     """
     Detect all Invenio modules with names ending by '*_unit_tests.py', build
     a complete test suite of them, and run it.
     Called by 'inveniocfg --run-unit-tests'.
     """
+    from invenio.config import CFG_PYLIBDIR
+    from invenio.pluginutils import PluginContainer
     test_modules_map = PluginContainer(
         os.path.join(CFG_PYLIBDIR, 'invenio', '*_unit_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
@@ -561,17 +563,18 @@ def build_and_run_unit_test_suite():
              ', '.join(broken_unit_tests))
 
     complete_suite = unittest.TestSuite(test_modules)
-    res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    res = unittest.TextTestRunner(descriptions=False, verbosity=2).run(complete_suite)
     return res.wasSuccessful()
 
 
-@nottest
+#@nottest
 def build_and_run_js_unit_test_suite():
     """
     Init the JsTestDriver server, detect all Invenio JavaScript files with
     names ending by '*_tests.js' and run them.
     Called by 'inveniocfg --run-js-unit-tests'.
     """
+    from invenio.config import CFG_PREFIX, CFG_WEBDIR, CFG_JSTESTDRIVER_PORT
     def _server_init(server_process):
         """
         Init JsTestDriver server and check if it succedeed
@@ -598,7 +601,7 @@ def build_and_run_js_unit_test_suite():
         Find all JS files installed in Invenio lib directory and run
         them on the JsTestDriver server
         """
-        from invenio.shellutils import run_shell_command
+        from invenio.utils.shell import run_shell_command
         errors_found = 0
         for candidate in os.listdir(CFG_WEBDIR + "/js"):
             base, ext = os.path.splitext(candidate)
@@ -624,6 +627,7 @@ def build_and_run_js_unit_test_suite():
                                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     try:
+        from invenio.config import CFG_SITE_URL
         if not _server_init(server_process):
             # There was an error initialising server
             return 1
@@ -642,13 +646,15 @@ def build_and_run_js_unit_test_suite():
     return exitcode
 
 
-@nottest
+#@nottest
 def build_and_run_regression_test_suite():
     """
     Detect all Invenio modules with names ending by
     '*_regression_tests.py', build a complete test suite of them, and
     run it.  Called by 'inveniocfg --run-regression-tests'.
     """
+    from invenio.config import CFG_PYLIBDIR
+    from invenio.pluginutils import PluginContainer
     test_modules_map = PluginContainer(
         os.path.join(CFG_PYLIBDIR, 'invenio', '*_regression_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
@@ -665,17 +671,19 @@ def build_and_run_regression_test_suite():
     warn_user_about_tests()
 
     complete_suite = unittest.TestSuite(test_modules)
-    res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    res = unittest.TextTestRunner(descriptions=False, verbosity=2).run(complete_suite)
     return res.wasSuccessful()
 
 
-@nottest
+#@nottest
 def build_and_run_web_test_suite():
     """
     Detect all Invenio modules with names ending by
     '*_web_tests.py', build a complete test suite of them, and
     run it.  Called by 'inveniocfg --run-web-tests'.
     """
+    from invenio.config import CFG_PYLIBDIR
+    from invenio.pluginutils import PluginContainer
     test_modules_map = PluginContainer(
         os.path.join(CFG_PYLIBDIR, 'invenio', '*_web_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
@@ -691,12 +699,11 @@ def build_and_run_web_test_suite():
     warn_user_about_tests()
 
     complete_suite = unittest.TestSuite(test_modules)
-    res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    res = unittest.TextTestRunner(descriptions=False, verbosity=2).run(complete_suite)
     return res.wasSuccessful()
 
 
 class InvenioWebTestCase(InvenioTestCase):
-
     """ Helper library of useful web test functions
     for web tests creation.
     """
@@ -894,6 +901,7 @@ class InvenioWebTestCase(InvenioTestCase):
         self.fill_textbox(textbox_name="password",  text=password)
         self.find_element_by_name_with_timeout("action")
         self.browser.find_element_by_name("action").click()
+        from invenio.config import CFG_SITE_NAME_INTL
         if force_ln and CFG_SITE_NAME_INTL[force_ln] not in self.browser.page_source:
             splitted_url = list(urlsplit(self.browser.current_url))
             query = cgi.parse_qs(splitted_url[3])
@@ -1104,7 +1112,6 @@ class InvenioWebTestCase(InvenioTestCase):
 
 
 class InvenioWebTestCaseException(Exception):
-
     """This exception is thrown if the element
     we are looking for is not found after a set time period.
     The element is not found because the page needs more
@@ -1130,6 +1137,7 @@ class InvenioWebTestCaseException(Exception):
         return repr(self.message)
 
 
+#@nottest
 def build_and_run_flask_test_suite():
     """
     Detect all Invenio modules with names ending by
@@ -1154,3 +1162,34 @@ def build_and_run_flask_test_suite():
 
     complete_suite = unittest.TestSuite(test_modules)
     run_test_suite(complete_suite)
+
+
+from invenio.base.utils import import_submodules_from_packages
+
+def iter_suites():
+    """Yields all testsuites."""
+    app = create_app()
+    packages = ['invenio'] + app.config.get('PACKAGES', [])
+
+    for module in import_submodules_from_packages('testsuite', packages=packages):
+        if not module.__name__.split('.')[-1].startswith('test_'):
+            continue
+        if hasattr(module, 'TEST_SUITE'):
+            yield module.TEST_SUITE
+
+
+def suite():
+    """A testsuite that has all the tests."""
+    #setup_path()
+    suite = unittest.TestSuite()
+    for other_suite in iter_suites():
+        suite.addTest(other_suite)
+    return suite
+
+
+def main():
+    """Runs the testsuite as command line application."""
+    try:
+        unittest.main(defaultTest='suite')
+    except Exception as e:
+        print('Error: %s' % e)

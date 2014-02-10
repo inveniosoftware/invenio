@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,14 +18,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Test unit for the miscutil/jinja2utils module.
+Unit test for the template extensions.
 """
 
-from invenio.jinja2utils import render_template_to_string
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.ext.template import render_template_to_string
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
-class TestJinja2Utils(InvenioTestCase):
+class TemplateTest(InvenioTestCase):
     """
     jinja2utils TestSuite.
     """
@@ -49,7 +49,24 @@ class TestJinja2Utils(InvenioTestCase):
         self.tplEqualToString(pxsx_tpl, '***test###', test_variable='test')
 
 
-TEST_SUITE = make_test_suite(TestJinja2Utils, )
+class TemplateLoaderCase(InvenioTestCase):
+
+    @property
+    def config(self):
+        cfg = super(TemplateLoaderCase, self).config
+        cfg['PACKAGES'] = [
+            'invenio.testsuite.test_apps.first',
+            'invenio.modules.*',
+            'invenio.testsuite.test_apps.last',
+        ]
+        return cfg
+
+    def test_fisrt_blueprint(self):
+        response = self.client.get('/')
+        self.assertEqual(response.data.strip(), 'First')
+        self.assertNotEqual(response.data.strip(), 'Last')
+
+TEST_SUITE = make_test_suite(TemplateTest, TemplateLoaderCase)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextAreaField
-from invenio.webdeposit_field import WebDepositField
+from invenio.modules.deposit.field_base import WebDepositField
 
 
 __all__ = ['AbstractField']
@@ -27,8 +27,9 @@ __all__ = ['AbstractField']
 class AbstractField(WebDepositField, TextAreaField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-pencil',
-            export_key='abstract.summary'
+            icon='pencil',
+            export_key='abstract.summary',
+            widget_classes='form-control'
         )
         defaults.update(kwargs)
         super(AbstractField, self).__init__(**defaults)

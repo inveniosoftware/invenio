@@ -22,12 +22,12 @@
 
 import datetime
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-split_in_days = lazy_import('invenio.weblinkback:split_in_days')
+split_in_days = lazy_import('invenio.legacy.weblinkback.api:split_in_days')
 
-from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, CFG_WEBLINKBACK_STATUS
+from invenio.legacy.weblinkback.config import CFG_WEBLINKBACK_TYPE, CFG_WEBLINKBACK_STATUS
 
 
 class TestSplitLinkbacksInInsertionDayGroups(InvenioTestCase):

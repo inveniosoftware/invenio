@@ -30,7 +30,8 @@ from celery import Celery, signals
 from celery.datastructures import DictAttribute
 from celery.loaders.base import BaseLoader
 
-from invenio.importutils import autodiscover_modules
+from invenio.base.utils import autodiscover_celery_tasks
+from invenio.base.factory import with_app_context
 
 
 class InvenioLoader(BaseLoader):
@@ -63,9 +64,9 @@ class InvenioLoader(BaseLoader):
             if current_app:
                 self.flask_app = current_app
             else:
-                from invenio.webinterface_handler_flask import create_invenio_flask_app
-                self.flask_app = create_invenio_flask_app()
-                from invenio.sqlalchemyutils import db
+                from invenio.base.factory import create_app
+                self.flask_app = create_app()
+                from invenio.ext.sqlalchemy import db
                 self.db = db
 
     def on_task_init(self, task_id, task):
@@ -108,11 +109,13 @@ class InvenioLoader(BaseLoader):
     def on_worker_process_init(self):
         self.close_database()
 
+    @with_app_context()
     def read_configuration(self):
-        """ Read configuration defined in invenio.celery_config """
-        usercfg = self._import_config_module('invenio.celery_config')
+        """ Read configuration defined in invenio.celery.config """
+        from invenio.celery.config import default_config
+        from flask import current_app
         self.configured = True
-        return DictAttribute(usercfg)
+        return default_config(current_app.config)
 
     def close_database(self, **dummy_kwargs):
         if self.db:
@@ -130,9 +133,12 @@ class InvenioLoader(BaseLoader):
 
     def autodiscover(self):
         """
-        Discover task modules named 'invenio.*_tasks'
+        Discover task modules named 'invenio.modules.*.tasks'
         """
-        self.task_modules.update(mod.__name__ for mod in autodiscover_modules(['invenio'], related_name_re='.+_tasks\.py') or ())
+        from invenio.celery import tasks
+        self.task_modules.update(tasks.__name__)
+        self.task_modules.update(
+            mod.__name__ for mod in autodiscover_celery_tasks() or ())
 
 
 #

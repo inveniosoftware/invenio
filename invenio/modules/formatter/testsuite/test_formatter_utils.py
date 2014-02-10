@@ -19,9 +19,11 @@
 
 """BibFormat - Unit Test Suite"""
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-from invenio.bibformat_utils import words_start_with_patterns, \
-                                    cut_out_snippet_core_creation
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+
+words_start_with_patterns = lazy_import('invenio.modules.formatter.utils:words_start_with_patterns')
+cut_out_snippet_core_creation = lazy_import('invenio.modules.formatter.utils:cut_out_snippet_core_creation')
 
 
 class WordsStartsWithPatternTest(InvenioTestCase):

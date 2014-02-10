@@ -24,8 +24,8 @@
 '''
 
 def initial_disambiguation():
-    from invenio.bibauthorid_tortoise import tortoise_from_scratch
-    from invenio.bibauthorid_personid_maintenance import check_results
+    from invenio.legacy.bibauthorid.tortoise import tortoise_from_scratch
+    from invenio.legacy.bibauthorid.personid_maintenance import check_results
     tortoise_from_scratch()
     assert check_results()
 
@@ -34,9 +34,9 @@ def initial_disambiguation():
 # For the moment tortoise is in experimental phase so
 # it is mandatory.
 def safe_disambiguation_iteration():
-    from invenio.bibauthorid_tortoise import tortoise
-    from invenio.bibauthorid_rabbit import rabbit
-    from invenio.bibauthorid_personid_maintenance import check_personid_papers \
+    from invenio.legacy.bibauthorid.tortoise import tortoise
+    from invenio.legacy.bibauthorid.rabbit import rabbit
+    from invenio.legacy.bibauthorid.personid_maintenance import check_personid_papers \
                                                  , check_results \
                                                  , repair_personid
 
@@ -51,9 +51,9 @@ def safe_disambiguation_iteration():
 
 
 def safe_merger():
-    from invenio.bibauthorid_merge import merge_static
-    from invenio.bibauthorid_rabbit import rabbit
-    from invenio.bibauthorid_personid_maintenance import check_personid_papers \
+    from invenio.legacy.bibauthorid.merge import merge_static
+    from invenio.legacy.bibauthorid.rabbit import rabbit
+    from invenio.legacy.bibauthorid.personid_maintenance import check_personid_papers \
                                                  , check_results \
                                                  , check_merger \
                                                  , repair_personid \
@@ -75,12 +75,12 @@ def safe_merger():
 
 
 def test_accuracy():
-    from invenio.bibauthorid_tortoise import tortoise
-    from invenio.bibauthorid_rabbit import rabbit
-    from invenio.bibauthorid_personid_maintenance import check_personid_papers \
+    from invenio.legacy.bibauthorid.tortoise import tortoise
+    from invenio.legacy.bibauthorid.rabbit import rabbit
+    from invenio.legacy.bibauthorid.personid_maintenance import check_personid_papers \
                                                  , check_results \
                                                  , repair_personid
-    from invenio.bibauthorid_merge import matched_claims
+    from invenio.legacy.bibauthorid.merge import matched_claims
 
     if not check_personid_papers():
         rabbit([])

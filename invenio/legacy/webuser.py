@@ -43,6 +43,7 @@ import datetime
 from socket import gaierror
 from flask import Request
 
+from invenio.base.wrappers import lazy_import
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
@@ -68,23 +69,45 @@ try:
     from flask import session
 except ImportError:
     pass
-from invenio.dbquery import run_sql, OperationalError, \
-    serialize_via_marshal, deserialize_via_marshal
-from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
-from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
-from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
-from invenio.access_control_config import SUPERADMINROLE, CFG_EXTERNAL_AUTH_USING_SSO
-from invenio.messages import gettext_set_language, wash_languages, wash_language
-from invenio.mailutils import send_email
-from invenio.errorlib import register_exception
-from invenio.webgroup_dblayer import get_groups
-from invenio.external_authentication import InvenioWebAccessExternalAuthError
-from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
-    CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS, CFG_EXTERNAL_AUTH_DEFAULT, \
-    CFG_TEMP_EMAIL_ADDRESS
-from invenio.webuser_config import CFG_WEBUSER_USER_TABLES
-import invenio.template
-tmpl = invenio.template.load('websession')
+from invenio.legacy.dbquery import run_sql, OperationalError
+from invenio.utils.serializers import serialize_via_marshal, \
+    deserialize_via_marshal
+
+
+from invenio.base.i18n import gettext_set_language, wash_languages, wash_language
+from invenio.ext.email import send_email
+from invenio.ext.logging import register_exception
+from invenio.ext.sqlalchemy import db
+from invenio.legacy.websession.dblayer import get_groups
+from invenio.legacy.external_authentication import InvenioWebAccessExternalAuthError
+from invenio.modules.accounts.models import User
+
+from invenio.legacy.websession.webuser_config import CFG_WEBUSER_USER_TABLES
+
+acc_get_role_id = lazy_import('invenio.modules.access.control:acc_get_role_id')
+acc_get_action_roles = lazy_import('invenio.modules.access.control:acc_get_action_roles')
+acc_get_action_id = lazy_import('invenio.modules.access.control:acc_get_action_id')
+acc_is_user_in_role = lazy_import('invenio.modules.access.control:acc_is_user_in_role')
+acc_find_possible_activities = lazy_import('invenio.modules.access.control:acc_find_possible_activities')
+mail_cookie_create_mail_activation = lazy_import('invenio.modules.access.mailcookie:mail_cookie_create_mail_activation')
+acc_firerole_check_user = lazy_import('invenio.modules.access.firerole:acc_firerole_check_user')
+load_role_definition = lazy_import('invenio.modules.access.firerole:load_role_definition')
+SUPERADMINROLE = lazy_import('invenio.modules.access.local_config:SUPERADMINROLE')
+CFG_EXTERNAL_AUTH_USING_SSO = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTH_USING_SSO')
+CFG_EXTERNAL_AUTHENTICATION = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTHENTICATION')
+CFG_WEBACCESS_MSGS = lazy_import('invenio.modules.access.local_config:CFG_WEBACCESS_MSGS')
+CFG_WEBACCESS_WARNING_MSGS = lazy_import('invenio.modules.access.local_config:CFG_WEBACCESS_WARNING_MSGS')
+CFG_EXTERNAL_AUTH_DEFAULT = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTH_DEFAULT')
+CFG_TEMP_EMAIL_ADDRESS = lazy_import('invenio.modules.access.local_config:CFG_TEMP_EMAIL_ADDRESS')
+
+
+
+
+# import invenio.legacy.template
+# tmpl = invenio.legacy.template.load('websession')
+tmpl = lazy_import('invenio.legacy.websession.templates:Template')()
+# tmpl = object
+
 
 re_invalid_nickname = re.compile(""".*[,'@]+.*""")
 
@@ -120,7 +143,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
     guessed from the context.
     """
 
-    from invenio.webpage import page
+    from invenio.legacy.webpage import page
 
     _ = gettext_set_language(ln)
 
@@ -228,7 +251,7 @@ def getUid(req):
             return -1
 
 
-from invenio.webuser_flask import current_user, login_user, logout_user
+from invenio.ext.login import current_user, login_user, logout_user
 getUid = lambda req: current_user.get_id()
 
 
@@ -470,7 +493,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
             except:
                 ip_address = None
             try:
-                if not send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
+                if not send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %(sitename)s", sitename=CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
                                   tmpl.tmpl_account_address_activation_email_body(
                                       email, address_activation_key,
                                       ip_address, ln)):
@@ -478,11 +501,17 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
             except (smtplib.SMTPException, socket.error):
                 return 6
 
-    # okay, go on and register the user:
-    user_preference = get_default_user_preferences()
-    uid = run_sql("INSERT INTO user (nickname, email, password, note, settings, last_login) "
-        "VALUES (%s,%s,AES_ENCRYPT(email,%s),%s,%s, NOW())",
-        (nickname, email, passw, activated, serialize_via_marshal(user_preference)))
+    # okay, go on and register the user: FIXME
+    user = User(nickname=nickname,
+                email=email,
+                password=passw,
+                note=activated)
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return 7
     if activated == 1: # Ok we consider the user as logged in :-)
         setUid(req, uid)
     return 0
@@ -1099,6 +1128,7 @@ def get_user_preferences(uid):
     pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
     if pref:
         try:
+            # FIXME: return User.query.get(uid).settings
             return deserialize_via_marshal(pref[0][1])
         except:
             pass
@@ -1183,20 +1213,20 @@ def collect_user_info(req, login_time=False, refresh=False):
     """
 
     if type(req) in [long, int] or req is None:
-        from invenio.webuser_flask import UserInfo
+        from invenio.ext.login import UserInfo
         return UserInfo(req)
 
-    from invenio.webuser_flask import current_user
+    from flask.ext.login import current_user
     return current_user._get_current_object()
 
     ##
     ## NOT USED ANYMORE
-    ## please see webuser_flask.py
+    ## please see inveno.ext.login
     ##
 
     #FIXME move EXTERNAL SSO functionality
 
-    from invenio.search_engine import get_permitted_restricted_collections
+    from invenio.legacy.search_engine import get_permitted_restricted_collections
     user_info = {
         'remote_ip' : '',
         'remote_host' : '',
@@ -1358,7 +1388,7 @@ def collect_user_info(req, login_time=False, refresh=False):
                     user_info[key.lower()] = value
             if login_time:
                 ## Heavy computational information
-                from invenio.access_control_engine import acc_authorize_action
+                from invenio.modules.access.engine import acc_authorize_action
                 user_info['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(user_info)
                 user_info['precached_usebaskets'] = acc_authorize_action(user_info, 'usebaskets')[0] == 0
                 user_info['precached_useloans'] = acc_authorize_action(user_info, 'useloans')[0] == 0

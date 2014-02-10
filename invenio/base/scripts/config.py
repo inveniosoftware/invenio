@@ -17,10 +17,38 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.scriptutils import Manager, change_command_name, \
+import StringIO
+import errno
+import imp
+import sys
+import types
+
+from pprint import pformat
+from flask import current_app
+from invenio.ext.script import Manager, change_command_name, \
     generate_secret_key
 
 manager = Manager(usage="Perform configuration operations")
+
+
+def default_keys():
+    yield 'SECRET_KEY'
+    for k in current_app.config.keys():
+        if k.startswith('CFG_DATABASE'):
+            yield k
+
+
+def get_instance_config_object(filename='invenio.cfg', silent=True):
+    d = imp.new_module('config')
+    d.__file__ = filename
+    try:
+        with current_app.open_instance_resource(filename) as config_file:
+            exec(compile(config_file.read(), filename, 'exec'), d.__dict__)
+    except IOError as e:
+        if not (silent and e.errno in (errno.ENOENT, errno.EISDIR)):
+            e.strerror = 'Unable to load configuration file (%s)' % e.strerror
+            raise
+    return d
 
 
 def get_conf():
@@ -28,7 +56,7 @@ def get_conf():
         from invenio.config import CFG_ETCDIR
     except:
         CFG_ETCDIR = None
-    from invenio.inveniocfg import prepare_conf
+    from invenio.legacy.inveniocfg import prepare_conf
 
     class TmpOptions(object):
         conf_dir = CFG_ETCDIR
@@ -43,17 +71,8 @@ def get(name):
     third-party programs to access values of conf options such as
     CFG_PREFIX.  Return None if VARNAME is not found.
     """
-    import sys
-    conf = get_conf()
-
     try:
-        name = name.lower()
-        # do not pay attention to section names yet:
-        all_options = {}
-        for section in conf.sections():
-            for option in conf.options(section):
-                all_options[option] = conf.get(section, option)
-        varvalue = all_options.get(name, None)
+        varvalue = current_app.config.get(name.upper(), None)
         if varvalue is None:
             raise Exception('Value of "%s" is None.' % name)
         print varvalue
@@ -63,30 +82,77 @@ def get(name):
         sys.exit(1)
 
 
+def set_(name, value, filename='invenio.cfg'):
+    """Set instance config variable with `value`."""
+    name = name.upper()
+    try:
+        d = get_instance_config_object(filename)
+    except Exception as e:
+        print >>sys.stderr, "ERROR: ", str(e)
+        sys.exit(1)
+    if name in d.__dict__:
+        print "ERROR: %s is already filled." % (name, )
+        sys.exit(1)
+
+    try:
+        type_ = type(current_app.config.get(name, value))
+        if type_ in [types.DictType, types.ListType]:
+            value = eval(value)
+        else:
+            value = type_(value)
+    except:
+        print '>>> Using default type ...'
+
+    with current_app.open_instance_resource(filename, 'a') as config_file:
+        print >>config_file, name, '=', pformat(value)
+
+set_.__name__ = 'set'
+manager.command(set_)
+
+
 @manager.command
 def list():
     """
     Print a list of all conf options and values from CONF.
     """
-    conf = get_conf()
-    sections = conf.sections()
-    sections.sort()
-    for section in sections:
-        options = conf.options(section)
-        options.sort()
-        for option in options:
-            print option.upper(), '=', conf.get(section, option)
+    for key, value in current_app.config.iteritems():
+        print key, '=', pformat(value)
 
 
 @manager.command
-def update():
+def update(filename='invenio.cfg', silent=True):
     """
     Update new config.py from conf options, keeping previous
     config.py in a backup copy.
     """
-    from invenio.inveniocfg import update_config_py
-    conf = get_conf()
-    update_config_py(conf)
+    d = get_instance_config_object(filename, silent)
+
+    new_config = StringIO.StringIO()
+    for key in set(d.__dict__.keys()) | set(default_keys()):
+        if key != key.upper():
+            continue
+        value = d.__dict__.get(key, current_app.config[key])
+        type_ = type(value)
+        prmt = key + ' (' + type_.__name__ + ') [' + pformat(value) + ']: '
+        while True:
+            new_value = raw_input(prmt)
+            try:
+                if type_ in [types.DictType, types.ListType]:
+                    new_value = eval(new_value) if new_value else value
+                elif isinstance(None, type_):
+                    new_value = new_value if new_value != '' else None
+                else:
+                    new_value = type_(new_value or value)
+                break
+            except Exception as e:
+                print e
+                pass
+        print '>>>', key, '=', pformat(new_value)
+        print >>new_config, key, '=', pformat(new_value)
+
+    with current_app.open_instance_resource(filename, 'w') as config_file:
+        config_file.write(new_config.getvalue())
+
 
 config_create = Manager(usage="Creates variables in config file.")
 manager.add_command("create", config_create)
@@ -94,41 +160,33 @@ manager.add_command("create", config_create)
 
 @config_create.command
 @change_command_name
-def secret_key(key=None):
-    """Generate and append CFG_SITE_SECRET_KEY to invenio-local.conf.
+def secret_key(key=None, filename='invenio.cfg', silent=True):
+    """Generate and append SECRET_KEY to invenio.cfg.
     Useful for the installation process."""
-    import os
-    import sys
-    from invenio.inveniocfg import _grep_version_from_executable
-    print ">>> Going to generate random CFG_SITE_SECRET_KEY..."
+    print ">>> Going to generate random SECRET_KEY..."
     try:
-        from invenio.config import CFG_ETCDIR, CFG_SITE_SECRET_KEY
-    except ImportError:
-        print "ERROR: please run 'inveniocfg --update-config-py' first."
+        d = get_instance_config_object(filename)
+    except Exception as e:
+        print >>sys.stderr, "ERROR: ", str(e)
         sys.exit(1)
-    if CFG_SITE_SECRET_KEY is not None and len(CFG_SITE_SECRET_KEY) > 0:
-        print "ERROR: CFG_SITE_SECRET_KEY is already filled."
+    if len(d.__dict__.get('SECRET_KEY', '')) > 0:
+        print "ERROR: SECRET_KEY is already filled."
         sys.exit(1)
-    invenio_local_path = CFG_ETCDIR + os.sep + 'invenio-local.conf'
-    if _grep_version_from_executable(invenio_local_path, 'CFG_SITE_SECRET_KEY'):
-        print "WARNING: invenio-local.conf already contains CFG_SITE_SECRET_KEY."
-        print "You may want to run 'inveniocfg --update-all'' now."
+    from invenio.base.config import SECRET_KEY
+    if current_app.config.get('SECRET_KEY') != SECRET_KEY:
+        print >>sys.stderr, "WARNING: custom config package already contains SECRET_KEY."
         print ">>> No need to generate secret key."
     else:
         if key is None:
             key = generate_secret_key()
-        with open(invenio_local_path, 'a') as f:
-            f.write('\nCFG_SITE_SECRET_KEY = %s\n' % (key, ))
-        print ">>> CFG_SITE_SECRET_KEY appended to `%s`." % (invenio_local_path, )
+        with current_app.open_instance_resource(filename, 'a') as config_file:
+            print >>config_file, 'SECRET_KEY =', pformat(key)
+            print ">>> SECRET_KEY appended to `%s`." % (config_file.name, )
 
 
 def main():
-    from invenio.config import CFG_SITE_SECRET_KEY
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    if not CFG_SITE_SECRET_KEY or CFG_SITE_SECRET_KEY == '':
-        CFG_SITE_SECRET_KEY = generate_secret_key()
-    app = create_invenio_flask_app(SECRET_KEY=CFG_SITE_SECRET_KEY)
-    manager.app = app
+    from invenio.base.factory import create_app
+    manager.app = create_app()
     manager.run()
 
 if __name__ == '__main__':

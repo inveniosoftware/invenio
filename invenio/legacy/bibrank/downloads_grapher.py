@@ -25,11 +25,11 @@ import time
 import calendar
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION, CFG_WEBDIR
-from invenio.messages import gettext_set_language
-from invenio.intbitset import intbitset
-from invenio.dbquery import run_sql
-from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
-from invenio.bibrank_grapher import *
+from invenio.base.i18n import gettext_set_language
+from intbitset import intbitset
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.bibrank.downloads_indexer import database_tuples_to_single_list
+from invenio.legacy.bibrank.grapher import *
 
 color_line_list = ['9', '19', '10', '15', '21', '18']
 cfg_id_bibdoc_id_bibrec = 5

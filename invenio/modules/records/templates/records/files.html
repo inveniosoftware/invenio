@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 {%- if not request.is_xhr -%}
-  {% extends "record.html" %}
+  {% extends "records/base.html" %}
 {%- endif -%}
 
 {% block record_content %}
@@ -26,4 +26,11 @@
   </div>
 
   {{ format_record(recid, 'HDFILE', ln=g.ln)|safe }}
+  
+  {% from 'cloudconnector/files.html' import upload_files with context %}
+  
+  {% call upload_files(files, request) %}
+  	<a href="#myModal" role="button" class="btn" data-toggle="modal">Upload to cloud service</a>
+  {% endcall %}
+  
 {% endblock %}

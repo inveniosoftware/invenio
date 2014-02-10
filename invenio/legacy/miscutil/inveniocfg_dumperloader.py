@@ -48,7 +48,7 @@ import re
 import datetime
 import StringIO
 from string import Template
-from invenio.dbquery import run_sql, wash_table_column_name
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
 
 from configobj import ConfigObj
 

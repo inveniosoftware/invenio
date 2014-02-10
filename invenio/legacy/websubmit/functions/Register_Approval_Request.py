@@ -25,13 +25,13 @@ import sre_constants
 import os
 import cgi
 import re
-from invenio.websubmit_dblayer import register_new_approval_request, \
+from invenio.legacy.websubmit.db_layer import register_new_approval_request, \
                                       get_simple_approval_status, \
                                       update_approval_request_status
-from invenio.websubmit_functions.Shared_Functions import ParamFromFile
-from invenio.websubmit_config import InvenioWebSubmitFunctionError, \
+from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError, \
                                      InvenioWebSubmitFunctionStop
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 
 def Register_Approval_Request(parameters, curdir, form, user_info=None):

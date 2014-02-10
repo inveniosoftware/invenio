@@ -18,13 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import FileField
-from invenio.webdeposit_field import WebDepositField
+from invenio.modules.deposit.field_base import WebDepositField
 
 __all__ = ['FileUploadField']
 
 
 class FileUploadField(WebDepositField, FileField):
     def __init__(self, **kwargs):
-        defaults = dict(icon='icon-upload', export_key=False)
+        defaults = dict(icon='upload', export_key=False)
         defaults.update(kwargs)
         super(FileUploadField, self).__init__(**defaults)

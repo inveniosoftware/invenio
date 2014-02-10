@@ -23,10 +23,10 @@
 __revision__ = "$Id$"
 
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-HTTPAsyncPageGetter = lazy_import('invenio.websearch_external_collections_getter:HTTPAsyncPageGetter')
-async_download = lazy_import('invenio.websearch_external_collections_getter:async_download')
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+HTTPAsyncPageGetter = lazy_import('invenio.legacy.websearch_external_collections.getter:HTTPAsyncPageGetter')
+async_download = lazy_import('invenio.legacy.websearch_external_collections.getter:async_download')
 
 
 class AsyncDownloadTest(InvenioTestCase):

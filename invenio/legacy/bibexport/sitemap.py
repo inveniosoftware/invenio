@@ -32,15 +32,15 @@ import os
 import gzip
 import time
 
-from invenio.search_engine import get_collection_reclist
-from invenio.dbquery import run_sql
+from invenio.legacy.search_engine import get_collection_reclist
+from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR, \
     CFG_SITE_RECORD, CFG_SITE_LANGS
-from invenio.intbitset import intbitset
-from invenio.websearch_webcoll import Collection
-from invenio.bibtask import write_message, task_update_progress, task_sleep_now_if_required
-from invenio.textutils import encode_for_xml
-from invenio.urlutils import get_canonical_and_alternates_urls
+from intbitset import intbitset
+from invenio.legacy.websearch.webcoll import Collection
+from invenio.legacy.bibsched.bibtask import write_message, task_update_progress, task_sleep_now_if_required
+from invenio.utils.text import encode_for_xml
+from invenio.utils.url import get_canonical_and_alternates_urls
 
 
 DEFAULT_TIMEZONE = '+01:00'

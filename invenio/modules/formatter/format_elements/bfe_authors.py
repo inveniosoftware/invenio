@@ -24,13 +24,14 @@ import re
 from urllib import quote
 from cgi import escape
 from invenio.config import CFG_SITE_URL
-from invenio.messages import gettext_set_language
-from invenio.bibauthority_config import \
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME, \
     CFG_BIBAUTHORITY_TYPE_NAMES, \
     CFG_BIBAUTHORITY_PREFIX_SEP
-from invenio.bibauthority_engine import \
+from invenio.legacy.bibauthority.engine import \
     get_low_level_recIDs_from_control_no
+
 
 def format_element(bfo, limit, separator=' ; ',
            extension='[...]',
@@ -95,7 +96,7 @@ def format_element(bfo, limit, separator=' ; ',
 
         if author.has_key('a'):
             if highlight == 'yes':
-                from invenio import bibformat_utils
+                from invenio.modules.formatter import utils as bibformat_utils
                 author['a'] = bibformat_utils.highlight(author['a'],
                                                         bfo.search_pattern)
 

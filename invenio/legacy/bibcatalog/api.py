@@ -27,8 +27,8 @@ from invenio.config import CFG_BIBCATALOG_SYSTEM
 
 bibcatalog_system = None
 if CFG_BIBCATALOG_SYSTEM == 'RT':
-    from invenio.bibcatalog_system_rt import BibCatalogSystemRT
+    from invenio.legacy.bibcatalog.system_rt import BibCatalogSystemRT
     bibcatalog_system = BibCatalogSystemRT()
 elif CFG_BIBCATALOG_SYSTEM == 'EMAIL':
-    from invenio.bibcatalog_system_email import BibCatalogSystemEmail
+    from invenio.legacy.bibcatalog.system_email import BibCatalogSystemEmail
     bibcatalog_system = BibCatalogSystemEmail()

@@ -26,19 +26,19 @@ __revision__ = "$Id$"
 import os
 import re
 import sre_constants
-from invenio.websubmit_dblayer import get_approval_request_notes
-from invenio.websubmit_config import InvenioWebSubmitFunctionError, \
+from invenio.legacy.websubmit.db_layer import get_approval_request_notes
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError, \
                                      CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.config import CFG_CERN_SITE, \
                            CFG_SITE_NAME, \
                            CFG_SITE_URL, \
                            CFG_SITE_SUPPORT_EMAIL, \
                            CFG_SITE_RECORD
-from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
-from invenio.websubmit_functions.Shared_Functions import ParamFromFile
-from invenio.errorlib import register_exception
-from invenio.search_engine import print_record
-from invenio.mailutils import send_email
+from invenio.modules.access.control import acc_get_role_users, acc_get_role_id
+from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
+from invenio.ext.logging import register_exception
+from invenio.legacy.search_engine import print_record
+from invenio.ext.email import send_email
 
 
 CFG_MAIL_BODY = """

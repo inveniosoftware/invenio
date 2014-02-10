@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
 ## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
@@ -41,29 +42,29 @@ from invenio.config import \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
-from invenio.messages import gettext_set_language, language_list_long
-from invenio.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
-from invenio.dbquery import run_sql, Error, get_table_update_time
-from invenio.bibrank_record_sorter import get_bibrank_methods
-from invenio.dateutils import convert_datestruct_to_dategui, strftime
-from invenio.bibformat import format_record
-from invenio.shellutils import mymkdir
-from invenio.intbitset import intbitset
-from invenio.websearch_external_collections import \
+from invenio.base.i18n import gettext_set_language, language_list_long
+from invenio.legacy.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
+from invenio.legacy.dbquery import run_sql, Error, get_table_update_time
+from invenio.legacy.bibrank.record_sorter import get_bibrank_methods
+from invenio.utils.date import convert_datestruct_to_dategui, strftime
+from invenio.modules.formatter import format_record
+from invenio.utils.shell import mymkdir
+from intbitset import intbitset
+from invenio.legacy.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \
      external_collection_sort_engine_by_name
-from invenio.bibtask import task_init, task_get_option, task_set_option, \
+from invenio.legacy.bibsched.bibtask import task_init, task_get_option, task_set_option, \
     write_message, task_has_option, task_update_progress, \
     task_sleep_now_if_required
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
 
-from invenio.websearch_external_collections_searcher import external_collections_dictionary
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
-from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS
+from invenio.legacy.websearch_external_collections.searcher import external_collections_dictionary
+from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS
 
-from invenio.signalutils import webcoll_after_webpage_cache_update
+from invenio.base.signals import webcoll_after_webpage_cache_update
 
 ## global vars
 COLLECTION_HOUSE = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
@@ -965,41 +966,6 @@ def set_cache_last_updated_timestamp(timestamp):
         # FIXME: do something here
         pass
     return timestamp
-
-def main():
-    """Main that construct all the bibtask."""
-    task_init(authorization_action="runwebcoll",
-            authorization_msg="WebColl Task Submission",
-            description="""Description:
-    webcoll updates the collection cache (record universe for a
-    given collection plus web page elements) based on invenio.conf and DB
-    configuration parameters. If the collection name is passed as an argument,
-    only this collection's cache will be updated. If the recursive option is
-    set as well, the collection's descendants will also be updated.\n""",
-            help_specific_usage="  -c, --collection\t Update cache for the given "
-                     "collection only. [all]\n"
-                    "  -r, --recursive\t Update cache for the given collection and all its\n"
-                    "\t\t\t descendants (to be used in combination with -c). [no]\n"
-                    "  -q, --quick\t\t Skip webpage cache update for those collections whose\n"
-                    "\t\t\t reclist was not changed. Note: if you use this option, it is advised\n"
-                    "\t\t\t to schedule, e.g. a nightly 'webcoll --force'. [no]\n"
-                    "  -f, --force\t\t Force update even if cache is up to date. [no]\n"
-                    "  -p, --part\t\t Update only certain cache parts (1=reclist,"
-                    " 2=webpage). [both]\n"
-                    "  -l, --language\t Update pages in only certain language"
-                    " (e.g. fr,it,...). [all]\n",
-            version=__revision__,
-            specific_params=("c:rqfp:l:", [
-                    "collection=",
-                    "recursive",
-                    "quick",
-                    "force",
-                    "part=",
-                    "language="
-                ]),
-            task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
-            task_submit_check_options_fnc=task_submit_check_options,
-            task_run_fnc=task_run_core)
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key it checks it's meaning, eventually using the value.

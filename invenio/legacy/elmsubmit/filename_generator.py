@@ -21,9 +21,7 @@ __revision__ = "$Id$"
 
 import sys
 import os.path
-
-_this_module = sys.modules[__name__]
-_this_module_dir = os.path.abspath(os.path.dirname(_this_module.__file__))
+import pkg_resources
 
 import re
 import os
@@ -45,9 +43,9 @@ try:
 except ImportError:
     _got_bz2 = False
 
-from invenio.elmsubmit_misc import open_tempfile as _open_tempfile
-from invenio.elmsubmit_misc import random_alphanum_string as _random_alphanum_string
-from invenio.elmsubmit_misc import remove_tempfile as _remove_tempfile
+from invenio.legacy.elmsubmit.misc import open_tempfile as _open_tempfile
+from invenio.legacy.elmsubmit.misc import random_alphanum_string as _random_alphanum_string
+from invenio.legacy.elmsubmit.misc import remove_tempfile as _remove_tempfile
 
 
 def generate_filename(filename=None, file=None, content_type=None, no_rand_chars=8, prefix='', postfix=''):
@@ -194,7 +192,7 @@ def calculate_filename_ext_libmagic(filename=None, file=None):
     return name_ext
 
 mimetypes.types_map = {}
-mimetypes.init([os.path.join(_this_module_dir, 'mime.types.edited')])
+mimetypes.init([pkg_resources.resource_filename('invenio.legacy.elmsubmit', 'mime.types.edited')])
 
 def calculate_filename_ext_mimetypes(content_type):
 

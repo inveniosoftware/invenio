@@ -23,14 +23,14 @@ import traceback
 
 from datetime import datetime
 from itertools import chain
-from invenio.bibtask import task_get_option, write_message, \
+from invenio.legacy.bibsched.bibtask import task_get_option, write_message, \
                             task_sleep_now_if_required, \
                             task_update_progress
-from invenio.dbquery import run_sql
-from invenio.search_engine import get_record
-from invenio.search_engine import get_collection_reclist
-from invenio.refextract_api import get_pdf_doc
-from invenio.bibrecord import record_get_field_instances, \
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.search_engine import get_record
+from invenio.legacy.search_engine import get_collection_reclist
+from invenio.legacy.refextract.api import get_pdf_doc
+from invenio.legacy.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
 
 

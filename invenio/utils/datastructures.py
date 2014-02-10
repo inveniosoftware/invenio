@@ -24,26 +24,19 @@ class LazyDict(object):
     """
     Lazy dictionary that evaluates its content when it is first accessed.
 
-    Example os use:
+    Example of use:
 
-    def bfe_discover():
-        import types
-        from invenio.importutils import autodiscover_modules
-        modules = autodiscover_modules(['invenio.bibformat_elements'], 'bfe_.+')
-        bfes= {}
-        for m in modules:
-            register_func = getattr(m, 'format_element', None)
-            if register_func and isinstance(register_func, types.FunctionType):
-                bfes[m.__name__.split('.')[-1]] = register_func
-        return bfes
+    def my_dict():
+        from werkzeug.utils import import_string
+        return {'foo': import_string('foo')}
 
-    lazy_dict = LazyDict(bfe_discover)
+    lazy_dict = LazyDict(my_dict)
     # at this point the internal dictionary is empty
-    lazy_dict['bfe_webjournal_imprint']
+    lazy_dict['foo']
     """
     def __init__(self, function=dict):
         """
-        @param function: it must return a dictionary like structure
+        :param function: it must return a dictionary like structure
         """
         super(LazyDict, self).__init__()
         self._cached_dict = None
@@ -106,7 +99,7 @@ class LaziestDict(LazyDict):
 
     def reader_discover(key):
         from werkzeug.utils import import_string
-        return import_string('invenio.bibfield_%sreader:reader' % (key))
+        return import_string('invenio.jsonalchemy.jsonext.readers%sreader:reader' % (key))
 
     laziest_dict = LaziestDict(reader_discover)
 
@@ -148,6 +141,193 @@ class LaziestDict(LazyDict):
             except:
                 return False
         return True
+
+import re
+
+
+class SmartDict(object):
+    """
+    This dictionary allows to do some 'smart queries' to its content::
+
+        >>> d = SmartDict()
+
+        >>> d['foo'] = {'a': 'world', 'b':'hello'}
+        >>> d['a'] = [ {'b':1}, {'b':2}, {'b':3} ]
+
+        >>> d['a']
+        [ {'b':1}, {'b':2}, {'b':3} ]
+        >>> d['a[0]']
+        {'b':1}
+        >>> d['a.b']
+        [1,2,3]
+        >>> d['a[1:]']
+        [{'b':2}, {'b':3}]
+    """
+
+    split_key_pattern = re.compile('\.|\[')
+    main_key_pattern = re.compile('\..*|\[.*')
+
+    def __init__(self, d=None):
+        self._dict = d if not d is None else dict()
+
+    def __getitem__(self, key):
+        """
+        As in C{dict.__getitem__} but using 'smart queries'
+
+        NOTE: accessing one value in a normal way, meaning d['a'], is almost as
+              fast as accessing a regular dictionary. But using the special name
+              convention is a bit slower than using the regular access::
+                %timeit x = dd['a[0].b']
+                100000 loops, best of 3: 3.94 µs per loop
+
+                %timeit x = dd['a'][0]['b']
+                1000000 loops, best of 3: 598 ns per loop
+        """
+        def getitem(k, v):
+            if isinstance(v, dict):
+                return v[k]
+            elif ']' in k:
+                k = k[:-1].replace('n', '-1')
+                #Work around for list indexes and slices
+                try:
+                    return v[int(k)]
+                except ValueError:
+                    return v[slice(*map(lambda x: int(x.strip()) if x.strip() else None, k.split(':')))]
+            else:
+                tmp = []
+                for inner_v in v:
+                    tmp.append(getitem(k, inner_v))
+                return tmp
+
+
+        #Check if we are using python regular keys
+        try:
+            return self._dict[key]
+        except KeyError:
+            pass
+
+        keys = SmartDict.split_key_pattern.split(key)
+        value = self._dict
+        for k in keys:
+            value = getitem(k, value)
+        return value
+
+    def __setitem__(self, key, value, extend=False):
+        #TODO: Check repeatable fields
+        if '.' not in key and ']' not in key and not extend:
+            self._dict[key] = value
+        else:
+            keys = SmartDict.split_key_pattern.split(key)
+            self.__setitem(self._dict, keys[0], keys[1:], value, extend)
+
+    def __delitem__(self, key):
+        """Note: It only works with first keys"""
+        del self._dict[key]
+
+    def __contains__(self, key):
+
+        if '.' not in key and '[' not in key:
+            return key in self._dict
+        try:
+            self[key]
+        except:
+            return False
+        return True
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__)
+                and self._dict == other._dict)
+
+    def __iter__(self):
+        return iter(self._dict)
+
+    def __len__(self):
+        return len(self._dict)
+
+    def keys(self):
+        return self._dict.keys()
+
+    def items(self):
+        return self._dict.items()
+
+    def iteritems(self):
+        return self._dict.iteritems()
+
+    def iterkeys(self):
+        return self._dict.iterkeys()
+
+    def itervalues(self):
+        return self._dict.itervalues()
+
+    def has_key(self, key):
+        return key in self
+
+    def __repr__(self):
+        return repr(self._dict)
+
+    def __setitem(self, chunk, key, keys, value, extend=False):
+        """ Helper function to fill up the dictionary"""
+
+        def setitem(chunk):
+            if keys:
+                return self.__setitem(chunk, keys[0], keys[1:], value, extend)
+            else:
+                return value
+
+        if ']' in key:  # list
+            key = int(key[:-1].replace('n', '-1'))
+            if extend:
+                if chunk is None:
+                    chunk = [None, ]
+                else:
+                    if not isinstance(chunk, list):
+                        chunk = [chunk, ]
+                    if key != -1:
+                        chunk.insert(key, None)
+                    else:
+                        chunk.append(None)
+            else:
+                if chunk is None:
+                    chunk = [None, ]
+            chunk[key] = setitem(chunk[key])
+        else: # dict
+            if extend:
+                if chunk is None:
+                    chunk = {}
+                    chunk[key] = None
+                    chunk[key] = setitem(chunk[key])
+                elif not key in chunk:
+                    chunk[key] = None
+                    chunk[key] = setitem(chunk[key])
+                else:
+                    if keys:
+                        chunk[key] = setitem(chunk[key])
+                    else:
+                        if not isinstance(chunk[key], list):
+                            chunk[key] = [chunk[key],]
+                        chunk[key].append(None)
+                        chunk[key][-1] = setitem(chunk[key][-1])
+            else:
+                if chunk is None:
+                    chunk = {}
+                if key not in chunk:
+                    chunk[key] = None
+                chunk[key] = setitem(chunk[key])
+
+        return chunk
+
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except:
+            return default
+
+    def set(self, key, value, extend=False):
+        self.__setitem__(key, value, extend)
+
+    def update(self, E, **F):
+        self._dict.update(E, **F)
 
 
 def flatten_multidict(multidict):

@@ -33,11 +33,11 @@ import base64
 from cPickle import dumps
 from zlib import decompress, compress
 
-from invenio.jsonutils import json, json_unicode_to_utf8
-from invenio.shellutils import mymkdir
-from invenio.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
+from invenio.utils.json import json, json_unicode_to_utf8
+from invenio.utils.shell import mymkdir
+from invenio.legacy.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_SECURE_URL
-from invenio.hashutils import sha1
+from invenio.utils.hash import sha1
 
 CFG_ROBOT_EMAIL_ATTRIBUTE_NAME = 'email'
 CFG_ROBOT_NICKNAME_ATTRIBUTE_NAME = 'nickname'
@@ -193,7 +193,7 @@ class ExternalAuthRobot(ExternalAuth):
         to properly login the user, and verify that the data are actually
         both well formed and signed correctly.
         """
-        from invenio.webinterface_handler import wash_urlargd
+        from invenio.ext.legacy.handler import wash_urlargd
         args = wash_urlargd(req.form, {
             'assertion': (str, ''),
             'robot': (str, ''),
@@ -350,8 +350,8 @@ class ExternalAuthRobot(ExternalAuth):
         @return: the URL to login as the user.
         @rtype: string
         """
-        from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
-        from invenio.urlutils import create_url
+        from invenio.modules.access.local_config import CFG_EXTERNAL_AUTHENTICATION
+        from invenio.utils.url import create_url
         if assertion is None:
             assertion = {}
         assertion[self.email_attribute_name] = email

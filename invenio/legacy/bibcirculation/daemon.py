@@ -25,22 +25,22 @@ __revision__ = "$Id$"
 
 import sys
 import time
-from invenio.dbquery import run_sql
-from invenio.bibtask import task_init, \
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.bibsched.bibtask import task_init, \
                             task_sleep_now_if_required, \
                             task_update_progress, \
                             task_set_option, \
                             task_get_option, \
                             write_message
-from invenio.mailutils import send_email
-import invenio.bibcirculation_dblayer as db
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
+from invenio.ext.email import send_email
+import invenio.legacy.bibcirculation.db_layer as db
+from invenio.legacy.bibcirculation.config import CFG_BIBCIRCULATION_TEMPLATES, \
                                           CFG_BIBCIRCULATION_LOANS_EMAIL, \
                                           CFG_BIBCIRCULATION_ILLS_EMAIL, \
                                           CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING, \
                                           CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED
 
-from invenio.bibcirculation_utils import generate_email_body, \
+from invenio.legacy.bibcirculation.utils import generate_email_body, \
                                          book_title_from_MARC, \
                                          update_user_info_from_ldap, \
                                          update_requests_statuses, \

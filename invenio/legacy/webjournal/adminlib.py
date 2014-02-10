@@ -29,7 +29,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_LANG, \
@@ -39,14 +39,14 @@ from invenio.config import \
      CFG_TMPSHAREDDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_RECORD
-from invenio.messages import gettext_set_language
-from invenio.mailutils import send_email
-from invenio.access_control_engine import acc_authorize_action
-from invenio.webjournal_config import \
+from invenio.base.i18n import gettext_set_language
+from invenio.ext.email import send_email
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.legacy.webjournal.config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
      InvenioWebJournalReleaseUpdateError, \
      InvenioWebJournalNoJournalOnServerError
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      get_journals_ids_and_names, \
      guess_journal_name, \
      get_current_issue, \
@@ -73,15 +73,15 @@ from invenio.webjournal_utils import \
      get_journal_index_to_refresh_on_release, \
      issue_is_later_than, \
      WEBJOURNAL_OPENER
-from invenio.dbquery import run_sql
-from invenio.bibrecord import \
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.bibrecord import \
      create_record, \
      print_rec
-from invenio.bibformat import format_record
-from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
-from invenio.search_engine import get_all_collections_of_a_record
-import invenio.template
-wjt = invenio.template.load('webjournal')
+from invenio.modules.formatter import format_record
+from invenio.legacy.bibsched.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
+from invenio.legacy.search_engine import get_all_collections_of_a_record
+import invenio.legacy.template
+wjt = invenio.legacy.template.load('webjournal')
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
@@ -545,8 +545,8 @@ def perform_request_configure(journal_name, xml_config, action, ln=CFG_SITE_LANG
         <niceName>Atlantis Times</niceName>
         <niceURL>%(CFG_SITE_URL)s</niceURL>
         <css>
-            <screen>/img/AtlantisTimes.css</screen>
-            <print>/img/AtlantisTimes.css</print>
+            <screen>/css/AtlantisTimes.css</screen>
+            <print>/css/AtlantisTimes.css</print>
         </css>
         <format_template>
             <index>AtlantisTimes_Index.bft</index>

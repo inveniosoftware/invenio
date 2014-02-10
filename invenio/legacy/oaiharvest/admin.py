@@ -29,39 +29,45 @@ import tempfile
 import datetime
 
 from httplib import InvalidURL
-from invenio.config import \
-     CFG_SITE_LANG, \
-     CFG_TMPDIR, \
-     CFG_SITE_URL, \
-     CFG_ETCDIR, \
-     CFG_BINDIR, \
-     CFG_LOGDIR, \
-     CFG_SITE_RECORD
-from invenio.oai_harvest_config import CFG_OAI_POSSIBLE_POSTMODES
-from invenio.bibrankadminlib import \
-     write_outcome, \
-     addadminbox, \
-     tupletotable, \
-     createhiddenform
-from invenio.dbquery import run_sql
-from invenio.oai_harvest_dblayer import get_holdingpen_day_size
+from invenio.config import(CFG_SITE_LANG,
+                           CFG_TMPDIR,
+                           CFG_SITE_URL,
+                           CFG_ETCDIR,
+                           CFG_BINDIR,
+                           CFG_LOGDIR,
+                           CFG_SITE_RECORD)
 
-from invenio.oai_harvest_dblayer import get_month_logs_size, \
-     get_history_entries_for_day, get_day_logs_size, get_entry_history, \
-     get_entry_logs_size, get_holdingpen_entries, delete_holdingpen_entry, \
-     get_holdingpen_years, get_holdingpen_month, get_holdingpen_year, \
-     get_holdingpen_day_fragment, get_holdingpen_entry_details
-from invenio.search_engine import get_record
+from invenio.legacy.oaiharvest.config import CFG_OAI_POSSIBLE_POSTMODES
+from invenio.legacy.bibrank.adminlib import (write_outcome,
+                                             addadminbox,
+                                             tupletotable,
+                                             createhiddenform)
+from invenio.legacy.dbquery import run_sql
 
-import invenio.template
-from invenio import oai_harvest_daemon
-from invenio.xmlmarc2textmarc import create_marc_record
-from invenio.bibrecord import create_record
-from invenio.urlutils import create_html_link
 
-webstyle_templates = invenio.template.load('webstyle')
-oaiharvest_templates = invenio.template.load('oai_harvest')
-from invenio.messages import gettext_set_language
+from invenio.legacy.oaiharvest.dblayer import (get_month_logs_size,
+                                               get_history_entries_for_day,
+                                               get_day_logs_size, get_entry_history,
+                                               get_entry_logs_size,
+                                               get_holdingpen_entries,
+                                               delete_holdingpen_entry,
+                                               get_holdingpen_years,
+                                               get_holdingpen_month,
+                                               get_holdingpen_year,
+                                               get_holdingpen_day_fragment,
+                                               get_holdingpen_entry_details)
+
+from invenio.legacy.search_engine import get_record
+
+import invenio.legacy.template
+from invenio.legacy.oaiharvest import daemon as oai_harvest_daemon
+from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
+from invenio.legacy.bibrecord import create_record
+from invenio.utils.url import create_html_link
+
+webstyle_templates = invenio.legacy.template.load('webstyle')
+oaiharvest_templates = invenio.legacy.template.load('oaiharvest')
+from invenio.base.i18n import gettext_set_language
 
 tmppath = CFG_TMPDIR + '/oaiharvestadmin.' + str(os.getpid())
 guideurl = "help/admin/oaiharvest-admin-guide"
@@ -1343,12 +1349,10 @@ def validatefile(oai_src_config):
      0 = okay
      1 = file non existing
      """
+    from invenio.legacy.bibconvert.registry import templates
 
-    CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR,
-                                                          os.sep,
-                                                          os.sep)
-    path_to_config = (CFG_BIBCONVERT_XSL_PATH + os.sep +
-                      oai_src_config)
+    path_to_config = templates.get(oai_src_config, '')
+
     if os.path.exists(path_to_config):
         # Try to read in config directory
         try:
@@ -1376,6 +1380,7 @@ def validatefile(oai_src_config):
         return 1
 
     return 1
+
 
 def findMetadataFormats(oai_src_baseurl):
     """This function finds the Metadata formats offered by a OAI repository by analysing the output of verb=ListMetadataFormats"""

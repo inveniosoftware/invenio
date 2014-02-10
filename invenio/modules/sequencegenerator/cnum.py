@@ -17,13 +17,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.sequtils import SequenceGenerator
+from invenio.modules.sequencegenerator.backend import SequenceGenerator
 
-from invenio.bibedit_utils import get_bibrecord
-from invenio.bibrecord import record_get_field_value, create_record
-from invenio.search_engine import perform_request_search
+from invenio.legacy.bibedit.utils import get_bibrecord
+from invenio.legacy.bibrecord import record_get_field_value, create_record
+from invenio.legacy.search_engine import perform_request_search
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 class ConferenceNoStartDateError(Exception):
     pass

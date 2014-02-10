@@ -63,7 +63,7 @@ $(document).ready(function() {
                     <input type="checkbox" name="recid" value="{{ s.id_bibrec }}" />
                 </td>
                 <td>
-                  <a href="{{ url_for('webcomment.comments', recid=s.id_bibrec) }}">
+                  <a href="{{ url_for('comments.comments', recid=s.id_bibrec) }}">
                   {{ get_record(s.id_bibrec).get('title.title', '#%d'|format(s.id_bibrec))|safe }}
                   </a>
                 </td>

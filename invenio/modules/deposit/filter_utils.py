@@ -26,7 +26,7 @@ See more information on:
 http://wtforms.simplecodes.com/docs/1.0.4/fields.html#wtforms.fields.Field.__init__
 """
 
-from invenio.htmlutils import HTMLWasher
+from invenio.utils.html import HTMLWasher
 
 
 def strip_string(value):

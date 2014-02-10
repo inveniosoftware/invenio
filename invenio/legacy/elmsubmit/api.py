@@ -23,19 +23,19 @@ __revision__ = "$Id$"
 import os
 import smtplib
 
-import invenio.elmsubmit_EZEmail as elmsubmit_EZEmail
-import invenio.elmsubmit_submission_parser as elmsubmit_submission_parser
+import invenio.legacy.elmsubmit.EZEmail as elmsubmit_EZEmail
+import invenio.legacy.elmsubmit.submission_parser as elmsubmit_submission_parser
 
 # import the config file
 
 from invenio.config import CFG_TMPDIR, CFG_SITE_NAME
-import invenio.elmsubmit_config as elmsubmit_config
+import invenio.legacy.elmsubmit.config as elmsubmit_config
 
-import invenio.elmsubmit_field_validation as elmsubmit_field_validation
+import invenio.legacy.elmsubmit.field_validation as elmsubmit_field_validation
 
-from invenio.elmsubmit_misc import random_alphanum_string as _random_alphanum_string
+from invenio.legacy.elmsubmit.misc import random_alphanum_string as _random_alphanum_string
 
-import invenio.elmsubmit_generate_marc as elmsubmit_generate_marc
+import invenio.legacy.elmsubmit.generate_marc as elmsubmit_generate_marc
 
 def process_email(email_string):
     """ main entry point of the module, handles whole processing of the email

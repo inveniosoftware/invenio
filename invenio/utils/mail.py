@@ -22,8 +22,9 @@
 __revision__ = "$Id$"
 
 import cgi
-from invenio.htmlutils import HTMLWasher
+from .html import HTMLWasher
 from HTMLParser import HTMLParseError
+
 
 def email_quoted_txt2html(text,
                           tabs_before=0,
@@ -171,6 +172,7 @@ def email_quote_txt(text,
     for line in lines:
         text += indent_txt + line + linebreak_output
     return text
+
 
 def escape_email_quoted_text(text, indent_txt='>>', linebreak_txt='\n'):
     """

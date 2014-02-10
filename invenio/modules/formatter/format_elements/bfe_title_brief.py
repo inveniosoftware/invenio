@@ -53,7 +53,7 @@ def format_element(bfo, highlight="no", multilang='no'):
         out += bfo.field('111__a')
 
     if highlight == 'yes':
-        from invenio import bibformat_utils
+        from invenio.modules.formatter import utils as bibformat_utils
         out = bibformat_utils.highlight(out, bfo.search_pattern,
                                         prefix_tag="<span style='font-weight: bolder'>",
                                         suffix_tag='</style>')

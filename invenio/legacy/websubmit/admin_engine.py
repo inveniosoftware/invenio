@@ -23,20 +23,20 @@ import re
 from os.path import split, basename, isfile
 from os import access, F_OK, R_OK, getpid, rename, unlink
 from time import strftime, localtime
-from invenio.websubmitadmin_dblayer import *
-from invenio.websubmitadmin_config import *
-from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES
-from invenio.access_control_admin import acc_get_all_roles, acc_get_role_users, acc_delete_user_role
+from invenio.legacy.websubmit.admin_dblayer import *
+from invenio.legacy.websubmit.admin_config import *
+from invenio.legacy.websubmit.config import CFG_RESERVED_SUBMISSION_FILENAMES
+from invenio.modules.access.control import acc_get_all_roles, acc_get_role_users, acc_delete_user_role
 from invenio.config import CFG_SITE_LANG, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
-from invenio.access_control_engine import acc_authorize_action
-from invenio.errorlib import register_exception
-from invenio.websubmitadmin_config import InvenioWebSubmitWarning
-from invenio.messages import gettext_set_language
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.ext.logging import register_exception
+from invenio.legacy.websubmit.admin_config import InvenioWebSubmitWarning
+from invenio.base.i18n import gettext_set_language
 
-import invenio.template
+import invenio.legacy.template
 
 try:
-    websubmitadmin_templates = invenio.template.load('websubmitadmin')
+    websubmitadmin_templates = invenio.legacy.template.load('websubmit', 'admin_')
 except:
     pass
 
@@ -1458,7 +1458,7 @@ def _functionedit_display_function_details(funcname, user_msg=""):
         ## lines and remove unnecessary leading whitespaces
         docstring = None
         try:
-            websubmit_function = __import__('invenio.websubmit_functions.%s' % funcname,
+            websubmit_function = __import__('invenio.legacy.websubmit.functions.%s' % funcname,
                                             globals(), locals(), [funcname])
             if hasattr(websubmit_function, funcname) and getattr(websubmit_function, funcname).__doc__:
                 docstring = getattr(websubmit_function, funcname).__doc__

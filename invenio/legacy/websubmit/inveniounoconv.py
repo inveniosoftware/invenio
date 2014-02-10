@@ -46,8 +46,7 @@ import time
 import signal
 import errno
 
-from invenio.flaskshell import *
-from invenio.websubmit_file_converter import CFG_OPENOFFICE_TMPDIR
+from invenio.legacy.websubmit.file_converter import CFG_OPENOFFICE_TMPDIR
 
 CFG_SOFFICE_PID = os.path.join(CFG_OPENOFFICE_TMPDIR, 'soffice.pid')
 
@@ -635,7 +634,7 @@ class Options:
             sys.exit(0)
 
         if self.kill:
-            from invenio.shellutils import run_shell_command
+            from invenio.utils.shell import run_shell_command
             run_shell_command('killall %s', [os.path.basename(office.binary)])
             time.sleep(1)
             run_shell_command('killall -9 %s', [os.path.basename(office.binary)])
@@ -940,7 +939,7 @@ class Convertor:
             try:
                 document.storeToURL(outputurl, tuple(outputprops) )
             except IOException, e:
-                from invenio.errorlib import get_pretty_traceback
+                from invenio.ext.logging import get_pretty_traceback
                 print >> sys.stderr, get_pretty_traceback()
                 raise UnoException("Unable to store document to %s with properties %s. Exception: %s" % (outputurl, outputprops, e), None)
 
@@ -1085,33 +1084,6 @@ def die(ret, msg=None):
     sys.exit(ret)
 
 def main():
-    global convertor, exitcode
-    convertor = None
-
-    try:
-        if op.listener:
-            listener = Listener()
-
-        if op.filenames:
-            convertor = Convertor()
-            for inputfn in op.filenames:
-                convertor.convert(inputfn)
-
-    except NoConnectException, e:
-        error("unoconv: could not find an existing connection to LibreOffice at %s:%s." % (op.server, op.port))
-        if op.connection:
-            info(0, "Please start an LibreOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    soffice -nologo -nodefault -accept=\"%s\"" % (op.server, op.server, op.port, op.connection))
-        else:
-            info(0, "Please start an LibreOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    soffice -nologo -nodefault -accept=\"socket,host=%s,port=%s;urp;\"" % (op.server, op.server, op.port, op.server, op.port))
-            info(0, "Please start an soffice instance on server '%s' by doing:\n\n    soffice -nologo -nodefault -accept=\"socket,host=localhost,port=%s;urp;\"" % (op.server, op.port))
-        exitcode = 1
-#    except UnboundLocalError:
-#        die(252, "Failed to connect to remote listener.")
-    except OSError:
-        error("Warning: failed to launch Office suite. Aborting.")
-
-### Main entrance
-if __name__ == '__main__':
     os.environ['HOME'] = CFG_OPENOFFICE_TMPDIR
 
     exitcode = 0
@@ -1182,6 +1154,30 @@ if __name__ == '__main__':
     except KeyboardInterrupt, e:
         die(6, 'Exiting on user request')
     except:
-        from invenio.errorlib import register_exception
+        from invenio.ext.logging import register_exception
         register_exception(alert_admin=True)
     die(exitcode)
+    global convertor, exitcode
+    convertor = None
+
+    try:
+        if op.listener:
+            listener = Listener()
+
+        if op.filenames:
+            convertor = Convertor()
+            for inputfn in op.filenames:
+                convertor.convert(inputfn)
+
+    except NoConnectException, e:
+        error("unoconv: could not find an existing connection to LibreOffice at %s:%s." % (op.server, op.port))
+        if op.connection:
+            info(0, "Please start an LibreOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    soffice -nologo -nodefault -accept=\"%s\"" % (op.server, op.server, op.port, op.connection))
+        else:
+            info(0, "Please start an LibreOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    soffice -nologo -nodefault -accept=\"socket,host=%s,port=%s;urp;\"" % (op.server, op.server, op.port, op.server, op.port))
+            info(0, "Please start an soffice instance on server '%s' by doing:\n\n    soffice -nologo -nodefault -accept=\"socket,host=localhost,port=%s;urp;\"" % (op.server, op.port))
+        exitcode = 1
+#    except UnboundLocalError:
+#        die(252, "Failed to connect to remote listener.")
+    except OSError:
+        error("Warning: failed to launch Office suite. Aborting.")

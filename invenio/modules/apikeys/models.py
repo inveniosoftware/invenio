@@ -21,9 +21,8 @@
 Web API Key database models.
 """
 # General imports.
+from werkzeug import cached_property
 from urlparse import parse_qs, urlparse, urlunparse
-from invenio.sqlalchemyutils import db
-from invenio.hashutils import sha1
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -40,23 +39,34 @@ except ImportError:
         return "%x" % random.getrandbits(16*8)
 from urllib import urlencode, basejoin
 
-from invenio.config import CFG_WEB_API_KEY_ALLOWED_URL
-from invenio.access_control_config import CFG_WEB_API_KEY_STATUS
+from invenio.base.globals import cfg
+from invenio.utils.hash import sha1
+from invenio.ext.sqlalchemy import db
 
-
-_CFG_WEB_API_KEY_ALLOWED_URL = [(re.compile(_url), _authorized_time, _need_timestamp)
-                                for _url, _authorized_time, _need_timestamp in CFG_WEB_API_KEY_ALLOWED_URL]
-
-_CFG_WEB_API_KEY_ALLOWED_URL = [(re.compile(_url), _authorized_time, _need_timestamp)
-                                for _url, _authorized_time, _need_timestamp in CFG_WEB_API_KEY_ALLOWED_URL]
 
 # Create your models here.
-from invenio.websession_model import User
+from invenio.modules.accounts.models import User
 
 
 class WebAPIKey(db.Model):
     """Represents a Web API Key record."""
     __tablename__ = 'webapikey'
+
+    #There are three status key that must be here: OK, REMOVED and REVOKED
+    #the value doesn't matter at all
+    CFG_WEB_API_KEY_STATUS = {'OK': 'OK',
+                              'REMOVED': 'REMOVED',
+                              'REVOKED': 'REVOKED',
+                              'WARNING': 'WARNING',
+                              }
+
+    @cached_property
+    def allowed_url(self):
+        """List of allowed urls."""
+        return [(re.compile(_url), _authorized_time, _need_timestamp)
+                for _url, _authorized_time, _need_timestamp in
+                cfg.get('CFG_WEB_API_KEY_ALLOWED_URL', [])]
+
 
     id = db.Column(db.String(150), primary_key=True, nullable=False)
     secret = db.Column(db.String(150), nullable=False)
@@ -90,7 +100,7 @@ class WebAPIKey(db.Model):
                 key_id = str(uuid4())
 
     @classmethod
-    def show_keys(cls, uid, diff_status=CFG_WEB_API_KEY_STATUS['REMOVED']):
+    def show_keys(cls, uid, diff_status=None):
         """
         Makes a query to the DB to obtain all the user's REST API keys
 
@@ -104,6 +114,8 @@ class WebAPIKey(db.Model):
         @return: Tuples with the id, description and status of the user's REST API
         keys
         """
+        if diff_status is None:
+            diff_status = cls.CFG_WEB_API_KEY_STATUS['REMOVED']
 
         return db.session.query(WebAPIKey.id, WebAPIKey.description, WebAPIKey.status).\
             filter(WebAPIKey.id_user == uid,
@@ -119,7 +131,7 @@ class WebAPIKey(db.Model):
         @param key_id: The id of the REST key that will be "removed"
         @type key_id: string
         """
-        assert status in CFG_WEB_API_KEY_STATUS
+        assert status in cls.CFG_WEB_API_KEY_STATUS
         cls.query.filter_by(id=key_id).\
             update({'status': status})
 
@@ -144,8 +156,9 @@ class WebAPIKey(db.Model):
 
         return cls.query.\
             filter_by(**filters). \
-            filter(WebAPIKey.status != CFG_WEB_API_KEY_STATUS['REMOVED'],
-                   WebAPIKey.status != CFG_WEB_API_KEY_STATUS['REVOKED']).all()
+            filter(WebAPIKey.status != cls.CFG_WEB_API_KEY_STATUS['REMOVED'],
+                   WebAPIKey.status != cls.CFG_WEB_API_KEY_STATUS['REVOKED']
+                   ).all()
 
     @classmethod
     def get_server_signature(cls, secret, url):
@@ -165,7 +178,7 @@ class WebAPIKey(db.Model):
         @return: If everything goes well it returns the user's uid, if not -1
         """
 
-        from invenio.webstat import register_customevent
+        from invenio.legacy.webstat.api import register_customevent
         from flask import request
         api_key = signature = timestamp = None
 
@@ -206,7 +219,7 @@ class WebAPIKey(db.Model):
 
         authorized_time = None
         need_timestamp = False
-        for url, authorized_time, need_timestamp in _CFG_WEB_API_KEY_ALLOWED_URL:
+        for url, authorized_time, need_timestamp in self.allowed_url:
             if url.match(url_req) is not None:
                 break
 

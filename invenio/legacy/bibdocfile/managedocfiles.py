@@ -84,20 +84,20 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_CERN_SITE, \
      CFG_SITE_RECORD
-from invenio.messages import gettext_set_language
-from invenio.bibdocfilecli import cli_fix_marc
-from invenio.bibdocfile import BibRecDocs, \
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.bibdocfile.cli import cli_fix_marc
+from invenio.legacy.bibdocfile.api import BibRecDocs, \
      decompose_file, calculate_md5, BibDocFile, \
      InvenioBibDocFileError, BibDocMoreInfo
-from invenio.websubmit_functions.Shared_Functions import \
+from invenio.legacy.websubmit.functions.Shared_Functions import \
      createRelatedFormats
-from invenio.errorlib import register_exception
-from invenio.dbquery import run_sql
-from invenio.websubmit_icon_creator import \
+from invenio.ext.logging import register_exception
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.websubmit.icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
-from invenio.urlutils import create_html_mailto
-from invenio.htmlutils import escape_javascript_string
-from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
+from invenio.utils.url import create_html_mailto
+from invenio.utils.html import escape_javascript_string
+from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 
 CFG_ALLOWED_ACTIONS = ['revise', 'delete', 'add', 'addFormat']
 

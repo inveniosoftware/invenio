@@ -26,21 +26,21 @@ __lastupdated__ = """$Date: 2008/06/13 15:35:13 $"""
 
 __revision__ = "$Id: search_engine_query_parser.py,v 1.12 2008/06/13 15:35:13 rivanov Exp $"
 
-from invenio.bibtask import write_message
+from invenio.legacy.bibsched.bibtask import write_message
 
 # imports used in FieldExporter class
-from invenio import search_engine
-from invenio import bibrecord
-from invenio import bibdocfile
+import invenio.legacy.search_engine
+from invenio.legacy import bibrecord
+from invenio.legacy.bibdocfile import api as bibdocfile
 import os
 
 # imports used in perform_request_... methods
 from invenio.config import CFG_SITE_LANG
-from invenio import bibexport_method_fieldexporter_dblayer as fieldexporter_dblayer
+from . import fieldexporter_dblayer
 
-from invenio import template
-fieldexporter_templates = template.load('bibexport_method_fieldexporter')
-from invenio.messages import gettext_set_language
+from invenio.legacy import template
+fieldexporter_templates = template.load('bibexport')
+from invenio.base.i18n import gettext_set_language
 
 def run_export_method(jobname):
     """Main function, reading params and running the task."""

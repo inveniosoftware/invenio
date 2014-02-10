@@ -28,15 +28,15 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_NAME
-from invenio.messages import gettext_set_language
-from invenio.webuser import \
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.webuser import \
      create_userinfobox_body, \
      create_useractivities_menu, \
      create_adminactivities_menu, \
      getUid
 
-import invenio.template
-webstyle_templates = invenio.template.load('webstyle')
+import invenio.legacy.template
+webstyle_templates = invenio.legacy.template.load('webstyle')
 
 from xml.dom.minidom import getDOMImplementation
 

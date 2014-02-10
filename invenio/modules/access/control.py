@@ -31,17 +31,17 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
-from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
+from invenio.modules.access.local_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
     DEF_USERS, DEF_ROLES, DEF_AUTHS, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
-from invenio.dbquery import run_sql, ProgrammingError
-from invenio.access_control_firerole import compile_role_definition, \
+from invenio.legacy.dbquery import run_sql, ProgrammingError
+from invenio.modules.access.firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize, load_role_definition
-from invenio.intbitset import intbitset
-from invenio.sqlalchemyutils import db
-from invenio.webaccess_model import AccAuthorization, AccACTION, \
+from intbitset import intbitset
+from invenio.ext.sqlalchemy import db
+from invenio.modules.access.models import AccAuthorization, AccACTION, \
                                     AccARGUMENT, UserAccROLE
 
 CFG_SUPERADMINROLE_ID = 0
@@ -1175,7 +1175,7 @@ def acc_get_role_users(id_role):
 
 
 def acc_get_roles_emails(id_roles):
-    from invenio.websession_model import User
+    from invenio.modules.accounts.models import User
     return set(map(lambda u: u.email.lower().strip(),
         db.session.query(User.email).join(User.roles).filter(db.and_(
             UserAccROLE.expiration >= db.func.now(),
@@ -1722,7 +1722,7 @@ def acc_delete_all_settings():
     """simply remove all data affiliated with webaccess by truncating
     tables accROLE, accACTION, accARGUMENT and those connected. """
 
-    from invenio.sqlalchemyutils import db
+    from invenio.ext.sqlalchemy import db
     db.session.commit()
 
     run_sql("""TRUNCATE accROLE""")

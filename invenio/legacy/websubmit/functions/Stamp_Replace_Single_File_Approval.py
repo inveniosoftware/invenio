@@ -21,10 +21,10 @@
 __revision__ = "$Id$"
 
 
-from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
-from invenio.errorlib import register_exception
+from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
+from invenio.ext.logging import register_exception
 from invenio import websubmit_file_stamper
-from invenio.websubmit_config import InvenioWebSubmitFunctionWarning, \
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionWarning, \
      InvenioWebSubmitFunctionError, InvenioWebSubmitFileStamperError
 import os.path
 import re

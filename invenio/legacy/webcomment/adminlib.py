@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,21 +21,21 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
      CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN
-from invenio.webcomment_config import InvenioWebCommentWarning
-from invenio.webcomment import query_get_comment, \
+from invenio.modules.comments.config import InvenioWebCommentWarning
+from invenio.modules.comments.api import query_get_comment, \
      get_reply_order_cache_data
-from invenio.urlutils import wash_url_argument
-from invenio.dbquery import run_sql
-from invenio.messages import gettext_set_language, wash_language
-from invenio.errorlib import register_exception
-from invenio.webuser import get_user_info, collect_user_info, \
+from invenio.utils.url import wash_url_argument
+from invenio.legacy.dbquery import run_sql
+from invenio.base.i18n import gettext_set_language, wash_language
+from invenio.ext.logging import register_exception
+from invenio.legacy.webuser import get_user_info, collect_user_info, \
                             isUserAdmin
-from invenio.access_control_engine import acc_authorize_action, \
+from invenio.modules.access.engine import acc_authorize_action, \
      acc_get_authorized_emails
-from invenio.search_engine import perform_request_search
+from invenio.legacy.search_engine import perform_request_search
 
-import invenio.template
-webcomment_templates = invenio.template.load('webcomment')
+import invenio.legacy.template
+webcomment_templates = invenio.legacy.template.load('webcomment')
 
 def getnavtrail(previous = '', ln=CFG_SITE_LANG):
     """Get the navtrail"""
@@ -105,7 +105,7 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
     """
     _ = gettext_set_language(ln)
 
-    from invenio.search_engine import record_exists
+    from invenio.legacy.search_engine import record_exists
 
     warnings = []
 

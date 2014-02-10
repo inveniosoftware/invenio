@@ -18,7 +18,7 @@
 """Basic test functions - NOT FOR XML """
 
 import time
-from invenio.bibworkflow_config import CFG_OBJECT_STATUS
+from ..config import CFG_OBJECT_STATUS
 
 
 def task_a(a):

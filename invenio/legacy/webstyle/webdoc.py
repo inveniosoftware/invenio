@@ -36,12 +36,12 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_SITE_NAME_INTL, \
      CFG_CACHEDIR
-from invenio.dateutils import \
+from invenio.utils.date import \
      convert_datestruct_to_datetext, \
      convert_datestruct_to_dategui, \
      convert_datecvs_to_datestruct
-from invenio.shellutils import mymkdir
-from invenio.messages import \
+from invenio.utils.shell import mymkdir
+from invenio.base.i18n import \
      gettext_set_language, \
      wash_language, \
      language_list_long
@@ -511,6 +511,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
         if not topics.has_key(category):
             topics[category] = []
         # Build list of tuples(webdoc_name, webdoc_date, webdoc_url)
+        # FIXME: OSError: [Errno 2] No such file or directory: '/../.virtualenvs/pu/lib/webdoc/invenio/admin'
         for webdocfile in [path for path in \
                            os.listdir(source_path) \
                            if path.endswith('.webdoc')]:
@@ -561,7 +562,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
                                    '<span class="label pull-right">' +
                                    time.strftime('%Y-%m-%d', topic_item[1]) +
                                    '</span>' if sort_by == 'date' else
-                                   '<i class="icon-chevron-right pull-right"></i>'))
+                                   '<i class="glyphicon glyphicon-chevron-right pull-right"></i>'))
                                 for topic_item in topic[:limit]]) + \
             '</li></ul>'
 

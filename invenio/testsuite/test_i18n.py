@@ -21,9 +21,9 @@
 
 __revision__ = "$Id$"
 
-from invenio import messages
-from invenio.config import CFG_SITE_LANG, CFG_SITE_LANGS
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base import i18n as messages
+from invenio.base.globals import cfg
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class MessagesLanguageTest(InvenioTestCase):
@@ -37,36 +37,36 @@ class MessagesLanguageTest(InvenioTestCase):
 
         # Preliminary test: same number of languages in both lists
         self.assertEqual(len(lang_list_long),
-                         len(CFG_SITE_LANGS))
+                         len(cfg['CFG_SITE_LANGS']))
 
 
         for lang, cfg_lang in zip(lang_list_long,
-                                  CFG_SITE_LANGS):
+                                  cfg['CFG_SITE_LANGS']):
             self.assertEqual(lang[0],
                              cfg_lang)
 
     def test_wash_invalid_language(self):
         """messages - washing invalid language code"""
         self.assertEqual(messages.wash_language('python'),
-                         CFG_SITE_LANG)
+                         cfg['CFG_SITE_LANG'])
 
     def test_wash_dashed_language(self):
         """messages - washing dashed language code (fr-ca)"""
-        if 'fr' not in CFG_SITE_LANGS:
+        if 'fr' not in cfg['CFG_SITE_LANGS']:
             self.assertEqual(messages.wash_language('fr-ca'),
-                             CFG_SITE_LANG)
+                             cfg['CFG_SITE_LANG'])
         else:
             self.assertEqual(messages.wash_language('fr-ca'),
                              'fr')
 
     def test_wash_languages(self):
         """messages - washing multiple languages"""
-        if 'de' not in CFG_SITE_LANGS:
+        if 'de' not in cfg['CFG_SITE_LANGS']:
             self.assertEqual(messages.wash_languages(['00',
                                                   '11',
                                                   '22',
                                                   'de']),
-                         CFG_SITE_LANG)
+                         cfg['CFG_SITE_LANG'])
         else:
             self.assertEqual(messages.wash_languages(['00',
                                                   '11',
@@ -76,7 +76,7 @@ class MessagesLanguageTest(InvenioTestCase):
         self.assertEqual(messages.wash_languages(['00',
                                                   '11',
                                                   '22']),
-                         CFG_SITE_LANG)
+                         cfg['CFG_SITE_LANG'])
 
     def test_rtl_direction(self):
         """messages - right-to-left language detection"""

@@ -20,9 +20,9 @@
 """WebMessage Forms"""
 
 from flask import url_for
-from invenio.webinterface_handler_flask_utils import _
-from invenio.bibknowledge import get_kb_mappings
-from invenio.wtforms_utils import InvenioBaseForm, AutocompleteField, \
+from invenio.base.i18n import _
+from invenio.modules.knowledge.api import get_kb_mappings
+from invenio.utils.forms import InvenioBaseForm, AutocompleteField, \
     RowWidget
 from wtforms import TextField
 from wtforms import FormField, SelectField, SelectMultipleField
@@ -54,12 +54,13 @@ class EasySearchForm(InvenioBaseForm):
         data_source=lambda: url_for('search.autocomplete', field='collaboration'))
     k = AutocompleteField(_('Keywords'), data_provide="typeahead-url",
         data_source=lambda: url_for('search.autocomplete', field='keyword'))
-    journal = FormField(JournalForm, widget=RowWidget())
+    journal = FormField(JournalForm, widget=RowWidget(
+        classes={0:'col-xs-6', 1:'col-xs-3', 2: 'col-xs-3'}))
 
 
 class GetCollections(object):
     def __iter__(self):
-        from invenio.websearch_model import Collection
+        from invenio.modules.search.models import Collection
         collections = Collection.query.all()
 
         for coll in collections:

@@ -17,16 +17,60 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""BibRecord - XML MARC processing library for Invenio.
+"""
+invenio.legacy.bibrecord
+------------------------
 
-For API, see create_record(), record_get_field_instances() and friends
-in the source code of this file in the section entitled INTERFACE.
+BibRecord - XML MARC processing library for Invenio.
 
-Note: Does not access the database, the input is MARCXML only."""
+BibRecord library offer a whole set of API function to handle record metadata.
+
+Managing metadata with BibRecord
+In order to work with bibrecord library you first need to have available a record representation.
+
+If you have a MARCXML representation of the record to be handled, you can use the create_record function to obtain a bibrecord internal representation::
+
+    from invenio.bibrecord import create_record
+    record = create_record(marcxml)[0]
+
+
+If you want to handle a record stored in the system and you know the record ID, then you can easily exploit Invenio search_engine API to obtain the corresponding marcxml::
+
+    from invenio.bibrecord import create_record
+    from invenio.legacy.search_engine import print_record
+    marcxml = print_record(rec_id, 'xm')
+    record = create_record(marcxml)[0]
+
+
+Having an internal representation of a record you can manipulate it by means of bibrecord functions like :func:`~invenio.legacy.bibrecord.record_get_field_instances`, :func:`~invenio.legacy.bibrecord.record_has_field`, :func:`~invenio.legacy.bibrecord.record_add_field`, :func:`~invenio.legacy.bibrecord.record_delete_field`, :func:`~invenio.legacy.bibrecord.record_delete_subfield`, :func:`~invenio.legacy.bibrecord.record_add_or_modify_subfield`, :func:`~invenio.legacy.bibrecord.record_add_subfield`, :func:`~invenio.legacy.bibrecord.record_does_field_exist`, :func:`~invenio.legacy.bibrecord.record_filter_fields`, :func:`~invenio.legacy.bibrecord.record_replace_in_subfields`, :func:`~invenio.legacy.bibrecord.record_get_field_value`, :func:`~invenio.legacy.bibrecord.record_get_field_values`...
+
+At the end, if you want the MARCXML representation of the record you can use record_xml_output::
+
+   from invenio.bibrecord import create_record
+   from invenio.legacy.search_engine import print_record
+   marcxml = print_record(rec_id, 'xm')
+   record = create_record(marcxml)[0]
+   # ... manipulation ...
+   new_marcxml = record_xml_output(record)
+
+
+
+In order to write back such a record into the system you should use the BibUpload utility.
+
+Please referer to bibrecord.py for a complete and up-to-date description of the API, see :func:`~invenio.legacy.bibrecordcreate_record`, :func:`~invenio.legacy.bibrecordrecord_get_field_instances` and friends in the source code of this file in the section entitled INTERFACE.
+
+
+As always, a good entry point to the bibrecord library and its record structure manipulating functions
+is to read the unit test cases that are located in bibrecord_tests.py and bibupload_regression_tests.py.
+
+
+"""
+
 
 ### IMPORT INTERESTING MODULES AND XML PARSERS
 
 import re
+import string
 import sys
 from cStringIO import StringIO
 
@@ -35,12 +79,17 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.bibrecord_config import CFG_MARC21_DTD, \
+from invenio.base.globals import cfg
+
+from invenio.legacy.bibrecord.bibrecord_config import CFG_MARC21_DTD, \
     CFG_BIBRECORD_WARNING_MSGS, CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL, \
     CFG_BIBRECORD_DEFAULT_CORRECT, CFG_BIBRECORD_PARSERS_AVAILABLE, \
     InvenioBibRecordParserError, InvenioBibRecordFieldError
-from invenio.config import CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
-from invenio.textutils import encode_for_xml
+from invenio.utils.text import encode_for_xml
+from invenio.legacy.dbquery import run_sql
+
+
+from intbitset import intbitset
 
 # Some values used for the RXP parsing.
 TAG, ATTRS, CHILDREN = 0, 1, 2
@@ -133,32 +182,32 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
     Field := (Subfields, ind1, ind2, value)
     Subfields := [(code, value)]
 
-    For example:
-                                ______
-                               |record|
-                                ------
-        __________________________|_______________________________________
-       |record['001']             |record['909']           |record['520'] |
-       |                          |                        |              |
-[list of fields]             [list of fields]       [list of fields]     ...
-       |                    ______|______________          |
-       |[0]                |[0]          |[1]    |         |[0]
-    ___|_____         _____|___       ___|_____ ...    ____|____
-   |Field 001|       |Field 909|     |Field 909|      |Field 520|
-    ---------         ---------       ---------        ---------
-     |     _______________|_________________    |             |
-    ...   |[0]            |[1]    |[2]      |  ...           ...
-          |               |       |         |
-    [list of subfields]  'C'     '4'
-       ___|__________________________________________
-       |                    |                        |
-('a', 'value') ('b', 'value for subfield b') ('a', 'value for another a')
+    .. example::
+                                        ______
+                                       |record|
+                                        ------
+                __________________________|_______________________________________
+               |record['001']             |record['909']           |record['520'] |
+               |                          |                        |              |
+        [list of fields]             [list of fields]       [list of fields]     ...
+               |                    ______|______________          |
+               |[0]                |[0]          |[1]    |         |[0]
+            ___|_____         _____|___       ___|_____ ...    ____|____
+           |Field 001|       |Field 909|     |Field 909|      |Field 520|
+            ---------         ---------       ---------        ---------
+             |     _______________|_________________    |             |
+            ...   |[0]            |[1]    |[2]      |  ...           ...
+                  |               |       |         |
+            [list of subfields]  'C'     '4'
+               ___|__________________________________________
+               |                    |                        |
+        ('a', 'value') ('b', 'value for subfield b') ('a', 'value for another a')
 
-    @param marcxml: an XML string representation of the record to create
-    @param verbose: the level of verbosity: 0 (silent), 1-2 (warnings),
+    :param marcxml: an XML string representation of the record to create
+    :param verbose: the level of verbosity: 0 (silent), 1-2 (warnings),
         3(strict:stop when errors)
-    @param correct: 1 to enable correction of marcxml syntax. Else 0.
-    @return: a tuple (record, status_code, list_of_errors), where status
+    :param correct: 1 to enable correction of marcxml syntax. Else 0.
+    :return: a tuple (record, status_code, list_of_errors), where status
         code is 0 where there are errors, 1 when no errors"""
     # Select the appropriate parser.
     parser = _select_parser(parser)
@@ -215,12 +264,12 @@ def filter_field_instances(field_instances, filter_subcode, filter_value, filter
         record_filter_field(record_get_field_instances(rec, '999', '%', '%'), 'y', '2001')
         In this case filter_subcode is 'y' and
         filter_value is '2001'.
-        @param field_instances: output from record_get_field_instances
-        @param filter_subcode: name of the subfield
-        @type filter_subcode: string
-        @param filter_value: value of the subfield
-        @type filter_value: string
-        @param filter_mode: 'e','s' or 'r'
+        :param field_instances: output from record_get_field_instances
+        :param filter_subcode: name of the subfield
+        :type filter_subcode: string
+        :param filter_value: value of the subfield
+        :type filter_value: string
+        :param filter_mode: 'e','s' or 'r'
     """
     matched = []
     if filter_mode == 'e':
@@ -291,12 +340,12 @@ def record_get_field_instances(rec, tag="", ind1=" ", ind2=" "):
 
     Parameters (tag, ind1, ind2) can contain wildcard %.
 
-    @param rec: a record structure as returned by create_record()
-    @param tag: a 3 characters long string
-    @param ind1: a 1 character long string
-    @param ind2: a 1 character long string
-    @param code: a 1 character long string
-    @return: a list of field tuples (Subfields, ind1, ind2, value,
+    :param rec: a record structure as returned by create_record()
+    :param tag: a 3 characters long string
+    :param ind1: a 1 character long string
+    :param ind2: a 1 character long string
+    :param code: a 1 character long string
+    :return: a list of field tuples (Subfields, ind1, ind2, value,
         field_position_global) where subfields is list of (code, value)"""
     if not rec:
         return []
@@ -337,15 +386,15 @@ def record_add_field(rec, tag, ind1=' ', ind2=' ', controlfield_value='',
     If both field_position_global and field_position_local are present,
     then field_position_local takes precedence.
 
-    @param rec: the record data structure
-    @param tag: the tag of the field to be added
-    @param ind1: the first indicator
-    @param ind2: the second indicator
-    @param controlfield_value: the value of the controlfield
-    @param subfields: the subfields (a list of tuples (code, value))
-    @param field_position_global: the global field position (record wise)
-    @param field_position_local: the local field position (tag wise)
-    @return: the global field position of the newly inserted field or -1 if the
+    :param rec: the record data structure
+    :param tag: the tag of the field to be added
+    :param ind1: the first indicator
+    :param ind2: the second indicator
+    :param controlfield_value: the value of the controlfield
+    :param subfields: the subfields (a list of tuples (code, value))
+    :param field_position_global: the global field position (record wise)
+    :param field_position_local: the local field position (tag wise)
+    :return: the global field position of the newly inserted field or -1 if the
         operation failed
     """
     error = validate_record_field_positions_global(rec)
@@ -460,9 +509,9 @@ def record_has_field(rec, tag):
     """
     Checks if the tag exists in the record.
 
-    @param rec: the record data structure
-    @param the: field
-    @return: a boolean
+    :param rec: the record data structure
+    :param the: field
+    :return: a boolean
     """
     return tag in rec
 
@@ -479,13 +528,13 @@ def record_delete_field(rec, tag, ind1=' ', ind2=' ',
     If both field_position_global and field_position_local are present,
     then field_position_local takes precedence.
 
-    @param rec: the record data structure
-    @param tag: the tag of the field to be deleted
-    @param ind1: the first indicator of the field to be deleted
-    @param ind2: the second indicator of the field to be deleted
-    @param field_position_global: the global field position (record wise)
-    @param field_position_local: the local field position (tag wise)
-    @return: the list of deleted fields
+    :param rec: the record data structure
+    :param tag: the tag of the field to be deleted
+    :param ind1: the first indicator of the field to be deleted
+    :param ind2: the second indicator of the field to be deleted
+    :param field_position_global: the global field position (record wise)
+    :param field_position_local: the local field position (tag wise)
+    :return: the list of deleted fields
     """
     error = validate_record_field_positions_global(rec)
     if error:
@@ -534,15 +583,15 @@ def record_delete_fields(rec, tag, field_positions_local=None):
     """
     Delete all/some fields defined with MARC tag 'tag' from record 'rec'.
 
-    @param rec: a record structure.
-    @type rec: tuple
-    @param tag: three letter field.
-    @type tag: string
-    @param field_position_local: if set, it is the list of local positions
+    :param rec: a record structure.
+    :type rec: tuple
+    :param tag: three letter field.
+    :type tag: string
+    :param field_position_local: if set, it is the list of local positions
         within all the fields with the specified tag, that should be deleted.
         If not set all the fields with the specified tag will be deleted.
-    @type field_position_local: sequence
-    @return: the list of deleted fields.
+    :type field_position_local: sequence
+    :return: the list of deleted fields.
     @rtype: list
     @note: the record is modified in place.
     """
@@ -571,14 +620,14 @@ def record_add_fields(rec, tag, fields, field_position_local=None,
     position is specified by the tag and the field_position_local in
     the list of fields.
 
-    @param rec: a record structure
-    @param tag: the tag of the fields
+    :param rec: a record structure
+    :param tag: the tag of the fields
     to be moved
-    @param field_position_local: the field_position_local to which the
+    :param field_position_local: the field_position_local to which the
     field will be inserted. If not specified, appends the fields to
     the tag.
-    @param a: list of fields to be added
-    @return: -1 if the operation failed, or the field_position_local
+    :param a: list of fields to be added
+    :return: -1 if the operation failed, or the field_position_local
     if it was successful
     """
     if field_position_local is None and field_position_global is None:
@@ -602,13 +651,13 @@ def record_move_fields(rec, tag, field_positions_local,
     Moves some fields to the position specified by
     'field_position_local'.
 
-    @param rec: a record structure as returned by create_record()
-    @param tag: the tag of the fields to be moved
-    @param field_positions_local: the positions of the
+    :param rec: a record structure as returned by create_record()
+    :param tag: the tag of the fields to be moved
+    :param field_positions_local: the positions of the
     fields to move
-    @param field_position_local: insert the field before that
+    :param field_position_local: insert the field before that
     field_position_local. If unspecified, appends the fields
-    @return: the field_position_local is the operation was successful
+    :return: the field_position_local is the operation was successful
     """
     fields = record_delete_fields(rec, tag,
         field_positions_local=field_positions_local)
@@ -630,7 +679,7 @@ def record_get_field(rec, tag, field_position_global=None,
     Returns the the matching field. One has to enter either a global
     field position or a local field position.
 
-    @return: a list of subfield tuples (subfield code, value).
+    :return: a list of subfield tuples (subfield code, value).
     @rtype:  list
     """
     if field_position_global is None and field_position_local is None:
@@ -695,7 +744,7 @@ def record_get_subfields(rec, tag, field_position_global=None,
     Returns the subfield of the matching field. One has to enter either a
     global field position or a local field position.
 
-    @return: a list of subfield tuples (subfield code, value).
+    :return: a list of subfield tuples (subfield code, value).
     @rtype:  list
     """
     field = record_get_field(rec, tag,
@@ -715,7 +764,7 @@ def record_delete_subfield_from(rec, tag, subfield_position,
     try:
         del subfields[subfield_position]
     except IndexError:
-        from invenio.xmlmarc2textmarc import create_marc_record
+        from .scripts.xmlmarc2textmarc import create_marc_record
         recordMarc = create_marc_record(rec, 0, {"text-marc": 1, "aleph-marc": 0})
         raise InvenioBibRecordFieldError("The record : %(recordCode)s does not contain the subfield "
             "'%(subfieldIndex)s' inside the field (local: '%(fieldIndexLocal)s, global: '%(fieldIndexGlobal)s' ) of tag '%(tag)s'." % \
@@ -831,12 +880,12 @@ def record_get_field_value(rec, tag, ind1=" ", ind2=" ", code=""):
       >> record_get_field_value(record, '%%%', '%', '%', '%')
       >> "val1"
 
-    @param rec: a record structure as returned by create_record()
-    @param tag: a 3 characters long string
-    @param ind1: a 1 character long string
-    @param ind2: a 1 character long string
-    @param code: a 1 character long string
-    @return: string value (empty if nothing found)"""
+    :param rec: a record structure as returned by create_record()
+    :param tag: a 3 characters long string
+    :param ind1: a 1 character long string
+    :param ind2: a 1 character long string
+    :param code: a 1 character long string
+    :return: string value (empty if nothing found)"""
     # Note: the code is quite redundant for speed reasons (avoid calling
     # functions or doing tests inside loops)
     ind1, ind2 = _wash_indicators(ind1, ind2)
@@ -918,12 +967,12 @@ def record_get_field_values(rec, tag, ind1=" ", ind2=" ", code="",
 
     Parameters (tag, ind1, ind2, code) can contain wildcard %.
 
-    @param rec: a record structure as returned by create_record()
-    @param tag: a 3 characters long string
-    @param ind1: a 1 character long string
-    @param ind2: a 1 character long string
-    @param code: a 1 character long string
-    @return: a list of strings"""
+    :param rec: a record structure as returned by create_record()
+    :param tag: a 3 characters long string
+    :param ind1: a 1 character long string
+    :param ind2: a 1 character long string
+    :param code: a 1 character long string
+    :return: a list of strings"""
     tmp = []
 
     ind1, ind2 = _wash_indicators(ind1, ind2)
@@ -1063,14 +1112,14 @@ def field_xml_output(field, tag):
             (tag, field[1], field[2]))
         marcxml += [_subfield_xml_output(subfield) for subfield in field[0]]
         marcxml.append('  </datafield>')
-    return '\n'.join(marcxml)
+    return '\n'.join(map(str, marcxml))
 
 def record_extract_oai_id(record):
     """Returns the OAI ID of the record."""
-    tag = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3]
-    ind1 = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3]
-    ind2 = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4]
-    subfield = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5]
+    tag = cfg['CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG'][0:3]
+    ind1 = cfg['CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG'][3]
+    ind2 = cfg['CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG'][4]
+    subfield = cfg['CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG'][5]
     values = record_get_field_values(record, tag, ind1, ind2, subfield)
     oai_id_regex = re.compile("oai[a-zA-Z0-9/.:]+")
     for value in [value.strip() for value in values]:
@@ -1097,7 +1146,7 @@ def print_rec(rec, format=1, tags=None):
     prints a record
     format = 1 -- XML
     format = 2 -- HTML (not implemented)
-    @param tags: list of tags to be printed
+    :param tags: list of tags to be printed
     """
     if tags is None:
         tags = []
@@ -1111,8 +1160,8 @@ def print_rec(rec, format=1, tags=None):
 def print_recs(listofrec, format=1, tags=None):
     """
     prints a list of records
-    @param format: 1 XML, 2 HTML (not implemented)
-    @param tags: list of tags to be printed
+    :param format: 1 XML, 2 HTML (not implemented)
+    :param tags: list of tags to be printed
            if 'listofrec' is not a list it returns empty string
     """
     if tags is None:
@@ -1138,17 +1187,17 @@ def record_find_field(rec, tag, field, strict=False):
     Returns the global and local positions of the first occurrence
     of the field in a record.
 
-    @param rec:    A record dictionary structure
-    @type  rec:    dictionary
-    @param tag:    The tag of the field to search for
-    @type  tag:    string
-    @param field:  A field tuple as returned by create_field()
-    @type  field:  tuple
-    @param strict: A boolean describing the search method. If strict
+    :param rec:    A record dictionary structure
+    :type  rec:    dictionary
+    :param tag:    The tag of the field to search for
+    :type  tag:    string
+    :param field:  A field tuple as returned by create_field()
+    :type  field:  tuple
+    :param strict: A boolean describing the search method. If strict
                    is False, then the order of the subfields doesn't
                    matter. Default search method is strict.
-    @type  strict: boolean
-    @return:       A tuple of (global_position, local_position) or a
+    :type  strict: boolean
+    :return:       A tuple of (global_position, local_position) or a
                    tuple (None, None) if the field is not present.
     @rtype:        tuple
     @raise InvenioBibRecordFieldError: If the provided field is invalid.
@@ -1177,10 +1226,10 @@ def record_strip_empty_fields(rec, tag=None):
     Removes empty subfields and fields from the record. If 'tag' is not None, only
     a specific tag of the record will be stripped, otherwise the whole record.
 
-    @param rec:  A record dictionary structure
-    @type  rec:  dictionary
-    @param tag:  The tag of the field to strip empty fields from
-    @type  tag:  string
+    :param rec:  A record dictionary structure
+    :type  rec:  dictionary
+    :param tag:  The tag of the field to strip empty fields from
+    :type  tag:  string
     """
     # Check whole record
     if tag is None:
@@ -1218,8 +1267,8 @@ def record_strip_controlfields(rec):
     """
     Removes all non-empty controlfields from the record
 
-    @param rec:  A record dictionary structure
-    @type  rec:  dictionary
+    :param rec:  A record dictionary structure
+    :type  rec:  dictionary
     """
     for tag in rec.keys():
         if tag[:2] == '00' and rec[tag][0][3]:
@@ -1229,11 +1278,11 @@ def record_order_subfields(rec, tag=None):
     """ Orders subfields from a record alphabetically based on subfield code.
     If 'tag' is not None, only a specific tag of the record will be reordered,
     otherwise the whole record.
-    @param rec: bibrecord
-    @type rec: bibrec
+    :param rec: bibrecord
+    :type rec: bibrec
 
-    @param tag: tag where the subfields will be ordered
-    @type tag: string
+    :param tag: tag where the subfields will be ordered
+    :type tag: string
     """
     if rec is None:
         return rec
@@ -1256,7 +1305,7 @@ def _compare_fields(field1, field2, strict=True):
     subfield will be taken care of, if not then the order of the
     subfields doesn't matter.
 
-    @return: True if the field are equivalent, False otherwise.
+    :return: True if the field are equivalent, False otherwise.
     """
     if strict:
         # Return a simple equal test on the field minus the position.
@@ -1273,8 +1322,8 @@ def _check_field_validity(field):
     """
     Checks if a field is well-formed.
 
-    @param field: A field tuple as returned by create_field()
-    @type field:  tuple
+    :param field: A field tuple as returned by create_field()
+    :type field:  tuple
     @raise InvenioBibRecordFieldError: If the field is invalid.
     """
     if type(field) not in (list, tuple):
@@ -1341,9 +1390,9 @@ def _tag_matches_pattern(tag, pattern):
     >> _tag_matches_pattern("909", "9%9") -> True
     >> _tag_matches_pattern("909", "9%8") -> False
 
-    @param tag: a 3 characters long string
-    @param pattern: a 3 characters long string
-    @return: False or True"""
+    :param tag: a 3 characters long string
+    :param pattern: a 3 characters long string
+    :return: False or True"""
     for char1, char2 in zip(tag, pattern):
         if char2 not in ('%', char1):
             return False
@@ -1355,8 +1404,8 @@ def validate_record_field_positions_global(record):
     duplicate global field positions and local field positions in the
     list of fields are ascending.
 
-    @param record: the record data structure
-    @return: the first error found as a string or None if no error was found
+    :param record: the record data structure
+    :return: the first error found as a string or None if no error was found
     """
     all_fields = []
     for tag, fields in record.items():
@@ -1368,6 +1417,159 @@ def validate_record_field_positions_global(record):
             if field[4] in all_fields:
                 return ("Duplicate global field position '%d' in tag '%s'" %
                     (field[4], tag))
+
+def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True, split_by=0):
+    """
+    Return list of field values for field TAG for the given record ID
+    or list of record IDs.  (RECIDS can be both an integer or a list
+    of integers.)
+
+    If REPETITIVE_VALUES is set to True, then return all values even
+    if they are doubled.  If set to False, then return unique values
+    only.
+    """
+    out = []
+    try:
+        recIDs = int(recIDs)
+    except:
+        pass
+    if isinstance(recIDs, (int, long)):
+        recIDs = [recIDs,]
+    if not isinstance(recIDs, (list, tuple, intbitset)):
+        return []
+    if len(recIDs) == 0:
+        return []
+    if tag == "001___":
+        # We have asked for tag 001 (=recID) that is not stored in bibXXx
+        # tables.
+        out = [str(recID) for recID in recIDs]
+    else:
+        # we are going to look inside bibXXx tables
+        digits = tag[0:2]
+        try:
+            intdigits = int(digits)
+            if intdigits < 0 or intdigits > 99:
+                raise ValueError
+        except ValueError:
+            # invalid tag value asked for
+            return []
+        bx = "bib%sx" % digits
+        bibx = "bibrec_bib%sx" % digits
+        if not repetitive_values:
+            queryselect = "DISTINCT(bx.value)"
+        else:
+            queryselect = "bx.value"
+
+        if sort:
+            sort_sql = "ORDER BY bibx.field_number, bx.tag ASC"
+        else:
+            sort_sql = ""
+
+        def get_res(recIDs):
+            query = "SELECT %s FROM %s AS bx, %s AS bibx " \
+                    "WHERE bibx.id_bibrec IN (%s) AND bx.id=bibx.id_bibxxx AND " \
+                    "bx.tag LIKE %%s %s" % \
+                    (queryselect, bx, bibx, ("%s,"*len(recIDs))[:-1], sort_sql)
+            return [i[0] for i in run_sql(query, tuple(recIDs) + (tag,))]
+
+        #print not sort and split_by>0 and len(recIDs)>split_by
+        if sort or split_by<=0 or len(recIDs)<=split_by:
+            return get_res(recIDs)
+        else:
+            return [i for res in map(get_res, zip(*[iter(recIDs)]*split_by)) for i in res]
+
+    return out
+
+def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
+    """Return buffer of ALEPH sequential-like textual format with fields found
+       in the list TAGS_IN for record RECID.
+
+       If can_see_hidden is True, just print everything.  Otherwise hide fields
+       from CFG_BIBFORMAT_HIDDEN_TAGS.
+    """
+
+    out = ""
+    if type(tags_in) is not list:
+        tags_in = [tags_in,]
+    if len(tags_in) == 1 and len(tags_in[0]) == 6:
+        ## case A: one concrete subfield asked, so print its value if found
+        ##         (use with care: can mislead if field has multiple occurrences)
+        out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
+    else:
+        ## case B: print our "text MARC" format; works safely all the time
+        # find out which tags to output:
+        dict_of_tags_out = {}
+        if not tags_in:
+            for i in range(0, 10):
+                for j in range(0, 10):
+                    dict_of_tags_out["%d%d%%" % (i, j)] = 1
+        else:
+            for tag in tags_in:
+                if len(tag) == 0:
+                    for i in range(0, 10):
+                        for j in range(0, 10):
+                            dict_of_tags_out["%d%d%%" % (i, j)] = 1
+                elif len(tag) == 1:
+                    for j in range(0, 10):
+                        dict_of_tags_out["%s%d%%" % (tag, j)] = 1
+                elif len(tag) < 5:
+                    dict_of_tags_out["%s%%" % tag] = 1
+                elif tag >= 6:
+                    dict_of_tags_out[tag[0:5]] = 1
+        tags_out = dict_of_tags_out.keys()
+        tags_out.sort()
+        # search all bibXXx tables as needed:
+        for tag in tags_out:
+            digits = tag[0:2]
+            try:
+                intdigits = int(digits)
+                if intdigits < 0 or intdigits > 99:
+                    raise ValueError
+            except ValueError:
+                # invalid tag value asked for
+                continue
+            if tag.startswith("001") or tag.startswith("00%"):
+                if out:
+                    out += "\n"
+                out += "%09d %s %d" % (recID, "001__", recID)
+            bx = "bib%sx" % digits
+            bibx = "bibrec_bib%sx" % digits
+            query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
+                    "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s"\
+                    "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
+            res = run_sql(query, (recID, str(tag)+'%'))
+            # go through fields:
+            field_number_old = -999
+            field_old = ""
+            for row in res:
+                field, value, field_number = row[0], row[1], row[2]
+                ind1, ind2 = field[3], field[4]
+                printme = True
+                #check the stuff in hiddenfields
+                if not can_see_hidden:
+                    for htag in cfg['CFG_BIBFORMAT_HIDDEN_TAGS']:
+                        ltag = len(htag)
+                        samelenfield = field[0:ltag]
+                        if samelenfield == htag:
+                            printme = False
+                if ind1 == "_":
+                    ind1 = ""
+                if ind2 == "_":
+                    ind2 = ""
+                # print field tag
+                if printme:
+                    if field_number != field_number_old or field[:-1] != field_old[:-1]:
+                        if out:
+                            out += "\n"
+                        out += "%09d %s " % (recID, field[:5])
+                        field_number_old = field_number
+                        field_old = field
+                    # print subfield value
+                    if field[0:2] == "00" and field[-1:] == "_":
+                        out += value
+                    else:
+                        out += "$$%s%s" % (field[-1:], value)
+    return out
 
 def _record_sort_by_indicators(record):
     """Sorts the fields inside the record by indicators."""
@@ -1711,8 +1913,8 @@ def _wash_indicators(*indicators):
     Washes the values of the indicators. An empty string or an
     underscore is replaced by a blank space.
 
-    @param indicators: a series of indicators to be washed
-    @return: a list of washed indicators
+    :param indicators: a series of indicators to be washed
+    :return: a list of washed indicators
     """
     return [indicator in ('', '_') and ' ' or indicator
             for indicator in indicators]
@@ -1721,8 +1923,8 @@ def _correct_record(record):
     """
     Checks and corrects the structure of the record.
 
-    @param record: the record data structure
-    @return: a list of errors found
+    :param record: the record data structure
+    :return: a list of errors found
     """
     errors = []
 
@@ -1800,11 +2002,11 @@ def _warnings(alist):
 
 def _compare_lists(list1, list2, custom_cmp):
     """Compares twolists using given comparing function
-    @param list1: first list to compare
-    @param list2: second list to compare
-    @param custom_cmp: a function taking two arguments (element of
+    :param list1: first list to compare
+    :param list2: second list to compare
+    :param custom_cmp: a function taking two arguments (element of
         list 1, element of list 2) and
-    @return: True or False depending if the values are the same"""
+    :return: True or False depending if the values are the same"""
     if len(list1) != len(list2):
         return False
     for element1, element2 in zip(list1, list2):

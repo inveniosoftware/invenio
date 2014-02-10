@@ -22,11 +22,11 @@ bibauthorid database models.
 """
 
 # General imports.
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
 # Create your models here.
 
-from invenio.websession_model import User
+from invenio.modules.accounts.models import User
 
 #FIX ME Add db.relationships
 

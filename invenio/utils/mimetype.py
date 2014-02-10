@@ -26,13 +26,10 @@ Usage example:
 """
 
 import re
+from invenio.base.globals import cfg
 from mimetypes import MimeTypes
 from werkzeug import cached_property, LocalProxy
-
-# FIXME rename config variables
-from invenio.config import \
-    CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
-    CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS
+from thread import get_ident
 
 try:
     import magic
@@ -85,8 +82,8 @@ class LazyMimeCache(object):
         _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
         _mimes.encodings_map.update({'.bz2' : 'bzip2'})
 
-        if CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES:
-            for key, value in CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES.iteritems():
+        if cfg['CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES']:
+            for key, value in cfg['CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES'].iteritems():
                 _mimes.add_type(key, value)
                 del key, value
 
@@ -103,7 +100,7 @@ class LazyMimeCache(object):
         _tmp_extensions = self.mimes.encodings_map.keys() + \
                     self.mimes.suffix_map.keys() + \
                     self.mimes.types_map[1].keys() + \
-                    CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS
+                    cfg['CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS']
         extensions = []
         for ext in _tmp_extensions:
             if ext.startswith('.'):
@@ -203,7 +200,7 @@ def guess_extension(amimetype, normalize=False):
     if ext and normalize:
         ## Normalize some common magic mis-interpreation
         ext = {'.asc': '.txt', '.obj': '.bin'}.get(ext, ext)
-        from invenio.bibdocfile_normalizer import normalize_format
+        from invenio.legacy.bibdocfile.api_normalizer import normalize_format
         return normalize_format(ext)
     return ext
 

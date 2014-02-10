@@ -22,15 +22,15 @@
 import os
 import shutil
 
-from invenio.jsonutils import json_decode_file
-from invenio.bibencode_config import (
+from invenio.utils.json import json_decode_file
+from invenio.modules.encoder.config import (
                                       CFG_BIBENCODE_PROFILES_ENCODING,
                                       CFG_BIBENCODE_PROFILES_EXTRACT,
                                       CFG_BIBENCODE_PROFILES_ENCODING_LOCAL,
                                       CFG_BIBENCODE_PROFILES_EXTRACT_LOCAL
                                       )
-from invenio.bibencode_utils import getval
-from invenio.errorlib import register_exception
+from invenio.modules.encoder.utils import getval
+from invenio.ext.logging import register_exception
 
 #-------------------#
 # Encoding profiles #

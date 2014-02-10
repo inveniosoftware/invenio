@@ -33,20 +33,20 @@ We have 3 tables:
 from itertools import chain
 import ConfigParser
 
-from invenio.bibformat_utils import parse_tag
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibrank_citation_indexer import tagify
-from invenio.config import CFG_ETCDIR, \
-                           CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
+from invenio.modules.formatter.utils import parse_tag
+from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.legacy.bibrank.citation_indexer import tagify
+from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
                            CFG_BIBRANK_SELFCITES_PRECOMPUTE
-from invenio.dbquery import run_sql
-from invenio.bibauthorid_searchinterface import get_personids_from_bibrec
-from invenio.bibrank_citation_searcher import get_cited_by
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.bibauthorid.searchinterface import get_personids_from_bibrec
+from invenio.legacy.bibrank.citation_searcher import get_cited_by
+from invenio.modules.ranker.registry import configuration
 
 
 def load_config_file(key):
     """Load config file containing the authors, co-authors tags #"""
-    filename = CFG_ETCDIR + "/bibrank/" + key + ".cfg"
+    filename = configuration.get(rank_method_code + '.cfg', '')
     config = ConfigParser.ConfigParser()
     try:
         config.readfp(open(filename))

@@ -27,11 +27,11 @@ X{BibFormatObject} in function L{escape_field}
 Still it is useful sometimes for debugging purpose to use the
 L{BibFormatObject} class directly. For eg:
 
-   >>> from invenio.bibformat_engine import BibFormatObject
+   >>> from invenio.modules.formatter.engine import BibFormatObject
    >>> bfo = BibFormatObject(102)
    >>> bfo.field('245__a')
    The order Rodentia in South America
-   >>> from invenio.bibformat_elements import bfe_title
+   >>> from invenio.modules.formatter.format_elements import bfe_title
    >>> bfe_title.format_element(bfo)
    The order Rodentia in South America
 
@@ -52,48 +52,47 @@ from flask import has_app_context
 from operator import itemgetter
 from werkzeug.utils import cached_property
 
+from invenio.base.globals import cfg
+from invenio.base.utils import (autodiscover_template_context_functions,
+                                autodiscover_format_elements)
 from invenio.config import \
      CFG_PATH_PHP, \
      CFG_BINDIR, \
      CFG_SITE_LANG
-from invenio.errorlib import \
+from invenio.ext.logging import \
      register_exception
-from invenio.bibrecord import \
+from invenio.legacy.bibrecord import \
      create_record, \
      record_get_field_instances, \
      record_get_field_value, \
      record_get_field_values, \
      record_xml_output
-from invenio.bibformat_xslt_engine import format
-from invenio.dbquery import run_sql
-from invenio.messages import \
+from . import registry
+from .engines.xslt import format
+from invenio.legacy.dbquery import run_sql
+from invenio.base.i18n import \
      language_list_long, \
      wash_language, \
      gettext_set_language
-from invenio import bibformat_dblayer
-from invenio.bibformat_config import \
+from . import api as bibformat_dblayer
+from .config import \
      CFG_BIBFORMAT_TEMPLATES_DIR, \
      CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
      CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
      CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, \
-     CFG_BIBFORMAT_TEMPLATES_PATH, \
-     CFG_BIBFORMAT_ELEMENTS_PATH, \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
-     CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH, \
      InvenioBibFormatError
-from invenio.bibformat_utils import \
+from invenio.modules.formatter.utils import \
      record_get_xml, \
      parse_tag
-from invenio.htmlutils import \
+from invenio.utils.html import \
      HTMLWasher, \
      CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST, \
      CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
-from invenio.webuser import collect_user_info
-from invenio.bibknowledge import get_kbr_values
-from invenio.importutils import autodiscover_modules
-from invenio.jinja2utils import render_template_to_string
+from invenio.modules.knowledge.api import get_kbr_values
+from invenio.ext.template import render_template_to_string
 from HTMLParser import HTMLParseError
-from invenio.shellutils import escape_shell_arg
+from invenio.utils.shell import escape_shell_arg
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -212,31 +211,44 @@ sub_non_alnum = re.compile('[^0-9a-zA-Z]+')
 fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
 
 
+from invenio.utils.memoise import memoize
+
+
 class LazyTemplateContextFunctionsCache(object):
     """Loads bibformat elements using plugin builder and caches results."""
 
     @cached_property
     def template_context_functions(self):
         """Returns template context functions"""
-        modules = autodiscover_modules(['invenio.template_context_functions'], 'tfn_.+')
+        modules = autodiscover_template_context_functions()
         elem = {}
         for m in modules:
             register_func = getattr(m, 'template_context_function', None)
             if register_func and isinstance(register_func, types.FunctionType):
-                 elem[m.__name__.split('.')[-1]] = register_func
+                elem[m.__name__.split('.')[-1]] = register_func
 
         return elem
 
-    @cached_property
-    def bibformat_elements(self):
+    @memoize
+    def bibformat_elements(self, modules=None):
         """Returns bibformat elements."""
-        modules = autodiscover_modules(['invenio.bibformat_elements'], 'bfe_.+')
+        if modules is None:
+            modules = registry.format_elements
 
         elem = {}
         for m in modules:
-            register_func = getattr(m, 'format_element', None)
+            if m is None:
+                continue
+            name = m.__name__.split('.')[-1]
+            filename = m.__file__[:-1] if m.__file__.endswith('.pyc') \
+                else m.__file__
+            register_func = getattr(m, 'format_element',
+                                    getattr(m, 'format', None))
+            escape_values = getattr(m, 'escape_values', None)
             if register_func and isinstance(register_func, types.FunctionType):
-                elem[m.__name__.split('.')[-1]] = register_func
+                register_func._escape_values = escape_values
+                register_func.__file__ = filename
+                elem[name] = register_func
 
         return elem
 
@@ -258,14 +270,14 @@ class LazyTemplateContextFunctionsCache(object):
 
         # Old bibformat templates
         tfn_from_files = dict((name.lower(), insert(name.lower()))
-                              for name in self.bibformat_elements.keys())
+                              for name in self.bibformat_elements().keys())
         # Update with new template context functions
         tfn_from_files.update(self.template_context_functions)
 
         bfe_from_tags = {}
         if has_app_context():
-            from invenio.sqlalchemyutils import db
-            from invenio.websearch_model import Tag
+            from invenio.ext.sqlalchemy import db
+            from invenio.modules.search.models import Tag
 
             # get functions from tag table
             bfe_from_tags = dict(('bfe_'+fix_tag_name(name),
@@ -278,6 +290,12 @@ class LazyTemplateContextFunctionsCache(object):
         return bfe_from_tags
 
 TEMPLATE_CONTEXT_FUNCTIONS_CACHE = LazyTemplateContextFunctionsCache()
+
+
+def get_format_element_path(filename):
+    if filename.endswith('.py'):
+        filename = filename[:-3]
+    return TEMPLATE_CONTEXT_FUNCTIONS_CACHE.bibformat_elements()[filename].__file__
 
 
 def call_old_bibformat(recID, of="HD", on_the_fly=False, verbose=0):
@@ -430,7 +448,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
         </span>""" % (template, recID)
 
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
-    path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, template)
+    path = "%s%s%s" % (cfg['CFG_BIBFORMAT_TEMPLATES_PATH'], os.sep, template)
     if template is None or not (
       os.access(path, os.R_OK) or
       template.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION)):
@@ -454,7 +472,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
                                             verbose=verbose)
     ############################# END ##################################
         try:
-            raise InvenioBibFormatError(_('No template could be found for output format %s.') % of)
+            raise InvenioBibFormatError(_('No template could be found for output format %(code)s.', code=of))
         except InvenioBibFormatError, exc:
             register_exception(req=bfo.req)
 
@@ -559,12 +577,12 @@ def format_with_format_template(format_template_filename, bfo,
         evaluated_format = '<!-- empty -->'
         #try:
         from functools import wraps
-        from invenio.bibfield import \
-            create_record as bibfield_create_record, \
-            get_record as bibfield_get_record
-        from invenio.search_engine import print_record
-        from invenio.webuser_flask import current_user
-        from invenio.webinterface_handler_flask_utils import unicodifier
+        from invenio.modules.records.api import \
+            create_record as new_create_record, \
+            get_record as new_get_record
+        from invenio.legacy.search_engine import print_record
+        from flask.ext.login import current_user
+        from invenio.base.helpers import unicodifier
 
         def _format_record(recid, of='hb', user_info=current_user, *args, **kwargs):
             return print_record(recid, format=of, user_info=user_info, *args, **kwargs)
@@ -576,15 +594,15 @@ def format_with_format_template(format_template_filename, bfo,
                 return unicodifier(f(*args, **kwds))
             return wrapper
 
-        if bfo.recID is not None:
-            record = bibfield_get_record(bfo.recID)
+        if bfo.recID:
+            record = new_get_record(bfo.recID)
         else:
-            record = bibfield_create_record(bfo.xml_record, master_format='marc')
-            bfo.recID = bfo.recID if bfo.recID is not None else 0
+            record = new_create_record(bfo.xml_record, master_format='marc')
+            bfo.recID = bfo.recID if bfo.recID else 0
         record.__getitem__ = encode_utf8(record.__getitem__)
         record.get = encode_utf8(record.get)
         evaluated_format = render_template_to_string(
-            CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
+            'format/record/'+format_template_filename,
             recid=bfo.recID,
             record=record,
             format_record=_format_record,
@@ -655,7 +673,9 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
                        '</span>'
         if format_element is None:
             try:
-                raise InvenioBibFormatError(_('Could not find format element named %s.') % function_name)
+                raise InvenioBibFormatError(
+                    _('Could not find format element named %(function_name)s.',
+                      function_name=function_name))
             except InvenioBibFormatError, exc:
                 register_exception(req=bfo.req)
 
@@ -713,6 +733,8 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
     escape = parameters.get('escape', "")
     output_text = ''
 
+    _ = gettext_set_language(bfo.lang)
+
     # 3 possible cases:
     # a) format element file is found: we execute it
     # b) format element file is not found, but exist in tag table (e.g. bfe_isbn)
@@ -749,7 +771,9 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
         except Exception, e:
             name = format_element['attrs']['name']
             try:
-                raise InvenioBibFormatError(_('Error when evaluating format element %s with parameters %s.') % (name, str(params)))
+                raise InvenioBibFormatError(_(
+                    'Error when evaluating format element %(format_element)s with parameters %(parameters)s.',
+                    format_element=name, parameters=str(params)))
             except InvenioBibFormatError, exc:
                 register_exception(req=bfo.req)
                 errors.append(exc.message)
@@ -890,7 +914,7 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
     else:
         # c) Element is unknown
         try:
-            raise InvenioBibFormatError(_('Could not find format element named %s.') % format_element)
+            raise InvenioBibFormatError(_('Could not find format element named %(format_element)s.', format_element=format_element))
         except InvenioBibFormatError, exc:
             register_exception(req=bfo.req)
             errors.append(exc.message)
@@ -986,10 +1010,9 @@ def get_format_template(filename, with_attributes=False):
                format_templates_cache[filename].has_key('attrs'):
             return format_templates_cache[filename]
 
-    format_template = {'code':""}
+    format_template = {'code': ""}
     try:
-
-        path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename)
+        path = registry.format_templates_lookup[filename]
 
         format_file = open(path)
         format_content = format_file.read()
@@ -1008,8 +1031,8 @@ def get_format_template(filename, with_attributes=False):
 
     except Exception, e:
         try:
-            raise InvenioBibFormatError(_('Could not read format template named %s. %s.') % (filename, str(e)))
-        except InvenioBibFormatError, exc:
+            raise InvenioBibFormatError(_('Could not read format template named %(filename)s. %(error)s.', filename=filename, error=str(e)))
+        except InvenioBibFormatError:
             register_exception()
 
     # Save attributes if necessary
@@ -1038,11 +1061,11 @@ def get_format_templates(with_attributes=False):
     @return: the list of format templates (with code and info)
     """
     format_templates = {}
-    files = os.listdir(CFG_BIBFORMAT_TEMPLATES_PATH)
 
-    for filename in files:
+    for filename in registry.format_templates:
         if filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION) or \
                filename.endswith(".xsl"):
+            filename = os.path.basename(filename)
             format_templates[filename] = get_format_template(filename,
                                                              with_attributes)
 
@@ -1063,9 +1086,7 @@ def get_format_template_attrs(filename):
     attrs['name'] = ""
     attrs['description'] = ""
     try:
-        template_file = open("%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH,
-                                         os.sep,
-                                         filename))
+        template_file = open(registry.format_templates_lookup[filename])
         code = template_file.read()
         template_file.close()
 
@@ -1087,8 +1108,8 @@ def get_format_template_attrs(filename):
                 attrs['description'] = match.group('desc').rstrip('.')
     except Exception, e:
         try:
-            raise InvenioBibFormatError(_('Could not read format template named %s. %s.') % (filename, str(e)))
-        except InvenioBibFormatError, exc:
+            raise InvenioBibFormatError(_('Could not read format template named %(filename)s. %(error)s.', filename=filename, error=str(e)))
+        except InvenioBibFormatError:
             register_exception()
 
         attrs['name'] = filename
@@ -1152,7 +1173,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
 
         else:
             try:
-                raise InvenioBibFormatError(_('Format element %s could not be found.') % element_name)
+                raise InvenioBibFormatError(_('Format element %(element_name)s could not be found.', element_name=element_name))
             except InvenioBibFormatError, exc:
                 register_exception()
 
@@ -1167,26 +1188,14 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
         if module_name.endswith(".py"):
             module_name = module_name[:-3]
 
-        # Load element
+        # Load function 'format_element()' inside element
         try:
-            module = __import__(CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH + \
-                                "." + module_name)
-            # Load last module in import path
-            # For eg. load bfe_name in
-            # invenio.bibformat_elements.bfe_name
-            # Used to keep flexibility regarding where elements
-            # directory is (for eg. test cases)
-            components = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH.split(".")
-            for comp in components[1:]:
-                module = getattr(module, comp)
-
-        except Exception, e:
-            # We catch all exceptions here, as we just want to print
-            # traceback in all cases
-            tb = sys.exc_info()[2]
-            stack = traceback.format_exception(Exception, e, tb, limit=None)
+            function_format = TEMPLATE_CONTEXT_FUNCTIONS_CACHE.\
+                bibformat_elements()[module_name]
+            format_element['code'] = function_format
+        except KeyError:
             try:
-                raise InvenioBibFormatError(_('Error in format element %s. %s.') % (element_name,"\n" + "\n".join(stack[-2:-1])))
+                raise InvenioBibFormatError(_('Format element %(element_name)s has no function named "format".', element_name=element_name))
             except InvenioBibFormatError, exc:
                 register_exception()
                 errors.append(exc.message)
@@ -1199,35 +1208,8 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
                 raise Exception, exc.message
             return None
 
-        # Load function 'format_element()' inside element
-        try:
-            function_format  = module.__dict__[module_name].format_element
-            format_element['code'] = function_format
-        except AttributeError, e:
-            # Try to load 'format()' function
-            try:
-                function_format  = module.__dict__[module_name].format
-                format_element['code'] = function_format
-            except AttributeError, e:
-                try:
-                    raise InvenioBibFormatError(_('Format element %s has no function named "format".') % element_name)
-                except InvenioBibFormatError, exc:
-                    register_exception()
-                    errors.append(exc.message)
-
-                if verbose >= 5:
-                    sys.stderr.write(exc.message)
-
-        if errors:
-            if verbose >= 7:
-                raise Exception, exc.message
-            return None
-
         # Load function 'escape_values()' inside element
-        function_escape  = getattr(module.__dict__[module_name],
-                                   'escape_values',
-                                   None)
-        format_element['escape_function'] = function_escape
+        format_element['escape_function'] = function_format._escape_values
 
         # Prepare, cache and return
         format_element['attrs'] = get_format_element_attrs_from_function( \
@@ -1265,10 +1247,12 @@ def get_format_elements(with_built_in_params=False):
     for name in mappings:
         format_elements[name.upper().replace(" ", "_").strip()] = get_format_element(name, with_built_in_params=with_built_in_params)
 
-    files = os.listdir(CFG_BIBFORMAT_ELEMENTS_PATH)
-    for filename in files:
+    for module in registry.format_elements:
+        filename = os.path.basename(module.__file__)
         filename_test = filename.upper().replace(" ", "_")
-        if filename_test.endswith(".PY") and filename.upper() != "__INIT__.PY":
+        if filename_test.endswith(".PYC"):
+            filename_test = filename_test[:-1]
+        if filename_test.endswith(".PY") and not filename.upper().startswith("__INIT__.PY"):
             if filename_test.startswith("BFE_"):
                 filename_test = filename_test[4:]
             element_name = filename_test[:-3]
@@ -1536,12 +1520,12 @@ def get_output_format(code, with_attributes=False, verbose=0):
     @return: strucured content of output format
     """
     _ = gettext_set_language(CFG_SITE_LANG)
-    output_format = {'rules':[], 'default':""}
+    output_format = {'rules': [], 'default': ""}
     filename = resolve_output_format_filename(code, verbose)
 
     if filename is None:
         try:
-            raise InvenioBibFormatError(_('Output format with code %s could not be found.') % code)
+            raise InvenioBibFormatError(_('Output format with code %(code)s could not be found.', code=code))
         except InvenioBibFormatError, exc:
             register_exception()
 
@@ -1564,7 +1548,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
         if with_attributes:
             output_format['attrs'] = get_output_format_attrs(code, verbose)
 
-        path = "%s%s%s" % (CFG_BIBFORMAT_OUTPUTS_PATH, os.sep, filename )
+        path = registry.output_formats_lookup[filename]
         format_file = open(path)
 
         current_tag = ''
@@ -1598,7 +1582,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
 
     except Exception, e:
         try:
-            raise InvenioBibFormatError(_('Output format %s cannot not be read. %s.') % (filename, str(e)))
+            raise InvenioBibFormatError(_('Output format %(filename)s cannot not be read. %(error)s.', filename=filename, error=str(e)))
         except InvenioBibFormatError, exc:
             register_exception()
 
@@ -1686,11 +1670,13 @@ def get_output_formats(with_attributes=False):
     @return: the list of output formats
     """
     output_formats = {}
-    files = os.listdir(CFG_BIBFORMAT_OUTPUTS_PATH)
 
-    for filename in files:
+    for filename in registry.output_formats_lookup.values():
+        filename = os.path.basename(filename)
         if filename.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
             code = "".join(filename.split(".")[:-1])
+            if filename in output_formats:
+                continue
             output_formats[filename] = get_output_format(code, with_attributes)
 
     return output_formats
@@ -1716,14 +1702,20 @@ def resolve_format_element_filename(element_name):
     else:
         name = element_name.replace(" ", "_").upper()
 
-    files = os.listdir(CFG_BIBFORMAT_ELEMENTS_PATH)
-    for filename in files:
-        test_filename = filename.replace(" ", "_").upper()
+    files = registry.format_elements
+
+    for element in files:
+        filename = element.__file__
+        if filename.endswith('.pyc'):
+            filename = filename[:-1]
+        basename = os.path.basename(filename)
+
+        test_filename = basename.replace(" ", "_").upper()
 
         if test_filename == name or \
-        test_filename == "BFE_" + name or \
-        "BFE_" + test_filename == name:
-            return filename
+                test_filename == "BFE_" + name or \
+                "BFE_" + test_filename == name:
+            return basename
 
     # No element with that name found
     # Do not log error, as it might be a normal execution case:
@@ -1750,15 +1742,14 @@ def resolve_output_format_filename(code, verbose=0):
     if not code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
         code = re.sub(r"\W", "", code)
         code += "."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
-
-    files = os.listdir(CFG_BIBFORMAT_OUTPUTS_PATH)
-    for filename in files:
-        if filename.upper() == code.upper():
+    code = code.upper()
+    for filename in registry.output_formats_lookup.keys():
+        if filename.upper() == code:
             return filename
 
     # No output format with that name found
     try:
-        raise InvenioBibFormatError(_('Could not find output format named %s.') % code)
+        raise InvenioBibFormatError(_('Could not find output format named %(code)s.', code=code))
     except InvenioBibFormatError, exc:
         register_exception()
 
@@ -1785,22 +1776,21 @@ def get_fresh_format_template_filename(name):
     filename = name
     # Remove non alphanumeric chars (except .)
     filename = re.sub(r"[^.0-9a-zA-Z]", "", filename)
-    path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename \
-           + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
     index = 1
-    while os.path.exists(path):
+
+    def _get_fullname(filename):
+        return filename + '.' + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
+
+    while _get_fullname(filename) in registry.format_templates_lookup:
         index += 1
         filename = name + str(index)
-        path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename \
-               + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
 
     if index > 1:
         returned_name = (name + str(index)).replace("_", " ")
     else:
         returned_name = name.replace("_", " ")
 
-    return (filename + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION,
-            returned_name) #filename.replace("_", " "))
+    return (_get_fullname(filename), returned_name)
 
 def get_fresh_output_format_filename(code):
     """
@@ -1824,26 +1814,25 @@ def get_fresh_output_format_filename(code):
     if len(code) > 6:
         code = code[:6]
 
+    def _get_fullname(filename):
+        return filename + '.' + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
+
     filename = code
-    path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename \
-           + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
     index = 2
-    while os.path.exists(path):
+    while _get_fullname(filename) in registry.output_formats_lookup:
         filename = code + str(index)
         if len(filename) > 6:
             filename = code[:-(len(str(index)))]+str(index)
         index += 1
-        path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename \
-               + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
         # We should not try more than 99999... Well I don't see how we
         # could get there.. Sanity check.
         if index >= 99999:
             try:
                 raise InvenioBibFormatError(_('Could not find a fresh name for output format %s.') % code)
-            except InvenioBibFormatError, exc:
+            except InvenioBibFormatError:
                 register_exception()
 
-            sys.exit("Output format cannot be named as %s"%code)
+            sys.exit("Output format cannot be named as %s" % code)
 
     return (filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, filename)
 
@@ -1938,7 +1927,8 @@ class BibFormatObject:
         self.output_format = output_format
         self.user_info = user_info
         if self.user_info is None:
-            self.user_info = collect_user_info(None)
+            from invenio.ext.login.legacy_user import UserInfo
+            self.user_info = UserInfo(None)
 
     def get_record(self):
         """
@@ -1946,7 +1936,7 @@ class BibFormatObject:
 
         @return: the record structure as defined by BibRecord library
         """
-        from invenio.search_engine import get_record
+        from invenio.legacy.search_engine import get_record
 
         # Create record if necessary
         if self.record is None:

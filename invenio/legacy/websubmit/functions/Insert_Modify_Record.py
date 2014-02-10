@@ -24,9 +24,9 @@ import tempfile
 
 from invenio.config import \
      CFG_TMPDIR
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
-from invenio.websubmit_functions.Shared_Functions import ParamFromFile
-from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
+from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
+from invenio.legacy.bibsched.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 
 def Insert_Modify_Record(parameters, curdir, form, user_info=None):
     """

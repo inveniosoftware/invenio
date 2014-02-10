@@ -29,14 +29,14 @@ try:
     PIL_imported = True
 except ImportError:
     PIL_imported = False
-from invenio.bibformat_engine import BibFormatObject
-from invenio.htmlutils import HTMLWasher, remove_html_markup
-from invenio.messages import gettext_set_language
+from invenio.modules.formatter.engine import BibFormatObject
+from invenio.utils.html import HTMLWasher, remove_html_markup
+from invenio.base.i18n import gettext_set_language
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_TMPDIR, \
      CFG_SITE_LANG
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      cache_index_page, \
      get_index_page_from_cache, \
      parse_url_string, \
@@ -44,13 +44,13 @@ from invenio.webjournal_utils import \
      get_journal_articles, \
      issue_is_later_than, \
      get_current_issue
-from invenio.webjournal_utils import \
+from invenio.legacy.webjournal.utils import \
      img_pattern, \
      header_pattern, \
      header_pattern2, \
      para_pattern
-from invenio.urlutils import create_html_link
-from invenio.bibdocfile import decompose_file
+from invenio.utils.url import create_html_link
+from invenio.legacy.bibdocfile.api import decompose_file
 
 def format_element(bfo, number_of_featured_articles="1",
            number_of_articles_with_image="3", new_articles_first='yes',

@@ -22,10 +22,11 @@
 __revision__ = \
     "$Id$"
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-bibindex_engine = lazy_import('invenio.bibindex_engine')
-load_tokenizers = lazy_import('invenio.bibindex_engine_utils.load_tokenizers')
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+bibindex_engine = lazy_import('invenio.legacy.bibindex.engine')
+load_tokenizers = lazy_import('invenio.legacy.bibindex.engine_utils.load_tokenizers')
+
 
 class TestListSetOperations(InvenioTestCase):
     """Tests for list set operations."""

@@ -18,8 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import re
-from invenio.bibindex_engine_stemmer import stem
-from invenio.bibindex_engine_stopwords import is_stopword
+from invenio.legacy.bibindex.engine_stemmer import stem
+from invenio.legacy.bibindex.engine_stopwords import is_stopword
 from invenio.config import CFG_BIBINDEX_MIN_WORD_LENGTH, \
      CFG_ETCDIR
 
@@ -103,7 +103,7 @@ def apply_stemming(word, stemming_language):
     return word
 
 
-def remove_stopwords(word, stopwords_kb = False):
+def remove_stopwords(word, stopwords_kb=None):
     """Returns word after stopword check.
        One must specify the name of the knowledge base.
 
@@ -112,9 +112,8 @@ def remove_stopwords(word, stopwords_kb = False):
        @param stopwords_kb: name of the stopwords knowledge base
        @type word: str
     """
-    if stopwords_kb:
-        stopwords_path = CFG_ETCDIR + "/bibrank/" + stopwords_kb
-        if is_stopword(word, stopwords_path):
+    if stopwords_kb is not None:
+        if is_stopword(word, stopwords_kb):
             return ""
     return word
 

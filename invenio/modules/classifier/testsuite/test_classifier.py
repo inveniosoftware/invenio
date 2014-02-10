@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,9 +34,18 @@ import time
 import stat
 import shutil
 
-from invenio import config
-from invenio.testutils import make_test_suite, run_test_suite, nottest, \
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+    ImportPathRegistry, RegistryProxy
+from invenio.testsuite import make_test_suite, run_test_suite, nottest, \
     InvenioTestCase
+
+TEST_PACKAGE = 'invenio.modules.classifier.testsuite'
+
+test_registry = RegistryProxy('test_registry', ImportPathRegistry,
+                              initial=[TEST_PACKAGE])
+
+taxonomies_registry = lambda: PkgResourcesDirDiscoveryRegistry(
+    'taxonomies', registry_namespace=test_registry)
 
 
 class BibClassifyTestCase(InvenioTestCase):
@@ -46,6 +55,7 @@ class BibClassifyTestCase(InvenioTestCase):
         """Initialize stuff"""
         ## NOTE next time please make sure that you change global variables
         ## back to initial values in tearDown. Thank you!!!
+        from invenio import config
         self.__CFG_TMPDIR = config.CFG_TMPDIR
         config.CFG_TMPDIR = tempfile.gettempdir()
 
@@ -55,15 +65,18 @@ class BibClassifyTestCase(InvenioTestCase):
         self.stderr = None
 
         self.taxonomy_name = "test"
-        from invenio import bibclassify_config as bconfig
+        from invenio.legacy.bibclassify import config as bconfig
         self.log = bconfig.get_logger("bibclassify.tests")
         self.log_level = bconfig.logging_level
         bconfig.set_global_level(bconfig.logging.CRITICAL)
+        self.app.extensions['registry']['classifierext.taxonomies'] = \
+            taxonomies_registry()
 
     def tearDown(self):
+        from invenio import config
         if self.stdout:
             self.unredirect()
-        from invenio import bibclassify_config as bconfig
+        from invenio.legacy.bibclassify import config as bconfig
         bconfig.set_global_level(self.log_level)
         config.CFG_TMPDIR = self.__CFG_TMPDIR
 
@@ -101,7 +114,7 @@ class BibClassifyTestCase(InvenioTestCase):
     @nottest
     def get_test_file(self, recid, type='Main', format='pdf'):
 
-        from invenio import bibdocfile
+        from invenio.legacy.bibdocfile import api as bibdocfile
         br = bibdocfile.BibRecDocs(recid)
         bibdocs = br.list_bibdocs(type)
         # we grab the first
@@ -116,7 +129,7 @@ class BibClassifyTest(BibClassifyTestCase):
     def test_rebuild_cache(self):
         """bibclassify - test rebuilding cache (takes long time)"""
 
-        from invenio import bibclassify_ontology_reader
+        from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader
         info = bibclassify_ontology_reader._get_ontology(self.taxonomy_name)
 
         if info[0]:
@@ -139,18 +152,21 @@ class BibClassifyTest(BibClassifyTestCase):
 
     def test_cache_accessibility(self):
         """bibclassify - test cache accessibility/writability"""
-        from invenio import bibclassify_ontology_reader
+        from flask import current_app
+        from invenio.modules.classifier.registry import taxonomies
+        from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader
         # we will do tests with a copy of test taxonomy, in case anything goes wrong...
         orig_name, orig_taxonomy_path, orig_taxonomy_url = bibclassify_ontology_reader._get_ontology(self.taxonomy_name)
 
-        taxonomy_path = orig_taxonomy_path.replace('.rdf', '.copy.rdf')
         taxonomy_name = self.taxonomy_name + '.copy'
+        taxonomy_path = os.path.join(
+            current_app.config['CFG_TMPDIR'], taxonomy_name + '.rdf')
 
         shutil.copy(orig_taxonomy_path, taxonomy_path)
+        taxonomies[taxonomy_name] = taxonomy_path
         assert(os.path.exists(taxonomy_path))
 
         name, taxonomy_path, taxonomy_url = bibclassify_ontology_reader._get_ontology(taxonomy_name)
-
         cache = bibclassify_ontology_reader._get_cache_path(os.path.basename(taxonomy_path))
 
 

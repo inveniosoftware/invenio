@@ -20,12 +20,14 @@
 """
 The BibRecord test suite.
 """
+import os
+import pkg_resources
 
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-from invenio.config import CFG_TMPDIR, \
-     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
-from invenio import bibrecord, bibrecord_config
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+bibrecord = lazy_import('invenio.legacy.bibrecord')
+bibrecord_config = lazy_import('invenio.legacy.bibrecord.bibrecord_config')
 
 try:
     import pyRXP
@@ -57,9 +59,8 @@ class BibRecordSuccessTest(InvenioTestCase):
 
     def setUp(self):
         """Initialize stuff"""
-        f = open(CFG_TMPDIR + '/demobibdata.xml', 'r')
-        xmltext = f.read()
-        f.close()
+        xmltext = pkg_resources.resource_string('invenio.testsuite',
+                os.path.join('data', 'demo_record_marc_data.xml'))
         self.recs = [rec[0] for rec in bibrecord.create_records(xmltext)]
 
     def test_records_created(self):
@@ -1600,6 +1601,7 @@ class BibRecordExtractIdentifiersTest(InvenioTestCase):
 
     def setUp(self):
         """Initialize stuff"""
+        from invenio.config import CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
         xml_example_record = """
         <record>
         <controlfield tag="001">1</controlfield>

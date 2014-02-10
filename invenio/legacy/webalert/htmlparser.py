@@ -27,9 +27,9 @@ import htmlentitydefs
 from invenio.config import \
      CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL, \
      CFG_SITE_LANG
-from invenio.bibformat import format_record
-from invenio.htmlutils import remove_html_markup
-from invenio.messages import gettext_set_language
+from invenio.modules.formatter import format_record
+from invenio.utils.html import remove_html_markup
+from invenio.base.i18n import gettext_set_language
 
 whitespaces_pattern = re.compile(r'[ \t]+')
 
@@ -56,10 +56,10 @@ def wrap_records(text):
     return '\n'.join(result_lines)
 
 class RecordHTMLParser(HTMLParser):
-    """A parser for the HTML returned by invenio.search_engine.print_record.
+    """A parser for the HTML returned by invenio.legacy.search_engine.print_record.
 
     The parser provides methods to transform the HTML returned by
-    invenio.search_engine.print_record into plain text, with some
+    invenio.legacy.search_engine.print_record into plain text, with some
     minor formatting.
     """
 

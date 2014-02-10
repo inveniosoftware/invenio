@@ -25,11 +25,10 @@ __revision__ = "$Id$"
 import time
 import os
 
-from invenio.config import CFG_TMPDIR
 
-from invenio.shellutils import escape_shell_arg, run_shell_command, \
+from invenio.utils.shell import escape_shell_arg, run_shell_command, \
     run_process_with_timeout, Timeout, split_cli_ids_arg
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class EscapeShellArgTest(InvenioTestCase):
@@ -120,7 +119,8 @@ class RunShellCommandTest(InvenioTestCase):
 class RunProcessWithTimeoutTest(InvenioTestCase):
     """Testing of running a process with timeout."""
     def setUp(self):
-        self.script_path = os.path.join(CFG_TMPDIR, 'test_sleeping.sh')
+        from flask import current_app
+        self.script_path = os.path.join(current_app.instance_path, 'test_sleeping.sh')
         script = open(self.script_path, 'w')
         print >> script, "#!/bin/sh"
         print >> script, "date"
@@ -130,7 +130,7 @@ class RunProcessWithTimeoutTest(InvenioTestCase):
         print >> script, "date"
         script.close()
         os.chmod(self.script_path, 0700)
-        self.python_script_path = os.path.join(CFG_TMPDIR, 'test_sleeping.py')
+        self.python_script_path = os.path.join(current_app.instance_path, 'test_sleeping.py')
         script = open(self.python_script_path, 'w')
         print >> script, """\
 #!/usr/bin/env python
@@ -170,8 +170,9 @@ else:
 
     def test_run_cmd_timeout_big_stdout(self):
         """shellutils - running simple command with a big standard output"""
-        from invenio.config import CFG_PYLIBDIR
-        test_file = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibcirculation_templates.py')
+        import pkg_resources
+        #FIXME this file will be removed soon
+        test_file = pkg_resources.resource_filename('invenio.legacy.bibcirculation', 'templates.py')
         exitstatus, stdout, stderr = run_process_with_timeout(['cat', test_file], timeout=10)
         self.assertEqual(open(test_file).read(), stdout)
         self.assertEqual(exitstatus, 0)

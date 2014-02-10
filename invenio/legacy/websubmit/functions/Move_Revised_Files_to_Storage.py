@@ -33,17 +33,17 @@ __revision__ = "$Id$"
 import time
 import os
 
-from invenio.bibdocfile import \
+from invenio.legacy.bibdocfile.api import \
      InvenioBibDocFileError, \
      BibRecDocs
-from invenio.errorlib import register_exception
-from invenio.websubmit_icon_creator import \
+from invenio.ext.logging import register_exception
+from invenio.legacy.websubmit.icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.config import CFG_BINDIR
-from invenio.dbquery import run_sql
-from invenio.websubmit_functions.Shared_Functions import \
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.websubmit.functions.Shared_Functions import \
      createRelatedFormats
-from invenio.bibdocfile_managedocfiles import get_description_and_comment
+from invenio.legacy.bibdocfile.managedocfiles import get_description_and_comment
 
 def Move_Revised_Files_to_Storage(parameters, curdir, form, user_info=None):
     """

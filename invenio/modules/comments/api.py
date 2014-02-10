@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,7 +31,7 @@ from datetime import datetime, timedelta
 
 # Invenio imports:
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_PREFIX, \
      CFG_SITE_LANG, \
      CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
@@ -51,32 +51,32 @@ from invenio.config import CFG_PREFIX, \
      CFG_WEBCOMMENT_ROUND_DATAFIELD, \
      CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
      CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH
-from invenio.webmessage_mailutils import \
+from invenio.utils.mail import \
      email_quote_txt, \
      email_quoted_txt2html
-from invenio.htmlutils import tidy_html
-from invenio.webuser import get_user_info, get_email, collect_user_info
-from invenio.dateutils import convert_datetext_to_dategui, \
+from invenio.utils.html import tidy_html
+from invenio.legacy.webuser import get_user_info, get_email, collect_user_info
+from invenio.utils.date import convert_datetext_to_dategui, \
                               datetext_default, \
                               convert_datestruct_to_datetext
-from invenio.mailutils import send_email
-from invenio.errorlib import register_exception
-from invenio.messages import wash_language, gettext_set_language
-from invenio.urlutils import wash_url_argument
-from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE, \
+from invenio.ext.email import send_email
+from invenio.ext.logging import register_exception
+from invenio.base.i18n import wash_language, gettext_set_language
+from invenio.utils.url import wash_url_argument
+from .config import CFG_WEBCOMMENT_ACTION_CODE, \
      InvenioWebCommentError, \
      InvenioWebCommentWarning
-from invenio.access_control_engine import acc_authorize_action
-from invenio.search_engine import \
+from invenio.modules.access.engine import acc_authorize_action
+from invenio.legacy.search_engine import \
      guess_primary_collection_of_a_record, \
      check_user_can_view_record, \
      get_collection_reclist, \
      get_colID
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.webcomment_washer import EmailWasher
+from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.utils.htmlwasher import EmailWasher
 try:
-    import invenio.template
-    webcomment_templates = invenio.template.load('webcomment')
+    import invenio.legacy.template
+    webcomment_templates = invenio.legacy.template.load('webcomment')
 except:
     pass
 
@@ -153,7 +153,7 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
     # res2 = query_retrieve_comments_or_remarks(recID, display_order, display_since, not reviews, user_info=user_info)
     nb_res = len(res)
 
-    from invenio.webcommentadminlib import get_nb_reviews, get_nb_comments
+    from invenio.legacy.webcomment.adminlib import get_nb_reviews, get_nb_comments
 
     nb_reviews = get_nb_reviews(recID, count_deleted=False)
     nb_comments = get_nb_comments(recID, count_deleted=False)
@@ -354,7 +354,7 @@ def check_user_can_comment(recID, client_ip_address, uid=-1):
     time limit: CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS
     @param recID: record id
     @param client_ip_address: IP => use: str(req.remote_ip)
-    @param uid: user id, as given by invenio.webuser.getUid(req)
+    @param uid: user id, as given by invenio.legacy.webuser.getUid(req)
     """
     recID = wash_url_argument(recID, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
@@ -383,7 +383,7 @@ def check_user_can_review(recID, client_ip_address, uid=-1):
     time limit: CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS
     @param recID: record ID
     @param client_ip_address: IP => use: str(req.remote_ip)
-    @param uid: user id, as given by invenio.webuser.getUid(req)
+    @param uid: user id, as given by invenio.legacy.webuser.getUid(req)
     """
     action_code = CFG_WEBCOMMENT_ACTION_CODE['ADD_REVIEW']
     query = """SELECT id_bibrec
@@ -405,7 +405,7 @@ def check_user_can_vote(cmt_id, client_ip_address, uid=-1):
     """ Checks if a user hasn't already voted
     @param cmt_id: comment id
     @param client_ip_address: IP => use: str(req.remote_ip)
-    @param uid: user id, as given by invenio.webuser.getUid(req)
+    @param uid: user id, as given by invenio.legacy.webuser.getUid(req)
     """
     cmt_id = wash_url_argument(cmt_id, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
@@ -436,7 +436,7 @@ def get_collection_moderators(collection):
     """
     Return the list of comment moderators for the given collection.
     """
-    from invenio.access_control_engine import acc_get_authorized_emails
+    from invenio.modules.access.engine import acc_get_authorized_emails
 
     res =  list(acc_get_authorized_emails('moderatecomments', collection=collection))
     if not res:
@@ -537,7 +537,7 @@ def check_user_can_report(cmt_id, client_ip_address, uid=-1):
     """ Checks if a user hasn't already reported a comment
     @param cmt_id: comment id
     @param client_ip_address: IP => use: str(req.remote_ip)
-    @param uid: user id, as given by invenio.webuser.getUid(req)
+    @param uid: user id, as given by invenio.legacy.webuser.getUid(req)
     """
     cmt_id = wash_url_argument(cmt_id, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
@@ -1414,7 +1414,7 @@ def get_first_comments_or_remarks(recID=-1,
                 first_res_comments = res_comments
     else: #error
         try:
-            raise InvenioWebCommentError(_('%s is an invalid record ID') % recID)
+            raise InvenioWebCommentError(_('%(recid)s is an invalid record ID', recid=recID))
         except InvenioWebCommentError, exc:
             register_exception()
             body = webcomment_templates.tmpl_error(exc.message, ln)
@@ -1562,7 +1562,7 @@ def perform_request_add_comment_or_remark(recID=0,
     check_recID_is_in_range(recID, warnings, ln)
     if uid <= 0:
         try:
-            raise InvenioWebCommentError(_('%s is an invalid user ID.') % uid)
+            raise InvenioWebCommentError(_('%(uid)s is an invalid user ID.', uid=uid))
         except InvenioWebCommentError, exc:
             register_exception()
             body = webcomment_templates.tmpl_error(exc.message, ln)
@@ -1843,13 +1843,13 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
 
     if type(recID) is int:
         if recID > 0:
-            from invenio.search_engine import record_exists
+            from invenio.legacy.search_engine import record_exists
             success = record_exists(recID)
             if success == 1:
                 return (1,"")
             else:
                 try:
-                    raise InvenioWebCommentWarning(_('Record ID %s does not exist in the database.') % recID)
+                    raise InvenioWebCommentWarning(_('Record ID %(recid)s does not exist in the database.', recid=recID))
                 except InvenioWebCommentWarning, exc:
                     register_exception(stream='warning')
                     warnings.append((exc.message, ''))
@@ -1865,7 +1865,7 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
             return (0, webcomment_templates.tmpl_record_not_found(status='missing', recID=recID, ln=ln))
         else:
             try:
-                raise InvenioWebCommentWarning(_('Record ID %s is an invalid ID.') % recID)
+                raise InvenioWebCommentWarning(_('Record ID %(recid)s is an invalid ID.', recid=recID))
             except InvenioWebCommentWarning, exc:
                 register_exception(stream='warning')
                 warnings.append((exc.message, ''))
@@ -1873,7 +1873,7 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
             return (0, webcomment_templates.tmpl_record_not_found(status='invalid', recID=recID, ln=ln))
     else:
         try:
-            raise InvenioWebCommentWarning(_('Record ID %s is not a number.') % recID)
+            raise InvenioWebCommentWarning(_('Record ID %(recid)s is not a number.', recid=recID))
         except InvenioWebCommentWarning, exc:
             register_exception(stream='warning')
             warnings.append((exc.message, ''))

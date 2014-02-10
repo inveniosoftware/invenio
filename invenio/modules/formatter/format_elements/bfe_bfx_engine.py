@@ -19,7 +19,7 @@
 __revision__ = "$Id$"
 
 from cStringIO import StringIO
-from invenio.bibformat_bfx_engine import format_with_bfx
+from invenio.modules.formatter.engines.bfx import format_with_bfx
 
 def format_element(bfo, template='DC'):
     """

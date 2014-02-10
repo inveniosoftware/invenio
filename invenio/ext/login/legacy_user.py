@@ -18,26 +18,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Flask-sqlalchemy re-implementation of webuser.
+    Legacy UserInfo object.
 """
 
-from datetime import timedelta
-from functools import wraps
-from flask import session, request, url_for, current_app, has_request_context,\
-    _request_ctx_stack, abort, redirect
-from werkzeug.local import LocalProxy
+from flask import session, request, has_request_context, current_app
+from flask.ext.login import UserMixin
 from werkzeug.datastructures import CallbackDict, CombinedMultiDict
 
-from invenio.cache import cache
-from invenio.config import \
-    CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
-    CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, \
-    CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
-    CFG_BIBAUTHORID_ENABLED, \
-    CFG_SITE_SUPPORT_EMAIL, \
-    CFG_SITE_NAME_INTL, \
-    CFG_SITE_NAME, \
-    CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
+from invenio.ext.cache import cache
+
+
+__all__ = ['UserInfo']
 
 CFG_USER_DEFAULT_INFO = {
     'remote_ip': '',
@@ -69,15 +60,11 @@ CFG_USER_DEFAULT_INFO = {
 }
 
 
-from flask.ext.login import LoginManager, current_user, \
-    login_user as flask_login_user, logout_user, login_required, UserMixin
-
-
-class InvenioLoginManager(LoginManager):
-    pass
-
-
 class UserInfo(CombinedMultiDict, UserMixin):
+    """
+    This provides legacy implementations for the methods that Flask-Login
+    and Invenio 1.x expects user objects to have.
+    """
 
     def __init__(self, uid=None, force=False):
         """
@@ -119,8 +106,10 @@ class UserInfo(CombinedMultiDict, UserMixin):
         Saves modified data pernamently for logged users.
         """
         if not self.is_guest and self.modified:
+            timeout = current_app.config.get(
+                'CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT', 0)*3600
             cache.set(self.get_key(), dict(self.info),
-                      timeout=CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT*3600)
+                      timeout=timeout)
 
     def reload(self):
         """
@@ -155,10 +144,10 @@ class UserInfo(CombinedMultiDict, UserMixin):
     def _create_guest(self):
         data = {'settings': {}}
 
-        if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-            from invenio.sqlalchemyutils import db
-            from invenio.websession_model import User
-            note = '1' if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0 else '0'
+        if current_app.config.get('CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS', False):
+            from invenio.ext.sqlalchemy import db
+            from invenio.modules.accounts.models import User
+            note = '1' if current_app.config.get('CFG_ACCESS_CONTROL_LEVEL_GUESTS', 0) == 0 else '0'
             u = User(email='', note=note, password='guest')
             db.session.add(u)
             db.session.commit()
@@ -179,7 +168,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         if not force and data is not None:
             return data
 
-        from invenio.websession_model import User
+        from invenio.modules.accounts.models import User
         data = {}
 
         try:
@@ -188,6 +177,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
             data['nickname'] = user.nickname or ''
             data['email'] = user.email or ''
             data['note'] = user.note or ''
+            data['groups'] = map(lambda x: x.usergroup.name,
+                                 user.usergroups or [])
             data.update(user.settings or {})
             data['settings'] = user.settings or {}
             data['guest'] = str(int(user.guest))  # '1' or '0'
@@ -203,6 +194,9 @@ class UserInfo(CombinedMultiDict, UserMixin):
 
         FIXME: compatibility layer only !!!
         """
+
+        CFG_BIBAUTHORID_ENABLED = current_app.config.get(
+            'CFG_BIBAUTHORID_ENABLED', False)
         # get autorization key
         acc_key = self.get_acc_key()
         acc = cache.get(acc_key)
@@ -213,37 +207,47 @@ class UserInfo(CombinedMultiDict, UserMixin):
         user_info = info
         user_info.update(self.req)
 
-        from invenio.webuser import isUserSubmitter, isUserReferee, \
+        from invenio.legacy.webuser import isUserSubmitter, isUserReferee, \
             isUserAdmin, isUserSuperAdmin
-        from invenio.access_control_engine import acc_authorize_action
-        from invenio.access_control_admin import acc_get_role_id, \
+        from invenio.modules.access.engine import acc_authorize_action
+        from invenio.modules.access.control import acc_get_role_id, \
             acc_is_user_in_role
-        from invenio.search_engine import get_permitted_restricted_collections
+        from invenio.legacy.search_engine import get_permitted_restricted_collections
 
         data = {}
         data['precached_permitted_restricted_collections'] = \
             get_permitted_restricted_collections(user_info)
-        data['precached_usebaskets'] = acc_authorize_action(user_info, 'usebaskets')[0] == 0
-        data['precached_useloans'] = acc_authorize_action(user_info, 'useloans')[0] == 0
-        data['precached_usegroups'] = acc_authorize_action(user_info, 'usegroups')[0] == 0
-        data['precached_usealerts'] = acc_authorize_action(user_info, 'usealerts')[0] == 0
-        data['precached_usemessages'] = acc_authorize_action(user_info, 'usemessages')[0] == 0
-        data['precached_usestats'] = acc_authorize_action(user_info, 'runwebstatadmin')[0] == 0
-        data['precached_viewsubmissions'] = isUserSubmitter(user_info)
+        data['precached_usebaskets'] = acc_authorize_action(
+            user_info, 'usebaskets')[0] == 0
+        data['precached_useloans'] = acc_authorize_action(
+            user_info, 'useloans')[0] == 0
+        data['precached_usegroups'] = acc_authorize_action(
+            user_info, 'usegroups')[0] == 0
+        data['precached_usealerts'] = acc_authorize_action(
+            user_info, 'usealerts')[0] == 0
+        data['precached_usemessages'] = acc_authorize_action(
+            user_info, 'usemessages')[0] == 0
+        data['precached_usestats'] = acc_authorize_action(
+            user_info, 'runwebstatadmin')[0] == 0
+        try:
+            data['precached_viewsubmissions'] = isUserSubmitter(user_info)
+        except:
+            data['precached_viewsubmissions'] = None
         data['precached_useapprove'] = isUserReferee(user_info)
         data['precached_useadmin'] = isUserAdmin(user_info)
         data['precached_usesuperadmin'] = isUserSuperAdmin(user_info)
-        data['precached_canseehiddenmarctags'] = acc_authorize_action(user_info, 'runbibedit')[0] == 0
+        data['precached_canseehiddenmarctags'] = acc_authorize_action(
+            user_info, 'runbibedit')[0] == 0
         usepaperclaim = False
         usepaperattribution = False
         viewclaimlink = False
 
-        if (CFG_BIBAUTHORID_ENABLED and acc_is_user_in_role(user_info,
-                                                            acc_get_role_id("paperclaimviewers"))):
+        if (CFG_BIBAUTHORID_ENABLED and acc_is_user_in_role(
+                user_info, acc_get_role_id("paperclaimviewers"))):
             usepaperclaim = True
 
-        if (CFG_BIBAUTHORID_ENABLED and acc_is_user_in_role(user_info,
-                                                            acc_get_role_id("paperattributionviewers"))):
+        if (CFG_BIBAUTHORID_ENABLED and acc_is_user_in_role(
+                user_info, acc_get_role_id("paperattributionviewers"))):
             usepaperattribution = True
 
         viewlink = False
@@ -252,27 +256,30 @@ class UserInfo(CombinedMultiDict, UserMixin):
         except (KeyError, TypeError):
             pass
 
-        if (CFG_BIBAUTHORID_ENABLED and usepaperattribution and viewlink):
+        if (current_app.config.get('CFG_BIBAUTHORID_ENABLED') and usepaperattribution and viewlink):
             viewclaimlink = True
 
-#                if (CFG_BIBAUTHORID_ENABLED
-#                    and ((usepaperclaim or usepaperattribution)
-#                         and acc_is_user_in_role(data, acc_get_role_id("paperattributionlinkviewers")))):
-#                    viewclaimlink = True
+#       if (CFG_BIBAUTHORID_ENABLED
+#               and ((usepaperclaim or usepaperattribution)
+#               and acc_is_user_in_role(
+#                   data, acc_get_role_id("paperattributionlinkviewers")))):
+#           viewclaimlink = True
 
         data['precached_viewclaimlink'] = viewclaimlink
         data['precached_usepaperclaim'] = usepaperclaim
         data['precached_usepaperattribution'] = usepaperattribution
 
+        timeout = current_app.config.get(
+            'CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT', 0)*3600
         cache.set(acc_key, data,
-                  timeout=CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT*3600)
+                  timeout=timeout)
         return data
 
     def is_authenticated(self):
         return not self.is_guest
 
     def is_authorized(self, name, **kwargs):
-        from invenio.access_control_engine import acc_authorize_action
+        from invenio.modules.access.engine import acc_authorize_action
         return acc_authorize_action(self, name)[0] == 0
 
     def is_active(self):
@@ -292,36 +299,3 @@ class UserInfo(CombinedMultiDict, UserMixin):
 
     def get_id(self):
         return self.get('id', -1)
-
-
-def login_user(user, *args, **kwargs):
-    if type(user) in [int, long]:
-        user = UserInfo(user)
-    return flask_login_user(user, *args, **kwargs)
-
-def reset_password(email, ln):
-    # create the reset key
-    from invenio.access_control_mailcookie import mail_cookie_create_pw_reset
-    reset_key = mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
-    if reset_key is None:
-        return False  # reset key could not be created
-
-    # load the email template
-    import invenio.template
-    websession_templates = invenio.template.load('websession')
-
-    # finally send the email
-    from invenio.mailutils import send_email
-    from invenio.webinterface_handler_flask_utils import _
-    if not send_email(CFG_SITE_SUPPORT_EMAIL, email, "%s %s"
-                      % (_("Password reset request for"),
-                         CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
-                      websession_templates.
-                      tmpl_account_reset_password_email_body(email,
-                                                             reset_key,
-                                                             request.
-                                                             remote_addr,
-                                                             ln)):
-        return False  # mail could not be sent
-
-    return True  # password reset email send successfully

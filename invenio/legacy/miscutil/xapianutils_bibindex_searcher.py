@@ -23,8 +23,8 @@ Xapian utilities.
 
 
 from invenio.config import CFG_XAPIAN_ENABLED
-from invenio.intbitset import intbitset
-from invenio.xapianutils_config import XAPIAN_DIR
+from intbitset import intbitset
+from invenio.legacy.miscutil.xapianutils_config import XAPIAN_DIR
 
 
 if CFG_XAPIAN_ENABLED:

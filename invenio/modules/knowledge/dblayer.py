@@ -24,8 +24,8 @@ Database access related functions for BibKnowledge.
 __revision__ = "$Id$"
 
 
-from invenio.dbquery import run_sql
-from invenio.memoiseutils import Memoise
+from invenio.legacy.dbquery import run_sql
+from invenio.utils.memoise import Memoise
 
 def get_kbs_info(kbtypeparam="", searchkbname=""):
     """Returns all kbs as list of dictionaries {id, name, description, kbtype}

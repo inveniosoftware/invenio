@@ -49,7 +49,7 @@ that makes remote debugging possible and easy.
 
 # ----------------------------- CONFIGURATION -----------------------------------------
 
-from invenio.remote_debugger_config import CFG_REMOTE_DEBUGGER_ENABLED, \
+from .config import CFG_REMOTE_DEBUGGER_ENABLED, \
     CFG_REMOTE_DEBUGGER_IMPORT, CFG_REMOTE_DEBUGGER_WINPDB_PASSWORD, \
     CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_IP, CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_PORT, \
     CFG_REMOTE_DEBUGGER_PYDEV_PATHS, CFG_REMOTE_DEBUGGER_WSGI_RELOAD, \
@@ -67,7 +67,7 @@ from cStringIO import StringIO
 
 
 def start_file_changes_monitor():
-    from invenio import remote_debugger_wsgi_reload as monitor
+    from invenio.utils import remote_debugger_wsgi_reload as monitor
     monitor.start(interval=1.0)
     for pattern in CFG_REMOTE_DEBUGGER_WSGI_RELOAD:
         for f in glob.glob(os.path.join(config.CFG_PREFIX, pattern)):

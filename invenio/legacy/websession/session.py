@@ -24,7 +24,7 @@ Just use L{get_session} to obtain a session object (with a dictionary
 interface, which will let you store permanent information).
 """
 
-from invenio.webinterface_handler_wsgi_utils import add_cookies, Cookie, get_cookie
+from invenio.legacy.wsgi.utils import add_cookies, Cookie, get_cookie
 
 import random
 import zlib
@@ -36,17 +36,17 @@ import time
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from invenio.dateutils import convert_datestruct_to_datetext
-from invenio.dbquery import run_sql, blob_to_string
+from invenio.utils.date import convert_datestruct_to_datetext
+from invenio.legacy.dbquery import run_sql, blob_to_string
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
     CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, CFG_SITE_URL, CFG_SITE_SECURE_URL, \
     CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS, \
     CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS
-from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
+from invenio.legacy.websession.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
     CFG_WEBSESSION_ENABLE_LOCKING
-from invenio.session_flask import InvenioSession as FlaskInvenioSession
-from invenio.hashutils import md5
+#from invenio.session_flask import InvenioSession as FlaskInvenioSession
+from invenio.utils.hash import md5
 
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 

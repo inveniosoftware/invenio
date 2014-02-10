@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2012, 2013 CERN.
 ##
@@ -14,11 +16,29 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""
+    invenio.ext.cache
+    -----------------
 
-pylibdir=$(libdir)/python/invenio/websearch_facets
+    This module provides initialization and configuration for `flask.ext.cache`
+    module.
+"""
 
-pylib_DATA = __init__.py facet_*.py
+from flask.ext.cache import Cache
+cache = Cache()
 
-EXTRA_DIST = $(pylib_DATA)
+__all__ = ['cache', 'setup_app']
 
-CLEANFILES = *~ *.tmp *.pyc
+
+def setup_app(app):
+    """Setup cache extension."""
+
+    app.config.setdefault('CACHE_TYPE',
+                          app.config.get('CFG_FLASK_CACHE_TYPE', 'redis'))
+    # if CACHE_KEY_PREFIX is not specified then CFG_DATABASE_NAME:: is used.
+    prefix = app.config.get('CFG_DATABASE_NAME', '')
+    if prefix:
+        prefix += '::'
+    app.config.setdefault('CACHE_KEY_PREFIX', prefix)
+    cache.init_app(app)
+    return app
