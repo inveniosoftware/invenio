@@ -26,7 +26,7 @@
     "jquery.hotkeys": "*",
     "uploadify": "*",
     "json2": "*",
-    "prism": "https://github.com/LeaVerou/prism/blob/gh-pages/prism.js",
+    "prism": "gh-pages",
     "swfobject": "https://github.com/swfobject/swfobject/blob/master/swfobject/swfobject.js",
     "datatables-colvis": "*",
     "typeahead.js-bootstrap": "https://raw.github.com/jharding/typeahead.js-bootstrap.css/master/typeahead.js-bootstrap.css",
