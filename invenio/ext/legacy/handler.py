@@ -293,7 +293,7 @@ def create_handler(root):
         if req.args:
             args = cgi.parse_qs(req.args)
             if 'apikey' in args and req.is_https():
-                uid = web_api_key.acc_get_uid_from_request(req.uri, req.args)
+                uid = web_api_key.acc_get_uid_from_request()
                 if uid < 0:
                     raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
                 else:

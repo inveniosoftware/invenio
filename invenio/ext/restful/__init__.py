@@ -99,7 +99,7 @@ def require_api_auth(f):
         def auth_key(*args, **kwargs):
             if 'apikey' in request.values:
                 from invenio.modules.apikeys.models import WebAPIKey
-                from flask.ext.login import login_user
+                from invenio.ext.login import login_user
 
                 user_id = WebAPIKey.acc_get_uid_from_request()
                 if user_id == -1:
