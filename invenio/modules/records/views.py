@@ -34,6 +34,7 @@ from invenio.modules.search.models import Collection
 from invenio.modules.search.signals import record_viewed
 from invenio.modules.records.models import Record as Bibrec
 from invenio.base.i18n import _
+from invenio.base.signals import pre_template_render
 from invenio.utils import apache
 from flask.ext.breadcrumbs import default_breadcrumb_root
 
@@ -143,6 +144,11 @@ def request_record(f):
                         collection=collection,
                         format_record=_format_record
                         )
+
+        pre_template_render.send(
+            "%s.%s" % (blueprint.name, f.__name__),
+            recid=recid,
+        )
         return f(recid, *args, **kwargs)
     return decorated
 
