@@ -432,17 +432,19 @@ def create_handler(root):
                 ## bibdocfile have a special treatment for HEAD
                 return root._traverse(req, path, False, guest_p)
         except TraversalError:
-            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+            raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
         except apache.SERVER_RETURN:
             ## This is one of mod_python way of communicating
             raise
         except IOError, exc:
-            if 'Write failed, client closed connection' not in "%s" % exc:
+            if not ('Write failed, client closed connection' in str(exc) or 'request data read error' in str(exc)):
                 ## Workaround for considering as false positive exceptions
                 ## rised by mod_python when the user close the connection
                 ## or in some other rare and not well identified cases.
                 register_exception(req=req, alert_admin=True)
-            raise
+                raise
+            else:
+                raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
         except Exception:
             # send the error message, much more convenient than log hunting
             if remote_debugger:
@@ -455,7 +457,7 @@ def create_handler(root):
             raise
 
         # Serve an error by default.
-        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+        raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
     return _profiler
 
 
