@@ -80,6 +80,10 @@ def https_replace(html):
     html = html.replace(_ESCAPED_CFG_SITE_URL, _ESCAPED_CFG_SITE_SECURE_URL)
     return _RE_HTTPS_REPLACES.sub(_http_replace_func, html)
 
+
+class ClientDisconnected(Exception):
+    pass
+
 class InputProcessed(object):
     """
     Auxiliary class used when reading input.
@@ -211,10 +215,9 @@ class SimulatedModPythonRequest(object):
                             self.__what_was_written += self.__buffer
             except IOError, err:
                 if "failed to write data" in str(err) or "client connection closed" in str(err):
-                    ## Let's just log this exception without alerting the admin:
-                    register_exception(req=self)
-                    self.__write_error = True ## This flag is there just
-                        ## to not report later other errors to the admin.
+                    # The Client disconnected, just ignore the exception
+                    if self.method == 'GET':
+                        raise ClientDisconnected()
                 else:
                     raise
             self.__buffer = ''
@@ -478,68 +481,70 @@ def application(environ, start_response):
     ## Needed for mod_wsgi, see: <http://code.google.com/p/modwsgi/wiki/ApplicationIssues>
     req = SimulatedModPythonRequest(environ, start_response)
     #print 'Starting mod_python simulation'
+
     try:
-        try:
-            if (CFG_FULL_HTTPS or (CFG_HAS_HTTPS_SUPPORT and get_session(req).need_https)) and not req.is_https():
-                # We need to isolate the part of the URI that is after
-                # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
-                original_parts = urlparse(req.unparsed_uri)
-                plain_prefix_parts = urlparse(CFG_SITE_URL)
-                secure_prefix_parts = urlparse(CFG_SITE_SECURE_URL)
+        if (CFG_FULL_HTTPS or (CFG_HAS_HTTPS_SUPPORT and get_session(req).need_https)) and not req.is_https():
+            # We need to isolate the part of the URI that is after
+            # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
+            original_parts = urlparse(req.unparsed_uri)
+            plain_prefix_parts = urlparse(CFG_SITE_URL)
+            secure_prefix_parts = urlparse(CFG_SITE_SECURE_URL)
 
-                # Compute the new path
-                plain_path = original_parts[2]
-                plain_path = secure_prefix_parts[2] + \
-                            plain_path[len(plain_prefix_parts[2]):]
+            # Compute the new path
+            plain_path = original_parts[2]
+            plain_path = secure_prefix_parts[2] + \
+                        plain_path[len(plain_prefix_parts[2]):]
 
-                # ...and recompose the complete URL
-                final_parts = list(secure_prefix_parts)
-                final_parts[2] = plain_path
-                final_parts[-3:] = original_parts[-3:]
+            # ...and recompose the complete URL
+            final_parts = list(secure_prefix_parts)
+            final_parts[2] = plain_path
+            final_parts[-3:] = original_parts[-3:]
 
-                target = urlunparse(final_parts)
-                redirect_to_url(req, target)
+            target = urlunparse(final_parts)
+            redirect_to_url(req, target)
 
-            possible_module, possible_handler = is_mp_legacy_publisher_path(environ['PATH_INFO'])
-            if possible_module is not None:
-                mp_legacy_publisher(req, possible_module, possible_handler)
-            elif CFG_WSGI_SERVE_STATIC_FILES:
-                possible_static_path = is_static_path(environ['PATH_INFO'])
-                if possible_static_path is not None:
-                    from invenio.bibdocfile import stream_file
-                    stream_file(req, possible_static_path)
-                else:
-                    ret = invenio_handler(req)
+        possible_module, possible_handler = is_mp_legacy_publisher_path(environ['PATH_INFO'])
+        if possible_module is not None:
+            mp_legacy_publisher(req, possible_module, possible_handler)
+        elif CFG_WSGI_SERVE_STATIC_FILES:
+            possible_static_path = is_static_path(environ['PATH_INFO'])
+            if possible_static_path is not None:
+                from invenio.bibdocfile import stream_file
+                stream_file(req, possible_static_path)
             else:
                 ret = invenio_handler(req)
-            req.flush()
-        except SERVER_RETURN, status:
-            status = int(str(status))
-            if status not in (OK, DONE):
-                req.status = status
-                req.headers_out['content-type'] = 'text/html'
-                admin_to_be_alerted = alert_admin_for_server_status_p(status,
-                                                  req.headers_in.get('referer'))
-                if admin_to_be_alerted:
-                    register_exception(req=req, alert_admin=True)
-                if not req.response_sent_p:
-                    start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-                return generate_error_page(req, admin_to_be_alerted)
-            else:
-                req.flush()
-        except:
-            register_exception(req=req, alert_admin=True)
+        else:
+            ret = invenio_handler(req)
+        req.flush()
+    except SERVER_RETURN, status:
+        status = int(str(status))
+        if status not in (OK, DONE):
+            req.status = status
+            req.headers_out['content-type'] = 'text/html'
+            admin_to_be_alerted = alert_admin_for_server_status_p(status,
+                                              req.headers_in.get('referer'))
+            if admin_to_be_alerted:
+                register_exception(req=req, alert_admin=True)
             if not req.response_sent_p:
-                req.status = HTTP_INTERNAL_SERVER_ERROR
-                req.headers_out['content-type'] = 'text/html'
                 start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-                if CFG_DEVEL_SITE:
-                    return ["<pre>%s</pre>" % cgi.escape(get_pretty_traceback(req=req, exc_info=sys.exc_info()))]
-                    from cgitb import html
-                    return [html(sys.exc_info())]
-                return generate_error_page(req)
-            else:
-                return generate_error_page(req, page_already_started=True)
+            return generate_error_page(req, admin_to_be_alerted)
+        else:
+            req.flush()
+    except ClientDisconnected:
+        pass
+    except:
+        register_exception(req=req, alert_admin=True)
+        if not req.response_sent_p:
+            req.status = HTTP_INTERNAL_SERVER_ERROR
+            req.headers_out['content-type'] = 'text/html'
+            start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+            if CFG_DEVEL_SITE:
+                return ["<pre>%s</pre>" % cgi.escape(get_pretty_traceback(req=req, exc_info=sys.exc_info()))]
+                from cgitb import html
+                return [html(sys.exc_info())]
+            return generate_error_page(req)
+        else:
+            return generate_error_page(req, page_already_started=True)
     finally:
         try:
             ## Let's save the session.
