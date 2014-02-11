@@ -28,7 +28,7 @@ from invenio.ext.legacy.handler import create_handler
 from invenio.ext.logging import register_exception
 from invenio.ext.legacy.handler import WebInterfaceDirectory
 from invenio.utils import apache
-from invenio.config import CFG_DEVEL_SITE, CFG_OPENAIRE_SITE
+from invenio.config import CFG_DEVEL_SITE
 
 class WebInterfaceDumbPages(WebInterfaceDirectory):
     """This class implements a dumb interface to use as a fallback in case of
@@ -258,17 +258,6 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceGotoPages = WebInterfaceDumbPages
 
-if CFG_OPENAIRE_SITE:
-    try:
-        from invenio.openaire_deposit_webinterface import \
-            WebInterfaceOpenAIREDepositPages
-    except:
-        register_exception(alert_admin=True, subject='EMERGENCY')
-        WebInterfaceOpenAIREDepositPages = WebInterfaceDumbPages
-    openaire_exports = ['deposit']
-else:
-    openaire_exports = []
-
 if CFG_DEVEL_SITE:
     try:
         from invenio.legacy.webstyle.httptest_webinterface import WebInterfaceHTTPTestPages
@@ -323,14 +312,12 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
                    'author',
                    'textmining',
                    'goto',
-               ] + test_exports + openaire_exports
+               ] + test_exports
 
     def __init__(self):
         self.getfile = bibdocfile_legacy_getfile
         if CFG_DEVEL_SITE:
             self.httptest = WebInterfaceHTTPTestPages()
-        if CFG_OPENAIRE_SITE:
-            self.deposit = WebInterfaceOpenAIREDepositPages()
 
     submit = WebInterfaceSubmitPages()
     youraccount = WebInterfaceYourAccountPages()
