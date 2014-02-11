@@ -557,6 +557,16 @@ def task_init(authorization_action="",
     if to_be_submitted:
         _task_submit(argv, authorization_action, authorization_msg)
     else:
+        ## BibTasks typically are going to work on several records
+        ## and recreating data. Caching is typically done at the
+        ## Python level, so there's no point in having a not
+        ## exploited SQL cache.
+        try:
+            run_sql("SET SESSION query_cache_type = OFF;")
+        except Exception:
+            ## Very likely query_cache_type is already disabled globally.
+            ## See: http://bugs.mysql.com/bug.php?id=69396
+            pass
         try:
             try:
                 if task_get_task_param('profile'):
