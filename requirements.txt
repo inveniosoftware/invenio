@@ -28,3 +28,4 @@ jinja2==2.7.2
 redis==2.9.0
 nydus==0.10.6
 Cerberus==0.5
+HTMLParser==0.0.2
