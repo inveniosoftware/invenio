@@ -1,0 +1,190 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% from "_macros.html" import js_bundle, css_bundle with context %}
+
+{%- if not request.is_xhr -%}
+  {% extends "records/base.html" %}
+{%- endif -%}
+
+{% css url_for('comments.static', filename='css/comments/comments.css'), '10-comments' %}
+{% js url_for('comments.static', filename='js/comments/collapse.js'), '10-comments' %}
+
+{% block record_content %}
+  <div class="page-header">
+    {{ format_record(recid, 'hs', ln=g.ln)|safe }}
+  </div>
+
+  <div class="page-header">
+    <h4>
+      {{ _("Comments") }}
+      <small>
+        {% if current_user.is_guest %}
+          <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+        {% else %}
+          <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_comment', recid=recid) }}">
+        {% endif %}
+            <i class="glyphicon glyphicon-pencil"></i> {{ _('write comment') }}
+          </a>
+      </small>
+    </h4>
+  </div>
+
+  {%- if comments -%}
+
+  <ul class="comments list-unstyled">
+  {%- for c in comments recursive -%}
+  <li name="{{ c.id }}">
+    <a class="collapse-comment pull-left{{ ' collapsed' if c.is_collapsed(current_user.get_id()) }}"
+       style="margin-right: 5px;"
+       data-toggle="collapse"
+       data-target="#collapse-{{ c.id }}"
+       href="{#{ url_for('comments.toggle', recid=recid, id=c.id) }#}">
+      {%- if c.is_collapsed(current_user.get_id()) -%}
+        <i class="glyphicon glyphicon-chevron-right">
+      {%- else -%}
+        <i class="glyphicon glyphicon-chevron-down">
+      {%- endif -%}
+        </i>
+    </a>
+
+    <h4>
+        {{ c.title }}
+        <small>
+          {%- if c.nb_votes_total > 0 -%}
+            {%- set votes = c.nb_votes_yes-(c.nb_votes_total-c.nb_votes_yes) -%}
+            {%- if votes > 0 -%}
+            / <span class="badge badge-success">+{{ votes }}</span>
+            {%- elif votes < 0 -%}
+            / <span class="badge badge-important">{{ votes }}</span>
+            {%- endif -%}
+          {%- endif -%}
+          <a class="pull-right" title="{{ _('Permalink to this comment') }}" href="#{{ c.id }}">¶</a>
+        </small>
+        {%- if not c.title -%}
+            &nbsp;
+        {%- endif -%}
+    </h4>
+    <div id="collapse-{{ c.id }}"
+         data-action="{{ url_for('comments.toggle', recid=recid, id=c.id) }}"
+         class="collapse{{ ' in' if not c.is_collapsed(current_user.get_id()) }}">
+    <blockquote>
+      <p style="font-size:90%;">
+      {{ c.body|quoted_txt2html(
+        indent_html=(
+          '<span style="border-left: 3px solid #CCC; padding-left:5px;">',
+          '</span>'))|safe }}
+      </p>
+      <small>
+
+        {%- if c.user -%}
+        <img src="{{ c.user.email|gravatar(size=14, default=url_for('static', filename='img/user-icon-1-16x16.gif', _external=True)) }}" alt="avatar"/>
+        <a href="{{ url_for('webmessage.add', sent_to_user_nicks=c.user.nickname) }}">
+          {{ c.user.nickname }}
+        </a>
+        {%- else -%}
+        <img src="/img/user-icon-1-16x16.gif" alt="avatar"/>
+          {{ _('Guest') }}
+        {%- endif -%} &nbsp;
+        - <i class="glyphicon glyphicon-time"></i> {{ c.date_creation }}
+        - <i class="glyphicon glyphicon-pencil"></i>
+        {% if current_user.is_guest %}
+          <a href="{{ url_for('webaccount.login', referer=url_for('comments.add_comment', recid=recid, in_reply=c.id)) }}">
+        {% else %}
+          <a data-toggle="modal" data-target="#" href="{{ url_for('comments.add_comment', recid=recid, in_reply=c.id) }}">
+        {% endif %}
+            {{ _('reply') }}
+          </a>
+        - <i class="glyphicon glyphicon-question-sign"></i> {{ _('Was it helpful?') }}
+         <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=1,
+            referer=request.url
+          ) }}">
+          <i class="glyphicon glyphicon-thumbs-up"></i>
+          {{ _('yes') }}
+          </a> /
+          <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=-1,
+            referer=request.url
+          ) }}">
+          <i class="glyphicon glyphicon-thumbs-down"></i>
+          {{ _('no') }}
+          </a>
+        -
+          <a href="{{ url_for('comments.report', recid=recid, id=c.id) }}">
+            <i class="glyphicon glyphicon-exclamation-sign"></i>
+            {{ _('report abuse') }}
+          </a>
+      </small>
+    </blockquote>
+    {%- if c.replies -%}
+    <ul class="list-unstyled" style="padding-left: 20px;">
+      {{ loop(c.replies) }}
+    </ul>
+    {%- endif -%}
+    </div>
+
+    {% if not loop.last %}
+      <hr/>
+    {% endif %}
+  </li>
+  {%- endfor -%}
+  </ul>
+
+  {% if current_user.is_guest %}
+    <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+  {% else %}
+    <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_comment', recid=recid) }}">
+  {% endif %}
+      <i class="glyphicon glyphicon-pencil"></i> {{ _('write comment') }}
+    </a>
+
+  {%- else -%}
+  <div class="alert alert-info">
+    {{ _('There are no comments. Be the first commenting this record.') }}
+  </div>
+  {%- endif -%}
+
+  <div style="clear:both"/></div>
+  <hr/>
+
+  {%- if record.user_comment_subscritions|length -%}
+
+  <div class="alert">
+  {%- set info_subs = _('%(open_tag)s Unsubscribe %(close_tag)s from this discussion. You will not receive any new comments by email.') % {
+    'open_tag': '<strong><a href="'+url_for('comments.unsubscribe', recid=recid)+'"><i class="glyphicon glyphicon-trash"></i>',
+    'close_tag':'</a></strong>'} -%}
+    {{ info_subs|safe }}
+  </div>
+
+  {%- else -%}
+
+  <div class="alert alert-info">
+  {%- set info_subs = _('%(open_tag)s Subscribe %(close_tag)s to this discussion. You will then receive all new comments by email.') % {
+    'open_tag': '<strong><a href="'+url_for('comments.subscribe', recid=recid)+'"><i class="glyphicon glyphicon-envelope"></i>',
+    'close_tag':'</a></strong>'} -%}
+    {{ info_subs|safe }}
+  </div>
+
+  {%- endif -%}
+
+{% endblock %}
+
+{%- if request.is_xhr -%}
+  {{ css_bundle() }}
+  {{ js_bundle() }}
+  <script type="text/javascript"> bindModals(); </script>
+{%- endif -%}
