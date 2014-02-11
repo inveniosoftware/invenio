@@ -19,7 +19,8 @@
 
 {%- macro flashed_messages() -%}
   {% block messages %}
-    {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['', 'info', 'error', 'warning', 'success']) %}
+    {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['', 'info', 'danger', 'error', 'warning', 'success']) %}
+    {% set category = 'danger' if category == 'error' else category %}
       <div class="alert alert-{{ category }}">
         <a class="close" data-dismiss="alert" href="#">×</a>
         {{ msg|safe }}
