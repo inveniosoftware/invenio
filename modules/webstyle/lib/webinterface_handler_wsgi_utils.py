@@ -509,8 +509,11 @@ class FieldStorage:
                         end_of_stream = True
                 # we read the headers until we reach an empty line
                 # NOTE : a single \n would mean the entity is malformed, but
-                # we're tolerating it anyway
-                h, v = line.split(":", 1)
+                # we're tolerating it anyway. We just raise an apache exception
+                try:
+                    h, v = line.split(":", 1)
+                except ValueError:
+                    raise SERVER_RETURN(HTTP_BAD_REQUEST)
                 headers.add(h, v)
                 h = h.lower()
                 if h == "content-disposition":
