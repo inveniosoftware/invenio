@@ -76,16 +76,24 @@ def login(nickname=None, password=None, login_method=None, action='',
     form = LoginForm(CombinedMultiDict(
         [ImmutableMultiDict({'referer': referer, 'login_method': 'Local'}
                             if referer else {'login_method': 'Local'}),
-                            request.values]), csrf_enabled=False)
-    try:
-        if login_method == 'Local' and \
-                authenticate(nickname, password, login_method=login_method):
+         request.values]), csrf_enabled=False)
 
-            flash(_("You are logged in as %(nick)s.", nick=nickname), "info")
-            return login_redirect(referer)
-    except Exception as e:
-        current_app.logger.error('Exception during login process: %s', str(e))
-        flash(_("Problem with login."), "error")
+    if request.method == "POST":
+        try:
+            if login_method == 'Local' and form.validate_on_submit() and \
+               authenticate(nickname, password, login_method=login_method):
+                flash(
+                    _("You are logged in as %(nick)s.", nick=nickname),
+                    "success"
+                )
+                return login_redirect(referer)
+            else:
+                flash(_("Invalid credentials."), "error")
+        except Exception as e:
+            current_app.logger.error(
+                'Exception during login process: %s', str(e)
+            )
+            flash(_("Problem with login."), "error")
 
     return render_template('accounts/login.html', form=form)
 
@@ -311,7 +319,11 @@ def access():
         except:
             db.session.rollback()
             flash(_('Authorization failled.'), 'error')
-        flash(_('Your email has been validated.'), 'success')
+        flash(
+            _('Your email address has been validated, and you can now proceed '
+              'to  sign-in.'),
+            'success'
+        )
     except:
         flash(_('The authorization token is invalid.'), 'error')
     return redirect('/')
