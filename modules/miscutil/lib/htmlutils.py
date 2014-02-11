@@ -337,16 +337,8 @@ class HTMLWasher(HTMLParser):
     def handle_data(self, data):
         """Function called for text nodes"""
         if not self.silent:
-            possible_urls = re.findall(r'(https?://[\w\d:#%/;$()~_?\-=\\\.&]*)', data)
-            # validate possible urls
-            # we'll transform them just in case
-            # they are valid.
-            if possible_urls and self.automatic_link_transformation:
-                for url in possible_urls:
-                    if regex_url.search(url):
-                        transformed_url = '<a href="%s">%s</a>' % (url, url)
-                        data = data.replace(url, transformed_url)
-                self.result += data
+            if self.automatic_link_transformation:
+                self.result += transform_links(data)
             else:
                 self.result += cgi.escape(data, True)
 
@@ -947,3 +939,25 @@ def get_links_in_html_page(html):
     parser = _LinkGetter()
     parser.feed(html)
     return parser.urls
+
+
+def transform_links(data):
+    """
+    Create html links from possible_urls in input string
+    @param data: input string where links have to be transformed
+    @type data: str
+    """
+    possible_urls = re.findall(r'(https?://[\w\d:#%/;$()~_?\-=\\\.&]*)', data)
+    # validate possible urls
+    # we'll transform them just in case
+    # they are valid.
+    result = ""
+    if possible_urls:
+        for url in possible_urls:
+            if regex_url.search(url):
+                transformed_url = '<a href="%s">%s</a>' % (url, url)
+                data = data.replace(url, transformed_url)
+        result += data
+    else:
+        result = data
+    return result
