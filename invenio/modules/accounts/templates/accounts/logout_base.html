@@ -19,9 +19,10 @@
 {% extends "page.html" %}
 {% set title = _("Logout") %}
 {% block body %}
-{{ _("You are no longer recognized by our system.") }}
+<p>{{ _("You have now been signed out.") }}</p>
 
 {% if using_sso and logout_sso: %}
+<p>
     {{ (_("""You are still recognized by the centralized
                 %(x_fmt_open)sSSO%(x_fmt_close)s system. You can
                 %(x_url_open)slogout from SSO%(x_url_close)s, too.""") %
@@ -29,8 +30,9 @@
                  'x_url_open' : '<a href="%s">' % (logout_sso, ),
                  'x_url_close' : '</a>'})|safe }}
   <br />
+</p>
 {% endif %}
-{{ (_("If you wish you can %(x_url_open)slogin here%(x_url_close)s.") %
+{{ (_("If you wish you can %(x_url_open)ssign in again%(x_url_close)s.") %
                 {'x_url_open': '<a href="%s">' % (url_for('.login'),),
                  'x_url_close': '</a>'})|safe}}
 {% endblock %}

@@ -24,14 +24,19 @@
 <div class="container">
   <div class="row">
     <div class="col-md-offset-3 col-md-6 well">
-      <form class="form-horizontal" method="POST" action="{{ url_for('.register',) }}">
+    {%- block form scoped -%}
+      <form class="form-horizontal" role="form" method="POST" action="{{ url_for('.register',) }}">
       {%- if state == 'success' %}
+      {%- block form_success scoped -%}
         <legend>{{title}}<span class="pull-right"><i class="glyphicon glyphicon-ok"></i></span></legend>
         {%- for m in messages %}
             <p>{{m}}</p>
         {%- endfor %}
+      {%- endblock form_success -%}
       {%- else %}
+      {%- block form_inner scoped -%}
         <fieldset>
+          {%- block form_title scoped -%}
           <legend>{{title}}<span class="pull-right">
           {%- if state -%}
             <i class="glyphicon glyphicon-warning-sign"></i>
@@ -39,6 +44,8 @@
             <i class="glyphicon glyphicon-edit"></i>
           {%- endif -%}
           </span></legend>
+          {%- endblock form_title -%}
+          {%- block form_message scoped -%}
           {% if messages and state != 'success' %}
           <div class="alert alert-{{state}}">
           {%- for m in messages %}
@@ -46,13 +53,18 @@
           {%- endfor %}
           </div>
           {% endif %}
+          {%- endblock form_message -%}
+          {%- block form_fields scoped -%}
           {% for field in form if field.name != 'submit' %}
-            {{render_field(field, show_description=True, label_size=3, field_size=9)}}
+            {%- block form_field scoped -%}{{render_field(field, show_description=True, label_size=4, field_size=5)}}{%- endblock form_field -%}
           {% endfor %}
+          {%- endblock form_fields -%}
         </fieldset>
-        {{form.submit(value="Sign up", class="btn btn-warning btn-large pull-right")}}
+        {{form.submit(value="Sign up", class="btn btn-warning btn-lg pull-right")}}
+      {%- endblock form_inner -%}
       {% endif %}
       </form>
+    {%- endblock form -%}
     </div>
   </div>
 </div>
