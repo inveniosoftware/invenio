@@ -797,6 +797,7 @@ class Template:
                        }
             else:
                 out += """ if (tester2()) {
+                             $(this).attr("disabled", true);
                              document.forms[0].action="/submit";
                              document.forms[0].step.value=1;
                              user_must_confirm_before_leaving_page = false;
