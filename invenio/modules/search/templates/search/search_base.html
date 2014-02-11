@@ -55,7 +55,7 @@
 
 
 {% block body %}
-
+{%- block extra_style -%}
 <style>
 .modal-backdrop {
   /* Show lighter modal window for search. */
@@ -101,13 +101,13 @@ body {
 }
 
 </style>
+{%- endblock extra_style -%}
 
+{%- block search_form -%}{{ search_form(collection) }}{%- endblock search_form -%}
 
-{{ search_form(collection) }}
-
-
-{% if not recids|length %}
-
+{%- block index -%}
+{%- if not recids|length -%}
+{%- block index_noresult -%}
 <div class="row">
   <div class="col-md-12">
     <p>
@@ -116,19 +116,18 @@ body {
     {{ create_nearest_terms_box()|safe }}
   </div>
 </div>
-
+{%- endblock index_noresult -%}
 {% else %}
-
+{%- block index_results -%}
 <div class="row">
+  {%- block facets %}
   <div class="col-md-3 col-lg-2 visible-md visible-lg">
-    <div
-      class="facet"
-      id="facet_list">
-    </div>
+    <div class="facet" id="facet_list"></div>
   </div>
-
+  {%- endblock facets %}
+  {%- block index_right -%}
   <div class="col-md-9 col-lg-10">
-
+    {%- block facets_filter %}
     <div class="row visible-md visible-lg">
       <div class="col-md-10">
         <div class="well" id="facet_filter" style="clear:both; display: none;">
@@ -136,6 +135,8 @@ body {
         </div>
       </div>
     </div>
+    {%- endblock facets_filter %}
+    {%- block results %}
     <div class="row">
       <div id="search_results" class="col-md-12">
       {% block search_results %}
@@ -143,9 +144,11 @@ body {
       {% endblock search_results %}
       </div>
     </div>
+    {%- endblock results %}
   </div>
+  {% endblock index_right %}
 </div>
-
+{%- block filter_modal -%}
 <div class="modal hide" id="overlay">
   <div class="modal-body">
     <center>
@@ -154,10 +157,11 @@ body {
     </center>
   </div>
 </div>
-
-{% endif %}
-
-{% endblock %}
+{%- endblock filter_modal -%}
+{%- endblock index_results -%}
+{%- endif -%}
+{%- endblock index -%}
+{%- endblock -%}
 
 {% block javascript %}
 {% if recids|length %}
