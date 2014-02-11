@@ -944,7 +944,7 @@ def get_author_info_of_confirmed_paper(sig):   ### personid_name_from_signature
                              and flag > -2""",
                              sig )
 
-    assert len(conf_author) < 2, "More that one author hold the same signature: %s" % conf_author
+    assert len(conf_author) < 2, "More than one author hold the same signature: %s" % str(conf_author)
 
     return conf_author
 
