@@ -2861,10 +2861,10 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         self.person_id = -1   # -1 is a non valid author identifier
 
         if identifier is None or not isinstance(identifier, str):
+            self.original_identifier = " "
             return
 
         self.original_identifier = identifier
-
         # check if it's a canonical id: e.g. "J.R.Ellis.1"
 
         try:
