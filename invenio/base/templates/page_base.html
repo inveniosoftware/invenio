@@ -17,10 +17,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% from "_macros.html" import flashed_messages, js_bundle, css_bundle with context %}
+{%- from "_macros.html" import flashed_messages, js_bundle, css_bundle with context -%}
 
 {# Global CSS #}
-{% block global_css %}
+{%- block global_css %}
   {%- css 'css/bootstrap.css', '00-invenio' -%}
   {%- css 'css/typeahead.js-bootstrap.css', '00-invenio' -%}
   {%- css 'css/token-input.css', '00-invenio' -%}
@@ -30,10 +30,9 @@
   {%- if config.CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' %}
     {%- css 'css/'+config.CFG_WEBSTYLE_TEMPLATE_SKIN, '00-invenio' -%}
   {%- endif %}
-{% endblock global_css %}
-
+{%- endblock global_css -%}
 {# Global Javascript files #}
-{% block global_javascript %}
+{%- block global_javascript -%}
   {%- js 'js/jquery.min.js', '00-invenio' -%}
   {%- js 'js/bootstrap.js', '00-invenio' -%}
   {%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
@@ -42,110 +41,64 @@
   {%- js 'js/invenio.js', '00-invenio' -%}
   {%- js 'js/translate.js', '00-invenio' -%}
   {%- js 'js/typeahead.js', '00-invenio' -%}
-{% endblock global_javascript %}
-
+{%- endblock global_javascript %}
+{%- block page -%}
 {%- if not no_pageheader -%}
+{%- block page_top -%}
 <!DOCTYPE html>
-<html lang="{{ ln|safe }}" {% if is_language_rtl(g.ln) %}dir="rtl"{% endif %}>
+<html{% if g.ln %} lang="{{ g.ln|safe }}"{% if is_language_rtl(g.ln) %} dir="rtl"{% endif %}{% endif %}>
 <head>
+  {%- block head %}
+  {%- block head_meta %}
   <meta charset="utf-8">
   <title>{{ title+' - ' if title }}{{ config.CFG_SITE_NAME_INTL[g.ln] }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="Content-Language" content="{{ g.ln|safe }}" />
-  <meta name="description" content="{{ description }}" />
-  <meta name="keywords" content="{{ keywords }}" />
-  <meta name="author" content="">
+  {%- if description %}<meta name="description" content="{{ description }}" />{% endif %}
+  {%- if keywords %}<meta name="keywords" content="{{ keywords }}" />{% endif %}
+  {%- if config.get('CFG_GOOGLE_SITE_VERIFICATION', None) -%}
+  {%- for google_id in config.CFG_GOOGLE_SITE_VERIFICATION %}
+  <meta name="google-site-verification" content="{{google_id}}" />
+  {%- endfor -%}
+  {%- endif -%}
+  {%- endblock head_meta -%}
+
+  {%- block head_links %}
   <link rev="made" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
   <link rel="canonical" href="{{ canonical_url }}" />
-  {% for alt_ln, alternate_url in alternate_urls.iteritems() %}
+  {%- block head_links_langs %}{%- for alt_ln, alternate_url in alternate_urls.iteritems() %}
   <link rel="alternate" hreflang="{{ alt_ln }}" href="{{ alternate_url }}" />
-  {% endfor %}
+  {%- endfor %}{%- endblock %}
   <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
   <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
   <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
-  {{ linkbackTrackbackLink }}
+  {%- if linkbackTrackbackLink %}{{ linkbackTrackbackLink }}{%- endif %}
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
-
-  <!-- Le fav and touch icons -->
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  {% for size in [144, 114, 72, 57] %}
-    {% set icon_name = 'apple-touch-icon-%d-precomposed.png'|format(size) %}
+  {%- block head_apple_icons -%}
+  {%- for size in [144, 114, 72, 57] -%}
+    {%- set icon_name = 'apple-touch-icon-%d-precomposed.png'|format(size) %}
   <link rel="apple-touch-icon-precomposed" sizes="{{ size }}x{{ size }}"
         href="{{ url_for('static', filename=icon_name) }}">
-  {% endfor %}
+  {%- endfor -%}
+  {%- endblock head_apple_icons -%}
+  {%- endblock head_links %}
 
-  {% block header %}
-    {{ metaheaderadd|safe }}
-    {% block metaheader %}
-    {% endblock metaheader %}
-  {% endblock header %}
+  {%- block header %}{{ metaheaderadd|safe }}{%- block metaheader %}{%- endblock metaheader -%}{%- endblock header -%}
 
   {{ css_bundle() }}
 
-  {% block _top_assets %}{% endblock _top_assets %}
-  {% block css %}{% endblock css %}
-  <style>
-
-    legend [class*="icon-"] { vertical-align: baseline; }
-    a.label, a.label:hover, .label a, .label a:hover { color: white;}
-    .htmlbrief .media-heading { font-weight: 200; }
-    .icon.muted { opacity: 0.6; }
-
-    /*
-    ----------------------- Stick footer ----------------------- */
-    html,
-    body {
-      height: 100%;
-    }
-
-    {% set footer_height = '150px' -%}
-    /* Wrapper for page content to push down footer */
-    #wrap {
-      min-height: 100%;
-      height: auto !important;
-      height: 100%;
-      /* Negative indent footer by it's height */
-      margin: 0 auto -{{ footer_height }};
-    }
-
-    /* Set the fixed height of the footer here */
-    #push,
-    footer {
-      min-height: {{ footer_height }};
-    }
-
-    #push {
-      margin-top: 60px;
-    }
-
-    footer a, footer a:hover {
-      color: #666;
-    }
-    footer, footer p {
-      font-size: 11px;
-      color: #333;
-    }
-
-    /* Lastly, apply responsive CSS fixes as necessary */
-    @media (max-width: 767px) {
-      footer {
-        margin-left: -20px;
-        margin-right: -20px;
-        padding-left: 20px;
-        padding-right: 20px;
-      }
-    }
-
-    /* --------------- */
-  </style>
+  {%- block _top_assets %}{% endblock _top_assets %}
+  {%- block css %}{% endblock css %}
+  {%- endblock head %}
 </head>
-<body class="{{ body_css_classes|join(' ') if body_css_classes }}"
-      lang="{{ g.ln.split('_', 1)[0]|safe }}" {{ rtl_direction|safe }}>
+<body{% if body_css_classes %} class="{{ body_css_classes|join(' ') }}"{% endif %}{% if g.ln %} lang="{{ g.ln.split('_', 1)[0]|safe }}"{% if rtl_direction %} {{ rtl_direction|safe }}{% endif %}{% endif %} itemscope itemtype="http://schema.org/WebPage">
+{%- block body_start %}{% endblock body_start %}
+{%- block page_header -%}
   <div id="wrap">
     <header>
       <!-- replaced page header -->
@@ -158,7 +111,10 @@
       {% endblock breadcrumb %}
       {% block pageheaderadd %}{{ pageheaderadd|safe }}{% endblock pageheaderadd %}
     </header>
+{%- endblock page_header -%}
+{%- endblock page_top -%}
 {%- endif -%}
+
 {%- if not no_pagebody -%}
 {%- block page_body -%}
     <div class="container">
@@ -176,7 +132,10 @@
     </div>
 {%- endblock page_body -%}
 {%- endif -%}
+
 {%- if not no_pagefooter -%}
+{%- block page_bottom -%}
+{%- block page_footer %}
     <div id="push"></div>
   </div>{# end wrap #}
 <footer>
@@ -186,10 +145,14 @@
   <!-- replaced page footer -->
   {%- include 'footer.html' -%}
 </footer>
-{% block _bottom_assets %}
+{%- endblock page_footer %}
+{%- block _bottom_assets %}
 {{ js_bundle() }}
-{% endblock _bottom_assets %}
-{% block javascript %}{% endblock javascript %}
+{%- endblock _bottom_assets %}
+{%- block javascript %}{% endblock javascript %}
+{%- block body_end %}{% endblock body_end %}
 </body>
 </html>
+{%- endblock page_bottom -%}
 {%- endif -%}
+{%- endblock page -%}
