@@ -24,6 +24,7 @@ from __future__ import absolute_import
 from flask import render_template, abort, request, flash, \
     redirect, url_for, jsonify, Blueprint
 from invenio.base.i18n import _
+from invenio.base.decorators import wash_arguments
 from flask.ext.login import current_user, login_required
 from invenio.ext.sqlalchemy import db
 from invenio.ext.cache import cache
@@ -31,12 +32,13 @@ from flask.ext.breadcrumbs import register_breadcrumb
 from invenio.ext.principal import permission_required
 from invenio.ext.sslify import ssl_required
 from flask.ext.menu import register_menu
+from invenio.utils.pagination import Pagination
 
-from .forms import CommunityForm, EditCommunityForm, DeleteCommunityForm
+
+from .forms import CommunityForm, EditCommunityForm, DeleteCommunityForm, SearchForm
 from .models import Community
 from .signals import pre_curation, post_curation, curate_record
-from .config import COMMUNITIES_ID_PREFIX_PROVISIONAL, \
-    COMMUNITIES_ID_PREFIX
+from invenio.base.globals import cfg
 
 
 blueprint = Blueprint(
@@ -57,10 +59,10 @@ def community_id(coll):
     """
     if coll:
         identifier = coll.name
-        if identifier.startswith(COMMUNITIES_ID_PREFIX_PROVISIONAL + "-"):
-            return identifier[len(COMMUNITIES_ID_PREFIX_PROVISIONAL + "-"):]
-        elif identifier.startswith(COMMUNITIES_ID_PREFIX + "-"):
-            return identifier[len(COMMUNITIES_ID_PREFIX + "-"):]
+        if identifier.startswith(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):
+            return identifier[len(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):]
+        elif identifier.startswith(cfg['COMMUNITIES_ID_PREFIX'] + "-"):
+            return identifier[len(cfg['COMMUNITIES_ID_PREFIX'] + "-"):]
     return ""
 
 
@@ -134,14 +136,25 @@ def mycommunities_ctx():
 @blueprint.route('/', methods=['GET', ])
 @register_breadcrumb(blueprint, '.', _('Communities'))
 @register_menu(blueprint, 'main.communities', _('Communities'), order=2)
-def index():
+@wash_arguments({'p': (unicode, ''),
+                 'so': (unicode, ''),
+                 'page': (int, 1)
+                })
+def index(p, so, page):
     """
     Index page with uploader and list of existing depositions
     """
     ctx = mycommunities_ctx()
+
+    communities = Community.filter_communities(p, so, page).all()
+    form = SearchForm()
+    per_page = cfg['COMMUNITIES_DISPLAYED_PER_PAGE']
+
     ctx.update({
+        'pagination': Pagination(page, per_page, Community.query.count()),
+        'form': form,
         'title': _('Community Collections'),
-        'communities': Community.query.order_by(Community.title).all(),
+        'communities': communities,
     })
 
     return render_template(

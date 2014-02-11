@@ -19,7 +19,7 @@
 from flask import Blueprint
 from flask.ext.admin import BaseView as FlaskBaseView, \
     AdminIndexView as FlaskAdminIndexView
-from flask.ext.admin.contrib.sqlamodel import ModelView as FlaskModelView
+from flask.ext.admin.contrib.sqla import ModelView as FlaskModelView
 from flask.ext.login import current_user
 
 from invenio.ext.sslify import ssl_required

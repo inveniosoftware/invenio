@@ -33,6 +33,16 @@ from .models import Community
 #
 # Form
 #
+
+class SearchForm(Form):
+    """
+    Search Form
+    """
+    p = TextField(
+        validators=[validators.required()]
+    )
+
+
 class CommunityForm(Form):
     """
     Community form.
