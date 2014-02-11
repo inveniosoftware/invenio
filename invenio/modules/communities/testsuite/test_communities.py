@@ -21,6 +21,7 @@
 
 import os
 import shutil
+from datetime import datetime, timedelta
 
 from invenio.base.wrappers import lazy_import
 from flask import url_for, current_app
@@ -36,6 +37,8 @@ from invenio.modules.communities.config import COMMUNITIES_ID_PREFIX, \
     COMMUNITIES_OUTPUTFORMAT_PROVISIONAL
 
 Community = lazy_import('invenio.modules.communities.models:Community')
+Collection = lazy_import('invenio.modules.search.models:Collection')
+calculate_rank_for_community = lazy_import('invenio.modules.communities.tasks:calculate_rank_for_community')
 
 class CommunityModelTest(InvenioTestCase):
 
@@ -95,7 +98,43 @@ class CommunityModelTest(InvenioTestCase):
         self.assertEqual(self._find_community_info(), None)
 
 
-TEST_SUITE = make_test_suite(CommunityModelTest)
+class CommunityRankerTest(InvenioTestCase):
+
+    test_name = 'test_comm'
+
+    def _create_comunity(self, options={}):
+        """
+            Creates community and adds a collection to it.
+            Collection has number of records set to 1.
+        """
+        c = Community()
+        for key,value in options.iteritems():
+            setattr(c, key, value)
+        # add a collection with "one" record
+        coll = Collection()
+        coll.nbrecs = 1
+        setattr(c, "collection", coll)
+        return c
+
+    def test_rank_community_with_one_record(self):
+        """communities - test community rank basic"""
+        c = self._create_comunity({'id': self.test_name,
+                                   'id_user': 1,
+                                   'last_record_accepted': datetime.now()-timedelta(days=100),
+                                   'fixed_points': 0})
+        self.assertEqual(calculate_rank_for_community(c, 2), 5)
+
+    def test_rank_community_last_accepted(self):
+        """communities - test community rank new record accepted"""
+        c = self._create_comunity({'id': self.test_name,
+                                   'id_user': 1,
+                                   'last_record_accepted': datetime.now(),
+                                   'fixed_points': 20})
+        self.assertEqual(calculate_rank_for_community(c, 2), 29)
+
+
+TEST_SUITE = make_test_suite(CommunityModelTest,
+                             CommunityRankerTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

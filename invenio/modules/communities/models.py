@@ -48,6 +48,7 @@ After call to save_collection() you must do the following:
 from datetime import datetime
 
 from invenio.config import CFG_SITE_LANG
+from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User
 from invenio.modules.search.models import \
@@ -138,6 +139,14 @@ class Community(db.Model):
     last_modified = db.Column(db.DateTime(), nullable=False, default=datetime.now, onupdate=datetime.now)
     """ Last modification datetime """
 
+    last_record_accepted = db.Column(db.DateTime(), nullable=False, default=datetime(2000, 1, 1, 0, 0, 0))
+    """ Last record acceptance datetime"""
+
+    ranking = db.Column(db.Integer(9), nullable=False, default=0)
+    """ Ranking of community. Updated by ranking deamon"""
+
+    fixed_points = db.Column(db.Integer(9), nullable=False, default=0)
+    """ Points which will be always added to overall score of community"""
     #
     # Relation ships
     #
@@ -216,6 +225,32 @@ class Community(db.Model):
                 pass
         return usercomm
 
+    @classmethod
+    def filter_communities(cls, p, so, page=0):
+        """
+            Helper function which takes from database
+            only those communities which match search
+            criteria. Uses parameter 'so' to set
+            communities in the correct order.
+
+            Parameter 'page' is introduced to restrict results
+            and return only slice of them for the current page.
+            If page == 0 function will return all communities
+            that match the pattern.
+        """
+        per_page = cfg['COMMUNITIES_DISPLAYED_PER_PAGE']
+
+        query = Community.query
+        if p:
+            query = query.filter(Community.title.like(p + "%"))
+        if so in cfg['COMMUNITIES_SORTING_OPTIONS']:
+            order = so == 'title' and db.asc or db.desc
+            query = query.order_by(order(getattr(Community, so)))
+        else:
+            query = query.order_by(db.desc(Community.ranking))
+        if page > 0:
+            query = query.slice((page-1)*per_page, page*per_page)
+        return query
     #
     # Utility methods
     #
@@ -360,6 +395,8 @@ class Community(db.Model):
             pretend=pretend
         )
 
+        self.last_record_accepted = datetime.now()
+        db.session.commit()
         post_curation.send(self, action='accept', recid=recid, record=rec, pretend=pretend)
         return rec
 

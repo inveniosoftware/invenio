@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+from datetime import timedelta
 
 COMMUNITIES_TABS = 'usage;comments;metadata;files'
 """ Detailed record tabs to enable for a community"""
@@ -68,3 +68,17 @@ COMMUNITIES_ID_PREFIX = 'user'
 
 COMMUNITIES_ID_PREFIX_PROVISIONAL = 'provisional-user'
 """ Collection identifier prefix for provisional user comunities. """
+
+COMMUNITIES_SORTING_OPTIONS = [
+    'title',
+    'ranking',
+]
+
+COMMUNITIES_DISPLAYED_PER_PAGE = 4
+
+COMMUNITIES_PERIODIC_TASKS = {
+            'ranking_deamon': {
+                'run_every': timedelta(seconds=20),
+            },
+
+}
