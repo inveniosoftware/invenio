@@ -37,16 +37,24 @@ from .validator import Validator
 class SmartJson(SmartDict):
     """Base class for Json structures"""
 
-    def __init__(self, json):
+    def __init__(self, json=None, **kwargs):
         super(SmartJson, self).__init__(json)
         self._dict_bson = SmartDict()
         self._validator = None
+
+        if json is None or not json:
+            self._dict['__meta_metadata__'] = dict()
+            self._dict['__meta_metadata__']['__additional_info__'] = kwargs
+            self._dict['__meta_metadata__']['__aliases__'] = {}
+            self._dict['__meta_metadata__']['__errors__'] = []
+            self._dict['__meta_metadata__']['__continuable_errors__'] = []
 
         if '__meta_metadata__.__additional_info__.model_meta_classes' in self:
             meta_classes = [import_string(str_cls)
                     for str_cls in self['__meta_metadata__.__additional_info__.model_meta_classes']]
             self.__class__ = type(self.__class__.__name__,
                     [self.__class__] + meta_classes, {})
+
 
     def __getitem__(self, key):
         """
@@ -75,18 +83,18 @@ class SmartJson(SmartDict):
 
         return self._dict_bson[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value, extend=False):
         """
         Uses the dumps capabilities to set the items to store them in the DB
         """
         main_key = SmartDict.main_key_pattern.sub('', key)
         if main_key in self:
-            self._dict_bson[key] = value
+            self._dict_bson.__setitem__(key, value, extend)
         else:
             reader = readers[self['__meta_metadata__']['__additional_info__']['master_format']]\
                 (namespace=self['__meta_metadata__']['__additional_info__']['namespace'])
             reader.set(self, main_key)
-            self._dict_bson[key] = value
+            self._dict_bson.__setitem__(key, value, extend)
 
         self._dumps(main_key)
 
@@ -155,7 +163,7 @@ class SmartJson(SmartDict):
                     FieldParser.field_definitions(self['__meta_metadata__']['__additional_info__']['namespace']))(self._dict_bson[field])
         except (KeyError, IndexError):
             if self['__meta_metadata__'][field]['memoize'] or \
-                    self['__meta_metadata__'][field]['type'] in ('derived', 'creator', 'UNKNOW'):
+                    self['__meta_metadata__'][field]['type'] in ('derived', 'creator', 'UNKNOWN'):
                 self._dict[field] = self._dict_bson[field]
 
     def _loads(self, field):

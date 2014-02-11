@@ -101,7 +101,7 @@ class Reader(object):
             self.blob = blob
             self.json = None
 
-        if not self.blob:
+        if self.blob is None:
             raise ReaderException("To perform a 'translate' operation a blob is needed")
 
         # If we already have the json return it, use add or update to modify it
@@ -122,7 +122,7 @@ class Reader(object):
         self.json = json if isinstance(json, SmartDict) else SmartDict(json)
         self.blob = blob
 
-        if not self.blob or not self.json:
+        if self.blob is None or self.json is None:
             raise ReaderException("To perform an 'add' operation a json structure and a blob are needed")
 
         self._prepare_blob()

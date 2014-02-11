@@ -86,6 +86,17 @@ class TestRecord(InvenioTestCase):
         self.assertEquals(rec['authors[0].full_name'], 'Döè1, John')
         self.assertEquals(rec['title.title'], 'Пушкин')
 
+    def test_create_empty_record(self):
+        """Record - Create empty record"""
+        rec = Record(master_format='marc')
+        self.assertTrue('__meta_metadata__' in rec)
+        self.assertEquals(rec.keys(), ['__meta_metadata__'])
+        rec['title'] = {'title':'My title'}
+        self.assertTrue('title' in rec)
+        self.assertTrue('title' in rec['__meta_metadata__'])
+        rec.set('title', {'title':'Second title?'}, extend=True)
+        self.assertEquals(len(rec['title']), 2)
+
 
 class TestMarcRecordCreation(InvenioTestCase):
     """Records from marc"""
