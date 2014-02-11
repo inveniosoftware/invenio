@@ -41,6 +41,15 @@ class Record(SmartJson):
 
     storage_engine = SQLAlchemyStorage(RecordMetadataModel)
 
+    def __init__(self, json=None, **kwargs):
+        if not json:
+            if 'namespace' not in kwargs:
+                kwargs['namespace'] = 'recordext'
+            if 'model' not in kwargs:
+                kwargs['model'] = '__default__'
+
+        super(Record, self).__init__(json, **kwargs)
+
     @classmethod
     def create(cls, blob, master_format, **kwargs):
         if 'namespace' not in kwargs:
@@ -51,9 +60,6 @@ class Record(SmartJson):
 
     @classmethod
     def create_many(cls, blobs, master_format, **kwargs):
-        if 'namespace' not in kwargs:
-            kwargs['namespace'] = 'recordext'
-
         reader = readers[master_format]
 
         for blob in reader.split_blob(blobs, **kwargs):
