@@ -482,8 +482,8 @@ class DepositionType(object):
     @classmethod
     def all(cls):
         """ Get a dictionary of deposition types """
-        from .loader import deposition_types
-        return deposition_types
+        from .registry import deposit_types
+        return deposit_types.mapping()
 
     @classmethod
     def get(cls, identifier):
@@ -505,8 +505,8 @@ class DepositionType(object):
     @classmethod
     def get_default(cls):
         """ Get a list of deposition type names """
-        from .loader import deposition_default
-        return deposition_default
+        from .registry import deposit_default_type
+        return deposit_default_type.get()
 
     def __unicode__(self):
         """ Return a name for this class """
@@ -1388,12 +1388,9 @@ class Deposition(object):
             BibWorkflowObject.modified.desc()).all()
 
         def _create_obj(o):
-            try:
-                obj = cls(o)
-                if type is None or obj.type == type:
-                    return obj
-            except InvalidDepositionType:
-                pass
+            obj = cls(o)
+            if type is None or obj.type == type:
+                return obj
             return None
 
         return filter(lambda x: x is not None, map(_create_obj, objects))

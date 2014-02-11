@@ -24,7 +24,7 @@ Validation functions
 import re
 from wtforms.validators import ValidationError, StopValidation, Regexp
 from invenio.utils import persistentid as pidutils
-from invenio.base.globals import cfg
+from flask import current_app
 
 #
 # General purpose validators
@@ -171,7 +171,7 @@ class InvalidDOIPrefix(object):
 
         ctx = dict(
             prefix=prefix,
-            CFG_SITE_NAME=cfg['CFG_SITE_NAME']
+            CFG_SITE_NAME=current_app.config['CFG_SITE_NAME']
         )
         self.message = self.message % ctx
         self.message_testing = self.message_testing % ctx
@@ -207,7 +207,7 @@ class MintedDOIValidator(object):
 
         ctx = dict(
             prefix=prefix,
-            CFG_SITE_NAME=CFG_SITE_NAME
+            CFG_SITE_NAME=current_app.config['CFG_SITE_NAME']
         )
         self.message = self.message % ctx
 

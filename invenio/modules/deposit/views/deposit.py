@@ -17,7 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebDeposit Blueprint"""
+"""
+Deposit Blueprint
+"""
 
 import json
 from functools import wraps
@@ -32,14 +34,13 @@ from flask import current_app, Blueprint, \
     send_file, \
     abort, \
     make_response
-from flask.ext.login import current_user, login_required
 from werkzeug.datastructures import MultiDict
 from werkzeug.utils import secure_filename
-
+from flask.ext.login import current_user, login_required
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.menu import register_menu
+
 from invenio.base.i18n import _
-from .. import forms
 from ..signals import template_context_created
 from ..models import Deposition, DepositionType, \
     DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
@@ -48,9 +49,13 @@ from ..models import Deposition, DepositionType, \
 from ..storage import ChunkedDepositionStorage, \
     DepositionStorage, ExternalFile, UploadError
 
-blueprint = Blueprint('webdeposit', __name__, url_prefix='/deposit',
-                      template_folder='../templates',
-                      static_folder='../static')
+blueprint = Blueprint(
+    'webdeposit',
+    __name__,
+    url_prefix='/deposit',
+    template_folder='../templates',
+    static_folder='../static'
+)
 
 default_breadcrumb_root(blueprint, '.webdeposit')
 
@@ -67,13 +72,13 @@ def deposition_error_handler(endpoint='.index'):
             except InvalidDepositionType:
                 if request.is_xhr:
                     abort(400)
-                flash(_("Invalid deposition type."), 'error')
+                flash(_("Invalid deposition type."), 'danger')
                 return redirect(url_for(endpoint))
             except (DepositionDoesNotExists,):
-                flash(_("Deposition does not exists."), 'error')
+                flash(_("Deposition does not exists."), 'danger')
                 return redirect(url_for(endpoint))
             except (DepositionNotDeletable,):
-                flash(_("Deposition cannot be deleted."), 'error')
+                flash(_("Deposition cannot be deleted."), 'danger')
                 return redirect(url_for(endpoint))
             except (DraftDoesNotExists,):
                 abort(400)
@@ -82,7 +87,7 @@ def deposition_error_handler(endpoint='.index'):
             except (UploadError,):
                 abort(400)
             except (ForbiddenAction,):
-                flash(_("Not allowed."), 'error')
+                flash(_("Not allowed."), 'danger')
                 return redirect(url_for(endpoint))
             except (UploadError,):
                 abort(400)

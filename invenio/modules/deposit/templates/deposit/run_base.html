@@ -35,7 +35,7 @@
     {% include "deposit/run_field_label.html" %}
 {%- endmacro -%}
 
-{%- macro field_display(thisfield, field_class="", container_class="form-group") -%}
+{%- macro field_display(thisfield, field_size=None, field_class="form-control", container_class="form-group") -%}
     {% include "deposit/run_field.html" %}
 {%- endmacro -%}
 
@@ -122,7 +122,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
 <div class="row">
     <div id="file_container" class="col-md-8 form-feedback-warning">
     <div id="flash-message"></div>
-    <form enctype="multipart/form-data" name="submitForm" id="submitForm" class="form-horizontal" method="post" action="{{ url_for('.run', deposition_type=deposition_type, uuid=uuid) }}">
+    <form enctype="multipart/form-data" name="submitForm" id="submitForm" role="form" class="form-horizontal" method="post" action="{{ url_for('.run', deposition_type=deposition_type, uuid=uuid) }}">
     {% block form_header scoped %}{{ form_action_bar() }}{% endblock form_header%}
 
     {% block form_title scoped %}
