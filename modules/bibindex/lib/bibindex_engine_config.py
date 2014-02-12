@@ -57,3 +57,8 @@ CFG_BIBINDEX_UPDATE_MESSAGE = "Searching for records which should be reindexed..
 CFG_BIBINDEX_UPDATE_MODE = { 'Update': 'update',
 							 'Insert': 'insert',
 							 'Remove': 'remove' }
+
+CFG_BIBINDEX_TOKENIZER_TYPE = {"string": "string",
+                               "multifield": "multifield",
+                               "recjson": "recjson",
+                               "unknown": "unknown"}

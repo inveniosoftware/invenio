@@ -21,10 +21,10 @@
 """
 
 
-from invenio.bibindex_tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
+from invenio.bibindex_tokenizers.BibIndexRecJsonTokenizer import BibIndexRecJsonTokenizer
 
 
-class BibIndexFiletypeTokenizer(BibIndexEmptyTokenizer):
+class BibIndexFiletypeTokenizer(BibIndexRecJsonTokenizer):
     """
         Tokenizes for file extensions.
         Tokenizer is adapted to work with bibfield and its get_record function.

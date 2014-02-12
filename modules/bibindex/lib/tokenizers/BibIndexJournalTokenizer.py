@@ -26,7 +26,7 @@
 """
 
 from invenio.dbquery import run_sql
-from invenio.bibindex_tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
+from invenio.bibindex_tokenizers.BibIndexMultiFieldTokenizer import BibIndexMultiFieldTokenizer
 from invenio.config import \
     CFG_CERN_SITE, \
     CFG_INSPIRE_SITE
@@ -47,10 +47,14 @@ else:
 
 
 
-class BibIndexJournalTokenizer(BibIndexEmptyTokenizer):
+class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
     """
-        Tokenizer for journal index. It returns joined title/volume/year/page as a word from journal tag.
-        (In fact it's an aggregator.)
+        Tokenizer for journal index.
+        Returns joined title/volume/year/page as a word from journal tag.
+
+        Tokenizer works on multiple tags.
+        For more information on tokenizers working on per-record basis
+        take a look on BibIndexJournalTokenizer base class.
     """
 
     def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):

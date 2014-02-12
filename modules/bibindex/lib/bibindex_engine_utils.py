@@ -357,6 +357,7 @@ def get_records_range_for_index(index_id):
     except Exception:
         return None
 
+
 def make_prefix(index_name):
     """
         Creates a prefix for specific index which is added
@@ -365,3 +366,7 @@ def make_prefix(index_name):
         @param index_name: name of the dependent index we want to create prefix for
     """
     return "__" + index_name + "__"
+
+
+class UnknownTokenizer(Exception):
+    pass

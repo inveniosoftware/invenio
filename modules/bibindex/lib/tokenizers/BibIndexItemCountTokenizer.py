@@ -20,11 +20,11 @@
    owned by the library in the real world.
 """
 
-from invenio.bibindex_tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
+from invenio.bibindex_tokenizers.BibIndexRecJsonTokenizer import BibIndexRecJsonTokenizer
 
 
 
-class BibIndexItemCountTokenizer(BibIndexEmptyTokenizer):
+class BibIndexItemCountTokenizer(BibIndexRecJsonTokenizer):
     """
         Returns a number of copies of a book which is owned by the library.
     """

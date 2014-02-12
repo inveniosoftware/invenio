@@ -1664,7 +1664,8 @@ def perform_modifytokenizer(idxID, ln=CFG_SITE_LANG, idxTOK='', callback='yes', 
 
 
         tokenizer_element = """<select name="idxTOK" class="admin_w200">"""
-        for key in _TOKENIZERS:
+        tokenizers = [tokenizer for tokenizer in _TOKENIZERS if _TOKENIZERS[tokenizer]().implemented]
+        for key in tokenizers:
             if key == idxTOK:
                 tokenizer_element += """<option value="%s" selected ="selected">%s</option>""" % (key, key)
             else:

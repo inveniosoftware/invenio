@@ -17,25 +17,27 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-    BibIndexEmptyTokenizer.
-
-    It's a really lazy tokenizer and doesn't do anything.
+    Abstract BibIndexStringTokenizer.
+    It is a tokenizer created only for inheritance.
+    All string based tokenizers should inherit after this tokenizer.
 """
 
-
-from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
-from invenio.bibindex_tokenizers.BibIndexStringTokenizer import BibIndexStringTokenizer
+from invenio.bibindex_tokenizers.BibIndexTokenizer import BibIndexTokenizer
 
 
 
-class BibIndexEmptyTokenizer(BibIndexStringTokenizer):
+class BibIndexStringTokenizer(BibIndexTokenizer):
     """
-       BibIndexEmptyTokenizer doesn't do anything.
-       Irrespective of input to tokenizing function it
-       always returns empty list.
+       BibIndexStringTokenizer is an abstract tokenizer.
+       It should be used only for inheritance.
 
-       Can be used in some default cases or when we want to
-       turn off specific index.
+       This tokenizer should be a base class for tokenizers
+       which operates on strings/phrases and splits them
+       into multiple terms/tokens.
+
+       Tokenizing functions take phrase as an argument.
+
+       Good examples of StringTokenizer is DeafultTokenizer.
     """
 
     def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
@@ -49,20 +51,15 @@ class BibIndexEmptyTokenizer(BibIndexStringTokenizer):
 
     def get_tokenizing_function(self, wordtable_type):
         """Picks correct tokenize_for_xxx function depending on type of tokenization (wordtable_type)"""
-        if wordtable_type == CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"]:
-            return self.tokenize_for_words
-        elif wordtable_type == CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"]:
-            return self.tokenize_for_pairs
-        elif wordtable_type == CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"]:
-            return self.tokenize_for_phrases
+        raise NotImplementedError
 
 
     def tokenize_for_words(self, phrase):
-        return []
+        raise NotImplementedError
 
     def tokenize_for_pairs(self, phrase):
-        return []
+        raise NotImplementedError
 
     def tokenize_for_phrases(self, phrase):
-        return []
+        raise NotImplementedError
 

@@ -27,6 +27,7 @@ import re
 import sys
 import time
 import fnmatch
+import inspect
 from datetime import datetime
 
 from invenio.config import CFG_SOLR_URL
@@ -37,7 +38,8 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_BIBINDEX_INDEX_TABLE_TYPE, \
      CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
      CFG_BIBINDEX_UPDATE_MESSAGE, \
-     CFG_BIBINDEX_UPDATE_MODE
+     CFG_BIBINDEX_UPDATE_MODE, \
+     CFG_BIBINDEX_TOKENIZER_TYPE
 from invenio.bibauthority_config import \
      CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
 from invenio.bibauthority_engine import get_index_strings_by_control_no,\
@@ -77,7 +79,8 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     remove_inexistent_indexes, \
     filter_for_virtual_indexes, \
     get_records_range_for_index, \
-    make_prefix
+    make_prefix, \
+    UnknownTokenizer
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibfield import get_record
 from invenio.memoiseutils import Memoise
@@ -345,6 +348,27 @@ def get_index_tokenizer(index_id):
         write_message("Exception caught: there is no such tokenizer")
         out = None
     return out
+
+
+def detect_tokenizer_type(tokenizer):
+    """
+        Checks what is the main type of the tokenizer.
+        For more information on tokenizer types take
+        a look at BibIndexTokenizer class.
+        @param tokenizer: instance of a tokenizer
+    """
+    from invenio.bibindex_tokenizers.BibIndexStringTokenizer import BibIndexStringTokenizer
+    from invenio.bibindex_tokenizers.BibIndexRecJsonTokenizer import BibIndexRecJsonTokenizer
+    from invenio.bibindex_tokenizers.BibIndexMultiFieldTokenizer import BibIndexMultiFieldTokenizer
+
+    tokenizer_inheritance_tree = inspect.getmro(tokenizer.__class__)
+    if BibIndexStringTokenizer in tokenizer_inheritance_tree:
+        return CFG_BIBINDEX_TOKENIZER_TYPE['string']
+    if BibIndexMultiFieldTokenizer in tokenizer_inheritance_tree:
+        return CFG_BIBINDEX_TOKENIZER_TYPE['multifield']
+    if BibIndexRecJsonTokenizer in tokenizer_inheritance_tree:
+        return CFG_BIBINDEX_TOKENIZER_TYPE['recjson']
+    return CFG_BIBINDEX_TOKENIZER_TYPE['unknown']
 
 
 def get_last_updated_all_indexes():
@@ -1141,6 +1165,7 @@ class WordTable(AbstractIndexTable):
                                                             self.remove_stopwords,
                                                             self.remove_html_markup,
                                                             self.remove_latex_markup)
+        self.tokenizer_type = detect_tokenizer_type(self.tokenizer)
         self.default_tokenizer_function = self.tokenizer.get_tokenizing_function(table_type)
 
         # tagToTokenizer mapping. It offers an indirection level necessary for
@@ -1314,8 +1339,8 @@ class WordTable(AbstractIndexTable):
                 wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
                                           wlist[recID])
 
-        if len(self.fields_to_index) == 0:
-            #'no tag' style of indexing - use bibfield instead of directly consulting bibrec
+        if self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["recjson"]:
+            # use bibfield instead of directly consulting bibrec
             tokenizing_function = self.default_tokenizer_function
             for recID in range(recID1, recID2 + 1):
                 record = get_record(recID)
@@ -1324,8 +1349,8 @@ class WordTable(AbstractIndexTable):
                     if not wlist.has_key(recID):
                         wlist[recID] = []
                     wlist[recID] = list_union(new_words, wlist[recID])
-        # case of special indexes:
-        elif self.index_name in ('authorcount', 'journal'):
+        elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["multifield"]:
+            # tokenizers operating on multiple fields/tags at a time
             for tag in self.fields_to_index:
                 tokenizing_function = self.tag_to_words_fnc_map.get(tag, self.default_tokenizer_function)
                 for recID in range(recID1, recID2 + 1):
@@ -1333,8 +1358,8 @@ class WordTable(AbstractIndexTable):
                     if not wlist.has_key(recID):
                         wlist[recID] = []
                     wlist[recID] = list_union(new_words, wlist[recID])
-        # usual tag-by-tag indexing for the rest:
-        else:
+        elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["string"]:
+            # tokenizers operating on one field/tag and phrase at a time
             for tag in self.fields_to_index:
                 tokenizing_function = self.tag_to_words_fnc_map.get(tag, self.default_tokenizer_function)
                 phrases = self.get_phrases_for_tokenizing(tag, recID1, recID2)
@@ -1344,6 +1369,9 @@ class WordTable(AbstractIndexTable):
                         wlist[recID] = []
                     new_words = tokenizing_function(phrase)
                     wlist[recID] = list_union(new_words, wlist[recID])
+        else:
+            raise UnknownTokenizer("Tokenizer has not been recognized: %s" \
+                                    % self.tokenizer.__class__.__name__)
 
 
         # lookup index-time synonyms:

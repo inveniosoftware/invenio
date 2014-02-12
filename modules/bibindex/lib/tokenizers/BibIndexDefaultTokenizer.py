@@ -34,11 +34,11 @@ from invenio.bibindex_engine_utils import latex_formula_re, \
      re_punctuation, \
      re_separators, \
      re_arxiv
-from invenio.bibindex_tokenizers.BibIndexTokenizer import BibIndexTokenizer
+from invenio.bibindex_tokenizers.BibIndexStringTokenizer import BibIndexStringTokenizer
 
 
 
-class BibIndexDefaultTokenizer(BibIndexTokenizer):
+class BibIndexDefaultTokenizer(BibIndexStringTokenizer):
     """
         It's a standard tokenizer. It is useful for most of the indexes.
         Its behaviour depends on stemming, remove stopwords, remove html markup and remove latex markup parameters.
