@@ -188,7 +188,10 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBSCHED_NON_CONCURRENT_TASKS',
                        'CFG_REDIS_HOSTS',
                        'CFG_BIBSCHED_INCOMPATIBLE_TASKS',
-                       'CFG_ICON_CREATION_FORMAT_MAPPINGS']:
+                       'CFG_ICON_CREATION_FORMAT_MAPPINGS',
+                       'CFG_BIBSCHED_INCOMPATIBLE_TASKS',
+                       'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_SIZE',
+                       'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_DOCTYPES']:
         try:
             option_value = option_value[1:-1]
             if option_name == "CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE" and option_value.strip().startswith("{"):
