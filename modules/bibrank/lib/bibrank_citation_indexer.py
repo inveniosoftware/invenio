@@ -151,10 +151,38 @@ def get_citation_weight(rank_method_code, config, chunk_size=25000):
     return weights, index_update_time
 
 
-def process_and_store(recids, config, chunk_size):
+def check_citations_losses(config, recids, refs, cites):
+    """Check citations/references losses at the end of computation process
+
+    Raises an exception if needed"""
     # Limit of # of citation we can loose in one chunk
     function = config.get("rank_method", "function")
     citation_loss_limit = int(config.get(function, "citation_loss_limit"))
+    citation_loss_per_record_limit = int(config.get(function, "citation_loss_per_record_limit"))
+
+    err_msg = 'Lost too many references, aborting'
+
+    refs_diff, cites_diff = compute_dicts_diff(recids, refs, cites)
+
+    # Overall loss limits
+    write_message("References balance %s" % sum(refs_diff))
+    write_message("Citations balance %s" % sum(cites_diff))
+    if citation_loss_limit and sum(cites_diff) <= -citation_loss_limit or sum(refs_diff) <= -citation_loss_limit:
+        print_cites_diff(recids, refs_diff, cites_diff)
+        raise Exception(err_msg)
+
+    # Per record loss limits
+    if citation_loss_per_record_limit:
+        for recid, record_refs_diff, record_cites_diff in zip(recids, refs_diff, cites_diff):
+            if record_refs_diff < -citation_loss_per_record_limit:
+                write_message('%s lost %s refs' % (recid, record_refs_diff))
+                raise Exception(err_msg)
+            if record_cites_diff < -citation_loss_per_record_limit:
+                write_message('%s lost %s cites' % (recid, record_cites_diff))
+                raise Exception(err_msg)
+
+
+def process_and_store(recids, config, chunk_size):
     # If we have nothing to process
     # Do not update the weights dictionary
     modified = False
@@ -176,12 +204,8 @@ def process_and_store(recids, config, chunk_size):
         # The core work
         cites, refs = process_chunk(chunk, config)
         # Check that we haven't lost too many citations
-        cites_diff = compute_dicts_diff(chunk, refs, cites)
-        write_message("Citations balance %s" % cites_diff)
-        if citation_loss_limit and cites_diff <= -citation_loss_limit:
-            print_cites_diff(chunk, refs, cites)
-            raise Exception('Lost too many references, aborting')
-
+        # (raises an exception if needed)
+        check_citations_losses(config, chunk, refs, cites)
         # Store processed citations/references
         store_dicts(chunk, refs, cites)
         modified = True
@@ -1129,19 +1153,17 @@ def compute_cites_diff(recid, new_cites):
     return len(cites_to_add) - len(cites_to_delete)
 
 
-def print_cites_diff(recids, refs, cites):
+def print_cites_diff(recids, refs_diff, cites_diff):
     """
     Given the new dictionaries for references and citations, computes how
     many references were added or removed by comparing them to the current
     stored in the database.
     """
-    for recid in recids:
-        refs_diff = compute_refs_diff(recid, refs[recid])
-        cites_diff = compute_cites_diff(recid, cites[recid])
-        if refs_diff:
-            write_message('%s lost %s refs' % (recid, refs_diff))
-        if cites_diff:
-            write_message('%s lost %s cites' % (recid, cites_diff))
+    for recid, record_refs_diff, record_cites_diff in zip(recids, refs_diff, cites_diff):
+        if record_refs_diff:
+            write_message('%s lost %s refs' % (recid, record_refs_diff))
+        if record_cites_diff:
+            write_message('%s lost %s cites' % (recid, record_cites_diff))
 
 
 def compute_dicts_diff(recids, refs, cites):
@@ -1150,11 +1172,9 @@ def compute_dicts_diff(recids, refs, cites):
     many references were added or removed by comparing them to the current
     stored in the database.
     """
-    cites_diff = 0
-    for recid in recids:
-        cites_diff += compute_refs_diff(recid, refs[recid])
-        cites_diff += compute_cites_diff(recid, cites[recid])
-    return cites_diff
+    refs_diff = [compute_refs_diff(recid, cites[recid]) for recid in recids]
+    cites_diff = [compute_cites_diff(recid, cites[recid]) for recid in recids]
+    return refs_diff, cites_diff
 
 
 def store_dicts(recids, refs, cites):
