@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask import render_template
+from flask import render_template, request
 
 
 def can_preview(f):
@@ -23,15 +23,17 @@ def can_preview(f):
     Returns if filetype can be previewed.
     '''
     return f.superformat in ['.pdf', '.jpeg', '.png', '.gif', '.tiff', '.bmp',
-                             '.mpeg4', '.3gpp', '.mov', '.avi', '.mpegps', '.wmv', '.flv',
-                             '.txt', '.css', '.html', '.php', '.c', '.cpp', '.h', '.hpp', '.js',
-                             '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.pages', '.ai',
-                             '.psd', '.dfx', '.svg', '.eps', '.ps', '.ttf', '.xps', '.zip', '.rar']
+                             '.mpeg4', '.3gpp', '.mov', '.avi', '.mpegps',
+                             '.wmv', '.flv', '.txt', '.css', '.html', '.php',
+                             '.c', '.cpp', '.h', '.hpp', '.js', '.doc', '.docx',
+                             '.xls', '.xlsx', '.ppt', '.pptx', '.pages', '.ai',
+                             '.psd', '.dfx', '.svg', '.eps', '.ps', '.ttf',
+                             '.xps', '.zip', '.rar']
 
 
-def preview(f, emb = None):
+def preview(f):
     '''
     Returns appropiate template and passes the filea and an embed flag.
     '''
-    return render_template("previews/gview.html", f=f, embed=emb)
-
+    return render_template("previews/gview.html", f=f,
+                           embed=request.args.get('embed', type=bool))

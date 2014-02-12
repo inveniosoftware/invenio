@@ -19,14 +19,14 @@
 
 """Previews Blueprint"""
 
-from flask import Blueprint
+from flask import Blueprint, request
 from flask.ext.breadcrumbs import default_breadcrumb_root
+
+from invenio.base.globals import cfg
+from invenio.config import CFG_SITE_RECORD
 
 from .registry import previewers
 
-from invenio.base.decorators import wash_arguments
-from invenio.config import CFG_SITE_RECORD
-from invenio.modules.records.views import request_record
 
 blueprint = Blueprint('previewer', __name__, url_prefix="/" + CFG_SITE_RECORD,
                       static_url_path='/record', template_folder='templates',
@@ -36,17 +36,23 @@ default_breadcrumb_root(blueprint, '.')
 
 
 @blueprint.route('/<int:recid>/preview', methods=['GET', 'POST'])
-@wash_arguments({'embed': (unicode, 'False'), 'filename': (unicode, None)})
-@request_record
-def preview(recid, embed=False, filename=None):
+def preview(recid):
     from invenio.legacy.bibdocfile.api import BibRecDocs
 
     files = BibRecDocs(recid).list_latest_files(list_hidden=False)
-    f = None
+    filename = request.args.get('filename', type=str)
 
     for f in files:
-        if f.name + f.superformat == filename:
-            for plugin_id in previewers:
+        if f.name + f.superformat == filename or filename is None:
+            ordered = previewers.keys()
+            if "CFG_PREVIEW_PREFERENCE" in cfg and \
+               f.superformat in cfg["CFG_PREVIEW_PREFERENCE"]:
+                from collections import OrderedDict
+                ordered = OrderedDict.fromkeys(
+                    cfg["CFG_PREVIEW_PREFERENCE"][f.superformat] +
+                    ordered).keys()
+
+            for plugin_id in ordered:
                 if previewers[plugin_id]['can_preview'](f):
-                    return previewers[plugin_id]['preview'](f, embed == 'true')
-    return previewers['preview_default']['preview'](filename, embed == 'true')
+                    return previewers[plugin_id]['preview'](f)
+    return previewers['default']['preview'](None)
