@@ -39,7 +39,9 @@ if __name__ != "__main__":
 
 from invenio.urlutils import redirect_to_url
 from invenio.session import get_session
-from invenio.webinterface_handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
+from invenio.webinterface_handler import (CFG_HAS_HTTPS_SUPPORT,
+                                          CFG_FULL_HTTPS,
+                                          ClientDisconnected)
 from invenio.webinterface_layout import invenio_handler
 from invenio.webinterface_handler_wsgi_utils import table, FieldStorage
 from invenio.webinterface_handler_config import \
@@ -80,9 +82,6 @@ def https_replace(html):
     html = html.replace(_ESCAPED_CFG_SITE_URL, _ESCAPED_CFG_SITE_SECURE_URL)
     return _RE_HTTPS_REPLACES.sub(_http_replace_func, html)
 
-
-class ClientDisconnected(Exception):
-    pass
 
 class InputProcessed(object):
     """

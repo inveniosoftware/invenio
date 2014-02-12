@@ -78,6 +78,10 @@ RE_SPECIAL_URI = re.compile('^/%s/\d+|^/collection/.+' % CFG_SITE_RECORD)
 _RE_BAD_MSIE = re.compile("MSIE\s+(\d+\.\d+)")
 
 
+class ClientDisconnected(Exception):
+    pass
+
+
 def _debug(req, msg):
     """
     Log the message.
@@ -445,6 +449,9 @@ def create_handler(root):
                 raise
             else:
                 raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
+        except ClientDisconnected:
+            # This is handled one step up
+            raise
         except Exception:
             # send the error message, much more convenient than log hunting
             if remote_debugger:
