@@ -77,7 +77,7 @@ class WebInterfaceErrorPages(WebInterfaceDirectory):
                         req=req)
         elif argd['error'] == "NA":
             return page(title=_("Sorry"),
-                        body=_("Cannot send error request, %(x_name)s parameter missing.".x_name='error'),
+                        body=_("Cannot send error request, %(x_name)s parameter missing.", x_name='error'),
                         lastupdated=__lastupdated__,
                         req=req)
         else:

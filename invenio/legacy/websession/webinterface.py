@@ -410,17 +410,19 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         email = None
                     if not email:
                         mess += '<p>' + _("Unable to switch to external login method %(x_name)s, because your email address is unknown.",
-                                    x_name=cgi.escape(args['login_method']))
+                                          x_name=cgi.escape(args['login_method']))
                     else:
                         try:
                             if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']].user_exists(email):
-                                mess += '<p>' +  _("Unable to switch to external login method %(x_meth)s, because your email address is unknown to the external login system.", x_meth=cgi.escape(args['login_method']))
+                                mess += '<p>' +  _("Unable to switch to external login method %(x_meth)s, because your email address is unknown to the external login system.",
+                                                   x_meth=cgi.escape(args['login_method']))
                             else:
                                 prefs['login_method'] = args['login_method']
                                 webuser.set_user_preferences(uid, prefs)
                                 mess += '<p>' + _("Login method successfully selected.")
                         except AttributeError:
-                            mess += '<p>' + _("The external login method %(x_name)s does not support email address based logins.  Please contact the site administrators.", x_name=% cgi.escape(args['login_method']))
+                            mess += '<p>' + _("The external login method %(x_name)s does not support email address based logins.  Please contact the site administrators.",
+                                              x_name=cgi.escape(args['login_method']))
 
         ## Change email or nickname:
         if args['email'] or args['nickname']:

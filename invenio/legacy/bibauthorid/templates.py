@@ -1579,8 +1579,8 @@ class Template:
             h(('<strong>' + self._("We do not have a publication list for '%(x_name)s'." +
                                  " Try using a less specific author name, or check" +
                                  " back in a few days as attributions are updated " +
-                                 "frequently.  Or you can send us feedback, at ") +
-                                 "<a rel='nofollow' href=\"mailto:%(x_mail)s\">%(x_email)s</a>.</strong>", x_name=query, x_mail=, x_email=authemail))
+                                 "frequently.  Or you can send us feedback, at " +
+                                 "<a rel='nofollow' href=\"mailto:%(x_mail)s\">%(x_email)s</a>.</strong>", x_name=query, x_mail=authemail, x_email=authemail)))
             h('</div>')
             if new_person_link:
                 link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
