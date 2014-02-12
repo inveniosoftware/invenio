@@ -1867,6 +1867,12 @@ class BibFormatObject(object):
         if search_pattern is None:
             search_pattern = []
         self.search_pattern = search_pattern
+        try:
+            assert isinstance(recID, int), 'Argument of wrong type!'
+        except AssertionError:
+            register_exception(prefix="recid needs to be an integer in BibFormatObject",
+                               alert_admin=True)
+            recID = int(recID)
         self.recID = recID
         self.output_format = output_format
         self.user_info = user_info
