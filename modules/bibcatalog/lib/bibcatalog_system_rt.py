@@ -466,7 +466,8 @@ class BibCatalogSystemRT(BibCatalogSystem):
         os.environ["RTUSER"] = username
         os.environ["RTSERVER"] = bibcatalog_rt_server
         passwd = escape_shell_arg(passwd)
-        error_code, myout, dummyerr = run_shell_command("echo " + passwd + " | " + command)
+        error_code, myout, error_output = run_shell_command("echo " + passwd + " | " + command)
         if error_code > 0:
-            raise ValueError('Problem running "%s": %d' % (command, error_code))
+            raise ValueError('Problem running "%s": %d - %s' %
+                             (command, error_code, error_output))
         return myout
