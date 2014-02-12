@@ -3031,10 +3031,15 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         orcid_info = pinfo['orcid']
 
         # author should have already an orcid if this method was triggered
-        orcid_id = get_orcid_id_of_author(pinfo['pid'])[0][0]
+        try:
+            orcid_id = get_orcid_id_of_author(pinfo['pid'])[0][0]
+        except IndexError:
+            #weird, no orcid id in the database? Let's not do anything...
+            orcid_id = None
         orcid_dois = get_dois_from_orcid(orcid_id)
+
         # TODO: what to do in case some ORCID server error occurs?
-        if orcid_dois is None:
+        if orcid_id is None or orcid_dois is None:
             redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, pinfo['pid']))
 
         # TODO: it would be smarter if:
