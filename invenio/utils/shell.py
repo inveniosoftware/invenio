@@ -30,6 +30,7 @@ import fcntl
 import tempfile
 import time
 import signal
+import six
 import select
 from itertools import chain
 from cStringIO import StringIO
@@ -294,7 +295,8 @@ def escape_shell_arg(shell_arg):
     @raise TypeError: if shell_arg is not a string.
     @see: U{http://mail.python.org/pipermail/python-list/2005-October/346957.html}
     """
-    if type(shell_arg) is not str:
+
+    if type(shell_arg) is six.text_type:
         msg = "ERROR: escape_shell_arg() expected string argument but " \
               "got '%s' of type '%s'." % (repr(shell_arg), type(shell_arg))
         raise TypeError(msg)
