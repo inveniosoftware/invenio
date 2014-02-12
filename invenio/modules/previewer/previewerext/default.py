@@ -16,7 +16,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from flask import render_template
+from flask import render_template, request
+
 
 def can_preview(f):
     '''
@@ -24,8 +25,12 @@ def can_preview(f):
     '''
     return None
 
-def preview(f, emb = None):
+
+def preview(f):
     '''
     Returns appropiate template and passes the filea and an embed flag.
     '''
-    return render_template("previews/default.html", f=f, embed=emb)
+    if f is None:
+        f = ''  # FIXME
+    return render_template("previews/default.html", f=f,
+                           embed=request.args.get('embed', type=bool))
