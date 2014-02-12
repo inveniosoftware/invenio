@@ -556,135 +556,136 @@
 {%- endblock search_form_style %}
 {%- block search_form_body scoped %}
   <div id="search-box-main" class="row">
-    <nav class="navbar navbar-default" role="navigation">
-      {% block search_form_text scoped %}
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <span class="navbar-brand hidden-sm hidden-xs" id="search-label">
-          {%- set nbrecs = collection.nbrecs -%}
-          {%- if not collection.nbrecs -%}
-          {%- set nbrecs = 0 -%}
-          {%- endif -%}
-          {{ _("Search %(x_num)i records for", x_num=nbrecs) }}
-        </span>
-      </div>
-      {% endblock search_form_text %}
-
-
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      {% block search_form_form scoped %}
-      <div class="navbar-collapse">
-        <form action="{{ url_for('search.search') }}"
-            name="search"
-            method="get"
-            role="search"
-            id="searchform">
-        {% block search_form_ctrls scoped %}
-        <div class="nav navbar-nav navbar-left navbar-form">
-            <div class="input-group" id="searchform-input-group">
-              {% block search_form_ctrls_help scoped %}
-              <span class="input-group-btn">
-                <a class="dropdown-toggle btn btn-default"
-                       rel="tooltip" title="{{ _('Search Tips and Examples') }}"
-                       data-placement="bottom"
-                       data-delay="100"
-                       data-toggle="dropdown" role="button"
-                       href="#"><i class="glyphicon glyphicon-question-sign"></i>
-                </a>
-                <ul class="searchexamples dropdown-menu">
-                  <li>
-                    <a href="/help/search-tips">
-                      <strong>{{ _("Search Tips") }}</strong>
-                      <i class="pull-right glyphicon glyphicon-info-sign"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/help/search-guide">
-                      <i class="pull-right glyphicon glyphicon-leaf"></i>
-                      <strong>{{ _("Search Guide") }}</strong>
-                    </a>
-                  </li>
-                  {% if collection.examples %}
-                  <li class="divider"></li>
-                  <li class="dropdown-header">
-                    {{ _('Search examples') }}
-                  </li>
-                {%- for e in collection.examples if e.body -%}
-                  <li>
-                    <a href="{{ url_for('search.search', p=e.body) }}">
-                      <i class="pull-right glyphicon glyphicon-chevron-right"></i>
-                      <span class="after-fix">{{ e.body }}</span>
-                    </a>
-                  </li>
-                {%- endfor -%}
-                {% endif %}
-                </ul>
-              </span>
-              {% endblock search_form_ctrls_help %}
-              {% block search_form_ctrls_input scoped %}
-              <input autocomplete="off"
-                      data-items="4"
-                      name="p"
-                      class="form-control"
-                      type="text"
-                      {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
-                      tabindex="1"
-                      value="{{ request.args.get('p', '') }}"
-                      {%- if request.endpoint == 'search.index' -%}
-                      autofocus
-                      {%- endif -%}
-              />{% endblock search_form_ctrls_input %}{# No space! #}
-              {% block search_form_ctrls_settings scoped %}<span class="input-group-btn invenio-collapsable-tabs" data-toggle="buttons">
-                <a href="#" class="btn btn-default right-not-rounded left-not-rounded" data-toggle="collapse" data-target="#navbar-bottom">
-                  <i class="glyphicon glyphicon-plus"></i>
-                  <b class="caret"></b>
-                </a>
-                <a href="#" class="btn btn-default right-not-rounded left-not-rounded" data-toggle="collapse" data-target="#navbar-bottom2">
-                  <i class="glyphicon glyphicon-cog"></i>
-                  <b class="caret"></b>
-                </a>
-              </span>
-              {% endblock search_form_ctrls_settings %}
-              {% block search_form_ctrls_button scoped %}
-              <span class="input-group-btn">
-                <button name="action_search" type="submit" class="btn btn-primary btn-inline-icon-hide-sm">
-                  <i class="glyphicon glyphicon-search"></i><span>&nbsp;{{ _("Search") }}</span>
-                </button>
-              </span>
-              {% endblock search_form_ctrls_button %}
-            </div>
+    <div class="col-sm-12">
+      <nav class="navbar navbar-default" role="navigation">
+        {% block search_form_text scoped %}
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <span class="navbar-brand hidden-sm hidden-xs" id="search-label">
+            {%- set nbrecs = collection.nbrecs -%}
+            {%- if not collection.nbrecs -%}
+            {%- set nbrecs = 0 -%}
+            {%- endif -%}
+            {{ _("Search %s records for")|format(nbrecs) }}
+          </span>
         </div>
-        {% endblock search_form_ctrls %}
-        {% block search_form_dropdown_boxes scoped %}
-        <div class="nav navbar-nav navbar-row">
-          <div id="navbar-bottom" class="collapse">
-            <div class="row navbar-row-container">
-              <div class="col-md-12">
-                <script type="text/javascript">
-                  var box = {{ search_box(collection, easy_search_form)|tojson|safe }};
-                  document.write(box);
-                </script>
+        {% endblock search_form_text %}
+
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        {% block search_form_form scoped %}
+        <div class="navbar-collapse">
+          <form action="{{ url_for('search.search') }}"
+              name="search"
+              method="get"
+              role="search"
+              id="searchform">
+          {% block search_form_ctrls scoped %}
+          <div class="nav navbar-nav navbar-left navbar-form">
+              <div class="input-group" id="searchform-input-group">
+                {% block search_form_ctrls_help scoped %}
+                <span class="input-group-btn">
+                  <a class="dropdown-toggle btn btn-default"
+                         rel="tooltip" title="{{ _('Search Tips and Examples') }}"
+                         data-placement="bottom"
+                         data-delay="100"
+                         data-toggle="dropdown" role="button"
+                         href="#"><i class="glyphicon glyphicon-question-sign"></i>
+                  </a>
+                  <ul class="searchexamples dropdown-menu">
+                    <li>
+                      <a href="/help/search-tips">
+                        <strong>{{ _("Search Tips") }}</strong>
+                        <i class="pull-right glyphicon glyphicon-info-sign"></i>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="/help/search-guide">
+                        <i class="pull-right glyphicon glyphicon-leaf"></i>
+                        <strong>{{ _("Search Guide") }}</strong>
+                      </a>
+                    </li>
+                    {% if collection.examples %}
+                    <li class="divider"></li>
+                    <li class="dropdown-header">
+                      {{ _('Search examples') }}
+                    </li>
+                  {%- for e in collection.examples if e.body -%}
+                    <li>
+                      <a href="{{ url_for('search.search', p=e.body) }}">
+                        <i class="pull-right glyphicon glyphicon-chevron-right"></i>
+                        <span class="after-fix">{{ e.body }}</span>
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                  {% endif %}
+                  </ul>
+                </span>
+                {% endblock search_form_ctrls_help %}
+                {% block search_form_ctrls_input scoped %}
+                <input autocomplete="off"
+                        data-items="4"
+                        name="p"
+                        class="form-control"
+                        type="text"
+                        {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
+                        tabindex="1"
+                        value="{{ request.args.get('p', '') }}"
+                        {%- if request.endpoint == 'search.index' -%}
+                        autofocus
+                        {%- endif -%}
+                />{% endblock search_form_ctrls_input %}{# No space! #}
+                {% block search_form_ctrls_settings scoped %}<span class="input-group-btn invenio-collapsable-tabs" data-toggle="buttons">
+                  <a href="#" class="btn btn-default right-not-rounded left-not-rounded" data-toggle="collapse" data-target="#navbar-bottom">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <b class="caret"></b>
+                  </a>
+                  <a href="#" class="btn btn-default right-not-rounded left-not-rounded" data-toggle="collapse" data-target="#navbar-bottom2">
+                    <i class="glyphicon glyphicon-cog"></i>
+                    <b class="caret"></b>
+                  </a>
+                </span>
+                {% endblock search_form_ctrls_settings %}
+                {% block search_form_ctrls_button scoped %}
+                <span class="input-group-btn">
+                  <button name="action_search" type="submit" class="btn btn-primary btn-inline-icon-hide-sm">
+                    <i class="glyphicon glyphicon-search"></i><span>&nbsp;{{ _("Search") }}</span>
+                  </button>
+                </span>
+                {% endblock search_form_ctrls_button %}
+              </div>
+          </div>
+          {% endblock search_form_ctrls %}
+          {% block search_form_dropdown_boxes scoped %}
+          <div class="nav navbar-nav navbar-row">
+            <div id="navbar-bottom" class="collapse">
+              <div class="row navbar-row-container">
+                <div class="col-md-12">
+                  <script type="text/javascript">
+                    var box = {{ search_box(collection, easy_search_form)|tojson|safe }};
+                    document.write(box);
+                  </script>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        {% endblock search_form_dropdown_boxes %}
-        </form>
-        {% block search_form_settings scoped %}
-        <div class="nav navbar-nav navbar-row">
-          <div id="navbar-bottom2" class="collapse">
-            <div class="row navbar-row-container">
-              <div class="col-md-12">
-                {{ searchsettings_form(collection) }}
+          {% endblock search_form_dropdown_boxes %}
+          </form>
+          {% block search_form_settings scoped %}
+          <div class="nav navbar-nav navbar-row">
+            <div id="navbar-bottom2" class="collapse">
+              <div class="row navbar-row-container">
+                <div class="col-md-12">
+                  {{ searchsettings_form(collection) }}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        {% endblock search_form_settings %}
-      </div><!-- /.navbar-collapse -->
-      {% endblock search_form_form %}
-    </nav>
-
+          {% endblock search_form_settings %}
+        </div><!-- /.navbar-collapse -->
+        {% endblock search_form_form %}
+      </nav>
+    </div>
   </div>
   {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['websearch-after-search-form']) %}
   <div class="row">
