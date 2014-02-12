@@ -73,7 +73,7 @@ from invenio.search_engine import record_exists, get_colID, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.webuser import get_user_info, getUid, get_email
+from invenio.webuser import get_user_info, getUid, get_email, collect_user_info
 from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_engine import acc_authorize_action
@@ -120,7 +120,8 @@ def user_can_edit_record_collection(req, recid):
     # Get the collections the record belongs to
     record_collections = get_all_collections_of_a_record(recid)
 
-    uid = getUid(req)
+    user_info = collect_user_info(req)
+    uid = user_info["uid"]
     # In case we are creating a new record
     if cache_exists(recid, uid):
         record = get_cache_contents(recid, uid)[2]
