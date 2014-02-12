@@ -123,6 +123,13 @@
         {% endblock search_result_nb_recs %}
         {% block search_result_settings scoped %}
         <div class="form-group pull-right">
+          {%- set args = request.values.copy().to_dict() -%}
+            {%- set form_args = request.form.copy().to_dict() -%}
+            {%- if form_args|length() and 'filter' in form_args -%}
+              {%- do form_args.pop('filter') -%}
+              {%- do args.update(form_args) -%}
+            {%- endif -%}
+            {%- set new_args = args.copy() -%}
           {% block search_result_settings_sort scoped %}
           <div class="btn-group">
             <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
@@ -130,13 +137,6 @@
               <span class="caret"></span>
             </a>
 
-            {%- set args = request.values.copy().to_dict() -%}
-            {%- set form_args = request.form.copy().to_dict() -%}
-            {%- if form_args|length() and 'filter' in form_args -%}
-              {%- do form_args.pop('filter') -%}
-              {%- do args.update(form_args) -%}
-            {%- endif -%}
-            {%- set new_args = args.copy() -%}
             {%- if 'so' in new_args -%}
               {%- do new_args.pop('so') -%}
             {%- endif -%}
