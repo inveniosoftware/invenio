@@ -1118,12 +1118,9 @@ def get_uid_based_on_pref(prefname, prefvalue):
     return the_uid
 
 def get_user_preferences(uid):
-    pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
-    if pref:
-        try:
-            return deserialize_via_marshal(pref[0][1])
-        except:
-            pass
+    pref = run_sql("SELECT settings FROM user WHERE id=%s", (uid,))
+    if pref and pref[0][0]:
+        return deserialize_via_marshal(pref[0][0])
     return get_default_user_preferences() # empty dict mean no preferences
 
 def set_user_preferences(uid, pref):
@@ -1308,7 +1305,14 @@ def collect_user_info(req, login_time=False, refresh=False):
         if user_info['guest'] == '0':
             user_info['group'] = [group[1] for group in get_groups(uid)]
             prefs = get_user_preferences(uid)
-            login_method = prefs['login_method']
+            try:
+                login_method = prefs['login_method']
+            except KeyError:
+                # login_method is missing for some reason, bad news..
+                msg = "Data error: The mandatory key 'login_method' is missing"
+                register_exception(prefix=msg,
+                                   alert_admin=True)
+                login_method = get_default_user_preferences()['login_method']
             ## NOTE: we fall back to default login_method if the login_method
             ## specified in the user settings does not exist (e.g. after
             ## a migration.)
