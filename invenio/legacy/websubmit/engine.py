@@ -233,7 +233,7 @@ def interface(req,
         indir = submission_dir
     else:
         ## Unable to determine the submission-directory:
-        return warning_page(_("Unable to find the submission directory for the action: %(x_dir)s", x_dir=escape(str(act)), req, ln))
+        return warning_page(_("Unable to find the submission directory for the action: %(x_dir)s", x_dir=escape(str(act))), req, ln)
 
     ## get the document type's long-name:
     doctype_lname = get_longname_of_doctype(doctype)
@@ -837,7 +837,7 @@ def endaction(req,
         indir = submission_dir
     else:
         ## Unable to determine the submission-directory:
-        return warning_page(_("Unable to find the submission directory for the action: %(x_dir)s", x_dir=escape(str(act)), req, ln))
+        return warning_page(_("Unable to find the submission directory for the action: %(x_dir)s", x_dir=escape(str(act))), req, ln)
     curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, indir, doctype, access)
     if os.path.exists(os.path.join(curdir, "combo%s" % doctype)):
         fp = open(os.path.join(curdir, "combo%s" % doctype), "r");
@@ -902,7 +902,7 @@ def endaction(req,
         indir = submission_dir
     else:
         ## Unable to determine the submission-directory:
-        return warning_page(_("Unable to find the submission directory for the action: %(x_dir)s", x_dir=escape(str(act)), req, ln))
+        return warning_page(_("Unable to find the submission directory for the action: %(x_dir)s", x_dir=escape(str(act))), req, ln)
 
     # The following words are reserved and should not be used as field names
     reserved_words = ["stop", "file", "nextPg", "startPg", "access", "curpage", "nbPg", "act", \

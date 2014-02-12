@@ -235,7 +235,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                      'account' : _("Your Account"),
                                   },
                         description=_("%(x_name)s Personalize, Set a new alert", x_name=CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME)),
-                        keywords=_("%(x_name)s, personalize" x_name=CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME)),
+                        keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME)),
                         uid=uid,
                         language=argd['ln'],
                         req=req,
