@@ -113,11 +113,12 @@ def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
     else:
         args = ()
     # construct command with argument substitution:
-    try:
-        cmd = cmd % tuple([escape_shell_arg(x) for x in args])
-    except TypeError:
-        # there were problems with %s and args substitution, so raise an error:
-        raise
+    if args:
+        try:
+            cmd = cmd % tuple([escape_shell_arg(x) for x in args])
+        except TypeError:
+            # there were problems with %s and args substitution, so raise an error:
+            raise
     cmd_out = ''
     cmd_err = ''
     # create files:
