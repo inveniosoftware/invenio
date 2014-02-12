@@ -670,25 +670,33 @@ R2a. Commit message format
 Invenio git commit log messages are usually formatted in the following
 way:
 
-* commit message headline providing short summary (up to about 50 chars) formatted in the style of `ModuleName: short description`. (using mostly nouns, no verbs)
+* commit message headline providing short summary (maximum 50 chars) 
+  formatted in the style of `ModuleName: short description`. (using mostly 
+  nouns, no verbs);
 
-* empty line
+* empty line;
 
-* commit message body with detailed description of what this patch does, formatted as a bulletted list. (using present tense)
+* commit message body with detailed description of what this patch 
+  does, formatted as a bulletted list, with one empty line between 
+  items (using present tense).
 
-Here is an example: changeset:b98f24bf38b95dd7366d57e8d6d90804957099e5::
+Here is an example: changeset:71df9665bf5fcdd020b67e4cbcedfaddfd6cadaa::
 
-    BibDocFile: additional mimetypes support
+    WebSearch: field-filtered MARCXML API output
+    
+    * Implements field-filtered MARCXML output in Python and Web APIs.
+      This was working for the TextMARC output, not for MARCXML output.
+      This commit fixes the problem.  Usage: `/record/123?of=xm&ot=100,700`
+      or `/search?p=ellis&of=xm&ot=100,700`.  (closes #1591)
 
-
-    * Introduces new CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES config
-      variable to be able to recognize new mimetypes from a given file
-      extension (useful in case an old mimetypes Python module is used).
-
+    * Adds new tests for trying to access hidden fields via the
+      filtered-field API technique.
 
 Note that if you use `vim` or `emacs git-modes` to write your commit
 messages, you will be alerted about the excessive headline length
-(more than 50 characters) via colour syntax highlighting.
+(more than 50 characters) via colour syntax highlighting. To use `vim`
+for example as your commit message editor, add `export EDITOR=vim` to
+your `.bashrc`, `bash_profile` or variants.
 
 The short commit logs are easily readable on narrow mobile devices,
 are helpful to quickly localise features, and ease any possible
