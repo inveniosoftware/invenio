@@ -1369,13 +1369,12 @@ class WordTable(AbstractIndexTable):
                     wlist[recID] = list_union(new_words, wlist[recID])
         elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["multifield"]:
             # tokenizers operating on multiple fields/tags at a time
-            for tag in self.fields_to_index:
-                tokenizing_function = self.tag_to_words_fnc_map.get(tag, self.default_tokenizer_function)
-                for recID in range(recID1, recID2 + 1):
-                    new_words = tokenizing_function(recID)
-                    if not wlist.has_key(recID):
-                        wlist[recID] = []
-                    wlist[recID] = list_union(new_words, wlist[recID])
+            tokenizing_function = self.default_tokenizer_function
+            for recID in range(recID1, recID2 + 1):
+                new_words = tokenizing_function(recID)
+                if not wlist.has_key(recID):
+                    wlist[recID] = []
+                wlist[recID] = list_union(new_words, wlist[recID])
         elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["string"]:
             # tokenizers operating on one field/tag and phrase at a time
             for tag in self.fields_to_index:

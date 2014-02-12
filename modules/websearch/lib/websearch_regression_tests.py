@@ -4681,7 +4681,7 @@ def make_fake_request(admin_user=True):
     buf = cStringIO.StringIO()
 
     def start_response(status, response_headers, exc_info=None):
-            return buf.write
+        return buf.write
 
     req = SimulatedModPythonRequest(environ, start_response)
     req._user_info = user_info
@@ -4782,6 +4782,28 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
         self._run_test('p=recid:148x', [])
 
         self._run_test('p=recid:148x;of=xm;rg=200', "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n\n</collection>")
+
+
+class WebSearchDOIQueryTest(InvenioTestCase):
+    """Tests queries using doi field."""
+
+    def test_span_doi_search(self):
+        """websearch - doi, span query 1->9"""
+        errors = test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=doi%3A1->9&of=id',
+                                       expected_text="[128, 127, 96]")
+        self.assertEqual(True, errors == [])
+
+    def test_doi_wildcard(self):
+        """websearch - doi, query for '10.1063%'"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=doi%3A10.1063%25&of=id',
+                                               expected_text="[127]"))
+
+    def test_doi_negative_search(self):
+        """websearch - doi, query for 'VDB:88636' """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=VDB%3A88636&f=doi&of=id',
+                                               expected_text="[]"))
 
 
 class WebSearchGetRecordTests(InvenioTestCase):
@@ -4938,6 +4960,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchWashCollectionsTest,
                              WebSearchAuthorCountQueryTest,
                              WebSearchFiletypeQueryTest,
+                             WebSearchDOIQueryTest,
                              WebSearchPerformRequestSearchRefactoringTest,
                              WebSearchGetRecordTests,
                              WebSearchExactTitleIndexTest,

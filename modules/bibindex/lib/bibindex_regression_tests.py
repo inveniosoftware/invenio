@@ -618,6 +618,47 @@ class BibIndexFiletypeIndexTest(InvenioTestCase):
         self.assertEqual(set2, ['pdf', 'ps.gz'])
 
 
+class BibIndexDOIIndexTest(InvenioTestCase):
+    """
+       Checks DOI index.
+    """
+
+    def test_doi_values_record_127(self):
+        """bibindex - tests if record 127 has proper values in DOI index"""
+        query = "SELECT termlist FROM idxWORD%02dR where id_bibrec=127" \
+                % get_index_id_from_index_name('doi')
+        res = run_sql(query)
+        self.assertEqual(deserialize_via_marshal(res[0][0]), ['10.1063/1.2737136'])
+
+    def test_doi_values_record_130(self):
+        """bibindex - tests if record 130 doesn't have any values indexed"""
+        query = "SELECT termlist FROM idxWORD%02dR where id_bibrec=130" \
+                % get_index_id_from_index_name('doi')
+        res = run_sql(query)
+        self.assertEqual(deserialize_via_marshal(res[0][0]), [])
+
+    def test_doi_values_like_63(self):
+        """bibindex - tests how many values like ".*63.*" were indexed"""
+        query = """SELECT count(*) FROM idxWORD%02dF where term LIKE '%%63%%' """ \
+                % get_index_id_from_index_name('doi')
+        res = run_sql(query)
+        self.assertEqual(res[0][0], 2)
+
+    def test_records_for_doi_value(self):
+        """bibindex - tests records for '0255-5476' value"""
+        query = """SELECT hitlist FROM idxWORD%02dF where term='0255-5476' """ \
+                % get_index_id_from_index_name('doi')
+        res = run_sql(query)
+        self.assertEqual(res, tuple())
+
+    def test_if_909C4_is_indexed(self):
+        """bibindex - checks if values from 909C4 are indexed"""
+        query = """SELECT id_bibrec,termlist FROM idxWORD%02dR """ \
+                % get_index_id_from_index_name('doi')
+        res = run_sql(query)
+        self.assertTrue(96 in [id_bibrec for id_bibrec,terms in res if deserialize_via_marshal(terms)])
+
+
 class BibIndexJournalIndexTest(InvenioTestCase):
     """
         Checks journal index. Tests are diffrent than those inside WebSearch module because
@@ -739,13 +780,13 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         run_sql("UPDATE bibrec SET modification_date = now() WHERE id = %s", (authRecID,))
         # run bibindex again
         task_id = reindex_for_type_with_bibsched(index_name, force_all=True)
-
         filename = task_log_path(task_id, 'log')
         _file = open(filename)
         text = _file.read() # small file
         _file.close()
         self.assertTrue(text.find(CFG_BIBINDEX_UPDATE_MESSAGE) >= 0)
-        self.assertTrue(text.find(CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR % (table, 1, get_max_recid())) >= 0)
+        adding_records_text = CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR[:CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR.find("#")] % table
+        self.assertTrue(text.find(adding_records_text) >= 0)
 
     def test_authority_record_enriched_index(self):
         """bibindex - test whether reverse index for bibliographic record
@@ -1691,6 +1732,7 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexAuthorCountIndexTest,
                              BibIndexItemCountIndexTest,
                              BibIndexFiletypeIndexTest,
+                             BibIndexDOIIndexTest,
                              BibIndexJournalIndexTest,
                              BibIndexCJKTokenizerTitleIndexTest,
                              BibIndexAuthorityRecordTest,
