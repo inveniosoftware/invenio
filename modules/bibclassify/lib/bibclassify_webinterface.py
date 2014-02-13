@@ -53,14 +53,16 @@ log = bconfig.get_logger("bibclassify.webinterface")
 template = load('bibclassify')
 
 
-
-def main_page(req, recid, tabs, ln, template):
+def main_page(req, recid, tabs, ln,
+              webstyle_template,
+              websearch_template):
     """Generates the main page for the keyword tab - http://url/record/[recid]/keywords
     @var req: request object
     @var recid: int docid
     @var tabs: list of tab links
     @var ln: language id
-    @var template: template object
+    @var webstyle_template: template object
+    @var websearch_template: template object
     @return: nothing, writes using req object
     """
 
@@ -72,12 +74,12 @@ def main_page(req, recid, tabs, ln, template):
         'numbering': (str, 'off'),
         'showall': (str, 'off'),
         })
-    for k,v in argd.items():
+
+    for k, v in argd.items():
         argd[k] = escape(v)
 
-
-    req.write(template.detailed_record_container_top(recid, tabs, ln))
-
+    req.write(webstyle_template.detailed_record_container_top(recid, tabs, ln))
+    req.write(websearch_template.tmpl_record_plots(recID=recid, ln=ln))
 
     # Get the keywords from MARC (if any)
     success, keywords, marcrec = record_get_keywords(recid)
@@ -91,7 +93,8 @@ def main_page(req, recid, tabs, ln, template):
             except Exception, msg:
                 log.error('Error removing the cached file: %s' % tmp_file)
                 log.error(msg)
-    else:
+
+    if argd['generate'] == "yes" or not success:
         # Give user possibility to generate them ONLY if not available already
         # we may have some keywords, but they are the old ones and we want to generate new
         new_found, new_keywords, marcrec = generate_keywords(req, recid, argd)
@@ -105,8 +108,10 @@ def main_page(req, recid, tabs, ln, template):
         # Output the keywords or the generate button or some message why kw not available
         write_keywords_body(keywords, req, recid, argd, marcrec=marcrec)
 
-    req.write(template.detailed_record_container_bottom(recid,
-        tabs, ln))
+    if argd['sorting'] == 'related' and not keywords:
+        req.write('You may want to run BibIndex.')
+
+    req.write(webstyle_template.detailed_record_container_bottom(recid, tabs, ln))
 
 
 def write_keywords_body(keywords, req, recid, argd, marcrec=None):
