@@ -4723,7 +4723,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                     elif tab == 'keywords':
                         from invenio.bibclassify_webinterface import main_page
                         main_page(req, recid, tabs, ln,
-                                  webstyle_templates)
+                                  webstyle_templates,
+                                  websearch_templates)
                     elif tab == 'plots':
                         req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,
