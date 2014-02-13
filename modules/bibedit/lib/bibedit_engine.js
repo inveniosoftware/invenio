@@ -1875,7 +1875,7 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
   addContentToDialog(dialogPreview, html_preview, "Do you want to submit the record?");
   dialogPreview.dialogDiv.dialog({
         title: "Confirm submit",
-        close: function() { updateStatus('ready'); },
+        close: function() { updateStatus('ready'); $('#btnSubmit').prop('disabled', false);},
         buttons: {
             "Submit changes": function() {
                         var reqData = {
@@ -1909,6 +1909,7 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
                     },
             Cancel: function() {
                         updateStatus('ready');
+                        $('#btnSubmit').prop('disabled', false);
                         $( this ).remove();
                     }
     }});
@@ -1987,13 +1988,14 @@ function onSubmitClick() {
    * Handle 'Submit' button (submit record).
    */
   log_action("onSubmitClick");
+  $('#btnSubmit').prop('disabled', true);
   save_changes().done(function() {
     updateStatus('updating');
     /* Save all opened fields before submitting */
     var savingOpenedFields = saveOpenedFields(savingOpenedFields);
 
     savingOpenedFields.done(function() {
-      var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
+      var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true, true);
 
       // Get preview of the record and let the user confirm submit
       getPreview(dialogPreview, onSubmitPreviewSuccess);
@@ -2241,36 +2243,28 @@ function onCancelClick(){
   log_action("onCancelClick");
   updateStatus('updating');
   if (!gRecordDirty || displayAlert('confirmCancel')) {
-  createReq({
-    recID: gRecID,
-    requestType: 'cancel'
-  }, function(json){
-    // Cancellation was successful.
+    createReq({
+      recID: gRecID,
+      requestType: 'cancel'
+    }, function(json) {
+      // Cancellation was successful.
       changeAndSerializeHash({
           state: 'cancel',
           recid: gRecID
-        });
-        cleanUp(!gNavigatingRecordSet, '', null, true, true, false);
-        updateStatus('report', gRESULT_CODES[json['resultCode']]);
-      }, false);
+      });
+      cleanUp(!gNavigatingRecordSet, '', null, true, true, false);
+      updateStatus('report', gRESULT_CODES[json['resultCode']]);
       holdingPenPanelRemoveEntries();
-      gUndoList = [];
-      gRedoList = [];
-      gReadOnlyMode = false;
-      gRecRevisionHistory = [];
-      gHoldingPenLoadedChanges = [];
-      gHoldingPenChanges = [];
-      gPhysCopiesNum = 0;
-      gBibCircUrl = null;
       // making the changes visible
       updateBibCirculationPanel();
       updateRevisionsHistory();
       updateUrView();
       updateToolbar(false);
-    }
-    else {
-      updateStatus('ready');
-    }
+      }, false);
+  }
+  else {
+    updateStatus('ready');
+  }
 }
 
 
