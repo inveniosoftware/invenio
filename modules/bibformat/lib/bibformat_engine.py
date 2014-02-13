@@ -2083,6 +2083,17 @@ class BibFormatObject(object):
         except IndexError:
             return default
 
+    def __repr__(self):
+        """
+        Representation of the BibFormatObject. Useful for debugging.
+        """
+        return "<BibFormatObject(recid=%r,lang=%r,search_pattern=%r,output_format=%r," \
+               "user_info=%r, record=%r)" % (self.recID,
+                                             self.lang,
+                                             self.search_pattern,
+                                             self.output_format,
+                                             self.user_info,
+                                             self.record)
 
 # Utility functions
 ##
