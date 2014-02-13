@@ -1402,7 +1402,7 @@ function createTemplateList() {
  * **************************** Functions related to jquery UI dialog ****************************************
  */
 
-function createDialog(title, content, height, width, loading) {
+function createDialog(title, content, height, width, loading, modal) {
     /* Creates a jQuery UI dialog
      *
      * title: string, title displayed on top of the dialog
@@ -1430,12 +1430,16 @@ function createDialog(title, content, height, width, loading) {
     }
     dialogDiv.append(contentParagraph.append(contentSpan));
     dialogDiv.appendTo($('body'));
-    dialogDiv.dialog({
-        title: title,
-        resizable: false,
-        height: height,
-        width: width
-    });
+    dialog_options = {}
+    dialog_options.title = title;
+    dialog_options.resizeable = false;
+    dialog_options.height = height;
+    dialog_options.width = width;
+    if (modal == true) {
+        dialog_options.modal = true;
+    }
+
+    dialogDiv.dialog(dialog_options);
 
     return dialog;
 }
