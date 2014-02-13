@@ -162,10 +162,15 @@
     });
   });
 
-  function bindModals() {
+  function bindModals(filter) {
     // Support for AJAX loaded modal window.
     // Focuses on first input textbox after it loads the window.
-    $('[data-toggle="modal"]').click(function(e) {
+    if (filter) {
+      filter = '[data-toggle="modal"]' + filter;
+    } else {
+      filter = '[data-toggle="modal"]';
+    }
+    $(filter).click(function (e) {
         e.preventDefault();
         var href = $(this).attr('href');
         if (href.indexOf('#') === 0) {
@@ -178,7 +183,9 @@
     });
   }
 
-  $(document).ready(bindModals);
+  $(document).ready(function() {
+    bindModals();
+  });
   window.bindModals = bindModals;
 
   $(document).on('hidden.bs.modal', function() {
