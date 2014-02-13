@@ -685,8 +685,6 @@ def _record_in_files_p(recid, filenames):
     # Get id tags of record in question
     rec_oaiid = rec_sysno = -1
     rec_oaiid_tag = get_fieldvalues(recid, OAIID_TAG)
-    if rec_oaiid_tag:
-        rec_oaiid = rec_oaiid_tag[0]
     rec_sysno_tag = get_fieldvalues(recid, SYSNO_TAG)
     if rec_sysno_tag:
         rec_sysno = rec_sysno_tag[0]
@@ -696,15 +694,15 @@ def _record_in_files_p(recid, filenames):
         try:
             if CFG_BIBEDIT_QUEUE_CHECK_METHOD == 'regexp':
                 # check via regexp: this is fast, but may not be precise
-                re_match_001 = re.compile('<controlfield tag="001">%s</controlfield>' % (recid))
-                re_match_oaiid = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (OAIID_TAG[0:3], rec_oaiid))
-                re_match_sysno = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (SYSNO_TAG[0:3], rec_sysno))
                 file_content = open(filename).read()
+                re_match_001 = re.compile('<controlfield tag="001">%s</controlfield>' % (recid))
                 if re_match_001.search(file_content):
                     return True
-                if rec_oaiid_tag:
+                for rec_oaiid in rec_oaiid_tag:
+                    re_match_oaiid = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (OAIID_TAG[0:3], re.escape(rec_oaiid)))
                     if re_match_oaiid.search(file_content):
                         return True
+                re_match_sysno = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (SYSNO_TAG[0:3], re.escape(rec_sysno)))
                 if rec_sysno_tag:
                     if re_match_sysno.search(file_content):
                         return True
