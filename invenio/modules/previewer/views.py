@@ -22,13 +22,13 @@
 from flask import Blueprint
 from flask.ext.breadcrumbs import default_breadcrumb_root
 
-from .registry import previews
+from .registry import previewers
 
 from invenio.base.decorators import wash_arguments
 from invenio.config import CFG_SITE_RECORD
 from invenio.modules.records.views import request_record
 
-blueprint = Blueprint('previews', __name__, url_prefix="/" + CFG_SITE_RECORD,
+blueprint = Blueprint('previewer', __name__, url_prefix="/" + CFG_SITE_RECORD,
                       static_url_path='/record', template_folder='templates',
                       static_folder='static')
 
@@ -46,7 +46,7 @@ def preview(recid, embed=False, filename=None):
 
     for f in files:
         if f.name + f.superformat == filename:
-            for plugin_id in previews:
-                if previews[plugin_id]['can_preview'](f):
-                    return previews[plugin_id]['preview'](f, embed == 'true')
-    return previews['preview_default']['preview'](filename, embed == 'true')
+            for plugin_id in previewers:
+                if previewers[plugin_id]['can_preview'](f):
+                    return previewers[plugin_id]['preview'](f, embed == 'true')
+    return previewers['preview_default']['preview'](filename, embed == 'true')
