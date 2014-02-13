@@ -648,10 +648,10 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             # Clone an existing record (from the users cache).
             existing_cache = cache_exists(recid, uid)
             if existing_cache:
-                cache = get_cache_contents(recid, uid)
-                if cache:
+                try:
+                    cache = get_cache_contents(recid, uid)
                     record = cache[2]
-                else:
+                except InvalidCache:
                     # if, for example, the cache format was wrong (outdated)
                     record = get_bibrecord(recid)
             else:
