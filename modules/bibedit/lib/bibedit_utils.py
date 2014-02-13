@@ -702,7 +702,7 @@ def _record_in_files_p(recid, filenames):
                     re_match_oaiid = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (OAIID_TAG[0:3], re.escape(rec_oaiid)))
                     if re_match_oaiid.search(file_content):
                         return True
-                re_match_sysno = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (SYSNO_TAG[0:3], re.escape(rec_sysno)))
+                re_match_sysno = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (SYSNO_TAG[0:3], re.escape(str(rec_sysno))))
                 if rec_sysno_tag:
                     if re_match_sysno.search(file_content):
                         return True
