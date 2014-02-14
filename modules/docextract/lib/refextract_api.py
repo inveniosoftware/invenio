@@ -332,7 +332,11 @@ def search_from_reference(text):
     return field, pattern.encode('utf-8')
 
 
-def check_record_for_refextract(recid):
+def record_can_extract_refs(recid):
+    return not bool(get_fieldvalues(recid, '999C5_'))
+
+
+def record_can_overwrite_refs(recid):
     if get_fieldvalues(recid, '999C6v'):
         # References extracted by refextract
         if get_fieldvalues(recid, '999C59'):
