@@ -26,11 +26,15 @@ They are intended to make sure there is no regression in references parsing.
 
 from invenio.testutils import InvenioTestCase
 import re
+from mock import patch
 
+from invenio import bibupload
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.testutils import make_test_suite, run_test_suite, InvenioXmlTestCase
 from invenio.refextract_engine import parse_references
 from invenio.docextract_utils import setup_loggers
 from invenio.refextract_text import wash_and_repair_reference_line
+from invenio.config import CFG_ETCDIR
 from invenio import refextract_kbs
 from invenio import refextract_record
 
@@ -2877,10 +2881,73 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
 class TaskTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=0)
+        self.recid = 20
 
     def test_task_run_core(self):
         from invenio.refextract_task import task_run_core
         task_run_core(1, [])
+
+    def test_overwrite(self):
+        from invenio.refextract_task import extract_one
+        def mocked_look_for_fulltext(recid):
+            return "%s/docextract/example.pdf" % CFG_ETCDIR
+        with patch('invenio.refextract_api.look_for_fulltext', mocked_look_for_fulltext):
+            results = []
+            try:
+                extract_one(self.recid, results)
+            except NotSafeForExtraction:
+                pass
+            else:
+                self.assertEqual(len(results), 1)
+                self.assertTrue(results[0]['999C5'])
+
+
+class TaskRecordWithRefsTest(unittest.TestCase):
+    def setUp(self):
+        """Setup record needed for tests
+
+        We setup the record with id=self.recid to have a single dummy
+        reference."""
+        setup_loggers(verbosity=0)
+        self.recid = 20
+        self.bibupload_xml = """<record>
+            <controlfield tag="001">%s</controlfield>
+            <datafield tag="999" ind1="C" ind2="5">
+                <subfield code="m">This is a dummy reference</subfield>
+            </datafield>
+        </record>""" % self.recid
+        recs = bibupload.xml_marc_to_records(self.bibupload_xml)
+        status, dummy, err = bibupload.bibupload(recs[0], opt_mode='correct')
+        assert status == 0, err.strip()
+        assert len(get_fieldvalues(self.recid, '999C5m')) == 1
+
+    def tearDown(self):
+        """Helper function that restores self.recid MARCXML"""
+        recs = bibupload.xml_marc_to_records(self.bibupload_xml)
+        bibupload.bibupload(recs[0], opt_mode='delete')
+
+    def test_no_overwrite(self):
+        from invenio.refextract_task import extract_one, NotSafeForExtraction
+        try:
+            extract_one(self.recid, [])
+        except NotSafeForExtraction:
+            pass
+        else:
+            self.fail()
+
+    def test_overwrite(self):
+        from invenio.refextract_task import extract_one, NotSafeForExtraction
+        def mocked_look_for_fulltext(recid):
+            return "%s/docextract/example.pdf" % CFG_ETCDIR
+        with patch('invenio.refextract_api.look_for_fulltext', mocked_look_for_fulltext):
+            results = []
+            try:
+                extract_one(self.recid, results, overwrite=True)
+            except NotSafeForExtraction:
+                pass
+            else:
+                self.assertEqual(len(results), 1)
+                self.assertTrue(results[0]['999C5'])
 
 TEST_SUITE = make_test_suite(RefextractTest)
 if __name__ == '__main__':
