@@ -47,6 +47,7 @@ Flask-Login==0.2.7
 Flask-Principal==0.4.0
 Flask-RESTful==0.2.11
 #Flask-SQLAlchemy==1.0
+Flask-OAuthlib==0.4.3
 git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy-1.99
 git+git://github.com/inveniosoftware/flask-menu.git#egg=Flask-Menu-0.1
 git+git://github.com/inveniosoftware/flask-breadcrumbs.git#egg=Flask-Breadcrumbs-0.1
@@ -63,3 +64,6 @@ git+https://github.com/lnielsen-cern/setuptools-bower.git#egg=setuptools-bower-0
 importlib==1.0.3
 pytz
 PyLD
+SQLAlchemy-Utils==0.23.1
+wtforms-alchemy==0.12.1
+mock==1.0.1
