@@ -2,6 +2,8 @@
 import distutils.sysconfig
 from os.path import join
 
+from invenio.utils.shell import which
+
 EXTENSIONS = [
     'invenio.ext.confighacks',
     'invenio.ext.jinja2hacks',
@@ -329,11 +331,11 @@ CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS = 1
 CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION = 0
 CFG_BIBRANK_SHOW_DOWNLOAD_STATS = 1
 CFG_BIBRANK_SHOW_READING_STATS = 1
-CFG_BIBSCHED_EDITOR = "/usr/bin/vim"
+CFG_BIBSCHED_EDITOR = which("vim")
 CFG_BIBSCHED_GC_TASKS_OLDER_THAN = 30
 CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE = ['bibupload', 'oairepositoryupdater', ]
 CFG_BIBSCHED_GC_TASKS_TO_REMOVE = ['bibindex', 'bibreformat', 'webcoll', 'bibrank', 'inveniogc', ]
-CFG_BIBSCHED_LOG_PAGER = "/usr/bin/less"
+CFG_BIBSCHED_LOG_PAGER = which("less")
 CFG_BIBSCHED_MAX_ARCHIVED_ROWS_DISPLAY = 500
 CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS = 1
 CFG_BIBSCHED_NODE_TASKS = {}
@@ -441,36 +443,36 @@ CFG_OPENOFFICE_SERVER_HOST = "localhost"
 CFG_OPENOFFICE_SERVER_PORT = 2002
 CFG_OPENOFFICE_USER = "nobody"
 CFG_PATH_ANY2DJVU = ""
-CFG_PATH_CONVERT = "/usr/local/bin/convert"
+CFG_PATH_CONVERT = which("convert")
 CFG_PATH_DJVUPS = ""
 CFG_PATH_DJVUTXT = ""
 CFG_PATH_FFMPEG = ""
 CFG_PATH_FFPROBE = ""
-CFG_PATH_GFILE = "/usr/bin/file"
-CFG_PATH_GS = "/usr/local/bin/gs"
-CFG_PATH_GUNZIP = "/usr/bin/gunzip"
-CFG_PATH_GZIP = "/usr/bin/gzip"
+CFG_PATH_GFILE = which("file")
+CFG_PATH_GS = which("gs")
+CFG_PATH_GUNZIP = which("gunzip")
+CFG_PATH_GZIP = which("gzip")
 CFG_PATH_MD5SUM = ""
 CFG_PATH_MEDIAINFO = ""
-CFG_PATH_MYSQL = "/usr/local/bin/mysql"
+CFG_PATH_MYSQL = which("mysql")
 CFG_PATH_OCROSCRIPT = ""
-CFG_PATH_OPENOFFICE_PYTHON = "bin/python"
-CFG_PATH_PAMFILE = "/usr/local/bin/pdftoppm"
-CFG_PATH_PDF2PS = "/usr/local/bin/pdf2ps"
-CFG_PATH_PDFINFO = "/usr/local/bin/pdfinfo"
-CFG_PATH_PDFLATEX = "/usr/texbin/pdflatex"
-CFG_PATH_PDFOPT = "/usr/local/bin/pdfopt"
+CFG_PATH_OPENOFFICE_PYTHON = which("python")
+CFG_PATH_PAMFILE = which("pdftoppm")
+CFG_PATH_PDF2PS = which("pdf2ps")
+CFG_PATH_PDFINFO = which("pdfinfo")
+CFG_PATH_PDFLATEX = which("pdflatex")
+CFG_PATH_PDFOPT = which("pdfopt")
 CFG_PATH_PDFTK = ""
-CFG_PATH_PDFTOPPM = "/usr/local/bin/pdftoppm"
-CFG_PATH_PDFTOPS = "/usr/local/bin/pdftops"
-CFG_PATH_PDFTOTEXT = "/usr/local/bin/pdftotext"
-CFG_PATH_PHP = "/usr/bin/php"
-CFG_PATH_PS2PDF = "/usr/local/bin/ps2pdf"
-CFG_PATH_PSTOASCII = "/usr/local/bin/ps2ascii"
+CFG_PATH_PDFTOPPM = which("pdftoppm")
+CFG_PATH_PDFTOPS = which("pdftops")
+CFG_PATH_PDFTOTEXT = which("pdftotext")
+CFG_PATH_PHP = which("php")
+CFG_PATH_PS2PDF = which("ps2pdf")
+CFG_PATH_PSTOASCII = which("ps2ascii")
 CFG_PATH_PSTOTEXT = ""
-CFG_PATH_TAR = "/usr/bin/tar"
-CFG_PATH_TIFF2PDF = "/usr/local/bin/tiff2pdf"
-CFG_PATH_WGET = "/usr/local/bin/wget"
+CFG_PATH_TAR = which("tar")
+CFG_PATH_TIFF2PDF = which("tiff2pdf")
+CFG_PATH_WGET = which("wget")
 CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT = 750
 CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT = 2
 CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT = 75
