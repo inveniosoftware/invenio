@@ -1870,7 +1870,12 @@ class BibFormatObject(object):
         try:
             assert isinstance(recID, (int, long)), 'Argument of wrong type!'
         except AssertionError:
-            register_exception(prefix="recid needs to be an integer in BibFormatObject",
+            from StringIO import StringIO
+            stream = StringIO()
+            traceback.print_stack(file=stream)
+            prefix = stream.getvalue()
+            prefix += "\nrecid needs to be an integer in BibFormatObject"
+            register_exception(prefix=prefix,
                                alert_admin=True)
             recID = int(recID)
         self.recID = recID
