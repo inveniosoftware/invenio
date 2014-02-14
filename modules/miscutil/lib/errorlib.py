@@ -414,6 +414,8 @@ def register_exception(stream='error',
         finally:
             client.context.clear()
 
+    from invenio.webinterface_handler import ClientDisconnected
+
     if CFG_PROPAGATE_EXCEPTIONS:
         raise
 
@@ -421,6 +423,9 @@ def register_exception(stream='error',
         ## Let's extract exception information
         exc_info = sys.exc_info()
         exc_name = exc_info[0].__name__
+
+        if exc_info[0] in (ClientDisconnected, KeyboardInterrupt):
+            raise
 
         output = get_pretty_traceback(
             req=req, exc_info=exc_info, skip_frames=2)
