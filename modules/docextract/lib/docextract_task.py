@@ -19,41 +19,31 @@
 
 """Generic Framework for extracting metadata from records using bibsched"""
 
-import traceback
-
 from datetime import datetime
 from itertools import chain
 from invenio.bibtask import task_get_option, write_message, \
                             task_sleep_now_if_required, \
                             task_update_progress
 from invenio.dbquery import run_sql
-from invenio.search_engine import get_record
 from invenio.search_engine import get_collection_reclist
-from invenio.refextract_api import get_pdf_doc
-from invenio.bibrecord import record_get_field_instances, \
-                              field_get_subfield_values
 
 
 def task_run_core_wrapper(name, core_func, extra_vars=None, post_process=None):
     def fun():
-        try:
-            return task_run_core(name, core_func,
-                                 extra_vars=extra_vars,
-                                 post_process=post_process)
-        except Exception:
-            # Remove extra '\n'
-            write_message(traceback.format_exc()[:-1])
-            raise
+        return task_run_core(name,
+                             core_func,
+                             extra_vars=extra_vars,
+                             post_process=post_process)
     return fun
 
 
 def fetch_last_updated(name):
-    select_sql = "SELECT last_recid, last_updated FROM xtrJOB" \
-        " WHERE name = %s LIMIT 1"
+    select_sql = """SELECT last_recid, last_updated FROM xtrJOB
+                    WHERE name = %s LIMIT 1"""
     row = run_sql(select_sql, (name,))
     if not row:
-        sql = "INSERT INTO xtrJOB (name, last_updated, last_recid) " \
-            "VALUES (%s, '1970-01-01', 0)"
+        sql = """INSERT INTO xtrJOB (name, last_updated, last_recid)
+                 VALUES (%s, '1970-01-01', 0)"""
         run_sql(sql, (name,))
         row = run_sql(select_sql, (name,))
 
@@ -65,33 +55,29 @@ def fetch_last_updated(name):
 
 
 def store_last_updated(recid, creation_date, name):
-    sql = "UPDATE xtrJOB SET last_recid = %s WHERE name=%s AND last_recid < %s"
-    run_sql(sql, (recid, name, recid))
-    sql = "UPDATE xtrJOB SET last_updated = %s " \
-                "WHERE name=%s AND last_updated < %s"
-    iso_date = creation_date.isoformat()
-    run_sql(sql, (iso_date, name, iso_date))
+    if recid is not None:
+        sql = "UPDATE xtrJOB SET last_recid = %s WHERE name=%s AND last_recid < %s"
+        run_sql(sql, (recid, name, recid))
+    if creation_date is not None:
+        sql = """UPDATE xtrJOB SET last_updated = %s
+                 WHERE name=%s AND last_updated < %s"""
+        iso_date = creation_date.isoformat()
+        run_sql(sql, (iso_date, name, iso_date))
 
 
 def fetch_concerned_records(name):
     task_update_progress("Fetching record ids")
 
-    last_recid, last_date = fetch_last_updated(name)
+    dummy, last_date = fetch_last_updated(name)
 
     if task_get_option('new'):
         # Fetch all records inserted since last run
-        sql = "SELECT `id`, `creation_date` FROM `bibrec` " \
-            "WHERE `creation_date` >= %s " \
-            "AND `id` > %s " \
-            "ORDER BY `creation_date`"
-        records = run_sql(sql, (last_date.isoformat(), last_recid))
-    elif task_get_option('modified'):
-        # Fetch all records inserted since last run
-        sql = "SELECT `id`, `modification_date` FROM `bibrec` " \
-            "WHERE `modification_date` >= %s " \
-            "AND `id` > %s " \
-            "ORDER BY `modification_date`"
-        records = run_sql(sql, (last_date.isoformat(), last_recid))
+        sql = """SELECT `id_bibrec`, `cd` FROM `bibdocfsinfo`
+                 INNER JOIN `bibrec_bibdoc`
+                 ON `bibdocfsinfo`.`id_bibdoc` = `bibrec_bibdoc`.`id_bibdoc`
+                 WHERE `cd` >= %s AND format IN ('.pdf', '.PDF', '.pdfa')
+                 ORDER BY `cd`"""
+        records = run_sql(sql, [last_date.isoformat()])
     else:
         given_recids = task_get_option('recids')
         for collection in task_get_option('collections'):
@@ -99,50 +85,15 @@ def fetch_concerned_records(name):
 
         if given_recids:
             format_strings = ','.join(['%s'] * len(given_recids))
-            records = run_sql("SELECT `id`, NULL FROM `bibrec` " \
-                "WHERE `id` IN (%s) ORDER BY `id`" % format_strings,
-                    list(given_recids))
+            records = run_sql("""SELECT `id`, NULL FROM `bibrec`
+                                 WHERE `id` IN (%s)
+                                 ORDER BY `id`""" % format_strings,
+                              list(given_recids))
         else:
             records = []
 
     task_update_progress("Done fetching record ids")
 
-    return records
-
-
-def fetch_concerned_arxiv_records(name):
-    task_update_progress("Fetching arxiv record ids")
-
-    dummy, last_date = fetch_last_updated(name)
-
-    # Fetch all records inserted since last run
-    sql = "SELECT `id`, `modification_date` FROM `bibrec` " \
-        "WHERE `modification_date` >= %s " \
-        "AND `creation_date` > NOW() - INTERVAL 7 DAY " \
-        "ORDER BY `modification_date`" \
-        "LIMIT 5000"
-    records = run_sql(sql, [last_date.isoformat()])
-
-    def check_arxiv(recid):
-        record = get_record(recid)
-
-        for report_tag in record_get_field_instances(record, "037"):
-            for category in field_get_subfield_values(report_tag, 'a'):
-                if category.startswith('arXiv'):
-                    return True
-        return False
-
-    def check_pdf_date(recid):
-        doc = get_pdf_doc(recid)
-        if doc:
-            return doc.md > last_date
-        return False
-
-    records = [(r, mod_date) for r, mod_date in records if check_arxiv(r)]
-    records = [(r, mod_date) for r, mod_date in records if check_pdf_date(r)]
-    write_message("recids %s" % repr([(r, mod_date.isoformat()) \
-                                               for r, mod_date in records]))
-    task_update_progress("Done fetching arxiv record ids")
     return records
 
 
@@ -156,7 +107,7 @@ def process_records(name, records, func, extra_vars):
         write_message(msg)
         func(recid, **extra_vars)
         if date:
-            store_last_updated(recid, date, name)
+            store_last_updated(None, date, name)
         count += 1
 
 
@@ -171,12 +122,6 @@ def task_run_core(name, func, extra_vars=None, post_process=None):
 
     records = fetch_concerned_records(name)
     process_records(name, records, func, extra_vars)
-
-    if task_get_option('arxiv'):
-        extra_vars['_arxiv'] = True
-        arxiv_name = "%s:arxiv" % name
-        records = fetch_concerned_arxiv_records(arxiv_name)
-        process_records(arxiv_name, records, func, extra_vars)
 
     if post_process:
         post_process(**extra_vars)

@@ -38,7 +38,7 @@ from invenio.shellutils import split_cli_ids_arg
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission
 from invenio.refextract_api import record_has_fulltext, \
-                                   check_record_for_refextract
+                                   record_can_extract_refs
 from invenio.bibtask import task_init, \
                             write_message, \
                             task_update_progress, \
@@ -354,11 +354,12 @@ def submit_refextract_task(recids):
     """Submit a refextract task if needed"""
     # First filter out recids we cannot safely extract references from
     # (mostly because they have been curated)
-    recids = [recid for recid in recids if check_record_for_refextract(recid)]
+    recids = [recid for recid in recids if not record_can_extract_refs(recid)]
 
     if recids:
         recids_str = ','.join(str(recid) for recid in recids)
-        task_low_level_submission('refextract', NAME, '-i', recids_str)
+        task_low_level_submission('refextract', NAME, '-i', recids_str,
+                                  '--overwrite')
 
 
 def fetch_updated_arxiv_records(date):
