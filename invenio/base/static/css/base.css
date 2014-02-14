@@ -87,3 +87,54 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 /* END typeahead fixes END */
+
+legend [class*="icon-"] { vertical-align: baseline; }
+a.label, a.label:hover, .label a, .label a:hover { color: white;}
+.htmlbrief .media-heading { font-weight: 200; }
+.icon.muted { opacity: 0.6; }
+
+/*
+----------------------- Stick footer ----------------------- */
+html,
+body {
+  height: 100%;
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by it's height */
+  margin: 0 auto -150px;
+}
+
+/* Set the fixed height of the footer here */
+#push,
+footer {
+  min-height: 150px;
+}
+
+#push {
+  margin-top: -60px;
+}
+
+footer a, footer a:hover {
+  color: #666;
+}
+footer, footer p {
+  font-size: 11px;
+  color: #333;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+  footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* --------------- */
