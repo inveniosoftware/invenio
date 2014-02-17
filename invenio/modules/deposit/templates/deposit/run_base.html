@@ -110,10 +110,14 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
 
 {% block body %}
 {% block form_submit_dialog %}
-<div id="form-submit-dialog" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="{{id}}Label" aria-hidden="true">
-  <div class="modal-body">
-    <div align="center">Submitting <img src="/img/loading.gif" /></div>
-  </div>
+<div id="form-submit-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="{{id}}Label" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div align="center" id="{{id}}Label">Submitting <img src="/img/loading.gif" /></div>
+        </div>
+    </div>
+    </div>
 </div>
 {% endblock form_submit_dialog %}
 <div class="row">

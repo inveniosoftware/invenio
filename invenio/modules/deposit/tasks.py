@@ -426,7 +426,8 @@ def finalize_record_sip():
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=False)
 
-        json = Record({})
+        r = Record()
+        json = Record(master_format='marc')
         for k, v in sip.metadata.items():
             json.set(k, v, extend=True)
 

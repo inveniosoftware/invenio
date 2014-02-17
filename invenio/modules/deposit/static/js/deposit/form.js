@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013 CERN.
+ * Copyright (C) 2013, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -534,7 +534,7 @@ var DEPOSIT_FORM = (function( $ ){
           var file = dropbox_files[i];
 
           $('#' + file.id + " .progress").hide();
-          $('#' + file.id + " .bar").css('width', "100%");
+          $('#' + file.id + " .progress-bar").css('width', "100%");
           $('#' + file.id + " .progress").addClass("progress-striped");
           $('#' + file.id + " .progress").show();
 
@@ -552,7 +552,7 @@ var DEPOSIT_FORM = (function( $ ){
 
               $('#' + file.id + " .progress").removeClass("progress-striped");
               $('#' + file.id + " .progress").hide();
-              $('#' + file.id + " .bar").css('width', "100%");
+              $('#' + file.id + " .progress-bar").css('width', "100%");
               $('#' + file.id + '_link').html(tpl_file_link.render({
                   filename: file.name,
                   download_url: get_file_url + "?file_id=" + data['id']
@@ -602,7 +602,7 @@ var DEPOSIT_FORM = (function( $ ){
           $.each(uploader.files, function(i, file) {
               if (file.loaded < file.size) {
                   $("#" + file.id + " .rmlink").show();
-                  //$('#' + file.id + " .bar").css('width', "0%");
+                  //$('#' + file.id + " .progress-bar").css('width', "0%");
               }
           });
           $('#upload_speed').html('');
@@ -631,7 +631,7 @@ var DEPOSIT_FORM = (function( $ ){
       });
 
       uploader.bind('UploadProgress', function(up, file) {
-          $('#' + file.id + " .bar").css('width', file.percent + "%");
+          $('#' + file.id + " .progress-bar").css('width', file.percent + "%");
           upload_speed = getBytesWithUnit(up.total.bytesPerSec) + " per sec";
           console.log("Progress " + file.name + " - " + file.percent);
           $('#upload_speed').html(upload_speed);
@@ -652,7 +652,7 @@ var DEPOSIT_FORM = (function( $ ){
 
           });
 
-          $(selector).show();
+          $(selector).removeClass("hide");
           $('#uploadfiles').removeClass("disabled");
           $('#file-table').show('slow');
           up.total.reset();
@@ -697,7 +697,7 @@ var DEPOSIT_FORM = (function( $ ){
           file.server_id = res_data.id;
 
           $('#' + file.id + " .progress").removeClass("progress-striped");
-          $('#' + file.id + " .bar").css('width', "100%");
+          $('#' + file.id + " .progress-bar").css('width', "100%");
           $('#' + file.id + ' .rmlink').show();
           $('#' + file.id + " .progress").hide();
           $('#' + file.id + '_link').html(tpl_file_link.render({
@@ -822,7 +822,7 @@ var DEPOSIT_FORM = (function( $ ){
   function submit(url, form_selector, dialog){
       if(dialog !== undefined){
           $(dialog).modal({
-              backdrop: false,
+              backdrop: 'static',
               keyboard: false,
               show: true,
           });

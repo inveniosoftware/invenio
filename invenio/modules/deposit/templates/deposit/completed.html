@@ -24,14 +24,14 @@
 
     <div class="well">
         <span class="pull-right">
-            <a href="{{url_for('deposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn hide" data-toggle="tooltip" title="" ><i class="glyphicon glyphicon-pencil"></i> {{ _('Edit') }}</a>
-            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn" data-toggle="tooltip" title=""><i class="glyphicon glyphicon-eye-open"></i> Live version</a>
+            <a href="{{url_for('deposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn btn-default" data-toggle="tooltip" title="" ><i class="icon-pencil"></i> Edit</a>
+            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn btn-default" data-toggle="tooltip" title=""><i class="icon-eye-open"></i> View</a>
         </span>
         <span class="clearfix"></span>
     </div>
 
-    <div class="progress progress-striped progress-warning" style="height: inherit;">
-        <div class="bar" style="width: 100%;">
+    <div class="progress progress-striped" style="height: inherit;">
+        <div class="progress-bar progress-bar-warning" style="width: 100%;">
             <h4>Preview</h4>
         </div>
     </div>
