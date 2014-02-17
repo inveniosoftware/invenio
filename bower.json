@@ -31,7 +31,8 @@
     "datatables-colvis": "*",
     "typeahead.js-bootstrap": "https://raw.github.com/jharding/typeahead.js-bootstrap.css/master/typeahead.js-bootstrap.css",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
-    "plupload": "*"
+    "plupload": "*",
+    "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0"
   },
   "resolutions": {
     "jquery": "2.1.0"
