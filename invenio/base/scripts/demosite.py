@@ -40,7 +40,7 @@ option_extrainfo = manager.option('-e', '--extra-info', dest='extra_info',
                                   help='extraneous parameters')
 option_packages = manager.option('-p', '--packages', dest='packages',
                                  action='append',
-                                 default=['invenio_demosite'],
+                                 default=[],
                                  help='package import name (repeteable)')
 
 
@@ -49,12 +49,14 @@ option_packages = manager.option('-p', '--packages', dest='packages',
 @option_file
 @option_jobid
 @option_extrainfo
-def populate(packages=['invenio_demosite'], default_data=True, files=None,
+def populate(packages=[], default_data=True, files=None,
              job_id=0, extra_info=None):
     """Load demo records.  Useful for testing purposes."""
     if not default_data:
         print '>>> Default data has been skiped (--no-data).'
         return
+    if not packages:
+        packages = ['invenio_demosite']
 
     from werkzeug.utils import import_string
     from invenio.config import CFG_PREFIX
@@ -98,13 +100,16 @@ def populate(packages=['invenio_demosite'], default_data=True, files=None,
 
 
 @option_packages
-def create(packages=['invenio_demosite']):
+def create(packages=[]):
     """Populate database with demo site data."""
 
     from invenio.ext.sqlalchemy import db
     from invenio.config import CFG_PREFIX
     from invenio.modules.accounts.models import User
     from invenio.base.scripts.config import get_conf
+
+    if not packages:
+        packages = ['invenio_demosite']
 
     print ">>> Going to create demo site..."
     db.session.execute("TRUNCATE schTASK")
