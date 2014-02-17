@@ -78,8 +78,8 @@ class HstEXCEPTION(db.Model):
             log = HstEXCEPTION(name=name,
                                filename=filename,
                                line=line,
-                               last_seen=db.func.now(),
-                               last_notified=db.func.now(),
+                               last_seen=datetime.now(),
+                               last_notified=datetime.now(),
                                counter=1,
                                total=1)
             db.session.add(log)
