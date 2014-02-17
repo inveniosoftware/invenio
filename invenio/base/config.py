@@ -33,6 +33,8 @@ PACKAGES = [
     'invenio.modules.*'
 ]
 
+PACKAGES_EXCLUDE = []
+
 CFG_PREFIX = distutils.sysconfig.get_config_var("prefix")
 
 CFG_BATCHUPLOADER_DAEMON_DIR = join(CFG_PREFIX, "var/batchupload")
