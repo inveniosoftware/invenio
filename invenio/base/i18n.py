@@ -37,12 +37,8 @@ For more information, see ABOUT-NLS file.
 __revision__ = "$Id$"
 
 import gettext
-from flask import current_app
 from flask.ext.babel import gettext, lazy_gettext
-from werkzeug.local import LocalProxy
 
-CFG_SITE_LANG = LocalProxy(lambda: current_app.config.get('CFG_SITE_LANG'))
-CFG_SITE_LANGS = LocalProxy(lambda: current_app.config.get('CFG_SITE_LANGS'))
 
 ## Placemark for the i18n function
 _ = lazy_gettext
@@ -67,6 +63,7 @@ def wash_language(ln):
     """Look at language LN and check if it is one of allowed languages
        for the interface.  Return it in case of success, return the
        default language otherwise."""
+    from invenio.config import CFG_SITE_LANG, CFG_SITE_LANGS
     if not ln:
         return CFG_SITE_LANG
     if isinstance(ln, list):
@@ -84,6 +81,7 @@ def wash_languages(lns):
     """Look at list of languages LNS and check if there's at least one
        of the allowed languages for the interface. Return it in case
        of success, return the default language otherwise."""
+    from invenio.config import CFG_SITE_LANG, CFG_SITE_LANGS
     for ln in lns:
         if ln:
             ln = ln.replace('-', '_')
@@ -104,6 +102,7 @@ def language_list_long(enabled_langs_only=True):
     site by the local administrator.  Useful for recognizing all I18N
     translations in webdoc sources or bibformat templates.
     """
+    from invenio.config import CFG_SITE_LANGS
     all_language_names = {'af': 'Afrikaans',
                           'ar': 'العربية',
                           'bg': 'Български',

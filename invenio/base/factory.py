@@ -43,9 +43,7 @@ def cleanup_legacy_configuration(app):
     """
     Cleanup legacy issue in configuration
     """
-    def language_list_long():
-        return []
-
+    from .i18n import language_list_long
     ## ... and map certain common parameters
     app.config['CFG_LANGUAGE_LIST_LONG'] = [
         (lang, longname.decode('utf-8'))
