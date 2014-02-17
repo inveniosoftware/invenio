@@ -16,7 +16,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-DEPOSIT_TYPES = []
+DEPOSIT_TYPES = [
+    'invenio.modules.deposit.workflows.article_metadata.Article',
+    'invenio.modules.deposit.workflows.photo_metadata.Photo',
+    'invenio.modules.deposit.workflows.poetry_metadata.Poetry',
+    'invenio.modules.deposit.workflows.preprint_metadata.Preprint',
+    'invenio.modules.deposit.workflows.thesis_metadata.Thesis',
+]
 """
 List of DepositionType import strings
 

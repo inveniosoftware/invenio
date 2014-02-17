@@ -25,48 +25,37 @@
 """
 
 import re
-from werkzeug.routing import BaseConverter, ValidationError
-from werkzeug.utils import cached_property
+from werkzeug.routing import BaseConverter
 
+def converter_factory(items):
 
-class DepositionConverter(BaseConverter):
-    """Matches one of the items provided.  Items can either be Python
-    identifiers or strings::
+    class DepositionConverter(BaseConverter):
+        """Matches one of the items provided.  Items can either be Python
+        identifiers or strings::
 
-        Rule('/<depositions:page_name>')
+            Rule('/<depositions:page_name>')
 
-    :param map: the :class:`Map`.
-    :param items: this function accepts the possible items as positional
-                  arguments.
-    """
+        :param map: the :class:`Map`.
+        :param items: this function accepts the possible items as positional
+                      arguments.
+        """
 
-    def __init__(self, map):
-        BaseConverter.__init__(self, map)
+        def __init__(self, url_map):
+            BaseConverter.__init__(self, url_map)
+            self.regex = '(?:%s)' % '|'.join([re.escape(x) for x in items])
 
-    @cached_property
-    def regex(self):
-        return '[^/]{1,}'
-        #items = [lambda x: '"%s"' % x, DepositionType.keys()]
-        #return '(?:%s)' % '|'.join([re.escape(x) for x in items])
-
-    def to_python(self, value):
-        try:
-            #FIXME there is a problem with the first request when
-            # `match_request` is call ouside application context.
-            from .models import DepositionType
-            keys = DepositionType.keys()
-        except:
-            keys = []
-        if not value in keys:
-            raise ValidationError()
-        return value
-
-    def to_url(self, value):
-        return value
+    return DepositionConverter
 
 
 def setup_app(app):
     """Installs 'depositions' url_map converter."""
 
-    app.url_map.converters['depositions'] = DepositionConverter
+    from .config import DEPOSIT_TYPES, DEPOSIT_DEFAULT_TYPE
+    from .registry import deposit_types
+    app.config.setdefault('DEPOSIT_TYPES', DEPOSIT_TYPES)
+    app.config.setdefault('DEPOSIT_DEFAULT_TYPE', DEPOSIT_DEFAULT_TYPE)
+
+    with app.app_context():
+        app.url_map.converters['depositions'] = converter_factory(
+            deposit_types.mapping().keys())
     return app
