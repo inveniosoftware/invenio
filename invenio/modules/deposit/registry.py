@@ -48,8 +48,9 @@ class DepositionTypeRegistry(ImportPathRegistry):
         )
 
         # Ensure DepositionType is actually a loaded workflow
-        if obj.__name__ not in workflows or obj != workflows[obj.__name__]:
-            raise RuntimeError("Import path '%s' is not a loaded workflow.")
+        # FIXME
+        #if obj.__name__ not in workflows or obj != workflows[obj.__name__]:
+        #    raise RuntimeError("Import path '%s' is not a loaded workflow.")
 
         if import_path == current_app.config['DEPOSIT_DEFAULT_TYPE']:
             deposit_default_type.register(obj)
