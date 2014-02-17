@@ -1284,33 +1284,43 @@ def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
     your_role_actions = acc_find_user_role_actions(user_info)
     your_admin_activities = {}
     for (role, action) in your_role_actions:
-        if CFG_ACC_ACTIVITIES_URLS.has_key(action):
+        if action in CFG_ACC_ACTIVITIES_URLS:
             your_admin_activities[action] = CFG_ACC_ACTIVITIES_URLS[action]
         if role == SUPERADMINROLE:
             your_admin_activities = dict(CFG_ACC_ACTIVITIES_URLS)
             break
 
-    ret = {}
-    for action, (name, url) in your_admin_activities.iteritems():
-        ret[_(name)] =  url % ln
-
     # For BibEdit and BibDocFile menu items, take into consideration
     # current record whenever possible
-    if ret.has_key(_("Run Record Editor")) or \
-           ret.has_key(_("Run Document File Manager")) and \
-           user_info['uri'].startswith('/' + CFG_SITE_RECORD + '/'):
+
+    if 'runbibedit' in your_admin_activities or \
+       'runbibdocfile' in your_admin_activities and \
+       user_info['uri'].startswith('/' + CFG_SITE_RECORD + '/'):
         try:
             # Get record ID and try to cast it to an int
-            current_record_id = int(urlparse.urlparse(user_info['uri'])[2].split('/')[2])
+            current_record_id = int(
+                urlparse.urlparse(user_info['uri'])[2].split('/')[2]
+            )
         except:
             pass
         else:
-            if ret.has_key(_("Run Record Editor")):
-                ret[_("Run Record Editor")] = ret[_("Run Record Editor")] + '&amp;#state=edit&amp;recid=' + str(current_record_id)
-            if ret.has_key(_("Run Document File Manager")):
-                ret[_("Run Document File Manager")] = ret[_("Run Document File Manager")] + '&amp;recid=' + str(current_record_id)
+            if 'runbibedit' in your_admin_activities:
+                your_admin_activities['runbibedit'] = \
+                    (your_admin_activities['runbibedit'][0] +
+                     '&amp;#state=edit&amp;recid=' + str(current_record_id),
+                     your_admin_activities['runbibedit'][1])
+            if 'runbibdocfile' in your_admin_activities:
+                your_admin_activities['runbibdocfile'] = \
+                    (your_admin_activities['runbibdocfile'][0] +
+                     '&amp;recid=' + str(current_record_id),
+                     your_admin_activities['runbibdocfile'][1])
+
+    ret = {}
+    for action, (name, url) in your_admin_activities.iteritems():
+        ret[_(name)] = url % ln
 
     return ret
+
 
 def acc_find_user_role_actions(user_info):
     """find name of all roles and actions connected to user_info."""
