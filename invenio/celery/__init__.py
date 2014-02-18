@@ -113,13 +113,12 @@ class InvenioLoader(BaseLoader):
     def on_worker_process_init(self):
         self.close_database()
 
-    @with_app_context()
     def read_configuration(self):
         """ Read configuration defined in invenio.celery.config """
         from invenio.celery.config import default_config
-        from flask import current_app
+        self._init_flask()
         self.configured = True
-        return default_config(current_app.config)
+        return default_config(self.flask_app.config)
 
     def close_database(self, **dummy_kwargs):
         if self.db:
