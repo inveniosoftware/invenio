@@ -1172,7 +1172,7 @@ def compute_dicts_diff(recids, refs, cites):
     many references were added or removed by comparing them to the current
     stored in the database.
     """
-    refs_diff = [compute_refs_diff(recid, cites[recid]) for recid in recids]
+    refs_diff = [compute_refs_diff(recid, refs[recid]) for recid in recids]
     cites_diff = [compute_cites_diff(recid, cites[recid]) for recid in recids]
     return refs_diff, cites_diff
 
