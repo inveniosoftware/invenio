@@ -83,7 +83,11 @@ class InvenioLoader(BaseLoader):
         Called before a task is run - pushes a new Flask request context
         for the task.
         """
-        task.request.flask_ctx = self.flask_app.test_request_context()
+        app = self.flask_app
+        if not app:
+            from flask import current_app
+            app = current_app
+        task.request.flask_ctx = app.test_request_context()
         task.request.flask_ctx.push()
 
     def on_task_postrun(self, task=None, **dummy_kwargs):
