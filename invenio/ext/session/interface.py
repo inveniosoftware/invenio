@@ -115,7 +115,7 @@ class SessionInterface(FlaskSessionInterface):
     def save_session(self, app, session, response):
         domain = self.get_cookie_domain(app)
         if not session:
-            current_app.logger.error("Empty session: " + str(request.url))
+            current_app.logger.debug("Empty session: " + str(request.url))
             return
         #    response.delete_cookie(app.session_cookie_name,
         #                            domain=domain)
