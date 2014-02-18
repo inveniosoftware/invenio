@@ -175,10 +175,10 @@ def check_citations_losses(config, recids, refs, cites):
     if citation_loss_per_record_limit:
         for recid, record_refs_diff, record_cites_diff in zip(recids, refs_diff, cites_diff):
             if record_refs_diff < -citation_loss_per_record_limit:
-                write_message('%s lost %s refs' % (recid, record_refs_diff))
+                write_message('%s balance: %s refs' % (recid, record_refs_diff))
                 raise Exception(err_msg)
             if record_cites_diff < -citation_loss_per_record_limit:
-                write_message('%s lost %s cites' % (recid, record_cites_diff))
+                write_message('%s balance: %s cites' % (recid, record_cites_diff))
                 raise Exception(err_msg)
 
 
@@ -1161,9 +1161,9 @@ def print_cites_diff(recids, refs_diff, cites_diff):
     """
     for recid, record_refs_diff, record_cites_diff in zip(recids, refs_diff, cites_diff):
         if record_refs_diff:
-            write_message('%s lost %s refs' % (recid, record_refs_diff))
+            write_message('%s balance %s refs' % (recid, record_refs_diff))
         if record_cites_diff:
-            write_message('%s lost %s cites' % (recid, record_cites_diff))
+            write_message('%s balance %s cites' % (recid, record_cites_diff))
 
 
 def compute_dicts_diff(recids, refs, cites):
