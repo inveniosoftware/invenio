@@ -159,7 +159,51 @@ class TestCitationIndexerWarnings(InvenioTestCase):
         self.assertEqual(after2 - before, 2)
         self.cleanup()
 
-TEST_SUITE = make_test_suite(TestCitationIndexer, TestCitationIndexerWarnings)
+
+
+class TestCitationLosses(unittest.TestCase):
+    def test_abort_cites(self):
+        from invenio.bibrank_citation_indexer import check_citations_losses
+        # Hack for tests, the config is a pseudo dictionary.
+        # check_citations_losses will look for citation_loss_per_record_limit
+        # in the real config object.
+        fake_config = {'rank_method': 'citation', 'citation': 2}
+        try:
+            check_citations_losses(fake_config,
+                                   recids=[1, 2, 81],
+                                   refs={1: set([]), 2: set([]), 81: set([])},
+                                   cites={1: set([]), 2: set([]), 81: set([])})
+        except Exception as e:  # pylint: disable=W0703
+            if 'Lost too many references' not in str(e):
+                raise
+        else:
+            self.fail()
+
+    def test_abort_refs(self):
+        from invenio.bibrank_citation_indexer import check_citations_losses
+        # Hack for tests, the config is a pseudo dictionary.
+        # check_citations_losses will look for citation_loss_per_record_limit
+        # in the real config object.
+        fake_config = {'rank_method': 'citation', 'citation': 2}
+        try:
+            check_citations_losses(fake_config,
+                                   recids=[1, 2, 91],
+                                   refs={1: set([]), 2: set([]), 91: set([])},
+                                   cites={1: set([]), 2: set([]), 91: set([])})
+        except Exception as e:  # pylint: disable=W0703
+            if 'Lost too many references' not in str(e):
+                raise
+        else:
+            self.fail()
+
+    def test_no_abort(self):
+        from invenio.bibrank_citation_indexer import check_citations_losses
+        check_citations_losses(CONFIG, [1, 2, 81], {1: set([]), 2: set([]), 81: set([])}, {1: set([]), 2: set([]), 81: set([])})
+
+
+TEST_SUITE = make_test_suite(TestCitationIndexer,
+                             TestCitationIndexerWarnings,
+                             TestCitationLosses)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
