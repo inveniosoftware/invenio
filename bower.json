@@ -2,8 +2,8 @@
   "name": "invenio-grunt",
   "version": "0.1.0",
   "dependencies": {
-    "bootstrap": "3.0.2",
-    "jquery": "2.0.3",
+    "bootstrap": "3.1.1",
+    "jquery": "2.1.0",
     "font-awesome": "~4.0.3",
     "ckeditor": "latest"
   },
@@ -34,6 +34,6 @@
     "plupload": "*"
   },
   "resolutions": {
-    "jquery": "2.0.3"
+    "jquery": "2.1.0"
   }
 }
