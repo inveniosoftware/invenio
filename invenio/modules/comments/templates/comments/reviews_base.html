@@ -20,6 +20,11 @@
   {% extends "records/base.html" %}
 {%- endif -%}
 
+{% from "_macros.html" import js_bundle with context %}
+
+{%- js url_for('comments.static', filename='js/comments/comments.js'), '10-comments' -%}
+{%- js url_for('comments.static', filename='js/comments/collapse.js'), '10-comments' -%}
+
 {% block record_content %}
   <div class="page-header">
     {{ format_record(recid, 'hs', ln=g.ln)|safe }}
@@ -126,5 +131,6 @@
 {% endblock %}
 
 {%- if request.is_xhr -%}
+  {{ js_bundle() }}
   <script type="text/javascript"> bindModals(null, 'input:text:visible:first'); </script>
 {%- endif -%}

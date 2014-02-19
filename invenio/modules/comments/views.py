@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,8 +26,7 @@ from flask import g, render_template, request, flash, redirect, url_for, \
     current_app, abort, Blueprint
 from invenio.ext.sqlalchemy import db
 from invenio.utils.mail import email_quote_txt
-from .models import CmtRECORDCOMMENT, CmtSUBSCRIPTION, \
-                                     CmtACTIONHISTORY
+from .models import CmtRECORDCOMMENT, CmtSUBSCRIPTION, CmtACTIONHISTORY
 from .forms import AddCmtRECORDCOMMENTForm, AddCmtRECORDCOMMENTFormReview
 from invenio.base.i18n import _
 from invenio.base.decorators import templated
@@ -50,7 +49,8 @@ def log_comment_action(action_code, id, recid, uid=None):
         id_cmtRECORDCOMMENT=id,
         id_bibrec=recid,
         id_user=uid or current_user.get_id(),
-        client_host=int(socket.inet_aton(request.remote_addr).encode('hex'), 16),
+        client_host=int(socket.inet_aton(request.remote_addr).encode('hex'),
+                        16),
         action_time=datetime.now(),
         action_code=action_code)
     db.session.add(action)
@@ -71,7 +71,8 @@ class CommentRights(object):
     def can_perform_action(self, action=None):
         cond = CmtACTIONHISTORY.id_user == self.uid \
             if self.uid > 0 else \
-            CmtACTIONHISTORY.client_host == socket.inet_aton(request.remote_addr)
+            CmtACTIONHISTORY.client_host == \
+            socket.inet_aton(request.remote_addr)
 
         if action in cfg['CFG_WEBCOMMENT_ACTION_CODE']:
             cond = db.and_(cond, CmtACTIONHISTORY.action_code ==
@@ -139,6 +140,10 @@ def add_comment(recid):
             db.session.add(c)
             db.session.commit()
             flash(_('Comment was sent'), "info")
+            from urlparse import urlparse
+            if 'notes' in urlparse(request.referrer).path:
+                return redirect(url_for('comments.notes', recid=recid) +
+                                '#' + form.pdf_page.data)
             return redirect(url_for('comments.comments', recid=recid))
         except:
             db.session.rollback()
@@ -195,7 +200,8 @@ def comments(recid):
         CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
         CmtRECORDCOMMENT.star_score == 0
     )).order_by(CmtRECORDCOMMENT.date_creation).all()
-    return render_template('comments/comments.html', comments=comments)
+    return render_template('comments/comments.html', comments=comments,
+                           option='comments')
 
 
 @blueprint.route('/<int:recid>/reviews', methods=['GET', 'POST'])
@@ -233,7 +239,8 @@ def report(recid, id):
             nb_abuse_reports=CmtRECORDCOMMENT.nb_abuse_reports + 1),
             synchronize_session='fetch')
 
-        log_comment_action(cfg['CFG_WEBCOMMENT_ACTION_CODE']['REPORT_ABUSE'], id, recid)
+        log_comment_action(cfg['CFG_WEBCOMMENT_ACTION_CODE']['REPORT_ABUSE'],
+                           id, recid)
         flash(_('Comment has been reported.'), 'success')
     else:
         flash(_('Comment has been already reported.'), 'error')
@@ -248,11 +255,10 @@ def report(recid, id):
 def vote(recid, id, value):
     if CommentRights(id).can_perform_action():
         value = 1 if int(value) > 0 else 0
-        CmtRECORDCOMMENT.query.filter(
-            CmtRECORDCOMMENT.id == id).update(dict(
-                nb_votes_total=CmtRECORDCOMMENT.nb_votes_total + 1,
-                nb_votes_yes=CmtRECORDCOMMENT.nb_votes_yes + value),
-                synchronize_session='fetch')
+        CmtRECORDCOMMENT.query.filter(CmtRECORDCOMMENT.id == id).update(dict(
+            nb_votes_total=CmtRECORDCOMMENT.nb_votes_total + 1,
+            nb_votes_yes=CmtRECORDCOMMENT.nb_votes_yes + value),
+            synchronize_session='fetch')
 
         log_comment_action(cfg['CFG_WEBCOMMENT_ACTION_CODE']['VOTE'], id, recid)
         flash(_('Thank you for your vote.'), 'success')

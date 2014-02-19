@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,6 +23,7 @@ from invenio.base.i18n import _
 from invenio.utils.forms import InvenioBaseForm
 from wtforms import TextField, TextAreaField, \
     HiddenField, SelectField, validators
+from invenio.modules.annotations.noteutils import HOWTO
 
 
 class AddCmtRECORDCOMMENTForm(InvenioBaseForm):
@@ -31,7 +32,7 @@ class AddCmtRECORDCOMMENTForm(InvenioBaseForm):
     body = TextAreaField(_('Message'), [
         validators.length(
             0, 10000,
-            message = _(
+            message=_(
                 "Your message is too long, please edit it. "
                 "Maximum size allowed is %{length}i characters.",
                 length=10000
@@ -39,6 +40,9 @@ class AddCmtRECORDCOMMENTForm(InvenioBaseForm):
         )
     ])
     in_reply_to_id_cmtRECORDCOMMENT = HiddenField(default=0)
+    notes_howto = HOWTO
+    pdf_page = HiddenField(validators=[validators.Optional(),
+                                       validators.NumberRange()])
 
 
 class AddCmtRECORDCOMMENTFormReview(AddCmtRECORDCOMMENTForm):
