@@ -33,9 +33,9 @@ def get_storage_engine():
     if not hasattr(g, "annotations_storage_engine"):
         g.annotations_storage_engine = \
             MongoDBStorage(SQLAnnotation.__name__,
-                           host=cfg["CFG_ANNOTATION_MONGODB_HOST"],
-                           port=cfg["CFG_ANNOTATION_MONGODB_PORT"],
-                           database=cfg["CFG_ANNOTATION_MONGODB_DATABASE"])
+                           host=cfg["CFG_ANNOTATIONS_MONGODB_HOST"],
+                           port=cfg["CFG_ANNOTATIONS_MONGODB_PORT"],
+                           database=cfg["CFG_ANNOTATIONS_MONGODB_DATABASE"])
     return g.annotations_storage_engine
 
 

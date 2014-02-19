@@ -17,10 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-ANNOTATIONS_MONGODB_HOST = "localhost"
-ANNOTATIONS_MONGODB_PORT = 27017
+from invenio.base.globals import cfg
 
-ANNOTATIONS_ATTACHMENTS = False
 
-ANNOTATIONS_NOTES_ENABLED = False
-ANNOTATIONS_PREVIEW_ENABLED = False
+def extract_notes(mapper, connection, target):
+    if cfg['ANNOTATIONS_NOTES_ENABLED'] and target.star_score == 0:
+        from .noteutils import extract_notes_from_comment
+        revs = extract_notes_from_comment(target)
+        if len(revs) > 0:
+            from invenio.modules.annotations.api import add_annotation
+            for rev in revs:
+                add_annotation(model='annotation_note', **rev)
