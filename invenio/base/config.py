@@ -55,6 +55,7 @@ PACKAGES = [
 ]
 
 PACKAGES_EXCLUDE = [
+    'invenio.modules.annotations',
     'invenio.modules.communities'
 ]
 
