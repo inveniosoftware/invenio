@@ -188,7 +188,7 @@
   }
 
   $(document).ready(function() {
-    bindModals(null, 'input:text:visible:first');
+    bindModals();
   });
   window.bindModals = bindModals;
 

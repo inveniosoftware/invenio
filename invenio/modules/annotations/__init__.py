@@ -54,11 +54,3 @@
         ANNOTATIONS_NOTES_ENABLED = True
         ANNOTATIONS_PREVIEW_ENABLED = True
 """
-
-from sqlalchemy.event import listen
-
-from invenio.modules.comments.models import CmtRECORDCOMMENT
-
-from .receivers import extract_notes
-
-listen(CmtRECORDCOMMENT, 'after_insert', extract_notes)

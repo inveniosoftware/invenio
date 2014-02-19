@@ -25,6 +25,7 @@ from flask.ext.login import current_user
 
 from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
+from invenio.modules.accounts.models import User
 
 
 # a note location can have one of the following structures (sans markers):
@@ -122,7 +123,7 @@ def extract_notes_from_comment(comment, bodyOnly=False):
         result = {'what': body,
                   'where': {'marker': marker}}
         if not bodyOnly:
-            result['who'] = comment.id_user
+            result['who'] = User.query.get(comment.id_user)
             result['where']['record'] = comment.id_bibrec
             result['comment'] = comment.id
         results.append(result)
@@ -178,7 +179,7 @@ def tree_put(tree, keys, value, path=None):
             tree[k]["path"] += ("_" if len(path) else "") + k
         else:
             if k not in tree:
-                tree[k] = {}
+                tree[k] = {"leaf": [], "path": path}
             tree[k] = tree_put(tree[k], keys[i + 1:l], value,
                                path + ("_" if len(path) else "") + k)
             tree[k]["path"] = k

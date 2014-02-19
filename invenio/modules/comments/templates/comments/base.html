@@ -1,0 +1,134 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% from "_macros.html" import js_bundle, css_bundle with context %}
+{%- if not request.is_xhr -%}
+  {%- extends "records/base.html" -%}
+{%- endif -%}
+
+{%- css url_for('comments.static', filename='css/comments/comments.css'), '10-comments' -%}
+{%- if config.ANNOTATIONS_NOTES_ENABLED -%}
+  {%- css url_for('annotations.static', filename='css/annotations/annotations.css'), '10-comments' -%}
+{%- endif -%}
+
+{%- js url_for('comments.static', filename='js/comments/comments.js'), '10-comments' -%}
+{%- js url_for('comments.static', filename='js/comments/collapse.js'), '10-comments' -%}
+
+
+{%- macro controls() -%}
+  <div class="pull-right">
+    {%- if option == 'comments' -%}
+      {%- if current_user.is_guest -%}
+        <a id="add-comment"
+           class="btn btn-primary"
+           href="{{ url_for('webaccount.login', referer=request.url) }}">
+      {%- else -%}
+        <a id="add-comment" class="btn btn-primary"
+           data-toggle="modal"
+           data-target="#"
+           href="{{ url_for('comments.add_comment', recid=recid) }}">
+      {%- endif-%}
+          <i class="glyphicon glyphicon-pencil"></i>
+          {{ _('Add comment') }}
+       </a>
+    {%- elif option == 'notes' and config.ANNOTATIONS_PREVIEW_ENABLED -%}
+        <button id="all-notes-toggle" type="button" class="btn btn-default">
+          <i class="glyphicon glyphicon-eye-open"></i>
+          {{ _("Show all annotations") }}
+        </button>
+    {%- endif -%}
+
+    &nbsp;
+
+    {%- if config.ANNOTATIONS_NOTES_ENABLED -%}
+      <div class="btn-group">
+        {%- if option == 'comments' -%}
+          <a class="btn btn-default active" href="{{ url_for('comments.comments', recid=recid) }}">
+        {%- else -%}
+          <a class="btn btn-default" href="{{ url_for('comments.comments', recid=recid) }}">
+        {%- endif -%}
+            {{ _('Comments') }}
+          </a>
+        {%- if option == 'notes' -%}
+          <a class="btn btn-default active"
+             href="{{ url_for('comments.notes', recid=recid) }}">
+        {%- else -%}
+          <a class="btn btn-default" href="{{ url_for('comments.notes', recid=recid) }}">
+        {%- endif -%}
+            {{ _('Annotations') }}
+          </a>
+      </div>
+    {%- endif -%}
+  </div>
+{%- endmacro %}
+
+{%- block record_content -%}
+
+  {%- from "_translate.html" import translate -%}
+  {{ translate(["Page", "of", "Show all annotations", "Show page annotations"]) }}
+
+  <div class="page-header">
+    {{ format_record(recid, 'hs', ln=g.ln)|safe }}
+  </div>
+
+  <div class="page-header">
+    <h4>
+      {%- if option == 'comments' -%}
+        {{ _("Comments") }}
+      {%- elif option == 'notes' -%}
+        {{_('Annotations')}}
+      {%- endif -%}
+
+      <div class="pull-right">
+        <small>
+          {{ controls() }}
+        </small>
+      </div>  <!-- /pull-right -->
+    </h4>
+  </div>  <!-- /page-header -->
+
+  {%- block custom -%}
+    {#{ controls() }#}
+  {%- endblock custom -%}
+
+  <div style="clear:both"/></div>
+  <hr/>
+
+  {%- if record.user_comment_subscritions|length -%}
+    <div class="alert">
+      {%- set info_subs=_('%(open_tag)s Unsubscribe %(close_tag)s from this discussion. You will not receive any new comments by email.',
+              open_tag='<strong><a href="%s"><i class="glyphicon glyphicon-trash"></i>'|format(url_for('comments.unsubscribe', recid=recid))|safe,
+              close_tag='</a></strong>'|safe) -%}
+      {{ info_subs|safe }}
+    </div>
+  {%- else -%}
+    <div class="alert alert-info">
+      {%- set info_subs=_('%(open_tag)s Subscribe %(close_tag)s to this discussion. You will then receive all new comments by email.',
+              open_tag='<strong><a href="%s"><i class="glyphicon glyphicon-envelope"></i>'|format(url_for('comments.subscribe', recid=recid))|safe,
+              close_tag='</a></strong>'|safe) -%}
+      {{ info_subs|safe }}
+    </div>
+  {%- endif -%}
+
+{%- endblock record_content -%}
+
+{%- if request.is_xhr -%}
+  {{ css_bundle() }}
+  {{ js_bundle() }}
+  <script type="text/javascript"> bindModals(); </script>
+{%- endif -%}

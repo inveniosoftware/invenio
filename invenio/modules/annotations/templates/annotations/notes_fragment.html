@@ -87,7 +87,7 @@
             <div id="collapse-{{ wash_html_id(value['path']) }}"
                data-action="{{ url_for('comments.notes_toggle', recid=recid, path=value['path']) }}"
                class="collapse{{ ' in' if not note_is_collapsed(recid, value['path']) }}">
-              <ul class="list-unstyled" style="padding-left: 20px;">
+              <ul class="list-unstyled" style="padding-left: 10px;">
                 {{ loop(value.items()) }}
               </ul>
             </div>
@@ -100,10 +100,10 @@
 
   {%- else -%}
   <div class="alert alert-info">
-    {%- if config.CFG_ANNOTATIONS_PREVIEW_ENABLED -%}
+    {%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
       {{ _('There are no notes on the current selection.') }}
     {%- else -%}
-      { _('There are no notes. Be the first commenting this record.') }}
+      {{ _('There are no notes. Be the first commenting this record.') }}
     {%- endif -%}
   </div>
   {%- endif -%}
