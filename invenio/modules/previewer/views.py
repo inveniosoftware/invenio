@@ -56,3 +56,11 @@ def preview(recid):
                 if previewers[plugin_id]['can_preview'](f):
                     return previewers[plugin_id]['preview'](f)
     return previewers['default']['preview'](None)
+
+
+@blueprint.route('/<int:recid>/preview/pdfmaxpage', methods=['GET', 'POST'])
+def get_pdf_maxpage(recid):
+    from invenio.legacy.bibdocfile.api import BibRecDocs
+    from .previewerext.pdftk import maxpage
+
+    return maxpage(BibRecDocs(recid).list_latest_files(list_hidden=False)[0])
