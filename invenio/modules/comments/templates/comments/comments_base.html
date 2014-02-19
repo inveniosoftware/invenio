@@ -186,5 +186,5 @@
 {%- if request.is_xhr -%}
   {{ css_bundle() }}
   {{ js_bundle() }}
-  <script type="text/javascript"> bindModals(); </script>
+  <script type="text/javascript"> bindModals(null, 'input:text:visible:first'); </script>
 {%- endif -%}

@@ -126,5 +126,5 @@
 {% endblock %}
 
 {%- if request.is_xhr -%}
-  <script type="text/javascript"> bindModals(); </script>
+  <script type="text/javascript"> bindModals(null, 'input:text:visible:first'); </script>
 {%- endif -%}

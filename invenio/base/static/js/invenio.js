@@ -162,7 +162,7 @@
     });
   });
 
-  function bindModals(filter) {
+  function bindModals(filter, focusOn) {
     // Support for AJAX loaded modal window.
     // Focuses on first input textbox after it loads the window.
     if (filter) {
@@ -178,13 +178,17 @@
         } else {
             $.get(href, function(data) {
                 $('<div class="modal" >' + data + '</div>').modal();
-            }).success(function() { $('input:text:visible:first').focus(); });
+            }).success(function() {
+                if(focusOn) {
+                    $(focusOn).focus()
+                }
+            });
         }
     });
   }
 
   $(document).ready(function() {
-    bindModals();
+    bindModals(null, 'input:text:visible:first');
   });
   window.bindModals = bindModals;
 
