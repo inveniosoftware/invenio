@@ -127,6 +127,16 @@ footer, footer p {
   color: #333;
 }
 
+/* fixes for bootstrap 3.1.1 */
+#searchform-input-group.input-group .form-control {
+  float: none;
+  width: 100%;
+}
+#searchform-input-group .input-group-btn.invenio-collapsable-tabs {
+  padding-left: 4px;
+}
+/* end of fixes */
+
 /* Lastly, apply responsive CSS fixes as necessary */
 @media (max-width: 767px) {
   footer {
