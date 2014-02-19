@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-calculate_start_date = lazy_import('invenio.webcomment:calculate_start_date')
+calculate_start_date = lazy_import('invenio.modules.comments.api:calculate_start_date')
 
 
 class TestCalculateStartDate(InvenioTestCase):
