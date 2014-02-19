@@ -102,3 +102,21 @@ def wash_urlargd(form, content):
             raise ValueError('cannot cast form value %s of type %r into type %r' % (value, src_type, dst_type))
 
     return result
+
+
+def wash_html_id(dirty):
+    """Strips any non-alphabetic or -newline characters from a given string,
+    such that it can be used as a HTML element ID (also with jQuery and in all
+    browsers).
+
+    Args:
+        dirty - the string to wash
+    Returns:
+        the HTML ID ready string
+    """
+    import re
+    if not dirty[0].isalpha():
+        # we make sure that the first character is a lowercase letter
+        dirty = 'i' + dirty
+    non_word = re.compile(r'[^\w]+')
+    return non_word.sub('', dirty)
