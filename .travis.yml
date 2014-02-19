@@ -24,6 +24,7 @@ services:
   - mysql # will start mysqld
   - rabbitmq # will start rabbitmq-server
   - redis # will start memcached
+  - mongodb # will start mongodb
 
 python:
   - "2.7"
@@ -42,6 +43,7 @@ install:
   - "mkvirtualenv invenio"
   - "workon invenio"
   - "travis_retry pip install . --process-dependency-links --allow-all-external"
+  - "travis_retry pip install -r requirements-mongo.txt --allow-all-external"
   - "pybabel compile -f -d invenio/base/translations/"
   - "inveniomanage config create secret-key"
   - "inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail"

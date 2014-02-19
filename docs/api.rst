@@ -27,6 +27,9 @@ Modules
 .. automodule:: invenio.modules.tags.views
    :members:
 
+.. automodule:: invenio.modules.annotations
+    :members:
+
 
 Legacy
 ------
