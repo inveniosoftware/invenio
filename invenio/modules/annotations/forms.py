@@ -20,6 +20,8 @@
 from wtforms import HiddenField, TextAreaField, BooleanField, validators
 
 from invenio.base.i18n import _
+from invenio.modules.deposit.fields import FileUploadField
+from invenio.modules.deposit.field_widgets import plupload_widget
 from invenio.utils.forms import InvenioBaseForm
 
 
@@ -31,3 +33,7 @@ class WebPageAnnotationForm(InvenioBaseForm):
                                      validators.Length(max=10000, message=_(
                                          "Your annotation is too long!"))])
     public = BooleanField(label=_("Public"), default=True)
+
+
+class WebPageAnnotationFormAttachments(WebPageAnnotationForm):
+    attachments = FileUploadField(widget=plupload_widget, label="Attachments")

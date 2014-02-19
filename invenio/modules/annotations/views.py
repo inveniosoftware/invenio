@@ -17,14 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask import Blueprint, render_template, request, redirect, flash
+from flask import current_app, Blueprint, render_template, request, redirect, \
+    flash, jsonify
 from flask.ext.login import login_required
 from flask.ext.login import current_user
 
 from invenio.modules.accounts.models import User
 
 from .api import add_annotation, get_annotations
-from .forms import WebPageAnnotationForm
+from .forms import WebPageAnnotationForm, WebPageAnnotationFormAttachments
 
 blueprint = Blueprint('annotations',
                       __name__,
@@ -63,7 +64,10 @@ def menu():
 @blueprint.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
-    form = WebPageAnnotationForm(request.form)
+    if cfg["CFG_ANNOTATIONS_ATTACHMENTS"]:
+        form = WebPageAnnotationFormAttachments(request.form)
+    else:
+        form = WebPageAnnotationForm(request.form)
     if form.validate_on_submit():
         # FIXME: use form.data instead of manual fields
         add_annotation(model='annotation',
@@ -91,3 +95,22 @@ def view():
                                 "who": current_user.get_id(),
                                 "perm": {"public": False, "groups": []}}),
                            get_username_by_id=get_username_by_id)
+
+
+@blueprint.route('/attach', methods=['POST'])
+@login_required
+def attach():
+    # if not _id, create empty annotation, get id
+    # send id back and autofill form
+    # save Document
+    # link Annotation and Document
+    current_app.logger.info('Uploaded file: ' +
+                            request.files.get('file').filename)
+    return jsonify(_id=0)
+
+
+@blueprint.route('/detach', methods=['POST'])
+@login_required
+def detach():
+    current_app.logger.info('Removal request: ' + request.values.get('file_id'))
+    return jsonify()
