@@ -18,7 +18,7 @@
 #}
 
 {%- from "_formhelpers.html" import render_filter_form with context -%}
-{%- from "search/helpers.html" import collection_tree, portalbox_sidebar,
+{%- from "search/helpers_base.html" import collection_tree, portalbox_sidebar,
 search_also, search_form, search_form_javascript with context -%}
 {%- extends "page.html" %}
 
@@ -91,7 +91,9 @@ search_also, search_form, search_form_javascript with context -%}
 </style>
 {%- endblock extra_style -%}
 
-{%- block search_form -%}{{ search_form(collection) }}{%- endblock search_form -%}
+{%- block search_form -%}
+  {{ search_form(collection, easy_search_form) }}
+{%- endblock search_form -%}
 
 {%- block index -%}
 <div class="row websearch clearfix"><!-- row 2 -->

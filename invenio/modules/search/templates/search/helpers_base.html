@@ -94,7 +94,9 @@
 {% endblock record_brief_links %}{% endmacro %}
 
 
-{% macro collection_tree(collections, limit=None) %}{% set macrokwargs = kwargs %}{% block collection_tree scoped %}
+{%- macro collection_tree(collections, limit=None) %}
+{%- set macrokwargs = kwargs %}
+{%- block collection_tree scoped %}
 {%- set idxs = [0] -%}
 <ul {{ macrokwargs|xmlattr }}>
 {% for collection in collections recursive %}
@@ -118,7 +120,8 @@
   </li>
 {% endfor %}
 </ul>
-{% endblock collection_tree %}{% endmacro %}
+{% endblock collection_tree %}
+{% endmacro %}
 
 {% macro portalbox_sidebar(portalboxes, width=2) %}{% set macrokwargs = kwargs %}{% block portalbox_sidebar scoped %}
   {% if portalboxes %}
@@ -159,7 +162,8 @@
 {% endmacro %}
 
 
-{% macro _search_simple_box(collection) %}{% block _search_simple_box scoped %}
+{% macro _search_simple_box(collection, easy_search_form) %}
+  {% block _search_simple_box scoped %}
     {% for f in easy_search_form if not f.name=='csrf_token' %}
     <div class="form-group">
       <label class="col-md-2 col-sm-3 control-label">
@@ -183,10 +187,12 @@
         </div>
       </div>
     </div>
-{% endblock _search_simple_box %}{% endmacro %}
+  {% endblock _search_simple_box %}
+{% endmacro %}
 
 
-{% macro _search_advanced_box(collection) %}{% block _search_advanced_box scoped %}
+{% macro _search_advanced_box(collection) %}
+{% block _search_advanced_box scoped %}
     <div class="form-group">
       <label class="col-sm-3 col-md-2 control-label">
         {{ _('what') }}?
@@ -264,9 +270,11 @@
       </div>
     </div>
 
-{% endblock _search_advanced_box %}{% endmacro %}
+{% endblock _search_advanced_box %}
+{% endmacro %}
 
-{% macro search_box(collection) %}{% block search_box scoped %}
+{% macro search_box(collection, easy_search_form) %}
+{% block search_box scoped %}
   <div class="form-horizontal add_to_search-form">
     <div class="form-group _tab-form-group">
       <label class="col-sm-3 col-md-2 control-label">
@@ -301,7 +309,7 @@
 
     <div class="tab-content">
       <div class="tab-pane active" id="simple-search">
-        {{ _search_simple_box(collection) }}
+        {{ _search_simple_box(collection, easy_search_form) }}
       </div>
       <div class="tab-pane" id="advanced-search">
         {{ _search_advanced_box(collection) }}
@@ -331,10 +339,12 @@
 
 
 </style>
-{% endblock search_box %}{% endmacro %}
+{% endblock search_box %}
+{% endmacro %}
 
 
-{% macro searchsettings_form(collection) %}{% block searchsettings_form scoped %}
+{% macro searchsettings_form(collection) %}
+{% block searchsettings_form scoped %}
 
   <form action="{{ url_for('search.search') }}"
     name="settings"
@@ -444,7 +454,7 @@
 {% endblock searchsettings_form %}{% endmacro %}
 
 
-{% macro search_form(collection) %}{% block search_form scoped %}
+{% macro search_form(collection, easy_search_form) %}{% block search_form scoped %}
 {%- block search_form_style %}
   <style>
     #search-label {
@@ -651,7 +661,7 @@
             <div class="row navbar-row-container">
               <div class="col-md-12">
                 <script type="text/javascript">
-                  var box = {{ search_box(collection)|tojson|safe }};
+                  var box = {{ search_box(collection, easy_search_form)|tojson|safe }};
                   document.write(box);
                 </script>
               </div>
