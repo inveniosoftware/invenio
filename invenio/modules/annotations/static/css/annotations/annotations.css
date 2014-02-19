@@ -21,3 +21,8 @@
     position: fixed;
     top: 50%;
 }
+
+.popover {
+    z-index: 9999;
+    position: fixed;
+}
