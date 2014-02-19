@@ -19,25 +19,39 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
 
 'use strict';
 
-var $ = window.jQuery;  // FIXME
+/* exported COMMENTS_COLLAPSE */
 
-$(document).ready(function() {
-    $('.collapse').on('shown.bs.collapse', function(e) {
-        $('[data-target="#' + e.target.id + '"').children()
-            .removeClass('glyphicon-chevron-right')
-            .addClass('glyphicon-chevron-down');
-        $.get($(this).attr('data-action'));
-        e.stopPropagation();
-    });
+/**
+ * Comment collapse utilities.
+ *
+ * @module
+ * @param {jQuery} $ usually window's jQuery object.
+ */
+var COMMENTS_COLLAPSE = (function($) {
 
-    $('.collapse').on('hidden.bs.collapse', function(e) {
-        $('[data-target="#' + e.target.id + '"').children()
-            .removeClass('glyphicon-chevron-down')
-            .addClass('glyphicon-chevron-right');
-        $.get($(this).attr('data-action')).fail(function() { return; });
-        e.stopPropagation();
-    });
+    function bindCollapse() {
+        $('.collapse').on('shown.bs.collapse', function(e) {
+            $('[data-target="#' + e.target.id + '"').children()
+                .removeClass('glyphicon-chevron-right')
+                .addClass('glyphicon-chevron-down');
+            $.get($(this).attr('data-action'));
+            e.stopPropagation();
+        });
 
-    $('a.collapse-comment').on('click', function(e) { e.preventDefault(); });
+        $('.collapse').on('hidden.bs.collapse', function(e) {
+            $('[data-target="#' + e.target.id + '"').children()
+                .removeClass('glyphicon-chevron-down')
+                .addClass('glyphicon-chevron-right');
+            $.get($(this).attr('data-action')).fail(function() { return; });
+            e.stopPropagation();
+        });
 
-});
+        $('a.collapse-comment').on('click', function(e) { e.preventDefault(); });
+    }
+
+    $(document).ready(bindCollapse);
+
+    return {
+        bindCollapse: bindCollapse
+    };
+})(window.jQuery);
