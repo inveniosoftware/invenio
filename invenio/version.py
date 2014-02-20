@@ -17,14 +17,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Invenio
-=======
+Version information for Invenio
 
-Invenio enables you to run your own electronic preprint server,
-your own online library catalogue or a digital document system on the
-web.  It complies with the Open Archive Initiative metadata harvesting
-protocol and uses MARC21 as its underlying bibliographic standard.
+This file is imported by ``invenio.__init__``, and parsed by
+``setup.py`` as well as ``docs/conf.py``.
 """
 
-# Version information
-from .version import __version__
+# Do not change the format of this next line. Doing so risks breaking
+# setup.py and docs/conf.py
+
+__version__ = "1.9999"
