@@ -275,9 +275,9 @@ class GenericBibUploadTest(InvenioTestCase):
         self.webcolled_recids.append(recid)
         from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
         from invenio import bibindex_engine
-        reload(bibindex_engine)
         from invenio import websearch_webcoll
-        reload(websearch_webcoll)
+        ## Reset the collection global cache
+        websearch_webcoll.COLLECTION_HOUSE = {}
         index_id, index_name, index_tags = bibindex_engine.get_word_tables(["collection"])[0]
         bibindex_engine.WordTable(index_name, index_id, index_tags, "idxWORD%02dF", wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"], tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"}).add_recIDs([[recid, recid]], 1)
         #sleep 1s to make sure all tables are ready
