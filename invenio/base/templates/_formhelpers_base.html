@@ -116,8 +116,8 @@
   </div>
 {% endblock %}{% endmacro %}
 
-{% macro render_filter_form(form) %}{% block render_filter_form scoped %}
-<form {{ kwargs|xmlattr }}>
+{% macro render_filter_form(form) %}{% set form_kwargs = kwargs %}{% block render_filter_form scoped %}
+<form {{ form_kwargs|xmlattr }}>
   {{ form.csrf_token }}
   {{ form.sort_by }}
   {{ form.order }}
