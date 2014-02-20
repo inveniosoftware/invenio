@@ -158,6 +158,9 @@ setup(
             'xmlmarc2textmarc = invenio.legacy.bibrecord.scripts.xmlmarc2textmarc:main',
             'xmlmarclint = invenio.legacy.bibrecord.scripts.xmlmarclint:main',
         ],
+        "distutils.commands": [
+            "inveniomanage = invenio.base.setuptools:InvenioManageCommand",
+        ]
     },
     install_requires=install_requires,
     dependency_links=dependency_links,
