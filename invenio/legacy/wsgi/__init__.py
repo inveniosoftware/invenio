@@ -52,15 +52,20 @@ _RE_HTTPS_REPLACES = re.compile(r"\b((?:src\s*=|url\s*\()\s*[\"']?)http\://", re
 ## the whole ip address - re.compile('^\d+\.\d+\.\d+\.\d+$') (1.01 µs)
 _RE_IPADDRESS_START = re.compile("^\d+\.")
 
+
 def _http_replace_func(match):
     ## src external_site -> CFG_SITE_SECURE_URL/sslredirect/external_site
     return match.group(1) + CFG_SITE_SECURE_URL + '/sslredirect/'
 
 _ESCAPED_CFG_SITE_URL = cgi.escape(CFG_SITE_URL, True)
 _ESCAPED_CFG_SITE_SECURE_URL = cgi.escape(CFG_SITE_SECURE_URL, True)
+
+
 def https_replace(html):
-    html = html.replace(_ESCAPED_CFG_SITE_URL, _ESCAPED_CFG_SITE_SECURE_URL)
+    html = html.decode('utf-8').replace(_ESCAPED_CFG_SITE_URL,
+                                        _ESCAPED_CFG_SITE_SECURE_URL)
     return _RE_HTTPS_REPLACES.sub(_http_replace_func, html)
+
 
 class InputProcessed(object):
     """
@@ -72,8 +77,8 @@ class InputProcessed(object):
     readline = readlines = __iter__ = read
 
 
-from werkzeug import BaseResponse, ResponseStreamMixin, \
-                     CommonResponseDescriptorsMixin
+from werkzeug import (BaseResponse, ResponseStreamMixin,
+                      CommonResponseDescriptorsMixin)
 
 
 class Response(BaseResponse, ResponseStreamMixin,
