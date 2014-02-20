@@ -1105,13 +1105,16 @@ def perform_modifydependentindexes(idxID, ln=CFG_SITE_LANG, newIDs=[], callback=
         elif idxID > -1 and confirm in [1, "1"]:
             output += "</br>"
             to_add, to_remove = find_dependent_indexes_to_change(idxID, newIDs)
-            res = modify_dependent_indexes(idxID, to_add, to_remove)
+            # NOTE: we don't need to take care of indexes to remove, because
+            # -w <<virutal_index>> --remove-dependent-index will take care of everything
+            # so it's enough to just post a message
+            res = modify_dependent_indexes(idxID, to_add)
             output += write_outcome(res)
             if len(to_remove) + len(to_add) > 0:
                 output += """<br /><span class="info">Please note you should run as soon as possible:"""
-            for index in to_add:
+            if len(to_add) > 0:
                 output += """<pre>$> %s/bibindex --reindex -w %s</pre>
-                          """ % (CFG_BINDIR, index)
+                          """ % (CFG_BINDIR, get_index_name_from_index_id(idxID))
             for index in to_remove:
                 output += """<pre>$> %s/bibindex -w %s --remove-dependent-index %s</pre>
                           """ % (CFG_BINDIR, get_index_name_from_index_id(idxID), index)
@@ -2561,15 +2564,18 @@ def add_virtual_idx(id_virtual, id_normal):
         return (0, e)
 
 
-def modify_dependent_indexes(idxID, indexes_to_add, indexes_to_remove):
-    """Adds and removes dependent indexes"""
+def modify_dependent_indexes(idxID, indexes_to_add=[]):
+    """
+        Adds indexes to a list of dependent indexes of
+        a specific virtual index.
+        @param idxID: id of the virtual index
+        @param indexes_to_add: list of names of indexes which
+                               should be added as new dependent
+                               indexes for a virtual index
+    """
     all_indexes = dict(get_all_index_names_and_column_values("id"))
     for index_name in indexes_to_add:
         res = add_dependent_index(idxID, all_indexes[index_name])
-        if res[0] == 0:
-            return res
-    for index_name in indexes_to_remove:
-        res = remove_dependent_index(idxID, all_indexes[index_name])
         if res[0] == 0:
             return res
     return (1, "")
@@ -2580,19 +2586,6 @@ def add_dependent_index(id_virtual, id_normal):
     try:
         query = """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal)
                    VALUES (%s, %s)""" % (id_virtual, id_normal)
-        res = run_sql(query)
-        return (1, "")
-    except StandardError, e:
-        return (0, e)
-
-
-def remove_dependent_index(id_virtual, id_normal):
-    """Remove dependent index to specific virtual index"""
-    try:
-        query = """DELETE FROM idxINDEX_idxINDEX
-                   WHERE id_virtual=%s AND
-                         id_normal=%s
-                """ % (id_virtual, id_normal)
         res = run_sql(query)
         return (1, "")
     except StandardError, e:

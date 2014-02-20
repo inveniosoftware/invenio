@@ -39,7 +39,8 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
      CFG_BIBINDEX_UPDATE_MESSAGE, \
      CFG_BIBINDEX_UPDATE_MODE, \
-     CFG_BIBINDEX_TOKENIZER_TYPE
+     CFG_BIBINDEX_TOKENIZER_TYPE, \
+     CFG_BIBINDEX_WASH_INDEX_TERMS
 from invenio.bibauthority_config import \
      CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
 from invenio.bibauthority_engine import get_index_strings_by_control_no,\
@@ -1986,24 +1987,15 @@ def remove_dependent_index(virtual_indexes, dependent_index):
     """
     if not virtual_indexes:
         write_message("You should specify a name of a virtual index...")
+        return
 
     id_dependent = get_index_id_from_index_name(dependent_index)
     wordTables = get_word_tables(virtual_indexes)
     for index_id, index_name, index_tags in wordTables:
-        vit = VirtualIndexTable(index_name,
-                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
-        vit.remove_dependent_index(dependent_index)
-        task_sleep_now_if_required()
-
-        vit = VirtualIndexTable(index_name,
-                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"])
-        vit.remove_dependent_index(dependent_index)
-        task_sleep_now_if_required()
-
-        vit = VirtualIndexTable(index_name,
-                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"])
-        vit.remove_dependent_index(dependent_index)
-        task_sleep_now_if_required()
+        for type_ in CFG_BIBINDEX_INDEX_TABLE_TYPE.itervalues():
+            vit = VirtualIndexTable(index_name, type_)
+            vit.remove_dependent_index(dependent_index)
+            task_sleep_now_if_required()
 
         query = """DELETE FROM idxINDEX_idxINDEX WHERE id_virtual=%s AND id_normal=%s"""
         run_sql(query, (index_id, id_dependent))
@@ -2015,47 +2007,32 @@ def update_virtual_index(virtual_indexes, reindex=False):
         @param virtual_indexes: list of index names
         @param reindex: shall we reindex given v.indexes from scratch?
     """
+    kwargs = {}
+    if reindex:
+        kwargs.update({'table_prefix': 'tmp_'})
+
     for index_name in virtual_indexes:
         if reindex:
-            reindex_prefix = "tmp_"
             index_id = get_index_id_from_index_name(index_name)
-            init_temporary_reindex_tables(index_id, reindex_prefix)
-            vit = VirtualIndexTable(index_name,
-                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                    table_prefix=reindex_prefix)
-            vit.set_reindex_mode()
-            vit.run_update()
+            init_temporary_reindex_tables(index_id)
 
-            vit = VirtualIndexTable(index_name,
-                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
-                                    wash_index_terms=100,
-                                    table_prefix=reindex_prefix)
-            vit.set_reindex_mode()
-            vit.run_update()
+            for key, type_ in CFG_BIBINDEX_INDEX_TABLE_TYPE.iteritems():
+                kwargs.update({'wash_index_terms': CFG_BIBINDEX_WASH_INDEX_TERMS[key]})
+                vit = VirtualIndexTable(index_name, type_, **kwargs)
+                vit.set_reindex_mode()
+                vit.run_update()
 
-            vit = VirtualIndexTable(index_name,
-                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
-                                    wash_index_terms=0,
-                                    table_prefix=reindex_prefix)
-            vit.set_reindex_mode()
-            vit.run_update()
-
-            swap_temporary_reindex_tables(index_id, reindex_prefix)
+            swap_temporary_reindex_tables(index_id)
             update_index_last_updated([index_name], task_get_task_param('task_starting_time'))
             task_sleep_now_if_required(can_stop_too=True)
         else:
-            vit = VirtualIndexTable(index_name,
-                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
-            vit.run_update()
-            vit = VirtualIndexTable(index_name,
-                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
-                                    wash_index_terms=100)
-            vit.run_update()
-            vit = VirtualIndexTable(index_name,
-                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
-                                    wash_index_terms=0)
-            vit.run_update()
+            for key, type_ in CFG_BIBINDEX_INDEX_TABLE_TYPE.iteritems():
+                kwargs.update({'wash_index_terms': CFG_BIBINDEX_WASH_INDEX_TERMS[key]})
+                vit = VirtualIndexTable(index_name, type_, **kwargs)
+                vit.run_update()
+
             task_sleep_now_if_required(can_stop_too=True)
+
 
 def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.
