@@ -23,24 +23,23 @@
       {{ _('Write message') }}
     </a>
   </li>
-  <li class="divider"></li>
+  <li class="divider" style="margin-bottom: 0"></li>
   {% for m, um in messages %}
-  <li class="row">
-    {% set a_class = "col-md-5 alert-info" if um.status == 'N' else "col-md-5" %}
-    <a style="margin-bottom: 1px;" class="{{ a_class }}" href="{{ url_for('webmessage.view', msgid=m.id) }}">
-      <div style="width: 100%; float: left;">
+  <li>
+    {% set a_class = "alert-info" if um.status == 'N' else "" %}
+    <a class="navbar-content {{ a_class }}"
+       href="{{ url_for('webmessage.view', msgid=m.id) }}">
         <div style="float:left; width: 30px; padding: 4px;">
           <img src="{{ m.user_from.email|gravatar(size=30, default=url_for('static', filename='img/user-icon-1-24x24.gif', _external=True)) }}" alt="avatar"/>
         </div>
-        <div style="margin-left: 38px;">
+        <div style="margin-left: 38px; padding: 4px;">
           <strong>{{ m.user_from.nickname }}</strong>
           <i class="pull-right">{{ m.received_date }}</i>
           <br/>
           <p>
-            {{ m.subject }} <small>{{ m.body[:50] }}</small>
+            {{ m.subject|truncate(25) }} <small>{{ m.body|truncate(50) }}</small>
           </p>
         </div>
-      </div>
     </a>
   </li>
   {% else %}
@@ -48,7 +47,7 @@
     <label>{{ _('Empty inbox') }}</label>
   </li>
   {% endfor %}
-  <li class="divider"></li>
+  <li class="divider" style="margin-top: 0"></li>
   <li style="text-align: center;">
     <a href="{{ url_for('webmessage.index') }}">{{ _('See All Messages') }}</a>
   </li>
