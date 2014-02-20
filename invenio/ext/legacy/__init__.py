@@ -67,6 +67,7 @@ def setup_app(app):
     app.wsgi_app = LegacyAppMiddleware(app)
 
     @app.errorhandler(404)
+    @app.errorhandler(405)
     def page_not_found(error):
         try:
             from invenio.legacy.wsgi import \
@@ -82,8 +83,9 @@ def setup_app(app):
                 return current_app.send_static_file(request.path)
             except NotFound as e:
                 current_app.logger.error(str(e) + " " + request.path)
-                pass
-        return render_template('404.html'), 404
+        if error.code == 404:
+            return render_template('404.html'), 404
+        return str(error), error.code
 
     @app.route('/admin/<module>/<action>.py', methods=['GET', 'POST', 'PUT'])
     @app.route('/admin/<module>/<action>.py/<path:arguments>',
