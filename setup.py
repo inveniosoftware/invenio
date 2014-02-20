@@ -39,8 +39,8 @@ And Easy to Setup
 .. code:: bash
 
     $ pip install invenio
-    $ python hello.py
-     * Running on http://localhost:5000/
+    $ inveniomanage runserver
+     * Running on http://localhost:4000/
 
 Links
 `````
@@ -52,10 +52,18 @@ Links
 """
 from __future__ import print_function
 
-import re
 import glob
+import os
+import re
 
 from setuptools import setup, find_packages
+
+# Get the version string.  Cannot be done with import!
+with open(os.path.join('invenio', 'version.py'), 'rt') as f:
+    version = re.search(
+        '__version__\s*=\s*"(?P<version>.*)"\n',
+        f.read()
+    ).group('version')
 
 
 def match_feature_name(filename):
@@ -100,7 +108,7 @@ packages.append('invenio_docs')
 
 setup(
     name='Invenio',
-    version='1.9999',
+    version=version,
     url='http://invenio-sofrware.org/repo/invenio',
     license='GPLv2',
     author='CERN',

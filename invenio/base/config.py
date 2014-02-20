@@ -2,6 +2,7 @@
 import distutils.sysconfig
 from os.path import join
 
+from invenio.version import __version__
 from invenio.utils.shell import which
 
 EXTENSIONS = [
@@ -499,7 +500,7 @@ CFG_SITE_SECURE_URL = "http://localhost:4000"
 CFG_SITE_SUPPORT_EMAIL = "info@invenio-software.org"
 CFG_SITE_URL = "http://localhost:4000"
 CFG_SOLR_URL = ""
-CFG_VERSION = "1.1.2.1185-8a57d"
+CFG_VERSION = __version__
 CFG_WEB_API_KEY_ALLOWED_URL = []
 CFG_WEBALERT_ALERT_ENGINE_EMAIL = "info@invenio-software.org"
 CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL = 72
