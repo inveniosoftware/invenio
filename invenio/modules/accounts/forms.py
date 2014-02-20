@@ -20,6 +20,7 @@
 """WebAccount Forms"""
 
 from wtforms.validators import Required
+from flask.ext.login import current_user
 from flask.ext.wtf import Form, validators
 from wtforms.fields import SubmitField, BooleanField, TextField, \
     TextAreaField, PasswordField, HiddenField
@@ -36,7 +37,8 @@ from .validators import wash_login_method, validate_nickname_or_email, \
 class LoginForm(Form):
     nickname = TextField(
         _("Nickname"),
-        validators=[Required(message=_("Nickname not provided")), validate_nickname_or_email])
+        validators=[Required(message=_("Nickname not provided")),
+                    validate_nickname_or_email])
     password = PasswordField(_("Password"))
     remember = BooleanField(_("Remember Me"))
     referer = HiddenField()
@@ -54,7 +56,8 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
         field.data = field.data.lower()
         if validate_email(field.data.lower()) != 1:
             raise validators.ValidationError(
-                _("Supplied email address %(email)s is invalid.", email=field.data)
+                _("Supplied email address %(email)s is invalid.",
+                  email=field.data)
             )
 
         # is email already taken?
@@ -77,6 +80,7 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
                 will have to <a href=%(link)s>reset</a> your password anew.",
                 link=url_for('webaccount.lost')), 'warning')
 
+
 class LostPasswordForm(InvenioBaseForm):
     email = TextField(_("Email address"))
 
@@ -84,7 +88,8 @@ class LostPasswordForm(InvenioBaseForm):
         field.data = field.data.lower()
         if email_valid_p(field.data) != 1:
             raise validators.ValidationError(
-                _("Supplied email address %(email)s is invalid.", email=field.data)
+                _("Supplied email address %(email)s is invalid.",
+                  email=field.data)
             )
 
         # is email registered?
@@ -92,7 +97,8 @@ class LostPasswordForm(InvenioBaseForm):
             User.query.filter(User.email == field.data).one()
         except SQLAlchemyError:
             raise validators.ValidationError(
-                _("Supplied email address %(email)s is not registered.", email=field.data)
+                _("Supplied email address %(email)s is not registered.",
+                  email=field.data)
             )
 
 
@@ -106,12 +112,8 @@ class ChangePasswordForm(InvenioBaseForm):
     password2 = PasswordField(_("Confirm password"),)
 
     def validate_current_password(self, field):
-        if len(field.data) == 0:
-            raise validators.ValidationError(
-                _("Please enter your current password"))
-
-        from invenio.modules.account.views import update_login
-        if update_login(current_user['nickname'], field.data) is None:
+        from invenio.ext.login import authenticate
+        if not authenticate(current_user['nickname'], field.data):
             raise validators.ValidationError(
                 _("The current password you entered does\
                   not match with our records."))
@@ -120,7 +122,8 @@ class ChangePasswordForm(InvenioBaseForm):
         CFG_ACCOUNT_MIN_PASSWORD_LENGTH = 6
         if len(field.data) < CFG_ACCOUNT_MIN_PASSWORD_LENGTH:
             raise validators.ValidationError(
-                _("Password must be at least %(x_pass)d characters long.", x_pass=(CFG_ACCOUNT_MIN_PASSWORD_LENGTH, )))
+                _("Password must be at least %(x_pass)d characters long.",
+                  x_pass=CFG_ACCOUNT_MIN_PASSWORD_LENGTH))
 
     def validate_password2(self, field):
         if field.data != self.password.data:
@@ -153,7 +156,8 @@ class RegisterForm(Form):
         try:
             User.query.filter(User.nickname == field.data).one()
             raise validators.ValidationError(
-                _("Desired nickname %(nick)s already exists in the database.", nick=field.data)
+                _("Desired nickname %(nick)s already exists in the database.",
+                  nick=field.data)
             )
         except SQLAlchemyError:
             pass
@@ -174,7 +178,8 @@ class RegisterForm(Form):
         CFG_ACCOUNT_MIN_PASSWORD_LENGTH = 6
         if len(field.data) < CFG_ACCOUNT_MIN_PASSWORD_LENGTH:
             raise validators.ValidationError(
-                _("Password must be at least %(x_pass)d characters long.", x_pass=(CFG_ACCOUNT_MIN_PASSWORD_LENGTH, )))
+                _("Password must be at least %(x_pass)d characters long.",
+                  x_pass=CFG_ACCOUNT_MIN_PASSWORD_LENGTH))
 
     def validate_password2(self, field):
         if field.data != self.password.data:
