@@ -31,10 +31,7 @@ from invenio.utils.html import get_html_text_editor
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
-     CFG_SITE_LANG, \
-     CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, \
-     CFG_WEBBASKET_USE_RICH_TEXT_EDITOR, \
-     CFG_SITE_RECORD
+     CFG_SITE_LANG
 from invenio.legacy.webuser import get_user_info
 from invenio.utils.date import convert_datetext_to_dategui
 from invenio.legacy.webbasket.db_layer import get_basket_ids_and_names
@@ -348,7 +345,7 @@ class Template:
                                       'basket_links': basket_links}
                     content_list.append(content_list_item)
 
-            nb_cells = CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS
+            nb_cells = cfg['CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS']
             nb_items = len(content_list)
             content_list.reverse()
             content = """
@@ -739,7 +736,7 @@ class Template:
                     if recid > 0:
                         detailed_record_html = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)i">%(detailed_record_label)s</a>""" % \
                                                {'siteurl': CFG_SITE_URL,
-                                                'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                                                'CFG_SITE_RECORD': cfg['CFG_SITE_RECORD'],
                                                 'recid': recid,
                                                 'detailed_record_label': _('Detailed record')}
                         notes_html = """<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(notes_action)s?"""\
@@ -847,7 +844,7 @@ class Template:
                     if recid > 0:
                         detailed_record_html = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)i">%(detailed_record_label)s</a>""" % \
                                                {'siteurl': CFG_SITE_URL,
-                                                'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                                                'CFG_SITE_RECORD': cfg['CFG_SITE_RECORD'],
                                                 'recid': recid,
                                                 'detailed_record_label': _('Detailed record')}
                         if share_rights_notes:
@@ -953,7 +950,7 @@ class Template:
                     if recid > 0:
                         detailed_record_html = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)i">%(detailed_record_label)s</a>""" % \
                                                {'siteurl': CFG_SITE_URL,
-                                                'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                                                'CFG_SITE_RECORD': cfg['CFG_SITE_RECORD'],
                                                 'recid': recid,
                                                 'detailed_record_label': _('Detailed record')}
                         if share_rights_notes:
@@ -1056,7 +1053,7 @@ class Template:
                     if recid > 0:
                         detailed_record_html = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)i">%(detailed_record_label)s</a>""" % \
                                                {'siteurl': CFG_SITE_URL,
-                                                'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                                                'CFG_SITE_RECORD': cfg['CFG_SITE_RECORD'],
                                                 'recid': recid,
                                                 'detailed_record_label': _('Detailed record')}
                         if share_rights_notes:
@@ -1291,35 +1288,35 @@ class Template:
 
         footer = ''
 
-        if limit > CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS:
+        if limit > cfg['CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS']:
             limit_first = 1
             page_first = """<a href="%s/yourbaskets/list_public_baskets?limit=%i&amp;sort=%s&amp;asc=%i&amp;ln=%s"><img src="%s" /></a>""" % \
                          (CFG_SITE_URL, limit_first, sort, asc, ln, '/img/sb.gif')
             footer += page_first
 
         if limit > 0:
-            limit_previous = limit > CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS \
-                             and limit - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS + 1 \
+            limit_previous = limit > cfg['CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS'] \
+                             and limit - cfg['CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS'] + 1 \
                              or 1
             page_previous = """<a href="%s/yourbaskets/list_public_baskets?limit=%i&amp;sort=%s&amp;asc=%i&amp;ln=%s"><img src="%s" /></a>""" % \
                             (CFG_SITE_URL, limit_previous, sort, asc, ln, '/img/sp.gif')
             footer += page_previous
 
         display_from = limit + 1
-        display_to = limit + CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS > number_of_all_public_baskets \
+        display_to = limit + cfg['CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS'] > number_of_all_public_baskets \
                      and number_of_all_public_baskets \
-                     or limit + CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
+                     or limit + cfg['CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS']
         footer += _('Displaying public baskets %(x_from)i - %(x_to)i out of %(x_total_public_basket)i public baskets in total.') % \
                {'x_from': display_from, 'x_to': display_to, 'x_total_public_basket': number_of_all_public_baskets}
 
-        if limit < number_of_all_public_baskets - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS:
-            limit_next = limit + CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS + 1
+        if limit < number_of_all_public_baskets - cfg['CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS']:
+            limit_next = limit + cfg['CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS'] + 1
             page_next = """<a href="%s/yourbaskets/list_public_baskets?limit=%i&amp;sort=%s&amp;asc=%i&amp;ln=%s"><img src="%s" /></a>""" % \
                         (CFG_SITE_URL, limit_next, sort, asc, ln, '/img/sn.gif')
             footer += page_next
 
-        if limit < number_of_all_public_baskets - ( 2 * CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS ):
-            limit_last = number_of_all_public_baskets - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS + 1
+        if limit < number_of_all_public_baskets - ( 2 * cfg['CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS'] ):
+            limit_last = number_of_all_public_baskets - cfg['CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS'] + 1
             page_last = """<a href="%s/yourbaskets/list_public_baskets?limit=%i&amp;sort=%s&amp;asc=%i&amp;ln=%s"><img src="%s" /></a>""" % \
                         (CFG_SITE_URL, limit_last, sort, asc, ln, '/img/se.gif')
             footer += page_last
@@ -1558,7 +1555,7 @@ class Template:
         #                                   textual_content=desc,
         #                                   width="640px",
         #                                   height="100px",
-        #                                   enabled=CFG_WEBBASKET_USE_RICH_TEXT_EDITOR,
+        #                                   enabled=cfg['CFG_WEBBASKET_USE_RICH_TEXT_EDITOR'],
         #                                   toolbar_set="WebComment")
         desc_editor = """<textarea name="es_desc" style="width: 600px; height: 100px;">%(value)s</textarea>""" % \
                       {'value': cgi.escape(desc, True)}
@@ -1698,7 +1695,7 @@ class Template:
                                            textual_content=note_body,
                                            width="600px",
                                            height="110px",
-                                           enabled=CFG_WEBBASKET_USE_RICH_TEXT_EDITOR,
+                                           enabled=cfg['CFG_WEBBASKET_USE_RICH_TEXT_EDITOR'],
                                            toolbar_set="WebComment")
 
         select_options = create_add_box_select_options(category,
@@ -2706,7 +2703,7 @@ class Template:
                      'add_and_view_notes_label': nb_cmt and _('Notes') + ' (' + str(nb_cmt) + ')' or add_notes and _('Add a note...') or '',
                      'last_cmt': last_cmt,
                      'siteurl': CFG_SITE_URL,
-                     'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                     'CFG_SITE_RECORD': cfg['CFG_SITE_RECORD'],
                      'bskid': bskid,
                      'recid': recid,
                      'external_url': external_url,
@@ -3138,7 +3135,7 @@ class Template:
                                           textual_content=note_body_textual,
                                           width="99%",
                                           height="160px",
-                                          enabled=CFG_WEBBASKET_USE_RICH_TEXT_EDITOR,
+                                          enabled=cfg['CFG_WEBBASKET_USE_RICH_TEXT_EDITOR'],
                                           file_upload_url=file_upload_url,
                                           toolbar_set="WebComment")
             add_note_html = """
@@ -3576,7 +3573,7 @@ class Template:
                      'add_and_view_notes_label': nb_cmt and _('Notes') + ' (' + str(nb_cmt) + ')' or _('Add a note...'),
                      'last_cmt': last_cmt,
                      'siteurl': CFG_SITE_URL,
-                     'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                     'CFG_SITE_RECORD': cfg['CFG_SITE_RECORD'],
                      'bskid': bskid,
                      'recid': recid,
                      'external_url': external_url,
@@ -3942,7 +3939,7 @@ class Template:
                                           textual_content=note_body_textual,
                                           width="100%",
                                           height="200px",
-                                          enabled=CFG_WEBBASKET_USE_RICH_TEXT_EDITOR,
+                                          enabled=cfg['CFG_WEBBASKET_USE_RICH_TEXT_EDITOR'],
                                           file_upload_url=file_upload_url,
                                           toolbar_set="WebComment")
             add_note_html = """
@@ -3980,7 +3977,7 @@ class Template:
                                    'submit_label': _('Add note'),
                                    'reply_to': optional_params.get("Reply to")}
 
-        go_back_logo = """<i class="icon %s"></i> &nbsp;""" % (ICON_NOTES,)
+        notes_icon = '<i class="icon %s"></i> &nbsp;' % (ICON_NOTES,)
         #notes_icon = '<img src="%s/img/wb-notes.png" style="vertical-align: top;" />' % (CFG_SITE_URL,)
 
         if user_can_add_notes and not add_note_p:
