@@ -148,6 +148,7 @@ def create_config(force=False, no_ssl=False):
         return [apc1, apc2]
 
     current_app.config.update(
+        SYS_PREFIX=sys.prefix,
         CFG_RUNNING_AS_USER=pwd.getpwuid(os.getuid())[0],
         CFG_WSGIDIR=os.path.abspath(
             pkg_resources.resource_filename('invenio', '')))

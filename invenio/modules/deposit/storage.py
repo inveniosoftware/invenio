@@ -27,10 +27,9 @@ import hashlib
 from fs import opener
 from fs import path
 import urllib2
-try:
-    from invenio.config import CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE
-except ImportError:
-    CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE = 104857600  # 100MB
+
+
+from invenio.base.globals import cfg
 
 
 class UploadError(IOError):
@@ -60,7 +59,7 @@ class ExternalFile(object):
 
             try:
                 size = int(info.getheader('Content-length'))
-                if size > CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE:
+                if size > cfg['DEPOSIT_MAX_UPLOAD_SIZE']:
                     raise UploadError("File too big")
             except Exception:
                 pass
@@ -162,9 +161,8 @@ class DepositionStorage(Storage):
     a folder (<CFG_WEBDEPOSIT_UPLOAD_FOLDER>/<deposition_id>/).
     """
     def __init__(self, deposition_id):
-        from invenio.config import CFG_WEBDEPOSIT_STORAGEDIR
         self.fs_path = path.join(
-            CFG_WEBDEPOSIT_STORAGEDIR,
+            cfg['DEPOSIT_STORAGEDIR'],
             str(deposition_id)
         )
 

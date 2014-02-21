@@ -45,7 +45,10 @@ variables:
  block configuration -%}
 {%- block header -%}
 WSGIRestrictStdout Off
-{% if os.environ.get('VIRTUAL_ENV', False) %}WSGIPythonHome {{ os.environ['VIRTUAL_ENV'] }}{% endif %}
+{%- set pythonhome = config.get('APACHE_PYTHON_HOME', config.SYS_PREFIX) %}
+{%- if pythonhome %}
+WSGIPythonHome {{pythonhome}}
+{%- endif %}
 
 <Files *.pyc>
    deny from all
@@ -93,13 +96,13 @@ WSGIRestrictStdout Off
     {%- for xsfp in [config.CFG_BIBDOCFILE_FILEDIR,
                     config.CFG_WEBDIR,
                     config.CFG_WEBSUBMIT_STORAGEDIR,
-                    config.CFG_WEBDEPOSIT_STORAGEDIR,
+                    config.DEPOSIT_STORAGEDIR,
                     config.CFG_TMPDIR,
                     [config.CFG_PREFIX, 'var', 'tmp', 'attachfile']|path_join,
                     [config.CFG_PREFIX, 'var', 'data', 'comments']|path_join,
                     [config.CFG_PREFIX, 'var', 'data', 'baskets', 'comments']|path_join,
                     '/tmp'] %}
-        {{ '#' if not config.CFG_BIBDOCFILE_USE_XSENDFILE }}XSendFilePath {{ xsfp }}
+        {% if xsfp %}{{ '#' if not config.CFG_BIBDOCFILE_USE_XSENDFILE }}XSendFilePath {{ xsfp }}{% endif %}
     {%- endfor -%}
     {%- endblock xsendfile_directive -%}
     {%- block directory_wsgi %}
@@ -144,6 +147,11 @@ WSGIRestrictStdout Off
         </IfModule>
         {% endif -%}
     {%- endblock deflate_directive -%}
+    {%- block etags -%}
+        # Don't do etags for files since in a load balanced environment, two
+        # servers will compute different etags for the same component.
+        FileETag None
+    {%- endblock etags -%}
     {%- block auth_shibboleth -%}
         {%- if config.CFG_EXTERNAL_AUTH_USING_SSO %}
         <Location ~ "{{ config.SSO_LOGIN_URL }}|Shibboleth.sso/">

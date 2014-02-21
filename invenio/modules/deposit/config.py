@@ -16,6 +16,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import os
+import sys
+
 DEPOSIT_TYPES = [
     'invenio.modules.deposit.workflows.article_metadata.Article',
     'invenio.modules.deposit.workflows.photo_metadata.Photo',
@@ -53,3 +56,9 @@ Then your config will look like something like this::
 
 DEPOSIT_DEFAULT_TYPE = None
 """ Import string of default deposition type """
+
+DEPOSIT_STORAGEDIR = os.path.join(sys.prefix, "var/data/deposit/storage")
+""" Default storage directory for uploaded depositions """
+
+DEPOSIT_MAX_UPLOAD_SIZE = 104857600
+""" Maximum upload size """

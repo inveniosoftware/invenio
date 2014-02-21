@@ -23,6 +23,9 @@
 {%- block header -%}
 ServerSignature Off
 ServerTokens Prod
+TraceEnable off
+SSLProtocol all -SSLv2
+SSLCipherSuite HIGH:MEDIUM:!ADH
 {{ '#' if not listen_directive_needed }}{{ 'Listen ' + vhost_site_url_port}}
 NameVirtualHost {{ vhost_ip_address }}:{{ vhost_site_url_port }}
 {{ ssl_pem_directive }}
