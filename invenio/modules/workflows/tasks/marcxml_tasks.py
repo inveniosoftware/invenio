@@ -43,7 +43,7 @@ from invenio.legacy.oaiharvest.utils import (record_extraction_from_file,
 from invenio.legacy.bibsched.bibtask import (task_sleep_now_if_required,
                                              task_low_level_submission
                                              )
-from invenio.modules.oai_harvest.models import OaiHARVEST
+from invenio.modules.oaiharvester.models import OaiHARVEST
 from invenio.modules.records.api import Record
 from invenio.modules.workflows.errors import WorkflowError
 from invenio.legacy.refextract.api import extract_references_from_file_xml

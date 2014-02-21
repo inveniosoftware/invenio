@@ -65,7 +65,7 @@ from invenio.modules.access.models import \
     AccARGUMENT, \
     AccAuthorization, \
     UserAccROLE
-from invenio.modules.oai_harvest.models import OaiREPOSITORY
+from invenio.modules.oaiharvester.models import OaiREPOSITORY
 from invenio.ext.template import render_template_to_string
 from invenio.modules.communities.signals import before_save_collection, \
     after_save_collection, before_save_collections, after_save_collections, \
