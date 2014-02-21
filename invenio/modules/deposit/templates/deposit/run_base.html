@@ -16,8 +16,19 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "page.html" %}
+{%- block webdeposit_assets %}
+  {% js 'js/jquery-ui.min.js', '01-jquery-ui' %}
+  {% js 'plupload/plupload.full.min.js', '50-webdeposit' %}
+  {% js url_for('webdeposit.static', filename='js/deposit/form.js'), '50-webdeposit' %}
+  {% js 'js/hogan.js', '40-webdeposit-hogan' %}
+  {% js url_for('webdeposit.static', filename='js/deposit/templates.js'), '50-webdeposit' %}
+  {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
+  {% js 'js/ckeditor/invenio-ckeditor-config.js', '50-ckeditor' %}
+  {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css', '01-jquery-ui' %}
+  {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css', '01-jquery-ui' %}
+{%- endblock webdeposit_assets %}
 
+{% extends "page.html" %}
 
 {% macro form_action_bar(margin="") -%}
     {% include "deposit/run_action_bar.html" %}
@@ -42,21 +53,6 @@
 {%- macro field_display_subform(thisfield) -%}
     {% include "deposit/run_field_subform.html" %}
 {%- endmacro -%}
-
-{%- block header %}
-    {{ super() }}
-    {%- block webdeposit_assets %}
-        {% js 'js/jquery-ui.min.js', '20-jquery-ui' %}
-        {% js 'plupload/plupload.full.min.js', '50-webdeposit' %}
-        {% js url_for('webdeposit.static', filename='js/deposit/form.js'), '50-webdeposit' %}
-        {% js 'js/hogan.js', '40-webdeposit-hogan' %}
-        {% js url_for('webdeposit.static', filename='js/deposit/templates.js'), '50-webdeposit' %}
-        {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
-        {% js 'ckeditor/invenio-ckeditor-config.js', '50-ckeditor' %}
-        {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css', '20-jquery-ui' %}
-        {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css', '20-jquery-ui' %}
-    {%- endblock webdeposit_assets %}
-{%- endblock header %}
 
 {%- block css %}
   {{ super() }}
@@ -210,7 +206,7 @@ $(document).ready(function() {
     var complete_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}';
     var autocomplete_url = '{{ url_for(".autocomplete", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, field_name="__FIELDNAME__") }}';
 
-    webdeposit_init_plupload(
+    DEPOSIT_FORM.init_plupload(
         '{{config.CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
         '.pluploader',
         save_url,
@@ -220,17 +216,17 @@ $(document).ready(function() {
         {{ form.files|safe }},
         '{{ url_for('.upload_url', deposition_type=deposition_type, uuid=uuid) }}'
     );
-    webdeposit_init_save(save_all_url, '.form-save', '#submitForm');
-    webdeposit_init_submit(complete_url, '.form-submit', '#submitForm', '#form-submit-dialog');
-    webdeposit_init_inputs('#submitForm input, #submitForm textarea, #submitForm select', save_url);
-    webdeposit_init_buttons('#submitForm .form-button', save_url);
-    webdeposit_init_autocomplete('[data-autocomplete="1"]', save_url, autocomplete_url);
-    webdeposit_init_field_lists('#submitForm .dynamic-field-list', save_url, '[data-autocomplete="1"]', autocomplete_url);
-    webdeposit_init_ckeditor( '#submitForm textarea[data-ckeditor="1"]', save_url);
+    DEPOSIT_FORM.init_save(save_all_url, '.form-save', '#submitForm');
+    DEPOSIT_FORM.init_submit(complete_url, '.form-submit', '#submitForm', '#form-submit-dialog');
+    DEPOSIT_FORM.init_inputs('#submitForm input, #submitForm textarea, #submitForm select', save_url);
+    DEPOSIT_FORM.init_buttons('#submitForm .form-button', save_url);
+    DEPOSIT_FORM.init_autocomplete('[data-autocomplete="1"]', save_url, autocomplete_url);
+    DEPOSIT_FORM.init_field_lists('#submitForm .dynamic-field-list', save_url, '[data-autocomplete="1"]', autocomplete_url);
+    DEPOSIT_FORM.init_ckeditor( '#submitForm textarea[data-ckeditor="1"]', save_url);
 
     // Date picker
     $(".datepicker").datepicker(date_options);
-    //webdeposit_check_status('{{ url_for('.status', deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}');
+    //DEPOSIT_FORM.check_status('{{ url_for('.status', deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}');
 });
 </script>
 {% endblock javascript %}

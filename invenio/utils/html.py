@@ -447,7 +447,7 @@ ckeditor_available = LocalProxy(is_html_text_editor_installed)
 
 def get_html_text_editor(name, id=None, content='', textual_content=None, width='300px', height='200px',
                          enabled=True, file_upload_url=None, toolbar_set="Basic",
-                         custom_configurations_path='/ckeditor/invenio-ckeditor-config.js',
+                         custom_configurations_path='/js/ckeditor/invenio-ckeditor-config.js',
                          ln=None):
     """
     Returns a wysiwyg editor (CKEditor) to embed in html pages.
