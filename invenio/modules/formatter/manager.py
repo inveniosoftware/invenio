@@ -240,7 +240,7 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
 def expunge(output_format="HB"):
     """Remove static output formats from cache."""
     from invenio.ext.sqlalchemy import db
-    from invenio.modules.record_editor.models import Bibfmt
+    from invenio.modules.editor.models import Bibfmt
 
     # Make it uppercased as it is stored in database.
     output_format = output_format.upper()

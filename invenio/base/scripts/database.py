@@ -125,7 +125,7 @@ def drop(yes_i_know=False):
         db.session.commit()
         print ">>> Data has been removed."
 
-    from invenio.modules.record_editor.models import Bibdoc
+    from invenio.modules.editor.models import Bibdoc
     event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
 
     tables = list(reversed(db.metadata.sorted_tables))

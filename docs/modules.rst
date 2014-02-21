@@ -80,7 +80,7 @@ Modules
 .. automodule:: invenio.modules.ranker
    :members:
 
-.. automodule:: invenio.modules.record_editor
+.. automodule:: invenio.modules.editor
    :members:
 
 .. automodule:: invenio.modules.records
