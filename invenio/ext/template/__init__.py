@@ -96,9 +96,6 @@ def inject_utils():
         get_record = lambda *args, **kwargs: None
     # from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
     return dict(
-        #FIXME use just gettext when all strings use named arguments
-        _=lambda s, *args, **kwargs: get_translations().gettext(
-            s.encode('utf8'), *args, **kwargs).decode('utf8'),
         current_user=user,
         get_css_bundle=current_app.jinja_env.get_css_bundle,
         get_js_bundle=current_app.jinja_env.get_js_bundle,

@@ -55,7 +55,7 @@
     <a href="{{ url_for('search.search', p="refersto:recid:%d" % recID) }}"
        data-hotkey-action="click"
        data-hotkey-value="g{{ i }}r">
-      {{ _("Cited by %i records") % num_citations if num_citations > 1 else _("Cited by 1 record") }}
+      {{ _("Cited by %(x_num)i records", x_num=num_citations) if num_citations > 1 else _("Cited by 1 record") }}
     </a>
     {%- endif -%}
   {%- endif -%}
@@ -71,7 +71,7 @@
        data-hotkey-action="click"
        data-hotkey-value="g{{ i }}c">
       <i class="glyphicon glyphicon-comment"></i>
-      {{ _("%i comments") % num_comments if num_comments > 1 else _("1 comment") }}
+      {{ _("%(x_num)i comments", x_num=num_comments) if num_comments > 1 else _("1 comment") }}
     </a>
     {%- endif -%}
   {%- endif -%}
@@ -85,7 +85,7 @@
      -
     <a href="{{ url_for('comments.reviews', recid=recID) }}">
       <i class="glyphicon glyphicon-eye-open"></i>
-      {{ _("%i reviews") % num_reviews if num_reviews > 1 else _("1 review") }}
+      {{ _("%(x_num)i reviews", x_num=num_reviews) if num_reviews > 1 else _("1 review") }}
     </a>
     {%- endif -%}
   {%- endif -%}
@@ -555,7 +555,7 @@
           {%- if not collection.nbrecs -%}
           {%- set nbrecs = 0 -%}
           {%- endif -%}
-          {{ _("Search %s records for")|format(nbrecs) }}
+          {{ _("Search %(x_num)i records for", x_num=nbrecs) }}
         </span>
       </div>
       {% endblock search_form_text %}
