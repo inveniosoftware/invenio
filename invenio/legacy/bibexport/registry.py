@@ -23,13 +23,13 @@ from flask_registry import PkgResourcesDirDiscoveryRegistry, \
     ModuleAutoDiscoveryRegistry, RegistryProxy
 from invenio.utils.datastructures import LazyDict
 
-exportext = RegistryProxy(
-    'exportext', ModuleAutoDiscoveryRegistry, 'exportext'
+exporterext = RegistryProxy(
+    'exporterext', ModuleAutoDiscoveryRegistry, 'exportext'
 )
 
 configurations = LazyDict(
     lambda: dict((os.path.basename(f), f)
-                 for f in RegistryProxy('exportext.configurations',
+                 for f in RegistryProxy('exporterext.configurations',
                                         PkgResourcesDirDiscoveryRegistry,
                                         'configurations',
-                                        registry_namespace=exportext)))
+                                        registry_namespace=exporterext)))

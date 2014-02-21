@@ -47,7 +47,7 @@ Modules
 .. automodule:: invenio.modules.error_log
    :members:
 
-.. automodule:: invenio.modules.export
+.. automodule:: invenio.modules.exporter
    :members:
 
 .. automodule:: invenio.modules.formatter
