@@ -24,12 +24,12 @@ try:
     # This tool can be run before Invenio is installed:
     # invenio files might then not exist.
     from invenio.base.globals import cfg
-    from invenio.config import \
-         CFG_WEBSTYLE_TEMPLATE_SKIN, \
-         CFG_PREFIX
-    CFG_WEBSTYLE_PYLIBDIR = CFG_PREFIX + os.sep + 'lib' + os.sep + 'python'
 except ImportError:
-    CFG_WEBSTYLE_PYLIBDIR = None
+    pass
+
+#FIXME Change it if you want skin support for legacy modules :)
+CFG_WEBSTYLE_PYLIBDIR = None
+CFG_WEBSTYLE_TEMPLATE_SKIN = 'default'
 
 # List of deprecated functions
 # Eg. {'webstyle': {'tmpl_records_format_other':"Replaced by .."}}

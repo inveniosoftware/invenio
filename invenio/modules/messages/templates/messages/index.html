@@ -26,7 +26,9 @@
 
 {% if not no_quota %}
     {% set ratio = 1.0 * nb_messages / config.CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES %}
-    {{ _("Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i")|format(x_nb_used=nb_messages, x_nb_total=config.CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES) }}<br />
+    {{ _("Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i",
+         x_nb_used=nb_messages,
+         x_nb_total=config.CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES) }}<br />
     <div class="quotabox"><div class="quotabar" style="width:{{ ratio * 200|int }}px"></div></div>
 {% endif %}
 

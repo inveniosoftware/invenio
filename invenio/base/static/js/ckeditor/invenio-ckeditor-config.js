@@ -36,7 +36,7 @@ config.removePlugins = 'elementspath';
 
 /* Some styling that will only apply inside the CKeditor, including to
    simulate the the ".commentbox" CSS class in WebComment case. */
-config.contentsCss = ['/img/invenio.css', '/ckeditor/invenio-ckeditor-content.css'];
+config.contentsCss = ['/css/invenio.css', '/css/ckeditor/invenio-ckeditor-content.css'];
 
 /* Though not recommended, it is much better that users gets a
    <br/> when pressing carriage return than a <p> element. Then

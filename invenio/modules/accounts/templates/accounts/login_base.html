@@ -141,7 +141,7 @@
 {% if config.CFG_EXTERNAL_AUTH_USING_SSO %}{% block form_header_sso scoped %}
   <div class="col-md-8 col-md-offset-2">
     <p class="lead text-center">
-    {{ _("You can login using %(x_url_open)sSingle-Sign-On%(x_url_close)s")|format(
+    {{ _("You can login using %(x_url_open)sSingle-Sign-On%(x_url_close)s",
       x_url_open='<a href="'+url_for('sso_login', _external=True, _scheme='https', referer=request.values.get('referer'))+'">',
       x_url_close='</a>')|safe }}
     </p>
@@ -154,7 +154,7 @@
     <p class="lead text-center">{{ _("If you already have an account, please login using the form below.") }}</p>
     <p class="text-center">{{ _("If you don't own an account yet, please %(x_url_open)s register",
                                 x_url_open='<a href="'+url_for('webaccount.register')+'">')|safe }}
-    {{ _("%(x_url_close)s an internal account.")|format(x_url_close='</a>')|safe }}</p>
+    {{ _("%(x_url_close)s an internal account.", x_url_close='</a>')|safe }}</p>
 
     <hr/>
   </div>

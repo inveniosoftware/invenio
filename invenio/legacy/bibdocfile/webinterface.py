@@ -66,8 +66,6 @@ from invenio.legacy.bibdocfile.managedocfiles import \
      get_upload_file_interface_css, \
      move_uploaded_files_to_storage
 
-bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
-
 
 class WebInterfaceFilesPages(WebInterfaceDirectory):
 
