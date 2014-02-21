@@ -74,7 +74,7 @@ Modules
 .. automodule:: invenio.modules.messages
    :members:
 
-.. automodule:: invenio.modules.oai_harvest
+.. automodule:: invenio.modules.oaiharvester
    :members:
 
 .. automodule:: invenio.modules.ranker
