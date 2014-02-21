@@ -62,7 +62,8 @@ class WebMessageSettings(Settings):
             ).scalar()
 
         template = """
-{{  _("You have %d new messages out of %d messages.") | format(unread, total) }}
+{{  _("You have %(x_num_new)d new messages out of %(x_num_total)d messages.",
+      x_num_new=unread, x_num_total=total) }}
 """
         return render_template_to_string(template, _from_string=True,
                     unread=unread, total=total)
