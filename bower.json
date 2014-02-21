@@ -8,7 +8,7 @@
     "ckeditor": "latest"
   },
   "devDependencies": {
-    "typeahead.js": "*",
+    "typeahead.js": "0.10.1",
     "hogan": "3.0.0",
     "jquery-tokeninput": "*",
     "MathJax": "v2.1-latest",
