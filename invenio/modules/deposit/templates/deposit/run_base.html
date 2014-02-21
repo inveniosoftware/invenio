@@ -211,7 +211,7 @@ $(document).ready(function() {
     var autocomplete_url = '{{ url_for(".autocomplete", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, field_name="__FIELDNAME__") }}';
 
     DEPOSIT_FORM.init_plupload(
-        '{{config.CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
+        '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
         '.pluploader',
         save_url,
         '{{ url_for('.upload_file', deposition_type=deposition_type, uuid=uuid) }}',

@@ -27,8 +27,8 @@ NameVirtualHost {{ vhost_ip_address }}:{{ vhost_site_url_port }}
 {{ '#' if not wsgi_socket_directive_needed }}WSGISocketPrefix {{ [config.CFG_PREFIX, 'var', 'run']|path_join }}
 {{ super() }}
 {%- endblock header -%}
-{%- set wsgi_processes = 5 -%}
-{%- if 'werkzeug-debugger' in config.CFG_DEVEL_TOOLS or 'winpdb' in config.CFG_DEVEL_TOOLS or 'pydev' in config.CFG_DEVEL_TOOLS -%}
+{%- set wsgi_processes = config.get('APACHE_WSGI_DAEMON_PROCESSES', 5) -%}
+{%- if config.DEBUG -%}
     {%- set wsgi_processes = 1 -%}
 {%- endif -%}
 {%- block wsgi %}
