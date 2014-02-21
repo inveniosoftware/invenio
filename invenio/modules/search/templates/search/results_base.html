@@ -27,6 +27,7 @@
   {%- else -%}
     {%- set hash_tag = '' -%}
   {%- endif -%}
+  {%- if pagination.pages > 1 -%}
   <ul class="pagination">
     {%- block pagination_first scoped -%}
     <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
@@ -71,6 +72,7 @@
     </li>
     {%- endblock -%}
   </ul>
+  {%- endif -%}
 {% endblock %}{% endmacro %}
 
 {% macro results_actions() %}{%- block results_actions scoped -%}
@@ -117,7 +119,7 @@
             {%- set r_to = pagination.page*pagination.per_page -%}
             {%- set r_of = recids|length -%}
             {%- set r_to = r_to if r_to < r_of else r_of -%}
-            {{ _('Showing records %d to %d out of %d results.') % (r_from, r_to, r_of) }}
+            {{ _('Showing records %(x_from)d to %(x_to)d out of %(x_total)d results.', x_from=r_from, x_to=r_to, x_total=r_of) }}
           </p>
         </div>
         {% endblock search_result_nb_recs %}
