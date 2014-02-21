@@ -1313,7 +1313,7 @@ class BibRecDocs(object):
                         raise IOError("Error in creating AFS mount point %s with quota %s and volume %s: exit_code=%s. Captured stdout:\n: %s\nCaptured stderr:\n: %s" % (mount_point, quota, volume, exit_code, stdout, stderr))
             for filename in os.listdir(bibdoc.basedir):
                 if filename[0] != '.' and ';' in filename:
-                    name, version = filename.split(';')
+                    name, version = filename.rsplit(';', 1)
                     try:
                         version = int(version)
                     except ValueError:
@@ -1404,7 +1404,7 @@ class BibRecDocs(object):
         bibdoc._build_file_list()
 
         for (bibdoc, dummyatttype) in self.bibdocs.values():
-            if not run_sql('SELECT data_value FROM bibdocmoreinfo WHERE bibdocid=%s', (bibdoc.id,)):
+            if not run_sql('SELECT data_value FROM bibdocmoreinfo WHERE id_bibdoc=%s', (bibdoc.id,)):
                 ## Import from MARC only if the bibdoc has never had
                 ## its more_info initialized.
                 try:
