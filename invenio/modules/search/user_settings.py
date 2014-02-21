@@ -51,9 +51,9 @@ class WebSearchSettings(Settings):
             ).scalar()
 
         template = """
-{{ _('You have made %d queries. A detailed list is available with a possibility to
+{{ _('You have made %(x_num_queries)d queries. A detailed list is available with a possibility to
 (a) view search results and (b) subscribe to an automatic email alerting service
-for these queries.') | format(queries) }}
+for these queries.', x_num_queries=queries) }}
 """
 
         return render_template_to_string(template, _from_string=True,
