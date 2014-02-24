@@ -42,11 +42,12 @@ def get_search_results_cache_key(**kwargs):
     return cfg['CFG_SEARCH_RESULTS_CACHE_PREFIX'] + get_search_query_id(**kwargs)
 
 
-def get_search_results_cache_key_from_qid(qid):
+def get_search_results_cache_key_from_qid(qid=None):
     """
     Returns key for search results cache from query identifier.
     """
-    return cfg['CFG_SEARCH_RESULTS_CACHE_PREFIX'] + qid
+    if qid is not None:
+        return cfg['CFG_SEARCH_RESULTS_CACHE_PREFIX'] + qid
 
 
 def get_collection_name_from_cache(qid):
@@ -55,6 +56,7 @@ def get_collection_name_from_cache(qid):
     """
     return search_results_cache.get(
         get_search_results_cache_key_from_qid(qid) + '::cc')
+
 
 def get_pattern_from_cache(qid):
     """

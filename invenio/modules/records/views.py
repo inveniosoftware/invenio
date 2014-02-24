@@ -156,6 +156,7 @@ def request_record(f):
 @blueprint.route('/<int:recid>/metadata', methods=['GET', 'POST'])
 @blueprint.route('/<int:recid>/', methods=['GET', 'POST'])
 @blueprint.route('/<int:recid>', methods=['GET', 'POST'])
+@blueprint.route('/<int:recid>/export/<of>', methods=['GET', 'POST'])
 @wash_arguments({'of': (unicode, 'hd')})
 @request_record
 def metadata(recid, of='hd'):
@@ -163,7 +164,8 @@ def metadata(recid, of='hd'):
     from invenio.modules.formatter import get_output_format_content_type
     register_page_view_event(recid, current_user.get_id(), str(request.remote_addr))
     if get_output_format_content_type(of) != 'text/html':
-        return redirect('/%s/%d/export/%s' % (CFG_SITE_RECORD, recid, of))
+        from invenio.modules.search.views.search import response_formated_records
+        return response_formated_records([recid], g.collection, of, qid=None)
 
     # Send the signal 'document viewed'
     record_viewed.send(
