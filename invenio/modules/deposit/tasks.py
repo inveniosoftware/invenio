@@ -25,6 +25,7 @@ from __future__ import print_function
 
 import os
 import dictdiffer
+import dateutil.parser
 
 from tempfile import mkstemp
 from functools import partial
@@ -44,12 +45,7 @@ from .helpers import record_to_draft, make_record, \
 from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.legacy.bibsched.bibtask import task_low_level_submission, \
     bibtask_allocate_sequenceid
-
-try:
-    from invenio.pidstore_model import PersistentIdentifier
-    HAS_PIDSUPPORT = True
-except ImportError:
-    HAS_PIDSUPPORT = False
+from invenio.modules.pidstore.models import PersistentIdentifier
 
 
 def is_api_request(obj, eng):
@@ -167,8 +163,10 @@ def load_record(draft_id='_default', producer='json_for_form',
         sip = d.get_latest_sip(sealed=True)
         record = get_record(sip.metadata.get('recid'), reset_cache=True)
 
-        sip_version_id = sip.metadata.get('version_id')
-        record_version_id = record.get('version_id')
+        sip_version_id = sip.metadata.get('modification_date')
+        if sip_version_id:
+            sip_version_id = dateutil.parser.parse(sip_version_id)
+        record_version_id = record.get('modification_date') if record else None
 
         # Check of record in latest SIP has been uploaded (record version must
         # be newer than SIP record version.
@@ -221,9 +219,6 @@ def load_record(draft_id='_default', producer='json_for_form',
             record, draft=draft, post_process=post_process, producer=producer
         )
 
-        # Store initial deposition_recjson
-        #draft.values['_initial'] = drafts_to_record([draft])
-
         d.update()
 
         # Stop API request
@@ -266,32 +261,30 @@ def merge_record(draft_id='_default', pre_process_load=None,
         changed_record = make_record(sip.metadata)
 
         # Generate patch
-        patch = dictdiffer.diff(
-            initial_record.rec_json,
-            changed_record.rec_json,
-        )
+        initial_json = initial_record.dumps(clean=True)
+        changed_json = changed_record.dumps(clean=True)
+
+        patch = list(dictdiffer.diff(
+            initial_json,
+            changed_json,
+        ))
 
         # Initial patch of current record.
         for k in initial_record:
-            if k not in current_record.rec_json:
-                current_record.rec_json[k] = initial_record[k]
-
-        # Fix Pyton 2.6 compatibility issue in CoolList deepcopy'ing
-        #from invenio.bibfield_utils import CoolList
-        #map_fun = lambda x: list(x) if isinstance(x, CoolList) else x
-        #metadata = dict([
-        #    (k, map_fun(v)) for k, v in current_record.rec_json.items()
-        #])
+            if k not in current_record:
+                current_record[k] = initial_record[k]
 
         # Apply patch
+        current_json = current_record.dumps(clean=True)
+
         sip.metadata = dictdiffer.patch(
             patch,
-            current_record.rec_json
+            current_json
         )
 
         # Ensure we are based on latest version_id to prevent being rejected in
         # the bibupload queue.
-        sip.metadata['version_id'] = current_record['version_id']
+        sip.metadata['modification_date'] = current_json['modification_date']
 
         d.update()
     return _merge_record
@@ -308,10 +301,8 @@ def create_recid():
             raise Exception("No submission information package found.")
 
         if 'recid' not in sip.metadata:
-            sip.metadata['recid'] = run_sql(
-                "INSERT INTO bibrec (creation_date, modification_date) "
-                "VALUES (NOW(), NOW())"
-            )
+            from invenio.legacy.bibupload.engine import create_new_record
+            sip.metadata['recid'] = create_new_record()
         d.update()
     return _create_recid
 
@@ -330,11 +321,6 @@ def mint_pid(pid_field='doi', pid_creator=None, pid_store_type='doi',
         (pid_str, recjson) that will check if an pid found using ``pid_field''
         should be registered or not.
     """
-    if not HAS_PIDSUPPORT:
-        def _mint_pid_dummy(dummy_obj, dummy_eng):
-            pass
-        return _mint_pid_dummy
-
     def _mint_pid(obj, dummy_eng):
         d = Deposition(obj)
         recjson = d.get_latest_sip(sealed=False).metadata
@@ -426,16 +412,7 @@ def finalize_record_sip():
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=False)
 
-        r = Record()
-        json = Record(master_format='marc')
-        for k, v in sip.metadata.items():
-            json.set(k, v, extend=True)
-
-        sip.package = json.legacy_export_as_marc()
-
-        current_app.logger.info(json['__meta_metadata__']['__errors__'])
-        current_app.logger.info(json['__meta_metadata__']['__continuable_errors__'])
-        current_app.logger.info(sip.package)
+        sip.package = make_record(sip.metadata).legacy_export_as_marc()
 
         d.update()
     return _finalize_sip

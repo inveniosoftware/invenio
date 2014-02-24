@@ -18,8 +18,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.modules.jsonalchemy.wrappers import SmartJson
-from invenio.modules.jsonalchemy.jsonext.readers.json_reader import JsonReader
+from invenio.modules.records.api import Record
 from .models import DepositionDraft
 
 
@@ -31,7 +30,7 @@ def record_to_draft(record, draft=None, form_class=None, pre_process=None,
     if draft is None:
         draft = DepositionDraft(None, form_class=form_class)
 
-    draft.values = SmartJson(record).produce('json_for_form')
+    draft.values = record.produce('json_for_form')
 
     if pre_process:
         draft = pre_process(draft)
@@ -83,8 +82,6 @@ def make_record(values):
     """
     Export recjson from drafts
     """
-    record = JsonReader()
-    for k, v in values.items():
-        record[k] = v
+    record = Record(json=values, master_format='marc')
 
     return record
