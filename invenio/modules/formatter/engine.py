@@ -68,7 +68,7 @@ from invenio.legacy.bibrecord import \
      record_get_field_values, \
      record_xml_output
 from . import registry
-from .engines.xslt import format
+from .engines import xslt
 from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import \
      language_list_long, \
@@ -579,12 +579,12 @@ def format_with_format_template(format_template_filename, bfo,
         from invenio.modules.records.api import \
             create_record as new_create_record, \
             get_record as new_get_record
-        from invenio.legacy.search_engine import print_record
         from flask.ext.login import current_user
         from invenio.base.helpers import unicodifier
 
         def _format_record(recid, of='hb', user_info=current_user, *args, **kwargs):
-            return print_record(recid, format=of, user_info=user_info, *args, **kwargs)
+            from invenio.modules.formatter import format_record
+            return format_record(recid, of, user_info=user_info, *args, **kwargs)
 
         # Fixes unicode problems in Jinja2 templates.
         def encode_utf8(f):
@@ -626,14 +626,7 @@ def format_with_format_template(format_template_filename, bfo,
                          record_get_xml(bfo.recID, 'xm', on_the_fly=False)
 
         # Transform MARCXML using stylesheet
-        evaluated_format = format(xml_record, template_source=format_content)
-        try:
-            evaluated_format = evaluated_format.decode('utf8').encode('utf8')
-        except:
-            try:
-                evaluated_format = evaluated_format.encode('utf8')
-            except:
-                evaluated_format = '<!-- Error -->'.encode('utf8')
+        evaluated_format = xslt.format(xml_record, template_source=format_content).decode('utf-8')
     return evaluated_format
 
 
@@ -791,7 +784,10 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
         if output_text is None:
             output_text = ""
         else:
-            output_text = str(output_text)
+            try:
+                output_text = str(output_text)
+            except:
+                output_text = output_text.encode('utf-8')
 
         # Escaping:
         # (1) By default, everything is escaped in mode 1
