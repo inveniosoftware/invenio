@@ -130,8 +130,8 @@ def request_record(f):
                 return dict(headerLinkbackTrackbackLink=get_trackback_auto_discovery_tag(recid))
 
         def _format_record(recid, of='hd', user_info=current_user, *args, **kwargs):
-            from invenio.legacy.search_engine import print_record
-            return print_record(recid, format=of, user_info=user_info, *args, **kwargs)
+            from invenio.modules.formatter import format_record
+            return format_record(recid, of, user_info=user_info, *args, **kwargs)
 
         @register_template_context_processor
         def record_context():
