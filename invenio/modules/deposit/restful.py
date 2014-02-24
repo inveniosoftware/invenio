@@ -144,7 +144,7 @@ def api_request_globals(f):
     return inner
 
 
-def filter_errors(result):
+def filter_draft_errors(result):
     """
     Extract error messages from a draft.process() result dictionary.
     """
@@ -157,6 +157,28 @@ def filter_errors(result):
                     message=m,
                     code=error_codes['validation_error'],
                 ))
+    return error_messages
+
+
+def filter_validation_errors(errors):
+    """
+    Extract error messages from Cerberus error dictionary.
+    """
+    error_messages = []
+    for field, msgs in errors.items():
+        if isinstance(msgs, dict):
+            for f, m in msgs.items():
+                error_messages.append(dict(
+                    field=f,
+                    message=m,
+                    code=error_codes['validation_error'],
+                ))
+        else:
+            error_messages.append(dict(
+                field=field,
+                message=msgs,
+                code=error_codes['validation_error'],
+            ))
     return error_messages
 
 
@@ -197,10 +219,7 @@ class InputProcessorMixin(object):
                 400,
                 message="Bad request",
                 status=400,
-                errors=map(lambda x: dict(
-                    message=x,
-                    code=error_codes["validation_error"]
-                ), v.errors),
+                errors=filter_validation_errors(v.errors),
             )
 
     def process_input(self, deposition, draft_id=None):
@@ -229,7 +248,7 @@ class InputProcessorMixin(object):
                     400,
                     message="Bad request",
                     status=400,
-                    errors=filter_errors(result),
+                    errors=filter_draft_errors(result),
                 )
 
             if validated and request.json.get('completed', False):

@@ -1435,7 +1435,7 @@ class SubmissionInformationPackage(FactoryMixin):
 
     def __setstate__(self, state):
         self.uuid = state['id']
-        self.metadata = state.get('metadata', {})
+        self._metadata = state.get('metadata', {})
         self.package = state.get('package', None)
         self.timestamp = state.get('timestamp', None)
         self.agents = [Agent.factory(a_state)
@@ -1447,6 +1447,26 @@ class SubmissionInformationPackage(FactoryMixin):
 
     def is_sealed(self):
         return self.timestamp is not None
+
+    @property
+    def metadata(self):
+        return self._metadata
+
+    @metadata.setter
+    def metadata(self, value):
+        import datetime
+        import json
+
+        class DateTimeEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, datetime.datetime) or isinstance(obj, datetime.date):
+                    encoded_object = obj.isoformat()
+                else:
+                    encoded_object = json.JSONEncoder.default(self, obj)
+                return encoded_object
+
+        data = json.dumps(value, cls=DateTimeEncoder)
+        self._metadata = json.loads(data)
 
 
 class Agent(FactoryMixin):
