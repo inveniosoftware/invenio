@@ -399,15 +399,21 @@ BibWorkflowEngine
         """
         callback_list = self.getCallbacks()
         if callback_list:
-            try:
-                current_tasks = callback_list[0]
-                current_task_idx = self.getCurrTaskId()[-1]
-            except IndexError:
-                # We hit an IndexError which probably means callbacks
-                # or task id was empty
-                return None
-            func = current_tasks[current_task_idx]
-            return func.func_name
+            for i in self.getCurrTaskId():
+                callback_list = callback_list[i]
+            return callback_list.func_name
+
+        # callback_list = self.getCallbacks()
+        # if callback_list:
+        #     try:
+        #         current_tasks = callback_list[0]
+        #         current_task_idx = self.getCurrTaskId()[-1]
+        #     except IndexError:
+        #         # We hit an IndexError which probably means callbacks
+        #         # or task id was empty
+        #         return None
+        #     func = current_tasks[current_task_idx]
+        #     return func.func_name
 
     def halt(self, msg, widget=None):
         """Halt the workflow (stop also any parent wfe)"""
