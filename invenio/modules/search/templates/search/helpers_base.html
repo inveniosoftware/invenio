@@ -631,7 +631,7 @@
                         {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
                         tabindex="1"
                         value="{{ request.args.get('p', '') }}"
-                        {%- if request.endpoint == 'search.index' -%}
+                        {%- if request.endpoint == 'search.index' %}
                         autofocus
                         {%- endif -%}
                 />{% endblock search_form_ctrls_input %}{# No space! #}
