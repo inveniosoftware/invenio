@@ -50,7 +50,7 @@ def log_comment_action(action_code, id, recid, uid=None):
         id_cmtRECORDCOMMENT=id,
         id_bibrec=recid,
         id_user=uid or current_user.get_id(),
-        client_host=socket.inet_aton(request.remote_addr),
+        client_host=int(socket.inet_aton(request.remote_addr).encode('hex'), 16),
         action_time=datetime.now(),
         action_code=action_code)
     db.session.add(action)
