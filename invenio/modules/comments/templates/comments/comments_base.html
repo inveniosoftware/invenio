@@ -164,18 +164,18 @@
   {%- if record.user_comment_subscritions|length -%}
 
   <div class="alert">
-  {%- set info_subs = _('%(open_tag)s Unsubscribe %(close_tag)s from this discussion. You will not receive any new comments by email.') % {
-    'open_tag': '<strong><a href="'+url_for('comments.unsubscribe', recid=recid)+'"><i class="glyphicon glyphicon-trash"></i>',
-    'close_tag':'</a></strong>'} -%}
+  {%- set info_subs = _('%(open_tag)s Unsubscribe %(close_tag)s from this discussion. You will not receive any new comments by email.',
+    open_tag='<strong><a href="%s"><i class="glyphicon glyphicon-trash"></i>'|format(url_for('comments.unsubscribe', recid=recid))|safe,
+    close_tag='</a></strong>'|safe) -%}
     {{ info_subs|safe }}
   </div>
 
   {%- else -%}
 
   <div class="alert alert-info">
-  {%- set info_subs = _('%(open_tag)s Subscribe %(close_tag)s to this discussion. You will then receive all new comments by email.') % {
-    'open_tag': '<strong><a href="'+url_for('comments.subscribe', recid=recid)+'"><i class="glyphicon glyphicon-envelope"></i>',
-    'close_tag':'</a></strong>'} -%}
+  {%- set info_subs = _('%(open_tag)s Subscribe %(close_tag)s to this discussion. You will then receive all new comments by email.',
+    open_tag='<strong><a href="%s"><i class="glyphicon glyphicon-envelope"></i>'|format(url_for('comments.subscribe', recid=recid))|safe,
+    close_tag='</a></strong>'|safe) -%}
     {{ info_subs|safe }}
   </div>
 
