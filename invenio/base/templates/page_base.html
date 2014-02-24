@@ -53,8 +53,6 @@
   <meta charset="utf-8">
   <title>{{ title+' - ' if title }}{{ config.CFG_SITE_NAME_INTL[g.ln] }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Language" content="{{ g.ln|safe }}" />
   {%- if description %}<meta name="description" content="{{ description }}" />{% endif %}
   {%- if keywords %}<meta name="keywords" content="{{ keywords }}" />{% endif %}
   {%- if config.get('CFG_GOOGLE_SITE_VERIFICATION', None) -%}
@@ -65,7 +63,7 @@
   {%- endblock head_meta -%}
 
   {%- block head_links %}
-  <link rev="made" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
+  <link rel="author" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
   <link rel="canonical" href="{{ canonical_url }}" />
   {%- block head_links_langs %}{%- for alt_ln, alternate_url in alternate_urls.iteritems() %}
   <link rel="alternate" hreflang="{{ alt_ln }}" href="{{ alternate_url }}" />
