@@ -1723,11 +1723,12 @@ def main():
   -w, --windex=w1[,w2]\tword/phrase indexes to consider (all)
   -M, --maxmem=XXX\tmaximum memory usage in kB (no limit)
   -f, --flush=NNN\t\tfull consistent table flush after NNN records (10000)
-  --force\tforce indexing of all records for provided indexes
-  -Z, --remove-dependent-index=w\tname of an index for removing from virtual index
+  --force\t\tforce indexing of all records for provided indexes
+  -Z, --remove-dependent-index=w  name of an index for removing from virtual index
+  -l --all-virtual\t\t set of all virtual indexes; the same as: -w virtual_ind1, virtual_ind2, ...
 """,
             version=__revision__,
-            specific_params=("adi:m:c:w:krRM:f:oZ:", [
+            specific_params=("adi:m:c:w:krRM:f:oZ:l", [
                 "add",
                 "del",
                 "id=",
@@ -1740,7 +1741,8 @@ def main():
                 "maxmem=",
                 "flush=",
                 "force",
-                "remove-dependent-index="
+                "remove-dependent-index=",
+                "all-virtual"
             ]),
             task_stop_helper_fnc=task_stop_table_close_fnc,
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
@@ -1797,6 +1799,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option("force", True)
     elif key in ("-Z", "--remove-dependent-index",):
         task_set_option("remove-dependent-index", value)
+    elif key in ("-l", "--all-virtual",):
+        task_set_option("all-virtual", True)
     else:
         return False
     return True
@@ -1969,7 +1973,10 @@ def get_indexes_from_cli():
         will return all known indexes.
     """
     indexes = task_get_option("windex")
-    if not indexes:
+    all_virtual = task_get_option("all-virtual")
+    if all_virtual:
+        indexes = filter_for_virtual_indexes(get_all_indexes())
+    elif not indexes:
         indexes = get_all_indexes()
     else:
         indexes = indexes.split(",")
@@ -2000,8 +2007,15 @@ def remove_dependent_index(virtual_indexes, dependent_index):
         query = """DELETE FROM idxINDEX_idxINDEX WHERE id_virtual=%s AND id_normal=%s"""
         run_sql(query, (index_id, id_dependent))
 
+def should_update_virtual_indexes():
+    """
+        Decides if any virtual indexes should be updated.
+        Decision is made based on arguments obtained
+        from CLI.
+    """
+    return task_get_option("all-virtual") or task_get_option("windex")
 
-def update_virtual_index(virtual_indexes, reindex=False):
+def update_virtual_indexes(virtual_indexes, reindex=False):
     """
         Function will update all specified virtual_indexes.
         @param virtual_indexes: list of index names
@@ -2090,7 +2104,9 @@ def task_run_core():
         return True
 
     # virtual index: update
-    update_virtual_index(virtual_indexes, task_get_option("reindex"))
+    if should_update_virtual_indexes():
+        update_virtual_indexes(virtual_indexes, task_get_option("reindex"))
+
     if len(regular_indexes) == 0:
         return True
 
