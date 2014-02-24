@@ -20,6 +20,6 @@
        xsi:schemaLocation="http://www.loc.gov/mods/v3
                            http://www.loc.gov/standards/mods/v3/mods-3-3.xsd">
 {% for recid in recids %}
-  {{ format_record(recid) }}
+  {{ format_record(recid, of) }}
 {% endfor %}
 </modsCollection>

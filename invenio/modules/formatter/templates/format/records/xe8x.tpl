@@ -18,6 +18,6 @@
 -#}
 <records>
 {% for recid in recids %}
-  {{ format_record(recid) }}
+  {{ format_record(recid, of) }}
 {% endfor %}
 </records>
