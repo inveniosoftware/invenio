@@ -116,7 +116,22 @@ class TestQueryParser(InvenioTestCase):
     def test_parsing_exact_phrase_query_unbalanced(self):
         "search engine - parsing unbalanced exact phrase"
         self._check('"the word', 'title', None,
-                    [['+', '"the', 'title', 'w'],
+                    [['+', 'the', 'title', 'w'],
+                     ['+', 'word', 'title', 'w']])
+        self._check('the" word', 'title', None,
+                    [['+', 'the', 'title', 'w'],
+                     ['+', 'word', 'title', 'w']])
+        self._check('"the"one" word', 'title', None,
+                    [['+', 'theone', 'title', 'a'],
+                     ['+', 'word', 'title', 'w']])
+        self._check('"theone" word', 'title', None,
+                    [['+', 'theone', 'title', 'a'],
+                     ['+', 'word', 'title', 'w']])
+        self._check('"t\'heone" word', 'title', None,
+                    [['+', "t'heone", 'title', 'a'],
+                     ['+', 'word', 'title', 'w']])
+        self._check('"t\"heone" word', 'title', None,
+                    [['+', 'theone', 'title', 'a'],
                      ['+', 'word', 'title', 'w']])
 
     def test_parsing_exact_phrase_query_in_any_field(self):
