@@ -1666,6 +1666,23 @@ class BibIndexVirtualIndexQueueTableTest(InvenioTestCase):
         empty = tuple()
         self.assertEqual(empty, res)
 
+    def test_5_remove_duplicates_in_queue_table(self):
+        """bibindex - checks if duplicates are removed"""
+        index_name = 'title'
+        table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"]
+        self.index_dependent_index(index_name, [[10,14]], table_type)
+        self.index_dependent_index(index_name, [[20,23]], table_type)
+        self.index_dependent_index(index_name, [[10,14]], table_type)
+        query = """SELECT id_bibrec_low, id_bibrec_high, mode FROM idx%s01Q
+                   WHERE index_name='%s' ORDER BY runtime ASC""" % (table_type, index_name)
+        entries_before = run_sql(query)
+        vit = VirtualIndexTable('global', table_type)
+        entries_after = vit.remove_duplicates(entries_before)
+        self.assertEqual(len(entries_before), 3)
+        self.assertEqual(len(entries_after), 2)
+        self.assertTrue(entries_before[1] == entries_after[1])
+        self.run_update_for_virtual_index(table_type)
+
 
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,

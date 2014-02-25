@@ -824,14 +824,14 @@ class VirtualIndexTable(AbstractIndexTable):
                 self.clean_queue_table(index_name)
         else:
             for index_id, index_name in self.dependent_indexes.iteritems():
-                query = """SELECT * FROM %s WHERE index_name=%%s
+                query = """SELECT id_bibrec_low, id_bibrec_high, mode FROM %s WHERE index_name=%%s
                            ORDER BY runtime ASC""" % (self.table_name[:-1] + "Q")
-                entries = run_sql(query, (index_name, ))
+                entries = self.remove_duplicates(run_sql(query, (index_name, )))
                 if entries:
                     write_message('Virtual index: %s is being updated for %s index' % (self.index_name, index_name))
                 for entry in entries:
                     operation = None
-                    _id, runtime, recID_low, recID_high, name, mode = entry
+                    recID_low, recID_high, mode = entry
 
                     if mode == CFG_BIBINDEX_UPDATE_MODE["Update"]:
                         operation = self.update_index
@@ -1086,6 +1086,23 @@ class VirtualIndexTable(AbstractIndexTable):
         """
         query = "DELETE FROM %s WHERE index_name='%s'" % (self.table_name[:-1].lstrip(self.table_prefix) + "Q", index_name)
         run_sql(query)
+
+    def remove_duplicates(self, entries):
+        """
+            Removes duplicates from a list of entries (taken from Queue table)
+            in order to process a single command only once.
+            Queue table may look like this:
+            id (..) id_bibrec_low id_bibrec_high index_name mode
+            ...
+            12          1               100       title     update
+            13          1               100       title     update
+            We don't want to perform the same operation twice. First we want to
+            squash the same commands into one.
+            @param entries: list of entries taken from the database
+        """
+        unique = set()
+        return [entry for entry in entries if entry not in unique and not unique.add(entry)]
+
 
     def remove_dependent_index(self, index_name):
         """
