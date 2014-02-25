@@ -851,8 +851,12 @@ Contents
            you may want to create the above symlink in order to
            configure completion for the inveniocfg command.
 
-Good luck, and thanks for choosing Invenio.
+Good luck and thanks for choosing Invenio.
 
-       - Invenio Development Team
-         <info@invenio-software.org>
-         <http://invenio-software.org/>
+      - Invenio Development Team
+
+        Email: info@invenio-software.org
+        IRC: #invenio on irc.freenode.net
+        Twitter: http://twitter.com/inveniosoftware
+        Github: http://github.com/inveniosoftware
+        URL: http://invenio-software.org

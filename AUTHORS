@@ -32,9 +32,6 @@ The CERN development team currently consists of:
  - Ludmila Marian <ludmila.marian@gmail.com>
      Citerank family of ranking methods.  Fixes to numerous modules.
 
- - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
-     Improvements to the BibCirculation module.
-
  - Flavio Costa <flavio.costa@cern.ch>
      Contributions to the Italian translation.
 
@@ -47,7 +44,7 @@ The CERN development team currently consists of:
 
  - Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
      Initial release of Invenio Upgrader and jsonutils; patches for
-     pluginutils,
+     pluginutils.
 
  - Patrick Glauner <patrick.oliver.glauner@cern.ch>
      Cleanup of SQL queries for several modules.
@@ -66,12 +63,6 @@ The CERN development team currently consists of:
      Improvements to BibMatch with remote matching capabilities,
      improvements to plot extractor, improvements to harvesting and
      other small fixes.
-
- - Piotr Praczyk <piotr.praczyk@gmail.com>
-     OAI harvesting from arXiv.  Test harvesting interface, for
-     OAIHarvest.  Record comparison library functions, for BibRecord.
-     Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
-     undo/redo.
 
  - Samuele Carli <samuele.carli@cern.ch>
      Initial implementation of BibAuthorID module, with Henning
@@ -118,9 +109,6 @@ currently consists of:
  - Alberto Accomazzi <aaccomazzi@cfa.harvard.edu>
      Team leader.
 
- - Giovanni Di Milia <gdimilia@cfa.harvard.edu>
-     Recognition of /record/sysno URLs, ADS formatting.
-
  - Jay Luker <lbjay@reallywow.com>
      Improvements to the emergency notification sending facility.
 
@@ -131,6 +119,18 @@ Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project since 2002.  In an approximately decreasing chronological
 order:
+
+ - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
+     Improvements to the BibCirculation module.
+
+ - Piotr Praczyk <piotr.praczyk@gmail.com>
+     OAI harvesting from arXiv.  Test harvesting interface, for
+     BibHarvest.  Record comparison library functions, for BibRecord.
+     Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
+     undo/redo.
+
+ - Giovanni Di Milia <gdimilia@cfa.harvard.edu>
+     Recognition of /record/sysno URLs, ADS formatting.
 
  - Daniel Stanculescu <daniel.stanculescu@cern.ch>
      Improvements to Unicode treatment for textutils.
