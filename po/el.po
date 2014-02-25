@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.0.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2013-08-19 19:30+0200\n"
+"POT-Creation-Date: 2014-02-25 14:17+0100\n"
 "PO-Revision-Date: 2012-03-01 16:53+0100\n"
 "Last-Translator: Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>\n"
 "Language-Team: EL <info@invenio-software.org>\n"
@@ -78,7 +78,7 @@ msgstr "Περιοχή Διαχειριστή"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:5162
+#: modules/websearch/lib/search_engine.py:5089
 #: modules/websearch/lib/websearch_templates.py:825
 #: modules/websearch/lib/websearch_templates.py:903
 #: modules/websearch/lib/websearch_templates.py:1026
@@ -1385,7 +1385,7 @@ msgstr "Οδηγός διαχείρισης WebSubmit"
 #: modules/websearch/lib/search_engine.py:1083
 #: modules/websearch/lib/search_engine.py:1249
 #: modules/websearch/lib/websearch_templates.py:1183
-#: modules/websearch/lib/websearch_webcoll.py:595
+#: modules/websearch/lib/websearch_webcoll.py:598
 msgid "OR"
 msgstr "Ή"
 
@@ -4555,13 +4555,13 @@ msgid "You are not authorized to use ill."
 msgstr "Δεν έχετε δικαίωμα να χρησιμοποιήσετε τον διαδανεισμό."
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:326
-#: modules/websearch/lib/search_engine.py:4145
-#: modules/websearch/lib/search_engine.py:4463
-#: modules/websearch/lib/search_engine.py:4646
-#: modules/websearch/lib/search_engine.py:4669
-#: modules/websearch/lib/search_engine.py:4677
-#: modules/websearch/lib/search_engine.py:4685
-#: modules/websearch/lib/search_engine.py:4731
+#: modules/websearch/lib/search_engine.py:4064
+#: modules/websearch/lib/search_engine.py:4382
+#: modules/websearch/lib/search_engine.py:4573
+#: modules/websearch/lib/search_engine.py:4596
+#: modules/websearch/lib/search_engine.py:4604
+#: modules/websearch/lib/search_engine.py:4612
+#: modules/websearch/lib/search_engine.py:4658
 msgid "The record has been deleted."
 msgstr "Η εγγραφή έχει διαγραφεί."
 
@@ -4570,9 +4570,9 @@ msgstr "Η εγγραφή έχει διαγραφεί."
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:143
 #: modules/websearch/lib/search_engine.py:1992
 #: modules/websearch/lib/search_engine.py:2001
-#: modules/websearch/lib/search_engine.py:5157
-#: modules/websearch/lib/search_engine.py:5199
-#: modules/websearch/lib/search_engine.py:5250
+#: modules/websearch/lib/search_engine.py:5084
+#: modules/websearch/lib/search_engine.py:5126
+#: modules/websearch/lib/search_engine.py:5177
 msgid "Requested record does not seem to exist."
 msgstr "Η εγγραφή που ζητήσατε δεν υπάρχει."
 
@@ -6405,38 +6405,38 @@ msgstr "Εξαγωγή με το BibSword: Βήμα 4/4"
 msgid "Export with BibSword: Acknowledgement"
 msgstr "Εξαγωγή με το BibSword: Βεβαίωση"
 
-#: modules/bibupload/lib/batchuploader_engine.py:263
+#: modules/bibupload/lib/batchuploader_engine.py:261
 msgid "More than one possible recID, ambiguous behaviour"
 msgstr "Περισσότερα από ένα πιθανά redID, αμφίσημη συμπεριφορά"
 
-#: modules/bibupload/lib/batchuploader_engine.py:263
+#: modules/bibupload/lib/batchuploader_engine.py:261
 msgid "No records match that file name"
 msgstr "Δεν υπάρχουν εγγραφές που να ταυτίζονται με αυτό το όνομα αρχείου"
 
-#: modules/bibupload/lib/batchuploader_engine.py:264
+#: modules/bibupload/lib/batchuploader_engine.py:262
 msgid "File already exists"
 msgstr "Το αρχείο υπάρχει ήδη"
 
-#: modules/bibupload/lib/batchuploader_engine.py:264
+#: modules/bibupload/lib/batchuploader_engine.py:262
 msgid "A file with the same name and format already exists"
 msgstr "Ένα αρχείο με αυτό το όνομα και αυτή την μορφή υπάρχει ήδη"
 
-#: modules/bibupload/lib/batchuploader_engine.py:265
+#: modules/bibupload/lib/batchuploader_engine.py:263
 #, python-format
 msgid "No rights to upload to collection '%s'"
 msgstr "Δεν έχετε δικαίωμα να μεταφορτώσετε στην συλλογή '%s'"
 
-#: modules/bibupload/lib/batchuploader_engine.py:469
+#: modules/bibupload/lib/batchuploader_engine.py:466
 msgid "Guests are not authorized to run batchuploader"
 msgstr "Οι επισκέπτες δεν έχουν δικαίωμα να χρησιμοποιήσουν το batchuploader"
 
-#: modules/bibupload/lib/batchuploader_engine.py:471
+#: modules/bibupload/lib/batchuploader_engine.py:468
 #, python-format
 msgid "The user '%s' is not authorized to run batchuploader"
 msgstr "Ο χρήστης '%s' δεν έχει δικαίωμα να χρησιμοποιήσει το batchuploader"
 
-#: modules/bibupload/lib/batchuploader_engine.py:584
-#: modules/bibupload/lib/batchuploader_engine.py:597
+#: modules/bibupload/lib/batchuploader_engine.py:581
+#: modules/bibupload/lib/batchuploader_engine.py:594
 #, python-format
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
@@ -6655,7 +6655,7 @@ msgstr "Μαζικό Ανέβασμα: Παρακολούθηση εργασιώ
 #: modules/webbasket/lib/webbasket.py:210
 #: modules/webbasket/lib/webbasket.py:851
 #: modules/webbasket/lib/webbasket.py:968
-#: modules/websession/lib/webuser.py:308
+#: modules/websession/lib/webuser.py:309
 #: modules/webstyle/lib/webstyle_templates.py:596
 msgid "N/A"
 msgstr "Μη Διαθ."
@@ -7183,8 +7183,9 @@ msgstr "Επιστροφή στην αρχική επιλογή"
 
 #: modules/webaccess/lib/access_control_config.py:306
 #: modules/websession/lib/websession_templates.py:1184
-#: modules/websession/lib/webuser.py:987 modules/websession/lib/webuser.py:996
-#: modules/websession/lib/webuser.py:997
+#: modules/websession/lib/webuser.py:992
+#: modules/websession/lib/webuser.py:1001
+#: modules/websession/lib/webuser.py:1002
 msgid "Run Record Editor"
 msgstr "Εκτέλεση Επεξεργαστή Εγγραφών"
 
@@ -7195,8 +7196,9 @@ msgstr "Εκτέλεση Επεξεργαστή Πολλαπλών Εγγραφ�
 
 #: modules/webaccess/lib/access_control_config.py:308
 #: modules/websession/lib/websession_templates.py:1218
-#: modules/websession/lib/webuser.py:988 modules/websession/lib/webuser.py:998
-#: modules/websession/lib/webuser.py:999
+#: modules/websession/lib/webuser.py:993
+#: modules/websession/lib/webuser.py:1003
+#: modules/websession/lib/webuser.py:1004
 msgid "Run Document File Manager"
 msgstr "Εκτέλεση Διαχειριστή Αρχείων"
 
@@ -10254,8 +10256,8 @@ msgstr "Ανάγνωση μηνύματος"
 
 #: modules/websearch/lib/search_engine.py:854
 #: modules/websearch/lib/search_engine.py:881
-#: modules/websearch/lib/search_engine.py:5189
-#: modules/websearch/lib/search_engine.py:5242
+#: modules/websearch/lib/search_engine.py:5116
+#: modules/websearch/lib/search_engine.py:5169
 msgid "Search Results"
 msgstr "Αποτελέσματα αναζήτησης"
 
@@ -10288,12 +10290,12 @@ msgid "add another collection"
 msgstr "προσθήκη συλλογής"
 
 #: modules/websearch/lib/search_engine.py:1083
-#: modules/websearch/lib/websearch_webcoll.py:595
+#: modules/websearch/lib/websearch_webcoll.py:598
 msgid "rank by"
 msgstr "ταξινόμηση με"
 
 #: modules/websearch/lib/search_engine.py:1227
-#: modules/websearch/lib/websearch_webcoll.py:565
+#: modules/websearch/lib/websearch_webcoll.py:568
 msgid "latest first"
 msgstr "Το τελευταίο, πρώτο"
 
@@ -10422,8 +10424,8 @@ msgstr ""
 "Ο όρος %s δεν ταίριαξε σε κάποια εγγραφή. Παραπλήσιοι όροι σε όλες τις "
 "συλλογές:"
 
-#: modules/websearch/lib/search_engine.py:3798
-#: modules/websearch/lib/search_engine.py:3918
+#: modules/websearch/lib/search_engine.py:3707
+#: modules/websearch/lib/search_engine.py:3827
 #, fuzzy, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. The records will not be "
@@ -10432,7 +10434,7 @@ msgstr ""
 "Λυπούμαστε, η '%s' δεν είναι έγκυρη επιλογή ταξινόμησης. Έγινε επιλογή της "
 "ταξινόμησης κατά τίτλο."
 
-#: modules/websearch/lib/search_engine.py:3906
+#: modules/websearch/lib/search_engine.py:3815
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -10441,23 +10443,23 @@ msgstr ""
 "Λυπούμαστε, η ταξινόμηση επιτρέπεται σε σετ των %d εγγραφών το πολύ. Θα "
 "γίνει χρήση της της εξ΄ορισμού ταξινόμησης."
 
-#: modules/websearch/lib/search_engine.py:4148
-#: modules/websearch/lib/search_engine.py:4467
+#: modules/websearch/lib/search_engine.py:4067
+#: modules/websearch/lib/search_engine.py:4386
 #, fuzzy, python-format
 msgid "The record %d replaces it."
 msgstr "Η εγγραφή έχει διαγραφεί."
 
-#: modules/websearch/lib/search_engine.py:4346
+#: modules/websearch/lib/search_engine.py:4265
 msgid "Use different search terms."
 msgstr "Χρησιμοποιήστε διαφορετικά κριτήρια έρευνας."
 
-#: modules/websearch/lib/search_engine.py:5495
+#: modules/websearch/lib/search_engine.py:5422
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Κανένα αποτέλεσμα στα χρονικά περιθώρια, θα γίνει παράβλεψη του κριτηρίου "
 "αυτού..."
 
-#: modules/websearch/lib/search_engine.py:5522
+#: modules/websearch/lib/search_engine.py:5449
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Κανένα αποτέλεσμα στα όρια έρευνας, θα γίνει παράβλεψη του κριτηρίου αυτού..."
@@ -10665,27 +10667,27 @@ msgid "Limit to:"
 msgstr "Περιοσμός σε:"
 
 #: modules/websearch/lib/websearch_templates.py:2301
-#: modules/websearch/lib/websearch_webcoll.py:613
+#: modules/websearch/lib/websearch_webcoll.py:616
 msgid "results"
 msgstr "αποτελέσματα"
 
 #: modules/websearch/lib/websearch_templates.py:2337
-#: modules/websearch/lib/websearch_webcoll.py:583
+#: modules/websearch/lib/websearch_webcoll.py:586
 msgid "asc."
 msgstr "αύξ."
 
 #: modules/websearch/lib/websearch_templates.py:2340
-#: modules/websearch/lib/websearch_webcoll.py:584
+#: modules/websearch/lib/websearch_webcoll.py:587
 msgid "desc."
 msgstr "φθίν."
 
 #: modules/websearch/lib/websearch_templates.py:2346
-#: modules/websearch/lib/websearch_webcoll.py:628
+#: modules/websearch/lib/websearch_webcoll.py:631
 msgid "single list"
 msgstr "απλή λίστα"
 
 #: modules/websearch/lib/websearch_templates.py:2349
-#: modules/websearch/lib/websearch_webcoll.py:627
+#: modules/websearch/lib/websearch_webcoll.py:630
 msgid "split by collection"
 msgstr "διαχωρισμός κατά συλλογή"
 
@@ -10896,7 +10898,7 @@ msgstr "Ανάλυση των άρθρων με βάση τις παραπομπ
 msgid "Additional Citation Metrics"
 msgstr "Πρόσθετα στατιστικά αναφορών"
 
-#: modules/websearch/lib/websearch_webcoll.py:649
+#: modules/websearch/lib/websearch_webcoll.py:652
 msgid "brief"
 msgstr "σύντομη"
 
@@ -11056,7 +11058,7 @@ msgid "The user request for joining group has already been rejected."
 msgstr "Το αίτημα για προσχώρηση στην ομάδα έχει ήδη απορριφθεί."
 
 #: modules/websession/lib/webgroup_dblayer.py:314
-#: modules/websession/lib/webuser.py:306
+#: modules/websession/lib/webuser.py:307
 msgid "user"
 msgstr "όνομα χρήστη"
 
@@ -12516,36 +12518,36 @@ msgstr "Τροποποίηση Ομάδας"
 msgid "Edit group members"
 msgstr "Τροποποίηση μελών ομάδας"
 
-#: modules/websession/lib/webuser.py:151
+#: modules/websession/lib/webuser.py:152
 msgid "Database problem"
 msgstr "Πρόβλημα βάσης δεδομένων"
 
-#: modules/websession/lib/webuser.py:478
+#: modules/websession/lib/webuser.py:483
 #, python-format
 msgid "Account registration at %s"
 msgstr "Δημιουργία λογαριασμού στο %s"
 
-#: modules/websession/lib/webuser.py:808
+#: modules/websession/lib/webuser.py:813
 msgid "New account on"
 msgstr "Νέος λογαριασμός στις"
 
-#: modules/websession/lib/webuser.py:810
+#: modules/websession/lib/webuser.py:815
 msgid "PLEASE ACTIVATE"
 msgstr "ΠΑΡΑΚΑΛΩ ΕΝΕΡΓΟΠΟΙΗΣΤΕ"
 
-#: modules/websession/lib/webuser.py:811
+#: modules/websession/lib/webuser.py:816
 msgid "A new account has been created on"
 msgstr "Ένας νέος λογαριασμός δημιουργήθηκε στις"
 
-#: modules/websession/lib/webuser.py:813
+#: modules/websession/lib/webuser.py:818
 msgid " and is awaiting activation"
 msgstr " και περιμένει ενεργοποίηση"
 
-#: modules/websession/lib/webuser.py:815
+#: modules/websession/lib/webuser.py:820
 msgid "   Username/Email"
 msgstr "    Όνομα χρήστη/Email"
 
-#: modules/websession/lib/webuser.py:816
+#: modules/websession/lib/webuser.py:821
 msgid "You can approve or reject this account request at"
 msgstr ""
 "Μπορείτε να δεχτείτε ή να απορρίψετε την αίτηση δημιουργίας λογαριασμού στο"
@@ -12696,9 +12698,10 @@ msgid "In case of doubt, please contact %(x_admin_email)s."
 msgstr "Σε περίπτωση αμφιβολίας, παρακαλώ επικοινωνήστε με %(x_admin_email)s."
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:176
+#, fuzzy
 msgid ""
-"Note that your submission as been inserted into the bibliographic task queue "
-"and is waiting for execution.\n"
+"Note that your submission has been inserted into the bibliographic task "
+"queue and is waiting for execution.\n"
 msgstr ""
 "Σημειώστε οτι η υποβολή σας έχει μπει στην ουρά εργασιών και περιμένει για "
 "την εκτέλεσή της.\n"

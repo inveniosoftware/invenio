@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.1.2\n"
+"Project-Id-Version: Invenio 1.1.3\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2013-08-19 19:30+0200\n"
+"POT-Creation-Date: 2014-02-25 14:17+0100\n"
 "PO-Revision-Date: 2008-06-06 15:55+0100\n"
 "Last-Translator: Marko Niinimaki <man@cern.ch>\n"
 "Language-Team: SV <info@invenio-software.org>\n"
@@ -81,7 +81,7 @@ msgstr "Administratörsarea"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:5162
+#: modules/websearch/lib/search_engine.py:5089
 #: modules/websearch/lib/websearch_templates.py:825
 #: modules/websearch/lib/websearch_templates.py:903
 #: modules/websearch/lib/websearch_templates.py:1026
@@ -1393,7 +1393,7 @@ msgstr "WebSubmit administration"
 #: modules/websearch/lib/search_engine.py:1083
 #: modules/websearch/lib/search_engine.py:1249
 #: modules/websearch/lib/websearch_templates.py:1183
-#: modules/websearch/lib/websearch_webcoll.py:595
+#: modules/websearch/lib/websearch_webcoll.py:598
 msgid "OR"
 msgstr "ELLER"
 
@@ -4719,13 +4719,13 @@ msgid "You are not authorized to use ill."
 msgstr "Du är inte ägaren av den här korgen."
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:326
-#: modules/websearch/lib/search_engine.py:4145
-#: modules/websearch/lib/search_engine.py:4463
-#: modules/websearch/lib/search_engine.py:4646
-#: modules/websearch/lib/search_engine.py:4669
-#: modules/websearch/lib/search_engine.py:4677
-#: modules/websearch/lib/search_engine.py:4685
-#: modules/websearch/lib/search_engine.py:4731
+#: modules/websearch/lib/search_engine.py:4064
+#: modules/websearch/lib/search_engine.py:4382
+#: modules/websearch/lib/search_engine.py:4573
+#: modules/websearch/lib/search_engine.py:4596
+#: modules/websearch/lib/search_engine.py:4604
+#: modules/websearch/lib/search_engine.py:4612
+#: modules/websearch/lib/search_engine.py:4658
 msgid "The record has been deleted."
 msgstr "Journalen har raderats."
 
@@ -4734,9 +4734,9 @@ msgstr "Journalen har raderats."
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:143
 #: modules/websearch/lib/search_engine.py:1992
 #: modules/websearch/lib/search_engine.py:2001
-#: modules/websearch/lib/search_engine.py:5157
-#: modules/websearch/lib/search_engine.py:5199
-#: modules/websearch/lib/search_engine.py:5250
+#: modules/websearch/lib/search_engine.py:5084
+#: modules/websearch/lib/search_engine.py:5126
+#: modules/websearch/lib/search_engine.py:5177
 #, fuzzy
 msgid "Requested record does not seem to exist."
 msgstr "Tyvärr verkar inte dokumentet %s existera."
@@ -6590,39 +6590,39 @@ msgstr ""
 msgid "Export with BibSword: Acknowledgement"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:263
+#: modules/bibupload/lib/batchuploader_engine.py:261
 msgid "More than one possible recID, ambiguous behaviour"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:263
+#: modules/bibupload/lib/batchuploader_engine.py:261
 msgid "No records match that file name"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:264
+#: modules/bibupload/lib/batchuploader_engine.py:262
 msgid "File already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:264
+#: modules/bibupload/lib/batchuploader_engine.py:262
 msgid "A file with the same name and format already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:265
+#: modules/bibupload/lib/batchuploader_engine.py:263
 #, python-format
 msgid "No rights to upload to collection '%s'"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:469
+#: modules/bibupload/lib/batchuploader_engine.py:466
 #, fuzzy
 msgid "Guests are not authorized to run batchuploader"
 msgstr "Du är inte ägaren av den här korgen."
 
-#: modules/bibupload/lib/batchuploader_engine.py:471
+#: modules/bibupload/lib/batchuploader_engine.py:468
 #, fuzzy, python-format
 msgid "The user '%s' is not authorized to run batchuploader"
 msgstr "Du är inte ägaren av den här korgen."
 
-#: modules/bibupload/lib/batchuploader_engine.py:584
-#: modules/bibupload/lib/batchuploader_engine.py:597
+#: modules/bibupload/lib/batchuploader_engine.py:581
+#: modules/bibupload/lib/batchuploader_engine.py:594
 #, python-format
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
@@ -6849,7 +6849,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket.py:210
 #: modules/webbasket/lib/webbasket.py:851
 #: modules/webbasket/lib/webbasket.py:968
-#: modules/websession/lib/webuser.py:308
+#: modules/websession/lib/webuser.py:309
 #: modules/webstyle/lib/webstyle_templates.py:596
 msgid "N/A"
 msgstr "N/A"
@@ -7390,8 +7390,9 @@ msgstr "Referens finns ännu inte"
 
 #: modules/webaccess/lib/access_control_config.py:306
 #: modules/websession/lib/websession_templates.py:1184
-#: modules/websession/lib/webuser.py:987 modules/websession/lib/webuser.py:996
-#: modules/websession/lib/webuser.py:997
+#: modules/websession/lib/webuser.py:992
+#: modules/websession/lib/webuser.py:1001
+#: modules/websession/lib/webuser.py:1002
 msgid "Run Record Editor"
 msgstr ""
 
@@ -7402,8 +7403,9 @@ msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:308
 #: modules/websession/lib/websession_templates.py:1218
-#: modules/websession/lib/webuser.py:988 modules/websession/lib/webuser.py:998
-#: modules/websession/lib/webuser.py:999
+#: modules/websession/lib/webuser.py:993
+#: modules/websession/lib/webuser.py:1003
+#: modules/websession/lib/webuser.py:1004
 msgid "Run Document File Manager"
 msgstr ""
 
@@ -10520,8 +10522,8 @@ msgstr "Läs ett meddelande"
 
 #: modules/websearch/lib/search_engine.py:854
 #: modules/websearch/lib/search_engine.py:881
-#: modules/websearch/lib/search_engine.py:5189
-#: modules/websearch/lib/search_engine.py:5242
+#: modules/websearch/lib/search_engine.py:5116
+#: modules/websearch/lib/search_engine.py:5169
 msgid "Search Results"
 msgstr "Sökresultat"
 
@@ -10556,12 +10558,12 @@ msgid "add another collection"
 msgstr "lägg till ny samling"
 
 #: modules/websearch/lib/search_engine.py:1083
-#: modules/websearch/lib/websearch_webcoll.py:595
+#: modules/websearch/lib/websearch_webcoll.py:598
 msgid "rank by"
 msgstr "rangordna efter"
 
 #: modules/websearch/lib/search_engine.py:1227
-#: modules/websearch/lib/websearch_webcoll.py:565
+#: modules/websearch/lib/websearch_webcoll.py:568
 msgid "latest first"
 msgstr "senaste först"
 
@@ -10677,8 +10679,8 @@ msgid ""
 msgstr ""
 "Söktermen %s matchade inga journaler. Närmsta sökterm, oavsett samling, är:"
 
-#: modules/websearch/lib/search_engine.py:3798
-#: modules/websearch/lib/search_engine.py:3918
+#: modules/websearch/lib/search_engine.py:3707
+#: modules/websearch/lib/search_engine.py:3827
 #, fuzzy, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. The records will not be "
@@ -10686,29 +10688,29 @@ msgid ""
 msgstr ""
 "%s är inte en tillänglig rangordning. Använder titelsortering istället."
 
-#: modules/websearch/lib/search_engine.py:3906
+#: modules/websearch/lib/search_engine.py:3815
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
 "sort order."
 msgstr "Sortering är endast tillåten för mängder med upp till %d journaler."
 
-#: modules/websearch/lib/search_engine.py:4148
-#: modules/websearch/lib/search_engine.py:4467
+#: modules/websearch/lib/search_engine.py:4067
+#: modules/websearch/lib/search_engine.py:4386
 #, fuzzy, python-format
 msgid "The record %d replaces it."
 msgstr "Journalen har raderats."
 
-#: modules/websearch/lib/search_engine.py:4346
+#: modules/websearch/lib/search_engine.py:4265
 msgid "Use different search terms."
 msgstr "Använd andra söktermer."
 
-#: modules/websearch/lib/search_engine.py:5495
+#: modules/websearch/lib/search_engine.py:5422
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Ingen träff funnen inom den angivna tidsramen, använder ej dessa kriterier"
 
-#: modules/websearch/lib/search_engine.py:5522
+#: modules/websearch/lib/search_engine.py:5449
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Inga träffer funna inom de angivna sökkriterierna, använder ej dessa..."
@@ -10913,27 +10915,27 @@ msgid "Limit to:"
 msgstr "begränsa till:"
 
 #: modules/websearch/lib/websearch_templates.py:2301
-#: modules/websearch/lib/websearch_webcoll.py:613
+#: modules/websearch/lib/websearch_webcoll.py:616
 msgid "results"
 msgstr "resultat"
 
 #: modules/websearch/lib/websearch_templates.py:2337
-#: modules/websearch/lib/websearch_webcoll.py:583
+#: modules/websearch/lib/websearch_webcoll.py:586
 msgid "asc."
 msgstr "stigande"
 
 #: modules/websearch/lib/websearch_templates.py:2340
-#: modules/websearch/lib/websearch_webcoll.py:584
+#: modules/websearch/lib/websearch_webcoll.py:587
 msgid "desc."
 msgstr "fallande"
 
 #: modules/websearch/lib/websearch_templates.py:2346
-#: modules/websearch/lib/websearch_webcoll.py:628
+#: modules/websearch/lib/websearch_webcoll.py:631
 msgid "single list"
 msgstr "enkel lista"
 
 #: modules/websearch/lib/websearch_templates.py:2349
-#: modules/websearch/lib/websearch_webcoll.py:627
+#: modules/websearch/lib/websearch_webcoll.py:630
 msgid "split by collection"
 msgstr "partionera efter samling"
 
@@ -11153,7 +11155,7 @@ msgstr "Fördelning av journaler"
 msgid "Additional Citation Metrics"
 msgstr "ytterligare filer"
 
-#: modules/websearch/lib/websearch_webcoll.py:649
+#: modules/websearch/lib/websearch_webcoll.py:652
 msgid "brief"
 msgstr "kortfattad"
 
@@ -11325,7 +11327,7 @@ msgid "The user request for joining group has already been rejected."
 msgstr "Din ansökan för att joina grupp %s har blivit avslagen."
 
 #: modules/websession/lib/webgroup_dblayer.py:314
-#: modules/websession/lib/webuser.py:306
+#: modules/websession/lib/webuser.py:307
 msgid "user"
 msgstr "Användare"
 
@@ -12747,39 +12749,39 @@ msgstr "Ändra grupp"
 msgid "Edit group members"
 msgstr "Ändra gruppmedlemmar"
 
-#: modules/websession/lib/webuser.py:151
+#: modules/websession/lib/webuser.py:152
 msgid "Database problem"
 msgstr "Databasproblem"
 
-#: modules/websession/lib/webuser.py:478
+#: modules/websession/lib/webuser.py:483
 #, python-format
 msgid "Account registration at %s"
 msgstr "Konto aktivering i %s"
 
-#: modules/websession/lib/webuser.py:808
+#: modules/websession/lib/webuser.py:813
 #, fuzzy
 msgid "New account on"
 msgstr "Visa användarkonto"
 
-#: modules/websession/lib/webuser.py:810
+#: modules/websession/lib/webuser.py:815
 msgid "PLEASE ACTIVATE"
 msgstr "ACTIVERA VSG"
 
-#: modules/websession/lib/webuser.py:811
+#: modules/websession/lib/webuser.py:816
 #, fuzzy
 msgid "A new account has been created on"
 msgstr "Ditt användarkonto har skapats"
 
-#: modules/websession/lib/webuser.py:813
+#: modules/websession/lib/webuser.py:818
 msgid " and is awaiting activation"
 msgstr "ock väntar aktivering"
 
-#: modules/websession/lib/webuser.py:815
+#: modules/websession/lib/webuser.py:820
 #, fuzzy
 msgid "   Username/Email"
 msgstr "Användarnamn"
 
-#: modules/websession/lib/webuser.py:816
+#: modules/websession/lib/webuser.py:821
 msgid "You can approve or reject this account request at"
 msgstr "Ni kan godkänna eller avslå detta konto begäran i"
 
@@ -12932,8 +12934,8 @@ msgstr ""
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:176
 msgid ""
-"Note that your submission as been inserted into the bibliographic task queue "
-"and is waiting for execution.\n"
+"Note that your submission has been inserted into the bibliographic task "
+"queue and is waiting for execution.\n"
 msgstr ""
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:179

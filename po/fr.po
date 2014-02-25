@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.1.2\n"
+"Project-Id-Version: Invenio 1.1.3\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2013-08-19 19:30+0200\n"
+"POT-Creation-Date: 2014-02-25 14:17+0100\n"
 "PO-Revision-Date: 2012-02-16 14:04+0100\n"
 "Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <info@invenio-software.org>\n"
@@ -79,7 +79,7 @@ msgstr "Zone d'administration"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:5162
+#: modules/websearch/lib/search_engine.py:5089
 #: modules/websearch/lib/websearch_templates.py:825
 #: modules/websearch/lib/websearch_templates.py:903
 #: modules/websearch/lib/websearch_templates.py:1026
@@ -1386,7 +1386,7 @@ msgstr "Guide d'administration de WebSubmit"
 #: modules/websearch/lib/search_engine.py:1083
 #: modules/websearch/lib/search_engine.py:1249
 #: modules/websearch/lib/websearch_templates.py:1183
-#: modules/websearch/lib/websearch_webcoll.py:595
+#: modules/websearch/lib/websearch_webcoll.py:598
 msgid "OR"
 msgstr "OU"
 
@@ -4556,13 +4556,13 @@ msgid "You are not authorized to use ill."
 msgstr "Vous n'êtes pas autorisé à faire des PEBs."
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:326
-#: modules/websearch/lib/search_engine.py:4145
-#: modules/websearch/lib/search_engine.py:4463
-#: modules/websearch/lib/search_engine.py:4646
-#: modules/websearch/lib/search_engine.py:4669
-#: modules/websearch/lib/search_engine.py:4677
-#: modules/websearch/lib/search_engine.py:4685
-#: modules/websearch/lib/search_engine.py:4731
+#: modules/websearch/lib/search_engine.py:4064
+#: modules/websearch/lib/search_engine.py:4382
+#: modules/websearch/lib/search_engine.py:4573
+#: modules/websearch/lib/search_engine.py:4596
+#: modules/websearch/lib/search_engine.py:4604
+#: modules/websearch/lib/search_engine.py:4612
+#: modules/websearch/lib/search_engine.py:4658
 msgid "The record has been deleted."
 msgstr "La notice a été supprimée."
 
@@ -4571,9 +4571,9 @@ msgstr "La notice a été supprimée."
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:143
 #: modules/websearch/lib/search_engine.py:1992
 #: modules/websearch/lib/search_engine.py:2001
-#: modules/websearch/lib/search_engine.py:5157
-#: modules/websearch/lib/search_engine.py:5199
-#: modules/websearch/lib/search_engine.py:5250
+#: modules/websearch/lib/search_engine.py:5084
+#: modules/websearch/lib/search_engine.py:5126
+#: modules/websearch/lib/search_engine.py:5177
 msgid "Requested record does not seem to exist."
 msgstr "Désolé, cette notice n'existe pas."
 
@@ -6399,38 +6399,38 @@ msgstr "Exportation BibSword: Étape 4/4"
 msgid "Export with BibSword: Acknowledgement"
 msgstr "Exportation BibSword: Quittance"
 
-#: modules/bibupload/lib/batchuploader_engine.py:263
+#: modules/bibupload/lib/batchuploader_engine.py:261
 msgid "More than one possible recID, ambiguous behaviour"
 msgstr "Multiples recIDs possibles, comportement indéfini"
 
-#: modules/bibupload/lib/batchuploader_engine.py:263
+#: modules/bibupload/lib/batchuploader_engine.py:261
 msgid "No records match that file name"
 msgstr "Aucune notice ne correspondant au nom de fichier"
 
-#: modules/bibupload/lib/batchuploader_engine.py:264
+#: modules/bibupload/lib/batchuploader_engine.py:262
 msgid "File already exists"
 msgstr "Fichier déjà existant"
 
-#: modules/bibupload/lib/batchuploader_engine.py:264
+#: modules/bibupload/lib/batchuploader_engine.py:262
 msgid "A file with the same name and format already exists"
 msgstr "A fichier avec les mêmes nom et format existe déjà"
 
-#: modules/bibupload/lib/batchuploader_engine.py:265
+#: modules/bibupload/lib/batchuploader_engine.py:263
 #, python-format
 msgid "No rights to upload to collection '%s'"
 msgstr "Aucun droit pour envoyer vers la collection '%s'"
 
-#: modules/bibupload/lib/batchuploader_engine.py:469
+#: modules/bibupload/lib/batchuploader_engine.py:466
 msgid "Guests are not authorized to run batchuploader"
 msgstr "Vous n'êtes pas autorisé à utiliser batchuploader."
 
-#: modules/bibupload/lib/batchuploader_engine.py:471
+#: modules/bibupload/lib/batchuploader_engine.py:468
 #, python-format
 msgid "The user '%s' is not authorized to run batchuploader"
 msgstr "L'utilisateur '%s' n'est pas autorisé à exécuter batchuploader"
 
-#: modules/bibupload/lib/batchuploader_engine.py:584
-#: modules/bibupload/lib/batchuploader_engine.py:597
+#: modules/bibupload/lib/batchuploader_engine.py:581
+#: modules/bibupload/lib/batchuploader_engine.py:594
 #, python-format
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
@@ -6651,7 +6651,7 @@ msgstr "Batch Uploader: moniteur de processus"
 #: modules/webbasket/lib/webbasket.py:210
 #: modules/webbasket/lib/webbasket.py:851
 #: modules/webbasket/lib/webbasket.py:968
-#: modules/websession/lib/webuser.py:308
+#: modules/websession/lib/webuser.py:309
 #: modules/webstyle/lib/webstyle_templates.py:596
 msgid "N/A"
 msgstr "N/A"
@@ -7180,8 +7180,9 @@ msgstr "Retour à la sélection principale"
 
 #: modules/webaccess/lib/access_control_config.py:306
 #: modules/websession/lib/websession_templates.py:1184
-#: modules/websession/lib/webuser.py:987 modules/websession/lib/webuser.py:996
-#: modules/websession/lib/webuser.py:997
+#: modules/websession/lib/webuser.py:992
+#: modules/websession/lib/webuser.py:1001
+#: modules/websession/lib/webuser.py:1002
 msgid "Run Record Editor"
 msgstr "Lancer éditeur de notices"
 
@@ -7192,8 +7193,9 @@ msgstr "Lancer éditeur de notices multiples"
 
 #: modules/webaccess/lib/access_control_config.py:308
 #: modules/websession/lib/websession_templates.py:1218
-#: modules/websession/lib/webuser.py:988 modules/websession/lib/webuser.py:998
-#: modules/websession/lib/webuser.py:999
+#: modules/websession/lib/webuser.py:993
+#: modules/websession/lib/webuser.py:1003
+#: modules/websession/lib/webuser.py:1004
 msgid "Run Document File Manager"
 msgstr "Lancer gestionnaire de fichiers"
 
@@ -10234,8 +10236,8 @@ msgstr "Lire un message"
 
 #: modules/websearch/lib/search_engine.py:854
 #: modules/websearch/lib/search_engine.py:881
-#: modules/websearch/lib/search_engine.py:5189
-#: modules/websearch/lib/search_engine.py:5242
+#: modules/websearch/lib/search_engine.py:5116
+#: modules/websearch/lib/search_engine.py:5169
 msgid "Search Results"
 msgstr "Résultats de la recherche"
 
@@ -10268,12 +10270,12 @@ msgid "add another collection"
 msgstr "ajouter une nouvelle collection"
 
 #: modules/websearch/lib/search_engine.py:1083
-#: modules/websearch/lib/websearch_webcoll.py:595
+#: modules/websearch/lib/websearch_webcoll.py:598
 msgid "rank by"
 msgstr "ordonner par"
 
 #: modules/websearch/lib/search_engine.py:1227
-#: modules/websearch/lib/websearch_webcoll.py:565
+#: modules/websearch/lib/websearch_webcoll.py:568
 msgid "latest first"
 msgstr "les plus récents en premier"
 
@@ -10400,8 +10402,8 @@ msgstr ""
 "Le terme de recherche %s ne se trouve dans aucune notice. Les termes les "
 "plus proches parmi toutes les collections sont:"
 
-#: modules/websearch/lib/search_engine.py:3798
-#: modules/websearch/lib/search_engine.py:3918
+#: modules/websearch/lib/search_engine.py:3707
+#: modules/websearch/lib/search_engine.py:3827
 #, fuzzy, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. The records will not be "
@@ -10410,7 +10412,7 @@ msgstr ""
 "Désolé, %s n'est pas une option de tri valide. Le tri par titre est utilisé "
 "à la place."
 
-#: modules/websearch/lib/search_engine.py:3906
+#: modules/websearch/lib/search_engine.py:3815
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -10419,23 +10421,23 @@ msgstr ""
 "Désolé, le tri n'est pas autorisé sur un ensemble de plus de %d notices. Les "
 "notices les plus récentes sont affichées en premier."
 
-#: modules/websearch/lib/search_engine.py:4148
-#: modules/websearch/lib/search_engine.py:4467
+#: modules/websearch/lib/search_engine.py:4067
+#: modules/websearch/lib/search_engine.py:4386
 #, fuzzy, python-format
 msgid "The record %d replaces it."
 msgstr "La notice a été supprimée."
 
-#: modules/websearch/lib/search_engine.py:4346
+#: modules/websearch/lib/search_engine.py:4265
 msgid "Use different search terms."
 msgstr "Utiliser d'autres termes de recherche"
 
-#: modules/websearch/lib/search_engine.py:5495
+#: modules/websearch/lib/search_engine.py:5422
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Pas de résultat pour l'intervalle de temps spécifé, la condition n'est pas "
 "prise en compte..."
 
-#: modules/websearch/lib/search_engine.py:5522
+#: modules/websearch/lib/search_engine.py:5449
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Pas de résultat pour les limites spécifiées, la condition n'est pas prise en "
@@ -10646,27 +10648,27 @@ msgid "Limit to:"
 msgstr "Limiter à:"
 
 #: modules/websearch/lib/websearch_templates.py:2301
-#: modules/websearch/lib/websearch_webcoll.py:613
+#: modules/websearch/lib/websearch_webcoll.py:616
 msgid "results"
 msgstr "résultats"
 
 #: modules/websearch/lib/websearch_templates.py:2337
-#: modules/websearch/lib/websearch_webcoll.py:583
+#: modules/websearch/lib/websearch_webcoll.py:586
 msgid "asc."
 msgstr "croissant"
 
 #: modules/websearch/lib/websearch_templates.py:2340
-#: modules/websearch/lib/websearch_webcoll.py:584
+#: modules/websearch/lib/websearch_webcoll.py:587
 msgid "desc."
 msgstr "décroissant"
 
 #: modules/websearch/lib/websearch_templates.py:2346
-#: modules/websearch/lib/websearch_webcoll.py:628
+#: modules/websearch/lib/websearch_webcoll.py:631
 msgid "single list"
 msgstr "liste unique"
 
 #: modules/websearch/lib/websearch_templates.py:2349
-#: modules/websearch/lib/websearch_webcoll.py:627
+#: modules/websearch/lib/websearch_webcoll.py:630
 msgid "split by collection"
 msgstr "regrouper par collection"
 
@@ -10876,7 +10878,7 @@ msgstr "Répartition des documents par citations"
 msgid "Additional Citation Metrics"
 msgstr "Métriques de Citations Additionnelles"
 
-#: modules/websearch/lib/websearch_webcoll.py:649
+#: modules/websearch/lib/websearch_webcoll.py:652
 msgid "brief"
 msgstr "condensé"
 
@@ -11035,7 +11037,7 @@ msgid "The user request for joining group has already been rejected."
 msgstr "La demande d'adhésion au groupe a déjà été rejetée."
 
 #: modules/websession/lib/webgroup_dblayer.py:314
-#: modules/websession/lib/webuser.py:306
+#: modules/websession/lib/webuser.py:307
 msgid "user"
 msgstr "utilisateur"
 
@@ -12492,36 +12494,36 @@ msgstr "Éditer un groupe"
 msgid "Edit group members"
 msgstr "Éditer les membres du groupe"
 
-#: modules/websession/lib/webuser.py:151
+#: modules/websession/lib/webuser.py:152
 msgid "Database problem"
 msgstr "Problème de base de données"
 
-#: modules/websession/lib/webuser.py:478
+#: modules/websession/lib/webuser.py:483
 #, python-format
 msgid "Account registration at %s"
 msgstr "Enregistrement d'un compte sur %s"
 
-#: modules/websession/lib/webuser.py:808
+#: modules/websession/lib/webuser.py:813
 msgid "New account on"
 msgstr "Nouveau compte sur"
 
-#: modules/websession/lib/webuser.py:810
+#: modules/websession/lib/webuser.py:815
 msgid "PLEASE ACTIVATE"
 msgstr "VEUILLEZ ACTIVER"
 
-#: modules/websession/lib/webuser.py:811
+#: modules/websession/lib/webuser.py:816
 msgid "A new account has been created on"
 msgstr "Un nouveau compte a été créé sur"
 
-#: modules/websession/lib/webuser.py:813
+#: modules/websession/lib/webuser.py:818
 msgid " and is awaiting activation"
 msgstr "et est en attente d'activation"
 
-#: modules/websession/lib/webuser.py:815
+#: modules/websession/lib/webuser.py:820
 msgid "   Username/Email"
 msgstr "Nom d'utilisateur/Email"
 
-#: modules/websession/lib/webuser.py:816
+#: modules/websession/lib/webuser.py:821
 msgid "You can approve or reject this account request at"
 msgstr "Vous pouvez approuver ou rejeter cette demande de compte sur"
 
@@ -12669,9 +12671,10 @@ msgid "In case of doubt, please contact %(x_admin_email)s."
 msgstr "En cas de doute, contactez %(x_admin_email)s."
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:176
+#, fuzzy
 msgid ""
-"Note that your submission as been inserted into the bibliographic task queue "
-"and is waiting for execution.\n"
+"Note that your submission has been inserted into the bibliographic task "
+"queue and is waiting for execution.\n"
 msgstr ""
 "Notez que votre soumission a été insérée dans la file d'attente et est en "
 "attente d'exécution.\n"
