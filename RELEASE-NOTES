@@ -1,127 +1,80 @@
 --------------------------------------------------------------------
-Invenio v1.1.2 is released
-August 19, 2013
+Invenio v1.1.3 is released
+February 25, 2014
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.1.2 was released on August 19, 2013.
+Invenio v1.1.3 was released on February 25, 2014.
 
 This stable release contains a number of minor fixes and improvements.
-It is recommended to all Invenio sites using v1.1.1 or previous stable
+It is recommended to all Invenio sites using v1.1.2 or previous stable
 release series (v0.99, v1.0).
 
 What's new:
 -----------
 
- *) BibAuthorID: fix in name comparisons (#1313 #1314); improvements
-    and fixes; improvements, fixes and optimizations; UI and backend
-    improvements
+ *) BatchUploader: rights to ::1 for robot upload; avoid
+    tempfile.tempdir redefinition (#1594)
 
- *) BibCatalog: removal of print statement (#1337)
+ *) BibCatalog: no newlines in subject for RT plugin
 
- *) BibClassify: escape keywords in tag cloud and MARCXML
+ *) BibDocFile: RHEL6 magic bindings support (#1466)
 
- *) BibDocFile: better JS washing in web UI; display file upload
-    progress (#1020 #1021); display "Restricted" label correctly
-    (#1299); fix check-md5 with bibdocfsinfo cache (#1249); fix
-    check-md5 with bibdocfsinfo cache (#1249); fix error in calling
-    register_download (#1311); handling of exceptions in Md5Folder
-    (#1060); revert md5 property patch (#1249); support new magic
-    library (#1207)
+ *) BibFormat: fix for BibTeX regression tests; better BibTeX title
+    and collaboration
 
- *) BibEncode: minor fix in process_batch_job()
+ *) BibRank: temporary file storage in CFG_TMPDIR (#1594)
 
- *) BibFormat: additional fulltext file display in HB (#1219); checks
-    for bibformat bin; fix CLI call to old PHP-based formatter; fixes
-    unit tests (#1320); fix for fulltext file format; fix snippets for
-    phrase queries (#1201); format_element initialisation fix; passing
-    of user_info for Excel format; replacement of CDS Invenio by
-    Invenio; setUp/tearDown in unit tests (#1319); skip hidden icons
-    in OpenGraph image tag
+ *) BibSword: author MARC tag definition fix
 
- *) BibIndex: better wording for stemming in admin UI; replacement of
-    CDS Invenio by Invenio; synonym indexing speed up (#1484); use
-    human friendly index name (#1329)
+ *) BibUpload: FFT replace warning in guide
 
- *) BibKnowledge: /kb/export 500 error fix; optional memoisation of
-    KBR lookups (#1484)
+ *) I18N: PO file update for the release of v1.1.3; PO file update for
+    the release of v1.0.6; PO file update for the release of v0.99.9;
+    collection demo names for new translations
 
- *) BibMerge: delete cache file on submit
+ *) OAIHarvest: for for bad exception handling
 
- *) BibSched: bibupload max_priority check; bugfix for high-priority
-    monotasks; increases size of monitor columns;
-    parse_runtime_limit() fix (#1432); parse_runtime_limit() tests fix
-    (#1432)
+ *) OAIRepository: optional support for --notimechange
 
- *) BibUpload: FMT regression test case fix (#1152); indicators in
-    strong tags (#939)
+ *) Travis CI: initial release of configuration
 
- *) CKEditor: updated to version 3.6.6
+ *) WebSearch: nonexisting record API test case fix (#1692); correct
+    record sums from hosted colls (#1651); space between records in
+    MARC HTML; fix for BibTeX regression tests; field-filtered MARCXML
+    API output (#1591); more complete API regression test suite;
+    get_fieldvalues_alephseq_like() utils; asciification of `oe`
+    grapheme (#1582); bug fix for SPIRES date math search
 
- *) dateutils: strftime improvement (#1065); strptime for Python-2.4
-    compatibility
+ *) WebSession: fix mail cookie expiration (#1596)
 
- *) errorlib: hiding bibcatalog info in exception body
+ *) WebSubmit: fix for typo in Shared_Functions; optional pdftk
+    regression tests
 
- *) global: test suite nosification
+ *) dbquery: closes redundant connection
 
- *) htmlutils: fix single quote escaping; improve js string escaping;
-    MathJax 2.1 (#1050)
+ *) git: addition of compile to gitignore; new entry in gitignore
 
- *) I18N: updates to Catalan and Spanish translations
+ *) global: language value always in link URLs
 
- *) installation: fix collectiondetailedrecordpagetabs (#1496); fix
-    for jQuery hotkeys add-on URL (#1507); fix for MathJax OS X
-    install issue (#1455); support for Apache-2.4 (#1552)
+ *) installation: pip requirement version updates; pip requirements;
+    no user prompt for warnings; empty Travis configuration; location
+    of jquery-1.7.1.min.js; location of flot; information about
+    unidecode; fix autotools rsync instructions
 
- *) inveniocfg: tests runner file closure fix (#1327)
+ *) intbitset: no crash when intbitset is on rhs (#1287)
 
- *) InvenioConnector: fix for CDS authentication; mechanize dependency
+ *) inveniocfg: fix for mod_headers
 
- *) inveniogc: consider journal cache subdirs
-
- *) memoiseutils: initial release
-
- *) OAIHarvest: fix path for temporary authorlists; holding-pen UI
-    bugfixes (#1401)
-
- *) OAIRepository: CFG_OAI_REPOSITORY_MARCXML_SIZE; no bibupload -n
-
- *) RefExtract: replacement of CDS Invenio by Invenio
-
- *) WebAccess: fix variable parsing in robot auth (#1456); IP-based
-    rules and offline user fix (#1233); replacement of CDS Invenio by
-    InveniO
-
- *) WebApiKey: renames unit tests to regression tests (#1324)
-
- *) WebAuthorProfile: fix XSS vulnerability
-
- *) WebComment: escape review "title"; escape review "title"
-
- *) WebSearch: 410 HTTP code for deleted records; advanced search
-    notification if no hits; better cleaning of word patterns; fix
-    infinite synonym lookup cases (#804); handles "find feb 12"
-    (#948); nicer browsing of fuzzy indexes (#1348); respect default
-    `rg` in Advanced Search; SPIRES date math search fixes (#431
-    #948); SPIRES invalid date search fix (#1467); tweaks SPIRES
-    two-digit search; unit test disabling for CFG_CERN_SITE; unit test
-    update (#1326)
-
- *) WebSession: fix for list of admin activities (#1444); login_method
-    changes; unit vs regression test suite cleanup
-
- *) WebStat: use CFG_JOURNAL_TAG instead of 773/909C4 (#546)
-
- *) WebSubmit: new websubmitadmin CLI (#1334); replacement of CDS
-    Invenio by Invenio; use PyPDF2 if available
+ *) kwalitee: list comprehensions instead of lambdas; compatibility
+    with pylint 1.0.0
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.1.2.tar.gz>
-  <http://invenio-software.org/download/invenio-1.1.2.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.1.2.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.1.3.tar.gz>
+  <http://invenio-software.org/download/invenio-1.1.3.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.1.3.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -137,8 +90,8 @@ Please proceed as follows:
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.1.2.tar.gz
-     $ cd invenio-1.1.2
+     $ tar xvfz invenio-1.1.3.tar.gz
+     $ cd invenio-1.1.3
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
@@ -146,7 +99,6 @@ Please proceed as follows:
      $ sudo -u www-data make install
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
          --exclude invenio-autotools.conf \
-         --exclude bibformat/format_templates/Default_HTML_brief.bft \
          /opt/invenio/etc/
        # Note: if you are upgrading from previous stable release
        # series (v0.99 or v1.0), please don't rsync but diff, in order
@@ -155,16 +107,9 @@ Please proceed as follows:
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --upgrade
 
- c) Update your MathJax and CKeditor plugins:
+ c) Restart your Apache server and your bibsched queue.
 
-     $ sudo -u www-data make install-mathjax-plugin
-     $ sudo -u www-data make install-ckeditor-plugin
-
- d) Restart your Apache server and your bibsched queue.
-
-*** NOTE The items below will go into v1.0.6 release announcement ***
-
- x) If your records may contain `oe` UTF-8 graphemes, please schedule
+ d) If your records may contain `oe` UTF-8 graphemes, please schedule
     reindexing of concerned indexes at a convenient time, for example:
 
      $ sudo -u www-data /opt/invenio/bin/bibindex -w title -f100000 -R
