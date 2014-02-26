@@ -368,6 +368,8 @@ template function generated it.
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s"%(rtl_direction)s>
 <head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta http-equiv="Content-Language" content="%(ln)s" />
  <title>%(pageheadertitle)s</title>
  %(metabase)s
  <link rev="made" href="mailto:%(sitesupportemail)s" />
@@ -383,8 +385,6 @@ template function generated it.
  <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
  <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
  %(linkbackTrackbackLink)s
- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
- <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
  <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
