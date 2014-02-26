@@ -3002,7 +3002,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
                                           permitted_restricted_collections)
 
         for coll in colls_to_be_displayed:
-            results[coll] = results.get(coll, intbitset()).union_update(records_that_can_be_displayed & get_collection_reclist(coll))
+            results[coll] = results.get(coll, intbitset()) | (records_that_can_be_displayed & get_collection_reclist(coll))
             results_nbhits += len(results[coll])
 
     if results_nbhits == 0:
