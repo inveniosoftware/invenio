@@ -68,3 +68,17 @@ readers_proxy = RegistryProxy('jsonext.readers',
 readers = LazyDict(lambda: dict((module.reader.__master_format__,
                                  module.reader)
                                 for module in readers_proxy))
+
+contexts_proxy = lambda namespace: RegistryProxy(
+    namespace + '.contexts', ModuleAutoDiscoverySubRegistry, 'contexts',
+    registry_namespace=jsonext(namespace))
+
+
+def contexts(namespace):
+    contexts = dict((module.__name__.split('.')[-1],
+                     getattr(module, 'context'))
+                    for module in contexts_proxy('jsonext'))
+    contexts.update((module.__name__.split('.')[-1],
+                     getattr(module, 'context'))
+                    for module in contexts_proxy(namespace))
+    return contexts

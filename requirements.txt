@@ -62,3 +62,4 @@ alembic==0.6.2
 git+https://github.com/lnielsen-cern/setuptools-bower.git#egg=setuptools-bower-0.1
 importlib==1.0.3
 pytz
+PyLD

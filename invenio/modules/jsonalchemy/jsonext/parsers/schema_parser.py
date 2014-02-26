@@ -19,8 +19,12 @@
 
 from pyparsing import QuotedString, Suppress, indentedBlock
 
+from invenio.base.utils import try_to_eval
+
 from invenio.modules.jsonalchemy.parser import BaseExtensionParser, \
         dict_def
+
+from ...registry import functions
 
 
 class SchemaParser(BaseExtensionParser):
@@ -38,7 +42,7 @@ class SchemaParser(BaseExtensionParser):
 
     @classmethod
     def create_element(cls, rule, override, extend, namespace):
-        return eval(rule.schema)
+        return try_to_eval(rule.schema, functions(namespace))
 
 SchemaParser.__name__ = 'schema'
 parser = SchemaParser
