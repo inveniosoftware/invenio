@@ -290,6 +290,7 @@ def create_html_link(urlbase, urlargd, link_label, linkattrd=None,
             attributes = [str(key) + '="' + str(linkattrd[key]) + '"'
                                 for key in linkattrd.keys()]
         output += attributes_separator.join(attributes)
+    output = wash_for_utf8(output)
     output += '>' + wash_for_utf8(link_label) + '</a>'
     return output
 
