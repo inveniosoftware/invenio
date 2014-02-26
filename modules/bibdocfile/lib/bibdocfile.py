@@ -2757,7 +2757,7 @@ class BibDoc(object):
         run_sql("DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.id,))
         for afile in self.docfiles:
             run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, false, %s, %s, %s, %s, %s)", (self.id, afile.get_version(), afile.get_format(), afile.cd, afile.md, afile.get_checksum(), afile.get_size(), afile.mime))
-            run_sql("UPDATE bibdocfsinfo SET last_version=true WHERE id_bibdoc=%s AND version=%s", (self.id, self.get_latest_version()))
+        run_sql("UPDATE bibdocfsinfo SET last_version=true WHERE id_bibdoc=%s AND version=%s", (self.id, self.get_latest_version()))
 
     def _build_related_file_list(self):
         """Lists all files attached to the bibdoc. This function should be
