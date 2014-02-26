@@ -33,7 +33,9 @@ from invenio.ext.principal import permission_required
 WEBACCESSACTION = 'cfgwebaccess'
 
 blueprint = Blueprint('webaccess_admin', __name__,
-                             url_prefix="/admin/webaccess")
+                      url_prefix="/admin/webaccess",
+                      template_folder='../templates',
+                      static_folder='../static')
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
