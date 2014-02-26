@@ -129,24 +129,16 @@ def get_all_public_collections(base_collections):
                     output.append((descendant.name, last_mod))
     return output
 
-def filter_fulltexts(recids, fulltext_type=None):
+def filter_fulltexts(recids):
     """ returns list of records having a fulltext of type fulltext_type.
     If fulltext_type is empty, return all records having a fulltext"""
     recids = dict(recids)
     minimum_timestamp = get_minimum_timestamp()
-    if fulltext_type:
-        query = """SELECT id_bibrec, max(modification_date)
-                   FROM bibrec_bibdoc
-                   LEFT JOIN bibdoc ON bibrec_bibdoc.id_bibdoc=bibdoc.id
-                   WHERE type=%s
-                   GROUP BY id_bibrec"""
-        res = run_sql(query, (fulltext_type,))
-    else:
-        query = """SELECT id_bibrec, max(modification_date)
-                   FROM bibrec_bibdoc
-                   LEFT JOIN bibdoc ON bibrec_bibdoc.id_bibdoc=bibdoc.id
-                   GROUP BY id_bibrec"""
-        res = run_sql(query)
+    query = """SELECT id_bibrec, max(modification_date)
+                FROM bibrec_bibdoc
+                LEFT JOIN bibdoc ON bibrec_bibdoc.id_bibdoc=bibdoc.id
+                GROUP BY id_bibrec"""
+    res = run_sql(query)
     return [(recid, max(lastmod, minimum_timestamp)) for (recid, lastmod) in res if recid in recids and BibRecDocs(recid).list_latest_files(list_hidden=False)]
 
 
@@ -307,7 +299,7 @@ class SitemapIndexWriter(object):
         self.filedescriptor.close()
         os.rename(self.name + '.part', self.name)
 
-def generate_sitemaps(sitemap_index_writer, collection_names, fulltext_filter=''):
+def generate_sitemaps(sitemap_index_writer, collection_names, export_fulltext=True):
     """
     Generate sitemaps themselves. Return list of generated sitemaps files
     """
@@ -354,20 +346,21 @@ def generate_sitemaps(sitemap_index_writer, collection_names, fulltext_filter=''
         if i % 100 == 0:
             task_update_progress("Sitemap for collection %s/%s" % (i + 1, len(collections)))
             task_sleep_now_if_required(can_stop_too=True)
-    write_message("... Generating urls for fulltexts...")
-    recids = filter_fulltexts(recids, fulltext_filter)
-    for i, (recid, lastmod) in enumerate(recids):
-        if nb_urls % 100 == 0 and (writer.get_size() >= MAX_SIZE or nb_urls >= MAX_RECORDS):
-            sitemap_id += 1
-            writer = SitemapWriter(sitemap_id)
-            sitemap_index_writer.add_url(writer.get_sitemap_url())
-        nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s/files' % (CFG_SITE_RECORD, recid),
-                                 lastmod = lastmod,
-                                 changefreq = DEFAULT_CHANGEFREQ_FULLTEXTS,
-                                 priority = DEFAULT_PRIORITY_FULLTEXTS)
-        if i % 100 == 0:
-            task_update_progress("Sitemap for files page %s/%s" % (i, len(recids)))
-            task_sleep_now_if_required(can_stop_too=True)
+    if export_fulltext:
+        write_message("... Generating urls for fulltexts...")
+        recids = filter_fulltexts(recids)
+        for i, (recid, lastmod) in enumerate(recids):
+            if nb_urls % 100 == 0 and (writer.get_size() >= MAX_SIZE or nb_urls >= MAX_RECORDS):
+                sitemap_id += 1
+                writer = SitemapWriter(sitemap_id)
+                sitemap_index_writer.add_url(writer.get_sitemap_url())
+            nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s/files' % (CFG_SITE_RECORD, recid),
+                                    lastmod = lastmod,
+                                    changefreq = DEFAULT_CHANGEFREQ_FULLTEXTS,
+                                    priority = DEFAULT_PRIORITY_FULLTEXTS)
+            if i % 100 == 0:
+                task_update_progress("Sitemap for files page %s/%s" % (i, len(recids)))
+                task_sleep_now_if_required(can_stop_too=True)
 
     write_message("... Generating urls for comments...")
     recids = filter_comments(recids)
@@ -399,7 +392,7 @@ def generate_sitemaps(sitemap_index_writer, collection_names, fulltext_filter=''
             task_update_progress("Sitemap for reviews page %s/%s" % (i, len(recids)))
             task_sleep_now_if_required(can_stop_too=True)
 
-def generate_sitemaps_index(collection_list, fulltext_filter=None):
+def generate_sitemaps_index(collection_list, export_fulltext=True):
     """main function. Generates the sitemap index and the sitemaps
     collection_list: list of collection names to add in sitemap
     fulltext_filter: if provided the parser will intergrate only give fulltext
@@ -407,7 +400,7 @@ def generate_sitemaps_index(collection_list, fulltext_filter=None):
     """
     write_message("Generating all sitemaps...")
     sitemap_index_writer = SitemapIndexWriter(CFG_WEBDIR + '/sitemap-index.xml.gz')
-    generate_sitemaps(sitemap_index_writer, collection_list, fulltext_filter)
+    generate_sitemaps(sitemap_index_writer, collection_list, export_fulltext=export_fulltext)
 
 
 def run_export_method(jobname):
@@ -415,9 +408,9 @@ def run_export_method(jobname):
     write_message("bibexport_sitemap: job %s started." % jobname)
 
     collections = get_config_parameter(jobname=jobname, parameter_name="collection", is_parameter_collection=True)
-    fulltext_type = get_config_parameter(jobname=jobname, parameter_name="fulltext_status")
+    export_fulltext = bool(int(get_config_parameter(jobname=jobname, parameter_name="export_fulltext")))
 
-    generate_sitemaps_index(collections, fulltext_type)
+    generate_sitemaps_index(collections, export_fulltext)
 
     write_message("bibexport_sitemap: job %s finished." % jobname)
 
