@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -366,7 +366,7 @@ template function generated it.
         out = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s" xmlns:og="http://opengraphprotocol.org/schema/" >
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s"%(rtl_direction)s>
 <head>
  <title>%(pageheadertitle)s</title>
  %(metabase)s
@@ -391,7 +391,7 @@ template function generated it.
  %(hepDataAdditions)s
  %(metaheaderadd)s
 </head>
-<body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
+<body%(body_css_classes)s>
 <div class="pageheader">
 %(inspect_templates_message)s
 <!-- replaced page header -->
