@@ -24,7 +24,7 @@ from invenio.config import CFG_VERSION, CFG_ETCDIR
 
 # pylint: disable=C0301
 
-CFG_REFEXTRACT_VERSION_NUM = '1.5.40'
+CFG_REFEXTRACT_VERSION_NUM = '1.5.41'
 # Version number:
 CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" \
                                     % (CFG_VERSION, CFG_REFEXTRACT_VERSION_NUM)
