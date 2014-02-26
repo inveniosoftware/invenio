@@ -674,7 +674,8 @@ def get_reference_section_title_patterns():
               u'bibliography',
               u'bibliographie',
               u'citations',
-              u'literaturverzeichnis']
+              u'literaturverzeichnis',
+              u'publications']
     sect_marker = u'^\s*([\[\-\{\(])?\s*' \
                   u'((\w|\d){1,5}([\.\-\,](\w|\d){1,5})?\s*' \
                   u'[\.\-\}\)\]]\s*)?' \

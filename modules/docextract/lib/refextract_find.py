@@ -492,7 +492,7 @@ def get_reference_section_beginning(fulltext):
     if sect_start:
         write_message('* title %r' % sect_start['title_string'], verbose=3)
         write_message('* marker %r' % sect_start['marker'], verbose=3)
-        write_message('* title_marker_same_line %s' \
+        write_message('* title_marker_same_line %s'
             % sect_start['title_marker_same_line'], verbose=3)
     else:
         write_message('* could not find references section', verbose=3)
