@@ -52,10 +52,10 @@ def gettext_set_language(ln, use_unicode=False):
     """
     from invenio.ext.babel import set_locale
     with set_locale(ln):
-        #if use_unicode:
-        #    def unicode_gettext_wrapper(*args, **kwargs):
-        #        return gettext(*args, **kwargs).decode('utf-8')
-        #    return unicode_gettext_wrapper
+        if not use_unicode:
+            def unicode_gettext_wrapper(*args, **kwargs):
+                return gettext(*args, **kwargs).encode('utf-8')
+            return unicode_gettext_wrapper
         return gettext
 
 

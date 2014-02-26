@@ -7644,7 +7644,7 @@ msgstr "Omezené"
 #, fuzzy, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
-msgstr "Záznam vytvořen %s, modifikován %s"
+msgstr "Záznam vytvořený %(x_date_creation)s, změněný %(x_date_modification)s"
 
 #: modules/webstyle/lib/webstyle_templates.py:919
 #, fuzzy
