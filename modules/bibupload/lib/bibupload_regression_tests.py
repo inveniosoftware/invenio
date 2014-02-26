@@ -1350,6 +1350,7 @@ class BibUploadInsertModeTest(GenericBibUploadTest):
         <datafield tag ="700" ind1=" " ind2=" ">
         <subfield code="a">Tester, K J</subfield>
         <subfield code="u">CERN2</subfield>
+        <subfield code="u">CERN2</subfield>
         </datafield>
         <datafield tag ="700" ind1=" " ind2=" ">
         <subfield code="a">Tester, G</subfield>

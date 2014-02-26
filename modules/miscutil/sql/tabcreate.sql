@@ -932,7 +932,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib00x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib01x (
@@ -940,7 +940,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib01x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib02x (
@@ -948,7 +948,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib02x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib03x (
@@ -956,7 +956,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib03x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib04x (
@@ -964,7 +964,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib04x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib05x (
@@ -972,7 +972,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib05x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib06x (
@@ -980,7 +980,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib06x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib07x (
@@ -988,7 +988,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib07x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib08x (
@@ -996,7 +996,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib08x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib09x (
@@ -1004,7 +1004,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib09x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib10x (
@@ -1012,7 +1012,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib10x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib11x (
@@ -1020,7 +1020,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib11x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib12x (
@@ -1028,7 +1028,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib12x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib13x (
@@ -1036,7 +1036,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib13x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib14x (
@@ -1044,7 +1044,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib14x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib15x (
@@ -1052,7 +1052,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib15x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib16x (
@@ -1060,7 +1060,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib16x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib17x (
@@ -1068,7 +1068,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib17x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib18x (
@@ -1076,7 +1076,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib18x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib19x (
@@ -1084,7 +1084,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib19x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib20x (
@@ -1092,7 +1092,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib20x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib21x (
@@ -1100,7 +1100,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib21x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib22x (
@@ -1108,7 +1108,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib22x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib23x (
@@ -1116,7 +1116,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib23x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib24x (
@@ -1124,7 +1124,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib24x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib25x (
@@ -1132,7 +1132,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib25x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib26x (
@@ -1140,7 +1140,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib26x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib27x (
@@ -1148,7 +1148,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib27x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib28x (
@@ -1156,7 +1156,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib28x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib29x (
@@ -1164,7 +1164,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib29x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib30x (
@@ -1172,7 +1172,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib30x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib31x (
@@ -1180,7 +1180,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib31x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib32x (
@@ -1188,7 +1188,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib32x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib33x (
@@ -1196,7 +1196,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib33x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib34x (
@@ -1204,7 +1204,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib34x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib35x (
@@ -1212,7 +1212,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib35x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib36x (
@@ -1220,7 +1220,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib36x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib37x (
@@ -1228,7 +1228,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib37x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib38x (
@@ -1236,7 +1236,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib38x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib39x (
@@ -1244,7 +1244,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib39x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib40x (
@@ -1252,7 +1252,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib40x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib41x (
@@ -1260,7 +1260,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib41x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib42x (
@@ -1268,7 +1268,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib42x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib43x (
@@ -1276,7 +1276,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib43x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib44x (
@@ -1284,7 +1284,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib44x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib45x (
@@ -1292,7 +1292,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib45x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib46x (
@@ -1300,7 +1300,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib46x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib47x (
@@ -1308,7 +1308,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib47x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib48x (
@@ -1316,7 +1316,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib48x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib49x (
@@ -1324,7 +1324,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib49x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib50x (
@@ -1332,7 +1332,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib50x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib51x (
@@ -1340,7 +1340,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib51x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib52x (
@@ -1348,7 +1348,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib52x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib53x (
@@ -1356,7 +1356,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib53x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib54x (
@@ -1364,7 +1364,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib54x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib55x (
@@ -1372,7 +1372,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib55x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib56x (
@@ -1380,7 +1380,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib56x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib57x (
@@ -1388,7 +1388,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib57x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib58x (
@@ -1396,7 +1396,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib58x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib59x (
@@ -1404,7 +1404,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib59x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib60x (
@@ -1412,7 +1412,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib60x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib61x (
@@ -1420,7 +1420,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib61x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib62x (
@@ -1428,7 +1428,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib62x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib63x (
@@ -1436,7 +1436,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib63x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib64x (
@@ -1444,7 +1444,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib64x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib65x (
@@ -1452,7 +1452,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib65x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib66x (
@@ -1460,7 +1460,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib66x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib67x (
@@ -1468,7 +1468,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib67x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib68x (
@@ -1476,7 +1476,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib68x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib69x (
@@ -1484,7 +1484,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib69x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib70x (
@@ -1492,7 +1492,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib70x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib71x (
@@ -1500,7 +1500,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib71x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib72x (
@@ -1508,7 +1508,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib72x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib73x (
@@ -1516,7 +1516,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib73x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib74x (
@@ -1524,7 +1524,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib74x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib75x (
@@ -1532,7 +1532,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib75x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib76x (
@@ -1540,7 +1540,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib76x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib77x (
@@ -1548,7 +1548,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib77x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib78x (
@@ -1556,7 +1556,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib78x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib79x (
@@ -1564,7 +1564,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib79x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib80x (
@@ -1572,7 +1572,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib80x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib81x (
@@ -1580,7 +1580,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib81x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib82x (
@@ -1588,7 +1588,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib82x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib83x (
@@ -1596,7 +1596,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib83x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib84x (
@@ -1604,7 +1604,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib84x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib85x (
@@ -1612,7 +1612,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib85x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib86x (
@@ -1620,7 +1620,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib86x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib87x (
@@ -1628,7 +1628,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib87x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib88x (
@@ -1636,7 +1636,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib88x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib89x (
@@ -1644,7 +1644,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib89x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib90x (
@@ -1652,7 +1652,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib90x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib91x (
@@ -1660,7 +1660,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib91x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib92x (
@@ -1668,7 +1668,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib92x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib93x (
@@ -1676,7 +1676,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib93x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib94x (
@@ -1684,7 +1684,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib94x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib95x (
@@ -1692,7 +1692,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib95x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib96x (
@@ -1700,7 +1700,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib96x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib97x (
@@ -1708,7 +1708,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib97x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib98x (
@@ -1716,7 +1716,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib98x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bib99x (
@@ -1724,7 +1724,7 @@ CREATE TABLE IF NOT EXISTS bibrec_bib99x (
   id_bibxxx mediumint(8) unsigned NOT NULL default '0',
   field_number smallint(5) unsigned default NULL,
   KEY id_bibxxx (id_bibxxx),
-  KEY id_bibrec (id_bibrec)
+  PRIMARY KEY (id_bibrec, id_bibxxx, field_number)
 ) ENGINE=MyISAM;
 
 -- tables for bibliographic records formatted:

@@ -2436,7 +2436,7 @@ def update_database_with_metadata(record, rec_id, oai_rec_id="oai", affected_tag
                         write_message("   Failed: during insert_record_bibrec_bibxxx", verbose=1, stream=sys.stderr)
                 else:
                     # get the tag and value from the content of each subfield
-                    for subfield in subfield_list:
+                    for subfield in set(subfield_list):
                         subtag = subfield[0]
                         value = subfield[1]
                         tag_list.append(subtag)
