@@ -71,7 +71,7 @@
       <link>{{ url_for('search.search', _external=True) }}</link>
     </textInput>
     {% for recid in recids[jrec:jrec+rg] %}
-    {{ format_record(recid, of).decode('utf8') }}
+    {{ format_record(recid, of) }}
     {% endfor %}
   </channel>
 </rss>
