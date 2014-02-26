@@ -21,45 +21,136 @@ from flask import g
 from werkzeug.local import LocalProxy
 
 from invenio.base.globals import cfg
-from invenio.modules.jsonalchemy.wrappers import SmartJson
 from invenio.modules.jsonalchemy.jsonext.engines.mongodb_pymongo import \
     MongoDBStorage
-from invenio.modules.jsonalchemy.jsonext.readers.json_reader import reader
-
-from .models import Annotation as SQLAnnotation
+from invenio.modules.jsonalchemy.reader import Reader
+from invenio.modules.jsonalchemy.wrappers import SmartJsonLD
 
 
 def get_storage_engine():
     if not hasattr(g, "annotations_storage_engine"):
         g.annotations_storage_engine = \
-            MongoDBStorage(SQLAnnotation.__name__,
-                           host=cfg["CFG_ANNOTATIONS_MONGODB_HOST"],
-                           port=cfg["CFG_ANNOTATIONS_MONGODB_PORT"],
-                           database=cfg["CFG_ANNOTATIONS_MONGODB_DATABASE"])
+            MongoDBStorage("Annotation",
+                           host=cfg["ANNOTATIONS_MONGODB_HOST"],
+                           port=cfg["ANNOTATIONS_MONGODB_PORT"],
+                           database=cfg["CFG_DATABASE_NAME"])
     return g.annotations_storage_engine
 
 
-class Annotation(SmartJson):
+class QueryIterator():
+
+    def __init__(self, cls, cursor):
+        self.cursor = cursor
+        self.i = -1
+        self.cls = cls
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        self.i += 1
+        if self.i >= self.cursor.count():
+            raise StopIteration
+        else:
+            return self.cls(self.cursor[self.i])
+
+    def count(self):
+        return self.cursor.count()
+
+    def __getitem__(self, i):
+        return self.cls(self.cursor[i])
+
+
+class Annotation(SmartJsonLD):
     storage_engine = LocalProxy(get_storage_engine)
 
     @classmethod
-    def create(cls, data, model='annotation', verbose=False):
-        parsed = reader(data, model=model, namespace="annotationsext")
-        dic = cls(parsed.translate())
-        uuid = cls.storage_engine.save_one(dic.dumps())
-        if verbose:
-            del dic["__meta_metadata__"]
-            print dic
-        return uuid
+    def create(cls, data, model='annotation', store=True):
+        dic = Reader.translate(data, cls, model=model, master_format='json',
+                               namespace="annotationsext")
+        if store:
+            return cls.storage_engine.save_one(dic.dumps())
+        else:
+            # useful for testing, until we have a mock DB
+            return dic
 
     @classmethod
     def search(cls, query):
-        return cls.storage_engine.search(query)
+        return QueryIterator(cls, cls.storage_engine.search(query))
+
+    def translate(self, context_name, ctx):
+        dump = self.dumps()
+        res = {}
+        if context_name == "oaf":
+            from invenio.modules.accounts.models import User
+
+            res["@id"] = cfg["CFG_SITE_URL"] + \
+                "/api/annotations/export/?_id=" + \
+                dump["_id"]
+            res["@type"] = "oa:Annotation"
+
+            u = User.query.filter(User.id == dump["who"]).one()
+            res["annotatedBy"] = {
+                "@id": cfg["CFG_SITE_URL"] +
+                "/api/accounts/account/?id=" +
+                str(u.id),
+                "@type": "foaf:Person",
+                "name": u.nickname,
+                "mbox": {"@id": "mailto:" + u.email}}
+
+            if "annotation" in self.model_info["names"]:
+                res["hasTarget"] = {
+                    "@type": ["cnt:ContentAsXML", "dctypes:Text"],
+                    "@id": cfg["CFG_SITE_URL"] + dump["where"],
+                    "cnt:characterEncoding": "utf-8",
+                    "format": "text/html"}
+            elif "annotation_note" in self.model_info["names"]:
+                res["hasTarget"] = {
+                    "@id": "oa:hasTarget",
+                    "@type": "oa:SpecificResource",
+                    "hasSource": cfg["CFG_SITE_URL"] + "/record/" +
+                    str(dump["where"]["record"]),
+                    "hasSelector":  {
+                        "@id": "oa:hasSelector",
+                        "@type": "oa:FragmentSelector",
+                        "value": dump["where"]["marker"],
+                        "dcterms:conformsTo": cfg["CFG_SITE_URL"] +
+                        "/api/annotations/notes_specification"}}
+
+            res["motivatedBy"] = "oa:commenting"
+
+            res["hasBody"] = {
+                "@id": "oa:hasBody",
+                "@type": ["cnt:ContentAsText", "dctypes:Text"],
+                "chars": dump["what"],
+                "cnt:characterEncoding": "utf-8",
+                "format": "text/plain"}
+
+            res["annotatedAt"] = dump["when"]
+            return res
+        raise NotImplementedError
 
 
-def add_annotation(model='annotation', **kwargs):
-    Annotation.create(kwargs, model)
+def get_jsonld_multiple(annos, context="oaf", new_context={}, format="full"):
+    return [a.get_jsonld(context=context, new_context=new_context,
+                         format=format) for a in annos]
+
+
+def add_annotation(model='annotation', store=True, **kwargs):
+    return Annotation.create(kwargs, model, store=store)
 
 
 def get_annotations(which):
     return Annotation.search(which)
+
+
+def get_count(uid, target):
+    private = 0
+    if uid:
+        private = get_annotations({"where": target,
+                                   "who": uid,
+                                   "perm":
+                                   {"public": False, "groups": []}}).count()
+    public = get_annotations({"where": target,
+                              "perm": {"public": True, "groups": []}}).count()
+    return {"public": public, "private": private, "total": public+private}
