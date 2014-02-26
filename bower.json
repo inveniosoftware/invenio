@@ -15,7 +15,7 @@
     "jquery_jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
     "jquery.treeview": "1.4.1",
     "jquery.tablesorter": "http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip",
-    "jquery.ui": "1-8-stable",
+    "jqueryui": "1.10.4",
     "jquery.ui.timepicker": "http://invenio-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js",
     "jquery.multifile": "http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js",
     "jquery.ajaxpager": "http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js",

@@ -17,7 +17,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 {%- block webdeposit_assets %}
-  {% js 'js/jquery-ui.min.js', '01-jquery-ui' %}
+  {% js 'js/jqueryui/jquery-ui.js', '01-jquery-ui' %}
+  {% js 'js/jqueryui/jquery.ui.core.js', '01-jquery-ui' %}
+  {% js 'js/jqueryui/jquery.ui.widget.js', '01-jquery-ui' %}
+  {% js 'js/jqueryui/jquery.ui.mouse.js', '01-jquery-ui' %}
+  {% js 'js/jqueryui/jquery.ui.sortable.js', '01-jquery-ui' %}
   {% js 'plupload/plupload.full.min.js', '50-webdeposit' %}
   {% js url_for('webdeposit.static', filename='js/deposit/form.js'), '50-webdeposit' %}
   {% js 'js/hogan.js', '40-webdeposit-hogan' %}

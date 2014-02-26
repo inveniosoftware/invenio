@@ -113,12 +113,16 @@ module.exports = {
     jqueryUI: {
         expand: true,
         flatten: true,
+        cwd: '<%= globalConfig.bower_path %>/jqueryui',
+        src: ['**'],
+        dest: '<%= globalConfig.installation_path %>/js/jqueryui'
+    },
+    jqueryUISortable: {
+        expand: true,
+        flatten: true,
         cwd: '<%= globalConfig.bower_path %>/',
-        src: ['jquery.ui/jquery-1.8.2.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            return dest + src.substring(0, src.indexOf('-')) + '-ui.js';
-        }
+        src: ['jquery.ui/ui/jquery.ui.sortable.js'],
+        dest: '<%= globalConfig.installation_path %>/js/'
     },
     jqueryTimePicker: {
         expand: true,
