@@ -2,6 +2,6 @@
     {{ field_label(thisfield) }}
 </div>
 {% for subfield in thisfield.form %}
-    {{ field_display( subfield )}}
+    {{ field_display( subfield, field_class="" )}}
 {% endfor %}
 <hr />

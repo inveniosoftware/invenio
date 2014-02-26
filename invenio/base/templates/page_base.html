@@ -22,7 +22,6 @@
 {# Global CSS #}
 {%- block global_css %}
   {%- css 'css/bootstrap.css', '00-invenio' -%}
-  {%- css 'css/typeahead.js-bootstrap.css', '00-invenio' -%}
   {%- css 'css/token-input.css', '00-invenio' -%}
   {%- css 'css/token-input-facebook.css', '00-invenio' -%}
   {%- css url_for('static', filename='css/base.css'), '00-invenio' -%}
@@ -39,7 +38,6 @@
   {%- js 'js/jquery.tokeninput.js', '10-invenio' -%}
   {%- js 'js/hogan.js', '10-invenio' -%}
   {%- js 'js/translate.js', '10-invenio' -%}
-  {%- js 'js/typeahead.js', '10-invenio' -%}
   {%- js 'js/invenio.js', '90-invenio' -%}
 {%- endblock global_javascript %}
 {%- block page -%}

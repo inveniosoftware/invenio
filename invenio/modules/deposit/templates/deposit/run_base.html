@@ -28,6 +28,9 @@
   {% js url_for('webdeposit.static', filename='js/deposit/templates.js'), '50-webdeposit' %}
   {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
   {% js 'js/ckeditor/invenio-ckeditor-config.js', '50-ckeditor' %}
+  {%- js 'js/typeahead.js', '10-invenio' -%}
+  {%- css url_for('static', filename='css/typeahead.js-bootstrap.css'), '50-webdeposit' -%}
+  {%- css url_for('static', filename='css/deposit/form.css'), '51-webdeposit' -%}
   {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css', '01-jquery-ui' %}
   {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css', '01-jquery-ui' %}
 {%- endblock webdeposit_assets %}
@@ -60,56 +63,11 @@
 
 {%- block css %}
   {{ super() }}
-<style>
-.ui-autocomplete-loading {
-    background: white url('{{ url_for('static', filename='img/loading.gif') }}') right top no-repeat;
-}
-
-span.ui-icon.ui-icon-circle-triangle-w { color: transparent; cursor: pointer; }
-span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
-
-/*.typeahead {
-    max-height: 250px;
-    overflow-y: auto;
-    /* prevent horizontal scrollbar */
-    /*overflow-x: hidden;*/
-/*}*/
-
-.l{
-    size: 10px;
-}
-
-.required:after {
-    color: red;
-    content:" *";
-}
-
-.rmlink {
-    cursor: pointer;
-}
-.sortlink {
-    cursor: move;
-    margin-left: 10px;
-}
-.empty-element {
-   display: none;
-}
-.sortlink:hover {
-   cursor: move;
-}
-.remove-element {
-   padding-left: 10px;
-}
-.field-list-element {
-    margin-bottom: 10px;
-}
-.field-list-element ul.inline {
-    margin: 0;
-}
-.tag {
-    cursor: move;
-}
-</style>
+  <style>
+    .ui-autocomplete-loading {
+      background: white url('{{ url_for('static', filename='img/loading.gif') }}') right top no-repeat;
+    }
+  </style>
 {%- endblock css %}
 
 {% block body %}
@@ -158,7 +116,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
                     {% block fieldset scoped %}
                     {% for field in fields %}
                         {% block field_body scoped %}
-                            {{ field_display(field) }}
+                            {{ field_display(field, field_class="") }}
                         {% endblock field_body %}
                     {% endfor %}
                     {% endblock fieldset %}

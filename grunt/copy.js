@@ -88,11 +88,11 @@ module.exports = {
             return dest + res;
         }
     },
-    typeaheadJSbootstrap: {
+    typeaheadBootstrap3Css: {
         expand: true,
         flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['typeahead.js-bootstrap/index.css'],
+        cwd: '<%= globalConfig.bower_path %>/typeahead.js-bootstrap3.less',
+        src: ['typeahead.css'],
         dest: '<%= globalConfig.installation_path %>/css/',
         rename: function(dest, src) {
             var res = src.replace(src.substring(0),
