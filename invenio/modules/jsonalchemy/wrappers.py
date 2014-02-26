@@ -30,7 +30,7 @@ from invenio.base.utils import try_to_eval
 from invenio.utils.datastructures import SmartDict
 
 from .parser import FieldParser, ModelParser
-from .registry import functions, readers, producers
+from .registry import functions, readers, producers, contexts
 from .validator import Validator
 
 
@@ -186,8 +186,8 @@ class SmartJson(SmartDict):
                 func = reduce(lambda obj, key: obj[key], \
                     self._dict['__meta_metadata__'][field]['function'], \
                     FieldParser.field_definitions(self['__meta_metadata__']['__additional_info__']['namespace']))
-                self._dict_bson[field] = try_to_eval(func, 
-                        functions(self['__meta_metadata__']['__additional_info__']['namespace']), 
+                self._dict_bson[field] = try_to_eval(func,
+                        functions(self['__meta_metadata__']['__additional_info__']['namespace']),
                         self=self)
                 if not old_value == self._dict_bson[field]:
                     #FIXME: trigger update in DB and fire signal to update others
@@ -251,3 +251,72 @@ class SmartJson(SmartDict):
         from invenio.legacy.bibrecord import create_record
         return create_record(self.legacy_export_as_marc())[0]
 
+
+class SmartJsonLD(SmartJson):
+    """Utility class for JSON-LD serialization"""
+
+    def translate(self, context_name, context):
+        """
+        Translates object to fit given JSON-LD context. Should not inject
+        context as this will be done at publication time.
+
+        """
+        raise NotImplementedError('Translation not required')
+
+    def get_context(self, context):
+        """
+        Returns the context definition identified by the parameter. If the
+        context is not found in the current namespace, the received parameter is
+        returned as is, the assumption being that a IRI was passed.
+
+        :param: context identifier
+        """
+        try:
+            return contexts(self['__meta_metadata__']['__additional_info__']['namespace'])[context]
+        except KeyError:
+            return context
+
+    def get_jsonld(self, context, new_context={}, format="full"):
+        """
+        Returns the JSON-LD serialization.
+
+        :param: context the context to use for raw publishing; each SmartJsonLD
+                        instance is expected to have a default context
+                        associated.
+        :param: new_context the context to use for formatted publishing,
+                            usually supplied by the client; used by the
+                            'compacted', 'framed', and 'normalized' formats.
+        :param: format the publishing format; can be 'full', 'compacted',
+                       'expanded', 'flattened', 'framed' or 'normalized'
+        """
+        from pyld import jsonld
+        import six
+
+        if isinstance(context, six.string_types):
+            ctx = self.get_context(context)
+        elif isinstance(context, dict):
+            ctx = context
+        else:
+            raise TypeError('JSON-LD context must be a string or dictionary')
+
+        try:
+            doc = self.translate(context, ctx)
+        except NotImplementedError:
+            # model does not require translation
+            doc = self.dumps()
+            del doc["__meta_metadata__"]
+        doc["@context"] = ctx
+
+        if format == "full":
+            return doc
+        if format == "compacted":
+            return jsonld.compact(doc, new_context)
+        elif format == "expanded":
+            return jsonld.expand(doc)
+        elif format == "flattened":
+            return jsonld.flatten(doc)
+        elif format == "framed":
+            return jsonld.frame(doc, new_context)
+        elif format == "normalized":
+            return jsonld.normalize(doc, new_context)
+        raise ValueError('Invalid JSON-LD serialization format')
