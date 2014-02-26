@@ -36,17 +36,17 @@ def kb_autocomplete(name, mapper=None):
     return inner
 
 
-def sherpa_romeo_publishers(dummy_form, term, limit=50):
+def sherpa_romeo_publishers(dummy_form, dummy_field, term, limit=50):
     if term:
         sherpa_romeo = SherpaRomeoSearch()
         publishers = sherpa_romeo.search_publisher(term)
         if publishers is None:
             return []
-        return publishers
+        return map(lambda x: {'value': x}, publishers[:limit])
     return []
 
 
-def sherpa_romeo_journals(dummy_form, term, limit=50):
+def sherpa_romeo_journals(dummy_form, dummy_field, term, limit=50):
     """
     Search SHERPA/RoMEO for journal name
     """
@@ -57,11 +57,11 @@ def sherpa_romeo_journals(dummy_form, term, limit=50):
         s = SherpaRomeoSearch()
         journals = s.search_journal(term)
         if journals is not None:
-            return journals[:limit]
+            return map(lambda x: {'value': x}, journals[:limit])
     return []
 
 
-def orcid_authors(dummy_form, term, limit=50):
+def orcid_authors(dummy_form, dummy_field, term, limit=50):
     if term:
         orcid = OrcidSearch()
         orcid.search_authors(term)

@@ -29,7 +29,7 @@ __all__ = ['ArticleForm']
 
 
 def keywords_autocomplete(form, field, term, limit=50):
-    return ["Keyword 1", "Keyword 2"]
+    return [{'value': "Keyword 1"}, {'value': "Keyword 2"}]
 
 
 class AuthorForm(WebDepositForm):

@@ -29,7 +29,7 @@
     "prism": "gh-pages",
     "swfobject": "https://github.com/swfobject/swfobject/blob/master/swfobject/swfobject.js",
     "datatables-colvis": "*",
-    "typeahead.js-bootstrap": "https://raw.github.com/jharding/typeahead.js-bootstrap.css/master/typeahead.js-bootstrap.css",
+    "typeahead.js-bootstrap3.less": "0.2.2",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
     "plupload": "*",
     "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0"

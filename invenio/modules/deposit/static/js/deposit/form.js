@@ -20,6 +20,8 @@
 
 var DEPOSIT_FORM = (function( $ ){
 
+  var empty_cssclass = "empty-element";
+
   //
   // Helpers
   //
@@ -934,29 +936,24 @@ var DEPOSIT_FORM = (function( $ ){
               handle_selection = typeahead_selection;
           }
 
-          if($(item).attr('type') != 'hidden') {
-              try {
-                  init_bootstrap_typeahead(item, url, save_url, handle_selection);
-              } catch (err) {
-                  init_typeaheadjs(item, url, save_url, handle_selection);
-              }
+          if($(item).parents('.' + empty_cssclass).length == 0) {
+              init_typeaheadjs(item, url, save_url, handle_selection);
           }
       });
   }
 
   /**
-   * Bootstrap standard typeahead
+   * Twitter typeahead.js support for autocompletion
    */
-  function init_bootstrap_typeahead(item, url, save_url, handle_selection) {
+  function init_typeaheadjs(item, url, save_url, handle_selection) {
       var autocomplete_request = null;
 
       function source(query, process) {
-          $(item).addClass('ui-autocomplete-loading');
-          var typeahead = this;
 
           if(autocomplete_request !== null){
               autocomplete_request.abort();
           }
+          $(item).addClass('ui-autocomplete-loading');
           autocomplete_request = $.ajax({
               type: 'GET',
               url: url,
@@ -965,31 +962,18 @@ var DEPOSIT_FORM = (function( $ ){
               process(data);
               $(item).removeClass('ui-autocomplete-loading');
           }).fail(function(data) {
-              process([query]);
               $(item).removeClass('ui-autocomplete-loading');
           });
       }
 
-      function updater(datum) {
-          handle_selection(save_url, this.$element, datum, $(this.$element).attr('name'));
-      }
-
       $(item).typeahead({
-          source: source,
-          minLength: 5,
-          items: 50,
-          updater: updater
+            minLength: 1
+        },
+        {
+            source: source,
+            displayKey: 'value'
       });
-  }
 
-  /**
-   * Twitter typeahead.js support for autocompletion
-   */
-  function init_typeaheadjs(item, url, save_url, handle_selection) {
-      $(item).typeahead({
-          name: item.name,
-          remote: url + "?term=%QUERY",
-      });
       $(item).on('typeahead:selected', function(e, datum, name){
           handle_selection(save_url, item, datum, name);
       });
@@ -1003,6 +987,9 @@ var DEPOSIT_FORM = (function( $ ){
           var value = datum;
           datum = {value: value, fields: {}};
           datum.fields = value;
+      }
+      if(datum.fields === undefined) {
+          datum.fields = datum.value;
       }
       if(datum.fields !== undefined) {
           if(field_lists !== undefined){
@@ -1405,7 +1392,7 @@ var DEPOSIT_FORM = (function( $ ){
       sep: '-',
       last_index: "__last_index__",
       index_suffix: "__index__",
-      empty_cssclass: "empty-element",
+      empty_cssclass: empty_cssclass,
       element_css_class: "field-list-element",
       remove_cssclass: "remove-element",
       add_cssclass: "add-element",
@@ -1432,7 +1419,6 @@ var DEPOSIT_FORM = (function( $ ){
     handle_field_values: handle_field_values,
     handle_response: handle_response,
     init_autocomplete: init_autocomplete,
-    init_bootstrap_typeahead: init_bootstrap_typeahead,
     init_buttons: init_buttons,
     init_ckeditor: init_ckeditor,
     init_field_lists: init_field_lists,

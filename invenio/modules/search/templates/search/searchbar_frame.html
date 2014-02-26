@@ -30,6 +30,10 @@
   {% js url_for('search.static', filename='js/search/hotkeys.js') %}
 {% endblock %}
 
+{% block css %}
+  {%- css url_for('static', filename='css/search/typeahead.js-bootstrap.css'), '50-webdeposit' -%}
+{% endblock %}
+
 {% block body %}
 
   {%- block search_form -%}
@@ -42,6 +46,7 @@
 {% endblock %}
 
 {% block javascript %}
+  {%- js 'js/typeahead.js', '10-invenio' -%}
   {{ super() }}
   {{ search_form_javascript(collection) }}
 {% endblock %}
