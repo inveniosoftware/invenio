@@ -27,6 +27,7 @@ __revision__ = "$Id$"
 
 import sys
 from werkzeug.utils import find_modules, import_string
+from flask import current_app
 from invenio.legacy.bibsched.bibtask import task_init, write_message, task_set_option, \
     task_get_option, task_update_progress
 from invenio.utils.autodiscovery.helpers import get_callable_documentation
@@ -40,9 +41,9 @@ def _load_tasklets():
     Load all the bibsched tasklets into the global variable _TASKLETS.
     """
     tasklets = {}
-    #FIXME
-    packages = [import_string('invenio.legacy.bibsched.tasklets'), ] #import_module_from_packages('bibsched_tasklets')
-    for module in packages:
+    packages = current_app.config.get('CFG_BIBSCHED_TASKLET_PACKAGES', [])
+    for pkg_import_str in packages:
+        module = import_string(pkg_import_str)
         for tasklet in find_modules(module.__name__):
             try:
                 func = import_string(tasklet + ':' + tasklet.split('.')[-1])
