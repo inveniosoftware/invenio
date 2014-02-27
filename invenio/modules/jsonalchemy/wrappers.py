@@ -23,6 +23,7 @@
 """
 import datetime
 import six
+import copy
 
 from werkzeug.utils import import_string
 
@@ -42,7 +43,7 @@ class SmartJson(SmartDict):
         self._dict_bson = SmartDict()
         self._validator = None
 
-        if json is None or not json:
+        if json is None or not json or '__meta_metadata__' not in json:
             self._dict['__meta_metadata__'] = dict()
             self._dict['__meta_metadata__']['__additional_info__'] = kwargs
             self._dict['__meta_metadata__']['__aliases__'] = {}
@@ -73,6 +74,12 @@ class SmartJson(SmartDict):
             except IndexError:
                 rest_of_key = ''
             return self[self._dict['__meta_metadata__']['__aliases__'][main_key] + rest_of_key]
+
+        if main_key not in self._dict['__meta_metadata__']:
+            reader = readers[self.additional_info['master_format']]\
+                (namespace=self.additional_info['namespace'])
+            reader.set(self._dict, main_key)
+
         try:
             if self._dict['__meta_metadata__'][main_key]['type'] == 'calculated':
                 self._load_precalculated_value(main_key)
@@ -93,7 +100,7 @@ class SmartJson(SmartDict):
         else:
             reader = readers[self.additional_info['master_format']]\
                 (namespace=self.additional_info['namespace'])
-            reader.set(self, main_key)
+            reader.set(self._dict, main_key)
             self._dict_bson.__setitem__(key, value, extend)
 
         self._dumps(main_key)
@@ -104,7 +111,7 @@ class SmartJson(SmartDict):
 
     @property
     def additional_info(self):
-        return self['__meta_metadata__']['__additional_info__']
+        return self._dict['__meta_metadata__']['__additional_info__']
 
     @property
     def validation_errors(self):
@@ -112,13 +119,19 @@ class SmartJson(SmartDict):
             self.validate()
         return self._validator.errors
 
-    def dumps(self):
+    def dumps(self, clean=False):
         """ """
         for key in self._dict_bson.keys():
             if key == '__meta_metadata__':
                 continue
             self._dumps(key)
-        return self._dict
+        d = copy.copy(self._dict)
+        if clean:
+            for k in list(d.keys()):
+                if k.startswith("_"):
+                    del d[k]
+            return d
+        return d
 
     def loads(self):
         """ """

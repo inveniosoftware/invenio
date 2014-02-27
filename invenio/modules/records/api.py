@@ -42,7 +42,7 @@ class Record(SmartJson):
     storage_engine = SQLAlchemyStorage(RecordMetadataModel)
 
     def __init__(self, json=None, **kwargs):
-        if not json:
+        if not json or '__meta_metadata__' not in json:
             if 'namespace' not in kwargs:
                 kwargs['namespace'] = 'recordext'
             if 'model' not in kwargs:
