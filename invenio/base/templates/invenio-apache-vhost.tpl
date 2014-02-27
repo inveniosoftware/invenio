@@ -115,8 +115,8 @@ WSGIPythonHome {{pythonhome}}
            Allow from all
         </Directory>
     {%- endblock directory_wsgi -%}
-    {%- block deflate_directive -%}
-    {%- if config.CFG_WEBSTYLE_HTTP_USE_COMPRESSION %}
+    {%- block deflate_directive %}
+    {% if config.CFG_WEBSTYLE_HTTP_USE_COMPRESSION %}
         ## Configuration snippet taken from:
         ## <http://httpd.apache.org/docs/2.2/mod/mod_deflate.html>
         <IfModule mod_deflate.c>
