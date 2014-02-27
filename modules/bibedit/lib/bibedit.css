@@ -987,6 +987,16 @@ label {
     font-size: 0.9em;
 }
 
+.rtInfoLoader {
+  display: none;
+  color: #5B74A8;
+}
+
+.rtInfoLoader span {
+  position: relative;
+  top: -3px;
+}
+
 #queue {
     position: relative;
     top: -10px;
