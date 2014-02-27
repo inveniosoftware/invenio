@@ -23,7 +23,8 @@ import pkg_resources
 from invenio.base.wrappers import lazy_import
 from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, \
+    InvenioTestCase, nottest
 
 Record = lazy_import('invenio.modules.records.api:Record')
 
@@ -60,6 +61,7 @@ class TestRecord(InvenioTestCase):
         del self.app.extensions['registry']['testsuite.fields']
         del self.app.extensions['registry']['testsuite.models']
 
+    @nottest
     def test_records_created(self):
         """Record - demo file how many records are created """
         xmltext = pkg_resources.resource_string('invenio.testsuite',
