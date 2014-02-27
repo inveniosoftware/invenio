@@ -27,8 +27,9 @@ from flask import current_app
 from sqlalchemy.exc import SQLAlchemyError
 from flask.ext.wtf import validators
 
+from invenio.base.i18n import _
+
 from .models import User
-_ = lambda x: x
 
 re_invalid_nickname = re.compile(""".*[,'@]+.*""")
 
