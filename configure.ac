@@ -643,6 +643,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibedit/doc/hacking/Makefile \
      modules/bibedit/etc/Makefile \
      modules/bibedit/lib/Makefile \
+     modules/bibedit/lib/ticket_templates/Makefile \
      modules/bibedit/web/Makefile \
      modules/bibencode/Makefile \
      modules/bibencode/bin/Makefile \
