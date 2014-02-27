@@ -119,7 +119,9 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     'error_ticket_closed': 122,
     'ticket_opened' : 123,
     'error_ticket_opened': 124,
-    'error_rt_connection': 125
+    'error_rt_connection': 125,
+    'ticket_created' : 126,
+    'error_ticket_created': 127
 }
 
 CFG_BIBEDIT_AJAX_RESULT_CODES = {

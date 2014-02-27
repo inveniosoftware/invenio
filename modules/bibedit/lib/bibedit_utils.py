@@ -35,6 +35,7 @@ import time
 import zlib
 import tempfile
 import sys
+import traceback
 from datetime import datetime
 from MySQLdb import ProgrammingError
 
@@ -43,6 +44,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+from invenio.jsonutils import json
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
     CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_CACHEDIR
@@ -63,7 +65,8 @@ from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, \
     CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
-    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
+    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE, \
+    CFG_PYLIBDIR
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.textutils import wash_for_xml
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
@@ -73,7 +76,8 @@ from invenio.search_engine import record_exists, get_colID, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.webuser import get_user_info, getUid, get_email, collect_user_info
+from invenio.webuser import get_user_info, getUid, get_email, \
+     collect_user_info, get_user_preferences, list_registered_users
 from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_engine import acc_authorize_action
@@ -85,6 +89,9 @@ from invenio.bibauthorid_name_utils import split_name_parts, \
                                         create_normalized_name
 from invenio.bibknowledge import get_kbr_values
 from invenio.webauthorprofile_config import deserialize
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
+from invenio.bibcatalog_system import get_bibcat_from_prefs
+from invenio.pluginutils import PluginContainer
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_BIBEDIT_CACHEDIR)
@@ -104,6 +111,9 @@ VOLATILE_PREFIX = "VOLATILE:"
 class InvalidCache(Exception):
     pass
 
+class BibEditPluginException(Exception):
+    """Raised when something is wrong with ticket plugins"""
+    pass
 
 # Authorization
 
@@ -1070,3 +1080,113 @@ def get_affiliation_for_paper(rec, name):
         return None
 
     return list(deserialize(affs[0][0]))
+
+
+####################### rt system utils ################################
+
+
+def get_new_ticket_RT_info(uid, recId):
+    response = {}
+    response['resultCode'] = 0
+    if BIBCATALOG_SYSTEM is None:
+            response['description'] = "<!--No ticket system configured-->"
+    elif BIBCATALOG_SYSTEM and uid:
+        bibcat_resp = BIBCATALOG_SYSTEM.check_system(uid)
+        if bibcat_resp == "":
+            # add available owners
+            users = []
+            users_list = list_registered_users()
+            for user_tuple in users_list:
+                try:
+                    user = {'username': get_user_preferences(user_tuple[0])['bibcatalog_username'],
+                        'id': user_tuple[0]}
+                except KeyError:
+                    continue
+                users.append(user)
+            response['users'] = users
+            # add available queues
+            response['queues'] = BIBCATALOG_SYSTEM.get_queues(uid)
+            # add user email
+            response['email'] = get_email(uid)
+            # TODO try catch
+            response['ticketTemplates'] = load_ticket_templates(recId)
+            response['resultCode'] = 1
+        else:
+            # put something in the tickets container, for debug
+            response['description'] = "Error connecting to RT<!--" + bibcat_resp + "-->"
+    return response
+
+
+def _bibedit_plugin_builder(plugin_name, plugin_code):  # pylint: disable-msg=W0613
+    """
+    Custom builder for pluginutils.
+
+    @param plugin_name: the name of the plugin.
+    @type plugin_name: string
+    @param plugin_code: the code of the module as just read from
+        filesystem.
+    @type plugin_code: module
+    @return: the plugin
+    """
+    final_plugin = {}
+    final_plugin["get_template_data"] = getattr(plugin_code, "get_template_data", None)
+    return final_plugin
+
+
+def load_ticket_plugins():
+    """
+    Will load all the ticket plugins found under CFG_BIBEDIT_PLUGIN_DIR.
+
+    Returns a tuple of plugin_object, list of errors.
+    """
+    # TODO add to configfile
+    CFG_BIBEDIT_PLUGIN_DIR = os.path.join(CFG_PYLIBDIR,
+                                             "invenio",
+                                             "bibedit_ticket_templates",
+                                             "*.py")
+    # Load plugins
+    plugins = PluginContainer(CFG_BIBEDIT_PLUGIN_DIR,
+                              plugin_builder=_bibedit_plugin_builder)
+
+    # Remove __init__ if applicable
+    try:
+        plugins.disable_plugin("__init__")
+    except KeyError:
+        pass
+
+    error_messages = []
+    # Check for broken plug-ins
+    broken = plugins.get_broken_plugins()
+    if broken:
+        error_messages = []
+        for plugin, info in broken.items():
+            error_messages.append("Failed to load %s:\n"
+                                  " %s" % (plugin, "".join(traceback.format_exception(*info))))
+    return plugins, error_messages
+
+
+def load_ticket_templates(recId):
+    """
+    Loads all enabled ticket plugins and calls them.
+    @return dictionary with the following structure:
+        key: string: name of queue
+        value: dict: a dictionary with 2 keys,
+        the template subject and content of the queue
+    @rtype dict
+    """
+    ticket_templates = {}
+    all_plugins, error_messages = load_ticket_plugins()
+    if error_messages:
+        # We got broken plugins. We alert only for now.
+        print >>sys.stderr, "\n".join(error_messages)
+    else:
+        plugins = all_plugins.get_enabled_plugins()
+        record = get_record(recId)
+        for name, plugin in plugins.items():
+            if plugin:
+                queue_data = plugin['get_template_data'](record)
+                if queue_data:
+                    ticket_templates[queue_data[0]] = { 'subject' : queue_data[1], 'content' : queue_data[2] }
+            else:
+                raise BibEditPluginException("Plugin not valid in %s" % (name,))
+    return ticket_templates
