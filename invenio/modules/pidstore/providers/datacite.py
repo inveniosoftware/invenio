@@ -25,7 +25,7 @@
 """
 
 from invenio.base.globals import cfg
-from invenio.utils.datacite import DataCite, HttpError, DataCiteError
+from invenio.utils.datacite import DataCite as DataCiteUtil, HttpError, DataCiteError
 
 from invenio.modules.pidstore.provider import PidProvider
 
@@ -36,7 +36,7 @@ class DataCite(PidProvider):
     pid_type = 'doi'
 
     def __init__(self):
-        self.api = DataCite()
+        self.api = DataCiteUtil()
 
     def _get_url(self, kwargs):
         try:
