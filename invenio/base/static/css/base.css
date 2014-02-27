@@ -95,56 +95,25 @@ a.label, a.label:hover, .label a, .label a:hover { color: white;}
 
 /*
 ----------------------- Stick footer ----------------------- */
+/* Reference: http://getbootstrap.com/examples/sticky-footer/sticky-footer.css */
 html,
 body {
   height: 100%;
+  /* The html and body elements cannot have any padding or margin. */
 }
 
 /* Wrapper for page content to push down footer */
 #wrap {
   min-height: 100%;
-  height: auto !important;
-  height: 100%;
-  /* Negative indent footer by it's height */
+  height: auto;
+  /* Negative indent footer by its height */
   margin: 0 auto -150px;
+  /* Pad bottom by footer height */
+  padding: 0 0 150px;
 }
 
 /* Set the fixed height of the footer here */
-#push,
-footer {
-  min-height: 150px;
+#footer {
+  height: 150px;
+  background-color: #f5f5f5;
 }
-
-#push {
-  margin-top: -60px;
-}
-
-footer a, footer a:hover {
-  color: #666;
-}
-footer, footer p {
-  font-size: 11px;
-  color: #333;
-}
-
-/* fixes for bootstrap 3.1.1 */
-#searchform-input-group.input-group .form-control {
-  float: none;
-  width: 100%;
-}
-#searchform-input-group .input-group-btn.invenio-collapsable-tabs {
-  padding-left: 4px;
-}
-/* end of fixes */
-
-/* Lastly, apply responsive CSS fixes as necessary */
-@media (max-width: 767px) {
-  footer {
-    margin-left: -20px;
-    margin-right: -20px;
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-}
-
-/* --------------- */
