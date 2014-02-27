@@ -448,12 +448,12 @@ var DEPOSIT_FORM = (function( $ ){
       function init_uuid(){
           if(uuid === null){
               uuid = create_deposition(newdep_url);
-              url = url.replace("__UUID__", uuid);
-              uploader.settings.url = url.replace("__UUID__", uuid);
-              delete_url = delete_url.replace("__UUID__", uuid);
-              get_file_url = get_file_url.replace("__UUID__", uuid);
-              dropbox_url = dropbox_url.replace("__UUID__", uuid);
-              continue_url = continue_url.replace("__UUID__", uuid);
+              url = url.replace("-1", uuid);
+              uploader.settings.url = url.replace("-1", uuid);
+              delete_url = delete_url.replace("-1", uuid);
+              get_file_url = get_file_url.replace("-1", uuid);
+              dropbox_url = dropbox_url.replace("-1", uuid);
+              continue_url = continue_url.replace("-1", uuid);
           }
       }
 

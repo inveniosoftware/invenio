@@ -919,10 +919,7 @@ class Deposition(object):
         if not workflow_object:
             self.files = []
             self.drafts = {}
-            self.type = (
-                DepositionType.get(type) if type
-                else DepositionType.get_default()
-            )
+            self.type = self.get_type(type)
             self.title = ''
             self.sips = []
 
@@ -1325,6 +1322,15 @@ class Deposition(object):
     # Class methods
     #
     @classmethod
+    def get_type(self, type_or_id):
+        if type and isinstance(type_or_id, type) and \
+           issubclass(type, DepositionType):
+                return type_or_id
+        else:
+            return DepositionType.get(type_or_id) if type_or_id else \
+                DepositionType.get_default()
+
+    @classmethod
     def create(cls, user, type=None):
         """
         Create a new deposition object.
@@ -1335,8 +1341,7 @@ class Deposition(object):
         @param user: The owner of the deposition
         @param type: Deposition type identifier.
         """
-        t = DepositionType.get(type) if type else \
-            DepositionType.get_default()
+        t = cls.get_type(type)
 
         if not t.authorize(None, 'create'):
             raise ForbiddenAction('create')

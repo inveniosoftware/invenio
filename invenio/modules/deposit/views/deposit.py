@@ -174,7 +174,7 @@ def create(deposition_type=None):
         flash(_('Invalid deposition type.'), 'error')
         return ('', 400) if request.is_xhr else redirect(url_for('.index'))
 
-    deposition = Deposition.create(current_user, deposition_type)
+    deposition = Deposition.create(current_user, type=deposition_type)
     deposition.save()
 
     return (str(deposition.id), 200) if request.is_xhr else redirect(url_for(
@@ -236,36 +236,29 @@ def save(deposition_type=None, uuid=None, draft_id=None):
     if request.method != 'POST':
         abort(400)
 
-    try:
-        current_app.logger.info(deposition_type)
-        current_app.logger.info(uuid)
-        deposition = Deposition.get(uuid, current_user, type=deposition_type)
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
 
-        is_submit = request.args.get('submit') == '1'
-        is_complete_form = request.args.get('all') == '1'
+    is_submit = request.args.get('submit') == '1'
+    is_complete_form = request.args.get('all') == '1'
 
-        data = request.json or MultiDict({})
-        if data and 'files' in data:
-            deposition.sort_files(data['files'])
+    data = request.json or MultiDict({})
+    if data and 'files' in data:
+        deposition.sort_files(data['files'])
 
-        # get_draft() and process() will raise an exception if draft doesn't exist
-        # or the draft does not have a form.
-        draft = deposition.get_draft(draft_id)
-        if draft.is_completed():
-            abort(400)
-        dummy_form, validated, result = draft.process(
-            data, complete_form=is_complete_form
-        )
+    # get_draft() and process() will raise an exception if draft doesn't exist
+    # or the draft does not have a form.
+    draft = deposition.get_draft(draft_id)
+    if draft.is_completed():
+        abort(400)
+    dummy_form, validated, result = draft.process(
+        data, complete_form=is_complete_form
+    )
 
-        # Complete draft only if form validates.
-        if validated and is_submit:
-            draft.complete()
+    # Complete draft only if form validates.
+    if validated and is_submit:
+        draft.complete()
 
-        deposition.save()
-    except Exception as e:
-        current_app.logger.info(e)
-        import traceback
-        current_app.logger.info(traceback.format_exc())
+    deposition.save()
 
     try:
         return jsonify(result)
