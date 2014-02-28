@@ -196,7 +196,7 @@ def harvest_records(obj, eng):
 
     task_sleep_now_if_required()
 
-    arguments = obj.extra_data["repository"].get_arguments()
+    arguments = obj.extra_data["repository"].arguments
     if arguments:
         eng.log.info("running with post-processes: %r" % (arguments,))
 
@@ -310,7 +310,7 @@ def fulltext_download(obj, eng):
         tarball, pdf = harvest_single(obj.data["system_control_number"]["value"],
                                       extract_path, ["pdf"])
         time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT)
-        arguments = obj.extra_data["repository"].get_arguments()
+        arguments = obj.extra_data["repository"].arguments
         if not arguments['t_doctype'] == '':
             doctype = arguments['t_doctype']
         else:
@@ -620,7 +620,7 @@ def upload_step(obj, eng):
     file_fd.close()
     mode = ["-r", "-i"]
 
-    arguments = obj.extra_data["repository"].get_arguments()
+    arguments = obj.extra_data["repository"].arguments
 
     if os.path.exists(filepath):
         try:
