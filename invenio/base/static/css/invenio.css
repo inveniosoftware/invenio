@@ -245,6 +245,10 @@ text-decoration:none;
 color: #6E5907;
 }
 
+.list-group-item.active a {
+   color: #ffffff;
+}
+
 .headerbox {
    color: #000;
    /*background: transparent;*/
@@ -4023,6 +4027,14 @@ img.login_button_small {
 .error:input {
    border-color: #b94a48;
    color: #b94a48;
+}
+
+.list-group-item.active a {
+   color: #ffffff;
+}
+
+.panel-bot-margin {
+    margin-bottom: 10px;
 }
 
 /* end of invenio.css */

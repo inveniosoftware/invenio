@@ -25,8 +25,10 @@ from flask.ext.wtf import Form, validators
 from wtforms.fields import SubmitField, BooleanField, TextField, \
     TextAreaField, PasswordField, HiddenField
 from sqlalchemy.exc import SQLAlchemyError
+from flask.ext.login import current_user
 
 from invenio.base.i18n import _
+from invenio.base.globals import cfg
 from invenio.legacy.webuser import email_valid_p
 from invenio.utils.forms import InvenioBaseForm
 from .models import User
@@ -106,24 +108,23 @@ class ChangePasswordForm(InvenioBaseForm):
     current_password = PasswordField(_("Current password"),
                                      description=_("Your current password"))
     password = PasswordField(
-        _("Password"),
+        _("New password"),
         description=
         _("The password phrase may contain punctuation, spaces, etc."))
-    password2 = PasswordField(_("Confirm password"),)
+    password2 = PasswordField(_("Confirm new password"),)
 
     def validate_current_password(self, field):
         from invenio.ext.login import authenticate
         if not authenticate(current_user['nickname'], field.data):
             raise validators.ValidationError(
-                _("The current password you entered does\
-                  not match with our records."))
+                _("Password mismatch."))
 
     def validate_password(self, field):
-        CFG_ACCOUNT_MIN_PASSWORD_LENGTH = 6
-        if len(field.data) < CFG_ACCOUNT_MIN_PASSWORD_LENGTH:
+        min_length = cfg['CFG_ACCOUNT_MIN_PASSWORD_LENGTH']
+        if len(field.data) < min_length:
             raise validators.ValidationError(
                 _("Password must be at least %(x_pass)d characters long.",
-                  x_pass=CFG_ACCOUNT_MIN_PASSWORD_LENGTH))
+                  x_pass=min_length))
 
     def validate_password2(self, field):
         if field.data != self.password.data:
@@ -144,7 +145,10 @@ class RegisterForm(Form):
         description=_("Example") + ": johnd")
     password = PasswordField(
         _("Password"),
-        description=_("The password phrase may contain punctuation, spaces, etc."))
+        description=_(
+            "The password phrase may contain punctuation, spaces, etc."
+        )
+    )
     password2 = PasswordField(_("Confirm password"),)
     referer = HiddenField()
     action = HiddenField(default='login')
@@ -169,17 +173,18 @@ class RegisterForm(Form):
         try:
             User.query.filter(User.email == field.data).one()
             raise validators.ValidationError(
-                _("Supplied email address %(addr)s already exists in the database.", addr=field.data)
+                _("Supplied email address %(addr)s already exists in the"
+                  " database.", addr=field.data)
             )
         except SQLAlchemyError:
             pass
 
     def validate_password(self, field):
-        CFG_ACCOUNT_MIN_PASSWORD_LENGTH = 6
-        if len(field.data) < CFG_ACCOUNT_MIN_PASSWORD_LENGTH:
+        min_length = cfg['CFG_ACCOUNT_MIN_PASSWORD_LENGTH']
+        if len(field.data) < min_length:
             raise validators.ValidationError(
                 _("Password must be at least %(x_pass)d characters long.",
-                  x_pass=CFG_ACCOUNT_MIN_PASSWORD_LENGTH))
+                  x_pass=min_length))
 
     def validate_password2(self, field):
         if field.data != self.password.data:

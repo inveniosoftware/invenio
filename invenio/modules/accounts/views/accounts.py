@@ -18,6 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """WebAccount Flask Blueprint"""
+from __future__ import absolute_import
 
 from werkzeug import CombinedMultiDict, ImmutableMultiDict
 from flask import render_template, request, flash, redirect, url_for, \
@@ -26,9 +27,9 @@ from flask.ext.login import current_user, login_required
 
 #from invenio import websession_config
 from invenio.legacy import webuser
-from .forms import LoginForm, RegisterForm, LostPasswordForm
-from .models import User
-from .validators import wash_login_method
+from ..forms import LoginForm, RegisterForm, LostPasswordForm
+from ..models import User
+from ..validators import wash_login_method
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
@@ -47,8 +48,8 @@ from invenio.utils.url import rewrite_to_secure_url
 #CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
 blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
-                      template_folder='templates',
-                      static_folder='static')
+                      template_folder='../templates',
+                      static_folder='../static')
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
@@ -302,9 +303,6 @@ def lost():
         if reset_password(request.values['email'], g.ln):
             flash(_('A password reset link has been sent to %(whom)s',
                     whom=request.values['email']), 'success')
-    else:
-        pass
-    logout_user()  # makes no sense to have the user logged-in here
     return render_template('accounts/lost.html', form=form)
 
 

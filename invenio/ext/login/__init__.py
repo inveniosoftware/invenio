@@ -147,7 +147,7 @@ def setup_app(app):
             flash(g._("Please sign in to continue."), 'info')
         else:
             flash(g._("Authorization failure."), 'danger')
-        from invenio.modules.accounts.views import login
+        from invenio.modules.accounts.views.accounts import login
         return login(referer=request.url), 401
 
     # Let's create login manager.
