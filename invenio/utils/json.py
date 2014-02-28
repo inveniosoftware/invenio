@@ -19,20 +19,12 @@
 
 """JSON utilities."""
 
+from __future__ import absolute_import
+import json
+CFG_JSON_AVAILABLE = True
+
 import re
-import sys
-if sys.hexversion < 0x2060000:
-    try:
-        import simplejson as json
-        CFG_JSON_AVAILABLE = True
-    except ImportError:
-        # Okay, no Ajax app will be possible, but continue anyway,
-        # since this package is only recommended, not mandatory.
-        CFG_JSON_AVAILABLE = False
-        json = None
-else:
-    import json
-    CFG_JSON_AVAILABLE = True
+
 
 def json_unicode_to_utf8(data):
     """Change all strings in a JSON structure to UTF-8."""
