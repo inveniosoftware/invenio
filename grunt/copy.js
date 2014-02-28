@@ -17,6 +17,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
+'use strict';
+
+/*jshint laxcomma:true */  // FIXME?
+
+
 module.exports = {
     css: {
         expand: true,
@@ -73,8 +78,13 @@ module.exports = {
         expand: true,
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>/',
-        src: ['typeahead.js/dist/typeahead.js'],
-        dest: '<%= globalConfig.installation_path %>/js/'
+        src: ['typeahead.js/dist/typeahead.bundle.min.js'],
+        dest: '<%= globalConfig.installation_path %>/js/',
+        rename: function(dest, src) {
+            var res = src.replace(src.substring(0),
+                                  'typeahead.js');
+            return dest + res;
+        }
     },
     typeaheadJSbootstrap: {
         expand: true,
