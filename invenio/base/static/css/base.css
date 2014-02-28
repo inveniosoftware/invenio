@@ -93,6 +93,19 @@ a.label, a.label:hover, .label a, .label a:hover { color: white;}
 .htmlbrief .media-heading { font-weight: 200; }
 .icon.muted { opacity: 0.6; }
 
+.list-group-item.active a {
+   color: #ffffff;
+   background-color:  #3276B1;
+}
+
+.list-group-item.active {
+   background-color:  #3276B1;
+}
+
+.panel-bot-margin {
+    margin-bottom: 10px;
+}
+
 /*
 ----------------------- Stick footer ----------------------- */
 /* Reference: http://getbootstrap.com/examples/sticky-footer/sticky-footer.css */

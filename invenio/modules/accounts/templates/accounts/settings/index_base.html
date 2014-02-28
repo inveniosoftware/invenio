@@ -16,23 +16,25 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% from "_formhelpers.html" import render_field with context %}
-{% extends "page.html" %}
-{% set title = None %}
 
+{% extends "page.html" %}
 
 {% block body %}
-<div class="row">
-    <div class="col-md-6 well col-md-offset-3">
-    <p>{{ _('Please enter your email address. You will receive a link to create a new password via email.') }}
-        <form name="edit" method="post" role="form">
-          {%- for field in form -%}
-            {{ render_field(field) }}
-          {%- endfor -%}
-          <div class="form-actions">
-            <input type="submit" name="save" value="{{ _("Get new password") }}" class="btn btn-primary"/>
-          </div>
-        </form>
+  <div class="row">
+  <div class="col-sm-3 col-md-3 col-pad-left-0">
+    <div class="panel-group">
+      <div class="panel panel-default">
+        <div class="panel-heading"><strong>Settings</strong></div>
+        <ul class="list-group">
+          {%- for item in current_menu.submenu('settings').children if item.visible %}
+          <li class="list-group-item{% if item.active %} active{% endif %}"><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+          {%- endfor %}
+        </ul>
+      </div>
     </div>
-</div>
+  </div>
+   <div class="col-sm-9 col-md-9 col-pad-right-0">
+    {%- block settings_body -%}{%- endblock settings_body -%}
+    </div>
+  </div>
 {% endblock %}
