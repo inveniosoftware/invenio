@@ -21,9 +21,10 @@
 __revision__ = "$Id$"
 
 import re
+import six
 from urllib import quote
 from cgi import escape
-from invenio.config import CFG_SITE_URL
+from invenio.base.globals import cfg
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME, \
@@ -60,6 +61,10 @@ def format_element(bfo, limit, separator=' ; ',
     @param link_mobile_pages: should we link to mobile app pages if print_links in on?
     @param relator_code_pattern: a regular expression to filter authors based on subfield $4 (relator code)
     """
+    CFG_SITE_URL = cfg['CFG_SITE_URL']
+    if isinstance(CFG_SITE_URL, six.text_type):
+        CFG_SITE_URL = CFG_SITE_URL.encode('utf8')
+
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
     authors = []
