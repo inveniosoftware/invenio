@@ -21,8 +21,10 @@
 __revision__ = "$Id$"
 
 import cgi
+import six
 from urllib import quote
-from invenio.config import CFG_SITE_URL
+from invenio.base.globals import cfg
+
 
 def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     """
@@ -33,6 +35,9 @@ def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='y
     @param separator: a separator between keywords
     @param link: links the keywords if 'yes' (HTML links)
     """
+    CFG_SITE_URL = cfg['CFG_SITE_URL']
+    if isinstance(CFG_SITE_URL, six.text_type):
+        CFG_SITE_URL = CFG_SITE_URL.encode('utf8')
 
     keywords = bfo.fields('6531_a')
 
