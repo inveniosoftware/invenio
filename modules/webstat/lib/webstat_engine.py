@@ -1429,10 +1429,10 @@ def get_list_link(process, category=None):
         file_coll_last_update = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, 'r')
         coll_last_update = file_coll_last_update.read()
         file_coll_last_update.close()
-        list_registers = get_modified_records_since(coll_last_update)
+        list_registers = zip(get_modified_records_since(coll_last_update).tolist())
 
     # build the link
-    if list_registers == ():
+    if len(list_registers) == 0:
         return "Up to date"
     link = '<a href="' + CFG_SITE_URL + '/search?p='
     for register in list_registers:
