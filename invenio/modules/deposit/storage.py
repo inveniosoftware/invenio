@@ -57,12 +57,9 @@ class ExternalFile(object):
             if not self.filename:
                 self.filename = filename
 
-            try:
-                size = int(info.getheader('Content-length'))
-                if size > cfg['DEPOSIT_MAX_UPLOAD_SIZE']:
-                    raise UploadError("File too big")
-            except Exception:
-                pass
+            size = int(info.getheader('Content-length'))
+            if size > cfg['DEPOSIT_MAX_UPLOAD_SIZE']:
+                raise UploadError("File too big")
         except InvenioBibdocfileUnauthorizedURL, e:
             raise UploadError(str(e))
         except urllib2.URLError, e:
