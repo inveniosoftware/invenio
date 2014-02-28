@@ -19,10 +19,6 @@
 
 'use strict';
 
-/*jshint laxcomma:true */  // FIXME?
-
-/* global module */
-/* global require */
 
 module.exports = function (grunt) {
     var globalConfig = {
