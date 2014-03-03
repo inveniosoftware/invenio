@@ -201,7 +201,7 @@ install-jquery-plugins:
 	mv bookmarks.png ../img/ && \
 	mv jquery.bookmark.css ../css/ && \
 	wget --no-check-certificate https://raw.github.com/0x000000/OmniWindow/master/jquery.omniwindow.js && \
-	wget --no-check-certificate http://malsup.github.com/jquery.blockUI.js && \
+	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.blockUI.js && \
 	wget --no-check-certificate http://invenio-software.org/download/jquery/sly.min.js &&\
 	wget --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
 	wget --no-check-certificate http://invenio-software.org/download/jquery/spin.min.js &&\
