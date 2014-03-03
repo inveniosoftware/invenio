@@ -53,8 +53,11 @@ def gettext_set_language(ln, use_unicode=False):
     from invenio.ext.babel import set_locale
     with set_locale(ln):
         if not use_unicode:
-            def unicode_gettext_wrapper(*args, **kwargs):
-                return gettext(*args, **kwargs).encode('utf-8')
+            def unicode_gettext_wrapper(text, **kwargs):
+                from invenio.base.helpers import unicodifier
+                from invenio.utils.text import wash_for_utf8
+                return wash_for_utf8(gettext(unicodifier(text),
+                                             **unicodifier(kwargs)))
             return unicode_gettext_wrapper
         return gettext
 

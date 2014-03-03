@@ -73,3 +73,23 @@ def unicodifier(obj):
     elif isinstance(obj, dict):
         return dict((key, unicodifier(value)) for key, value in obj.iteritems())
     return obj
+
+
+def utf8ifier(obj):
+    """
+    Tries to (recursively) convert the given object into utf8.
+
+    :param obj: the object to convert
+        (can be e.g. unicode, str, list, tuple, dict)
+    """
+    if isinstance(obj, str):
+        return obj
+    elif isinstance(obj, unicode):
+        return obj.encode('utf8')
+    elif isinstance(obj, list):
+        return [utf8ifier(elem) for elem in obj]
+    elif isinstance(obj, tuple):
+        return tuple(utf8ifier(elem) for elem in obj)
+    elif isinstance(obj, dict):
+        return dict((key, utf8ifier(value)) for key, value in obj.iteritems())
+    return obj

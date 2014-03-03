@@ -43,7 +43,8 @@ def setup_app(app):
             elif name == '__path__':
                 return os.path.dirname(__file__)
             try:
-                return self.wrapped[name]
+                from invenio.base.helpers import utf8ifier
+                return utf8ifier(self.wrapped[name])
             except:
                 pass
                 #import traceback
