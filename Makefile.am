@@ -200,7 +200,7 @@ install-jquery-plugins:
 	rm -f jquery.bookmark.ext.* bookmarks-big.png bookmarkBasic.html jquery.bookmark.js jquery.bookmark.pack.js && \
 	mv bookmarks.png ../img/ && \
 	mv jquery.bookmark.css ../css/ && \
-	wget --no-check-certificate https://raw.github.com/0x000000/OmniWindow/master/jquery.omniwindow.js && \
+	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.omniwindow.js && \
 	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.blockUI.js && \
 	wget --no-check-certificate http://invenio-software.org/download/jquery/sly.min.js &&\
 	wget --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
