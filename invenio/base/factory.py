@@ -32,7 +32,7 @@ from pkg_resources import iter_entry_points
 #from invenio.ext.logging import register_exception
 from .helpers import with_app_context, unicodifier
 from .wrappers import Flask
-from flask_registry import Registry, ExtensionRegistry, \
+from flask.ext.registry import Registry, ExtensionRegistry, \
     PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
 
 

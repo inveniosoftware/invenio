@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
-from flask_registry import RegistryProxy
+from flask.ext.registry import RegistryProxy
 
 tokenizers = RegistryProxy(
     'tokenizers', ModuleAutoDiscoverySubRegistry, 'tokenizers'

@@ -34,7 +34,7 @@ from sqlalchemy import event
 from sqlalchemy.pool import Pool
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 from invenio.utils.hash import md5
-from flask_registry import RegistryProxy, ModuleAutoDiscoveryRegistry
+from flask.ext.registry import RegistryProxy, ModuleAutoDiscoveryRegistry
 
 
 def _include_sqlalchemy(obj, engine=None):

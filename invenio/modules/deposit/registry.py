@@ -18,7 +18,7 @@
 
 
 from flask import current_app
-from flask_registry import ImportPathRegistry, SingletonRegistry, \
+from flask.ext.registry import ImportPathRegistry, SingletonRegistry, \
     RegistryProxy
 from invenio.modules.workflows.loader import workflows
 

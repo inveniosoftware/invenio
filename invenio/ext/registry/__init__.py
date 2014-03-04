@@ -22,7 +22,7 @@ Addtional registries for Flask-Registry
 """
 
 from werkzeug.utils import import_string, find_modules
-from flask_registry import ModuleAutoDiscoveryRegistry
+from flask.ext.registry import ModuleAutoDiscoveryRegistry
 
 
 class ModuleAutoDiscoverySubRegistry(ModuleAutoDiscoveryRegistry):
