@@ -61,28 +61,31 @@ class Record(SmartJson):
         raise StopIteration()
 
     @classmethod
-    def get_record(cls, recid):
-        try:
-            json = cls.storage_engine.get_one(recid)
-            return Record(json)
-        except NoResultFound:
-            # try to retrieve the record from the master format if any
-            # this might be deprecated in the near future as soon as json will
-            # become the master format, until then ...
-            blob = cls.get_blob(recid)
-            record_model = RecordModel.query.get(recid)
-            if record_model is None or blob is None:
-                return None
-            additional_info = record_model.additional_info \
-                    if record_model.additional_info else {'master_format': 'marc'}
-            record = cls.create(blob, **additional_info)
-            record._save()
-            record_model.additional_info = \
-                    record.get('__meta_metadata__.__additional_info__', {'master_format': 'marc'})
-            from invenio.ext.sqlalchemy import db
-            db.session.merge(record_model)
-            db.session.commit()
-            return record
+    def get_record(cls, recid, reset_cache=False):
+        if not reset_cache:
+            try:
+                json = cls.storage_engine.get_one(recid)
+                return Record(json)
+            except NoResultFound:
+                pass
+        # try to retrieve the record from the master format if any
+        # this might be deprecated in the near future as soon as json will
+        # become the master format, until then ...
+        blob = cls.get_blob(recid)
+        record_model = RecordModel.query.get(recid)
+        if record_model is None or blob is None:
+            return None
+        additional_info = record_model.additional_info \
+                if record_model.additional_info else {'master_format': 'marc'}
+        record = cls.create(blob, **additional_info)
+        record._save()
+        record_model.additional_info = \
+                record.get('__meta_metadata__.__additional_info__',
+                           {'master_format': 'marc'})
+        from invenio.ext.sqlalchemy import db
+        db.session.merge(record_model)
+        db.session.commit()
+        return record
 
     @staticmethod
     def get_blob(recid):
@@ -96,7 +99,7 @@ class Record(SmartJson):
         return decompress(record_blob.value)
 
     def _save(self):
-        self.storage_engine.save_one(self.dumps())
+        self.storage_engine.update_one(self.dumps())
 
 # Functional interface
 create_record = Record.create
