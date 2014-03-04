@@ -534,6 +534,17 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             # Update bibfmt with the format xm of this record
             modification_date = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(record_get_field_value(record, '005'), '%Y%m%d%H%M%S.0'))
             error = update_bibfmt_format(rec_id, rec_xml_new, 'xm', modification_date, pretend=pretend)
+
+            # Fire record signals.
+            from flask import current_app
+            from invenio.base import signals
+            if record_had_altered_bit:
+                signals.record_after_update.send(
+                    current_app._get_current_object(), recid=rec_id)
+            else:
+                signals.record_after_create.send(
+                    current_app._get_current_object(), recid=rec_id)
+
             if error == 1:
                 msg = "   Failed: error during update_bibfmt_format 'xm'"
                 write_message(msg, verbose=1, stream=sys.stderr)
