@@ -1001,9 +1001,8 @@ var DEPOSIT_FORM = (function( $ ){
                   field_lists[field_list_name].append_element(datum.fields, input_index);
                   // Clear typeahead field
                   try {
-                     $(item).typeahead('setQuery', "");
+                     $(item).typeahead('val', "");
                   } catch (error) {} //Suppress error
-                  $(item).val("");
                   // Save list
                   data = $('#'+field_list_name).serialize_object();
                   if($.isEmptyObject(data)){
