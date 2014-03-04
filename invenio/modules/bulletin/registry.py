@@ -19,7 +19,7 @@
 
 import pkg_resources
 
-from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
+from flask.ext.registry import ModuleAutoDiscoveryRegistry, RegistryProxy
 from invenio.utils.datastructures import LazyDict
 
 bulletinext = RegistryProxy(

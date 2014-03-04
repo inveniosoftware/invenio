@@ -25,7 +25,7 @@ __revision__ = \
 import os
 import tempfile
 
-from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
 
 from invenio.base.wrappers import lazy_import

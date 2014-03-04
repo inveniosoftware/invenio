@@ -34,7 +34,7 @@ import time
 import stat
 import shutil
 
-from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
 from invenio.testsuite import make_test_suite, run_test_suite, nottest, \
     InvenioTestCase

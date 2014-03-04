@@ -19,7 +19,7 @@
 
 import os
 
-from flask_registry import RegistryProxy, ImportPathRegistry
+from flask.ext.registry import RegistryProxy, ImportPathRegistry
 
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 from invenio.utils.datastructures import LazyDict

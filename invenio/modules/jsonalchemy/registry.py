@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ModuleAutoDiscoveryRegistry, RegistryProxy
 
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry

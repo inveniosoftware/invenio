@@ -23,7 +23,7 @@ __revision__ = \
     "$Id$"
 
 from invenio.base.wrappers import lazy_import
-from flask_registry import PkgResourcesDirDiscoveryRegistry, \
+from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
