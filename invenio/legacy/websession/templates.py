@@ -835,7 +835,7 @@ class Template:
                     'mailcookie' : reset_key
                 }, {})),
             'outro' : _("in order to confirm the validity of this request."),
-            'outro2' : _("Please note that this URL will remain valid for about %(days)s days only.") % {'days': CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS},
+            'outro2' : _("Please note that this URL will remain valid for about %(days)s days only.", days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS),
         }
         return out
 
