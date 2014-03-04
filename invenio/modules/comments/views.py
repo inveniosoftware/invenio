@@ -225,6 +225,7 @@ def reviews(recid):
 
 
 @blueprint.route('/<int:recid>/report/<int:id>', methods=['GET', 'POST'])
+@login_required
 @request_record
 def report(recid, id):
     if CommentRights(id).can_perform_action():
@@ -242,6 +243,7 @@ def report(recid, id):
 
 @blueprint.route('/<int:recid>/vote/<int:id>/<value>',
                  methods=['GET', 'POST'])
+@login_required
 @request_record
 def vote(recid, id, value):
     if CommentRights(id).can_perform_action():
