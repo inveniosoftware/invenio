@@ -75,7 +75,7 @@ class SQLAlchemyStorage(Storage):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.update_one`"""
         #FIXME: what if we get only the fields that have change
         if id is None:
-            id = json['id']
+            id = json['_id']
 
         self.db.session.merge(self.model(id=id, json=json))
         self.db.session.commit()
