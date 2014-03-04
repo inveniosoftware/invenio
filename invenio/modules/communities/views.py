@@ -97,10 +97,10 @@ def communities(bfo, is_owner=False, provisional=False, public=True,
     for cid in bfo.fields('980__a'):
         if exclude is not None and cid in exclude:
             continue
-        if provisional and cid.startswith('provisional-'):
-            colls.append(cid[len("provisional-user-"):])
-        elif public and cid.startswith('user-'):
-            colls.append(cid[len("user-"):])
+        if provisional and cid.startswith(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):
+            colls.append(cid[len(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):])
+        elif public and cid.startswith(cfg['COMMUNITIES_ID_PREFIX'] + "-"):
+            colls.append(cid[len(cfg['COMMUNITIES_ID_PREFIX'] + "-"):])
 
     query = [Community.id.in_(colls)]
     if is_owner:
@@ -116,8 +116,8 @@ def community_state(bfo, ucoll_id=None):
 
     :param coll: Collection object
     """
-    coll_id_reject = "provisional-user-%s" % ucoll_id
-    coll_id_accept = "user-%s" % ucoll_id
+    coll_id_reject = cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + ("-%s" % ucoll_id)
+    coll_id_accept = cfg['COMMUNITIES_ID_PREFIX'] + ("-%s" % ucoll_id)
     for cid in bfo.fields('980__a'):
         if cid == coll_id_accept:
             return "accepted"
