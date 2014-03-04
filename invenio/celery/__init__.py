@@ -89,12 +89,19 @@ class InvenioLoader(BaseLoader):
             app = current_app
         task.request.flask_ctx = app.test_request_context()
         task.request.flask_ctx.push()
+        app.try_trigger_before_first_request_functions()
+        app.preprocess_request()
 
     def on_task_postrun(self, task=None, **dummy_kwargs):
         """
         Called after a task is run - pops the pushed Flask request context
         for the task.
         """
+        app = self.flask_app
+        if not app:
+            from flask import current_app
+            app = current_app
+        app.process_response(app.response_class())
         task.request.flask_ctx.pop()
 
     def on_process_cleanup(self):
