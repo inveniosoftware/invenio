@@ -852,3 +852,17 @@ re_arxiv_notation = re.compile(ur"""
 # et. al. before J. /// means J is a journal
 
 re_num = re.compile(ur'(\d+)')
+
+
+re_year_in_misc_txt = re.compile(ur"(?:^|(?<!\d))(?:19|20)\d{2}(?:(?!\d)|$)")
+
+
+def remove_year(s, year=None):
+    if year:
+        year_pattern = re.escape(year)
+    else:
+        year_pattern = ur"(?:19|20)\d{2}"
+    s = re.sub(ur'\[\s*%s\s*\]' % year_pattern, '', s)
+    s = re.sub(ur'\(\s*%s\s*\)' % year_pattern, '', s)
+    s = re.sub(ur'\s*%s\s*' % year_pattern, '', s)
+    return s
