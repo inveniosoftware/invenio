@@ -581,6 +581,10 @@
               role="search"
               id="searchform">
           {% block search_form_ctrls scoped %}
+          <input type="hidden" name="ln" value="{{g.ln}}">
+          {% if collection.id > 1 %}
+          <input type="hidden" name="cc" value="{{collection.name}}">
+          {% endif %}
           <div class="nav navbar-nav navbar-left navbar-form">
               <div class="input-group" id="searchform-input-group">
                 {% block search_form_ctrls_help scoped %}
