@@ -4387,7 +4387,7 @@ class Template:
     def tmpl_citesummary_more_links(self, searchpattern, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
         out = ''
-        msg = _('<p><a href="%(url)s">%(msg)s</a></p>')
+        msg = '<p><a href="%(url)s">%(msg)s</a></p>'
         params = {'ln': ln,
                   'p': quote(searchpattern),
                   'of': 'hcs2'}
