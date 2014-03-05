@@ -64,7 +64,8 @@ from invenio.legacy.websearch_external_collections.searcher import external_coll
 from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_TIMEOUT
 from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS
 
-from invenio.base.signals import webcoll_after_webpage_cache_update
+from invenio.base.signals import webcoll_after_webpage_cache_update, \
+    webcoll_after_reclist_cache_update
 
 ## global vars
 COLLECTION_HOUSE = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
@@ -1070,6 +1071,7 @@ def task_run_core():
                 coll.update_reclist()
                 task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
                 task_sleep_now_if_required(can_stop_too=True)
+            webcoll_after_reclist_cache_update.send('webcoll', collections=colls)
         # thirdly, update collection webpage cache:
         if task_get_option("part", 2) == 2:
             i = 0

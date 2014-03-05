@@ -58,6 +58,13 @@ Example subscriber::
     )
 """
 
+webcoll_after_reclist_cache_update = _signals.signal(
+    'webcoll_after_reclist_cache_update')
+"""
+This signal is sent right after webcoll runs reclist cache update.
+It passes all updated collections.
+"""
+
 pre_command = _signals.signal('pre-command')
 """
 This signal is sent right before any inveniomanage command is executed.
