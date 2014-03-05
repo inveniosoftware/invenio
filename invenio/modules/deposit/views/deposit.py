@@ -282,7 +282,8 @@ def delete(deposition_type=None, uuid=None):
     return redirect(url_for(".index"))
 
 
-@blueprint.route('/<depositions:deposition_type>/<int:uuid>', methods=['GET', 'POST'])
+@blueprint.route('/<depositions:deposition_type>/<int:uuid>',
+                 methods=['GET', 'POST'])
 @blueprint.route('/<int:uuid>/', methods=['GET', 'POST'])
 @login_required
 @deposition_error_handler()
@@ -291,23 +292,6 @@ def run(deposition_type=None, uuid=None):
     Runs the workflows and shows the current output of the workflow.
     """
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
-
-    # Set breadcrumb
-    #breadcrumb = [(_('Home'), '')] + blueprint.breadcrumbs
-    #if not deposition.type.is_default():
-    #    breadcrumb.append(
-    #        (deposition.type.name, '.deposition_type_index', {
-    #            'deposition_type': deposition.type.get_identifier()
-    #        })
-    #    )
-
-    #breadcrumb.append(
-    #    (deposition.title or _('Untitled'), '.run', {
-    #        'deposition_type': deposition.type.get_identifier(),
-    #        'uuid': deposition.id
-    #    })
-    #)
-    #current_app.config['breadcrumbs_map'][request.endpoint] = breadcrumb
 
     return deposition.run_workflow()
 

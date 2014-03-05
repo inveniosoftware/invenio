@@ -24,8 +24,8 @@
 
     <div class="well">
         <span class="pull-right">
-            <a href="{{url_for('deposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn btn-default" data-toggle="tooltip" title="" ><i class="icon-pencil"></i> Edit</a>
-            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn btn-default" data-toggle="tooltip" title=""><i class="icon-eye-open"></i> View</a>
+            <a href="{{url_for('webdeposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn btn-default" data-toggle="tooltip" title="" ><i class="fa fa-pencil"></i> Edit</a>
+            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn btn-default" data-toggle="tooltip" title=""><i class="fa fa-eye"></i> View</a>
         </span>
         <span class="clearfix"></span>
     </div>
