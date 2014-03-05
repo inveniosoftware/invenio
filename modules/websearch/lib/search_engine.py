@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -985,7 +985,8 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         # Add metadata in meta tags for Google scholar-esque harvesting...
         # only if we have a detailed meta format and we are looking at a
         # single record
-        if (recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT):
+        if recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT and \
+          record_exists(recID) == 1:
             metaheaderadd += format_record(recID,
                                            CFG_WEBSEARCH_DETAILED_META_FORMAT,
                                            ln=ln)

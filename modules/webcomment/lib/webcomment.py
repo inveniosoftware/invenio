@@ -25,6 +25,7 @@ __revision__ = "$Id$"
 import time
 import math
 import os
+import shutil
 import cgi
 import re
 from datetime import datetime, timedelta
@@ -1000,9 +1001,15 @@ def move_attached_files_to_storage(attached_files, recID, comid):
     @param comid: the comment ID to which we attach the files
     """
     for filename, filepath in attached_files.iteritems():
-        os.renames(filepath,
-                   os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
-                                str(recID), str(comid), filename))
+        dest_dir = os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
+                                str(recID), str(comid))
+        try:
+            os.makedirs(dest_dir)
+        except:
+            # Dir most probably already existed
+            pass
+        shutil.move(filepath,
+                    os.path.join(dest_dir, filename))
 
 def get_attached_files(recid, comid):
     """
