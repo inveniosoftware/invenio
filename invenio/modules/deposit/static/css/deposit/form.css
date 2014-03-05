@@ -61,7 +61,7 @@ span.ui-icon.ui-icon-circle-triangle-e {
 .field-list-element {
   margin-bottom: 10px;
 }
-.field-list-element ul.inline {
+.field-list-element ul.list-inline {
   margin: 0;
 }
 .tag {

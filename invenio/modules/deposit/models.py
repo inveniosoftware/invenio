@@ -1323,8 +1323,8 @@ class Deposition(object):
     #
     @classmethod
     def get_type(self, type_or_id):
-        if type and isinstance(type_or_id, type) and \
-           issubclass(type, DepositionType):
+        if type_or_id and isinstance(type_or_id, type) and \
+           issubclass(type_or_id, DepositionType):
                 return type_or_id
         else:
             return DepositionType.get(type_or_id) if type_or_id else \
