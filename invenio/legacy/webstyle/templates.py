@@ -695,7 +695,8 @@ URI: http://%(host)s%(page)s
             'status' : status,
             'message' : _("The server encountered an error while dealing with your request."),
             'alerted' : admin_was_alerted and _("The system administrators have been alerted.") or '',
-            'doubts' : _("In case of doubt, please contact %(x_admin_email)s.") % {'x_admin_email' : '<a href="mailto:%(admin)s">%(admin)s</a>' % {'admin' : CFG_SITE_SUPPORT_EMAIL}}
+            'doubts' : _("In case of doubt, please contact %(x_admin_email)s.",
+                         x_admin_email='<a href="mailto:%(admin)s">%(admin)s</a>' % {'admin' : CFG_SITE_SUPPORT_EMAIL})
         }
         return out
 
