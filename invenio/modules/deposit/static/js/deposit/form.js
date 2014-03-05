@@ -949,7 +949,6 @@ var DEPOSIT_FORM = (function( $ ){
       var autocomplete_request = null;
 
       function source(query, process) {
-
           if(autocomplete_request !== null){
               autocomplete_request.abort();
           }
@@ -1279,7 +1278,6 @@ var DEPOSIT_FORM = (function( $ ){
           // Remove class
           new_element.removeClass(options.empty_cssclass);
           new_element.addClass(options.element_css_class);
-          new_element.addClass("input-group");
           // Pre-populate field values
           update_element_values(new_element, data, field_prefix_index);
           // Update ids
