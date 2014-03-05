@@ -27,10 +27,10 @@ The loader's purposes is to load modules defined in invenio.*_tasks modules
 from __future__ import absolute_import
 
 from celery import Celery, signals
-from celery.datastructures import DictAttribute
 from celery.loaders.base import BaseLoader
 
-from invenio.base.utils import autodiscover_celery_tasks
+from . import registry
+
 from invenio.base.factory import with_app_context
 
 
@@ -141,7 +141,7 @@ class InvenioLoader(BaseLoader):
         from invenio.celery import tasks
         self.task_modules.update(tasks.__name__)
         self.task_modules.update(
-            mod.__name__ for mod in autodiscover_celery_tasks() or ())
+            mod.__name__ for mod in registry.tasks or ())
 
 
 #
