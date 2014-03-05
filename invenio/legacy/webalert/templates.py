@@ -222,8 +222,8 @@ class Template:
                  'notif_no' : (notification == 'n' and 'selected="selected"' or ""),
                  'yes' : _("yes"),
                  'no' : _("no"),
-                 'specify' : _("if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket") % {'x_fmt_open': '<b>',
-                                                                                                  'x_fmt_close': '</b>'},
+                 'specify' : _("if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket",
+                               x_fmt_open='<b>', x_fmt_close='</b>'),
                  'store_basket' : _("Store results in basket?"),
                  'baskets': baskets
                }
@@ -445,8 +445,8 @@ class Template:
 
         # display message: number of items in the list
         if permanent == "n":
-            msg = _("You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during the last 30 days or so.") % {'x_nb1': nb_queries_total,
-                                                                                                                               'x_nb2': nb_queries_distinct}
+            msg = _("You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during the last 30 days or so.",
+                    x_nb1=nb_queries_total, x_nb2=nb_queries_distinct)
             out += '<p>' + msg + '</p>'
         else:
             # permanent="y"
