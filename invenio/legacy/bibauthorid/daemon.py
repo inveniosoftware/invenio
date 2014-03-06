@@ -24,7 +24,7 @@ Bibauthorid Daemon
 
 import sys
 from invenio.legacy.bibauthorid import config as bconfig
-from invenio import bibtask
+from invenio.legacy.bibsched import bibtask
 
 from invenio.legacy.bibauthorid.backinterface import get_recently_modified_record_ids
 from invenio.legacy.bibauthorid.backinterface import get_user_log
