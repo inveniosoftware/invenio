@@ -37,6 +37,21 @@ module.exports = {
                ,'prism/prism.css'],
         dest: '<%= globalConfig.installation_path %>/css/'
     },
+    jquery_css: {
+        expand: true,
+        flatten: true,
+        cwd: '<%= globalConfig.bower_path %>',
+        src: ['jqueryui/themes/base/jquery.ui.datepicker.css'
+             ,'jqueryui/themes/base/jquery.ui.theme.css'],
+        dest: '<%= globalConfig.installation_path %>/img/jquery-ui/themes/base/'
+    },
+    jquery_imgs: {
+        expand: true,
+        flatten: true,
+        cwd: '<%= globalConfig.bower_path %>',
+        src: ['jqueryui/themes/base/images/ui-bg_flat_75_ffffff_40x100.png'],
+        dest: '<%= globalConfig.installation_path %>/img/jquery-ui/themes/base/images/'
+    },
     img: {
         expand: true,
         flatten: true,
