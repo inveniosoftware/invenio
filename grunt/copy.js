@@ -28,6 +28,7 @@ module.exports = {
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>',
         src: ['bootstrap/dist/css/bootstrap*'
+               ,'font-awesome/css/font-awesome.*'
                ,'jquery-tokeninput/styles/token-input-facebook.css'
                ,'jquery-tokeninput/styles/token-input.css'
                ,'jquery.bookmark/jquery.bookmark.css'
@@ -73,7 +74,8 @@ module.exports = {
         expand: true,
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>/',
-        src: ['bootstrap/dist/fonts/glyphicons-halflings-regular.*'],
+        src: ['bootstrap/dist/fonts/glyphicons-halflings-regular.*'
+             ,'font-awesome/fonts/*'],
         dest: '<%= globalConfig.installation_path %>/fonts/'
     },
     typeahead: {
