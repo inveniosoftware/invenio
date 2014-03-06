@@ -46,7 +46,7 @@ from invenio.modules.ranker.registry import configuration
 
 def load_config_file(key):
     """Load config file containing the authors, co-authors tags #"""
-    filename = configuration.get(rank_method_code + '.cfg', '')
+    filename = configuration.get(key + '.cfg', '')
     config = ConfigParser.ConfigParser()
     try:
         config.readfp(open(filename))

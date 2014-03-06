@@ -579,10 +579,9 @@ class Template:
 %(quota_label)s<br />
 <div class="quotabox">
   <div class="quotabar" style="width:%(width)ipx"></div>
-</div>""" %{'quota_label' : _("Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i") % {'x_nb_used': nb_messages,
-                                                                                                  'x_nb_total': CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES},
-            'width' : int(ratio * 200)
-            }
+</div>""" % {'quota_label': _("Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i",
+                              x_nb_used=nb_messages, x_nb_total=CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES),
+             'width': int(ratio * 200)}
 
         return out
 
