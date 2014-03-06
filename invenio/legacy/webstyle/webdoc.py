@@ -23,6 +23,8 @@ WebDoc -- Transform webdoc sources into static html files
 __revision__ = \
     "$Id$"
 
+from . import registry
+
 from invenio.config import \
      CFG_PREFIX, \
      CFG_SITE_LANG, \
@@ -53,11 +55,11 @@ import sys
 import time
 
 # List of (webdoc_source_dir, webdoc_cache_dir)
-webdoc_dirs = {'help':('%s/lib/webdoc/invenio/help' % CFG_PREFIX, \
+webdoc_dirs = {'help':('',
                        '%s/webdoc/help-pages' % CFG_CACHEDIR),
-               'admin':('%s/lib/webdoc/invenio/admin' % CFG_PREFIX, \
+               'admin':('admin',
                         '%s/webdoc/admin-pages' % CFG_CACHEDIR),
-               'hacking':('%s/lib/webdoc/invenio/hacking' % CFG_PREFIX, \
+               'hacking':('hacking',
                           '%s/webdoc/hacking-pages' % CFG_CACHEDIR)}
 
 # Regular expression for finding text to be translated
@@ -461,9 +463,9 @@ def get_webdoc_info(webdoc):
     webdoc_cache_modification_date  = 0
 
     for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs.values():
-        webdoc_source_path = _webdoc_source_dir + os.sep + \
-                             webdoc + '.webdoc'
-        if os.path.exists(webdoc_source_path):
+        webdoc_source_path = registry.doc_category_topics(
+            _webdoc_source_dir).get(webdoc)
+        if webdoc_source_path is not None and os.path.exists(webdoc_source_path):
             webdoc_cache_dir = _web_doc_cache_dir + os.sep + webdoc
             webdoc_name = webdoc
             webdoc_source_modification_date = os.stat(webdoc_source_path).st_mtime
@@ -511,11 +513,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
         if not topics.has_key(category):
             topics[category] = []
         # Build list of tuples(webdoc_name, webdoc_date, webdoc_url)
-        # FIXME: OSError: [Errno 2] No such file or directory: '/../.virtualenvs/pu/lib/webdoc/invenio/admin'
-        for webdocfile in [path for path in \
-                           os.listdir(source_path) \
-                           if path.endswith('.webdoc')]:
-            webdoc_name = webdocfile[:-7]
+        for webdoc_name, webdocfile in registry.doc_category_topics(source_path).items():
             webdoc_url = CFG_SITE_URL + "/help/" + \
                          ((category != 'help' and category + '/') or '') + \
                          webdoc_name
