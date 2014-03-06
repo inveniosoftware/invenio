@@ -1,9 +1,9 @@
 {% extends "workflows/layout_workflow_details.html" %}
 {% import 'workflows/utils.html' as utils %}
-{% block body %}
+{% block modalbody %}
 <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">{{ workflow_metadata.name }}</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">{{ workflow_metadata.name }}</h3>
 </div>
 <div class="modal-body">
     <div class="row">
@@ -43,9 +43,6 @@
     </div>
 </div>
 <div class="modal-footer">
-        <input type="submit" class="btn" name="{{workflow_metadata.id}}_beginning" value="Restart from BEGINNING" />
-        <input type="submit" class="btn" name="{{workflow_metadata.id}}_current" value="Restart from CURRENT task" />
-        <button id="extra" class="btn">Assign ticket <i class="glyphicon glyphicon-flag"></i></button>
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
 </div>
 {% endblock %}

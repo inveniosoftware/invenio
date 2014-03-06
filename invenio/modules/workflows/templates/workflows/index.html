@@ -10,7 +10,9 @@
             var url_entry_details = "{{ url_for('workflows.entry_details') }}";
             var url_workflow_details = "{{ url_for('workflows.workflow_details') }}";
 
-            init_index(url_redis_get, url_entry_details, url_workflow_details);
+            WORKFLOWS_INDEX.init_index(url_redis_get,
+                                       url_entry_details,
+                                       url_workflow_details);
         });
     </script>
 {% endblock javascript %}

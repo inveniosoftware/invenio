@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013 CERN.
+ * Copyright (C) 2013, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,14 +17,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-function($){
-    function bind_object_preview(url_prefix, entry_id) {
+var WORKFLOWS_OBJECT_PREVIEW = (function($){
+    var object_preview_module = {};
+
+    object_preview_module.bind_object_preview = function(url_prefix, entry_id) {
         $("div.btn-group[name='object_preview_btn']").bind('click', function(event){
             var format = event.target.name;
             jQuery.ajax({
                     url: url_prefix,
                     data: {'oid': entry_id,
-                          'format': format},
+                           'format': format},
                     success: function(json){
                         if(format == 'xm' || format == 'marcxml'){
                             $('div[name="object_preview"]').wrapAll('<debug>').text(json);
@@ -34,5 +36,7 @@ function($){
                     }
             })
         });
-    }
+    };
 
+    return object_preview_module;
+}( window.jQuery ));

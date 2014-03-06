@@ -5,7 +5,6 @@
     {{ super() }}
     {% css url_for('static', filename='css/ColVis.css') %}
     {% css url_for('static', filename='css/dataTables.bootstrap.css') %}
-    {% css url_for('workflows.static', filename='css/workflows/style.css'), '20-workflows' %}
 {% endblock header %}
 
 {% js url_for('static', filename='js/jquery.dataTables.min.js'), '30-datatables' %}
@@ -35,7 +34,7 @@
             version_showing = "{{version_showing}}";
 
             init_urls(url);
-            init_urls_approval(url);
+            WORKFLOWS_APPROVAL.init_urls_approval(url);
             oTable = init_datatable(version_showing);
         });
     </script>

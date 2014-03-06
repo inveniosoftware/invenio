@@ -31,7 +31,7 @@ from ..utils import (get_workflow_definition,
                      get_redis_keys as utils_get_redis_keys,
                      filter_holdingpen_results)
 
-from ..models import Workflow, BibWorkflowObject
+from ..models import Workflow, BibWorkflowObject, BibWorkflowEngineLog
 from ..loader import workflows
 
 blueprint = Blueprint('workflows', __name__, url_prefix="/admin/workflows",
@@ -57,25 +57,41 @@ def index():
 
 @blueprint.route('/entry_details', methods=['GET', 'POST'])
 @login_required
+@register_breadcrumb(blueprint, '.entry_details', _("Entry"))
 @wash_arguments({'id_entry': (int, 0)})
-def entry_details(id_entry):
+@wash_arguments({'of': (unicode, "hd")})
+def entry_details(id_entry, of):
     """
     Displays entry details.
     """
-    wfe_object = BibWorkflowObject.query.filter(
+    from flask import Markup
+    from pprint import pformat
+
+    bwobject = BibWorkflowObject.query.filter(
         BibWorkflowObject.id == id_entry
     ).first()
 
     workflow_object = Workflow.query.filter(
-        Workflow.uuid == wfe_object.id_workflow
+        Workflow.uuid == bwobject.id_workflow
     ).first()
 
     # Workflow class: workflow.workflow is the workflow list
     workflow = get_workflow_definition(workflow_object.name)
+    formatted_data = bwobject.get_formatted_data(of)
+    if isinstance(formatted_data, dict):
+        formatted_data = pformat(formatted_data)
+    if of and of in ("xm", "xml", "marcxml"):
+        data = Markup.escape(formatted_data)
+    else:
+        data = formatted_data
+
+    engine_log = BibWorkflowEngineLog.query.filter(
+        BibWorkflowEngineLog.id_object == workflow_object.uuid
+    )
     return render_template('workflows/entry_details.html',
-                           entry=wfe_object, log="",
-                           data_preview=_entry_data_preview(
-                               wfe_object.get_data(), 'hd'),
+                           entry=bwobject,
+                           log=engine_log,
+                           data_preview=data,
                            workflow_func=workflow.workflow)
 
 

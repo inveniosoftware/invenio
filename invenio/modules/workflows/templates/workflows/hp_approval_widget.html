@@ -17,21 +17,7 @@
     <script type="text/javascript">
         $(document).ready(function(){
             var url_preview = "{{ url_for('holdingpen.entry_data_preview') }}";
-            $('button.preview').click(function() {
-                bwoid = $(this).attr('data-id');
-                format = $(this).attr('name');
-                data_preview(url_preview, bwoid, format);
-                $('button.preview').each(function() {
-                    $(this).removeClass('active');
-                });
-                $(this).addClass('active');
-            });
 
-            $('button.preview.active').each(function() {
-                bwoid = $(this).attr('data-id');
-                format = $(this).attr('name');
-                data_preview(url_preview, bwoid, format); 
-            });
         });
     </script>
 {%- endblock javascript %}
