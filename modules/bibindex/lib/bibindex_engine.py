@@ -42,7 +42,8 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_BIBINDEX_UPDATE_MESSAGE, \
      CFG_BIBINDEX_UPDATE_MODE, \
      CFG_BIBINDEX_TOKENIZER_TYPE, \
-     CFG_BIBINDEX_WASH_INDEX_TERMS
+     CFG_BIBINDEX_WASH_INDEX_TERMS, \
+     CFG_BIBINDEX_SPECIAL_TAGS
 from invenio.bibauthority_config import \
      CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
 from invenio.bibauthority_engine import get_index_strings_by_control_no, \
@@ -1258,15 +1259,13 @@ class WordTable(AbstractIndexTable):
         For furher reading see description of this method.
     """
 
-    def __init__(self, index_name, fields_to_index, table_type, table_prefix="", tag_to_tokenizer_map={}, wash_index_terms=50):
+    def __init__(self, index_name, fields_to_index, table_type, table_prefix="", wash_index_terms=50):
         """Creates words table instance.
         @param index_name: the index name
         @param index_id: the index integer identificator
         @param fields_to_index: a list of fields to index
         @param table_name_pattern: i.e. idxWORD%02dF or idxPHRASE%02dF
-        @parm wordtable_type: type of the wordtable: Words, Pairs, Phrases
-        @param tag_to_tokenizer_map: a mapping to specify particular tokenizer to
-            extract words from particular metdata (such as 8564_u)
+        @param table_type: type of the wordtable: Words, Pairs, Phrases
         @param wash_index_terms: do we wash index terms, and if yes (when >0),
             how many characters do we keep in the index terms; see
             max_char_length parameter of wash_index_term()
@@ -1292,19 +1291,32 @@ class WordTable(AbstractIndexTable):
         self.tokenizer_type = detect_tokenizer_type(self.tokenizer)
         self.default_tokenizer_function = self.tokenizer.get_tokenizing_function(table_type)
 
-        # tagToTokenizer mapping. It offers an indirection level necessary for
-        # indexing fulltext.
-        self.tag_to_words_fnc_map = {}
-        for k in tag_to_tokenizer_map.keys():
-            special_tokenizer_for_tag = _TOKENIZERS[tag_to_tokenizer_map[k]](self.stemming_language,
-                                                                             self.remove_stopwords,
-                                                                             self.remove_html_markup,
-                                                                             self.remove_latex_markup)
-            special_tokenizer_function = special_tokenizer_for_tag.get_tokenizing_function(table_type)
-            self.tag_to_words_fnc_map[k] = special_tokenizer_function
+        self.special_tags = self._handle_special_tags()
 
         if self.stemming_language and self.table_name.startswith('idxWORD'):
             write_message('%s has stemming enabled, language %s' % (self.table_name, self.stemming_language))
+
+    def _handle_special_tags(self):
+        """
+            Fills in a dict with special tags which
+            always use the same tokenizer and this
+            tokenizer is independent of index.
+        """
+        special_tags = {}
+        for tag in self.fields_to_index:
+            if tag in CFG_BIBINDEX_SPECIAL_TAGS:
+
+                for t in CFG_BIBINDEX_INDEX_TABLE_TYPE:
+                    if self.table_type == CFG_BIBINDEX_INDEX_TABLE_TYPE[t]:
+                        tokenizer_name = CFG_BIBINDEX_SPECIAL_TAGS[tag][t]
+                        tokenizer = _TOKENIZERS[tokenizer_name]
+                        instance = tokenizer(self.stemming_language,
+                                             self.remove_stopwords,
+                                             self.remove_html_markup,
+                                             self.remove_latex_markup)
+                        special_tags[tag] = instance.get_tokenizing_function(self.table_type)
+                        break
+        return special_tags
 
     def turn_off_virtual_indexes(self):
         """
@@ -1463,9 +1475,9 @@ class WordTable(AbstractIndexTable):
                 wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
                                           wlist[recID])
 
+        tokenizing_function = self.default_tokenizer_function
         if self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["recjson"]:
             # use bibfield instead of directly consulting bibrec
-            tokenizing_function = self.default_tokenizer_function
             for recID in range(recID1, recID2 + 1):
                 record = get_record(recID)
                 if record:
@@ -1475,7 +1487,6 @@ class WordTable(AbstractIndexTable):
                     wlist[recID] = list_union(new_words, wlist[recID])
         elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["multifield"]:
             # tokenizers operating on multiple fields/tags at a time
-            tokenizing_function = self.default_tokenizer_function
             for recID in range(recID1, recID2 + 1):
                 new_words = tokenizing_function(recID)
                 if not wlist.has_key(recID):
@@ -1484,7 +1495,7 @@ class WordTable(AbstractIndexTable):
         elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["string"]:
             # tokenizers operating on one field/tag and phrase at a time
             for tag in self.fields_to_index:
-                tokenizing_function = self.tag_to_words_fnc_map.get(tag, self.default_tokenizer_function)
+                tokenizing_function = self.special_tags.get(tag, self.default_tokenizer_function)
                 phrases = self.get_phrases_for_tokenizing(tag, recID1, recID2)
                 for row in sorted(phrases):
                     recID, phrase = row
@@ -2193,7 +2204,6 @@ def task_run_core():
             wordTable = WordTable(index_name=index_name,
                                   fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                  tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                                   wash_index_terms=50)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
@@ -2203,7 +2213,6 @@ def task_run_core():
             wordTable = WordTable(index_name=index_name,
                                   fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
-                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=100)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
@@ -2213,7 +2222,6 @@ def task_run_core():
             wordTable = WordTable(index_name=index_name,
                                   fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
-                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=0)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
@@ -2257,7 +2265,6 @@ def task_run_core():
                               fields_to_index=index_tags,
                               table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                               table_prefix=reindex_prefix,
-                              tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                               wash_index_terms=50)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
@@ -2298,7 +2305,6 @@ def task_run_core():
                               fields_to_index=index_tags,
                               table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                               table_prefix=reindex_prefix,
-                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=100)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
@@ -2339,7 +2345,6 @@ def task_run_core():
                               fields_to_index=index_tags,
                               table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
                               table_prefix=reindex_prefix,
-                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=0)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()

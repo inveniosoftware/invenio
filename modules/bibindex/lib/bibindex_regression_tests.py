@@ -157,7 +157,6 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
                           fields_to_index=get_index_tags(index_name),
                           table_prefix=prefix,
                           table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                          tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                           wash_index_terms=50)
     if turn_off_virtual_indexes:
         wordTable.turn_off_virtual_indexes()
@@ -857,7 +856,6 @@ def insert_record_one_and_second_revision():
         wordTable = WordTable(index_name=index_name,
                               fields_to_index=index_tags,
                               table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=50)
         wordTable.add_recIDs([[_id, _id]], 10000)
 
@@ -902,7 +900,6 @@ def insert_record_two_and_second_revision():
         wordTable = WordTable(index_name=index_name,
                               fields_to_index=index_tags,
                               table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=50)
         wordTable.add_recIDs([[id_bibrec, id_bibrec]], 10000)
 
@@ -1073,7 +1070,6 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
                 wordTable = WordTable(index_name=index_name,
                                       fields_to_index=index_tags,
                                       table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                      tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                       wash_index_terms=50)
                 wordTable.add_recIDs([self.records], 10000)
             vit = VirtualIndexTable('global',
@@ -1092,7 +1088,6 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
                 wordTable = WordTable(index_name=index_name,
                                       fields_to_index=index_tags,
                                       table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                      tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                       wash_index_terms=50)
                 wordTable.del_recIDs([self.records])
             vit = VirtualIndexTable('global',
@@ -1310,7 +1305,6 @@ class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
             wordTable = WordTable(index_name=index_name,
                                   fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[1, 10]], 1000)
         vit = VirtualIndexTable(self.new_index_name,
@@ -1331,7 +1325,6 @@ class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
             wordTable = WordTable(index_name=index_name,
                                   fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             if special_tokenizer == True:
                 wordTable.default_tokenizer_function = tokenize_for_words
@@ -1404,7 +1397,6 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
                 wordTable = WordTable(index_name=index_name,
                                       fields_to_index=index_tags,
                                       table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                      tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                                       wash_index_terms=50)
                 wordTable.add_recIDs([[1, 113]], 1000)
             vit = VirtualIndexTable(self.new_index_name,
@@ -1533,7 +1525,6 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
             wordTable = WordTable(index_name=self.index_name,
                                   fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[1, 9]], 1000)
             vit = VirtualIndexTable('global',
@@ -1542,7 +1533,6 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
             wordTable = WordTable(index_name=self.index_name,
                                   fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
-                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[6, 9]], 1000)
             vit = VirtualIndexTable('global',
@@ -1561,7 +1551,6 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
             wordTable = WordTable(index_name=self.index_name,
                                   fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[1, 9]], 1000)
             vit = VirtualIndexTable('global',
@@ -1570,7 +1559,6 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
             wordTable = WordTable(index_name=self.index_name,
                                   fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
-                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=50)
             wordTable.add_recIDs([[6, 9]], 1000)
             vit = VirtualIndexTable('global',
@@ -1663,7 +1651,6 @@ class BibIndexVirtualIndexQueueTableTest(InvenioTestCase):
         wordTable = WordTable(index_name=index_name,
                               fields_to_index=index_tags,
                               table_type=table_type,
-                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=50)
         wordTable.add_recIDs(records_range, 10000)
 
@@ -1725,6 +1712,23 @@ class BibIndexVirtualIndexQueueTableTest(InvenioTestCase):
         self.run_update_for_virtual_index(table_type)
 
 
+class BibIndexSpecialTagsTest(InvenioTestCase):
+
+    def test_special_tags_for_title(self):
+        """bibindex - special tags for title"""
+        index_name = 'title'
+        wt = WordTable(index_name, ['8564_u'], CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        self.assertNotEqual(wt.default_tokenizer_function.__self__.__class__.__name__,
+                            wt.special_tags['8564_u'].__self__.__class__.__name__)
+
+    def test_special_tags_for_fulltext(self):
+        """bibindex - special tags for fulltext"""
+        index_name = 'fulltext'
+        wt = WordTable(index_name, ['8564_u'], CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        self.assertEqual(wt.default_tokenizer_function.__self__.__class__.__name__,
+                            wt.special_tags['8564_u'].__self__.__class__.__name__)
+
+
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
                              BibIndexRemoveHtmlTest,
@@ -1745,7 +1749,8 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexVirtualIndexRemovalTest,
                              BibIndexCLICallTest,
                              BibIndexCommonWordsInVirtualIndexTest,
-                             BibIndexVirtualIndexQueueTableTest)
+                             BibIndexVirtualIndexQueueTableTest,
+                             BibIndexSpecialTagsTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

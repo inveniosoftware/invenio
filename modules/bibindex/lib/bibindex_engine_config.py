@@ -66,3 +66,8 @@ CFG_BIBINDEX_TOKENIZER_TYPE = {"string": "string",
                                "multifield": "multifield",
                                "recjson": "recjson",
                                "unknown": "unknown"}
+
+CFG_BIBINDEX_SPECIAL_TAGS = {'8564_u': {'Words': 'BibIndexFulltextTokenizer',
+                                        'Pairs': 'BibIndexEmptyTokenizer',
+                                        'Phrases': 'BibIndexEmptyTokenizer'}
+                            }
