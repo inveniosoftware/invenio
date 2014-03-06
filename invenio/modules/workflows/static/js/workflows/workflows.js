@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013 CERN.
+ * Copyright (C) 2013, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,40 +17,49 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
+var WORKFLOWS_APP = (function($) {
 
-function init_workflow(url_run_workflow) {
+    var workflows_app = {};
 
-    $("#example_my_workflow").popover({
-        trigger: 'hover',
-        placement: 'right',
-        content: "Workflow has been started."
-    });
-    $("input[type=submit]").bind('click', function(){
-        w_name = $(this).attr('name');
-        jQuery.ajax({
-            url: url_run_workflow + "?workflow_name=" + w_name,
-            success: function(json){
-                    bootstrap_alert.warning('Workflow has been started');
-            }
-        })
-    });
+    workflows_app.init_workflow = function(url_run_workflow) {
 
-    bind_alerts();
-}
+        $("#example_my_workflow").popover({
+            trigger: 'hover',
+            placement: 'right',
+            content: "Workflow has been started."
+        });
 
-function bind_alerts() {
-    bootstrap_alert = function() {}
-    bootstrap_alert.warning = function(message) {
-        $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>')
+        $("input[type=submit]").bind('click', function(){
+            w_name = $(this).attr('name');
+            jQuery.ajax({
+                url: url_run_workflow + "?workflow_name=" + w_name,
+                success: function(json){
+                        bootstrap_alert.warning('Workflow has been started');
+                }
+            })
+        });
+
+        workflows_app.bind_alerts();
     }
 
-    window.setTimeout(function() {
-        $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
-            // $(this).slideDown(500);
-        });
-    }, 3500);
-}
+    workflows_app.bind_alerts = function() {
+        bootstrap_alert = function() {}
+        bootstrap_alert.warning = function(message) {
+            $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>')
+        }
 
-function activate_button(){
-    $("input[type=submit]").removeAttr("disabled");
-}
+        window.setTimeout(function() {
+            $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
+                // $(this).slideDown(500);
+            });
+        }, 3500);
+    }
+
+
+    workflows_app.activate_button = function(){
+        $("input[type=submit]").removeAttr("disabled");
+    }
+
+    return workflows_app;
+
+}(window.jQuery);
