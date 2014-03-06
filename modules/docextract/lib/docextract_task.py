@@ -75,7 +75,8 @@ def fetch_concerned_records(name):
         sql = """SELECT `id_bibrec`, `cd` FROM `bibdocfsinfo`
                  INNER JOIN `bibrec_bibdoc`
                  ON `bibdocfsinfo`.`id_bibdoc` = `bibrec_bibdoc`.`id_bibdoc`
-                 WHERE `cd` >= %s AND format IN ('.pdf', '.PDF', '.pdfa')
+                 WHERE `cd` > %s
+                 AND format IN ('.pdf', '.PDF', '.pdf;pdfa', '.PDF;pdfa')
                  ORDER BY `cd`"""
         records = run_sql(sql, [last_date.isoformat()])
     else:
