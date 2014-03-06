@@ -829,10 +829,10 @@ class Template:
                     }
                 ),
             'intro2' : _("If you want to reset the password for this account, please go to:"),
-            'link' : "%s/youraccount/access%s" %
+            'link' : "%s/youraccount/resetpassword%s" %
                 (CFG_SITE_SECURE_URL, make_canonical_urlargd({
                     'ln' : ln,
-                    'mailcookie' : reset_key
+                    'k' : reset_key
                 }, {})),
             'outro' : _("in order to confirm the validity of this request."),
             'outro2' : _("Please note that this URL will remain valid for about %(days)s days only.", days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS),
