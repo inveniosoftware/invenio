@@ -61,7 +61,7 @@ WSGIPythonHome {{pythonhome}}
 <VirtualHost {{ vhost_ip_address }}:{{ vhost_site_url_port }}>
     {%- block server %}
         ServerName {{ servername }}
-        ServerAlias {{ serveralias }}
+        ServerAlias {{ config.get('APACHE_SERVER_ALIASES', serveralias) }}
         ServerAdmin {{ config.CFG_SITE_ADMIN_EMAIL }}
     {%- endblock server -%}
     {%- block directory_web %}
