@@ -1299,7 +1299,7 @@ class BibRecDocs(object):
         zero_version_bug = False
         if os.path.exists(bibdoc.basedir):
             from invenio.config import CFG_CERN_SITE, CFG_INSPIRE_SITE, CFG_BIBDOCFILE_AFS_VOLUME_PATTERN, CFG_BIBDOCFILE_AFS_VOLUME_QUOTA
-            if os.path.realpath(bibdoc.basedir).startswith('/afs') and (CFG_CERN_SITE or CFG_INSPIRE_SITE):
+            if os.path.realpath(bibdoc.basedir).startswith('/afs') and (CFG_CERN_SITE or CFG_INSPIRE_SITE) and CFG_BIBDOCFILE_AFS_VOLUME_PATTERN:
                 ## We are on AFS at CERN! Let's allocate directories the CERN/AFS way. E.g.
                 ## $ afs_admin create -q 1000000 /afs/cern.ch/project/cds/files/g40 p.cds.g40
                 ## NOTE: This might be extended to use low-level OpenAFS CLI tools
