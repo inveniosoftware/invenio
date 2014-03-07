@@ -415,10 +415,13 @@ BibWorkflowEngine
         """
         callback_list = self.getCallbacks()
         if callback_list:
-            self.log.info(str(self.getCallbacks()))
-            self.log.info(str(self.getCurrTaskId()))
             for i in self.getCurrTaskId():
                 callback_list = callback_list[i]
+            if isinstance(callback_list, list):
+                # With operator functions such as IF_ELSE
+                # The final value is not a function, but a list.value
+                # We currently then just take the __str__ of that list.
+                return str(callback_list)
             return callback_list.func_name
 
     def get_current_object(self):
