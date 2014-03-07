@@ -74,11 +74,12 @@ COMMUNITIES_SORTING_OPTIONS = [
     'ranking',
 ]
 
+COMMUNITIES_DEFAULT_SORTING_OPTION = 'ranking'
+
 COMMUNITIES_DISPLAYED_PER_PAGE = 4
 
 COMMUNITIES_PERIODIC_TASKS = {
-            'ranking_deamon': {
-                'run_every': timedelta(seconds=20),
-            },
-
+    'ranking_deamon': {
+        'run_every': timedelta(seconds=20),
+    },
 }
