@@ -366,7 +366,7 @@ def _upgrade_recipe_find_path(import_str, create=True):
         m = import_string(import_str)
 
         # Check if package or module
-        if m.__package__ is not None:
+        if m.__package__ is not None and m.__package__ != m.__name__:
             raise RuntimeError(
                 "Expected package but found module at '%s'." % import_str
             )
