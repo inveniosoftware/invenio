@@ -146,6 +146,7 @@ class RemoteToken(db.Model):
         Method to get RemoteToken for user
         """
         args = [
+            RemoteAccount.id == RemoteToken.id_remote_account,
             RemoteAccount.user_id == user_id,
             RemoteAccount.client_id == client_id,
             RemoteToken.token_type == token_type,
@@ -154,9 +155,9 @@ class RemoteToken(db.Model):
         if access_token:
             args.append(RemoteToken.access_token == access_token)
 
-        return cls.query.options(db.joinedload('remote_account')).filter(
-            *args
-        ).first()
+        return cls.query.options(
+            db.joinedload('remote_account')
+        ).filter(*args).first()
 
     @classmethod
     def get_by_token(cls, client_id, access_token, token_type=''):
@@ -164,6 +165,7 @@ class RemoteToken(db.Model):
         Method to get RemoteAccount object for token
         """
         return cls.query.options(db.joinedload('remote_account')).filter(
+            RemoteAccount.id == RemoteToken.id_remote_account,
             RemoteAccount.client_id == client_id,
             RemoteToken.token_type == token_type,
             RemoteAccount.access_token == access_token,

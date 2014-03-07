@@ -58,3 +58,14 @@ class RemoteTokenTestCase(BaseTestCase):
         assert RemoteToken.query.count() == 2
         acc.delete()
         assert RemoteToken.query.count() == 0
+
+    def test_get_regression(self):
+        from ..models import RemoteToken
+
+        t3 = RemoteToken.create(3, "dev", "mytoken", "mysecret")
+        t4 = RemoteToken.create(4, "dev", "mytoken", "mysecret")
+
+        assert RemoteToken.get(3, "dev").remote_account.user_id == \
+            t3.remote_account.user_id
+        assert RemoteToken.get(4, "dev").remote_account.user_id == \
+            t4.remote_account.user_id
