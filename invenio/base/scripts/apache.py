@@ -23,7 +23,7 @@ manager = Manager(usage="Perform Apache operations.")
 
 
 @manager.command
-def version(separator='\n'):
+def version(separator='\n', formatting='{version} [{executable}]'):
     """
     Try to detect Apache version by localizing httpd or apache
     executables and grepping inside binaries.  Return list of all
@@ -38,7 +38,10 @@ def version(separator='\n'):
     for apache in cmd_out.split("\n"):
         apache_version = _grep_version_from_executable(apache, '^Apache\/')
         if apache_version:
-            out.append("%s [%s]" % (apache_version, apache))
+            out.append(formatting.format(version=apache_version,
+                                         executable=apache))
+    if separator is None:
+        return out
     return separator.join(out)
 
 
