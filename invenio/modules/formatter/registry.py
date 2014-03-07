@@ -54,6 +54,7 @@ output_formats = RegistryProxy(
     '.', registry_namespace=output_formats_directories
 )
 
+
 def create_format_templates_lookup():
     out = {}
 
@@ -68,7 +69,7 @@ def create_format_templates_lookup():
             parts = normpath.split(os.path.sep)
             out[os.path.sep.join(parts[-level:])] = normpath
 
-    for t in format_templates:
+    for t in reversed(format_templates):
         _register(t)
     return out
 
@@ -79,7 +80,7 @@ format_templates_lookup = LazyDict(create_format_templates_lookup)
 def create_output_formats_lookup():
     out = {}
 
-    for f in output_formats:
+    for f in reversed(output_formats):
         of = os.path.basename(f)
         if of in out:
             continue
