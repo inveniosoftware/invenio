@@ -23,21 +23,21 @@ from __future__ import absolute_import
 
 from flask import render_template, abort, request, flash, \
     redirect, url_for, jsonify, Blueprint
-from invenio.base.i18n import _
-from invenio.base.decorators import wash_arguments
-from flask.ext.login import current_user, login_required
-from invenio.ext.sqlalchemy import db
-from invenio.ext.cache import cache
 from flask.ext.breadcrumbs import register_breadcrumb
-from invenio.ext.principal import permission_required
-from invenio.ext.sslify import ssl_required
+from flask.ext.login import current_user, login_required
 from flask.ext.menu import register_menu
-from invenio.utils.pagination import Pagination
 
+from invenio.base.decorators import wash_arguments
+from invenio.base.i18n import _
+from invenio.ext.cache import cache
+from invenio.ext.principal import permission_required
+from invenio.ext.sqlalchemy import db
+from invenio.ext.sslify import ssl_required
+from invenio.utils.pagination import Pagination
 
 from .forms import CommunityForm, EditCommunityForm, DeleteCommunityForm, SearchForm
 from .models import Community
-from .signals import pre_curation, post_curation, curate_record
+from .signals import curate_record
 from invenio.base.globals import cfg
 
 
@@ -55,13 +55,16 @@ def community_id(coll):
     """
     Determine if current user is owner of a given record
 
-    @param coll: Collection object
+    :param coll: Collection object
     """
     if coll:
         identifier = coll.name
-        if identifier.startswith(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):
-            return identifier[len(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):]
-        elif identifier.startswith(cfg['COMMUNITIES_ID_PREFIX'] + "-"):
+        if identifier.startswith(
+                cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):
+            return identifier[len(
+                cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):]
+        elif identifier.startswith(
+                cfg['COMMUNITIES_ID_PREFIX'] + "-"):
             return identifier[len(cfg['COMMUNITIES_ID_PREFIX'] + "-"):]
     return ""
 
@@ -75,24 +78,24 @@ def curation_action(recid, ucoll_id=None):
 
 
 @blueprint.app_template_filter('communities')
-def communities(bfo, is_owner=False, provisional=False, public=True, filter_zenodo=False):
+def communities(bfo, is_owner=False, provisional=False, public=True,
+                exclude=None):
     """
     Maps collection identifiers to community collection objects
 
-    @param bfo: BibFormat Object
-    @param is_owner: Set to true to only return user collections which the
+    :param bfo: BibFormat Object
+    :param is_owner: Set to true to only return user collections which the
                      current user owns.
-    @oaram provisional: Return provisional collections (default to false)
-    @oaram public: Return public collections (default to true)
+    :param provisional: Return provisional collections (default to false)
+    :param public: Return public collections (default to true)
+    :param exclude: List of collection that should be excluded.
     """
     colls = []
     if is_owner and current_user.is_guest:
         return colls
 
     for cid in bfo.fields('980__a'):
-        # Remove zenodo collections from ab
-        if filter_zenodo and (cid == 'user-zenodo' or
-           cid == 'provisional-user-zenodo'):
+        if exclude is not None and cid in exclude:
             continue
         if provisional and cid.startswith('provisional-'):
             colls.append(cid[len("provisional-user-"):])
@@ -111,7 +114,7 @@ def community_state(bfo, ucoll_id=None):
     """
     Determine if current user is owner of a given record
 
-    @param coll: Collection object
+    :param coll: Collection object
     """
     coll_id_reject = "provisional-user-%s" % ucoll_id
     coll_id_accept = "user-%s" % ucoll_id
@@ -138,23 +141,24 @@ def mycommunities_ctx():
 @register_menu(blueprint, 'main.communities', _('Communities'), order=2)
 @wash_arguments({'p': (unicode, ''),
                  'so': (unicode, ''),
-                 'page': (int, 1)
-                })
+                 'page': (int, 1),
+                 })
 def index(p, so, page):
     """
     Index page with uploader and list of existing depositions
     """
     ctx = mycommunities_ctx()
 
-    communities = Community.filter_communities(p, so, page).all()
+    communities = Community.filter_communities(p, so, page)
     form = SearchForm()
-    per_page = cfg['COMMUNITIES_DISPLAYED_PER_PAGE']
+    per_page = cfg.get('COMMUNITIES_DISPLAYED_PER_PAGE', 10)
 
     ctx.update({
-        'pagination': Pagination(page, per_page, Community.query.count()),
+        'pagination': Pagination(page, per_page, communities.count()),
         'form': form,
         'title': _('Community Collections'),
-        'communities': communities,
+        'communities': communities.slice(
+            per_page*(page-1), per_page*page).all(),
     })
 
     return render_template(

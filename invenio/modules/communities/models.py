@@ -46,11 +46,25 @@ After call to save_collection() you must do the following:
 """
 
 from datetime import datetime
+from flask import url_for
 
-from invenio.config import CFG_SITE_LANG
 from invenio.base.globals import cfg
+from invenio.config import CFG_SITE_LANG
 from invenio.ext.sqlalchemy import db
+from invenio.ext.template import render_template_to_string
+from invenio.legacy.bibrecord import record_add_field
+from invenio.modules.access.models import \
+    AccACTION, \
+    AccROLE, \
+    AccARGUMENT, \
+    AccAuthorization, \
+    UserAccROLE
 from invenio.modules.accounts.models import User
+from invenio.modules.communities.signals import before_save_collection, \
+    after_save_collection, before_save_collections, after_save_collections, \
+    before_delete_collection, after_delete_collection, \
+    before_delete_collections, after_delete_collections, \
+    pre_curation, post_curation
 from invenio.modules.search.models import \
     Collection, \
     Collectionname, \
@@ -60,26 +74,9 @@ from invenio.modules.search.models import \
     CollectionPortalbox, \
     Format, \
     CollectionFormat
-from invenio.modules.access.models import \
-    AccACTION, \
-    AccROLE, \
-    AccARGUMENT, \
-    AccAuthorization, \
-    UserAccROLE
 from invenio.modules.oaiharvester.models import OaiREPOSITORY
-from invenio.ext.template import render_template_to_string
-from invenio.modules.communities.signals import before_save_collection, \
-    after_save_collection, before_save_collections, after_save_collections, \
-    before_delete_collection, after_delete_collection, \
-    before_delete_collections, after_delete_collections, \
-    pre_curation, post_curation
-from invenio.legacy.bibrecord import record_add_field
-from flask import url_for, current_app
 
 
-#
-# Configuration variables
-#
 class Community(db.Model):
     """ Represents a Community - a layer around
     Invenio's collections and portalboxes, that allow end-users to create
@@ -136,10 +133,12 @@ class Community(db.Model):
     created = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     """ Creation datetime """
 
-    last_modified = db.Column(db.DateTime(), nullable=False, default=datetime.now, onupdate=datetime.now)
+    last_modified = db.Column(db.DateTime(), nullable=False,
+                              default=datetime.now, onupdate=datetime.now)
     """ Last modification datetime """
 
-    last_record_accepted = db.Column(db.DateTime(), nullable=False, default=datetime(2000, 1, 1, 0, 0, 0))
+    last_record_accepted = db.Column(db.DateTime(), nullable=False,
+                                     default=datetime(2000, 1, 1, 0, 0, 0))
     """ Last record acceptance datetime"""
 
     ranking = db.Column(db.Integer(9), nullable=False, default=0)
@@ -150,21 +149,25 @@ class Community(db.Model):
     #
     # Relation ships
     #
-    owner = db.relationship(User, backref='communities', foreign_keys=[id_user])
+    owner = db.relationship(User, backref='communities',
+                            foreign_keys=[id_user])
     """ Relation to the owner (User) of the community"""
 
     collection = db.relationship(
-        Collection, uselist=False, backref='community', foreign_keys=[id_collection]
+        Collection, uselist=False, backref='community',
+        foreign_keys=[id_collection]
     )
-    """ Relationship to Invenio collection. """
+    """ Relationship to collection. """
 
     collection_provisional = db.relationship(
-        Collection, uselist=False, backref='community_provisional', foreign_keys=[id_collection_provisional]
+        Collection, uselist=False, backref='community_provisional',
+        foreign_keys=[id_collection_provisional]
     )
-    """ Relationship to Invenio restricted collection containing uncurated records. """
+    """ Relationship to restricted collection containing uncurated records. """
 
     oai_set = db.relationship(
-        OaiREPOSITORY, uselist=False, backref='community', foreign_keys=[id_oairepository]
+        OaiREPOSITORY, uselist=False, backref='community',
+        foreign_keys=[id_oairepository]
     )
     """ Relation to the owner (User) of the community"""
 
@@ -185,7 +188,8 @@ class Community(db.Model):
     @property
     def oai_url(self):
         """ Get link to OAI-PMH API for this community collection """
-        return "/oai2d?verb=ListRecords&metadataPrefix=oai_dc&set=%s" % self.get_collection_name()
+        return "/oai2d?verb=ListRecords&metadataPrefix=oai_dc&set=%s" % (
+            self.get_collection_name(), )
 
     @property
     def community_url(self):
@@ -202,13 +206,14 @@ class Community(db.Model):
         """ Get direct upload URL """
         return url_for('webdeposit.index', c=self.id)
 
-
     @classmethod
     def from_recid(cls, recid, provisional=False):
         """ Get user communities specified in recid """
         from invenio.legacy.search_engine import get_record
         rec = get_record(recid)
-        prefix = "%s-" % (current_app.config['COMMUNITIES_ID_PREFIX_PROVISIONAL'] if provisional else current_app.config['COMMUNITIES_ID_PREFIX'])
+        prefix = "%s-" % (
+            cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL']
+            if provisional else cfg['COMMUNITIES_ID_PREFIX'])
 
         colls = rec.get('980', [])
         usercomm = []
@@ -251,15 +256,19 @@ class Community(db.Model):
         if page > 0:
             query = query.slice((page-1)*per_page, page*per_page)
         return query
+
     #
     # Utility methods
     #
     def get_collection_name(self, provisional=False):
         """ Get a unique collection name identifier """
         if provisional:
-            return "%s-%s" % (current_app.config['COMMUNITIES_ID_PREFIX_PROVISIONAL'], self.id)
+            return "%s-%s" % (
+                cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'],
+                self.id)
         else:
-            return "%s-%s" % (current_app.config['COMMUNITIES_ID_PREFIX'], self.id)
+            return "%s-%s" % (
+                cfg['COMMUNITIES_ID_PREFIX'], self.id)
 
     def get_title(self, provisional=False):
         if provisional:
@@ -292,7 +301,7 @@ class Community(db.Model):
     # Curation methods
     #
     def _modify_record(self, recid, test_func, replace_func, include_func,
-            append_colls=[], replace_colls=[]):
+                       append_colls=[], replace_colls=[]):
         """
         Generate record a MARCXML file
 
@@ -310,7 +319,7 @@ class Community(db.Model):
             if replace_colls:
                 for c in replace_colls:
                     newcolls.append([('a', c)])
-                    dirty=True
+                    dirty = True
             else:
                 for c in colls:
                     try:
@@ -327,7 +336,7 @@ class Community(db.Model):
                         pass
                 for c in append_colls:
                     newcolls.append([('a', c)])
-                    dirty=True
+                    dirty = True
         except KeyError:
             return False
 
@@ -376,7 +385,8 @@ class Community(db.Model):
         expected_id = self.get_collection_name(provisional=True)
         new_id = self.get_collection_name(provisional=False)
 
-        append_colls, replace_colls = signalresult2list(pre_curation.send(self, action='accept', recid=recid, pretend=pretend))
+        append_colls, replace_colls = signalresult2list(pre_curation.send(
+            self, action='accept', recid=recid, pretend=pretend))
 
         def test_func(code, val):
             return code == 'a' and val == expected_id
@@ -397,7 +407,8 @@ class Community(db.Model):
 
         self.last_record_accepted = datetime.now()
         db.session.commit()
-        post_curation.send(self, action='accept', recid=recid, record=rec, pretend=pretend)
+        post_curation.send(self, action='accept', recid=recid, record=rec,
+                           pretend=pretend)
         return rec
 
     def reject_record(self, recid, pretend=False):
@@ -409,7 +420,8 @@ class Community(db.Model):
         expected_id = self.get_collection_name(provisional=True)
         new_id = self.get_collection_name(provisional=False)
 
-        append_colls, replace_colls = signalresult2list(pre_curation.send(self, action='reject', recid=recid, pretend=pretend))
+        append_colls, replace_colls = signalresult2list(pre_curation.send(
+            self, action='reject', recid=recid, pretend=pretend))
 
         def test_func(code, val):
             return False
@@ -428,7 +440,8 @@ class Community(db.Model):
             pretend=pretend
         )
 
-        post_curation.send(self, action='reject', recid=recid, record=rec, pretend=pretend)
+        post_curation.send(self, action='reject', recid=recid, record=rec,
+                           pretend=pretend)
         return rec
 
     #
@@ -464,12 +477,13 @@ class Community(db.Model):
                 id_collection=collection.id
             ).first()
             if c_tabs:
-                update_changed_fields(c_tabs, dict(tabs=current_app.config['COMMUNITIES_TABS']))
+                update_changed_fields(c_tabs, dict(
+                    tabs=cfg['COMMUNITIES_TABS']))
                 return c_tabs
 
         c_tabs = Collectiondetailedrecordpagetabs(
             collection=collection,
-            tabs=current_app.config['COMMUNITIES_TABS'],
+            tabs=cfg['COMMUNITIES_TABS'],
         )
         db.session.add(c_tabs)
         return c_tabs
@@ -486,14 +500,16 @@ class Community(db.Model):
                 id_son=collection.id
             ).first()
             if c_tree:
-                update_changed_fields(c_tree, dict(type=current_app.config['COMMUNITIES_COLLECTION_TYPE'], score=current_app.config['COMMUNITIES_COLLECTION_SCORE']))
+                update_changed_fields(c_tree, dict(
+                    type=cfg['COMMUNITIES_COLLECTION_TYPE'],
+                    score=cfg['COMMUNITIES_COLLECTION_SCORE']))
                 return c_tree
 
         c_tree = CollectionCollection(
             dad=dad,
             son=collection,
-            type=current_app.config['COMMUNITIES_COLLECTION_TYPE'],
-            score=current_app.config['COMMUNITIES_COLLECTION_SCORE'],
+            type=cfg['COMMUNITIES_COLLECTION_TYPE'],
+            score=cfg['COMMUNITIES_COLLECTION_SCORE'],
         )
         db.session.add(c_tree)
         return c_tree
@@ -538,7 +554,10 @@ class Community(db.Model):
                     c_pbox, body = elem
                     pbox = c_pbox.portalbox
                     update_changed_fields(pbox, dict(body=body))
-                    update_changed_fields(c_pbox, dict(score=score, position=current_app.config['COMMUNITIES_PORTALBOX_POSITION']))
+                    update_changed_fields(c_pbox, dict(
+                        score=score,
+                        position=cfg[
+                            'COMMUNITIES_PORTALBOX_POSITION']))
                     objects.append(c_pbox)
                 return objects
             else:
@@ -556,7 +575,7 @@ class Community(db.Model):
                 collection=collection,
                 portalbox=p,
                 ln=CFG_SITE_LANG,
-                position=current_app.config['COMMUNITIES_PORTALBOX_POSITION'],
+                position=cfg['COMMUNITIES_PORTALBOX_POSITION'],
                 score=score,
             ))
             db.session.add_all([p, c_pbox])
@@ -587,13 +606,17 @@ class Community(db.Model):
 
     def save_acl(self, collection_id, collection_name):
         """
-        Create or update authorization for user to view the provisional collection
+        Create or update authorization for user to view the provisional
+        collection.
         """
         # Role - use Community id, because role name is limited to 32 chars.
         role_name = 'coll_%s' % collection_id
         role = AccROLE.query.filter_by(name=role_name).first()
         if not role:
-            role = AccROLE(name=role_name, description='Curators of Community %s' % collection_name)
+            role = AccROLE(
+                name=role_name,
+                description='Curators of Community {collection}'.format(
+                    collection=collection_name))
             db.session.add(role)
 
         # Argument
@@ -622,9 +645,11 @@ class Community(db.Model):
             db.session.add(userrole)
 
         # Authorization
-        auth = AccAuthorization.query.filter_by(role=role, action=action, argument=arg).first()
+        auth = AccAuthorization.query.filter_by(role=role, action=action,
+                                                argument=arg).first()
         if not auth:
-            auth = AccAuthorization(role=role, action=action, argument=arg, argumentlistid=1)
+            auth = AccAuthorization(role=role, action=action, argument=arg,
+                                    argumentlistid=1)
 
     def save_collection(self, provisional=False):
         """
@@ -640,14 +665,18 @@ class Community(db.Model):
         )
 
         if c:
-            before_save_collection.send(self, is_new=True, provisional=provisional)
+            before_save_collection.send(self, is_new=True,
+                                        provisional=provisional)
             update_changed_fields(c, fields)
         else:
-            before_save_collection.send(self, is_new=False, provisional=provisional)
+            before_save_collection.send(self, is_new=False,
+                                        provisional=provisional)
             c = Collection(**fields)
             db.session.add(c)
             db.session.commit()
-        setattr(self, 'collection_provisional' if provisional else 'collection', c)
+        setattr(self,
+                'collection_provisional' if provisional else 'collection',
+                c)
 
         # Setup OAI Repository
         if provisional:
@@ -660,19 +689,23 @@ class Community(db.Model):
         self.save_collectiondetailedrecordpagetabs(c)
         self.save_collectioncollection(
             c,
-            current_app.config['COMMUNITIES_PARENT_NAME_PROVISIONAL'] if provisional else current_app.config['COMMUNITIES_PARENT_NAME']
+            cfg['COMMUNITIES_PARENT_NAME_PROVISIONAL']
+            if provisional else cfg['COMMUNITIES_PARENT_NAME']
         )
 
         # Setup collection format is needed
-        if not provisional and current_app.config['COMMUNITIES_OUTPUTFORMAT']:
-            self.save_collectionformat(c, current_app.config['COMMUNITIES_OUTPUTFORMAT'])
-        elif provisional and current_app.config['COMMUNITIES_OUTPUTFORMAT_PROVISIONAL']:
-            self.save_collectionformat(c, current_app.config['COMMUNITIES_OUTPUTFORMAT_PROVISIONAL'])
+        if not provisional and cfg['COMMUNITIES_OUTPUTFORMAT']:
+            self.save_collectionformat(
+                c, cfg['COMMUNITIES_OUTPUTFORMAT'])
+        elif provisional and cfg['COMMUNITIES_OUTPUTFORMAT_PROVISIONAL']:
+            self.save_collectionformat(
+                c, cfg['COMMUNITIES_OUTPUTFORMAT_PROVISIONAL'])
 
         # Setup portal boxes
         self.save_collectionportalboxes(
             c,
-            current_app.config['COMMUNITIES_PORTALBOXES_PROVISIONAL'] if provisional else current_app.config['COMMUNITIES_PORTALBOXES']
+            cfg['COMMUNITIES_PORTALBOXES_PROVISIONAL']
+            if provisional else cfg['COMMUNITIES_PORTALBOXES']
         )
         db.session.commit()
         after_save_collection.send(self, collection=c, provisional=provisional)
@@ -701,10 +734,12 @@ class Community(db.Model):
             return (code, val)
 
         def include_func(code, val):
-            return not (code == 'a' and (val == provisional_id or val == normal_id))
+            return not (code == 'a' and (
+                val == provisional_id or val == normal_id))
 
         coll = []
-        for r in search_pattern(p="980__a:%s OR 980__a:%s" % (normal_id, provisional_id)):
+        for r in search_pattern(p="980__a:%s OR 980__a:%s" % (
+                normal_id, provisional_id)):
             coll.append(
                 self._modify_record(r, test_func, replace_func, include_func)
             )
@@ -717,10 +752,12 @@ class Community(db.Model):
         """
         # Most of the logic in this method ought to be moved to a
         # Collection.delete() method.
-        c = getattr(self, "collection_provisional" if provisional else "collection")
+        c = getattr(self, "collection_provisional"
+                    if provisional else "collection")
         collection_name = self.get_collection_name(provisional=provisional)
 
-        before_delete_collection.send(self, collection=c, provisional=provisional)
+        before_delete_collection.send(self, collection=c,
+                                      provisional=provisional)
 
         if c:
             # Delete portal boxes
@@ -735,11 +772,13 @@ class Community(db.Model):
             # Delete title, tabs, collection tree
             Collectionname.query.filter_by(id_collection=c.id).delete()
             CollectionCollection.query.filter_by(id_son=c.id).delete()
-            Collectiondetailedrecordpagetabs.query.filter_by(id_collection=c.id).delete()
+            Collectiondetailedrecordpagetabs.query.filter_by(
+                id_collection=c.id).delete()
 
         if provisional:
             # Delete ACLs
-            AccARGUMENT.query.filter_by(keyword='collection', value=collection_name).delete()
+            AccARGUMENT.query.filter_by(keyword='collection',
+                                        value=collection_name).delete()
             role = AccROLE.query.filter_by(name='coll_%s' % c.id).first()
             if role:
                 UserAccROLE.query.filter_by(role=role).delete()
@@ -782,7 +821,11 @@ def update_changed_fields(obj, fields):
 
 
 def signalresult2list(extra_colls):
-    replace = list(set(reduce(sum, map(lambda x: x[1].get('replace',[]) if x[1] else [], extra_colls or [(None, None)]))))
-    append = list(set(reduce(sum, map(lambda x: x[1].get('append',[]) if x[1] else [], extra_colls or [(None, None)]))))
+    replace = list(set(reduce(sum, map(
+        lambda x: x[1].get('replace', []) if x[1] else [],
+        extra_colls or [(None, None)]))))
+    append = list(set(reduce(sum, map(
+        lambda x: x[1].get('append', []) if x[1] else [],
+        extra_colls or [(None, None)]))))
 
     return (append, replace)
