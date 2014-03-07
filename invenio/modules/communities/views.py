@@ -152,7 +152,7 @@ def index(p, so, page):
     if not so:
         so = cfg.get('COMMUNITIES_DEFAULT_SORTING_OPTION')
 
-    communities = Community.filter_communities(p, so, page)
+    communities = Community.filter_communities(p, so)
     form = SearchForm()
     per_page = cfg.get('COMMUNITIES_DISPLAYED_PER_PAGE', 10)
 

@@ -231,7 +231,7 @@ class Community(db.Model):
         return usercomm
 
     @classmethod
-    def filter_communities(cls, p, so, page=0):
+    def filter_communities(cls, p, so):
         """
             Helper function which takes from database
             only those communities which match search
@@ -243,8 +243,6 @@ class Community(db.Model):
             If page == 0 function will return all communities
             that match the pattern.
         """
-        per_page = cfg['COMMUNITIES_DISPLAYED_PER_PAGE']
-
         query = Community.query
         if p:
             query = query.filter(Community.title.like(p + "%"))
@@ -253,8 +251,6 @@ class Community(db.Model):
             query = query.order_by(order(getattr(Community, so)))
         else:
             query = query.order_by(db.desc(Community.ranking))
-        if page > 0:
-            query = query.slice((page-1)*per_page, page*per_page)
         return query
 
     #
