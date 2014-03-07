@@ -404,8 +404,8 @@ CFG_OAUTH2_CONFIGURATIONS =  {
         'nickname': ['user', 'username']
     },
     'orcid': {
-        'consumer_key': '0000-0002-8651-6707',
-        'consumer_secret': '215e23ca-7421-4543-8306-a105fe0b5688',
+        'consumer_key': '',
+        'consumer_secret': '',
         'authorize_url': 'http://sandbox-1.orcid.org/oauth/authorize',
         'access_token_url': 'http://api.sandbox-1.orcid.org/oauth/token',
         'request_url': 'http://api.sandbox-1.orcid.org/{id}/orcid-profile',
@@ -449,7 +449,7 @@ if CFG_OPENID_AUTHENTICATION:
 
 # If OAuth1 authentication is enabled, add 'oauth1' to login methods.
 CFG_OAUTH1_AUTHENTICATION = bool(CFG_OAUTH1_PROVIDERS)
-if CFG_OAUTH1_PROVIDERS:
+if CFG_OAUTH1_AUTHENTICATION:
     from invenio.external_authentication_oauth1 import ExternalOAuth1
     CFG_EXTERNAL_AUTHENTICATION['oauth1'] = ExternalOAuth1(enforce_external_nicknames=True)
 

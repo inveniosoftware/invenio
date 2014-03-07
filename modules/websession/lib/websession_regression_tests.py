@@ -107,8 +107,27 @@ class WebSessionLostYourPasswordTest(InvenioTestCase):
         run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
             "WHERE id=1")
 
+class WebSessionExternalLoginTest(InvenioTestCase):
+    """Test external login functionality."""
+
+    def test_no_external_login(self):
+        """websession - openid, oauth1 or oauth2 external login option in log in page"""
+        base_url = CFG_SITE_SECURE_URL + '/youraccount'
+        login_url = base_url + '/login'
+        browser = Browser()
+        response = browser.open(login_url)
+        #Check all the links and see if any of them is of class openid (external login button)
+        for link in browser.links():
+            for value in link.attrs:
+                if (value[0] == 'class'):
+                    if value[1] == 'openid_url':
+                        self.fail("Openid external login in login page: %s" % link.attrs)
+
+        return
+
 TEST_SUITE = make_test_suite(WebSessionWebPagesAvailabilityTest,
-                             WebSessionLostYourPasswordTest)
+                             WebSessionLostYourPasswordTest,
+                             WebSessionExternalLoginTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
