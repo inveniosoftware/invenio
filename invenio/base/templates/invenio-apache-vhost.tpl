@@ -69,8 +69,13 @@ WSGIPythonHome {{pythonhome}}
         <Directory {{ config.COLLECT_STATIC_ROOT }}>
            Options FollowSymLinks MultiViews
            AllowOverride None
+           <IfVersion >= 2.4>
+           Require all granted
+           </IfVersion>
+           <IfVersion < 2.4>
            Order allow,deny
            Allow from all
+           </IfVersion>
         </Directory>
     {%- endblock directory_web -%}
     {%- block logging %}
@@ -111,8 +116,13 @@ WSGIPythonHome {{pythonhome}}
            WSGIApplicationGroup %{GLOBAL}
            Options FollowSymLinks MultiViews
            AllowOverride None
+           <IfVersion >= 2.4>
+           Require all granted
+           </IfVersion>
+           <IfVersion < 2.4>
            Order allow,deny
            Allow from all
+           </IfVersion>
         </Directory>
     {%- endblock directory_wsgi -%}
     {%- block deflate_directive %}
