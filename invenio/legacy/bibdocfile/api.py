@@ -1367,7 +1367,7 @@ class BibRecDocs(object):
         self.build_bibdoc_list()
 
         for (bibdoc, dummyatttype) in self.bibdocs.values():
-            if not run_sql('SELECT data_value FROM bibdocmoreinfo WHERE bibdocid=%s', (bibdoc.id,)):
+            if not run_sql('SELECT data_value FROM bibdocmoreinfo WHERE id_bibdoc=%s', (bibdoc.id,)):
                 ## Import from MARC only if the bibdoc has never had
                 ## its more_info initialized.
                 try:
