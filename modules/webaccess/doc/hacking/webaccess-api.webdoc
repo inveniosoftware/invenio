@@ -23,7 +23,7 @@
 <pre>
 Invenio Access Control Engine can be called from within your Python programs
 via both a regular Python API and CLI.
-In addition the you get an explanation of the program flow.
+In addition to the above features, you also get an explanation of the program flow.
 
 Contents:
  1. Regular API
