@@ -176,6 +176,26 @@ class RefextractInvenioTest(InvenioXmlTestCase):
 </record>
 """)
 
+    def test_ligo_report_number(self):
+        """Checks that LIGO report numbers are recognized"""
+        ref_line = u"""[2] LIGO-T950132-00-R; LIGO-T940063-00-R; LIGO-T060303-00-D"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="r">LIGO-T950132-00-R</subfield>
+   </datafield>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="r">LIGO-T940063-00-R</subfield>
+   </datafield>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="r">LIGO-T060303-00-D</subfield>
+   </datafield>
+</record>
+""")
+
+
 class RefextractTest(InvenioXmlTestCase):
     """Testing output of refextract"""
 
