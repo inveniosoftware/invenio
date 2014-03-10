@@ -27,6 +27,7 @@ from math import ceil
 from flask import make_response, g, request, flash, jsonify, \
     redirect, url_for, current_app, abort, session, Blueprint
 from flask.ext.login import current_user
+from werkzeug.local import LocalProxy
 
 from .. import receivers
 from ..cache import get_search_query_id, get_collection_name_from_cache
@@ -54,6 +55,11 @@ blueprint = Blueprint('search', __name__, url_prefix="",
                       static_folder='../static')
 
 default_breadcrumb_root(blueprint, '.')
+
+collection_of = LocalProxy(
+    lambda: g.collection.formatoptions[0]['code']
+)
+"""Collection output format."""
 
 FACETS = FacetLoader()
 
@@ -85,9 +91,10 @@ def check_collection(method=None, name_getter=collection_name_from_request,
         uid = current_user.get_id()
         name = name_getter()
         if name:
-            collection = Collection.query.filter(Collection.name == name).first_or_404()
+            g.collection = collection = Collection.query.filter(
+                Collection.name==name).first_or_404()
         elif default_collection:
-            collection = Collection.query.get_or_404(1)
+            g.collection = collection = Collection.query.get_or_404(1)
         else:
             return abort(404)
 
@@ -342,7 +349,7 @@ def rss(collection, p, jrec, so, rm):
 @blueprint.route('/search', methods=['GET', 'POST'])
 @register_breadcrumb(blueprint, '.browse', _('Search results'))
 @wash_arguments({'p': (unicode, ''),
-                 'of': (unicode, 'hb'),
+                 'of': (unicode, collection_of),
                  'so': (unicode, None),
                  'rm': (unicode, None)})
 @check_collection(default_collection=True)
