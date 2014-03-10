@@ -1931,6 +1931,10 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         primary_pid = webapi.get_person_id_from_canonical_id(primary_cname)
         is_available = webapi.is_profile_available(primary_pid)
 
+        if not session['personinfo']['merge_primary_profile']:
+            session['personinfo']['merge_primary_profile'] = [primary_cname, '1' if is_available else '0']
+            session.dirty = True
+
         body = ''
 
         cname = ''
@@ -2109,7 +2113,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                                 if prof[0] == profile:
                                     profiles_to_merge.remove(prof)
                         primary_profile = session["personinfo"]["merge_primary_profile"]
-                        if primary_profile not in profiles_to_merge:
+                        if primary_profile and primary_profile not in profiles_to_merge:
                             profiles_to_merge.append(primary_profile)
                         session["personinfo"]["merge_primary_profile"] = [profile, profile_availability]
                         session.dirty = True
