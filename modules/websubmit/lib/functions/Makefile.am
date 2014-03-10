@@ -60,6 +60,7 @@ pylib_DATA = __init__.py \
              Print_Success_DEL.py \
              Print_Success_MBI.py \
              Print_Success_SRV.py \
+             process_authors_json.py \
              Register_Approval_Request.py \
              Register_Referee_Decision.py \
              Withdraw_Approval_Request.py \

@@ -1,5 +1,5 @@
-## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# This file is part of Invenio.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,14 +15,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webdir = $(localstatedir)/www/img
+pylibdir = $(libdir)/python/invenio/websubmit_author_sources
 
-web_DATA = invenio.css \
-           invenio-ie7.css \
-           tablesorter.css \
-           jquery.ajaxPager.css \
-           author_autocompletion.css
+pylib_DATA = __init__.py \
+             bibauthority.py
 
-EXTRA_DIST = $(web_DATA)
+EXTRA_DIST = $(pylib_DATA)
 
-CLEANFILES = *~ *.tmp
+CLEANFILES = *~ *.tmp *.pyc

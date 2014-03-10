@@ -856,6 +856,7 @@ INSERT INTO sbmFUNDESC VALUES ('Run_PlotExtractor','with_docname');
 INSERT INTO sbmFUNDESC VALUES ('Run_PlotExtractor','with_doctype');
 INSERT INTO sbmFUNDESC VALUES ('Run_PlotExtractor','with_docformat');
 INSERT INTO sbmFUNDESC VALUES ('Run_PlotExtractor','extract_plots_switch_file');
+INSERT INTO sbmFUNDESC VALUES ('process_authors_json','authors_json');
 
 INSERT INTO sbmGFILERESULT VALUES ('HTML','HTML document');
 INSERT INTO sbmGFILERESULT VALUES ('WORD','data');

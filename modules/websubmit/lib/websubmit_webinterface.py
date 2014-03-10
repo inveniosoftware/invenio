@@ -65,13 +65,18 @@ import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
 
-from invenio.websubmit_engine import home, action, interface, endaction, makeCataloguesTable
+from invenio.websubmit_engine import home, \
+                                     action, \
+                                     interface, \
+                                     endaction, \
+                                     makeCataloguesTable, \
+                                     get_authors_from_allowed_sources
 
 class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
-    _exports = ['summary', 'sub', 'direct', '', 'attachfile', 'uploadfile', \
-                'getuploadedfile', 'upload_video', ('continue', 'continue_'), \
-                'doilookup']
+    _exports = ['summary', 'sub', 'direct', '', 'attachfile', 'uploadfile',
+                'getuploadedfile', 'upload_video', ('continue', 'continue_'),
+                'doilookup', 'get_authors']
 
     def uploadfile(self, req, form):
         """
@@ -997,6 +1002,25 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     # Answer to both /submit/ and /submit
     __call__ = index
 
+    def get_authors(self, req, form):
+        """
+        Simple interface for when there is an ajax call to get
+        a list of authors that matches the currently typed name
+        string in the input of the web interface.
+        """
+
+        argd = wash_urlargd(form, {
+            "query": (str, ""),
+            "relative_curdir": (str, ""),
+        })
+
+        (result, error) = get_authors_from_allowed_sources(
+            req,
+            argd["query"],
+            argd["relative_curdir"],
+        )
+
+        return json.dumps(result)
 
 ## def retrieve_most_recent_attached_file(file_path):
 ##     """

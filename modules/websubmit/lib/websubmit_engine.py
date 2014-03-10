@@ -21,7 +21,6 @@
 
 __revision__ = "$Id$"
 
-## import interesting modules:
 import traceback
 import string
 import os
@@ -30,8 +29,9 @@ import time
 import types
 import re
 import pprint
-from urllib import quote_plus
+from urllib import quote_plus, unquote_plus
 from cgi import escape
+from json import dumps
 
 from invenio.config import \
      CFG_SITE_LANG, \
@@ -42,22 +42,28 @@ from invenio.config import \
      CFG_DEVEL_SITE, \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_USE_MATHJAX
-
 from invenio.dbquery import Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webpage import page, error_page, warning_page
 from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser, \
                             page_not_authorized
-from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES, \
-    InvenioWebSubmitFunctionError, InvenioWebSubmitFunctionStop, \
-    InvenioWebSubmitFunctionWarning
 from invenio.messages import gettext_set_language, wash_language
 from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
-from invenio.websubmitadmin_engine import string_is_alphanumeric_including_underscore
 from invenio.htmlutils import get_mathjax_header
+from invenio.bibfield_utils import retrieve_authorid_type, \
+                                   retrieve_authorid_id
+from invenio.pluginutils import PluginContainer
+from invenio.search_engine import get_record
 
+from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES, \
+                                     CFG_SUBFIELFD_TO_JSON_FIELDS, \
+                                     CFG_SUBFIELD_DEFINITIONS, \
+                                     InvenioWebSubmitFunctionError, \
+                                     InvenioWebSubmitFunctionStop, \
+                                     InvenioWebSubmitFunctionWarning
+from invenio.websubmitadmin_engine import string_is_alphanumeric_including_underscore
 from invenio.websubmit_dblayer import \
      get_storage_directory_of_action, \
      get_longname_of_doctype, \
@@ -87,6 +93,9 @@ from invenio.websubmit_dblayer import \
      get_functions_for_submission_step, \
      get_submissions_at_level_X_with_score_above_N, \
      submission_is_finished
+from invenio.websubmit_functions.Shared_Functions import \
+    ParamFromFile, \
+    write_file
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -535,11 +544,19 @@ def interface(req,
         # The 'R' fields must be executed in the engine's environment,
         # as the runtime functions access some global and local
         # variables.
-        if full_field ['type'] == 'R':
+        if full_field['type'] == 'R':
             try:
-                co = compile (full_field ['htmlcode'].replace("\r\n","\n"), "<string>", "exec")
+                co = compile(full_field['htmlcode'].replace(
+                    "\r\n", "\n"),
+                    "<string>",
+                    "exec"
+                )
                 the_globals['text'] = ''
                 the_globals['custom_level'] = None
+                the_globals['element'] = {
+                    "name": full_field["name"],
+                    "value": ""
+                }
                 exec co in the_globals
                 text = the_globals['text']
                 # Also get the custom_level if it's define in the element description
@@ -551,7 +568,10 @@ def interface(req,
                 register_exception(req=req, alert_admin=True, prefix="Error in evaluating response element %s with globals %s" % (pprint.pformat(full_field), pprint.pformat(the_globals)))
                 raise
         else:
-            text = websubmit_templates.tmpl_submit_field (ln = ln, field = full_field)
+            text = websubmit_templates.tmpl_submit_field(
+                ln=ln,
+                field=full_field
+            )
             # Provide a default value for the custom_level
             custom_level = None
 
@@ -1861,3 +1881,151 @@ def log_function(curdir, message, start_time, filename="function_log"):
         fd = open("%s/%s" % (curdir, filename), "a+")
         fd.write("""%s --- %s\n""" % (message, time_lap))
         fd.close()
+
+def _convert_tag_tuple_array_to_author_dictionary(record_tag):
+    """
+    """
+
+    author = {}
+
+    for _tuple in record_tag:
+        if _tuple[0] == CFG_SUBFIELD_DEFINITIONS["id"]:
+            if CFG_SUBFIELFD_TO_JSON_FIELDS[CFG_SUBFIELD_DEFINITIONS["id"]].get(retrieve_authorid_type(_tuple[1])):
+               author[CFG_SUBFIELFD_TO_JSON_FIELDS[CFG_SUBFIELD_DEFINITIONS["id"]].get(retrieve_authorid_type(_tuple[1]))] = retrieve_authorid_id(_tuple[1]).decode("string_escape")
+        else:
+            if CFG_SUBFIELFD_TO_JSON_FIELDS.get(_tuple[0]):
+                if (not _tuple[1] == " ") and _tuple[1]:
+                    author[CFG_SUBFIELFD_TO_JSON_FIELDS.get(_tuple[0])] = _tuple[1].decode("string_escape")
+
+    return author
+
+
+def _convert_record_authors_to_json(recid):
+    """
+    Convert authors of a record to the original
+    json that was submitted with the record about
+    the authors. This is used to recreate the list
+    on the frontend when the record is requested for
+    modification.
+    """
+
+    record = get_record(recid)
+
+    if record:
+        record_authors = record.get("100", []) + record.get("700", [])
+        if record_authors:
+            json_authors = []
+            for record_author in record_authors:
+                json_authors.append(
+                    _convert_tag_tuple_array_to_author_dictionary(
+                        record_author[0]
+                    )
+                )
+            return dumps({"items": json_authors}).replace("\"", "'")
+
+        else:
+            return ""
+
+    else:
+        return ""
+
+
+def get_authors_autocompletion(
+    element,
+    recid=None,
+    curdir=None,
+    author_sources=[],
+    extra_options={},
+    extra_fields={},
+    ln=CFG_SITE_LANG
+):
+    """
+    Creates the author autocompletion form.
+    """
+
+    # Prepare the AUTHOR_SOURCES file in the submission directory.
+    # This file will later be checked to see if this submission has access
+    # to the given author sources.
+    write_file("%s/AUTHOR_SOURCES" % curdir, "\n".join(author_sources))
+
+    # In case we are modifying a record then prepare the authors to be loaded
+    # in the form.
+    if recid is not None:
+        element['value'] = _convert_record_authors_to_json(recid)
+
+    # We don't want to expose the entire curdir in the query so we just use the
+    # relative part of it.
+    relative_curdir = curdir.partition(CFG_WEBSUBMIT_STORAGEDIR)[-1].strip("/")
+
+    return websubmit_templates.tmpl_authors_autocompletion(
+        element,
+        relative_curdir=quote_plus(relative_curdir),
+        author_sources_p = bool(author_sources),
+        extra_options=extra_options,
+        extra_fields=extra_fields,
+        ln=CFG_SITE_LANG
+    )
+
+def get_authors_from_allowed_sources(
+    req,
+    query,
+    relative_curdir):
+    """
+    Uses pluginbuilder to import the functions from allowed plugins
+    to query for authors from the, correspodent to its plugin, author source.
+    """
+
+    def plugin_builder_function(plugin_name, plugin_code):
+        """
+        """
+
+        return {
+            "source_name": getattr(plugin_code, "CFG_SOURCE_NAME", None),
+            "query_function": getattr(plugin_code, "query_author_source", None),
+        }
+
+    result = []
+    error = None
+
+    relative_curdir = unquote_plus(relative_curdir)
+
+    # Retrieve the author sources that this submission is allowed to use.
+    author_sources = ParamFromFile(os.path.join(CFG_WEBSUBMIT_STORAGEDIR, relative_curdir, "AUTHOR_SOURCES"))
+    author_sources = filter(None, author_sources.split("\n"))
+    if not author_sources:
+        error = "No author sources available"
+        return (result, error)
+
+    # Retrieve the user that started this submission and match them to the user
+    # running this query.
+    SuE = ParamFromFile(os.path.join(CFG_WEBSUBMIT_STORAGEDIR, relative_curdir, "SuE"))
+    user_info = collect_user_info(req)
+    email = user_info["email"]
+    if email != SuE:
+        error = "The current user is not authorized to perform this query"
+        return (result, error)
+
+    # Load the author sources plugins
+    author_sources_plugins = PluginContainer(
+        os.path.join(
+            CFG_PYLIBDIR,
+            "invenio",
+            "websubmit_author_sources",
+            "*.py"
+        ),
+        plugin_builder_function
+    )
+
+    # For every author source check if it exists in the currently loaded
+    # plugins. If it does then query the source of the plugin and extend
+    # the array of results to include the authors that were returned.
+    for author_source in author_sources:
+        author_source = author_source.rstrip()
+        if author_sources_plugins.has_key(str(author_source)):
+            try:
+                result.extend(author_sources_plugins[author_source]["query_function"](query))
+            except:
+                register_exception(req=req, alert_admin=True, prefix="Error in executing plugin %s with globals %s" % (pprint.pformat(author_source), pprint.pformat(traceback.format_exc())))
+                raise
+
+    return (result, error)

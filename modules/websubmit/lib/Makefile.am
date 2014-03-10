@@ -15,15 +15,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = functions
+SUBDIRS = author_sources \
+          functions
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = websubmit_config.py websubmit_engine.py \
+pylib_DATA = websubmit_config.py \
+             websubmit_engine.py \
              websubmit_dblayer.py \
              websubmit_webinterface.py \
              websubmit_templates.py \
              websubmit_regression_tests.py \
+             websubmit_unit_tests.py \
              websubmitadmin_config.py \
              websubmitadmin_dblayer.py \
              websubmitadmin_engine.py \

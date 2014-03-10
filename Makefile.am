@@ -206,6 +206,10 @@ install-jquery-plugins:
 	wget --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
 	wget --no-check-certificate http://invenio-software.org/download/jquery/spin.min.js &&\
 	rm -f jquery.bookmark.package-1.4.0.zip && \
+	wget https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js && \
+	wget https://twitter.github.com/typeahead.js/releases/0.10.5/typeahead.bundle.min.js && \
+	wget https://raw.githubusercontent.com/es-shims/es5-shim/v4.0.3/es5-shim.min.js && \
+	wget https://raw.githubusercontent.com/es-shims/es5-shim/v4.0.3/es5-shim.map && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/base/ && \
@@ -237,6 +241,10 @@ uninstall-jquery-plugins:
 	rm -f jquery.dataTables.min.js && \
 	rm -f ui.core.js && \
 	rm -f jquery.bookmark.min.js && \
+	rm -f handlebars.min.js && \
+	rm -f typeahead.bundle.min.js && \
+	rm -f es5-shim.min.js && \
+	rm -f es5-shim.map && \
 		rm -f jquery.dataTables.ColVis.min.js && \
         rm -f jquery.hotkeys.js && \
         rm -f jquery.tablesorter.min.js && \

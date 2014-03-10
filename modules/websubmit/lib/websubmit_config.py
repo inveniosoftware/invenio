@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,8 +18,6 @@
 """Invenio Submission Web Interface config file."""
 
 __revision__ = "$Id$"
-
-import re
 
 ## test:
 test = "FALSE"
@@ -53,6 +51,57 @@ CFG_RESERVED_SUBMISSION_FILENAMES = ['SuE',
 
 ## Prefix for video uploads, Garbage Collector
 CFG_WEBSUBMIT_TMP_VIDEO_PREFIX = "video_upload_"
+
+# Mapping of each name to its subfield
+CFG_SUBFIELD_DEFINITIONS = {
+    "name": "a",
+    "id": "0",
+    "contribution": "g",
+    "affiliation": "u",
+    "email": "m"
+}
+
+# Mapping of external name of fields to internal names fields
+CFG_SUBFIELFD_TO_JSON_FIELDS = {
+    CFG_SUBFIELD_DEFINITIONS["name"]: "name",
+    CFG_SUBFIELD_DEFINITIONS["id"]: {
+        "id": "id",
+        "SzGeCERN" : "cernccid",
+        "INSPIRE": "inspireid"
+    },
+    CFG_SUBFIELD_DEFINITIONS["contribution"]: "contribution",
+    CFG_SUBFIELD_DEFINITIONS["affiliation"]: "affiliation",
+    CFG_SUBFIELD_DEFINITIONS["email"]: "email"
+}
+
+# Mapping of the internal field names to tpl attribute and file names
+CFG_JSON_TO_TPL_FIELDS = {
+    "id": "AUTHOR_ID",
+    "inspireid": "AUTHOR_ID",
+    "name": "AUTHOR_FULLNAME",
+    "firstname": "AUTHOR_FULLNAME",
+    "lastname": "AUTHOR_FULLNAME",
+    "cernccid": "AUTHOR_ID",
+    "affiliation": "AUTHOR_AFFILIATION",
+    "email": "AUTHOR_EMAIL",
+    "contribution": "AUTHOR_CONTRIBUTION"
+}
+
+# Mapping from the id type name to id_encaptulation string used to
+# format ids depending on their type.
+CFG_AUTHORITY_CONTAINER_DICTIONARY = {
+    "id": "AUTHOR|(ID)%s",
+    "inspireid": "AUTHOR|(INSPIRE)%s",
+    "cernccid": "AUTHOR|(SzGeCERN)%s"
+}
+
+# Create a template dictionary that has all the values from
+# CFG_AUTHORITY_CONTAINER_DICTIONARY as its keys and has no values
+# It will be used to create the dictionary for each element to be used
+# when writing the files for bibconvert. Even the empty elements will
+# be written with a specific notation so bibconvert does not mix up the
+# values of the different elements.
+CFG_TPL_FIELDS = reduce(lambda x, y: x.update(y) or x, [{f: ""} for f in set(CFG_JSON_TO_TPL_FIELDS.itervalues())])
 
 class InvenioWebSubmitFunctionError(Exception):
     """This exception should only ever be raised by WebSubmit functions.

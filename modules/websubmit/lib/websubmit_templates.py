@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,8 +21,13 @@ import cgi
 import re
 import operator
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD, \
-     CFG_SITE_SECURE_URL, CFG_INSPIRE_SITE
+from invenio.config import \
+    CFG_SITE_URL, \
+    CFG_SITE_LANG, \
+    CFG_SITE_RECORD, \
+    CFG_SITE_SECURE_URL, \
+    CFG_INSPIRE_SITE, \
+    CFG_SITE_SUPPORT_EMAIL
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.urlutils import create_html_link
@@ -2897,6 +2902,374 @@ class Template:
          'siteurl': https and CFG_SITE_SECURE_URL or CFG_SITE_URL,
          'help-label': escape_javascript_string(_("Use '\\$' delimiters to write LaTeX markup. Eg: \\$e=mc^{2}\\$")),
          }
+
+    def tmpl_authors_autocompletion(
+        self,
+        element,
+        relative_curdir,
+        author_sources_p,
+        extra_options={},
+        extra_fields={},
+        ln=CFG_SITE_LANG):
+        """
+        Return the HTML and JavaScript code for the author autocompletion.
+        """
+
+        _ = gettext_set_language(ln)
+
+        if relative_curdir:
+            params = "&amp;relative_curdir=%s" % (relative_curdir,)
+        else:
+            params = ""
+
+        # Does this submission allow custom authors or only the suggested ones?
+        custom_authors_p = extra_options.get("allow_custom_authors", False)
+        if custom_authors_p:
+            custom_authors_script = """
+if (typeof datum === "undefined") {
+    if (typeof document.getElementById('author_textbox').value === "undefined") {
+        return;
+    }
+    datum = {};
+    author_textbox = document.getElementById('author_textbox').value;
+    datum['lastname'] = author_textbox.split(',')[0];
+    datum['firstname'] = author_textbox.split(',')[1].split(':')[0].replace(' ','');
+    datum['affiliation'] = author_textbox.split(':')[1].replace(' ','');
+}"""
+            custom_authors_text = """
+<br />
+If you wish to enter a custom author please use this format: &quot;<span style="color: blue;">Lastname, Firstname: Affiliation</span>&quot;"""
+            custom_authors_button = """
+<button id="select_author_button" style="vertical-align:bottom; height:40px;">Add Author</button>
+<script>
+$(document).ready(function(){
+    $( "#select_author_button" ).click(AppendAuthorToAuthorHiddenInput);
+});
+</script>"""
+        else:
+            custom_authors_script = """
+if (typeof datum === "undefined") {
+    if (typeof document.getElementById('author_textbox').value === "undefined") {
+        return;
+    }
+    alert("%s");
+}""" % _("Custom authors are not allowed. Instead, please choose an author from the suggestions.\\nIf you think this is a mistake please contact &lt;%s&gt;" % (CFG_SITE_SUPPORT_EMAIL,))
+            custom_authors_text = ""
+            custom_authors_button = ""
+
+        # Should the "Principal author" label be displayed or not?
+        show_principal_author_label_p = extra_options.get("highlight_principal_author", True) and "true" or "false"
+
+        # Should the Bloodhound engine be initialized or not?
+        initialize_engine_p = author_sources_p and "true" or "false"
+
+        # Does this submission have any extra text to display?
+        extra_text = extra_options.get("extra_text", "")
+        extra_text = extra_text and "<br />" + extra_text or extra_text
+
+        # TODO: Move the extra_fields_configuration somewhere more appropriate
+        extra_fields_configuration = {
+            # TODO: This value should be coming pre-escpaped within the JSON on MBI
+            "contribution": {
+                "label": _("Contribution"),
+                "html": '<div class="author-row-body-extra">%s:&nbsp<input class="author-row-body-extra-contribution" type="text" size="75" value="{{contribution}}" onkeyup="add_author_extra_field(this, \'{{index}}\', \'contribution\');"/></div>',
+            },
+        }
+
+        # Does this submission have any extra fields to add?
+        extra_fields_rows = ""
+        extra_fields_import_rows = ""
+        extra_fields_append_rows = ""
+        for (extra_field_name, extra_field_p) in extra_fields.iteritems():
+            if extra_field_p:
+                extra_field_configuration = extra_fields_configuration.get(extra_field_name, None)
+                if extra_field_configuration is not None:
+                    extra_fields_rows += extra_field_configuration["html"] % (extra_field_configuration["label"],) + "\n"
+                    extra_fields_import_rows += "'%s': authors[authorindex]['%s'],\n" % (extra_field_name, extra_field_name,)
+                    extra_fields_append_rows += "'%s': ''," % (extra_field_name,)
+                
+        out = """
+<div>
+    <em>
+        Start by typing an author name and suggestions will become available to choose from.
+        %(custom_authors_text)s
+        %(extra_text)s
+    </em>
+<div>
+
+<div style="white-space: nowrap;">
+    <input style="width: 300px; background-color: rgb(255, 255, 255);" valign="top" id="author_textbox" placeholder="Type an author name" name="add_author" class="typeahead" />
+    %(custom_authors_button)s
+    <img id="loading_gif" style="height: 35px; width: 35px; vertical-align: bottom; visibility: hidden;" src="/img/loading.gif" />
+</div>
+
+<div id="websubmit_authors_table">
+</div>
+
+<input type="hidden" id="authors_json_input" name="%(name)s" value="%(value)s" />
+
+<link rel="stylesheet" type="text/css" href="%(CFG_SITE_URL)s/img/author_autocompletion.css">
+<script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="%(CFG_SITE_URL)s/js/handlebars.min.js"></script>
+<script type="text/javascript" src="%(CFG_SITE_URL)s/js/typeahead.bundle.min.js"></script>
+<script type="text/javascript" src="%(CFG_SITE_URL)s/js/json2.js"></script>
+<script type="text/javascript" src="%(CFG_SITE_URL)s/js/es5-shim.min.js"></script>
+
+<script id="author-row-template" type="text/x-handlebars-template">
+    <div id="{{index}}" class="author-row websubmit_author_list">
+        <div class="author-row-header">
+            <div class="author-row-header-name">
+                {{name}}&nbsp;<span class="author-row-header-principal"></span>
+            </div>
+            <div class="author-row-header-delete">
+                <a href="javascript:void(0)" class="author-row-header-delete-button" data-index="{{index}}">
+                    <img src="%(CFG_SITE_URL)s/img/wb-delete-item.png" />
+                </a>
+            </div>
+        </div>
+        <div class="author-row-body">
+            <div class="author-row-body-email">
+                {{email}}
+            </div>
+            <div class="author-row-body-affiliation">
+                {{affiliation}}
+            </div>
+            %(extra_fields_rows)s
+        </div>
+        <div class="author-row-footer">
+        </div>
+    </div>
+</script>
+
+<script id="author-row-template-autocomplete" type="text/x-handlebars-template">
+    <div id="autocomplete_element_{{position}}" class="autocomplete-author-row">
+        <div class="autocomplete-author-row-name">
+            {{lastname}} {{firstname}} {{name}}
+        </div>
+        <div class="autocomplete-author-row-email">
+            {{email}}
+        </div>
+        <div class="autocomplete-author-row-affiliation">
+            {{affiliation}}
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var authors = {};
+    var authorindex = 0;
+    var reserved_keys = ['name', 'surname', 'firstname'];
+    // Compile the template, readmore  handlebarsjs.com
+    var $AUTHORS_ROW_TEMPLATE = Handlebars.compile($('#author-row-template').html());
+    var $AUTHORS_AUTOCOMPLETE_ROW_TEMPLATE = Handlebars.compile($('#author-row-template-autocomplete').html())
+
+    function format_author_entry(firstname, lastname, affiliation) {
+        return lastname + ", " + firstname + ": " + affiliation;
+    }
+
+    function AppendAuthorToAuthorHiddenInput(object, datum) {
+        %(custom_authors_script)s
+        if (!checkAuthorExistence(datum)) {
+            authorindex = Math.random().toString(36).slice(2);
+            authors[authorindex] = $.extend({}, datum);
+            if ("firstname" in authors[authorindex]) {
+                authors[authorindex]['name'] = authors[authorindex]['lastname']+ ", "+authors[authorindex]['firstname'];
+                delete authors[authorindex]['firstname'];
+                delete authors[authorindex]['lastname'];
+            }
+            // create dictionary ready to be rendered
+            appendRow({
+                %(extra_fields_append_rows)s
+                'name': (datum['firstname'] === undefined) ? datum['name'] : datum['lastname'] + ', ' + datum['firstname'],
+                'affiliation': datum['affiliation'],
+                'index': authorindex,
+                'email': (datum['email'] !== undefined) ? datum['email'] : ''
+            });
+        }
+        $('.typeahead').typeahead('val', '');
+    }
+
+    function appendRow(author) {
+        // apend the author's compiled template
+        $('#websubmit_authors_table').append($AUTHORS_ROW_TEMPLATE(author));
+        exportAuthorsToTextarea();
+    }
+
+    function add_author_extra_field(e, index, fieldname) {
+        authors[index][fieldname] = e.value;
+        exportAuthorsToTextarea();
+    }
+
+    function delete_the_author() {
+        var $that = $(this);
+        var index = $that.data('index');
+        $('#' + index).remove();
+        delete authors[index];
+        $('#author_textbox').val("");
+        exportAuthorsToTextarea();
+    }
+
+    function checkAuthorExistence(datum){
+        var value_array = [];
+        value_array.push(datum['affiliation']);
+        if ('name' in datum) {
+            value_array.push(datum['name']);
+        }
+        if ('firstname' in datum) {
+            value_array.push(datum['lastname'] + ", " + datum['firstname']);
+        }
+        if (Object.keys(authors).length === 0) {
+            return false;
+        }
+        for (var key in authors) {
+            if (value_array.indexOf(authors[key]['name'])!= -1 && value_array.indexOf(authors[key]['affiliation'])!=-1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function dispkey(suggestion_object) {
+        return suggestion_object["lastname"] + ", " + suggestion_object["firstname"] + ": " + suggestion_object["affiliation"];
+    }
+
+    function exportAuthorsToTextarea() {
+        document.getElementById('authors_json_input').value = "";
+        var items_array = {"items":[]};
+        var keys = $("#websubmit_authors_table").sortable( "toArray" );
+
+        // Reset all principal authors
+        if ( %(show_principal_author_label_p)s ) {
+            $('.author-row-header-principal').empty();
+        }
+        $('.author-row').removeClass('author-principal');
+        // Add only to frist one
+        if(keys[0] !== undefined) {
+            if ( %(show_principal_author_label_p)s ) {
+                $('#'+keys[0]).find('.author-row-header-principal').html('<span class="label">Principal author</span>');
+            }
+            $('#'+keys[0]).addClass('author-principal')
+        }
+
+        for (var ind in keys) {
+            items_array["items"].push(authors[keys[ind]])
+        }
+        document.getElementById('authors_json_input').value = JSON.stringify(items_array);
+
+        numbering = 1;
+        $('[name="author_numbering"]').each(function(){
+            $(this).text((numbering++) +"." );
+        });
+    }
+
+    function importAuthorsFromInput() {
+        var json = document.getElementById('authors_json_input').value.split("'").join("\\"");
+        var obj = JSON && JSON.parse(json) || $.parseJSON(json);
+        for (var i in obj['items']) {
+            authorindex = Math.random().toString(36).slice(2);
+            authors[authorindex] = obj['items'][i];
+            appendRow({
+                %(extra_fields_import_rows)s
+                'name': (authors[authorindex]['firstname'] === undefined) ? authors[authorindex]['name'] : authors[authorindex]['lastname'] + ', ' + authors[authorindex]['firstname'],
+                'affiliation': authors[authorindex]['affiliation'],
+                'index': authorindex,
+                'email': (authors[authorindex]['email'] !== undefined) ? authors[authorindex]['email'] : ''
+            });
+        }
+    }
+
+    var positionCounter = 1;
+    $(document).ready(function() {
+        $( "#websubmit_authors_table" ).sortable();
+        $( "#websubmit_authors_table" ).sortable({
+            update: function( event, ui ) {
+                exportAuthorsToTextarea();
+            }
+        });
+        // Bind the event to delete author
+        $('body').on('click', '.author-row-header-delete-button', delete_the_author);
+        Handlebars.registerHelper('position', function() {
+            return positionCounter++;
+        });
+        var engine = new Bloodhound({
+            name: 'authors',
+            limit: 40,
+            local: [],
+            remote: {
+                url : '%(CFG_SITE_URL)s/submit/get_authors?query=%%QUERY%(params)s',
+                ajax: {
+                    beforeSend: function(){ $("#loading_gif").css('visibility','visible'); },
+                    complete: function(){ $("#loading_gif").css('visibility','hidden'); }
+                },
+                filter: function(parsedResponse) {
+                    var dataset = [];
+                    for (key in parsedResponse) {
+                        if (!checkAuthorExistence(parsedResponse[key]))
+                        dataset.push(parsedResponse[key])
+                    }
+                    return dataset;
+                },
+                rateLimitWait : 500
+            },
+            datumTokenizer: function(d) {
+                tokens = [];
+                tokens.push(Bloodhound.tokenizers.whitespace(d['lastname']));
+                tokens.push(Bloodhound.tokenizers.whitespace(d['firstname']));
+                tokens.push(d['affiliation'])
+                tokens.push(d['email'])
+                return tokens;
+            },
+            queryTokenizer: function (s) {
+                return s.split(/[, :]+/);
+            }
+        });
+
+        if (document.getElementById('authors_json_input').value != "" && document.getElementById('authors_json_input').value != "None") {
+            importAuthorsFromInput();
+        }
+
+        if (%(initialize_engine_p)s) {
+            engine.initialize();
+        }
+
+        $('.typeahead').typeahead({
+            highlight: true,
+            hint: true,
+            minLength: 3
+        }, {
+            displayKey: dispkey,
+            templates: {
+                suggestion: $AUTHORS_AUTOCOMPLETE_ROW_TEMPLATE,
+                empty: [
+                    '<div class="author-empty-message">',
+                    '<h2>No authors found</h2>',
+                    '<p>The query did not return any author from the sources</p>',
+                    '</div>'
+                ].join(''),
+            },
+            source: engine.ttAdapter()
+        });
+        $('#author_textbox').on('typeahead:selected', AppendAuthorToAuthorHiddenInput);
+        $('#author_textbox').on('typeahead:closed', null);
+    });
+
+</script>""" % {
+                "CFG_SITE_URL": CFG_SITE_URL,
+                "name": element['name'],
+                "value": element['value'],
+                "params": params,
+                "custom_authors_script": custom_authors_script,
+                "custom_authors_button": custom_authors_button,
+                "custom_authors_text": custom_authors_text,
+                "show_principal_author_label_p": show_principal_author_label_p,
+                "extra_text": extra_text,
+                "extra_fields_rows": extra_fields_rows,
+                "extra_fields_import_rows": extra_fields_import_rows,
+                "extra_fields_append_rows": extra_fields_append_rows,
+                "initialize_engine_p": initialize_engine_p,
+            }
+
+        return out
 
 def displaycplxdoc_displayauthaction(action, linkText):
     return """ <strong class="headline">(<a href="" onclick="document.forms[0].action.value='%(action)s';document.forms[0].submit();return false;">%(linkText)s</a>)</strong>""" % {

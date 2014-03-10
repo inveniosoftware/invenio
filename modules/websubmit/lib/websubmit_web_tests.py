@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2014 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -310,7 +310,73 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.page_source_test(expected_text=['Submission Complete!', \
                                              'Your document has the following reference(s): <b>CERN-GE-9806033'])
 
-TEST_SUITE = make_test_suite(InvenioWebSubmitWebTest, )
+    def test_autocompletion_authors(self):
+        """"""
+        from time import sleep
+        from random import randint,choice
+        from string import ascii_uppercase, digits
+        def random_string(N=None):
+            if N == None:
+                N = randint(10, 25)
+            return "".join(choice(ascii_uppercase + digits) for _ in range(N))
+        test_authors = 10
+        self.browser.get(CFG_SITE_SECURE_URL)
+        self.login(username="admin", password="")
+        self.browser.get(CFG_SITE_SECURE_URL+"/submit?ln=en&doctype=DEMOTHE")
+        self.find_element_by_xpath_with_timeout("//input[@value='Submit New Record']")
+        self.browser.find_element_by_xpath("//input[@value='Submit New Record']").click()
+        self.find_element_by_name_with_timeout("DEMOTHE_TITLE")
+        self.fill_textbox(textbox_name="DEMOTHE_TITLE", text=random_string())
+        title = self.browser.find_element_by_name("DEMOTHE_TITLE")
+        self.find_element_by_id_with_timeout("author_textbox")
+        author_names = {}
+        authors_to_input = ["Ellis", "Dickinson", "Bach"]
+        for i in range(0,2):
+            self.browser.find_element_by_id("author_textbox").send_keys(authors_to_input[i])
+            self.find_element_by_id_with_timeout("autocomplete_element_"+str(i+1))
+            self.browser.find_element_by_id("autocomplete_element_"+str(i+1)).click()
+            author_names[i] = self.browser.find_elements_by_class_name("author-row-header-name")[i].text
+
+        self.fill_textbox(textbox_name="DEMOTHE_ABS", text=random_string())
+        abstract = self.browser.find_element_by_name("DEMOTHE_ABS").text
+        self.choose_selectbox_option_by_label("DEMOTHE_LANG", label="English")
+        self.fill_textbox(textbox_name="DEMOTHE_PUBL", text="CERN")
+        self.fill_textbox("DEMOTHE_PLDEF", text="Geneva")
+        self.choose_selectbox_option_by_label(selectbox_name="DEMOTHE_DIPL", label="MSc")
+        self.fill_textbox(textbox_name="DEMOTHE_DATE", text="11/11/1991")
+        self.fill_textbox(textbox_name="DEMOTHE_UNIV", text="AUTH")
+        self.fill_textbox(textbox_name="DEMOTHE_PLACE", text="Thessaloniki")
+        self.fill_textbox(textbox_name="DEMOTHE_FILE", text="/opt/invenio/lib/webtest/invenio/test.pdf")
+        author_contributions = {}
+        for i in range(0, 2):
+            self.browser.find_elements_by_class_name("author-row-body-extra-contribution")[i].send_keys(random_string())
+        for i in range(0, 2):
+            author_contributions[i] = self.browser.find_elements_by_class_name("author-row-body-extra-contribution")[i].get_attribute("value")
+        self.find_element_by_name_with_timeout("endS")
+        self.browser.find_element_by_name("endS").click()
+        self.find_element_by_xpath_with_timeout("html/body/div[2]/div[3]/form/center/table/tbody/tr[2]/td/small/b[2]")
+        doc_ref = self.browser.find_element_by_xpath("html/body/div[2]/div[3]/form/center/table/tbody/tr[2]/td/small/b[2]").text
+        self.browser.get(CFG_SITE_SECURE_URL + "/submit?ln=en&doctype=DEMOTHE")
+        self.find_element_by_xpath_with_timeout("//input[@value='Modify Record']")
+        self.browser.find_element_by_xpath("//input[@value='Modify Record']").click()
+        self.browser.find_element_by_name("DEMOTHE_RN").clear()
+        self.fill_textbox(textbox_name="DEMOTHE_RN", text=doc_ref)
+        self.choose_selectbox_option_by_label(selectbox_name="DEMOTHE_CHANGE[]", label="Title")
+        self.choose_selectbox_option_by_label(selectbox_name="DEMOTHE_CHANGE[]", label="Author(s)")
+        self.choose_selectbox_option_by_label(selectbox_name="DEMOTHE_CHANGE[]", label="Abstract")
+        sleep(5)
+        self.find_element_by_name_with_timeout("endS")
+        self.browser.find_element_by_name("endS").click()
+        for i in range(0, 2):
+            self.find_elements_by_class_name_with_timeout("author-row-header-name")
+            self.assertEqual(self.browser.find_elements_by_class_name("author-row-header-name")[i].text, author_names[i], "Authors must stay the same")
+            self.assertEqual(
+                self.browser.find_elements_by_class_name("author-row-body-extra-contribution")[i].get_attribute("value"),
+                author_contributions[i],
+                "Contributions should stay in the same authors"
+            )
+
+TEST_SUITE = make_test_suite(InvenioWebSubmitWebTest,)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE, warn_user=True)
