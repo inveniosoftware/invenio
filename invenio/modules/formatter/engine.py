@@ -240,6 +240,8 @@ class LazyTemplateContextFunctionsCache(object):
             if m is None:
                 continue
             name = m.__name__.split('.')[-1]
+            if name in elem:
+                continue
             filename = m.__file__[:-1] if m.__file__.endswith('.pyc') \
                 else m.__file__
             register_func = getattr(m, 'format_element',
