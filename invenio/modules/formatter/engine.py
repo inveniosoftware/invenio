@@ -449,10 +449,12 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
         </span>""" % (template, recID)
 
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
-    path = "%s%s%s" % (cfg['CFG_BIBFORMAT_TEMPLATES_PATH'], os.sep, template)
+    path = registry.format_templates_lookup.get(template)
+
     if template is None or not (
-      os.access(path, os.R_OK) or
-      template.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION)):
+       template.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION)
+       or path is None or os.access(path, os.R_OK)
+       ):
         # template not found in new BibFormat. Call old one
         if verbose == 9:
             if template is None:
