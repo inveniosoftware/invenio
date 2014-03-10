@@ -40,7 +40,7 @@ git+https://github.com/david-e/flask-admin@bootstrap3#egg=Flask-Admin-1.0.7
 Flask-Assets==0.7
 Flask-Babel==0.9
 Flask-Cache==0.12
-Flask-DebugToolbar==0.8.0
+Flask-DebugToolbar==0.9.0
 Flask-Email==1.4.4
 Flask-Gravatar==0.4.0
 Flask-Login==0.2.7
