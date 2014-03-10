@@ -31,7 +31,11 @@ CFG_DATACITE_URL
 
 Example of usage:
     doc = '''
-    <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd">
+    <resource
+        xmlns="http://datacite.org/schema/kernel-2.2"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://datacite.org/schema/kernel-2.2
+        http://schema.datacite.org/meta/kernel-2.2/metadata.xsd">
     <identifier identifierType="DOI">10.5072/invenio.test.1</identifier>
     <creators>
         <creator>
@@ -78,9 +82,10 @@ except ImportError:
 
 if not HAS_SSL:
     from warnings import warn
-    warn("Module ssl not installed. Please install with e.g. 'pip install ssl'. Required for HTTPS connections to DataCite.", RuntimeWarning)
+    warn("Module ssl not installed. Please install with e.g. "
+         "'pip install ssl'. Required for HTTPS connections to DataCite.",
+         RuntimeWarning)
 
-import urllib2
 import re
 from invenio.utils.xmlDict import XmlDictConfig, ElementTree
 
@@ -96,15 +101,18 @@ if HAS_SSL:
     # OpenSSL 1.0.0 has a reported bug with SSLv3/TLS handshake.
     # Python libs affected are httplib2 and urllib2. Eg:
     # httplib2.SSLHandshakeError: [Errno 1] _ssl.c:497:
-    # error:14077438:SSL routines:SSL23_GET_SERVER_HELLO:tlsv1 alert internal error
-    # custom HTTPS opener, banner's oracle 10g server supports SSLv3 only
+    # error:14077438:SSL routines:SSL23_GET_SERVER_HELLO:tlsv1 alert internal
+    # error custom HTTPS opener, banner's oracle 10g server supports SSLv3 only
     class HTTPSConnectionV3(httplib.HTTPSConnection):
         def __init__(self, *args, **kwargs):
             httplib.HTTPSConnection.__init__(self, *args, **kwargs)
 
         def connect(self):
             try:
-                sock = socket.create_connection((self.host, self.port), self.timeout)
+                sock = socket.create_connection(
+                    (self.host, self.port),
+                    self.timeout
+                )
             except AttributeError:
                 # Python 2.4 compatibility (does not deal with IPv6)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -119,9 +127,15 @@ if HAS_SSL:
                 pass
 
             try:
-                self.sock = ssl.wrap_socket(sock, self.key_file, self.cert_file, ssl_version=ssl.PROTOCOL_SSLv3)
+                self.sock = ssl.wrap_socket(
+                    sock, self.key_file, self.cert_file,
+                    ssl_version=ssl.PROTOCOL_SSLv3
+                )
             except ssl.SSLError:
-                self.sock = ssl.wrap_socket(sock, self.key_file, self.cert_file, ssl_version=ssl.PROTOCOL_SSLv23)
+                self.sock = ssl.wrap_socket(
+                    sock, self.key_file, self.cert_file,
+                    ssl_version=ssl.PROTOCOL_SSLv23
+                )
 
     class HTTPSHandlerV3(urllib2.HTTPSHandler):
         def https_open(self, req):
@@ -179,7 +193,10 @@ class DataCiteRequestError(DataCiteError):
 
 
 class DataCiteNoContentError(DataCiteRequestError):
-    """ DOI is known to MDS, but is not resolvable (might be due to handle's latency) """
+    """
+    DOI is known to MDS, but is not resolvable (might be due to handle's
+    latency)
+    """
     pass
 
 
@@ -238,7 +255,8 @@ class DataCiteRequest(object):
                            query string on all requests.
     @type  default_params: dict
     """
-    def __init__(self, base_url=None, username=None, password=None, default_params={}):
+    def __init__(self, base_url=None, username=None, password=None,
+                 default_params={}):
         self.base_url = base_url
         self.username = username
         self.password = password
@@ -268,7 +286,8 @@ class DataCiteRequest(object):
         self.data = None
         self.code = None
 
-        headers['Authorization'] = 'Basic ' + base64.encodestring(self.username + ':' + self.password)
+        headers['Authorization'] = 'Basic ' + \
+            base64.encodestring(self.username + ':' + self.password)
         if headers['Authorization'][-1] == '\n':
             headers['Authorization'] = headers['Authorization'][:-1]
 
@@ -317,11 +336,13 @@ class DataCiteRequest(object):
 
     def post(self, url, body=None, params={}, headers={}):
         """ Make a POST request """
-        return self.request(url, method='POST', body=body, params=params, headers=headers)
+        return self.request(url, method='POST', body=body, params=params,
+                            headers=headers)
 
     def delete(self, url, params={}, headers={}):
         """ Make a DELETE request """
-        return self.request(url, method="DELETE", params=params, headers=headers)
+        return self.request(url, method="DELETE", params=params,
+                            headers=headers)
 
 
 class DataCite(object):
@@ -329,10 +350,11 @@ class DataCite(object):
     DataCite API wrapper
     """
 
-    def __init__(self, username=None, password=None, url=None, prefix=None, test_mode=None, api_ver="2"):
+    def __init__(self, username=None, password=None, url=None, prefix=None,
+                 test_mode=None, api_ver="2"):
         """
-        Initialize DataCite API. In case parameters are not specified via keyword
-        arguments, they will be read from the Invenio configuration.
+        Initialize DataCite API. In case parameters are not specified via
+        keyword arguments, they will be read from the Invenio configuration.
 
         @param username: DataCite username (or CFG_DATACITE_USERNAME)
         @type  username: str
@@ -340,27 +362,34 @@ class DataCite(object):
         @param password: DataCite password (or CFG_DATACITE_PASSWORD)
         @type  password: str
 
-        @param url: DataCite API base URL (or CFG_DATACITE_URL). Defaults to https://mds.datacite.org/.
+        @param url: DataCite API base URL (or CFG_DATACITE_URL). Defaults to
+            https://mds.datacite.org/.
         @type  url: str
 
-        @param prefix: DOI prefix (or CFG_DATACITE_DOI_PREFIX). Defaults to 10.5072 (DataCite test prefix).
+        @param prefix: DOI prefix (or CFG_DATACITE_DOI_PREFIX). Defaults to
+            10.5072 (DataCite test prefix).
         @type  prefix: str
 
-        @param test_mode: Set to True to enable test mode (or CFG_DATACITE_TESTMODE). Defaults to False.
+        @param test_mode: Set to True to enable test mode (or
+            CFG_DATACITE_TESTMODE). Defaults to False.
         @type  test_mode: boolean
 
-        @param api_ver: DataCite API version. Currently has no effect. Default to 2.
+        @param api_ver: DataCite API version. Currently has no effect.
+            Default to 2.
         @type  api_ver: str
         """
         if not HAS_SSL:
-            warn("Module ssl not installed. Please install with e.g. 'pip install ssl'. Required for HTTPS connections to DataCite.")
+            warn("Module ssl not installed. Please install with e.g. "
+                 "'pip install ssl'. Required for HTTPS connections to "
+                 "DataCite.")
 
         self.username = username or cfg.get('CFG_DATACITE_USERNAME', '')
         self.password = password or cfg.get('CFG_DATACITE_PASSWORD', '')
         self.prefix = prefix or cfg.get('CFG_DATACITE_DOI_PREFIX', '10.5072')
         self.api_ver = api_ver  # Currently not used
 
-        self.api_url = url or cfg.get('CFG_DATACITE_URL', 'https://mds.datacite.org/')
+        self.api_url = url or cfg.get('CFG_DATACITE_URL',
+                                      'https://mds.datacite.org/')
         if self.api_url[-1] != '/':
             self.api_url = self.api_url + "/"
 
@@ -540,6 +569,7 @@ class DataCite(object):
         else:
             raise DataCiteError.factory(r.code)
 
+
 class DataciteMetadata(object):
 
     def __init__(self, doi):
@@ -557,7 +587,8 @@ class DataciteMetadata(object):
 
             # Remove the resource tags
             data = re.sub('<resource .*xsd">', '', data)
-            self.data = '<?xml version="1.0"?><datacite>' + data[0:len(data) - 11] + '</datacite>'
+            self.data = '<?xml version="1.0"?><datacite>' + \
+                data[0:len(data) - 11] + '</datacite>'
             self.root = ElementTree.XML(self.data)
             self.xml = XmlDictConfig(self.root)
 
@@ -620,4 +651,3 @@ class DataciteMetadata(object):
         if 'titles' in self.xml:
             return self.xml['rights']
         return None
-
