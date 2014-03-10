@@ -25,6 +25,7 @@ __revision__ = "$Id$"
 # pylint: disable=C0301
 
 import os
+import pkg_resources
 import sys
 
 from invenio.base.globals import cfg
@@ -41,11 +42,14 @@ bibformat_config = lazy_import('invenio.modules.formatter.config')
 bibformatadminlib = lazy_import('invenio.legacy.bibformat.adminlib')
 format_templates = lazy_import('invenio.modules.formatter.testsuite.format_templates')
 
-TEST_PACKAGE = 'invenio.modules.formatter.testsuite'
+TEST_PACKAGES = [
+    'invenio.modules.formatter.testsuite.overlay',
+    'invenio.modules.formatter.testsuite',
+]
 
 
 test_registry = RegistryProxy('test_registry', ImportPathRegistry,
-                              initial=[TEST_PACKAGE])
+                              initial=TEST_PACKAGES)
 
 format_templates_registry = lambda: PkgResourcesDirDiscoveryRegistry(
     'format_templates', registry_namespace=test_registry)
@@ -342,9 +346,17 @@ class OutputFormatTest(InvenioTestCase):
     def test_resolve_output_format(self):
         """ bibformat - resolving output format filename"""
         filenames = ["test1", "test1.bfo", "TEST1", "TeST1", "TEST1.bfo", "<b>test1"]
+        from invenio.modules.formatter.registry import create_output_formats_lookup
+        output_formats_paths = create_output_formats_lookup()
+        expected_filename = pkg_resources.resource_filename(
+            'invenio.modules.formatter.testsuite',
+            'overlay/output_formats/TEST1.bfo')
+
         for i in range(len(filenames)-2):
             filename_1 = bibformat_engine.resolve_output_format_filename(filenames[i])
             self.assert_(filename_1 is not None)
+
+            self.assertEqual(output_formats_paths[filename_1], expected_filename)
 
             filename_2 = bibformat_engine.resolve_output_format_filename(filenames[i+1])
             self.assertEqual(filename_1, filename_2)
