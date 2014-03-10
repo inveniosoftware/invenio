@@ -163,7 +163,7 @@ def sherpa_romeo_issn_process(form, field, submit=False):
     field.add_message("Couldn't find Journal.", state='info')
 
 
-def sherpa_romeo_publisher_process(form, field, submit=False):
+def sherpa_romeo_publisher_process(form, field, submit=False, fields=None):
     value = field.data or ''
     if value == "" or value.isspace():
         return
@@ -227,7 +227,7 @@ def sherpa_romeo_publisher_process(form, field, submit=False):
             field.add_message(info_html, state='info')
 
 
-def sherpa_romeo_journal_process(form, field, submit=False):
+def sherpa_romeo_journal_process(form, field, submit=False, fields=None):
     value = field.data or ''
     if value == "" or value.isspace():
         return
