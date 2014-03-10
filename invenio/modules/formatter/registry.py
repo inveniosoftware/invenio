@@ -80,7 +80,7 @@ format_templates_lookup = LazyDict(create_format_templates_lookup)
 def create_output_formats_lookup():
     out = {}
 
-    for f in reversed(output_formats):
+    for f in output_formats:
         of = os.path.basename(f)
         if of in out:
             continue
