@@ -136,6 +136,7 @@ def index():
     @register_template_context_processor
     def index_context():
         return dict(
+            of=request.values.get('of', collection.formatoptions[0]['code']),
             easy_search_form=EasySearchForm(csrf_enabled=False),
             format_record=format_record,
         )
@@ -150,6 +151,7 @@ def collection(name):
     @register_template_context_processor
     def index_context():
         return dict(
+            of=request.values.get('of', collection.formatoptions[0]['code']),
             format_record=format_record,
             easy_search_form=EasySearchForm(csrf_enabled=False),
             breadcrumbs=current_breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:])

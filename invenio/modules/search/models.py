@@ -23,22 +23,19 @@ WebSearch database models.
 
 # General imports.
 import re
-from operator import itemgetter
+
 from flask import g, url_for
-from invenio.base.globals import cfg
-try:
-    from intbitset import intbitset
-except:
-    from intbitset import intbitset
-#from invenio.legacy.search_engine import collection_restricted_p
-from invenio.ext.sqlalchemy import db
-from sqlalchemy.orm.collections import InstrumentedList
+from intbitset import intbitset
+from operator import itemgetter
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.orm.collections import InstrumentedList
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
-from sqlalchemy.ext.orderinglist import ordering_list
-#from invenio.legacy.websearch_external_collections.searcher import \
-#    external_collections_dictionary
+
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
+from invenio.ext.sqlalchemy import db
 
 # Create your models here.
 
@@ -190,8 +187,9 @@ class Collection(db.Model):
         if len(self._formatoptions):
             return [dict(f) for f in self._formatoptions]
         else:
-            return [{'code': 'hb', 'name': "HTML %s" % g._("brief"),
-                     'content_type': 'text/html'}]
+            return [{'code': u'hb',
+                     'name': _("HTML %(format)s", format=_("brief")),
+                     'content_type': u'text/html'}]
 
     formatoptions = property(formatoptions)
 
