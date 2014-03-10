@@ -18,6 +18,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 import sys
 import getopt
 
@@ -50,7 +52,7 @@ def main():
             if opt[0] in ["-h", "--help"]:
                 usage(0)
             elif opt[0] in ["-V", "--version"]:
-                print elmsubmit.__revision__
+                print(elmsubmit.__revision__)
                 sys.exit(0)
     except StandardError as e:
         usage(e)

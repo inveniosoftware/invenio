@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 BibIndex stemmer facility based on the Porter Stemming Algorithm.
 <http://tartarus.org/~martin/PorterStemmer/>
@@ -485,4 +487,4 @@ if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1:
         for word in sys.argv[1:]:
-            print stem(word)
+            print(stem(word))

@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 textmarc2xmlmarc utility.
 """
@@ -151,8 +153,8 @@ class Record:
         "Displays record in the xml format."
 
         ## display record header
-        print '<record>'
-        print '   <controlfield tag="001">%d</controlfield>' % int(self.sysno)
+        print('<record>')
+        print('   <controlfield tag="001">%d</controlfield>' % int(self.sysno))
 
         ## display record body
         keys = self.field.keys()
@@ -181,16 +183,16 @@ class Record:
                 instance_to_print = field_instance.display(field_type)
                 if instance_to_print:
                     if tag[:2] != "00":
-                        print "   <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (tag, i1, i2)
-                        print instance_to_print
-                        print "   </datafield>"
+                        print("   <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (tag, i1, i2))
+                        print(instance_to_print)
+                        print("   </datafield>")
                     else:
                         if not (tag == "001" and int(self.sysno) == int(instance_to_print)):
-                            print "   <controlfield tag=\"%s\">%s</controlfield>" % (tag,instance_to_print)
+                            print("   <controlfield tag=\"%s\">%s</controlfield>" % (tag,instance_to_print))
 
 
         ## display record footer
-        print "</record>"
+        print("</record>")
 
 def log_on_exec(command):
     "Execute command and create record in log file"
@@ -471,20 +473,20 @@ def main():
     if help_p == 1:
         usage(0)
     else:
-        print '<?xml version="1.0" encoding="UTF-8"?>'
-        print '<collection xmlns="http://www.loc.gov/MARC21/slim">'
+        print('<?xml version="1.0" encoding="UTF-8"?>')
+        print('<collection xmlns="http://www.loc.gov/MARC21/slim">')
         if files:
             for afile in files:
                 try:
                     transform_file(afile)
                 except ValueError:
-                    print >> sys.stderr, "WARNING: %s skipped" % afile
+                    print("WARNING: %s skipped" % afile, file=sys.stderr)
         else:
             try:
                 transform_file("-")
             except ValueError:
-                print >> sys.stderr, "WARNING: ignoring input"
-        print '</collection>'
+                print("WARNING: ignoring input", file=sys.stderr)
+        print('</collection>')
 
     sys.stderr.close()
 

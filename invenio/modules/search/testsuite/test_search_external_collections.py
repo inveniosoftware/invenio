@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 ## This file is part of Invenio.
 ## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
@@ -76,17 +78,17 @@ def download_and_parse():
 @with_app_context()
 def build_search_urls_test():
     """Build some classical urls from basic_search_units."""
-    print "Testing external_search_engines build_search_url functions."
+    print("Testing external_search_engines build_search_url functions.")
     tests = [ [['+', 'ellis', 'author', 'w'], ['+', 'unification', 'title', 'w'],
             ['-', 'Ross', 'author', 'w'], ['+', 'large', '', 'w'], ['-', 'helloworld', '', 'w']],
         [['+', 'ellis', 'author', 'w'], ['+', 'unification', 'title', 'w']],
         [['+', 'ellis', 'author', 'w']],
         [['-', 'Ross', 'author', 'w']] ]
     for engine in external_collections_dictionary.values():
-        print engine.name
+        print(engine.name)
         for test in tests:
             url = engine.build_search_url(test)
-            print "    Url: " + str(url)
+            print("    Url: " + str(url))
 
 class ExtCollTests(InvenioTestCase):
     """Test cases for websearch_external_collections_*"""

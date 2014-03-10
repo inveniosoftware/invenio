@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 BibDocAdmin CLI administration tool
 """
@@ -169,7 +171,7 @@ def cli_quick_match_all_recids(options):
         debug('Initially considering all the recids')
         recids = intbitset(run_sql('SELECT id FROM bibrec'))
         if not recids:
-            print >> sys.stderr, 'WARNING: No record in the database'
+            print('WARNING: No record in the database', file=sys.stderr)
     if md_rec[0] is not None:
         tmp_date_query.append('modification_date>=%s')
         tmp_date_params.append(md_rec[0])
@@ -190,7 +192,7 @@ def cli_quick_match_all_recids(options):
         recids &= intbitset(run_sql(query % tmp_date_query, tmp_date_params))
         debug('After applying dates we obtain recids: %s' % recids)
         if not recids:
-            print >> sys.stderr, 'WARNING: Time constraints for records are too strict'
+            print('WARNING: Time constraints for records are too strict', file=sys.stderr)
     if collection or pattern:
         recids &= intbitset(perform_request_search(cc=collection or '', p=pattern or ''))
         debug('After applyings pattern and collection we obtain recids: %s' % recids)
@@ -427,13 +429,13 @@ def cli_get_stats(dummy):
     """Print per every collection some stats"""
     def print_table(title, table):
         if table:
-            print "=" * 20, title, "=" * 20
+            print("=" * 20, title, "=" * 20)
             for row in table:
-                print "\t".join(str(elem) for elem in row)
+                print("\t".join(str(elem) for elem in row))
 
     for collection, reclist in run_sql("SELECT name, reclist FROM collection ORDER BY name"):
-        print "-" * 79
-        print "Statistic for: %s " % collection
+        print("-" * 79)
+        print("Statistic for: %s " % collection)
         reclist = intbitset(reclist)
         if reclist:
             sqlreclist = "(" + ','.join(str(elem) for elem in reclist) + ')'
@@ -580,14 +582,14 @@ Examples:
 
 def print_info(docid, info):
     """Nicely print info about a docid."""
-    print '%i:%s' % (docid, info)
+    print('%i:%s' % (docid, info))
 
 def bibupload_ffts(ffts, append=False, do_debug=False, interactive=True):
     """Given an ffts dictionary it creates the xml and submit it."""
     xml = ffts_to_xml(ffts)
     if xml:
         if interactive:
-            print xml
+            print(xml)
         tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPSHAREDDIR)
         os.write(tmp_file_fd, xml)
         os.close(tmp_file_fd)
@@ -600,7 +602,7 @@ def bibupload_ffts(ffts, append=False, do_debug=False, interactive=True):
             else:
                 task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2')
             if interactive:
-                print "BibUpload append submitted with id %s" % task
+                print("BibUpload append submitted with id %s" % task)
         else:
             if interactive:
                 wait_for_user("This will be corrected via BibUpload")
@@ -609,9 +611,9 @@ def bibupload_ffts(ffts, append=False, do_debug=False, interactive=True):
             else:
                 task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name, '-N', 'FFT', '-S2')
             if interactive:
-                print "BibUpload correct submitted with id %s" % task
+                print("BibUpload correct submitted with id %s" % task)
     elif interactive:
-        print >> sys.stderr, "WARNING: no MARC to upload."
+        print("WARNING: no MARC to upload.", file=sys.stderr)
     return True
 
 def ranges2ids(parse_string):
@@ -737,7 +739,7 @@ def cli_textify(options):
     perform_ocr = getattr(options, 'perform_ocr', None)
     if perform_ocr:
         if not can_perform_ocr():
-            print >> sys.stderr, "WARNING: OCR requested but OCR is not possible"
+            print("WARNING: OCR requested but OCR is not possible", file=sys.stderr)
             perform_ocr = False
     if perform_ocr:
         additional = ' using OCR (this might take some time)'
@@ -745,18 +747,18 @@ def cli_textify(options):
         additional = ''
     for docid in cli_docids_iterator(options):
         bibdoc = BibDoc.create_instance(docid)
-        print 'Extracting text for docid %s%s...' % (docid, additional),
+        print('Extracting text for docid %s%s...' % (docid, additional), end=' ')
         sys.stdout.flush()
         #pylint: disable=E1103
         if force or (hasattr(bibdoc, "has_text") and not bibdoc.has_text(require_up_to_date=True)):
             try:
                 #pylint: disable=E1103
                 bibdoc.extract_text(perform_ocr=perform_ocr)
-                print "DONE"
+                print("DONE")
             except InvenioBibDocFileError as e:
-                print >> sys.stderr, "WARNING: %s" % e
+                print("WARNING: %s" % e, file=sys.stderr)
         else:
-            print "not needed"
+            print("not needed")
 
 def cli_rename(options):
     """Rename a docname within a recid."""
@@ -775,12 +777,12 @@ def cli_fix_bibdocfsinfo_cache(options):
     """Rebuild the bibdocfsinfo table according to what is available on filesystem"""
     to_be_fixed = intbitset()
     for docid in intbitset(run_sql("SELECT id FROM bibdoc")):
-        print "Fixing bibdocfsinfo table for docid %s..." % docid,
+        print("Fixing bibdocfsinfo table for docid %s..." % docid, end=' ')
         sys.stdout.flush()
         try:
             bibdoc = BibDoc(docid)
         except InvenioBibDocFileError as err:
-            print err
+            print(err)
             continue
         try:
             bibdoc._sync_to_db()
@@ -789,13 +791,13 @@ def cli_fix_bibdocfsinfo_cache(options):
                 recid = bibdoc.bibrec_links[0]["recid"]
                 if recid:
                     to_be_fixed.add(recid)
-                print "ERROR: %s, scheduling a fix for recid %s" % (err, recid)
+                print("ERROR: %s, scheduling a fix for recid %s" % (err, recid))
             else:
-                print "ERROR %s" % (err, )
-        print "DONE"
+                print("ERROR %s" % (err, ))
+        print("DONE")
     if to_be_fixed:
         cli_fix_format(options, recids=to_be_fixed)
-    print "You can now add CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE=1 to your invenio-local.conf file."
+    print("You can now add CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE=1 to your invenio-local.conf file.")
 
 def cli_fix_all(options):
     """Fix all the records of a recid_set."""
@@ -826,14 +828,14 @@ def cli_check_format(options):
         tot += 1
         bibrecdocs = BibRecDocs(recid)
         if not bibrecdocs.check_duplicate_docnames():
-            print >> sys.stderr, "recid %s has duplicate docnames!"
+            print("recid %s has duplicate docnames!", file=sys.stderr)
             broken = True
             duplicate = True
         else:
             broken = False
         for docname in bibrecdocs.get_bibdoc_names():
             if not bibrecdocs.check_format(docname):
-                print >> sys.stderr, "recid %s with docname %s need format fixing" % (recid, docname)
+                print("recid %s with docname %s need format fixing" % (recid, docname), file=sys.stderr)
                 broken = True
         if broken:
             count += 1
@@ -843,7 +845,7 @@ def cli_check_format(options):
         result = "All records appear to be correct with respect to formats."
     if duplicate:
         result += " Note however that at least one record appear to have duplicate docnames. You should better fix this situation by using --fix-duplicate-docnames."
-    print wrap_text_in_a_box(result, style="conclusion")
+    print(wrap_text_in_a_box(result, style="conclusion"))
     return not(duplicate or count)
 
 def cli_check_duplicate_docnames(options):
@@ -855,12 +857,12 @@ def cli_check_duplicate_docnames(options):
         bibrecdocs = BibRecDocs(recid)
         if bibrecdocs.check_duplicate_docnames():
             count += 1
-            print >> sys.stderr, "recid %s has duplicate docnames!"
+            print("recid %s has duplicate docnames!", file=sys.stderr)
     if count:
-        print "%d out of %d records have duplicate docnames." % (count, tot)
+        print("%d out of %d records have duplicate docnames." % (count, tot))
         return False
     else:
-        print "All records appear to be correct with respect to duplicate docnames."
+        print("All records appear to be correct with respect to duplicate docnames.")
         return True
 
 def cli_fix_format(options, recids=None):
@@ -875,15 +877,15 @@ def cli_fix_format(options, recids=None):
         for docname in bibrecdocs.get_bibdoc_names():
             if not bibrecdocs.check_format(docname):
                 if bibrecdocs.fix_format(docname, skip_check=True):
-                    print >> sys.stderr, "%i has been fixed for docname %s" % (recid, docname)
+                    print("%i has been fixed for docname %s" % (recid, docname), file=sys.stderr)
                 else:
-                    print >> sys.stderr, "%i has been fixed for docname %s. However note that a new bibdoc might have been created." % (recid, docname)
+                    print("%i has been fixed for docname %s. However note that a new bibdoc might have been created." % (recid, docname), file=sys.stderr)
                 fixed.add(recid)
     if fixed:
-        print "Now we need to synchronize MARC to reflect current changes."
+        print("Now we need to synchronize MARC to reflect current changes.")
         cli_fix_marc(options, explicit_recid_set=fixed)
 
-    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (tot, len(fixed)), style="conclusion")
+    print(wrap_text_in_a_box("%i out of %i record needed to be fixed." % (tot, len(fixed)), style="conclusion"))
     return not fixed
 
 def cli_fix_duplicate_docnames(options):
@@ -895,12 +897,12 @@ def cli_fix_duplicate_docnames(options):
         bibrecdocs = BibRecDocs(recid)
         if not bibrecdocs.check_duplicate_docnames():
             bibrecdocs.fix_duplicate_docnames(skip_check=True)
-            print >> sys.stderr, "%i has been fixed for duplicate docnames." % recid
+            print("%i has been fixed for duplicate docnames." % recid, file=sys.stderr)
             fixed.add(recid)
     if fixed:
-        print "Now we need to synchronize MARC to reflect current changes."
+        print("Now we need to synchronize MARC to reflect current changes.")
         cli_fix_marc(options, explicit_recid_set=fixed)
-    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (tot, len(fixed)), style="conclusion")
+    print(wrap_text_in_a_box("%i out of %i record needed to be fixed." % (tot, len(fixed)), style="conclusion"))
     return not fixed
 
 def cli_delete(options):
@@ -979,13 +981,13 @@ def cli_undelete(options):
                 recid = bibdoc.bibrec_links[0]["recid"]
             fix_marc.add(recid)
             count += 1
-            print '%s (docid %s from recid %s) will be undeleted to restriction: %s' % (dnold, docid, recid, restriction)
+            print('%s (docid %s from recid %s) will be undeleted to restriction: %s' % (dnold, docid, recid, restriction))
     wait_for_user("I'll proceed with the undeletion")
     for docid in to_be_undeleted:
         bibdoc = BibDoc.create_instance(docid)
         bibdoc.undelete(restriction)
     cli_fix_marc(options, explicit_recid_set=fix_marc)
-    print wrap_text_in_a_box("%s bibdoc successfuly undeleted with status '%s'" % (count, restriction), style="conclusion")
+    print(wrap_text_in_a_box("%s bibdoc successfuly undeleted with status '%s'" % (count, restriction), style="conclusion"))
 
 def cli_get_info(options):
     """Print all the info of the matched docids or recids."""
@@ -1070,13 +1072,13 @@ def cli_get_disk_usage(options):
             print_info(docid, 'size=%s' % size)
             print_info( docid, 'latest version size=%s' % latest_size)
     if human_readable:
-        print wrap_text_in_a_box('total size: %s\n\nlatest version total size: %s'
+        print(wrap_text_in_a_box('total size: %s\n\nlatest version total size: %s'
             % (nice_size(total_size), nice_size(total_latest_size)),
-            style='conclusion')
+            style='conclusion'))
     else:
-        print wrap_text_in_a_box('total size: %s\n\nlatest version total size: %s'
+        print(wrap_text_in_a_box('total size: %s\n\nlatest version total size: %s'
             % (total_size, total_latest_size),
-            style='conclusion')
+            style='conclusion'))
 
 def cli_check_md5(options):
     """Check the md5 sums of a docid_set."""
@@ -1091,9 +1093,9 @@ def cli_check_md5(options):
                     failures += 1
                     print_info(docid, '%s failing checksum!' % afile.get_full_path())
     if failures:
-        print wrap_text_in_a_box('%i files failing' % failures , style='conclusion')
+        print(wrap_text_in_a_box('%i files failing' % failures , style='conclusion'))
     else:
-        print wrap_text_in_a_box('All files are correct', style='conclusion')
+        print(wrap_text_in_a_box('All files are correct', style='conclusion'))
 
 def cli_update_md5(options):
     """Update the md5 sums of a docid_set."""
@@ -1136,7 +1138,7 @@ def cli_hide(options):
                         documents_to_be_hidden[docid] = []
                     documents_to_be_hidden[docid].append((this_version, this_format))
                     to_be_fixed.add(recid)
-                    print '%s (docid: %s, recid: %s) will be hidden' % (bibdocfile.get_full_name(), docid, recid)
+                    print('%s (docid: %s, recid: %s) will be hidden' % (bibdocfile.get_full_name(), docid, recid))
     wait_for_user('Proceeding to hide the matched documents...')
     for docid, documents in iteritems(documents_to_be_hidden):
         bibdoc = BibDoc.create_instance(docid)
@@ -1170,7 +1172,7 @@ def cli_unhide(options):
                         documents_to_be_unhidden[docid] = []
                     documents_to_be_unhidden[docid].append((this_version, this_format))
                     to_be_fixed.add(recid)
-                    print '%s (docid: %s, recid: %s) will be unhidden' % (bibdocfile.get_full_name(), docid, recid)
+                    print('%s (docid: %s, recid: %s) will be unhidden' % (bibdocfile.get_full_name(), docid, recid))
     wait_for_user('Proceeding to unhide the matched documents...')
     for docid, documents in iteritems(documents_to_be_unhidden):
         bibdoc = BibDoc.create_instance(docid)
@@ -1199,7 +1201,7 @@ def main():
             elif getattr(options, 'new_docname', None):
                 cli_rename(options)
             else:
-                print >> sys.stderr, "ERROR: no action specified"
+                print("ERROR: no action specified", file=sys.stderr)
                 sys.exit(1)
         elif getattr(options, 'append_path', None):
             options.empty_recs = 'yes'
@@ -1253,9 +1255,9 @@ def main():
         elif getattr(options, 'action', None) == 'get-stats':
             cli_get_stats(options)
         else:
-            print >> sys.stderr, "ERROR: Action %s is not valid" % getattr(options, 'action', None)
+            print("ERROR: Action %s is not valid" % getattr(options, 'action', None), file=sys.stderr)
             sys.exit(1)
     except Exception as e:
         register_exception()
-        print >> sys.stderr, 'ERROR: %s' % e
+        print('ERROR: %s' % e, file=sys.stderr)
         sys.exit(1)

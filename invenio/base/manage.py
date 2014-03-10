@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 
 from flask import current_app
 from invenio.ext.script import Manager, change_command_name, \
@@ -53,14 +55,14 @@ def version():
 def check_for_software_updates():
     from flask import get_flashed_messages
     from invenio.ext.script import check_for_software_updates
-    print ">>> Going to check software updates ..."
+    print(">>> Going to check software updates ...")
     result = check_for_software_updates()
     messages = list(get_flashed_messages(with_categories=True))
     if len(messages) > 0:
-        print '\n'.join(map(lambda t, msg: '[%s]: %s' % (t.upper(), msg),
-                            messages))
-    print '>>> ' + ('Invenio is up to date.' if result else
-                    'Please consider updating your Invenio installation.')
+        print('\n'.join(map(lambda t, msg: '[%s]: %s' % (t.upper(), msg),
+                            messages)))
+    print('>>> ' + ('Invenio is up to date.' if result else
+                    'Please consider updating your Invenio installation.'))
 
 
 @manager.command
@@ -72,17 +74,17 @@ def detect_system_details():
     """
     import sys
     import socket
-    print ">>> Going to detect system details..."
-    print "* Hostname: " + socket.gethostname()
-    print "* Invenio version: " + version()
-    print "* Python version: " + sys.version.replace("\n", " ")
+    print(">>> Going to detect system details...")
+    print("* Hostname: " + socket.gethostname())
+    print("* Invenio version: " + version())
+    print("* Python version: " + sys.version.replace("\n", " "))
 
     try:
         from invenio.base.scripts.apache import version as detect_apache_version
-        print "* Apache version: " + detect_apache_version(
-            separator=";\n                  ")
+        print("* Apache version: " + detect_apache_version(
+            separator=";\n                  "))
     except ImportError:
-        print >> sys.stderr, '* Apache manager could not be imported.'
+        print('* Apache manager could not be imported.', file=sys.stderr)
 
     try:
         from invenio.base.scripts.database import \
@@ -90,17 +92,17 @@ def detect_system_details():
             version as detect_database_driver_version, \
             driver as detect_database_driver_name
 
-        print "* " + detect_database_driver_name() + " version: " + \
-            detect_database_driver_version()
+        print("* " + detect_database_driver_name() + " version: " + \
+            detect_database_driver_version())
         try:
             out = mysql_info(separator="\n", line_format="    - %s: %s")
-            print "* MySQL version:\n", out
+            print("* MySQL version:\n", out)
         except Exception as e:
-            print >> sys.stderr, "* Error:", e
+            print("* Error:", e, file=sys.stderr)
     except ImportError:
-        print >> sys.stderr, '* Database manager could not be imported.'
+        print('* Database manager could not be imported.', file=sys.stderr)
 
-    print ">>> System details detected successfully."
+    print(">>> System details detected successfully.")
 
 
 def main():

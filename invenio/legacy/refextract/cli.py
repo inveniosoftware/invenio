@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """This is file handles the command line interface
 
     * We parse the options for both daemon and standalone usage
@@ -165,7 +167,7 @@ def usage(wmsg=None, err_code=0):
 
     # Display the help information and the warning in the stderr stream
     # 'help_message' is global
-    print >> sys.stderr, USAGE_MESSAGE
+    print(USAGE_MESSAGE, file=sys.stderr)
     # Output error message, either to the stderr stream also or
     # on the interface. Stop the extraction procedure
     halt(msg=wmsg, exit_code=err_code)
@@ -257,11 +259,11 @@ def write_references(config, xml_references):
         ofilehdl = sys.stdout
 
     try:
-        print >>ofilehdl, CFG_REFEXTRACT_XML_VERSION.encode("utf-8")
-        print >>ofilehdl, CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8")
+        print(CFG_REFEXTRACT_XML_VERSION.encode("utf-8"), file=ofilehdl)
+        print(CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"), file=ofilehdl)
         for out in xml_references:
-            print >>ofilehdl, out.encode("utf-8")
-        print >>ofilehdl, CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8")
+            print(out.encode("utf-8"), file=ofilehdl)
+        print(CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"), file=ofilehdl)
         ofilehdl.flush()
     except IOError as err:
         write_message("%s\n%s\n" % (config.xmlfile, err), \

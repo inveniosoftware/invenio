@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 __revision__ = "$Id$"
 
 import re
@@ -994,7 +996,7 @@ def print_missing(num):
                      GROUP BY extcitepubinfo HAVING COUNT(id_bibrec) >= %s
                      ORDER BY COUNT(id_bibrec) DESC""", (num,))
     for (cnt, brec) in res:
-        print str(cnt)+"\t"+brec
+        print(str(cnt)+"\t"+brec)
 
     write_message("Listing done.")
 

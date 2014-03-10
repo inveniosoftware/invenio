@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 from six import iteritems
 
 from invenio.celery import celery
@@ -50,8 +52,8 @@ def celery_run(workflow_name, data, **kwargs):
                             db.session.add(data[i].extra_data["repository"])
                             db.session.commit()
                         except Exception as e:
-                            print "Celery : SQLAlchemy decoherence data object"
-                            print e.message
+                            print("Celery : SQLAlchemy decoherence data object")
+                            print(e.message)
     else:
         if isinstance(data, BibWorkflowObjectIdContainer):
             data = data.get_object()
@@ -67,8 +69,8 @@ def celery_run(workflow_name, data, **kwargs):
                         db.session.add(data.extra_data["repository"])
                         db.session.commit()
                     except Exception as e:
-                        print "Celery : SQLAlchemy decoherence data object"
-                        print e.message
+                        print("Celery : SQLAlchemy decoherence data object")
+                        print(e.message)
     run_worker(workflow_name, data, **kwargs)
 
 

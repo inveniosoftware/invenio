@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Test the suitability of Python core and the availability of various
 Python modules for running Invenio.  Warn the user if there are
@@ -42,10 +44,10 @@ def wait_for_user(msg):
     try:
         raw_input(msg)
     except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
+        print("\n\nInstallation aborted.")
         sys.exit(1)
     except EOFError:
-        print " (continuing in batch mode)"
+        print(" (continuing in batch mode)")
         return
 
 ## 1) check Python version:
@@ -500,46 +502,46 @@ except StandardError as msg:
     )
 
 if warning_messages:
-    print """
+    print("""
     ******************************************************
     ** WARNING MESSAGES                                 **
     ******************************************************
-    """
+    """)
     for warning in warning_messages:
-        print warning
+        print(warning)
 
 if error_messages:
-    print """
+    print("""
     ******************************************************
     ** ERROR MESSAGES                                   **
     ******************************************************
-    """
+    """)
     for error in error_messages:
-        print error
+        print(error)
 
 if warning_messages and error_messages:
-    print """
+    print("""
     There were %(n_err)s error(s) found that you need to solve.
     Please see above, solve them, and re-run configure.
     Note that there are also %(n_wrn)s warnings you may want
     to look into.  Aborting the installation.
     """ % {'n_wrn': len(warning_messages),
-           'n_err': len(error_messages)}
+           'n_err': len(error_messages)})
 
     sys.exit(1)
 elif error_messages:
-    print """
+    print("""
     There were %(n_err)s error(s) found that you need to solve.
     Please see above, solve them, and re-run configure.
     Aborting the installation.
-    """ % {'n_err': len(error_messages)}
+    """ % {'n_err': len(error_messages)})
 
     sys.exit(1)
 elif warning_messages:
-    print """
+    print("""
     There were %(n_wrn)s warnings found that you may want to
     look into, solve, and re-run configure before you
     continue the installation.  However, you can also continue
     the installation now and solve these issues later, if you wish.
-    """ % {'n_wrn': len(warning_messages)}
+    """ % {'n_wrn': len(warning_messages)})
     wait_for_user("Press ENTER to continue the installation...")

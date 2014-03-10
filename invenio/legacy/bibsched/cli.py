@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """BibSched - task management, scheduling and executing system for Invenio
 """
 
@@ -461,7 +463,7 @@ class Manager(object):
             if os.path.exists(pager):
                 self.curses.endwin()
                 os.system('%s %s' % (pager, logname))
-                print >> self.old_stdout, "\rPress ENTER to continue",
+                print("\rPress ENTER to continue", end=' ', file=self.old_stdout)
                 self.old_stdout.flush()
                 raw_input()
                 # We need to redraw the bibsched task list
@@ -1529,12 +1531,12 @@ pidfile = os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched.pid')
 
 
 def error(msg):
-    print >> sys.stderr, "error: %s" % msg
+    print("error: %s" % msg, file=sys.stderr)
     sys.exit(1)
 
 
 def warning(msg):
-    print >> sys.stderr, "warning: %s" % msg
+    print("warning: %s" % msg, file=sys.stderr)
 
 
 def server_pid(ping_the_process=True, check_is_really_bibsched=True):
@@ -1616,7 +1618,7 @@ def halt(verbose=True, soft=False, debug=False): # pylint: disable=W0613
     pid = server_pid()
     if not pid:
         if soft:
-            print >> sys.stderr, 'bibsched seems not to be running.'
+            print('bibsched seems not to be running.', file=sys.stderr)
             return
         else:
             error('bibsched seems not to be running.')
@@ -1624,12 +1626,12 @@ def halt(verbose=True, soft=False, debug=False): # pylint: disable=W0613
     try:
         os.kill(pid, signal.SIGKILL)
     except OSError:
-        print >> sys.stderr, 'no bibsched process found'
+        print('no bibsched process found', file=sys.stderr)
 
     Log("daemon stopped (pid %d)" % pid)
 
     if verbose:
-        print "stopping bibsched: pid %d" % pid
+        print("stopping bibsched: pid %d" % pid)
     os.unlink(pidfile)
 
 
@@ -1725,7 +1727,7 @@ def stop(verbose=True, debug=False):
     * return
     """
     if verbose:
-        print "Stopping BibSched if running"
+        print("Stopping BibSched if running")
     halt(verbose, soft=True, debug=debug)
     run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
     res = run_sql("""SELECT id, proc, status FROM schTASK
@@ -1737,7 +1739,7 @@ def stop(verbose=True, debug=False):
                          OR status='SLEEPING'
                          OR status='CONTINUING')""")
     if verbose:
-        print "Stopping all running BibTasks"
+        print("Stopping all running BibTasks")
     for task_id, proc, status in res:
         if status == 'SLEEPING':
             bibsched_send_signal(proc, task_id, signal.SIGCONT)
@@ -1757,7 +1759,7 @@ def stop(verbose=True, debug=False):
             time.sleep(CFG_BIBSCHED_REFRESHTIME)
 
     if verbose:
-        print "\nStopped"
+        print("\nStopped")
     Log("BibSched and all BibTasks stopped")
 
 
@@ -1783,7 +1785,7 @@ def main():
             usage(0)
 
         elif opt in ["-V", "--version"]:
-            print __revision__
+            print(__revision__)
             sys.exit(0)
 
         elif opt in ['-q', '--quiet']:

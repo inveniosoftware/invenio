@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 '''
 BibSWORD Client Engine
 '''
@@ -857,7 +859,7 @@ def main():
         usage(1, 'No options given')
 
     if not '--yes-i-know' in sys.argv[1:]:
-        print "This is an experimental tool. It is disabled for the moment."
+        print("This is an experimental tool. It is disabled for the moment.")
         sys.exit(0)
 
     try:
@@ -967,8 +969,8 @@ def main():
     if options['action'] == "list-remote-servers":
         servers = list_remote_servers()
         for server in servers:
-            print str(server['id']) +': '+ server['name'] + \
-                  ' ( ' + server['host'] + ' ) '
+            print(str(server['id']) +': '+ server['name'] + \
+                  ' ( ' + server['host'] + ' ) ')
 
 
     #---------------------------------------------------------------------------
@@ -980,12 +982,12 @@ def main():
         info = list_server_info(options['server-id'])
 
         if info == {}:
-            print 'Error, no infos found !'
+            print('Error, no infos found !')
         else:
-            print 'SWORD version: ' + info['version']
-            print 'Maximal upload size [Kb]: ' + info['maxUploadSize']
-            print 'Implements verbose mode: ' + info['verbose']
-            print 'Implementes simulation mode: ' + info['noOp']
+            print('SWORD version: ' + info['version'])
+            print('Maximal upload size [Kb]: ' + info['maxUploadSize'])
+            print('Implements verbose mode: ' + info['verbose'])
+            print('Implementes simulation mode: ' + info['noOp'])
 
 
     #---------------------------------------------------------------------------
@@ -1000,8 +1002,8 @@ def main():
             usage(1, "Wrong server id, try --get-remote-servers")
 
         for collection in collections:
-            print collection['id'] +': '+ collection['label'] + ' - ' + \
-                  collection['url']
+            print(collection['id'] +': '+ collection['label'] + ' - ' + \
+                  collection['url'])
 
 
     #---------------------------------------------------------------------------
@@ -1013,16 +1015,16 @@ def main():
         info = list_collection_informations(str(options['server-id']),
                                             options['collection-id'])
 
-        print 'Accepted media types:'
+        print('Accepted media types:')
 
         accept_list = info['accept']
         for accept in accept_list:
-            print '- ' + accept
+            print('- ' + accept)
 
-        print 'collection policy: ' + info['collectionPolicy']
-        print 'mediation allowed: ' + info['mediation']
-        print 'treatment mode: ' + info['treatment']
-        print 'location of accept packaging list: ' + info['acceptPackaging']
+        print('collection policy: ' + info['collectionPolicy'])
+        print('mediation allowed: ' + info['mediation'])
+        print('treatment mode: ' + info['treatment'])
+        print('location of accept packaging list: ' + info['acceptPackaging'])
 
     #---------------------------------------------------------------------------
     # --list-primary-categories
@@ -1037,8 +1039,8 @@ def main():
             usage(1, "Wrong server id, try --get-collections")
 
         for category in categories:
-            print category['id'] +': '+ category['label'] + ' - ' + \
-                    category['url']
+            print(category['id'] +': '+ category['label'] + ' - ' + \
+                    category['url'])
 
 
     #---------------------------------------------------------------------------
@@ -1054,8 +1056,8 @@ def main():
             usage(1, "Wrong server id, try --get-collections")
 
         for category in categories:
-            print category['id'] +': '+ category['label'] + ' - ' + \
-                    category['url']
+            print(category['id'] +': '+ category['label'] + ' - ' + \
+                    category['url'])
 
 
     #---------------------------------------------------------------------------
@@ -1067,17 +1069,17 @@ def main():
         results = select_submitted_record_infos()
 
         for result in results:
-            print '\n'
-            print 'submission id: ' + str(result[0])
-            print 'remote server id: ' + str(result[1])
-            print 'submitter id: ' + str(result[4])
-            print 'local record id: ' + result[2]
-            print 'remote record id: ' + str(result[3])
-            print 'submit date: ' + result[5]
-            print 'document type: ' + result[6]
-            print 'media link: ' + result[7]
-            print 'metadata link: ' + result[8]
-            print 'status link: ' + result[9]
+            print('\n')
+            print('submission id: ' + str(result[0]))
+            print('remote server id: ' + str(result[1]))
+            print('submitter id: ' + str(result[4]))
+            print('local record id: ' + result[2])
+            print('remote record id: ' + str(result[3]))
+            print('submit date: ' + result[5])
+            print('document type: ' + result[6])
+            print('media link: ' + result[7])
+            print('metadata link: ' + result[8])
+            print('status link: ' + result[9])
 
 
     #---------------------------------------------------------------------------
@@ -1092,7 +1094,7 @@ def main():
             usage(1, "recid %d unknown" % options['recid'])
 
         else:
-            print marcxml
+            print(marcxml)
 
 
     #---------------------------------------------------------------------------
@@ -1113,8 +1115,8 @@ def main():
         medias = get_media_list(options['recid'])
 
         for media in medias:
-            print 'media_link = '+ media['path']
-            print 'media_type = '+ media['type']
+            print('media_link = '+ media['path'])
+            print('media_type = '+ media['type'])
 
     #---------------------------------------------------------------------------
     # --compress-media-file
@@ -1134,7 +1136,7 @@ def main():
             usage (1, "you must provide a media file list, a metadata file or"+
                       " a valid recid")
 
-        print compress_media_file(options['media-file-list'])
+        print(compress_media_file(options['media-file-list']))
 
 
     #---------------------------------------------------------------------------
@@ -1162,15 +1164,15 @@ def main():
         medias = options['media-file-list']
         server_id = options["server-id"]
 
-        print collection
+        print(collection)
         for media in medias:
-            print media['type']
-        print server_id
+            print(media['type'])
+        print(server_id)
 
         result = deposit_media(server_id, medias, collection)
 
         for result in results:
-            print result
+            print(result)
 
 
     #---------------------------------------------------------------------------
@@ -1192,8 +1194,8 @@ def main():
         deposit = []
         deposit.append(options['deposit-result'])
 
-        print format_metadata(options['marcxml-file'], deposit,
-                              user_info)
+        print(format_metadata(options['marcxml-file'], deposit,
+                              user_info))
 
 
     #---------------------------------------------------------------------------
@@ -1216,11 +1218,11 @@ def main():
 
         metadata = open(options['metadata']).read()
 
-        print submit_metadata(options['server-id'],
+        print(submit_metadata(options['server-id'],
                               options['collection_url'],
                               metadata,
                               user_info['nickname'],
-                              user_info['email'])
+                              user_info['email']))
 
 
     #---------------------------------------------------------------------------
@@ -1261,16 +1263,16 @@ def main():
                                               options['recid'])
 
         if response['error'] != '':
-            print 'error: ' + response['error']
+            print('error: ' + response['error'])
 
         if response['message'] != '':
-            print 'message: ' + response['message']
+            print('message: ' + response['message'])
 
         for deposit_media in response['deposit_media']:
-            print 'deposit_media: \n ' + deposit_media
+            print('deposit_media: \n ' + deposit_media)
 
         if response['submit_metadata'] != '':
-            print 'submit_metadata: \n ' + response['submit_metadata']
+            print('submit_metadata: \n ' + response['submit_metadata'])
 
 
 #-------------------------------------------------------------------------------

@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Invenio Bibliographic Task Class.
 
 BibTask class.
@@ -552,7 +554,7 @@ def _task_build_params(
             if opt[0] in ("-h", "--help"):
                 _usage(0, help_specific_usage=help_specific_usage, description=description)
             elif opt[0] in ("-V", "--version"):
-                print _TASK_PARAMS["version"]
+                print(_TASK_PARAMS["version"])
                 sys.exit(0)
             elif opt[0] in ("-u", "--user"):
                 _TASK_PARAMS["user"] = opt[1]
@@ -775,10 +777,10 @@ def authenticate(user, authorization_action, authorization_msg=""):
     if CFG_EXTERNAL_AUTH_USING_SSO or os.path.basename(sys.argv[0]) in CFG_VALID_PROCESSES_NO_AUTH_NEEDED:
         return user
     if authorization_msg:
-        print authorization_msg
-        print "=" * len(authorization_msg)
+        print(authorization_msg)
+        print("=" * len(authorization_msg))
     if user == "":
-        print >> sys.stdout, "\rUsername: ",
+        print("\rUsername: ", end=' ', file=sys.stdout)
         try:
             user = sys.stdin.readline().lower().strip()
         except EOFError:
@@ -788,13 +790,13 @@ def authenticate(user, authorization_action, authorization_msg=""):
             sys.stderr.write("\n")
             sys.exit(1)
     else:
-        print >> sys.stdout, "\rUsername:", user
+        print("\rUsername:", user, file=sys.stdout)
     ## first check user:
     # p_un passed may be an email or a nickname:
     res = run_sql("select id from user where email=%s", (user,), 1) + \
         run_sql("select id from user where nickname=%s", (user,), 1)
     if not res:
-        print "Sorry, %s does not exist." % user
+        print("Sorry, %s does not exist." % user)
         sys.exit(1)
     else:
         uid = res[0][0]
@@ -826,13 +828,13 @@ def authenticate(user, authorization_action, authorization_msg=""):
                 if CFG_EXTERNAL_AUTHENTICATION[login_method].auth_user(get_email(uid), password_entered):
                     ok = True
         if not ok:
-            print "Sorry, wrong credentials for %s." % user
+            print("Sorry, wrong credentials for %s." % user)
             sys.exit(1)
         else:
             ## secondly check authorization for the authorization_action:
             (auth_code, auth_message) = acc_authorize_action(uid, authorization_action)
             if auth_code != 0:
-                print auth_message
+                print(auth_message)
                 sys.exit(1)
             return user
 
@@ -1145,7 +1147,7 @@ def guess_apache_process_user_from_ps():
                     if username not in apache_users and username != 'root':
                         apache_users.append(username)
     except Exception as e:
-        print >> sys.stderr, "WARNING: %s" % e
+        print("WARNING: %s" % e, file=sys.stderr)
     return tuple(apache_users)
 
 def guess_apache_process_user():
@@ -1160,7 +1162,7 @@ def guess_apache_process_user():
             return userline[0]
         except KeyError:
             pass
-    print >> sys.stderr, "ERROR: Cannot detect Apache server process user. Please set the correct value in CFG_BIBSCHED_PROCESS_USER."
+    print("ERROR: Cannot detect Apache server process user. Please set the correct value in CFG_BIBSCHED_PROCESS_USER.", file=sys.stderr)
     sys.exit(1)
 
 def check_running_process_user():
@@ -1174,23 +1176,23 @@ def check_running_process_user():
         # We have the expected bibsched process user defined in config,
         # so check against her, not against Apache.
         if running_as_user != CFG_BIBSCHED_PROCESS_USER:
-            print >> sys.stderr, """ERROR: You must run "%(x_proc)s" as the user set up in your
+            print("""ERROR: You must run "%(x_proc)s" as the user set up in your
 CFG_BIBSCHED_PROCESS_USER (seems to be "%(x_user)s").
 
 You may want to do "sudo -u %(x_user)s %(x_proc)s ..." to do so.
 
 If you think this is not right, please set CFG_BIBSCHED_PROCESS_USER
 appropriately and rerun "inveniocfg --update-config-py".""" % \
-            {'x_proc': os.path.basename(sys.argv[0]), 'x_user': CFG_BIBSCHED_PROCESS_USER}
+            {'x_proc': os.path.basename(sys.argv[0]), 'x_user': CFG_BIBSCHED_PROCESS_USER}, file=sys.stderr)
             sys.exit(1)
     elif running_as_user != guess_apache_process_user(): # not defined in config, check against Apache
-        print >> sys.stderr, """ERROR: You must run "%(x_proc)s" as the same user that runs your Apache server
+        print("""ERROR: You must run "%(x_proc)s" as the same user that runs your Apache server
 process (seems to be "%(x_user)s").
 
 You may want to do "sudo -u %(x_user)s %(x_proc)s ..." to do so.
 
 If you think this is not right, please set CFG_BIBSCHED_PROCESS_USER
 appropriately and rerun "inveniocfg --update-config-py".""" % \
-        {'x_proc': os.path.basename(sys.argv[0]), 'x_user': guess_apache_process_user()}
+        {'x_proc': os.path.basename(sys.argv[0]), 'x_user': guess_apache_process_user()}, file=sys.stderr)
         sys.exit(1)
     return

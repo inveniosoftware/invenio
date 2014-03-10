@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 '''
     bibauthorid_bdinterface
     This is the only file in bibauthorid which should
@@ -2503,9 +2505,9 @@ def check_results():
     for dd in duplicated:
         is_ok = False
         for d in dd:
-            print "Duplicated row in aidRESULTS"
-            print "%s %s %s %s" % d
-        print
+            print("Duplicated row in aidRESULTS")
+            print("%s %s %s %s" % d)
+        print()
 
 
     clusters = {}
@@ -2518,12 +2520,12 @@ def check_results():
 
     if faulty_clusters:
         is_ok = False
-        print "Recids NOT unique in clusters!"
-        print ("A total of %s clusters hold an average of %.2f duplicates" %
-               (len(faulty_clusters), (sum(faulty_clusters.values()) / float(len(faulty_clusters)))))
+        print("Recids NOT unique in clusters!")
+        print(("A total of %s clusters hold an average of %.2f duplicates" %
+               (len(faulty_clusters), (sum(faulty_clusters.values()) / float(len(faulty_clusters))))))
 
         for c in faulty_clusters:
-            print "Name: %-20s      Size: %4d      Faulty: %2d" % (c, len(clusters[c]), faulty_clusters[c])
+            print("Name: %-20s      Size: %4d      Faulty: %2d" % (c, len(clusters[c]), faulty_clusters[c]))
 
     return is_ok
 
@@ -2597,11 +2599,11 @@ def check_claim_inspireid_contradiction():
         pids = set(chain.from_iterable(imap(itemgetter(0), cluster)))
 
         if len(pids) > 1:
-            print "InspireID: %s links the following papers:" % iid
-            print map(itemgetter(1), cluster)
-            print "More than one personid claimed them:"
-            print list(pids)
-            print
+            print("InspireID: %s links the following papers:" % iid)
+            print(map(itemgetter(1), cluster))
+            print("More than one personid claimed them:")
+            print(list(pids))
+            print()
             continue
 
         if len(pids) == 0:
@@ -2623,11 +2625,11 @@ def check_claim_inspireid_contradiction():
         problem = list(chain.from_iterable(problem))
 
         if problem:
-            print "A personid has claimed a paper from an inspireid cluster and a contradictory paper."
-            print "Personid %d" % pid
-            print "Inspireid cluster %s" % str(map(itemgetter(1), cluster))
-            print "Contradicting claims: %s" % str(problem)
-            print
+            print("A personid has claimed a paper from an inspireid cluster and a contradictory paper.")
+            print("Personid %d" % pid)
+            print("Inspireid cluster %s" % str(map(itemgetter(1), cluster)))
+            print("Contradicting claims: %s" % str(problem))
+            print()
 
 def get_all_bibrecs():
     '''

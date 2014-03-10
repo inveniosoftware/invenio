@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """BibEncode module.
 A multi-purpose module that wraps around FFMPEG.
 It allows the execution of video transcoding, frame extraction,
@@ -318,7 +320,7 @@ def task_submit_check_options():
             return False
         else:
             if not os.path.exists(_topt('input')):
-                print("The file %s does not exist" % _topt('input'))
+                print(("The file %s does not exist" % _topt('input')))
                 return False
 
     ## OUTPUT ##
@@ -495,9 +497,9 @@ def task_submit_check_options():
             template = json_decode_file(_topt('input'))
             message = "# YOU ARE ABOUT TO UPDATE RECORDS MATCHING '%s'  #" % _topt('search')
             print('\n')
-            print("#" + "-"*(len(message)-2) + "#")
+            print(("#" + "-"*(len(message)-2) + "#"))
             print(message)
-            print("#" + "-"*(len(message)-2) + "#")
+            print(("#" + "-"*(len(message)-2) + "#"))
             print('\n')
             print('The selected template file contains:')
             pprint(template)

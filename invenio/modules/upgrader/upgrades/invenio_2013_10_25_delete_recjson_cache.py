@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
@@ -34,5 +36,5 @@ def pre_upgrade():
     pass
 
 def post_upgrade():
-    print 'NOTE: please run inveniocfg --load-bibfield-conf to apply new changes.'
-    print 'NOTE: please consider scheduling inveniocfg --reset-recjson-cache when time permits. (May take long time.)'
+    print('NOTE: please run inveniocfg --load-bibfield-conf to apply new changes.')
+    print('NOTE: please consider scheduling inveniocfg --reset-recjson-cache when time permits. (May take long time.)')

@@ -14,10 +14,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from datetime import datetime
+
+from __future__ import print_function
 
 import time
+
+from datetime import datetime
 from sqlalchemy import func
+
 from invenio.ext.sqlalchemy import db
 from invenio.legacy.dbquery import run_sql
 from invenio.modules.oaiharvester.models import OaiHARVEST, OaiHARVESTLOG
@@ -303,5 +307,5 @@ def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
             db.session.add(my_new_harvest_log)
             db.session.commit()
     except Exception as msg:
-        print "Logging exception : %s   " % (str(msg),)
+        print("Logging exception : %s   " % (str(msg),))
 

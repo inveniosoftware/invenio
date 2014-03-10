@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 This module implement fulltext conversion between many different file formats.
 """
@@ -320,7 +322,7 @@ def can_pdfopt(verbose=False):
     if CFG_PATH_PDFOPT:
         return True
     elif verbose:
-        print >> sys.stderr, "PDF linearization is not supported because the pdfopt executable is not available"
+        print("PDF linearization is not supported because the pdfopt executable is not available", file=sys.stderr)
     return False
 
 
@@ -328,11 +330,11 @@ def can_pdfx(verbose=False):
     """Return True if it's possible to generate PDF/Xs."""
     if not CFG_PATH_PDFTOPS:
         if verbose:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because the pdftops executable is not available"
+            print("Conversion of PS or PDF to PDF/X is not possible because the pdftops executable is not available", file=sys.stderr)
         return False
     if not CFG_PATH_GS:
         if verbose:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because the gs executable is not available"
+            print("Conversion of PS or PDF to PDF/X is not possible because the gs executable is not available", file=sys.stderr)
         return False
     else:
         try:
@@ -340,18 +342,18 @@ def can_pdfx(verbose=False):
             if not output:
                 raise ValueError("No version information returned")
             if [int(number) for number in output.split('.')] < [int(number) for number in CFG_GS_MINIMAL_VERSION_FOR_PDFX.split('.')]:
-                print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because the minimal gs version for the executable %s is not met: it should be %s but %s has been found" % (CFG_PATH_GS, CFG_GS_MINIMAL_VERSION_FOR_PDFX, output)
+                print("Conversion of PS or PDF to PDF/X is not possible because the minimal gs version for the executable %s is not met: it should be %s but %s has been found" % (CFG_PATH_GS, CFG_GS_MINIMAL_VERSION_FOR_PDFX, output), file=sys.stderr)
                 return False
         except Exception as err:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because it's not possible to retrieve the gs version using the executable %s: %s" % (CFG_PATH_GS, err)
+            print("Conversion of PS or PDF to PDF/X is not possible because it's not possible to retrieve the gs version using the executable %s: %s" % (CFG_PATH_GS, err), file=sys.stderr)
             return False
     if not CFG_PATH_PDFINFO:
         if verbose:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because the pdfinfo executable is not available"
+            print("Conversion of PS or PDF to PDF/X is not possible because the pdfinfo executable is not available", file=sys.stderr)
         return False
     if not os.path.exists(CFG_ICC_PATH):
         if verbose:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because %s does not exists. Have you run make install-pdfa-helper-files?" % CFG_ICC_PATH
+            print("Conversion of PS or PDF to PDF/X is not possible because %s does not exists. Have you run make install-pdfa-helper-files?" % CFG_ICC_PATH, file=sys.stderr)
         return False
     return True
 
@@ -360,11 +362,11 @@ def can_pdfa(verbose=False):
     """Return True if it's possible to generate PDF/As."""
     if not CFG_PATH_PDFTOPS:
         if verbose:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/A is not possible because the pdftops executable is not available"
+            print("Conversion of PS or PDF to PDF/A is not possible because the pdftops executable is not available", file=sys.stderr)
         return False
     if not CFG_PATH_GS:
         if verbose:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/A is not possible because the gs executable is not available"
+            print("Conversion of PS or PDF to PDF/A is not possible because the gs executable is not available", file=sys.stderr)
         return False
     else:
         try:
@@ -372,18 +374,18 @@ def can_pdfa(verbose=False):
             if not output:
                 raise ValueError("No version information returned")
             if [int(number) for number in output.split('.')] < [int(number) for number in CFG_GS_MINIMAL_VERSION_FOR_PDFA.split('.')]:
-                print >> sys.stderr, "Conversion of PS or PDF to PDF/A is not possible because the minimal gs version for the executable %s is not met: it should be %s but %s has been found" % (CFG_PATH_GS, CFG_GS_MINIMAL_VERSION_FOR_PDFA, output)
+                print("Conversion of PS or PDF to PDF/A is not possible because the minimal gs version for the executable %s is not met: it should be %s but %s has been found" % (CFG_PATH_GS, CFG_GS_MINIMAL_VERSION_FOR_PDFA, output), file=sys.stderr)
                 return False
         except Exception as err:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/A is not possible because it's not possible to retrieve the gs version using the executable %s: %s" % (CFG_PATH_GS, err)
+            print("Conversion of PS or PDF to PDF/A is not possible because it's not possible to retrieve the gs version using the executable %s: %s" % (CFG_PATH_GS, err), file=sys.stderr)
             return False
     if not CFG_PATH_PDFINFO:
         if verbose:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/A is not possible because the pdfinfo executable is not available"
+            print("Conversion of PS or PDF to PDF/A is not possible because the pdfinfo executable is not available", file=sys.stderr)
         return False
     if not os.path.exists(CFG_ICC_PATH):
         if verbose:
-            print >> sys.stderr, "Conversion of PS or PDF to PDF/A is not possible because %s does not exists. Have you run make install-pdfa-helper-files?" % CFG_ICC_PATH
+            print("Conversion of PS or PDF to PDF/A is not possible because %s does not exists. Have you run make install-pdfa-helper-files?" % CFG_ICC_PATH, file=sys.stderr)
         return False
     return True
 
@@ -392,15 +394,15 @@ def can_perform_ocr(verbose=False):
     """Return True if it's possible to perform OCR."""
     if not CFG_CAN_DO_OCR:
         if verbose:
-            print >> sys.stderr, "OCR is not supported because either the pyPdf of ReportLab Python libraries are missing"
+            print("OCR is not supported because either the pyPdf of ReportLab Python libraries are missing", file=sys.stderr)
         return False
     if not CFG_PATH_OCROSCRIPT:
         if verbose:
-            print >> sys.stderr, "OCR is not supported because the ocroscript executable is not available"
+            print("OCR is not supported because the ocroscript executable is not available", file=sys.stderr)
         return False
     if not CFG_PATH_PDFTOPPM:
         if verbose:
-            print >> sys.stderr, "OCR is not supported because the pdftoppm executable is not available"
+            print("OCR is not supported because the pdftoppm executable is not available", file=sys.stderr)
         return False
     return True
 
@@ -684,11 +686,11 @@ def can_unoconv(verbose=False):
             return True
         except Exception as err:
             if verbose:
-                print >> sys.stderr, get_unoconv_installation_guideline(err)
+                print(get_unoconv_installation_guideline(err), file=sys.stderr)
             return False
     else:
         if verbose:
-            print >> sys.stderr, "Libre/OpenOffice.org integration not enabled"
+            print("Libre/OpenOffice.org integration not enabled", file=sys.stderr)
         return False
 
 
@@ -999,7 +1001,7 @@ def pdf2pdfhocr(input_pdf, text_hocr, output_pdf, rotations=None, font='Courier'
         text_page = input2.getPage(i)
         angle = _get_page_rotation(i)
         if angle != 0:
-            print >> sys.stderr,  "Rotating page %d by %d degrees." % (i, angle)
+            print("Rotating page %d by %d degrees." % (i, angle), file=sys.stderr)
             text_page = text_page.rotateClockwise(angle)
         if draft:
             below, above = orig_page, text_page
@@ -1007,7 +1009,7 @@ def pdf2pdfhocr(input_pdf, text_hocr, output_pdf, rotations=None, font='Courier'
             below, above = text_page, orig_page
         below.mergePage(above)
         if angle != 0 and not draft:
-            print >> sys.stderr,  "Rotating back page %d by %d degrees." % (i, angle)
+            print("Rotating back page %d by %d degrees." % (i, angle), file=sys.stderr)
             below.rotateCounterClockwise(angle)
         output.addPage(below)
     outputStream = file(output_pdf, "wb")
@@ -1422,35 +1424,35 @@ def main_cli():
             input_format = normalize_format(options.can_convert)
             if input_format == '.pdf':
                 if can_pdfopt(True):
-                    print "PDF linearization supported"
+                    print("PDF linearization supported")
                 else:
-                    print "No PDF linearization support"
+                    print("No PDF linearization support")
                 if can_pdfa(True):
-                    print "PDF/A generation supported"
+                    print("PDF/A generation supported")
                 else:
-                    print "No PDF/A generation support"
+                    print("No PDF/A generation support")
             if can_perform_ocr(True):
-                print "OCR supported"
+                print("OCR supported")
             else:
-                print "OCR not supported"
-            print 'Can convert from "%s" to:' % input_format[1:],
+                print("OCR not supported")
+            print('Can convert from "%s" to:' % input_format[1:], end=' ')
             for output_format in __CONVERSION_MAP:
                 if can_convert(input_format, output_format):
-                    print '"%s"' % output_format[1:],
-            print
+                    print('"%s"' % output_format[1:], end=' ')
+            print()
     elif options.check_ocr_is_needed:
-        print "Checking if OCR is needed on %s..." % options.check_ocr_is_needed,
+        print("Checking if OCR is needed on %s..." % options.check_ocr_is_needed, end=' ')
         sys.stdout.flush()
         if guess_is_OCR_needed(options.check_ocr_is_needed):
-            print "needed."
+            print("needed.")
         else:
-            print "not needed."
+            print("not needed.")
     elif options.ocrize:
         try:
             output = pdf2hocr2pdf(options.ocrize, output_file=options.output_name, title=options.title, ln=options.ln)
-            print "Output stored in %s" % output
+            print("Output stored in %s" % output)
         except InvenioWebSubmitFileConverterError as err:
-            print "ERROR: %s" % err
+            print("ERROR: %s" % err)
             sys.exit(1)
     else:
         try:
@@ -1459,9 +1461,9 @@ def main_cli():
             if not options.input_name:
                 parser.error("An input should be specified!")
             output = convert_file(options.input_name, output_file=options.output_name, output_format=options.output_format, pdfopt=options.pdfopt, pdfa=options.pdf_a, title=options.title, ln=options.ln)
-            print "Output stored in %s" % output
+            print("Output stored in %s" % output)
         except InvenioWebSubmitFileConverterError as err:
-            print "ERROR: %s" % err
+            print("ERROR: %s" % err)
             sys.exit(1)
 
 

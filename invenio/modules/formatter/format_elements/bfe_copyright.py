@@ -19,6 +19,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """BibFormat element - Prints copyright information"""
 
 __revision__ = "$Id$"
@@ -720,7 +722,7 @@ def test():
     assert(format_element(bfo26, remove_link_to_CERN_license="no")  == 'Publication: &copy; 2012 FOO (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>), Preprint: <a href="http://copyright.cern.ch/">&copy; 2011 CERN</a>')
 
 
-    print "All tests run ok"
+    print("All tests run ok")
 
 
 if __name__ == "__main__":

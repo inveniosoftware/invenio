@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """GOTO CLI interface."""
 
 import optparse
@@ -73,10 +75,10 @@ def main():
 
     (options, dummy_args) = parser.parse_args()
     if options.action == "list-goto-plugins":
-        print "GOTO plugins found:"
+        print("GOTO plugins found:")
         for component, goto in REDIRECT_METHODS.items():
-            print component + ' -> ' + getattr(goto, '__doc__',
-                                               'No documentation')
+            print(component + ' -> ' + getattr(goto, '__doc__',
+                                               'No documentation'))
     #elif options.action == 'list-broken-goto-plugins':
     #    print "Broken GOTO plugins found:"
     #    for component, error in REDIRECT_METHODS.get_broken_plugins().items():
@@ -90,7 +92,7 @@ def main():
         if is_redirection_label_already_taken(label):
             parser.error("The specified label %s is already taken" % label)
         register_redirection(label, plugin, parameters)
-        print "The redirection %s was successfully registered for the plugin %s with parameters %s" % (label, plugin, parameters)
+        print("The redirection %s was successfully registered for the plugin %s with parameters %s" % (label, plugin, parameters))
     elif options.update:
         label = options.update
         if not is_redirection_label_already_taken(label):
@@ -101,20 +103,20 @@ def main():
         if not plugin in REDIRECT_METHODS:
             parser.error("%s is not a valid plugin" % plugin)
         update_redirection(label, plugin, parameters=None)
-        print "The redirection %s was successfully updated for the plugin %s with parameters %s" % (label, plugin, parameters)
+        print("The redirection %s was successfully updated for the plugin %s with parameters %s" % (label, plugin, parameters))
     elif options.get_redirection:
         label = options.get_redirection
         if not is_redirection_label_already_taken(label):
             parser.error("The specified label %s does not exist" % label)
-        print get_redirection_data(label)
+        print(get_redirection_data(label))
     elif options.drop_redirection:
         label = options.drop_redirection
         if is_redirection_label_already_taken(label):
             wait_for_user("Are you sure you want to drop the redirection: %s\n%s" % (label, get_redirection_data(label)))
             drop_redirection(label)
-            print "The redirection %s was successfully dropped" % label
+            print("The redirection %s was successfully dropped" % label)
         else:
-            print "The specified label %s is not registered with any redirection" % label
+            print("The specified label %s is not registered with any redirection" % label)
     else:
         parser.print_help()
 

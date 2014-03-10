@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 BibClassify command-line interface.
 
@@ -119,7 +121,7 @@ def main():
 
 def _display_help():
     """Prints the help message for this module."""
-    print """Usage: bibclassify [OPTION]... [FILE/URL]...
+    print("""Usage: bibclassify [OPTION]... [FILE/URL]...
        bibclassify [OPTION]... [DIRECTORY]...
 Searches keywords in FILEs and/or files in DIRECTORY(ies). If a directory is
 specified, BibClassify will generate keywords for all PDF documents contained
@@ -178,7 +180,7 @@ Examples (daemon mode):
     $ bibclassify -u admin -s 24h -L 23:00-05:00
     $ bibclassify -u admin -i 1234
     $ bibclassify -u admin -c Preprints
-"""
+""")
     sys.exit(1)
 
 
@@ -187,9 +189,9 @@ def _display_version():
     try:
         from invenio.config import CFG_VERSION
 
-        print "\nInvenio/%s bibclassify/%s\n" % (CFG_VERSION, CFG_VERSION)
+        print("\nInvenio/%s bibclassify/%s\n" % (CFG_VERSION, CFG_VERSION))
     except ImportError:
-        print "Invenio bibclassify/standalone"
+        print("Invenio bibclassify/standalone")
     sys.exit(1)
 
 
@@ -222,7 +224,7 @@ def _read_options(options_string):
                       "extract-acronyms", "acronyms-file=", "only-core-tags"]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError as err1:
-        print >> sys.stderr, "Options problem: %s" % err1
+        print("Options problem: %s" % err1, file=sys.stderr)
         _display_help()
 
     # 2 dictionaries containing the option linked to its destination in the

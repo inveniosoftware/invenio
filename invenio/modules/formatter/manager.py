@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Invenio template migration engine.
 
@@ -75,9 +77,9 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
 
     def update_rule(rule):
         rule['template'] = rename_template(rule['template'])
-        print '        ...', rule['template'], 'to',
-        print rename_template(rule['template'])
-        print '           ', rule
+        print('        ...', rule['template'], 'to', end=' ')
+        print(rename_template(rule['template']))
+        print('           ', rule)
         return rule
 
     def eval_format_template_elements(format_template, bfo, verbose=0):
@@ -110,7 +112,7 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
                                                     ', '.join(params_str))
                 return result
 
-            print '\n'.join(error)
+            print('\n'.join(error))
 
         # Substitute special tags in the format by our own text.
         # Special tags have the form <BFE_format_element_name [param="value"]* />
@@ -166,8 +168,8 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
     skip_templates = lambda (name, key): name[-3:] != 'xsl'
     format_templates = filter(skip_templates, iteritems(get_format_templates(True)))
 
-    print '>>> Going to migrate %d format template(s) ...' % (
-        len(format_templates), )
+    print('>>> Going to migrate %d format template(s) ...' % (
+        len(format_templates), ))
 
     if not os.path.exists(CFG_BIBFORMAT_JINJA_TEMPLATE_PATH):
         os.makedirs(CFG_BIBFORMAT_JINJA_TEMPLATE_PATH)
@@ -181,15 +183,15 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
                                 rename_template(name))
 
         if os.path.exists(new_name):
-            print '    [!] File', new_name, 'already exists.',
+            print('    [!] File', new_name, 'already exists.', end=' ')
             if not rewrite_existing_templates:
-                print 'Skipped.'
+                print('Skipped.')
                 continue
             else:
                 shutil.copy2(new_name, new_name + '.backup')
-                print 'Rewritten.'
+                print('Rewritten.')
 
-        print '    ... migrating', name, 'to', new_name
+        print('    ... migrating', name, 'to', new_name)
 
         with open(new_name, 'w+') as f:
             code = template['code']
@@ -199,42 +201,42 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
             evaled = eval_format_template_elements(localized_format, None)
             f.write(evaled)
 
-    print
+    print()
 
     skip_legacy = lambda (name, key): name[-11:] != '_legacy.' + \
         CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
     output_formats = filter(skip_legacy,
                             iteritems(get_output_formats(with_attributes=True)))
-    print '>>> Going to migrate %d output format(s) ...' % (
-        len(output_formats))
+    print('>>> Going to migrate %d output format(s) ...' % (
+        len(output_formats)))
 
     for name, output_format in output_formats:
         if not any(map(lambda rule: rule['template'][-3:] == CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION,
                    output_format['rules'])):
-            print '    [!]', name, 'does not contain any',
-            print CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, 'template',
+            print('    [!]', name, 'does not contain any', end=' ')
+            print(CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, 'template', end=' ')
             if only_template is not None:
-                print 'or does not match', only_template_re,
-            print '.'
+                print('or does not match', only_template_re, end=' ')
+            print('.')
             continue
 
         new_name = name[:-4] + \
             '_legacy.' + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
         if os.path.exists(os.path.join(CFG_BIBFORMAT_OUTPUTS_PATH, new_name)):
-            print '    [!] File', new_name, 'already exists. Skipped.'
+            print('    [!] File', new_name, 'already exists. Skipped.')
             continue
         shutil.copy2(
             os.path.join(CFG_BIBFORMAT_OUTPUTS_PATH, name),
             os.path.join(CFG_BIBFORMAT_OUTPUTS_PATH, new_name))
         # rename template names
-        print '    ... migrating', name, 'to', new_name
+        print('    ... migrating', name, 'to', new_name)
         update_output_format_rules(name,
                                    map(update_rule, output_format['rules']),
                                    rename_template(output_format['default']))
 
-    print
-    print '>>> Please re-run `bibreformat` for all cached output formats.'
-    print '    $ bibreformat -oHB,HD -a'
+    print()
+    print('>>> Please re-run `bibreformat` for all cached output formats.')
+    print('    $ bibreformat -oHB,HD -a')
 
 
 @manager.option('-o', '--output-format', dest='output_format',
@@ -246,7 +248,7 @@ def expunge(output_format="HB"):
 
     # Make it uppercased as it is stored in database.
     output_format = output_format.upper()
-    print ">>> Cleaning %s cache..." % (output_format, )
+    print(">>> Cleaning %s cache..." % (output_format, ))
     # Prepare where expression.
     filter_format = Bibfmt.format == output_format \
             if ',' not in output_format else \

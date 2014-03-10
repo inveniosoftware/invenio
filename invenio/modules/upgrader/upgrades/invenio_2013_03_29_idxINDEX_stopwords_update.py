@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 
 from invenio.legacy.dbquery import run_sql
 
@@ -42,4 +44,4 @@ def pre_upgrade():
     pass
 
 def post_upgrade():
-    print 'NOTE: please double check your new index stopword settings in BibIndex Admin Interface.'
+    print('NOTE: please double check your new index stopword settings in BibIndex Admin Interface.')

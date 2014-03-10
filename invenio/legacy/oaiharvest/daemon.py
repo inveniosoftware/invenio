@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 OAI Harvest daemon - harvest records from OAI repositories.
 
@@ -367,7 +369,7 @@ def main():
                 elif opt in ["-w", "--password"]:
                     password = opt_value
                 elif opt in ["-V", "--version"]:
-                    print __revision__
+                    print(__revision__)
                     sys.exit(0)
                 else:
                     usage(1, "Option %s is not allowed" % opt)
@@ -477,7 +479,7 @@ def main():
             except orm.exc.NoResultFound:
                 usage(1, "The repository %s doesn't exist in our database." % name_repository)
 
-        print "A workflow has been specified, overriding the repository one."
+        print("A workflow has been specified, overriding the repository one.")
 
     task_set_option("repository", None)
     task_set_option("dates", None)

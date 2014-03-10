@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 This module implements the low-level API for dealing with fulltext files.
     - All the files associated to a I{record} (identified by a I{recid}) can be
@@ -4017,7 +4019,7 @@ class MoreInfo(object):
         if DBG_LOG_QUERIES:
             from invenio.legacy.bibsched.bibtask import write_message
             write_message("Executing query: " + query_str + "   ARGS: " + repr(where_args))
-            print "Executing query: " + query_str + "   ARGS: " + repr(where_args)
+            print("Executing query: " + query_str + "   ARGS: " + repr(where_args))
 
         res = run_sql(query_str, where_args)
 
@@ -4061,7 +4063,7 @@ class MoreInfo(object):
             if DBG_LOG_QUERIES:
                 from invenio.legacy.bibsched.bibtask import write_message
                 write_message("Executing query: " + query_str + " ARGS: " + repr(query_args))
-                print "Executing query: " + query_str + " ARGS: " + repr(query_args)
+                print("Executing query: " + query_str + " ARGS: " + repr(query_args))
 
             run_sql(query_str, query_args)
         else:
@@ -4073,7 +4075,7 @@ class MoreInfo(object):
             if DBG_LOG_QUERIES:
                 from invenio.legacy.bibsched.bibtask import write_message
                 write_message("Executing query: " + query_str + " ARGS: " + repr(query_args))
-                print "Executing query: " + query_str + " ARGS: " + repr(query_args)
+                print("Executing query: " + query_str + " ARGS: " + repr(query_args))
 
             run_sql(query_str, query_args )
 
@@ -4093,7 +4095,7 @@ class MoreInfo(object):
             s_ = ""
             if res:
                 s_ = cPickle.loads(res[0][0])
-            print "Executing query: " + query_str + "  ARGS: " + repr(where_args) + " WITH THE RESULT: " + str(s_)
+            print("Executing query: " + query_str + "  ARGS: " + repr(where_args) + " WITH THE RESULT: " + str(s_))
 
         if res and res[0][0]:
             try:
@@ -4109,7 +4111,7 @@ class MoreInfo(object):
         if DBG_LOG_QUERIES:
             from invenio.legacy.bibsched.bibtask import write_message
             write_message("Executing query: " + query_str + "   ARGS: " + repr(where_args))
-            print "Executing query: " + query_str + "   ARGS: " + repr(where_args)
+            print("Executing query: " + query_str + "   ARGS: " + repr(where_args))
         run_sql(query_str, where_args)
 
         return None
@@ -4205,7 +4207,7 @@ class MoreInfo(object):
             if DBG_LOG_QUERIES:
                 from invenio.legacy.bibsched.bibtask import write_message
                 write_message("Executing query: " + query_str + "   ARGS: " + repr(query_args))
-                print "Executing query: " + query_str + "   ARGS: " + repr(query_args)
+                print("Executing query: " + query_str + "   ARGS: " + repr(query_args))
             run_sql(query_str, query_args)
 
     def get_cache(self):
@@ -4279,7 +4281,7 @@ class BibDocMoreInfo(MoreInfo):
         if DBG_LOG_QUERIES:
             from invenio.legacy.bibsched.bibtask import write_message
             write_message("Creating BibDocMoreInfo :" + repr(self["comments"]))
-            print "Creating BibdocMoreInfo :" + repr(self["comments"])
+            print("Creating BibdocMoreInfo :" + repr(self["comments"]))
 
     def __repr__(self):
         """

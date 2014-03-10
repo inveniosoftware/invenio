@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 This script updates the filesystem and database structure WRT icons.
 
@@ -64,24 +66,24 @@ def fix_bibdoc_bibdoc(id_bibdoc1, id_bibdoc2, logfile):
         the_bibdoc = BibDoc.create_instance(id_bibdoc1)
     except Exception as err:
         msg = "WARNING: when opening docid %s: %s" % (id_bibdoc1, err)
-        print >> logfile, msg
-        print msg
+        print(msg, file=logfile)
+        print(msg)
         return True
     try:
         msg = "Fixing icon for the document %s" % (id_bibdoc1, )
-        print msg,
-        print >> logfile, msg,
+        print(msg, end=' ')
+        print(msg, end=' ', file=logfile)
         the_icon = BibDoc.create_instance(id_bibdoc2)
         for a_file in the_icon.list_latest_files():
             the_bibdoc.add_icon(a_file.get_full_path(), format=a_file.get_format())
         the_icon.delete()
         run_sql("DELETE FROM bibdoc_bibdoc WHERE id_bibdoc1=%s AND id_bibdoc2=%s", (id_bibdoc1, id_bibdoc2))
-        print "OK"
-        print >> logfile, "OK"
+        print("OK")
+        print("OK", file=logfile)
         return True
     except Exception as err:
-        print "ERROR: %s" % err
-        print >> logfile, "ERROR: %s" % err
+        print("ERROR: %s" % err)
+        print("ERROR: %s" % err, file=logfile)
         register_exception()
         return False
 
@@ -92,40 +94,40 @@ def main():
     try:
         logfile = open(logfilename, 'w')
     except IOError as e:
-        print wrap_text_in_a_box('NOTE: it\'s impossible to create the log:\n\n  %s\n\nbecause of:\n\n  %s\n\nPlease run this migration kit as the same user who runs Invenio (e.g. Apache)' % (logfilename, e), style='conclusion', break_long=False)
+        print(wrap_text_in_a_box('NOTE: it\'s impossible to create the log:\n\n  %s\n\nbecause of:\n\n  %s\n\nPlease run this migration kit as the same user who runs Invenio (e.g. Apache)' % (logfilename, e), style='conclusion', break_long=False))
         sys.exit(1)
 
     bibdoc_bibdoc = retrieve_bibdoc_bibdoc()
 
-    print wrap_text_in_a_box ("""This script migrate the filesystem structure used to store icons files to the new stricter structure.
+    print(wrap_text_in_a_box ("""This script migrate the filesystem structure used to store icons files to the new stricter structure.
 This script must not be run during normal Invenio operations.
 It is safe to run this script. No file will be deleted.
 Anyway it is recommended to run a backup of the filesystem structure just in case.
-A backup of the database tables involved will be automatically performed.""", style='important')
+A backup of the database tables involved will be automatically performed.""", style='important'))
     if not bibdoc_bibdoc:
-        print wrap_text_in_a_box("No need for migration", style='conclusion')
+        print(wrap_text_in_a_box("No need for migration", style='conclusion'))
         return
-    print "%s icons will be migrated/fixed." % len(bibdoc_bibdoc)
+    print("%s icons will be migrated/fixed." % len(bibdoc_bibdoc))
     wait_for_user()
-    print "Backing up database tables"
+    print("Backing up database tables")
     try:
         if not backup_tables():
-            print wrap_text_in_a_box("""It appears that is not the first time that you run this script.
+            print(wrap_text_in_a_box("""It appears that is not the first time that you run this script.
 Backup tables have been already created by a previous run.
-In order for the script to go further they need to be removed.""", style='important')
+In order for the script to go further they need to be removed.""", style='important'))
 
             wait_for_user()
-            print "Backing up database tables (after dropping previous backup)",
+            print("Backing up database tables (after dropping previous backup)", end=' ')
             backup_tables(drop=True)
-            print "-> OK"
+            print("-> OK")
         else:
-            print "-> OK"
+            print("-> OK")
     except Exception as e:
-        print wrap_text_in_a_box("Unexpected error while backing up tables. Please, do your checks: %s" % e, style='conclusion')
+        print(wrap_text_in_a_box("Unexpected error while backing up tables. Please, do your checks: %s" % e, style='conclusion'))
         sys.exit(1)
 
     to_fix_marc = intbitset()
-    print "Created a complete log file into %s" % logfilename
+    print("Created a complete log file into %s" % logfilename)
     try:
         try:
             for id_bibdoc1, id_bibdoc2 in bibdoc_bibdoc:
@@ -133,7 +135,7 @@ In order for the script to go further they need to be removed.""", style='import
                     record_does_exist = True
                     recids = get_recid_from_docid(id_bibdoc1)
                     if not recids:
-                        print "Skipping %s" % id_bibdoc1
+                        print("Skipping %s" % id_bibdoc1)
                         continue
                     for recid in recids:
                         if record_exists(recid[0]) > 0:
@@ -144,18 +146,18 @@ In order for the script to go further they need to be removed.""", style='import
                         if record_does_exist:
                             raise StandardError("Error when correcting document ID %s" % id_bibdoc1)
                 except Exception as err:
-                    print >> logfile, "ERROR: %s" % err
-            print wrap_text_in_a_box("DONE", style='conclusion')
+                    print("ERROR: %s" % err, file=logfile)
+            print(wrap_text_in_a_box("DONE", style='conclusion'))
         except:
             logfile.close()
             register_exception()
-            print wrap_text_in_a_box(
+            print(wrap_text_in_a_box(
                 title = "INTERRUPTED BECAUSE OF ERROR!",
                 body = """Please see the log file %s for what was the status prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, CFG_SITE_SUPPORT_EMAIL),
-            style = 'conclusion')
+            style = 'conclusion'))
             sys.exit(1)
     finally:
-        print "Scheduling FIX-MARC to synchronize MARCXML for updated records."
+        print("Scheduling FIX-MARC to synchronize MARCXML for updated records.")
         cli_fix_marc(options={}, explicit_recid_set=to_fix_marc)
 
 

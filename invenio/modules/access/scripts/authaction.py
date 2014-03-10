@@ -18,6 +18,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """authaction -- CLI interface to Access Control Engine"""
 
 __revision__ = "$Id$"
@@ -66,7 +68,7 @@ def main():
         sys.stderr.write("%s\n" % __revision__)
         sys.exit(0)
     if alen < 3 or alen % 2 == 0:
-        print "7 - %s" % CFG_WEBACCESS_WARNING_MSGS[7]
+        print("7 - %s" % CFG_WEBACCESS_WARNING_MSGS[7])
         return "7 - %s" % CFG_WEBACCESS_WARNING_MSGS[7]
 
     # try to authorize
@@ -84,5 +86,5 @@ def main():
                                                          **kwargs)
 
     # print and return
-    print "%s - %s" % (auth_code, auth_message)
+    print("%s - %s" % (auth_code, auth_message))
     return "%s - %s" % (auth_code, auth_message)

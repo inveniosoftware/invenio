@@ -17,6 +17,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """Holding Pen & BibWorkflow web interface"""
 
+from __future__ import print_function
+
 from flask import render_template, Blueprint
 from flask.ext.login import login_required
 
@@ -145,5 +147,5 @@ def _entry_data_preview(data, of='default'):
                                            xml_record=data['record'])
             return data['record']
         except ValueError:
-            print "This is not a XML string"
+            print("This is not a XML string")
     return data

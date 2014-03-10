@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Self citations task
 
@@ -81,8 +83,8 @@ def check_options():
             and not task_get_option('recids') \
             and not task_get_option('collections') \
             and not task_get_option('rebuild'):
-        print >>sys.stderr, 'Error: No input file specified, you need' \
-            ' to specify which files to run on'
+        print('Error: No input file specified, you need' \
+            ' to specify which files to run on', file=sys.stderr)
         return False
 
     return True

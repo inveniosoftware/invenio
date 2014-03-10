@@ -19,6 +19,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """ Migration from local clear password [v0.92.1] to local encrypted
  password_migration_kit
 Usage: python password_migration_kit.py
@@ -36,60 +38,60 @@ from invenio.utils.text import wrap_text_in_a_box
 import sys
 
 def migrate_passwords():
-    print wrap_text_in_a_box(title="Password migration kit (for Invenio prior to v0.92.1)", style='conclusion')
-    print "Checking your installation..."
+    print(wrap_text_in_a_box(title="Password migration kit (for Invenio prior to v0.92.1)", style='conclusion'))
+    print("Checking your installation...")
     if __check_update_possibility():
-        print "Tables are OK."
+        print("Tables are OK.")
     else:
-        print "No need to update."
+        print("No need to update.")
         sys.exit(1)
     admin_pwd = __get_admin_pwd()
-    print "There are %i passwords to migrate (including guest users)" % __count_current_passwords()
-    print "========================================================="
-    print "Creating backup...",
+    print("There are %i passwords to migrate (including guest users)" % __count_current_passwords())
+    print("=========================================================")
+    print("Creating backup...", end=' ')
     sys.stdout.flush()
     if __creating_backup():
-        print "OK"
+        print("OK")
     else:
         __print_error()
-    print "Migrating all Null password to ''...",
+    print("Migrating all Null password to ''...", end=' ')
     sys.stdout.flush()
     if __migrate_passwords_from_null_to_empty_quotes():
-        print "OK"
+        print("OK")
     else:
         __print_error(True)
-    print "Changing the column type from string to blob...",
+    print("Changing the column type from string to blob...", end=' ')
     sys.stdout.flush()
     if __migrate_column_from_string_to_blob():
-        print "OK"
+        print("OK")
     else:
         __print_error(True)
-    print "Encrypting passwords...",
+    print("Encrypting passwords...", end=' ')
     sys.stdout.flush()
     if __encrypt_password():
-        print "OK"
+        print("OK")
     else:
         __print_error(True)
-    print "Checking that admin could enter...",
+    print("Checking that admin could enter...", end=' ')
     sys.stdout.flush()
     if __check_admin(admin_pwd):
-        print "OK"
+        print("OK")
     else:
         __print_error(True)
-    print "Removing backup...",
+    print("Removing backup...", end=' ')
     sys.stdout.flush()
     if __removing_backup():
-        print "OK"
+        print("OK")
     else:
         __print_error()
-    print "========================================================="
-    print "Migration to encrypted local passwords has been successful."
+    print("=========================================================")
+    print("Migration to encrypted local passwords has been successful.")
 
 def __check_update_possibility():
     res = run_sql("SHOW COLUMNS FROM user LIKE 'password'");
     if res:
         return res[0][1] not in ('tinyblob', 'blob')
-    print "User table is broken or Invenio Database is not functional."
+    print("User table is broken or Invenio Database is not functional.")
 
 def __count_current_passwords():
     query = "SELECT count(*) FROM user"
@@ -104,7 +106,7 @@ def __migrate_passwords_from_null_to_empty_quotes():
     try:
         run_sql(query)
     except Exception as msg:
-        print 'The query "%s" produced: %s' % (query, msg)
+        print('The query "%s" produced: %s' % (query, msg))
         return False
     return True
 
@@ -113,7 +115,7 @@ def __migrate_column_from_string_to_blob():
     try:
         run_sql(query)
     except Exception as msg:
-        print 'The query "%s" produced: %s' % (query, msg)
+        print('The query "%s" produced: %s' % (query, msg))
         return False
     return True
 
@@ -122,7 +124,7 @@ def __encrypt_password():
     try:
         run_sql(query)
     except Exception as msg:
-        print 'The query "%s" produced: %s' % (query, msg)
+        print('The query "%s" produced: %s' % (query, msg))
         return False
     return True
 
@@ -134,7 +136,7 @@ def __check_admin(admin_pwd):
         else:
             return False
     except Exception as msg:
-        print 'The query "%s" produced: %s' % (query, msg)
+        print('The query "%s" produced: %s' % (query, msg))
         return False
 
 def __creating_backup():
@@ -142,7 +144,7 @@ def __creating_backup():
     try:
         run_sql(query)
     except Exception as msg:
-        print 'The query "%s" produced: %s' % (query, msg)
+        print('The query "%s" produced: %s' % (query, msg))
         return False
     return True
 
@@ -151,7 +153,7 @@ def __removing_backup():
     try:
         run_sql(query)
     except Exception as msg:
-        print 'The query "%s" produced: %s' % (query, msg)
+        print('The query "%s" produced: %s' % (query, msg))
         return False
     return True
 
@@ -160,29 +162,29 @@ def __restoring_from_backup():
     try:
         run_sql(query)
     except Exception as msg:
-        print 'The query "%s" produced: %s' % (query, msg)
+        print('The query "%s" produced: %s' % (query, msg))
         return False
     query = "ALTER TABLE user CHANGE password password varchar(20) NULL default NULL"
     try:
         run_sql(query)
     except Exception as msg:
-        print 'The query "%s" produced: %s' % (query, msg)
+        print('The query "%s" produced: %s' % (query, msg))
         return False
     query = "UPDATE user,user_backup SET user.password=user_backup.password WHERE user.id=user_backup.id AND user.nickname=user_backup.nickname"
     try:
         run_sql(query)
     except Exception as msg:
-        print 'The query "%s" produced: %s' % (query, msg)
+        print('The query "%s" produced: %s' % (query, msg))
         return False
     return True
 
 def __print_error(restore_backup=False):
-    print wrap_text_in_a_box("The kit encountered errors in migrating passwords. Please contact The Invenio developers in order to get support providing all the printed messages.")
+    print(wrap_text_in_a_box("The kit encountered errors in migrating passwords. Please contact The Invenio developers in order to get support providing all the printed messages."))
     if restore_backup:
         if __restoring_from_backup():
-            print wrap_text_in_a_box("Passwords were restored from the backup, but you still need to migrate them in order to use this version of Invenio.")
+            print(wrap_text_in_a_box("Passwords were restored from the backup, but you still need to migrate them in order to use this version of Invenio."))
         else:
-            print wrap_text_in_a_box("The kit was't unable to restore passwords from the backup")
+            print(wrap_text_in_a_box("The kit was't unable to restore passwords from the backup"))
     sys.exit(1)
 
 if __name__ == '__main__':

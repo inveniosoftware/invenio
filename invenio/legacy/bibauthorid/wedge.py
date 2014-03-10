@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 from invenio.legacy.bibauthorid import config as bconfig
 from itertools import izip, starmap
 from operator import mul
@@ -78,9 +80,9 @@ def wedge(cluster_set, report_cluster_status=False, force_wedge_thrsh=False):
                     msg.append( ' %s vs %s : %s + %s = %s -- %s' %  (id1, id2, c12, c21, c12+c21, cl1.hates(cl2)))
         msg = 'Wedge final clusters for %s: \n' % str(wedge_thrsh) + '\n'.join(msg)
         if not bconfig.DEBUG_WEDGE_OUTPUT and bconfig.DEBUG_WEDGE_PRINT_FINAL_CLUSTER_COMPATIBILITIES:
-            print
-            print msg
-            print
+            print()
+            print(msg)
+            print()
         wedge_print(msg)
 
 

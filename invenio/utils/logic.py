@@ -34,6 +34,8 @@
 #
 """Representations and Inference for Logic (Chapters 7-10)
 
+from __future__ import print_function
+
 Covers both Propositional and First-Order Logic. First we have important data
 types:
 
@@ -777,14 +779,14 @@ def pretty_set(s):
     return 'set(%s)' % slist
 
 def pp(x):
-    print pretty(x)
+    print(pretty(x))
 
 def ppsubst(s):
     """Pretty-print substitution s"""
     ppdict(s)
 
 def ppdict(d):
-    print pretty_dict(d)
+    print(pretty_dict(d))
 
 def ppset(s):
-    print pretty_set(s)
+    print(pretty_set(s))

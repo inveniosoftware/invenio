@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """OAI Repository administration tool -
 
    Updates the metadata of the records to include OAI identifiers and
@@ -454,7 +456,7 @@ def main():
     # through BibSched...)
     if (CFG_OAI_ID_FIELD[:5] != CFG_OAI_SET_FIELD[:5]) or \
             (CFG_OAI_ID_FIELD[:5] != CFG_OAI_PREVIOUS_SET_FIELD[:5]):
-        print >> sys.stderr, """\
+        print("""\
 ERROR: since Invenio 1.0 the OAI ID and the OAI Set must be stored in the same
 field. Please revise your configuration for the variables
     CFG_OAI_ID_FIELD (currently set to %s)
@@ -463,7 +465,7 @@ field. Please revise your configuration for the variables
             CFG_OAI_ID_FIELD,
             CFG_OAI_SET_FIELD,
             CFG_OAI_PREVIOUS_SET_FIELD
-        )
+        ), file=sys.stderr)
         sys.exit(1)
     mode = -1
     if '-d' in sys.argv[1:] or '--detailed-report' in sys.argv[1:]:

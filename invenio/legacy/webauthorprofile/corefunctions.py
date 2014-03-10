@@ -21,6 +21,8 @@
 # pylint: disable=C0301
 # pylint: disable=W0613
 
+from __future__ import print_function
+
 import os
 
 def handleSIGCHLD():
@@ -336,7 +338,7 @@ def _compute_cache_for_person(person_id):
     _ = get_coauthors(person_id)
     _ = get_summarize_records(person_id, 'hcs', 'en')
     _ = get_hepnames_data(person_id)
-    print person_id, ',' , str(time.time() - start)
+    print(person_id, ',' , str(time.time() - start))
 
 def precompute_cache_for_person(person_ids=None, all_persons=False, only_expired=False):
     pids = []

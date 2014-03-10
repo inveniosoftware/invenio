@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 import os
 import sys
 import shutil
@@ -75,17 +77,17 @@ def init(user='root', password='', yes_i_know=False):
         ]
         for cmd in cmds:
             cmd = cmd.format(**args)
-            print cmd
+            print(cmd)
             if os.system(cmd):
-                print "ERROR: failed execution of", cmd
+                print("ERROR: failed execution of", cmd, file=sys.stderr)
                 sys.exit(1)
-        print '>>> Database has been installed.'
+        print('>>> Database has been installed.')
 
 @option_yes_i_know
 def drop(yes_i_know=False):
     """Drops database tables"""
 
-    print ">>> Going to drop tables and related data on filesystem ..."
+    print(">>> Going to drop tables and related data on filesystem ...")
 
     from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
@@ -110,21 +112,21 @@ def drop(yes_i_know=False):
     try:
         msg = destroy_customevents()
         if msg:
-            print msg
+            print(msg)
     except:
-        print "ERROR: Could not destroy customevents."
+        print("ERROR: Could not destroy customevents.")
 
     ## FIXME: move to bibedit_model
     def bibdoc_before_drop(target, connection_dummy, **kw_dummy):
         print
-        print ">>> Going to remove records data..."
+        print(">>> Going to remove records data...")
         for (docid,) in db.session.query(target.c.id).all():
             directory = _make_base_dir(docid)
             if os.path.isdir(directory):
-                print '    >>> Removing files for docid =', docid
+                print('    >>> Removing files for docid =', docid)
                 shutil.rmtree(directory)
         db.session.commit()
-        print ">>> Data has been removed."
+        print(">>> Data has been removed.")
 
     from invenio.modules.editor.models import Bibdoc
     event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
@@ -144,21 +146,21 @@ def drop(yes_i_know=False):
             table.drop(bind=db.engine)
             dropped += 1
         except:
-            print '\r', '>>> problem with dropping table', table
+            print('\r', '>>> problem with dropping table', table)
 
     print
     if dropped == N:
-        print ">>> Tables dropped successfully."
+        print(">>> Tables dropped successfully.")
     else:
-        print "ERROR: not all tables were properly dropped."
-        print ">>> Dropped", dropped, 'out of', N
+        print("ERROR: not all tables were properly dropped.")
+        print(">>> Dropped", dropped, 'out of', N)
 
 
 @option_default_data
 def create(default_data=True):
     """Creates database tables from sqlalchemy models"""
 
-    print ">>> Going to create tables..."
+    print(">>> Going to create tables...")
 
     from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
@@ -168,20 +170,20 @@ def create(default_data=True):
         test_db_connection()
     except Exception as e:
         from invenio.ext.logging import get_tracestack
-        print 'Cannot connect with the db:', e.message
-        print get_tracestack()
+        print('Cannot connect with the db:', e.message)
+        print(get_tracestack())
         return
 
     list(models)
 
     def cfv_after_create(target, connection, **kw):
         print
-        print ">>> Modifing table structure..."
+        print(">>> Modifing table structure...")
         from invenio.legacy.dbquery import run_sql
         run_sql('ALTER TABLE collection_field_fieldvalue DROP PRIMARY KEY')
         run_sql('ALTER TABLE collection_field_fieldvalue ADD INDEX id_collection(id_collection)')
         run_sql('ALTER TABLE collection_field_fieldvalue CHANGE id_fieldvalue id_fieldvalue mediumint(9) unsigned')
-        #print run_sql('SHOW CREATE TABLE collection_field_fieldvalue')
+        #print(run_sql('SHOW CREATE TABLE collection_field_fieldvalue'))
 
     from invenio.modules.search.models import CollectionFieldFieldvalue
     event.listen(CollectionFieldFieldvalue.__table__, "after_create", cfv_after_create)
@@ -201,15 +203,15 @@ def create(default_data=True):
             table.create(bind=db.engine)
             created += 1
         except:
-            print '\r', '>>> problem with creating table', table
+            print('\r', '>>> problem with creating table', table)
 
-    print
+    print('\n')
 
     if created == N:
-        print ">>> Tables created successfully."
+        print(">>> Tables created successfully.")
     else:
-        print "ERROR: not all tables were properly created."
-        print ">>> Created", created, 'out of', N
+        print("ERROR: not all tables were properly created.")
+        print(">>> Created", created, 'out of', N)
 
     populate(default_data)
 
@@ -221,13 +223,13 @@ def diff():
     try:
         from migrate.versioning import schemadiff
     except ImportError:
-        print ">>> Required package sqlalchemy-migrate is not installed. " \
-            "Please install with:"
-        print ">>> pip install sqlalchemy-migrate"
+        print(">>> Required package sqlalchemy-migrate is not installed. "
+              "Please install with:")
+        print(">>> pip install sqlalchemy-migrate")
         return
 
     from invenio.ext.sqlalchemy import db
-    print db.schemadiff()
+    print(db.schemadiff())
 
 
 @option_yes_i_know
@@ -242,7 +244,7 @@ def recreate(yes_i_know=False, default_data=True):
 def uri():
     """Prints SQLAlchemy database uri."""
     from flask import current_app
-    print current_app.config['SQLALCHEMY_DATABASE_URI']
+    print(current_app.config['SQLALCHEMY_DATABASE_URI'])
 
 
 def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
@@ -263,14 +265,14 @@ def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
                                   session=db.session)
     data = dbfixture.data(*[f for (n, f) in iteritems(fixtures) if n in models])
     if len(models) != len(fixtures):
-        print ">>> ERROR: There are", len(models), "tables and", len(fixtures), "fixtures."
-        print ">>>", set(fixture_names) ^ set(models.keys())
+        print(">>> ERROR: There are", len(models), "tables and", len(fixtures), "fixtures.")
+        print(">>>", set(fixture_names) ^ set(models.keys()))
     else:
-        print ">>> There are", len(models), "tables to be loaded."
+        print(">>> There are", len(models), "tables to be loaded.")
 
     if truncate_tables_first:
-        print ">>> Going to truncate following tables:",
-        print map(lambda t: t.__tablename__, models.values())
+        print(">>> Going to truncate following tables:",
+              map(lambda t: t.__tablename__, models.values()))
         db.session.execute("TRUNCATE %s" % ('collectionname', ))
         db.session.execute("TRUNCATE %s" % ('collection_externalcollection', ))
         for m in models.values():
@@ -290,10 +292,10 @@ def populate(default_data=True, truncate_tables_first=False):
     from invenio.base.scripts.config import get_conf
 
     if not default_data:
-        print '>>> No data filled...'
+        print('>>> No data filled...')
         return
 
-    print ">>> Going to fill tables..."
+    print(">>> Going to fill tables...")
 
     load_fixtures(truncate_tables_first=truncate_tables_first)
 
@@ -308,14 +310,14 @@ def populate(default_data=True, truncate_tables_first=False):
 
     for cmd in ["%s/bin/webaccessadmin -u admin -c -a" % CFG_PREFIX]:
         if os.system(cmd):
-            print "ERROR: failed execution of", cmd
+            print("ERROR: failed execution of", cmd)
             sys.exit(1)
 
     from invenio.modules.upgrader.engine import InvenioUpgrader
     iu = InvenioUpgrader()
     map(iu.register_success, iu.get_upgrades())
 
-    print ">>> Tables filled successfully."
+    print(">>> Tables filled successfully.")
 
 
 def version():
@@ -347,7 +349,7 @@ def driver_info(verbose=False):
 @change_command_name
 def mysql_info(separator=None, line_format=None):
     """
-    Detect and print MySQL details useful for debugging problems on various OS.
+    Detect and print(MySQL details useful for debugging problems on various OS.
     """
 
     from invenio.ext.sqlalchemy import db
@@ -360,7 +362,7 @@ def mysql_info(separator=None, line_format=None):
             run_sql("SHOW VARIABLES LIKE 'charact%'") + \
             run_sql("SHOW VARIABLES LIKE 'collat%'"):
         if False:
-            print "    - %s: %s" % (key, val)
+            print("    - %s: %s" % (key, val))
         elif key in ['version',
                      'character_set_client',
                      'character_set_connection',

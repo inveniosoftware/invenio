@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """ Error handling library """
 
 __revision__ = "$Id$"
@@ -194,24 +196,21 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
 
         ## Let's extract the traceback:
         tracestack_data_stream = StringIO()
-        print >> tracestack_data_stream, \
-                "\n** Traceback details \n"
+        print("\n** Traceback details \n", file=tracestack_data_stream)
         traceback.print_exc(file=tracestack_data_stream)
         stack = [frame[0] for frame in inspect.trace()]
         #stack = [frame[0] for frame in inspect.getouterframes(exc_info[2])][skip_frames:]
         try:
             stack.reverse()
-            print >> tracestack_data_stream, \
-                    "\n** Stack frame details"
+            print("\n** Stack frame details", file=tracestack_data_stream)
             values_to_hide = set()
             for frame in stack:
                 try:
-                    print >> tracestack_data_stream
-                    print >> tracestack_data_stream, \
-                            "Frame %s in %s at line %s" % (
+                    print(file=tracestack_data_stream)
+                    print("Frame %s in %s at line %s" % (
                                 frame.f_code.co_name,
                                 frame.f_code.co_filename,
-                                frame.f_lineno)
+                                frame.f_lineno), file=tracestack_data_stream)
                     ## Dereferencing f_locals
                     ## See: http://utcc.utoronto.ca/~cks/space/blog/python/FLocalsAndTraceFunctions
                     local_values = frame.f_locals
@@ -221,20 +220,18 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
                         code = open(frame.f_code.co_filename).readlines()
                         first_line = max(1, frame.f_lineno-3)
                         last_line = min(len(code), frame.f_lineno+3)
-                        print >> tracestack_data_stream, "-" * 79
+                        print("-" * 79, file=tracestack_data_stream)
                         for line in xrange(first_line, last_line+1):
                             code_line = code[line-1].rstrip()
                             if line == frame.f_lineno:
-                                print >> tracestack_data_stream, \
-                                    "----> %4i %s" % (line, code_line)
+                                print("----> %4i %s" % (line, code_line), file=tracestack_data_stream)
                             else:
-                                print >> tracestack_data_stream, \
-                                    "      %4i %s" % (line, code_line)
-                        print >> tracestack_data_stream, "-" * 79
+                                print("      %4i %s" % (line, code_line), file=tracestack_data_stream)
+                        print("-" * 79, file=tracestack_data_stream)
                     except:
                         pass
                     for key, value in local_values.items():
-                        print >> tracestack_data_stream, "\t%20s = " % key,
+                        print("\t%20s = " % key, end=' ', file=tracestack_data_stream)
                         try:
                             value = repr(value)
                         except Exception as err:
@@ -244,11 +241,9 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
                             ## exception was raised during its __init__ call).
                             value = "ERROR: when representing the value: %s" % (err)
                         try:
-                            print >> tracestack_data_stream, \
-                                _truncate_dynamic_string(value)
+                            print(_truncate_dynamic_string(value), file=tracestack_data_stream)
                         except:
-                            print >> tracestack_data_stream, \
-                                "<ERROR WHILE PRINTING VALUE>"
+                            print("<ERROR WHILE PRINTING VALUE>", file=tracestack_data_stream)
                 finally:
                     del frame
         finally:
@@ -261,12 +256,12 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
         ## Okay, start printing:
         output = StringIO()
 
-        print >> output, "* %s" % www_data
-        print >> output, "\n** User details"
-        print >> output, client_data
+        print("* %s" % www_data, file=output)
+        print("\n** User details", file=output)
+        print(client_data, file=output)
 
         if tracestack_data:
-            print >> output, tracestack_data
+            print(tracestack_data, file=output)
         return output.getvalue()
     else:
         return ""
@@ -317,22 +312,22 @@ def register_exception(stream='error',
             log_stream = StringIO()
             email_stream = StringIO()
 
-            print >> email_stream, '\n',
+            print('\n', end=' ', file=email_stream)
 
             ## If a prefix was requested let's print it
             if prefix:
                 #prefix = _truncate_dynamic_string(prefix)
-                print >> log_stream, prefix + '\n'
-                print >> email_stream, prefix + '\n'
+                print(prefix + '\n', file=log_stream)
+                print(prefix + '\n', file=email_stream)
 
-            print >> log_stream, output
-            print >> email_stream, output
+            print(output, file=log_stream)
+            print(output, file=email_stream)
 
             ## If a suffix was requested let's print it
             if suffix:
                 #suffix = _truncate_dynamic_string(suffix)
-                print >> log_stream, suffix
-                print >> email_stream, suffix
+                print(suffix, file=log_stream)
+                print(suffix, file=email_stream)
 
             log_text = log_stream.getvalue()
             email_text = email_stream.getvalue()
@@ -384,8 +379,8 @@ this exception into %s""" % os.path.join(cfg['CFG_LOGDIR'], 'invenio.' + stream)
         else:
             return 0
     except Exception as err:
-        print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (
-            cfg['CFG_LOGDIR'] + '/invenio.' + stream, err)
+        print("Error in registering exception to '%s': '%s'" % (
+            cfg['CFG_LOGDIR'] + '/invenio.' + stream, err), file=sys.stderr)
         return 0
 
 

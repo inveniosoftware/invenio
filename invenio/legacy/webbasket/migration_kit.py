@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """ Migration from webbasket [v0.7.1] to [v0.9.0]
 Usage: python webbasket_migration_kit.py
 This utility will copy records and baskets from CDSware 0.7.1 to Invenio 0.9
@@ -41,27 +43,27 @@ import sys
 def migrate_v071_baskets():
     default_topic_name = ''
     default_share_level = ''
-    print "Basket migration kit (for CDSware prior to v0.7.1 -> v0.90)"
-    print "==============================="
-    print "Checking your installation..."
+    print("Basket migration kit (for CDSware prior to v0.7.1 -> v0.90)")
+    print("===============================")
+    print("Checking your installation...")
     if __check_update_possibility():
-        print "Tables are OK, please answer the next two questions in order to migrate your existing baskets"
+        print("Tables are OK, please answer the next two questions in order to migrate your existing baskets")
     else:
         sys.exit(1)
-    print "There are %i baskets to migrate" % __count_current_baskets()
-    print "==============================="
-    print "In new WebBasket module, baskets are stored in topics."
-    print 'Name of default topic [Default topic]: ',
+    print("There are %i baskets to migrate" % __count_current_baskets())
+    print("===============================")
+    print("In new WebBasket module, baskets are stored in topics.")
+    print('Name of default topic [Default topic]: ', end=' ')
     default_topic_name = raw_input() or "Default topic"
     def choose_share_level():
-        print "==============================="
-        print "Public baskets now have share levels. Please choose between:"
-        print "  0: current public baskets should not be public anymore"
-        print "  1: people can view content [default]"
-        print "  2: people can view content and comments"
-        print "  3: people can add comments"
-        print "  4: people can add records to baskets"
-        print 'Share level for current public baskets [1]: ',
+        print("===============================")
+        print("Public baskets now have share levels. Please choose between:")
+        print("  0: current public baskets should not be public anymore")
+        print("  1: people can view content [default]")
+        print("  2: people can view content and comments")
+        print("  3: people can add comments")
+        print("  4: people can add records to baskets")
+        print('Share level for current public baskets [1]: ', end=' ')
         return raw_input() or '1'
     choosed = 0
     while not(choosed):
@@ -80,79 +82,79 @@ def migrate_v071_baskets():
                     cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDCMT'],
                     cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDITM']]
     default_share_level = share_levels[default_share_level]
-    print "==============================="
-    print "Checking database consistency..."
+    print("===============================")
+    print("Checking database consistency...")
     problem = 0
     owners_list = __check_every_basket_has_one_owner()
     if len(owners_list):
-        print "  -----------------------------"
-        print "  Warning! There are baskets without owners."
-        print "  The following basket ids exist in table 'basket' but not in 'user_basket'"
+        print("  -----------------------------")
+        print("  Warning! There are baskets without owners.")
+        print("  The following basket ids exist in table 'basket' but not in 'user_basket'")
         for (bskid, junk) in owners_list:
-            print "    " + str(bskid)
-        print "  -----------------------------"
+            print("    " + str(bskid))
+        print("  -----------------------------")
         problem = 1
     else:
-        print "  Baskets' ownership: OK"
+        print("  Baskets' ownership: OK")
     baskets_list = __check_baskets_exist()
     if len(baskets_list):
-        print "  -----------------------------"
-        print "  Warning! Users own unexisting baskets"
-        print "  The following basket ids exist in table 'user_basket' but not in 'basket'"
+        print("  -----------------------------")
+        print("  Warning! Users own unexisting baskets")
+        print("  The following basket ids exist in table 'user_basket' but not in 'basket'")
         for (bskid, junk) in baskets_list:
-            print "    " + str(bskid)
+            print("    " + str(bskid))
         problem = 1
-        print "  -----------------------------"
+        print("  -----------------------------")
     else:
-        print "  Baskets' existence: OK"
+        print("  Baskets' existence: OK")
     baskets_list = __check_basket_is_owned_by_only_one_user()
     if len(baskets_list):
-        print "  -----------------------------"
-        print "  Warning! Some baskets are owned by more than one user"
-        print "  The following basket ids are mentioned several times in table 'user_basket'"
+        print("  -----------------------------")
+        print("  Warning! Some baskets are owned by more than one user")
+        print("  The following basket ids are mentioned several times in table 'user_basket'")
         for (bskid, junk) in baskets_list:
-            print "    " + str(bskid) + " (%i records)" % __count_records(bskid)
+            print("    " + str(bskid) + " (%i records)" % __count_records(bskid))
         problem = 1
-        print "  -----------------------------"
+        print("  -----------------------------")
     else:
-        print "  Multiple owners: OK"
+        print("  Multiple owners: OK")
     if problem:
-        print "Problems have been detected. Please fix them before continuing."
-        print "Tables you should look at: basket, user_basket, basket_record, user_query_basket"
+        print("Problems have been detected. Please fix them before continuing.")
+        print("Tables you should look at: basket, user_basket, basket_record, user_query_basket")
         sys.exit(1)
-    print "==============================="
-    print "Copying baskets..."
+    print("===============================")
+    print("Copying baskets...")
     nb_baskets = "N/A"
     try:
         nb_baskets = __import_baskets(default_topic_name, default_share_level)
     except:
-        print "There was an error while importing baskets."
-        print "Table bskBASKET was perhaps not empty?"
-        print "Migration cancelled"
+        print("There was an error while importing baskets.")
+        print("Table bskBASKET was perhaps not empty?")
+        print("Migration cancelled")
         sys.exit(1)
-    print "%s baskets haven been imported." % str(nb_baskets)
-    print "==============================="
-    print "Copying records... (time for a coffee break!)"
+    print("%s baskets haven been imported." % str(nb_baskets))
+    print("===============================")
+    print("Copying records... (time for a coffee break!)")
     nb_records = "N/A"
     try:
         nb_records = __import_records()
     except:
-        print "There was an error while importing records."
-        print "Table bskREC was perhaps not empty?"
-        print "Migration cancelled"
+        print("There was an error while importing records.")
+        print("Table bskREC was perhaps not empty?")
+        print("Migration cancelled")
         sys.exit(1)
-    print "%s records haven been imported." % str(nb_records)
-    print "==============================="
-    print "Updating auto-increment values."
+    print("%s records haven been imported." % str(nb_records))
+    print("===============================")
+    print("Updating auto-increment values.")
     try:
         __set_auto_increment_value()
     except:
-        print "There was an error:"
-        print "Could not set new auto-increment value to table 'bskBASKET'"
+        print("There was an error:")
+        print("Could not set new auto-increment value to table 'bskBASKET'")
         sys.exit(1)
     def choose_delete():
-        print "==============================="
-        print "Would you like to remove old tables (type y or n)? [n]"
+        print("===============================")
+        print("Would you like to remove old tables (type y or n)? [n]")
         return raw_input() or 'n'
     choosed = 0
     while not(choosed):
@@ -169,11 +171,11 @@ def migrate_v071_baskets():
         try:
             __drop_baskets()
         except:
-            print "There was an error while deleting old tables"
+            print("There was an error while deleting old tables")
             sys.exit(1)
-        print "Old baskets have been erased"
-    print "==============================="
-    print "Migration to new basket system has been successful."
+        print("Old baskets have been erased")
+    print("===============================")
+    print("Migration to new basket system has been successful.")
 
 def __check_update_possibility():
     """"""
@@ -183,8 +185,8 @@ def __check_update_possibility():
             return 1
         return 0
     if len(filter(v071filter, res)) != 3:
-        print "Tables 'basket', 'user_basket' and 'basket_record' do not seem to exist."
-        print "Migration is not necessary"
+        print("Tables 'basket', 'user_basket' and 'basket_record' do not seem to exist.")
+        print("Migration is not necessary")
         return 0
     res = run_sql("SHOW TABLES LIKE '%bsk%'")
     def v090filter(element):
@@ -192,28 +194,28 @@ def __check_update_possibility():
             return 1
         return 0
     if len(filter(v090filter, res)) != 4:
-        print "Tables 'bskBASKET', 'user_bskBASKET', 'usergroup_bskBASKET and 'bskREC' do not seem to exist."
-        print "Please run make create-tables in a shell"
+        print("Tables 'bskBASKET', 'user_bskBASKET', 'usergroup_bskBASKET and 'bskREC' do not seem to exist.")
+        print("Please run make create-tables in a shell")
         return 0
     query1 = "SELECT count(*) from bskBASKET"
     new_bsk_nb = run_sql(query1)[0][0]
     if new_bsk_nb:
-        print "Table bskBASKET does not seem to be empty. Migration has already been done"
+        print("Table bskBASKET does not seem to be empty. Migration has already been done")
         return 0
     query2 = "SELECT count(*) from bskREC"
     new_rec_nb = run_sql(query2)[0][0]
     if new_rec_nb:
-        print "Table bskREC does not seem to be empty. Migration has already been done"
+        print("Table bskREC does not seem to be empty. Migration has already been done")
         return 0
     query3 = "SELECT count(*) from user_bskBASKET"
     new_ubsk_nb = run_sql(query3)[0][0]
     if new_ubsk_nb:
-        print "Table user_bskBASKET does not seem to be empty. Migration has already been done"
+        print("Table user_bskBASKET does not seem to be empty. Migration has already been done")
         return 0
     query4 = "SELECT count(*) from usergroup_bskBASKET"
     new_ugbsk_nb = run_sql(query4)[0][0]
     if new_ugbsk_nb:
-        print "Table usergroup_bskBASKET does not seem to be empty. Migration has already been done"
+        print("Table usergroup_bskBASKET does not seem to be empty. Migration has already been done")
         return 0
     return 1
 
@@ -268,12 +270,12 @@ def __import_baskets(default_topic_name="Imported baskets",
                 int(bskid)
                 int(id_owner)
             except:
-                print "#####################"
-                print "id basket:"
-                print bskid
-                print "id user"
-                print id_owner
-                print "#########################"
+                print("#####################")
+                print("id basket:")
+                print(bskid)
+                print("id user")
+                print(id_owner)
+                print("#########################")
 
             return "(%i,'%s',%i,'%s')" % (int(bskid),
                                           real_escape_string(name),
@@ -335,7 +337,7 @@ def __import_records():
             last_rec = iterator + 10000
         else:
             last_rec = len(records)
-        print "  Inserting records %i-%i out of %i" % (iterator, last_rec, len(records)  )
+        print("  Inserting records %i-%i out of %i" % (iterator, last_rec, len(records)  ))
         iterator = iterator + 10000
     return len(records)
 

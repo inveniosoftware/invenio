@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """OAI harvestor - 'wget' records from an OAI repository.
 
 This 'getter' simply retrieve the records from an OAI repository.
@@ -36,13 +38,13 @@ try:
     import tempfile
     import os
 except ImportError as e:
-    print "Error: %s" % e
+    print("Error: %s" % e)
     sys.exit(1)
 
 try:
     from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_VERSION
 except ImportError as e:
-    print "Error: %s" % e
+    print("Error: %s" % e)
     sys.exit(1)
 
 class InvenioOAIRequestError(Exception):

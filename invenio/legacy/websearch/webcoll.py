@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Create Invenio collection cache."""
 
 __revision__ = "$Id$"
@@ -170,7 +172,7 @@ class Collection:
                     self.reclist_updated_since_start = 1
                 self.old_reclist = intbitset(self.reclist)
             except Error as e:
-                print "Error %d: %s" % (e.args[0], e.args[1])
+                print("Error %d: %s" % (e.args[0], e.args[1]))
                 sys.exit(1)
 
     def get_example_search_queries(self):
@@ -280,7 +282,7 @@ class Collection:
             except:
                 code = 0
                 message = v
-            print "I/O Error: " + str(message) + " (" + str(code) + ")"
+            print("I/O Error: " + str(message) + " (" + str(code) + ")")
             sys.exit(1)
         # print user info:
         write_message("... creating %s" % fullfilename, verbose=6)
@@ -831,7 +833,7 @@ class Collection:
             else:
                 write_message("... no changes in reclist detected", verbose=6)
         except Error as e:
-            print "Database Query Error %d: %s." % (e.args[0], e.args[1])
+            print("Database Query Error %d: %s." % (e.args[0], e.args[1]))
             sys.exit(1)
         # last but not least, update the speed-up flag:
         self.update_reclist_run_already = 1
@@ -994,7 +996,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         languages += value.split(',')
         for ln in languages:
             if ln not in CFG_SITE_LANGS:
-                print 'ERROR: "%s" is not a recognized language code' % ln
+                print('ERROR: "%s" is not a recognized language code' % ln)
                 return False
         task_set_option("language", languages)
     else:
@@ -1005,7 +1007,7 @@ def task_submit_check_options():
     if task_has_option('collection'):
         coll = get_collection(task_get_option("collection"))
         if coll.id is None:
-            print 'ERROR: Collection "%s" does not exist' % coll.name
+            print('ERROR: Collection "%s" does not exist' % coll.name)
             return False
     return True
 

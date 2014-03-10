@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 from six import iteritems
 
 from invenio.utils.sherpa_romeo import SherpaRomeoSearch
@@ -142,10 +144,10 @@ class SherpaRomeoTesting:
 
     def print_test_results(self):
         for err_msg in self.error_messages:
-            print err_msg
-            print "-----------------"
+            print(err_msg)
+            print("-----------------")
 
         if self.failed_tests > 0:
-            print "Failed Tests: ", self.failed_tests
+            print("Failed Tests: ", self.failed_tests)
         if self.passed_tests > 0:
-            print "Passed Tests: ", self.passed_tests
+            print("Passed Tests: ", self.passed_tests)

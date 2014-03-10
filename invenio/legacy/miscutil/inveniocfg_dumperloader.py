@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 *** HIGHLY EXPERIMENTAL; PLEASE DO NOT USE. ***
 
@@ -98,7 +100,7 @@ COLLECTIONS = {
 
 def print_usage():
     """Print help."""
-    print __doc__
+    print(__doc__)
 
 def create_section_id(num, with_date=True):
     """
@@ -157,7 +159,7 @@ def dict2db(table_name, dict_data, mode):
     try:
         run_sql(query)
     except:
-        print "VALUES: %s ALREADY EXIST IN TABLE %s. SKIPPING" % (query_values, table_name)
+        print("VALUES: %s ALREADY EXIST IN TABLE %s. SKIPPING" % (query_values, table_name))
         pass
 
 def query2list(query, table_name):
@@ -315,7 +317,7 @@ def dump_collection(collection, config, force_ids, print_to_screen=False):
         if print_to_screen == True:
             output = StringIO.StringIO()
             config.write(output)#Write to the output string instead of the file
-            print output.getvalue()
+            print(output.getvalue())
         else:
             config.write()
 
@@ -401,12 +403,12 @@ def cli_cmd_dump_config():
             collection = COLLECTIONS[sys.argv[sys.argv.index('-col') + 1].upper()]
             dump_collection(collection, config, force_ids, print_to_screen)
         except:
-            print "ERROR: you must especify the collection to dump with the -col COLLECTION_NAME option"
+            print("ERROR: you must especify the collection to dump with the -col COLLECTION_NAME option")
     elif '-all' in sys.argv:
         for collection in COLLECTIONS:
             dump_collection(COLLECTIONS[collection], config, force_ids, print_to_screen)
     else:
-        print "Please specify the collection to dump"
+        print("Please specify the collection to dump")
 
 def cli_cmd_load_config():
     """Load all the config sections back into the database"""
@@ -416,10 +418,10 @@ def cli_cmd_load_config():
         try:
             mode = sys.argv[sys.argv.index('-mode') + 1]
             if mode not in ['i', 'c', 'r']:
-                print "Not valid mode please select one of the following (i)nsert, (c)orrect or (r)eplace"
+                print("Not valid mode please select one of the following (i)nsert, (c)orrect or (r)eplace")
                 sys.exit(1)
         except IndexError:
-            print "You must especify the mode with the -mode option"
+            print("You must especify the mode with the -mode option")
             sys.exit(1)
 
     for section in config.sections:
@@ -439,7 +441,7 @@ def main():
         print_usage()
 
     for message in MESSAGES:
-        print message
+        print(message)
 
 if __name__ == '__main__':
     main()

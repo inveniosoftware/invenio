@@ -16,6 +16,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """Functions shared by websubmit_functions"""
 
+from __future__ import print_function
+
 __revision__ = "$Id$"
 
 import os
@@ -54,29 +56,29 @@ def createRelatedFormats(fullpath, overwrite=True, debug=False):
         basedir, filename, extension = decompose_file(fullpath)
         extension = extension.lower()
         if debug:
-            print >> sys.stderr, "basedir: %s, filename: %s, extension: %s" % (basedir, filename, extension)
+            print("basedir: %s, filename: %s, extension: %s" % (basedir, filename, extension), file=sys.stderr)
 
         filelist = glob.glob(os.path.join(basedir, '%s*' % filename))
         if debug:
-            print >> sys.stderr, "filelist: %s" % filelist
+            print("filelist: %s" % filelist, file=sys.stderr)
         missing_formats = get_missing_formats(filelist)
         if debug:
-            print >> sys.stderr, "missing_formats: %s" % missing_formats
+            print("missing_formats: %s" % missing_formats, file=sys.stderr)
         for path, formats in iteritems(missing_formats):
             if debug:
-                print >> sys.stderr, "... path: %s, formats: %s" % (path, formats)
+                print("... path: %s, formats: %s" % (path, formats), file=sys.stderr)
             for aformat in formats:
                 if debug:
-                    print >> sys.stderr, "...... aformat: %s" % aformat
+                    print("...... aformat: %s" % aformat, file=sys.stderr)
                 newpath = os.path.join(basedir, filename + aformat)
                 if debug:
-                    print >> sys.stderr, "...... newpath: %s" % newpath
+                    print("...... newpath: %s" % newpath, file=sys.stderr)
                 try:
                     convert_file(path, newpath)
                     createdpaths.append(newpath)
                 except InvenioWebSubmitFileConverterError as msg:
                     if debug:
-                        print >> sys.stderr, "...... Exception: %s" % msg
+                        print("...... Exception: %s" % msg, file=sys.stderr)
                     register_exception(alert_admin=True)
     finally:
         if debug:

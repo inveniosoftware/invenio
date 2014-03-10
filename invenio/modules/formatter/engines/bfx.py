@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 BFX formatting engine.
 For API: see format_with_bfx() docstring below.
@@ -1035,7 +1037,7 @@ def print_bfx_record(record):
     for tag in tags:
         field_instances = record[tag]
         for field_instance in field_instances:
-            print tag, field_instance
+            print(tag, field_instance)
 
 def record_fields_value(record, tag, subfield):
     '''

@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
@@ -638,10 +640,10 @@ def modify_customevent(event_id=None, name=None, cols=[]):
         for col_del in cols_del:
             result = -1
             while result < 1 or result > len(cols_add) + 1:
-                print """What do you want to do with the column %s in event %s?:
-1.- Delete it""" % (col_del, event_id)
+                print("""What do you want to do with the column %s in event %s?:
+1.- Delete it""" % (col_del, event_id))
                 for i in range(len(cols_add)):
-                    print "%d.- Rename it to %s" % (i + 2, cols_add[i])
+                    print("%d.- Rename it to %s" % (i + 2, cols_add[i]))
                 result = int(raw_input("\n"))
             if result == 1:
                 sql_query.append("DROP COLUMN `%s`" % col_del)

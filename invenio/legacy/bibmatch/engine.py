@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """BibMatch - tool to match records with database content of an Invenio instance,
 either locally or remotely through invenio_connector."""
 
@@ -67,8 +69,7 @@ re_querystring = re.compile("\s?([^\s$]*)\[(.+?)\]([^\s$]*).*?", re.DOTALL)
 def usage():
     """Print help"""
 
-    print >> sys.stderr, \
-    """ BibMatch - match bibliographic data against database, either locally or remotely
+    print(""" BibMatch - match bibliographic data against database, either locally or remotely
  Usage: %s [options] [QUERY]
 
  Options:
@@ -205,7 +206,7 @@ def usage():
 
  $ bibmatch --collection 'Books,Articles' < input.xml
  $ bibmatch --collection 'Theses' --user admin < input.xml
-    """ % (sys.argv[0],)
+    """ % (sys.argv[0],), file=sys.stderr)
     sys.exit(1)
 
     return
@@ -1141,7 +1142,7 @@ def main():
             usage()
             sys.exit(0)
         if opt in ["-V", "--version"]:
-            print __revision__
+            print(__revision__)
             sys.exit(0)
         if opt in ["-t", "--text-marc-output"]:
             textmarc_output = 1
@@ -1279,15 +1280,15 @@ def main():
         sys.stderr.write("\n See detailed log at %s\n" % (CFG_LOGFILE,))
 
     if not noprocess and recs_out:
-        print '<collection xmlns="http://www.loc.gov/MARC21/slim">'
+        print('<collection xmlns="http://www.loc.gov/MARC21/slim">')
         for record, results in recs_out:
             if textmarc_output:
                 # FIXME: textmarc output does not print matching results
-                print transform_record_to_marc(record)
+                print(transform_record_to_marc(record))
             else:
-                print results
-                print record_xml_output(record)
-        print "</collection>"
+                print(results)
+                print(record_xml_output(record))
+        print("</collection>")
 
     if batch_output:
         i = 0

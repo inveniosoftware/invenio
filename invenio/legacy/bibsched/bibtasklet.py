@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Invenio Bibliographic Tasklet BibTask.
 
 This is a particular BibTask that execute tasklets, which can be any
@@ -50,7 +52,7 @@ def _load_tasklets():
                 func = import_string(tasklet + ':' + tasklet.split('.')[-1])
                 tasklets[tasklet.split('.')[-1]] = func
             except:
-                print 'Fail', tasklet
+                print('Fail', tasklet)
 
     return tasklets
 
@@ -62,13 +64,13 @@ def cli_list_tasklets():
     """
     Print the list of available tasklets and broken tasklets.
     """
-    print """Available tasklets:"""
+    print("""Available tasklets:""")
     for tasklet in _TASKLETS.values():
-        print get_callable_documentation(tasklet)
+        print(get_callable_documentation(tasklet))
 
-    print """Broken tasklets:"""
+    print("""Broken tasklets:""")
     for tasklet_name, error in iteritems(_TASKLETS.get_broken_plugins()):
-        print "%s: %s" % (tasklet_name, error)
+        print("%s: %s" % (tasklet_name, error))
     sys.exit(0)
 
 
@@ -92,8 +94,8 @@ def task_submit_elaborate_specific_parameter(key, value,
         try:
             key, value = value.split('=', 1)
         except NameError:
-            print >> sys.stderr, 'ERROR: an argument must be in the form ' \
-                'param=value, not "%s"' % value
+            print('ERROR: an argument must be in the form ' \
+                'param=value, not "%s"' % value, file=sys.stderr)
             return False
         arguments[key] = value
         task_set_option('arguments', arguments)
@@ -111,19 +113,19 @@ def task_submit_check_options():
     tasklet = task_get_option('tasklet', None)
     arguments = task_get_option('arguments', {})
     if not tasklet:
-        print >> sys.stderr, 'ERROR: no tasklet specified'
+        print('ERROR: no tasklet specified', file=sys.stderr)
         return False
     elif tasklet not in _TASKLETS:
-        print >> sys.stderr, 'ERROR: "%s" is not a valid tasklet. Use ' \
+        print('ERROR: "%s" is not a valid tasklet. Use ' \
             '--list-tasklets to obtain a list of the working tasklets.' % \
-                tasklet
+                tasklet, file=sys.stderr)
         return False
     else:
         try:
             check_arguments_compatibility(_TASKLETS[tasklet], arguments)
         except ValueError as err:
-            print >> sys.stderr, 'ERROR: wrong arguments (%s) specified for ' \
-                'tasklet "%s": %s' % (arguments, tasklet, err)
+            print('ERROR: wrong arguments (%s) specified for ' \
+                'tasklet "%s": %s' % (arguments, tasklet, err), file=sys.stderr)
             return False
     return True
 

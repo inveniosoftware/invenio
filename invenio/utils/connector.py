@@ -19,6 +19,8 @@
 """
 Tools to connect to distant Invenio servers using Invenio APIs.
 
+from __future__ import print_function
+
 Example of use:
 
 from InvenioConnector import *
@@ -572,10 +574,10 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
         elif self.in_controlfield:
             self.buffer += data
         elif "Search-Engine-Total-Number-Of-Results:" in data:
-            print data
+            print(data)
             match_obj = re.search("\d+", data)
             if match_obj:
-                print int(match_obj.group())
+                print(int(match_obj.group()))
                 self.counts = int(match_obj.group())
 
     def endElement(self, name):

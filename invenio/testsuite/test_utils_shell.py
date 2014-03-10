@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Unit tests for shellutils library."""
 
 __revision__ = "$Id$"
@@ -122,17 +124,17 @@ class RunProcessWithTimeoutTest(InvenioTestCase):
         from flask import current_app
         self.script_path = os.path.join(current_app.instance_path, 'test_sleeping.sh')
         script = open(self.script_path, 'w')
-        print >> script, "#!/bin/sh"
-        print >> script, "date"
-        print >> script, "echo 'foo'"
-        print >> script, "echo 'bar' > /dev/stderr"
-        print >> script, "sleep $1"
-        print >> script, "date"
+        print("#!/bin/sh", file=script)
+        print("date", file=script)
+        print("echo 'foo'", file=script)
+        print("echo 'bar' > /dev/stderr", file=script)
+        print("sleep $1", file=script)
+        print("date", file=script)
         script.close()
         os.chmod(self.script_path, 0700)
         self.python_script_path = os.path.join(current_app.instance_path, 'test_sleeping.py')
         script = open(self.python_script_path, 'w')
-        print >> script, """\
+        print("""\
 #!/usr/bin/env python
 import os
 print os.getpid(), os.getpgrp()
@@ -140,7 +142,7 @@ if os.getpid() == os.getpgrp():
     print "PID == PGID"
 else:
     print "PID != PGID"
-"""
+""", file=script)
         script.close()
         os.chmod(self.python_script_path, 0700)
 

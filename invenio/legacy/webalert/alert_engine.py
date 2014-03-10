@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Alert engine implementation."""
 
 ## rest of the Python code goes below
@@ -105,20 +107,20 @@ def add_records_to_basket(records, basket_id):
     if nrec > 0:
         nrec_to_add = nrec < index and nrec or index
         if CFG_WEBALERT_DEBUG_LEVEL > 0:
-            print "-> adding %i records into basket %s: %s" % (nrec_to_add, basket_id, filtered_records[0][:nrec_to_add])
+            print("-> adding %i records into basket %s: %s" % (nrec_to_add, basket_id, filtered_records[0][:nrec_to_add]))
             if nrec > nrec_to_add:
-                print "-> not added %i records into basket %s: %s due to maximum limit restrictions." % (nrec - nrec_to_add, basket_id, filtered_records[0][nrec_to_add:])
+                print("-> not added %i records into basket %s: %s due to maximum limit restrictions." % (nrec - nrec_to_add, basket_id, filtered_records[0][nrec_to_add:]))
         try:
             if CFG_WEBALERT_DEBUG_LEVEL == 0:
                 add_to_basket(owner_uid, filtered_records[0][:nrec_to_add], 0, basket_id)
             else:
-                print '   NOT ADDED, DEBUG LEVEL > 0'
+                print('   NOT ADDED, DEBUG LEVEL > 0')
         except Exception:
             register_exception()
 
     if CFG_WEBALERT_DEBUG_LEVEL > 2 and filtered_out_recids:
-        print "-> these records have been filtered out, as user id %s did not have access:\n%s" % \
-              (owner_uid, repr(filtered_out_recids))
+        print("-> these records have been filtered out, as user id %s did not have access:\n%s" % \
+              (owner_uid, repr(filtered_out_recids)))
 
     if index < CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
         for external_collection_results in filtered_records[1][0]:
@@ -132,25 +134,25 @@ def add_records_to_basket(records, basket_id):
             if nrec > 0 and index_tmp > 0:
                 nrec_to_add = nrec < index_tmp and nrec or index_tmp
                 if CFG_WEBALERT_DEBUG_LEVEL > 0:
-                    print "-> adding %s external records (collection \"%s\") into basket %s: %s" % (nrec_to_add, external_collection_results[0], basket_id, external_collection_results[1][0][:nrec_to_add])
+                    print("-> adding %s external records (collection \"%s\") into basket %s: %s" % (nrec_to_add, external_collection_results[0], basket_id, external_collection_results[1][0][:nrec_to_add]))
                     if nrec > nrec_to_add:
-                        print "-> not added %s external records (collection \"%s\") into basket %s: %s due to maximum limit restriction" % (nrec - nrec_to_add, external_collection_results[0], basket_id, external_collection_results[1][0][nrec_to_add:])
+                        print("-> not added %s external records (collection \"%s\") into basket %s: %s due to maximum limit restriction" % (nrec - nrec_to_add, external_collection_results[0], basket_id, external_collection_results[1][0][nrec_to_add:]))
                 try:
                     if CFG_WEBALERT_DEBUG_LEVEL == 0:
                         collection_id = get_collection_id(external_collection_results[0])
                         added_items = add_to_basket(owner_uid, external_collection_results[1][0][:nrec_to_add], collection_id, basket_id)
                         format_external_records(added_items, of="xm")
                     else:
-                        print '   NOT ADDED, DEBUG LEVEL > 0'
+                        print('   NOT ADDED, DEBUG LEVEL > 0')
                 except Exception:
                     register_exception()
             elif nrec > 0 and CFG_WEBALERT_DEBUG_LEVEL > 0:
-                print "-> not added %s external records (collection \"%s\") into basket %s: %s due to maximum limit restriction" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0])
+                print("-> not added %s external records (collection \"%s\") into basket %s: %s due to maximum limit restriction" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0]))
     elif CFG_WEBALERT_DEBUG_LEVEL > 0:
         for external_collection_results in filtered_records[1][0]:
             nrec = len(external_collection_results[1][0])
             if nrec > 0:
-                print "-> not added %i external records (collection \"%s\") into basket %s: %s due to maximum limit restrictions" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0])
+                print("-> not added %i external records (collection \"%s\") into basket %s: %s due to maximum limit restrictions" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0]))
 
 def get_query(alert_id):
     """Returns the query for that corresponds to this alert id."""
@@ -161,7 +163,7 @@ def get_query(alert_id):
 def email_notify(alert, records, argstr):
     """Send the notification e-mail for a specific alert."""
     if CFG_WEBALERT_DEBUG_LEVEL > 2:
-        print "+" * 80 + '\n'
+        print("+" * 80 + '\n')
     uid = alert[0]
     user_info = collect_user_info(uid)
     frequency = alert[3]
@@ -198,8 +200,8 @@ def email_notify(alert, records, argstr):
     msg = ""
 
     if CFG_WEBALERT_DEBUG_LEVEL > 2 and filtered_out_recids:
-        print "-> these records have been filtered out, as user id %s did not have access:\n%s" % \
-              (uid, repr(filtered_out_recids))
+        print("-> these records have been filtered out, as user id %s did not have access:\n%s" % \
+              (uid, repr(filtered_out_recids)))
 
     if CFG_WEBALERT_DEBUG_LEVEL > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE ***\n\n"
@@ -227,16 +229,16 @@ def email_notify(alert, records, argstr):
     email = alert_recipient_email or get_email(uid)
 
     if email == 'guest':
-        print "********************************************************************************"
-        print "The following alert was not send, because cannot detect user email address:"
-        print "   " + repr(argstr)
-        print "********************************************************************************"
+        print("********************************************************************************")
+        print("The following alert was not send, because cannot detect user email address:")
+        print("   " + repr(argstr))
+        print("********************************************************************************")
         return
 
     if CFG_WEBALERT_DEBUG_LEVEL > 0:
-        print "********************************************************************************"
-        print msg
-        print "********************************************************************************"
+        print("********************************************************************************")
+        print(msg)
+        print("********************************************************************************")
 
     if CFG_WEBALERT_DEBUG_LEVEL < 2:
         send_email(fromaddr=webalert_templates.tmpl_alert_email_from(),
@@ -352,8 +354,8 @@ def run_query(query, frequency, date_until):
             log('query %08s produced %08s records for external collection \"%s\"' % (query[0], n, external_collection_results[0]))
 
     if CFG_WEBALERT_DEBUG_LEVEL > 2:
-        print "[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (
-            strftime("%c"), query, date_from, date_until, recs)
+        print("[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (
+            strftime("%c"), query, date_from, date_until, recs))
 
     return {'id_query': query[0], 'argstr': query[1],
             'records': recs, 'date_from': date_from, 'date_until': date_until}

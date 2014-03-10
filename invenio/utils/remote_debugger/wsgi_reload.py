@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Invenio utility to monitor and automatically reload modules when edits
 are done in-live.
@@ -45,8 +47,8 @@ _lock = threading.Lock()
 def _restart(path):
     _queue.put(True)
     prefix = 'monitor (pid=%d):' % os.getpid()
-    print >> sys.stderr, '%s Change detected to \'%s\'.' % (prefix, path)
-    print >> sys.stderr, '%s Triggering process restart.' % prefix
+    print('%s Change detected to \'%s\'.' % (prefix, path), file=sys.stderr)
+    print('%s Triggering process restart.' % prefix, file=sys.stderr)
     os.kill(os.getpid(), signal.SIGINT)
 
 def _modified(path):
@@ -135,7 +137,7 @@ def start(interval=1.0):
     _lock.acquire()
     if not _running:
         prefix = 'monitor (pid=%d):' % os.getpid()
-        print >> sys.stderr, '%s Starting change monitor.' % prefix
+        print('%s Starting change monitor.' % prefix, file=sys.stderr)
         _running = True
         _thread.start()
     _lock.release()

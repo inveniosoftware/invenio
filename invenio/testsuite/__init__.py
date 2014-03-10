@@ -15,6 +15,8 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 # pylint: disable=E1102
 
 from __future__ import with_statement
@@ -522,10 +524,10 @@ def test_web_page_content(url,
         pass
 
     if CFG_TESTUTILS_VERBOSE >= 9:
-        print "%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \
+        print("%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \
               (time.strftime("%Y-%m-%d %H:%M:%S -->", time.localtime()),
                url, username, expected_text,
-               ",".join(error_messages))
+               ",".join(error_messages)))
 
     return error_messages
 
@@ -589,11 +591,11 @@ def build_and_run_js_unit_test_suite():
         while 1:
             stdout_line = server_process.stdout.readline()
             if output_success in stdout_line:
-                print '* JsTestDriver server ready\n'
+                print('* JsTestDriver server ready\n')
                 return True
             elif output_error in stdout_line or elapsed_time > read_timeout:
-                print '* ! JsTestDriver server init failed\n'
-                print server_process.stdout.read()
+                print('* ! JsTestDriver server init failed\n')
+                print(server_process.stdout.read())
                 return False
             elapsed_time = time.time() - start_time
 
@@ -610,17 +612,17 @@ def build_and_run_js_unit_test_suite():
             if ext != '.js' or not base.endswith('_tests'):
                 continue
 
-            print "Found test file %s. Running tests... " % (base + ext)
+            print("Found test file %s. Running tests... " % (base + ext))
             dummy_current_exitcode, cmd_stdout, dummy_err_msg = run_shell_command(
                 cmd="java -jar %s/JsTestDriver.jar --config %s --tests all" %
                 (CFG_PREFIX + "/lib/java/js-test-driver", CFG_WEBDIR + "/js/" + base + '.conf'))
-            print cmd_stdout
+            print(cmd_stdout)
             if "Fails: 0" not in cmd_stdout:
                 errors_found += 1
-        print errors_found
+        print(errors_found)
         return errors_found
 
-    print "Going to start JsTestDriver server..."
+    print("Going to start JsTestDriver server...")
     server_process = subprocess.Popen(["java", "-jar",
                                        "%s/JsTestDriver.jar" % (
                                        CFG_PREFIX + "/lib/java/js-test-driver"), "--runnerMode", "INFO",
@@ -633,11 +635,11 @@ def build_and_run_js_unit_test_suite():
             # There was an error initialising server
             return 1
 
-        print "Now you can capture the browsers where you would " \
+        print("Now you can capture the browsers where you would " \
               "like to run the tests by opening the following url:\n" \
-              "%s:%d/capture \n" % (CFG_SITE_URL, CFG_JSTESTDRIVER_PORT)
+              "%s:%d/capture \n" % (CFG_SITE_URL, CFG_JSTESTDRIVER_PORT))
 
-        print "Press enter when you are ready to run tests"
+        print("Press enter when you are ready to run tests")
         raw_input()
 
         exitcode = _find_and_run_js_test_files()
@@ -1193,4 +1195,4 @@ def main():
     try:
         unittest.main(defaultTest='suite')
     except Exception as e:
-        print('Error: %s' % e)
+        print(('Error: %s' % e))

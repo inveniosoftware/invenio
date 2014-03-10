@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 from invenio.ext.script import Manager, change_command_name
 
 manager = Manager(usage="Perform Apache operations.")
@@ -158,7 +160,7 @@ def create_config(force=False, no_ssl=False):
 
     apache_conf_dir = current_app.instance_path + os.sep + 'apache'
 
-    print ">>> Going to create Apache conf files..."
+    print(">>> Going to create Apache conf files...")
     conf_files = ['invenio-apache-vhost.conf', 'invenio-apache-vhost-ssl.conf']
     conf_files = conf_files[:1 if no_ssl else 2]
 
@@ -167,7 +169,7 @@ def create_config(force=False, no_ssl=False):
 
     for local_file, context in zip(conf_files,
                                    get_context()[:1 if no_ssl else 2]):
-        print ">>> Writing %s ..." % local_file
+        print(">>> Writing %s ..." % local_file)
 
         try:
             apache_vhost_file = apache_conf_dir + os.sep + local_file
@@ -178,12 +180,13 @@ def create_config(force=False, no_ssl=False):
             with open(apache_vhost_file, 'w') as f:
                 out = render_template_to_string(local_file + '.tpl', os=os,
                                                 **context)
-                print >> f, out
+                print(out, file=f)
 
         except TemplateNotFound:
-            print >> sys.stderr, "Could not find template %s" % local_file
+            print("Could not find template %s".format(local_file),
+                  file=sys.stderr)
 
-    print wrap_text_in_a_box("""\
+    print(wrap_text_in_a_box("""\
 Apache virtual host configuration file(s) for your Invenio site
 was(were) created.  Please check created file(s) and activate virtual
 host(s).  For example, you can put the following include statements in
@@ -194,8 +197,8 @@ your httpd.conf:\n
 Please see the INSTALL file for more details.
     """ % '\n\n'.join(tuple(map(
         lambda x: "Include " + apache_conf_dir.encode('utf-8') + os.sep + x,
-        list(conf_files[:1 if no_ssl else 2])))))
-    print ">>> Apache conf files created."
+        list(conf_files[:1 if no_ssl else 2]))))))
+    print(">>> Apache conf files created.")
 
 
 def main():

@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 import re
 import redis
 import traceback
@@ -106,19 +108,19 @@ class dictproperty(object):
             try:
                 return self._fget(self._obj, key)
             except TypeError:
-                print "can't read item"
+                print("can't read item")
 
         def __setitem__(self, key, value):
             try:
                 self._fset(self._obj, key, value)
             except TypeError:
-                print "can't set item %s: %s" % (str(key), str(value),)
+                print("can't set item %s: %s" % (str(key), str(value),))
 
         def __delitem__(self, key):
             try:
                 self._fdel(self._obj, key)
             except TypeError:
-                print "can't delete item"
+                print("can't delete item")
 
     def __init__(self, fget=None, fset=None, fdel=None, doc=None):
         self._fget = fget

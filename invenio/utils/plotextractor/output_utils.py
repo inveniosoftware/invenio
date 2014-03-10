@@ -8,6 +8,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 import os
 import re
 import sys
@@ -19,7 +21,7 @@ from invenio.legacy.bibrecord import field_xml_output
 DUMMY_IMAGE_TMP = pkg_resources.resource_filename(__name__, 'plotextractor_dummy.png')
 
 def write_message(message):
-    print message
+    print(message)
 
 def write_messages(messages):
     for message in messages:

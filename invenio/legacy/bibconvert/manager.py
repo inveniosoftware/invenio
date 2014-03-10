@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 from invenio.ext.script import Manager
 
 from .registry import templates
@@ -33,7 +35,7 @@ def update():
     from conf file.  Note: this edits tpl files in situ, taking a
     backup first.  Use only when you know what you are doing.
     """
-    print ">>> Going to update bibconvert templates..."
+    print(">>> Going to update bibconvert templates...")
     import os
     import re
     import shutil
@@ -58,7 +60,7 @@ def update():
             fdesc = open(tplfile, 'w')
             fdesc.write(out)
             fdesc.close()
-    print ">>> bibconvert templates updated successfully."
+    print(">>> bibconvert templates updated successfully.")
 
 
 def main():

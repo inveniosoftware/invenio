@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 
 def websearch_before_browse_handler(collection, **kwargs):
     from flask import flash, g
@@ -24,7 +26,7 @@ def websearch_before_browse_handler(collection, **kwargs):
     from invenio.legacy.search_engine import create_exact_author_browse_help_link
     keys = ['p', 'p1', 'p2', 'p3', 'f', 'f1', 'f2', 'f3', 'rm', 'cc', 'ln', 'jrec', 'rg', 'aas', 'action']
     kwargs = dict(filter(lambda (k, v): k in keys, iteritems(kwargs)))
-    print kwargs
+    print(kwargs)
     msg = create_exact_author_browse_help_link(**kwargs)
     if msg and len(msg)>0:
         flash(msg, 'websearch-after-search-form')

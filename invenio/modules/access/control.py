@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Invenio Access Control Admin."""
 
 __revision__ = "$Id$"
@@ -165,27 +167,27 @@ def acc_update_action(id_action=0, name_action='', verbose=0, **update):
         if update.has_key('description'):
             # change the description, no other effects
             if verbose:
-                print 'desc'
+                print('desc')
             run_sql("""UPDATE accACTION SET description = %s WHERE id = %s""",
                 (update['description'], id_action))
 
         if update.has_key('allowedkeywords'):
             # change allowedkeywords
             if verbose:
-                print 'keys'
+                print('keys')
             # check if changing allowedkeywords or not
             if run_sql("""SELECT id FROM accACTION
                     WHERE id = %s AND allowedkeywords != %s """,
                     (id_action, update['allowedkeywords'])):
                 # change allowedkeywords
                 if verbose:
-                    print ' changing'
+                    print(' changing')
                 run_sql("""UPDATE accACTION SET allowedkeywords = %s
                     WHERE id = %s""", (update['allowedkeywords'], id_action))
                 # delete entries, but keep optional authorizations
                 # if there still is keywords
                 if verbose:
-                    print ' deleting auths'
+                    print(' deleting auths')
                 run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT
                     WHERE id_accACTION = %s %s """,
                     (id_action, update['allowedkeywords'] and
@@ -194,20 +196,20 @@ def acc_update_action(id_action=0, name_action='', verbose=0, **update):
         if update.has_key('optional'):
             # check if there changing optional or not
             if verbose:
-                print 'optional'
+                print('optional')
             if run_sql("""SELECT id FROM accACTION
                 WHERE id = %s AND optional != %s """,
                     (id_action, update['optional'])):
                 # change optional
                 if verbose:
-                    print ' changing'
+                    print(' changing')
                 run_sql("""UPDATE accACTION SET optional = %s WHERE id = %s""",
                     (update['optional'], id_action))
                 # setting it to no, delete authorizations with
                 # optional arguments
                 if update['optional'] == 'no':
                     if verbose:
-                        print '  deleting optional'
+                        print('  deleting optional')
                     run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT
                         WHERE id_accACTION = %s AND
                         id_accARGUMENT = -1 AND
@@ -608,16 +610,16 @@ def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
     inserted = []
 
     if verbose:
-        print 'ids: starting'
+        print('ids: starting')
     if verbose:
-        print 'ids: checking ids'
+        print('ids: checking ids')
 
     # check that all the ids are valid and reference something...
     if not run_sql("""SELECT id FROM accROLE WHERE id = %s""", (id_role, )):
         return 0
 
     if verbose:
-        print 'ids: get allowed keywords'
+        print('ids: get allowed keywords')
     # check action exist and get allowed keywords
     try:
         allowedkeys = acc_get_action_keywords(id_action=id_action)
@@ -627,58 +629,58 @@ def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
         return 0
 
     if verbose:
-        print 'ids: is it optional'
+        print('ids: is it optional')
     # action with optional arguments
     if optional:
         if verbose:
-            print 'ids: yes - optional'
+            print('ids: yes - optional')
         if not acc_get_action_is_optional(id_action=id_action):
             return []
 
         if verbose:
-            print 'ids: run query to check if exists'
+            print('ids: run query to check if exists')
         if not run_sql("""SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT
                 WHERE id_accROLE = %s AND
                 id_accACTION = %s AND
                 id_accARGUMENT = -1 AND
                 argumentlistid = -1""", (id_role, id_action, )):
             if verbose:
-                print 'ids: does not exist'
+                print('ids: does not exist')
             run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE,
                          id_accACTION, id_accARGUMENT, argumentlistid)
                        VALUES (%s, %s, -1, -1) """, (id_role, id_action))
             return ((id_role, id_action, -1, -1), )
         if verbose:
-            print 'ids: exists'
+            print('ids: exists')
         return []
 
     if verbose:
-        print 'ids: check if not arguments'
+        print('ids: check if not arguments')
     # action without arguments
     if not allowedkeys:
         if verbose:
-            print 'ids: not arguments'
+            print('ids: not arguments')
         if not run_sql("""SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT
                 WHERE id_accROLE = %s AND id_accACTION = %s AND
                 argumentlistid = %s AND id_accARGUMENT = %s""",
                 (id_role, id_action, 0, 0)):
             if verbose:
-                print 'ids: try to insert'
+                print('ids: try to insert')
             run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE,
                          id_accACTION, id_accARGUMENT, argumentlistid)
                        VALUES (%s, %s, %s, %s)""", (id_role, id_action, 0, 0))
             return ((id_role, id_action, 0, 0), )
         else:
             if verbose:
-                print 'ids: already existed'
+                print('ids: already existed')
             return 0
     else:
         if verbose:
-            print 'ids: arguments exist'
+            print('ids: arguments exist')
         argstr = ''
         # check that the argument exists, and that it is a valid key
         if verbose:
-            print 'ids: checking all the arguments'
+            print('ids: checking all the arguments')
         for id_argument in id_arguments:
             res_arg = run_sql("""SELECT id,keyword,value FROM accARGUMENT WHERE id = %s""",
                 (id_argument, ))
@@ -691,7 +693,7 @@ def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
 
         # arglistid = -1 means that the user wants a new group
         if verbose:
-            print 'ids: find arglistid'
+            print('ids: find arglistid')
         if arglistid < 0:
             # check if such single group already exists
             for (id_trav, ) in run_sql("""SELECT DISTINCT argumentlistid FROM
@@ -724,7 +726,7 @@ def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
             arglistid = 1
 
         if verbose:
-            print 'ids: insert all the entries'
+            print('ids: insert all the entries')
         # all references are valid, insert: one entry in raa for each argument
         for id_argument in id_arguments:
             if not run_sql("""SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT
@@ -739,10 +741,10 @@ def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
         # [(r, ac, ar1, aid), (r, ac, ar2, aid)]
 
         if verbose:
-            print 'ids:   inside add function'
+            print('ids:   inside add function')
             for r in acc_find_possible_actions(id_role=id_role,
                     id_action=id_action):
-                print 'ids:   ', r
+                print('ids:   ', r)
 
     return inserted
 
@@ -768,9 +770,9 @@ def acc_add_role_action_arguments_names(name_role='', name_action='',
      **keyval - dictionary of keyword=value pairs, used to find ids. """
 
     if verbose:
-        print 'names: starting'
+        print('names: starting')
     if verbose:
-        print 'names: checking ids'
+        print('names: checking ids')
 
     # find id of the role, return 0 if it doesn't exist
     id_role = run_sql("""SELECT id FROM accROLE where name = %s""",
@@ -789,12 +791,12 @@ def acc_add_role_action_arguments_names(name_role='', name_action='',
         return 0
 
     if verbose:
-        print 'names: checking arguments'
+        print('names: checking arguments')
 
     id_arguments = []
     if not optional:
         if verbose:
-            print 'names: not optional'
+            print('names: not optional')
         # place to keep ids of arguments and list of allowed keywords
         allowedkeys = acc_get_action_keywords(id_action=id_action)
             # res[0][3].split(',')
@@ -813,7 +815,7 @@ def acc_add_role_action_arguments_names(name_role='', name_action='',
             id_arguments.append(id_argument) # append the id to the list
     else:
         if verbose:
-            print 'names: optional'
+            print('names: optional')
 
     # use the other function
     return acc_add_role_action_arguments(id_role=id_role,

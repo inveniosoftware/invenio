@@ -19,6 +19,8 @@
 """
 WebSubmitAdmin CLI tool.
 
+from __future__ import print_function
+
 Usage websubmitadmin [options]
 
 Options:
@@ -308,8 +310,8 @@ def diff_submission(submission1_dump, submission2_dump, verbose=2,
 
 def usage(exitcode=1, msg=""):
     "Print usage"
-    print __doc__
-    print msg
+    print(__doc__)
+    print(msg)
     sys.exit(exitcode)
 
 def main():
@@ -327,7 +329,7 @@ def main():
                                     "no-fail-insert",
                                     "yes-i-know"])
     except getopt.GetoptError as err:
-        print err
+        print(err)
         usage(1)
 
     _ignore_date = False
@@ -389,7 +391,7 @@ def main():
                 _action = 'remove'
                 _doctype = opt[1]
     except StandardError as _exception:
-        print _exception
+        print(_exception)
         usage(1)
 
     if not _action:
@@ -398,18 +400,18 @@ def main():
         usage(1, 'You must specify a doctype')
 
     if _action == 'dump':
-        print dump_submission(doctype=_doctype,
+        print(dump_submission(doctype=_doctype,
                               method=_method,
                               include_cleaning=_clean,
-                              ignore_duplicate_insert=_no_fail_insert)
+                              ignore_duplicate_insert=_no_fail_insert))
     elif _action == 'load':
         if _yes_i_know:
             input_stream = sys.stdin.read()
             (code, messages) = load_submission(doctype=_doctype, dump=input_stream, method=_method)
-            print '\n'.join(messages)
+            print('\n'.join(messages))
             sys.exit(code)
         else:
-            print "Loading submission dumps using this tool is experimental. Please use 'dbexec' instead, or run with '--yes-i-know' if you really want to proceed."
+            print("Loading submission dumps using this tool is experimental. Please use 'dbexec' instead, or run with '--yes-i-know' if you really want to proceed.")
             sys.exit(1)
     elif _action == 'diff':
         if not sys.stdin.isatty():
@@ -418,14 +420,14 @@ def main():
                                     method=_method,
                                     include_cleaning=_clean,
                                     ignore_duplicate_insert=_no_fail_insert)
-            print diff_submission(dump1, input_stream, _verbose, _ignore_date, _ignore_position, _ignore_page)
+            print(diff_submission(dump1, input_stream, _verbose, _ignore_date, _ignore_position, _ignore_page))
     elif _action == 'remove':
         if not _method:
             usage(1, 'You must specify option --method')
         if _yes_i_know:
             remove_submission(doctype=_doctype, method=_method)
         else:
-            print "Removing submissions using this tool is experimental. Run with '--yes-i-know' if you really want to proceed."
+            print("Removing submissions using this tool is experimental. Run with '--yes-i-know' if you really want to proceed.")
             sys.exit(1)
 
 if __name__ == '__main__':

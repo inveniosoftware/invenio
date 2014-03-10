@@ -18,6 +18,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Alert engine command line interface"""
 
 __revision__ = "$Id$"
@@ -27,7 +29,7 @@ from invenio.base.factory import with_app_context
 
 def usage():
     from invenio.config import CFG_SITE_SUPPORT_EMAIL
-    print """Usage: alertengine [OPTION]
+    print("""Usage: alertengine [OPTION]
 Run the alert engine.
 
   -h, --help          display this help and exit
@@ -36,7 +38,7 @@ Run the alert engine.
   -d  --date="YEAR-MONTH-DAY" run the alertengine as if we were the
                               specified day, for test purposes (today)
 
-Report bugs to <%s>""" % CFG_SITE_SUPPORT_EMAIL
+Report bugs to <%s>""" % CFG_SITE_SUPPORT_EMAIL)
 
 @with_app_context()
 def main():
@@ -60,7 +62,7 @@ def main():
             usage()
             sys.exit()
         if o in ("-V", "--version"):
-            print __revision__
+            print(__revision__)
             sys.exit(0)
         if o in ("-d", "--date"):
             year, month, day = map(int, a.split('-'))
