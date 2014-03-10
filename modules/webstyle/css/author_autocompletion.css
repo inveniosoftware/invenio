@@ -1,0 +1,204 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+   This file is part of Invenio.
+   Copyright (C) 2014 CERN.
+
+   Invenio is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of the
+   License, or (at your option) any later version.
+
+   Invenio is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Invenio; if not, write to the Free Software Foundation, Inc.,
+   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+.typeahead,
+.tt-query,
+.tt-hint {
+  width: 400px;
+  height: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  border: 2px solid #ccc;
+  outline: none;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.typeahead {
+  background-color: #fff;
+}
+.author-row{
+  background: #fff;
+  margin-bottom: 5px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-left: 2px solid #ccc;
+  position: relative;
+  -webkit-transition: border 1s ease-in-out;
+  -moz-transition: border 1s ease-in-out;
+  -o-transition: border 1s ease-in-out;
+  transition: border 1s ease-in-out;
+}
+.author-principal{
+  border-left: 2px solid #4B77BE;
+}
+.author-row-header-principal{
+  line-height: 20px!important;
+  padding: 0px;
+}
+.author-row-header-principal .label {
+  display: inline-block;
+  font-size: 11px;
+  line-height: normal;
+  color: #fff;
+  padding: 1px;
+  background: #4B77BE;
+  border: 1px solid #3A539B;
+}
+.author-row:hover {
+  cursor: move;
+}
+.author-row:hover .author-row-header-delete{
+  visibility: visible;
+  cursor: default!important;
+}
+.author-row-header-delete{
+  position: absolute;
+  right: 5px;
+  height: 90%;
+  width: 30%;
+  text-align: right;
+  top: 5px;
+  visibility: hidden;
+}
+.author-row-header-name {
+  font-size: 18px;
+  padding-bottom: 2px;
+  color: #111;
+}
+.author-row-body-extra {
+  color: #444;
+}
+.author-row-body-affiliation {
+  color: #444;
+}
+.author-row-body-email {
+  padding-bottom: 10px;
+  font-size: 12px;
+}
+
+.author-row-body {
+  color: #666;
+  font-size: 14px;
+}
+.author-empty-message{
+  padding: 10px 20px;
+}
+.author-empty-message h2{
+  margin: 0;
+  padding: 0 0 5px;
+  line-height: normal;
+  color: #111;
+  font-size: 16px;
+}
+.author-empty-message p{
+  color: #757575;
+  margin: 0;
+  padding: 0;
+  line-height: normal;
+  font-size: 11px;
+}
+.autocomplete-author-row{
+
+}
+.autocomplete-author-row-name{
+  font-size: 16px;
+  line-height: normal;
+  padding: 0;
+}
+.autocomplete-author-row-email{
+  font-size: 10px;
+  line-height: normal;
+  padding: 0 0 5px;
+  color: #666;
+}
+.autocomplete-author-row-affiliation{
+  font-size: 11px;
+  line-height: normal;
+  padding: 0;
+  color: #666;
+}
+.typeahead:focus {
+  border: 2px solid #0097cf;
+}
+.tt-hint {
+  color: #999
+}
+.tt-dropdown-menu {
+  min-height: 50px;
+  max-height: 300px;
+  overflow-y: scroll;
+  width: 650px;
+  margin-top: 0px;
+  padding: 0px 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,.2)
+}
+
+.tt-suggestion {
+  padding: 5px 20px;
+  font-size: 18px;
+  line-height: 24px;
+  border-bottom:1px solid #ddd;
+
+}
+
+.tt-suggestion.tt-cursor {
+  color: #fff;
+  cursor: pointer;
+  background-color:#0097cf;
+}
+
+.tt-suggestion.tt-cursor .autocomplete-author-row-email,
+.tt-suggestion.tt-cursor .autocomplete-author-row-affiliation{
+  color: #fff!important;
+}
+
+.tt-suggestion p {
+  margin: 0;
+}
+
+/*websubmit author autocompletion */
+#websubmit_authors_table {
+
+  padding: 0 0px;
+  max-width: 100%;
+  width: 664px;
+  margin: 20px 0;
+}
+#websubmit_authors_tbody {
+  width: 664px;
+}
+.websubmit_authors_tr {
+  border-collapse: collapse;
+  vertical-align: middle;
+}
+.websubmit_authors_list {
+  display: block;
+  margin-top: 10px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  background: #fff;
+  overflow: hidden;
+  margin-bottom:10px;
+}
