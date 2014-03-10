@@ -19,8 +19,11 @@
 
 from __future__ import absolute_import
 
+import re
+
 from flask import request, url_for, current_app
 
+from . import signatures
 from .registry import receivers_registry
 
 
@@ -39,6 +42,9 @@ class ReceiverDoesNotExists(WebhookError):
 class InvalidPayload(WebhookError):
     pass
 
+class InvalidSignature(WebhookError):
+    pass
+
 
 #
 # Models
@@ -49,8 +55,9 @@ class Receiver(object):
     extracting a payload from a request, and passing it on to a method which
     can handle the event notification.
     """
-    def __init__(self, fn):
+    def __init__(self, fn, signature=''):
         self._callable = fn
+        self.signature = signature
 
     @classmethod
     def get(cls, receiver_id):
@@ -104,10 +111,23 @@ class Receiver(object):
             payload=self.extract_payload()
         )
 
+    def check_signature(self):
+        if not self.signature:
+            return True
+        signature_value = request.headers.get(self.signature, None)
+        if signature_value:
+            validator = 'check_' + re.sub(r'[-]', '_', self.signature).lower()
+            check_signature = getattr(signatures, validator)
+            if check_signature(signature_value, request.data):
+                return True
+        return False
+
     def extract_payload(self):
         """
         Method to extract payload from request.
         """
+        if not self.check_signature():
+            raise InvalidSignature('Invalid Signature')
         if request.content_type == 'application/json':
             return request.get_json()
         elif request.content_type == 'application/x-www-form-urlencoded':
@@ -120,7 +140,8 @@ class CeleryReceiver(Receiver):
     Receiver which will fire a celery task to handle payload instead of running
     it synchronously during the request.
     """
-    def __init__(self, task_callable, **options):
+    def __init__(self, task_callable, signature='', **options):
+        super(CeleryReceiver, self).__init__(task_callable, signature)
         self._task = task_callable
         self._options = options
         from celery import Task
