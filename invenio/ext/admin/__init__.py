@@ -58,20 +58,33 @@ Usage example - create a file called <module>_admin.py::
                                     category="My Category"))
 """
 
+from __future__ import absolute_import
+
 from flask.ext.admin import Admin
 from .views import AdminIndexView
+from flask.ext.registry import ModuleAutoDiscoveryRegistry
+
 
 #
 # Utility method
 #
+class AdminDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
+    setup_func_name = 'register_admin'
+
+    def __init__(self, *args, **kwargs):
+        self.admin = kwargs.pop('admin', None)
+        super(AdminDiscoveryRegistry, self).__init__(*args, **kwargs)
+
+    def register(self, module, *args, **kwargs):
+        super(AdminDiscoveryRegistry, self).register(
+            module, self.app, self.admin, *args, **kwargs
+        )
 
 
 def setup_app(app):
     """
     Register all administration views with the Flask application
     """
-    from invenio.base.utils import autodiscover_admin_views
-
     # Initialize app
     admin = Admin(
         name="Invenio",
@@ -80,13 +93,7 @@ def setup_app(app):
     )
     admin.init_app(app)
 
-    # Call register() in admin module to register views.
-    modules = autodiscover_admin_views(app)
-    for m in modules:
-        register_func = getattr(m, 'register_admin', None)
-        if register_func and callable(register_func):
-            try:
-                register_func(app, admin)
-            except Exception:
-                from invenio.ext.logging import register_exception
-                register_exception()
+    # Create registry and run discovery
+    app.extensions['registry']['admin'] = AdminDiscoveryRegistry(
+        'admin', app=app, with_setup=True, admin=admin
+    )
