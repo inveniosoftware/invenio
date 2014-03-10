@@ -18,6 +18,8 @@
 WebSubmit Metadata Plugin - This is the plugin to update metadata from
 PDF files.
 
+from __future__ import print_function
+
 Dependencies: pdftk
 """
 
@@ -121,11 +123,11 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
 
     # Print pdf metadata
     if verbose > 1:
-        print 'Metadata information in the PDF file ' + filename + ': \n'
+        print('Metadata information in the PDF file ' + filename + ': \n')
         try:
             os.system(CFG_PATH_PDFTK + ' ' + inputfile + ' dump_data')
         except Exception:
-            print 'Problem with inputfile to PDFTK'
+            print('Problem with inputfile to PDFTK')
 
     # Info file for pdftk
     (fd, path_to_info) = tempfile.mkstemp(prefix="wsm_pdf_plugin_info_", \
@@ -133,7 +135,7 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
     os.close(fd)
     file_in = open(path_to_info, 'w')
     if verbose > 5:
-        print "Saving PDFTK info file to %s" % path_to_info
+        print("Saving PDFTK info file to %s" % path_to_info)
 
     # User interaction to form the info file
     # Main Case: Dictionary received through option -d
@@ -142,24 +144,24 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
             line = 'InfoKey: ' + tag + '\nInfoValue: ' + \
                    metadata_dictionary[tag] + '\n'
             if verbose > 0:
-                print line
+                print(line)
             file_in.writelines(line)
     else:
         data_modified = False
         user_input = 'user_input'
-        print "Entering interactive mode. Choose what you want to do:"
+        print("Entering interactive mode. Choose what you want to do:")
         while (user_input):
             if not data_modified:
                 try:
                     user_input = raw_input('[w]rite / [q]uit\n')
                 except:
-                    print "Aborting"
+                    print("Aborting")
                     return
             else:
                 try:
                     user_input = raw_input('[w]rite / [q]uit and apply / [a]bort \n')
                 except:
-                    print "Aborting"
+                    print("Aborting")
                     return
             if user_input == 'q':
                 if not data_modified:
@@ -170,7 +172,7 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
                     tag = raw_input('Tag to update:\n')
                     value = raw_input('With value:\n')
                 except:
-                    print "Aborting"
+                    print("Aborting")
                     return
                 # Write to info file
                 line = 'InfoKey: ' + tag + '\nInfoValue: ' + value + '\n'
@@ -179,7 +181,7 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
             elif user_input == 'a':
                 return
             else:
-                print "Invalid option: "
+                print("Invalid option: ")
     file_in.close()
 
     (fd, pdf_temp_path) = tempfile.mkstemp(prefix="wsm_pdf_plugin_pdf_", \
@@ -194,7 +196,7 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
                                     args=(CFG_PATH_PDFTK, inputfile,
                                           path_to_info, pdf_temp_path))
     if verbose > 5:
-        print output_std, output_err
+        print(output_std, output_err)
 
     if os.path.exists(pdf_temp_path):
         # Move to final destination if exist

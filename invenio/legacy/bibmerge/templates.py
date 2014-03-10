@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 # pylint: disable=C0103
 
 """Invenio BibMerge Templates."""
@@ -410,7 +412,7 @@ def BM_html_add_diff_spans(value1, value2):
     index2 = 0
     idtag = 0
     for diff in Levenshtein_diffs(value1, value2):
-        print diff
+        print(diff)
         chars = diff[1]
         if diff[0]=='n':
             newvalue1 += u"""<span class="bibMergeDiffSpanSame" id="diff%s">%s</span>""" % (idtag, value1[index1: index1+chars])

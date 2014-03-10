@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Module for running microtests on how well the extraction works -
 this module is STANDALONE safe"""
 
@@ -225,7 +227,7 @@ if __name__ == "__main__":
                             it seems to be a relative path, but not relative to the script, nor to the invenio rootdir' % p)
         run(test_paths)
     else:
-        print 'Usage: %s glob_pattern [glob_pattern...]\nExample: %s %s/etc/bibclassify/microtest*.cfg' % (sys.argv[0],
+        print('Usage: %s glob_pattern [glob_pattern...]\nExample: %s %s/etc/bibclassify/microtest*.cfg' % (sys.argv[0],
                                                                                                            sys.argv[0],
                                                                                                            bconfig.CFG_PREFIX,
-        )
+        ))

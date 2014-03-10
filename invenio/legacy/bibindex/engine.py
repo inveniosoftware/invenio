@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 BibIndex indexing engine implementation.  See bibindex executable for entry point.
 """
@@ -1481,7 +1483,7 @@ def task_submit_check_options():
     """Check for options compatibility."""
     if task_get_option("reindex"):
         if task_get_option("cmd") != "add" or task_get_option('id') or task_get_option('collection'):
-            print >> sys.stderr, "ERROR: You can use --reindex only when adding modified record."
+            print("ERROR: You can use --reindex only when adding modified record.", file=sys.stderr)
             return False
     return True
 

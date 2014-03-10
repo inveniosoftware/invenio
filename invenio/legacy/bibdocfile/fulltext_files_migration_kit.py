@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 __revision__ = "$Id$"
 
 """This script updates the filesystem structure of fulltext files in order
@@ -38,27 +40,27 @@ def retrieve_fulltext_recids():
 
 def fix_recid(recid, logfile):
     """Fix a given recid."""
-    print "Upgrading record %s ->" % recid,
-    print >> logfile, "Upgrading record %s:" % recid
+    print("Upgrading record %s ->" % recid, end=' ')
+    print("Upgrading record %s:" % recid, file=logfile)
 
     bibrec = BibRecDocs(recid)
-    print >> logfile, bibrec
+    print(bibrec, file=logfile)
     docnames = bibrec.get_bibdoc_names()
     try:
         for docname in docnames:
-            print docname,
+            print(docname, end=' ')
             new_bibdocs = bibrec.fix(docname)
             new_bibdocnames = [bibrec.get_docname(bibdoc.id) for bibdoc in new_bibdocs]
             if new_bibdocnames:
-                print "(created bibdocs: '%s')" % "', '".join(new_bibdocnames),
-                print >> logfile, "(created bibdocs: '%s')" % "', '".join(new_bibdocnames)
+                print("(created bibdocs: '%s')" % "', '".join(new_bibdocnames), end=' ')
+                print("(created bibdocs: '%s')" % "', '".join(new_bibdocnames), file=logfile)
     except InvenioBibDocFileError as e:
-        print >> logfile, BibRecDocs(recid)
-        print "%s -> ERROR", e
+        print(BibRecDocs(recid), file=logfile)
+        print("%s -> ERROR", e)
         return False
     else:
-        print >> logfile, BibRecDocs(recid)
-        print "-> OK"
+        print(BibRecDocs(recid), file=logfile)
+        print("-> OK")
         return True
 
 def backup_tables(drop=False):
@@ -93,50 +95,50 @@ def main():
     try:
         logfile = open(logfilename, 'w')
     except IOError as e:
-        print wrap_text_in_a_box('NOTE: it\'s impossible to create the log:\n\n  %s\n\nbecause of:\n\n  %s\n\nPlease run this migration kit as the same user who runs Invenio (e.g. Apache)' % (logfilename, e), style='conclusion', break_long=False)
+        print(wrap_text_in_a_box('NOTE: it\'s impossible to create the log:\n\n  %s\n\nbecause of:\n\n  %s\n\nPlease run this migration kit as the same user who runs Invenio (e.g. Apache)' % (logfilename, e), style='conclusion', break_long=False))
         sys.exit(1)
 
     recids = retrieve_fulltext_recids()
-    print wrap_text_in_a_box ("""This script migrate the filesystem structure used to store fulltext files to the new stricter structure.
+    print(wrap_text_in_a_box ("""This script migrate the filesystem structure used to store fulltext files to the new stricter structure.
 This script must not be run during normal Invenio operations.
 It is safe to run this script. No file will be deleted.
 Anyway it is recommended to run a backup of the filesystem structure just in case.
-A backup of the database tables involved will be automatically performed.""", style='important')
-    print "%s records will be migrated/fixed." % len(recids)
-    print "Please type yes if you want to go further:",
+A backup of the database tables involved will be automatically performed.""", style='important'))
+    print("%s records will be migrated/fixed." % len(recids))
+    print("Please type yes if you want to go further:", end=' ')
 
     if not check_yes():
-        print "INTERRUPTED"
+        print("INTERRUPTED")
         sys.exit(1)
-    print "Backing up database tables"
+    print("Backing up database tables")
     try:
         if not backup_tables():
-            print wrap_text_in_a_box("""It appears that is not the first time that you run this script.
+            print(wrap_text_in_a_box("""It appears that is not the first time that you run this script.
 Backup tables have been already created by a previous run.
-In order for the script to go further they need to be removed.""", style='important')
+In order for the script to go further they need to be removed.""", style='important'))
 
-            print "Please, type yes if you agree to remove them and go further:",
+            print("Please, type yes if you agree to remove them and go further:", end=' ')
 
             if not check_yes():
-                print wrap_text_in_a_box("INTERRUPTED", style='conclusion')
+                print(wrap_text_in_a_box("INTERRUPTED", style='conclusion'))
                 sys.exit(1)
-            print "Backing up database tables (after dropping previous backup)",
+            print("Backing up database tables (after dropping previous backup)", end=' ')
             backup_tables(drop=True)
-            print "-> OK"
+            print("-> OK")
         else:
-            print "-> OK"
+            print("-> OK")
     except Exception as e:
-        print wrap_text_in_a_box("Unexpected error while backing up tables. Please, do your checks: %s" % e, style='conclusion')
+        print(wrap_text_in_a_box("Unexpected error while backing up tables. Please, do your checks: %s" % e, style='conclusion'))
         sys.exit(1)
 
-    print "Created a complete log file into %s" % logfilename
+    print("Created a complete log file into %s" % logfilename)
     for recid in recids:
         if not fix_recid(recid, logfile):
             logfile.close()
-            print wrap_text_in_a_box(title="INTERRUPTED BECAUSE OF ERROR!", body="""Please see the log file %s for what was the status of record %s prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, recid, CFG_SITE_SUPPORT_EMAIL),
-            style='conclusion')
+            print(wrap_text_in_a_box(title="INTERRUPTED BECAUSE OF ERROR!", body="""Please see the log file %s for what was the status of record %s prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, recid, CFG_SITE_SUPPORT_EMAIL),
+            style='conclusion'))
             sys.exit(1)
-    print wrap_text_in_a_box("DONE", style='conclusion')
+    print(wrap_text_in_a_box("DONE", style='conclusion'))
 
 if __name__ == '__main__':
     main()

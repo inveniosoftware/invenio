@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
    "refextract" is used to extract and process the "references"
    or "citations" made to other documents from within a document.
@@ -55,4 +57,4 @@ def main():
         return daemon_main()
     except KeyboardInterrupt:
         # Exit cleanly
-        print 'Interrupted'
+        print('Interrupted')

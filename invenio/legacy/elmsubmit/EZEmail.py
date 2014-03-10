@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 # Side note: CJK codecs at http://cjkpython.i18n.org/.
 
@@ -341,7 +343,7 @@ def contents(filename):
 
     def walk_email(msg,indent=0):
 
-        print "-"*indent, msg.get_content_type()
+        print("-"*indent, msg.get_content_type())
 
         if msg.is_multipart():
             for part in msg.get_payload():
@@ -1981,12 +1983,12 @@ if __name__ == "__main__":
 #    import profile
     def f():
         for filename in sys.stdin.xreadlines():
-            print filename,
+            print(filename, end=' ')
             filename = filename[:-1]
             contents(filename)
-            print "==="
+            print("===")
             a = ParseMessage(open(filename, 'rb').read(), strict=False)
-            print a.primary_message()
+            print(a.primary_message())
     f()
 #    profile.run('f()')
 

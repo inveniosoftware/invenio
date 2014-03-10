@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Unit tests for the inveniomanage script."""
 
 import sys
@@ -118,20 +120,20 @@ class InveniomanageTest(InvenioTestCase):
         from invenio.base.manage import main, version as im_version
 
         def pre_handler_version(sender, *args, **kwargs):
-            print '>>> pre_handler_version'
+            print('>>> pre_handler_version')
 
         def post_handler_version(sender, *args, **kwargs):
-            print '>>> post_handler_version'
+            print('>>> post_handler_version')
 
         # Bind only `inveniomanage version` command to pre/post handler.
         pre_command.connect(pre_handler_version, sender=im_version)
         post_command.connect(post_handler_version, sender=im_version)
 
         def pre_handler_general_test(sender, *args, **kwargs):
-            print '>>> pre_handler_general'
+            print('>>> pre_handler_general')
 
         def post_handler_general_test(sender, *args, **kwargs):
-            print '>>> post_handler_general'
+            print('>>> post_handler_general')
 
         # Bind all commands to pre/post general handler.
         pre_command.connect(pre_handler_general_test)

@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Miscellaneous utlity functions that have the potential for re-use.
 """
@@ -199,7 +201,7 @@ def dict2file(dictionary, directory):
             os.mkdir(fullpath)
             dict2file(dictionary_or_data, fullpath)
 
-    print 'dict.items', dictionary.items()
+    print('dict.items', dictionary.items())
 
     map(f, dictionary.items())
 
@@ -533,15 +535,15 @@ def get_owner_uid(path):
 # Text utils:
 
 def wrap_text(text, cols=80):
-    print "text", text
+    print("text", text)
     parts = re.split(r'(\n(?:\s*\n))+', text)
     (paragraphs, whitespace) = cleave_pair(parts)
     for x in parts:
-        print ">>", x
-    print "paras", paragraphs
-    print "white", whitespace
+        print(">>", x)
+    print("paras", paragraphs)
+    print("white", whitespace)
     wrapped_paragraphs =  map(lambda t: textwrap.fill(t, width=cols), paragraphs)
-    print wrapped_paragraphs
+    print(wrapped_paragraphs)
     return ''.join(merge_pair(wrapped_paragraphs, whitespace))
 
 # Module utils:

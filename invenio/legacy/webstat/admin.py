@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
@@ -101,22 +103,22 @@ def task_submit_check_options():
           straigh-forward execution mode is entered.
     """
     if task_has_option("create_event_with_id"):
-        print webstat.create_customevent(task_get_option("create_event_with_id"),
+        print(webstat.create_customevent(task_get_option("create_event_with_id"),
                                          task_get_option("event_name", None),
-                                         task_get_option("column_headers", []))
+                                         task_get_option("column_headers", [])))
         sys.exit(0)
 
     elif task_has_option("destroy_event_with_id"):
-        print webstat.destroy_customevent(task_get_option("destroy_event_with_id"))
+        print(webstat.destroy_customevent(task_get_option("destroy_event_with_id")))
         sys.exit(0)
 
     elif task_has_option("list_events"):
         events = webstat._get_customevents()
         if len(events) == 0:
-            print "There are no custom events available."
+            print("There are no custom events available.")
         else:
-            print "Available custom events are:\n"
-            print '\n'.join([x[0] + ": " + ((x[1] == None) and "No descriptive name" or str(x[1])) for x in events])
+            print("Available custom events are:\n")
+            print('\n'.join([x[0] + ": " + ((x[1] == None) and "No descriptive name" or str(x[1])) for x in events]))
         sys.exit(0)
 
     elif task_has_option("cache_events"):
@@ -151,7 +153,7 @@ def task_submit_check_options():
         return True
 
     elif task_has_option("dump_config"):
-        print """\
+        print("""\
 [general]
 visitors_box = True
 search_box = True
@@ -183,7 +185,7 @@ display-public-basket-url = "/yourbaskets/display_public"
 alert-url = "/youralerts/"
 display-your-alerts-url = "/youralerts/list"
 display-your-searches-url = "/youralerts/display"
-""" % CFG_SITE_RECORD
+""" % CFG_SITE_RECORD)
         sys.exit(0)
 
     elif task_has_option("load_config"):

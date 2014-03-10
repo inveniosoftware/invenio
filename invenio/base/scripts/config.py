@@ -17,7 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import StringIO
+from __future__ import print_function
+
 import errno
 import imp
 import sys
@@ -28,6 +29,11 @@ from flask import current_app
 from six import iteritems, StringIO
 from invenio.ext.script import Manager, change_command_name, \
     generate_secret_key
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 manager = Manager(usage="Perform configuration operations")
 
@@ -76,10 +82,10 @@ def get(name):
         varvalue = current_app.config.get(name.upper(), None)
         if varvalue is None:
             raise Exception('Value of "%s" is None.' % name)
-        print varvalue
-    except Exception, e:
+        print(varvalue)
+    except Exception as e:
         if e.message:
-            print >> sys.stderr, e.message
+            print(e.message, file=sys.stderr)
         sys.exit(1)
 
 
@@ -89,10 +95,10 @@ def set_(name, value, filename='invenio.cfg'):
     try:
         d = get_instance_config_object(filename)
     except Exception as e:
-        print >>sys.stderr, "ERROR: ", str(e)
+        print("ERROR: ", str(e), file=sys.stderr)
         sys.exit(1)
     if name in d.__dict__:
-        print "ERROR: %s is already filled." % (name, )
+        print("ERROR: %s is already filled." % (name, ))
         sys.exit(1)
 
     try:
@@ -102,10 +108,10 @@ def set_(name, value, filename='invenio.cfg'):
         else:
             value = type_(value)
     except:
-        print '>>> Using default type ...'
+        print('>>> Using default type ...')
 
     with current_app.open_instance_resource(filename, 'a') as config_file:
-        print >>config_file, name, '=', pformat(value)
+        print(name, '=', pformat(value), file=config_file)
 
 set_.__name__ = 'set'
 manager.command(set_)
@@ -117,7 +123,7 @@ def list():
     Print a list of all conf options and values from CONF.
     """
     for key, value in iteritems(current_app.config):
-        print key, '=', pformat(value)
+        print(key, '=', pformat(value))
 
 
 @manager.command
@@ -128,7 +134,7 @@ def update(filename='invenio.cfg', silent=True):
     """
     d = get_instance_config_object(filename, silent)
 
-    new_config = StringIO.StringIO()
+    new_config = StringIO()
     for key in set(d.__dict__.keys()) | set(default_keys()):
         if key != key.upper():
             continue
@@ -146,10 +152,10 @@ def update(filename='invenio.cfg', silent=True):
                     new_value = type_(new_value or value)
                 break
             except Exception as e:
-                print e
+                print(e)
                 pass
-        print '>>>', key, '=', pformat(new_value)
-        print >>new_config, key, '=', pformat(new_value)
+        print('>>>', key, '=', pformat(new_value))
+        print(key, '=', pformat(new_value), file=new_config)
 
     with current_app.open_instance_resource(filename, 'w') as config_file:
         config_file.write(new_config.getvalue())
@@ -164,25 +170,25 @@ manager.add_command("create", config_create)
 def secret_key(key=None, filename='invenio.cfg', silent=True):
     """Generate and append SECRET_KEY to invenio.cfg.
     Useful for the installation process."""
-    print ">>> Going to generate random SECRET_KEY..."
+    print(">>> Going to generate random SECRET_KEY...")
     try:
         d = get_instance_config_object(filename)
     except Exception as e:
-        print >>sys.stderr, "ERROR: ", str(e)
+        print("ERROR: ", str(e), file=sys.stderr)
         sys.exit(1)
     if len(d.__dict__.get('SECRET_KEY', '')) > 0:
-        print "ERROR: SECRET_KEY is already filled."
+        print("ERROR: SECRET_KEY is already filled.")
         sys.exit(1)
     from invenio.base.config import SECRET_KEY
     if current_app.config.get('SECRET_KEY') != SECRET_KEY:
-        print >>sys.stderr, "WARNING: custom config package already contains SECRET_KEY."
-        print ">>> No need to generate secret key."
+        print("WARNING: custom config package already contains SECRET_KEY.", file=sys.stderr)
+        print(">>> No need to generate secret key.")
     else:
         if key is None:
             key = generate_secret_key()
         with current_app.open_instance_resource(filename, 'a') as config_file:
-            print >>config_file, 'SECRET_KEY =', pformat(key)
-            print ">>> SECRET_KEY appended to `%s`." % (config_file.name, )
+            print('SECRET_KEY =', pformat(key), file=config_file)
+            print(">>> SECRET_KEY appended to `%s`." % (config_file.name, ))
 
 
 def main():

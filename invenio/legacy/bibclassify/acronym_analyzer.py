@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Bibclassify acronym analyser.
 """
@@ -266,5 +268,5 @@ def _equivalent_expansions(expansion1, expansion2):
 
 
 if __name__ == "__main__":
-    print get_acronyms(
-        "asymptomatically de Sitter(dS). and what one large relative symmetric (LRS) which always has general relativity (GR)")
+    print(get_acronyms(
+        "asymptomatically de Sitter(dS). and what one large relative symmetric (LRS) which always has general relativity (GR)"))

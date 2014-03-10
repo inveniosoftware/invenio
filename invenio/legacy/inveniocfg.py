@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Invenio configuration and administration CLI tool.
 
@@ -95,7 +97,7 @@ from warnings import warn
 
 def print_usage():
     """Print help."""
-    print __doc__
+    print(__doc__)
 
 
 def get_version():
@@ -106,7 +108,7 @@ def get_version():
 
 def print_version():
     """Print version information."""
-    print get_version()
+    print(get_version())
 
 
 def convert_conf_option(option_name, option_value):
@@ -126,8 +128,8 @@ def convert_conf_option(option_name, option_value):
                           'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
                           'CFG_WEBSUBMIT_DESIRED_CONVERSIONS']:
         new_option_name = option_name.replace('WEBSUBMIT', 'BIBDOCFILE')
-        print >> sys.stderr, ("""WARNING: %s has been renamed to %s.
-Please, update your invenio-local.conf file accordingly.""" % (option_name, new_option_name))
+        print(("""WARNING: %s has been renamed to %s.
+Please, update your invenio-local.conf file accordingly.""" % (option_name, new_option_name)), file=sys.stderr)
         option_name = new_option_name
 
 
@@ -194,14 +196,14 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
             option_value = option_value[1:-1]
         except TypeError:
             if option_name in ('CFG_WEBSEARCH_FULLTEXT_SNIPPETS',):
-                print >> sys.stderr, """WARNING: CFG_WEBSEARCH_FULLTEXT_SNIPPETS
+                print("""WARNING: CFG_WEBSEARCH_FULLTEXT_SNIPPETS
 has changed syntax: it can be customised to display different snippets for
 different document types.  See the corresponding documentation in invenio.conf.
-You may want to customise your invenio-local.conf configuration accordingly."""
+You may want to customise your invenio-local.conf configuration accordingly.""", file=sys.stderr)
                 option_value = """{'': %s}""" % option_value
             else:
-                print >> sys.stderr, "ERROR: type error in %s value %s." % \
-                      (option_name, option_value)
+                print("ERROR: type error in %s value %s." % \
+                      (option_name, option_value), file=sys.stderr)
                 sys.exit(1)
 
     ## 3cbis) very special cases: dicts with backward compatible string
@@ -277,9 +279,9 @@ You may want to customise your invenio-local.conf configuration accordingly."""
 
     ## 4a) dropped variables
     if option_name in ['CFG_BATCHUPLOADER_WEB_ROBOT_AGENT']:
-        print >> sys.stderr, ("""ERROR: CFG_BATCHUPLOADER_WEB_ROBOT_AGENT has been dropped in favour of
+        print(("""ERROR: CFG_BATCHUPLOADER_WEB_ROBOT_AGENT has been dropped in favour of
 CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS.
-Please, update your invenio-local.conf file accordingly.""")
+Please, update your invenio-local.conf file accordingly."""), file=sys.stderr)
         option_value = option_value[1:-1]
     elif option_name in ['CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
                          'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
@@ -288,13 +290,13 @@ Please, update your invenio-local.conf file accordingly.""")
                          'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
                          'CFG_WEBSUBMIT_DESIRED_CONVERSIONS']:
         new_option_name = option_name.replace('WEBSUBMIT', 'BIBDOCFILE')
-        print >> sys.stderr, ("""ERROR: %s has been renamed to %s.
-Please, update your invenio-local.conf file accordingly.""" % (option_name, new_option_name))
+        print(("""ERROR: %s has been renamed to %s.
+Please, update your invenio-local.conf file accordingly.""" % (option_name, new_option_name)), file=sys.stderr)
         option_name = new_option_name
     elif option_name in ['CFG_WEBSTYLE_INSPECT_TEMPLATES']:
-        print >> sys.stderr, ("""ERROR: CFG_WEBSTYLE_INSPECT_TEMPLATES has been dropped in favour of
+        print(("""ERROR: CFG_WEBSTYLE_INSPECT_TEMPLATES has been dropped in favour of
 CFG_DEVEL_TOOLS.
-Please, update your invenio-local.conf file accordingly.""")
+Please, update your invenio-local.conf file accordingly."""), file=sys.stderr)
         return
 
     ## 5) finally, return output line:
@@ -302,12 +304,12 @@ Please, update your invenio-local.conf file accordingly.""")
 
 
 def update_config_py(conf):
-    print '>>> NOT NEEDED!!!'
-    print '>>> quiting ...'
+    print('>>> NOT NEEDED!!!')
+    print('>>> quiting ...')
     return
 
     import sys
-    print ">>> Going to update config.py..."
+    print(">>> Going to update config.py...")
     ## location where config.py is:
     configpyfile = conf.get("Invenio", "CFG_PYLIBDIR") + \
         os.sep + 'invenio' + os.sep + 'config.py'
@@ -348,12 +350,12 @@ def update_config_py(conf):
     ## special treatment for CFG_SITE_SECRET_KEY that can not be empty
     if not conf.get("Invenio", "CFG_SITE_SECRET_KEY"):
         CFG_BINDIR = conf.get("Invenio", "CFG_BINDIR") + os.sep
-        print >> sys.stderr, """WARNING: CFG_SITE_SECRET_KEY can not be empty.
+        print("""WARNING: CFG_SITE_SECRET_KEY can not be empty.
 You may want to customise your invenio-local.conf configuration accordingly.
 
 $ %sinveniomanage config create secret-key
 $ %sinveniomanage config update
-""" % (CFG_BINDIR, CFG_BINDIR)
+""" % (CFG_BINDIR, CFG_BINDIR), file=sys.stderr)
 
     ## FIXME: special treatment for experimental variables
     ## CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES and CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
@@ -365,8 +367,8 @@ $ %sinveniomanage config update
     fdesc.write("# END OF GENERATED FILE")
     ## we are done:
     fdesc.close()
-    print "You may want to restart Apache now."
-    print ">>> config.py updated successfully."
+    print("You may want to restart Apache now.")
+    print(">>> config.py updated successfully.")
 
 
 def cli_cmd_update_config_py(conf):
@@ -391,7 +393,7 @@ def cli_cmd_update_dbquery_py(conf):
     Note: this edits dbquery.py in situ, taking a backup first.
     Use only when you know what you are doing.
     """
-    print ">>> Going to update dbquery.py..."
+    print(">>> Going to update dbquery.py...")
     ## location where dbquery.py is:
     dbqueryconfigpyfile = conf.get("Invenio", "CFG_PYLIBDIR") + \
                     os.sep + 'invenio' + os.sep + 'dbquery_config.py'
@@ -408,8 +410,8 @@ def cli_cmd_update_dbquery_py(conf):
     fdesc.writelines(out)
     fdesc.close()
 
-    print "You may want to restart Apache now."
-    print ">>> dbquery.py updated successfully."
+    print("You may want to restart Apache now.")
+    print(">>> dbquery.py updated successfully.")
 
 def cli_cmd_update_dbexec(conf):
     """
@@ -417,7 +419,7 @@ def cli_cmd_update_dbexec(conf):
     Note: this edits dbexec in situ, taking a backup first.
     Use only when you know what you are doing.
     """
-    print ">>> Going to update dbexec..."
+    print(">>> Going to update dbexec...")
     ## location where dbexec is:
     dbexecfile = conf.get("Invenio", "CFG_BINDIR") + \
                     os.sep + 'dbexec'
@@ -437,7 +439,7 @@ def cli_cmd_update_dbexec(conf):
     fdesc = open(dbexecfile, 'w')
     fdesc.write(out)
     fdesc.close()
-    print ">>> dbexec updated successfully."
+    print(">>> dbexec updated successfully.")
 
 
 def cli_cmd_update_bibconvert_tpl(conf):
@@ -464,7 +466,7 @@ def cli_cmd_update_web_tests(conf):
     taken from conf file.  Note: this edits test files in situ, taking
     a backup first.  Use only when you know what you are doing.
     """
-    print ">>> Going to update web tests..."
+    print(">>> Going to update web tests...")
     ## location where test_*.html files are:
     testdir = conf.get("Invenio", 'CFG_PREFIX') + os.sep + \
              'lib' + os.sep + 'webtest' + os.sep + 'invenio'
@@ -493,14 +495,14 @@ def cli_cmd_update_web_tests(conf):
             fdesc = open(testfile, 'w')
             fdesc.write(out)
             fdesc.close()
-    print ">>> web tests updated successfully."
+    print(">>> web tests updated successfully.")
 
 def cli_cmd_reset_sitename(conf):
     """
     Reset collection-related tables with new CFG_SITE_NAME and
     CFG_SITE_NAME_INTL* read from conf files.
     """
-    print ">>> Going to reset CFG_SITE_NAME and CFG_SITE_NAME_INTL..."
+    print(">>> Going to reset CFG_SITE_NAME and CFG_SITE_NAME_INTL...")
     from invenio.legacy.dbquery import run_sql, IntegrityError
     # reset CFG_SITE_NAME:
     sitename = conf.get("Invenio", "CFG_SITE_NAME")
@@ -519,8 +521,8 @@ def cli_cmd_reset_sitename(conf):
             run_sql("""UPDATE collectionname SET value=%s
                         WHERE ln=%s AND id_collection=1 AND type='ln'""",
                     (sitename_lang, lang))
-    print "You may want to restart Apache now."
-    print ">>> CFG_SITE_NAME and CFG_SITE_NAME_INTL* reset successfully."
+    print("You may want to restart Apache now.")
+    print(">>> CFG_SITE_NAME and CFG_SITE_NAME_INTL* reset successfully.")
 
 def cli_cmd_reset_recstruct_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
@@ -534,15 +536,15 @@ def cli_cmd_reset_recstruct_cache(conf):
     enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
     pid = server_pid(ping_the_process=False)
     if pid:
-        print >> sys.stderr, "ERROR: bibsched seems to run with pid %d, according to %s." % (pid, pidfile)
-        print >> sys.stderr, "       Please stop bibsched before running this procedure."
+        print("ERROR: bibsched seems to run with pid %d, according to %s." % (pid, pidfile), file=sys.stderr)
+        print("       Please stop bibsched before running this procedure.", file=sys.stderr)
         sys.exit(1)
     if enable_recstruct_cache:
-        print ">>> Searching records which need recstruct cache resetting; this may take a while..."
+        print(">>> Searching records which need recstruct cache resetting; this may take a while...")
         all_recids = intbitset(run_sql("SELECT id FROM bibrec"))
         good_recids = intbitset(run_sql("SELECT bibrec.id FROM bibrec JOIN bibfmt ON bibrec.id = bibfmt.id_bibrec WHERE format='recstruct' AND modification_date < last_updated"))
         recids = all_recids - good_recids
-        print ">>> Generating recstruct cache..."
+        print(">>> Generating recstruct cache...")
         tot = len(recids)
         count = 0
         for recid in recids:
@@ -551,12 +553,12 @@ def cli_cmd_reset_recstruct_cache(conf):
             run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), %s)", (recid, value))
             count += 1
             if count % 1000 == 0:
-                print "    ... done records %s/%s" % (count, tot)
+                print("    ... done records %s/%s" % (count, tot))
         if count % 1000 != 0:
-            print "    ... done records %s/%s" % (count, tot)
-        print ">>> recstruct cache generated successfully."
+            print("    ... done records %s/%s" % (count, tot))
+        print(">>> recstruct cache generated successfully.")
     else:
-        print ">>> Cleaning recstruct cache..."
+        print(">>> Cleaning recstruct cache...")
         run_sql("DELETE FROM bibfmt WHERE format='recstruct'")
 
 
@@ -579,15 +581,15 @@ def cli_cmd_reset_siteadminemail(conf):
     """
     Reset user-related tables with new CFG_SITE_ADMIN_EMAIL read from conf files.
     """
-    print ">>> Going to reset CFG_SITE_ADMIN_EMAIL..."
+    print(">>> Going to reset CFG_SITE_ADMIN_EMAIL...")
     from invenio.legacy.dbquery import run_sql
     siteadminemail = conf.get("Invenio", "CFG_SITE_ADMIN_EMAIL")
     run_sql("DELETE FROM user WHERE id=1")
     run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
                         (1, %s, AES_ENCRYPT(email, ''), 1, 'admin')""",
             (siteadminemail,))
-    print "You may want to restart Apache now."
-    print ">>> CFG_SITE_ADMIN_EMAIL reset successfully."
+    print("You may want to restart Apache now.")
+    print(">>> CFG_SITE_ADMIN_EMAIL reset successfully.")
 
 def cli_cmd_reset_fieldnames(conf):
     """
@@ -595,7 +597,7 @@ def cli_cmd_reset_fieldnames(conf):
     ranking method names such as word similarity.  Their translations
     are taken from the PO files.
     """
-    print ">>> Going to reset I18N field names..."
+    print(">>> Going to reset I18N field names...")
     from invenio.base.i18n import gettext_set_language, language_list_long
     from invenio.legacy.dbquery import run_sql, IntegrityError
 
@@ -652,7 +654,7 @@ def cli_cmd_reset_fieldnames(conf):
                                 WHERE id_rnkMETHOD=%s AND ln=%s AND type=%s""",
                             (rankmethod_name_names[rankmethod_name], rankmethod_id, lang, 'ln',))
 
-    print ">>> I18N field names reset successfully."
+    print(">>> I18N field names reset successfully.")
 
 def cli_check_openoffice(conf):
     """
@@ -665,10 +667,10 @@ def cli_check_openoffice(conf):
     for handler in logger.handlers:
         logger.removeHandler(handler)
     check_running_process_user()
-    print ">>> Checking if Libre/OpenOffice.org is correctly integrated...",
+    print(">>> Checking if Libre/OpenOffice.org is correctly integrated...", end=' ')
     sys.stdout.flush()
     if can_unoconv(True):
-        print "ok"
+        print("ok")
     else:
         sys.exit(1)
 
@@ -677,7 +679,7 @@ def test_db_connection():
     Test DB connection, and if fails, advise user how to set it up.
     Useful to be called during table creation.
     """
-    print "Testing DB connection...",
+    print("Testing DB connection...", end=' ')
     from invenio.utils.text import wrap_text_in_a_box
     from invenio.legacy.dbquery import run_sql, Error
 
@@ -688,7 +690,7 @@ def test_db_connection():
         from invenio.dbquery_config import CFG_DATABASE_HOST, \
             CFG_DATABASE_PORT, CFG_DATABASE_NAME, CFG_DATABASE_USER, \
             CFG_DATABASE_PASS
-        print wrap_text_in_a_box("""\
+        print(wrap_text_in_a_box("""\
 DATABASE CONNECTIVITY ERROR %(errno)d: %(errmsg)s.\n
 
 Perhaps you need to set up database and connection rights?
@@ -722,13 +724,13 @@ the above error message and fix the problem before continuing.""" % \
                                   'dbuser': CFG_DATABASE_USER,
                                   'dbpass': CFG_DATABASE_PASS,
                                   'webhost': CFG_DATABASE_HOST == 'localhost' and 'localhost' or os.popen('hostname -f', 'r').read().strip(),
-                                  })
+                                  }))
         sys.exit(1)
-    print "ok"
+    print("ok")
 
     ## second, test insert/select of a Unicode string to detect
     ## possible Python/MySQL/MySQLdb mis-setup:
-    print "Testing Python/MySQL/MySQLdb UTF-8 chain...",
+    print("Testing Python/MySQL/MySQLdb UTF-8 chain...", end=' ')
     try:
         try:
             beta_in_utf8 = "β" # Greek beta in UTF-8 is 0xCEB2
@@ -738,7 +740,7 @@ the above error message and fix the problem before continuing.""" % \
             assert res[0] == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
             run_sql("DROP TABLE test__invenio__utf8")
         except Exception as err:
-            print wrap_text_in_a_box("""\
+            print(wrap_text_in_a_box("""\
 DATABASE RELATED ERROR %s\n
 
 A problem was detected with the UTF-8 treatment in the chain
@@ -747,12 +749,12 @@ the MySQL database. You may perhaps have installed older
 versions of some prerequisite packages?\n
 
 Please check the INSTALL file and please fix this problem
-before continuing.""" % err)
+before continuing.""" % err))
 
             sys.exit(1)
     finally:
         run_sql("DROP TABLE IF EXISTS test__invenio__utf8")
-    print "ok"
+    print("ok")
 
 
 def cli_cmd_create_secret_key(conf):
@@ -781,13 +783,13 @@ def cli_cmd_create_tables(conf):
 
 
 def cli_cmd_load_webstat_conf(conf):
-    print ">>> Going to load WebStat config..."
+    print(">>> Going to load WebStat config...")
     from invenio.config import CFG_PREFIX
     cmd = "%s/bin/webstatadmin --load-config" % CFG_PREFIX
     if os.system(cmd):
-        print "ERROR: failed execution of", cmd
+        print("ERROR: failed execution of", cmd)
         sys.exit(1)
-    print ">>> WebStat config load successfully."
+    print(">>> WebStat config load successfully.")
 
 
 def cli_cmd_load_bibfield_config(conf):
@@ -803,7 +805,7 @@ def cli_cmd_load_bibfield_config(conf):
 
 def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
-    print ">>> Going to drop tables and related data on filesystem ..."
+    print(">>> Going to drop tables and related data on filesystem ...")
 
     from invenio.base.scripts.database import main
 
@@ -819,7 +821,7 @@ def cli_cmd_drop_tables(conf):
 
 def cli_cmd_create_demo_site(conf):
     """Create demo site.  Useful for testing purposes."""
-    print ">>> Going to create demo site..."
+    print(">>> Going to create demo site...")
     from invenio.config import CFG_PREFIX
     from invenio.legacy.dbquery import run_sql
     run_sql("TRUNCATE schTASK")
@@ -828,7 +830,7 @@ def cli_cmd_create_demo_site(conf):
     for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/democfgdata.sql" % \
                    (CFG_PREFIX, CFG_PREFIX),]:
         if os.system(cmd):
-            print "ERROR: failed execution of", cmd
+            print("ERROR: failed execution of", cmd)
             sys.exit(1)
     cli_cmd_reset_fieldnames(conf) # needed for I18N demo ranking method names
     for cmd in ["%s/bin/webaccessadmin -u admin -c -r -D" % CFG_PREFIX,
@@ -837,15 +839,15 @@ def cli_cmd_create_demo_site(conf):
                 "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
                 "%s/bin/bibsort 2" % CFG_PREFIX, ]:
         if os.system(cmd):
-            print "ERROR: failed execution of", cmd
+            print("ERROR: failed execution of", cmd)
             sys.exit(1)
-    print ">>> Demo site created successfully."
+    print(">>> Demo site created successfully.")
 
 def cli_cmd_load_demo_records(conf):
     """Load demo records.  Useful for testing purposes."""
     from invenio.config import CFG_PREFIX
     from invenio.legacy.dbquery import run_sql
-    print ">>> Going to load demo records..."
+    print(">>> Going to load demo records...")
     run_sql("TRUNCATE schTASK")
     for cmd in ["%s/bin/bibupload -u admin -i %s" % (CFG_PREFIX,
                     pkg_resources.resource_filename('invenio.testsuite', os.path.join('data','demo_record_marc_data.xml'))),
@@ -866,13 +868,13 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/oairepositoryupdater 7" % CFG_PREFIX,
                 "%s/bin/bibupload 8" % CFG_PREFIX,]:
         if os.system(cmd):
-            print "ERROR: failed execution of", cmd
+            print("ERROR: failed execution of", cmd)
             sys.exit(1)
-    print ">>> Demo records loaded successfully."
+    print(">>> Demo records loaded successfully.")
 
 def cli_cmd_remove_demo_records(conf):
     """Remove demo records.  Useful when you are finished testing."""
-    print ">>> Going to remove demo records..."
+    print(">>> Going to remove demo records...")
     from invenio.config import CFG_PREFIX
     from invenio.legacy.dbquery import run_sql
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
@@ -885,20 +887,20 @@ your records and documents!"""))
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,
                 "%s/bin/webcoll 1" % CFG_PREFIX,]:
         if os.system(cmd):
-            print "ERROR: failed execution of", cmd
+            print("ERROR: failed execution of", cmd)
             sys.exit(1)
-    print ">>> Demo records removed successfully."
+    print(">>> Demo records removed successfully.")
 
 def cli_cmd_drop_demo_site(conf):
     """Drop demo site completely.  Useful when you are finished testing."""
-    print ">>> Going to drop demo site..."
+    print(">>> Going to drop demo site...")
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
     wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
 your site and documents!"""))
     cli_cmd_drop_tables(conf)
     cli_cmd_create_tables(conf)
     cli_cmd_remove_demo_records(conf)
-    print ">>> Demo site dropped successfully."
+    print(">>> Demo site dropped successfully.")
 
 def cli_cmd_run_unit_tests(conf):
     """Run unit tests, usually on the working demo site."""
@@ -1238,18 +1240,18 @@ def main(*cmd_args):
         try:
             conf = prepare_conf(options)
         except Exception as e:
-            print e
+            print(e)
             sys.exit(1)
 
         ## Decide what to do
         actions = getattr(options, 'actions', None)
 
         if not actions:
-            print """ERROR: Please specify a command.  Please see '--help'."""
+            print("""ERROR: Please specify a command.  Please see '--help'.""")
             sys.exit(1)
 
         if len(actions) > 1:
-            print """ERROR: Please specify only one command.  Please see '--help'."""
+            print("""ERROR: Please specify only one command.  Please see '--help'.""")
             sys.exit(1)
 
         for action in actions:
@@ -1335,13 +1337,13 @@ def main(*cmd_args):
             elif action == 'upgrade-show-applied':
                 cli_cmd_upgrade_show_applied(conf)
             elif action == 'upgrade-create-standard-recipe':
-                print >> sys.stderr, 'ERROR: inveniocfg --upgrade-create-release-recipe is not supported anymore. Use instead: inveniomanage upgrade create release'
+                print('ERROR: inveniocfg --upgrade-create-release-recipe is not supported anymore. Use instead: inveniomanage upgrade create release', file=sys.stderr)
                 sys.exit(1)
             elif action == 'upgrade-create-release-recipe':
-                print >> sys.stderr, 'ERROR: inveniocfg --upgrade-create-standard-recipe is not supported anymore. Use instead: inveniomanage upgrade create recipe'
+                print('ERROR: inveniocfg --upgrade-create-standard-recipe is not supported anymore. Use instead: inveniomanage upgrade create recipe', file=sys.stderr)
                 sys.exit(1)
             else:
-                print "ERROR: Unknown command", action
+                print("ERROR: Unknown command", action)
                 sys.exit(1)
 
 if __name__ == '__main__':

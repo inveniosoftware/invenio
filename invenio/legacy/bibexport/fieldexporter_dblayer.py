@@ -19,6 +19,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Every db-related function of plugin field exporter"""
 
 __revision__ = "$Id: webmessage_dblayer.py,v 1.28 2008/08/08 13:28:15 cparker Exp $"
@@ -961,7 +963,7 @@ def _save_query_result_in_file(query_result, output_directory, output_format):
     """
     file_name = query_result.get_query().get_name()
     path = output_directory + os.sep + file_name
-    print path
+    print(path)
 
     output_file = None
     try:
@@ -1135,7 +1137,7 @@ def _get_query_results_for_job_result(job_result_id):
     query_parameters = (job_result_id, )
 
     query_result = run_sql(query, query_parameters)
-    print query_result
+    print(query_result)
 
     all_query_results = []
 

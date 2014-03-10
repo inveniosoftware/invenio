@@ -17,6 +17,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """Holding Pen web interface"""
 
+from __future__ import print_function
+
 from flask import render_template, Blueprint, redirect, url_for, flash, request, current_app
 from flask.ext.login import login_required
 
@@ -119,7 +121,7 @@ def batch_widget(bwolist):
     try:
         bwolist = map(int, bwolist)
     except ValueError:
-        print 'Error in IDs'
+        print('Error in IDs')
 
     objlist = []
     workflow_list = []

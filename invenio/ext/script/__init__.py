@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 
 import re
 import functools
@@ -49,10 +51,10 @@ def generate_secret_key():
 
 def print_progress(p, L=40, prefix='', suffix=''):
     bricks = int(p * L)
-    print '\r', prefix,
-    print '[{0}{1}] {2}%'.format('#' * bricks, ' ' * (L - bricks),
-                                 int(p * 100)),
-    print suffix,
+    print('\r', prefix, end=' ')
+    print('[{0}{1}] {2}%'.format('#' * bricks, ' ' * (L - bricks),
+                                 int(p * 100)), end=' ')
+    print(suffix, end=' ')
 
 
 def check_for_software_updates(flash_message=False):
@@ -106,7 +108,7 @@ def check_for_software_updates(flash_message=False):
 
             return False
     except Exception as e:
-        print e
+        print(e)
         if flash_message:
             flash(_('Cannot download or parse release notes from http://'
                     'invenio-software.org/repo/invenio/tree/RELEASE-NOTES'),

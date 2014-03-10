@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Invenio garbage collector.
 """
@@ -40,7 +42,7 @@ try:
     from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
     from invenio.utils.date import convert_datestruct_to_datetext
 except ImportError as e:
-    print "Error: %s" % (e,)
+    print("Error: %s" % (e,))
     sys.exit(1)
 
 # configure variables

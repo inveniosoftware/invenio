@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """This is websubmit_file_stamper.py
    This tool is used to create a stamped version of a PDF file.
 
@@ -1363,8 +1365,8 @@ def get_cli_options():
             if '/' in options["output-file"]:
                 # probably user specified a file path, which is not
                 # supported
-                print "Warning: you seem to have specifed a path for option '--output-file'."
-                print "Only a file name can be specified. Stamping might fail."
+                print("Warning: you seem to have specifed a path for option '--output-file'.")
+                print("Only a file name can be specified. Stamping might fail.")
         elif opt[0] in ("-t", "--latex-template"):
             ## Get the path to the latex template to be used for the creation
             ## of the stamp file:

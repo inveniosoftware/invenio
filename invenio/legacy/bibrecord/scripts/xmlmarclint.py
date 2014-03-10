@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 XML MARC lint - check your XML MARC files.
 """
@@ -46,12 +48,12 @@ def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hVv:", ["help", "version", "verbose="])
     except getopt.GetoptError:
-        print cmdusage
+        print(cmdusage)
         sys.exit(2)
 
     for opt in opts:
         if opt[0] in ("-V","--version"):
-            print __revision__
+            print(__revision__)
             sys.exit(0)
         elif opt[0] in ("-h","--help"):
             sys.stderr.write(cmdusage)
@@ -60,7 +62,7 @@ def main():
             try:
                 verbose = string.atoi(opt[1])
             except ValueError:
-                print "[ERROR] verbose must be an integer."
+                print("[ERROR] verbose must be an integer.")
                 sys.exit(2)
 
     try:
@@ -72,7 +74,7 @@ def main():
     try:
         xmltext = open(xmlfile,'r').read()
     except IOError:
-        print "[ERROR] File %s not found." % xmlfile
+        print("[ERROR] File %s not found." % xmlfile)
         import sys
         sys.exit(1)
 
@@ -84,7 +86,7 @@ def main():
     errors = []
 
     if xmltext and not listofrecs:
-        print "[ERROR] No valid record detected."
+        print("[ERROR] No valid record detected.")
         sys.exit(1)
 
     if verbose:
@@ -95,18 +97,18 @@ def main():
             errors.extend(map((lambda x:x[2]), listofrecs))
     else:
         if badrecords:
-            print "[ERROR] Bad records detected.  For more information, increase verbosity."
-            print "\n[INFO] You may also want to run `xmllint %s' to help " \
-                  "localise errors in the input file." % xmlfile
+            print("[ERROR] Bad records detected.  For more information, increase verbosity.")
+            print("\n[INFO] You may also want to run `xmllint %s' to help " \
+                  "localise errors in the input file." % xmlfile)
             sys.exit(1)
 
     errors = [error for error in errors if error]
 
     if s or errors:
         if s:
-            print s
+            print(s)
         for error in errors:
-            print "[ERROR]", error
-        print "[INFO] You may also want to run `xmllint %s' to help " \
-              "localise errors in the input file." % xmlfile
+            print("[ERROR]", error)
+        print("[INFO] You may also want to run `xmllint %s' to help " \
+              "localise errors in the input file." % xmlfile)
         sys.exit(1)

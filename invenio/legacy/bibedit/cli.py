@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 # pylint: disable=C0103
 """
 BibEdit CLI tool.
@@ -58,11 +60,11 @@ from invenio.legacy.bibrecord import create_record, records_identical
 
 def print_usage():
     """Print help."""
-    print __doc__
+    print(__doc__)
 
 def print_version():
     """Print version information."""
-    print __revision__
+    print(__revision__)
 
 def cli_clean_revisions(recid, dry_run=True, verbose=True):
     """Clean revisions of the given recid, by removing duplicate revisions
@@ -73,7 +75,7 @@ def cli_clean_revisions(recid, dry_run=True, verbose=True):
         try:
             recids = [int(recid)]
         except ValueError:
-            print 'ERROR: record ID must be integer, not %s.' % recid
+            print('ERROR: record ID must be integer, not %s.' % recid)
             sys.exit(1)
     for recid in recids:
         all_revisions = run_sql("SELECT marcxml, job_id, job_name, job_person, job_date FROM hstRECORD WHERE id_bibrec=%s ORDER BY job_date ASC", (recid,))
@@ -83,7 +85,7 @@ def cli_clean_revisions(recid, dry_run=True, verbose=True):
             try:
                 current_rec = create_record(zlib.decompress(marcxml))[0]
             except Exception:
-                print >> sys.stderr, "ERROR: corrupted revisions found. Please run %s --fix-revisions '*'" % sys.argv[0]
+                print("ERROR: corrupted revisions found. Please run %s --fix-revisions '*'" % sys.argv[0], file=sys.stderr)
                 sys.exit(1)
             if records_identical(current_rec, previous_rec):
                 deleted_revisions += 1
@@ -91,9 +93,9 @@ def cli_clean_revisions(recid, dry_run=True, verbose=True):
                     run_sql("DELETE FROM hstRECORD WHERE id_bibrec=%s AND job_id=%s AND job_name=%s AND job_person=%s AND job_date=%s", (recid, job_id, job_name, job_person, job_date))
             previous_rec = current_rec
         if verbose and deleted_revisions:
-            print "record %s: deleted %s duplicate revisions out of %s" % (recid, deleted_revisions, len(all_revisions))
+            print("record %s: deleted %s duplicate revisions out of %s" % (recid, deleted_revisions, len(all_revisions)))
     if verbose:
-        print "DONE"
+        print("DONE")
 
 def cli_list_revisions(recid, details=False):
     """Print list of all known record revisions (=RECID.REVDATE) for record
@@ -102,7 +104,7 @@ def cli_list_revisions(recid, details=False):
     try:
         recid = int(recid)
     except ValueError:
-        print 'ERROR: record ID must be integer, not %s.' % recid
+        print('ERROR: record ID must be integer, not %s.' % recid)
         sys.exit(1)
     record_rev_list = get_record_revision_ids(recid)
     if not details:
@@ -112,38 +114,38 @@ def cli_list_revisions(recid, details=False):
                               "# Author".ljust(15), "# Job Details")
         out += '\n'.join([get_info_of_revision_id(revid) for revid in record_rev_list])
     if out:
-        print out
+        print(out)
     else:
-        print 'ERROR: Record %s not found.' % recid
+        print('ERROR: Record %s not found.' % recid)
 
 def cli_get_revision(revid):
     """Return MARCXML for record revision REVID (=RECID.REVDATE) of a record."""
     if not revision_format_valid_p(revid):
-        print 'ERROR: revision %s is invalid; ' \
-              'must be NNN.YYYYMMDDhhmmss.' % revid
+        print('ERROR: revision %s is invalid; ' \
+              'must be NNN.YYYYMMDDhhmmss.' % revid)
         sys.exit(1)
     out =  get_marcxml_of_revision_id(revid)
     if out:
-        print out
+        print(out)
     else:
-        print 'ERROR: Revision %s not found.' % revid
+        print('ERROR: Revision %s not found.' % revid)
 
 def cli_diff_revisions(revid1, revid2):
     """Return diffs of MARCXML for record revisions REVID1, REVID2."""
     for revid in [revid1, revid2]:
         if not revision_format_valid_p(revid):
-            print 'ERROR: revision %s is invalid; ' \
-                  'must be NNN.YYYYMMDDhhmmss.' % revid
+            print('ERROR: revision %s is invalid; ' \
+                  'must be NNN.YYYYMMDDhhmmss.' % revid)
             sys.exit(1)
     xml1 = get_marcxml_of_revision_id(revid1)
     if not xml1:
-        print 'ERROR: Revision %s not found. ' % revid1
+        print('ERROR: Revision %s not found. ' % revid1)
         sys.exit(1)
     xml2 = get_marcxml_of_revision_id(revid2)
     if not xml2:
-        print 'ERROR: Revision %s not found. ' % revid2
+        print('ERROR: Revision %s not found. ' % revid2)
         sys.exit(1)
-    print get_xml_comparison(revid1, revid2, xml1, xml2)
+    print(get_xml_comparison(revid1, revid2, xml1, xml2))
 
 def cli_revert_to_revision(revid):
     """Submit specified record revision REVID upload, to replace current
@@ -151,30 +153,30 @@ def cli_revert_to_revision(revid):
 
     """
     if not revision_format_valid_p(revid):
-        print 'ERROR: revision %s is invalid; ' \
-              'must be NNN.YYYYMMDDhhmmss.' % revid
+        print('ERROR: revision %s is invalid; ' \
+              'must be NNN.YYYYMMDDhhmmss.' % revid)
         sys.exit(1)
 
     xml_record = get_marcxml_of_revision_id(revid)
     if xml_record == '':
-        print 'ERROR: Revision %s does not exist. ' % revid
+        print('ERROR: Revision %s does not exist. ' % revid)
         sys.exit(1)
 
     recid = split_revid(revid)[0]
 
     if record_locked_by_other_user(recid, -1):
-        print 'The record is currently being edited. ' \
-            'Please try again in a few minutes.'
+        print('The record is currently being edited. ' \
+            'Please try again in a few minutes.')
         sys.exit(1)
 
     if record_locked_by_queue(recid):
-        print 'The record is locked because of unfinished upload tasks. ' \
-            'Please try again in a few minutes.'
+        print('The record is locked because of unfinished upload tasks. ' \
+            'Please try again in a few minutes.')
         sys.exit(1)
 
     save_xml_record(recid, 0, xml_record)
-    print 'Your modifications have now been submitted. They will be ' \
-        'processed as soon as the task queue is empty.'
+    print('Your modifications have now been submitted. They will be ' \
+        'processed as soon as the task queue is empty.')
 
 
 def check_rev(recid, verbose=True, fix=False):
@@ -184,9 +186,9 @@ def check_rev(recid, verbose=True, fix=False):
         try:
             get_marcxml_of_revision_id(rev)
             if verbose:
-                print '%s: ok' % rev
+                print('%s: ok' % rev)
         except zlib.error:
-            print '%s: invalid' % rev
+            print('%s: invalid' % rev)
             if fix:
                 fix_rev(recid, job_date, verbose)
 
@@ -198,11 +200,11 @@ def fix_rev(recid, job_date, verbose=True):
 
 def cli_check_revisions(recid):
     if recid == '*':
-        print 'Checking all records'
+        print('Checking all records')
         recids = intbitset(run_sql("SELECT id FROM bibrec ORDER BY id"))
         for index, rec in enumerate(recids):
             if index % 1000 == 0 and index:
-                print index, 'records processed'
+                print(index, 'records processed')
             check_rev(rec, verbose=False)
     else:
         check_rev(recid)
@@ -210,11 +212,11 @@ def cli_check_revisions(recid):
 
 def cli_fix_revisions(recid):
     if recid == '*':
-        print 'Fixing all records'
+        print('Fixing all records')
         recids = intbitset(run_sql("SELECT id FROM bibrec ORDER BY id"))
         for index, rec in enumerate(recids):
             if index % 1000 == 0 and index:
-                print index, 'records processed'
+                print(index, 'records processed')
             check_rev(rec, verbose=False, fix=True)
     else:
         check_rev(recid, fix=True)
@@ -292,7 +294,7 @@ def main():
                 recid = '*'
             cli_clean_revisions(recid, dry_run=False)
         else:
-            print "ERROR: Please specify a command.  Please see '--help'."
+            print("ERROR: Please specify a command.  Please see '--help'.")
             sys.exit(1)
 
 if __name__ == '__main__':

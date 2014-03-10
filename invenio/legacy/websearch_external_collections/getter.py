@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 ## This file is part of Invenio.
 ## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
 ##
@@ -151,7 +153,7 @@ class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
         Workaround broken asyncore log_info method that tries to print
         to stdout.
         """
-        print >> sys.stderr, "%s: %s" % (type, message)
+        print("%s: %s" % (type, message), file=sys.stderr)
 
 def build_rest_request(uri):
     """Build an http request for a specific url."""

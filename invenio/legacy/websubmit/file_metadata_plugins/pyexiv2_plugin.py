@@ -18,6 +18,8 @@
 WebSubmit Metadata Plugin - This is a plugin to extract/update
 metadata from images.
 
+from __future__ import print_function
+
 Dependencies: Exiv2
 """
 
@@ -138,39 +140,39 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
             if tag in image.exifKeys() or tag in image.iptcKeys():
                 # Updating
                 if verbose > 0:
-                    print "Updating %(tag)s from <%(old_value)s> to <%(new_value)s>" % \
+                    print("Updating %(tag)s from <%(old_value)s> to <%(new_value)s>" % \
                           {'tag': tag,
                            'old_value': image[tag],
-                           'new_value': metadata_dictionary[tag]}
+                           'new_value': metadata_dictionary[tag]})
             else:
                 # Adding
                 if verbose > 0:
-                    print "Adding %(tag)s with value <%(new_value)s>" % \
+                    print("Adding %(tag)s with value <%(new_value)s>" % \
                           {'tag': tag,
-                           'new_value': metadata_dictionary[tag]}
+                           'new_value': metadata_dictionary[tag]})
             try:
                 image[tag] = metadata_dictionary[tag]
                 image.writeMetadata()
             except Exception:
-                print 'Tag or Value incorrect'
+                print('Tag or Value incorrect')
 
     # Alternative way: User interaction
     else:
         data_modified = False
         user_input = 'user_input'
-        print "Entering interactive mode. Choose what you want to do:"
+        print("Entering interactive mode. Choose what you want to do:")
         while (user_input):
             if not data_modified:
                 try:
                     user_input = raw_input('[w]rite / [q]uit\n')
                 except:
-                    print "Aborting"
+                    print("Aborting")
                     return
             else:
                 try:
                     user_input = raw_input('[w]rite / [q]uit and apply / [a]bort \n')
                 except:
-                    print "Aborting"
+                    print("Aborting")
                     return
 
             if user_input == 'q':
@@ -183,16 +185,16 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
                     value = raw_input('With value:\n')
                     data_modified = True
                 except:
-                    print "Aborting"
+                    print("Aborting")
                     return
                 try:
                     image[tag] = value
                 except Exception as err:
-                    print 'Tag or Value incorrect'
+                    print('Tag or Value incorrect')
             elif user_input == 'a':
                 return
             else:
-                print "Invalid option: "
+                print("Invalid option: ")
         try:
             image.writeMetadata()
         except Exception as err:
@@ -228,10 +230,10 @@ def read_metadata_remote(inputfile, loginpw, verbose):
     # Make HTTPS Connection
     domain = inputfile.split('/')[2]
     if verbose > 3:
-        print 'Domain: ', domain
+        print('Domain: ', domain)
     url = inputfile.split(domain)[1]
     if verbose > 3:
-        print 'URL: ', url
+        print('URL: ', url)
 
     # Establish headers
     if loginpw != None:
@@ -253,7 +255,7 @@ def read_metadata_remote(inputfile, loginpw, verbose):
                   headers = _headers)
         except Exception:
             # Cannot connect
-            print 'Could not connect'
+            print('Could not connect')
     # Case HTTP
     else:
         try:
@@ -263,14 +265,14 @@ def read_metadata_remote(inputfile, loginpw, verbose):
                   headers = _headers)
         except Exception:
             # Cannot connect
-            print 'Could not connect'
+            print('Could not connect')
 
     # Get response
     if verbose > 5:
-        print "Fetching data from remote server."
+        print("Fetching data from remote server.")
     response = conn.getresponse()
     if verbose > 2:
-        print response.status, response.reason
+        print(response.status, response.reason)
 
     if response.status == 401:
         # Authentication required
@@ -284,7 +286,7 @@ def read_metadata_remote(inputfile, loginpw, verbose):
         raise InvenioWebSubmitFileMetadataRuntimeError("URL does not brings to a valid image file.")
     else:
         if verbose > 5:
-            print 'Valid JPEG Standard-based image'
+            print('Valid JPEG Standard-based image')
 
     # Start the fake image
     path_to_fake = fake_image_init(verbose)
@@ -297,7 +299,7 @@ def read_metadata_remote(inputfile, loginpw, verbose):
         if data[0:2] == '\xff\xe1' or data[0:2] == '\xff\xed':
             marker = data
             if verbose > 5:
-                print 'Metadata Marker->', repr(marker), '\nGetting data'
+                print('Metadata Marker->', repr(marker), '\nGetting data')
             size = response.read(2)
             length = ord(size[0]) * 256 + ord(size[1])
             meta = response.read(length-2)

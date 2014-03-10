@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """WebMessage Admin -- clean messages"""
 
 __revision__ = "$Id$"
@@ -59,13 +61,13 @@ def main():
     if alen > 1 and sys.argv[1] in ["-h", "--help"]:
         usage(0)
     elif alen > 1 and sys.argv[1] in ["-V", "--version"]:
-        print __revision__
+        print(__revision__)
         sys.exit(0)
     if alen != 2 or sys.argv[1] not in ['clean']:
         usage(1)
 
     # getting input from user
-    print 'User:    ',
+    print('User:    ', end=' ')
     user = raw_input()
     password = getpass.getpass()
 
@@ -78,12 +80,12 @@ def main():
 
     if not perform:
         # wrong password or user not recognized
-        print 'User not authorized'
+        print('User not authorized')
         return perform
 
     # perform chosen action
     if sys.argv[1] == 'clean':
         cleaned = clean_messages()
-        print 'Database cleaned. %i suppressed messages' % int(cleaned)
+        print('Database cleaned. %i suppressed messages' % int(cleaned))
 
     return perform

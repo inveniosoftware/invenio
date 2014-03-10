@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Usage: bibrankgkb %s [options]
      Examples:
@@ -182,7 +184,7 @@ def get_from_source(type, data):
                     value = match.group("value").replace(",", ".")
                     datastruct[key] = value
                     if opts_dict["verbose"] == 9:
-                        print "%s---%s" % (key, value)
+                        print("%s---%s" % (key, value))
     return datastruct
 
 def convert(convstruct, journals):
@@ -218,8 +220,7 @@ def usage(code, msg=''):
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
 
-    print >> sys.stderr, \
-    """ Usage: %s [options]
+    print(""" Usage: %s [options]
      Examples:
        %s --input=bibrankgkb.cfg --output=test.kb
        %s -otest.kb -v9
@@ -232,7 +233,7 @@ def usage(code, msg=''):
  -h,  --help                print this help and exit
  -V,  --version             print version and exit
  -v,  --verbose=LEVEL       verbose level (from 0 to 9, default 1)
-    """ % ((sys.argv[0],) * 4)
+    """ % ((sys.argv[0],) * 4), file=sys.stderr)
 
     sys.exit(code)
 
@@ -257,7 +258,7 @@ def command_line():
             if opt == ("-h","") or opt == ("--help",""):
                 usage(1)
             elif opt == ("-V","") or opt == ("--version",""):
-                print __revision__
+                print(__revision__)
                 sys.exit(1)
             elif opt[0] in ["--input", "-i"]:
                 opts_dict["input"] = configuration.get(opt[1], opt[1])

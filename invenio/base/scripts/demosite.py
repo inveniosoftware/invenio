@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 import os
 import pkg_resources
 import sys
@@ -53,7 +55,7 @@ def populate(packages=[], default_data=True, files=None,
              job_id=0, extra_info=None):
     """Load demo records.  Useful for testing purposes."""
     if not default_data:
-        print '>>> Default data has been skiped (--no-data).'
+        print('>>> Default data has been skiped (--no-data).')
         return
     if not packages:
         packages = ['invenio_demosite']
@@ -63,7 +65,7 @@ def populate(packages=[], default_data=True, files=None,
     map(import_string, packages)
 
     from invenio.ext.sqlalchemy import db
-    print ">>> Going to load demo records..."
+    print(">>> Going to load demo records...")
     db.session.execute("TRUNCATE schTASK")
     db.session.commit()
     if files is None:
@@ -76,7 +78,7 @@ def populate(packages=[], default_data=True, files=None,
         for cmd in ["%s/bin/bibupload -u admin -i %s" % (CFG_PREFIX, f),
                     "%s/bin/bibupload %d" % (CFG_PREFIX, job_id)]:
             if os.system(cmd):
-                print "ERROR: failed execution of", cmd
+                print("ERROR: failed execution of", cmd)
                 sys.exit(1)
     for cmd in ["%s/bin/bibdocfile --textify --with-ocr --recid 97" % CFG_PREFIX,
                 "%s/bin/bibdocfile --textify --all" % CFG_PREFIX,
@@ -94,9 +96,9 @@ def populate(packages=[], default_data=True, files=None,
                 "%s/bin/oairepositoryupdater %d" % (CFG_PREFIX, job_id + 6),
                 "%s/bin/bibupload %d" % (CFG_PREFIX, job_id + 7)]:
         if os.system(cmd):
-            print "ERROR: failed execution of", cmd
+            print("ERROR: failed execution of", cmd)
             sys.exit(1)
-    print ">>> Demo records loaded successfully."
+    print(">>> Demo records loaded successfully.")
 
 
 @option_packages
@@ -111,7 +113,7 @@ def create(packages=[]):
     if not packages:
         packages = ['invenio_demosite']
 
-    print ">>> Going to create demo site..."
+    print(">>> Going to create demo site...")
     db.session.execute("TRUNCATE schTASK")
     try:
         db.session.execute("TRUNCATE session")
@@ -144,9 +146,9 @@ def create(packages=[]):
                 "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
                 "%s/bin/bibsort 2" % CFG_PREFIX, ]:
         if os.system(cmd):
-            print "ERROR: failed execution of", cmd
+            print("ERROR: failed execution of", cmd)
             sys.exit(1)
-    print ">>> Demo site created successfully."
+    print(">>> Demo site created successfully.")
 
 
 def main():

@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 BibClassify ontology reader.
 
@@ -809,7 +811,7 @@ def _download_ontology(url, local_file):
         file_desc.write(url_desc.read())
         file_desc.close()
     except IOError as e:
-        print e
+        print(e)
         return False
     except:
         log.warning("Unable to download the ontology. '%s'" %
@@ -1035,68 +1037,68 @@ def check_taxonomy(taxonomy):
                 else:
                     patterns[pattern] = (label, expression)
 
-    print "\n==== ERRORS ===="
+    print("\n==== ERRORS ====")
 
     if no_prefLabel:
-        print "\nConcepts with no prefLabel: %d" % len(no_prefLabel)
-        print "\n".join(["   %s" % subj for subj in no_prefLabel])
+        print("\nConcepts with no prefLabel: %d" % len(no_prefLabel))
+        print("\n".join(["   %s" % subj for subj in no_prefLabel]))
     if multiple_prefLabels:
-        print ("\nConcepts with multiple prefLabels: %d" %
-               len(multiple_prefLabels))
-        print "\n".join(["   %s" % subj for subj in multiple_prefLabels])
+        print(("\nConcepts with multiple prefLabels: %d" %
+               len(multiple_prefLabels)))
+        print("\n".join(["   %s" % subj for subj in multiple_prefLabels]))
     if both_composites:
-        print ("\nConcepts with both composite properties: %d" %
-               len(both_composites))
-        print "\n".join(["   %s" % subj for subj in both_composites])
+        print(("\nConcepts with both composite properties: %d" %
+               len(both_composites)))
+        print("\n".join(["   %s" % subj for subj in both_composites]))
     if bad_hidden_labels:
-        print "\nConcepts with bad hidden labels: %d" % len(bad_hidden_labels)
+        print("\nConcepts with bad hidden labels: %d" % len(bad_hidden_labels))
         for kw, lbls in iteritems(bad_hidden_labels):
-            print "   %s:" % kw
-            print "\n".join(["      '%s'" % lbl for lbl in lbls])
+            print("   %s:" % kw)
+            print("\n".join(["      '%s'" % lbl for lbl in lbls]))
     if bad_alt_labels:
-        print "\nConcepts with bad alt labels: %d" % len(bad_alt_labels)
+        print("\nConcepts with bad alt labels: %d" % len(bad_alt_labels))
         for kw, lbls in iteritems(bad_alt_labels):
-            print "   %s:" % kw
-            print "\n".join(["      '%s'" % lbl for lbl in lbls])
+            print("   %s:" % kw)
+            print("\n".join(["      '%s'" % lbl for lbl in lbls]))
     if both_skw_and_ckw:
-        print ("\nKeywords that are both skw and ckw: %d" %
-               len(both_skw_and_ckw))
-        print "\n".join(["   %s" % subj for subj in both_skw_and_ckw])
+        print(("\nKeywords that are both skw and ckw: %d" %
+               len(both_skw_and_ckw)))
+        print("\n".join(["   %s" % subj for subj in both_skw_and_ckw]))
 
-    print
+    print()
 
     if composite_problem1:
-        print "\n".join(["SKW '%s' references an unexisting CKW '%s'." %
-                         (skw, ckw) for skw, ckw in composite_problem1])
+        print("\n".join(["SKW '%s' references an unexisting CKW '%s'." %
+                         (skw, ckw) for skw, ckw in composite_problem1]))
     if composite_problem2:
-        print "\n".join(["SKW '%s' references a SKW '%s'." %
-                         (skw, ckw) for skw, ckw in composite_problem2])
+        print("\n".join(["SKW '%s' references a SKW '%s'." %
+                         (skw, ckw) for skw, ckw in composite_problem2]))
     if composite_problem3:
-        print "\n".join(["SKW '%s' is not composite of CKW '%s'." %
-                         (skw, ckw) for skw, ckw in composite_problem3])
+        print("\n".join(["SKW '%s' is not composite of CKW '%s'." %
+                         (skw, ckw) for skw, ckw in composite_problem3]))
     if composite_problem4:
         for skw, ckws in iteritems(composite_problem4):
-            print "SKW '%s' does not exist but is " "referenced by:" % skw
-            print "\n".join(["    %s" % ckw for ckw in ckws])
+            print("SKW '%s' does not exist but is " "referenced by:" % skw)
+            print("\n".join(["    %s" % ckw for ckw in ckws]))
     if composite_problem5:
-        print "\n".join(["CKW '%s' references a CKW '%s'." % kw
-                         for kw in composite_problem5])
+        print("\n".join(["CKW '%s' references a CKW '%s'." % kw
+                         for kw in composite_problem5]))
     if composite_problem6:
-        print "\n".join(["CKW '%s' is not composed by SKW '%s'." % kw
-                         for kw in composite_problem6])
+        print("\n".join(["CKW '%s' is not composed by SKW '%s'." % kw
+                         for kw in composite_problem6]))
 
-    print "\n==== WARNINGS ===="
+    print("\n==== WARNINGS ====")
 
     if bad_notes:
-        print ("\nConcepts with bad notes: %d" % len(bad_notes))
-        print "\n".join(["   '%s': '%s'" % note for note in bad_notes])
+        print(("\nConcepts with bad notes: %d" % len(bad_notes)))
+        print("\n".join(["   '%s': '%s'" % note for note in bad_notes]))
     if stemming_collisions:
         print ("\nFollowing keywords have unnecessary labels that have "
                "already been generated by BibClassify.")
         for subj in stemming_collisions:
-            print "   %s:\n     %s\n     and %s" % subj
+            print("   %s:\n     %s\n     and %s" % subj)
 
-    print "\nFinished."
+    print("\nFinished.")
     sys.exit(0)
 
 

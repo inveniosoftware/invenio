@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 __revision__ = "$Id$"
 
 import getopt
@@ -26,9 +28,9 @@ from invenio.base.helpers import with_app_context
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
     if msg:
-        print >> sys.stderr, "Error: %s." % msg
-        print >> sys.stderr
-    print >> sys.stderr, """Usage: %s [options]
+        print("Error: %s." % msg, file=sys.stderr)
+        print(file=sys.stderr)
+    print("""Usage: %s [options]
 
 General options:
   -h, --help\t\tprint this help
@@ -42,7 +44,7 @@ Option to administrate authorizations:
   -c, --compile\t\tcompile firewall like role definitions (FireRole)
   -r, --reset\t\treset to default settings
   -D, --demo\t\tto be used with -a or -r in order to consider demo site authorizations
-""" % sys.argv[0]
+""" % sys.argv[0], file=sys.stderr)
     sys.exit(exitcode)
 
 
@@ -73,7 +75,7 @@ def main():
             if opt[0] in ("-h", "--help"):
                 usage(0)
             elif opt[0] in ("-V", "--version"):
-                print __revision__
+                print(__revision__)
                 sys.exit(0)
             elif opt[0] in ("-u", "--user"):
                 options["user"] = opt[1]
@@ -95,19 +97,19 @@ def main():
             #        authorization_action="cfgwebaccess")
             if options['reset'] and options['demo']:
                 acc_reset_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
-                print "Reset default demo site settings."
+                print("Reset default demo site settings.")
             elif options['reset']:
                 acc_reset_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']])
-                print "Reset default settings."
+                print("Reset default settings.")
             elif options['add'] and options['demo']:
                 acc_add_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
-                print "Added default demo site settings."
+                print("Added default demo site settings.")
             elif options['add']:
                 acc_add_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']])
-                print "Added default settings."
+                print("Added default settings.")
             if options['compile']:
                 repair_role_definitions()
-                print "Compiled firewall like role definitions."
+                print("Compiled firewall like role definitions.")
         else:
             usage(1, "You must specify at least one command")
     except StandardError as e:

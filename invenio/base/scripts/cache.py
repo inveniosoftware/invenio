@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 from flask import current_app
 from invenio.ext.script import Manager, change_command_name
 
@@ -42,15 +44,15 @@ def reset_rec_cache(output_format, get_record, split_by=1000):
     from invenio.modules.formatter.models import Bibfmt
     pid = server_pid(ping_the_process=False)
     if pid:
-        print >> sys.stderr, "ERROR: bibsched seems to run with pid %d, according to %s." % (pid, pidfile)
-        print >> sys.stderr, "       Please stop bibsched before running this procedure."
+        print("ERROR: bibsched seems to run with pid {0}, according to {1}.".format(pid, pidfile), file=sys.stderr)
+        print("       Please stop bibsched before running this procedure.", file=sys.stderr)
         sys.exit(1)
     if current_app.config.get('CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE'):
-        print ">>> Searching records which need %s cache resetting; this may take a while..." % (output_format, )
+        print(">>> Searching records which need %s cache resetting; this may take a while..." % (output_format, ))
         all_recids = intbitset(db.session.query(Bibrec.id).all())
         #TODO: prevent doing all records?
         recids = all_recids
-        print ">>> Generating %s cache..." % (output_format, )
+        print(">>> Generating %s cache..." % (output_format, ))
         tot = len(recids)
         count = 0
         it = iter(recids)
@@ -65,13 +67,13 @@ def reset_rec_cache(output_format, get_record, split_by=1000):
             #TODO: Update the cache or wait for the first access
             map(get_record, rec_group)
             count += len(rec_group)
-            print "    ... done records %s/%s" % (count, tot)
+            print("    ... done records %s/%s" % (count, tot))
             if len(rec_group) < split_by or count >= tot:
                 break
 
-        print ">>> %s cache generated successfully." % (output_format, )
+        print(">>> %s cache generated successfully." % (output_format, ))
     else:
-        print ">>> Cleaning %s cache..." % (output_format, )
+        print(">>> Cleaning %s cache..." % (output_format, ))
         Bibfmt.query.filter(Bibfmt.format == output_format).delete(synchronize_session=False)
         db.session.commit()
 

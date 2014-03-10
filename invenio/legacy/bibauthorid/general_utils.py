@@ -21,6 +21,8 @@ bibauthorid_general_utils
     Bibauthorid utilities used by many parts of the framework
 '''
 
+from __future__ import print_function
+
 from invenio.legacy.bibauthorid import config as bconfig
 from datetime import datetime
 import sys
@@ -56,7 +58,7 @@ def set_stdout():
         except KeyError:
             pidfiles[PID()]  =    open('/tmp/bibauthorid_log_pid_'+str(PID()),'w')
             sys.stdout = pidfiles[PID()]
-            print 'REDIRECTING TO PIDFILE '
+            print('REDIRECTING TO PIDFILE ')
 
 
 #python2.4 compatibility layer.
@@ -86,10 +88,10 @@ bai_all = all
 def __print_func(*args):
     set_stdout()
     if PRINT_TS:
-        print datetime.now(),
+        print(datetime.now(), end=' ')
     for arg in args:
-        print arg,
-    print ""
+        print(arg, end=' ')
+    print("")
     sys.stdout.flush()
 
 def __dummy_print(*args):
@@ -123,15 +125,15 @@ if bconfig.DEBUG_OUTPUT:
         progress = padd(bar + percent, status_len)
         comment = padd(comment, comment_len)
         if print_ts or PRINT_TS_US:
-            print  datetime.now(),
-        print 'pid:',PID(),
-        print progress, comment, TERMINATOR,
+            print(datetime.now(), end=' ')
+        print('pid:',PID(), end=' ')
+        print(progress, comment, TERMINATOR, end=' ')
         sys.stdout.flush()
 
     def update_status_final(comment=""):
         set_stdout()
         update_status(1., comment, print_ts=PRINT_TS)
-        print ""
+        print("")
         sys.stdout.flush()
 
 else:

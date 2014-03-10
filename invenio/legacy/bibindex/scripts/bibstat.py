@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 BibStat reports some interesting numbers on the bibliographic record set.
 """
@@ -51,13 +53,13 @@ def report_definitions_of_physical_tags():
     Report definitions of physical MARC tags.
     """
     from invenio.legacy.dbquery import run_sql
-    print "### 1 - PHYSICAL TAG DEFINITIONS"
-    print
-    print "# MARC tag ... description"
+    print("### 1 - PHYSICAL TAG DEFINITIONS")
+    print()
+    print("# MARC tag ... description")
     res = run_sql('SELECT id,value,name FROM tag ORDER BY value')
     for row in res:
         (dummytagid, tagvalue, tagname) = row
-        print "%s ... %s" % (tagvalue, tagname,)
+        print("%s ... %s" % (tagvalue, tagname,))
 
 
 def report_definitions_of_logical_fields():
@@ -65,22 +67,22 @@ def report_definitions_of_logical_fields():
     Report definitions of logical fields.
     """
     from invenio.legacy.dbquery import run_sql
-    print
-    print "### 2 - LOGICAL FIELD DEFINITIONS"
-    print
-    print "# logical field: associated physical tags",
+    print()
+    print("### 2 - LOGICAL FIELD DEFINITIONS")
+    print()
+    print("# logical field: associated physical tags", end=' ')
     res = run_sql('SELECT id,name,code FROM field ORDER BY code')
     for row in res:
         (fieldid, dummyfieldname, fieldcode) = row
-        print
-        print "%s:" % (fieldcode,),
+        print()
+        print("%s:" % (fieldcode,), end=' ')
         res2 = run_sql("""SELECT value FROM tag, field_tag
                            WHERE id_field=%s AND id_tag=id
                        """, (fieldid,))
         for row2 in res2:
             tag = row2[0]
-            print tag,
-    print
+            print(tag, end=' ')
+    print()
 
 
 def report_definitions_of_indexes():
@@ -88,52 +90,52 @@ def report_definitions_of_indexes():
     Report definitions of indexes.
     """
     from invenio.legacy.dbquery import run_sql
-    print
-    print "### 3 - INDEX DEFINITIONS"
-    print
-    print "# index (stemming): associated logical fields",
+    print()
+    print("### 3 - INDEX DEFINITIONS")
+    print()
+    print("# index (stemming): associated logical fields", end=' ')
     res = run_sql("""SELECT id,name,stemming_language FROM idxINDEX
                      ORDER BY name""")
     for row in res:
         (indexid, indexname, indexstem) = row
         if indexstem:
             indexname += ' (%s)' % indexstem
-        print
-        print "%s:" % (indexname,),
+        print()
+        print("%s:" % (indexname,), end=' ')
         res2 = run_sql("""SELECT code FROM field, idxINDEX_field
                            WHERE id_idxINDEX=%s AND id_field=id
                        """, (indexid,))
         for row2 in res2:
             code = row2[0]
-            print code,
-    print
+            print(code, end=' ')
+    print()
 
 
 def report_on_all_bibliographic_tables():
     """Report stats for all the interesting bibliographic tables."""
-    print
-    print "### 4 -  TABLE SPACE AND SIZE INFO"
-    print ''
-    print "# %12s %17s %17s %17s" % ("TABLE", "ROWS", "DATA SIZE", "INDEX SIZE")
+    print()
+    print("### 4 -  TABLE SPACE AND SIZE INFO")
+    print('')
+    print("# %12s %17s %17s %17s" % ("TABLE", "ROWS", "DATA SIZE", "INDEX SIZE"))
     for i in range(0, 10):
         for j in range(0, 10):
-            print report_table_status("bib%1d%1dx" % (i, j))
-            print report_table_status("bibrec_bib%1d%1dx" % (i, j))
+            print(report_table_status("bib%1d%1dx" % (i, j)))
+            print(report_table_status("bibrec_bib%1d%1dx" % (i, j)))
     for i in range(0, 11):
-        print report_table_status("idxWORD%02dF" % i)
-        print report_table_status("idxWORD%02dR" % i)
+        print(report_table_status("idxWORD%02dF" % i))
+        print(report_table_status("idxWORD%02dR" % i))
     for i in range(0, 11):
-        print report_table_status("idxPHRASE%02dF" % i)
-        print report_table_status("idxPHRASE%02dR" % i)
+        print(report_table_status("idxPHRASE%02dF" % i))
+        print(report_table_status("idxPHRASE%02dR" % i))
     return
 
 
 def report_tag_usage():
     """Analyze bibxxx tables and report info on usage of various tags."""
-    print ''
-    print "### 5 -  TAG USAGE INFO"
-    print ''
-    print "# TAG     NB_RECORDS\t# recID1 recID2 ... recID9 (example records)"
+    print('')
+    print("### 5 -  TAG USAGE INFO")
+    print('')
+    print("# TAG     NB_RECORDS\t# recID1 recID2 ... recID9 (example records)")
     from invenio.legacy.dbquery import run_sql
     for i in range(0, 10):
         for j in range(0, 10):
@@ -152,9 +154,9 @@ def report_tag_usage():
                                         """ % (bibrec_bibxxx, bibxxx),
                                     (tag,))
                 # print results
-                print tag, (8-len(tag))*' ', len(res_usage), \
+                print(tag, (8-len(tag))*' ', len(res_usage), \
                       '\t\t', '#', " ".join([str(row[0]) for row in
-                                             res_usage[:9]])
+                                             res_usage[:9]]))
 
 
 def report_header():
@@ -163,20 +165,20 @@ def report_header():
     """
     from invenio.legacy.dbquery import CFG_DATABASE_HOST, \
         CFG_DATABASE_PORT, CFG_DATABASE_NAME
-    print '### BIBSTAT REPORT FOR DB %s:%s.%s RUN AT %s' % (CFG_DATABASE_HOST,
+    print('### BIBSTAT REPORT FOR DB %s:%s.%s RUN AT %s' % (CFG_DATABASE_HOST,
                                                          CFG_DATABASE_PORT,
                                                          CFG_DATABASE_NAME,
-                                                         time.asctime())
-    print ''
+                                                         time.asctime()))
+    print('')
 
 
 def report_footer():
     """
     Stop reporting.
     """
-    print
-    print
-    print '### END OF BIBSTAT REPORT'
+    print()
+    print()
+    print('### END OF BIBSTAT REPORT')
 
 
 def usage(exitcode=1, msg=""):
@@ -202,7 +204,7 @@ def main():
             if opt[0] in ["-h", "--help"]:
                 usage(0)
             elif opt[0] in ["-V", "--version"]:
-                print __revision__
+                print(__revision__)
                 sys.exit(0)
             else:
                 usage(1)

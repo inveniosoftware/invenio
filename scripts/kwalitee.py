@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Code kwalitee checking tools for Invenio Python code.
 
@@ -138,7 +140,7 @@ def get_list_of_web_test_files(modulesdir, modulename):
                                stderr=subprocess.PIPE)
     process_output, process_error = process.communicate()
     if process_error:
-        print "[ERROR]", process_error
+        print("[ERROR]", process_error)
     for test_file in process_output.split('\n'): # pylint: disable=E1103
         if test_file:
             out.append(test_file)
@@ -157,7 +159,7 @@ def get_nb_test_cases_in_file(filename):
                                stderr=subprocess.PIPE)
     process_output, process_error = process.communicate()
     if process_error:
-        print "[ERROR]", process_error
+        print("[ERROR]", process_error)
     return process_output.count('\n')
 
 
@@ -180,7 +182,7 @@ def get_pylint_results(filename):
 
     pylint_output, pylint_error = process.communicate()
     if pylint_error:
-        print "[ERROR]", pylint_error
+        print("[ERROR]", pylint_error)
 
     # detect number of missing docstrings:
     nb_missing_docstrings = pylint_output.count("] Missing docstring")
@@ -192,7 +194,7 @@ def get_pylint_results(filename):
     if pylint_score_matched:
         pylint_score = pylint_score_matched.group(1)
     else:
-        print "ERROR: cannot detect pylint score for %s" % filename
+        print("ERROR: cannot detect pylint score for %s" % filename)
 
     # detect pylint messages
     nb_msg_convention = pylint_output.count(": [C")
@@ -346,16 +348,16 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
     # detect Invenio modules:
     modulenames = get_invenio_modulenames(modulesdir)
     if "websearch" not in modulenames:
-        print "Cannot find Invenio modules in %s." % modulesdir
+        print("Cannot find Invenio modules in %s." % modulesdir)
         print_usage()
         sys.exit(1)
     # print header
-    print "="*112
-    print "Invenio Python Code Kwalitee Check %73s" % \
-          time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    print "="*112
-    print ""
-    print "%(modulename)13s %(nb_loc)8s %(nb_unitt)6s %(nb_regressiont)6s " \
+    print("="*112)
+    print("Invenio Python Code Kwalitee Check %73s" % \
+          time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    print("="*112)
+    print("")
+    print("%(modulename)13s %(nb_loc)8s %(nb_unitt)6s %(nb_regressiont)6s " \
           "%(nb_webt)6s %(nb_tests_per_1k_loc)8s %(nb_missing_docstrings)8s " \
           "%(nb_pychecker_warnings)12s %(avg_pylint_score)11s " \
           "%(pylint_details)s" % \
@@ -368,9 +370,9 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
               'nb_missing_docstrings': '#MissDoc',
               'nb_pychecker_warnings': '#PyChk/1kSRC',
               'avg_pylint_score': 'PyLintScore',
-              'pylint_details': 'PyLintDetails'}
-    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, \
-          "-"*11, "-"*25
+              'pylint_details': 'PyLintDetails'})
+    print(" ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, \
+          "-"*11, "-"*25)
     for modulename in modulenames:
         # calculate kwalitee for this modulename:
         kwalitee[modulename] = calculate_module_kwalitee(modulesdir,
@@ -400,7 +402,7 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
         kwalitee['TOTAL']['nb_msg_fatal'] += \
                kwalitee[modulename]['nb_msg_fatal']
         # print results for this modulename:
-        print "%(modulename)13s %(nb_loc)8d %(nb_unitt)6d " \
+        print("%(modulename)13s %(nb_loc)8d %(nb_unitt)6d " \
               "%(nb_regressiont)6d %(nb_webt)6d %(nb_tests_per_1k_loc)8.2f " \
               "%(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f " \
               "%(avg_pylint_score)8.2f/10 %(pylint_details)s" % \
@@ -427,11 +429,11 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
                        kwalitee[modulename]['nb_msg_error'],
                        kwalitee[modulename]['nb_msg_warning'],
                        kwalitee[modulename]['nb_msg_refactor'],
-                       kwalitee[modulename]['nb_msg_convention'])}
+                       kwalitee[modulename]['nb_msg_convention'])})
     # print totals:
-    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, \
-          "-"*11, "-"*25
-    print "%(modulename)13s %(nb_loc)8d %(nb_unitt)6d %(nb_regressiont)6d " \
+    print(" ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, \
+          "-"*11, "-"*25)
+    print("%(modulename)13s %(nb_loc)8d %(nb_unitt)6d %(nb_regressiont)6d " \
           "%(nb_webt)6d %(nb_tests_per_1k_loc)8.2f " \
           "%(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f " \
           "%(avg_pylint_score)8.2f/10 %(pylint_details)s" % \
@@ -457,9 +459,9 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
                          kwalitee['TOTAL']['nb_msg_error'],
                          kwalitee['TOTAL']['nb_msg_warning'],
                          kwalitee['TOTAL']['nb_msg_refactor'],
-                         kwalitee['TOTAL']['nb_msg_convention'])}
+                         kwalitee['TOTAL']['nb_msg_convention'])})
     # print legend:
-    print """
+    print("""
 Legend:
   #LOC = number of lines of code (excl. test files, incl. comments/blanks)
   #UnitT = number of unit test cases
@@ -471,7 +473,7 @@ Legend:
   PyLintScore = average PyLint score [desirable: > 9.00]
   PyLintDetails = number of PyLint messages (Fatal, Error, Warning, Refactor,
                                              Convention)
-  """
+  """)
     return
 
 
@@ -490,7 +492,7 @@ def generate_kwalitee_stats_for_some_files(filenames):
                          'nb_msg_fatal': 0,
                          }
     # print header:
-    print "%(filename)50s %(nb_loc)8s %(nb_missing_docstrings)8s " \
+    print("%(filename)50s %(nb_loc)8s %(nb_missing_docstrings)8s " \
           "%(nb_pychecker_warnings)6s %(avg_pylint_score)11s " \
           "%(pylint_details)s" % {
               'filename': 'File',
@@ -498,8 +500,8 @@ def generate_kwalitee_stats_for_some_files(filenames):
               'nb_missing_docstrings': '#MissDoc',
               'nb_pychecker_warnings': '#PyChk',
               'avg_pylint_score': 'PyLintScore',
-              'pylint_details': 'PyLintDetails'}
-    print " ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11, "-"*25
+              'pylint_details': 'PyLintDetails'})
+    print(" ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11, "-"*25)
     files_for_pylinting = wash_list_of_python_files_for_pylinting(filenames)
     for filename in files_for_pylinting:
         # calculate the kwalitee of the files:
@@ -540,7 +542,7 @@ def generate_kwalitee_stats_for_some_files(filenames):
         kwalitee['TOTAL']['nb_msg_error'] += kwalitee[filename]['nb_msg_error']
         kwalitee['TOTAL']['nb_msg_fatal'] += kwalitee[filename]['nb_msg_fatal']
         # print results for this filename:
-        print "%(filename)50s %(nb_loc)8d %(nb_missing_docstrings)8d " \
+        print("%(filename)50s %(nb_loc)8d %(nb_missing_docstrings)8d " \
               "%(nb_pychecker_warnings)6d %(avg_pylint_score)8.2f/10 " \
               "%(pylint_details)s" % {
             'filename': filename,
@@ -555,10 +557,10 @@ def generate_kwalitee_stats_for_some_files(filenames):
                    kwalitee[filename]['nb_msg_error'],
                    kwalitee[filename]['nb_msg_warning'],
                    kwalitee[filename]['nb_msg_refactor'],
-                   kwalitee[filename]['nb_msg_convention'])}
+                   kwalitee[filename]['nb_msg_convention'])})
     # print totals:
-    print " ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11, "-"*25
-    print "%(filename)50s %(nb_loc)8d %(nb_missing_docstrings)8d " \
+    print(" ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11, "-"*25)
+    print("%(filename)50s %(nb_loc)8d %(nb_missing_docstrings)8d " \
           "%(nb_pychecker_warnings)6d %(avg_pylint_score)8.2f/10 " \
           "%(pylint_details)s" % {
         'filename': 'TOTAL',
@@ -572,9 +574,9 @@ def generate_kwalitee_stats_for_some_files(filenames):
                kwalitee['TOTAL']['nb_msg_error'],
                kwalitee['TOTAL']['nb_msg_warning'],
                kwalitee['TOTAL']['nb_msg_refactor'],
-               kwalitee['TOTAL']['nb_msg_convention'])}
+               kwalitee['TOTAL']['nb_msg_convention'])})
     # print legend:
-    print """
+    print("""
 Legend:
   #LOC = number of lines of code (incl. comments/blanks)
   #MissDoc = number of missing docstrings [desirable: 0]
@@ -582,7 +584,7 @@ Legend:
   PyLintScore = PyLint score [desirable: > 9.00]
   PyLintDetails = number of PyLint messages (Fatal, Error, Warning, Refactor,
                                              Convention)
-  """
+  """)
     return
 
 
@@ -615,17 +617,17 @@ def print_heading(phrase, prefix='', suffix='', stream='INFO'):
     """Print heading phrase in a special style."""
     if QUIET_MODE:
         return
-    print prefix + '[' + stream + '] ' + phrase + suffix
+    print(prefix + '[' + stream + '] ' + phrase + suffix)
 
 
 def print_usage():
     """Print usage info."""
-    print __doc__
+    print(__doc__)
 
 
 def print_version():
     """Print version info."""
-    print __revision__
+    print(__revision__)
 
 
 def cmd_check_all(filenames):
@@ -687,10 +689,10 @@ def cmd_check_errors(filenames):
         out, err = process.communicate()
         if err:
             errors_found_p = True
-            print "[ERROR]", err
+            print("[ERROR]", err)
         if out:
             errors_found_p = True
-            print out
+            print(out)
     return errors_found_p
 
 
@@ -711,7 +713,7 @@ def cmd_check_variables(filenames):
         pylint_output, pylint_error = process.communicate()
         if pylint_error:
             errors_found_p = True
-            print "[ERROR]", pylint_error
+            print("[ERROR]", pylint_error)
         for line in pylint_output.split('\n'): # pylint: disable=E1103
             if '; [F' in line or ': [E' in line or ': [W' in line:
                 if 'variable' in line or \
@@ -722,7 +724,7 @@ def cmd_check_variables(filenames):
                     out += line + '\n'
         if out:
             errors_found_p = True
-            print out
+            print(out)
     return errors_found_p
 
 
@@ -743,13 +745,13 @@ def cmd_check_indentation(filenames):
         process_output, process_error = process.communicate()
         if process_error:
             errors_found_p = True
-            print "[ERROR]", process_error
+            print("[ERROR]", process_error)
         for line in process_output.split('\n'): # pylint: disable=E1103
             if 'indent' in line:
                 out += line + '\n'
         if out:
             errors_found_p = True
-            print out
+            print(out)
     return errors_found_p
 
 
@@ -765,13 +767,13 @@ def cmd_check_whitespace(filenames):
         process_output, process_error = process.communicate()
         if process_error:
             errors_found_p = True
-            print "[ERROR]", process_error
+            print("[ERROR]", process_error)
         for line in process_output.split('\n'): # pylint: disable=E1103
             if line:
                 out += line + '\n'
         if out:
             errors_found_p = True
-            print out
+            print(out)
     return errors_found_p
 
 
@@ -801,13 +803,13 @@ def cmd_check_html_options(filenames):
         process_output, process_error = process.communicate()
         if process_error:
             errors_found_p = True
-            print "[ERROR]", process_error
+            print("[ERROR]", process_error)
         for line in process_output.split('\n'): # pylint: disable=E1103
             if line:
                 out += line + '\n'
         if out:
             errors_found_p = True
-            print out
+            print(out)
     return errors_found_p
 
 
@@ -824,7 +826,7 @@ def cmd_check_docstrings(filenames):
         process_output, process_error = process.communicate()
         if process_error:
             errors_found_p = True
-            print "[ERROR]", process_error
+            print("[ERROR]", process_error)
         for line in process_output.split('\n'): # pylint: disable=E1103
             if line.startswith('  [......'):
                 pass
@@ -837,7 +839,7 @@ def cmd_check_docstrings(filenames):
         if out and out.strip() != 'Warning: Undocumented:':
             # something other than sole __package__ was found
             errors_found_p = True
-            print out
+            print(out)
     return errors_found_p
 
 
@@ -855,10 +857,10 @@ def cmd_check_pep8(filenames):
         out, err = process.communicate()
         if err:
             errors_found_p = True
-            print "[ERROR]", err
+            print("[ERROR]", err)
         if out:
             errors_found_p = True
-            print out
+            print(out)
     return errors_found_p
 
 
@@ -880,13 +882,13 @@ def cmd_check_sql(filenames):
             process_output, process_error = process.communicate()
             if process_error:
                 errors_found_p = True
-                print "[ERROR]", process_error
+                print("[ERROR]", process_error)
             for line in process_output.split('\n'): # pylint: disable=E1103
                 if line and not line.endswith('# kwalitee: disable=sql'):
                     out += line + '\n'
         if out:
             errors_found_p = True
-            print out.strip()
+            print(out.strip())
     return errors_found_p
 
 
@@ -904,13 +906,13 @@ def cmd_check_eval(filenames): # kwalitee: disable=eval
             process_output, process_error = process.communicate()
             if process_error:
                 errors_found_p = True
-                print "[ERROR]", process_error
+                print("[ERROR]", process_error)
             for line in process_output.split('\n'): # pylint: disable=E1103
                 if line and not line.endswith('# kwalitee: disable=eval'):
                     out += line + '\n'
         if out:
             errors_found_p = True
-            print out.strip()
+            print(out.strip())
     return errors_found_p
 
 
@@ -921,8 +923,8 @@ def cmd_stats(filenames):
         if os.path.isdir(modulesdir):
             generate_kwalitee_stats_for_all_modules(modulesdir)
         else:
-            print "ERROR: %s does not seem to be Invenio top source " \
-                  "directory." % filenames[0]
+            print("ERROR: %s does not seem to be Invenio top source " \
+                  "directory." % filenames[0])
             print_usage()
             sys.exit(0)
     else:
@@ -962,7 +964,7 @@ def main():
             # by default, we are checking only `most important' stuff
             cmd_option = 'check_some'
         if not cmd_pathnames:
-            print "ERROR: Please specify directory/file; see '--help'."
+            print("ERROR: Please specify directory/file; see '--help'.")
             sys.exit(1)
         # run it:
         if cmd_option == 'stats':

@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Format records using chosen format.
 
@@ -568,7 +570,7 @@ def usage(exitcode=1, msg=""):
     """
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
-    print """BibFormat: outputs the result of the formatting of a record.
+    print("""BibFormat: outputs the result of the formatting of a record.
 
     Usage: bibformat required [options]
     Examples:
@@ -589,7 +591,7 @@ def usage(exitcode=1, msg=""):
      -h, --help                 print this help and exit
      -v, --verbose=LEVEL        verbose level (from 0 to 9, default 0)
      -V  --version              print the script version
-     """
+     """)
     sys.exit(exitcode)
 
 def main():
@@ -624,7 +626,7 @@ def main():
             if opt[0] in ["-h", "--help"]:
                 usage(0)
             elif opt[0] in ["-V", "--version"]:
-                print __revision__
+                print(__revision__)
                 sys.exit(0)
             elif opt[0] in ["-v", "--verbose"]:
                 options["verbose"]  = int(opt[1])
@@ -650,11 +652,11 @@ def main():
     except StandardError as e:
         usage(e)
 
-    print format_records(recIDs=options["recID"],
+    print(format_records(recIDs=options["recID"],
                          of=options["output"],
                          ln=options["lang"],
                          verbose=options["verbose"],
-                         on_the_fly=options["onthefly"])
+                         on_the_fly=options["onthefly"]))
 
     return
 

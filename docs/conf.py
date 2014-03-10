@@ -11,13 +11,15 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from __future__ import print_function
+
 import sys, os
 try:
     import sphinx_bootstrap_theme
     _html_theme = 'bootstrap'
     _html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 except:
-    print >> sys.stderr, 'Please run: `pip install sphinx_bootstrap_theme`'
+    print('Please run: `pip install sphinx_bootstrap_theme`', file=sys.stderr)
     _html_theme = 'default'
     _html_theme_path = []
 

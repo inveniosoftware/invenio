@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 WebDoc -- Transform webdoc sources into static html files
 """
@@ -319,9 +321,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          body,
                                          verbose)
                     except IOError as e:
-                        print e
+                        print(e)
                     except OSError as e:
-                        print e
+                        print(e)
 
                 # Title
                 if title is not None or lang == CFG_SITE_LANG:
@@ -333,9 +335,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          title,
                                          verbose)
                     except IOError as e:
-                        print e
+                        print(e)
                     except OSError as e:
-                        print e
+                        print(e)
 
                 # Keywords
                 if keywords is not None or lang == CFG_SITE_LANG:
@@ -347,9 +349,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          keywords,
                                          verbose)
                     except IOError as e:
-                        print e
+                        print(e)
                     except OSError as e:
-                        print e
+                        print(e)
 
                 # Navtrail
                 if navtrail is not None or lang == CFG_SITE_LANG:
@@ -361,9 +363,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          navtrail,
                                          verbose)
                     except IOError as e:
-                        print e
+                        print(e)
                     except OSError as e:
-                        print e
+                        print(e)
 
                 # Description
                 if description is not None or lang == CFG_SITE_LANG:
@@ -375,9 +377,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          description,
                                          verbose)
                     except IOError as e:
-                        print e
+                        print(e)
                     except OSError as e:
-                        print e
+                        print(e)
 
                 # Last updated timestamp (CVS timestamp)
                 if lastupdated is not None or lang == CFG_SITE_LANG:
@@ -389,9 +391,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          lastupdated,
                                          verbose)
                     except IOError as e:
-                        print e
+                        print(e)
                     except OSError as e:
-                        print e
+                        print(e)
 
                 # Last updated cache file
                 try:
@@ -400,12 +402,12 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                      convert_datestruct_to_dategui(time.localtime()),
                                      verbose=0)
                 except IOError as e:
-                    print e
+                    print(e)
                 except OSError as e:
-                    print e
+                    print(e)
 
             if verbose > 0:
-                print 'Written cache in %s' % webdoc_cache_dir
+                print('Written cache in %s' % webdoc_cache_dir)
 
 def read_webdoc_source(webdoc):
     """
@@ -717,7 +719,7 @@ def write_cache_file(filename, webdoc_cache_dir, filebody, verbose=0):
     f.write(filebody)
     f.close()
     if verbose > 2:
-        print 'Written %s' % fullfilename
+        print('Written %s' % fullfilename)
 
 def get_mo_last_modification():
     """
@@ -854,7 +856,7 @@ def main():
             if opt[0] in ["-h", "--help"]:
                 usage(0)
             elif opt[0] in ["-V", "--version"]:
-                print __revision__
+                print(__revision__)
                 sys.exit(0)
             elif opt[0] in ["-v", "--verbose"]:
                 options["verbose"]  = int(opt[1])

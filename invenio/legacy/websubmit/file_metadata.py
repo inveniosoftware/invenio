@@ -21,6 +21,8 @@ This is the metadata reader and writer module. Contains the proper
 plugin containers in order to read/write metadata from images or other
 files.
 
+from __future__ import print_function
+
 Public APIs:
   - read_metadata()
   - write_metadata()
@@ -71,7 +73,7 @@ def read_metadata(inputfile, force=None, remote=False,
     # Check file type (0 base, 1 name, 2 ext)
     ext = decompose_file(inputfile)[2]
     if verbose > 5:
-        print ext.lower(), 'extension to extract from'
+        print(ext.lower(), 'extension to extract from')
 
     # Loop through the plugins to find a good one for given file
     for plugin_name, plugin in iteritems(metadata_extractor_plugins):
@@ -80,7 +82,7 @@ def read_metadata(inputfile, force=None, remote=False,
             plugin['can_read_local'](inputfile) and not remote and \
             (not force or plugin_name == force):
             if verbose > 5:
-                print 'Using ' + plugin_name
+                print('Using ' + plugin_name)
             fetched_metadata = plugin['read_metadata_local'](inputfile,
                                                              verbose)
             if not metadata:
@@ -93,7 +95,7 @@ def read_metadata(inputfile, force=None, remote=False,
             plugin['can_read_remote'](inputfile) and \
             (not force or plugin_name == force):
             if verbose > 5:
-                print 'Using ' + plugin_name
+                print('Using ' + plugin_name)
             fetched_metadata = plugin['read_metadata_remote'](inputfile,
                                                               loginpw,
                                                               verbose)
@@ -136,7 +138,7 @@ def write_metadata(inputfile, outputfile, metadata_dictionary,
     # Check file type (0 base, 1 name, 2 ext)
     ext = decompose_file(inputfile)[2]
     if verbose > 5:
-        print ext.lower(), 'extension to write to'
+        print(ext.lower(), 'extension to write to')
 
     # Loop through the plugins to find a good one to ext
     for plugin_name, plugin in iteritems(metadata_extractor_plugins):
@@ -144,7 +146,7 @@ def write_metadata(inputfile, outputfile, metadata_dictionary,
             plugin['can_write_local'](inputfile) and \
             (not force or plugin_name == force):
             if verbose > 5:
-                print 'Using ' + plugin_name
+                print('Using ' + plugin_name)
             return plugin['write_metadata_local'](inputfile,
                                                   outputfile,
                                                   metadata_dictionary,
@@ -155,18 +157,18 @@ def write_metadata(inputfile, outputfile, metadata_dictionary,
 
 def metadata_info(verbose=0):
     """Shows information about the available plugins"""
-    print 'Plugin APIs version: %s' % str(__required_plugin_API_version__)
+    print('Plugin APIs version: %s' % str(__required_plugin_API_version__))
 
     # Plugins
-    print 'Available plugins:'
+    print('Available plugins:')
 
     # Print each operation on each plugin
     for plugin_name, plugin_funcs in iteritems(metadata_extractor_plugins):
         if len(plugin_funcs) > 0:
-            print '-- Name: ' + plugin_name
-            print '   Supported operation%s: ' % \
+            print('-- Name: ' + plugin_name)
+            print('   Supported operation%s: ' % \
                   (len(plugin_funcs) > 1 and 's' or '') + \
-                  ', '.join(plugin_funcs)
+                  ', '.join(plugin_funcs))
 
     # Are there any unloaded plugins?
     # broken_plugins = metadata_extractor_plugins.get_broken_plugins()
@@ -194,9 +196,9 @@ def print_metadata(metadata):
     if metadata:
         max_key_length = max([len(key) for key in metadata.keys()])
         for key, value in iteritems(metadata):
-            print key, "." * (max_key_length - len(key)), str(value)
+            print(key, "." * (max_key_length - len(key)), str(value))
     else:
-        print '(No metadata)'
+        print('(No metadata)')
 
 def plugin_builder_function(plugin):
     """
@@ -295,24 +297,24 @@ def main():
     # Is output file specified?
     if options.update and not options.output_file:
         if options.verbose > 5:
-            print "Option --output-file not specified. Updating input file."
+            print("Option --output-file not specified. Updating input file.")
         options.output_file = input_file
     elif options.extract and options.output_file:
-        print "Option --output-file cannot be used with --extract."
-        print parser.get_usage()
+        print("Option --output-file cannot be used with --extract.")
+        print(parser.get_usage())
         sys.exit(1)
 
     # Make sure there is not extract / write / info at the same time
     if (options.extract and options.update) or \
        (options.extract and options.info) or \
        (options.info and options.update):
-        print "Choose either --extract, --update or --info"
-        print parser.get_usage()
+        print("Choose either --extract, --update or --info")
+        print(parser.get_usage())
         sys.exit(1)
     elif (options.extract and not input_file) or \
             (options.update and not input_file):
-        print "Input file is missing"
-        print parser.get_usage()
+        print("Input file is missing")
+        print(parser.get_usage())
         sys.exit(1)
 
     # Function call based on args
@@ -325,13 +327,13 @@ def main():
                                      options.verbose)
             print_metadata(metadata)
         except TypeError as err:
-            print err
+            print(err)
             return 1
         except RuntimeError as err:
-            print err
+            print(err)
             return 1
         except InvenioWebSubmitFileMetadataRuntimeError as err:
-            print err
+            print(err)
             return 1
     elif options.update:
         try:
@@ -341,19 +343,19 @@ def main():
                            options.force_plugin,
                            options.verbose)
         except TypeError as err:
-            print err
+            print(err)
             return 1
         except RuntimeError as err:
-            print err
+            print(err)
             return 1
         except InvenioWebSubmitFileMetadataRuntimeError as err:
-            print err
+            print(err)
             return 1
     elif options.info:
         try:
             metadata_info(options.verbose)
         except TypeError:
-            print 'Problem retrieving plugin information\n'
+            print('Problem retrieving plugin information\n')
             return 1
     else:
         parser.error("Incorrect number of arguments\n")

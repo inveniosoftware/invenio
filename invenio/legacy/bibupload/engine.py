@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 BibUpload: Receive MARC XML file and update the appropriate database
 tables according to options.
@@ -1717,7 +1719,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 
     def _process_document_moreinfos(more_infos, docname, version, docformat, mode):
         if not mode in ('correct', 'append', 'replace_or_insert', 'replace', 'correct', 'insert'):
-            print "exited because the mode is incorrect"
+            print("exited because the mode is incorrect")
             return
 
         brd = BibRecDocs(rec_id)
@@ -2734,10 +2736,10 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args): # pylint: 
             if value.lower() == 'oracle':
                 task_set_option('oracle_friendly', True)
         else:
-            print >> sys.stderr, """The specified value is not in the list of allowed special treatments codes: %s""" % CFG_BIBUPLOAD_ALLOWED_SPECIAL_TREATMENTS
+            print("""The specified value is not in the list of allowed special treatments codes: %s""" % CFG_BIBUPLOAD_ALLOWED_SPECIAL_TREATMENTS, file=sys.stderr)
             return False
     elif key in ("-S", "--stage"):
-        print >> sys.stderr, """WARNING: the --stage parameter is deprecated and ignored."""
+        print("""WARNING: the --stage parameter is deprecated and ignored.""", file=sys.stderr)
     else:
         return False
     return True

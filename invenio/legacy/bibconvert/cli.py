@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """BibConvert tool to convert bibliographic records from any format to any format."""
 
 __revision__ = "$Id$"
@@ -186,7 +188,7 @@ def main():
             usage(0)
 
         elif opt in ["-V", "--version"]:
-            print __revision__
+            print(__revision__)
             sys.exit(0)
 
         elif opt in ["-l", "--length"]:
@@ -244,7 +246,7 @@ def main():
         # BibConvert for bfx
         source_xml = sys.stdin.read()
         try:
-            print bibconvert_bfx_engine.convert(source_xml, extract_tpl)
+            print(bibconvert_bfx_engine.convert(source_xml, extract_tpl))
         except NameError:
             sys.stderr.write("Error: cannot use BibConvert BFX engine.\n")
             sys.stderr.write("A compliant XSLT library is needed. See Invenio INSTALL guide.\n")
@@ -260,7 +262,7 @@ def main():
         try:
             res = bibconvert_xslt_engine.convert(source_xml, extract_tpl)
             if res is not None:
-                print res
+                print(res)
             else:
                 sys.exit(1)
         except NameError:

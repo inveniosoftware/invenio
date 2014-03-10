@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """WebSearch Admin Flask Blueprint"""
 
 from flask import Blueprint, g, render_template, request, flash, redirect, \
@@ -110,7 +112,7 @@ def modifycollectiontree():
         try:
             descendants = Collection.query.get(id_son).descendants_ids
             ancestors = new_dad.ancestors_ids
-            print descendants, ancestors
+            print(descendants, ancestors)
             if descendants & ancestors:
                 raise
         except:

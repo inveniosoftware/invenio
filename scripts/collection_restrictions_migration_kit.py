@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 This script will migrate collection restriction rules from previous
 Apache-only method (column restricted in the collection table) to
@@ -62,28 +64,28 @@ def create_needed_roles(restrictions, apache_group):
     role_name = CFG_PROPOSED_ROLE_NAME % apache_group
     role_description = CFG_PROPOSED_ROLE_DESCRIPTION % ', '.join(get_collections_for_group(restrictions, apache_group))
     role_definition_src = 'allow apache_group "%s"' % apache_group
-    print "Creating role '%s' ('%s') with firerole '%s'..." % (role_name, role_description, role_definition_src),
+    print("Creating role '%s' ('%s') with firerole '%s'..." % (role_name, role_description, role_definition_src), end=' ')
     res = acc_add_role(role_name, role_description, serialize(compile_role_definition(role_definition_src)), role_definition_src)
     if res == 0:
-        print "Already existed!"
+        print("Already existed!")
     else:
-        print "OK!"
+        print("OK!")
     return role_name
 
 def migrate_restricted_collection(collection_name, role_name):
     """Migrate a single collection restriction."""
 
-    print "Adding authorization to role '%s' for viewing collection '%s'..." % (role_name, collection_name),
+    print("Adding authorization to role '%s' for viewing collection '%s'..." % (role_name, collection_name), end=' ')
     acc_add_authorization(role_name, VIEWRESTRCOLL, collection=collection_name)
-    print "OK!"
+    print("OK!")
 
 def check_viewrestrcoll_exists():
     """Security check for VIEWRESTRCOLL to exist."""
     res = acc_get_action_id(VIEWRESTRCOLL)
     if not res:
-        print "ERROR: %s action does not exist!" % VIEWRESTRCOLL
-        print "Please run first webaccessadmin -a in order to update the system"
-        print "to newly added actions."
+        print("ERROR: %s action does not exist!" % VIEWRESTRCOLL)
+        print("Please run first webaccessadmin -a in order to update the system")
+        print("to newly added actions.")
         sys.exit(1)
 
 def migrate():
@@ -92,8 +94,8 @@ def migrate():
     restrictions = retrieve_restricted_collection()
     apache_groups = set(restrictions.values())
 
-    print "%i restrictions to migrate" % len(restrictions.keys())
-    print "%i roles to create" % len(apache_groups)
+    print("%i restrictions to migrate" % len(restrictions.keys()))
+    print("%i roles to create" % len(apache_groups))
     role_names = {}
     for apache_group in apache_groups:
         role_names[apache_group] = create_needed_roles(restrictions, apache_group)

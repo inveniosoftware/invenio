@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """Invenio templating framework."""
 
 from __future__ import nested_scopes
@@ -379,16 +381,16 @@ def print_messages(messages,
 
             # Print separator if we have moved to another template
             if last_template != message[2]:
-                print "************* Template %s" % message[2]
+                print("************* Template %s" % message[2])
                 last_template = message[2]
 
-            print '%s:%s:%s%s' % \
+            print('%s:%s:%s%s' % \
                   (message[0],
                    message[4],
 #                   message[2].endswith('.py') and message[2][:-3] or \
 #                   message[2],
                    message[3] and ("%s(): " % message[3]) or ' ',
-                   message[1])
+                   message[1]))
 
     # Print summary
     if verbose >= 0:
@@ -400,21 +402,21 @@ def print_messages(messages,
                            if message[0] == 'C'])
 
         if len(messages) > 0:
-            print '\nFAILED'
+            print('\nFAILED')
         else:
-            print '\nOK'
+            print('\nOK')
 
-        print "%i error%s, %i warning%s, %i comment%s." % \
+        print("%i error%s, %i warning%s, %i comment%s." % \
               (nb_errors,   nb_errors   > 1 and 's' or '',
                nb_warnings, nb_warnings > 1 and 's' or '',
-               nb_comments, nb_comments > 1 and 's' or '')
+               nb_comments, nb_comments > 1 and 's' or ''))
 
 def usage(exitcode=1):
     """
     Print usage of the template checking utility
     """
 
-    print """Usage: python templates.py --check-custom-templates [options]
+    print("""Usage: python templates.py --check-custom-templates [options]
 Options:
   -v, --verbose                Verbose level (0=min, 2=default, 3=max).
   -d, --default-templates-dir  path to a directory with the default
@@ -427,7 +429,7 @@ Options:
 Check that your custom templates are synchronized with default Invenio templates.
 Examples: $ python templates.py --check-custom-templates
           $ python templates.py --check-custom-templates -c~/webstyle_template_ithaca.py
-"""
+""")
     sys.exit(exitcode)
 
 if __name__ == "__main__" and \

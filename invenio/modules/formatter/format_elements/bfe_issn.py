@@ -19,6 +19,8 @@
 """BibFormat element - Print ISSN corresponding to given journal name
 """
 
+from __future__ import print_function
+
 __revision__ = "$Id$"
 
 import pprint
@@ -1039,7 +1041,7 @@ def print_info():
     """
     Info on element arguments
     """
-    print """ Collects ISSN and corresponding journal names from local repository
+    print(""" Collects ISSN and corresponding journal names from local repository
  and prints archive as dict structure.
 
  Usage: python bfe_issn.py [Options] [url]
@@ -1054,7 +1056,7 @@ def print_info():
 
  Returned structure can then be copied into bfe_issn.py
  'format' function.
-    """
+    """)
 if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hu:v",
@@ -1072,7 +1074,7 @@ if __name__ == '__main__':
         if opt in ["-u", "--url"]:
             url_arg = opt_value
         elif opt in ["-v", "--version"]:
-            print __revision__
+            print(__revision__)
             sys.exit(0)
         else:
             print_info()

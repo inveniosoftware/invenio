@@ -18,6 +18,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Twitter fetcher
 
@@ -170,5 +172,5 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         bst_twitter_fetcher(sys.argv[1])
     else:
-        print "USAGE: %s TWITTER_QUERY" % sys.argv[0]
+        print("USAGE: %s TWITTER_QUERY" % sys.argv[0])
         sys.exit(1)

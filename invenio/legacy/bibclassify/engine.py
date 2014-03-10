@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 BibClassify engine.
 
@@ -76,7 +78,7 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
     # not process multiple files)
     def process_lines():
         if output_mode == "text":
-            print "Input file: %s" % source
+            print("Input file: %s" % source)
 
         output = get_keywords_from_text(text_lines,
                                         taxonomy_name,
@@ -95,7 +97,7 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
         else:
             if isinstance(output, dict):
                 for i in output:
-                    print output[i]
+                    print(output[i])
 
     # Get the fulltext for each source.
     for entry in input_sources:
@@ -313,7 +315,7 @@ def get_keywords_output(single_keywords, composite_keywords, taxonomy_name,
         if s == "text":
             my_styles["text"] = _output_text(single_keywords_p, composite_keywords_p,
                                              author_keywords, acronyms, spires, only_core_tags, limit=output_limit)
-            print my_styles["text"]
+            print(my_styles["text"])
         elif s == "marcxml":
             my_styles["marcxml"] = _output_marc(single_keywords_p, composite_keywords_p,
                                                 author_keywords, acronyms)

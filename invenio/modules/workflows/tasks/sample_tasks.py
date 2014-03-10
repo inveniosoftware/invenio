@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 import datetime
 
 
@@ -34,7 +36,7 @@ def check_data(obj, eng):
 
 def print_data(obj, eng):
     """ Static task with no parameters """
-    print obj.data + datetime.timedelta(days=2)
+    print(obj.data + datetime.timedelta(days=2))
 
 
 def set_data(obj, eng):

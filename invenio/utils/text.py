@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 ## This file is part of Invenio.
 ## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
@@ -324,11 +326,11 @@ def wait_for_user(msg=""):
     """
     if '--yes-i-know' in sys.argv:
         return
-    print msg
+    print(msg)
     try:
         answer = raw_input("Please confirm by typing 'Yes, I know!': ")
     except KeyboardInterrupt:
-        print
+        print()
         answer = ''
     if answer != 'Yes, I know!':
         sys.stderr.write("ERROR: Aborted.\n")
