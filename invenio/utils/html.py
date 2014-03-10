@@ -748,7 +748,8 @@ def create_tag(tag, escaper=EscapedHTMLString, opening_only=False, body=None, es
         out += " />"
     if indent:
         out = indent_text(out, indent)[:-1]
-    return EscapedString(out)
+    from invenio.utils.text import wash_for_utf8
+    return EscapedString(wash_for_utf8(out))
 
 class MLClass(object):
     """
