@@ -738,6 +738,9 @@ class FormatTest(InvenioTestCase):
         </record>'''
         self.app.extensions['registry']['output_formats'] = output_formats_registry()
         self.app.extensions['registry']['format_elements'] = format_elements_registry()
+        self.app.extensions['registry']['format_templates'] = format_templates_registry()
+        from invenio.modules.formatter.registry import format_templates_lookup
+        format_templates_lookup.expunge()
         #self.old_import_path = cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH']
         #cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH'] = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
         self.old_templates_path = cfg['CFG_BIBFORMAT_TEMPLATES_PATH']
@@ -748,6 +751,8 @@ class FormatTest(InvenioTestCase):
         del self.app.extensions['registry']['output_formats']
         from invenio.modules.formatter.registry import output_formats_lookup
         output_formats_lookup.expunge()
+        from invenio.modules.formatter.registry import format_templates_lookup
+        format_templates_lookup.expunge()
         del self.app.extensions['registry']['format_elements']
         #cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH'] = self.old_import_path
         cfg['CFG_BIBFORMAT_TEMPLATES_PATH'] = self.old_templates_path
