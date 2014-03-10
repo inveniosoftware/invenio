@@ -26,6 +26,7 @@ the tests.
 
 import string
 import os
+import random
 
 from invenio.base.factory import with_app_context
 from invenio.base.wrappers import lazy_import
