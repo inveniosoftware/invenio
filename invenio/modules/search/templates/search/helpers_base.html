@@ -166,11 +166,11 @@
   {% block _search_simple_box scoped %}
     {% for f in easy_search_form if not f.name=='csrf_token' %}
     <div class="form-group">
-      <label class="col-md-2 col-sm-3 control-label">
+      <label class="col-md-2 col-sm-3 control-label" for="{{ f.label.field_id }}">
         {{ f.label.text }}
       </label>
       <div class="col-md-10 col-sm-9">
-        {{ f(class_='form-control')|safe }}
+        {{ f(class_='form-control') }}
       </div>
     </div>
     {% endfor %}
@@ -194,20 +194,20 @@
 {% macro _search_advanced_box(collection) %}
 {% block _search_advanced_box scoped %}
     <div class="form-group">
-      <label class="col-sm-3 col-md-2 control-label">
+      <label class="col-sm-3 col-md-2 control-label" for="p1">
         {{ _('what') }}?
       </label>
       <div class="col-sm-9 col-md-10">
-        <input type="text" name="p1" value="" class="form-control"/>
+        <input type="text" id="p1" name="p1" value="" class="form-control"/>
       </div>
     </div>
 
     <div class="form-group">
-      <label class="col-sm-3 col-md-2 control-label">
+      <label class="col-sm-3 col-md-2 control-label" for="p2">
         {{ _('where') }}?
       </label>
       <div class="col-sm-9 col-md-10">
-        <select class="form-control" name="f">
+        <select class="form-control" id="p2" name="f">
           {% for (code, name) in collection.search_within %}
           <option value="{{ code }}">
             {{ name }}
@@ -218,11 +218,11 @@
     </div>
 
     <div class="form-group">
-      <label class="col-sm-3 col-md-2 control-label">
+      <label class="col-sm-3 col-md-2 control-label" for="m1">
         {{ _('how') }}?
       </label>
       <div class="col-sm-9 col-md-10">
-        <select name="m1" class="form-control">
+        <select name="m1" id="m1" class="form-control">
           {%- for v in config.CFG_WEBSEACH_MATCHING_TYPES|sort(attribute='order') -%}
             <option value="{{ v.code }}">{{ _(v.title)|safe }}</option>
           {%- endfor -%}
@@ -233,10 +233,12 @@
     {% for id, soo in collection.search_options|groupby('id_field') %}
     <hr/>
     <div class="form-group">
-      <label class="control-label col-sm-3 col-md-2">{{ soo[0].field.name_ln }}</label>
+      <label class="control-label col-sm-3 col-md-2" for="{{ soo[0].field.code }}">
+        {{- soo[0].field.name_ln -}}
+      </label>
       <div class="col-sm-9 col-md-10">
         <div class="input-group">
-          <select class="form-control" name="{{ soo[0].field.code }}">
+          <select class="form-control" id="{{ soo[0].field.code }}" name="{{ soo[0].field.code }}">
             <option value="">*** {{ _('select') }} ***</option>
             {% for so in soo %}
             <option value="{{ so.fieldvalue.value }}">
