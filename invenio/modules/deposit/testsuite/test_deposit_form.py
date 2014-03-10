@@ -30,6 +30,11 @@ class WebDepositFormTest(InvenioTestCase):
         from werkzeug import MultiDict
 
         def reset_processor(form, field, submit=False, fields=None):
+            if field.name == 'related_identifier-0-scheme':
+                if fields and 'related_identifier-0-scheme' in fields:
+                    field.data = 'RESET TEST FIELDS'
+                    return
+
             field.data = 'RESET'
 
         def dummy_autocomplete(form, field, term, limit=50):
@@ -294,7 +299,7 @@ class WebDepositFormTest(InvenioTestCase):
         form.post_process(formfields=form_data.keys())
 
         expected_data = self.object_data
-        expected_data['related_identifier'][0]['scheme'] = "RESET"
+        expected_data['related_identifier'][0]['scheme'] = "RESET TEST FIELDS"
         self.assertEqual(form.data, expected_data)
 
     def test_flags(self):
