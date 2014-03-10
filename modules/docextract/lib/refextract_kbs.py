@@ -306,7 +306,7 @@ def build_reportnum_kb(fpath):
             for classification in preprint_classifications:
                 search_pattern_str = ur'(?:^|[^a-zA-Z0-9\/\.\-])([\[\(]?(?P<categ>' \
                                      + classification[0].strip() + u')' \
-                                     + numeration_regexp + u'[\]\)]?)'
+                                     + numeration_regexp + ur'[\]\)]?)'
 
                 re_search_pattern = re.compile(search_pattern_str,
                                                  re.UNICODE)
