@@ -114,7 +114,6 @@ search_also, search_form, search_form_javascript with context -%}
         <div class="page-header">
           <h3>{{ collection.name + ":" }}</h3>
         </div>
-        {%- set of = request.values.get('of', 'hb') -%}
         {% for recid in collection.reclist[-10:]|reverse %}
         <div class="row">
           <div class="col-md-12">
