@@ -33,7 +33,7 @@ import time
 from flask import session
 from wtforms.form import Form as WTForm
 from wtforms.widgets import TextInput, HTMLString, html_params
-from wtforms.fields import Field, TextField, HiddenField, FileField
+from wtforms.fields import Field, StringField, HiddenField, FileField
 from flask.ext.wtf import Form
 from wtforms.ext.csrf.session import SessionSecureForm
 from wtforms.compat import text_type
@@ -62,7 +62,7 @@ class RowWidget(object):
             else:
                 wrapper_class = classes.get(i, '')
                 html.append('%s<div class="%s">%s</div>' % (
-                    hidden, 
+                    hidden,
                     wrapper_class,
                     text_type(subfield(
                         class_=class_,
@@ -70,7 +70,7 @@ class RowWidget(object):
                 hidden = ''
         if hidden:
             html.append(hidden)
-        return HTMLString('<div class="%s">' % (row_class, ) + 
+        return HTMLString('<div class="%s">' % (row_class, ) +
                           ''.join(html) + '</div>')
 
 
@@ -133,7 +133,7 @@ class TimePickerWidget(TextInput):
         return super(TimePickerWidget, self).__call__(field, **kwargs)
 
 
-class AutocompleteField(TextField):
+class AutocompleteField(StringField):
     def __init__(self, label=None, validators=None, data_provide="typeahead", data_source=None, **kwargs):
         super(AutocompleteField, self).__init__(label, validators, **kwargs)
         if data_source:
@@ -170,14 +170,14 @@ def has_file_field(form):
     return False
 
 
-class FilterTextField(TextField):
+class FilterTextField(StringField):
     alias = None
 
     def __init__(self, *args, **kwargs):
         self.alias = kwargs.get('alias')
         if 'alias' in kwargs:
             del kwargs['alias']
-        super(TextField, self).__init__(*args, **kwargs)
+        super(FilterTextField, self).__init__(*args, **kwargs)
         if not self.raw_data:
             self.raw_data = []
 
