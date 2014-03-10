@@ -16,16 +16,30 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+import re
+import hmac
+from hashlib import sha1
 
-WEBHOOKS_DEBUG_RECEIVER_URLS = {}
-"""
-Mapping of receiver id to URL pattern. This allows generating URLs to an
-intermediate webhook proxy service like Ultrahook for testing on development
-machines::
+from invenio.base.globals import cfg
 
-    WEBHOOKS_DEBUG_RECEIVER_URLS = {
-        'github': 'https://hook.user.ultrahook.com/?access_token=%%(token)s'
-    }
-"""
 
-WEBHOOKS_SECRET_KEY = "secret_key"
+def get_hmac(message):
+    """
+    Helper function which calculates HMAC value.
+    """
+    key = str(cfg["WEBHOOKS_SECRET_KEY"])
+    hmac_value = hmac.new(key, message, sha1).hexdigest()
+    return hmac_value
+
+
+def check_x_hub_signature(signature, message):
+    """
+    Checks X-Hub-Signature. Secret key to compare
+    signature: WEBHOOKS_SECRET_KEY.
+    """
+    hmac_value = get_hmac(message)
+    if hmac_value == signature or \
+       (signature.find('=') > -1 and \
+            hmac_value == signature[signature.find('=') + 1:]):
+        return True
+    return False

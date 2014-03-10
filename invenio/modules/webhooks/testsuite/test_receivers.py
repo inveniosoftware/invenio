@@ -25,7 +25,8 @@ from invenio.testsuite import InvenioTestCase
 
 
 from ..models import Event, Receiver, InvalidPayload, CeleryReceiver, \
-    ReceiverDoesNotExists
+    ReceiverDoesNotExists, InvalidSignature
+from ..signatures import get_hmac
 
 from invenio.celery import celery
 
@@ -131,3 +132,31 @@ class ReceiverTestCase(InvenioTestCase):
 
         assert Receiver.get_hook_url('test-receiver', 'token') == \
             'http://test.local/?access_token=token'
+
+    def test_signature_checking(self):
+        """
+        webhooks - checks signatures for payload
+        """
+        r = Receiver(self.callable, signature='X-Hub-Signature')
+        Receiver.register('test-receiver-sign', r)
+
+        # check correct signature
+        payload = json.dumps(dict(somekey='somevalue'))
+        headers = [('Content-Type', 'application/json'),
+                   ('X-Hub-Signature', get_hmac(payload))]
+        with self.app.test_request_context(headers=headers, data=payload):
+            r.consume_event(2)
+            assert self.payload == json.loads(payload)
+
+        # check signature with prefix
+        headers = [('Content-Type', 'application/json'),
+                   ('X-Hub-Signature', 'sha1=' + get_hmac(payload))]
+        with self.app.test_request_context(headers=headers, data=payload):
+            r.consume_event(2)
+            assert self.payload == json.loads(payload)
+
+        # check incorrect signature
+        headers = [('Content-Type', 'application/json'),
+                   ('X-Hub-Signature', get_hmac("somevalue"))]
+        with self.app.test_request_context(headers=headers, data=payload):
+            self.assertRaises(InvalidSignature, r.consume_event, 2)
