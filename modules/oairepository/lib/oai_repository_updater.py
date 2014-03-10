@@ -293,6 +293,10 @@ def oairepositoryupdater_task():
         print_repository_status(verbose=report)
         return True
 
+    if run_sql("SELECT id FROM schTASK WHERE proc='bibupload:oairepository' AND status='WAITING'"):
+        write_message("Previous requests of oairepository still being elaborated. Let's skip this execution.")
+        return True
+
     initial_snapshot = {}
     for set_spec in all_set_specs():
         initial_snapshot[set_spec] = get_set_definitions(set_spec)
@@ -414,9 +418,9 @@ def oairepositoryupdater_task():
             write_message("Wrote to file %s" % filename)
             if not no_upload:
                 if task_get_option("notimechange"):
-                    task_low_level_submission('bibupload', 'oairepository', '-c', filename, '-n')
+                    task_low_level_submission('bibupload', 'oairepository', '-c', filename, '-n', '-Noairepository', '-P', '-1')
                 else:
-                    task_low_level_submission('bibupload', 'oairepository', '-c', filename)
+                    task_low_level_submission('bibupload', 'oairepository', '-c', filename, '-Noairepository', '-P', '-1')
             # Prepare to save results in a tmp file
             (fd, filename) = mkstemp(dir=CFG_TMPSHAREDDIR,
                                         prefix='oairepository_' + \
