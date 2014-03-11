@@ -4669,6 +4669,40 @@ class WebSearchFiletypeQueryTest(InvenioTestCase):
                                         expected_text="[50, 93]"))
 
 
+class WebSearchFilenameQueryTest(InvenioTestCase):
+    """Test of queries using filename fields."""
+
+    def test_search_for_main_file_name(self):
+        """websearch - file name, query for name without extension"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=0402130&f=filename&of=id',
+                                               expected_text="[89]"))
+
+    def test_search_for_file_name_with_extension(self):
+        """websearch - file name, query for name with extension"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=0210075.ps.gz&f=filename&of=id',
+                                               expected_text="[83]"))
+
+    def test_search_for_file_name_with_part_of_extension(self):
+        """websearch - file name, query for name and part of extension"""
+        self.assertEqual([],
+                  test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=filename:0212138.ps&of=id&so=a',
+                                        expected_text="[84]"))
+
+    def test_search_for_file_name_with_wildcard(self):
+        """websearch - file name, query with wildcard"""
+        self.assertEqual([],
+                  test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=filename:convert*&of=id&so=a',
+                                        expected_text="[66, 71, 97]"))
+
+    def test_search_for_file_name_with_span(self):
+        """websearch - file name, query with span"""
+        self.assertEqual([],
+                  test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=filename:6->7&of=id&so=a',
+                                        expected_text="[3, 6]"))
+
+
 def make_fake_request(admin_user=True):
     environ = {'wsgi.errors': cStringIO.StringIO(),
                'QUERY_STRING': '',
@@ -4960,6 +4994,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchWashCollectionsTest,
                              WebSearchAuthorCountQueryTest,
                              WebSearchFiletypeQueryTest,
+                             WebSearchFilenameQueryTest,
                              WebSearchDOIQueryTest,
                              WebSearchPerformRequestSearchRefactoringTest,
                              WebSearchGetRecordTests,

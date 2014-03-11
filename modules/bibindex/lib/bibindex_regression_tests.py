@@ -1729,6 +1729,44 @@ class BibIndexSpecialTagsTest(InvenioTestCase):
                             wt.special_tags['8564_u'].__self__.__class__.__name__)
 
 
+class BibIndexFilenameIndexTest(InvenioTestCase):
+
+
+    def test_common_filename_with_different_extensions(self):
+        """bibindex - checks if file name '0105155' will occur only once"""
+        index_id = get_index_id_from_index_name('filename')
+        query = """SELECT termlist FROM idxWORD%02dR
+                   WHERE id_bibrec=12""" % index_id
+        res = run_sql(query)
+        self.assertEqual(sorted(deserialize_via_marshal(res[0][0])),
+                         sorted(['0105155', '0105155.pdf',
+                                 '0105155.ps', '0105155.ps.gz']))
+
+    def test_filename_with_extension_present(self):
+        """bibindex - checks if file name with extension is found"""
+        index_id = get_index_id_from_index_name('filename')
+        query = """SELECT termlist FROM idxWORD%02dR
+                   WHERE id_bibrec=92""" % index_id
+        res = run_sql(query)
+        self.assertTrue('0606096.pdf' in deserialize_via_marshal(res[0][0]))
+
+    def test_incorrect_extension(self):
+        """bibindex - checks if incorrect filename could not be found"""
+        index_id = get_index_id_from_index_name('filename')
+        query = """SELECT termlist FROM idxWORD%02dR
+                   WHERE id_bibrec=12""" % index_id
+        res = run_sql(query)
+        self.assertFalse('0105155.gz' in deserialize_via_marshal(res[0][0]))
+
+    def test_filename_in_forward_table(self):
+        """bibindex - checks if words are present in forward table"""
+        index_id = get_index_id_from_index_name('filename')
+        query = """SELECT term FROM idxWORD%02dF
+                   WHERE term LIKE '05011%%'""" % index_id
+        res = run_sql(query)
+        self.assertTrue(len(res) == 2)
+
+
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
                              BibIndexRemoveHtmlTest,
@@ -1750,7 +1788,8 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexCLICallTest,
                              BibIndexCommonWordsInVirtualIndexTest,
                              BibIndexVirtualIndexQueueTableTest,
-                             BibIndexSpecialTagsTest)
+                             BibIndexSpecialTagsTest,
+                             BibIndexFilenameIndexTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
