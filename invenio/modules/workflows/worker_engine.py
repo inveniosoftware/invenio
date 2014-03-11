@@ -27,12 +27,19 @@ def run_worker(wname, data, **kwargs):
     Runs workflow with given name and given data.
     Data can be specified as list of objects or
     single id of WfeObject/BibWorkflowObjects.
+
+    :param wname: the name of the workflow which will be run.
+    :type wname: String
+    :param data: And Array of value and variable which will
+    be processed by the workflow specified by wname
+    :type data: Array
+    :param kwargs: This parameter allow to pass some
+    special arguments for the different steps.
     """
     engine = BibWorkflowEngine(wname, **kwargs)
     engine.save()
     objects = get_workflow_object_instances(data, engine)
     run_workflow(wfe=engine, data=objects, **kwargs)
-
     return engine
 
 
@@ -43,6 +50,10 @@ def restart_worker(wid, **kwargs):
 
     Data can be specified as list of objects
     or single id of WfeObject/BibWorkflowObjects.
+
+    :param wid: workflow id (uuid) of the workflow to be restarted
+    :param kwargs: This parameter allow to pass some
+    special arguments for the different steps.
     """
     if "data" not in kwargs:
         data = []
@@ -77,11 +88,15 @@ def continue_worker(oid, restart_point="continue_next",
     """
     Restarts workflow with given id (wid) at given point.
 
-    restart_point can be one of:
+    :param oid: object id of the object to process
+    :param restart_point: can be one of:
 
     * restart_prev: will restart from the previous task
     * continue_next: will continue to the next task
     * restart_task: will restart the current task
+
+    :param kwargs: This parameter allow to pass some
+    special arguments for the different steps.
     """
     workflow_object = BibWorkflowObject.query.get(oid)
     workflow = Workflow.query.get(workflow_object.id_workflow)

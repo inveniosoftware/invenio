@@ -58,7 +58,17 @@ class BibWorkflowEngine(GenericWorkflowEngine):
     Overrides key functions in GenericWorkflowEngine to implement
     logging and certain workarounds for storing data before/after
     task calls (This part will be revisited in the future).
+
+    :param name:
+    :param uuid:
+    :param curr_obj:
+    :param workflow_object:
+    :param id_user:
+    :param module_name:
+    :param kwargs:
     """
+
+
     def __init__(self, name=None, uuid=None, curr_obj=0,
                  workflow_object=None, id_user=0, module_name="Unknown",
                  **kwargs):
@@ -80,10 +90,11 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                                        module_name=module_name, uuid=uuid)
                 self.save(status=WorkflowStatus.NEW)
 
-        db_handler_obj = BibWorkflowLogHandler(BibWorkflowEngineLog, "uuid")
-        self.log = get_logger(logger_name="workflow.%s" % self.db_obj.uuid,
-                              db_handler_obj=db_handler_obj,
-                              obj=self)
+        if not self.db_obj.uuid in self.log.name:
+            db_handler_obj = BibWorkflowLogHandler(BibWorkflowEngineLog, "uuid")
+            self.log = get_logger(logger_name="workflow.%s" % self.db_obj.uuid,
+                                  db_handler_obj=db_handler_obj,
+                                  obj=self)
 
         self.set_workflow_by_name(self.db_obj.name)
         self.set_extra_data_params(**kwargs)
@@ -97,6 +108,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
     def set_extra_data(self, value):
         """
         Main method to update data saved to the object.
+        :param value:
         """
         self.db_obj._extra_data = base64.b64encode(cPickle.dumps(value))
 
@@ -214,10 +226,16 @@ BibWorkflowEngine
         self.db_obj.save(status)
 
     def process(self, objects):
+        """
+
+        :param objects:
+        """
         super(BibWorkflowEngine, self).process(objects)
 
     def restart(self, obj, task):
         """Restart the workflow engine after it was deserialized
+        :param task:
+        :param obj:
         """
         self.log.debug("Restarting workflow from %s object and %s task" %
                        (str(obj), str(task),))
@@ -247,7 +265,6 @@ BibWorkflowEngine
             self._i[1][-1] += 1
         else:
             raise Exception('Unknown start pointfor task: %s' % obj)
-
         self.process(self._objects)
         self._unpickled = False
 
@@ -258,8 +275,9 @@ BibWorkflowEngine
 
         Default processing factory, will process objects in order
 
-        @var objects: list of objects (passed in by self.process())
-        @keyword cls: engine object itself, because this method may
+        :param objects: list of objects (passed in by self.process())
+
+        :keyword cls: engine object itself, because this method may
             be implemented by the standalone function, we pass the
             self also as a cls argument
 
@@ -400,6 +418,10 @@ BibWorkflowEngine
                        "")
 
     def set_counter_initial(self, obj_count):
+        """
+
+        :param obj_count:
+        """
         self.db_obj.counter_initial = obj_count
         self.db_obj.counter_halted = 0
         self.db_obj.counter_error = 0
@@ -415,11 +437,19 @@ BibWorkflowEngine
         self.db_obj.counter_finished += 1
 
     def set_workflow_by_name(self, workflow_name):
+        """
+
+        :param workflow_name:
+        """
         workflow = get_workflow_definition(workflow_name)
         self.workflow_definition = workflow
         self.setWorkflow(self.workflow_definition.workflow)
 
     def set_extra_data_params(self, **kwargs):
+        """
+
+        :param kwargs:
+        """
         tmp = self.get_extra_data()
         if not tmp:
             tmp = {}

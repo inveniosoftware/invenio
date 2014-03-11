@@ -97,7 +97,7 @@ class WorkflowDefinitionError(Exception):
 class WorkflowWorkerError(Exception):
     """Raised when there is a problem with workflow workers."""
 
-    def __init__(self, message, worker_name, **kwargs):
+    def __init__(self, message, worker_name="No Name Given", **kwargs):
         Exception.__init__(self)
         self.message = message
         self.worker_name = worker_name

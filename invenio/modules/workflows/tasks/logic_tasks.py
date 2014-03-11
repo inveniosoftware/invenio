@@ -18,6 +18,14 @@
 
 
 def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"):
+    """
+
+    :param get_list_function:
+    :param savename:
+    :param cache_data:
+    :param order:
+    :return:
+    """
     if order not in ["ASC", "DSC"]:
         order = "ASC"
 
@@ -33,7 +41,13 @@ def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"
         if step not in eng.extra_data["_Iterators"]:
             eng.extra_data["_Iterators"][step] = {}
             if cache_data:
-                eng.extra_data["_Iterators"][step]["cache"] = get_list_function(obj, eng)
+                if callable(get_list_function):
+                    eng.extra_data["_Iterators"][step]["cache"] = get_list_function(obj, eng)
+                elif isinstance(get_list_function, list):
+                    eng.extra_data["_Iterators"][step]["cache"] = get_list_function
+                else:
+                    eng.extra_data["_Iterators"][step]["cache"] = []
+
                 my_list_to_process = eng.extra_data["_Iterators"][step]["cache"]
             if order == "ASC":
                 eng.extra_data["_Iterators"][step].update({"value": 0})
@@ -74,6 +88,14 @@ def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"
 
 
 def simple_for(inita, enda, incrementa, variable_name=None):
+    """
+    :param inita: the starting value
+    :param enda: the ending value
+    :param incrementa: the increment of the value for each iteration
+    :param variable_name: if needed the name in extra_data where we want to store
+    the value
+    """
+
     def _simple_for(obj, eng):
 
         init = inita
@@ -117,6 +139,11 @@ def simple_for(inita, enda, incrementa, variable_name=None):
 
 
 def end_for(obj, eng):
+    """
+
+    :param obj:
+    :param eng:
+    """
     coordonatex = len(eng.getCurrTaskId()) - 1
     coordonatey = eng.getCurrTaskId()[coordonatex]
     new_vector = eng.getCurrTaskId()
@@ -124,11 +151,14 @@ def end_for(obj, eng):
     eng.setPosition(eng.getCurrObjId(), new_vector)
 
 
-def get_obj_data(obj, eng):
-    return obj.data
-
-
 def execute_if(fun, *args):
+    """
+
+    :param fun:
+    :param args:
+    :return:
+    """
+
     def _execute_if(obj, eng):
         for rule in args:
             res = rule(obj, eng)
@@ -140,6 +170,13 @@ def execute_if(fun, *args):
 
 
 def workflow_if(cond, neg=False):
+    """
+
+    :param cond:
+    :param neg:
+    :return:
+    """
+
     def _workflow_if(obj, eng):
         conda = cond
         while callable(conda):
@@ -167,12 +204,15 @@ def workflow_if(cond, neg=False):
 
 
 def workflow_else(obj, eng):
+    """
+
+    :param obj:
+    :param eng:
+    """
     coordonatex = len(eng.getCurrTaskId()) - 1
     coordonatey = eng.getCurrTaskId()[coordonatex]
     new_vector = eng.getCurrTaskId()[:]
     new_vector[coordonatex] = coordonatey - 2
-    eng.log.error(str(eng.getCurrTaskId()))
-    eng.log.error(str(eng.extra_data["_state"][str(new_vector)]))
     if not eng.extra_data["_state"][str(new_vector)]:
         eng.jumpCallForward(1)
     else:
@@ -181,3 +221,62 @@ def workflow_else(obj, eng):
         new_vector = eng.getCurrTaskId()
         new_vector[coordonatex] = coordonatey + 1
         eng.setPosition(eng.getCurrObjId(), new_vector)
+
+
+def compare_logic(a, b, op):
+    """
+
+    :param a: value A to compare
+    :param b: value B to compare
+    :param op: Operator can be :
+    - eq  A equal B
+    - gt A greater than B
+    - gte A greater than or equal B
+    - lt A lesser than B
+    - lte A lesser than or equal B
+    :return: Boolean: result of the test
+    """
+
+
+    def _compare_logic(obj, eng):
+        my_a = a
+        my_b = b
+        if callable(my_a):
+            while callable(my_a):
+                my_a = my_a(obj, eng)
+
+        if callable(my_b):
+            while callable(my_b):
+                my_b = my_b(obj, eng)
+        if op == "eq":
+            if my_a == my_b:
+                return True
+            else:
+                return False
+        elif "gt" in op:
+            if "e" in op:
+                if my_a >= my_b:
+                    return True
+                else:
+                    return False
+            else:
+                if my_a > my_b:
+                    return True
+                else:
+                    return False
+        elif "lt" in op:
+            if "e" in op:
+                if my_a <= my_b:
+                    return True
+                else:
+                    return False
+            else:
+                if my_a < my_b:
+                    return True
+                else:
+                    return False
+        else:
+            return False
+
+
+    return _compare_logic
