@@ -37,7 +37,7 @@ class BibIndexItemCountTokenizer(BibIndexEmptyTokenizer):
         """Tokenizes for number of copies of a book in the 'real' library"""
         count = 0
         try:
-            count = record['_number_of_copies']
+            count = record['number_of_copies']
         except KeyError:
             pass
         except TypeError:
