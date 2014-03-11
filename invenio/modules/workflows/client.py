@@ -22,10 +22,15 @@ from .models import ObjectVersion
 from .engine import WorkflowStatus
 
 
-def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
+def run_workflow(wfe, data, stop_on_halt=False,
                  initial_run=True, **kwargs):
     """
     Main function running the workflow.
+    :param data:
+    :param stop_on_halt:
+    :param initial_run:
+    :param kwargs:
+    :param wfe:
     """
     while True:
         try:

@@ -26,7 +26,14 @@ from invenio.modules.workflows.errors import WorkflowError
 from time import sleep
 
 
+def interrupt_workflow(obj, eng):
+    eng.halt("interrupting workflow.")
+
 def get_nb_workflow_created(obj, eng):
+    """
+    :param obj: Bibworkflow Object to process
+    :param eng: BibWorkflowEngine processing the object
+    """
     try:
         return eng.extra_data["_nb_workflow"]
     except KeyError:
@@ -34,6 +41,13 @@ def get_nb_workflow_created(obj, eng):
 
 
 def num_workflow_running_greater(num):
+    """
+
+    :param num: the number that you want to compare with the number de workflow running
+    :type num: number
+
+    """
+
     def _num_workflow_running_greater(obj, eng):
         try:
             if (eng.extra_data["_nb_workflow"] - eng.extra_data["_nb_workflow_finish"]) > num:
@@ -46,7 +60,10 @@ def num_workflow_running_greater(num):
 
 
 def get_nb_workflow_running(obj, eng):
-
+    """
+    :param obj: Bibworkflow Object to process
+    :param eng: BibWorkflowEngine processing the object
+    """
     try:
         eng.log.error(str())
         return eng.extra_data["_nb_workflow"] - eng.extra_data["_nb_workflow_finish"]
@@ -60,14 +77,14 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
      will be run on the celery node configurer into invenio
      configuration.
 
-     The first argument is the name of the workflow.
+     :param workflow_to_run: The first argument is the name of the workflow to run.
 
-     The second one is the data to use for this workflow
+     :param data: The second one is the data to use for this workflow.
 
-     The copy parameter allow you to pass to the workflow  a copy
+     :param copy: The copy parameter allow you to pass to the workflow  a copy
      of the obj at the moment of the call .
 
-     **kargs allow you to add some key:value into the extra data of
+     :param kwargs: **kargs allow you to add some key:value into the extra data of
      the object.
      """
 
@@ -78,7 +95,7 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
         if copy is True:
             myobject.copy(obj)
         if data is not None:
-            myobject.data = data
+            myobject.set_data(data)
         extra = myobject.get_extra_data()
         myobject.set_extra_data(extra)
         myobject.data_type = "record"
@@ -109,9 +126,12 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
 
 def wait_for_workflows_to_complete(obj, eng):
     """
-     This function wait all the asynchronous workflow launched.
-     It acts like a barrier
-     """
+    This function wait all the asynchronous workflow launched.
+    It acts like a barrier
+
+    :param obj: Bibworkflow Object to process
+    :param eng: BibWorkflowEngine processing the object
+    """
     if '_workflow_ids' in eng.extra_data:
         for workflow_id in eng.extra_data['_workflow_ids']:
             try:
@@ -139,10 +159,13 @@ def wait_for_workflows_to_complete(obj, eng):
 
 def wait_for_a_workflow_to_complete_obj(obj, eng):
     """
-     This function wait for the asynchronous workflow specified
-     in obj.data ( asyncresult )
-     It acts like a barrier
-     """
+    This function wait for the asynchronous workflow specified
+    in obj.data ( asyncresult )
+    It acts like a barrier
+
+    :param obj: Bibworkflow Object to process
+    :param eng: BibWorkflowEngine processing the object
+    """
     if not obj.data:
         eng.extra_data["_nb_workflow"] = 0
         eng.extra_data["_nb_workflow_failed"] = 0
@@ -169,10 +192,12 @@ def wait_for_a_workflow_to_complete_obj(obj, eng):
 
 def wait_for_a_workflow_to_complete(obj, eng):
     """
-     This function wait for the asynchronous workflow specified
-     in obj.data ( asyncresult )
-     It acts like a barrier
-     """
+    This function wait for the asynchronous workflow specified
+    in obj.data ( asyncresult )
+    It acts like a barrier
+    :param obj: Bibworkflow Object to process
+    :param eng: BibWorkflowEngine processing the object
+    """
     if '_workflow_ids' in eng.extra_data:
         to_wait = None
         i = 0
@@ -208,8 +233,19 @@ def wait_for_a_workflow_to_complete(obj, eng):
 
 def write_something_generic(messagea, func):
     """
-    This function allows to send a message to bibsched...
-    This messages will be store into log.
+    This function allows you to write a message where you want.
+    This function support the multicasting.
+
+    Messagea is a string or a list of string  and function that will be concatenate
+    in one and only string.
+
+    Func is the list of the functions that will be used to send the message. The function
+    should always take in parameter a string which is the message.
+
+    :param func: the list of function that will be used to propagate the message
+    :type func: Array of functions
+    :param messagea: the message that you want to propagate
+    :type messagea: Array of strings and functions.
     """
 
     def _write_something_generic(obj, eng):
@@ -256,15 +292,26 @@ def get_list_of_workflows_to_wait(obj, eng):
     """
      Return a list of asyncresult corresponding to running
      asynchrnous workflow
+
+    :param obj: Bibworkflow Object to process
+    :param eng: BibWorkflowEngine processing the object
      """
     return eng.extra_data["_workflow_ids"]
 
 
 def get_status_async_result_obj_data(obj, eng):
+    """
+    :param obj: Bibworkflow Object to process
+    :param eng: BibWorkflowEngine processing the object
+    """
     return obj.data.state
 
 
 def get_workflows_progress(obj, eng):
+    """
+    :param obj: Bibworkflow Object to process
+    :param eng: BibWorkflowEngine processing the object
+    """
     try:
         return (eng.extra_data["_nb_workflow_finish"] * 100.0) / (eng.extra_data["_nb_workflow"])
     except KeyError:
@@ -274,6 +321,14 @@ def get_workflows_progress(obj, eng):
 
 
 def workflows_reviews(stop_if_error=False):
+    """
+    This function just give you a little review of you children workflows.
+    This function can be used to stop the workflow if a child has crashed.
+
+    :param stop_if_error: give to the function the indication it it should stop
+    if a child workflow has crashed.
+    :type stop_if_error: Boolean
+    """
     def _workflows_reviews(obj, eng):
         """
          This function write a  little report about
@@ -293,6 +348,12 @@ def workflows_reviews(stop_if_error=False):
 
 
 def log_info(message):
+    """
+
+    :param message:
+    :return:
+    """
+
     def _log_info(obj, eng):
         eng.log.info(message)
 

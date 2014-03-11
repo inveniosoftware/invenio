@@ -77,7 +77,6 @@ def session_manager(orig_func):
 
 
 class Workflow(db.Model):
-
     __tablename__ = "bwlWORKFLOW"
 
     uuid = db.Column(db.String(36), primary_key=True, nullable=False)
@@ -103,12 +102,12 @@ class Workflow(db.Model):
     def __repr__(self):
         return "<Workflow(name: %s, module: %s, cre: %s, mod: %s," \
                "id_user: %s, status: %s)>" % \
-            (str(self.name),
-             str(self.module_name),
-             str(self.created),
-             str(self.modified),
-             str(self.id_user),
-             str(self.status))
+               (str(self.name),
+                str(self.module_name),
+                str(self.created),
+                str(self.modified),
+                str(self.id_user),
+                str(self.status))
 
     def __str__(self):
         return """Workflow:
@@ -161,7 +160,7 @@ class Workflow(db.Model):
     def get_most_recent(cls, *criteria, **filters):
         """ Returns the most recently modified workflow. """
 
-        most_recent = cls.get(*criteria, **filters).\
+        most_recent = cls.get(*criteria, **filters). \
             order_by(desc(Workflow.modified)).first()
         if most_recent is None:
             raise NoResultFound
@@ -179,15 +178,15 @@ class Workflow(db.Model):
         a specific value.
         You can define either the key or the getter function.
 
-        @param key: the key to access the desirable value
-        @param getter: a callable that takes a dict as param and returns a
+        :param key: the key to access the desirable value
+        :param getter: a callable that takes a dict as param and returns a
         value
         """
         extra_data = Workflow.get(Workflow.id_user == self.id_user,
                                   Workflow.uuid == self.uuid).one()._extra_data
 
         extra_data = cPickle.loads(base64.b64decode(extra_data))
-        if key is not None:
+        if key:
             return extra_data[key]
         elif callable(getter):
             return getter(extra_data)
@@ -201,9 +200,9 @@ class Workflow(db.Model):
         a specific value.
         You can define either the key, value or the setter function.
 
-        @param key: the key to access the desirable value
-        @param value: the new value
-        @param setter: a callable that takes a dict as param and modifies it
+        :param key: the key to access the desirable value
+        :param value: the new value
+        :param setter: a callable that takes a dict as param and modifies it
         """
         extra_data = Workflow.get(Workflow.id_user == user_id,
                                   Workflow.uuid == uuid).one()._extra_data
@@ -318,10 +317,10 @@ class BibWorkflowObject(db.Model):
     def __eq__(self, other):
         if isinstance(other, BibWorkflowObject):
             if self._data == other._data and \
-                    self._extra_data == other._extra_data and \
-                    self.id_workflow == other.id_workflow and \
-                    self.version == other.version and \
-                    self.id_parent == other.id_parent and \
+                            self._extra_data == other._extra_data and \
+                            self.id_workflow == other.id_workflow and \
+                            self.version == other.version and \
+                            self.id_parent == other.id_parent and \
                     isinstance(self.created, datetime) and \
                     isinstance(self.modified, datetime):
                 return True
@@ -359,6 +358,7 @@ class BibWorkflowObject(db.Model):
         """
         Retrive the currently assigned widget, if any.
         """
+
         try:
             return self.get_extra_data()["_widget"]
         except KeyError:
@@ -463,6 +463,7 @@ class BibWorkflowObject(db.Model):
                 else:
                     # So, XML then
                     from xml.dom.minidom import parseString
+
                     try:
                         pretty_data = parseString(data)
                         return pretty_data.toprettyxml()
@@ -472,15 +473,19 @@ class BibWorkflowObject(db.Model):
                     except Exception:
                         # Some other parsing error
                         pass
-            # Just return raw string
+                # Just return raw string
             return data
-        # Not any of the above types. How juicy!
+            # Not any of the above types. How juicy!
         return data
 
     @session_manager
     def save(self, version=None, task_counter=None, id_workflow=None):
         """
-        Saved object
+        Save object to persistent storage.
+
+        :param version:
+        :param task_counter:
+        :param id_workflow:
         """
         if task_counter is not None:
             self.log.debug("Saving task counter: %s" % (task_counter,))
@@ -578,7 +583,7 @@ class BibWorkflowObjectLog(db.Model):
     def get_most_recent(cls, *criteria, **filters):
         """ Returns the most recently created log. """
 
-        most_recent = cls.get(*criteria, **filters).\
+        most_recent = cls.get(*criteria, **filters). \
             order_by(desc(BibWorkflowObjectLog.created)).first()
         if most_recent is None:
             raise NoResultFound
@@ -600,8 +605,8 @@ class BibWorkflowEngineLog(db.Model):
     message = db.Column(db.TEXT, default="", nullable=False)
 
     def __repr__(self):
-        return "<BibWorkflowEngineLog(%i, %s, %s, %s)>" % \
-               (self.id, self.id_object, self.message, self.created)
+        return "\nseverity: %s\ndate: %s\nmessage: %s" % \
+               (self.log_type, self.created, self.message)
 
     @classmethod
     def get(cls, *criteria, **filters):
@@ -616,7 +621,7 @@ class BibWorkflowEngineLog(db.Model):
     def get_most_recent(cls, *criteria, **filters):
         """ Returns the most recently created log. """
 
-        most_recent = cls.get(*criteria, **filters).\
+        most_recent = cls.get(*criteria, **filters). \
             order_by(desc(BibWorkflowEngineLog.created)).first()
         if most_recent is None:
             raise NoResultFound

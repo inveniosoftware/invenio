@@ -38,12 +38,16 @@ def get_logger(logger_name, db_handler_obj,
 
     db_handler_obj.setFormatter(formatter)
     db_handler_obj.setLevel(level)
-    logger.addHandler(db_handler_obj)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    stream_handler.setLevel(level)
-    logger.addHandler(stream_handler)
+    should_we_add = True
+    for handler in logger.handlers:
+        if handler.name == db_handler_obj.name:
+            should_we_add = False
+    if should_we_add:
+        logger.addHandler(db_handler_obj)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        stream_handler.setLevel(level)
+        logger.addHandler(stream_handler)
 
     # Let's not propagate to root logger..
     logger.propagate = 0
@@ -65,9 +69,13 @@ class BibWorkflowLogHandler(logging.Handler):
     """
 
     def __init__(self, model, id_name):
+
         logging.Handler.__init__(self)
+
         self.model = model
         self.id_name = id_name
+
+
 
     def emit(self, record):
         log_obj = self.model(id_object=getattr(record.obj, self.id_name),

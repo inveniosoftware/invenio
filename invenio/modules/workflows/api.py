@@ -22,6 +22,7 @@ BibWorkflow API - functions to run workflows
 
 from werkzeug.utils import (import_string,
                             cached_property)
+
 from invenio.base.globals import cfg
 from invenio.base.config import CFG_BIBWORKFLOW_WORKER
 
@@ -69,13 +70,13 @@ def start(workflow_name, data, **kwargs):
 
     The workflow engine object generated is returned upon completion.
 
-    @param workflow_name: the workflow name to run. Ex: "my_workflow"
-    @type workflow_name: str
+    :param workflow_name: the workflow name to run. Ex: "my_workflow"
+    :type workflow_name: String
 
-    @param data: the workflow name to run. Ex: "my_workflow"
-    @type data: list of objects/dicts
+    :param data: the workflow name to run. Ex: "my_workflow"
+    :type data: list of objects/dicts
 
-    @return: BibWorkflowEngine that ran the workflow.
+    :return: BibWorkflowEngine that ran the workflow.
     """
     from .worker_engine import run_worker
     return run_worker(workflow_name, data, **kwargs)
@@ -89,13 +90,13 @@ def start_delayed(workflow_name, data, **kwargs):
 
     Otherwise, see documentation of start().
 
-    @param workflow_name: the workflow name to run. Ex: "my_workflow"
-    @type workflow_name: str
+    :param workflow_name: the workflow name to run. Ex: "my_workflow"
+    :type workflow_name: String
 
-    @param data: the workflow name to run. Ex: "my_workflow"
-    @type data: list of objects/dicts
+    :param data: the workflow name to run. Ex: "my_workflow"
+    :type data: list of objects/dicts
 
-    @return: BibWorkflowEngine that ran the workflow.
+    :return: BibWorkflowEngine that ran the workflow.
     """
     if not CFG_BIBWORKFLOW_WORKER:
         raise WorkflowWorkerError('No worker configured')
@@ -112,8 +113,11 @@ def start_delayed(workflow_name, data, **kwargs):
     else:
         if isinstance(data, BibWorkflowObject):
             data = BibWorkflowObjectIdContainer(data).to_dict()
-    return WORKER().run_worker(workflow_name, data, **kwargs)
 
+    result =  WORKER().run_worker(workflow_name, data, **kwargs)
+    from invenio.ext.sqlalchemy import db
+    db.session.close()
+    return result
 
 def start_by_wid(wid, **kwargs):
     """
@@ -124,10 +128,10 @@ def start_by_wid(wid, **kwargs):
     in order to pass certain variables to the tasks in the workflow execution,
     such as a taskid from BibSched, the current user etc.
 
-    @param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000"
-    @type wid: string
+    :param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000"
+    :type wid: String
 
-    @return: BibWorkflowEngine that ran the workflow.
+    :return: BibWorkflowEngine that ran the workflow.
     """
     from .worker_engine import restart_worker
     return restart_worker(wid, **kwargs)
@@ -146,13 +150,15 @@ def start_by_wid_delayed(wid, **kwargs):
     in order to pass certain variables to the tasks in the workflow execution,
     such as a taskid from BibSched, the current user etc.
 
-    @param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000"
-    @type wid: string
+    :param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000"
+    :type wid: String
 
-    @return: BibWorkflowEngine that ran the workflow.
+    :return: BibWorkflowEngine that ran the workflow.
     """
-    return WORKER().restart_worker(wid, **kwargs)
-
+    result = WORKER().restart_worker(wid, **kwargs).uuid
+    from invenio.ext.sqlalchemy import db
+    db.session.close()
+    return result
 
 def start_by_oids(workflow_name, oids, **kwargs):
     """
@@ -163,13 +169,13 @@ def start_by_oids(workflow_name, oids, **kwargs):
     in order to pass certain variables to the tasks in the workflow execution,
     such as a taskid from BibSched, the current user etc.
 
-    @param workflow_name: the workflow name to run. Ex: "my_workflow"
-    @type workflow_name: str
+    :param workflow_name: the workflow name to run. Ex: "my_workflow"
+    :type workflow_name: String
 
-    @param oids: list of BibWorkflowObject id's to run.
-    @type oids: list of strings/integers
+    :param oids: list of BibWorkflowObject id's to run.
+    :type oids: list of strings/integers
 
-    @return: BibWorkflowEngine that ran the workflow.
+    :return: BibWorkflowEngine that ran the workflow.
     """
     from .models import BibWorkflowObject
     objects = BibWorkflowObject.query.filter(
@@ -191,13 +197,13 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
     available. For example, enqueueing the execution of the workflow in
     a task queue such as Celery (http://celeryproject.org).
 
-    @param workflow_name: the workflow name to run. Ex: "my_workflow"
-    @type workflow_name: str
+    :param workflow_name: the workflow name to run. Ex: "my_workflow"
+    :type workflow_name: String
 
-    @param oids: list of BibWorkflowObject id's to run.
-    @type oids: list of strings/integers
+    :param oids: list of BibWorkflowObject id's to run.
+    :type oids: list of strings/integers
 
-    @return: BibWorkflowEngine that ran the workflow.
+    :return: BibWorkflowEngine that ran the workflow.
     """
     from .models import BibWorkflowObject
     objects = BibWorkflowObject.query.filter(
@@ -220,16 +226,16 @@ def continue_oid(oid, start_point="continue_next", **kwargs):
     available. For example, enqueueing the execution of the workflow in
     a task queue such as Celery (http://celeryproject.org).
 
-    @param oid: id of BibWorkflowObject to run.
-    @type oid: string
+    :param oid: id of BibWorkflowObject to run.
+    :type oid: String
 
-    @param start_point: where should the workflow start from? One of:
+    :param start_point: where should the workflow start from? One of:
         * restart_prev: will restart from the previous task
         * continue_next: will continue to the next task
         * restart_task: will restart the current task
-    @type start_point: string
+    :type start_point: String
 
-    @return: BibWorkflowEngine that ran the workflow
+    :return: BibWorkflowEngine that ran the workflow
     """
     from .worker_engine import continue_worker
     return continue_worker(oid, start_point, **kwargs)
@@ -248,19 +254,22 @@ def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
     available. For example, enqueueing the execution of the workflow in
     a task queue such as Celery (http://celeryproject.org).
 
-    @param oid: id of BibWorkflowObject to run.
-    @type oid: string
+    :param oid: id of BibWorkflowObject to run.
+    :type oid: String
 
-    @param start_point: where should the workflow start from? One of:
+    :param start_point: where should the workflow start from? One of:
         * restart_prev: will restart from the previous task
         * continue_next: will continue to the next task
         * restart_task: will restart the current task
-    @type start_point: string
+    :type start_point: String
 
-    @return: BibWorkflowEngine that ran the workflow
+    :return: BibWorkflowEngine that ran the workflow
     """
-    return WORKER().continue_worker(oid, start_point, **kwargs)
 
+    result = WORKER().continue_worker(oid, start_point, **kwargs).uuid
+    from invenio.ext.sqlalchemy import db
+    db.session.close()
+    return result
 
 def resume_objects_in_workflow(id_workflow, start_point="continue_next",
                                **kwargs):
@@ -275,16 +284,16 @@ def resume_objects_in_workflow(id_workflow, start_point="continue_next",
     to resume the objects from can optionally be given. By default,
     the objects resume with their next task in the workflow.
 
-    @param id_workflow: id of Workflow with objects to resume.
-    @type id_workflow: string
+    :param id_workflow: id of Workflow with objects to resume.
+    :type id_workflow: String
 
-    @param start_point: where should the workflow start from? One of:
+    :param start_point: where should the workflow start from? One of:
         * restart_prev: will restart from the previous task
         * continue_next: will continue to the next task
         * restart_task: will restart the current task
-    @type start_point: string
+    :type start_point: String
 
-    @yield: BibWorkflowEngine that ran the workflow
+    yield: BibWorkflowEngine that ran the workflow
     """
     from .models import BibWorkflowObject, ObjectVersion
 

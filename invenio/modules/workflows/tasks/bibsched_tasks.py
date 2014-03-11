@@ -23,6 +23,7 @@ def write_something_bibsched(messagea="This is the default message"):
     """
     This function allows to send a message to bibsched...
     This messages will be store into log.
+    :param messagea:
     """
 
     def _write_something_bibsched(obj, eng):
@@ -55,6 +56,12 @@ def write_something_bibsched(messagea="This is the default message"):
 
 
 def task_update_progress(msg):
+    """
+
+    :param msg:
+    :return:
+    """
+
     def _task_update_progress(obj, eng):
         """Updates progress information in the BibSched task table."""
         from invenio.legacy.bibsched.bibtask import task_update_progress as task_update_progress_nested
@@ -65,6 +72,12 @@ def task_update_progress(msg):
 
 
 def task_update_status(val):
+    """
+
+    :param val:
+    :return:
+    """
+
     def _task_update_status(obj, eng):
         """Updates status information in the BibSched task table."""
         from invenio.legacy.bibsched.bibtask import task_update_status as task_update_status_nested
