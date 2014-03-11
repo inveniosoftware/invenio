@@ -3,7 +3,7 @@
 ## Some functions about dates
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -93,7 +93,8 @@ class datetime(real_datetime):
 
     @classmethod
     def combine(self, date, time):
-        return self(date.year, date.month, date.day, time.hour, time.minute, time.microsecond, time.tzinfo)
+        return self(date.year, date.month, date.day, time.hour, time.minute,
+                    time.second, time.microsecond, time.tzinfo)
 
     def date(self):
         return date(self.year, self.month, self.day)
