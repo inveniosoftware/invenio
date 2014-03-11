@@ -43,10 +43,10 @@ __revision__ = "$Id$"
 
 import re
 import time
-from datetime import date as real_date, \
-                     datetime as real_datetime, \
-                     time as real_time, \
-                     timedelta
+from datetime import (date as real_date,
+                      datetime as real_datetime,
+                      time as real_time,
+                      timedelta)
 from flask.ext.babel import format_datetime as babel_format_datetime
 from invenio.base.globals import cfg
 from invenio.base.i18n import gettext_set_language, _
@@ -67,21 +67,25 @@ try:
         GOT_DATEUTIL = True
     else:
         from warnings import warn
-        warn("Not using dateutil module because the version %s is not compatible with Python-2.x" % dateutil.__version__)
+        warn("Not using dateutil module because the version %s is not "
+             "compatible with Python-2.x" % dateutil.__version__)
         GOT_DATEUTIL = False
 except ImportError:
     # Ok, no date parsing is possible, but continue anyway,
     # since this package is only recommended, not mandatory.
     GOT_DATEUTIL = False
 
+
 datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
 default_ln = lambda ln: cfg['CFG_SITE_LANG'] if ln is None else ln
 
+
 class date(real_date):
     def strftime(self, fmt):
         return strftime(fmt, self)
+
 
 class datetime(real_datetime):
     def strftime(self, fmt):
@@ -94,10 +98,9 @@ class datetime(real_datetime):
     def date(self):
         return date(self.year, self.month, self.day)
 
+
 def convert_datetext_to_dategui(datetext, ln=None, secs=False):
-    """
-    Convert:
-    '2005-11-16 15:11:57' => '16 nov 2005, 15:11'
+    """Convert: '2005-11-16 15:11:57' => '16 nov 2005, 15:11'
     Or optionally with seconds:
     '2005-11-16 15:11:57' => '16 nov 2005, 15:11:57'
     Month is internationalized
@@ -118,9 +121,9 @@ def convert_datetext_to_dategui(datetext, ln=None, secs=False):
         except ValueError:
             return _("N/A").encode('utf8')
 
+
 def convert_datetext_to_datestruct(datetext):
-    """
-    Convert:
+    """Convert:
     '2005-11-16 15:11:57' => (2005, 11, 16, 15, 11, 44, 2, 320, 0)
     """
     try:
@@ -128,10 +131,9 @@ def convert_datetext_to_datestruct(datetext):
     except:
         return datestruct_default
 
+
 def convert_datestruct_to_dategui(datestruct, ln=None):
-    """
-    Convert:
-    (2005, 11, 16, 15, 11, 44, 2, 320, 0) => '16 nov 2005, 15:11'
+    """Convert: (2005, 11, 16, 15, 11, 44, 2, 320, 0) => '16 nov 2005, 15:11'
     Month is internationalized
     """
     ln = default_ln(ln)
@@ -146,22 +148,19 @@ def convert_datestruct_to_dategui(datestruct, ln=None):
         except:
             return _("N/A").encode('utf8')
 
+
 def convert_datestruct_to_datetext(datestruct):
-    """
-    Convert:
-    (2005, 11, 16, 15, 11, 44, 2, 320, 0) => '2005-11-16 15:11:57'
+    """Convert: (2005, 11, 16, 15, 11, 44, 2, 320, 0) => '2005-11-16 15:11:57'
     """
     try:
         return strftime(datetext_format, datestruct)
     except:
         return datetext_default
 
+
 def convert_datecvs_to_datestruct(datecvs):
-    """
-    Convert CVS $Date$ and
-    $Id$
-    formats into datestruct. Useful for later conversion of Last
-    updated timestamps in the page footers.
+    """Convert CVS $Date$ and $Id$ formats into datestruct. Useful for later
+    conversion of Last updated timestamps in the page footers.
 
     Example: '$Date$' => (2006, 09, 20, 19, 27, 11, 0, 0)
     """
@@ -176,30 +175,30 @@ def convert_datecvs_to_datestruct(datecvs):
     except ValueError:
         return datestruct_default
 
+
 def get_datetext(year, month, day):
-    """
-    year=2005, month=11, day=16 => '2005-11-16 00:00:00'
-    """
+    """year=2005, month=11, day=16 => '2005-11-16 00:00:00'"""
     input_format = "%Y-%m-%d"
     try:
-        datestruct = time.strptime("%i-%i-%i"% (year, month, day), input_format)
+        datestruct = time.strptime("%i-%i-%i" % (year, month, day),
+                                   input_format)
         return strftime(datetext_format, datestruct)
     except:
         return datetext_default
 
+
 def get_datestruct(year, month, day):
-    """
-    year=2005, month=11, day=16 => (2005, 11, 16, 0, 0, 0, 2, 320, -1)
-    """
+    """year=2005, month=11, day=16 => (2005, 11, 16, 0, 0, 0, 2, 320, -1)"""
     input_format = "%Y-%m-%d"
     try:
-        return time.strptime("%i-%i-%i"% (year, month, day), input_format)
+        return time.strptime("%i-%i-%i" % (year, month, day), input_format)
     except ValueError or TypeError:
         return datestruct_default
 
+
 def get_i18n_day_name(day_nb, display='short', ln=None):
-    """
-    get the string representation of a weekday, internationalized
+    """Get the string representation of a weekday, internationalized
+
     @param day_nb: number of weekday UNIX like.
                    => 0=Sunday
     @param ln: language for output
@@ -226,9 +225,10 @@ def get_i18n_day_name(day_nb, display='short', ln=None):
 
     return days[day_nb]
 
+
 def get_i18n_month_name(month_nb, display='short', ln=None):
-    """
-    get a non-numeric representation of a month, internationalized.
+    """Get a non-numeric representation of a month, internationalized.
+
     @param month_nb: number of month, (1 based!)
                      =>1=jan,..,12=dec
     @param ln: language for output
@@ -238,37 +238,38 @@ def get_i18n_month_name(month_nb, display='short', ln=None):
     _ = gettext_set_language(ln)
     if display == 'short':
         months = {0: _("Month"),
-                   1: _("Jan"),
-                   2: _("Feb"),
-                   3: _("Mar"),
-                   4: _("Apr"),
-                   5: _("May"),
-                   6: _("Jun"),
-                   7: _("Jul"),
-                   8: _("Aug"),
-                   9: _("Sep"),
-                   10: _("Oct"),
-                   11: _("Nov"),
-                   12: _("Dec")}
+                  1: _("Jan"),
+                  2: _("Feb"),
+                  3: _("Mar"),
+                  4: _("Apr"),
+                  5: _("May"),
+                  6: _("Jun"),
+                  7: _("Jul"),
+                  8: _("Aug"),
+                  9: _("Sep"),
+                  10: _("Oct"),
+                  11: _("Nov"),
+                  12: _("Dec")}
     else:
         months = {0: _("Month"),
-                   1: _("January"),
-                   2: _("February"),
-                   3: _("March"),
-                   4: _("April"),
-                   5: _("May "), # trailing space distinguishes short/long form
-                   6: _("June"),
-                   7: _("July"),
-                   8: _("August"),
-                   9: _("September"),
-                   10: _("October"),
-                   11: _("November"),
-                   12: _("December")}
+                  1: _("January"),
+                  2: _("February"),
+                  3: _("March"),
+                  4: _("April"),
+                  5: _("May "),  # trailing space distinguishes short/long form
+                  6: _("June"),
+                  7: _("July"),
+                  8: _("August"),
+                  9: _("September"),
+                  10: _("October"),
+                  11: _("November"),
+                  12: _("December")}
     return months[month_nb].strip()
 
+
 def create_day_selectbox(name, selected_day=0, ln=None):
-    """
-    Creates an HTML menu for day selection. (0..31 values).
+    """Creates an HTML menu for day selection. (0..31 values).
+
     @param name: name of the control (i.e. name of the var you'll get)
     @param selected_day: preselect a day. Use 0 for the label 'Day'
     @param ln: language of the menu
@@ -276,54 +277,61 @@ def create_day_selectbox(name, selected_day=0, ln=None):
     """
     ln = default_ln(ln)
     _ = gettext_set_language(ln)
-    out = "<select name=\"%s\">\n"% name
+    out = "<select name=\"%s\">\n" % name
     for i in range(0, 32):
-        out += "  <option value=\"%i\""% i
+        out += "  <option value=\"%i\"" % i
         if (i == selected_day):
             out += " selected=\"selected\""
         if (i == 0):
-            out += ">%s</option>\n"% _("Day")
+            out += ">%s</option>\n" % _("Day")
         else:
-            out += ">%i</option>\n"% i
+            out += ">%i</option>\n" % i
     out += "</select>\n"
     return out
 
+
 def create_month_selectbox(name, selected_month=0, ln=None):
-    """
-    Creates an HTML menu for month selection. Value of selected field is numeric
-    @param name: name of the control (your form will be sent with name=value...)
+    """Creates an HTML menu for month selection. Value of selected field is
+    numeric.
+
+    @param name: name of the control, your form will be sent with name=value...
     @param selected_month: preselect a month. use 0 for the Label 'Month'
     @param ln: language of the menu
     @return: html as string
     """
     ln = default_ln(ln)
-    out = "<select name=\"%s\">\n"% name
+    out = "<select name=\"%s\">\n" % name
 
     for i in range(0, 13):
-        out += "<option value=\"%i\""% i
+        out += "<option value=\"%i\"" % i
         if (i == selected_month):
             out += " selected=\"selected\""
-        out += ">%s</option>\n"% get_i18n_month_name(i, ln)
+        out += ">%s</option>\n" % get_i18n_month_name(i, ln)
     out += "</select>\n"
     return out
 
+
 def create_year_inputbox(name, value=0):
-    """
-    Creates an HTML field (simple input) for year selection.
+    """Creates an HTML field (simple input) for year selection.
+
     @param name: name of the control (i.e. name of the variable you'll get)
     @param value: prefilled value (int)
     @return: html as string
     """
-    out = "<input type=\"text\" name=\"%s\" value=\"%i\" maxlength=\"4\" size=\"4\"/>\n"% (name, value)
+    out = "<input type=\"text\" name=\"%s\" value=\"%i\" maxlength=\"4\" " \
+          "size=\"4\"/>\n" % (name, value)
     return out
 
-def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=None):
-    """
-    Creates an HTML menu (dropdownbox) for year selection.
+
+def create_year_selectbox(name, from_year=-1, length=10, selected_year=0,
+                          ln=None):
+    """Creates an HTML menu (dropdownbox) for year selection.
+
     @param name: name of control( i.e. name of the variable you'll get)
     @param from_year: year on which to begin. if <0 assume it is current year
     @param length: number of items in menu
-    @param selected_year: initial selected year (if in range), else: label is selected
+    @param selected_year: initial selected year (if in range), else: label is
+                          selected
     @param ln: language
     @return: html as string
     """
@@ -331,27 +339,33 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=Non
     _ = gettext_set_language(ln)
     if from_year < 0:
         from_year = time.localtime()[0]
-    out = "<select name=\"%s\">\n"% name
+    out = "<select name=\"%s\">\n" % name
     out += '  <option value="0"'
     if selected_year == 0:
         out += ' selected="selected"'
-    out += ">%s</option>\n"% _("Year")
+    out += ">%s</option>\n" % _("Year")
     for i in range(from_year, from_year + length):
-        out += "<option value=\"%i\""% i
+        out += "<option value=\"%i\"" % i
         if (i == selected_year):
             out += " selected=\"selected\""
-        out += ">%i</option>\n"% i
+        out += ">%i</option>\n" % i
     out += "</select>\n"
     return out
 
-_RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>[a-z]+)?\s*((?P<begin>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?", re.I)
+
+_RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>[a-z]+)?\s*((?P<begin>\d\d?"
+                                   r"(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?",
+                                   re.I)
 _RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hours>\d\d?)(:(?P<minutes>\d\d?))?')
+
+
 def parse_runtime_limit(value):
-    """
-    Parsing CLI option for runtime limit, supplied as VALUE.
+    """Parsing CLI option for runtime limit, supplied as VALUE.
     Value could be something like: Sunday 23:00-05:00, the format being
     [Wee[kday]] [hh[:mm][-hh[:mm]]].
-    The function will return two valid time ranges. The first could be in the past, containing the present or in the future. The second is always in the future.
+    The function will return two valid time ranges. The first could be in the
+    past, containing the present or in the future. The second is always in the
+    future.
     """
 
     def extract_time(value):
@@ -363,13 +377,13 @@ def parse_runtime_limit(value):
         key = value[:3].lower()
         try:
             return {
-                'mon' : 0,
-                'tue' : 1,
-                'wed' : 2,
-                'thu' : 3,
-                'fri' : 4,
-                'sat' : 5,
-                'sun' : 6,
+                'mon': 0,
+                'tue': 1,
+                'wed': 2,
+                'thu': 3,
+                'fri': 4,
+                'sat': 5,
+                'sun': 6,
             }[key]
         except KeyError:
             raise ValueError("%s is not a good weekday name." % value)
@@ -377,7 +391,9 @@ def parse_runtime_limit(value):
     today = date.today()
     g = _RE_RUNTIMELIMIT_FULL.search(value)
     if not g:
-        raise ValueError('"%s" does not seem to be correct format for parse_runtime_limit() [Wee[kday]] [hh[:mm][-hh[:mm]]]).' % value)
+        raise ValueError('"%s" does not seem to be correct format for '
+                         'parse_runtime_limit() '
+                         '[Wee[kday]] [hh[:mm][-hh[:mm]]]).' % value)
     pieces = g.groupdict()
 
     if pieces['weekday'] is None:
@@ -418,9 +434,10 @@ def parse_runtime_limit(value):
     )
     return current_range, future_range
 
+
 def guess_datetime(datetime_string):
-    """
-    Try to guess the datetime contained in a string of unknow format.
+    """Try to guess the datetime contained in a string of unknow format.
+
     @param datetime_string: the datetime representation.
     @type datetime_string: string
     @return: the guessed time.
@@ -438,19 +455,21 @@ def guess_datetime(datetime_string):
                 return time.strptime(datetime_string, format)
             except ValueError:
                 pass
-    raise ValueError("It is not possible to guess the datetime format of %s" % datetime_string)
+    raise ValueError("It is not possible to guess the datetime format of %s" %
+                     datetime_string)
+
 
 def get_time_estimator(total):
-    """
-    Given a total amount of items to compute, return a function that,
+    """Given a total amount of items to compute, return a function that,
     if called every time an item is computed (or every step items are computed)
     will give a time estimation for how long it will take to compute the whole
-    set of itmes. The function will return two values: the first is the
-    number of seconds that are still needed to compute the whole set, the second
-    value is the time in the future when the operation is expected to end.
+    set of itmes. The function will return two values: the first is the number
+    of seconds that are still needed to compute the whole set, the second value
+    is the time in the future when the operation is expected to end.
     """
     t1 = time.time()
     count = [0]
+
     def estimate_needed_time(step=1):
         count[0] += step
         t2 = time.time()
@@ -458,11 +477,10 @@ def get_time_estimator(total):
         return t3, t3 + t1
     return estimate_needed_time
 
+
 def pretty_date(ugly_time=False, ln=None):
-    """
-    Get a datetime object or a int() Epoch timestamp and return a
-    pretty string like 'an hour ago', 'Yesterday', '3 months ago',
-    'just now', etc.
+    """Get a datetime object or a int() Epoch timestamp and return a pretty
+    string like 'an hour ago', 'Yesterday', '3 months ago', 'just now', etc.
     """
 
     ln = default_ln(ln)
@@ -533,6 +551,7 @@ def pretty_date(ugly_time=False, ln=None):
 # Allowed if there's an even number of "%"s because they are escaped.
 _illegal_formatting = re.compile(r"((^|[^%])(%%)*%[sy])")
 
+
 def _findall(text, substr):
     # Also finds overlaps
     sites = []
@@ -542,17 +561,20 @@ def _findall(text, substr):
         if j == -1:
             break
         sites.append(j)
-        i=j+1
+        i = j + 1
     return sites
+
 
 def strftime(fmt, dt):
     if not isinstance(dt, real_date):
-        dt = datetime(dt.tm_year, dt.tm_mon, dt.tm_mday, dt.tm_hour, dt.tm_min, dt.tm_sec)
+        dt = datetime(dt.tm_year, dt.tm_mon, dt.tm_mday, dt.tm_hour, dt.tm_min,
+                      dt.tm_sec)
     if dt.year >= 1900:
         return time.strftime(fmt, dt.timetuple())
     illegal_formatting = _illegal_formatting.search(fmt)
     if illegal_formatting:
-        raise TypeError("strftime of dates before 1900 does not handle" + illegal_formatting.group(0))
+        raise TypeError("strftime of dates before 1900 does not handle %s" %
+                        illegal_formatting.group(0))
 
     year = dt.year
     # For every non-leap year century, advance by
@@ -567,8 +589,8 @@ def strftime(fmt, dt):
     s1 = time.strftime(fmt, (year,) + timetuple[1:])
     sites1 = _findall(s1, str(year))
 
-    s2 = time.strftime(fmt, (year+28,) + timetuple[1:])
-    sites2 = _findall(s2, str(year+28))
+    s2 = time.strftime(fmt, (year + 28,) + timetuple[1:])
+    sites2 = _findall(s2, str(year + 28))
 
     sites = []
     for site in sites1:
@@ -578,7 +600,7 @@ def strftime(fmt, dt):
     s = s1
     syear = "%04d" % (dt.year,)
     for site in sites:
-        s = s[:site] + syear + s[site+4:]
+        s = s[:site] + syear + s[site + 4:]
     return s
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -55,9 +55,7 @@ def format_timestamp_tuples(t):
 
 
 class ConvertFromDateCVSTest(InvenioTestCase):
-    """
-    Testing conversion of CVS dates.
-    """
+    """Testing conversion of CVS dates."""
 
     def test_convert_good_cvsdate(self):
         """dateutils - conversion of good CVS dates"""
@@ -68,10 +66,9 @@ class ConvertFromDateCVSTest(InvenioTestCase):
         self.assertEqual(dateutils.convert_datecvs_to_datestruct(datecvs)[:6],
                          datestruct_beginning_expected)
 
-        # here we have to use '$' + 'Date...' here, otherwise the CVS
-        # commit would erase this time format to put commit date:
-        datecvs = "$" + "Id: dateutils_tests.py,v 1.6 2007/02/14 18:33:02 tibor Exp $"
-        datestruct_beginning_expected = (2007, 2, 14, 18, 33, 02)
+        datecvs = "$Id: dateutils_tests.py,v 1.6 2007/02/14 18:33:02 tibor " \
+                  "Exp $"
+        datestruct_beginning_expected = (2007, 2, 14, 18, 33, 2)
         self.assertEqual(dateutils.convert_datecvs_to_datestruct(datecvs)[:6],
                          datestruct_beginning_expected)
 
@@ -84,14 +81,13 @@ class ConvertFromDateCVSTest(InvenioTestCase):
         self.assertEqual(dateutils.convert_datecvs_to_datestruct(datecvs)[:6],
                          datestruct_beginning_expected)
 
-class ConvertIntoDateGUITest(InvenioTestCase):
-    """
-    Testing conversion into dategui with various languages.
-    """
 
+class ConvertIntoDateGUITest(InvenioTestCase):
+    """Testing conversion into dategui with various languages."""
     if lang_english_configured:
         def test_convert_good_to_dategui_en(self):
-            """dateutils - conversion of good text date into English GUI date"""
+            """dateutils - conversion of good text date into English GUI date
+            """
             datetext = "2006-07-16 18:36:01"
             dategui_en_expected = "16 Jul 2006, 18:36"
             dategui_en = dateutils.convert_datetext_to_dategui(datetext,
@@ -125,14 +121,16 @@ class ConvertIntoDateGUITest(InvenioTestCase):
                                                                ln='sk')
             self.assertEqual(dategui_sk, dategui_sk_expected)
 
+
 class ParseRuntimeLimitTest(InvenioTestCase):
-    """
-    Testing the runtime limit parser used by BibSched to determine task
+    """Testing the runtime limit parser used by BibSched to determine task
     runtimes and also by the errorlib.register_emergency function to parse the
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES configuration
     """
     def test_parse_runtime_limit_day_abbr_plus_times(self):
-        """dateutils - parse runtime using a weekday abbreviation plus a time range"""
+        """dateutils - parse runtime using a weekday abbreviation plus a time
+        range
+        """
         limit = 'Sun 8:00-16:00'
         day = datetime.date.today()
         now = datetime.time()
@@ -213,76 +211,76 @@ class ParseRuntimeLimitTest(InvenioTestCase):
         result = dateutils.parse_runtime_limit(limit)
         self.assertEqual(expected, result)
 
+
 class STRFTimeTest(InvenioTestCase):
-    """
-    Testing support of datest before 1900 for function strftime
-    """
+    """Testing support of datest before 1900 for function strftime"""
     def test_strftime_date_over_1900(self):
         test_date = "12.03.1908"
         expected = "Thu, 12 Mar 1908 00:00:00 +0000"
-        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", strptime(test_date,"%d.%m.%Y"))
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000",
+                                    strptime(test_date, "%d.%m.%Y"))
         self.assertEqual(expected, result)
 
     def test_strftime_date_under_1900(self):
         test_date = "3.1.1765"
         expected = "Thu, 03 Jan 1765 00:00:00 +0000"
-        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", strptime(test_date,"%d.%m.%Y"))
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000",
+                                    strptime(test_date, "%d.%m.%Y"))
         self.assertEqual(expected, result)
 
     def test_strftime_date_over_1900_object(self):
-        test_date = "12.03.1908"
+        test_date = datetime.date(1908, 3, 12)
         expected = "Thu, 12 Mar 1908 00:00:00 +0000"
-        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", datetime.date(1908,3,12))
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", test_date)
         self.assertEqual(expected, result)
 
     def test_strftime_date_under_1900_object(self):
-        test_date = "3.1.1765"
+        test_date = datetime.date(1765, 1, 3)
         expected = "Thu, 03 Jan 1765 00:00:00 +0000"
-        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", datetime.date(1765,1,3))
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", test_date)
         self.assertEqual(expected, result)
 
+
 class DateTest(InvenioTestCase):
-    """
-    Testing creation of date object
-    """
+    """Testing creation of date object"""
     def test_date_creation(self):
         expected = datetime.date.today()
         result = dateutils.date.today()
         self.assertEqual(expected, result)
 
     def test_date_strftime(self):
-        expected = datetime.date.today().strftime("%a, %d %b %Y %H:%M:%S +0000")
+        expected = datetime.date.today().strftime("%a, %d %b %Y %H:%M:%S "
+                                                  "+0000")
         date_object = dateutils.date.today()
         result = date_object.strftime("%a, %d %b %Y %H:%M:%S +0000")
         self.assertEqual(expected, result)
 
+
 class DateTimeTest(InvenioTestCase):
-    """
-    Testing creation of date object
-    """
+    """Testing creation of date object"""
     def test_datetime_creation_after_1900(self):
-        expected = datetime.datetime(1908,3,12,12,12,12)
-        result = dateutils.datetime(1908,3,12,12,12,12)
+        expected = datetime.datetime(1908, 3, 12, 12, 12, 12)
+        result = dateutils.datetime(1908, 3, 12, 12, 12, 12)
         self.assertEqual(expected, result)
 
     def test_datetime_creation_before_1900(self):
-        expected = datetime.datetime(1765,1,3,10,2,13)
-        result = dateutils.datetime(1765,1,3,10,2,13)
+        expected = datetime.datetime(1765, 1, 3, 10, 2, 13)
+        result = dateutils.datetime(1765, 1, 3, 10, 2, 13)
         self.assertEqual(expected, result)
 
     def test_datetime_strftime_before_1900(self):
-        new_datetime = dateutils.datetime(1765,1,3,10,2,13)
+        new_datetime = dateutils.datetime(1765, 1, 3, 10, 2, 13)
         expected = "Thu, 03 Jan 1765 10:02:13 +0000"
         result = new_datetime.strftime("%a, %d %b %Y %H:%M:%S +0000")
         self.assertEqual(expected, result)
+
 
 TEST_SUITE = make_test_suite(ConvertFromDateCVSTest,
                              ConvertIntoDateGUITest,
                              ParseRuntimeLimitTest,
                              STRFTimeTest,
                              DateTest,
-                             DateTimeTest
-                             )
+                             DateTimeTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
