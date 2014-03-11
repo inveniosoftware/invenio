@@ -24,12 +24,10 @@ BibEdit database models.
 
 # General imports.
 from invenio.ext.sqlalchemy import db
-from flask import current_app
-from werkzeug import cached_property
-
-from invenio.modules.records.models import Record as Bibrec
 
 # Create your models here.
+
+from invenio.modules.records.models import Record as Bibrec
 
 
 class BibHOLDINGPEN(db.Model):
@@ -55,7 +53,7 @@ class Bibdoc(db.Model):
                 nullable=False, autoincrement=True)
     status = db.Column(db.Text, nullable=False)
     docname = db.Column(db.String(250), nullable=True,  # collation='utf8_bin'
-                server_default='file', index=True)
+                        index=True)
     creation_date = db.Column(db.DateTime, nullable=False,
                 server_default='1900-01-01 00:00:00', index=True)
     modification_date = db.Column(db.DateTime, nullable=False,

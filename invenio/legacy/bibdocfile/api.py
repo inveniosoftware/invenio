@@ -1861,6 +1861,7 @@ class BibDoc(object):
     def get_docname(self):
         """Obsolete !! (will return empty String for new format documents"""
         return self.storagename
+
     def get_doctype(self, recid):
         """Retrieves the type of this document in the scope of a given recid"""
         link_types = [attachement["doctype"] for attachement in \
@@ -2096,15 +2097,16 @@ class BibDoc(object):
         @note: an expunged BibDoc object shouldn't be used anymore or the
         result might be unpredicted.
         """
-        del self.__md5s
         self.more_info.delete()
         del self.more_info
         os.system('rm -rf %s' % escape_shell_arg(self.basedir))
         run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
         run_sql('DELETE FROM bibdoc_bibdoc WHERE id_bibdoc1=%s OR id_bibdoc2=%s', (self.id, self.id))
         run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
-        run_sql('INSERT INTO hstDOCUMENT(action, id_bibdoc, doctimestamp) VALUES("EXPUNGE", %s, NOW())', (self.id, ))
+        run_sql('INSERT INTO hstDOCUMENT(action, docname, docformat, docversion, docsize, docchecksum, id_bibdoc, doctimestamp) VALUES("EXPUNGE", %s, %s, %s, %s, %s, %s, NOW())',
+                ('', self.doctype, self.get_latest_version(), self.get_total_size_latest_version(), '', self.id, ))
         run_sql('DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s', (self.id, ))
+        del self.__md5s
         del self.docfiles
         del self.id
         del self.cd
