@@ -131,6 +131,47 @@ class ConvertIntoDateStructTest(InvenioTestCase):
         self.assertEqual(expected, result)
 
 
+class ConvertDateStructIntoGUI(InvenioTestCase):
+    """Testing convertion from date struct to date GUI"""
+    if lang_english_configured:
+        def test_convert_datestruct_to_dategui_en(self):
+            expected = '16 Nov 2005, 15:11'
+            struct = struct_time((2005, 11, 16, 15, 11, 44, 2, 320, 0))
+            result = dateutils.convert_datestruct_to_dategui(struct, "en")
+            self.assertEqual(expected, result)
+
+        def test_convert_incomplete_datestruct_to_dategui_en(self):
+            expected = 'N/A'
+            struct = struct_time((0, 0, 0, 15, 11, 44, 2, 320, 0))
+            result = dateutils.convert_datestruct_to_dategui(struct, "en")
+            self.assertEqual(expected, result)
+
+        def test_convert_buggy_datestruct_to_dategui_en(self):
+            expected = 'N/A'
+            struct = struct_time((-1, 11, 16, 15, 11, 44, 2, 320, 0))
+            result = dateutils.convert_datestruct_to_dategui(struct, "en")
+            self.assertEqual(expected, result)
+
+    if lang_slovak_configured:
+        def test_convert_datestruct_to_dategui_sk(self):
+            expected = '16 júl 2005, 15:11'
+            struct = struct_time((2005, 7, 16, 15, 11, 44, 2, 320, 0))
+            result = dateutils.convert_datestruct_to_dategui(struct, "sk")
+            self.assertEqual(expected, result)
+
+        def test_convert_incomplete_datestruct_to_dategui_sk(self):
+                expected = 'nepríst.'
+                struct = struct_time((0, 11, 16, 15, 11, 44, 2, 320, 0))
+                result = dateutils.convert_datestruct_to_dategui(struct, "sk")
+                self.assertEqual(expected, result)
+
+        def test_convert_buggy_datestruct_to_dategui_sk(self):
+                expected = 'nepríst.'
+                struct = struct_time((-1, 11, 16, 15, 11, 44, 2, 320, 0))
+                result = dateutils.convert_datestruct_to_dategui(struct, "sk")
+                self.assertEqual(expected, result)
+
+
 class ParseRuntimeLimitTest(InvenioTestCase):
     """Testing the runtime limit parser used by BibSched to determine task
     runtimes and also by the errorlib.register_emergency function to parse the
@@ -295,7 +336,8 @@ class DateTimeTest(InvenioTestCase):
         self.assertEqual(expected, dt.date())
 
 
-TEST_SUITE = make_test_suite(ConvertFromDateCVSTest,
+TEST_SUITE = make_test_suite(ConvertDateStructIntoGUI,
+                             ConvertFromDateCVSTest,
                              ConvertIntoDateGUITest,
                              ConvertIntoDateStructTest,
                              ParseRuntimeLimitTest,
