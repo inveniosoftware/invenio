@@ -28,15 +28,6 @@ def add_data(a):
         obj.data += a
     return _add_data
 
-
-def add_datetime(a):
-    """ Task using closure to allow parameters """
-    def _add_datetime(obj, eng):
-        """Function task_a docstring"""
-        obj.data += datetime.timedelta(days=2)
-    return _add_datetime
-
-
 def check_data(obj, eng):
     """ Static task with no parameters """
     if obj.data < 5:

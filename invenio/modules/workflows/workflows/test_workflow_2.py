@@ -19,7 +19,7 @@
 """ Implements a workflow for testing """
 
 from invenio.modules.workflows.tasks.test_tasks import (lower_than_20,
-                                                        add,
+                                                        task_a_bis,
                                                         higher_than_20,
                                                         sleep_task,
                                                         simple_task)
@@ -30,7 +30,7 @@ class test_workflow_2(object):
     A second test workflow for unit-tests.
     """
     workflow = [higher_than_20,
-                add(20),
+                task_a_bis(20),
                 lower_than_20,
                 sleep_task(4),
                 simple_task(2)]
