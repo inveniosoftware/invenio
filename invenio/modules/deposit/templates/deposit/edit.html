@@ -18,9 +18,6 @@
 #}
 {% extends "deposit/run.html" %}
 
-{% macro form_action_bar_edit(margin="") -%}
-    {% include "deposit/edit_action_bar.html" %}
-{%- endmacro %}
-
-{% block form_header scoped %}{{ form_action_bar_edit() }}{% endblock form_header%}
-{% block form_footer scoped %}{{ form_action_bar_edit() }}{% endblock form_footer %}
+{% block form_action_bar %}
+{% include "deposit/edit_action_bar.html" %}
+{% endblock %}
