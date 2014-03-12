@@ -966,7 +966,7 @@ class Template:
                 }
 
             if CFG_CERN_SITE:
-                out += "<p>" + _("If you don't own a CERN account yet, you can register a %(x_url_open)snew CERN lightweight account%(x_url_close)s.") % {'x_url_open' : '<a href="https://www.cern.ch/lightweightregistration/RegisterAccount.aspx">', 'x_url_close' : '</a>'} + "</p>"
+                out += "<p>" + _("If you don't own a CERN account yet, you can register a %(x_url_open)snew CERN lightweight account%(x_url_close)s.", **{'x_url_open' : '<a href="https://www.cern.ch/lightweightregistration/RegisterAccount.aspx">', 'x_url_close' : '</a>'}) + "</p>"
             else:
                 if register_available:
                     out += "<p>"+_("If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)s an internal account.") %\
@@ -1212,16 +1212,17 @@ class Template:
         out = ""
         # guest condition
         if guest:
-            return _("You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s first.") % \
-                        {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
-                         'x_url_close': '<a/>'}
+            return _("You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s first.",
+                     x_url_open='<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
+                     x_url_close='<a/>')
 
         # no rights condition
         if not roles:
             return "<p>" + _("You are not authorized to access administrative functions.") + "</p>"
 
         # displaying form
-        out += "<p>" + _("You are enabled to the following roles: %(x_role)s.") % {'x_role': ('<em>' + ", ".join(roles) + "</em>")} + '</p>'
+        out += "<p>" + _("You are enabled to the following roles: %(x_role)s.",
+                         x_role=('<em>' + ", ".join(roles) + "</em>")) + '</p>'
 
         if activities:
             # print proposed links:
@@ -1271,9 +1272,9 @@ class Template:
             if tmp_out:
                 out += _("Here are some interesting web admin links for you:") + tmp_out
 
-                out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.") %\
-                {'x_url_open': '<a href="' + CFG_SITE_URL + '/help/admin?ln=' + ln + '">',
-                    'x_url_close': '</a>'}
+                out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.",
+                                    x_url_open='<a href="' + CFG_SITE_URL + '/help/admin?ln=' + ln + '">',
+                                    x_url_close='</a>')
         return out
 
     def tmpl_create_userinfobox(self, ln, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats):
@@ -2512,8 +2513,9 @@ Best regards.
         url %= (grpID, ln)
         # FIXME: which user?  We should show his nickname.
         body = (_("A user wants to join the group %(x_name)s.", x_name=group_name)) + '<br />'
-        body += _("Please %(x_url_open)saccept or reject%(x_url_close)s this user's request.") % {'x_url_open': '<a href="' + url + '">',
-                                                                                                  'x_url_close': '</a>'}
+        body += _("Please %(x_url_open)saccept or reject%(x_url_close)s this user's request.",
+                  x_url_open='<a href="' + url + '">',
+                  x_url_close='</a>')
         body += '<br />'
         return subject, body
 
@@ -2536,8 +2538,9 @@ Best regards.
             body = _("Your request for joining group %(x_name)s has been rejected.", x_name=group_name)
         url = CFG_SITE_URL + "/yourgroups/display?ln=" + ln
         body += '<br />'
-        body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">',
-                                                                                              'x_url_close': '</a>'}
+        body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.",
+                  x_url_open='<a href="' + url + '">',
+                  x_url_close='</a>')
         body += '<br />'
         return subject, body
 
@@ -2554,8 +2557,8 @@ Best regards.
         url = CFG_SITE_URL + "/yourgroups/display?ln=" + ln
         body = _("Group %(x_name)s has been deleted by its administrator.", x_name=group_name)
         body += '<br />'
-        body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">',
-                                                                                              'x_url_close': '</a>'}
+        body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.", **{'x_url_open': '<a href="' + url + '">',
+                                                                                              'x_url_close': '</a>'})
         body += '<br />'
         return subject, body
 
