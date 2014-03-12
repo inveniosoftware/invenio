@@ -148,7 +148,7 @@ class Workflow(db.Model):
         """ Returns the most recently modified workflow. """
 
         most_recent = cls.get(*criteria, **filters).\
-                              order_by(desc(Workflow.modified)).first()
+            order_by(desc(Workflow.modified)).first()
         if most_recent is None:
             raise NoResultFound
         else:
@@ -496,6 +496,22 @@ class BibWorkflowObject(db.Model):
             return data
         # Not any of the above types. How juicy!
         return data
+
+    @classmethod
+    def get(cls, *criteria, **filters):
+        """ A wrapper for the filter and filter_by functions of sqlalchemy.
+        Define a dict with which columns should be filtered by which values.
+
+        e.g. Workflow.get(uuid=uuid)
+             Workflow.get(Workflow.uuid != uuid)
+
+        The function supports also "hybrid" arguments.
+        e.g. Workflow.get(Workflow.module_name != 'i_hate_this_module',
+                          user_id=user_id)
+
+        look up also sqalchemy BaseQuery's filter and filter_by documentation
+        """
+        return cls.query.filter(*criteria).filter_by(**filters)
 
     @classmethod
     def delete(cls, oid):

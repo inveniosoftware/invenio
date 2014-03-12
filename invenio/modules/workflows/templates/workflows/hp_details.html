@@ -28,15 +28,15 @@
             $('button.preview').click(function() {
                 bwoid = $(this).attr('data-id');
                 format = $(this).attr('name');
-                data_preview(url.url_preview, bwoid, format);
+                data_preview.show(url.url_preview, bwoid, format);
                 $('button.preview').each(function() {
                     $(this).removeClass('active');
                 });
                 $(this).addClass('active');
             });
 
-            data_preview(url.url_preview, bwoid, format);
-            action_buttons(url, bwoid);
+            data_preview.show(url.url_preview, bwoid, format);
+            details.init_action_buttons(url, bwoid);
         });
     </script>
 {% endblock javascript %}
