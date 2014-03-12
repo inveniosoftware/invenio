@@ -16,28 +16,32 @@
  * along with Invenio; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
-
-function data_preview(url_preview, bwoid, format) {
-    jQuery.ajax({
-        url: url_preview,
-        data: {'oid': bwoid,
-               'of': format},
-        success: function(json){
-            if(format == "xm" || format == "marcxml"){
-                if( json.data === ""){
-                    json.data = "Preview not available";
+var data_preview = (function( $ ){
+    return {
+        show: function (url_preview, bwoid, format) {
+            $.ajax({
+                url: url_preview,
+                data: {'objectid': bwoid,
+                       'of': format},
+                success: function(json){
+                    if(format == "xm" || format == "marcxml"){
+                        if( json.data === ""){
+                            json.data = "Preview not available";
+                        }
+                        $('div[id="object_preview_container'+bwoid+'"]').empty();
+                        $('div[id="object_preview_container'+bwoid+'"]').append("<pre><code id='object_preview' class='language-markup'></code></pre>");
+                        $('code[id="object_preview"]').append(json.data);
+                        Prism.highlightElement($('code[id="object_preview"]')[0]);
+                    }else{
+                        if( json.data === ""){
+                            json.data = "Preview not available";
+                        }
+                        $('div[id="object_preview_container'+bwoid+'"]').empty();
+                        $('div[id="object_preview_container'+bwoid+'"]').append(json.data);
+                    }
                 }
-                $('div[id="object_preview_container'+bwoid+'"]').empty();
-                $('div[id="object_preview_container'+bwoid+'"]').append("<pre><code id='object_preview' class='language-markup'></code></pre>");
-                $('code[id="object_preview"]').append(json.data);
-                Prism.highlightElement($('code[id="object_preview"]')[0]);
-            }else{
-                if( json.data === ""){
-                    json.data = "Preview not available";
-                }
-                $('div[id="object_preview_container'+bwoid+'"]').empty();
-                $('div[id="object_preview_container'+bwoid+'"]').append(json.data);
-            }
+            });
         }
-    });
-};
+    };
+})( window.jQuery );
+

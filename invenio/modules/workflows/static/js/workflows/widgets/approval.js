@@ -17,10 +17,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var WORKFLOWS_APPROVAL = (function ($) {
+var WORKFLOWS_APPROVAL = (function ($, holdingpen) {
     "use strict";
 
-    var recordsToApprove = [];
+    var recordsToApprove = holdingpen.recordsToApprove;
     var bwoid = null;
     var datapreview = "hd";
     var number_of_objs = $(".theform").length;
@@ -33,6 +33,7 @@ var WORKFLOWS_APPROVAL = (function ($) {
         $("#batch-btn").popover();
 
         $(".theform #submitButton").click(function (event) {
+
         event.preventDefault();
 
         var form_name = $(this)[0].form.name;
@@ -119,7 +120,7 @@ var WORKFLOWS_APPROVAL = (function ($) {
         $("button.preview").click(function () {
             bwoid = $(this).attr("data-id");
             format = $(this).attr("name");
-            data_preview(url_preview, bwoid, format);
+            data_preview.show(url_preview, bwoid, format);
             $("button.preview").each(function() {
                 $(this).removeClass("active");
             });
@@ -129,7 +130,7 @@ var WORKFLOWS_APPROVAL = (function ($) {
         $("button.preview.active").each(function () {
             bwoid = $(this).attr("data-id");
             format = $(this).attr("name");
-            data_preview(url_preview, bwoid, format);
+            data_preview.show(url_preview, bwoid, format);
         });
 
     });
@@ -170,12 +171,12 @@ var WORKFLOWS_APPROVAL = (function ($) {
                         '<a id="accept-multi" href="javascript:void(0)" class="mini-approval-btn">'+
                         'Accept</a></button>';
 
-        if(!$("#batch-btn").exists()){    
+        if($('#batch-btn').length < 1){
             var accept_link = "<a id='drop-down-accept' class='drop-down-btns btn' href='#'>Accept All</a>";
             var reject_link = "<a id='drop-down-reject' class='drop-down-btns btn' href='#'>Reject All</a>";
 
             var batch_btn = '<li class="dropdown">'+
-                  '<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>'+
+                  '<a href="#" id="batch-btn" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>'+
                   '<ul class="dropdown-menu">'+
                     '<li>'+accept_link+'</li>'+
                     '<li>'+reject_link+'</li>'+
@@ -226,5 +227,5 @@ var WORKFLOWS_APPROVAL = (function ($) {
         mini_approval: mini_approval,
         disapproveRecords: disapproveRecords,
     };
-})(window.jQuery);
+})(window.jQuery, holdingpen);
 

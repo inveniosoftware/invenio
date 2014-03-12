@@ -13,6 +13,9 @@
 {% js url_for('static', filename='js/dataTables.bootstrap.js'), '30-datatables' %}
 {% js url_for('static', filename='js/bootstrap-tagsinput.min.js'), '30-datatables' %}
 {% js url_for('workflows.static', filename='js/workflows/hp_maintable.js'), '50-workflows' %}
+{% js url_for('workflows.static', filename='js/workflows/hp_tags.js'), '50-workflows' %}
+{% js url_for('workflows.static', filename='js/workflows/hp_selection.js'), '50-workflows' %}
+{% js url_for('workflows.static', filename='js/workflows/hp_utilities.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/widgets/approval.js'), '50-workflows' %}
 
 {% block javascript %}
@@ -33,9 +36,18 @@
             url.preview = "{{ url_for('holdingpen.entry_data_preview') }}";
             version_showing = "{{version_showing}}";
 
-            init_urls(url);
+            holdingpen.init_urls(url);
+            datatable_settings = holdingpen.init_datatable(version_showing); 
+            console.log(datatable_settings);
+            console.log(datatable_settings[1]);
+            holdingpen.oTable = datatable_settings[0];
+            holdingpen.oSettings = datatable_settings[1];
+            holdingpen.datatable = datatable(window.jQuery, holdingpen);
+            holdingpen.tag = tags(window.jQuery, holdingpen);
+            holdingpen.utilities = utilities(window.jQuery, holdingpen);
+            holdingpen.utilities.initialize_versions(version_showing);
             WORKFLOWS_APPROVAL.init_urls_approval(url);
-            oTable = init_datatable(version_showing);
+            
         });
     </script>
 {% endblock javascript %}
@@ -73,6 +85,8 @@
                     <li><a id="version-running" class="version-selection" name="Running">Running</a></li>
                 </ul>
             </li>
+        </ul>
+        <ul id="navbar-right" class="nav navbar-nav navbar-right">
         </ul>
       </div>
     </nav>

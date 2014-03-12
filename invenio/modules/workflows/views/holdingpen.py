@@ -303,9 +303,9 @@ def details(objectid):
     of all available versions of the object. (Initial, Error, Final)
     """
     of = "hd"
-    bwobject = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id == objectid).first_or_404()
+    bwobject = BibWorkflowObject.query.get(objectid)
 
+    formatted_data = bwobject.get_formatted_data(of)
     extracted_data = extract_data(bwobject)
 
     try:
@@ -319,7 +319,7 @@ def details(objectid):
                            bwparent=extracted_data['bwparent'],
                            info=extracted_data['info'],
                            log=extracted_data['logtext'],
-                           data_preview=bwobject.get_formatted_data(of),
+                           data_preview=formatted_data,
                            workflow_func=extracted_data['workflow_func'],
                            workflow=extracted_data['w_metadata'],
                            edit_record_widget=edit_record_widget)
