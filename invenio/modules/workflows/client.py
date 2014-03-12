@@ -47,6 +47,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
             if current_obj:
                 if e.widget:
                     current_obj.add_widget(e.widget, e.message)
+                current_obj.version = ObjectVersion.HALTED
                 current_obj.save(version=ObjectVersion.HALTED,
                                  task_counter=wfe.getCurrTaskId(),
                                  id_workflow=wfe.uuid)
@@ -76,7 +77,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
             wfe._objects[wfe.getCurrObjId()].save(ObjectVersion.HALTED,
                                                   wfe.getCurrTaskId(),
                                                   id_workflow=wfe.uuid)
-            wfe.save(WorkflowStatus.ERROR)
+            wfe.save(status=WorkflowStatus.ERROR)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
             # if stop_on_halt or stop_on_error:
             if isinstance(e, WorkflowError):
@@ -87,10 +88,11 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False,
                                     id_object=wfe.getCurrObjId())
 
 
-def continue_execution(wfe, data, restart_point="restart_task",
-                       stop_on_halt=False, stop_on_error=False, **kwargs):
+def continue_execution(wfe, workflow_object, restart_point="restart_task",
+                       task_offset=1, stop_on_halt=False, stop_on_error=False,
+                       **kwargs):
     """
-    Continue execution of workflow for given object (wfe) from "restart_point".
+    Continue execution of workflow for one given object from "restart_point".
 
     restart_point can be one of:
 
@@ -102,18 +104,17 @@ def continue_execution(wfe, data, restart_point="restart_task",
     Use stop_on_halt to stop processing the workflow
     if HaltProcessing is raised.
     """
-    wfe.log.info("Continue execution from: %s" % (str(restart_point),))
-    pos = data[0].get_current_task()
+    pos = workflow_object.get_current_task()
+
+    wfe._objects = [workflow_object]
 
     if restart_point == "restart_prev":
-        pos[-1] -= 1
-        wfe.setPosition(wfe.db_obj.current_object, pos)
+        pos[-1] -= task_offset
     elif restart_point == "continue_next":
-        pos[-1] += 1
-        wfe.setPosition(wfe.db_obj.current_object, pos)
-    else:
-        # restart_task
-        wfe.setPosition(wfe.db_obj.current_object, pos)
-    wfe._objects = data
-    run_workflow(wfe, data, stop_on_halt, stop_on_error,
+        pos[-1] += task_offset
+    # Set (object index, position index) in the workflow. Only one object so
+    # object selection is 0. Position is the index of the task to run.
+
+    wfe.setPosition(0, pos)
+    run_workflow(wfe, wfe._objects, stop_on_halt,
                  initial_run=False, **kwargs)

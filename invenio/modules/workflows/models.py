@@ -22,7 +22,7 @@ import tempfile
 from six.moves import cPickle
 import base64
 import logging
-import six
+from six import string_types, iteritems
 
 from datetime import datetime
 from sqlalchemy import desc
@@ -56,10 +56,24 @@ def get_default_extra_data():
                           "error_msg": "",
                           "_last_task_name": "",
                           "latest_object": -1,
-                          "widget": None,
+                          "_widget": None,
                           "redis_search": {},
                           "source": ""}
     return base64.b64encode(cPickle.dumps(extra_data_default))
+
+
+def session_manager(orig_func):
+    """Decorator to wrap function with the session."""
+    def new_func(self, *a, **k):
+        """Wrappend function to manage DB session."""
+        try:
+            resp = orig_func(self, *a, **k)
+            db.session.commit()
+            return resp
+        except:
+            db.session.rollback()
+            raise
+    return new_func
 
 
 class Workflow(db.Model):
@@ -177,6 +191,8 @@ class Workflow(db.Model):
             return extra_data[key]
         elif callable(getter):
             return getter(extra_data)
+        elif not key:
+            return extra_data
 
     def set_extra_data(self, user_id=0, uuid=None,
                        key=None, value=None, setter=None):
@@ -202,9 +218,21 @@ class Workflow(db.Model):
         )
 
     @classmethod
+    @session_manager
     def delete(cls, uuid=None):
         cls.get(Workflow.uuid == uuid).delete()
-        db.session.commit()
+
+    @session_manager
+    def save(self, status):
+        """
+        Save object to persistent storage.
+
+        :param status:
+        """
+        self.modified = datetime.now()
+        if status is not None:
+            self.status = status
+        db.session.add(self)
 
 
 class BibWorkflowObject(db.Model):
@@ -224,7 +252,7 @@ class BibWorkflowObject(db.Model):
     id_workflow = db.Column(db.String(36),
                             db.ForeignKey("bwlWORKFLOW.uuid"), nullable=True)
     version = db.Column(db.Integer(3),
-                        default=ObjectVersion.RUNNING, nullable=False)
+                        default=ObjectVersion.INITIAL, nullable=False)
     id_parent = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"),
                           default=None)
     child_objects = db.relationship("BibWorkflowObject",
@@ -248,8 +276,8 @@ class BibWorkflowObject(db.Model):
     def log(self):
         if not self._log:
             db_handler_obj = BibWorkflowLogHandler(BibWorkflowObjectLog, "id")
-            self._log = get_logger(logger_name="object.%s_%s" %
-                                               (self.id_workflow, self.id),
+            self._log = get_logger(logger_name="object.%s" %
+                                               (self.id,),
                                    db_handler_obj=db_handler_obj,
                                    loglevel=logging.DEBUG,
                                    obj=self)
@@ -279,10 +307,6 @@ class BibWorkflowObject(db.Model):
         Main method to update data saved to the object.
         """
         self._extra_data = base64.b64encode(cPickle.dumps(value))
-
-    def _create_db_obj(self):
-        db.session.add(self)
-        db.session.commit()
 
     def __repr__(self):
         return "<BibWorkflowObject(id = %s, data = %s, id_workflow = %s, " \
@@ -365,49 +389,6 @@ class BibWorkflowObject(db.Model):
             # Assume old version "task_counter"
             return extra_data["task_counter"]
 
-    def _create_version_obj(self, id_workflow, version, id_parent=None,
-                            no_update=False):
-
-        obj = BibWorkflowObject(_data=self._data,
-                                id_workflow=id_workflow,
-                                version=version,
-                                id_parent=id_parent,
-                                _extra_data=self._extra_data,
-                                status=self.status,
-                                data_type=self.data_type)
-
-        db.session.add(obj)
-        db.session.commit()
-        if version is ObjectVersion.INITIAL and not no_update:
-            self.id_parent = obj.id
-            db.session.commit()
-        return obj.id
-
-    def _update_db(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def save(self, version=None, task_counter=[0], id_workflow=None):
-        """
-        Saved object
-        """
-        if not self.id:
-            db.session.add(self)
-            db.session.commit()
-
-        extra_data = self.get_extra_data()
-        extra_data["_task_counter"] = task_counter
-        self.set_extra_data(extra_data)
-
-        if not id_workflow:
-            id_workflow = self.id_workflow
-
-        if version:
-            self.version = version
-            if version in (ObjectVersion.FINAL, ObjectVersion.HALTED):
-                redis_create_search_entry(self)
-            self._update_db()
-
     def save_to_file(self, directory=None,
                      prefix="workflow_object_data_", suffix=".obj"):
         """
@@ -466,7 +447,7 @@ class BibWorkflowObject(db.Model):
                 # Maybe not, submission?
                 return data
 
-        if isinstance(data, six.string_types):
+        if isinstance(data, string_types):
             # Its a string type, lets try to convert
             if format:
                 # We can try formatter!
@@ -496,6 +477,28 @@ class BibWorkflowObject(db.Model):
         # Not any of the above types. How juicy!
         return data
 
+    @session_manager
+    def save(self, version=None, task_counter=None, id_workflow=None):
+        """
+        Saved object
+        """
+        if task_counter is not None:
+            self.log.debug("Saving task counter: %s" % (task_counter,))
+            extra_data = self.get_extra_data()
+            extra_data["_task_counter"] = task_counter
+            self.set_extra_data(extra_data)
+
+        if version is not None:
+            self.version = version
+            if version in (ObjectVersion.FINAL, ObjectVersion.HALTED):
+                redis_create_search_entry(self)
+
+        if id_workflow is not None:
+            self.id_workflow = id_workflow
+        db.session.add(self)
+        if self.id is not None:
+            self.log.debug("Saving object: %s" % (self.id or "new",))
+
     @classmethod
     def get(cls, *criteria, **filters):
         """ A wrapper for the filter and filter_by functions of sqlalchemy.
@@ -513,9 +516,33 @@ class BibWorkflowObject(db.Model):
         return cls.query.filter(*criteria).filter_by(**filters)
 
     @classmethod
+    @session_manager
     def delete(cls, oid):
         cls.get(BibWorkflowObject.id == oid).delete()
-        db.session.commit()
+
+    @classmethod
+    @session_manager
+    def create_object(cls, **kwargs):
+        """Create a new Workflow Object with given content."""
+        obj = BibWorkflowObject(**kwargs)
+        db.session.add(obj)
+        return obj
+
+    @classmethod
+    @session_manager
+    def create_object_revision(cls, old_obj, version, **kwargs):
+        """Add a new revision to a Workflow Object."""
+        # Create new object and copy it
+        obj = BibWorkflowObject(**kwargs)
+        obj.copy(old_obj)
+
+        # Overwrite some changes
+        obj.id_parent = old_obj.id
+        obj.version = version
+        for key, value in iteritems(kwargs):
+            setattr(obj, key, value)
+        db.session.add(obj)
+        return obj
 
 
 class BibWorkflowObjectLog(db.Model):
