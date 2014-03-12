@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013 CERN.
+ * Copyright (C) 2013, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,18 +17,20 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var holdingpen = (function ( $ ){
+var WORKFLOWS_HOLDINGPEN = (function ( $ ){
     var oTable;
     var oSettings;
     var selectedRow;
     var rowList = [];
     var rowIndexList = [];
     var recordsToApprove = [];
-    var defaultcss='#example tbody tr.even:hover, #example tbody tr.odd:hover {background-color: #FFFFCC;}';     
+    var defaultcss="#example tbody tr.even:hover, #example tbody tr.odd:hover {background-color: #FFFFCC;}";
+    var context = {};
+    var datatable = {};
+    var tag = {};
+    var utilities = {};
 
-    url = new Object();
-
-    return { 
+    return {
         oTable: oTable,
         oSettings: oSettings,
         selectedRow: selectedRow,
@@ -36,25 +38,30 @@ var holdingpen = (function ( $ ){
         rowIndexList: rowIndexList,
         recordsToApprove: recordsToApprove,
         defaultcss: defaultcss,
+        context: context,
+        datatable: datatable,
+        tag: tag,
+        utilities: utilities,
 
-        init_urls: function (url_) {
-            url.load_table = url_.load_table;
-            url.batch_widget = url_.batch_widget;
-            url.resolve_widget = url_.resolve_widget;
-            url.delete_single = url_.delete_single;
-            url.refresh = url_.refresh;
-            url.widget = url_.widget;
-            url.details = url_.details;
+        init: function(data) {
+            this.context = data;
+            this.datatable = window.WORKFLOWS_HP_SELECTION;
+            this.tag = window.WORKFLOWS_HP_TAGS;
+            this.tag.init();
+            this.utilities = window.WORKFLOWS_HP_UTILITIES;
+            this.utilities.init();
+            this.init_datatable(this.datatable);
+            this.datatable.init(this.oTable, this.oSettings);
         },
 
-        init_datatable: function (version_showing){
+        init_datatable: function (datatable){
             oSettings = {
-                "sDom": 'lf<"clear">rtip',
+                "sDom": "lf<'clear'>rtip",
                 "bJQueryUI": true,
                 "bProcessing": true,
                 "bServerSide": true,
                 "bDestroy": true,
-                "sAjaxSource": url.load_table,
+                "sAjaxSource": this.context.holdingpen.url_load,
                 "oColVis": {
                     "buttonText": "Select Columns",
                     "bRestore": true,
@@ -65,14 +72,13 @@ var holdingpen = (function ( $ ){
                                 {'bSearchable': false, 'bVisible': false, 'aTargets': [0]},
                                 {'sWidth': "25%", 'aTargets': [2]},
                                 {'sWidth': "15%", 'aTargets': [4]}],
-                "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+                "fnRowCallback": function ( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
                     var id = aData[0];
-                    holdingpen.datatable.rememberSelected(nRow, id);
-                    oSettings = oTable.fnSettings();
+                    datatable.rememberSelected(nRow, id);
                     nRow.row_id = id;
                     nRow.checkbox = nRow.cells[0].firstChild;
                     nRow.addEventListener("click", function(e) {
-                        holdingpen.datatable.selectRow(nRow, e, oSettings);
+                        datatable.selectRow(nRow, e, oTable.fnSettings());
                     });
                 },
                 "fnDrawCallback": function(){
@@ -93,8 +99,9 @@ var holdingpen = (function ( $ ){
                 $('#select-all')[0].checked = false;
             });
             $('.dropdown-toggle').dropdown();
-            return [oTable, oTable.fnSettings()];
+            this.oSettings = oTable.fnSettings();
+            this.oTable = oTable;
         }
-    }
+    };
 })( window.jQuery );
 

@@ -1,76 +1,109 @@
-// -*- coding: utf-8 -*-
-// This file is part of Invenio.
-// Copyright (C) 2013 CERN.
-//
-// Invenio is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as
-// published by the Free Software Foundation; either version 2 of the
-// License, or (at your option) any later version.
-//
-// Invenio is distributed in the hope that it will be useful, but
-// WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Invenio; if not, write to the Free Software Foundation, Inc.,
-// 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+/*
+ * This file is part of Invenio.
+ * Copyright (C) 2013, 2014 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
 
-
-var details = (function( $ ){
-    url = new Object();
+var WORKFLOWS_HP_DETAILS = (function( $ ){
+    var context = {};
+    var format = "hd";
     var bwoid;
 
-    if ( window.addEventListener ) {
-        $("div.btn-group[name='data_version']").bind('click', function(event){
-            version = event.target.name;
+    function data_preview(url_preview, bwoid, format) {
+        $.ajax({
+            url: url_preview,
+            data: {'objectid': bwoid,
+                   'of': format},
+            success: function(json){
+                if(format === "xm" || format === "marcxml"){
+                    if( json.data === ""){
+                        json.data = "Preview not available";
+                    }
+                    $('div[id="object_preview_container'+bwoid+'"]').empty();
+                    $('div[id="object_preview_container'+bwoid+'"]').append("<pre><code id='object_preview' class='language-markup'></code></pre>");
+                    $('code[id="object_preview"]').append(json.data);
+                    Prism.highlightElement($('code[id="object_preview"]')[0]);
+                } else {
+                    if( json.data === ""){
+                        json.data = "Preview not available";
+                    }
+                    $('div[id="object_preview_container'+bwoid+'"]').empty();
+                    $('div[id="object_preview_container'+bwoid+'"]').append(json.data);
+                }
+            }
         });
     }
 
-    function bootstrap_alert (message) {
-        $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>');
-    }
-
     return{
-        init_url_details: function (url_, bwoid_){
-            url = url_;
-            bwoid = bwoid_;
-        },
+        bwoid: bwoid,
+        data_preview: data_preview,
+        init: function (context, bwoid) {
+            if ( window.addEventListener ) {
+                $("div.btn-group[name='data_version']").bind('click', function(event){
+                    version = event.target.name;
+                });
+            }
 
-        init_action_buttons: function (url, bwoid) {
+            this.bwoid = bwoid;
+            this.data_preview(context.holdingpen.url_preview,
+                              bwoid,
+                              format);
+
+            $('button.preview').click(function() {
+                var format = $(this).attr('name');
+                data_preview(context.holdingpen.url_preview, bwoid, format);
+                $('button.preview').each(function() {
+                    $(this).removeClass('active');
+                });
+                $(this).addClass('active');
+            });
+
             $('#restart_button').on('click', function() {
-                jQuery.ajax({
-                    url: url.url_restart_record,
-                    data: {'objectid': bwoid},
+                $.ajax({
+                    url: context.holdingpen.url_restart_record,
+                    data: {'objectid': this.bwoid},
                     success: function(json){
-                        bootstrap_alert('Object restarted');
+                        WORKFLOWS_UTILITIES.bootstrap_alert('Object restarted', 'info');
                     }
                 });
             });
 
             $('#restart_button_prev').on('click', function() {
-                jQuery.ajax({
-                    url: url.url_restart_record_prev,
-                    data: {'objectid': bwoid},
+                $.ajax({
+                    url: context.holdingpen.url_restart_record_prev,
+                    data: {'objectid': this.bwoid},
                     success: function(json){
-                        bootstrap_alert('Object restarted from previous task');
+                        WORKFLOWS_UTILITIES.bootstrap_alert('Object restarted from previous task', 'info');
                     }
                 });
             });
 
             $('#continue_button').on('click', function() {
-                jQuery.ajax({
-                    url: url.url_continue,
-                    data: {'objectid': bwoid},
+                $.ajax({
+                    url: context.holdingpen.url_continue,
+                    data: {'objectid': this.bwoid},
                     success: function(json){
-                        bootstrap_alert('Object continued from next task');
+                        WORKFLOWS_UTILITIES.bootstrap_alert('Object continued from next task', 'info');
                     }
                 });
             });
 
             $('#edit_form').on('submit', function(event){
                 event.preventDefault();
-                var form_data = new Object;
+                var form_data = {};
                 $("#edit_form input").each(function() {
                     if($(this)[0].name != 'submitButton'){
                         if($(this)[0].name == 'core'){
@@ -82,17 +115,16 @@ var details = (function( $ ){
                     }
                 });
 
-                console.log(form_data);
-                jQuery.ajax({
+                $.ajax({
                     type: 'POST',
-                    url: url.url_resolve_edit,
-                    data: {'objectid': bwoid,
+                    url: context.holdingpen.url_resolve_edit,
+                    data: {'objectid': this.bwoid,
                            'data': form_data},
                     success: function(json){
-                        bootstrap_alert('Record successfully edited');
+                        WORKFLOWS_UTILITIES.bootstrap_alert('Record successfully edited', 'info');
                     }
                 });
             });
         }
-    }
+    };
 })( window.jQuery );

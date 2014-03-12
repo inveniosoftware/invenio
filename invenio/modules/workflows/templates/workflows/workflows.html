@@ -1,6 +1,7 @@
 {% extends "workflows/layout.html" %}
 
-{% js url_for('workflows.static', filename='js/workflows/workflows.js') %}
+{% js url_for('workflows.static', filename='js/workflows/workflows.js'), '50-workflows' %}
+{% js url_for('workflows.static', filename='js/workflows/utilities.js'), '50-workflows' %}
 
 {% block javascript %}
     {{ super() }}

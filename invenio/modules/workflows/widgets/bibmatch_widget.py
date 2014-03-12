@@ -50,5 +50,6 @@ class bibmatch_widget(Form):
 
 
 bibmatch_widget.__title__ = 'Bibmatch Widget'
+bibmatch_widget.static = []
 
 widget = bibmatch_widget()

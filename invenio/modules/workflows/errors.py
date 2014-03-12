@@ -50,28 +50,6 @@ class WorkflowHalt(HaltProcessing):
                (repr(self.message), repr(self.widget), repr(self.payload))
 
 
-# class WorkflowError(Exception):
-#     """Raised when workflow experiences an error."""
-#
-#     def __init__(self, message, id_workflow=None, id_object=None, **kwargs):
-#         self.message = message
-#         self.id_workflow = id_workflow
-#         self.id_object = id_object
-#         self.payload = kwargs
-#         super(WorkflowError, self).__init__(message, id_workflow, id_object, kwargs)
-#
-#     def to_dict(self):
-#         rv = dict(self.payload or ())
-#         rv['message'] = self.message
-#         rv['id_workflow'] = self.id_workflow
-#         rv['id_object'] = self.id_object
-#         return rv
-#
-#     def __str__(self):
-#         """String representation."""
-#         return "WorkflowError(%s, id_workflow: %s, id_object: %s, payload: %r)" % \
-#                (self.message, str(self.id_workflow), str(self.id_object), repr(self.payload))
-
 class WorkflowError(Exception):
     """Raised when workflow experiences an error."""
 

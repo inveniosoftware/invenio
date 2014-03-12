@@ -21,7 +21,8 @@ import re
 
 from flask import (render_template, Blueprint,
                    request, current_app,
-                   jsonify, session)
+                   jsonify, session, url_for,
+                   flash)
 from flask.ext.login import login_required
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.menu import register_menu
@@ -57,8 +58,7 @@ def index():
     Displays main interface of Holdingpen.
     Acts as a hub for catalogers (may be removed)
     """
-    from ..containers import create_hp_containers
-    bwolist = create_hp_containers()
+    bwolist = get_holdingpen_objects()
 
     widget_list = get_widget_list(bwolist)
 
@@ -73,36 +73,16 @@ def maintable():
     """
     Displays main table interface of Holdingpen.
     """
-    from ..containers import create_hp_containers
-    bwolist = create_hp_containers()
-
+    bwolist = get_holdingpen_objects()
     widget_list = get_widget_list(bwolist)
+    widget_static = []
+    for name, widget in widgets.iteritems():
+        if getattr(widget, "static", None):
+            widget_static.extend(widget.static)
 
-    try:
-        version_showing = current_app.config['VERSION_SHOWING']
-    except KeyError:
-        version_showing = ObjectVersion.HALTED
-
-    return dict(bwolist=bwolist, widget_list=widget_list,
-                version_showing=version_showing)
-
-
-@blueprint.route('/refresh', methods=['GET', 'POST'])
-@login_required
-def refresh():
-    """
-    Reloads the bibworkflow_containers file,
-    thus rebuilding the BWObject list.
-    """
-    # FIXME: Temp hack until redis is hooked up
-    try:
-        version_showing = session['VERSION_SHOWING']
-        load_table(version_showing)
-    except:
-        pass
-        # import invenio.modules.workflows.containers
-        # reload(invenio.modules.workflows.containers)
-    return 'Records Refreshed'
+    return dict(bwolist=bwolist,
+                widget_list=widget_list,
+                widget_static=widget_static)
 
 
 @blueprint.route('/batch_widget', methods=['GET', 'POST'])
@@ -163,7 +143,6 @@ def load_table(version_showing):
     3] then if the user searched for something
     and finally it builds the JSON to send.
     """
-    from ..containers import create_hp_containers
     VERSION_SHOWING = []
     req = request.get_json()
 
@@ -197,7 +176,7 @@ def load_table(version_showing):
         i_display_length = current_app.config.get('iDisplayLength', 10)
         sEcho = current_app.config.get('sEcho', 0) + 1
 
-    bwolist = create_hp_containers(sSearch=a_search,
+    bwolist = get_holdingpen_objects(sSearch=a_search,
                                    version_showing=VERSION_SHOWING)
 
     if 'iSortCol_0' in current_app.config:
@@ -220,7 +199,7 @@ def load_table(version_showing):
         table_data['iTotalRecords'] = len(bwolist)
         table_data['iTotalDisplayRecords'] = len(bwolist)
     except:
-        bwolist = create_hp_containers(version_showing=VERSION_SHOWING)
+        bwolist = get_holdingpen_objects(version_showing=VERSION_SHOWING)
         table_data['iTotalRecords'] = len(bwolist)
         table_data['iTotalDisplayRecords'] = len(bwolist)
 
@@ -228,13 +207,8 @@ def load_table(version_showing):
     records_showing = 0
 
     for bwo in bwolist[i_display_start:i_display_start+i_display_length]:
-        try:
-            # FIXME: Will be used in near future
-            # widgetname = widgets[bwo.get_extra_data()['widget']].__title__
-            widget = widgets[bwo.get_extra_data()['widget']]
-        except KeyError:
-            # widgetname = None
-            widget = None
+        widget_name = bwo.get_widget()
+        widget = widgets.get(widget_name, None)
 
         # if widget != None and bwo.version in VERSION_SHOWING:
         records_showing += 1
@@ -294,7 +268,7 @@ def get_version_showing():
         return None
 
 
-@blueprint.route('/details/<objectid>', methods=['GET', 'POST'])
+@blueprint.route('/details/<int:objectid>', methods=['GET', 'POST'])
 @register_breadcrumb(blueprint, '.details', _("Record Details"))
 @login_required
 def details(objectid):
@@ -363,14 +337,14 @@ def restart_record_prev(objectid):
     return 'Record restarted current task'
 
 
-@blueprint.route('/delete_from_db', methods=['GET', 'POST'])
+@blueprint.route('/delete', methods=['GET', 'POST'])
 @login_required
 @wash_arguments({'objectid': (int, 0)})
 def delete_from_db(objectid):
     """
     Deletes all available versions of the object from the db
     """
-    BibWorkflowObject.delete(bwobject_id)
+    BibWorkflowObject.delete(objectid)
     return 'Record Deleted'
 
 
@@ -420,7 +394,7 @@ def resolve_widget(objectid, widget):
     Calls the run_widget function of the specific widget.
     """
     widget_form = widgets[widget]
-    widget_form().run_widget(objectid, request)
+    # widget_form().run_widget(objectid)
     return "Done"
 
 
@@ -450,6 +424,10 @@ def entry_data_preview(objectid, of):
 
     bwobject = BibWorkflowObject.query.get(int(objectid))
 
+    if not bwobject:
+        flash("No object found for %s" % (objectid,))
+        return jsonify(data={})
+
     formatted_data = bwobject.get_formatted_data(of)
     if isinstance(formatted_data, dict):
         formatted_data = pformat(formatted_data)
@@ -458,6 +436,32 @@ def entry_data_preview(objectid, of):
     else:
         data = formatted_data
     return jsonify(data=data)
+
+
+@blueprint.route('/get_context', methods=['GET', 'POST'])
+@login_required
+def get_context():
+    """
+    Returns a JSON structure with URL maps for Holding Pen.
+    """
+    context = {}
+    context['url_prefix'] = blueprint.url_prefix
+    context['holdingpen'] = {
+        "url_load": url_for('holdingpen.load_table'),
+        "url_preview": url_for('holdingpen.entry_data_preview'),
+        "url_restart_record": url_for('holdingpen.restart_record'),
+        "url_restart_record_prev": url_for('holdingpen.restart_record_prev'),
+        "url_continue_record": url_for('holdingpen.continue_record'),
+        "url_resolve_edit": url_for('holdingpen.resolve_edit')
+    }
+    try:
+        context['version_showing'] = current_app.config['VERSION_SHOWING']
+    except KeyError:
+        context['version_showing'] = ObjectVersion.HALTED
+
+    context['widgets'] = [name for name, widget in widgets.iteritems()
+                          if getattr(widget, "static", None)]
+    return jsonify(context)
 
 
 def get_info(bwobject):
@@ -533,3 +537,47 @@ def get_widget_list(object_list):
             widget_count = widget_dict.setdefault(widget, 0)
             widget_count += 1
     return widget_dict
+
+
+def get_holdingpen_objects(iSortCol_0=None,
+                           sSortDir_0=None,
+                           sSearch=None,
+                           version_showing=(ObjectVersion.HALTED,)):
+    """
+    Looks for related BibWorkflowObject's for display in Holding Pen.
+
+    Uses DataTable naming for filtering/sorting. Work in progress.
+    """
+    if iSortCol_0:
+        iSortCol_0 = int(iSortCol_0)
+
+    bwobject_list = BibWorkflowObject.query.filter(
+        BibWorkflowObject.id_parent != 0 and
+        not version_showing or BibWorkflowObject.version.in_(version_showing)
+    ).all()
+
+    if sSearch and len(sSearch) < 2:
+        bwobject_list_tmp = []
+        for bwo in bwobject_list:
+            extra_data = bwo.get_extra_data()
+            if bwo.id_parent == sSearch:
+                bwobject_list_tmp.append(bwo)
+            elif bwo.id_user == sSearch:
+                bwobject_list_tmp.append(bwo)
+            elif bwo.id_workflow == sSearch:
+                bwobject_list_tmp.append(bwo)
+            elif extra_data['_last_task_name'] == sSearch:
+                bwobject_list_tmp.append(bwo)
+            else:
+                widget_name = bwo.get_widget()
+                if widget_name:
+                    widget = widgets[widget_name]
+                    if sSearch in widget.__title__ or sSearch in widget_name:
+                        bwobject_list_tmp.append(bwo)
+        bwobject_list = bwobject_list_tmp
+
+    if iSortCol_0 == -6:
+        if sSortDir_0 == 'desc':
+            bwobject_list.reverse()
+
+    return bwobject_list

@@ -16,38 +16,30 @@
 {% js url_for('workflows.static', filename='js/workflows/hp_tags.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/hp_selection.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/hp_utilities.js'), '50-workflows' %}
-{% js url_for('workflows.static', filename='js/workflows/widgets/approval.js'), '50-workflows' %}
+
+{% for file in widget_static %}
+    {% js url_for('workflows.static', filename=file), '50-workflows' %}
+{% endfor %}
 
 {% block javascript %}
     {{ super() }}
 
     <script type="text/javascript">
         $(document).ready(function(){
-            url = new Object();
-            // console.log(url);
-            url.load_table = "{{ url_for('holdingpen.load_table')|safe }}";
-            url.batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
-            url.resolve_widget = "{{ url_for('holdingpen.resolve_widget') }}";
-            url.delete_single = "{{ url_for('holdingpen.delete_from_db') }}";
-            url.refresh = "{{ url_for('holdingpen.refresh') }}";
-            url.widget = "{{ url_for('holdingpen.show_widget') }}";
-            url.details = "{{ url_for('holdingpen.details')|safe }}";
-            url.batch_widget = "{{ url_for('holdingpen.batch_widget') }}";
-            url.preview = "{{ url_for('holdingpen.entry_data_preview') }}";
-            version_showing = "{{version_showing}}";
-
-            holdingpen.init_urls(url);
-            datatable_settings = holdingpen.init_datatable(version_showing); 
-            console.log(datatable_settings);
-            console.log(datatable_settings[1]);
-            holdingpen.oTable = datatable_settings[0];
-            holdingpen.oSettings = datatable_settings[1];
-            holdingpen.datatable = datatable(window.jQuery, holdingpen);
-            holdingpen.tag = tags(window.jQuery, holdingpen);
-            holdingpen.utilities = utilities(window.jQuery, holdingpen);
-            holdingpen.utilities.initialize_versions(version_showing);
-            WORKFLOWS_APPROVAL.init_urls_approval(url);
-            
+            var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
+            window.jQuery.ajax({
+                url: context_url,
+                success: function(data) {
+                    WORKFLOWS_HOLDINGPEN.init(data);
+                    WORKFLOWS_HOLDINGPEN.init_datatable(WORKFLOWS_HP_SELECTION);
+                    WORKFLOWS_HP_TAGS.init();
+                    WORKFLOWS_HP_UTILITIES.init();
+                    for (var i = data.widgets.length - 1; i >= 0; i--) {
+                        window[data.widgets[i]] = window[data.widgets[i]](window.jQuery, WORKFLOWS_HOLDINGPEN);
+                        window[data.widgets[i]].init(data);
+                    };
+                }
+            })            
         });
     </script>
 {% endblock javascript %}

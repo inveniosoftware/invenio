@@ -200,7 +200,7 @@ BibWorkflowEngine
                 # do nothing
                 obj.log.info("object saving process : was already existing")
                 continue
-                # Set the current workflow id in the object
+            # Set the current workflow id in the object
             if obj.version == ObjectVersion.INITIAL \
                 and obj.id_workflow is not None:
                 obj.log.info("object saving process : was already existing")
@@ -387,7 +387,7 @@ BibWorkflowEngine
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
                     raise
-                # We save the object once it is fully run through
+            # We save the object once it is fully run through
             obj.save(ObjectVersion.FINAL)
             obj.log.info("Object proccesing is finished")
             self.increase_counter_finished()
