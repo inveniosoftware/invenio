@@ -37,9 +37,9 @@
 
 {% extends "page.html" %}
 
-{% macro form_action_bar(margin="") -%}
+{% macro form_action_bar(margin="") -%}{% block form_action_bar scoped %}
     {% include "deposit/run_action_bar.html" %}
-{%- endmacro %}
+{% endblock %}{%- endmacro %}
 
 {%- macro form_group_accordion_start(group, idx) -%}
     {% include "deposit/run_group_start.html" %}
