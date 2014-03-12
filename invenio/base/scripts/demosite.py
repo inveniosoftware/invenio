@@ -126,7 +126,7 @@ def create(packages=[]):
     from invenio.base.scripts.database import load_fixtures
     load_fixtures(packages=packages, truncate_tables_first=True)
 
-    db.session.execute("UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext');")
+    db.session.execute("UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext','miscellaneous');")
     db.session.commit()
 
     conf = get_conf()
