@@ -40,25 +40,11 @@ var WORKFLOWS_APP = (function($) {
         });
 
         workflows_app.bind_alerts();
-    }
-
-    workflows_app.bind_alerts = function() {
-        bootstrap_alert = function() {}
-        bootstrap_alert.warning = function(message) {
-            $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>')
-        }
-
-        window.setTimeout(function() {
-            $("#alert_placeholder").fadeTo(500, 0).slideUp(500, function(){
-                // $(this).slideDown(500);
-            });
-        }, 3500);
-    }
-
+    };
 
     workflows_app.activate_button = function(){
         $("input[type=submit]").removeAttr("disabled");
-    }
+    };
 
     return workflows_app;
 

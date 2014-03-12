@@ -463,7 +463,7 @@ class BibWorkflowObject(db.Model):
             try:
                 new_dict_representation = Record(data)
                 data = new_dict_representation.legacy_export_as_marc()
-            except Exception as e:
+            except (TypeError, KeyError):
                 # Maybe not, submission?
                 return data
 

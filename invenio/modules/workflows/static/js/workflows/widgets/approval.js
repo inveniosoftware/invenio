@@ -17,7 +17,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var WORKFLOWS_APPROVAL = (function ($, holdingpen) {
+var approval_widget = (function ($, holdingpen) {
     "use strict";
 
     var recordsToApprove = holdingpen.recordsToApprove;
@@ -27,39 +27,39 @@ var WORKFLOWS_APPROVAL = (function ($, holdingpen) {
     var current_number = number_of_objs - 1;
     var url = {};
 
+    var init = function (data){
+        url = {"resolve_widget": data.url_prefix + "/resolve",
+                    "delete_single": data.url_prefix + "/delete"};
 
-    $(document).ready(function () {
         $(".message").hide();
         $("#batch-btn").popover();
 
         $(".theform #submitButton").click(function (event) {
+            event.preventDefault();
 
-        event.preventDefault();
+            var form_name = $(this)[0].form.name;
+            var bwo_id = form_name.substring(form_name.indexOf("bwobject_id") + 12);
+            var form_id = $(this)[0].form.id.substring(4);
 
-        var form_name = $(this)[0].form.name;
-        var bwo_id = form_name.substring(form_name.indexOf("bwobject_id") + 12);
-        var form_id = $(this)[0].form.id.substring(4);
+            btn_div_id = "decision-btns" + form_id;
+            hr_id = "hr"+form_id;
 
-        btn_div_id = "decision-btns" + form_id;
-        hr_id = "hr"+form_id;
-
-        formdata = $(this)[0].value;
-        formurl = event.currentTarget.parentElement.name;
-        console.log(formurl);
-        $.ajax({
-            type: "POST",
-            url: formurl,
-            data: {"decision": formdata},
-            success: function(data){
-                $("#"+form_id).fadeOut(400);
-                $("#"+btn_div_id).fadeOut(400);
-                $("#"+hr_id).fadeOut(400);
-                current_number--;
+            formdata = $(this)[0].value;
+            formurl = event.currentTarget.parentElement.name;
+            $.ajax({
+                type: "POST",
+                url: formurl,
+                data: {"decision": formdata},
+                success: function(data){
+                    $("#"+form_id).fadeOut(400);
+                    $("#"+btn_div_id).fadeOut(400);
+                    $("#"+hr_id).fadeOut(400);
+                    current_number--;
+                }
+            });
+            if (current_number === 0){
+                $("#goodbye-msg").text("All Done!");
             }
-        });
-        if (current_number === 0){
-            $("#goodbye-msg").text("All Done!");
-        }
         });
 
         $("#submitButtonMini").click(function (event){
@@ -81,42 +81,6 @@ var WORKFLOWS_APPROVAL = (function ($, holdingpen) {
               '</div>'+
           '</div>');
 
-        $("#drop-down-accept").on("click", function (){
-            for(i=0; i<recordsToApprove.length; i++){
-                console.log(recordsToApprove[i]);
-                jQuery.ajax({
-                    type: "POST",
-                    url: url.resolve_widget,
-                    data: {"objectid": recordsToApprove[i],
-                         "widget": "approval_widget",
-                         "decision": "Accept"},
-                    success: function(json){
-                        recordsToApprove = [];
-                        $("#refresh_button").click();
-                        checkRecordsToApprove();
-                    }
-                });
-            }
-        });
-
-        $("#drop-down-reject").on("click", function (){
-            for(i=0; i<recordsToApprove.length; i++){
-                console.log(recordsToApprove[i]);
-                jQuery.ajax({
-                    type: "POST",
-                    url: url.resolve_widget,
-                    data: {"objectid": recordsToApprove[i],
-                           "widget": "approval_widget",
-                           "decision": "Reject"},
-                    success: function(json){
-                        recordsToApprove = [];
-                        $("#refresh_button").click();
-                        checkRecordsToApprove();
-                    }
-                });
-            }
-        });
-
         $("button.preview").click(function () {
             bwoid = $(this).attr("data-id");
             format = $(this).attr("name");
@@ -133,10 +97,6 @@ var WORKFLOWS_APPROVAL = (function ($, holdingpen) {
             data_preview.show(url_preview, bwoid, format);
         });
 
-    });
-
-    var init_urls_approval = function (url_){
-        url = url_;
     };
 
     var checkRecordsToApprove = function (){
@@ -160,7 +120,7 @@ var WORKFLOWS_APPROVAL = (function ($, holdingpen) {
     };
 
     var hideApproveAll = function (){
-        $("#multi-approval").empty();
+        $("#navbar-right").empty();
     };
 
     var approveAll = function () {
@@ -187,6 +147,39 @@ var WORKFLOWS_APPROVAL = (function ($, holdingpen) {
 
             $("#navbar-right").append(batch_btn);
             $(".dropdown-toggle").dropdown();
+
+            $("#drop-down-accept").on("click", function (){
+                for(var i=0; i<recordsToApprove.length; i++){
+                    jQuery.ajax({
+                        type: "POST",
+                        url: url.resolve_widget,
+                        data: {"objectid": recordsToApprove[i],
+                             "widget": "approval_widget",
+                             "decision": "Accept"},
+                        success: function(json){
+                            recordsToApprove = [];
+                            checkRecordsToApprove();
+                        }
+                    });
+                }
+            });
+
+            $("#drop-down-reject").on("click", function (){
+                for(i=0; i<recordsToApprove.length; i++){
+                    console.log(recordsToApprove[i]);
+                    jQuery.ajax({
+                        type: "POST",
+                        url: url.resolve_widget,
+                        data: {"objectid": recordsToApprove[i],
+                               "widget": "approval_widget",
+                               "decision": "Reject"},
+                        success: function(json){
+                            recordsToApprove = [];
+                            checkRecordsToApprove();
+                        }
+                    });
+                }
+            });
         }
     };
 
@@ -200,7 +193,6 @@ var WORKFLOWS_APPROVAL = (function ($, holdingpen) {
             success: function(json){
                 deselectAll();
                 recordsToApprove = [];
-                $("#refresh_button").click();     
                 checkRecordsToApprove();
             }
         });
@@ -212,20 +204,17 @@ var WORKFLOWS_APPROVAL = (function ($, holdingpen) {
             console.log(bwolist[i]);
             jQuery.ajax({
                 url: url.delete_single,
-                data: {"objectid": bwolist[i]},
-                success: function(){
-                    $("#refresh_button").click();
-                }
+                data: {"objectid": bwolist[i]}
             });
         }
     };
 
     return {
-        init_urls_approval: init_urls_approval,
+        init: init,
         checkRecordsToApprove: checkRecordsToApprove,
         deleteRecords: deleteRecords,
         mini_approval: mini_approval,
         disapproveRecords: disapproveRecords,
     };
-})(window.jQuery, holdingpen);
+});
 

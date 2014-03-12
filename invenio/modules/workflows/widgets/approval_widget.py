@@ -54,19 +54,19 @@ class approval_widget(Form):
                  'w_metadata_list': w_metadata_list,
                  'workflow_func_list': workflow_func_list})
 
-    def run_widget(self, objectid, request):
+    def run_widget(self, objectid):
         """
         Resolves the action taken in the approval widget
         """
         from flask import request, flash
-        from ..api import continue_oid_delayed
+        from ..api import continue_oid
         from ..models import BibWorkflowObject
 
         bwobject = BibWorkflowObject.query.get(objectid)
 
         if request.form['decision'] == 'Accept':
             bwobject.remove_widget()
-            continue_oid_delayed(objectid)
+            continue_oid(objectid)
             flash('Record Accepted')
 
         elif request.form['decision'] == 'Reject':
@@ -74,5 +74,6 @@ class approval_widget(Form):
             flash('Record Rejected')
 
 approval_widget.__title__ = 'Approve Record'
+approval_widget.static = ["js/workflows/widgets/approval.js"]
 
 widget = approval_widget()

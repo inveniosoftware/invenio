@@ -36,5 +36,6 @@ class edit_record_widget(Form):
 
 
 edit_record_widget.__title__ = 'Edit Record'
+edit_record_widget.static = []
 
 widget = edit_record_widget()

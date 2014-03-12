@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013 CERN.
+ * Copyright (C) 2013, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -20,22 +20,28 @@
 
 // DataTables row selection functions
 //***********************************
-var datatable = function ( $, holdingpen ){
-    var oTable = holdingpen.oTable;
-    var oSettings = holdingpen.oSettings;
+var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
+    var oTable = {};
+    var oSettings = {};
     var rowList = holdingpen.rowList;
     var rowIndexList = holdingpen.rowIndexList;
     var hoveredRow = -1;
 
+    function init(_oTable, _oSettings){
+        console.log(1);
+        oTable = _oTable;
+        oSettings = _oSettings;
+    }
+
     function selectAll(){
-        var fromPos = oSettings._iDisplayStart;
-        var toPos = oSettings._iDisplayLength-1 + fromPos;
+        var fromPos = holdingpen.oSettings._iDisplayStart;
+        var toPos = holdingpen.oSettings._iDisplayLength-1 + fromPos;
         var j;
 
         var current_row = null;
         for (var i=fromPos; i<=toPos; i++){
             j = i%10;
-            current_row = oSettings.aoData[oSettings.aiDisplay[j]].nTr;
+            current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
             console.log(current_row);
             if($.inArray(current_row.row_id, rowList) <= -1){
                 if (selectCellByTitle(current_row, 'Actions').innerText != 'N/A'){
@@ -49,8 +55,8 @@ var datatable = function ( $, holdingpen ){
     }
 
     function selectCellByTitle (row, title){
-        for(var i=0; i<oSettings.aoHeader[0].length; i++){
-            var trimmed_title = $.trim(oSettings.aoHeader[0][i].cell.innerText);
+        for(var i=0; i<holdingpen.oSettings.aoHeader[0].length; i++){
+            var trimmed_title = $.trim(holdingpen.oSettings.aoHeader[0][i].cell.innerText);
             if(trimmed_title === title){
                 return $(row).children()[i - 1];
             }
@@ -58,14 +64,14 @@ var datatable = function ( $, holdingpen ){
     }
 
     function deselectAllFromPage (){
-        var fromPos = oSettings._iDisplayStart;
-        var toPos = oSettings._iDisplayLength-1 + fromPos;
+        var fromPos = holdingpen.oSettings._iDisplayStart;
+        var toPos = holdingpen.oSettings._iDisplayLength-1 + fromPos;
 
         for (i=fromPos; i<=toPos; i++){
             j = i % 10;
             if($.inArray(i, rowIndexList) > -1){
-                current_row = oSettings.aoData[oSettings.aiDisplay[j]].nTr;
-                selectRow(current_row, event, oSettings);
+                current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
+                selectRow(current_row, event, holdingpen.oSettings);
             }
         }
     }
@@ -88,8 +94,8 @@ var datatable = function ( $, holdingpen ){
 
                 if (selectCellByTitle(row, 'Actions').innerText != 'N/A'){                    
                     if(widget_name === 'Approve Record'){
-                        recordsToApprove.push(row.row_id);
-                        console.log(recordsToApprove);
+                        holdingpen.recordsToApprove.push(row.row_id);
+                        console.log(holdingpen.recordsToApprove);
                     }
                 }   
                 row.checkbox.checked = true;
@@ -101,17 +107,18 @@ var datatable = function ( $, holdingpen ){
                 row.style.background = "white";
                 
                 if(widget_name === 'Approve Record'){
-                    recordsToApprove.splice(recordsToApprove.indexOf(row.row_id), 1);
+                    holdingpen.recordsToApprove.splice(holdingpen.recordsToApprove.indexOf(row.row_id), 1);
                 }
                 row.checkbox.checked = false;
             }
         }
-        checkRecordsToApprove();
+        window['approval_widget'].checkRecordsToApprove();
     }
 
      function deselectAll (){
         holdingpen.rowList = [];
         holdingpen.rowIndexList = [];
+        console.log(this.oTable);
         oTable.fnDraw(false);
         window.getSelection().removeAllRanges();
     } 
@@ -150,7 +157,7 @@ var datatable = function ( $, holdingpen ){
                 currentRowIndex = rowIndexList[rowIndexList.length-1];
                 if (currentRowIndex < 9){
                     row_index = currentRowIndex + 1;
-                    current_row = oSettings.aoData[oSettings.aiDisplay[row_index]].nTr;
+                    current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[row_index]].nTr;
                     if($.inArray(current_row.row_id, rowList) <= -1){
                         holdingpen.rowIndexList.push(row_index);
                         holdingpen.rowList.push(current_row.row_id);
@@ -161,10 +168,10 @@ var datatable = function ( $, holdingpen ){
             else{
                 if (hoveredRow < 9){
                     if (hoveredRow != -1){
-                        unhoverRow(oSettings.aoData[oSettings.aiDisplay[hoveredRow]].nTr);
+                        unhoverRow(holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[hoveredRow]].nTr);
                     }
                     hoveredRow++;
-                    hoverRow(oSettings.aoData[oSettings.aiDisplay[hoveredRow]].nTr);
+                    hoverRow(holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[hoveredRow]].nTr);
                 }
             }
         }
@@ -173,7 +180,7 @@ var datatable = function ( $, holdingpen ){
                 currentRowIndex = holdingpen.rowIndexList[holdingpen.rowIndexList.length-1];
                 if (currentRowIndex > 0){
                     rowToAdd = currentRowIndex - 1;
-                    var current_row = oSettings.aoData[oSettings.aiDisplay[rowToAdd]].nTr;
+                    var current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[rowToAdd]].nTr;
                     if($.inArray(current_row.row_id, holdingpen.rowList) <= -1){
                         holdingpen.rowIndexList.push(rowToAdd);
                         holdingpen.rowList.push(current_row.row_id);
@@ -183,9 +190,9 @@ var datatable = function ( $, holdingpen ){
             }
             else{
                 if (hoveredRow > 0){
-                    unhoverRow(oSettings.aoData[oSettings.aiDisplay[hoveredRow]].nTr);
+                    unhoverRow(holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[hoveredRow]].nTr);
                     hoveredRow--;
-                    hoverRow(oSettings.aoData[oSettings.aiDisplay[hoveredRow]].nTr);
+                    hoverRow(holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[hoveredRow]].nTr);
                 }
             }
         }
@@ -200,7 +207,7 @@ var datatable = function ( $, holdingpen ){
             removeSelection();
         }
         else if (e.keyCode == 13 && hoveredRow != -1){
-            selectCellByTitle(oSettings.aoData[oSettings.aiDisplay[hoveredRow]].nTr, 'Details').click();
+            selectCellByTitle(holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[hoveredRow]].nTr, 'Details').click();
         }
         else if(e.keyCode == 46){
             if (holdingpen.rowList.length >= 1){
@@ -216,10 +223,11 @@ var datatable = function ( $, holdingpen ){
         if (e.keyCode == 27) {  // esc           
             deselectAll();
             console.log($('#select-all'));
-        }   
+        }
     });
 
     return{
+        init: init,
         selectRow: selectRow,
         deselectAll: deselectAll,
         hoverRow: hoverRow,
@@ -227,7 +235,7 @@ var datatable = function ( $, holdingpen ){
 
         removeSelection: function () {
             if (window.getSelection) {  // all browsers, except IE before version 9
-                var selection = window.getSelection ();                                        
+                var selection = window.getSelection ();
                 selection.removeAllRanges ();
             }
             else {
@@ -239,7 +247,7 @@ var datatable = function ( $, holdingpen ){
         },
 
         selectRange: function (row){
-            var toPos = oTable.fnGetPosition(row) + oSettings._iDisplayStart;
+            var toPos = oTable.fnGetPosition(row) + holdingpen.oSettings._iDisplayStart;
             var fromPos = holdingpen.rowIndexList[holdingpen.rowIndexList.length-1];
             var i;
             var current_row = null;
@@ -248,7 +256,7 @@ var datatable = function ( $, holdingpen ){
                 for (i=fromPos; i<=toPos; i++){
                     j = i % 10;
                     if($.inArray(i, rowIndexList) <= -1){
-                        current_row = oSettings.aoData[oSettings.aiDisplay[j]].nTr;
+                        current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
                         if (selectCellByTitle(current_row, 'Actions').innerText != 'N/A'){
                             holdingpen.rowIndexList.push(i);
                             holdingpen.rowList.push(current_row.row_id);
@@ -262,7 +270,7 @@ var datatable = function ( $, holdingpen ){
                 for (i=fromPos; i>=toPos; i--){
                     j = i % 10;
                     if($.inArray(i, holdingpen.rowIndexList) <= -1){
-                        current_row = oSettings.aoData[oSettings.aiDisplay[j]].nTr
+                        current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
                         if (selectCellByTitle(current_row, 'Actions').innerText != 'N/A'){
                             holdingpen.rowIndexList.push(i);
                             holdingpen.rowList.push(current_row.row_id);
@@ -283,13 +291,13 @@ var datatable = function ( $, holdingpen ){
         },
 
         getCellIndex: function (row, title){
-            for(var i=0; i<oSettings.aoHeader[0].length; i++){
-                var trimmed_title = $.trim(oSettings.aoHeader[0][i].cell.innerText);
+            for(var i=0; i<holdingpen.oSettings.aoHeader[0].length; i++){
+                var trimmed_title = $.trim(holdingpen.oSettings.aoHeader[0][i].cell.innerText);
                 if(trimmed_title === title){
-                    return i
+                    return i;
                 }
-            }   
-        }       
+            }
+        }
     };
-}
+}($, WORKFLOWS_HOLDINGPEN);
 //***********************************
