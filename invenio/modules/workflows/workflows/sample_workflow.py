@@ -26,7 +26,7 @@ class sample_workflow(object):
     """
     This is a sample workflow.
     """
-    workflow = [execute_if(add_data(1), lambda obj, eng: False),
+    workflow = [execute_if(add_data(1), lambda obj, eng: True),
                 approve_record,
                 print_data]
     title = "Sample workflow"
