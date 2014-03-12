@@ -415,103 +415,12 @@ function onGetTicketsSuccess(json) {
                   undefined, undefined, errorCallback);
        event.preventDefault();
     });
-    // closeTicket link
-    $(".ticketButtons .bibEditCloseTicketLink").on('click',function(event) {
-       var ticketId = $(this).parent().parent().attr('id').substring(6);// e.g ticket195561
-       $(this).siblings(".bibeditTicketPreviewBox").hide();
-       $("#ticket" + ticketId).children().hide();
-       $("#ticket" + ticketId).children(".ajaxLoader").children().show();
-       $("#ticket" + ticketId).children(".ajaxLoader").show();
-       var errorCallback = onCloseTicketError(ticketId);
-       createReq({recID: gRecID, ticketid:ticketId, requestType: 'closeTicket'}, onCloseTicketSuccess,
-                  undefined, undefined, errorCallback);
-       event.preventDefault();
-    });
   }
   else if(json['resultCode'] == 125) {
     rtConnectionError(json['tickets']);
   }
 }
 
-function onCloseTicketSuccess(json) {
-/*
- * Handle successfull 'closeTicket' requests.
- */
- var ticketID = json['ticketid'];
- //stop ajaxloader
- $("#ticket" + ticketID).children(".ajaxLoader").hide();
- removeTicketError(ticketID);
- if (json['ticket_closed_code'] == 121 && json['ticket_closed_description'] && gRecID) {
-    $("#ticket" + ticketID + " .ticketSpan").children("br:first-child").before(' resolved');
-    $("#ticket" + ticketID + " .ticketSpan").addClass("ticketResolved");
-    // undo link
-    var link = '<a href="#" title="Open ticket" class ="openTicketLink" id="openTicket' + ticketID + '" >Undo</a>';
-    $("#ticket" + ticketID + " .ticketSpan").after(link);
-    $("#openTicket" + ticketID).on('click', function(event) {
-         var ticketId = $(this).attr('id').substring(10);//e.g openTicket195561
-         $("#ticket" + ticketID).children().hide();
-         $("#ticket" + ticketID).children(".ajaxLoader").children().show();
-         $("#ticket" + ticketID).children(".ajaxLoader").show();
-         var errorCallback = onOpenTicketError(ticketId);
-          createReq({recID: gRecID, ticketid:ticketId, requestType: 'openTicket'}, onOpenTicketSuccess,
-                    undefined, undefined, onOpenTicketError);
-         event.preventDefault();
-    });
-    $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-    $("#ticket" + ticketID + " .ticketButtons").hide();
- }
- else {
-    if (json['ticket_closed_code'] == 125) {
-       $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-       rtConnectionError(json['ticket_closed_description']);
-    }
-    else {
-        $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-        addErrorMsg(ticketID, json['ticket_closed_description']);
-    }
- }
-}
-
-function onCloseTicketError(ticketid) {
-  /*
-   * Handle failed 'closeTicket' requests.
-   */
-   return function (XHR, textStatus, errorThrown) {
-      var ticketID = ticketid;
-      //stop ajaxloader
-      $("#ticket" + ticketID).children(".ajaxLoader").hide();
-      removeTicketError(ticketID);
-      $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-        addErrorMsg(ticketID, 'Error occured.Try again');
-    };
-}
-
-function onOpenTicketSuccess(json) {
-/*
- * Handle successfull 'openTicket' requests.
- */
- var ticketID = json['ticketid'];
- //stop ajaxloader
- $("#ticket" + ticketID).children(".ajaxLoader").hide();
- removeTicketError(ticketID);
- if (json['ticket_opened_code'] == 123 && json['ticket_opened_description'] && gRecID) {
-    var span_html = $("#ticket" + ticketID +" .ticketSpan").html();
-    $("#ticket" + ticketID + " .ticketSpan").html(span_html.split(" resolved").join(""));// remove resolved
-    $("#ticket" + ticketID + " .ticketSpan").removeClass("ticketResolved");
-    $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-    $("#openTicket" + ticketID).remove();
- }
- else {
-    if(json['ticket_opened_code'] == 125) {
-      $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-      rtConnectionError(json['ticket_opened_description']);
-    }
-    else {
-      $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-      addErrorMsg(ticketID, json['ticket_opened_description']);
-    }
- }
-}
 
 function onOpenTicketError(ticketid) {
 /*
