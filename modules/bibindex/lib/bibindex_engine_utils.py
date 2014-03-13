@@ -194,7 +194,7 @@ def filter_for_virtual_indexes(index_list):
         virtual = zip(*get_all_virtual_indexes())[1]
         selected = set(virtual) & set(index_list)
         return list(selected)
-    except KeyError:
+    except IndexError:
         return []
     return []
 
