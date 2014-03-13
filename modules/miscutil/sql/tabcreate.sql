@@ -4941,6 +4941,7 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_21_aiduserinputl
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_hstRECORD_marcxml_longblob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_06_new_citation_dict_table',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_25_new_param_websubmit_function',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_10_new_param_websubmit_function',NOW());
 
 -- master upgrade recipes:
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_29_idxINDEX_new_indexer_column',NOW());

@@ -657,6 +657,7 @@ class Template:
         nbFields = len(upload)
         # if there is a file upload field, we change the encoding type
         out = """<script language="JavaScript1.1" type="text/javascript">
+        /*<![CDATA[*/
               """
         for i in range(0, nbFields):
             if upload[i] == 1:
@@ -738,7 +739,9 @@ class Template:
                     for val in vals:
                         if tmp != "":
                             tmp += " || "
-                        tmp += "el.options[j].value == \"%s\" || el.options[j].text == \"%s\"" % (val, val)
+                        tmp += "el.options[j].value == \"%s\" || el.options[j].text == \"%s\"" % \
+                          (escape_javascript_string(val, escape_for_html=False),
+                           escape_javascript_string(val, escape_for_html=False))
                     if tmp != "":
                         out += """
                                  <!--SELECT field found-->
@@ -759,18 +762,16 @@ class Template:
                                 el.checked=true;
                               }""" % {
                                 'fieldname' : fieldname,
-                                'text' : cgi.escape(str(text)).replace('"', '\\"'),
+                                'text' : escape_javascript_string(text, escape_for_html=False),
                               }
                 elif upload[i] == 0:
-                    text = text.replace('"','\"')
-                    text = text.replace("\n","\\n")
                     # If the field is not an upload element
                     out += """<!--input field found-->
                                el = document.forms[0].elements['%(fieldname)s'];
                                el.value="%(text)s";
                            """ % {
                              'fieldname' : fieldname,
-                             'text' : cgi.escape(str(text)).replace('"', '\\"'),
+                             'text': escape_javascript_string(text, escape_for_html=False),
                            }
         out += """<!--End Fill in section-->
                """
@@ -806,7 +807,7 @@ class Template:
                              return false;
                            }
                          }"""
-        out += """</script>"""
+        out += """ /*]]>*/</script>"""
         return out
 
     def tmpl_page_do_not_leave_submission_js(self, ln, enabled=CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION):

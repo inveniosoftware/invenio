@@ -606,9 +606,6 @@ def interface(req,
         if os.path.exists(os.path.join(curdir, full_field['name'])):
             file = open(os.path.join(curdir, full_field['name']), "r");
             text = file.read()
-            text = re.compile("[\n\r]*$").sub("", text)
-            text = re.compile("\n").sub("\\n", text)
-            text = re.compile("\r").sub("", text)
             file.close()
 
         values.append(text)
