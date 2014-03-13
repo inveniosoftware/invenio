@@ -191,9 +191,11 @@ def setup_app(app):
         convert_datetext_to_dategui to print a human friendly date.
         """
         if isinstance(date, datetime):
-            return convert_datestruct_to_dategui(date.timetuple(),
-                                                 g.ln).decode('utf-8')
-        return convert_datetext_to_dategui(date, g.ln).decode('utf-8')
+            return convert_datestruct_to_dategui(
+                date.timetuple(),
+                getattr(g, 'ln', app.config['CFG_SITE_LANG'])).decode('utf-8')
+        return convert_datetext_to_dategui(
+            date, getattr(g, 'ln', app.config['CFG_SITE_LANG'])).decode('utf-8')
 
     @app.template_filter('invenio_pretty_date')
     def _pretty_date(date):
@@ -202,7 +204,8 @@ def setup_app(app):
         pretty_date to print a human friendly timestamp.
         """
         if isinstance(date, datetime) or isinstance(date, basestring):
-            return pretty_date(date, ln=g.ln)
+            return pretty_date(
+                date, ln=getattr(g, 'ln', app.config['CFG_SITE_LANG']))
         return date
 
     @app.template_filter('invenio_url_args')
