@@ -32,7 +32,8 @@
     "typeahead.js-bootstrap3.less": "0.2.2",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
     "plupload": "*",
-    "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0"
+    "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",
+    "font-awesome": "*"
   },
   "resolutions": {
     "jquery": "2.1.0"
