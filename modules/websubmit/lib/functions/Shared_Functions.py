@@ -26,8 +26,9 @@ from logging import DEBUG
 
 from invenio.config import \
      CFG_PATH_CONVERT, \
-     CFG_SITE_LANG
-from invenio.bibdocfile import decompose_file
+     CFG_SITE_LANG, \
+     CFG_BIBDOCFILE_FILEDIR
+from invenio.bibdocfile import decompose_file, decompose_file_with_version
 from invenio.errorlib import register_exception
 from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats, get_file_converter_logger
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
@@ -37,11 +38,15 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine import get_record
 from invenio.bibrecord import record_get_field_values, record_get_field_value
 
-def createRelatedFormats(fullpath, overwrite=True, debug=False):
+def createRelatedFormats(fullpath, overwrite=True, debug=False, consider_version=False):
     """Given a fullpath, this function extracts the file's extension and
     finds in which additional format the file can be converted and converts it.
     @param fullpath: (string) complete path to file
     @param overwrite: (bool) overwrite already existing formats
+    @param consider_version: (bool) if True, consider the version info
+                             in C{fullpath} to find missing format
+                             for that specific version, if C{fullpath}
+                             contains version info
     Return a list of the paths to the converted files
     """
     file_converter_logger = get_file_converter_logger()
@@ -50,15 +55,29 @@ def createRelatedFormats(fullpath, overwrite=True, debug=False):
         file_converter_logger.setLevel(DEBUG)
     try:
         createdpaths = []
-        basedir, filename, extension = decompose_file(fullpath)
+        if consider_version:
+            try:
+                basedir, filename, extension, version = decompose_file_with_version(fullpath)
+            except:
+                basedir, filename, extension = decompose_file(fullpath)
+                version = 0
+        else:
+            basedir, filename, extension = decompose_file(fullpath)
+            version = 0
         extension = extension.lower()
         if debug:
             print >> sys.stderr, "basedir: %s, filename: %s, extension: %s" % (basedir, filename, extension)
 
-        filelist = glob.glob(os.path.join(basedir, '%s*' % filename))
-        if debug:
-            print >> sys.stderr, "filelist: %s" % filelist
-        missing_formats = get_missing_formats(filelist)
+        if overwrite:
+            missing_formats = get_missing_formats([fullpath])
+        else:
+            if version:
+                filelist = glob.glob(os.path.join(basedir, '%s*;%s' % (filename, version)))
+            else:
+                filelist = glob.glob(os.path.join(basedir, '%s*' % filename))
+            if debug:
+                print >> sys.stderr, "filelist: %s" % filelist
+            missing_formats = get_missing_formats(filelist)
         if debug:
             print >> sys.stderr, "missing_formats: %s" % missing_formats
         for path, formats in missing_formats.iteritems():
@@ -71,7 +90,12 @@ def createRelatedFormats(fullpath, overwrite=True, debug=False):
                 if debug:
                     print >> sys.stderr, "...... newpath: %s" % newpath
                 try:
-                    convert_file(path, newpath)
+                    if CFG_BIBDOCFILE_FILEDIR in basedir:
+                        # We should create the new files in a temporary location, not
+                        # directly inside the BibDoc directory.
+                        newpath = convert_file(path, output_format=aformat)
+                    else:
+                        convert_file(path, newpath)
                     createdpaths.append(newpath)
                 except InvenioWebSubmitFileConverterError, msg:
                     if debug:

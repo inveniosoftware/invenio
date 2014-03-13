@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -186,7 +186,8 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING',
                        'CFG_BIBSCHED_NON_CONCURRENT_TASKS',
                        'CFG_REDIS_HOSTS',
-                       'CFG_BIBSCHED_INCOMPATIBLE_TASKS']:
+                       'CFG_BIBSCHED_INCOMPATIBLE_TASKS',
+                       'CFG_ICON_CREATION_FORMAT_MAPPINGS']:
         try:
             option_value = option_value[1:-1]
             if option_name == "CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE" and option_value.strip().startswith("{"):

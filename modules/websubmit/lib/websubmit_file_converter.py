@@ -795,8 +795,7 @@ def pdf2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     @return [string] output_file input_file
     raise InvenioWebSubmitFileConverterError in case of errors.
     """
-
-    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
+    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf;pdfa')
 
     if title is None:
         stdout = execute_command(CFG_PATH_PDFINFO, input_file)
@@ -923,7 +922,7 @@ def ps2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     raise InvenioWebSubmitFileConverterError in case of errors.
     """
 
-    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
+    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf;pdfa')
     if input_file.endswith('.gz'):
         new_input_file = os.path.join(working_dir, 'input.ps')
         execute_command(CFG_PATH_GUNZIP, '-c', input_file, filename_out=new_input_file)
