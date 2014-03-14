@@ -1,15 +1,17 @@
 <name>Authority HTML detailed</name>
 <description>Detailed Authority HTML format.</description>
 
-<h1>Authority Record</h1>
+<h1><BFE_FIELD tag="100__a"/></h1>
 
 <div>
-
-<BFE_AUTHORITY_CONTROL_NO/>
 
 <BFE_AUTHORITY_AUTHOR detail="yes"/>
 <BFE_AUTHORITY_INSTITUTE detail="yes"/>
 <BFE_AUTHORITY_JOURNAL detail="yes"/>
 <BFE_AUTHORITY_SUBJECT detail="yes"/>
+
+<BFE_AUTHORITY_AUTHOR_PUBLICATIONS detail="yes"/>
+<BFE_AUTHORITY_LINKS detail="yes"/>
+<BFE_AUTHORITY_CONTROL_NO/>
 
 </div>

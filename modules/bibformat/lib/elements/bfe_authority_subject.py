@@ -46,7 +46,8 @@ def format_element(bfo, detail='no'):
     if len(main_dicts):
         main_dict = main_dicts[0]
         main = stringify_dict(main_dict)
-        out += "<p>" + "<strong>" + _("Main %s name") % _("subject") + "</strong>" + ": " + main + "</p>"
+        out += "<a style='margin-top:0px;margin-bottom:0px'  href='" +"/record/"+ str(bfo.recID) +"?ln=" + bfo.lang + "' >" + main + "</a>"
+        ##out += "<p>" + "<strong>" + _("Main %s name") % _("subject") + "</strong>" + ": " + main + "</p>"
     # detail
     if detail.lower() == "yes":
         sees = [stringify_dict(see_dict) for see_dict in bfo.fields('450%%')]
@@ -55,7 +56,7 @@ def format_element(bfo, detail='no'):
         if len(sees):
             out += "<p>" + "<strong>" + _("Variant(s)") + "</strong>" + ": " + ", ".join(sees) + "</p>"
         see_alsos = [stringify_dict(see_also_dict) for see_also_dict in bfo.fields('550%%')]
-        see_alsos = filter(None, see_alsos) # fastest way to remove empty ""s    
+        see_alsos = filter(None, see_alsos) # fastest way to remove empty ""s
         see_alsos = [re.sub(",{2,}",",", x) for x in see_alsos] # prevent ",,"
         if len(see_alsos):
             out += "<p>" + "<strong>" + _("See also") + "</strong>" + ": " + ", ".join(see_alsos) + "</p>"

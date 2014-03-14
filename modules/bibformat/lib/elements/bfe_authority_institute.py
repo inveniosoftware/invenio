@@ -49,7 +49,8 @@ def format_element(bfo, detail='no'):
     main_dicts = bfo.fields('110%%')
     if len(main_dicts):
         main = main_dicts[0].get('a') or ""
-        out += "<p>" + "<strong>" + _("Main %s name") % _("institute") + "</strong>" + ": " + main + "</p>"
+        ##out += "<p style='margin-top:0px;margin-bottom:0px>" + "<strong>" + _("Main %s name") % _("institute") + "</strong>" + ": " + main + "</p>"
+        out += "<a style='margin-top:0px;margin-bottom:0px'  href='" +"/record/"+ str(bfo.recID) +"?ln=" + bfo.lang + "' >" + main + "</a>"
     # detail
     if detail.lower() == "yes":
         sees = [see_dict['a'] for see_dict in bfo.fields('410%%') if 'a' in see_dict]

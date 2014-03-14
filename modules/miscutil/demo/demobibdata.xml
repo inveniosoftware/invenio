@@ -24865,6 +24865,9 @@ Only the mountain and I.
     <datafield tag="035" ind1=" " ind2=" ">
       <subfield code="a">AUTHOR|(SzGeCERN)aaa0004</subfield>
     </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(VIAF)111409861</subfield>
+    </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">AUTHORITY</subfield>
     </datafield>
@@ -24901,6 +24904,9 @@ Only the mountain and I.
     </datafield>
     <datafield tag="035" ind1=" " ind2=" ">
       <subfield code="a">AUTHOR|(DLC)n 80141717</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(VIAF)56770935</subfield>
     </datafield>
     <datafield tag="035" ind1=" " ind2=" ">
       <subfield code="a">AUTHOR|(SzGeCERN)aaa0005</subfield>
