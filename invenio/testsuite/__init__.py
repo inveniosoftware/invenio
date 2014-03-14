@@ -329,7 +329,7 @@ class InvenioTestUtilsBrowserException(Exception):
     pass
 
 
-@nottest
+#@nottest
 def test_web_page_existence(url):
     """
     Test whether URL exists and is well accessible.
@@ -373,7 +373,7 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
     return browser
 
 
-@nottest
+#@nottest
 def test_web_page_content(url,
                           username="guest",
                           password="",
