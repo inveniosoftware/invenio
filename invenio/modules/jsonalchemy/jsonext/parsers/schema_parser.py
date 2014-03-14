@@ -17,32 +17,37 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 60 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from pyparsing import QuotedString, Suppress, indentedBlock
+from pyparsing import Keyword
 
 from invenio.base.utils import try_to_eval
 
-from invenio.modules.jsonalchemy.parser import BaseExtensionParser, \
-        dict_def
+from invenio.modules.jsonalchemy.registry import functions
+from invenio.modules.jsonalchemy.parser import FieldBaseExtensionParser, \
+    DICT_DEF, indentedBlock
 
-from ...registry import functions
 
-
-class SchemaParser(BaseExtensionParser):
+class SchemaParser(FieldBaseExtensionParser):
     """
-    
+    Parses the schema definitions for fields, using cerberus::
+        modification_date:
+            schema:
+                {'modification_date': {'type': 'datetime',
+                                       'required': True,
+                                       'default': lambda: __import__('datetime').datetime.now()}}
     """
 
     @classmethod
     def parse_element(cls, indent_stack):
-        schema = indentedBlock(dict_def,indent_stack)
-        return (Suppress('schema:') + schema)\
-                .setParseAction(lambda toks: toks[0][0][0])\
-                .setResultsName('schema')
+        """Sets the ``schema`` attribute inside the rule"""
+        return (Keyword('schema:').suppress() +
+                indentedBlock(DICT_DEF, indent_stack)
+               ).setParseAction(lambda toks: toks[0])\
+               .setResultsName('schema')
 
 
     @classmethod
-    def create_element(cls, rule, override, extend, namespace):
+    def create_element(cls, rule, namespace):
+        """Just evaluates the content of the schema to a python dictionary"""
         return try_to_eval(rule.schema, functions(namespace))
 
-SchemaParser.__name__ = 'schema'
 parser = SchemaParser

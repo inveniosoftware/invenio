@@ -17,16 +17,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 60 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from pyparsing import Optional, Suppress, indentedBlock, Each
+from pyparsing import Optional, Keyword, Literal
 
 from invenio.base.utils import try_to_eval
 
 from invenio.modules.jsonalchemy.registry import functions
-from invenio.modules.jsonalchemy.parser import BaseExtensionParser, FieldParser, \
-        python_allowed_expr
+from invenio.modules.jsonalchemy.parser import FieldBaseExtensionParser, \
+    PYTHON_ALLOWED_EXPR, indentedBlock
 
 
-class JsonExtraParser(BaseExtensionParser):
+class JsonExtraParser(FieldBaseExtensionParser):
     """
     Class to parse and store the information related with how to load and dump
     a non-json object.
@@ -41,36 +41,64 @@ class JsonExtraParser(BaseExtensionParser):
     to parse.
     """
 
+    __parsername__ = 'json_ext'
+
     @classmethod
     def parse_element(cls, indent_stack):
-        json_dumps = (Suppress('dumps') + Suppress(',') + python_allowed_expr)\
-                .setResultsName("dumps")\
-                .setParseAction(lambda toks: toks.value[0])
-        json_loads = (Suppress("loads") + Suppress(",") + python_allowed_expr)\
-                .setResultsName("loads")\
-                .setParseAction(lambda toks: toks.value[0])
-
-        func = indentedBlock(Each((json_dumps, json_loads)), indent_stack)
-        return (Suppress('json:') + func)\
-                .setResultsName('json_ext')\
-                .setParseAction(lambda toks: toks[0][0])
+        """Sets ``json_ext`` in the rule"""
+        json_dumps = (Keyword('dumps').suppress() +
+                      Literal(',').suppress() +
+                      PYTHON_ALLOWED_EXPR)\
+                     .setResultsName("dumps")\
+                     .setParseAction(lambda toks: toks[0].strip())
+        json_loads = (Keyword("loads").suppress() +
+                      Literal(",").suppress() +
+                      PYTHON_ALLOWED_EXPR)\
+                     .setResultsName("loads")\
+                     .setParseAction(lambda toks: toks[0].strip())
+        return (Keyword('json:').suppress() +
+                indentedBlock((json_dumps & json_loads), indent_stack)
+               ).setResultsName('json_ext')
 
     @classmethod
-    def create_element(cls, rule, override, extend, namespace):
-        json_id = rule.json_id[0]
-        assert json_id in FieldParser.field_definitions(namespace)
+    def create_element(cls, rule, namespace):
+        """Creates the dictionary with the dump and load functions"""
 
-        return {'loads': try_to_eval(rule.json_ext.loads.strip(), functions(namespace)),
-                'dumps': try_to_eval(rule.json_ext.dumps.strip(), functions(namespace))}
+        return {'loads': try_to_eval(rule.json_ext.loads,
+                                     functions(namespace)),
+                'dumps': try_to_eval(rule.json_ext.dumps,
+                                     functions(namespace))}
 
     @classmethod
     def add_info_to_field(cls, json_id, rule):
-        info = {}
+        """Adds to the field definition the path to get the json functions"""
+        info = {'dumps': None, 'loads': None}
         if 'json_ext' in rule:
             info['dumps'] = (json_id, 'json_ext', 'dumps')
             info['loads'] = (json_id, 'json_ext', 'loads')
         return info
 
+    @classmethod
+    def evaluate(cls, json, field_name, action, args):
+        """Evaluate the dumps and loads functions depending on the action"""
+        from invenio.modules.jsonalchemy.parser import FieldParser
+        if action == 'set':
+            try:
+                json._dict[field_name] = reduce(
+                    lambda obj, key: obj[key],
+                    args['dumps'],
+                    FieldParser.field_definitions(
+                        json.additional_info.namespace))(json._dict_bson[field_name])
+            except (KeyError, IndexError, TypeError):
+                json._dict[field_name] = json._dict_bson[field_name]
+        elif action == 'get':
+            try:
+                json._dict_bson[field_name] = reduce(
+                    lambda obj, key: obj[key],
+                    args['loads'],
+                    FieldParser.field_definitions(
+                        json.additional_info.namespace))(json._dict[field_name])
+            except (KeyError, IndexError, TypeError):
+                json._dict_bson[field_name] = json._dict[field_name]
 
-JsonExtraParser.__name__ = 'json_ext'
 parser = JsonExtraParser
