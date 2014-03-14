@@ -32,27 +32,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from invenio.utils.serializers import ZlibMarshal, ZlibPickle
 
 
-@MutableDict.as_mutable
-class JSONEncodedTextDict(TypeDecorator):
-    """
-    Represents an immutable structure as a json-encoded string.
-
-    @see: http://docs.sqlalchemy.org/en/latest/core/types.html
-    """
-
-    impl = TEXT
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            value = json.dumps(value)
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value:
-            return json.loads(value)
-        return None
-
-
 class MarshalBinary(TypeDecorator):
 
     impl = LargeBinary
