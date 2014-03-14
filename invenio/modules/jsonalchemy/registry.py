@@ -24,50 +24,73 @@ from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 from invenio.utils.datastructures import LazyDict
 
 jsonext = lambda namespace: RegistryProxy(
-    namespace, ModuleAutoDiscoveryRegistry, namespace
-)
+    namespace, ModuleAutoDiscoveryRegistry, namespace)
 
-fields_definitions = lambda namespace: RegistryProxy(
+
+fields_proxy = lambda namespace: RegistryProxy(
     namespace + '.fields', PkgResourcesDirDiscoveryRegistry, 'fields',
     registry_namespace=jsonext(namespace))
 
-models_definitions = lambda namespace: RegistryProxy(
+
+def fields_definitions(namespace=None):
+    field_defs = list(fields_proxy('jsonext'))
+    if namespace:
+        field_defs.extend(list(fields_proxy(namespace)))
+    return field_defs
+
+
+models_proxy = lambda namespace: RegistryProxy(
     namespace + '.models', PkgResourcesDirDiscoveryRegistry, 'models',
     registry_namespace=jsonext(namespace))
+
+
+def models_definitions(namespace=None):
+    models_defs = list(models_proxy('jsonext'))
+    if namespace:
+        models_defs.extend(list(models_proxy(namespace)))
+    return models_defs
+
 
 function_proxy = lambda namespace: RegistryProxy(
     namespace + '.functions', ModuleAutoDiscoverySubRegistry, 'functions',
     registry_namespace=jsonext(namespace))
 
 
-def functions(namespace):
+def functions(namespace=None):
     funcs = dict((module.__name__.split('.')[-1],
-                 getattr(module, module.__name__.split('.')[-1], ''))
+                 getattr(module, module.__name__.split('.')[-1]))
                  for module in function_proxy('jsonext'))
-    funcs.update((module.__name__.split('.')[-1],
-                 getattr(module, module.__name__.split('.')[-1], ''))
-                 for module in function_proxy(namespace))
+    if namespace:
+        funcs.update((module.__name__.split('.')[-1],
+                     getattr(module, module.__name__.split('.')[-1]))
+                     for module in function_proxy(namespace))
     return funcs
+
 
 parsers = RegistryProxy('jsonext.parsers', ModuleAutoDiscoverySubRegistry,
                         'parsers', registry_namespace=jsonext('jsonext'))
+
 
 producers_proxy = RegistryProxy('jsonext.producers',
                                 ModuleAutoDiscoverySubRegistry,
                                 'producers',
                                 registry_namespace=jsonext('jsonext'))
 
+
 producers = LazyDict(lambda: dict((module.__name__.split('.')[-1],
                                    module.produce)
                                   for module in producers_proxy))
+
 
 readers_proxy = RegistryProxy('jsonext.readers',
                               ModuleAutoDiscoverySubRegistry,
                               'readers', registry_namespace=jsonext('jsonext'))
 
+
 readers = LazyDict(lambda: dict((module.reader.__master_format__,
                                  module.reader)
                                 for module in readers_proxy))
+
 
 contexts_proxy = lambda namespace: RegistryProxy(
     namespace + '.contexts', ModuleAutoDiscoverySubRegistry, 'contexts',
