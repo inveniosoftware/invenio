@@ -1185,6 +1185,11 @@ function displayAlert(msgType, args) {
         msg = 'Field ' + args[0] + ' cannot be deleted.\n' +
         'It contains subfield changed in Holding Pen\'s record and an action should be taken first';
         break;
+    case 'alertSwitchHoldingPenToMarc':
+        msg = '******************** WARNING ********************\n' +
+            '                  You have pending Holding Pen changes.\n\n' +
+            'You must take an action for every Holding Pen change\n';
+        break;
     case 'errorPhysicalCopiesExist':
         msg = "ERROR: Cannot delete record when physical copies exist. " +
             "First remove the copies in the BibCirculation module and then try again";

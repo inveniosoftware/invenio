@@ -2125,6 +2125,20 @@ function onTextMarcClick() {
   * 3) Activate flag to know we are in text marc mode (for submission)
   */
   log_action("onTextMarcClick");
+  var stop = false;
+  for (changeInd in gHoldingPenChanges){
+    var changeObj = gHoldingPenChanges[changeInd];
+    if ( (!changeObj.hasOwnProperty('applied_change') || changeObj.applied_change !== true ) &&
+        changeObj.change_type !== "subfield_same"){
+      stop = true;
+    }
+  }
+  if (stop) {
+    displayAlert('alertSwitchHoldingPenToMarc');
+    event.preventDefault();
+    return;
+  }
+
   $("#img_textmarc").off("click");
 
   save_changes().done(function() {
@@ -2197,7 +2211,8 @@ function onTableViewClick() {
   */
   log_action("onTableViewClick");
   createReq({recID: gRecID, textmarc: $('#textmarc_textbox').val(),
-      requestType: 'getTableView', recordDirty: gRecordDirty
+      requestType: 'getTableView', recordDirty: gRecordDirty,
+      disabled_hp_changes: gDisabledHpEntries
        }, function(json) {
           var resCode = json['resultCode'];
           if (resCode == 115) {

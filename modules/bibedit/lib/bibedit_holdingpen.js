@@ -428,7 +428,7 @@ function onHoldingPenChangesetRetrieved(json){
 
 function holdingPenPanelApplyChangeSet(changesNum){
   /** Applies the changeset of given number to the record
-   * 	   (initialises the retrieving if necessary)
+   *      (initialises the retrieving if necessary)
    *
    * applying a changeset consists of adding the proposal
    * buttons in appropriate fields and removing the Holding Pen entry
