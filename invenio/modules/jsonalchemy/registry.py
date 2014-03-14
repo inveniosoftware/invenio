@@ -34,7 +34,7 @@ fields_proxy = lambda namespace: RegistryProxy(
 
 def fields_definitions(namespace=None):
     field_defs = list(fields_proxy('jsonext'))
-    if namespace:
+    if namespace is not None:
         field_defs.extend(list(fields_proxy(namespace)))
     return field_defs
 
@@ -46,7 +46,7 @@ models_proxy = lambda namespace: RegistryProxy(
 
 def models_definitions(namespace=None):
     models_defs = list(models_proxy('jsonext'))
-    if namespace:
+    if namespace is not None:
         models_defs.extend(list(models_proxy(namespace)))
     return models_defs
 
@@ -60,7 +60,7 @@ def functions(namespace=None):
     funcs = dict((module.__name__.split('.')[-1],
                  getattr(module, module.__name__.split('.')[-1]))
                  for module in function_proxy('jsonext'))
-    if namespace:
+    if namespace is not None:
         funcs.update((module.__name__.split('.')[-1],
                      getattr(module, module.__name__.split('.')[-1]))
                      for module in function_proxy(namespace))
@@ -97,11 +97,12 @@ contexts_proxy = lambda namespace: RegistryProxy(
     registry_namespace=jsonext(namespace))
 
 
-def contexts(namespace):
+def contexts(namespace=None):
     contexts = dict((module.__name__.split('.')[-1],
                      getattr(module, 'context'))
                     for module in contexts_proxy('jsonext'))
-    contexts.update((module.__name__.split('.')[-1],
-                     getattr(module, 'context'))
-                    for module in contexts_proxy(namespace))
+    if namespace is not None:
+        contexts.update((module.__name__.split('.')[-1],
+                         getattr(module, 'context'))
+                        for module in contexts_proxy(namespace))
     return contexts

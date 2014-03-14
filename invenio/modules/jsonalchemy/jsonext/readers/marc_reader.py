@@ -37,13 +37,6 @@ class MarcReader(Reader):
 
     split_marc = re.compile('<record.*?>.*?</record>', re.DOTALL)
 
-    def __init__(self, blob=None, **kwargs):
-        """
-        :param blob:
-        """
-        super(MarcReader, self).__init__(blob=blob, **kwargs)
-        self._additional_info['master_format'] = 'marc'
-
     @staticmethod
     def split_blob(blob, schema=None, **kwargs):
         """
@@ -65,7 +58,8 @@ class MarcReader(Reader):
             return import_string(guess_function)(self)
 
         try:
-            return [coll['a'].lower() for coll in self.rec_tree.get('980__') if 'a' in coll]
+            return [coll['a'].lower()
+                    for coll in self.rec_tree.get('980__') if 'a' in coll]
         except TypeError:
             try:
                 return self.rec_tree.get('980__', {})['a']
@@ -105,7 +99,7 @@ class MarcReader(Reader):
                 value = current_value
             d[key] = value
         self.rec_tree = SaveDict()
-        tmp = create_record(self.blob)[0]
+        tmp = create_record(self._blob)[0]
         for key, values in iteritems(tmp):
             if key < '010' and key.isdigit():
                 self.rec_tree[key] = [value[3] for value in values]
@@ -114,6 +108,8 @@ class MarcReader(Reader):
                     field = SaveDict()
                     for subfield in value[0]:
                         dict_extend_helper(field, subfield[0], subfield[1])
-                    dict_extend_helper(self.rec_tree, (key + value[1] + value[2]).replace(' ', '_'), field)
+                    dict_extend_helper(
+                        self.rec_tree,
+                        (key + value[1] + value[2]).replace(' ', '_'), field)
 
 reader = MarcReader

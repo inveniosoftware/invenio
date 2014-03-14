@@ -18,6 +18,9 @@ Extensions
 Modules
 -------
 
+.. automodule:: invenio.modules.jsonalchemy
+   :members:
+
 .. automodule:: invenio.modules.tags
    :members:
 

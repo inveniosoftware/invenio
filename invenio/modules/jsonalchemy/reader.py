@@ -21,40 +21,44 @@
     invenio.modules.jsonalchemy.reader
     ----------------------------------
 
-    Default reader, it could be considered as an interface to be implemented by
-    the other readers.
 """
 import datetime
 import six
 
 from invenio.base.utils import try_to_eval
-from invenio.utils.datastructures import SmartDict
 
 from .errors import ReaderException
 from .parser import FieldParser, ModelParser
-from .registry import functions, parsers
+from .registry import functions, readers
 
 
-class Reader(object):
-    """Default reader"""
+def split_blob(blob, master_format, **kwargs):
+    return readers[master_format].split_blob(blob, **kwargs)
 
-    def __init__(self, blob=None, **kwargs):
-        """
-        :param blob:
-        """
-        self.blob = blob
-        self.json = None
-        self._additional_info = kwargs
-        self._additional_info['model'] = kwargs.get('model', '__default__')
-        self._additional_info['namespace'] = kwargs.get('namespace', None)
 
-        if self._additional_info['namespace'] is None:
-            raise ReaderException('A namespace is needed to instantiate a reader')
+class Reader(object):  # pylint: disable=R0921
+    """
+    Default/Base reader, it provides the common functionality to use the
+    readers. Typically this class should be used as a factory to create the
+    concrete reader depending of the master format of the input.
 
-        if self._additional_info['model'] != '__default__' and \
-                isinstance(self._additional_info['model'], six.string_types):
-            self._additional_info['model'] = [self._additional_info['model'], ]
+    >>> from invenio.modules.jsonalchemy.reader import Reader
+    >>> from invenio.modules.readers.api import Record
+    >>> record = Reader.translate(blob, 'marc', Record, model=['picture'])
 
+    """
+
+    def __new__(cls, json, blob=None, **kwargs):  # pylint: disable=W0613
+        try:
+            master_format = json.additional_info.master_format
+            return super(Reader, cls).__new__(readers[master_format])
+        except KeyError as e:
+            raise KeyError("Not reader found for '%s'" % (e.message, ))
+
+    def __init__(self, json, blob=None, **kwargs):
+        self._blob = blob if blob is not None or kwargs.get('no_blob', False) \
+            else json.get_blob()
+        self._json = json
         self._parsed = []
 
     @staticmethod
@@ -65,430 +69,476 @@ class Reader(object):
         """
         raise NotImplementedError()
 
-    @property
-    def field_definitions(self):
-        """Helper property to get the field definitions from the current namespace"""
-        return FieldParser.field_definitions(self.json_additional_info['namespace'])
-
-    @property
-    def model_definitions(self):
-        """Helper property to get the model definitions from the current namespace"""
-        return ModelParser.model_definitions(self.json_additional_info['namespace'])
-
-    @property
-    def functions(self):
-        """Helper property to get the functions from the current namespace"""
-        return functions(self.json_additional_info['namespace'])
-
-    @property
-    def json_additional_info(self):
-        """Helper property to get the additional infor from the current json obj"""
-        try:
-            return self.json['__meta_metadata__']['__additional_info__']
-        except KeyError:
-            return self._additional_info
-
-    def translate(self, blob=None):
+    @classmethod
+    def translate(cls, blob, json_class, master_format='json', **kwargs):
         """
-        It transforms the incoming blob into a json structure using the rules
-        described into the field and model definitions.
-        To apply this rules it takes into account the type of the reader, which
-        in fact means the type of the source format or `master_format`
+        Transforms the incoming blob into a json structure (``json_class``)
+        using the rules describes in the field and model definitions.
 
-        :return: Json structure (typically a dictionary)
+        :param blob: incoming blob (like MARC)
+        :param json_class: Any subclass of :class:`~invenio.modules.jsonalchemy.wrappers.SmartJson`
+        :param master_format: Master format of the input blob.
+        :param kwargs: parameter to pass to json_class
+
+        :return: New object of ``json_class`` type containing the result of the
+            translation
         """
-        if blob is not None:
-            self.blob = blob
-            self.json = None
+        from .wrappers import SmartJson
+        if blob is None:
+            raise ReaderException(
+                    "To perform a 'translate' operation a blob is needed")
+        if not issubclass(json_class, SmartJson):
+            raise ReaderException("The json class must be of type 'SmartJson'")
 
-        if self.blob is None:
-            raise ReaderException("To perform a 'translate' operation a blob is needed")
+        json = json_class(master_format=master_format, **kwargs)
+        # fill up with all possible fields
+        fields = ModelParser.resolve_models(json.model_info.names,
+                                            json.additional_info.namespace)\
+                                           .get('fields')
+        cls.add(json, fields, blob, fetch_model_info=True)
+        return json
 
-        # If we already have the json return it, use add or update to modify it
-        if self.json:
-            return self.json
-
-        self.json = {}
-        self.json['__meta_metadata__'] = {}
-        self.json['__meta_metadata__']['__additional_info__'] = self.json_additional_info
-        self.json['__meta_metadata__']['__aliases__'] = {}
-        self.json['__meta_metadata__']['__errors__'] = []
-        self.json['__meta_metadata__']['__continuable_errors__'] = []
-
-        return self.add(self.json, self.blob)
-
-    def add(self, json, blob, fields=None):
-        """Adds the list of fields to the json structure"""
-        self.json = json if isinstance(json, SmartDict) else SmartDict(json)
-        self.blob = blob
-
-        if self.blob is None or self.json is None:
-            raise ReaderException("To perform an 'add' operation a json structure and a blob are needed")
-
-        self._prepare_blob()
-
-        if self.json_additional_info['model'] == '__default__':
-            self.json_additional_info['model'] = \
-                self.guess_model_from_input()
-
-        if not isinstance(fields, dict):
-            if isinstance(fields, six.string_types):
-                fields = (fields, )
-            fields = self._get_fields_from_model(fields)
-
-        for field_name, json_id in fields.items():
-            self._unpack_rule(json_id, field_name)
-
-        self._post_process_json()
-
-        return self.json._dict
-
-    def set(self, json, field, value=None):
+    @classmethod
+    def add(cls, json, fields, blob=None, fetch_model_info=False):
         """
-        When adding a new field to the json object tries to find as much information
-        about this field as possible and attaches it to the json object.
-        ``self.json['__meta_metadata__'][field]``
+        Adds the list of fields to the json structure, if fields is ``None``
+        it adds all the possible fields from the current model.
+
+        :param json: Any ``SmartJson`` object
+        :param fields: Dict of fields to be added to the json structure
+            containing field_name:json_id
         """
-        self.json = json if isinstance(json, SmartDict) else SmartDict(json)
+        reader = cls(json, blob)
+        reader._prepare_blob()
 
-        if field in self.json['__meta_metadata__']:
-            if value:
-                self.json[field] = value
-            return self.json._dict
+        if fetch_model_info:
+            reader._process_model_info()
 
-        try:
-            model = self.json_additional_info['model']
-        except KeyError as e:
-            raise ReaderException('The json structure must contain a model (%s)' % (e, ))
+        if isinstance(fields, six.string_types):
+            fields = (fields, )
+        if isinstance(fields, (list, tuple)):
+            model_fields = ModelParser.resolve_models(json.model_info.names,
+                    json.additional_info.namespace)\
+                    .get('fields')
+            fields = dict((field_name, model_fields.get(field_name, field_name))
+                          for field_name in fields)
 
-        json_id = ModelParser.resolve_models(model, self.json_additional_info['namespace']).get(field, field)
+        for json_id, field_name in six.iteritems(fields):
+            reader._unpack_rule(json_id, field_name)
+        reader._post_process_json()
 
-        try:
-            #FIXME: find solution for cases like authors or keywords
-            rule_def = self.field_definitions[json_id]
-        except KeyError:
-            rule_def = {}
-            self.json['__meta_metadata__']['__continuable_errors__']\
-                    .append("Adding a new field '%s' without definition" % (field))
+    @classmethod
+    def set(cls, json, field, value=None, set_default_value=False):
+        """
+        When adding a new field to the json object finds as much information
+        about it as possible and attaches it to the json object inside
+        ``json['__meta_metadata__'][field]``.
 
-        try:
-            if self.json_additional_info['master_format'] in rule_def['rules']:
-                rule = rule_def['rules'][self.json_additional_info['master_format']][0]
-                rule_type = 'creator'
-            elif 'derived' in rule_def['rules']:
-                rule = rule_def['rules']['derived'][0]
-                rule_type = 'derived'
-            elif 'calculated' in rule_def['rules']:
-                rule = rule_def['rules']['calculated'][0]
-                rule_type = 'calculated'
-            else:
-                rule = {}
-                rule_type = 'UNKNOWN'
-        except KeyError:
-            rule = {}
-            rule_type = 'UNKNOWN'
-
-        self.json['__meta_metadata__'][field] = \
-                self._find_meta_metadata(json_id, field, rule_type, rule, rule_def)
+        :param json: Any ``SmartJson`` object
+        :param field: Name of the new field to be added
+        :param value: New value for the field (if not ``None``)
+        :param set_default_value: If set to ``True`` looks for the default value
+            if any and sets it.
+        """
+        reader = None
+        json_id = None
+        if field not in json.meta_metadata:
+            #We don't have any meta_metadata, look for it.
+            reader = cls(json=json, no_blob=True)
+            json_id = \
+                ModelParser.resolve_models(json.model_info,
+                                           json.additional_info.namespace)\
+                    ['fields'].get(field, field)
+            json['__meta_metadata__'][field] = \
+                    reader._find_field_metadata(json_id, field)
 
         if value:
-            self.json[field] = value
+            json[field] = value
+        elif set_default_value:
+            if reader is None:
+                reader = cls(json=json, no_blob=True)
+                json_id = \
+                    ModelParser.resolve_models(json.model_info,
+                                               json.additional_info.namespace)\
+                        ['fields'].get(field, field)
 
-        return self.json._dict
+            reader._set_default_value(json_id, field)
 
-    def update(self, json, blob, fields=None):
+    @classmethod
+    def update(cls, json, fields, blob=None, update_db=False):
         """
-        Tries to update the json structure with the fields given.
-        If no fields are given then it will try to update all the fields inside
-        the json structure.
+        Updates the fields given from the json structure.
+
+        :param json: Any ``SmartJson`` object
+        :param blob: incoming blob (like MARC), if ``None``, ``json.get_blob``
+            will be used to retrieve it if needed.
+        :param fields: List of fields to be updated, if ``None`` all fields will
+            be updated.
+        :param save: If set to ``True`` a 'soft save' will be performed with the
+            changes.
         """
+        reader = cls(json=json, blob=blob if blob else json.get_blob())
+        reader._update(fields)
 
-        if not blob or not json:
-            raise ReaderException("To perform an 'update' operation a json structure and a blob are needed")
+        if update_db:
+            json.update()
 
-        self.json = json if isinstance(json, SmartDict) else SmartDict(json)
-        self.blob = blob
+    @classmethod
+    def process_model_info(cls, json):
+        """
+        Fetches all the possible information about the current models and
+        applies all the model extensions `evaluate` methods if any extension is
+        used
+        """
+        reader = cls(json, no_blob=True)
+        reader._process_model_info()
 
-        try:
-            model = self.json_additional_info['model']
-        except KeyError as e:
-            raise ReaderException('The json structure must contain a model (%s)' % (e, ))
+    @classmethod
+    def update_meta_metadata(cls, json, blob=None, fields=None, section=None,
+                             keep_core_values=True, store_backup=True):
+        """
+        Updates the meta-metadata for a guiven set of fields (if ``None`` all
+        fields will be used).
 
-        if not fields:
-            fields = dict(zip(json.keys(), json.keys()))
-            fields.update(ModelParser.resolve_models(model,
-                self.json_additional_info['namespace']).get('fields', {}))
-        elif not isinstance(fields, dict):
-            if isinstance(fields, six.string_types):
-                fields = (fields, )
 
-            fields = dict((field, ModelParser.resolve_models(model,
-                self.json_additional_info['namespace']).get('fields', {}).get(field, field))
-                          for field in fields)
+        """
+        reader = cls(json, blob)
+        reader._update_meta_metadata(fields, section, keep_core_values,
+                                     store_backup)
 
-        return self.add(json, blob, fields)
 
-    def guess_model_from_input(self):
+    def _process_model_info(self):
         """
         Dummy method to guess the model of a given input.
         Should be redefined in the dedicated readers.
 
-        .. seealso:: modules :py:mod:`invenio.modules.jsonalchemy.jsonext.readers`
+        :return: List of models found in the blob
         """
-        return '__default__'
+        if self._json.model_info.names == ['__default__']:
+             self._json['__meta_metadata__']['__model_info__']['names'] = \
+                     self._guess_model_from_input()
+
+        model = ModelParser.resolve_models(self._json.model_info.names,
+                                           self._json.additional_info.namespace)
+
+        for key, value in six.iteritems(model):
+            if key in ('fields', 'bases'):
+                continue
+            ModelParser.parser_extensions()[key].evaluate(self._json, value)
+
+    def _guess_model_from_input(self):
+        """
+        Dummy method to guess the model of a given input.
+        Should be redefined in the dedicated readers.
+
+        :return: List of models found in the blob
+        """
+        return ['__default__']
 
     def _prepare_blob(self, *args, **kwargs):
         """
         Responsible of doing any kind of transformation over the blob before the
-        translation begins
-
-        .. seealso:: modules :py:mod:`invenio.modules.jsonalchemy.jsonext.readers`
+        translation begins.
+        It should create a common structure that all the methods, specially
+        ``_get_elements_from_blob`` understand.
         """
         raise NotImplementedError()
-
-    def _get_elements_from_blob(self, regex_key):
-        """
-        Should handle 'entire_record' and '*'
-        Not an iterator!
-
-        .. seealso:: modules :py:mod:`invenio.modules.jsonalchemy.jsonext.readers`       
-        """
-        raise NotImplementedError()
-
-    def _get_fields_from_model(self, fields=None):
-        """
-        Helper function to get all the fields from the current model (if any)
-
-        :param fields: List containing the name of the fields to disambiguate.
-            If None searches for all possible fields.
-        """
-        if self.json_additional_info['model'] == '__default__' or \
-                all(model not in self.model_definitions for model in self.json_additional_info['model']):
-            if not fields:
-                return dict(zip(self.field_definitions.keys(), self.field_definitions.keys()))
-            else:
-                return dict(zip(fields, fields))
-        else:
-            full_model = ModelParser.resolve_models(self.json_additional_info['model'],
-                    self.json_additional_info['namespace'])
-            if not fields:
-                return full_model['fields']
-            else:
-                return dict((field, full_model.get(field, field))
-                            for field in fields)
-        return dict()
-
-    def _unpack_rule(self, json_id, field_name=None):
-        """From the field definitions extract the rules an tries to apply them"""
-        try:
-            rule_def = self.field_definitions[json_id]
-        except KeyError as e:
-            self.json['__meta_metadata__']['__continuable_errors__']\
-                    .append("Error - Unable to find '%s' field definition" % (json_id, ))
-            return False
-
-        if not field_name:
-            field_name = self._get_fields_from_model((json_id, ))[json_id]
-
-        # Undo the workaround for [0] and [n]
-        if isinstance(rule_def, list):
-            return all(map(self._unpack_rule, rule_def))
-
-        # Already parsed, avoid doing it again
-        if (json_id, field_name) in self._parsed:
-            return field_name in self.json
-
-        self._parsed.append((json_id, field_name))
-        apply_rule = self._apply_rules(json_id, field_name, rule_def)
-        apply_virtual_rule = self._apply_virtual_rules(json_id, field_name, rule_def)
-        return  apply_rule or apply_virtual_rule
-
-    def _apply_rules(self, json_id, field_name, rule_def):
-        """Tries to apply a 'creator' rule"""
-        applied = False
-        for rule in rule_def['rules'].get(
-                self.json_additional_info['master_format'], []):
-            elements = self._get_elements_from_blob(rule['source_tag'])
-            if not elements:
-                self._set_default_value(json_id, field_name)
-                return False
-            if not self._evaluate_decorators(rule):
-                return False
-            if 'entire_record' in rule['source_tag'] or '*' in rule['source_tag']:
-                try:
-                    value = try_to_eval(rule['value'], self.functions, value=elements, self=self.json)
-                    info = self._find_meta_metadata(json_id, field_name, 'creator', rule, rule_def)
-                    if 'json_ext' in rule_def:
-                        value = rule_def['json_ext']['dumps'](value)
-                    self.json.set(field_name, value, extend=True)
-                    self.json['__meta_metadata__.%s' % (SmartDict.main_key_pattern.sub('', field_name), )] = info
-                    applied = True
-                except Exception as e:
-                    self.json['__meta_metadata__']['__errors__']\
-                            .append('Rule Error - Unable to apply rule for field %s - %s' % (field_name, str(e)),)
-                    applied = False
-
-            else:
-                for element in elements:
-                    if not isinstance(element, (list, tuple)):
-                        element = (element, )
-                    applied = False
-                    for e in element:
-                        if rule['only_if_master_value'] and \
-                           not all(try_to_eval(rule['only_if_master_value'],
-                               self.functions, value=e, self=self.json)):
-                            applied = applied or False
-                        else:
-                            try:
-                                value = try_to_eval(rule['value'], self.functions,
-                                        value=e, self=self.json)
-                                info = self._find_meta_metadata(json_id,
-                                        field_name, 'creator', rule, rule_def)
-                                if 'json_ext' in rule_def:
-                                    value = rule_def['json_ext']['dumps'](value)
-                                self.json.set(field_name, value, extend=True)
-                                self.json['__meta_metadata__.%s' % (SmartDict.main_key_pattern.sub('', field_name), )] = info
-                                applied = applied or True
-                            except Exception as e:
-                                self.json['__meta_metadata__']['__errors__']\
-                                        .append('Rule Error - Unable to apply rule for field %s - %s' % (field_name, str(e)),)
-                                applied = applied or False
-
-        if field_name not in self.json or not applied:
-            self._set_default_value(json_id, field_name)
-        return applied
-
-    def _apply_virtual_rules(self, json_id, field_name, rule_def):
-        """Tries to apply either a 'derived' or 'calculated' rule"""
-        rules = []
-        rules.append(('calculated', rule_def['rules'].get('calculated', [])))
-        rules.append(('derived', rule_def['rules'].get('derived', [])))
-        for (rule_type, rrules) in rules:
-            for rule in rrules:
-                if not self._evaluate_decorators(rule):
-                    return False
-                try:
-                    info = self._find_meta_metadata(json_id, field_name, rule_type, rule, rule_def)
-                    if rule_type == 'derived' or rule['memoize']:
-                        value = try_to_eval(rule['value'], self.functions, self=self.json)
-                        if 'json_ext' in rule_def:
-                            value = rule_def['json_ext']['dumps'](value)
-                    else:
-                        value = None
-
-                    self.json.set(field_name, value, extend=True)
-                    self.json['__meta_metadata__.%s' % (SmartDict.main_key_pattern.sub('', field_name), )] = info
-                except Exception as e:
-                    self.json['__meta_metadata__']['__continuable_errors__']\
-                            .append('Virtual Rule CError - Unable to evaluate %s - %s' % (field_name, str(e)))
-                    return False
-
-        if field_name not in self.json:
-            self._set_default_value(json_id, field_name)
-        return True
-
-    def _evaluate_decorators(self, rule):
-        """Evaluates all 'decorators' related with the current rule"""
-        if rule['parse_first']:
-            map(self._unpack_rule, try_to_eval(rule['parse_first']))
-        if rule['depends_on']:
-            for key in try_to_eval(rule['depends_on']):
-                if key in self.json:
-                    continue
-                main_key = SmartDict.main_key_pattern.sub('', key)
-                if not self._unpack_rule(main_key):
-                    return False
-        if rule['only_if'] and not all(try_to_eval(rule['only_if'], self.functions, self=self.json)):
-            return False
-        return True
-
-    def _find_meta_metadata(self, json_id, field_name, rule_type=None, rule=None, rule_def=None):
-        """Given one rule fills up the parallel dictionary with the needed meta-metadata"""
-        if rule_def is None:
-            rule_def = self.field_definitions[json_id]
-        if rule is None or rule_type is None:
-            if self.json_additional_info['master_format'] in rule_def['rules']:
-                rule = rule_def['rules'][self.json_additional_info['master_format']][0]
-                rule_type = 'creator'
-            elif 'derived' in rule_def['rules']:
-                rule = rule_def['rules']['derived'][0]
-                rule_type = 'derived'
-            elif 'calculated' in rule_def['rules']:
-                rule = rule_def['rules']['calculated'][0]
-                rule_type = 'calculated'
-            else:
-                rule = {}
-                rule_type = 'UNKNOWN'
-
-        for alias in rule_def.get('aliases', []):
-            self.json['__meta_metadata__.__aliases__.%s' % (alias, )] = field_name
-        info = {}
-        info['timestamp'] = datetime.datetime.now().isoformat()
-        if rule_def.get('persistent_identifier', None) is not None:
-            info['pid'] = rule_def['persistent_identifier']
-        info['memoize'] = rule.get('memoize', None)
-        info['type'] = rule_type
-        if rule_type in ('calculated', 'derived'):
-            info['function'] = (json_id, 'rules', rule_type, 0, 'value')
-        elif rule_type == 'UNKNOWN':
-            info['function'] = 'UNKNOWN'
-            info['source_tag'] = 'UNKNOWN'
-        else:
-            info['source_tag'] = rule['source_tag']
-
-        #Check the extensions
-        for parser_extension in parsers:
-            info.update(parser_extension.parser.add_info_to_field(json_id, rule_def))
-
-        return info
-
-    def _set_default_value(self, json_id, field_name):
-        """Finds the default value inside the schema, if any"""
-        def remove_metadata(field_name):
-            """Handy closure to remove metadata when not needed"""
-            try:
-                del self.json['__meta_metadata__'][field_name]
-            except KeyError:
-                pass
-
-        schema = self.field_definitions[json_id].get('schema', {}).get(json_id)
-        if schema and 'default' in schema:
-            try:
-                value = schema['default']()
-                try:
-                    value = self.field_definitions[json_id]['json_ext']['dumps'](value)
-                except KeyError:
-                    pass
-                self.json.set(field_name, value, extend=True)
-                self.json['__meta_metadata__.%s' % (SmartDict.main_key_pattern.sub('', field_name), )] = \
-                        self._find_meta_metadata(json_id, field_name)
-            except Exception as e:
-                self.json['__meta_metadata__']['__continuable_errors__']\
-                        .append('Default Value CError - Unable to set default value for %s - %s' % (field_name, str(e)))
-                remove_metadata(field_name)
-        else:
-            remove_metadata(field_name)
 
     def _post_process_json(self):
         """
         Responsible of doing any kind of transformation over the json structure
-        after it is created, e.g. pruning the json to delete None values or
-        singletons.
+        after it is created, e.g. pruning the json to delete singletons.
         """
-        def remove_none_values(obj):
-            """Handy closure to remove recursively None values from obj"""
-            if isinstance(obj, dict):
-                for key, value in obj.items():
-                    if value is None:
-                        del obj[key]
-                    else:
-                        remove_none_values(value)
-            if isinstance(obj, list):
-                for element in obj:
-                    if element is None:
-                        obj.remove(element)
-                    else:
-                        remove_none_values(element)
+        pass
 
-        map(remove_none_values, [value for key, value in self.json.items() if not key == '__meta_metadata__'])
+    def _get_elements_from_blob(self, regex_key):
+        """
+        Like ``get`` for a normal python dictionary but in this case it should
+        handle 'entire_record' and '*' as key.
 
+        :param regex_key: key to access the intermediate structure, could be a
+            plain string or a python regular expression.
+
+        :return: List containing the values matching the regex_key
+        """
+        raise NotImplementedError()
+
+    def _unpack_rule(self, json_id, field_name=None):
+        """
+        From the field definitions extract the rules an tries to apply them to
+        fill up the current json.
+
+        :param json_id: key to access the field description in
+            ``FieldParser.field_definitions``
+        :param field_name: future name of the field in the json structure, if
+            ``None`` json_id will be used.
+
+        :return: ``True`` if the rule for ``json_id`` was applied successfully,
+            ``False`` otherwise.
+        """
+        try:
+            rule = FieldParser.field_definitions(
+                    self._json.additional_info.namespace)[json_id]
+        except KeyError as e:
+            self._json.continuable_errors.append(
+                "Error - Unable to find '%s' field definition" % (json_id, ))
+            return False
+
+        if not field_name:
+            field_name = json_id
+
+        if (json_id, field_name) in self._parsed:
+            return field_name in self._json
+
+        self._parsed.append((json_id, field_name))
+
+        ## In this two method calls the decorators are never apply because of
+        ## default types, i.e. when keywords are evaluated the first keyword
+        ## which is parsed creates a string not a list, therefore all the
+        ## extensions and decorator that are expecting a list will fail.
+        self._apply_rules(json_id, field_name, rule)
+        self._apply_virtual_rules(json_id, field_name, rule)
+
+        if field_name not in self._json._dict_bson:
+            self._set_default_value(json_id, field_name)
+        else:
+            self._set_default_type(json_id, field_name)
+            for ext, args in six.iteritems(self._json.meta_metadata[field_name]['after']):
+                FieldParser.decorator_after_extensions()[ext]\
+                        .evaluate(self._json, field_name, 'set', args)
+            for ext, args in six.iteritems(self._json.meta_metadata[field_name]['ext']):
+                FieldParser.field_extensions()[ext]\
+                        .evaluate(self._json, field_name, 'set', args)
+        return field_name in self._json
+
+    def _apply_rules(self, json_id, field_name, rule):
+        """Tries to apply a 'creator' rule"""
+        for field_def in rule['rules'].get(
+                self._json.additional_info.master_format, []):
+            if not self._evaluate_before_decorators(field_def):
+                continue
+            for elements in \
+                    self._get_elements_from_blob(field_def['source_tags']):
+                if not isinstance(elements, (list, tuple)):
+                    elements = (elements, )
+                for element in elements:
+                    if not self._evaluate_on_decorators(field_def, element):
+                        continue
+                    try:
+                        value = try_to_eval(
+                            field_def['function'],
+                            functions(self._json.additional_info.namespace),
+                            value=element, self=self._json)
+                        self._remove_none_values(value)
+                        info = self._find_field_metadata(json_id, field_name,
+                                                         'creator', field_def)
+                        self._json['__meta_metadata__'][field_name] = info
+                        self._json.__setitem__(field_name, value, extend=True,
+                                               exclude=['decorators',
+                                                        'extensions'])
+                    except Exception as e:
+                        self._json.errors.append(
+                                "Rule Error - Unable to apply rule for field "
+                                "'%s' with value '%s'. \n%s"
+                                % (field_name, element, str(e)),)
+
+    def _apply_virtual_rules(self, json_id, field_name, rule):
+        """Tries to apply either a 'derived' or 'calculated' rule"""
+        field_defs = []
+        field_defs.append(('calculated', rule['rules'].get('calculated', [])))
+        field_defs.append(('derived', rule['rules'].get('derived', [])))
+        for (field_type, _field_def) in field_defs:
+            for field_def in _field_def:
+                if not self._evaluate_before_decorators(field_def):
+                    continue
+                try:
+                    value = try_to_eval(
+                        field_def['function'],
+                        functions(self._json.additional_info.namespace),
+                        self=self._json)
+                    self._remove_none_values(value)
+                    info = self._find_field_metadata(json_id, field_name,
+                                                     field_type, field_def)
+                    self._json['__meta_metadata__'][field_name] = info
+                    self._json.__setitem__(field_name, value, extend=False,
+                                           exclude=['decorators', 'extensions'])
+                except Exception as e:
+                    self._json.errors.append(
+                                "Rule Error - Unable to apply rule for virtual "
+                                "field '%s'. \n%s"
+                                % (field_name, str(e)),)
+
+    def _set_default_value(self, json_id, field_name):
+        """Finds the default value inside the schema, if any"""
+        def set_default_value(field, schema):
+            """Helper function to allow subfield default values"""
+            if 'default' in schema:
+                return schema['default']()
+            elif 'schema' in schema:
+                default = dict()
+                for key, value in six.iteritems(schema['schema']):
+                    default[key] = set_default_value(key, value)
+                return default
+            return None
+
+        value = set_default_value(field_name,
+                    FieldParser.field_definitions(
+                        self._json.additional_info.namespace)[json_id]\
+                            .get('schema', {}).get(json_id, {}))
+        if value is not None:
+            info = self._find_field_metadata(json_id, field_name,
+                                             self._json.get(field_name))
+            self._json['__meta_metadata__'][field_name] = info
+            self._json[field_name] = value
+
+    def _set_default_type(self, json_id, field_name):
+        """Finds the default type inside the schema, if `force` is used"""
+        from .validator import Validator
+        def set_default_type(field, schema):
+            """Helper function to allow subfield default values"""
+            if 'type' in schema and schema.get('force', False):
+                Validator.force_type(self._json._dict_bson, field_name,
+                                     schema['type'])
+            elif 'schema' in schema:
+                for key, value in six.iteritems(schema['schema']):
+                    set_default_type('%s.%s' % (field, key), value)
+
+        if field_name not in self._json._dict_bson:
+            return
+
+        schema = FieldParser.field_definitions(
+                self._json.additional_info.namespace)[json_id]\
+                            .get('schema', {}).get(json_id, {})
+        set_default_type(field_name, schema)
+
+    def _remove_none_values(self, obj):
+        """Handy closure to remove recursively None values from obj"""
+        if isinstance(obj, dict):
+            for key in list(obj.keys()):
+                if obj[key] is None:
+                    del obj[key]
+                else:
+                    self._remove_none_values(obj[key])
+        if isinstance(obj, list):
+            for element in obj:
+                if element is None:
+                    obj.remove(element)
+                else:
+                    self._remove_none_values(element)
+
+    def _update(self, fields):
+        """From the list of field names it tries to update their content."""
+        #TODO
+        raise NotImplementedError('Missing implementation in current version')
+
+    def _find_field_metadata(self, json_id, field_name,
+                             field_type=None, field_def=None):
+        """
+        Given one field definition fills up the parallel dictionary with the
+        needed meta-metadata, inlcuding field extensions and after decorators.
+
+        If the information regarding the field definition is no present, the
+        first one available will be used: first ``creator`` rules for the master
+        format of the json, then ``derived`` and finally ``calculated``. For
+        each of them if more than one definition is present the first one will
+        be used.
+
+        If no rule is found the field info will be tag as ``UNKNOWN``
+
+        :return: dictionary
+        """
+        try:
+            rule = FieldParser.field_definitions(
+                    self._json.additional_info.namespace)[json_id]
+        except KeyError:
+            self._json.continuable_errors.append(
+                    "Adding a new field '%s' ('%s') without definition"
+                    % (field_name, json_id))
+            rule = {}
+            field_def = {}
+            field_type = 'UNKNOWN'
+
+        if field_def is None:
+            if self._json.additional_info.master_format in rule.get('rules', {}):
+                field_def = rule['rules']\
+                        [self._json.additional_info.master_format][0]
+                field_type = 'creator'
+            elif 'derived' in rule.get('rules', {}):
+                field_def = rule['rules']['derived'][0]
+                field_type = 'derived'
+            elif 'calculated' in rule.get('rules', {}):
+                field_def = rule['rules']['calculated'][0]
+                field_type = 'calculated'
+            else:
+                field_def = {}
+                field_type = 'UNKNOWN'
+
+        for alias in rule.get('aliases', []):
+            self._json['__meta_metadata__']['__aliases__'][alias] = field_name
+
+        info = {}
+        info['json_id'] = json_id
+        info['timestamp'] = datetime.datetime.now().isoformat()
+        info['pid'] = rule.get('pid', None)
+        info['type'] = field_type
+        if field_type in ('calculated', 'derived'):
+            info['function'] = (json_id, 'rules', field_type, 0, 'function')
+        elif field_type == 'UNKNOWN':
+            info['function'] = 'UNKNOWN'
+        else:
+            info['function'] = field_def['source_tags']
+
+        #Decorator extensions
+        info['after'] = dict()
+        for name, parser in six.iteritems(FieldParser.decorator_after_extensions()):
+            try:
+                ext = parser.add_info_to_field(json_id, info,
+                        field_def['decorators']['after'].get(name))
+                if ext is not None:
+                    info['after'][name] = ext
+            except KeyError as e:
+                #Only raise if the error is different the KeyError 'decorators'
+                if not e.message == 'decorators':
+                    raise e
+
+        #Field extensions
+        info['ext'] = dict()
+        for name, parser in six.iteritems(FieldParser.field_extensions()):
+            try:
+                ext = parser.add_info_to_field(json_id, rule)
+                if ext is not None:
+                    info['ext'][name] = ext
+            except NotImplementedError:
+                #Maybe your extension doesn't have anything to add to the field
+                pass
+
+        return info
+
+    def _update_meta_metadata(self, fields=None, section=None,
+                              keep_core_values=True, store_backup=True):
+        """
+        Given one field definition fills up the parallel dictionary with the
+        needed meta-metadata, including field extensions and after decorators.
+
+        If there is some information about this field in the json structure it
+        will keep some core information like the source format.
+        """
+        #TODO
+        raise NotImplementedError('Missing implementation on this version')
+
+    def _evaluate_before_decorators(self, field_def):
+        """Evaluates all the before decorators (they must return a boolean)"""
+        for name, content in six.iteritems(field_def['decorators']['before']):
+            if not FieldParser.decorator_before_extensions()[name]\
+                    .evaluate(self, content):
+                return False
+        return True
+
+    def _evaluate_on_decorators(self, field_def, master_value):
+        """Evaluates all the on decorators (they must return a boolean"""
+        for name, content in six.iteritems(field_def['decorators']['on']):
+            if not FieldParser.decorator_on_extensions()[name]\
+                    .evaluate(master_value,
+                              self._json.additional_info.namespace, content):
+                return False
+        return True

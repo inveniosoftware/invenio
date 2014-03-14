@@ -24,6 +24,7 @@
 """
 
 import pymongo
+from itertools import imap
 
 from invenio.modules.jsonalchemy.storage import Storage
 
@@ -56,25 +57,25 @@ class MongoDBStorage(Storage):
             def add_id(t):
                 t[0]['_id'] = t[1]
                 return t[0]
-            jsons = impa(add_id, zip(jsons, ids))
+            jsons = imap(add_id, zip(jsons, ids))
 
         return self.__collection.insert(jsons, continue_on_error=True)
 
     def update_one(self, json, id=None):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.update_one`"""
         #FIXME: what if we get only the fields that have change
-        if not recid is None:
-            json['_id'] = recid
+        if not id is None:
+            json['_id'] = id
 
         return self.__collection.save(json)
 
     def update_many(self, jsons, ids=None):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.update_many`"""
-        if not recids is None:
+        if not ids is None:
             def add_id(t):
                 t[0]['_id'] = t[1]
                 return t[0]
-            jsons = impa(add_id, zip(jsons, ids))
+            jsons = imap(add_id, zip(jsons, ids))
 
         return map(self.__collection.save, jsons)
 
@@ -87,12 +88,12 @@ class MongoDBStorage(Storage):
         return self.__collection.find({'_id': {'$in':ids}})
 
     def get_field_values(self, ids, field, repetitive_values=True, count=False,
-            include_recid=False, split_by=0):
+            include_id=False, split_by=0):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_field_values`"""
         raise NotImplementedError()
 
     def get_fields_values(self, ids, fields, repetitive_values=True, count=False,
-            include_recid=False, split_by=0):
+            include_id=False, split_by=0):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_fields_values`"""
         raise NotImplementedError()
 
