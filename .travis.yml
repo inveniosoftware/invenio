@@ -34,7 +34,7 @@ python:
 
 install:
   - "sudo apt-get update"
-  - "sudo apt-get install apache2 libapache2-mod-wsgi ssl-cert poppler-utils --fix-missing"
+  - "sudo apt-get install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion --fix-missing"
   - "sudo a2enmod actions"
   - "sudo a2enmod version"
   - "sudo a2enmod rewrite"
