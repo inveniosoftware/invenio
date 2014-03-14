@@ -214,7 +214,7 @@ class SmartDict(object):
             value = getitem(k, value)
         return value
 
-    def __setitem__(self, key, value, extend=False):
+    def __setitem__(self, key, value, extend=False, **kwargs):
         #TODO: Check repeatable fields
         if '.' not in key and ']' not in key and not extend:
             self._dict[key] = value
@@ -325,11 +325,28 @@ class SmartDict(object):
         except:
             return default
 
-    def set(self, key, value, extend=False):
-        self.__setitem__(key, value, extend)
+    def set(self, key, value, extend=False, **kwargs):
+        self.__setitem__(key, value, extend, **kwargs)
 
     def update(self, E, **F):
         self._dict.update(E, **F)
+
+
+class DotableDict(dict):
+    """
+    DotableDict to make nested python dictionaries (json-like objects)
+    accessable using dot notation.
+
+    >>> dotable = DotableDict({'a': [{'b': 3, 'c': 5}]})
+    >>> dotable.a
+    ...  [{'b': 3, 'c': 5}]
+    """
+    #TODO: allow dotable.a[0].b
+    def __getattr__(self, key):
+        return self[key]
+
+    def __setattr__(self, key, value):
+        self[key] = value
 
 
 def flatten_multidict(multidict):

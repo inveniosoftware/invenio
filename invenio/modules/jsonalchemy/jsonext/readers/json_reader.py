@@ -22,8 +22,7 @@
     --------------------------------------------------------
 
 """
-from invenio.utils.datastructures import SmartDict
-from invenio.base.utils import try_to_eval
+import re
 
 from invenio.modules.jsonalchemy.reader import Reader
 
@@ -31,13 +30,6 @@ class JsonReader(Reader):
     """Default reader"""
 
     __master_format__ = 'json'
-
-    def __init__(self, blob=None, **kwargs):
-        """
-        :param blob:
-        """
-        super(JsonReader, self).__init__(blob=blob, **kwargs)
-        self._additional_info['master_format'] = 'json'
 
     @staticmethod
     def split_blob(blob, schema=None, **kwargs):
@@ -47,60 +39,44 @@ class JsonReader(Reader):
         """
         return blob.splitlines()
 
-    def _prepare_blob(self, *args, **kwargs):
-        self.json.update(self.blob)
+    def _prepare_blob(self):
+        pass
 
     def _get_elements_from_blob(self, regex_key):
         if regex_key in ('entire_record', '*'):
-            return self.blob
-        return [self.blob.get(key) for key in regex_key]
+            return self._blob
+        elements = []
+        for k in regex_key:
+            regex = re.compile(k)
+            keys = filter(regex.match, self._blob.keys())
+            values = []
+            for key in keys:
+                values.append(self._blob.get(key))
+            elements.extend(values)
+        return elements
 
-    def _apply_rules(self, json_id, field_name, rule_def):
-        try:
-            info = self._find_meta_metadata(json_id, field_name, 'creator', {'source_tag':json_id}, rule_def)
-            if 'json_ext' in rule_def and field_name in self.json:
-                self.json[field_name] = rule_def['json_ext']['dumps'](self.json[field_name])
-            self.json['__meta_metadata__.%s' % (field_name, )] = info
-        except KeyError:
-            self._set_default_value(json_id, field_name)
-        except Exception as e:
-            self.json['__meta_metadata__']['__errors__']\
-                    .append('Rule Error - Unable to apply rule for field %s - %s' % (field_name, str(e)),)
-            return False
-        if field_name not in self.json:
-            self._set_default_value(json_id, field_name)
+    def _unpack_rule(self, json_id, field_name=None):
+        super(JsonReader, self)._unpack_rule(json_id, field_name)
 
-        return True
+    def _apply_virtual_rules(self, json_id, field_name, rule):
+        """JSON if a bit special as you can set the value of this fields"""
+        if json_id in self._blob:
+            field_defs = []
+            field_defs.append(('calculated',
+                               rule['rules'].get('calculated', [])))
+            field_defs.append(('derived', rule['rules'].get('derived', [])))
+            for (field_type, ffield_def) in field_defs:
+                for field_def in ffield_def:
+                    info = self._find_field_metadata(json_id, field_name,
+                                                     field_type, field_def)
+                    self._json['__meta_metadata__'][field_name] = info
+                    self._json.__setitem__(field_name, self._blob[json_id],
+                                           extend=False,
+                                           exclude=['decorators', 'extensions'])
+                    return
+        else:
+            super(JsonReader, self)._apply_virtual_rules(json_id, field_name,
+                                                         rule)
 
-    def _apply_virtual_rules(self, json_id, field_name, rule_def):
-        rules = []
-        rules.append(('calculated', rule_def['rules'].get('calculated', [])))
-        rules.append(('derived', rule_def['rules'].get('derived', [])))
-        for (rule_type, rrules) in rules:
-            for rule in rrules:
-                if not self._evaluate_decorators(rule) and \
-                        field_name not in self.json:
-                    return False
-                try:
-                    info = self._find_meta_metadata(json_id, field_name, rule_type, rule, rule_def)
-                    if field_name not in self.json:
-                        if rule_type == 'derived' or rule['memoize']:
-                            value = try_to_eval(rule['value'], self.functions, self=self.json)
-                            if 'json_ext' in rule_def:
-                                value = rule_def['json_ext']['dumps'](value)
-                        else:
-                            value = None
-
-                        self.json.set(field_name, value, extend=True)
-
-                    self.json['__meta_metadata__.%s' % (SmartDict.main_key_pattern.sub('', field_name), )] = info
-                except Exception as e:
-                    self.json['__meta_metadata__']['__continuable_errors__']\
-                            .append('Virtual Rule CError - Unable to evaluate %s - %s' % (field_name, str(e)))
-                    return False
-
-        if field_name not in self.json:
-            self._set_default_value(json_id, field_name)
-        return True
 
 reader = JsonReader

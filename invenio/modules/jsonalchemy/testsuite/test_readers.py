@@ -104,8 +104,8 @@ class TestJSONReader(InvenioTestCase):
 
         blob = {'abstract': {'summary': 'Candidate for the associated production of the Higgs boson and Z boson. Both, the Higgs and Z boson decay into 2 jets each. The green and the yellow jets belong to the Higgs boson. They represent the fragmentation of a bottom andanti-bottom quark. The red and the blue jets stem from the decay of the Z boson into a quark anti-quark pair. Left: View of the event along the beam axis. Bottom right: Zoom around the interaction point at the centre showing detailsof the fragmentation of the bottom and anti-bottom quarks. As expected for b quarks, in each jet the decay of a long-lived B meson is visible. Top right: "World map" showing the spatial distribution of the jets in the event.'},
                 'authors': [{'first_name': '',
-                'full_name': 'Photolab',
-                'last_name': 'Photolab'}],
+                             'full_name': 'Photolab',
+                             'last_name': 'Photolab'}],
                 'collection': {'primary': 'PICTURE'},
                 'keywords': [{'term': 'LEP'}],
                 'number_of_authors': 1,
@@ -603,7 +603,7 @@ class TestMarcReader(InvenioTestCase):
         self.assertEquals(json['__meta_metadata__']['__additional_info__']['master_format'], 'marc')
         self.assertTrue('authors' in json)
         self.assertEquals(json['authors'][0]['full_name'], "Efstathiou, G P")
-        self.assertTrue(len(json['authors']) == 5)
+        self.assertEquals(len(json['authors']), 5)
         self.assertTrue('title' in json)
         self.assertEquals(json['title']['title'], "Constraints on $\Omega_{\Lambda}$ and $\Omega_{m}$from Distant Type 1a Supernovae and Cosmic Microwave Background Anisotropies")
         self.assertTrue('abstract' in json)

@@ -21,203 +21,268 @@
     invenio.modules.jsonalchemy.wrapper
     -----------------------------------
 """
+import copy
 import datetime
 import six
-import copy
 
-from six import iteritems
-from werkzeug.utils import import_string
-
-from invenio.base.utils import try_to_eval
-from invenio.utils.datastructures import SmartDict
+from invenio.utils.datastructures import DotableDict, SmartDict
 
 from .parser import FieldParser, ModelParser
-from .registry import functions, readers, producers, contexts
-from .validator import Validator
+from .reader import Reader
+from .registry import contexts, producers
 
 
 class SmartJson(SmartDict):
     """Base class for Json structures"""
 
-    def __init__(self, json=None, **kwargs):
+    def __init__(self, json=None, set_default_values=False,
+                 process_model_info=False, **kwargs):
+        """
+        #TODO: explain what can go in **kwargs and for what
+        """
         super(SmartJson, self).__init__(json)
         self._dict_bson = SmartDict()
-        self._validator = None
 
-        if json is None or not json or '__meta_metadata__' not in json:
+        if not json or '__meta_metadata__' not in json:
+            model_names = kwargs.get('model', ['__default__', ])
+            if 'model' in kwargs:
+                del kwargs['model']
+            if isinstance(model_names, six.string_types):
+                model_names = [model_names, ]
             self._dict['__meta_metadata__'] = dict()
             self._dict['__meta_metadata__']['__additional_info__'] = kwargs
-            self._dict['__meta_metadata__']['__aliases__'] = {}
-            self._dict['__meta_metadata__']['__errors__'] = []
-            self._dict['__meta_metadata__']['__continuable_errors__'] = []
+            self._dict['__meta_metadata__']['__model_info__'] = \
+                    dict(names=model_names)
+            self._dict['__meta_metadata__']['__aliases__'] = dict()
+            self._dict['__meta_metadata__']['__errors__'] = list()
+            self._dict['__meta_metadata__']['__continuable_errors__'] = list()
 
-        if '__meta_metadata__.__additional_info__.model_meta_classes' in self:
-            meta_classes = [import_string(str_cls)
-                    for str_cls in self['__meta_metadata__.__additional_info__.model_meta_classes']]
-            self.__class__ = type(self.__class__.__name__,
-                    [self.__class__] + meta_classes, {})
+        if process_model_info:
+            Reader.process_model_info(self)
 
+        if set_default_values:
+            self.set_default_values()
 
-    def __getitem__(self, key):
-        """
-        Uses the load capabilities to output the information stored in the DB.
-        """
+    @property
+    def additional_info(self):
+        return DotableDict(self['__meta_metadata__']['__additional_info__'])
+
+    @property
+    def errors(self):
+        return self._dict['__meta_metadata__']['__errors__']
+
+    @property
+    def continuable_errors(self):
+        return self._dict['__meta_metadata__']['__continuable_errors__']
+
+    @property
+    def meta_metadata(self):
+        return DotableDict(self._dict['__meta_metadata__'])
+
+    @property
+    def model_info(self):
+        return DotableDict(self._dict['__meta_metadata__']['__model_info__'])
+
+    def __getitem__(self, key, reset=False, **kwargs):
         try:
-            return self._dict_bson[key]
+            value = self._dict_bson[key]
+            if value and not reset:
+                return value
         except KeyError:
             #We will try to find the key inside the json dict and load it
             pass
-
         main_key = SmartDict.main_key_pattern.sub('', key)
-        if main_key in self._dict['__meta_metadata__']['__aliases__']:
+        if main_key == '__meta_metadata__':
+            return self._dict[key]
+        elif main_key in self._dict:
+            if main_key not in self.meta_metadata:
+                Reader.set(self, main_key)
+            action = kwargs.get('action', 'get')
+            exclude = kwargs.get('exclude', [])
+            if 'extensions' not in exclude:
+                for ext, args in six.iteritems(self.meta_metadata[main_key]['ext']):
+                    if ext in exclude:
+                        continue
+                    FieldParser.field_extensions()[ext]\
+                            .evaluate(self, main_key, action, args)
+            if 'decorators' not in exclude:
+                for ext, args in six.iteritem(self.meta_metadata[main_key]['after']):
+                    if ext in exclude:
+                        continue
+                    FieldParser.decorator_after_extensions()[ext]\
+                            .evaluate(self, main_key, action, args)
+
+            return self._dict_bson[key]
+        else:
             try:
                 rest_of_key = SmartDict.main_key_pattern.findall(key)[0]
             except IndexError:
                 rest_of_key = ''
-            return self[self._dict['__meta_metadata__']['__aliases__'][main_key] + rest_of_key]
+            return self[self._dict['__meta_metadata__']['__aliases__']\
+                    [main_key] + rest_of_key]
 
-        if main_key not in self._dict['__meta_metadata__']:
-            reader = readers[self.additional_info['master_format']]\
-                (namespace=self.additional_info['namespace'])
-            reader.set(self._dict, main_key)
-
-        try:
-            if self._dict['__meta_metadata__'][main_key]['type'] == 'calculated':
-                self._load_precalculated_value(main_key)
-            else:
-                self._loads(main_key)
-        except KeyError:
-            self._loads(main_key)
-
-        return self._dict_bson[key]
-
-    def __setitem__(self, key, value, extend=False):
-        """
-        Uses the dumps capabilities to set the items to store them in the DB
-        """
+    def __setitem__(self, key, value, extend=False, **kwargs):
         main_key = SmartDict.main_key_pattern.sub('', key)
-        if main_key in self:
+        #If we have meta_metadata for the main key go ahead
+        if main_key in self.meta_metadata:
             self._dict_bson.__setitem__(key, value, extend)
+        #Othewise we need the meta_metadata
         else:
-            reader = readers[self.additional_info['master_format']]\
-                (namespace=self.additional_info['namespace'])
-            reader.set(self._dict, main_key)
-            self._dict_bson.__setitem__(key, value, extend)
+            Reader.set(self, main_key)
+            self._dict_bson.__setitem__(key, value, extend, **kwargs)
+        action = kwargs.get('action', 'set')
+        exclude = kwargs.get('exclude', [])
+        if 'decorators' not in exclude:
+            for ext, args in six.iteritems(self.meta_metadata[main_key]['after']):
+                if ext in exclude:
+                    continue
+                FieldParser.decorator_after_extensions()[ext]\
+                        .evaluate(self, main_key, action, args)
+        if 'extensions' not in exclude:
+            for ext, args in six.iteritems(self.meta_metadata[main_key]['ext']):
+                if ext in exclude:
+                    continue
+                FieldParser.field_extensions()[ext]\
+                        .evaluate(self, main_key, action, args)
 
-        self._dumps(main_key)
+    def __str__(self):
+        return self.dumps(without_meta_metadata=True).__str__()
 
-    def items(self):
+    def __repr__(self):
+        return self._dict.__repr__()
+
+    def __delitem__(self, key):
+        self._dict.__delitem__(key)
+        del self._dict['__meta_metadata__'][key]
+        try:
+            del self._dict_bson[key]
+        except KeyError:
+            pass
+
+    def get(self, key, default=None, reset=False, **kwargs):
+        try:
+            return self.__getitem__(key, reset, **kwargs)
+        except (KeyError, IndexError):
+            return default
+
+    def items(self, without_meta_metadata=False):
         for key in self.keys():
+            if key == '__meta_metadata__' and without_meta_metadata:
+                continue
             yield (key, self[key])
 
-    @property
-    def additional_info(self):
-        return self._dict['__meta_metadata__']['__additional_info__']
-
-    @property
-    def validation_errors(self):
-        if self._validator is None:
-            self.validate()
-        return self._validator.errors
-
-    def dumps(self, clean=False):
-        """ """
-        for key in self._dict_bson.keys():
-            if key == '__meta_metadata__':
+    def keys(self, without_meta_metadata=False):
+        for key in super(SmartJson, self).keys():
+            if key == '__meta_metadata__' and without_meta_metadata:
                 continue
-            self._dumps(key)
-        d = copy.copy(self._dict)
+            yield key
+
+    def get_blob(self, *args, **kwargs):
+        """
+        Should look for the original version of the file where the json came
+        from.
+        """
+        raise NotImplementedError()
+
+    def dumps(self, without_meta_metadata=False, with_calculated_fields=False,
+              clean=False):
+        """
+        Creates the JSON friendly representation of the current object.
+
+        :param without_meta_metadata: by default ``False``, if set to ``True``
+            all the ``__meta_metadata__`` will be removed from the output.
+        :param wit_calculated_fields: by default the calculated fields are not
+            dump, if they are needed in the output set it to ``True``
+        :param clean: if set to ``True`` all the keys stating with ``_`` will be
+            removed from the ouput
+
+        :return: JSON friendly object
+        """
+        dict_ = copy.copy(self._dict)
+        if with_calculated_fields:
+            for key, value in six.iteritem(self._dict):
+                if value is None and \
+                        self.meta_metadata[key]['type'] == 'calculated':
+                    dict_[key] = self[key]
+        if without_meta_metadata:
+            del dict_['__meta_metadata__']
         if clean:
-            for k in list(d.keys()):
-                if k.startswith("_"):
-                    del d[k]
-            return d
-        return d
+            for key in list(dict_.keys()):
+                if key.startswith('_'):
+                    del dict_[key]
+        return dict_
 
-    def loads(self):
-        """ """
-        for key in self._dict.keys():
-            if key == '__meta_metadata__':
-                continue
-            self._loads(key)
-        return self._dict_bson._dict
+    def loads(self, without_meta_metadata=False, with_calculated_fields=True,
+              clean=False):
+        """
+        Creates the BSON representation of the current object.
 
-    def produce(self, output, fields=None):
-        return producers[output](self, fields=fields)
+        :param without_meta_metadata: if set to ``True`` all the
+            ``__meta_metadata__`` will be removed from the output.
+        :param wit_calculated_fields: by default the calculated fields are in
+            the output, if they are not needed set it to ``False``
+        :param clean: if set to ``True`` all the keys stating with ``_`` will be
+            removed from the ouput
 
-    def validate(self):
+        :return: JSON friendly object
 
-        def find_schema(json_id):
-            schema = FieldParser.field_definitions(self.additional_info['namespace']).get(json_id, {})
-            if isinstance(schema, list):
-                for jjson_id in schema:
-                    yield FieldParser.field_definitions(self.additional_info['namespace']).get(jjson_id, {}).get('schema', {})
-                raise StopIteration()
-            yield schema.get('schema', {})
+        """
+        dict_ = dict()
+        for key in self.keys():
+            dict_[key] = self[key]
 
-        if self._validator is None:
-            schema = {}
-            model_fields = ModelParser.model_definitions(self.additional_info['namespace']).get('fields', {})
-            if model_fields:
-                for field in self.keys():
-                    if field not in model_fields:
-                        model_fields[field] = field
-                model_field = [json_id for json_id in model_fields.values()]
-            else:
-                model_fields = self.keys()
+        if without_meta_metadata:
+            del dict_['__meta_metadata__']
+        if not with_calculated_fields:
+            for key in self.keys():
+                if self.meta_metadata[key]['type'] == 'calculated':
+                    del dict_[key]
+        if clean:
+            for key in list(dict_.keys()):
+                if key.startswith('_'):
+                    del dict_[key]
 
-            for json_id in model_fields:
-                for new_schema in find_schema(json_id):
-                    schema.update(new_schema)
-            self._validator = Validator(schema=schema)
+        return dict_
 
-        return self._validator.validate(self)
 
-    def _dumps(self, field):
-        """ """
-        try:
-            self._dict[field] = reduce(lambda obj, key: obj[key], \
-                    self._dict['__meta_metadata__'][field]['dumps'], \
-                    FieldParser.field_definitions(self.additional_info['namespace']))(self._dict_bson[field])
-        except (KeyError, IndexError):
-            if self['__meta_metadata__'][field]['memoize'] or \
-                    self['__meta_metadata__'][field]['type'] in ('derived', 'creator', 'UNKNOWN'):
-                self._dict[field] = self._dict_bson[field]
+    def produce(self, producer_code, fields=None):
+        """
+        Depending on the ``producer_code`` it creates a different flavor of JSON
 
-    def _loads(self, field):
-        """ """
-        try:
-            self._dict_bson[field] = reduce(lambda obj, key: obj[key], \
-                    self._dict['__meta_metadata__'][field]['loads'], \
-                    FieldParser.field_definitions(self.additional_info['namespace']))(self._dict[field])
-        except (KeyError, IndexError):
-            self._dict_bson[field] = self._dict[field]
+        :param producer_code: One of the possible producers listed in the
+            ``producer`` section inside de field definitions
+        :param fields: List of fields that should be present in the output, if
+            ``None`` all fields from ``self`` will be used.
 
-    def _load_precalculated_value(self, field):
+        :return: It depends on each producer, see producer folder inside
+            jsonext, typically ``dict``.
+        """
+        return producers[producer_code](self, fields=fields)
+
+    def set_default_values(self, fields=None):
+        #TODO
+        raise NotImplementedError('Missing implementation in this version')
+
+    def validate(self, validator=None):
         """
 
         """
-        if self._dict['__meta_metadata__'][field]['memoize'] is None:
-            func = reduce(lambda obj, key: obj[key], \
-                    self._dict['__meta_metadata__'][field]['function'], \
-                    FieldParser.field_definitions(self.additional_info['namespace']))
-            self._dict_bson[field] = try_to_eval(func,
-                    functions(self.additional_info['namespace']),
-                    self=self)
-        else:
-            live_time = datetime.timedelta(0, self._dict['__meta_metadata__'][field]['memoize'])
-            timestamp = datetime.datetime.strptime(self._dict['__meta_metadata__'][field]['timestamp'], "%Y-%m-%dT%H:%M:%S")
-            if datetime.datetime.now() > timestamp + live_time:
-                old_value = self._dict_bson[field]
-                func = reduce(lambda obj, key: obj[key], \
-                    self._dict['__meta_metadata__'][field]['function'], \
-                    FieldParser.field_definitions(self.additional_info['namespace']))
-                self._dict_bson[field] = try_to_eval(func,
-                        functions(self.additional_info['namespace']),
-                        self=self)
-                if not old_value == self._dict_bson[field]:
-                    #FIXME: trigger update in DB and fire signal to update others
-                    pass
+        if validator is None:
+            from .validator import Validator as validator
+        schema = dict()
+        model_fields = ModelParser.resolve_models(self.model_info.names,
+                self.additional_info.namespace).get('fields', {})
+        for field in self.keys():
+            if field not in model_fields and not field == '__meta_metadata__':
+                model_fields[field] = self.meta_metadata[field]['json_id']
+        for json_id in model_fields.values():
+            try:
+                schema.update(FieldParser.field_definitions(self.additional_info.namespace)[json_id].get('schema', {}))
+            except TypeError:
+                pass
+        _validator = validator(schema=schema)
+        _validator.validate(self)
+        return _validator.errors
 
     # Legacy methods, try not to use them as they are already deprecated
 
@@ -240,7 +305,7 @@ class SmartJson(SmartDict):
             tag = ''
             ind1 = ''
             ind2 = ''
-            for key, value in iteritems(marc_dict):
+            for key, value in six.iteritems(marc_dict):
                 if isinstance(value, six.string_types) or not isinstance(value, Iterable):
                     value = [value]
                 for v in value:
@@ -269,11 +334,10 @@ class SmartJson(SmartDict):
 
     def legacy_create_recstruct(self):
         """
-        It creates the recstruct representation using the legacy rules defined in
-        the configuration file
-
-        #CHECK: it might be a bit overkilling
+        It creates the recstruct representation using the legacy rules defined
+        in the configuration file
         """
+        #FIXME: it might be a bit overkilling
         from invenio.legacy.bibrecord import create_record
         return create_record(self.legacy_export_as_marc())[0]
 
@@ -298,7 +362,7 @@ class SmartJsonLD(SmartJson):
         :param: context identifier
         """
         try:
-            return contexts(self['__meta_metadata__']['__additional_info__']['namespace'])[context]
+            return contexts(self.additional_info.namespace)[context]
         except KeyError:
             return context
 
@@ -320,7 +384,6 @@ class SmartJsonLD(SmartJson):
                        http://www.w3.org/TR/json-ld/
         """
         from pyld import jsonld
-        import six
 
         if isinstance(context, six.string_types):
             ctx = self.get_context(context)

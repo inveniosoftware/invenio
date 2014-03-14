@@ -23,12 +23,12 @@
 
     See http://cerberus.readthedocs.org/en/latest
 """
+import datetime
+import six
 
 from cerberus import Validator as ValidatorBase
 from cerberus import ValidationError, SchemaError
 from cerberus import errors
-
-from .reader import FieldParser, ModelParser
 
 
 class Validator(ValidatorBase):
@@ -38,8 +38,28 @@ class Validator(ValidatorBase):
 
     def __init__(self, schema=None, transparent_schema_rules=True,
                  ignore_none_values=False, allow_unknown=True):
-       super(Validator, self).__init__(schema, transparent_schema_rules,
-               ignore_none_values, allow_unknown)
+        super(Validator, self).__init__(schema, transparent_schema_rules,
+                                        ignore_none_values, allow_unknown)
+
+    #FIXME: refactor spaghetti code
+    @staticmethod
+    def force_type(document, field, type_):
+        """Tries to force `field` contentn to `type`"""
+        if type_ == 'list' and not isinstance(document[field], (list, tuple)):
+            document[field] = [document[field], ]
+        elif type_ == 'string' and not isinstance(document[field],
+                                                  six.string_types):
+            document[field] = str(document[field])
+        elif type_ == 'boolean' and not isinstance(document[field], bool):
+            document[field] = bool(document[field])
+        elif type_ == 'integer' and not isinstance(document[field], int):
+            document[field] = int(document[field])
+        elif type_ == 'datetime' and not isinstance(document[field], datetime):
+            from dateutil import parser
+            document[field] = parser.parse(document[field])
+        else:
+            document[field] = eval(type_)(document[field])
+
 
     def _validate(self, document, schema=None, update=False):
         self._errors = {}
@@ -59,7 +79,7 @@ class Validator(ValidatorBase):
         self.document = document
 
         special_rules = ["required", "nullable", "type"]
-        for field, value in self.document.items():
+        for field, value in six.iteritems(self.document):
 
             if self.ignore_none_values and value is None:
                 continue
