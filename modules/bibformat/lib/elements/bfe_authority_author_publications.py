@@ -29,6 +29,9 @@ from invenio.bibauthority_engine import \
     get_low_level_recIDs_from_control_no, \
     get_dependent_records_for_control_no
 
+from invenio.search_engine import get_fieldvalues
+
+CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT = 10
 __revision__ = "$Id$"
 
 def format_element(bfo):
@@ -44,8 +47,10 @@ def format_element(bfo):
 
     control_nos = [d['a'] for d in bfo.fields('035__')]
     control_nos = filter(None, control_nos) # fastest way to remove empty ""s
-
-    control_nos_formatted = []
+    previous_recIDs = []
+    parameters = []
+    count = None
+    publications_formatted = []
     for control_no in control_nos:
 #        recIDs = []
 #        types = guess_authority_types(bfo.recID)
@@ -53,7 +58,9 @@ def format_element(bfo):
 #        control_nos = [(type + CFG_BIBAUTHORITY_PREFIX_SEP + control_no) for type in types]
 #        for control_no in control_nos:
 #            recIDs.extend(list(search_pattern(p='"' + control_no + '"')))
-        recIDs = get_dependent_records_for_control_no(control_no)
+        for ctrl_number_field_numbers in CFG_BIBAUTHORITY_RECORD_AUTHOR_CONTROL_NUMBER_FIELDS:
+            parameters.append(ctrl_number_field_numbers + ":" + control_no.replace(" ",""))
+        recIDs = [x for x in get_dependent_records_for_control_no(control_no) if x not in previous_recIDs]
         count = len(recIDs)
         count_string = str(count) + " dependent records"
         from urllib import quote
@@ -63,61 +70,41 @@ def format_element(bfo):
             postfix = "</a>"
             url_str = ''
             # we have multiple dependent records
-            if count > 1:
-                # joining control_nos might be more helpful for the user
-                # than joining recIDs... or maybe not...
-#                p_val = '"' + '" or "'.join(control_nos) + '"' # more understandable for the user
+            if count > CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT:
+                #titles = get_fieldvalues(recIDs[:CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT],"245__a")
+                for i in xrange(CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT):
+                    title = get_fieldvalues(recIDs[i],"245__a")
+                    if title:
+                        url_str = "/record/"+ str(recIDs[i])
+                        prefix = prefix_pattern % url_str
+                        publications_formatted.append(prefix + title[0] + postfix)
+            else:
+                #titles = get_fieldvalues(recIDs,"245__a")
+                for i in xrange(len(recIDs)):
+                    title = get_fieldvalues(recIDs[i],"245__a")
+                    if title:
+                        url_str = "/record/"+ str(recIDs[i])
+                        prefix = prefix_pattern % url_str
+                        publications_formatted.append(prefix + title[0] + postfix)
 
-                #p_val = "recid:" + ' or recid:'.join([str(recID) for recID in recIDs]) # more efficient
-                parameters = []
-                for ctrl_number_field_numbers in CFG_BIBAUTHORITY_RECORD_AUTHOR_CONTROL_NUMBER_FIELDS:
-                    parameters.append(ctrl_number_field_numbers + ":" + control_no)
-                p_val = quote(" or ".join(parameters))
-                # include "&c=" parameter for bibliographic records
-                # and one "&c=" parameter for authority records
-                url_str = \
-                    "/search" + \
-                    "?p=" + p_val + \
-                    "&c=" + quote(CFG_SITE_NAME) + \
-                    "&c=" + CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME + \
-                    "&sc=1" + \
-                    "&ln=" + bfo.lang
-            # we have exactly one dependent record
-            elif count == 1:
-                url_str = "/record/" + str(recIDs[0])
-
-            prefix = prefix_pattern % (url_str)
-            count_string = prefix + count_string + postfix
-        #assemble the html and append to list
-        html_str = control_no + " (" + count_string + ")"
-
-        #"?p=" + "recid:" + 'or recid:'.join([str(_id) for _id in my_recIDs]) + \
-        # check if there are more than one authority record with the same
-        # control number. If so, warn the user about this inconsistency.
-        # TODO: hide this warning from unauthorized users
-        my_recIDs = get_low_level_recIDs_from_control_no(control_no)
-        if len(my_recIDs) > 1:
-            url_str = \
-                    "/search" + \
-                    "?p=" + CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD + ":" + control_no + \
-                    "&c=" + quote(CFG_SITE_NAME) + \
-                    "&c=" + CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME + \
-                    "&sc=1" + \
-                    "&ln=" + bfo.lang
-            html_str += \
-                ' <span style="color:red">' + \
-                '(Warning, there is currently ' + \
-                '<a href="' + url_str + '">more than one authority record</a> ' + \
-                'with this Control Number)' + \
-                '</span>'
-
-        control_nos_formatted.append(html_str)
-
-    title = "<strong>" + _("Control Number(s)") + "</strong>"
-    if control_nos_formatted:
-        content = "<ul><li>" + "</li><li> ".join(control_nos_formatted) + "</li></ul>"
+    title = "<strong>" + _("Publication(s)") + "</strong>"
+    if publications_formatted:
+        content = "<ul><li>" + "</li><li> ".join(publications_formatted) + "</li></ul>"
     else:
         content = "<strong style='color:red'>Missing !</strong>"
+
+    p_val = quote(" or ".join(parameters))
+        # include "&c=" parameter for bibliographic records
+        # and one "&c=" parameter for authority records
+    url_str = \
+    "/search" + \
+    "?p=" + p_val + \
+    "&c=" + quote(CFG_SITE_NAME) + \
+    "&c=" + CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME + \
+    "&sc=1" + \
+    "&ln=" + bfo.lang
+    prefix = prefix_pattern % url_str
+    content += prefix + "See all " + str(count) + " publications..." + postfix
 
     return "<p>" + title + ": " + content + "</p>"
 
