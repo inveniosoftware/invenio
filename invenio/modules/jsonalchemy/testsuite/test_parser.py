@@ -56,67 +56,12 @@ def clean_field_model_definitions():
 class TestParser(InvenioTestCase):
 
     def setUp(self):
-        self.tmp_file_1 = tempfile.NamedTemporaryFile()
-        config_1 = '''
-@inherit_from(("authors[0]",))
-main_author:
-    """Just main author"""
-        '''
-        self.tmp_file_1.write(config_1)
-        self.tmp_file_1.flush()
-        self.tmp_file_2 = tempfile.NamedTemporaryFile()
-        config_2 = '''
-include "%s"
-
-authors[0], creator:
-    creator:
-        @legacy((("100", "100__", "100__%%"), ""),
-                ("100__a", "first author name", "full_name"),
-                ("100__e", "relator_name"),
-                ("100__h", "CCID"),
-                ("100__i", "INSPIRE_number"),
-                ("100__u", "first author affiliation", "affiliation"))
-        marc, "100__", { 'full_name':value['a'], 'first_name':util_split(value['a'],',',1), 'last_name':util_split(value['a'],',',0), 'relator_name':value['e'], 'CCID':value['h'], 'INSPIRE_number':value['i'], 'affiliation':value['u'] }
-    checker:
-        check_field_existence(0,1)
-        check_field_type('str')
-    producer:
-        json_for_marc(), {"100__a": "full_name", "100__e": "relator_name", "100__h": "CCID", "100__i": "INSPIRE_number", "100__u": "affiliation"}
-        json_for_dc(), {"dc:creator": "full_name"}
-    description:
-        """Main Author"""
-
-authors[n], contributor:
-    creator:
-        @legacy((("700", "700__", "700__%%"), ""),
-                ("700__a", "additional author name", "full_name"),
-                ("700__u", "additional author affiliation", "affiliation"))
-        marc, "700__", {'full_name': value['a'], 'first_name':util_split(value['a'],',',1), 'last_name':util_split(value['a'],',',0), 'relator_name':value['e'], 'CCID':value['h'], 'INSPIRE_number':value['i'], 'affiliation':value['u'] }
-    checker:
-        check_field_existence(0,'n')
-        check_field_type('str')
-    producer:
-        json_for_marc(), {"700__a": "full_name", "700__e": "relator_name", "700__h": "CCID", "700__i": "INSPIRE_number", "700__u": "affiliation"}
-        json_for_dc(), {"dc:contributor": "full_name"}
-    description:
-        """Authors"""
-
-        ''' % (self.tmp_file_1.name, )
-        self.tmp_file_2.write(config_2)
-        self.tmp_file_2.flush()
-
         self.app.extensions['registry']['testsuite.fields'] = field_definitions()
-        for path in self.app.extensions['registry']['testsuite.fields'].registry:
-            if os.path.basename(path) == 'authors.cfg':
-                self.app.extensions['registry']['testsuite.fields'].registry.remove(path)
-        self.app.extensions['registry']['testsuite.fields'].register(self.tmp_file_2.name)
         self.app.extensions['registry']['testsuite.models'] = model_definitions()
 
     def tearDown(self):
         del self.app.extensions['registry']['testsuite.fields']
         del self.app.extensions['registry']['testsuite.models']
-        self.tmp_file_1.close()
-        self.tmp_file_2.close()
 
     def test_wrong_indent(self):
         """JSONAlchemy - wrong indent"""
@@ -146,21 +91,6 @@ authors[n], contributor:
         tmp_file.close()
         clean_field_model_definitions()
 
-    def test_not_existing_file(self):
-        """JSONAlchemy - not existing file"""
-        from invenio.modules.jsonalchemy.errors import FieldParserException
-        tmp_file_3 = tempfile.NamedTemporaryFile()
-        config_3 = '''
-        include "non_exisintg.cfg"
-        '''
-        tmp_file_3.write(config_3)
-        tmp_file_3.flush()
-
-        clean_field_model_definitions()
-        self.app.extensions['registry']['testsuite.fields'].register(tmp_file_3.name)
-        self.assertRaises(FieldParserException, Field_parser.reparse, 'testsuite')
-        tmp_file_3.close()
-        clean_field_model_definitions()
 
     def test_wrong_field_definitions(self):
         """JSONAlchemy - wrong field definitions"""
@@ -196,36 +126,6 @@ authors[n], contributor:
         tmp_file_5.close()
         clean_field_model_definitions()
 
-        tmp_file_6 = tempfile.NamedTemporaryFile()
-        config_6 = '''
-        @inherit_from(('wrong_field', ))
-        wrong_field_new:
-            """ Desc """
-        '''
-        tmp_file_6.write(config_6)
-        tmp_file_6.flush()
-        del self.app.extensions['registry']['testsuite.fields']
-        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
-        self.app.extensions['registry']['testsuite.fields'].register(tmp_file_6.name)
-        self.assertRaises(FieldParserException, Field_parser.reparse, 'testsuite')
-        tmp_file_6.close()
-        clean_field_model_definitions()
-
-        tmp_file_7 = tempfile.NamedTemporaryFile()
-        config_7 = '''
-        @inherit_from(('wrong_field', ))
-        wrong_field:
-            """ Desc """
-        '''
-        tmp_file_7.write(config_7)
-        tmp_file_7.flush()
-        del self.app.extensions['registry']['testsuite.fields']
-        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
-        self.app.extensions['registry']['testsuite.fields'].register(tmp_file_7.name)
-        self.assertRaises(FieldParserException, Field_parser.reparse, 'testsuite')
-        tmp_file_7.close()
-        clean_field_model_definitions()
-
     def test_field_rules(self):
         """JsonAlchemy - field parser"""
         self.assertTrue(len(Field_parser.field_definitions('testsuite')) >= 22)
@@ -233,24 +133,16 @@ authors[n], contributor:
         self.assertTrue('authors' in Field_parser.field_definitions('testsuite'))
         self.assertTrue('title' in Field_parser.field_definitions('testsuite'))
         #Check work around for [n] and [0]
-        self.assertTrue(len(Field_parser.field_definitions('testsuite')['authors']) == 2)
-        self.assertEqual(Field_parser.field_definitions('testsuite')['authors'], ['authors[0]', 'authors[n]'])
-        self.assertTrue('authors[0]' in Field_parser.field_definitions('testsuite'))
-        self.assertTrue('authors[n]' in Field_parser.field_definitions('testsuite'))
-        self.assertTrue(Field_parser.field_definitions('testsuite')['doi']['persistent_identifier'])
+        self.assertTrue(Field_parser.field_definitions('testsuite')['doi']['pid'])
         #Check if derived and calulated are well parserd
         self.assertTrue('dummy' in Field_parser.field_definitions('testsuite'))
-        self.assertEquals(Field_parser.field_definitions('testsuite')['dummy']['persistent_identifier'], 2)
-        self.assertEquals(Field_parser.field_definitions('testsuite')['dummy']['rules'].keys(), ['derived'])
+        self.assertEquals(Field_parser.field_definitions('testsuite')['dummy']['pid'], 2)
+        self.assertEquals(Field_parser.field_definitions('testsuite')['dummy']['rules'].keys(), ['json', 'derived'])
         self.assertTrue(len(Field_parser.field_definitions('testsuite')['dummy']['producer']), 2)
         self.assertTrue(Field_parser.field_definitions('testsuite')['_random'])
-        #Check inheritance
-        self.assertTrue('main_author' in Field_parser.field_definitions('testsuite'))
-        self.assertEqual(Field_parser.field_definitions('testsuite')['main_author']['rules'],
-                         Field_parser.field_definitions('testsuite')['authors[0]']['rules'])
         #Check override
         value = {'a':'a', 'b':'b', 'k':'k'}
-        self.assertEquals(eval(Field_parser.field_definitions('testsuite')['title']['rules']['marc'][0]['value']),
+        self.assertEquals(eval(Field_parser.field_definitions('testsuite')['title']['rules']['marc'][0]['function']),
                 {'form': 'k', 'subtitle': 'b', 'title': 'a'})
         #Check extras
         self.assertTrue('json_ext' in Field_parser.field_definitions('testsuite')['modification_date'])
@@ -278,39 +170,40 @@ authors[n], contributor:
     def test_model_definitions(self):
         """JsonAlchemy - model parser"""
         self.assertTrue(len(Model_parser.model_definitions('testsuite')) >= 2)
-        self.assertTrue('base' in Model_parser.model_definitions('testsuite'))
+        self.assertTrue('test_base' in Model_parser.model_definitions('testsuite'))
         tmp = Model_parser.model_definitions('testsuite')
         Model_parser.reparse('testsuite')
         self.assertEquals(len(Model_parser.model_definitions('testsuite')), len(tmp))
 
     def test_resolve_several_models(self):
         """JSONAlchemy - test resolve several models"""
-        self.assertEquals(Model_parser.resolve_models('__default__', 'testsuite'), {})
         test_model = Model_parser.model_definitions('testsuite')['test_model']
-        del test_model['description']
-        self.assertEquals(Model_parser.resolve_models('test_model', 'testsuite'),
-                test_model)
-        self.assertEquals(Model_parser.resolve_models(['base', 'test_model'], 'testsuite'),
-                test_model)
-        self.assertEquals(Model_parser.resolve_models(['foo', 'test_model'], 'testsuite'),
-                test_model)
+        self.assertEquals(Model_parser.resolve_models('test_model', 'testsuite')['fields'],
+                test_model['fields'])
+        self.assertEquals(Model_parser.resolve_models(['test_base', 'test_model'], 'testsuite')['fields'],
+                test_model['fields'])
 
     def test_field_name_model_based(self):
         """JSONAlchemy - field name model based"""
-        self.assertEqual(Field_parser.field_definition_model_based('title_article', 'test_model', 'testsuite'),
-                Field_parser.field_definitions('testsuite')['title'])
+        field_model_def = Field_parser.field_definition_model_based('title', 'test_model', 'testsuite')
+        field_def = Field_parser.field_definitions('testsuite')['title_title']
+
+        value = {'a': 'Awesome title', 'b':'sub title', 'k':'form'}
+        from invenio.base.utils import try_to_eval
+
+        self.assertEqual(try_to_eval(field_model_def['rules']['marc'][0]['function'], value=value),
+                         try_to_eval(field_def['rules']['marc'][0]['function'], value=value))
 
 
     def test_guess_legacy_field_names(self):
         """JsonAlchemy - check legacy field names"""
         self.assertEquals(guess_legacy_field_names(('100__a', '245'), 'marc', 'testsuite'),
-                {'100__a':['authors[0].full_name'], '245':['title']})
+                {'100__a':['_first_author.full_name'], '245':['title']})
         self.assertEquals(guess_legacy_field_names('foo', 'bar', 'baz'), {'foo': []})
 
     def test_get_producer_rules(self):
         """JsonAlchemy - check producer rules"""
-        self.assertTrue(get_producer_rules('authors[0]', 'json_for_marc', 'testsuite')[0] in get_producer_rules('authors', 'json_for_marc', 'testsuite'))
-        self.assertTrue(len(get_producer_rules('keywords', 'json_for_marc', 'testsuite')) == 1)
+        self.assertEquals(len(get_producer_rules('keywords', 'json_for_marc', 'testsuite')), 1)
         self.assertRaises(KeyError, lambda: get_producer_rules('foo', 'json_for_marc', 'testsuite'))
 
 
