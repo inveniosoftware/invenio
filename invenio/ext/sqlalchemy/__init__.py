@@ -24,17 +24,20 @@
     This module provides initialization and configuration for
     `flask.ext.sqlalchemy` module.
 """
-
-from .expressions import AsBINARY
-from .types import JSONEncodedTextDict, MarshalBinary, PickleBinary, GUID
-from .utils import get_model_type
 import sqlalchemy
+
+from flask.ext.registry import RegistryProxy, ModuleAutoDiscoveryRegistry
 from flask.ext.sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
 from sqlalchemy import event
-from sqlalchemy.pool import Pool
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
+from sqlalchemy.pool import Pool
+from sqlalchemy_utils import JSONType
+
 from invenio.utils.hash import md5
-from flask.ext.registry import RegistryProxy, ModuleAutoDiscoveryRegistry
+from .expressions import AsBINARY
+from .types import MarshalBinary, PickleBinary, GUID
+from .utils import get_model_type
+
 
 
 def _include_sqlalchemy(obj, engine=None):
@@ -49,7 +52,7 @@ def _include_sqlalchemy(obj, engine=None):
     else:
         from sqlalchemy import types as engine_types
 
-    setattr(obj, 'JSON', JSONEncodedTextDict)
+    setattr(obj, 'JSON', JSONType)
     setattr(obj, 'Char', engine_types.CHAR)
     try:
         setattr(obj, 'TinyText', engine_types.TINYTEXT)
