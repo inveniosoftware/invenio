@@ -31,6 +31,7 @@ from tempfile import NamedTemporaryFile
 from xml.dom import minidom
 import socket
 
+from invenio.intbitset import intbitset
 from invenio.bibdocfilecli import bibupload_ffts
 from invenio.docextract_task import store_last_updated, \
                                     fetch_last_updated
@@ -46,6 +47,7 @@ from invenio.bibtask import task_init, \
                             task_set_option, \
                             task_sleep_now_if_required
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.search_engine import search_pattern
 from invenio.config import CFG_VERSION, \
                            CFG_TMPSHAREDDIR, \
                            CFG_TMPDIR, \
@@ -361,32 +363,24 @@ def submit_refextract_task(recids):
         task_low_level_submission('refextract', NAME, '-i', recids_str,
                                   '--overwrite')
 
-
+_RE_ARXIV_ID = re.compile(re.escape("<identifier>oai:arXiv.org:") + "(.+?)" + re.escape("</identifier>"), re.M)
 def fetch_updated_arxiv_records(date):
     """Fetch all the arxiv records modified since the last run"""
 
-    def check_arxiv(recid):
-        """Returns True for arxiv papers"""
-        for report_number in get_fieldvalues(recid, '037__9'):
-            if report_number == 'arXiv':
-                return True
-        return False
-
-    # Fetch all records inserted since last run
-    sql = "SELECT `id`, `modification_date` FROM `bibrec` " \
-          "WHERE `modification_date` >= %s " \
-          "ORDER BY `modification_date`"
-    records = run_sql(sql, [date.isoformat()])
-    records = [(r, mod_date) for r, mod_date in records if check_arxiv(r)]
-
-    # Show all records for debugging purposes
-    if task_get_option('verbose') >= 9:
-        write_message('recids:', verbose=9)
-        for recid, mod_date in records:
-            write_message("* %s, %s" % (recid, mod_date), verbose=9)
-
-    task_update_progress("Done fetching %s arxiv record ids" % len(records))
-    return records
+    from invenio.oai_harvest_getter import harvest
+    harvested_files = harvest("export.arxiv.org", "/oai2", {
+        "verb": "ListIdentifiers",
+        "from": date.strftime("%Y-%m-%d"),
+        "metadataPrefix": "arXiv"},
+        output=os.path.join(CFG_TMPDIR, "arxiv-pdf-checker-oai-tmp-"))
+    modified_arxiv_ids = []
+    for harvested_file in harvested_files:
+        modified_arxiv_ids += _RE_ARXIV_ID.findall(open(harvested_file).read())
+        os.remove(harvested_file)
+    recids = intbitset()
+    for arxiv_id in modified_arxiv_ids:
+        recids |= search_pattern(p='035__a:"oai:arXiv.org:%s"' % arxiv_id)
+    return recids - search_pattern(p="980:DELETED")
 
 
 def task_run_core(name=NAME):
@@ -396,7 +390,6 @@ def task_run_core(name=NAME):
     recids = task_get_option('recids')
     if recids:
         start_date = None
-        recids = [(recid, None) for recid in recids]
     else:
         start_date = datetime.now()
         dummy, last_date = fetch_last_updated(name)
@@ -406,7 +399,7 @@ def task_run_core(name=NAME):
 
     try:
 
-        for count, (recid, dummy) in enumerate(recids):
+        for count, recid in enumerate(recids):
             if count % 50 == 0:
                 msg = 'Done %s of %s' % (count, len(recids))
                 write_message(msg)
