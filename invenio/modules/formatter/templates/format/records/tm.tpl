@@ -1,6 +1,6 @@
 {#-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,8 +16,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -#}
-<collection xmlns="http://www.loc.gov/MARC21/slim">
-{% for recid in recids -%}
-  {{ format_record(recid, 'xm').strip()|safe }}
-{%- endfor %}
-</collection>
+{%- for recid in recids[(pagination.page-1)*rg:pagination.page*rg] -%}
+{{ format_record(recid, 'tm')|safe }}
+{% endfor -%}

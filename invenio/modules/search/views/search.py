@@ -381,7 +381,7 @@ def search(collection, p, of, so, rm):
     recids = perform_request_search(req=request.get_legacy_request(), **argd)
 
     #if so or rm:
-    if len(of)>0 and of[0] == 'h':
+    if len(of) > 0 and of[0] in ['h', 't']:
         recids.reverse()
 
     # back-to-search related code
