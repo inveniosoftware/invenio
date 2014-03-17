@@ -125,7 +125,7 @@ def default_handler(resp, remote, *args, **kwargs):
 
 def disconnect_handler(remote, *args, **kwargs):
     if not current_user.is_authenticated():
-        current_app.login_manager.unauthorized()
+        return current_app.login_manager.unauthorized()
 
     account = RemoteAccount.get(
         user_id=current_user.get_id(),
