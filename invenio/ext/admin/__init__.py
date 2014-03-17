@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -61,8 +62,9 @@ Usage example - create a file called <module>_admin.py::
 from __future__ import absolute_import
 
 from flask.ext.admin import Admin
-from .views import AdminIndexView
 from flask.ext.registry import ModuleAutoDiscoveryRegistry
+
+from .views import AdminIndexView
 
 
 #
@@ -85,9 +87,11 @@ def setup_app(app):
     """
     Register all administration views with the Flask application
     """
+    app.config.setdefault("ADMIN_NAME", "Invenio")
+
     # Initialize app
     admin = Admin(
-        name="Invenio",
+        name=app.config['ADMIN_NAME'],
         index_view=AdminIndexView(),
         base_template="admin_base.html"
     )

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask import Blueprint
+from flask import current_app, abort
 from flask.ext.admin import BaseView as FlaskBaseView, \
     AdminIndexView as FlaskAdminIndexView
 from flask.ext.admin.contrib.sqla import ModelView as FlaskModelView
@@ -66,6 +67,16 @@ class BaseView(FlaskBaseView):
         else:
             return current_user.is_super_admin
 
+    def _handle_view(self, name, **kwargs):
+        """
+        This method will be executed before calling any view method.
+        """
+        if not current_user.is_authenticated():
+            return current_app.login_manager.unauthorized()
+
+        if not self.is_accessible():
+            return abort(403)
+
     def is_accessible(self):
         """
         Check if admin interface is accessible by the current user
@@ -76,61 +87,11 @@ class BaseView(FlaskBaseView):
 
     def create_blueprint(self, admin):
         """
-        Create Flask blueprint.
-
-        Copy/pasted from flask.ext.admin.BaseView, with minor edits needed to
-        ensure Blueprint is being used.
+        Ensure admin is only available over SSL.
         """
-        # Store admin instance
-        self.admin = admin
-
-        # If endpoint name is not provided, get it from the class name
-        if self.endpoint is None:
-            self.endpoint = self.__class__.__name__.lower()
-
-        # If the static_url_path is not provided, use the admin's
-        if not self.static_url_path:
-            self.static_url_path = admin.static_url_path
-
-        # If url is not provided, generate it from endpoint name
-        if self.url is None:
-            if self.admin.url != '/':
-                self.url = '%s/%s' % (self.admin.url, self.endpoint)
-            else:
-                if self == admin.index_view:
-                    self.url = '/'
-                else:
-                    self.url = '/%s' % self.endpoint
-        else:
-            if not self.url.startswith('/'):
-                self.url = '%s/%s' % (self.admin.url, self.url)
-
-        # If we're working from the root of the site, set prefix to None
-        if self.url == '/':
-            self.url = None
-
-        # If name is not povided, use capitalized endpoint name
-        if self.name is None:
-            self.name = self._prettify_name(self.__class__.__name__)
-
-        import_name = getattr(self, 'import_name', __name__)
-
-        # Create blueprint and register rules
-        self.blueprint = ssl_required(Blueprint(
-            self.endpoint, import_name,
-            url_prefix=self.url,
-            subdomain=self.admin.subdomain,
-            template_folder='templates',
-            static_folder=self.static_folder,
-            static_url_path=self.static_url_path,
-        ))
-
-        for url, name, methods in self._urls:
-            self.blueprint.add_url_rule(url,
-                                        name,
-                                        getattr(self, name),
-                                        methods=methods)
-
+        self.blueprint = ssl_required(
+            super(BaseView, self).create_blueprint(admin)
+        )
         return self.blueprint
 
 
