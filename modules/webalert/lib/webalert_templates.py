@@ -534,42 +534,42 @@ class Template:
                 'warning_label_is_active_p' : not alert_active_p and '<span class="warning">[&nbsp;%s&nbsp;]&nbsp;</span>' % _('paused') or '',
                }
 
-        footer = ''
+        paging_navigation_html = ''
         if paging_navigation[0]:
-            footer += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
+            paging_navigation_html += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
                       (CFG_SITE_SECURE_URL, 1, step, idq, ln, '/img/sb.gif')
         if paging_navigation[1]:
-            footer += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
+            paging_navigation_html += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
                       (CFG_SITE_SECURE_URL, page - 1, step, idq, ln, '/img/sp.gif')
-        footer += "&nbsp;"
+        paging_navigation_html += "&nbsp;"
         displayed_alerts_from = ((page - 1) * step) + 1
         displayed_alerts_to = paging_navigation[2] and (page * step) or nb_alerts
-        footer += _('Displaying alerts <strong>%i to %i</strong> from <strong>%i</strong> total alerts') % \
+        paging_navigation_html += _('Displaying alerts <strong>%i to %i</strong> from <strong>%i</strong> total alerts') % \
                (displayed_alerts_from, displayed_alerts_to, nb_alerts)
-        footer += "&nbsp;"
+        paging_navigation_html += "&nbsp;"
         if paging_navigation[2]:
-            footer += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
+            paging_navigation_html += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
                       (CFG_SITE_SECURE_URL, page + 1, step, idq, ln, '/img/sn.gif')
         if paging_navigation[3]:
-            footer += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
+            paging_navigation_html += """<a href="%s/youralerts/display?page=%i&amp;step=%i&amp;idq=%i&amp;ln=%s"><img src="%s" /></a>""" % \
                       (CFG_SITE_SECURE_URL, paging_navigation[3], step, idq, ln, '/img/se.gif')
 
         out += """
 <table class="youralerts_display_table" cellspacing="0px">
   <thead class="youralerts_display_table_header">
     <tr>
-      <td colspan="2"></td>
+      <td colspan="2">%(paging_navigation_html)s</td>
     </tr>
   </thead>
   <tfoot class="youralerts_display_table_footer">
     <tr>
-      <td colspan="2">%(footer)s</td>
+      <td colspan="2">%(paging_navigation_html)s</td>
     </tr>
   </tfoot>
   <tbody>
     %(youralerts_display_html)s
   </tbody>
-</table>""" % {'footer': footer,
+</table>""" % {'paging_navigation_html': paging_navigation_html,
                'youralerts_display_html': youralerts_display_html}
 
         return out

@@ -5219,42 +5219,42 @@ class Template:
                 'search_query_last_performed': search_query_last_performed,
                 'search_query_options': search_query_options}
 
-        footer = ''
+        paging_navigation_html = ''
         if paging_navigation[0]:
-            footer += """<a href="%s/yoursearches/display?page=%i&amp;step=%i&amp;p=%s&amp;ln=%s"><img src="%s" /></a>""" % \
+            paging_navigation_html += """<a href="%s/yoursearches/display?page=%i&amp;step=%i&amp;p=%s&amp;ln=%s"><img src="%s" /></a>""" % \
                       (CFG_SITE_SECURE_URL, 1, step, cgi.escape(p), ln, '/img/sb.gif')
         if paging_navigation[1]:
-            footer += """<a href="%s/yoursearches/display?page=%i&amp;step=%i&amp;p=%s&amp;ln=%s"><img src="%s" /></a>""" % \
+            paging_navigation_html += """<a href="%s/yoursearches/display?page=%i&amp;step=%i&amp;p=%s&amp;ln=%s"><img src="%s" /></a>""" % \
                       (CFG_SITE_SECURE_URL, page - 1, step, cgi.escape(p), ln, '/img/sp.gif')
-        footer += "&nbsp;"
+        paging_navigation_html += "&nbsp;"
         displayed_searches_from = ((page - 1) * step) + 1
         displayed_searches_to = paging_navigation[2] and (page * step) or nb_queries_distinct
-        footer += _('Displaying searches <strong>%i to %i</strong> from <strong>%i</strong> total unique searches') % \
+        paging_navigation_html += _('Displaying searches <strong>%i to %i</strong> from <strong>%i</strong> total unique searches') % \
                (displayed_searches_from, displayed_searches_to, nb_queries_distinct)
-        footer += "&nbsp;"
+        paging_navigation_html += "&nbsp;"
         if paging_navigation[2]:
-            footer += """<a href="%s/yoursearches/display?page=%i&amp;step=%i&amp;p=%s&amp;ln=%s"><img src="%s" /></a>""" % \
+            paging_navigation_html += """<a href="%s/yoursearches/display?page=%i&amp;step=%i&amp;p=%s&amp;ln=%s"><img src="%s" /></a>""" % \
                       (CFG_SITE_SECURE_URL, page + 1, step, cgi.escape(p), ln, '/img/sn.gif')
         if paging_navigation[3]:
-            footer += """<a href="%s/yoursearches/display?page=%i&amp;step=%i&amp;p=%s&amp;ln=%s"><img src="%s" /></a>""" % \
+            paging_navigation_html += """<a href="%s/yoursearches/display?page=%i&amp;step=%i&amp;p=%s&amp;ln=%s"><img src="%s" /></a>""" % \
                       (CFG_SITE_SECURE_URL, paging_navigation[3], step, cgi.escape(p), ln, '/img/se.gif')
 
         out += """
 <table class="websearch_yoursearches_table" cellspacing="0px">
   <thead class="websearch_yoursearches_table_header">
     <tr>
-      <td colspan="2"></td>
+      <td colspan="2">%(paging_navigation_html)s</td>
     </tr>
   </thead>
   <tfoot class="websearch_yoursearches_table_footer">
     <tr>
-      <td colspan="2">%(footer)s</td>
+      <td colspan="2">%(paging_navigation_html)s</td>
     </tr>
   </tfoot>
   <tbody>
     %(yoursearches)s
   </tbody>
-</table>""" % {'footer': footer,
+</table>""" % {'paging_navigation_html': paging_navigation_html,
                'yoursearches': yoursearches}
 
         return out

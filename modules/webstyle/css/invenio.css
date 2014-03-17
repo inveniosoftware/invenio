@@ -2587,7 +2587,11 @@ a:hover.bibMergeImgClickable img {
 }
 .youralerts_display_table_header td {
    background-color: #ffffcc;
+   color: black;
    padding: 2px;
+   font-size: 80%;
+   text-align: center;
+   white-space: nowrap;
    border-bottom: 1px solid #ffcc00;
 }
 .youralerts_display_table_footer td {
@@ -2598,7 +2602,7 @@ a:hover.bibMergeImgClickable img {
    text-align: center;
    white-space: nowrap;
 }
-.youralerts_display_table_footer img {
+.youralerts_display_table_footer img, .youralerts_display_table_header img {
    border: none;
    margin: 0px 3px;
    vertical-align: bottom;
@@ -2717,13 +2721,11 @@ a:hover.bibMergeImgClickable img {
 .websearch_yoursearches_table_header td {
    background-color: #ffffcc;
    color: black;
-   padding: 2px;
-   font-weight: bold;
-   font-size: 75%;
-   text-transform: uppercase;
-   border-bottom: 1px solid #ffcc00;
+   padding: 5px;
+   font-size: 80%;
+   text-align: center;
    white-space: nowrap;
-   vertical-align: top;
+   border-bottom: 1px solid #ffcc00;
 }
 .websearch_yoursearches_table_footer td {
    background-color: #ffffcc;
@@ -2733,7 +2735,7 @@ a:hover.bibMergeImgClickable img {
    text-align: center;
    white-space: nowrap;
 }
-.websearch_yoursearches_table_footer img {
+.websearch_yoursearches_table_footer img, .websearch_yoursearches_table_header img {
    border: none;
    margin: 0px 3px;
    vertical-align: bottom;
