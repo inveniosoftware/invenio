@@ -352,15 +352,28 @@ Here are all the alerts defined by this user: %s""" % (uid, repr(result)))
         alerts = []
         paging_navigation = ()
 
-    out = webalert_templates.tmpl_youralerts_display(ln=ln,
-                                                     alerts=alerts,
-                                                     nb_alerts=nb_alerts,
-                                                     nb_queries=nb_queries,
-                                                     idq=idq,
-                                                     page=page,
-                                                     step=step,
-                                                     paging_navigation=paging_navigation,
-                                                     p=p)
+    # check if there are any popular alerts already defined
+    query_popular_alerts_p = """ SELECT      COUNT(q.id)
+                                 FROM        query q
+                                 WHERE       q.type='p'"""
+    result_popular_alerts_p = run_sql(query_popular_alerts_p)
+    if result_popular_alerts_p[0][0] > 0:
+        popular_alerts_p = True
+    else:
+        popular_alerts_p = False
+
+    out = webalert_templates.tmpl_youralerts_display(
+        ln                = ln,
+        alerts            = alerts,
+        nb_alerts         = nb_alerts,
+        nb_queries        = nb_queries,
+        idq               = idq,
+        page              = page,
+        step              = step,
+        paging_navigation = paging_navigation,
+        p                 = p,
+        popular_alerts_p  = popular_alerts_p)
+
     return out
 
 def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG):
