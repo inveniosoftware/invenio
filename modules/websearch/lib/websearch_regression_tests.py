@@ -922,7 +922,6 @@ class WebSearchCJKTokenizedSearchTest(InvenioTestCase):
             run_sql(query)
             self.reindexed = True
             wordTable = WordTable(index_name=self.index_name,
-                                  fields_to_index=get_index_tags(self.index_name),
                                   table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
             wordTable.turn_off_virtual_indexes()
             wordTable.add_recIDs([[104, 104]], 10000)
@@ -936,12 +935,9 @@ class WebSearchCJKTokenizedSearchTest(InvenioTestCase):
                        WHERE name='%s'""" % (self.last_updated, self.index_name)
             run_sql(query)
             wordTable = WordTable(index_name=self.index_name,
-                                  fields_to_index=get_index_tags(self.index_name),
                                   table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
             wordTable.turn_off_virtual_indexes()
             wordTable.add_recIDs([[104, 104]], 10000)
-
-
 
     def test_title_cjk_tokenized_two_characters(self):
         """CJKTokenizer - test for finding chinese poetry with two CJK characters"""

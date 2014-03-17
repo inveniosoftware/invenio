@@ -66,6 +66,7 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_TAG, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
+
 from invenio.bibindex_engine_utils import load_tokenizers, \
     get_all_index_names_and_column_values, \
     get_index_tags, \
@@ -1208,19 +1209,20 @@ class WordTable(AbstractIndexTable):
         For furher reading see description of this method.
     """
 
-    def __init__(self, index_name, fields_to_index, table_type, table_prefix="", wash_index_terms=50):
+    def __init__(self, index_name, table_type, table_prefix="", wash_index_terms=50):
         """Creates words table instance.
         @param index_name: the index name
         @param index_id: the index integer identificator
         @param fields_to_index: a list of fields to index
-        @param table_name_pattern: i.e. idxWORD%02dF or idxPHRASE%02dF
         @param table_type: type of the wordtable: Words, Pairs, Phrases
+        @param table_prefix: prefix for table name, indexing will be performed
+            on table: <<table_prefix>>idx<<wordtable_type>>XXF
         @param wash_index_terms: do we wash index terms, and if yes (when >0),
             how many characters do we keep in the index terms; see
             max_char_length parameter of wash_index_term()
         """
         AbstractIndexTable.__init__(self, index_name, table_type, table_prefix, wash_index_terms)
-        self.fields_to_index = fields_to_index
+        self.fields_to_index = get_index_tags(index_name, virtual=False)
         self.timestamp = datetime.now()
 
         self.virtual_indexes = get_index_virtual_indexes(self.index_id)
@@ -2081,8 +2083,8 @@ def remove_dependent_index(virtual_indexes, dependent_index):
         return
 
     id_dependent = get_index_id_from_index_name(dependent_index)
-    wordTables = get_word_tables(virtual_indexes)
-    for index_id, index_name, index_tags in wordTables:
+    for index_name in virtual_indexes:
+        index_id = get_index_id_from_index_name(index_name)
         for type_ in CFG_BIBINDEX_INDEX_TABLE_TYPE.itervalues():
             vit = VirtualIndexTable(index_name, type_)
             vit.remove_dependent_index(dependent_index)
@@ -2091,6 +2093,7 @@ def remove_dependent_index(virtual_indexes, dependent_index):
         query = """DELETE FROM idxINDEX_idxINDEX WHERE id_virtual=%s AND id_normal=%s"""
         run_sql(query, (index_id, id_dependent))
 
+
 def should_update_virtual_indexes():
     """
         Decides if any virtual indexes should be updated.
@@ -2098,6 +2101,7 @@ def should_update_virtual_indexes():
         from CLI.
     """
     return task_get_option("all-virtual") or task_get_option("windex")
+
 
 def update_virtual_indexes(virtual_indexes, reindex=False):
     """
@@ -2145,31 +2149,24 @@ def task_run_core():
     virtual_indexes = filter_for_virtual_indexes(indexes)
     regular_indexes = list(set(indexes) - set(virtual_indexes))
 
-
     # check tables consistency
     if task_get_option("cmd") == "check":
-        wordTables = get_word_tables(indexes)
-        for index_id, index_name, index_tags in wordTables:
+        for index_name in indexes:
             wordTable = WordTable(index_name=index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   wash_index_terms=50)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
-
             wordTable = WordTable(index_name=index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                                   wash_index_terms=100)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
-
             wordTable = WordTable(index_name=index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
                                   wash_index_terms=0)
             _last_word_table = wordTable
@@ -2199,19 +2196,19 @@ def task_run_core():
                                                        task_get_option("reindex") or \
                                                        task_get_option("cmd") == "del"))
 
-    wordTables = get_word_tables(recIDs_for_index.keys())
-    if not wordTables:
+    if len(recIDs_for_index.keys()) == 0:
         write_message("Selected indexes/recIDs are up to date.")
 
+
     # Let's work on single words!
-    for index_id, index_name, index_tags in wordTables:
+    for index_name in recIDs_for_index.keys():
+        index_id = get_index_id_from_index_name(index_name)
         reindex_prefix = ""
         if task_get_option("reindex"):
             reindex_prefix = "tmp_"
             init_temporary_reindex_tables(index_id, reindex_prefix)
 
         wordTable = WordTable(index_name=index_name,
-                              fields_to_index=index_tags,
                               table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                               table_prefix=reindex_prefix,
                               wash_index_terms=50)
@@ -2251,7 +2248,6 @@ def task_run_core():
 
         # Let's work on pairs now
         wordTable = WordTable(index_name=index_name,
-                              fields_to_index=index_tags,
                               table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                               table_prefix=reindex_prefix,
                               wash_index_terms=100)
@@ -2291,7 +2287,6 @@ def task_run_core():
 
         # Let's work on phrases now
         wordTable = WordTable(index_name=index_name,
-                              fields_to_index=index_tags,
                               table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
                               table_prefix=reindex_prefix,
                               wash_index_terms=0)
