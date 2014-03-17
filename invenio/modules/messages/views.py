@@ -196,7 +196,8 @@ def add(msg_reply_id):
 def view(msgid):
     uid = current_user.get_id()
     if (dbquery.check_user_owns_message(uid, msgid) == 0):
-        flash(_('Sorry, this message (#%(x_msg)d) is not in your mailbox.', x_msg=(msgid, )), "error")
+        flash(_('Sorry, this message (#%(x_msg)d) is not in your mailbox.',
+                x_msg=msgid), "error")
     else:
         try:
             m = dbquery.get_message(uid, msgid)
