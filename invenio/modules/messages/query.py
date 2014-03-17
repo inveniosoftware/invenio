@@ -349,7 +349,7 @@ def get_uids_members_of_groups(gids):
             query_params.append(gid)
         query += " id_usergroup=%s)"
         query_params.append(gids[-1])
-        return map(get_element, run_sql(query, tuple(query_params)))
+        return sorted(map(get_element, run_sql(query, tuple(query_params))))
     return []
 
 def user_exists(uid):
