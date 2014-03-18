@@ -25,7 +25,7 @@ __revision__ = \
 from invenio.testutils import InvenioTestCase
 
 from invenio import bibindex_engine
-from invenio.bibindex_engine_utils import load_tokenizers
+from invenio.bibindex_engine_utils import load_tokenizers, list_union
 from invenio.testutils import make_test_suite, run_test_suite
 
 
@@ -37,10 +37,10 @@ class TestListSetOperations(InvenioTestCase):
     """Tests for list set operations."""
 
     def test_list_union(self):
-        """bibindex engine - list union"""
+        """bibindex engine utils - list union"""
         self.assertEqual([1, 2, 3, 4],
-                         bibindex_engine.list_union([1, 2, 3],
-                                                    [1, 3, 4]))
+                         list_union([1, 2, 3],
+                                    [1, 3, 4]))
 
     def test_list_unique(self):
         """bibindex engine - list unique"""

@@ -425,3 +425,13 @@ def make_prefix(index_name):
 
 class UnknownTokenizer(Exception):
     pass
+
+
+def list_union(list1, list2):
+    "Returns union of the two lists."
+    union_dict = {}
+    for e in list1:
+        union_dict[e] = 1
+    for e in list2:
+        union_dict[e] = 1
+    return union_dict.keys()

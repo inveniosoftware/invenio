@@ -44,7 +44,7 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_BIBINDEX_WASH_INDEX_TERMS, \
      CFG_BIBINDEX_SPECIAL_TAGS
 from invenio.bibauthority_config import \
-     CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
+    CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
 from invenio.bibauthority_engine import get_index_strings_by_control_no, \
      get_control_nos_from_recID
 from invenio.bibdocfile import BibRecDocs
@@ -66,7 +66,7 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_TAG, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
-
+from invenio.bibindex_termcollectors import TermCollector
 from invenio.bibindex_engine_utils import load_tokenizers, \
     get_all_index_names_and_column_values, \
     get_index_tags, \
@@ -85,7 +85,7 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     filter_for_virtual_indexes, \
     get_records_range_for_index, \
     make_prefix, \
-    UnknownTokenizer
+    list_union
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibfield import get_record
 from invenio.memoiseutils import Memoise
@@ -109,16 +109,6 @@ _last_word_table = None
 
 
 _TOKENIZERS = load_tokenizers()
-
-
-def list_union(list1, list2):
-    "Returns union of the two lists."
-    union_dict = {}
-    for e in list1:
-        union_dict[e] = 1
-    for e in list2:
-        union_dict[e] = 1
-    return union_dict.keys()
 
 
 def list_unique(_list):
@@ -1426,37 +1416,13 @@ class WordTable(AbstractIndexTable):
                 wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
                                           wlist[recID])
 
-        tokenizing_function = self.default_tokenizer_function
-        if self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["recjson"]:
-            # use bibfield instead of directly consulting bibrec
-            for recID in range(recID1, recID2 + 1):
-                record = get_record(recID)
-                if record:
-                    new_words = tokenizing_function(record)
-                    if not wlist.has_key(recID):
-                        wlist[recID] = []
-                    wlist[recID] = list_union(new_words, wlist[recID])
-        elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["multifield"]:
-            # tokenizers operating on multiple fields/tags at a time
-            for recID in range(recID1, recID2 + 1):
-                new_words = tokenizing_function(recID)
-                if not wlist.has_key(recID):
-                    wlist[recID] = []
-                wlist[recID] = list_union(new_words, wlist[recID])
-        elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["string"]:
-            # tokenizers operating on one field/tag and phrase at a time
-            for tag in self.fields_to_index:
-                tokenizing_function = self.special_tags.get(tag, self.default_tokenizer_function)
-                phrases = self.get_phrases_for_tokenizing(tag, recID1, recID2)
-                for row in sorted(phrases):
-                    recID, phrase = row
-                    if not wlist.has_key(recID):
-                        wlist[recID] = []
-                    new_words = tokenizing_function(phrase)
-                    wlist[recID] = list_union(new_words, wlist[recID])
-        else:
-            raise UnknownTokenizer("Tokenizer has not been recognized: %s" \
-                                    % self.tokenizer.__class__.__name__)
+        collector = TermCollector(self.tokenizer,
+                                  self.tokenizer_type,
+                                  self.table_type,
+                                  self.fields_to_index,
+                                  [recID1, recID2])
+        collector.set_special_tags(self.special_tags)
+        wlist = collector.collect(xrange(recID1, recID2 + 1), wlist)
 
 
         # lookup index-time synonyms:
@@ -1500,43 +1466,6 @@ class WordTable(AbstractIndexTable):
             for w in wlist[recID]:
                 put(recID, w, 1)
         return len(recIDs)
-
-
-    def get_phrases_for_tokenizing(self, tag, first_recID, last_recID):
-        """Gets phrases for later tokenization for a range of records and
-           specific tag.
-           @param tag: MARC tag
-           @param first_recID: first recID from the range of recIDs to index
-           @param last_recID: last recID from the range of recIDs to index
-        """
-        bibXXx = "bib" + tag[0] + tag[1] + "x"
-        bibrec_bibXXx = "bibrec_" + bibXXx
-        query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
-                   WHERE bb.id_bibrec BETWEEN %%s AND %%s
-                   AND bb.id_bibxxx=b.id AND tag LIKE %%s""" % (bibXXx, bibrec_bibXXx)
-        phrases = run_sql(query, (first_recID, last_recID, tag))
-        if tag == '8564_u':
-            ## FIXME: Quick hack to be sure that hidden files are
-            ## actually indexed.
-            phrases = set(phrases)
-            for recid in xrange(int(first_recID), int(last_recID) + 1):
-                for bibdocfile in BibRecDocs(recid).list_latest_files():
-                    phrases.add((recid, bibdocfile.get_url()))
-        #authority records
-        pattern = tag.replace('%', '*')
-        matches = fnmatch.filter(CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.keys(), pattern)
-        if not len(matches):
-            return phrases
-        phrases = set(phrases)
-        for tag_match in matches:
-            authority_tag = tag_match[0:3] + "__0"
-            for recID in xrange(int(first_recID), int(last_recID) + 1):
-                control_nos = get_fieldvalues(recID, authority_tag)
-                for control_no in control_nos:
-                    new_strings = get_index_strings_by_control_no(control_no)
-                    for string_value in new_strings:
-                        phrases.add((recID, string_value))
-        return phrases
 
     def log_progress(self, start, done, todo):
         """Calculate progress and store it.

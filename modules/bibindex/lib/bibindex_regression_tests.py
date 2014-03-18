@@ -1328,7 +1328,7 @@ class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   wash_index_terms=50)
             if special_tokenizer == True:
-                wordTable.default_tokenizer_function = tokenize_for_words
+                wordTable.tokenizer.tokenize_for_words = tokenize_for_words
             wordTable.add_recIDs([[1, 10]], 1000)
         vit = VirtualIndexTable(self.new_index_name,
                                 CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
