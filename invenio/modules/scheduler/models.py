@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,14 +27,16 @@ from invenio.ext.sqlalchemy import db
 # Create your models here.
 from invenio.modules.sequencegenerator.models import SeqSTORE
 
+
 class HstTASK(db.Model):
     """Represents a HstTASK record."""
+
     __tablename__ = 'hstTASK'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True, autoincrement=False)
+                   primary_key=True, autoincrement=False)
     proc = db.Column(db.String(255), nullable=False)
     host = db.Column(db.String(255), nullable=False,
-                server_default='')
+                     server_default='')
     user = db.Column(db.String(50), nullable=False)
     runtime = db.Column(db.DateTime, nullable=False, index=True)
     sleeptime = db.Column(db.String(20), nullable=True)
@@ -42,19 +44,22 @@ class HstTASK(db.Model):
     status = db.Column(db.String(50), nullable=True, index=True)
     progress = db.Column(db.String(255), nullable=True)
     priority = db.Column(db.TinyInteger(4), nullable=False,
-                server_default='0', index=True)
-    sequenceid = db.Column(db.Integer(8), db.ForeignKey(SeqSTORE.id))
+                         server_default='0', index=True)
+    sequenceid = db.Column(db.Integer(15, unsigned=True),
+                           db.ForeignKey(SeqSTORE.id))
+
 
 class SchTASK(db.Model):
     """Represents a SchTASK record."""
+
     def __init__(self):
         pass
     __tablename__ = 'schTASK'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True, autoincrement=True)
+                   primary_key=True, autoincrement=True)
     proc = db.Column(db.String(255), nullable=False)
     host = db.Column(db.String(255), nullable=False,
-                server_default='')
+                     server_default='')
     user = db.Column(db.String(50), nullable=False)
     runtime = db.Column(db.DateTime, nullable=False, index=True)
     sleeptime = db.Column(db.String(20), nullable=True)
@@ -62,8 +67,9 @@ class SchTASK(db.Model):
     status = db.Column(db.String(50), nullable=True, index=True)
     progress = db.Column(db.String(255), nullable=True)
     priority = db.Column(db.TinyInteger(4), nullable=False,
-                server_default='0', index=True)
-    sequenceid = db.Column(db.Integer(8), db.ForeignKey(SeqSTORE.id))
+                         server_default='0', index=True)
+    sequenceid = db.Column(db.Integer(15, unsigned=True),
+                           db.ForeignKey(SeqSTORE.id))
 
 
 __all__ = ['HstTASK',

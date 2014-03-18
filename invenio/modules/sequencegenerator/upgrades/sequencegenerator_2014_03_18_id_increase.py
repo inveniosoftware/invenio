@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-#
+##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,27 +17,24 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-SeqUtils database models.
-"""
-
+from sqlalchemy import *
 from invenio.ext.sqlalchemy import db
+from invenio.modules.upgrader.api import op
+
+depends_on = []
 
 
-class SeqSTORE(db.Model):
-    """Represents a SeqSTORE record."""
-    __tablename__ = 'seqSTORE'
+def info():
+    return "Increase integer size for id to match master-branch"
 
-    id = db.Column(
-        db.Integer(15, unsigned=True),
-        primary_key=True, nullable=False,
-        autoincrement=True
+
+def do_upgrade():
+    op.alter_column(
+        u'seqSTORE', 'id',
+        type_=db.Integer(display_width=15, unsigned=True),
+        autoincrement=True,
     )
-    seq_name = db.Column(db.String(15))
-    seq_value = db.Column(db.String(20))
 
-    __table_args__ = (db.Index('seq_name_value', seq_name, seq_value,
-                               unique=True),
-                      db.Model.__table_args__)
 
-__all__ = ['SeqSTORE']
+def estimate():
+    return 1
