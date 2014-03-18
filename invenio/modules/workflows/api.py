@@ -38,7 +38,6 @@ from .errors import WorkflowWorkerError
 
 
 class WorkerBackend(object):
-
     @cached_property
     def worker(self):
         try:
@@ -85,6 +84,7 @@ def start(workflow_name, data, **kwargs):
     :return: BibWorkflowEngine that ran the workflow.
     """
     from .worker_engine import run_worker
+
     return run_worker(workflow_name, data, **kwargs)
 
 
@@ -138,6 +138,7 @@ def start_by_wid(wid, **kwargs):
     :return: BibWorkflowEngine that ran the workflow.
     """
     from .worker_engine import restart_worker
+
     return restart_worker(wid, **kwargs)
 
 
@@ -159,8 +160,7 @@ def start_by_wid_delayed(wid, **kwargs):
 
     :return: BibWorkflowEngine that ran the workflow.
     """
-    result = WORKER().restart_worker(wid, **kwargs)
-    return result
+    return WORKER().restart_worker(wid, **kwargs)
 
 
 def start_by_oids(workflow_name, oids, **kwargs):
@@ -215,6 +215,7 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
     :return: BibWorkflowEngine that ran the workflow.
     """
     from .models import BibWorkflowObject
+
     objects = BibWorkflowObject.query.filter(
         BibWorkflowObject.id.in_(list(oids))
     ).all()
@@ -247,6 +248,7 @@ def continue_oid(oid, start_point="continue_next", **kwargs):
     :return: BibWorkflowEngine that ran the workflow
     """
     from .worker_engine import continue_worker
+
     return continue_worker(oid, start_point, **kwargs)
 
 
@@ -274,9 +276,8 @@ def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
 
     :return: BibWorkflowEngine that ran the workflow
     """
+    return WORKER().continue_worker(oid, start_point, **kwargs)
 
-    result = WORKER().continue_worker(oid, start_point, **kwargs)
-    return result
 
 
 def resume_objects_in_workflow(id_workflow, start_point="continue_next",

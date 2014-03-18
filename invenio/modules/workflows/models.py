@@ -50,7 +50,7 @@ def get_default_data():
 
 def get_default_extra_data():
     """ Returns the base64 representation of the extra_data default value """
-    extra_data_default = {"_tasks_results": [],
+    extra_data_default = {"_tasks_results": {},
                           "owner": {},
                           "_task_counter": {},
                           "error_msg": "",
@@ -64,6 +64,7 @@ def get_default_extra_data():
 
 def session_manager(orig_func):
     """Decorator to wrap function with the session."""
+
     def new_func(self, *a, **k):
         """Wrappend function to manage DB session."""
         try:
@@ -73,6 +74,7 @@ def session_manager(orig_func):
         except:
             db.session.rollback()
             raise
+
     return new_func
 
 
@@ -98,6 +100,9 @@ class Workflow(db.Model):
     counter_error = db.Column(db.Integer, default=0, nullable=False)
     counter_finished = db.Column(db.Integer, default=0, nullable=False)
     module_name = db.Column(db.String(64), nullable=False)
+
+
+
 
     def __repr__(self):
         return "<Workflow(name: %s, module: %s, cre: %s, mod: %s," \
@@ -338,7 +343,12 @@ class BibWorkflowObject(db.Model):
         """
         task_name = self.extra_data["_last_task_name"]
         res_obj = WorkflowsTaskResult(task_name, name, result)
-        self.extra_data["_tasks_results"].append(res_obj)
+        if task_name in self.extra_data["_tasks_results"]:
+            self.extra_data["_tasks_results"][task_name].append(res_obj)
+        else:
+            self.extra_data["_tasks_results"][task_name] = [res_obj]
+
+
 
     def add_action(self, action, message):
         """Assign an action to this object for an action to be taken
@@ -521,7 +531,7 @@ class BibWorkflowObject(db.Model):
                     except Exception:
                         # Some other parsing error
                         pass
-                # Just return raw string
+                        # Just return raw string
             return data
         if isinstance(data, set):
             return list(data)

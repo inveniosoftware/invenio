@@ -79,6 +79,7 @@ def approve_record(obj, eng):
         obj.extra_data["_error_msg"] = 'Could not assign action'
 
 
+
 approve_record.__title__ = "Record Approval"
 approve_record.__description__ = "This task assigns the approval action to a record."
 

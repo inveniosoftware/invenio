@@ -41,7 +41,7 @@ def num_workflow_running_greater(num):
 
     :param num: the number that you want to compare with the number de workflow running
     :type num: number
-
+    :return True if you need to wait or false if you don't need to wait
     """
 
     def _num_workflow_running_greater(obj, eng):
@@ -52,6 +52,7 @@ def num_workflow_running_greater(num):
                 return False
         except KeyError:
             return False
+
     return _num_workflow_running_greater
 
 
@@ -92,10 +93,14 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
         myobject = BibWorkflowObject.create_object_revision(obj,
                                                             version=ObjectVersion.INITIAL,
                                                             data_type="record")
+        if data:
+            myobject.set_data(data)
+            myobject.save()
 
         workflow_id = start_delayed(workflow_to_run,
                                     data=[myobject],
                                     stop_on_error=True,
+                                    module_name=eng.module_name,
                                     **kwargs)
 
         eng.log.info("Workflow launched")
@@ -246,9 +251,9 @@ def write_something_generic(messagea, func):
     should always take in parameter a string which is the message.
 
     :param func: the list of function that will be used to propagate the message
-    :type func: Array of functions
+    :type func: List of functions
     :param messagea: the message that you want to propagate
-    :type messagea: Array of strings and functions.
+    :type messagea: List of strings and functions.
     """
 
     def _write_something_generic(obj, eng):
@@ -323,15 +328,16 @@ def get_workflows_progress(obj, eng):
         return "No workflows"
 
 
-def workflows_reviews(stop_if_error=False):
+def workflows_reviews(stop_if_error=False, clean=True):
     """
     This function just give you a little review of you children workflows.
     This function can be used to stop the workflow if a child has crashed.
 
     :param stop_if_error: give to the function the indication it it should stop
     if a child workflow has crashed.
-    :type stop_if_error: Boolean
+    :type stop_if_error: bool
     """
+
     from invenio.modules.workflows.errors import WorkflowError
 
     def _workflows_reviews(obj, eng):
@@ -348,6 +354,12 @@ def workflows_reviews(stop_if_error=False):
             raise WorkflowError(
                 "%s / %s failed" % (eng.extra_data["_nb_workflow_failed"], eng.extra_data["_nb_workflow"]),
                 eng.uuid, obj.id, payload=eng.extra_data["_uuid_workflow_crashed"])
+        obj.add_task_result("review_workflow",
+                            {"failed": eng.extra_data["_nb_workflow_failed"], "total": eng.extra_data["_nb_workflow"]})
+        if clean:
+            eng.extra_data["_nb_workflow_failed"] = 0
+            eng.extra_data["_nb_workflow"] = 0
+            eng.extra_data["_nb_workflow_finish"] = 0
 
     return _workflows_reviews
 
@@ -360,6 +372,9 @@ def log_info(message):
     """
 
     def _log_info(obj, eng):
-        eng.log.info(message)
+        messagea = message
+        while six.callable(messagea):
+            messagea = messagea(obj, eng)
+        eng.log.info(messagea)
 
     return _log_info

@@ -24,7 +24,7 @@ from invenio.modules.workflows.tasks.logic_tasks import (end_for,
                                                          workflow_else,
                                                          workflow_if,
                                                          compare_logic)
-from invenio.modules.workflows.tasks.sample_tasks import add_data
+from invenio.modules.workflows.tasks.sample_tasks import add_data, print_data
 
 from invenio.modules.workflows.tasks.workflows_tasks import interrupt_workflow
 
@@ -37,8 +37,10 @@ class test_workflow_logic(object):
     Test workflow for unit-tests.
     """
     workflow = [
+        print_data,
         foreach([0, 1, 4, 10], "step", True),
         [
+            print_data,
             simple_for(0, 4, 1, "Iterator"),
             [
                 add_data(1),
@@ -48,11 +50,13 @@ class test_workflow_logic(object):
             workflow_if(compare_logic(get_data, 9, "gte")),
             [
                 set_obj_extra_data_key("test", "gte9"),
+                print_data,
                 interrupt_workflow
             ],
             workflow_else,
             [
                 set_obj_extra_data_key("test", "lt9"),
+                print_data,
                 interrupt_workflow
             ],
         ],

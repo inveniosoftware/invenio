@@ -23,6 +23,7 @@ from invenio.celery import celery
 
 from invenio.base.helpers import with_app_context
 from invenio.modules.workflows.worker_result import AsynchronousResultWrapper, uui_to_workflow
+from invenio.modules.workflows.utils import session_manager
 
 
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.run_worker')
@@ -84,8 +85,7 @@ class worker_celery(object):
         @param data: list of objects for the workflow
         @type data: list
         """
-        result = celery_run.delay(workflow_name, data, **kwargs)
-        return CeleryResult(result)
+        return CeleryResult(celery_run.delay(workflow_name, data, **kwargs))
 
     def restart_worker(self, wid, **kwargs):
         """
@@ -95,8 +95,7 @@ class worker_celery(object):
         @param wid: uuid of the workflow to be run
         @type wid: string
         """
-        result = celery_restart.delay(wid, **kwargs)
-        return CeleryResult(result)
+        return CeleryResult(celery_restart.delay(wid, **kwargs))
 
     def continue_worker(self, oid, restart_point, **kwargs):
         """
@@ -109,8 +108,7 @@ class worker_celery(object):
         @param restart_point: sets the start point
         @type restart_point: string
         """
-        result = celery_continue.delay(oid, restart_point, **kwargs)
-        return CeleryResult(result)
+        return CeleryResult(celery_continue.delay(oid, restart_point, **kwargs))
 
 
 class CeleryResult(AsynchronousResultWrapper):
@@ -126,6 +124,7 @@ class CeleryResult(AsynchronousResultWrapper):
     def status(self):
         return self.asyncresult.status
 
+    @session_manager
     def get(self, postprocess=None):
         if postprocess is None:
             return uui_to_workflow(self.asyncresult.get())
