@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -380,7 +380,7 @@ CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG = "970__a"
 CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS = [
 ('http(s)?://.*', {}),
 ]
-CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS = ['/tmp', '/home', ]
+CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS = ['/tmp', '/home', '/Users']
 CFG_BIBUPLOAD_REFERENCE_TAG = "999"
 CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE = 1
 CFG_BIBUPLOAD_STRONG_TAGS = ['964', ]
