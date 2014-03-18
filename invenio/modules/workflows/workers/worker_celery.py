@@ -21,8 +21,8 @@ from six import iteritems
 
 from invenio.celery import celery
 
-from invenio.ext.sqlalchemy import db
 from invenio.base.helpers import with_app_context
+from invenio.modules.workflows.worker_result import AsynchronousResultWrapper, uui_to_workflow
 
 
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.run_worker')
@@ -33,6 +33,7 @@ def celery_run(workflow_name, data, **kwargs):
     """
     from ..worker_engine import run_worker
     from ..utils import BibWorkflowObjectIdContainer
+
     if isinstance(data, list):
         for i in range(0, len(data)):
             if isinstance(data[i], dict):
@@ -43,34 +44,8 @@ def celery_run(workflow_name, data, **kwargs):
                         k, v = stack.pop()
                         if isinstance(v, dict):
                             stack.extend(iteritems(v))
-                        elif isinstance(v, db.Model):
-                            # try except pass to maintain compatibility in case SQLAlchemy is fixed
-                            try:
-                                db.session.merge(data[i].extra_data["repository"])
-                                db.session.add(data[i].extra_data["repository"])
-                                db.session.commit()
-                            except Exception as e:
-                                print("Celery : SQLAlchemy decoherence data object")
-                                print(e.message)
-    else:
-        if isinstance(data, dict):
-            if str(BibWorkflowObjectIdContainer().__class__) in data:
-                data = BibWorkflowObjectIdContainer().from_dict(data).get_object()
-                stack = data.get_extra_data().items()
-                while stack:
-                    k, v = stack.pop()
-                    if isinstance(v, dict):
-                        stack.extend(iteritems(v))
-                    elif isinstance(v, db.Model):
-                        # try except pass to maintain compatibility in case SQLAlchemy is fixed
-                        try:
-                            db.session.merge(data.extra_data["repository"])
-                            db.session.add(data.extra_data["repository"])
-                            db.session.commit()
-                        except Exception as e:
-                            print("Celery : SQLAlchemy decoherence data object")
-                            print(e.message)
-    run_worker(workflow_name, data, **kwargs)
+
+    return run_worker(workflow_name, data, **kwargs).uuid
 
 
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.restart_worker')
@@ -81,7 +56,8 @@ def celery_restart(wid, **kwargs):
     """
     from ..worker_engine import restart_worker
 
-    restart_worker(wid, **kwargs)
+    result = restart_worker(wid, **kwargs).uuid
+    return result
 
 
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.continue_worker')
@@ -92,7 +68,8 @@ def celery_continue(oid, restart_point, **kwargs):
     """
     from ..worker_engine import continue_worker
 
-    continue_worker(oid, restart_point, **kwargs)
+    return continue_worker(oid, restart_point, **kwargs).uuid
+
 
 
 class worker_celery(object):
@@ -107,7 +84,8 @@ class worker_celery(object):
         @param data: list of objects for the workflow
         @type data: list
         """
-        return celery_run.delay(workflow_name, data, **kwargs)
+        result = celery_run.delay(workflow_name, data, **kwargs)
+        return CeleryResult(result)
 
     def restart_worker(self, wid, **kwargs):
         """
@@ -117,7 +95,8 @@ class worker_celery(object):
         @param wid: uuid of the workflow to be run
         @type wid: string
         """
-        return celery_restart.delay(wid, **kwargs)
+        result = celery_restart.delay(wid, **kwargs)
+        return CeleryResult(result)
 
     def continue_worker(self, oid, restart_point, **kwargs):
         """
@@ -130,4 +109,25 @@ class worker_celery(object):
         @param restart_point: sets the start point
         @type restart_point: string
         """
-        return celery_continue.delay(oid, restart_point, **kwargs)
+        result = celery_continue.delay(oid, restart_point, **kwargs)
+        return CeleryResult(result)
+
+
+class CeleryResult(AsynchronousResultWrapper):
+    """
+
+    :param asynchronousresult:
+    """
+
+    def __init__(self, asynchronousresult):
+        super(CeleryResult, self).__init__(asynchronousresult)
+
+    @property
+    def status(self):
+        return self.asyncresult.status
+
+    def get(self, postprocess=None):
+        if postprocess is None:
+            return uui_to_workflow(self.asyncresult.get())
+        else:
+            return postprocess(self.asyncresult.get())

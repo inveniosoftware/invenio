@@ -17,6 +17,7 @@
 
 from redis import Redis
 from rq.decorators import job
+from invenio.modules.workflows.worker_result import AsynchronousResultWrapper
 from ..worker_engine import (run_worker,
                              restart_worker,
                              continue_worker)
@@ -31,36 +32,50 @@ class worker_redis(object):
         Registers run_worker function as a new task in RQ
         The delay method executes it asynchronously
 
-        @param workflow_name: name of the workflow to be run
-        @type workflow_name: string
+        :param workflow_name: name of the workflow to be run
+        :type workflow_name: string
 
-        @param data: list of objects for the workflow
-        @type data: list
+        :param data: list of objects for the workflow
+        :type data: list
         """
-        return job(queue='default', connection=redis_conn)(run_worker). \
-            delay(workflow_name, data, **kwargs)
+        return RedisResult(job(queue='default', connection=redis_conn)(run_worker). \
+            delay(workflow_name, data, **kwargs))
 
     def restart_worker(self, wid, **kwargs):
         """
         Registers restart_worker as a new task in RQ
         The delay method executes it asynchronously
 
-        @param wid: uuid of the workflow to be run
-        @type wid: string
+        :param wid: uuid of the workflow to be run
+        :type wid: string
         """
-        return job(queue='default', connection=redis_conn)(restart_worker).\
-            delay(wid, **kwargs)
+        return RedisResult(job(queue='default', connection=redis_conn)(restart_worker). \
+            delay(wid, **kwargs))
 
     def continue_worker(self, oid, restart_point, **kwargs):
         """
         Registers continue_worker as a new task in RQ
         The delay method executes it asynchronously
 
-        @param oid: uuid of the object to be started
-        @type oid: string
+        ;param oid: uuid of the object to be started
+        :type oid: string
 
-        @param restart_point: sets the start point
-        @type restart_point: string
+        :param restart_point: sets the start point
+        :type restart_point: string
         """
-        return job(queue='default', connection=redis_conn)(continue_worker). \
-            delay(oid, restart_point, **kwargs)
+        return RedisResult(job(queue='default', connection=redis_conn)(continue_worker). \
+            delay(oid, restart_point, **kwargs))
+
+
+
+class RedisResult(AsynchronousResultWrapper):
+
+    def __init__(self, asynchronousresult):
+        super(RedisResult, self).__init__(asynchronousresult)
+
+    @property
+    def status(self):
+        raise NotImplementedError
+
+    def get(self, postprocess=None):
+        raise NotImplementedError
