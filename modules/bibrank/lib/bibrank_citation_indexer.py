@@ -136,9 +136,13 @@ def get_citation_weight(rank_method_code, config, chunk_size=25000):
         begin_time = time.time()
         try:
             function = config.get("rank_method", "function")
-            config.get(function, 'collections')
+            collections = config.get(function, 'collections')
         except ConfigParser.NoOptionError:
             config.set(function, 'collections', None)
+
+        # Ignore records not in selected collections
+        updated_recids = [recid for recid in updated_recids if recid in recids_cache(collections)]
+
         # Process fully the updated records
         weights = process_and_store(updated_recids, config, chunk_size)
         end_time = time.time()
