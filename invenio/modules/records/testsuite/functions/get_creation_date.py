@@ -17,30 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-@persistent_identifier(0)
-recid:
-    """ """
-    schema:
-        {'recid': {'type':'integer', 'min': 1, 'required': True}}
-    creator:
-        @legacy(('001', ''), )
-        @connect('_id')
-        marc, '001', int(value)
-    producer:
-        json_for_marc(), {'001': ''}
 
-@extend
-modification_date:
-    derived:
-        @legacy('marc', ('005', ''))
-        @depends_on('recid')
-        get_modification_date(self.get('recid', -1))
-    producer:
-        json_for_marc(), {"005": "self.get('modification_date').strftime('%Y%m%d%H%M%S.0')"}
+def get_creation_date(recid):
+    """
+    Returns creation date for given record.
 
-@extend
-creation_date:
-    derived:
-        @depends_on('recid')
-        get_creation_date(self.get('recid', -1))
+    @param recid:
 
+    @return: Creation date
+    """
+    from invenio.modules.records.models import Record as Bibrec
+    return Bibrec.query.get(recid).creation_date

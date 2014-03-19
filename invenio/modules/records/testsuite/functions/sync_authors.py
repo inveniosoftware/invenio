@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,30 +17,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-@persistent_identifier(0)
-recid:
-    """ """
-    schema:
-        {'recid': {'type':'integer', 'min': 1, 'required': True}}
-    creator:
-        @legacy(('001', ''), )
-        @connect('_id')
-        marc, '001', int(value)
-    producer:
-        json_for_marc(), {'001': ''}
+from .util_merge_authors import util_merge_authors
 
-@extend
-modification_date:
-    derived:
-        @legacy('marc', ('005', ''))
-        @depends_on('recid')
-        get_modification_date(self.get('recid', -1))
-    producer:
-        json_for_marc(), {"005": "self.get('modification_date').strftime('%Y%m%d%H%M%S.0')"}
-
-@extend
-creation_date:
-    derived:
-        @depends_on('recid')
-        get_creation_date(self.get('recid', -1))
-
+def sync_authors(self, field_name, connected_field, action):
+    if action == 'set':
+        if field_name == 'authors' and self.get('authors'):
+            self.__setitem__('_first_author', self['authors'][0],
+                            exclude=['connect'])
+            if self['authors'][1:]:
+                self.__setitem__('_additional_authors', self['authors'][1:],
+                                 exclude=['connect'])
+        elif field_name in ('_first_author', '_additional_authors'):
+            self.__setitem__('authors', util_merge_authors(self),
+                             exclude=['connect'])

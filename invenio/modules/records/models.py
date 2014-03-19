@@ -123,17 +123,16 @@ class Record(db.Model):
 class RecordMetadata(db.Model):
     """Represents a json record inside the SQL database"""
 
-    __tablename__ = 'record_metadata'
+    __tablename__ = 'record_json'
 
     id = db.Column(db.MediumInteger(8, unsigned=True),
             db.ForeignKey(Record.id),
             primary_key=True,
             nullable=False,
             autoincrement=True)
-    json = db.Column(db.MarshalBinary(default_value={}, force_type=dict),
-            nullable=False)
+    json = db.Column(db.JSON, nullable=False)
 
-    record = db.relationship(Record, backref='record_metadata')
+    record = db.relationship(Record, backref='record_json')
 
 __all__ = ['Record',
            'RecordMetadata',
