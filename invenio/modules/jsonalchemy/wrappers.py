@@ -311,8 +311,12 @@ class SmartJsonLD(SmartJson):
         :param: new_context the context to use for formatted publishing,
                             usually supplied by the client; used by the
                             'compacted', 'framed', and 'normalized' formats.
-        :param: format the publishing format; can be 'full', 'compacted',
-                       'expanded', 'flattened', 'framed' or 'normalized'
+        :param: format the publishing format; can be 'full', 'inline',
+                       'compacted', 'expanded', 'flattened', 'framed' or
+                       'normalized'. Note that 'full' and 'inline' are synonims,
+                       referring to the document form which includes the
+                       context; for more information see:
+                       http://www.w3.org/TR/json-ld/
         """
         from pyld import jsonld
         import six
@@ -328,11 +332,11 @@ class SmartJsonLD(SmartJson):
             doc = self.translate(context, ctx)
         except NotImplementedError:
             # model does not require translation
-            doc = self.dumps()
-            del doc["__meta_metadata__"]
+            doc = self.dumps(clean=True)
+
         doc["@context"] = ctx
 
-        if format == "full":
+        if format in ["full", "inline"]:
             return doc
         if format == "compacted":
             return jsonld.compact(doc, new_context)
