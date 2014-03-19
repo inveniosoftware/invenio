@@ -6,7 +6,7 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
-Invenio v1.1.2 -- released 2014-02-25
+Invenio v1.1.3 -- released 2014-02-25
 -------------------------------------
 
  *) BatchUploader: rights to ::1 for robot upload; avoid
