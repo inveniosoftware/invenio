@@ -17,30 +17,19 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-@persistent_identifier(0)
-recid:
-    """ """
-    schema:
-        {'recid': {'type':'integer', 'min': 1, 'required': True}}
-    creator:
-        @legacy(('001', ''), )
-        @connect('_id')
-        marc, '001', int(value)
-    producer:
-        json_for_marc(), {'001': ''}
+def get_bibdoc(recid):
+    """
+    Retrieves using BibDoc all the files related with a given record
 
-@extend
-modification_date:
-    derived:
-        @legacy('marc', ('005', ''))
-        @depends_on('recid')
-        get_modification_date(self.get('recid', -1))
-    producer:
-        json_for_marc(), {"005": "self.get('modification_date').strftime('%Y%m%d%H%M%S.0')"}
+    @param recid
 
-@extend
-creation_date:
-    derived:
-        @depends_on('recid')
-        get_creation_date(self.get('recid', -1))
+    @return BibDoc of the given record
+    """
+    if not recid or recid < 0:
+        return None
 
+    from invenio.legacy.bibdocfile.api import BibDoc, InvenioBibDocFileError
+    try:
+        return BibDoc(int(recid))
+    except InvenioBibDocFileError:
+        return None

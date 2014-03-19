@@ -17,30 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-@persistent_identifier(0)
-recid:
-    """ """
-    schema:
-        {'recid': {'type':'integer', 'min': 1, 'required': True}}
-    creator:
-        @legacy(('001', ''), )
-        @connect('_id')
-        marc, '001', int(value)
-    producer:
-        json_for_marc(), {'001': ''}
 
-@extend
-modification_date:
-    derived:
-        @legacy('marc', ('005', ''))
-        @depends_on('recid')
-        get_modification_date(self.get('recid', -1))
-    producer:
-        json_for_marc(), {"005": "self.get('modification_date').strftime('%Y%m%d%H%M%S.0')"}
+def get_cited_by_count(recid):
+    """
+    Return how many records cite given record.
 
-@extend
-creation_date:
-    derived:
-        @depends_on('recid')
-        get_creation_date(self.get('recid', -1))
+    @param recid:
 
+    @return: Number of records citing given record
+    """
+    from invenio.legacy.bibrank.citation_searcher import get_cited_by_count
+    if recid:
+        return get_cited_by_count(recid)

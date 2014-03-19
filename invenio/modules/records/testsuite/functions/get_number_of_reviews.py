@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,30 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-@persistent_identifier(0)
-recid:
-    """ """
-    schema:
-        {'recid': {'type':'integer', 'min': 1, 'required': True}}
-    creator:
-        @legacy(('001', ''), )
-        @connect('_id')
-        marc, '001', int(value)
-    producer:
-        json_for_marc(), {'001': ''}
 
-@extend
-modification_date:
-    derived:
-        @legacy('marc', ('005', ''))
-        @depends_on('recid')
-        get_modification_date(self.get('recid', -1))
-    producer:
-        json_for_marc(), {"005": "self.get('modification_date').strftime('%Y%m%d%H%M%S.0')"}
+def get_number_of_reviews(recid):
+    """
+    Returns number of reviews for given record.
 
-@extend
-creation_date:
-    derived:
-        @depends_on('recid')
-        get_creation_date(self.get('recid', -1))
+    :param recid:
 
+    :return: Number of reviews
+    """
+    from invenio.legacy.webcomment.adminlib import get_nb_reviews
+    if recid:
+        return get_nb_reviews(recid)

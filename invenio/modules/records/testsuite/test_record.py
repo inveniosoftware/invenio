@@ -20,9 +20,10 @@
 import os
 import pkg_resources
 
-from invenio.base.wrappers import lazy_import
 from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
+from invenio.base.wrappers import lazy_import
+from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 from invenio.testsuite import make_test_suite, run_test_suite, \
     InvenioTestCase, nottest
 
@@ -40,6 +41,8 @@ field_definitions = lambda: PkgResourcesDirDiscoveryRegistry(
     'fields', registry_namespace=test_registry)
 model_definitions = lambda: PkgResourcesDirDiscoveryRegistry(
     'models', registry_namespace=test_registry)
+function_proxy = lambda: ModuleAutoDiscoverySubRegistry(
+    'functions', registry_namespace=test_registry)
 
 
 class TestRecord(InvenioTestCase):
@@ -56,10 +59,12 @@ class TestRecord(InvenioTestCase):
         """Initialize stuff"""
         self.app.extensions['registry']['testsuite.fields'] = field_definitions()
         self.app.extensions['registry']['testsuite.models'] = model_definitions()
+        self.app.extensions['registry']['testsuite.functions'] = function_proxy()
 
     def tearDown(self):
         del self.app.extensions['registry']['testsuite.fields']
         del self.app.extensions['registry']['testsuite.models']
+        del self.app.extensions['registry']['testsuite.functions']
 
     @nottest
     def test_records_created(self):
@@ -90,14 +95,23 @@ class TestRecord(InvenioTestCase):
 
     def test_create_empty_record(self):
         """Record - Create empty record"""
-        rec = Record(master_format='marc')
+        rec = Record(master_format='marc', namespace='testsuite')
         self.assertTrue('__meta_metadata__' in rec)
-        self.assertEquals(rec.keys(), ['__meta_metadata__'])
+        self.assertEquals(list(rec.keys()), ['__meta_metadata__'])
         rec['title'] = {'title':'My title'}
         self.assertTrue('title' in rec)
         self.assertTrue('title' in rec['__meta_metadata__'])
         rec.set('title', {'title':'Second title?'}, extend=True)
         self.assertEquals(len(rec['title']), 2)
+
+    def test_validate(self):
+        """Record - Validate record"""
+        rec = Record(master_format='marc', namespace='testsuite')
+        self.assertTrue('__meta_metadata__' in rec)
+        self.assertTrue('recid' in rec.validate())
+        rec['recid'] = '1'
+        self.assertTrue('recid' in rec.validate())
+        self.assertEquals(rec.validate()['recid'], 'must be of integer type')
 
 
 class TestMarcRecordCreation(InvenioTestCase):
@@ -445,16 +459,16 @@ class TestMarcRecordCreation(InvenioTestCase):
         """
         r = Record.create(xml, master_format='marc', namespace='testsuite', schema='xml')
 
-        self.assertTrue(r['__meta_metadata__.__additional_info__.master_format'] == 'marc')
+        self.assertEquals(r.additional_info.master_format, 'marc')
         self.assertTrue('authors' in r)
-        self.assertTrue(r['authors[0].full_name'] == "Efstathiou, G P")
-        self.assertTrue(len(r['authors']) == 5)
+        self.assertEquals(r['authors[0].full_name'], "Efstathiou, G P")
+        self.assertEquals(len(r['authors']), 5)
         self.assertTrue('title.title' in r)
-        self.assertTrue(r['title.title'] == "Constraints on $\Omega_{\Lambda}$ and $\Omega_{m}$from Distant Type 1a Supernovae and Cosmic Microwave Background Anisotropies")
+        self.assertEquals(r['title.title'], "Constraints on $\Omega_{\Lambda}$ and $\Omega_{m}$from Distant Type 1a Supernovae and Cosmic Microwave Background Anisotropies")
         self.assertTrue('abstract.summary' in r)
-        self.assertTrue(r['abstract.summary'] == "We perform a combined likelihood analysis of the latest cosmic microwave background anisotropy data and distant Type 1a Supernova data of Perlmutter etal (1998a). Our analysis is restricted tocosmological models where structure forms from adiabatic initial fluctuations characterised by a power-law spectrum with negligible tensor component. Marginalizing over other parameters, our bestfit solution gives Omega_m = 0.25 (+0.18, -0.12) and Omega_Lambda = 0.63 (+0.17, -0.23) (95 % confidence errors) for the cosmic densities contributed by matter and a cosmological constantrespectively. The results therefore strongly favour a nearly spatially flat Universe with a non-zero cosmological constant.")
+        self.assertEquals(r['abstract.summary'], "We perform a combined likelihood analysis of the latest cosmic microwave background anisotropy data and distant Type 1a Supernova data of Perlmutter etal (1998a). Our analysis is restricted tocosmological models where structure forms from adiabatic initial fluctuations characterised by a power-law spectrum with negligible tensor component. Marginalizing over other parameters, our bestfit solution gives Omega_m = 0.25 (+0.18, -0.12) and Omega_Lambda = 0.63 (+0.17, -0.23) (95 % confidence errors) for the cosmic densities contributed by matter and a cosmological constantrespectively. The results therefore strongly favour a nearly spatially flat Universe with a non-zero cosmological constant.")
         self.assertTrue('reference' in r)
-        self.assertTrue(len(r['reference']) == 36)
+        self.assertEquals(len(r['reference']), 36)
 
 TEST_SUITE = make_test_suite(TestRecord, )
 
