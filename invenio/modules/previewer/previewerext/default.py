@@ -32,5 +32,5 @@ def preview(f):
     '''
     if f is None:
         f = ''  # FIXME
-    return render_template("previews/default.html", f=f,
+    return render_template("previewer/default.html", f=f,
                            embed=request.args.get('embed', type=bool))

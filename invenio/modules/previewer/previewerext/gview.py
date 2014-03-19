@@ -35,5 +35,5 @@ def preview(f):
     '''
     Returns appropiate template and passes the filea and an embed flag.
     '''
-    return render_template("previews/gview.html", f=f,
+    return render_template("previewer/gview.html", f=f,
                            embed=request.args.get('embed', type=bool))

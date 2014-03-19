@@ -67,11 +67,11 @@
       {# currently still has a wrapper div to use when pushing bottom to the bottom #}
       <div id="wrap">
         {% if embed %}
-          {% include 'previews/top.html' %}
+          {% include 'previewer/top.html' %}
         {% endif %}
         {% block body %}
         {% endblock %}
       </div>
-      {% include 'previews/bottom.html' %}
+      {% include 'previewer/bottom.html' %}
   </body>
 </html>

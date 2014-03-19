@@ -30,5 +30,5 @@ def preview(f):
     '''
     Returns appropiate template and passes the filea and an embed flag.
     '''
-    return render_template("previews/csv.html", f=f,
+    return render_template("previewer/csv.html", f=f,
                            embed=request.args.get('embed', type=bool))
