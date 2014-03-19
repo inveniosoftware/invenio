@@ -42,7 +42,7 @@
       <i class="glyphicon glyphicon-calendar"></i> {{ record['creation_date']|invenio_format_date() }}
       {# Citations link #}
       {%- if config.CFG_BIBRANK_SHOW_CITATION_LINKS -%}
-        {%- set num_citations = record['_cited_by_count'] -%}
+        {%- set num_citations = record['cited_by_count'] -%}
         {%- if num_citations -%}
          |
         <a href="{{ url_for('.search', p="refersto:recid:%d" % recid) }}">
@@ -54,7 +54,7 @@
 
       {# Comments link #}
       {%- if config.CFG_WEBCOMMENT_ALLOW_COMMENTS and config.CFG_WEBSEARCH_SHOW_COMMENT_COUNT -%}
-        {%- set num_comments = record['_number_of_comments'] -%}
+        {%- set num_comments = record['number_of_comments'] -%}
         {%- if num_comments -%}
          |
         <a href="{{ url_for('comments.comments', recid=recid) }}">
@@ -66,7 +66,7 @@
 
       {# Reviews link #}
       {%- if config.CFG_WEBCOMMENT_ALLOW_REVIEWS and config.CFG_WEBSEARCH_SHOW_REVIEW_COUNT -%}
-        {%- set num_reviews = record['_number_of_reviews'] -%}
+        {%- set num_reviews = record['number_of_reviews'] -%}
         {%- if num_reviews -%}
          |
         <a href="{{ url_for('comments.reviews', recid=recid) }}">
