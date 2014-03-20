@@ -2394,23 +2394,6 @@ def create_guest_warning_box(ln=CFG_SITE_LANG):
     """return a warning message about logging into system"""
     return webbasket_templates.tmpl_create_guest_warning_box(ln)
 
-def create_personal_baskets_selection_box(uid,
-                                          html_select_box_name='baskets',
-                                          selected_bskid=None,
-                                          ln=CFG_SITE_LANG):
-    """Return HTML box for basket selection. Only for personal baskets.
-    @param uid: user id
-    @param html_select_box_name: name used in html form
-    @param selected_bskid: basket currently selected
-    @param ln: language
-    """
-    baskets = db.get_all_personal_baskets_names(uid)
-    return webbasket_templates.tmpl_personal_baskets_selection_box(
-                                        baskets,
-                                        html_select_box_name,
-                                        selected_bskid,
-                                        ln)
-
 def create_basket_navtrail(uid,
                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            topic="", group=0,

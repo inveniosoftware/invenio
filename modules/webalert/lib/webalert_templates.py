@@ -36,6 +36,8 @@ from invenio.htmlparser import get_as_text, wrap, wrap_records
 from invenio.urlutils import create_html_link
 from invenio.search_engine import guess_primary_collection_of_a_record, get_coll_ancestors
 from invenio.dateutils import convert_datetext_to_datestruct
+from invenio.webbasket_dblayer import get_basket_ids_and_names
+from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES
 
 class Template:
     def tmpl_errorMsg(self, ln, error_msg, rest = ""):
@@ -458,8 +460,14 @@ class Template:
                                        alert_frequency == 'month' and '<strong>' + _('monthly') + '</strong>')
             alert_details_notification = alert_notification == 'y' and _('You are notified by <strong>e-mail</strong>') or \
                                          alert_notification == 'n' and ''
-            alert_details_basket = alert_basket_name and _('The results are automatically added to your basket:') + \
-                                                         '&nbsp;' + '<strong>' + cgi.escape(alert_basket_name) + '</strong>' or ''
+            alert_details_basket = alert_basket_name and '%s&nbsp;<strong><a href="%s/yourbaskets/display?category=%s&bskid=%s&ln=%s">%s</a></strong>' % (
+                                                         _('The results are automatically added to your personal basket:'),
+                                                         CFG_SITE_SECURE_URL,
+                                                         CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                                         str(alert_basket_id),
+                                                         ln,
+                                                         cgi.escape(alert_basket_name)) \
+                                                     or ''
             alert_details_frequency_notification_basket = alert_details_frequency + \
                                                           (alert_details_notification and \
                                                            '&nbsp;/&nbsp;' + \
@@ -818,6 +826,59 @@ Need human intervention?  Contact <%s>
                    }
             out += """</tr>\n"""
         out += "</table><br />\n"
+
+        return out
+
+    def tmpl_personal_basket_select_element(
+        self,
+        bskid,
+        personal_baskets_list,
+        select_element_name,
+        ln):
+        """
+        Returns an HTML select element with the user's personal baskets as the list of options.
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = """
+            <select name="%s">""" % (select_element_name,)
+
+        # Calculate the selected basket if there is one pre-selected.
+        bskid = bskid and str(bskid) or ""
+
+        # Create the default disabled label option.
+        out += """
+                <option value="%(value)i"%(selected)s>%(label)s</option>""" % \
+                                 {'value': 0,
+                                  'selected': bskid == '' and ' selected="selected"' or '',
+                                  'label': _("Don't store results in basket...")}
+
+        # Create the <optgroup>s and <option>s for the user personal baskets.
+        if personal_baskets_list:
+            out += """
+                <optgroup label="%s">""" % ('* ' + _('Your personal baskets') + ' *',)
+            for baskets_topic_and_bskids in personal_baskets_list:
+                topic = baskets_topic_and_bskids[0]
+                bskids = baskets_topic_and_bskids[1].split(',')
+                out += """
+                  <optgroup label="%s">""" % (cgi.escape(topic, True),)
+                bskids_and_names = get_basket_ids_and_names(bskids)
+                for bskid_and_name in bskids_and_names:
+                    basket_value = str(bskid_and_name[0])
+                    basket_name = bskid_and_name[1]
+                    out += """
+                    <option value="%(value)s"%(selected)s>%(label)s</option>""" % \
+                                  {'value': basket_value,
+                                   'selected': basket_value == bskid and ' selected="selected"' or '',
+                                   'label': cgi.escape(basket_name, True)}
+                out += """
+                  </optgroup>"""
+            out += """
+                </optgroup>"""
+
+        out += """
+            </select>"""
 
         return out
 

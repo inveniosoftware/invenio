@@ -2116,22 +2116,6 @@ class Template:
               'submit_label': _("Add group")}
         return out
 
-    def tmpl_personal_baskets_selection_box(self,
-                                            baskets=[],
-                                            select_box_name='baskets',
-                                            selected_bskid=None,
-                                            ln=CFG_SITE_LANG):
-        """return an HTML popupmenu
-        @param baskets: list of (bskid, bsk_name, bsk_topic) tuples
-        @param select_box_name: name that will be used for the control
-        @param selected_bskid: id of the selcte basket, use None for no selection
-        @param ln: language"""
-        _ = gettext_set_language(ln)
-        elements = [(0, '- ' + _("no basket") + ' -')]
-        for (bskid, bsk_name, bsk_topic) in baskets:
-            elements.append((bskid, bsk_topic + ' &gt; ' + bsk_name))
-        return self.__create_select_menu(select_box_name, elements, selected_bskid)
-
     def tmpl_create_guest_warning_box(self, ln=CFG_SITE_LANG):
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
