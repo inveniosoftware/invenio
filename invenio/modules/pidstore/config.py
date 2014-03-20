@@ -20,6 +20,7 @@
 PIDSTORE_PROVIDERS = [
     'invenio.modules.pidstore.providers.datacite:DataCite',
     'invenio.modules.pidstore.providers.local_doi:LocalDOI',
+    'invenio.modules.pidstore.providers.recid:RecordID',
 ]
 
 PIDSTORE_OBJECT_TYPES = ['rec', ]
@@ -41,7 +42,6 @@ PIDSTORE_DATACITE_SITE_URL = None
 """
 Site URL to use when minting records. Defaults to CFG_SITE_URL.
 """
-
 
 #
 # Internal configuration values. Normally you will not need to edit
