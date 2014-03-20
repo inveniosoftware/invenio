@@ -28,8 +28,9 @@ from invenio.dbquery import run_sql
 from invenio.webuser import isGuestUser
 from invenio.errorlib import register_exception
 from invenio.webaccount import warning_guest_user
-from invenio.webbasket import create_personal_baskets_selection_box
-from invenio.webbasket_dblayer import check_user_owns_baskets
+from invenio.webbasket_dblayer import \
+    check_user_owns_baskets, \
+    get_all_user_personal_basket_ids_by_topic
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
 
@@ -96,7 +97,7 @@ def perform_input_alert(action,
                         id_basket,
                         uid,
                         is_active,
-                        old_id_basket=None,
+                        old_id_basket = None,
                         ln = CFG_SITE_LANG):
     """get the alert settings
     input:  action="add" for a new alert (blank form), action="modify" for an update
@@ -123,10 +124,11 @@ def perform_input_alert(action,
     except:
         urlargs = "UNKNOWN"
 
-    baskets = create_personal_baskets_selection_box(uid=uid,
-                                                    html_select_box_name='idb',
-                                                    selected_bskid=old_id_basket,
-                                                    ln=ln)
+    baskets = webalert_templates.tmpl_personal_basket_select_element(
+        bskid = old_id_basket,
+        personal_baskets_list = get_all_user_personal_basket_ids_by_topic(uid),
+        select_element_name = "idb",
+        ln = ln)
 
     return webalert_templates.tmpl_input_alert(
              ln = ln,
