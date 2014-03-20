@@ -1,2 +1,3 @@
 qrcode
 PIL
+Pillow
