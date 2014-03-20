@@ -140,6 +140,12 @@ class PidProvider(object):
     def is_provider_for_pid(cls, pid_str):
         raise NotImplementedError
 
+    #
+    # API methods which might need to be implemented depending on each provider.
+    #
+    def create_new_pid(self, pid_value):
+        """ Some PidProvider might have the ability to create new values """
+        return pid_value
 
 class LocalPidProvider(PidProvider):
     """
