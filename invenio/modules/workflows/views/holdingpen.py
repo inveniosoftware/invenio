@@ -15,7 +15,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""Holding Pen web interface"""
+"""
+    invenio.modules.workflows.views.holdingpen
+    ------------------------------------------
+
+    Holding Pen is an overlay over all objects (BibWorkflowObject) that
+    have run through a workflow (BibWorkflowEngine). This area is targeted
+    to catalogers and super users for inspecting ingestion workflows and
+    submissions/depositions.
+
+    Note: Currently work-in-progress.
+"""
+
 
 import re
 

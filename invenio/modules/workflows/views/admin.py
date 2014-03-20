@@ -15,7 +15,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""Holding Pen & BibWorkflow web interface"""
+"""
+    invenio.modules.workflows.views.admin
+    -------------------------------------
+
+    Workflows admin area for an overview over available workflow
+    definitions, workflows and objects created.
+
+    WARNING: Currently not fully working.
+"""
 
 from __future__ import print_function
 from six import text_type
