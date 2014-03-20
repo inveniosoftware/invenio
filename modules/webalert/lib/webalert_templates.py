@@ -461,7 +461,7 @@ class Template:
             alert_details_notification = alert_notification == 'y' and _('You are notified by <strong>e-mail</strong>') or \
                                          alert_notification == 'n' and ''
             alert_details_basket = alert_basket_name and '%s&nbsp;<strong><a href="%s/yourbaskets/display?category=%s&bskid=%s&ln=%s">%s</a></strong>' % (
-                                                         _('The results are automatically added to your personal basket:'),
+                                                         _('The results are added to your basket:'),
                                                          CFG_SITE_SECURE_URL,
                                                          CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                                                          str(alert_basket_id),
@@ -470,21 +470,21 @@ class Template:
                                                      or ''
             alert_details_frequency_notification_basket = alert_details_frequency + \
                                                           (alert_details_notification and \
-                                                           '&nbsp;/&nbsp;' + \
+                                                           '&nbsp;<strong>&middot;</strong>&nbsp;' + \
                                                            alert_details_notification) + \
                                                           (alert_details_basket and \
-                                                           '&nbsp;/&nbsp;' + \
+                                                           '&nbsp;<strong>&middot;</strong>&nbsp;' + \
                                                            alert_details_basket)
 
             alert_details_search_query = get_html_user_friendly_alert_query_args(alert_query_args, ln)
 
             alert_details_creation_date = get_html_user_friendly_date_from_datetext(alert_creation_date, True, False, ln)
             alert_details_last_run_date = get_html_user_friendly_date_from_datetext(alert_last_run_date, True, False, ln)
-            alert_details_creation_last_run_dates = _('Created:') + '&nbsp;' + \
-                                                    alert_details_creation_date + \
-                                                    '&nbsp;/&nbsp;' + \
-                                                    _('Last run:') + '&nbsp;' + \
-                                                    alert_details_last_run_date
+            alert_details_creation_last_run_dates = _('Last run:') + '&nbsp;' + \
+                                                    alert_details_last_run_date + \
+                                                    '&nbsp;<strong>&middot;</strong>&nbsp;' + \
+                                                    _('Created:') + '&nbsp;' + \
+                                                    alert_details_creation_date
 
             alert_details_options_pause_or_resume = create_html_link('%s/youralerts/%s' % \
                 (CFG_SITE_SECURE_URL, alert_active_p and 'pause' or 'resume'),
@@ -520,11 +520,11 @@ class Template:
             alert_details_options = '<img src="%s/img/youralerts_alert_%s.png" />' % \
                                         (CFG_SITE_URL, alert_active_p and 'pause' or 'resume') + \
                                     alert_details_options_pause_or_resume + \
-                                    '&nbsp;&middot;&nbsp;' + \
+                                    '&nbsp;<strong>&middot;</strong>&nbsp;' + \
                                     '<img src="%s/img/youralerts_alert_edit.png" />&nbsp;' % \
                                         (CFG_SITE_URL,) + \
                                     alert_details_options_edit + \
-                                    '&nbsp;&middot;&nbsp;' + \
+                                    '&nbsp;<strong>&middot;</strong>&nbsp;' + \
                                     '<img src="%s/img/youralerts_alert_delete.png" />' % \
                                         (CFG_SITE_URL,) + \
                                     alert_details_options_delete
@@ -536,19 +536,15 @@ class Template:
       </td>
       <td class="youralerts_display_table_content" onMouseOver='this.className="youralerts_display_table_content_mouseover"' onMouseOut='this.className="youralerts_display_table_content"'>
         <div class="youralerts_display_table_content_container_main%(css_class_content_is_active_p)s">
-          <div class="youralerts_display_table_content_name">%(warning_label_is_active_p)s%(alert_name)s</div>
-          <div class="youralerts_display_table_content_details">%(alert_details_frequency_notification_basket)s</div>
+          <div class="youralerts_display_table_content_name"><strong>%(warning_label_is_active_p)s</strong>%(alert_name_label)s&nbsp;<strong>%(alert_name)s</strong></div>
           <div class="youralerts_display_table_content_search_query">%(alert_details_search_query)s</div>
+          <div class="youralerts_display_table_content_details">%(alert_details_frequency_notification_basket)s</div>
         </div>
-        <div class="youralerts_display_table_content_clear"></div>
-        <div class="youralerts_display_table_content_container_left">
-          <div class="youralerts_display_table_content_options">%(alert_details_options)s</div>
-        </div>
-        <div class="youralerts_display_table_content_container_right">
-          <div class="youralerts_display_table_content_dates">%(alert_details_creation_last_run_dates)s</div>
-        </div>
+        <div class="youralerts_display_table_content_dates">%(alert_details_creation_last_run_dates)s</div>
+        <div class="youralerts_display_table_content_options">%(alert_details_options)s</div>
       </td>
     </tr>""" % {'counter': counter,
+                'alert_name_label' : _('Alert'),
                 'alert_name': cgi.escape(alert_name),
                 'alert_details_frequency_notification_basket': alert_details_frequency_notification_basket,
                 'alert_details_search_query': alert_details_search_query,
@@ -999,7 +995,7 @@ def get_html_user_friendly_date_from_datetext(given_date,
         if days_old == 0:
             out = _('Today')
         elif days_old < 7:
-            out = str(days_old) + ' ' + _('day(s) ago')
+            out = str(days_old) + ' ' + _('days ago')
         elif days_old == 7:
             out = _('A week ago')
         elif days_old < 14:
@@ -1010,21 +1006,27 @@ def get_html_user_friendly_date_from_datetext(given_date,
             out = _('More than two weeks ago')
         elif days_old == 30:
             out = _('A month ago')
-        elif days_old < 180:
+        elif days_old < 90:
             out = _('More than a month ago')
+        elif days_old < 180:
+            out = _('More than three months ago')
         elif days_old < 365:
             out = _('More than six months ago')
-        else:
+        elif days_old < 730:
             out = _('More than a year ago')
+        elif days_old < 1095:
+            out = _('More than two years ago')
+        elif days_old < 1460:
+            out = _('More than three years ago')
+        elif days_old < 1825:
+            out = _('More than four years ago')
+        else:
+            out = _('More than five years ago')
         if show_full_date:
-            out += '<span style="color: gray;">' + \
-                   '&nbsp;' + _('on') + '&nbsp;' + \
-                   given_date.split()[0] + '</span>'
+            out += '&nbsp;' + _('on') + '&nbsp;' + given_date.split()[0]
             if show_full_time:
-                out += '<span style="color: gray;">' + \
-                       '&nbsp;' + _('at') + '&nbsp;' + \
-                       given_date.split()[1] + '</span>'
+                out += '&nbsp;' + _('at') + '&nbsp;' + given_date.split()[1]
     else:
-        out = _('Unknown')
+        out = _('unknown')
 
     return out

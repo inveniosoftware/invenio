@@ -5193,14 +5193,14 @@ class Template:
 
             search_query_options_alert = search_query_number_of_user_alerts and \
                 """<a href="%s/youralerts/display?ln=%s&amp;idq=%i"><img src="%s/img/yoursearches_alert_edit.png" />%s</a>""" % \
-                (CFG_SITE_SECURE_URL, ln, search_query_id, CFG_SITE_URL, _('Edit your existing alert(s)')) + \
-                '&nbsp;&nbsp;&nbsp;' + \
+                (CFG_SITE_SECURE_URL, ln, search_query_id, CFG_SITE_URL, _('Edit your existing alerts')) + \
+                '&nbsp;<strong>&middot;</strong>&nbsp;' + \
                 """<a href="%s/youralerts/input?ln=%s&amp;idq=%i"><img src="%s/img/yoursearches_alert.png" />%s</a>""" % \
                 (CFG_SITE_SECURE_URL, ln, search_query_id, CFG_SITE_URL, _('Set up as a new alert')) or \
                 """<a href="%s/youralerts/input?ln=%s&amp;idq=%i"><img src="%s/img/yoursearches_alert.png" />%s</a>""" % \
                 (CFG_SITE_SECURE_URL, ln, search_query_id, CFG_SITE_URL, _('Set up as a new alert'))
 
-            search_query_options = "%s&nbsp;&nbsp;&nbsp;%s" % \
+            search_query_options = "%s&nbsp;<strong>&middot;</strong>&nbsp;%s" % \
                                    (search_query_options_search, \
                                     search_query_options_alert)
 
@@ -5211,7 +5211,7 @@ class Template:
       </td>
       <td class="websearch_yoursearches_table_content" onMouseOver='this.className="websearch_yoursearches_table_content_mouseover"' onMouseOut='this.className="websearch_yoursearches_table_content"'>
         <div>%(search_query_details)s</div>
-        <div class="websearch_yoursearches_table_content_options">%(search_query_last_performed)s</div>
+        <div class="websearch_yoursearches_table_content_dates">%(search_query_last_performed)s</div>
         <div class="websearch_yoursearches_table_content_options">%(search_query_options)s</div>
       </td>
     </tr>""" % {'counter': counter,
@@ -5283,9 +5283,9 @@ def get_html_user_friendly_search_query_args(args,
     args_dict = parse_qs(args)
 
     if not args_dict.has_key('p') and not args_dict.has_key('p1') and not args_dict.has_key('p2') and not args_dict.has_key('p3'):
-        search_patterns_html = _('Search for everything')
+        search_patterns_html = _('You searched for everything')
     else:
-        search_patterns_html = _('Search for') + ' '
+        search_patterns_html = _('You searched for') + ' '
         if args_dict.has_key('p'):
             search_patterns_html += '<strong>' + cgi.escape(args_dict['p'][0]) + '</strong>'
             if args_dict.has_key('f'):
@@ -5376,7 +5376,7 @@ def get_html_user_friendly_date_from_datetext(given_date,
         if days_old == 0:
             out = _('Today')
         elif days_old < 7:
-            out = str(days_old) + ' ' + _('day(s) ago')
+            out = str(days_old) + ' ' + _('days ago')
         elif days_old == 7:
             out = _('A week ago')
         elif days_old < 14:
@@ -5387,21 +5387,27 @@ def get_html_user_friendly_date_from_datetext(given_date,
             out = _('More than two weeks ago')
         elif days_old == 30:
             out = _('A month ago')
-        elif days_old < 180:
+        elif days_old < 90:
             out = _('More than a month ago')
+        elif days_old < 180:
+            out = _('More than three months ago')
         elif days_old < 365:
             out = _('More than six months ago')
-        else:
+        elif days_old < 730:
             out = _('More than a year ago')
+        elif days_old < 1095:
+            out = _('More than two years ago')
+        elif days_old < 1460:
+            out = _('More than three years ago')
+        elif days_old < 1825:
+            out = _('More than four years ago')
+        else:
+            out = _('More than five years ago')
         if show_full_date:
-            out += '<span style="color: gray;">' + \
-                   '&nbsp;' + _('on') + '&nbsp;' + \
-                   given_date.split()[0] + '</span>'
+            out += '&nbsp;' + _('on') + '&nbsp;' + given_date.split()[0]
             if show_full_time:
-                out += '<span style="color: gray;">' + \
-                       '&nbsp;' + _('at') + '&nbsp;' + \
-                       given_date.split()[1] + '</span>'            
+                out += '&nbsp;' + _('at') + '&nbsp;' + given_date.split()[1]
     else:
-        out = _('Unknown')
+        out = _('unknown')
 
     return out

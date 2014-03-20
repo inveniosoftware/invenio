@@ -2635,19 +2635,6 @@ a:hover.bibMergeImgClickable img {
 }
 .youralerts_display_table_content_container_main {
    width: 100%;
-   border-bottom: 1px solid #CCCCCC;
-   padding-bottom: 10px;
-}
-.youralerts_display_table_content_container_left {
-   float: left;
-   width: 50%;
-}
-.youralerts_display_table_content_container_right {
-   float: right;
-   width: 50%;
-}
-.youralerts_display_table_content_clear {
-   clear: both;
 }
 .youralerts_display_table_counter {
    background-color: white;
@@ -2660,40 +2647,33 @@ a:hover.bibMergeImgClickable img {
 }
 .youralerts_display_table_content_name {
    margin-bottom: 5px;
-   font-weight: bold;
    position: relative;
    left: 0px;
    top: 0px;
 }
 .youralerts_display_table_content_details {
    margin-bottom: 5px;
-   font-size: 80%;
    position: relative;
    left: 0px;
 }
 .youralerts_display_table_content_search_query {
    margin-bottom: 5px;
-   font-size: 80%;
    position: relative;
    left: 0px;
 }
 .youralerts_display_table_content_dates {
+   margin-bottom: 5px;
    position: relative;
-   font-size: 70%;
-   text-align: right;
-   white-space: nowrap;
+   left: 0px;
+   font-size: 80%;
    color: gray;
-   margin-top: 5px;
-   /*margin-bottom: 5px;*/
+   white-space: nowrap;
 }
 .youralerts_display_table_content_options {
+   margin-bottom: 5px;
    position: relative;
-   /*top: 0px;
-   right: 0px;*/
-   margin-top: 5px;
-   /*margin-bottom: 5px;*/
-   font-size: 70%;
-   text-align: left;
+   left: 0px;
+   font-size: 80%;
    white-space: nowrap;
 }
 .youralerts_display_table_content_options img{
@@ -2710,6 +2690,9 @@ a:hover.bibMergeImgClickable img {
 }
 
 .youralerts_display_table_content_inactive {
+   color: #CCCCCC;
+}
+.youralerts_display_table_content_inactive a, .youralerts_display_table_content_inactive a:link, .youralerts_display_table_content_inactive a:visited, .youralerts_display_table_content_inactive a:active, .youralerts_display_table_content_inactive a:hover {
    color: #CCCCCC;
 }
 /* end of WebAlert module */
@@ -2774,6 +2757,11 @@ a:hover.bibMergeImgClickable img {
    font-size: 80%;
    color: grey;
    border-bottom: 1px solid #ffcc00;
+}
+.websearch_yoursearches_table_content_dates {
+   color: gray;
+   margin: 5px;
+   font-size: 80%;
 }
 .websearch_yoursearches_table_content_options {
    margin: 5px;
