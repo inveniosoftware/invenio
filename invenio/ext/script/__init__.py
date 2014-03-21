@@ -19,8 +19,8 @@
 
 
 import re
-import urllib
 import functools
+from six.moves import urllib
 from functools import wraps
 from flask import flash
 from flask.ext.script import Manager as FlaskExtManager
@@ -43,7 +43,7 @@ def change_command_name(method=None, new_name=None):
 def generate_secret_key():
     import string
     import random
-    return ''.join([random.choice(string.letters + string.digits)
+    return ''.join([random.choice(string.ascii_letters + string.digits)
                     for dummy in range(0, 256)])
 
 
