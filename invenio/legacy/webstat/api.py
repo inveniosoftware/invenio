@@ -24,7 +24,7 @@ import os
 import time
 import re
 import datetime
-import cPickle
+from six.moves import cPickle
 import calendar
 from datetime import timedelta
 from urllib import quote

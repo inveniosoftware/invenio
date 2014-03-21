@@ -45,7 +45,7 @@ from invenio.modules.formatter import format_record, format_records
 
 
 try:
-    import cPickle as pickle
+    from six.moves import cPickle as pickle
 except ImportError:
     import pickle
 

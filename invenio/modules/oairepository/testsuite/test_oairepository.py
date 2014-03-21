@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 
 import re
-from cStringIO import StringIO
+from six import StringIO
 
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase

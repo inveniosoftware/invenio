@@ -26,7 +26,7 @@ webaccess to connect user to roles using every infos about users.
 """
 
 import re
-import cPickle
+from six.moves import cPickle
 from zlib import compress, decompress
 import sys
 import time

@@ -443,7 +443,7 @@ def task_init(
             try:
                 if task_get_task_param('profile'):
                     try:
-                        from cStringIO import StringIO
+                        from six import StringIO
                         import pstats
                         filename = os.path.join(CFG_TMPDIR, 'bibsched_task_%s.pyprof' % _TASK_PARAMS['task_id'])
                         existing_sorts = pstats.Stats.sort_arg_dict_default.keys()

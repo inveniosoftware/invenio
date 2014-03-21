@@ -30,7 +30,7 @@ import re
 import os
 import string
 import time
-import cPickle
+from six.moves import cPickle
 
 from invenio.config import \
      CFG_CERN_SITE, \

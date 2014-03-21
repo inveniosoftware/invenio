@@ -25,7 +25,7 @@ import datetime
 import calendar
 import re
 import os
-import cPickle
+from six.moves import cPickle
 import math
 import urllib
 from MySQLdb import OperationalError

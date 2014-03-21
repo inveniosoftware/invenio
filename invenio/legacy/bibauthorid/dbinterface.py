@@ -27,7 +27,7 @@ from __future__ import print_function
 '''
 import invenio.legacy.bibauthorid.config as bconfig
 import numpy
-import cPickle
+from six.moves import cPickle
 from cPickle import UnpicklingError
 from invenio.utils.html import X
 

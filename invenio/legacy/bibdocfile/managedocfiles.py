@@ -69,7 +69,7 @@ DEPENDENCIES:
 =============
   - jQuery Form plugin U{http://jquery.malsup.com/form/}
 """
-import cPickle
+from six.moves import cPickle
 import os
 import time
 import cgi

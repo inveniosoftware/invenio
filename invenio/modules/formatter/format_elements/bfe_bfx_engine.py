@@ -18,7 +18,7 @@
 """
 __revision__ = "$Id$"
 
-from cStringIO import StringIO
+from six import StringIO
 from invenio.modules.formatter.engines.bfx import format_with_bfx
 
 def format_element(bfo, template='DC'):

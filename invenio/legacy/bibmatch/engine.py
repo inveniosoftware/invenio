@@ -60,7 +60,7 @@ from invenio.legacy.bibmatch.validator import validate_matches, transform_record
 from invenio.utils.text import translate_to_ascii, xml_entities_to_utf8
 
 try:
-    from cStringIO import StringIO
+    from six import StringIO
 except ImportError:
     from StringIO import StringIO
 

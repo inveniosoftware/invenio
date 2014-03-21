@@ -72,7 +72,7 @@ is to read the unit test cases that are located in bibrecord_tests.py and bibupl
 import re
 import string
 import sys
-from cStringIO import StringIO
+from six import StringIO
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622

@@ -33,7 +33,7 @@ def reset_rec_cache(output_format, get_record, split_by=1000):
 
     import sys
     try:
-        import cPickle as pickle
+        from six.moves import cPickle as pickle
     except:
         import pickle
     from itertools import islice

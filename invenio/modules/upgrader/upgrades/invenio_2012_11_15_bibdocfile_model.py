@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.legacy.dbquery import run_sql, OperationalError
-import cPickle
+from six.moves import cPickle
 import logging
 
 depends_on = ['invenio_release_1_1_0']
