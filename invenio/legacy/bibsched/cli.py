@@ -1352,7 +1352,7 @@ class BibSched(object):
         """Return all the node_relevant_active_tasks to work on."""
         try:
             self.check_errors()
-        except RecoverableError, msg:
+        except RecoverableError as msg:
             register_emergency('Light emergency from %s: BibTask failed: %s' % (CFG_SITE_URL, msg))
 
         max_bibupload_priority, min_bibupload_priority = run_sql(
@@ -1431,7 +1431,7 @@ class BibSched(object):
                             break
                     else:
                         time.sleep(CFG_BIBSCHED_REFRESHTIME)
-        except Exception, err:
+        except Exception as err:
             register_exception(alert_admin=True)
             try:
                 register_emergency('Emergency from %s: BibSched halted: %s' % (CFG_SITE_URL, err))
@@ -1774,7 +1774,7 @@ def main():
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "hVdqS:s:t:", [
             "help", "version", "debug", "quiet", "since=", "status=", "task="])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         Log("Error: %s" % err)
         usage(1, err)
 

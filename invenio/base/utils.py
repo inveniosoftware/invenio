@@ -174,7 +174,7 @@ def try_to_eval(string, context={}, **general_context):
     while (True):
         try:
             res = eval(string, globals().update(general_context), locals())  # kwalitee: disable=eval
-        except NameError, err:
+        except NameError as err:
             #Try first to import using werkzeug import_string
             try:
                 from werkzeug.utils import import_string

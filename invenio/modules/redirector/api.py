@@ -74,7 +74,7 @@ def register_redirection(label, plugin, parameters=None, update_on_duplicate=Fal
     try:
         parameters.items() ## dummy test to see if it exposes the dict interface
         json_parameters = json.dumps(parameters)
-    except Exception, err:
+    except Exception as err:
         raise ValueError("The parameters %s do not specify a valid JSON map: %s" % (parameters, err))
     try:
         run_sql("INSERT INTO goto(label, plugin, parameters, creation_date, modification_date) VALUES(%s, %s, %s, NOW(), NOW())", (label, plugin, json_parameters))
@@ -120,7 +120,7 @@ def update_redirection(label, plugin, parameters=None):
     try:
         parameters.items() ## dummy test to see if it exposes the dict interface
         json_parameters = json.dumps(parameters)
-    except Exception, err:
+    except Exception as err:
         raise ValueError("The parameters %s do not specify a valid JSON map: %s" % (parameters, err))
     run_sql("UPDATE goto SET plugin=%s, parameters=%s, modification_date=NOW() WHERE label=%s", (plugin, json_parameters, label))
 

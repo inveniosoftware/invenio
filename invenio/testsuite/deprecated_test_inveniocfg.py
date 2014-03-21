@@ -80,7 +80,7 @@ class InveniocfgTest(InvenioTestCase):
         try:
             func(*args, **kwargs)
             self.fail()
-        except SystemExit, e:
+        except SystemExit as e:
             self.assertEqual(exit_val, e.code)
 
     #

@@ -83,7 +83,7 @@ class Template:
         if docname:
             try:
                 bibdocs = [bibrecdocs.get_bibdoc(docname)]
-            except Exception, dummy:
+            except Exception as dummy:
                 bibdocs = bibrecdocs.list_bibdocs(doctype)
         else:
             bibdocs = bibrecdocs.list_bibdocs(doctype)

@@ -455,7 +455,7 @@ class DepositionFileListResource(Resource):
             try:
                 d.add_file(df)
                 d.save()
-            except FilenameAlreadyExists, e:
+            except FilenameAlreadyExists as e:
                 df.delete()
                 raise e
 

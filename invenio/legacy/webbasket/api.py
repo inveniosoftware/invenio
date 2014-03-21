@@ -102,7 +102,7 @@ def perform_request_display_public(uid,
             return ("", None, None)
         try:
             raise InvenioWebBasketWarning(_('The selected public basket does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
         warnings_html = webbasket_templates.tmpl_warnings(exc.message, ln)
             #warnings.append(exc.message)
@@ -110,7 +110,7 @@ def perform_request_display_public(uid,
         (body, navtrail) = perform_request_list_public_baskets(uid)
         try:
             raise InvenioWebBasketWarning(_('Please select a valid public basket from the list of public baskets.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append('WRN_WEBBASKET_SHOW_LIST_PUBLIC_BASKETS')
@@ -133,13 +133,13 @@ def perform_request_display_public(uid,
             else:
                 try:
                     raise InvenioWebBasketWarning(_('The selected item does not exist or you do not have access to it.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     warnings_item.append(exc.message)
                 #warnings_item.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
                 try:
                     raise InvenioWebBasketWarning(_('Returning to the public basket view.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     warnings_item.append(exc.message)
                 #warnings_item.append('WRN_WEBBASKET_RETURN_TO_PUBLIC_BASKET')
@@ -296,7 +296,7 @@ def __display_public_basket_single_item(bskid,
         body = ""
         try:
             raise InvenioWebBasketWarning(_('The selected item does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         #warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
@@ -414,7 +414,7 @@ def perform_request_write_public_note(uid,
     if not can_add_notes_to_public_basket_p(bskid):
         try:
             raise InvenioWebBasketWarning(_('You do not have permission to write notes to this item.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
 #            warnings_rights = exc.message
         #warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
@@ -427,7 +427,7 @@ def perform_request_write_public_note(uid,
             optional_params["Add note"] = ()
             try:
                 raise InvenioWebBasketWarning(_('The note you are quoting does not exist or you do not have access to it.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 optional_params["Warnings"] = exc.message
         else:
@@ -473,7 +473,7 @@ def perform_request_save_public_note(uid,
     if not can_add_notes_to_public_basket_p(bskid):
         try:
             raise InvenioWebBasketWarning(_('You do not have permission to write notes to this item.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
 #            warnings_rights = exc.message
         #warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
@@ -483,7 +483,7 @@ def perform_request_save_public_note(uid,
             optional_params["Incomplete note"] = (note_title, note_body)
             try:
                 raise InvenioWebBasketWarning(_('You must fill in both the subject and the body of the note.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 optional_params["Warnings"] = exc.message
         else:
@@ -586,7 +586,7 @@ def perform_request_display(uid,
             if not valid_selected_topic_p:
                 try:
                     raise InvenioWebBasketWarning(_('The selected topic does not exist or you do not have access to it.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     warnings.append(exc.message)
                 #warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_TOPIC')
@@ -618,7 +618,7 @@ def perform_request_display(uid,
             else:
                 try:
                     raise InvenioWebBasketWarning(_('The selected basket does not exist or you do not have access to it.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     warnings.append(exc.message)
                 #warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
@@ -651,7 +651,7 @@ def perform_request_display(uid,
             if not valid_selected_group_p:
                 try:
                     raise InvenioWebBasketWarning(_('The selected topic does not exist or you do not have access to it.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     warnings.append(exc.message)
                 #warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_GROUP')
@@ -690,7 +690,7 @@ def perform_request_display(uid,
             else:
                 try:
                     raise InvenioWebBasketWarning(_('The selected topic does not exist or you do not have access to it.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     warnings.append(exc.message)
                 #warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
@@ -711,7 +711,7 @@ def perform_request_display(uid,
             elif (selected_bskid, None) in valid_bskids:
                 try:
                     raise InvenioWebBasketWarning(_('The selected basket is no longer public.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     warnings.append(exc.message)
                 #warnings.append('WRN_WEBBASKET_FORMER_PUBLIC_BASKET')
@@ -720,7 +720,7 @@ def perform_request_display(uid,
             else:
                 try:
                     raise InvenioWebBasketWarning(_('The selected basket does not exist or you do not have access to it.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     warnings.append(exc.message)
                 #warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
@@ -999,7 +999,7 @@ def __display_basket_single_item(uid, bskid,
                                                    ln)
         try:
             raise InvenioWebBasketWarning(_('The selected item does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             bsk_warnings.append(exc.message)
         #bsk_warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
@@ -1546,7 +1546,7 @@ def perform_request_write_note(uid,
     if not check_user_can_comment(uid, bskid):
         try:
             raise InvenioWebBasketWarning(_('You do not have permission to write notes to this item.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
         #warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
         warnings_html += webbasket_templates.tmpl_warnings(exc.message, ln)
@@ -1558,7 +1558,7 @@ def perform_request_write_note(uid,
             optional_params["Add note"] = ()
             try:
                 raise InvenioWebBasketWarning(_('The note you are quoting does not exist or you do not have access to it.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 optional_params["Warnings"] = exc.message
         else:
@@ -1611,7 +1611,7 @@ def perform_request_save_note(uid,
     if not check_user_can_comment(uid, bskid):
         try:
             raise InvenioWebBasketWarning(_('You do not have permission to write notes to this item.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             #warnings_rights = exc.message
         #warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
@@ -1623,7 +1623,7 @@ def perform_request_save_note(uid,
             optional_params["Incomplete note"] = (note_title, note_body)
             try:
                 raise InvenioWebBasketWarning(_('You must fill in both the subject and the body of the note.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 optional_params["Warnings"] = exc.message
         else:
@@ -1676,7 +1676,7 @@ def perform_request_delete_note(uid,
     if not __check_user_can_perform_action(uid, bskid, cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELCMT']):
         try:
             raise InvenioWebBasketWarning(_('You do not have permission to delete this note.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             #warnings_notes.append(exc.message)
         #warnings_notes.append('WRN_WEBBASKET_RESTRICTED_DELETE_NOTES')
@@ -1687,7 +1687,7 @@ def perform_request_delete_note(uid,
         else:
             try:
                 raise InvenioWebBasketWarning(_('The note you are deleting does not exist or you do not have access to it.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 #warnings_notes.append(exc.message)
             #warnings_notes.append('WRN_WEBBASKET_DELETE_INVALID_NOTE')
@@ -1789,13 +1789,13 @@ def perform_request_add(uid,
                 recids_to_remove.append(recid)
                 try:
                     raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights to add record #%(x_id)i.', x_id=recid))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     #warnings.append(exc.message)
                 #warnings.append(('WRN_WEBBASKET_NO_RIGHTS_TO_ADD_THIS_RECORD', recid))
                 try:
                     raise InvenioWebBasketWarning(_('Some of the items were not added due to lack of sufficient rights.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     warnings_html = webbasket_templates.tmpl_warnings(exc.message, ln)
                     #warnings_html = webbasket_templates.tmpl_warnings('WRN_WEBBASKET_NO_RIGHTS_TO_ADD_RECORDS', ln)
@@ -1812,19 +1812,19 @@ def perform_request_add(uid,
         if not es_title:
             try:
                 raise InvenioWebBasketWarning(_('Please provide a title for the external source.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 es_warnings.append(exc.message)
         if not es_desc:
             try:
                 raise InvenioWebBasketWarning(_('Please provide a description for the external source.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 es_warnings.append(exc.message)
         if not es_url:
             try:
                 raise InvenioWebBasketWarning(_('Please provide a url for the external source.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 es_warnings.append(exc.message)
         else:
@@ -1833,21 +1833,21 @@ def perform_request_add(uid,
                 if str(status).startswith('0'):
                     try:
                         raise InvenioWebBasketWarning(_('The url you have provided is not valid.'))
-                    except InvenioWebBasketWarning, exc:
+                    except InvenioWebBasketWarning as exc:
                         register_exception(stream='warning')
                         es_warnings.append(exc.message)
                     #es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_0')
                 elif str(status).startswith('4'):
                     try:
                         raise InvenioWebBasketWarning(_('The url you have provided is not valid: The request contains bad syntax or cannot be fulfilled.'))
-                    except InvenioWebBasketWarning, exc:
+                    except InvenioWebBasketWarning as exc:
                         register_exception(stream='warning')
                         es_warnings.append(exc.message)
                     #es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_4')
                 elif str(status).startswith('5'):
                     try:
                         raise InvenioWebBasketWarning(_('The url you have provided is not valid: The server failed to fulfil an apparently valid request.'))
-                    except InvenioWebBasketWarning, exc:
+                    except InvenioWebBasketWarning as exc:
                         register_exception(stream='warning')
                         es_warnings.append(exc.message)
                     #es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_5')
@@ -1896,7 +1896,7 @@ def perform_request_add(uid,
                                                            cfg['CFG_WEBBASKET_SHARE_LEVELS']['ADDITM'])):
                         try:
                             raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
-                        except InvenioWebBasketWarning, exc:
+                        except InvenioWebBasketWarning as exc:
                             register_exception(stream='warning')
                             #warnings.append(exc.message)
                         #warnings.append('WRN_WEBBASKET_NO_RIGHTS')
@@ -1908,7 +1908,7 @@ def perform_request_add(uid,
                                                     cfg['CFG_WEBBASKET_SHARE_LEVELS']['DELITM'])):
                         try:
                             raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
-                        except InvenioWebBasketWarning, exc:
+                        except InvenioWebBasketWarning as exc:
                             register_exception(stream='warning')
                             #warnings.append(exc.message)
                         #warnings.append('WRN_WEBBASKET_NO_RIGHTS')
@@ -1918,7 +1918,7 @@ def perform_request_add(uid,
             if ( colid >= 0 and not validated_recids ) or ( colid == -1 and ( not es_title or not es_desc or not es_url ) ):
                 try:
                     raise InvenioWebBasketWarning(_('No records to add.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning')
                     #warnings.append(exc.message)
             if not warnings_html and not wait:
@@ -1967,7 +1967,7 @@ def perform_request_add(uid,
                             raise InvenioWebBasketWarning(_('Some items could not be moved. The destination basket already contains those items.'))
                         else:
                             raise InvenioWebBasketWarning(_('Cannot add items to the selected basket. Invalid parameters.'))
-                    except InvenioWebBasketWarning, exc:
+                    except InvenioWebBasketWarning as exc:
                         register_exception(stream='warning')
                         #warnings.append(exc.message)
                     #warnings.append('WRN_WEBBASKET_INVALID_ADD_TO_PARAMETERS')
@@ -1979,7 +1979,7 @@ def perform_request_add(uid,
         bskid = db.create_basket(uid=uid, basket_name=_('Untitled basket'), topic=_('Untitled topic'))
         try:
             raise InvenioWebBasketWarning(_('A default topic and basket have been automatically created. Edit them to rename them as you see fit.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append('WRN_WEBBASKET_DEFAULT_TOPIC_AND_BASKET')
@@ -2040,7 +2040,7 @@ def perform_request_delete(uid, bskid, confirmed=0,
     if not(db.check_user_owns_baskets(uid, [bskid])):
         try:
             raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBBASKET_NO_RIGHTS',))
@@ -2109,7 +2109,7 @@ def perform_request_edit(uid, bskid, topic="", new_name='',
     if rights != cfg['CFG_WEBBASKET_SHARE_LEVELS']['MANAGE']:
         try:
             raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBBASKET_NO_RIGHTS',))
@@ -2260,13 +2260,13 @@ def perform_request_create_basket(req, uid,
             if not new_basket_name:
                 try:
                     raise InvenioWebBasketWarning(_('Please provide a name for the new basket.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning', req=req)
                     warnings.append(exc.message)
             if (not new_topic_name and create_in_topic == "-1"):
                 try:
                     raise InvenioWebBasketWarning(_('Please select an existing topic or create a new one.'))
-                except InvenioWebBasketWarning, exc:
+                except InvenioWebBasketWarning as exc:
                     register_exception(stream='warning', req=req)
                     warnings.append(exc.message)
 
@@ -2305,7 +2305,7 @@ def perform_request_subscribe(uid,
         if not db.subscribe(uid, bskid):
             try:
                 raise InvenioWebBasketWarning(_('You cannot subscribe to this basket, you are the either owner or you have already subscribed.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 #warnings.append(exc.message)
             #warnings.append('WRN_WEBBASKET_CAN_NOT_SUBSCRIBE')
@@ -2313,7 +2313,7 @@ def perform_request_subscribe(uid,
     else:
         try:
             raise InvenioWebBasketWarning(_('The selected public basket does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET')
@@ -2335,7 +2335,7 @@ def perform_request_unsubscribe(uid,
         if not db.unsubscribe(uid, bskid):
             try:
                 raise InvenioWebBasketWarning(_('You cannot unsubscribe from this basket, you are the either owner or you have already unsubscribed.'))
-            except InvenioWebBasketWarning, exc:
+            except InvenioWebBasketWarning as exc:
                 register_exception(stream='warning')
                 #warnings.append(exc.message)
             #warnings.append('WRN_WEBBASKET_CAN_NOT_UNSUBSCRIBE')
@@ -2343,7 +2343,7 @@ def perform_request_unsubscribe(uid,
     else:
         try:
             raise InvenioWebBasketWarning(_('The selected public basket does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET')
@@ -2795,7 +2795,7 @@ def wash_b_search(b):
     if b_category not in valid_categories:
         try:
             raise InvenioWebBasketWarning(_('The category you have selected does not exist. Please select a valid category.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             return ("", "", exc.message)
         #return ("", "", ['WRN_WEBBASKET_INVALID_CATEGORY'])
@@ -2818,7 +2818,7 @@ def wash_b_add(b):
     if b_category not in valid_categories or len(b) != 2 or not b[1]:
         try:
             raise InvenioWebBasketWarning(_('Cannot add items to the selected basket. Invalid parameters.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             return ("", "", exc.message)
     return (b_category, b[1], None)
@@ -2833,7 +2833,7 @@ def wash_category(category):
     if category not in valid_categories:
         try:
             raise InvenioWebBasketWarning(_('The category you have selected does not exist. Please select a valid category.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             return ("", "", exc.message)
         #return ("", ['WRN_WEBBASKET_INVALID_CATEGORY'])
@@ -2846,7 +2846,7 @@ def wash_topic(uid, topic):
     if not db.is_topic_valid(uid, topic):
         try:
             raise InvenioWebBasketWarning(_('The selected topic does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             return ("", "", exc.message)
         #return ("", ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_TOPIC'])
@@ -2859,7 +2859,7 @@ def wash_group(uid, group):
     if not group.isdigit() or not db.is_group_valid(uid, group):
         try:
             raise InvenioWebBasketWarning(_('The selected group does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             return (0, exc.message)
         #return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_GROUP'])
@@ -2873,7 +2873,7 @@ def wash_bskid(uid, category, bskid):
     if not bskid.isdigit():
         try:
             raise InvenioWebBasketWarning(_('The selected basket does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             return (0, exc.message)
         #return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET'])
@@ -2881,14 +2881,14 @@ def wash_bskid(uid, category, bskid):
     if category == cfg['CFG_WEBBASKET_CATEGORIES']['PRIVATE'] and not db.is_personal_basket_valid(uid, bskid):
         try:
             raise InvenioWebBasketWarning(_('The selected basket does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             return (0, exc.message)
         #return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET'])
     if category == cfg['CFG_WEBBASKET_CATEGORIES']['GROUP'] and not db.is_group_basket_valid(uid, bskid):
         try:
             raise InvenioWebBasketWarning(_('The selected basket does not exist or you do not have access to it.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning as exc:
             register_exception(stream='warning')
             return (0, exc.message)
         #return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET'])
@@ -2912,7 +2912,7 @@ def wash_of(of):
         return (of, None)
     try:
         raise InvenioWebBasketWarning(_('The selected output format is not available or is invalid.'))
-    except InvenioWebBasketWarning, exc:
+    except InvenioWebBasketWarning as exc:
         register_exception(stream='warning')
     return ('hb', exc.message)
 

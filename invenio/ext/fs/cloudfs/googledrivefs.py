@@ -166,7 +166,7 @@ class GoogleDriveClient(object):
         if not item or item.metadata is None or item.expired:
             try:
                 metadata = self.service.files().get(fileId=path).execute()
-            except errors.HttpError, e:
+            except errors.HttpError as e:
                 if e.resp.status == 404:
                     raise ResourceNotFoundError("Source file doesn't exist")
                 raise OperationFailedError(opname='get_file',
@@ -191,7 +191,7 @@ class GoogleDriveClient(object):
         if not item or item.metadata is None or item.expired:
             try:
                 metadata = self.service.files().get(fileId=path).execute()
-            except errors.HttpError, e:
+            except errors.HttpError as e:
                 if e.resp.status == 404:
                     raise ResourceNotFoundError(path)
                 raise OperationFailedError(opname='metadata', path=path,
@@ -234,7 +234,7 @@ class GoogleDriveClient(object):
                     children.append(child['id'])
                     self.cache[child['id']] = CacheItem(child, parents=[path])
                 item = self.cache[path] = CacheItem(metadata, children)
-            except errors.HttpError, e:
+            except errors.HttpError as e:
                 if e.resp.status == 404:
                     raise ResourceNotFoundError(path)
                 if not item or e.resp.status != 304:
@@ -257,7 +257,7 @@ class GoogleDriveClient(object):
             }
         try:
             metadata = self.service.files().insert(body=body).execute()
-        except errors.HttpError, e:
+        except errors.HttpError as e:
             if e.resp.status == 405:
                 raise ResourceInvalidError(parent_id)
             if e.resp.status == 404:
@@ -280,7 +280,7 @@ class GoogleDriveClient(object):
             metadata = self.service.files().copy(fileId=file_id,
                                                  body=body,
                                                  ).execute()
-        except errors.HttpError, e:
+        except errors.HttpError as e:
             if e.resp.status == 404:
                 raise ResourceNotFoundError("Parent or source " +
                                             "file don't exist")
@@ -296,7 +296,7 @@ class GoogleDriveClient(object):
             metadata = self.service.files().update(fileId=file_id,
                                                    body=new_file
                                                    ).execute()
-        except errors.HttpError, e:
+        except errors.HttpError as e:
             if e.resp.status == 404:
                 raise ResourceNotFoundError("Parent or source " +
                                             "file don't exist")
@@ -320,7 +320,7 @@ class GoogleDriveClient(object):
         if not item or item.metadata is None or item.expired:
             try:
                 metadata = self.service.files().get(fileId=file_id).execute()
-            except errors.HttpError, e:
+            except errors.HttpError as e:
                 raise OperationFailedError(opname='update_file_content',
                                            msg=e.resp.reason)
             except:
@@ -336,10 +336,10 @@ class GoogleDriveClient(object):
                                                        body=metadata,
                                                        media_body=media_body
                                                        ).execute()
-        except errors.HttpError, e:
+        except errors.HttpError as e:
             raise OperationFailedError(opname='update_file_content',
                                        msg=e.resp.reason)
-        except TypeError, e:
+        except TypeError as e:
             raise ResourceInvalidError("update_file_content %r" % e)
         except:
             return self._retry_operation(self.update_file_content, file_id,
@@ -351,7 +351,7 @@ class GoogleDriveClient(object):
     def file_delete(self, path):
         try:
             self.service.files().delete(fileId=path).execute()
-        except errors.HttpError, e:
+        except errors.HttpError as e:
             if e.resp.status == 404:
                 raise ResourceNotFoundError(path)
             raise OperationFailedError(opname='file_delete',
@@ -371,9 +371,9 @@ class GoogleDriveClient(object):
             metadata = self.service.files().insert(body=body,
                                                    media_body=media_body
                                                    ).execute()
-        except errors.HttpError, e:
+        except errors.HttpError as e:
             raise OperationFailedError(opname='put_file', msg=e.resp.reason)
-        except TypeError, e:
+        except TypeError as e:
             raise ResourceInvalidError("put_file")
         except:
             return self._retry_operation(self.put_file, parent_id, title,
@@ -599,7 +599,7 @@ class GoogleDriveFS(FS):
             try:
                 spooled_file.write(self.client.get_file(path))
                 spooled_file.seek(0, 0)
-            except Exception, e:
+            except Exception as e:
                 if "w" not in mode and "a" not in mode:
                     raise ResourceNotFoundError("%r" % e)
                 else:
@@ -788,7 +788,7 @@ class GoogleDriveFS(FS):
         try:
             self.client.metadata(path)
             return True
-        except RemoteConnectionError, e:
+        except RemoteConnectionError as e:
             raise e
         except:
             return False
@@ -869,7 +869,7 @@ class GoogleDriveFS(FS):
         try:
             url = self.getinfo(path)
             url = url["webContentLink"]
-        except RemoteConnectionError, e:
+        except RemoteConnectionError as e:
             raise e
         except:
             if not allow_none:

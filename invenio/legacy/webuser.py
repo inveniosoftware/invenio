@@ -173,7 +173,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
                     else:
                         body = CFG_WEBACCESS_WARNING_MSGS[4] + CFG_WEBACCESS_MSGS[2]
 
-        except OperationalError, e:
+        except OperationalError as e:
             body = _("Database problem") + ': ' + str(e)
 
 
@@ -565,7 +565,7 @@ def merge_usera_into_userb(id_usera, id_userb):
                     'table': table,
                     'column': column
                 }, (id_userb, id_usera, id_usera))
-        except Exception, err:
+        except Exception as err:
             msg = "Error when merging id_user=%s into id_userb=%s for table %s: %s\n" % (id_usera, id_userb, table, err)
             msg += "users where succesfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[:index]])
             msg += "users where not succesfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[index:]])
@@ -1435,6 +1435,6 @@ def collect_user_info(req, login_time=False, refresh=False):
                 user_info['precached_usepaperclaim'] = usepaperclaim
                 user_info['precached_usepaperattribution'] = usepaperattribution
 
-    except Exception, e:
+    except Exception as e:
         register_exception()
     return user_info

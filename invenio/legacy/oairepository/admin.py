@@ -400,7 +400,7 @@ def get_oai_set(id=''):
             set[15] = params.get('op2', 'a')
             sets.append(set)
         return sets
-    except StandardError, e:
+    except StandardError as e:
         register_exception(alert_admin=True)
         return str(e)
 
@@ -470,7 +470,7 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
                        oai_set_id))
 
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception(alert_admin=True)
         return (0, str(e))
 
@@ -505,7 +505,7 @@ def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection,
                        oai_set_f1, oai_set_m1, oai_set_p2, oai_set_f2,
                        oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception(alert_admin=True)
         return (0, e)
 
@@ -515,7 +515,7 @@ def delete_oai_set(oai_set_id):
     try:
         run_sql("DELETE FROM oaiREPOSITORY WHERE id=%s", (oai_set_id,))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception(alert_admin=True)
         return (0, e)
 

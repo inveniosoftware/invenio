@@ -960,7 +960,7 @@ def get_xml_from_textmarc(recid, textmarc_record):
             transform_file(file_name)
             response['resultMsg'] = 'textmarc_parsing_success'
             response['resultXML'] = new_stdout.getvalue()
-        except ParseError, e:
+        except ParseError as e:
             # Something went wrong, notify user
             response['resultXML'] = ""
             response['resultMsg'] = 'textmarc_parsing_error'

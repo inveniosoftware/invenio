@@ -48,7 +48,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedI
             return page_not_authorized(req, "../yourapprovals.py/index",
                                        navmenuid='yourapprovals')
         u_email = get_email(uid)
-    except Error, e:
+    except Error as e:
         return error_page(str(e), req, ln=ln)
 
     user_info = collect_user_info(req)

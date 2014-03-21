@@ -117,7 +117,7 @@ def tweet_to_record(tweet, query):
         ## Let's fetch the icon of the user profile, and let's upload it as
         ## an image (and an icon of itself)
         record_add_field(rec, 'FFT', subfields=[('a', user.profile.image_url.encode('UTF-8')), ('x', user.profile.image_url.encode('UTF-8'))])
-    except Exception, err:
+    except Exception as err:
         write_message("WARNING: issue when fetching the user: %s" % err, stream=sys.stderr)
     if hasattr(tweet, 'iso_language_code'):
             ## Let's add the language of the Tweet if available (also this depends)

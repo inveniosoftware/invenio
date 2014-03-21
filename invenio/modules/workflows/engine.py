@@ -328,7 +328,7 @@ BibWorkflowEngine
                                       (str(callbacks), repr(obj)))
                         obj.log.debug("Processing has stopped")
                     break
-                except JumpTokenBack, step:
+                except JumpTokenBack as step:
                     if step.args[0] > 0:
                         raise WorkflowError("JumpTokenBack cannot"
                                             " be positive number")
@@ -338,7 +338,7 @@ BibWorkflowEngine
                         obj.log.debug("Object preempted")
                     i[0] = max(-1, i[0] - 1 + step.args[0])
                     i[1] = [0]  # reset the callbacks pointer
-                except JumpTokenForward, step:
+                except JumpTokenForward as step:
                     if step.args[0] < 0:
                         raise WorkflowError("JumpTokenForward cannot"
                                             " be negative number")
@@ -354,7 +354,7 @@ BibWorkflowEngine
                         obj.log.debug("Object preempted")
                     i[1] = [0]  # reset the callbacks pointer
                     continue
-                except HaltProcessing, e:
+                except HaltProcessing as e:
                     self.increase_counter_halted()
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
@@ -366,7 +366,7 @@ BibWorkflowEngine
                         # stopped
                         obj.log.info("Object proccesing is halted")
                     raise WorkflowHalt(e)
-                except Exception, e:
+                except Exception as e:
                     self.log.error("Unexpected error: %s", sys.exc_info()[0])
                     self.log.error(e.message)
                     obj.log.error("Something terribly wrong"

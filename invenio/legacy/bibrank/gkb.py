@@ -244,7 +244,7 @@ def command_line():
     sleeptime = ""
     try:
         opts, args = getopt.getopt(sys.argv[1:], short_flags, long_flags)
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         write_message(err, sys.stderr)
         usage(1)
     if args:
@@ -275,7 +275,7 @@ def command_line():
         bibrankgkb(config)
         if opts_dict["verbose"] >= 9:
             showtime((time.time() - startCreate))
-    except StandardError, e:
+    except StandardError as e:
         write_message(e, sys.stderr)
         sys.exit(1)
     return

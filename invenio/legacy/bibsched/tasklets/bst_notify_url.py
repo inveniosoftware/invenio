@@ -85,7 +85,7 @@ def bst_notify_url(url, data=None,
         try:
             opener.open(request)
             success_p = True
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             success_p = False
             reason_failure = repr(e)
         if not success_p:

@@ -1124,7 +1124,7 @@ def create_working_directory():
     try:
         path_workingdir = tempfile.mkdtemp(prefix="websubmit_file_stamper_", \
                                            dir="%s" % CFG_TMPDIR)
-    except OSError, err:
+    except OSError as err:
         ## Unable to create the temporary directory in ~invenio/var/tmp
         msg = "Error: Unable to create a temporary working directory in " \
               "which to carry out the stamping process. An attempt was made " \
@@ -1329,7 +1329,7 @@ def get_cli_options():
                                            "stamp=",
                                            "layer=",
                                            "output-file="])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         ## Invalid option provided - usage message
         usage(wmsg="Error: %(msg)s." % { 'msg' : str(err) })
 
@@ -1566,7 +1566,7 @@ def stamp_file_cli():
     ## is situated and the name of the stamped file:
     try:
         (working_dir, stamped_file) = stamp_file(input_options)
-    except InvenioWebSubmitFileStamperError, err:
+    except InvenioWebSubmitFileStamperError as err:
         ## Something went wrong:
         sys.stderr.write("Stamping failed: [%s]\n" % str(err))
         sys.stderr.flush()

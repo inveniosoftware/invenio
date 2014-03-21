@@ -635,7 +635,7 @@ def get_cli_options():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hV", [
             "help", "version", "text-marc", "aleph-marc="])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage(1, err)
 
     options = { "append-mode"  : 0,

@@ -188,7 +188,7 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
         ## Let's retrieve contextual user related info, if any
         try:
             client_data = get_pretty_wide_client_info(req)
-        except Exception, err:
+        except Exception as err:
             client_data = "Error in retrieving " \
                 "contextual information: %s" % err
 
@@ -237,7 +237,7 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
                         print >> tracestack_data_stream, "\t%20s = " % key,
                         try:
                             value = repr(value)
-                        except Exception, err:
+                        except Exception as err:
                             ## We shall gracefully accept errors when repr() of
                             ## a value fails (e.g. when we are trying to repr() a
                             ## variable that was not fully initialized as the
@@ -383,7 +383,7 @@ this exception into %s""" % os.path.join(cfg['CFG_LOGDIR'], 'invenio.' + stream)
             return 1
         else:
             return 0
-    except Exception, err:
+    except Exception as err:
         print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (
             cfg['CFG_LOGDIR'] + '/invenio.' + stream, err)
         return 0

@@ -60,10 +60,10 @@ def index(req, ln=CFG_SITE_LANG, journal_name=None, action=""):
     try:
         journal_name = wash_journal_name(ln, journal_name)
         action = wash_url_argument(action, 'str')
-    except InvenioWebJournalNoJournalOnServerError, e:
+    except InvenioWebJournalNoJournalOnServerError as e:
         # Ok, no journal. Let the admin add one...
         pass
-    except InvenioWebJournalNoNameError, e:
+    except InvenioWebJournalNoNameError as e:
         register_exception(req=req)
         return e.user_box()
     if action in ['delete', 'askDelete']:
@@ -102,10 +102,10 @@ def administrate(req, journal_name, ln=CFG_SITE_LANG):
 
     try:
         journal_name = wash_journal_name(ln, journal_name)
-    except InvenioWebJournalNoJournalOnServerError, e:
+    except InvenioWebJournalNoJournalOnServerError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalNoNameError, e:
+    except InvenioWebJournalNoNameError as e:
         register_exception(req=req)
         return e.user_box()
     auth = acc_authorize_action(getUid(req), 'cfgwebjournal',
@@ -143,10 +143,10 @@ def feature_record(req, journal_name="", recid="", img_url="", ln=CFG_SITE_LANG,
 
     try:
         journal_name = wash_journal_name(ln, journal_name)
-    except InvenioWebJournalNoJournalOnServerError, e:
+    except InvenioWebJournalNoJournalOnServerError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalNoNameError, e:
+    except InvenioWebJournalNoNameError as e:
         register_exception(req=req)
         return e.user_box()
 
@@ -196,19 +196,19 @@ def alert(req, journal_name="", ln=CFG_SITE_LANG, sent="False", plainText=u"",
         subject = wash_url_argument(subject, 'str')
         sent = wash_url_argument(sent, 'str')
         force = wash_url_argument(force, 'str')
-    except InvenioWebJournalNoJournalOnServerError, e:
+    except InvenioWebJournalNoJournalOnServerError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalNoNameError, e:
+    except InvenioWebJournalNoNameError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalNoCurrentIssueError, e:
+    except InvenioWebJournalNoCurrentIssueError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalIssueNumberBadlyFormedError, e:
+    except InvenioWebJournalIssueNumberBadlyFormedError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalJournalIdNotFoundDBError, e:
+    except InvenioWebJournalJournalIdNotFoundDBError as e:
         register_exception(req=req)
         return e.user_box()
 
@@ -256,16 +256,16 @@ def regenerate(req, journal_name="", issue="", ln=CFG_SITE_LANG,
         confirmed_p = wash_url_argument(confirmed_p, 'str') == "confirmed"
         publish_draft_articles_p = wash_url_argument(publish_draft_articles_p, 'str') == "move"
 
-    except InvenioWebJournalNoJournalOnServerError, e:
+    except InvenioWebJournalNoJournalOnServerError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalNoNameError, e:
+    except InvenioWebJournalNoNameError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalNoCurrentIssueError, e:
+    except InvenioWebJournalNoCurrentIssueError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalIssueNumberBadlyFormedError, e:
+    except InvenioWebJournalIssueNumberBadlyFormedError as e:
         register_exception(req=req)
         return e.user_box()
 
@@ -308,16 +308,16 @@ def issue_control(req, journal_name="", issue=[],
         issues = [wash_issue_number(ln,journal_name, _issue) \
                   for _issue in issue \
                   if _issue != "ww/YYYY"]
-    except InvenioWebJournalNoJournalOnServerError, e:
+    except InvenioWebJournalNoJournalOnServerError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalNoNameError, e:
+    except InvenioWebJournalNoNameError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalNoCurrentIssueError, e:
+    except InvenioWebJournalNoCurrentIssueError as e:
         register_exception(req=req)
         return e.user_box()
-    except InvenioWebJournalIssueNumberBadlyFormedError, e:
+    except InvenioWebJournalIssueNumberBadlyFormedError as e:
         register_exception(req=req)
         return e.user_box()
 
@@ -364,10 +364,10 @@ def configure(req, journal_name=None, ln=CFG_SITE_LANG, xml_config=u'', action='
         journal_name = wash_journal_name(ln, journal_name, guess=False)
         xml_config = wash_url_argument(xml_config, 'str')
         action = wash_url_argument(action, 'str')
-    except InvenioWebJournalNoJournalOnServerError, e:
+    except InvenioWebJournalNoJournalOnServerError as e:
         # Ok, no journal. Let the admin add one...
         pass
-    except InvenioWebJournalNoNameError, e:
+    except InvenioWebJournalNoNameError as e:
         register_exception(req=req)
         return e.user_box()
 

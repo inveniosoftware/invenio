@@ -442,7 +442,7 @@ if __name__ == "__main__" and \
                                     "default-templates-dir=",
                                     "custom-templates-dir=",
                                     "check-custom-templates"])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage(1)
     try:
         for opt in opts:
@@ -455,7 +455,7 @@ if __name__ == "__main__" and \
             elif opt[0] in ["-c", "--custom-templates-dir"]:
                 custom_base_dir = opt[1]
 
-    except StandardError, e:
+    except StandardError as e:
         usage(1)
 
     messages_ = check(default_base_dir, custom_base_dir)

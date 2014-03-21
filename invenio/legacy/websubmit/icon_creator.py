@@ -79,7 +79,7 @@ def create_working_directory():
     try:
         path_workingdir = tempfile.mkdtemp(prefix="websubmit_icon_creator_", \
                                            dir="%s" % CFG_TMPDIR)
-    except OSError, err:
+    except OSError as err:
         ## Unable to create the temporary directory in ~invenio/var/tmp
         msg = "Error: Unable to create a temporary working directory in " \
               "which to carry out the icon creation process. An attempt was " \
@@ -476,7 +476,7 @@ def create_icon(options):
     try:
         basename_source_file = \
                 copy_file_to_directory(options["input-file"], path_workingdir)
-    except IOError, err:
+    except IOError as err:
         ## Unable to copy the source file to the working directory.
         msg = "Icon creation failed: unable to copy the source image file " \
               "to the working directory. Got this error: [%s]" % str(err)
@@ -656,7 +656,7 @@ def get_cli_options():
                                            "multipage-icon-delay=",
                                            "icon-file-format=",
                                            "icon-name="])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         ## Invalid option provided - usage message
         usage(wmsg="Error: %(msg)s." % { 'msg' : str(err) })
 
@@ -735,7 +735,7 @@ def create_icon_cli():
     ## which the icon file is situated and the name of the icon file:
     try:
         (working_dir, icon_file) = create_icon(input_options)
-    except InvenioWebSubmitIconCreatorError, err:
+    except InvenioWebSubmitIconCreatorError as err:
         ## Something went wrong:
         sys.stderr.write("Icon creation failed: [%s]\n" % str(err))
         sys.stderr.flush()

@@ -49,7 +49,7 @@ def backup_tables(drop=False):
     try:
         run_sql("""CREATE TABLE bibdoc_bibdoc_backup_for_icon (KEY id_bibdoc1(id_bibdoc1),
                 KEY id_bibdoc2(id_bibdoc2)) SELECT * FROM bibdoc_bibdoc""")
-    except OperationalError, e:
+    except OperationalError as e:
         if not drop:
             return False
         raise e
@@ -62,7 +62,7 @@ def fix_bibdoc_bibdoc(id_bibdoc1, id_bibdoc2, logfile):
 
     try:
         the_bibdoc = BibDoc.create_instance(id_bibdoc1)
-    except Exception, err:
+    except Exception as err:
         msg = "WARNING: when opening docid %s: %s" % (id_bibdoc1, err)
         print >> logfile, msg
         print msg
@@ -79,7 +79,7 @@ def fix_bibdoc_bibdoc(id_bibdoc1, id_bibdoc2, logfile):
         print "OK"
         print >> logfile, "OK"
         return True
-    except Exception, err:
+    except Exception as err:
         print "ERROR: %s" % err
         print >> logfile, "ERROR: %s" % err
         register_exception()
@@ -91,7 +91,7 @@ def main():
     logfilename = '%s/fulltext_files_migration_kit-%s.log' % (CFG_LOGDIR, datetime.today().strftime('%Y%m%d%H%M%S'))
     try:
         logfile = open(logfilename, 'w')
-    except IOError, e:
+    except IOError as e:
         print wrap_text_in_a_box('NOTE: it\'s impossible to create the log:\n\n  %s\n\nbecause of:\n\n  %s\n\nPlease run this migration kit as the same user who runs Invenio (e.g. Apache)' % (logfilename, e), style='conclusion', break_long=False)
         sys.exit(1)
 
@@ -120,7 +120,7 @@ In order for the script to go further they need to be removed.""", style='import
             print "-> OK"
         else:
             print "-> OK"
-    except Exception, e:
+    except Exception as e:
         print wrap_text_in_a_box("Unexpected error while backing up tables. Please, do your checks: %s" % e, style='conclusion')
         sys.exit(1)
 
@@ -143,7 +143,7 @@ In order for the script to go further they need to be removed.""", style='import
                     if not fix_bibdoc_bibdoc(id_bibdoc1, id_bibdoc2, logfile):
                         if record_does_exist:
                             raise StandardError("Error when correcting document ID %s" % id_bibdoc1)
-                except Exception, err:
+                except Exception as err:
                     print >> logfile, "ERROR: %s" % err
             print wrap_text_in_a_box("DONE", style='conclusion')
         except:

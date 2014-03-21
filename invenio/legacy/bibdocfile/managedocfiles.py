@@ -1313,7 +1313,7 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
               file_restriction + '\n'
         file_desc.write("%s --> %s" %(time.strftime("%Y-%m-%d %H:%M:%S"), msg))
         file_desc.close()
-    except Exception ,e:
+    except Exception as e:
         raise e
 
 def read_actions_log(log_dir):
@@ -1337,7 +1337,7 @@ def read_actions_log(log_dir):
                 (action, bibdoc_name, file_path, rename, description,
                  comment, doctype, keep_previous_versions,
                  file_restriction) = action.rstrip('\n').split('<--->')
-            except ValueError, e:
+            except ValueError as e:
                 # Malformed action log
                 pass
 
@@ -1962,7 +1962,7 @@ def add(file_path, bibdoc_name, rename, doctype, description, comment,
                                 bibdoc.add_icon(iconpath, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
                             _do_log(working_dir, 'Added icon to ' + \
                                     brd.get_docname(bibdoc.id) + ': ' + iconpath)
-                        except InvenioBibDocFileError, e:
+                        except InvenioBibDocFileError as e:
                             # Most probably icon already existed.
                             pass
 
@@ -1997,7 +1997,7 @@ def add(file_path, bibdoc_name, rename, doctype, description, comment,
             # it was renamed)
             pending_bibdocs[bibdoc_name] = (doctype, comment, description, [])
 
-    except InvenioBibDocFileError, e:
+    except InvenioBibDocFileError as e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
@@ -2050,7 +2050,7 @@ def add_format(file_path, bibdoc_name, recid, doctype, working_dir,
                                 bibdoc.add_icon(iconpath, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
                             _do_log(working_dir, 'Added icon to ' + \
                                     brd.get_docname(bibdoc.id) + ': ' + iconpath)
-                        except InvenioBibDocFileError, e:
+                        except InvenioBibDocFileError as e:
                             # Most probably icon already existed.
                             pass
         else:
@@ -2060,7 +2060,7 @@ def add_format(file_path, bibdoc_name, recid, doctype, working_dir,
                 pending_bibdocs[bibdoc_name][3].append(file_path)
             # else: we previously added a file by mistake. Do
             # not care, it will be deleted
-    except InvenioBibDocFileError, e:
+    except InvenioBibDocFileError as e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
@@ -2168,7 +2168,7 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
                     _do_log(working_dir, 'Added ' + brd.get_docname(bibdoc.id) + ': ' + \
                             file_path)
 
-                except InvenioBibDocFileError, e:
+                except InvenioBibDocFileError as e:
                     _do_log(working_dir, str(e))
                     register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
                                        'tried to revise a file %s ' \
@@ -2221,7 +2221,7 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
                                     bibdoc.add_icon(iconpath, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
                                 _do_log(working_dir, 'Added icon to ' + \
                                         brd.get_docname(bibdoc.id) + ': ' + iconpath)
-                            except InvenioBibDocFileError, e:
+                            except InvenioBibDocFileError as e:
                                 # Most probably icon already existed.
                                 pass
 
@@ -2253,7 +2253,7 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
             if rename and rename != bibdoc_name:
                 pending_bibdocs[rename] = pending_bibdocs[bibdoc_name]
 
-    except InvenioBibDocFileError, e:
+    except InvenioBibDocFileError as e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
@@ -2277,7 +2277,7 @@ def delete(bibdoc_name, recid, working_dir, pending_bibdocs,
         if pending_bibdocs.has_key(bibdoc_name):
             del pending_bibdocs[bibdoc_name]
 
-    except InvenioBibDocFileError, e:
+    except InvenioBibDocFileError as e:
         # Mmh most probably we deleted two files at the same
         # second. Sleep 1 second and retry...  This might go
         # away one bibdoc improves its way to delete files
@@ -2287,7 +2287,7 @@ def delete(bibdoc_name, recid, working_dir, pending_bibdocs,
             _do_log(working_dir, 'Deleted ' + bibdoc_name)
             if pending_bibdocs.has_key(bibdoc_name):
                 del pending_bibdocs[bibdoc_name]
-        except InvenioBibDocFileError, e:
+        except InvenioBibDocFileError as e:
             _do_log(working_dir, str(e))
             _do_log(working_dir, repr(bibrecdocs.list_bibdocs()))
             register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
@@ -2345,7 +2345,7 @@ def _create_icon(file_path, icon_size, docformat='gif', verbosity=9):
              'icon-file-format': format,
              'verbosity': verbosity})
         icon_path = icon_dir + os.sep + icon_name
-    except InvenioWebSubmitIconCreatorError, e:
+    except InvenioWebSubmitIconCreatorError as e:
         register_exception(prefix='Icon for file %s could not be created: %s' % \
                            (file_path, str(e)),
                            alert_admin=False)

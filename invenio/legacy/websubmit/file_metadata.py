@@ -324,13 +324,13 @@ def main():
                                      options.loginpw,
                                      options.verbose)
             print_metadata(metadata)
-        except TypeError, err:
+        except TypeError as err:
             print err
             return 1
-        except RuntimeError, err:
+        except RuntimeError as err:
             print err
             return 1
-        except InvenioWebSubmitFileMetadataRuntimeError, err:
+        except InvenioWebSubmitFileMetadataRuntimeError as err:
             print err
             return 1
     elif options.update:
@@ -340,13 +340,13 @@ def main():
                            options.metadata,
                            options.force_plugin,
                            options.verbose)
-        except TypeError, err:
+        except TypeError as err:
             print err
             return 1
-        except RuntimeError, err:
+        except RuntimeError as err:
             print err
             return 1
-        except InvenioWebSubmitFileMetadataRuntimeError, err:
+        except InvenioWebSubmitFileMetadataRuntimeError as err:
             print err
             return 1
     elif options.info:

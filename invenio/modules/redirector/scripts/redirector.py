@@ -38,7 +38,7 @@ def main():
     def get_json_parameters_from_cli(option, dummy_opt_str, value, dummy_parser):
         try:
             option.parameters = json_unicode_to_utf8(json.loads(value))
-        except Exception, err:
+        except Exception as err:
             raise optparse.OptionValueError("Cannot parse as a valid JSON serialization the provided parameters: %s. %s" % (value, err))
 
     def get_parameter_from_cli(option, dummy_opt_str, value, dummy_parser):

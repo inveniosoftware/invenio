@@ -569,7 +569,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             else:
                 try:
                     marcxml_template = get_marcxml_for_doi(doi)
-                except CrossrefError, inst:
+                except CrossrefError as inst:
                     response['resultCode'] = \
                         CFG_BIBEDIT_AJAX_RESULT_CODES_REV[inst.code]
                 except:
@@ -790,7 +790,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
 
                     save_xml_record(recid, uid)
                     response['resultCode'] = 4
-            except Exception, e:
+            except Exception as e:
                 response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[ \
                     'error_wrong_cache_file_format']
                 if CFG_DEVEL_SITE: # return debug information in the request

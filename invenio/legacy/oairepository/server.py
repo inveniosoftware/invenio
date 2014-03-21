@@ -407,12 +407,12 @@ def print_record(recid, prefix='marcxml', verb='ListRecords', set_spec=None, set
     ## FIXME: Move these checks in a bibtask
     #try:
         #assert idents, "No OAI ID for record %s, please do your checks!" % recid
-    #except AssertionError, err:
+    #except AssertionError as err:
         #register_exception(alert_admin=True)
         #return ""
     #try:
         #assert len(idents) == 1, "More than OAI ID found for recid %s. Considering only the first one, but please do your checks: %s" % (recid, idents)
-    #except AssertionError, err:
+    #except AssertionError as err:
         #register_exception(alert_admin=True)
     ident = idents[0]
 
@@ -769,7 +769,7 @@ def oai_cache_gc():
         if ((time.time() - os.path.getmtime(filename)) > CFG_OAI_EXPIRE):
             try:
                 os.remove(filename)
-            except OSError, e:
+            except OSError as e:
                 # Most probably the cache was already deleted
                 pass
 

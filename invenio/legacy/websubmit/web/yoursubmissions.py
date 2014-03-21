@@ -53,7 +53,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedI
                                        navmenuid='yoursubmissions',
                                        text=auth_message)
         u_email = get_email(uid)
-    except Error, e:
+    except Error as e:
         return error_page(str(e), req, ln=ln)
 
     if deletedId != "":

@@ -420,7 +420,7 @@ def test_web_page_content(url,
         browser = get_authenticated_mechanize_browser(username, password)
         try:
             browser.open(url)
-        except mechanize.HTTPError, msg:
+        except mechanize.HTTPError as msg:
             if msg.code != 401:
                 raise msg
             error_messages.append('ERROR: Page %s (login %s) not accessible. %s' % \
@@ -504,7 +504,7 @@ def test_web_page_content(url,
                 raise InvenioTestUtilsBrowserException, error_text
 
 
-    except InvenioTestUtilsBrowserException, msg:
+    except InvenioTestUtilsBrowserException as msg:
         error_messages.append(
             'ERROR: Page %s (login %s) led to an error: %s.' %
             (url, username, msg))
@@ -817,7 +817,7 @@ class InvenioWebTestCase(InvenioTestCase):
                 # let's store the result of the comparison in the errors list
                 try:
                     self.assertEqual(q.text, text)
-                except AssertionError, e:
+                except AssertionError as e:
                     self.errors.append(str(e))
 
     def find_element_by_xpath_with_timeout(self, element_xpath, timeout=30):
@@ -951,7 +951,7 @@ class InvenioWebTestCase(InvenioTestCase):
                         q.get_attribute('value'), unexpected_element_value)
                 else:
                     self.assertNotEqual(q.text, unexpected_element_value)
-            except AssertionError, e:
+            except AssertionError as e:
                 self.errors.append(str(e))
 
         if expected_element_value:
@@ -961,7 +961,7 @@ class InvenioWebTestCase(InvenioTestCase):
                         q.get_attribute('value'), expected_element_value)
                 else:
                     self.assertEqual(q.text, expected_element_value)
-            except AssertionError, e:
+            except AssertionError as e:
                 self.errors.append(str(e))
 
     @nottest
@@ -989,7 +989,7 @@ class InvenioWebTestCase(InvenioTestCase):
                 try:
                     self.assertEqual(
                         -1, self.browser.page_source.find(unexpected_text))
-                except AssertionError, e:
+                except AssertionError as e:
                     self.errors.append(str(e))
 
         if expected_text:
@@ -1002,7 +1002,7 @@ class InvenioWebTestCase(InvenioTestCase):
                 try:
                     self.assertNotEqual(
                         -1, self.browser.page_source.find(expected_text))
-                except AssertionError, e:
+                except AssertionError as e:
                     self.errors.append(str(e))
 
     def choose_selectbox_option_by_label(self, selectbox_name="", selectbox_id="", label=""):

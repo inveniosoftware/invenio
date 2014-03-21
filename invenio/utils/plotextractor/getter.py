@@ -625,7 +625,7 @@ def download(url, filename, to_dir):
         new_file_fd.close()
         write_message('Downloaded to ' + new_file)
         return True
-    except (IOError, urllib2.URLError), e:
+    except (IOError, urllib2.URLError) as e:
         # this could be a permissions error, but it probably means that
         # there's nothing left in that section YYMM
         write_message('Error downloading from %s: \n%s\n' % (url, str(e)))

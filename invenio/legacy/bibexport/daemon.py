@@ -102,7 +102,7 @@ def task_run_core():
                 # pylint: enable=E0602
                 _update_job_lastrun_time(jobname)
                 write_message("finished export job " + jobname, verbose=3)
-            except Exception, msg:
+            except Exception as msg:
                 write_message("ERROR: cannot run export job %s: %s." % (jobname, msg), sys.stderr)
                 errors_encountered_p = True
     return not errors_encountered_p

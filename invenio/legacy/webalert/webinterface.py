@@ -141,7 +141,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         try:
             html = webalert.perform_input_alert("add", argd['idq'], argd['name'], argd['freq'],
                                                 argd['notif'], argd['idb'], uid, ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except webalert.AlertError as msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -226,7 +226,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         try:
             html = webalert.perform_input_alert("update", argd['idq'], argd['name'], argd['freq'],
                                                 argd['notif'], argd['idb'], uid, argd['old_idb'], ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except webalert.AlertError as msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -360,7 +360,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         try:
             html = webalert.perform_add_alert(argd['name'], argd['freq'], argd['notif'],
                                               argd['idb'], argd['idq'], uid, ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except webalert.AlertError as msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -437,7 +437,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         try:
             html = webalert.perform_update_alert(argd['name'], argd['freq'], argd['notif'],
                                                  argd['idb'], argd['idq'], argd['old_idb'], uid, ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except webalert.AlertError as msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -511,7 +511,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         try:
             html = webalert.perform_remove_alert(argd['name'], argd['idq'],
                                                  argd['idb'], uid, ln=argd['ln'])
-        except webalert.AlertError, msg:
+        except webalert.AlertError as msg:
             return page(title=_("Error"),
                         body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
                         navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {

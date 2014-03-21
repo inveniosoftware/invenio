@@ -2068,7 +2068,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 write_warning(_('Instead searching %(x_name)s.', x_name=str([bsu_o, bsu_p, bsu_f, bsu_m])), req=req)
         try:
             basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m, wl)
-        except InvenioWebSearchWildcardLimitError, excp:
+        except InvenioWebSearchWildcardLimitError as excp:
             basic_search_unit_hitset = excp.res
             if of.startswith("h"):
                 write_warning(_("Search term too generic, displaying only partial results..."), req=req)
@@ -2447,7 +2447,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
         try:
             res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
                           (word0_washed, word1_washed), wildcard_limit = wl)
-        except InvenioDbQueryWildcardLimitError, excp:
+        except InvenioDbQueryWildcardLimitError as excp:
             res = excp.res
             limit_reached = 1 # set the limit reached flag to true
     else:
@@ -2467,7 +2467,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
                 try:
                     res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % bibwordsX,
                                   (wash_index_term(word),), wildcard_limit = wl)
-                except InvenioDbQueryWildcardLimitError, excp:
+                except InvenioDbQueryWildcardLimitError as excp:
                     res = excp.res
                     limit_reached = 1 # set the limit reached flag to true
         else:
@@ -2571,7 +2571,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
             try:
                 res = run_sql_with_limit("SELECT term, hitlist FROM %s WHERE term %s" \
                                      % (idxpair_table_washed, query_addons), query_params, wildcard_limit=wl) #kwalitee:disable=sql
-            except InvenioDbQueryWildcardLimitError, excp:
+            except InvenioDbQueryWildcardLimitError as excp:
                 res = excp.res
                 limit_reached = 1 # set the limit reached flag to true
         else:
@@ -2659,7 +2659,7 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
         try:
             res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons),
                       query_params, wildcard_limit=wl)
-        except InvenioDbQueryWildcardLimitError, excp:
+        except InvenioDbQueryWildcardLimitError as excp:
             res = excp.res
             limit_reached = 1 # set the limit reached flag to true
     else:
@@ -2742,7 +2742,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
                 try:
                     res = run_sql_with_limit("SELECT id FROM bibrec WHERE id %s" % query_addons,
                               query_params, wildcard_limit=wl)
-                except InvenioDbQueryWildcardLimitError, excp:
+                except InvenioDbQueryWildcardLimitError as excp:
                     res = excp.res
                     limit_reached = 1 # set the limit reached flag to true
             else:
@@ -2763,7 +2763,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
             if use_query_limit:
                 try:
                     res = run_sql_with_limit(query, query_params_and_tag, wildcard_limit=wl)
-                except InvenioDbQueryWildcardLimitError, excp:
+                except InvenioDbQueryWildcardLimitError as excp:
                     res = excp.res
                     limit_reached = 1 # set the limit reached flag to true
             else:
@@ -5398,7 +5398,7 @@ def prs_wash_arguments_colls(kwargs=None, of=None, req=None, cc=None, c=None, sc
         kwargs['colls_to_search'] = colls_to_search
         kwargs['hosted_colls'] = hosted_colls
         kwargs['wash_colls_debug'] = wash_colls_debug
-    except InvenioWebSearchUnknownCollectionError, exc:
+    except InvenioWebSearchUnknownCollectionError as exc:
         colname = exc.colname
         if of.startswith("h"):
             page_start(req, of, cc, aas, ln, getUid(req),

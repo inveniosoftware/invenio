@@ -49,7 +49,7 @@ def run(glob_patterns,
             try:
                 test_cases = load_microtest_definition(cfgfile)
                 run_microtest_suite(test_cases, results=results, plevel=plevel)
-            except Exception, msg:
+            except Exception as msg:
                 log.error('Error running microtest: %s' % cfgfile)
                 log.error(msg)
                 log.error(traceback.format_exc())
@@ -94,7 +94,7 @@ def run_microtest_suite(test_cases, results={}, plevel=1):
             results.setdefault(test_name, [])
             results[test_name].append(details)
 
-        except Exception, msg:
+        except Exception as msg:
             log.error('Operational error executing section: %s' % test_name)
             #log.error(msg)
             log.error(traceback.format_exc())

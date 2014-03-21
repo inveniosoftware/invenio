@@ -129,7 +129,7 @@ def append_to_output_file(filename, output):
         file = open(filename, 'a')
         file.write(output)
         file.close()
-    except IOError, e:
+    except IOError as e:
         exit_on_error("Cannot write into %s" % filename)
 
     return 1
@@ -433,7 +433,7 @@ def parse_input_data_f(source_data_open, source_tpl):
             if (out[0][0]==""):
                 out = []
             out.append([field_code, stack])
-    except IndexError, e:
+    except IndexError as e:
         out = out
 
     return out
@@ -475,12 +475,12 @@ def parse_input_data_fx(source_tpl):
         try:
             field_defined[1][0] = sub_keywd(field_defined[1][0])
             field_defined[1][1] = sub_keywd(field_defined[1][1])
-        except IndexError, e:
+        except IndexError as e:
             field_defined = field_defined
 
         try:
             field_defined[1][2] = sub_keywd(field_defined[1][2])
-        except IndexError, e:
+        except IndexError as e:
             field_defined = field_defined
 
         field_data_1 =""
@@ -500,7 +500,7 @@ def parse_input_data_fx(source_tpl):
                     field_data_1_tmp = re.split(field_defined_regexp, record, 1)[1]
                     field_data_1_in_list = field_data_1_tmp.split(field_defined_regexp)
 
-            except IndexError, e:
+            except IndexError as e:
                 field_data_1 = ""
         else:
             try:
@@ -510,7 +510,7 @@ def parse_input_data_fx(source_tpl):
                 else:
                     field_data_1_tmp = record.split(field_defined[1][0], 1)[1]
                     field_data_1_in_list = field_data_1_tmp.split(field_defined[1][0])
-            except IndexError, e:
+            except IndexError as e:
                 field_data_1 = ""
 
         spliton      = []
@@ -527,7 +527,7 @@ def parse_input_data_fx(source_tpl):
                 for item in extract_tpl_parsed:
                     try:
                         spliton.append(item[1][0])
-                    except IndexError, e:
+                    except IndexError as e:
                         spliton = spliton
             elif (field_defined[1][1][0:2] == '//') and \
                      (field_defined[1][1][-2:] == '//'):
@@ -536,7 +536,7 @@ def parse_input_data_fx(source_tpl):
             else:
                 spliton = [field_defined[1][1]]
 
-        except IndexError,e :
+        except IndexError as e:
             spliton = ""
 
         outvalues = []
@@ -1960,7 +1960,7 @@ def create_record(begin_record_header,
                             if DATA[0] != "":
                                 print_line = 1
                             to_output.append(DATA)
-                    except IndexError, e:
+                    except IndexError as e:
                         pass
             else:
                 to_output.append([field_tpl_item_STRING])

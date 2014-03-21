@@ -40,7 +40,7 @@ class BibSortWasher(object):
         fnc_name = '_' + washer
         try:
             self.washer_fnc = self.__getattribute__(fnc_name)
-        except AttributeError, err:
+        except AttributeError as err:
             raise InvenioBibSortWasherNotImplementedError(err)
 
     def get_washer(self):

@@ -392,7 +392,7 @@ def call_bibupload(marcxmlfile, mode=None, oai_src_id=-1, sequence_id=None):
                 args.extend(['-I', str(sequence_id)])
             task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
             create_oaiharvest_log(task_id, oai_src_id, marcxmlfile)
-        except Exception, msg:
+        except Exception as msg:
             write_message("An exception during submitting oaiharvest task occured : %s " % (str(msg)))
             return None
         return task_id

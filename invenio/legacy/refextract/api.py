@@ -72,7 +72,7 @@ def extract_references_from_url_xml(url):
     try:
         try:
             marcxml = extract_references_from_file_xml(filename)
-        except IOError, err:
+        except IOError as err:
             if err.code == 404:
                 raise FullTextNotAvailable()
             else:

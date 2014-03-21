@@ -177,7 +177,7 @@ class SimulatedModPythonRequest(object):
                             self.__what_was_written += https_replace(self.__buffer)
                         else:
                             self.__what_was_written += self.__buffer
-            except IOError, err:
+            except IOError as err:
                 if "failed to write data" in str(err) or "client connection closed" in str(err):
                     ## Let's just log this exception without alerting the admin:
                     register_exception(req=self)
@@ -290,7 +290,7 @@ class SimulatedModPythonRequest(object):
                         self.__bytes_sent += the_len
                         self.__write(chunk[:the_len])
                         break
-        except IOError, err:
+        except IOError as err:
             if "failed to write data" in str(err) or "client connection closed" in str(err):
                 ## Let's just log this exception without alerting the admin:
                 register_exception(req=self)
@@ -454,7 +454,7 @@ def application(environ, start_response, handler=None):
     ## TODO for future reimplementation of stream_file
     #except StreamFileException as e:
     #    return e.value
-    except SERVER_RETURN, status:
+    except SERVER_RETURN as status:
         redirection, = status.args
         from werkzeug.wrappers import BaseResponse
         if isinstance(redirection, BaseResponse):
@@ -608,7 +608,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
 
         try:
             return _check_result(req, module_globals[possible_handler](req, **form))
-        except TypeError, err:
+        except TypeError as err:
             if ("%s() got an unexpected keyword argument" % possible_handler) in str(err) or ('%s() takes at least' % possible_handler) in str(err):
                 inspected_args = inspect.getargspec(module_globals[possible_handler])
                 expected_args = list(inspected_args[0])

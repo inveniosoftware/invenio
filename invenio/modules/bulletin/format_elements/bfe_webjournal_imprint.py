@@ -67,9 +67,9 @@ def format_element(bfo, display_date='yes', display_issue_number='yes',
         issue_display = get_issue_number_display(issue_number,
                                                  journal_name,
                                                  ln)
-    except InvenioWebJournalJournalIdNotFoundDBError, e:
+    except InvenioWebJournalJournalIdNotFoundDBError as e:
         return e.user_box()
-    except Exception, e:
+    except Exception as e:
         issue_display = issue_number
 
     issues = issue_display.split("/")[0]

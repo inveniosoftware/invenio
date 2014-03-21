@@ -1081,7 +1081,7 @@ class BibRecDocs(object):
                                                 human_readable=self.human_readable)
                 self.build_bibdoc_list()
                 return bibdoc
-        except Exception, e:
+        except Exception as e:
             register_exception()
             raise InvenioBibDocFileError(str(e))
 
@@ -1145,7 +1145,7 @@ class BibRecDocs(object):
             try:
                 bibdoc.add_file_new_format(fullpath, description=description, comment=comment, docformat=docformat, flags=flags, modification_date=modification_date)
                 self.build_bibdoc_list()
-            except InvenioBibDocFileError, dummy:
+            except InvenioBibDocFileError as dummy:
                 # Format already exist!
                 if never_fail:
                     bibdoc = self.add_bibdoc(doctype, docname, True)
@@ -1291,7 +1291,7 @@ class BibRecDocs(object):
                     new_name = 'FIXING-%s-%s' % (str(counter), name)
                     try:
                         shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name))
-                    except Exception, e:
+                    except Exception as e:
                         register_exception()
                         raise InvenioBibDocFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name), e)
                     if versions[version].has_key(docformat):
@@ -1317,7 +1317,7 @@ class BibRecDocs(object):
                     type_fd = open("%s/.type" % bibdoc.basedir, "w")
                     type_fd.write(str(bibdoc.doctype))
                     type_fd.close()
-            except Exception, e:
+            except Exception as e:
                 register_exception()
                 raise InvenioBibDocFileError, e
             os.umask(old_umask)
@@ -1332,7 +1332,7 @@ class BibRecDocs(object):
                     destination = '%s%s;%i' % (docname, docformat, version)
                     try:
                         shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination))
-                    except Exception, e:
+                    except Exception as e:
                         register_exception()
                         raise InvenioBibDocFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination), e)
 
@@ -1343,7 +1343,7 @@ class BibRecDocs(object):
                 type_fd = open("%s/.type" % bibdoc.basedir, "w")
                 type_fd.write(str(bibdoc.doctype))
                 type_fd.close()
-            except Exception, e:
+            except Exception as e:
                 register_exception()
                 raise InvenioBibDocFileError, "Error in creating .recid and .type file for '%s' folder: '%s'" % (bibdoc.basedir, e)
 
@@ -1359,7 +1359,7 @@ class BibRecDocs(object):
                 res.append(new_bibdoc)
                 try:
                     os.remove('%s/%s' % (bibdoc.basedir, filename))
-                except Exception, e:
+                except Exception as e:
                     register_exception()
                     raise InvenioBibDocFileError, "Error in removing '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), e)
 
@@ -1373,7 +1373,7 @@ class BibRecDocs(object):
                 ## its more_info initialized.
                 try:
                     bibdoc.import_descriptions_and_comments_from_marc()
-                except Exception, e:
+                except Exception as e:
                     register_exception()
                     raise InvenioBibDocFileError, "Error in importing description and comment from %s for record %s: %s" % (repr(bibdoc), self.id, e)
         return res
@@ -1566,7 +1566,7 @@ class BibDoc(object):
         try:
             BibDoc.prepare_basedir(doc_id)
 
-        except Exception, e:
+        except Exception as e:
             run_sql('DELETE FROM bibdoc WHERE id=%s', (doc_id, ))
 #            run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (doc_id, ))
 
@@ -1638,7 +1638,7 @@ class BibDoc(object):
             for link in self.bibrec_links:
                 reclinks_fd.write("%(recid)s %(docname)s %(doctype)s\n" % link)
             reclinks_fd.close()
-        except Exception, e:
+        except Exception as e:
             register_exception(alert_admin=True)
             raise InvenioBibDocFileError, e
 
@@ -1951,7 +1951,7 @@ class BibDoc(object):
                     os.chmod(destination, 0644)
                     if modification_date: # if the modification time of the file needs to be changed
                         update_modification_date_of_file(destination, modification_date)
-                except Exception, e:
+                except Exception as e:
                     register_exception()
                     raise InvenioBibDocFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
                 self.more_info.set_description(description, docformat, myversion)
@@ -2023,7 +2023,7 @@ class BibDoc(object):
                     os.chmod(destination, 0644)
                     if modification_date: # if the modification time of the file needs to be changed
                         update_modification_date_of_file(destination, modification_date)
-                except Exception, e:
+                except Exception as e:
                     register_exception()
                     raise InvenioBibDocFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
                 self.more_info.set_comment(comment, docformat, version)
@@ -2085,7 +2085,7 @@ class BibDoc(object):
                         self.more_info.unset_flag(flag, afile.get_format(), afile.get_version())
                     try:
                         os.remove(afile.get_full_path())
-                    except Exception, dummy:
+                    except Exception as dummy:
                         register_exception()
             Md5Folder(self.basedir).update()
             self.touch()
@@ -2517,7 +2517,7 @@ class BibDoc(object):
 
             run_sql("UPDATE bibdoc SET status='DELETED' WHERE id=%s", (self.id,))
             self.status = 'DELETED'
-        except Exception, e:
+        except Exception as e:
             register_exception()
             raise InvenioBibDocFileError, "It's impossible to delete bibdoc %s: %s" % (self.id, e)
 
@@ -2548,7 +2548,7 @@ class BibDoc(object):
 
         try:
             run_sql("UPDATE bibdoc SET status=%s WHERE id=%s AND status='DELETED'", (previous_status, self.id))
-        except Exception, e:
+        except Exception as e:
             raise InvenioBibDocFileError, "It's impossible to undelete bibdoc %s: %s" % (self.id, e)
 
         if recid:
@@ -2560,7 +2560,7 @@ class BibDoc(object):
                     original_name = '-'.join(docname.split('-')[2:])
                     original_name = bibrecdocs.propose_unique_docname(original_name)
                     bibrecdocs.change_name(docid=self.id, newname=original_name)
-                except Exception, e:
+                except Exception as e:
                     raise InvenioBibDocFileError, "It's impossible to restore the previous docname %s. %s kept as docname because: %s" % (original_name, docname, e)
             else:
                 raise InvenioBibDocFileError, "Strange just undeleted docname isn't called DELETED-somedate-docname but %s" % docname
@@ -2690,7 +2690,7 @@ class BibDoc(object):
                                     fileversion, docformat,
                                     self.id, self.status, checksum,
                                     self.more_info, human_readable=self.human_readable, bibdoc=self))
-                        except Exception, e:
+                        except Exception as e:
                             register_exception()
                             raise InvenioBibDocFileError, e
         if context in ('init', 'init_from_disk'):
@@ -3465,7 +3465,7 @@ class Md5Folder(object):
                 md5file.write('%s *%s\n' % (value, key))
             md5file.close()
             os.umask(old_umask)
-        except Exception, e:
+        except Exception as e:
             register_exception(alert_admin=True)
             raise InvenioBibDocFileError("Encountered an exception while storing .md5 for folder '%s': '%s'" % (self.folder, e))
 
@@ -3487,7 +3487,7 @@ class Md5Folder(object):
         if filename and filename in self.md5s.keys():
             try:
                 return self.md5s[filename] == calculate_md5(os.path.join(self.folder, filename))
-            except Exception, e:
+            except Exception as e:
                 register_exception(alert_admin=True)
                 raise InvenioBibDocFileError("Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e))
         else:
@@ -3495,7 +3495,7 @@ class Md5Folder(object):
                 try:
                     if calculate_md5(os.path.join(self.folder, filename)) != md5hash:
                         return False
-                except Exception, e:
+                except Exception as e:
                     register_exception(alert_admin=True)
                     raise InvenioBibDocFileError("Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e))
             return True
@@ -3522,7 +3522,7 @@ def calculate_md5_external(filename):
             return calculate_md5(filename, force_internal=True)
         else:
             return ret
-    except Exception, e:
+    except Exception as e:
         raise InvenioBibDocFileError("Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e))
 
 def calculate_md5(filename, force_internal=False):
@@ -3540,7 +3540,7 @@ def calculate_md5(filename, force_internal=False):
                     break
             to_be_read.close()
             return computed_md5.hexdigest()
-        except Exception, e:
+        except Exception as e:
             register_exception(alert_admin=True)
             raise InvenioBibDocFileError("Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e))
     else:
@@ -3662,7 +3662,7 @@ def decompose_bibdocfile_very_old_url(url):
                 docformat = normalize_format(params.get('format', [''])[0])
 
                 return (recid, docname, docformat)
-            except Exception, e:
+            except Exception as e:
                 raise InvenioBibDocFileError('Problem with %s: %s' % (url, e))
         else:
             raise InvenioBibDocFileError('%s has no params to correspond to a bibdocfile.' % url)
@@ -3716,9 +3716,9 @@ def check_valid_url(url):
         else:
             try:
                 open_url(url)
-            except InvenioBibdocfileUnauthorizedURL, e:
+            except InvenioBibdocfileUnauthorizedURL as e:
                 raise StandardError, str(e)
-    except Exception, e:
+    except Exception as e:
         raise StandardError, "%s is not a correct url: %s" % (url, e)
 
 def safe_mkstemp(suffix, prefix='bibdocfile_'):
@@ -3776,7 +3776,7 @@ def download_local_file(filename, docformat=None):
                 break
         else:
             raise StandardError, "%s is not in one of the allowed paths." % path
-    except Exception, e:
+    except Exception as e:
         raise StandardError, "Impossible to copy the local file '%s': %s" % \
                 (filename, str(e))
 
@@ -3813,9 +3813,9 @@ def download_external_url(url, docformat=None, progress_callback=None):
 
     try:
         from_file = open_url(url)
-    except InvenioBibdocfileUnauthorizedURL, e:
+    except InvenioBibdocfileUnauthorizedURL as e:
         raise StandardError, str(e)
-    except urllib2.URLError, e:
+    except urllib2.URLError as e:
         raise StandardError, 'URL could not be opened: %s' % str(e)
 
     if not docformat:
@@ -3844,7 +3844,7 @@ def download_external_url(url, docformat=None, progress_callback=None):
 
         if os.path.getsize(tmppath) == 0:
             raise StandardError, "%s seems to be empty" % url
-    except Exception, e:
+    except Exception as e:
         # Try to close and remove the temporary file.
         try:
             to_file.close()

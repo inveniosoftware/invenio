@@ -159,7 +159,7 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
                                   'verbosity'            : 0,
                                   })
                             fileiconpath = os.path.join(icon_path, icon_name)
-                        except InvenioWebSubmitIconCreatorError, e:
+                        except InvenioWebSubmitIconCreatorError as e:
                             _do_log(curdir, "Icon could not be created to %s: %s" % (filepath, e))
                             pass
                         if os.path.exists(fileiconpath):
@@ -172,7 +172,7 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
                                     icon_suffix = icon_size.replace('>', '').replace('<', '').replace('^', '').replace('!', '')
                                     bibdoc.add_icon(fileiconpath, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
                                     _do_log(curdir, "Added icon %s" % fileiconpath)
-                            except InvenioBibDocFileError, e:
+                            except InvenioBibDocFileError as e:
                                 # Most probably icon already existed.
                                 pass
 
@@ -228,7 +228,7 @@ def read_param_file(curdir, param, split_lines=False):
             else:
                 param_value = fd.read()
             fd.close()
-    except Exception, e:
+    except Exception as e:
         _do_log(curdir, 'Could not read %s: %s' % (param, e))
         pass
     return param_value
@@ -258,11 +258,11 @@ def get_session_id(req, uid, user_info):
         try:
             from flask import session
             session_id = session.sid
-        except AttributeError, e:
+        except AttributeError as e:
             # req was maybe not available (for eg. when this is run
             # through Create_Modify_Interface.py)
             session_id = user_info['session']
-    except Exception, e:
+    except Exception as e:
         raise ValueError("Cannot retrieve user session")
 
     return session_id

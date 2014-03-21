@@ -123,7 +123,7 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
         # Create copy of inputfile
         try:
             shutil.copy2(inputfile, outputfile)
-        except Exception, err:
+        except Exception as err:
             raise InvenioWebSubmitFileMetadataRuntimeError(err)
 
     # Load the image
@@ -187,7 +187,7 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
                     return
                 try:
                     image[tag] = value
-                except Exception, err:
+                except Exception as err:
                     print 'Tag or Value incorrect'
             elif user_input == 'a':
                 return
@@ -195,7 +195,7 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
                 print "Invalid option: "
         try:
             image.writeMetadata()
-        except Exception, err:
+        except Exception as err:
             raise InvenioWebSubmitFileMetadataRuntimeError("Could not update metadata: " + err)
 
 def read_metadata_remote(inputfile, loginpw, verbose):

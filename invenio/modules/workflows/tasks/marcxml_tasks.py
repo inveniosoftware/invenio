@@ -634,7 +634,7 @@ def upload_step(obj, eng):
             args.append(filepath)
             task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
             create_oaiharvest_log(task_id, obj.extra_data["repository"].id, filepath)
-        except Exception, msg:
+        except Exception as msg:
             eng.log.error("An exception during submitting oaiharvest task occured : %s " % (str(msg)))
             return None
     else:

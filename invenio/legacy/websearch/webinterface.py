@@ -991,7 +991,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             filedesc.close()
             req.write(c_rss)
             return
-        except Exception, e:
+        except Exception as e:
             # do it live and cache
 
             previous_url = None
@@ -1065,7 +1065,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                     f = open(fullfilename, "w")
                     f.write(rss_prologue + rss_body + rss_epilogue)
                     f.close()
-                except IOError, v:
+                except IOError as v:
                     if v[0] == 36:
                         # URL was too long. Never mind, don't cache
                         pass

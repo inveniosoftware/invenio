@@ -157,7 +157,7 @@ class FieldList(WebDepositField, wtforms.FieldList):
     def _add_entry(self, *args, **kwargs):
         try:
             return super(FieldList, self)._add_entry(*args, **kwargs)
-        except ValueError, e:
+        except ValueError as e:
             self.process_errors.append(e.args[0])
 
     def _extract_indices(self, prefix, formdata):

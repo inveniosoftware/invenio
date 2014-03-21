@@ -66,7 +66,7 @@ def main():
         opts, args = getopt.getopt(sys.argv[1:], "hVu:racD",
                                     ["help", "version", "user=",
                                     "reset", "add", "compile", "demo"])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage(1, err)
     try:
         for opt in opts:
@@ -110,7 +110,7 @@ def main():
                 print "Compiled firewall like role definitions."
         else:
             usage(1, "You must specify at least one command")
-    except StandardError, e:
+    except StandardError as e:
         from invenio.ext.logging import register_exception
         register_exception()
         usage(e)

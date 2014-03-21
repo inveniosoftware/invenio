@@ -93,7 +93,7 @@ def Link_Records(parameters, curdir, form, user_info=None):
     if not rn_a:
         try:
             recid_a, rn_a = get_recid_and_reportnumber(recid=sysno)
-        except ValueError, err:
+        except ValueError as err:
             raise InvenioWebSubmitFunctionError("Error in finding the current record and its reportnumber: %s" % err)
 
     if exists(join(curdir, edsrn2)):

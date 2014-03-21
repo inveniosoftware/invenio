@@ -137,7 +137,7 @@ def get_creation_date_lxml(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
             fmt_str = fmt.text
 
         return get_creation_date(recID_int, fmt_str)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -177,7 +177,7 @@ def get_creation_date_libxslt(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
             fmt_str = libxml2.xmlNode(_obj=recID[0]).children.content
 
         return get_creation_date(recID_int, fmt_str)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -219,7 +219,7 @@ def get_creation_date_4suite(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
             fmt_str = str(fmt)
 
         return get_creation_date(recID_int, fmt_str)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -271,7 +271,7 @@ def get_modification_date_lxml(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
             fmt_str = fmt.text
 
         return get_modification_date(recID_int, fmt_str)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -311,7 +311,7 @@ def get_modification_date_libxslt(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
             fmt_str = libxml2.xmlNode(_obj=recID[0]).children.content
 
         return get_modification_date(recID_int, fmt_str)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -353,7 +353,7 @@ def get_modification_date_4suite(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
             fmt_str = str(fmt)
 
         return get_modification_date(recID_int, fmt_str)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -402,7 +402,7 @@ def eval_bibformat_lxml(ctx, recID, template_code):
         return format_with_format_template(None, bfo,
                                            verbose=0,
                                            format_template_code=template_code)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -445,7 +445,7 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
         return format_with_format_template(None, bfo,
                                            verbose=0,
                                            format_template_code=template_code)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -488,7 +488,7 @@ def eval_bibformat_4suite(ctx, recID, template_code):
         return format_with_format_template(None, bfo,
                                            verbose=0,
                                            format_template_code=template_code)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -555,7 +555,7 @@ def format(xmltext, template_filename=None, template_source=None):
 
         try:
             xml = etree.XML(xmltext)
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError as e:
             error = 'The XML code given is invalid. [%s]' % (e,)
             sys.stderr.write(error)
             return result
@@ -566,7 +566,7 @@ def format(xmltext, template_filename=None, template_source=None):
 
         try:
             xsl = etree.XML(template)
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError as e:
             error = 'The XSL code given is invalid. [%s]' % (e,)
             sys.stderr.write(error)
             return result
@@ -580,14 +580,14 @@ def format(xmltext, template_filename=None, template_source=None):
             fns["creation_date"]     = get_creation_date_lxml
             fns["modification_date"] = get_modification_date_lxml
             fns["eval_bibformat"]    = eval_bibformat_lxml
-        except etree.NamespaceRegistryError, e:
+        except etree.NamespaceRegistryError as e:
             error = 'Failed registering the XPath extension function. [%s]' % (e,)
             sys.stderr.write(error)
             return result
 
         try:
             xslt = etree.XSLT(xsl)
-        except etree.XSLTParseError, e:
+        except etree.XSLTParseError as e:
             error = 'The XSL code given is invalid. [%s]' % (e,)
             sys.stderr.write(error)
             return result

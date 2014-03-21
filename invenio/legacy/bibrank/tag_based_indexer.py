@@ -349,7 +349,7 @@ def bibrank_engine(run):
             config = ConfigParser.ConfigParser()
             try:
                 config.readfp(open(config_file))
-            except StandardError, e:
+            except StandardError as e:
                 write_message("Cannot find configurationfile: %s" % config_file, sys.stderr)
                 raise StandardError
 
@@ -399,7 +399,7 @@ def bibrank_engine(run):
             else:
                 write_message("Invalid command found processing %s" % rank_method_code, sys.stderr)
                 raise StandardError
-    except StandardError, e:
+    except StandardError as e:
         write_message("\nException caught: %s" % e, sys.stderr)
         write_message(traceback.format_exc()[:-1])
         register_exception()

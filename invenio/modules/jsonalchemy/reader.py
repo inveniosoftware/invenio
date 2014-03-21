@@ -462,7 +462,7 @@ class Reader(object):
                 self.json.set(field_name, value, extend=True)
                 self.json['__meta_metadata__.%s' % (SmartDict.main_key_pattern.sub('', field_name), )] = \
                         self._find_meta_metadata(json_id, field_name)
-            except Exception, e:
+            except Exception as e:
                 self.json['__meta_metadata__']['__continuable_errors__']\
                         .append('Default Value CError - Unable to set default value for %s - %s' % (field_name, str(e)))
                 remove_metadata(field_name)

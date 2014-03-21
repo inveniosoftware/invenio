@@ -57,7 +57,7 @@ def format_element(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_c
 
     try:
         escape_mode_int = int(escape)
-    except ValueError, e:
+    except ValueError as e:
         escape_mode_int = 0
 
     abstract_en = bfo.fields('520__a', escape=escape_mode_int)

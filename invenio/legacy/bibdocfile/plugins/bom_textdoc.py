@@ -94,7 +94,7 @@ class BibTextDoc(BibDoc):
             convert_file(filename, os.path.join(self.basedir, '.text;%i' % version), '.txt', perform_ocr=perform_ocr, ln=ln)
             if version == self.get_latest_version():
                 run_sql("UPDATE bibdoc SET text_extraction_date=NOW() WHERE id=%s", (self.id, ))
-        except InvenioWebSubmitFileConverterError, e:
+        except InvenioWebSubmitFileConverterError as e:
             register_exception(alert_admin=True, prefix="Error in extracting text from bibdoc %i, version %i" % (self.id, version))
             raise InvenioBibDocFileError, str(e)
 

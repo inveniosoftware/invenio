@@ -192,7 +192,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         try:
                             try:
                                 docfile = doc.get_file(docformat, version)
-                            except InvenioBibDocFileError, msg:
+                            except InvenioBibDocFileError as msg:
                                 req.status = apache.HTTP_NOT_FOUND
                                 if req.headers_in.get('referer'):
                                     ## There must be a broken link somewhere.
@@ -222,7 +222,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                     doc.register_download(ip, docfile.get_version(), docformat, uid, self.recid)
                                 try:
                                     return docfile.stream(req, download=is_download)
-                                except InvenioBibDocFileError, msg:
+                                except InvenioBibDocFileError as msg:
                                     register_exception(req=req, alert_admin=True)
                                     req.status = apache.HTTP_INTERNAL_SERVER_ERROR
                                     warn += write_warning(_("An error has happened in trying to stream the request file."))
@@ -230,7 +230,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                 req.status = apache.HTTP_UNAUTHORIZED
                                 warn += write_warning(_("The requested file is hidden and can not be accessed."))
 
-                        except InvenioBibDocFileError, msg:
+                        except InvenioBibDocFileError as msg:
                             register_exception(req=req, alert_admin=True)
 
             if docname and docformat and not warn:

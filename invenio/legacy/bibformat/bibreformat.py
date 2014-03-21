@@ -49,7 +49,7 @@ try:
     import time
     import zlib
     from datetime import datetime
-except ImportError, e:
+except ImportError as e:
     print "Error: %s" % e
     sys.exit(1)
 

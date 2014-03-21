@@ -156,7 +156,7 @@ def perform_request_create_group(uid,
     if group_name == "":
         try:
             raise InvenioWebSessionWarning(_('Please enter a group name.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_input_create_group(group_name,
@@ -166,7 +166,7 @@ def perform_request_create_group(uid,
     elif not group_name_valid_p(group_name):
         try:
             raise InvenioWebSessionWarning(_('Please enter a valid group name.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_input_create_group(group_name,
@@ -176,7 +176,7 @@ def perform_request_create_group(uid,
     elif join_policy=="-1":
         try:
             raise InvenioWebSessionWarning(_('Please choose a group join policy.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_input_create_group(group_name,
@@ -186,7 +186,7 @@ def perform_request_create_group(uid,
     elif db.group_name_exist(group_name):
         try:
             raise InvenioWebSessionWarning(_('Group name already exists. Please choose another group name.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_input_create_group(group_name,
@@ -258,7 +258,7 @@ def perform_request_join_group(uid,
         if status:
             try:
                 raise InvenioWebSessionWarning(_('You are already member of the group.'))
-            except InvenioWebSessionWarning, exc:
+            except InvenioWebSessionWarning as exc:
                 register_exception(stream='warning')
                 warnings.append(exc.message)
             body = perform_request_groups_display(uid,
@@ -300,7 +300,7 @@ def perform_request_join_group(uid,
     else:
         try:
             raise InvenioWebSessionWarning(_('Please select only one group.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_input_join_group(uid,
@@ -357,7 +357,7 @@ def perform_request_leave_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
     else:
         try:
             raise InvenioWebSessionWarning(_('Please select one group.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_input_leave_group(uid,
@@ -382,14 +382,14 @@ def perform_request_edit_group(uid,
     if not len(user_status):
         try:
             raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
-        except InvenioWebSessionError, exc:
+        except InvenioWebSessionError as exc:
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
     elif user_status[0][0] != CFG_WEBSESSION_USERGROUP_STATUS['ADMIN']:
         try:
             raise InvenioWebSessionError(_('Sorry, you do not have sufficient rights on this group.'))
-        except InvenioWebSessionError, exc:
+        except InvenioWebSessionError as exc:
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
@@ -397,7 +397,7 @@ def perform_request_edit_group(uid,
     if not len(group_infos):
         try:
             raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
-        except InvenioWebSessionError, exc:
+        except InvenioWebSessionError as exc:
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
@@ -430,7 +430,7 @@ def perform_request_update_group(uid, grpID, group_name, group_description,
     if group_name == "":
         try:
             raise InvenioWebSessionWarning(_('Please enter a group name.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_edit_group(uid,
@@ -440,7 +440,7 @@ def perform_request_update_group(uid, grpID, group_name, group_description,
     elif not group_name_valid_p(group_name):
         try:
             raise InvenioWebSessionWarning(_('Please enter a valid group name.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_edit_group(uid,
@@ -450,7 +450,7 @@ def perform_request_update_group(uid, grpID, group_name, group_description,
     elif join_policy == "-1":
         try:
             raise InvenioWebSessionWarning(_('Please choose a group join policy.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_edit_group(uid,
@@ -460,7 +460,7 @@ def perform_request_update_group(uid, grpID, group_name, group_description,
     elif (group_name_available and group_name_available[0][0]!= grpID):
         try:
             raise InvenioWebSessionWarning(_('Group name already exists. Please choose another group name.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_edit_group(uid,
@@ -497,7 +497,7 @@ def  perform_request_delete_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
     if not group_infos:
         try:
             raise InvenioWebSessionWarning(_('The group has already been deleted.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_groups_display(uid,
@@ -508,7 +508,7 @@ def  perform_request_delete_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
         if not len(user_status):
             try:
                 raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
-            except InvenioWebSessionError, exc:
+            except InvenioWebSessionError as exc:
                 register_exception()
                 body = websession_templates.tmpl_error(exc.message, ln)
                 return body
@@ -553,14 +553,14 @@ def perform_request_manage_member(uid,
     if not len(user_status):
         try:
             raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
-        except InvenioWebSessionError, exc:
+        except InvenioWebSessionError as exc:
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
     elif user_status[0][0] != CFG_WEBSESSION_USERGROUP_STATUS['ADMIN']:
         try:
             raise InvenioWebSessionError(_('Sorry, you do not have sufficient rights on this group.'))
-        except InvenioWebSessionError, exc:
+        except InvenioWebSessionError as exc:
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
@@ -568,7 +568,7 @@ def perform_request_manage_member(uid,
     if not len(group_infos):
         try:
             raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
-        except InvenioWebSessionError, exc:
+        except InvenioWebSessionError as exc:
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
@@ -602,14 +602,14 @@ def perform_request_remove_member(uid, grpID, member_id, ln=CFG_SITE_LANG):
     if not len(user_status):
         try:
             raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
-        except InvenioWebSessionError, exc:
+        except InvenioWebSessionError as exc:
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
     if member_id == -1:
         try:
             raise InvenioWebSessionWarning(_('Please choose a member if you want to remove him from the group.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_manage_member(uid,
@@ -642,14 +642,14 @@ def perform_request_add_member(uid, grpID, user_id, ln=CFG_SITE_LANG):
     if not len(user_status):
         try:
             raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
-        except InvenioWebSessionError, exc:
+        except InvenioWebSessionError as exc:
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
     if user_id == -1:
         try:
             raise InvenioWebSessionWarning(_('Please choose a user from the list if you want him to be added to the group.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_manage_member(uid,
@@ -662,7 +662,7 @@ def perform_request_add_member(uid, grpID, user_id, ln=CFG_SITE_LANG):
         if status and status[0][0] == 'M':
             try:
                 raise InvenioWebSessionWarning(_('The user is already member of the group.'))
-            except InvenioWebSessionWarning, exc:
+            except InvenioWebSessionWarning as exc:
                 register_exception(stream='warning')
                 warnings.append(exc.message)
             body = perform_request_manage_member(uid,
@@ -709,14 +709,14 @@ def perform_request_reject_member(uid,
     if not len(user_status):
         try:
             raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
-        except InvenioWebSessionError, exc:
+        except InvenioWebSessionError as exc:
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
     if user_id == -1:
         try:
             raise InvenioWebSessionWarning(_('Please choose a user from the list if you want him to be removed from waiting list.'))
-        except InvenioWebSessionWarning, exc:
+        except InvenioWebSessionWarning as exc:
             register_exception(stream='warning')
             warnings.append(exc.message)
         body = perform_request_manage_member(uid,
@@ -729,7 +729,7 @@ def perform_request_reject_member(uid,
         if not status:
             try:
                 raise InvenioWebSessionWarning(_('The user request for joining group has already been rejected.'))
-            except InvenioWebSessionWarning, exc:
+            except InvenioWebSessionWarning as exc:
                 register_exception(stream='warning')
                 warnings.append(exc.message)
             body = perform_request_manage_member(uid,

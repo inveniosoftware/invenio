@@ -1782,7 +1782,7 @@ def _get_name_by_bibrecref_from_cache(bib):
     try:
         if tag in MARC_100_700_CACHE[table][refid][0]:
             ret = MARC_100_700_CACHE[table][refid][1]
-    except (KeyError, IndexError), e:
+    except (KeyError, IndexError) as e:
         #The GC did run and the table is not clean?
         #We might want to allow empty response here
         raise Exception(str(bib) + str(e))
@@ -1977,7 +1977,7 @@ class Bib_matrix(object):
         if not os.path.isdir(files_dir):
             try:
                 os.mkdir(files_dir)
-            except OSError, e:
+            except OSError as e:
                 if e.errno == 17 or 'file exists' in str(e.strerror).lower():
                     pass
                 else:

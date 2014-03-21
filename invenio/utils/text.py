@@ -413,7 +413,7 @@ def wash_for_utf8(text, correct=True):
     while True:
         try:
             text.decode("utf-8")
-        except UnicodeDecodeError, e:
+        except UnicodeDecodeError as e:
             if correct:
                 ret.append(text[:e.start])
                 text = text[e.end:]

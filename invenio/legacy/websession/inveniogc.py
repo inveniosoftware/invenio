@@ -39,7 +39,7 @@ try:
     from invenio.legacy.bibsched.cli import gc_tasks
     from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
     from invenio.utils.date import convert_datestruct_to_datetext
-except ImportError, e:
+except ImportError as e:
     print "Error: %s" % (e,)
     sys.exit(1)
 
@@ -228,7 +228,7 @@ def clean_cache():
             try:
                 os.remove(filename)
                 count += 1
-            except OSError, e:
+            except OSError as e:
                 write_message("Error: %s" % e)
     write_message("""%s rss cache file pruned out of %s.""" % (count, len(filenames)))
     write_message("""CLEANING OF OLD CACHED RSS REQUEST FINISHED""")
@@ -249,7 +249,7 @@ def clean_cache():
             try:
                 os.remove(filename)
                 count += 1
-            except OSError, e:
+            except OSError as e:
                 write_message("Error: %s" % e)
     write_message("""%s webjournal cache file pruned out of %s.""" % (count, len(filenames)))
     write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES FINISHED""")

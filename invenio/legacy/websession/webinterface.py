@@ -135,7 +135,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         body += "<p>" + _("You can now go to %(x_url_open)syour account page%(x_url_close)s.") % {'x_url_open' : '<a href="/youraccount/display?ln=%s">' % args['ln'], 'x_url_close' : '</a>'} + "</p>"
                     return page(title=_("Email address successfully activated"),
                     body=body, req=req, language=args['ln'], uid=webuser.getUid(req), lastupdated=__lastupdated__, navmenuid='youraccount', secure_page_p=1)
-                except InvenioWebAccessMailCookieDeletedError, e:
+                except InvenioWebAccessMailCookieDeletedError as e:
                     body = "<p>" + _("You have already confirmed the validity of your email address!") + "</p>"
                     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
                         body += "<p>" + _("Please, wait for the administrator to "
@@ -772,7 +772,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         try:
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
-        except InvenioWebAccessExternalAuthError, err:
+        except InvenioWebAccessExternalAuthError as err:
             return page("Error", body=str(err), req=req)
         if iden:
             uid = webuser.update_Uid(req, args['p_un'], args['remember_me'])

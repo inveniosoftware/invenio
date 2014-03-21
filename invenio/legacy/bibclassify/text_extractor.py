@@ -91,7 +91,7 @@ def text_lines_from_local_file(document, remote=False):
             filestream = os.popen(cmd)
         else:
             filestream = open(document, "r")
-    except IOError, ex1:
+    except IOError as ex1:
         log.error("Unable to read from file %s. (%s)" % (document, ex1.strerror))
         return []
 

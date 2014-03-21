@@ -57,10 +57,10 @@ class DataCite(PidProvider):
 
         try:
             self.api.metadata_post(doc)
-        except DataCiteError, e:
+        except DataCiteError as e:
             pid.log("RESERVE", "Failed with %s" % e.__class__.__name__)
             return False
-        except HttpError, e:
+        except HttpError as e:
             pid.log("RESERVE", "Failed with HttpError - %s" % unicode(e))
             return False
         else:
@@ -77,10 +77,10 @@ class DataCite(PidProvider):
             self.api.metadata_post(doc)
             # Mint DOI
             self.api.doi_post(pid.pid_value, url)
-        except DataCiteError, e:
+        except DataCiteError as e:
             pid.log("REGISTER", "Failed with %s" % e.__class__.__name__)
             return False
-        except HttpError, e:
+        except HttpError as e:
             pid.log("REGISTER", "Failed with HttpError - %s" % unicode(e))
             return False
         else:
@@ -104,10 +104,10 @@ class DataCite(PidProvider):
             # Set metadata
             self.api.metadata_post(doc)
             self.api.doi_post(pid.pid_value, url)
-        except DataCiteError, e:
+        except DataCiteError as e:
             pid.log("UPDATE", "Failed with %s" % e.__class__.__name__)
             return False
-        except HttpError, e:
+        except HttpError as e:
             pid.log("UPDATE", "Failed with HttpError - %s" % unicode(e))
             return False
         else:
@@ -121,10 +121,10 @@ class DataCite(PidProvider):
         """ Delete a registered DOI """
         try:
             self.api.metadata_delete(pid.pid_value)
-        except DataCiteError, e:
+        except DataCiteError as e:
             pid.log("DELETE", "Failed with %s" % e.__class__.__name__)
             return False
-        except HttpError, e:
+        except HttpError as e:
             pid.log("DELETE", "Failed with HttpError - %s" % unicode(e))
             return False
         else:

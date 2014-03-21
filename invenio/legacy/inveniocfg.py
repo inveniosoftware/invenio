@@ -684,7 +684,7 @@ def test_db_connection():
     ## first, test connection to the DB server:
     try:
         run_sql("SHOW TABLES")
-    except Error, err:
+    except Error as err:
         from invenio.dbquery_config import CFG_DATABASE_HOST, \
             CFG_DATABASE_PORT, CFG_DATABASE_NAME, CFG_DATABASE_USER, \
             CFG_DATABASE_PASS
@@ -737,7 +737,7 @@ the above error message and fix the problem before continuing.""" % \
             res = run_sql("SELECT x,y,HEX(x),HEX(y),LENGTH(x),LENGTH(y),CHAR_LENGTH(x),CHAR_LENGTH(y) FROM test__invenio__utf8")
             assert res[0] == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
             run_sql("DROP TABLE test__invenio__utf8")
-        except Exception, err:
+        except Exception as err:
             print wrap_text_in_a_box("""\
 DATABASE RELATED ERROR %s\n
 
@@ -1237,7 +1237,7 @@ def main(*cmd_args):
         # Read configuration
         try:
             conf = prepare_conf(options)
-        except Exception, e:
+        except Exception as e:
             print e
             sys.exit(1)
 

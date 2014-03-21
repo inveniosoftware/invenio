@@ -131,7 +131,7 @@ def bibconvert_function_lxml(dummy_ctx, value, func):
 
         return FormatField(string_value, func).rstrip('\n')
 
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -160,7 +160,7 @@ def bibconvert_escape_lxml(dummy_ctx, value):
 
         return encode_for_xml(string_value)
 
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -191,7 +191,7 @@ def bibconvert_function_libxslt(dummy_ctx, value, func):
 
         return FormatField(string_value, func).rstrip('\n')
 
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -212,7 +212,7 @@ def bibconvert_escape_libxslt(dummy_ctx, value):
 
         return encode_for_xml(string_value)
 
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -243,7 +243,7 @@ def bibconvert_function_4suite(dummy_ctx, value, func):
 
         return FormatField(string_value, func).rstrip('\n')
 
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
@@ -313,7 +313,7 @@ def convert(xmltext, template_filename=None, template_source=None):
                 pass
 
             xml = etree.XML(xmltext)
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError as e:
             error = 'The XML code given is invalid. [%s]' % (e,)
             raise Exception(error)
         except Exception as e:
@@ -322,7 +322,7 @@ def convert(xmltext, template_filename=None, template_source=None):
 
         try:
             xsl = etree.XML(template)
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError as e:
             error = 'The XSL code given is invalid. [%s]' % (e,)
             raise Exception(error)
         except Exception as e :
@@ -333,13 +333,13 @@ def convert(xmltext, template_filename=None, template_source=None):
             fns = etree.FunctionNamespace(CFG_BIBCONVERT_FUNCTION_NS)
             fns["format"] = bibconvert_function_lxml
             fns["escape"] = bibconvert_escape_lxml
-        except etree.NamespaceRegistryError, e:
+        except etree.NamespaceRegistryError as e:
             error = 'Failed registering the XPath extension function. [%s]' % (e,)
             raise Exception(error)
 
         try:
             xslt = etree.XSLT(xsl)
-        except etree.XSLTParseError, e:
+        except etree.XSLTParseError as e:
             error = 'The XSL code given is invalid. [%s]' % (e,)
             raise Exception(error)
         except:
@@ -373,7 +373,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         # Load template and source
         try:
             template_xml = libxml2.parseDoc(template)
-        except libxml2.parserError, e:
+        except libxml2.parserError as e:
             sys.stderr.write('Parsing XSL template failed:\n ' + \
                              str(e) + '\n')
             raise Exception('Parsing XSL template failed:\n ' + \
@@ -381,7 +381,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         processor = libxslt.parseStylesheetDoc(template_xml)
         try:
             source = libxml2.parseDoc(xmltext)
-        except libxml2.parserError, e:
+        except libxml2.parserError as e:
             sys.stderr.write('Parsing XML source failed:\n ' + \
                              str(e) + '\n')
             raise Exception('Parsing XSL template failed:\n ' + \
@@ -416,7 +416,7 @@ def convert(xmltext, template_filename=None, template_source=None):
                                                        uri=CFG_SITE_URL)
         try:
             processor.appendStylesheet(transform)
-        except XsltException, e:
+        except XsltException as e:
             sys.stderr.write('Parsing XSL template failed:\n' + str(e))
             raise Exception('Parsing XSL template failed:\n ' +
                             str(e) + '\n')
@@ -424,7 +424,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         # Transform
         try:
             result = processor.run(source)
-        except XsltException, e:
+        except XsltException as e:
             sys.stderr.write('Conversion failed:\n' + str(e))
             raise Exception('Conversion failed:\n' + str(e))
     else:

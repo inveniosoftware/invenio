@@ -65,7 +65,7 @@ class WebInterfaceGotoPages(WebInterfaceDirectory):
                     params_to_pass['req'] = req
                 try:
                     new_url = goto_plugin(**params_to_pass)
-                except Exception, err:
+                except Exception as err:
                     register_exception(req=req, alert_admin=True)
                     raise SERVER_RETURN(HTTP_NOT_FOUND)
                 if new_url:

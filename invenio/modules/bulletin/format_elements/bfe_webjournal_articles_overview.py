@@ -229,7 +229,7 @@ def format_element(bfo, number_of_featured_articles="1",
                                     raise IOError('Not an image')
                             else:
                                 img_file = Image.open(local_img) # IOError if not readable image
-                        except IOError, e:
+                        except IOError as e:
                             pass
                         else:
                             orig_img_width = img_file.size[0]
@@ -484,5 +484,5 @@ def get_content_type(url):
     try:
         response = urllib2.urlopen(req)
         return response.info().getheader('content-type')
-    except Exception, e:
+    except Exception as e:
         return ''

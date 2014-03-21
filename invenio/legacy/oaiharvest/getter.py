@@ -35,13 +35,13 @@ try:
     import base64
     import tempfile
     import os
-except ImportError, e:
+except ImportError as e:
     print "Error: %s" % e
     sys.exit(1)
 
 try:
     from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_VERSION
-except ImportError, e:
+except ImportError as e:
     print "Error: %s" % e
     sys.exit(1)
 
@@ -285,7 +285,7 @@ def OAI_Request(server, script, params, method="POST", secure=False,
             else:
                 # Unsecured connection
                 conn = httplib.HTTPConnection(server)
-        except (httplib.HTTPException, socket.error), e:
+        except (httplib.HTTPException, socket.error) as e:
             raise InvenioOAIRequestError("An error occured when trying to connect to %s: %s" % (server, e))
 
         # Connection established, perform a request
@@ -294,7 +294,7 @@ def OAI_Request(server, script, params, method="POST", secure=False,
                 conn.request("GET", script + "?" + params, headers=headers)
             elif method == "POST":
                 conn.request("POST", script, params, headers)
-        except socket.gaierror, e:
+        except socket.gaierror as e:
             # We'll retry in a few seconds
             nb_seconds_retry = 30
             sys.stderr.write("An error occured when trying to request %s: %s\nWill retry in %i seconds\n" % (server, e, nb_seconds_retry))
@@ -304,7 +304,7 @@ def OAI_Request(server, script, params, method="POST", secure=False,
         # Request sent, get results
         try:
             response = conn.getresponse()
-        except (httplib.HTTPException, socket.error), e:
+        except (httplib.HTTPException, socket.error) as e:
             # We'll retry in a few seconds
             nb_seconds_retry = 30
             sys.stderr.write("An error occured when trying to read response from %s: %s\nWill retry in %i seconds\n" % (server, e, nb_seconds_retry))
@@ -353,11 +353,11 @@ def OAI_Request(server, script, params, method="POST", secure=False,
             try:
                 user = raw_input()
                 password = getpass.getpass()
-            except EOFError, e:
+            except EOFError as e:
                 sys.stderr.write(str(e))
                 sys.stderr.write("\n")
                 sys.exit(1)
-            except KeyboardInterrupt, e:
+            except KeyboardInterrupt as e:
                 sys.stderr.write(str(e))
                 sys.stderr.write("\n")
                 sys.exit(1)

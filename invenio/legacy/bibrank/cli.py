@@ -150,7 +150,7 @@ def task_run_core():
             config = ConfigParser.ConfigParser()
             try:
                 config.readfp(open(filename))
-            except StandardError, e:
+            except StandardError as e:
                 write_message("Cannot find configurationfile: %s. "
                     "The rankmethod may also not be registered using "
                     "the BibRank Admin Interface." % filename, sys.stderr)
@@ -165,7 +165,7 @@ def task_run_core():
             else:
                 write_message("Cannot run method '%s', no function to call"
                     % key)
-    except StandardError, e:
+    except StandardError as e:
         write_message("\nException caught: %s" % e, sys.stderr)
         write_message(traceback.format_exc()[:-1])
         register_exception()

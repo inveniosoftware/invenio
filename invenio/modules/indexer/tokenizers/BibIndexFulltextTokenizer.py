@@ -161,7 +161,7 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
                             else:
                                 tmpwords = self.tokenize_for_words_default(text)
                             words.update(dict(map(lambda x: (x, 1), tmpwords)))
-                        except Exception, e:
+                        except Exception as e:
                             message = 'ERROR: it\'s impossible to correctly extract words from %s referenced by %s: %s' % (url, url_direct_or_indirect, e)
                             register_exception(prefix=message, alert_admin=True)
                             write_message(message, stream=sys.stderr)
@@ -170,7 +170,7 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
                         if self.verbose > 3:
                             file_converter_logger.setLevel(old_logging_level)
                 return words.keys()
-        except Exception, e:
+        except Exception as e:
             message = 'ERROR: it\'s impossible to correctly extract words from %s: %s' % (url_direct_or_indirect, e)
             register_exception(prefix=message, alert_admin=True)
             write_message(message, stream=sys.stderr)

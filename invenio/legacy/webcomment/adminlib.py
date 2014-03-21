@@ -120,7 +120,7 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
             if comID != -1:
                 try:
                     raise InvenioWebCommentWarning(_('Invalid comment ID.'))
-                except InvenioWebCommentWarning, exc:
+                except InvenioWebCommentWarning as exc:
                     register_exception(stream='warning')
                     warnings.append((exc.message, ''))
                 #warnings.append(("WRN_WEBCOMMENT_ADMIN_INVALID_COMID",))
@@ -140,7 +140,7 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
             else:
                 try:
                     raise InvenioWebCommentWarning(_('Comment ID %(x_name)s does not exist.', x_name=comID))
-                except InvenioWebCommentWarning, exc:
+                except InvenioWebCommentWarning as exc:
                     register_exception(stream='warning')
                     warnings.append((exc.message, ''))
                 #warnings.append(('WRN_WEBCOMMENT_ADMIN_COMID_INEXISTANT', comID))
@@ -154,7 +154,7 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
             else:
                 try:
                     raise InvenioWebCommentWarning(_('Record ID %(x_rec)s does not exist.', x_rec=comID))
-                except InvenioWebCommentWarning, exc:
+                except InvenioWebCommentWarning as exc:
                     register_exception(stream='warning')
                     warnings.append((exc.message, ''))
                 #warnings.append(('WRN_WEBCOMMENT_ADMIN_RECID_INEXISTANT', comID))

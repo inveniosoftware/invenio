@@ -117,7 +117,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype="", categ="", RN="", s
             return page_not_authorized(req, "../publiline.py/index",
                                        navmenuid='yourapprovals')
         uid_email = get_email(uid)
-    except Error, e:
+    except Error as e:
         return error_page(str(e), req, ln=ln)
 
     if flow == "cplx":

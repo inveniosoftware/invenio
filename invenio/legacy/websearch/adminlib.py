@@ -146,7 +146,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
                 try:
                     trans_names = get_name(colID, key, sel_type, "collection")
                     trans.append(trans_names[0][0])
-                except StandardError, e:
+                except StandardError as e:
                     trans.append('')
 
         for nr in range(0, len(sitelangs)):
@@ -565,7 +565,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
         else:
             output += """
             """
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return """<b><span class="info">An error occured.</span></b>
         """
@@ -2113,7 +2113,7 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
                         text += """</table></td></tr>
                         """
                     break
-            except StandardError, e:
+            except StandardError as e:
                 pass
         text += """<tr><td>
         """
@@ -2388,7 +2388,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     try:
         collection_web_update_time = strftime("%Y-%m-%d %H:%M:%S",
                            time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S"))
-    except ValueError, e:
+    except ValueError as e:
         pass
 
     if collection_table_update_time > collection_web_update_time:
@@ -2723,7 +2723,7 @@ def get_col_tree(colID, rtype=''):
                 ntree.insert(0, (id_son, up, down, ccolID, rtype))
             tree = tree[0:ssize] + ntree + tree[ssize:len(tree)]
         return tree
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return ()
 
@@ -2742,7 +2742,7 @@ def add_col_dad_son(add_dad, add_son, rtype):
         highscore += 1
         res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,%s)", (add_dad, add_son, highscore, rtype))
         return (1, highscore)
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -2812,7 +2812,7 @@ def get_col_rnk(colID, ln):
         res2 = get_def_name('', "rnkMETHOD")
         result = filter(lambda x: res1.has_key(x[0]), res2)
         return result
-    except StandardError, e:
+    except StandardError as e:
         return ()
 
 def get_pbx():
@@ -2909,7 +2909,7 @@ def remove_col_subcol(id_son, id_dad, type):
             for (id, up, down, dad, rtype) in tree:
                 run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s", (id, dad))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def check_col(add_dad, add_son):
@@ -2932,7 +2932,7 @@ def check_col(add_dad, add_son):
                 else:
                     stack.append(id[0])
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def attach_rnk_col(colID, rnkID):
@@ -2943,7 +2943,7 @@ def attach_rnk_col(colID, rnkID):
     try:
         res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)", (colID, rnkID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -2955,7 +2955,7 @@ def detach_rnk_col(colID, rnkID):
     try:
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s", (colID, rnkID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -2966,7 +2966,7 @@ def switch_col_treescore(col_1, col_2):
         res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s", (res2[0][0], col_1[3], col_1[0]))
         res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s", (res1[0][0], col_2[3], col_2[0]))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -2988,7 +2988,7 @@ def move_col_tree(col_from, col_to, move_to_rtype=''):
         res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s", (col_from[0], col_from[3]))
         res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,%s)", (col_to[0], col_from[0], highscore, move_to_rtype))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3001,7 +3001,7 @@ def remove_pbx(colID, pbxID, ln):
     try:
         res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s AND id_portalbox=%s AND ln=%s", (colID, pbxID, ln))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3013,7 +3013,7 @@ def remove_fmt(colID, fmtID):
     try:
         res = run_sql("DELETE FROM collection_format WHERE id_collection=%s AND id_format=%s", (colID, fmtID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3033,7 +3033,7 @@ def remove_fld(colID, fldID, fldvID=''):
                 sql += " AND id_fieldvalue is NULL"
         res = run_sql(sql, tuple(params))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3045,7 +3045,7 @@ def delete_fldv(fldvID):
         res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_fieldvalue=%s", (fldvID, ))
         res = run_sql("DELETE FROM fieldvalue WHERE id=%s", (fldvID, ))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3057,7 +3057,7 @@ def delete_pbx(pbxID):
         res = run_sql("DELETE FROM collection_portalbox WHERE id_portalbox=%s", (pbxID, ))
         res = run_sql("DELETE FROM portalbox WHERE id=%s", (pbxID, ))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3070,7 +3070,7 @@ def delete_fmt(fmtID):
         res = run_sql("DELETE FROM collection_format WHERE id_format=%s", (fmtID, ))
         res = run_sql("DELETE FROM formatname WHERE id_format=%s", (fmtID, ))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3088,7 +3088,7 @@ def delete_col(colID):
         res = run_sql("DELETE FROM collection_format WHERE id_collection=%s", (colID, ))
         res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_collection=%s", (colID, ))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3104,7 +3104,7 @@ def add_fmt(code, name, rtype):
         res = run_sql("INSERT INTO formatname(id_format, type, ln, value) VALUES (%s,%s,%s,%s)",
                       (fmtID[0][0], rtype, CFG_SITE_LANG, name))
         return (1, fmtID)
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3118,7 +3118,7 @@ def update_fldv(fldvID, name, value):
         res = run_sql("UPDATE fieldvalue set name=%s where id=%s", (name, fldvID))
         res = run_sql("UPDATE fieldvalue set value=%s where id=%s", (value, fldvID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3136,7 +3136,7 @@ def add_fldv(name, value):
             return (1, res[0][0])
         else:
             raise StandardError
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3148,7 +3148,7 @@ def add_pbx(title, body):
             return (1, res[0][0])
         else:
             raise StandardError
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3175,7 +3175,7 @@ def add_col(colNAME, dbquery=None):
             return (1, colID[0][0])
         else:
             raise StandardError
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3198,7 +3198,7 @@ def add_col_pbx(colID, pbxID, ln, position, score=''):
                 score = 0
             res = run_sql("INSERT INTO collection_portalbox(id_portalbox, id_collection, ln, score, position) values (%s,%s,%s,%s,%s)", (pbxID, colID, ln, (score + 1), position))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3219,7 +3219,7 @@ def add_col_fmt(colID, fmtID, score=''):
                 score = 0
             res = run_sql("INSERT INTO collection_format(id_format, id_collection, score) values (%s,%s,%s)", (fmtID, colID, (score + 1)))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3259,7 +3259,7 @@ def add_col_fld(colID, fldID, type, fldvID=''):
                 run_sql("UPDATE collection_field_fieldvalue SET score=score+1")
                 res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score,score_fieldvalue) values (%s,%s,%s,%s, 0)", (fldID, colID, type, 1))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3273,7 +3273,7 @@ def modify_dbquery(colID, dbquery=None):
     try:
         res = run_sql("UPDATE collection SET dbquery=%s WHERE id=%s", (dbquery, colID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3297,7 +3297,7 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
         if position:
             res = run_sql("UPDATE collection_portalbox SET position=%s WHERE id_collection=%s and id_portalbox=%s and ln=%s", (position, colID, pbxID, sel_ln))
         return (1, "")
-    except Exception, e:
+    except Exception as e:
         register_exception()
         return (0, e)
 
@@ -3316,7 +3316,7 @@ def switch_fld_score(colID, id_1, id_2):
             res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s", (res2[0][0], colID, id_1))
             res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s", (res1[0][0], colID, id_2))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         register_exception()
         return (0, e)
 
@@ -3335,7 +3335,7 @@ def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
             res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s", (res2[0][0], colID, id_1, fldvID_1))
             res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s", (res1[0][0], colID, id_1, fldvID_2))
         return (1, "")
-    except Exception, e:
+    except Exception as e:
         register_exception()
         return (0, e)
 
@@ -3353,7 +3353,7 @@ def switch_pbx_score(colID, id_1, id_2, sel_ln):
         res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln=%s", (res2[0][0], colID, id_1, sel_ln))
         res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln=%s", (res1[0][0], colID, id_2, sel_ln))
         return (1, "")
-    except Exception, e:
+    except Exception as e:
         register_exception()
         return (0, e)
 
@@ -3371,7 +3371,7 @@ def switch_score(colID, id_1, id_2, table):
         res = run_sql("UPDATE collection_%s SET score=%%s WHERE id_collection=%%s and id_%s=%%s" % (table, table), (res2[0][0], colID, id_1))
         res = run_sql("UPDATE collection_%s SET score=%%s WHERE id_collection=%%s and id_%s=%%s" % (table, table), (res1[0][0], colID, id_2))
         return (1, "")
-    except Exception, e:
+    except Exception as e:
         register_exception()
         return (0, e)
 

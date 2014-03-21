@@ -129,7 +129,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
         if not item or item.metadata is None or item.expired:
             try:
                 metadata = super(SkyDriveClient, self).info(path)
-            except api_v5.ProtocolError, e:
+            except api_v5.ProtocolError as e:
                 if e.code == 404:
                     raise ResourceNotFoundError(path)
                 raise OperationFailedError(opname='metadata', path=path,
@@ -168,7 +168,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
                     children.append(child['id'])
                     self.cache[child['id']] = CacheItem(child, parent=path)
                 item = self.cache[path] = CacheItem(metadata, children)
-            except api_v5.ProtocolError, e:
+            except api_v5.ProtocolError as e:
                 if e.code == 404:
                     raise ResourceNotFoundError(path)
                 if not item or e.resp.status != 304:
@@ -188,7 +188,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
         "Add newly created directory to cache."
         try:
             metadata = super(SkyDriveClient, self).mkdir(title, parent_id)
-        except api_v5.ProtocolError, e:
+        except api_v5.ProtocolError as e:
             if e.code == 405:
                     raise ResourceInvalidError(parent_id)
             if e.code == 404:
@@ -205,7 +205,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
     def file_copy(self, src, dst):
         try:
             metadata = super(SkyDriveClient, self).copy(src, dst, False)
-        except api_v5.ProtocolError, e:
+        except api_v5.ProtocolError as e:
             if e.code == 404:
                 raise ResourceNotFoundError(
                     "Parent or source file don't exist")
@@ -220,7 +220,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
     def file_move(self, src, dst):
         try:
             metadata = super(SkyDriveClient, self).copy(src, dst, True)
-        except api_v5.ProtocolError, e:
+        except api_v5.ProtocolError as e:
             if e.code == 404:
                 raise ResourceNotFoundError(
                     "Parent or source file don't exist")
@@ -237,7 +237,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
     def file_delete(self, path):
         try:
             super(SkyDriveClient, self).delete(path)
-        except api_v5.ProtocolError, e:
+        except api_v5.ProtocolError as e:
             if e.code == 404:
                 raise ResourceNotFoundError(path)
             raise OperationFailedError(opname='file_delete', msg=str(e))
@@ -251,11 +251,11 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
         try:
             metadata = super(SkyDriveClient, self).put(
                 (title, content), parent_id, overwrite=overwrite)
-        except api_v5.ProtocolError, e:
+        except api_v5.ProtocolError as e:
             if e.code == 404:
                 raise ResourceNotFoundError(parent_id)
             raise OperationFailedError(opname='put_copy', msg=str(e))
-        except TypeError, e:
+        except TypeError as e:
             raise ResourceInvalidError("put_file")
         except:
             raise RemoteConnectionError(
@@ -269,7 +269,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
         if not self.cache.get(path, None):
             try:
                 metadata = super(SkyDriveClient, self).info(path)
-            except api_v5.ProtocolError, e:
+            except api_v5.ProtocolError as e:
                 if e.code == 404:
                     raise ResourceNotFoundError("Source file doesn't exist")
 
@@ -290,7 +290,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
         try:
             metadata = super(SkyDriveClient, self).info_update(
                 file_id, new_file_info)
-        except api_v5.ProtocolError, e:
+        except api_v5.ProtocolError as e:
             if e.resp.status == 404:
                 raise ResourceNotFoundError(path=file_id)
 
@@ -466,7 +466,7 @@ class SkyDriveFS(FS):
             try:
                 spooled_file.write(self.client.get_file(path))
                 spooled_file.seek(0, 0)
-            except Exception, e:
+            except Exception as e:
                 if "w" not in mode and "a" not in mode:
                     raise ResourceNotFoundError("%r" % e)
                 else:
@@ -627,7 +627,7 @@ class SkyDriveFS(FS):
         """
         try:
             return self.client.metadata(path)
-        except RemoteConnectionError, e:
+        except RemoteConnectionError as e:
             raise RemoteConnectionError(e)
         except:
             return False
@@ -717,7 +717,7 @@ class SkyDriveFS(FS):
         url = None
         try:
             url = self.getinfo(path)['source']
-        except RemoteConnectionError, e:
+        except RemoteConnectionError as e:
             raise RemoteConnectionError(e)
         except:
             if not allow_none:

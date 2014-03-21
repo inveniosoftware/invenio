@@ -415,27 +415,27 @@ def wash_function_parameters(parameters, curdir, ln=CFG_SITE_LANG):
     # not (0)
     try:
         createRelatedFormats_p = int(parameters['createRelatedFormats'])
-    except ValueError, e:
+    except ValueError as e:
         createRelatedFormats_p = False
 
     # If users can name the files they add
     # Value should be 0 (Cannot rename) or 1 (Can rename)
     try:
         can_name_new_files = int(parameters['canNameNewFiles'])
-    except ValueError, e:
+    except ValueError as e:
         can_name_new_files = False
 
     # The default behaviour wrt keeping previous files or not.
     # 0 = do not keep, 1 = keep
     try:
         keep_default = int(parameters['keepDefault'])
-    except ValueError, e:
+    except ValueError as e:
         keep_default = False
 
     # If we display links to files (1) or not (0)
     try:
         show_links = int(parameters['showLinks'])
-    except ValueError, e:
+    except ValueError as e:
         show_links = True
 
     file_label = parameters['fileLabel']

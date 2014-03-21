@@ -342,7 +342,7 @@ def can_pdfx(verbose=False):
             if [int(number) for number in output.split('.')] < [int(number) for number in CFG_GS_MINIMAL_VERSION_FOR_PDFX.split('.')]:
                 print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because the minimal gs version for the executable %s is not met: it should be %s but %s has been found" % (CFG_PATH_GS, CFG_GS_MINIMAL_VERSION_FOR_PDFX, output)
                 return False
-        except Exception, err:
+        except Exception as err:
             print >> sys.stderr, "Conversion of PS or PDF to PDF/X is not possible because it's not possible to retrieve the gs version using the executable %s: %s" % (CFG_PATH_GS, err)
             return False
     if not CFG_PATH_PDFINFO:
@@ -374,7 +374,7 @@ def can_pdfa(verbose=False):
             if [int(number) for number in output.split('.')] < [int(number) for number in CFG_GS_MINIMAL_VERSION_FOR_PDFA.split('.')]:
                 print >> sys.stderr, "Conversion of PS or PDF to PDF/A is not possible because the minimal gs version for the executable %s is not met: it should be %s but %s has been found" % (CFG_PATH_GS, CFG_GS_MINIMAL_VERSION_FOR_PDFA, output)
                 return False
-        except Exception, err:
+        except Exception as err:
             print >> sys.stderr, "Conversion of PS or PDF to PDF/A is not possible because it's not possible to retrieve the gs version using the executable %s: %s" % (CFG_PATH_GS, err)
             return False
     if not CFG_PATH_PDFINFO:
@@ -503,9 +503,9 @@ def convert_file(input_file, output_file=None, output_format=None, **params):
                 get_file_converter_logger().debug("Converting from %s to %s using %s with params %s" % (current_input, current_output, converter, final_params))
                 current_output = converter(current_input, current_output, **final_params)
                 get_file_converter_logger().debug("... current_output %s" % (current_output, ))
-            except InvenioWebSubmitFileConverterError, err:
+            except InvenioWebSubmitFileConverterError as err:
                 raise InvenioWebSubmitFileConverterError("Error when converting from %s to %s: %s" % (input_file, output_ext, err))
-            except Exception, err:
+            except Exception as err:
                 register_exception(alert_admin=True)
                 raise InvenioWebSubmitFileConverterError("Unexpected error when converting from %s to %s (%s): %s" % (input_file, output_ext, type(err), err))
             if current_input != input_file:
@@ -620,7 +620,7 @@ def unoconv(input_file, output_file=None, output_format='txt', pdfopt=True, **du
                         ## Sometimes OpenOffice crashes but we don't care :-)
                         ## it still have created a nice file.
                         pass
-    except Exception, err:
+    except Exception as err:
         raise InvenioWebSubmitFileConverterError(get_unoconv_installation_guideline(err))
 
     output_format = normalize_format(output_format)
@@ -682,7 +682,7 @@ def can_unoconv(verbose=False):
             os.remove(output)
             os.remove(test)
             return True
-        except Exception, err:
+        except Exception as err:
             if verbose:
                 print >> sys.stderr, get_unoconv_installation_guideline(err)
             return False
@@ -1047,7 +1047,7 @@ def pdf2hocr2pdf(input_file, output_file=None, ln='en', return_working_dir=False
                 return False
             else:
                 return True
-        except InvenioWebSubmitFileConverterError, err:
+        except InvenioWebSubmitFileConverterError as err:
             get_file_converter_logger().debug('Deskewing error: %s' % err)
             return False
 
@@ -1066,7 +1066,7 @@ def pdf2hocr2pdf(input_file, output_file=None, ln='en', return_working_dir=False
                 get_file_converter_logger().debug('Errors found in recognize.err')
                 return False
             return not guess_ocropus_produced_garbage(os.path.join(working_dir, 'recognize.out'), not extract_only_text)
-        except InvenioWebSubmitFileConverterError, err:
+        except InvenioWebSubmitFileConverterError as err:
             get_file_converter_logger().debug('Recognizer error: %s' % err)
             return False
 
@@ -1326,7 +1326,7 @@ def prepare_io(input_file, output_file=None, output_ext=None, need_working_dir=T
         try:
             (fd, output_file) = tempfile.mkstemp(suffix=output_ext, dir=CFG_TMPDIR)
             os.close(fd)
-        except IOError, err:
+        except IOError as err:
             raise InvenioWebSubmitFileConverterError("It's impossible to create a temporary file: %s" % err)
     else:
         output_file = os.path.abspath(output_file)
@@ -1336,7 +1336,7 @@ def prepare_io(input_file, output_file=None, output_ext=None, need_working_dir=T
     if need_working_dir:
         try:
             working_dir = tempfile.mkdtemp(dir=CFG_TMPDIR, prefix='conversion')
-        except IOError, err:
+        except IOError as err:
             raise InvenioWebSubmitFileConverterError("It's impossible to create a temporary directory: %s" % err)
 
         input_ext = decompose_file(input_file, skip_version=True)[2]
@@ -1449,7 +1449,7 @@ def main_cli():
         try:
             output = pdf2hocr2pdf(options.ocrize, output_file=options.output_name, title=options.title, ln=options.ln)
             print "Output stored in %s" % output
-        except InvenioWebSubmitFileConverterError, err:
+        except InvenioWebSubmitFileConverterError as err:
             print "ERROR: %s" % err
             sys.exit(1)
     else:
@@ -1460,7 +1460,7 @@ def main_cli():
                 parser.error("An input should be specified!")
             output = convert_file(options.input_name, output_file=options.output_name, output_format=options.output_format, pdfopt=options.pdfopt, pdfa=options.pdf_a, title=options.title, ln=options.ln)
             print "Output stored in %s" % output
-        except InvenioWebSubmitFileConverterError, err:
+        except InvenioWebSubmitFileConverterError as err:
             print "ERROR: %s" % err
             sys.exit(1)
 

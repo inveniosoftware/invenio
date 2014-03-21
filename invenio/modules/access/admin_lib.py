@@ -233,7 +233,7 @@ You should enable at least on robot based login method in <tt>access_control_con
                 try:
                     assertion = json.loads(json_assertion)
                     assert(isinstance(assertion, dict))
-                except Exception, err:
+                except Exception as err:
                     errors.append("""The assertion is not a valid json serializable mapping: %s""" % (err))
             else:
                 assertion = None
@@ -372,7 +372,7 @@ def perform_rolearea(req, grep=""):
     if grep:
         try:
             re_grep = re.compile(grep)
-        except Exception, err:
+        except Exception as err:
             re_grep = None
             grep = ''
     else:
@@ -486,7 +486,7 @@ def perform_actionarea(req, grep=''):
     if grep:
         try:
             re_grep = re.compile(grep)
-        except Exception, err:
+        except Exception as err:
             re_grep = None
             grep = ''
     else:
@@ -1974,7 +1974,7 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
 
         try:
             firerole_def_ser = serialize(compile_role_definition(firerole_def_src))
-        except InvenioWebAccessFireroleError, msg:
+        except InvenioWebAccessFireroleError as msg:
             output += "<strong>%s</strong>" % msg
         else:
             text = """
@@ -2094,7 +2094,7 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
 
         try:
             firerole_def_ser = serialize(compile_role_definition(firerole_def_src))
-        except InvenioWebAccessFireroleError, msg:
+        except InvenioWebAccessFireroleError as msg:
             subtitle = 'step 2 - role could not be modified'
             output += '<p>sorry, could not modify role because of troubles with            its definition:<br />%s</p>' % msg
         else:

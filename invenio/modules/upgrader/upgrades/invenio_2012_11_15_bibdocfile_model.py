@@ -72,24 +72,24 @@ def _update_database_structure_pre(logger):
     logger.info("Adding missing columns to tables")
     try:
         run_sql("ALTER TABLE bibdoc ADD COLUMN doctype varchar(255) AFTER more_info")
-    except Exception, e:
+    except Exception as e:
         logger.info("WARNING: Problem when altering table. Is the database really in the state from before the upgrade ? " + str(e))
     try:
         run_sql("ALTER TABLE bibdoc CHANGE COLUMN docname docname varchar(250) COLLATE utf8_bin default NULL")
-    except Exception, e:
+    except Exception as e:
         logger.info("WARNING: Problem when altering table. Is the database really in the state from before the upgrade ? " + str(e))
 
 
     try:
         run_sql("ALTER TABLE bibrec_bibdoc ADD COLUMN docname varchar(250) COLLATE utf8_bin NOT NULL default 'file' AFTER id_bibdoc, ADD KEY docname(docname)")
-    except Exception, e:
+    except Exception as e:
         logger.info("WARNING: Problem when altering table. Is the database really in the state from before the upgrade ? " + str(e))
 
     try:
         run_sql("ALTER TABLE bibdoc_bibdoc CHANGE COLUMN id_bibdoc1 id_bibdoc1 mediumint(9) unsigned DEFAULT NULL")
         run_sql("ALTER TABLE bibdoc_bibdoc CHANGE COLUMN id_bibdoc2 id_bibdoc2 mediumint(9) unsigned DEFAULT NULL")
         run_sql("ALTER TABLE bibdoc_bibdoc ADD COLUMN id mediumint(9) unsigned NOT NULL auto_increment FIRST, ADD COLUMN version1 tinyint(4) unsigned AFTER id_bibdoc1, ADD COLUMN format1 varchar(50) AFTER version1, ADD COLUMN version2 tinyint(4) unsigned AFTER id_bibdoc2, ADD COLUMN format2 varchar(50) AFTER version2, CHANGE COLUMN type rel_type varchar(255) AFTER format2, ADD KEY (id)")
-    except Exception, e:
+    except Exception as e:
         logger.info("WARNING: Problem when altering table. Is the database really in the state from before the upgrade ? " + str(e))
 
     run_sql("""CREATE TABLE IF NOT EXISTS bibdocmoreinfo (
@@ -120,7 +120,7 @@ def _backup_tables(logger):
         run_sql("""CREATE TABLE bibrec_bibdoc_backup_newdatamodel SELECT * FROM bibrec_bibdoc""")
         run_sql("""CREATE TABLE bibdoc_backup_newdatamodel SELECT * FROM bibdoc""")
         run_sql("""CREATE TABLE bibdoc_bibdoc_backup_newdatamodel SELECT * FROM bibdoc_bibdoc""")
-    except OperationalError, e:
+    except OperationalError as e:
         logger.info("Problem when backing up tables")
         raise
     return True
@@ -174,7 +174,7 @@ def _fix_recid(recid, logger):
                         if v1 != v2:
                             are_equal = False
                             logger.info("ERROR: Document %s: Expected description %s and got %s" % (str(docid), str(v2), str(v1)))
-            except Exception, e:
+            except Exception as e:
                 logger.info("ERROR: Document %s: Problem with retrieving descriptions: %s  MoreInfo: %s Descriptions: %s" % (str(docid), str(e), str(minfo), str(descriptions)))
 
             try:
@@ -187,7 +187,7 @@ def _fix_recid(recid, logger):
                         if v1 != v2:
                             are_equal = False
                             logger.info("ERROR: Document %s: Expected comment %s and got %s" % (str(docid), str(v2), str(v1)))
-            except Exception, e:
+            except Exception as e:
                 logger.info("ERROR: Document %s: Problem with retrieving comments: %s MoreInfo: %s  Comments: %s" % (str(docid), str(e), str(minfo), str(comments)))
 
             try:
@@ -199,7 +199,7 @@ def _fix_recid(recid, logger):
                                 are_equal = are_equal and (docformat in flags[flagname][version])
                                 if not (docformat in flags[flagname][version]):
                                     logger.info("ERROR: Document %s: Expected  %s" % (str(docid), str(minfo) ))
-            except Exception, e:
+            except Exception as e:
                 logger.info("ERROR: Document %s: Problem with retrieving flags. %s MoreInfo: %s  flags: %s" % (str(docid), str(e), str(minfo), str(flags)))
 
 

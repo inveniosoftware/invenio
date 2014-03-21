@@ -151,7 +151,7 @@ class RemoteSwordServer:
         #launch request
         try:
             response = urllib2.urlopen(result).read()
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError as e:
             tmpfd = NamedTemporaryFile(mode='w', suffix='.xml', prefix='bibsword_error_',
                                        dir=CFG_TMPDIR, delete=False)
             tmpfd.write(e.read())

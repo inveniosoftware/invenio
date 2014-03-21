@@ -410,7 +410,7 @@ class Template:
                     out += result
                 else:
                     log.error("Module %s returned wrong results? %s" % (m, str(result)[:50]))
-            except Exception, msg:
+            except Exception as msg:
                 log.error("Error importing module: %s" % (m))
                 log.error(msg)
                 del (_modules[m])

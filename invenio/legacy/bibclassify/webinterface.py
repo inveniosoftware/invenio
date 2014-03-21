@@ -76,7 +76,7 @@ def main_page(req, recid, tabs, ln, template):
         if os.path.exists(tmp_file):
             try:
                 os.remove(tmp_file)
-            except Exception, msg:
+            except Exception as msg:
                 log.error('Error removing the cached file: %s' % tmp_file)
                 log.error(msg)
     else:

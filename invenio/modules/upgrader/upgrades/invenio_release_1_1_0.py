@@ -686,5 +686,5 @@ def _run_sql_ignore(query, *args, **kwargs):
     """ Execute SQL query but ignore any errors. """
     try:
         run_sql(query, *args, **kwargs)
-    except Exception, e:
+    except Exception as e:
         warnings.warn("Failed to execute query %s: %s" % (query, unicode(e)))
