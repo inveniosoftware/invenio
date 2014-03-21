@@ -19,6 +19,7 @@
 
 from operator import itemgetter
 from itertools import groupby
+from six import iteritems
 from werkzeug.utils import cached_property
 from flask import g, url_for, request
 from flask.ext.login import current_user
@@ -87,13 +88,13 @@ def faceted_results_filter(recids, filter_data, facets):
 
     if '+' in filter_data:
         values = filter_data['+']
-        for key, facet in facets.iteritems():
+        for key, facet in iteritems(facets):
             if key in values:
                 output.intersection_update(facet.get_facet_recids(values[key]))
 
     if '-' in filter_data:
         values = filter_data['-']
-        for key, facet in facets.iteritems():
+        for key, facet in iteritems(facets):
             if key in values:
                 output.difference_update(facet.get_facet_recids(values[key]))
 

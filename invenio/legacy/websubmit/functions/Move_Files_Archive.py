@@ -18,6 +18,7 @@
 __revision__ = "$Id$"
 
 import os
+from six import iteritems
 from invenio.legacy.bibdocfile.api import BibRecDocs, decompose_file, normalize_format
 
 def Move_Files_Archive(parameters, curdir, form, user_info=None):
@@ -25,7 +26,7 @@ def Move_Files_Archive(parameters, curdir, form, user_info=None):
     MainDir = "%s/files/MainFiles" % curdir
     IncludeDir = "%s/files/AdditionalFiles" % curdir
     watcheddirs = {'Main' : MainDir, 'Additional' : IncludeDir}
-    for type, dir in watcheddirs.iteritems():
+    for type, dir in iteritems(watcheddirs):
         if os.path.exists(dir):
             formats = {}
             files = os.listdir(dir)

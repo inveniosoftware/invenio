@@ -30,6 +30,7 @@ __required_plugin_API_version__ = "WebSubmit File Metadata Plugin API 1.0"
 
 import sys
 from optparse import OptionParser
+from six import iteritems
 from invenio.legacy.bibdocfile.api import decompose_file
 from invenio.legacy.websubmit.config import InvenioWebSubmitFileMetadataRuntimeError
 from invenio.utils.datastructures import LazyDict
@@ -73,7 +74,7 @@ def read_metadata(inputfile, force=None, remote=False,
         print ext.lower(), 'extension to extract from'
 
     # Loop through the plugins to find a good one for given file
-    for plugin_name, plugin in metadata_extractor_plugins.iteritems():
+    for plugin_name, plugin in iteritems(metadata_extractor_plugins):
         # Local file
         if plugin.has_key('can_read_local') and \
             plugin['can_read_local'](inputfile) and not remote and \
@@ -138,7 +139,7 @@ def write_metadata(inputfile, outputfile, metadata_dictionary,
         print ext.lower(), 'extension to write to'
 
     # Loop through the plugins to find a good one to ext
-    for plugin_name, plugin in metadata_extractor_plugins.iteritems():
+    for plugin_name, plugin in iteritems(metadata_extractor_plugins):
         if plugin.has_key('can_write_local') and \
             plugin['can_write_local'](inputfile) and \
             (not force or plugin_name == force):
@@ -160,7 +161,7 @@ def metadata_info(verbose=0):
     print 'Available plugins:'
 
     # Print each operation on each plugin
-    for plugin_name, plugin_funcs in metadata_extractor_plugins.iteritems():
+    for plugin_name, plugin_funcs in iteritems(metadata_extractor_plugins):
         if len(plugin_funcs) > 0:
             print '-- Name: ' + plugin_name
             print '   Supported operation%s: ' % \
@@ -172,7 +173,7 @@ def metadata_info(verbose=0):
     # if len(broken_plugins.keys()) > 0:
     #     print 'Could not load the following plugin%s:' % \
     #           (len(broken_plugins.keys()) > 1 and 's' or '')
-    #     for broken_plugin_name, broken_plugin_trace_info in broken_plugins.iteritems():
+    #     for broken_plugin_name, broken_plugin_trace_info in iteritems(broken_plugins):
     #         print '-- Name: ' + broken_plugin_name
     #         if verbose > 5:
     #             formatted_traceback = \
@@ -192,7 +193,7 @@ def print_metadata(metadata):
     """
     if metadata:
         max_key_length = max([len(key) for key in metadata.keys()])
-        for key, value in metadata.iteritems():
+        for key, value in iteritems(metadata):
             print key, "." * (max_key_length - len(key)), str(value)
     else:
         print '(No metadata)'

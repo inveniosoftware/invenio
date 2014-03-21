@@ -32,6 +32,8 @@ replace in plain-text.
 import re
 import subprocess
 
+from six import iteritems
+
 from invenio.config import CFG_PATH_PDFTOTEXT
 from invenio.legacy.docextract.utils import write_message
 
@@ -416,7 +418,7 @@ def replace_undesirable_characters(line):
     for bad_string, replacement in UNDESIRABLE_STRING_REPLACEMENTS:
         line = line.replace(bad_string, replacement)
 
-    for bad_char, replacement in UNDESIRABLE_CHAR_REPLACEMENTS.iteritems():
+    for bad_char, replacement in iteritems(UNDESIRABLE_CHAR_REPLACEMENTS):
         line = line.replace(bad_char, replacement)
 
     return line

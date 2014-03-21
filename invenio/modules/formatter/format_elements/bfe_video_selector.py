@@ -16,12 +16,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Creates a <select> element with <option> elements 
+"""BibFormat element - Creates a <select> element with <option> elements
 containing various information about video sources. The options are later
 evaluated by javascript and the video source is dynamically injected in the
 HTML5 video element.
 """
 
+from six import iteritems
 from invenio.legacy.bibdocfile.api import BibRecDocs
 
 def format_element(bfo):
@@ -53,7 +54,7 @@ def format_element(bfo):
                 videos[size]['poster'] = src
     ## Build video select options for every video size format that was found
     select_options = []
-    for key, options in videos.iteritems():
+    for key, options in iteritems(videos):
         ## If we have at least one url, the format is available
         if options['mp4'] or options['webm'] or options['ogv']:
             ## create am option element
@@ -63,12 +64,12 @@ def format_element(bfo):
             select_options.append(option_element)
     select_element = create_select_element(select_options)
     return select_element
-            
+
 def create_select_element(options):
     """ Creates the HTML select element that carries the video format options
     """
     text = """<select id="mejs-resolution" style="display: none">
-              %s 
+              %s
               </select>
            """ % '\n'.join(options)
     return text

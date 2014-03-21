@@ -19,6 +19,8 @@
 
 """BibEncode encoding submodule"""
 
+from six import iteritems
+
 from invenio.legacy.bibsched.bibtask import (
                              write_message,
                              task_update_progress,
@@ -403,7 +405,7 @@ def encode_video(input_file, output_file,
         ## Metadata additions
         if type(metadata) is type(dict()):
             ## build metadata arguments for ffmpeg
-            for key, value in metadata.iteritems():
+            for key, value in iteritems(metadata):
                 if value is not None:
                     meta_arg = (
                         CFG_BIBENCODE_FFMPEG_METADATA_ARGUMENT % (key, value)

@@ -28,6 +28,7 @@ this exporting method.
 from datetime import datetime
 from urllib import quote
 from ConfigParser import ConfigParser
+from six import iteritems
 import os
 import gzip
 import time
@@ -204,7 +205,7 @@ class SitemapWriter(object):
             optional += u"""
     <priority>%s</priority>""" % priority
         if alternate:
-            for ln, alternate_url in alternate_urls.iteritems():
+            for ln, alternate_url in iteritems(alternate_urls):
                 ln = ln.replace('_', '-') ## zh_CN -> zh-CN
                 optional += u"""
     <xhtml:link rel="alternate" hreflang="%s" href="%s" />""" % (ln, encode_for_xml(alternate_url, quote=True))

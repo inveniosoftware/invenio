@@ -21,6 +21,8 @@ __revision__ = "$Id$"
 
 import random
 
+from six import iteritems
+
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
@@ -327,7 +329,7 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     idx_dict = dict(get_def_name('', "idxINDEX"))
 
     stemming_language_map = get_stemming_language_map()
-    stemming_language_map_reversed = dict([(elem[1], elem[0]) for elem in stemming_language_map.iteritems()])
+    stemming_language_map_reversed = dict([(elem[1], elem[0]) for elem in iteritems(stemming_language_map)])
 
     virtual_indexes = dict(get_all_virtual_indexes())
 

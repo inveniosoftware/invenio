@@ -19,6 +19,8 @@
 Invenio special data structures
 """
 
+from six import iteritems
+
 
 class LazyDict(object):
     """
@@ -68,7 +70,7 @@ class LazyDict(object):
     def iteritems(self):
         if self._cached_dict is None:
             self._evaluate_function()
-        return self._cached_dict.iteritems()
+        return iteritems(self._cached_dict)
 
     def iterkeys(self):
         if self._cached_dict is None:
@@ -251,7 +253,7 @@ class SmartDict(object):
         return self._dict.items()
 
     def iteritems(self):
-        return self._dict.iteritems()
+        return iteritems(self._dict)
 
     def iterkeys(self):
         return self._dict.iterkeys()

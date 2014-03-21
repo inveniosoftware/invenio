@@ -30,6 +30,7 @@ import math
 import urllib
 from MySQLdb import OperationalError
 from xml.dom import minidom
+from six import iteritems
 from urlparse import urlparse
 
 from invenio.config import \
@@ -258,10 +259,10 @@ def get_order_dict_from_recid_list(recids, journal_name, issue_number,
     # records. To do so, use negative integers
     if ordered_new_records:
         highest_new_record_order = max(ordered_new_records.keys())
-        for order, new_records in ordered_new_records.iteritems():
+        for order, new_records in iteritems(ordered_new_records):
             ordered_records[- highest_new_record_order + order - 1] = new_records
 
-    for (order, records) in ordered_records.iteritems():
+    for (order, records) in iteritems(ordered_records):
         # Reverse so that if there are several articles at same
         # positon, newest appear first
         records.reverse()
@@ -1463,7 +1464,7 @@ def make_journal_url(current_uri, custom_parameters=None):
         custom_parameters = {}
 
     default_params = parse_url_string(current_uri)
-    for key, value in custom_parameters.iteritems():
+    for key, value in iteritems(custom_parameters):
         # Override default params with custom params
         default_params[key] = str(value)
 

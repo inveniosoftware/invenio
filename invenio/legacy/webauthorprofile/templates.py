@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 import re
 from operator import itemgetter
+from six import iteritems
 
 from invenio.config import \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
@@ -215,7 +216,7 @@ class Template:
         else:
             baid_query = ''
 
-        sorted_names_list = sorted(names_dict.iteritems(), key=itemgetter(1),
+        sorted_names_list = sorted(iteritems(names_dict), key=itemgetter(1),
                                    reverse=True)
         header = "<strong>" + _("Name variants") + "</strong>"
         content = []
@@ -653,7 +654,7 @@ class Template:
         return  '(%s papers)' % pubs_to_papers_link
 
     def tmpl_authornametitle(self, names_dict):
-        sorted_names_list = sorted(names_dict.iteritems(), key=itemgetter(1),
+        sorted_names_list = sorted(iteritems(names_dict), key=itemgetter(1),
                                    reverse=True)
         try:
             return sorted_names_list[0][0]
@@ -672,7 +673,7 @@ class Template:
             baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
         else:
             baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
-        sorted_names_list = sorted(names_dict.iteritems(), key=itemgetter(1),
+        sorted_names_list = sorted(iteritems(names_dict), key=itemgetter(1),
                                    reverse=True)
         pubs_to_papers_link = create_html_link(websearch_templates.build_search_url(p=baid_query), {}, str(len(pubs)))
         display_name = ""

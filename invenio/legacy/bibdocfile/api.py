@@ -74,6 +74,7 @@ except ImportError:
 from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident
+from six import iteritems
 
 from invenio.utils import apache
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
@@ -162,7 +163,7 @@ _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
 _mimes.encodings_map.update({'.bz2' : 'bzip2'})
 
 if CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES:
-    for key, value in CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES.iteritems():
+    for key, value in iteritems(CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES):
         _mimes.add_type(key, value)
         del key, value
 
@@ -816,11 +817,11 @@ class BibRecDocs(object):
         """
 
         if not doctype:
-            return dict((k,v) for (k,(v,_)) in self.bibdocs.iteritems())
+            return dict((k,v) for (k,(v,_)) in iteritems(self.bibdocs))
 
 
         res = {}
-        for (docname, (doc, attachmenttype)) in self.bibdocs.iteritems():
+        for (docname, (doc, attachmenttype)) in iteritems(self.bibdocs):
             if attachmenttype == doctype:
                 res[docname] = doc
         return res
@@ -1324,10 +1325,10 @@ class BibRecDocs(object):
         if not versions:
             bibdoc.delete()
         else:
-            for version, formats in versions.iteritems():
+            for version, formats in iteritems(versions):
                 if zero_version_bug:
                     version += 1
-                for docformat, filename in formats.iteritems():
+                for docformat, filename in iteritems(formats):
                     destination = '%s%s;%i' % (docname, docformat, version)
                     try:
                         shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination))
@@ -2646,7 +2647,7 @@ class BibDoc(object):
             # added file.
             added_files = dict(new_files)
             deleted_files = {}
-            for key, value in old_files.iteritems():
+            for key, value in iteritems(old_files):
                 if added_files.has_key(key):
                     del added_files[key]
                 else:
@@ -2701,11 +2702,11 @@ class BibDoc(object):
             if context == 'rename':
                 deletedstr = "RENAMEDFROM"
                 addedstr = "RENAMEDTO"
-            for (docname, docformat, version), (size, checksum, md) in added_files.iteritems():
+            for (docname, docformat, version), (size, checksum, md) in iteritems(added_files):
                 if context == 'rename':
                     md = '' # No modification time
                 log_action(addedstr, self.id, docname, docformat, version, size, checksum, md)
-            for (docname, docformat, version), (size, checksum, md) in deleted_files.iteritems():
+            for (docname, docformat, version), (size, checksum, md) in iteritems(deleted_files):
                 if context == 'rename':
                     md = '' # No modification time
                 log_action(deletedstr, self.id, docname, docformat, version, size, checksum, md)
@@ -3301,7 +3302,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             'if-range' : None,
             'if-none-match' : None,
         }
-        for key, value in req.headers_in.iteritems():
+        for key, value in iteritems(req.headers_in):
             key = key.strip().lower()
             value = value.strip()
             if key in ('unless-modified-since', 'if-modified-since'):

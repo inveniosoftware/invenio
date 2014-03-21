@@ -27,6 +27,8 @@ engine.
 __revision__ = "$Id$"
 
 import re
+from six import iteritems
+
 #from .config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 CFG_EXTERNAL_COLLECTION_MAXRESULTS = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
@@ -439,7 +441,7 @@ class InvenioHTMLExternalCollectionResultsParser(ExternalCollectionResultsParser
         self.clean()
         self.num_results_regex_str = None
         self.nbrecs_regex_str = None
-        for (name, value) in params.iteritems():
+        for (name, value) in iteritems(params):
             setattr(self, name, value)
         if self.num_results_regex_str:
             self.num_results_regex = re.compile(self.num_results_regex_str)
@@ -482,7 +484,7 @@ class InvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsParser)
         self.clean()
         self.num_results_regex_str = None
         self.nbrecs_regex_str = None
-        for (name, value) in params.iteritems():
+        for (name, value) in iteritems(params):
             setattr(self, name, value)
         if self.num_results_regex_str:
             self.num_results_regex = re.compile(self.num_results_regex_str)

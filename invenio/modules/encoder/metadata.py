@@ -25,6 +25,7 @@ __revision__ = "$Id$"
 
 import subprocess
 import re
+from six import iteritems
 from xml.dom import minidom
 
 from invenio.utils.json import json, json_decode_file
@@ -54,7 +55,7 @@ def write_metadata(input_file, output_file, metadata):
     meta_args = []
     if type(metadata) is dict:
         ## build metadata arguments for ffmpeg
-        for key, value in metadata.iteritems():
+        for key, value in iteritems(metadata):
             if value is not None:
                 meta_args.append(CFG_BIBENCODE_FFMPEG_METADATA_ARGUMENT % (key, value))
     else:

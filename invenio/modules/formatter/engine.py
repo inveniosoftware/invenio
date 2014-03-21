@@ -50,6 +50,7 @@ import cgi
 import types
 from flask import has_app_context
 from operator import itemgetter
+from six import iteritems
 from werkzeug.utils import cached_property
 
 from invenio.base.globals import cfg
@@ -261,7 +262,7 @@ class LazyTemplateContextFunctionsCache(object):
             def _bfe_element(bfo, **kwargs):
                 # convert to utf-8 for legacy app
                 kwargs = dict((k, v.encode('utf-8') if isinstance(v, unicode) else v)
-                              for k, v in kwargs.iteritems())
+                              for k, v in iteritems(kwargs))
                 format_element = get_format_element(name)
                 (out, dummy) = eval_format_element(format_element,
                                                    bfo,

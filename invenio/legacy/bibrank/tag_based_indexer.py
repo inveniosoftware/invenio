@@ -26,6 +26,8 @@ import time
 import traceback
 import ConfigParser
 
+from six import iteritems
+
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_PREFIX
@@ -274,9 +276,9 @@ def del_recids(rank_method_code, range_rec):
 def union_dicts(dict1, dict2):
     "Returns union of the two dicts."
     union_dict = {}
-    for (key, value) in dict1.iteritems():
+    for (key, value) in iteritems(dict1):
         union_dict[key] = value
-    for (key, value) in dict2.iteritems():
+    for (key, value) in iteritems(dict2):
         union_dict[key] = value
     return union_dict
 
@@ -289,13 +291,13 @@ def rank_method_code_statistics(rank_method_code):
     min = ('', 999999)
     mincount = 0
 
-    for (recID, value) in method.iteritems():
+    for (recID, value) in iteritems(method):
         if value < min and value > 0:
             min = value
         if value > max:
             max = value
 
-    for (recID, value) in method.iteritems():
+    for (recID, value) in iteritems(method):
         if value == min:
             mincount += 1
         if value == max:
@@ -314,7 +316,7 @@ def rank_method_code_statistics(rank_method_code):
         distinct_values = {}
         lower = -1.0 + ((float(max + 1) / 10)) * (i - 1)
         upper = -1.0 + ((float(max + 1) / 10)) * i
-        for (recID, value) in method.iteritems():
+        for (recID, value) in iteritems(method):
             if value >= lower and value <= upper:
                 setcount += 1
                 distinct_values[value] = 1

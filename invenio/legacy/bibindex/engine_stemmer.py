@@ -22,6 +22,7 @@ BibIndex stemmer facility based on the Porter Stemming Algorithm.
 
 __revision__ = "$Id$"
 
+from six import iteritems
 from thread import get_ident
 from invenio.legacy.bibindex.engine_stemmer_greek import GreekStemmer
 
@@ -77,7 +78,7 @@ try:
         """Return a diction of code language, language name for all the available
         languages."""
         ret = {}
-        for language_name, language_code in _lang_map.iteritems():
+        for language_name, language_code in iteritems(_lang_map):
             if is_stemmer_available_for_language(language_code):
                 ret[language_name] = language_code
         return ret

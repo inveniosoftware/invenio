@@ -28,6 +28,7 @@ import os
 import cgi
 import re
 from datetime import datetime, timedelta
+from six import iteritems
 
 # Invenio imports:
 
@@ -999,7 +1000,7 @@ def move_attached_files_to_storage(attached_files, recID, comid):
     @param recID: the record ID to which we attach the files
     @param comid: the comment ID to which we attach the files
     """
-    for filename, filepath in attached_files.iteritems():
+    for filename, filepath in iteritems(attached_files):
         os.renames(filepath,
                    os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
                                 str(recID), str(comid), filename))
@@ -1139,9 +1140,9 @@ def get_users_subscribed_to_discussion(recID, check_authorizations=True):
                         subscribers_emails[email] = False
 
     return ([email for email, can_unsubscribe_p \
-             in subscribers_emails.iteritems() if can_unsubscribe_p],
+             in iteritems(subscribers_emails) if can_unsubscribe_p],
             [email for email, can_unsubscribe_p \
-             in subscribers_emails.iteritems() if not can_unsubscribe_p] )
+             in iteritems(subscribers_emails) if not can_unsubscribe_p] )
 
 def email_subscribers_about_new_comment(recID, reviews, emails1,
                                         emails2, comID, msg="",

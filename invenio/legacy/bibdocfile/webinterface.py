@@ -20,6 +20,8 @@ import os
 import time
 import shutil
 
+from six import iteritems
+
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
@@ -243,7 +245,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
             cc = guess_primary_collection_of_a_record(self.recid)
             unordered_tabs = get_detailed_page_tabs(get_colID(cc), self.recid, ln)
-            ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+            ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
             ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
             link_ln = ''
             if ln != CFG_SITE_LANG:

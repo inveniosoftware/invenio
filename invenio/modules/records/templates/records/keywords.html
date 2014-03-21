@@ -29,7 +29,7 @@
    # FIXME add different formats
    #}
   <ul class="list-unstyled">
-  {%- for k,v in keywords.iteritems()-%}
+  {%- for k,v in keywords.items() -%}
     <li>
       <a href="{{ url_for('search.search', p='keyword:"%s"' % (k,)) }}">
         {{ k }}

@@ -19,6 +19,7 @@
 
 """WebMessage Forms"""
 
+from six import iteritems
 from string import strip
 
 from invenio.base.globals import cfg
@@ -97,7 +98,7 @@ class FilterMsgMESSAGEForm(FilterForm):
         from werkzeug.datastructures import MultiDict, CombinedMultiDict
         args = [MultiDict((k,l) for (k,l) in i.iteritems(True) if l!='') for i in list(args)]
         super(FilterMsgMESSAGEForm, self).__init__(*args, **kwargs)
-        for n, f in self._fields.iteritems():
+        for n, f in iteritems(self._fields):
             if hasattr(f, 'alias') and f.alias:
                 new = args[0].getlist(f.alias, None)
                 if new is not None:

@@ -47,6 +47,8 @@ from operator import add
 
 from invenio.legacy.bibauthorid.dbinterface import get_personiID_external_ids    #pylint: disable-msg=W0614
 from flask import session
+from six import iteritems
+
 
 def get_person_redirect_link(pid):
     '''
@@ -1133,7 +1135,7 @@ def create_request_ticket(userinfo, ticket):
     m("A user sent a change request through the web interface.")
     m("User Information:")
 
-    for k, v in userinfo.iteritems():
+    for k, v in iteritems(userinfo):
         if v:
             m("    %s: %s" % (k, v))
 
@@ -1199,7 +1201,7 @@ def send_user_commit_notification_email(userinfo, ticket):
     m("A user committed a change through the web interface.")
     m("User Information:")
 
-    for k, v in userinfo.iteritems():
+    for k, v in iteritems(userinfo):
         if v:
             m("    %s: %s" % (k, v))
 
@@ -1207,7 +1209,7 @@ def send_user_commit_notification_email(userinfo, ticket):
 
     for t in ticket:
         m(" --- <start> --- \n")
-        for k, v in t.iteritems():
+        for k, v in iteritems(t):
             m("    %s: %s \n" % (str(k), str(v)))
             if k == 'bibref':
                 try:

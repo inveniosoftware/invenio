@@ -37,6 +37,7 @@ import time
 from logging import DEBUG, getLogger
 from htmlentitydefs import entitydefs
 from optparse import OptionParser
+from six import iteritems
 
 try:
     from invenio.legacy.websubmit.hocrlib import create_pdf, extract_hocr, CFG_PPM_RESOLUTION
@@ -269,7 +270,7 @@ def get_missing_formats(filelist, desired_conversion=None):
 
     def normalize_desired_conversion():
         ret = {}
-        for key, value in desired_conversion.iteritems():
+        for key, value in iteritems(desired_conversion):
             ret[normalize_format(key)] = [normalize_format(aformat) for aformat in value]
         return ret
 

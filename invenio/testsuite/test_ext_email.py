@@ -25,7 +25,7 @@ import os
 import sys
 import pkg_resources
 from base64 import encodestring
-from StringIO import StringIO
+from six import iteritems, StringIO
 from flask import current_app
 
 from invenio.ext.email import send_email
@@ -103,7 +103,7 @@ Subject: %s
 From: from@example.com
 To: to@example.com"""
 
-        for name, ctx in contexts.iteritems():
+        for name, ctx in iteritems(contexts):
             msg = render_template_to_string('mail_text.tpl', **ctx)
             send_email('from@example.com', ['to@example.com'], subject=name,
                        **ctx)
@@ -130,9 +130,9 @@ To: to@example.com"""
         }
 
         def strip_html_key(ctx):
-            return dict(map(lambda (k, v): (k[5:], v), ctx.iteritems()))
+            return dict(map(lambda (k, v): (k[5:], v), iteritems(ctx)))
 
-        for name, ctx in contexts.iteritems():
+        for name, ctx in iteritems(contexts):
             msg = render_template_to_string('mail_html.tpl',
                                             **strip_html_key(ctx))
             send_email('from@example.com', ['to@example.com'], subject=name,

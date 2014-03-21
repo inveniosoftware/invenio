@@ -24,6 +24,8 @@ import math
 import re
 import ConfigParser
 
+from six import iteritems
+
 from invenio.legacy.search_engine import perform_request_search, wash_index_term
 from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.legacy.bibindex.engine_stemmer import is_stemmer_available_for_language, stem
@@ -66,15 +68,15 @@ def dict_union(list1, list2):
     "Returns union of the two dictionaries."
     union_dict = {}
 
-    for (e, count) in list1.iteritems():
+    for (e, count) in iteritems(list1):
         union_dict[e] = count
-    for (e, count) in list2.iteritems():
+    for (e, count) in iteritems(list2):
         if not union_dict.has_key(e):
             union_dict[e] = count
         else:
             union_dict[e] = (union_dict[e][0] + count[0], count[1])
 
-    #for (e, count) in list2.iteritems():
+    #for (e, count) in iteritems(list2):
     #    list1[e] = (list1.get(e, (0, 0))[0] + count[0], count[1])
 
     #return list1
@@ -247,7 +249,7 @@ class WordTable:
         """
 
         set_changed_p = 0
-        for recID,sign in recIDs.iteritems():
+        for recID,sign in iteritems(recIDs):
             if sign[0] == -1 and set.has_key(recID):
                 # delete recID if existent in set and if marked as to be deleted
                 del set[recID]
@@ -480,7 +482,7 @@ class WordTable:
         # put words into memory word list:
         put = self.put
         for recID in recIDs:
-            for (w, count) in wlist[recID].iteritems():
+            for (w, count) in iteritems(wlist[recID]):
                 put(recID, w, count)
 
         return len(recIDs)
@@ -926,7 +928,7 @@ def check_rnkWORD(table):
         docs_terms = run_sql("SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec>=%s and id_bibrec<=%s" % (table[:-1], i, i+5000))
         for (j, termlist) in docs_terms:
             termlist = deserialize_via_marshal(termlist)
-            for (t, tf) in termlist.iteritems():
+            for (t, tf) in iteritems(termlist):
                 if tf[1] == 0 and not errors.has_key(t):
                     errors[t] = 1
                     write_message("ERROR: Gi missing for record %s and term: %s (%s) in %s" % (j,t,repr(t), table))
@@ -995,7 +997,7 @@ def update_rnkWORD(table, terms):
                 term_docs = deserialize_via_marshal(hitlist)
                 if term_docs.has_key("Gi"):
                     del term_docs["Gi"]
-                for (j, tf) in term_docs.iteritems():
+                for (j, tf) in iteritems(term_docs):
                     if (task_get_option("quick") == "yes" and tf[1] == 0) or task_get_option("quick") == "no":
                         Nj[j] = 0
             write_message("Phase 1: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
@@ -1010,7 +1012,7 @@ def update_rnkWORD(table, terms):
             docs_terms = get_from_reverse_index(records, i, (i + 5000), table)
             for (j, termlist) in docs_terms:
                 doc_terms = deserialize_via_marshal(termlist)
-                for (t, tf) in doc_terms.iteritems():
+                for (t, tf) in iteritems(doc_terms):
                     Gi[t] = 0
             write_message("Phase 2: ......processed %s/%s records " % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
             i += 5000
@@ -1030,7 +1032,7 @@ def update_rnkWORD(table, terms):
                 term_docs = deserialize_via_marshal(hitlist)
                 if term_docs.has_key("Gi"):
                     del term_docs["Gi"]
-                for (j, tf) in term_docs.iteritems():
+                for (j, tf) in iteritems(term_docs):
                     Nj[j] = 0
             write_message("Phase 1: ......processed %s/%s terms" % ((i+5000)>max_id and max_id or (i+5000), max_id))
             i += 5000
@@ -1052,9 +1054,9 @@ def update_rnkWORD(table, terms):
                     del term_docs["Gi"]
                 Fi = 0
                 Gi[t] = 1
-                for (j, tf) in term_docs.iteritems():
+                for (j, tf) in iteritems(term_docs):
                     Fi += tf[0]
-                for (j, tf) in term_docs.iteritems():
+                for (j, tf) in iteritems(term_docs):
                     if tf[0] != Fi:
                         Gi[t] = Gi[t] + ((float(tf[0]) / Fi) * math.log(float(tf[0]) / Fi) / math.log(2)) / math.log(N)
             write_message("Phase 3: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
@@ -1074,9 +1076,9 @@ def update_rnkWORD(table, terms):
                 else:
                     Fi = 0
                     Gi[t] = 1
-                    for (j, tf) in term_docs.iteritems():
+                    for (j, tf) in iteritems(term_docs):
                         Fi += tf[0]
-                    for (j, tf) in term_docs.iteritems():
+                    for (j, tf) in iteritems(term_docs):
                         if tf[0] != Fi:
                             Gi[t] = Gi[t] + ((float(tf[0]) / Fi) * math.log(float(tf[0]) / Fi) / math.log(2)) / math.log(N)
             write_message("Phase 3: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
@@ -1092,7 +1094,7 @@ def update_rnkWORD(table, terms):
         for (j, termlist) in docs_terms:
             doc_terms = deserialize_via_marshal(termlist)
             try:
-                for (t, tf) in doc_terms.iteritems():
+                for (t, tf) in iteritems(doc_terms):
                     if Gi.has_key(t):
                         Nj[j] = Nj.get(j, 0) + math.pow(Gi[t] * (1 + math.log(tf[0])), 2)
                         Git = int(math.floor(Gi[t]*100))
@@ -1124,7 +1126,7 @@ def update_rnkWORD(table, terms):
                 term_docs = deserialize_via_marshal(hitlist)
                 if term_docs.has_key("Gi"):
                     del term_docs["Gi"]
-                for (j, tf) in term_docs.iteritems():
+                for (j, tf) in iteritems(term_docs):
                     if Nj.has_key(j):
                         term_docs[j] = (tf[0], Nj[j])
                 Git = int(math.floor(Gi[t]*100))
@@ -1163,7 +1165,7 @@ def get_from_reverse_index(records, start, stop, table):
     #"""Tests word separating policy on various input."""
     #print "%s:" % phrase
     #gwfp = get_words_from_phrase(phrase)
-    #for (word, count) in gwfp.iteritems():
+    #for (word, count) in iteritems(gwfp):
         #print "\t-> %s - %s" % (word, count)
 
 def getName(methname, ln=None, type='ln'):

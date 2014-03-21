@@ -19,6 +19,8 @@
 
 """ WebTag database models. """
 
+from six import iteritems
+
 # Database
 from invenio.ext.sqlalchemy import db
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -98,7 +100,7 @@ class WtgTAG(db.Model, Serializable):
     }
 
     ACCESS_LEVELS = \
-        dict((v, k) for (k, v) in ACCESS_NAMES.iteritems())
+        dict((v, k) for (k, v) in iteritems(ACCESS_NAMES))
 
     ACCESS_RIGHTS = {
         0: [],

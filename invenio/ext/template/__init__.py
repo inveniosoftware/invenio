@@ -29,7 +29,7 @@ from .context_processor import setup_app as context_processor_setup_app
 from .loader import OrderAwareDispatchingJinjaLoader
 from flask import g, request, current_app, _request_ctx_stack, url_for
 from jinja2 import FileSystemLoader, ChoiceLoader
-
+from six import iteritems
 
 ENV_PREFIX = '_collected_'
 
@@ -89,7 +89,7 @@ def inject_utils():
     canonical_url, alternate_urls = get_canonical_and_alternates_urls(
         request.environ['PATH_INFO'])
     alternate_urls = dict((ln.replace('_', '-'), alternate_url)
-                          for ln, alternate_url in alternate_urls.iteritems())
+                          for ln, alternate_url in iteritems(alternate_urls))
     try:
         from invenio.modules.records.api import get_record  # should not be global due to bibfield_config
     except:

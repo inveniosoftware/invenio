@@ -64,7 +64,7 @@
   {%- block head_links %}
   <link rel="author" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
   <link rel="canonical" href="{{ canonical_url }}" />
-  {%- block head_links_langs %}{%- for alt_ln, alternate_url in alternate_urls.iteritems() %}
+  {%- block head_links_langs %}{%- for alt_ln, alternate_url in alternate_urls.items() %}
   <link rel="alternate" hreflang="{{ alt_ln }}" href="{{ alternate_url }}" />
   {%- endfor %}{%- endblock %}
   <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />

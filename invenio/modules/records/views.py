@@ -20,7 +20,7 @@
 """WebSearch Flask Blueprint"""
 
 from functools import wraps
-
+from six import iteritems
 from flask import g, render_template, request, flash, redirect, url_for, \
     current_app, abort, Blueprint
 from flask.ext.login import current_user
@@ -103,8 +103,8 @@ def request_record(f):
         g.record_tab_keys = []
         tabs = []
         counts = get_detailed_page_tabs_counts(recid)
-        for k, v in get_detailed_page_tabs(collection.id, recid,
-                                           g.ln).iteritems():
+        for k, v in iteritems(get_detailed_page_tabs(collection.id, recid,
+                                                     g.ln)):
             t = {}
             b = 'record'
             if k == '':

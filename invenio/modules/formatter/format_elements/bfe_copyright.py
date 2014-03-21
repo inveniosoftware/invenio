@@ -30,6 +30,8 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
+from six import iteritems
+
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from invenio.utils.url import create_html_link
 
@@ -164,7 +166,7 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
         for bibdoc_id in add_CERN_license_link_to_bibdocs:
             copyrights_and_licenses_list[bibdoc_id]['license'].append(['', '', CFG_CERN_LICENSE_URL])
 
-        for linkage, copyright_and_license in copyrights_and_licenses_list.iteritems():
+        for linkage, copyright_and_license in iteritems(copyrights_and_licenses_list):
             copyrights = copyright_and_license['copyright']
             licenses = copyright_and_license['license']
             if len(copyrights) == 1 and len(licenses) == 1:

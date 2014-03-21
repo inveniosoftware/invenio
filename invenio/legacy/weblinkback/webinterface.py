@@ -20,6 +20,8 @@
 
 """WebLinkback - Web Interface"""
 
+from six import iteritems
+
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.legacy.webuser import getUid, collect_user_info, page_not_authorized
@@ -113,7 +115,7 @@ class WebInterfaceRecordLinkbacksPages(WebInterfaceDirectory):
         unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
                                                 self.recid,
                                                 ln=argd['ln'])
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
         if argd['ln'] != CFG_SITE_LANG:

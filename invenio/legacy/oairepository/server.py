@@ -31,6 +31,7 @@ if sys.hexversion < 0x2050000:
 else:
     from glob import iglob
 from flask import url_for
+from six import iteritems
 
 from invenio.config import \
      CFG_OAI_DELETED_POLICY, \
@@ -815,7 +816,7 @@ def check_argd(argd):
 
     ## no several times the same argument
     bad_arguments_error = False
-    for param, value in argd.iteritems():
+    for param, value in iteritems(argd):
         if len(value) > 1 and not bad_arguments_error:
             errors.append(("badArgument", "More than one value specified for the %s argument: %s" % (param, value)))
             bad_arguments_error = True ## This is needed only once

@@ -22,6 +22,9 @@ BibFormat format templates files.
 """
 
 import os
+
+from six import iteritems
+
 from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_ETCDIR, \
@@ -509,9 +512,9 @@ Cher Abonné,
         ''' % {'current_issue': current_issue,
                'next_issue' : next_issue,
                'current_articles': ",".join(["%s : %s" % (item[0], item[1]) \
-                                             for item in current_articles.iteritems()]),
+                                             for item in iteritems(current_articles)]),
                'next_articles': ",".join(["%s : %s" % (item[0], item[1]) \
-                                          for item in next_articles.iteritems()]),
+                                          for item in iteritems(next_articles)]),
                'CFG_SITE_URL' : CFG_SITE_URL,
                'journal_name': journal_name,
                'update': _("Update")}
@@ -607,7 +610,7 @@ Cher Abonné,
                                (item[0], item[1],
                                 CFG_SITE_URL, journal_name,
                                 issue.split('/')[1], issue.split('/')[0], item[0]) \
-                               for item in articles.iteritems()]),
+                               for item in iteritems(articles)]),
 
                     (not released_on) and
                     ('<em>not released</em>' + (as_editor and '<br/><a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">&gt;release now</a>' % (CFG_SITE_URL, journal_name) or '')) or

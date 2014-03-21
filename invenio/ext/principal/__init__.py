@@ -29,6 +29,7 @@ from flask import current_app
 from flask.ext.login import current_user, user_logged_in, user_logged_out
 from flask.ext.principal import Principal, Identity, AnonymousIdentity, \
     identity_changed, Permission
+from six import iteritems
 
 principals = Principal()
 
@@ -45,7 +46,7 @@ class AccAuthorizeActionPermission(Permission):
         auth, message = acc_authorize_action(
             identity.id, self.action, **dict(
                 (k, v() if callable(v) else v)
-                for (k, v) in self.params.iteritems()))
+                for (k, v) in iteritems(self.params)))
         if auth == 0:
             return True
         current_app.logger.info(message)

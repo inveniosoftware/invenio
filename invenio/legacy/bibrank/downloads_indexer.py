@@ -24,6 +24,8 @@ import time
 import calendar
 import string
 
+from six import iteritems
+
 from invenio.legacy.dbquery import run_sql
 
 def append_to_file(path, content):
@@ -164,7 +166,7 @@ def merge_with_old_dictionnary(old_dic, new_dic):
     """For each key id_bibrec in new_dic add the old values contained in old_dic
     Return not ordered merged dictionnary"""
     union_dic = {}
-    for (key, value) in new_dic.iteritems():
+    for (key, value) in iteritems(new_dic):
         if key in old_dic.keys():
             old_dic_value_dic = dict(old_dic[key])
             tuple_list = []
@@ -182,7 +184,7 @@ def merge_with_old_dictionnary(old_dic, new_dic):
         else :
             union_dic[key] = value
 
-    for (key, value) in old_dic.iteritems():
+    for (key, value) in iteritems(old_dic):
         if key not in union_dic.keys():
             union_dic[key] = value
     return union_dic

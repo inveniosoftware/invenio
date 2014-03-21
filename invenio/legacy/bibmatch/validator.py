@@ -29,6 +29,8 @@ import sys
 import pprint
 import difflib
 
+from six import iteritems
+
 from invenio.config import CFG_BIBMATCH_MATCH_VALIDATION_RULESETS, \
                            CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT
 from invenio.legacy.bibmatch.config import CFG_BIBMATCH_VALIDATION_MATCHING_MODES, \
@@ -667,7 +669,7 @@ def get_validation_ruleset(record):
     final_list = []
     joker_list = []
     normal_list = []
-    for tag, (threshold, compare_mode, match_mode, result_mode) in validation_ruleset.iteritems():
+    for tag, (threshold, compare_mode, match_mode, result_mode) in iteritems(validation_ruleset):
         if compare_mode == 'ignored' or threshold <= 0.0:
             # Ignore rule
             continue

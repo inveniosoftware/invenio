@@ -28,6 +28,7 @@ __revision__ = "$Id$"
 import sys
 from werkzeug.utils import find_modules, import_string
 from flask import current_app
+from six import iteritems
 from invenio.legacy.bibsched.bibtask import task_init, write_message, task_set_option, \
     task_get_option, task_update_progress
 from invenio.utils.autodiscovery.helpers import get_callable_documentation
@@ -66,7 +67,7 @@ def cli_list_tasklets():
         print get_callable_documentation(tasklet)
 
     print """Broken tasklets:"""
-    for tasklet_name, error in _TASKLETS.get_broken_plugins().iteritems():
+    for tasklet_name, error in iteritems(_TASKLETS.get_broken_plugins()):
         print "%s: %s" % (tasklet_name, error)
     sys.exit(0)
 

@@ -27,6 +27,8 @@ __lastupdated__ = """$Date$"""
 
 import cgi
 
+from six import iteritems
+
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR
 from invenio.legacy.webpage import page
 from invenio.ext.legacy.handler import WebInterfaceDirectory, wash_urlargd
@@ -52,12 +54,12 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
         """ For testing single sign-on """
         req.add_common_vars()
         sso_env = {}
-        for var, value in req.subprocess_env.iteritems():
+        for var, value in iteritems(req.subprocess_env):
             if var.startswith('HTTP_ADFS_'):
                 sso_env[var] = value
         out = "<html><head><title>SSO test</title></head>"
         out += "<body><table>"
-        for var, value in sso_env.iteritems():
+        for var, value in iteritems(sso_env):
             out += "<tr><td><strong>%s</strong></td><td>%s</td></tr>" % (var, value)
         out += "</table></body></html>"
         return out

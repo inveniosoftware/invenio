@@ -35,6 +35,7 @@ This module is standalone safe.
 """
 
 from datetime import datetime, timedelta
+from six import iteritems
 import cPickle
 import os
 import re
@@ -956,7 +957,7 @@ def check_taxonomy(taxonomy):
     stemming_collisions = []
     interconcept_collisions = {}
 
-    for subject, predicates in subjects.iteritems():
+    for subject, predicates in iteritems(subjects):
         # No prefLabel or multiple prefLabels
         try:
             if len(predicates[prefLabel]) > 1:
@@ -1049,12 +1050,12 @@ def check_taxonomy(taxonomy):
         print "\n".join(["   %s" % subj for subj in both_composites])
     if bad_hidden_labels:
         print "\nConcepts with bad hidden labels: %d" % len(bad_hidden_labels)
-        for kw, lbls in bad_hidden_labels.iteritems():
+        for kw, lbls in iteritems(bad_hidden_labels):
             print "   %s:" % kw
             print "\n".join(["      '%s'" % lbl for lbl in lbls])
     if bad_alt_labels:
         print "\nConcepts with bad alt labels: %d" % len(bad_alt_labels)
-        for kw, lbls in bad_alt_labels.iteritems():
+        for kw, lbls in iteritems(bad_alt_labels):
             print "   %s:" % kw
             print "\n".join(["      '%s'" % lbl for lbl in lbls])
     if both_skw_and_ckw:
@@ -1074,7 +1075,7 @@ def check_taxonomy(taxonomy):
         print "\n".join(["SKW '%s' is not composite of CKW '%s'." %
                          (skw, ckw) for skw, ckw in composite_problem3])
     if composite_problem4:
-        for skw, ckws in composite_problem4.iteritems():
+        for skw, ckws in iteritems(composite_problem4):
             print "SKW '%s' does not exist but is " "referenced by:" % skw
             print "\n".join(["    %s" % ckw for ckw in ckws])
     if composite_problem5:

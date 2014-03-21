@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 from zlib import decompress
 from zlib import compress
+from six import iteritems
 from time import localtime
 
 from invenio.base.globals import cfg
@@ -1122,7 +1123,7 @@ def store_external_records(records, of="hb"):
 def store_external_urls(ids_urls):
     """Store original urls for external records to the database."""
 
-    #for id_url in ids_urls.iteritems():
+    #for id_url in iteritems(ids_urls):
     for id_url in ids_urls:
         query = """UPDATE
                     bskEXTREC

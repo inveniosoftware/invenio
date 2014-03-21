@@ -21,6 +21,8 @@ import re
 import MySQLdb
 import urllib
 
+from six import iteritems
+
 from invenio.base.globals import cfg
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -403,7 +405,7 @@ def create_login_page_box(referer='', ln=CFG_SITE_LANG):
             break
     register_available = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and internal
     ## Let's retrieve all the login method that are not dedicated to robots
-    methods = [method[0] for method in CFG_EXTERNAL_AUTHENTICATION.iteritems() if not method[1] or not method[1].robot_login_method_p()]
+    methods = [method[0] for method in iteritems(CFG_EXTERNAL_AUTHENTICATION) if not method[1] or not method[1].robot_login_method_p()]
     methods.sort()
 
     return websession_templates.tmpl_login_form(

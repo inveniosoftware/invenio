@@ -24,6 +24,7 @@
 import re
 import string
 from datetime import datetime
+from six import iteritems
 
 from invenio.modules.indexer.tokenizers.BibIndexAuthorTokenizer import BibIndexAuthorTokenizer as FNT
 from invenio.utils.date import GOT_DATEUTIL
@@ -1258,9 +1259,9 @@ class SpiresToInvenioSyntaxConverter:
         """Replaces all SPIRES keywords in the string with their
         corresponding Invenio keywords"""
 
-        for spires_keyword, invenio_keyword in self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.iteritems():
+        for spires_keyword, invenio_keyword in iteritems(self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS):
             query = self._replace_keyword(query, spires_keyword, invenio_keyword)
-        for spires_keyword, invenio_keyword in self._SECOND_ORDER_KEYWORD_MATCHINGS.iteritems():
+        for spires_keyword, invenio_keyword in iteritems(self._SECOND_ORDER_KEYWORD_MATCHINGS):
             query = self._replace_second_order_keyword(query, spires_keyword, invenio_keyword)
 
         return query

@@ -15,6 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from six import iteritems
 
 from invenio.celery import celery
 
@@ -41,7 +42,7 @@ def celery_run(workflow_name, data, **kwargs):
                 while stack:
                     k, v = stack.pop()
                     if isinstance(v, dict):
-                        stack.extend(v.iteritems())
+                        stack.extend(iteritems(v))
                     elif isinstance(v, db.Model):
                         # try except pass to maintain compatibility in case SQLAlchemy is fixed
                         try:
@@ -58,7 +59,7 @@ def celery_run(workflow_name, data, **kwargs):
             while stack:
                 k, v = stack.pop()
                 if isinstance(v, dict):
-                    stack.extend(v.iteritems())
+                    stack.extend(iteritems(v))
                 elif isinstance(v, db.Model):
                     # try except pass to maintain compatibility in case SQLAlchemy is fixed
                     try:

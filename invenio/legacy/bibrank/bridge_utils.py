@@ -18,6 +18,7 @@
 
 import ConfigParser
 import re
+from six import iteritems
 from invenio.legacy.bibrank.bridge_config import CFG_BIBRANK_WRD_CFG_PATH
 from invenio.legacy.search_engine import get_fieldvalues
 from invenio.legacy.bibindex.adminlib import get_fld_id, get_fld_tags
@@ -36,7 +37,7 @@ def get_tags():
     Returns the tags per Solr field as a dictionary.
     """
     tags = {}
-    for (field_name, logical_fields) in get_logical_fields().iteritems():
+    for (field_name, logical_fields) in iteritems(get_logical_fields()):
         tags_of_logical_fields = []
         for logical_field in logical_fields:
             field_id = get_fld_id(logical_field)

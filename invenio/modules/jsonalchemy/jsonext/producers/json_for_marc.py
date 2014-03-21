@@ -24,6 +24,7 @@ def produce(self, fields=None):
     @param tags: list of tags to include in the output, if None or
                 empty list all available tags will be included.
     """
+    from six import iteritems
     from invenio.modules.jsonalchemy.parser import get_producer_rules
     from invenio.base.utils import try_to_eval
 
@@ -47,7 +48,7 @@ def produce(self, fields=None):
                     for r in rule[1]:
                         tmp_dict = {}
                         #FIXME: check field meta_metadata
-                        for key, subfield in r[1].iteritems():
+                        for key, subfield in iteritems(r[1]):
                             if not subfield:
                                 tmp_dict[key] = f
                             else:

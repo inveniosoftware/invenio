@@ -84,7 +84,7 @@
                         {% else %}
                             There were no errors.
                         {% endif %}
-                        
+
                         <div id="moreinfoModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                           <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -105,7 +105,7 @@
                         <div class="muted"><b>Record Metadata:</b></div></br>
                         <table class="table table-striped">
                             <tbody>
-                                {% for key, value in info.iteritems() %}
+                                {% for key, value in info.items() %}
                                     <b>{{ key }}</b> = {{ value }}
                                     <hr>
                                 {% endfor %}
@@ -128,7 +128,7 @@
                         {{ field }}
                     {% endfor %}
                 </form>
-            </div>  
+            </div>
         <hr id="hr{{i}}">
         {% endfor %}
     </div>

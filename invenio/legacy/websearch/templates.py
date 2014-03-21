@@ -26,6 +26,7 @@ import cgi
 import string
 import re
 import locale
+from six import iteritems
 from urllib import quote, urlencode
 from xml.sax.saxutils import escape as xml_escape
 
@@ -4114,7 +4115,7 @@ class Template:
                 baid_query = extended_author_search_str
 
         baid_query = baid_query + " "
-        sorted_names_list = sorted(names_dict.iteritems(), key=itemgetter(1),
+        sorted_names_list = sorted(iteritems(names_dict), key=itemgetter(1),
                                    reverse=True)
 
         # Prepare data for display
@@ -4219,7 +4220,7 @@ class Template:
 
         header = "<strong>" + _("Frequent co-authors") + "</strong>"
         content = []
-        sorted_coauthors = sorted(sorted(authors.iteritems(), key=itemgetter(0)),
+        sorted_coauthors = sorted(sorted(iteritems(authors), key=itemgetter(0)),
                                   key=itemgetter(1), reverse=True)
 
         for name, frequency in sorted_coauthors:
@@ -4379,7 +4380,7 @@ class Template:
         msg = _('Back to citesummary')
 
         url = CFG_SITE_URL + '/search?' + \
-                          '&'.join(['='.join(i) for i in params.iteritems()])
+                          '&'.join(['='.join(i) for i in iteritems(params)])
         out += '<p><a href="%(url)s">%(msg)s</a></p>' % {'url': url, 'msg': msg}
 
         return out
@@ -4392,7 +4393,7 @@ class Template:
                   'p': quote(searchpattern),
                   'of': 'hcs2'}
         url = CFG_SITE_URL + '/search?' + \
-                       '&amp;'.join(['='.join(i) for i in params.iteritems()])
+                       '&amp;'.join(['='.join(i) for i in iteritems(params)])
         out += msg % {'url': url,
                       'msg': _('Exclude self-citations')}
 
@@ -4554,7 +4555,7 @@ class Template:
             out += '<formats id="%i">\n' % (identifier)
         else:
             out += "<formats>\n"
-        for format_name, format_type in formats.iteritems():
+        for format_name, format_type in iteritems(formats):
             docs = ''
             if format_name == 'xn':
                 docs = 'http://www.nlm.nih.gov/databases/dtd/'
