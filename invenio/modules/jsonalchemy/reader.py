@@ -27,6 +27,7 @@ reader depending of the master format of the input.
     >>> from invenio.modules.readers.api import Record
     >>> record = Reader.translate(blob, 'marc', Record, model=['picture'])
 """
+import itertools
 import datetime
 import six
 
@@ -37,8 +38,28 @@ from .parser import FieldParser, ModelParser
 from .registry import functions, readers
 
 
-def split_blob(blob, master_format, **kwargs):
-    return readers[master_format].split_blob(blob, **kwargs)
+def split_blob(blob, master_format, slice_size=0, **kwargs):
+    """@todo: Docstring for split_blob.
+
+    :blob: @todo
+    :master_format: @todo
+    :slice_size: @todo
+    :**kwargs: @todo
+    :returns: @todo
+
+    """
+    def grouper(n, iterable):
+        iter_ = iter(iterable)
+        while True:
+            chunk = tuple(itertools.islice(iter_, n))
+            if not chunk:
+                return
+            yield chunk
+    if slice_size == 0:
+        return readers[master_format].split_blob(blob, **kwargs)
+    else:
+        return grouper(slice_size,
+                       readers[master_format].split_blob(blob, **kwargs))
 
 
 class Reader(object):  # pylint: disable=R0921
