@@ -593,7 +593,7 @@ def bibupload_ffts(ffts, append=False, do_debug=False, interactive=True):
         tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPSHAREDDIR)
         os.write(tmp_file_fd, xml)
         os.close(tmp_file_fd)
-        os.chmod(tmp_file_name, 0644)
+        os.chmod(tmp_file_name, 0o644)
         if append:
             if interactive:
                 wait_for_user("This will be appended via BibUpload")

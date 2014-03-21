@@ -1307,7 +1307,7 @@ class BibRecDocs(object):
                     raise InvenioBibDocFileError, "A file called %s exists under %s. This is not a valid name. There should be a ';' followed by an integer representing the file version. Please, manually fix this file either by renaming or by deleting it." % (filename, bibdoc.basedir)
         else:
             # we create the corresponding storage directory
-            old_umask = os.umask(022)
+            old_umask = os.umask(0o022)
             os.makedirs(bibdoc.basedir)
             # and save the father record id if it exists
             try:
@@ -1628,7 +1628,7 @@ class BibDoc(object):
         basedir = _make_base_dir(doc_id)
         # we create the corresponding storage directory
         if not os.path.exists(basedir):
-            old_umask = os.umask(022)
+            old_umask = os.umask(0o022)
             os.makedirs(basedir)
             os.umask(old_umask)
 
@@ -1950,7 +1950,7 @@ class BibDoc(object):
                     raise InvenioBibDocFileError("According to the database a file of format %s is already attached to the docid %s" % (docformat, self.id))
                 try:
                     shutil.copyfile(filename, destination)
-                    os.chmod(destination, 0644)
+                    os.chmod(destination, 0o644)
                     if modification_date: # if the modification time of the file needs to be changed
                         update_modification_date_of_file(destination, modification_date)
                 except Exception as e:
@@ -2022,7 +2022,7 @@ class BibDoc(object):
                     raise InvenioBibDocFileError, "A file for docid '%s' already exists for the format '%s'" % (str(self.id), docformat)
                 try:
                     shutil.copyfile(filename, destination)
-                    os.chmod(destination, 0644)
+                    os.chmod(destination, 0o644)
                     if modification_date: # if the modification time of the file needs to be changed
                         update_modification_date_of_file(destination, modification_date)
                 except Exception as e:
@@ -3461,7 +3461,7 @@ class Md5Folder(object):
     def store(self):
         """Store the current md5 dictionary into .md5"""
         try:
-            old_umask = os.umask(022)
+            old_umask = os.umask(0o022)
             md5file = open(os.path.join(self.folder, ".md5"), "w")
             for key, value in self.md5s.items():
                 md5file.write('%s *%s\n' % (value, key))

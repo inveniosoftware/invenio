@@ -1061,7 +1061,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             # Check if there's enough space to cache the request.
             if len(os.listdir(dirname)) < CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS:
                 try:
-                    os.umask(022)
+                    os.umask(0o022)
                     f = open(fullfilename, "w")
                     f.write(rss_prologue + rss_body + rss_epilogue)
                     f.close()

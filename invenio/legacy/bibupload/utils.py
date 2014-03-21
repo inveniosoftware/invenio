@@ -44,7 +44,7 @@ def open_temp_file(prefix):
 def close_temp_file(file_out, filename):
     """ Close temporary file again """
     file_out.close()
-    os.chmod(filename, 0644)
+    os.chmod(filename, 0o644)
 
 
 def bibupload_record(record=None, collection=None, file_prefix="bibuploadutils", mode="-c",
