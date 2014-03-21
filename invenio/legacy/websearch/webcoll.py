@@ -274,7 +274,7 @@ class Collection:
         mymkdir(dirname)
         fullfilename = dirname + "/%s.html" % filename
         try:
-            os.umask(022)
+            os.umask(0o022)
             f = open(fullfilename, "wb")
         except IOError as v:
             try:

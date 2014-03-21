@@ -714,7 +714,7 @@ def write_cache_file(filename, webdoc_cache_dir, filebody, verbose=0):
     if filebody is None:
         filebody = ''
 
-    os.umask(022)
+    os.umask(0o022)
     f = open(fullfilename, "w")
     f.write(filebody)
     f.close()

@@ -169,9 +169,9 @@ def extract(input, # byte string of file location
             file_handle = None, # [None, 'py', 'os']
             file_handle_mode = 'rb',
 
-            force_file_permissions=None, # file permission bits. eg 0777.
-            force_dir_permissions=None, # file permission bits. eg 0777.
-            umask=None, # file permission bits. eg. 0777 (assuming standard umask interpretation).
+            force_file_permissions=None, # file permission bits. eg 0o777.
+            force_dir_permissions=None, # file permission bits. eg 0o777.
+            umask=None, # file permission bits. eg. 0o777 (assuming standard umask interpretation).
 
             allow_file_types=_valid_file_types, # list containing any of ['regular, dir, symlink, hardlink, char_dev, block_dev, fifo']
             on_find_invalid_file_type='throw_error', # ['throw_error', 'skip']
@@ -302,7 +302,7 @@ def extract(input, # byte string of file location
             if umask is None:
                 # It doesn't seem possible to read the umask without also
                 # setting it. Hence this fudge:
-                umask = os.umask(0777)
+                umask = os.umask(0o777)
                 os.umask(umask)
 
             # Used in the extraction for loop to check for filename collisions
@@ -431,8 +431,8 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
            rename_from_set='abcdefghijklmnopqrstuvwxyz', # characters to use if filename_collision='rename_random'
            num_random_bits=8, # number of random bits to use in the random filename.
 
-           force_file_permissions=None, # file permission bits. eg 0777.
-           force_dir_permissions=None, # file permission bits. eg 0777.
+           force_file_permissions=None, # file permission bits. eg 0o777.
+           force_dir_permissions=None, # file permission bits. eg 0o777.
 
            file_handle = None, # [None, 'py', 'os']
            file_handle_mode = 'rb',

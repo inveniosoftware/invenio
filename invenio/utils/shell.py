@@ -190,13 +190,13 @@ def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
     cmd_err = ''
     # create files:
     if filename_out:
-        cmd_out_fd = os.open(filename_out, os.O_CREAT, 0644)
+        cmd_out_fd = os.open(filename_out, os.O_CREAT, 0o644)
         file_cmd_out = filename_out
     else:
         cmd_out_fd, file_cmd_out = \
                     tempfile.mkstemp("invenio.utils.shell-cmd-out")
     if filename_err:
-        cmd_err_fd = os.open(filename_err, os.O_CREAT, 0644)
+        cmd_err_fd = os.open(filename_err, os.O_CREAT, 0o644)
         file_cmd_err = filename_err
     else:
         cmd_err_fd, file_cmd_err = \
@@ -373,7 +373,7 @@ def escape_shell_arg(shell_arg):
     return "'%s'" % shell_arg.replace("'", r"'\''")
 
 
-def mymkdir(newdir, mode=0777):
+def mymkdir(newdir, mode=0o777):
     """works the way a good mkdir should :)
         - already exists, silently complete
         - regular file in the way, raise an exception
@@ -389,7 +389,7 @@ def mymkdir(newdir, mode=0777):
         if head and not os.path.isdir(head):
             mymkdir(head, mode)
         if tail:
-            os.umask(022)
+            os.umask(0o022)
             os.mkdir(newdir, mode)
 
 
