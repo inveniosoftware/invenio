@@ -96,7 +96,7 @@ if sys.version_info > CFG_MAX_PYTHON_VERSION:
 try:
     import MySQLdb
     import base64
-    import cPickle
+    from six.moves import cPickle
     import cStringIO
     import cgi
     import copy

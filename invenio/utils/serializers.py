@@ -23,7 +23,7 @@
 """
 
 import marshal
-import cPickle as pickle
+from six.moves import cPickle as pickle
 from zlib import compress, decompress
 
 __all__ = ['ZlibMarshal',

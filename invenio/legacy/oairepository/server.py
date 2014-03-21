@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-import cPickle
+from six.moves import cPickle
 import os
 import re
 import time
@@ -906,7 +906,7 @@ def oai_profile():
     """
     Runs a benchmark
     """
-    from cStringIO import StringIO
+    from six import StringIO
     oai_list_records_or_identifiers(StringIO(), argd={"metadataPrefix": "oai_dc", "verb": "ListRecords"})
     oai_list_records_or_identifiers(StringIO(), argd={"metadataPrefix": "marcxml", "verb" :"ListRecords"})
     oai_list_records_or_identifiers(StringIO(), argd={"metadataPrefix": "oai_dc", "verb": "ListIdentifiers"})

@@ -54,7 +54,7 @@ from invenio.legacy.bibrecord import create_records, \
                               record_strip_empty_fields
 
 try:
-    from cStringIO import StringIO
+    from six import StringIO
 except ImportError:
     from StringIO import StringIO
 

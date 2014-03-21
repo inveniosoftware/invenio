@@ -36,7 +36,7 @@ __revision__ = "$Id$"
 import sys
 import os
 
-from cStringIO import StringIO
+from six import StringIO
 processor_type = -1
 try:
     # Try to load

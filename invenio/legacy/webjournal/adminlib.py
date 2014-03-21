@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 
 import sys
-import cPickle
+from six.moves import cPickle
 import re
 import os
 

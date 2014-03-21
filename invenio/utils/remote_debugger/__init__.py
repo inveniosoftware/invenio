@@ -63,7 +63,7 @@ import os
 import glob
 import traceback
 import sys
-from cStringIO import StringIO
+from six import StringIO
 
 
 def start_file_changes_monitor():

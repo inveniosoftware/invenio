@@ -20,7 +20,7 @@
 from invenio.legacy.bibauthorid import config as bconfig
 from datetime import datetime
 import os
-#import cPickle as SER
+#from six.moves import cPickle as SER
 import msgpack as SER
 
 import gc

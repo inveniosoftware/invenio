@@ -26,7 +26,7 @@ by both the web and CLI interfaces.
 
 __revision__ = "$Id$"
 
-import cPickle
+from six.moves import cPickle
 import difflib
 import fnmatch
 import marshal
@@ -39,7 +39,7 @@ import sys
 from datetime import datetime
 
 try:
-    from cStringIO import StringIO
+    from six import StringIO
 except ImportError:
     from StringIO import StringIO
 

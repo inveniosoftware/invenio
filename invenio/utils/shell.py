@@ -33,7 +33,7 @@ import signal
 import six
 import select
 from itertools import chain
-from cStringIO import StringIO
+from six import StringIO
 import subprocess
 
 

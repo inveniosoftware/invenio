@@ -28,7 +28,7 @@ from invenio.legacy.wsgi.utils import add_cookies, Cookie, get_cookie
 
 import random
 import zlib
-import cPickle
+from six.moves import cPickle
 import re
 import sys
 import os

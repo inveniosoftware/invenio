@@ -38,7 +38,7 @@ This module is standalone safe.
 
 from datetime import datetime, timedelta
 from six import iteritems
-import cPickle
+from six.moves import cPickle
 import os
 import re
 import sys

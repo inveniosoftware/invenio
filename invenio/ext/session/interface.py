@@ -24,7 +24,7 @@
     Implements Flask `SessionInterface`.
 """
 
-import cPickle
+from six.moves import cPickle
 import zlib
 
 from datetime import timedelta, datetime

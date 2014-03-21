@@ -19,7 +19,7 @@
 
 import os
 import tempfile
-import cPickle
+from six.moves import cPickle
 import base64
 import logging
 import six

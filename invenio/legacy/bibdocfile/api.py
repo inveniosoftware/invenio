@@ -55,7 +55,7 @@ import socket
 import urllib2
 import urllib
 import tempfile
-import cPickle
+from six.moves import cPickle
 import base64
 import binascii
 import cgi
