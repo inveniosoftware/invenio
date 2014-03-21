@@ -10,7 +10,7 @@ from invenio.ext.sqlalchemy import db
 from mock import MagicMock
 from flask_oauthlib.client import prepare_request
 try:
-    from urlparse import urlparse
+    from six.moves.urllib.parse import urlparse
 except ImportError:
     from urllib.parse import urlparse
 

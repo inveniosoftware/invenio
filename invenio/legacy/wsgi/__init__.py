@@ -25,7 +25,7 @@ import cgi
 import gc
 import inspect
 from fnmatch import fnmatch
-from urlparse import urlparse, urlunparse
+from six.moves.urllib.parse import urlparse, urlunparse
 from six import iteritems
 from wsgiref.util import FileWrapper
 

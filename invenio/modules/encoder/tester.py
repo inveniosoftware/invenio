@@ -28,7 +28,7 @@ from invenio.base.globals import cfg
 from invenio.utils.url import make_invenio_opener
 from os.path import basename
 import os
-from urlparse import urlsplit
+from six.moves.urllib.parse import urlsplit
 import shutil
 import urllib2
 

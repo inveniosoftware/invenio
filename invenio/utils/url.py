@@ -34,7 +34,7 @@ import inspect
 import urllib
 import urllib2
 from urllib import urlencode, quote_plus, quote, FancyURLopener
-from urlparse import urlparse, urlunparse
+from six.moves.urllib.parse import urlparse, urlunparse
 from cgi import parse_qs, parse_qsl, escape
 from werkzeug import cached_property
 from werkzeug.local import LocalProxy
