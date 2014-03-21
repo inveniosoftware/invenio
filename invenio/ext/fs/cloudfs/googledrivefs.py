@@ -494,7 +494,7 @@ class GoogleDriveFS(FS):
         """
         path = self._normpath(path)
 
-        if isinstance(contents, basestring):
+        if isinstance(contents, six.string_types):
             string_data = contents
         else:
             try:

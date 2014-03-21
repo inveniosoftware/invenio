@@ -15,6 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 021111307, USA.
 
+import six
 from invenio.legacy.bibsched.bibtask import write_message
 
 
@@ -26,7 +27,7 @@ def write_something_bibsched(messagea="This is the default message"):
 
     def _write_something_bibsched(obj, eng):
 
-        if isinstance(messagea, basestring):
+        if isinstance(messagea, six.string_types):
             write_message(messagea)
             return None
 
@@ -45,7 +46,7 @@ def write_something_bibsched(messagea="This is the default message"):
                     while callable(I):
                         I = I(obj, eng)
                     temp += str(I)
-                elif isinstance(I, basestring):
+                elif isinstance(I, six.string_types):
                     temp += I
             write_message(temp)
             return None
@@ -61,7 +62,7 @@ def write_something_generic(messagea, func):
 
     def _write_something_generic(obj, eng):
 
-        if isinstance(messagea, basestring):
+        if isinstance(messagea, six.string_types):
             func(messagea)
             return None
 
@@ -80,7 +81,7 @@ def write_something_generic(messagea, func):
                     while callable(I):
                         I = I(obj, eng)
                     temp += str(I)
-                elif isinstance(I, basestring):
+                elif isinstance(I, six.string_types):
                     temp += I
             func(temp)
             return None

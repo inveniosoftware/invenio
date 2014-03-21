@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import six
+
 from werkzeug import MultiDict
 import json
 from wtforms.widgets import html_params, HTMLString, RadioInput, HiddenInput, \
@@ -339,7 +341,7 @@ class TagItemWidget(DynamicItemWidget):
                 return '<%s>' % self.html_tag
             else:
                 ctx = {}
-                if(isinstance(subfield.data, basestring)):
+                if(isinstance(subfield.data, six.string_types)):
                     ctx['value'] = subfield.data
                 elif subfield.data:
                     ctx.update(subfield.data)

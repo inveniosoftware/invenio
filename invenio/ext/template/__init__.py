@@ -23,6 +23,7 @@
     used in Invenio.
 """
 
+import six
 
 from .bccache import BytecodeCacheWithConfig
 from .context_processor import setup_app as context_processor_setup_app
@@ -203,7 +204,7 @@ def setup_app(app):
         This is a special Jinja2 filter that will call
         pretty_date to print a human friendly timestamp.
         """
-        if isinstance(date, datetime) or isinstance(date, basestring):
+        if isinstance(date, datetime) or isinstance(date, six.string_types):
             return pretty_date(
                 date, ln=getattr(g, 'ln', app.config['CFG_SITE_LANG']))
         return date

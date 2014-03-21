@@ -26,6 +26,7 @@ import os
 import subprocess
 import unicodedata
 import re
+import six
 import sys
 import time
 try:
@@ -123,7 +124,7 @@ def force_unicode(seq, encoding='utf-8', errors='ignore'):
         return ''
 
     try:
-        if not isinstance(seq, basestring,):
+        if not isinstance(seq, six.string_types,):
             if hasattr(seq, '__unicode__'):
                 seq = unicode(seq)
             else:

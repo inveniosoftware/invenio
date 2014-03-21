@@ -21,6 +21,7 @@ This module is NOT standalone safe - this component is never expected
 to run in a standalone mode, but always inside invenio."""
 
 import os
+import six
 from cgi import escape
 
 from invenio.legacy import bibupload
@@ -147,9 +148,9 @@ def record_get_keywords(record, main_field=bconfig.CFG_MAIN_FIELD,
     """
     keywords = {}
 
-    if isinstance(main_field, basestring):
+    if isinstance(main_field, six.string_types):
         main_field = [main_field]
-    if isinstance(others, basestring):
+    if isinstance(others, six.string_types):
         others = [others]
 
     if isinstance(record, int):
@@ -335,9 +336,9 @@ def _doc_already_submitted(recid):
 def filter_marcrec(marcrec, main_field=bconfig.CFG_MAIN_FIELD,
                    others=bconfig.CFG_OTHER_FIELDS):
     """Removes the unwanted fields and returns xml"""
-    if isinstance(main_field, basestring):
+    if isinstance(main_field, six.string_types):
         main_field = [main_field]
-    if isinstance(others, basestring):
+    if isinstance(others, six.string_types):
         others = [others]
     key_map = ['001']
 

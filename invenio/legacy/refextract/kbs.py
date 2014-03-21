@@ -18,6 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import re
+import six
 import sys
 import csv
 
@@ -351,7 +352,7 @@ def build_reportnum_kb(fpath):
                        # styles.
 
     try:
-        if isinstance(fpath, basestring):
+        if isinstance(fpath, six.string_types):
             write_message('Loading reports kb from %s' % fpath, verbose=3)
             fh = open(fpath, "r")
             fpath_needs_closing = True
@@ -481,7 +482,7 @@ def build_special_journals_kb(fpath):
 
 
 def build_books_kb(fpath):
-    if isinstance(fpath, basestring):
+    if isinstance(fpath, six.string_types):
         fpath_needs_closing = True
         try:
             write_message('Loading books kb from %s' % fpath, verbose=3)
@@ -512,7 +513,7 @@ def build_books_kb(fpath):
 
 
 def build_publishers_kb(fpath):
-    if isinstance(fpath, basestring):
+    if isinstance(fpath, six.string_types):
         fpath_needs_closing = True
         try:
             write_message('Loading publishers kb from %s' % fpath, verbose=3)
@@ -545,7 +546,7 @@ def build_publishers_kb(fpath):
 def build_authors_kb(fpath):
     replacements = []
 
-    if isinstance(fpath, basestring):
+    if isinstance(fpath, six.string_types):
         fpath_needs_closing = True
         try:
             fh = open(fpath, "r")
@@ -589,7 +590,7 @@ def build_journals_re_kb(fpath):
 
     kb = []
 
-    if isinstance(fpath, basestring):
+    if isinstance(fpath, six.string_types):
         fpath_needs_closing = True
         try:
             fh = open(fpath, "r")

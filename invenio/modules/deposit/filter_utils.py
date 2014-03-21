@@ -26,6 +26,8 @@ See more information on:
 http://wtforms.simplecodes.com/docs/1.0.4/fields.html#wtforms.fields.Field.__init__
 """
 
+import six
+
 from invenio.utils.html import HTMLWasher
 
 
@@ -33,7 +35,7 @@ def strip_string(value):
     """
     Remove leading and trailing spaces from string
     """
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         return value.strip()
     else:
         return value
@@ -43,7 +45,7 @@ def splitlines_list(value):
     """
     Split string per line into a list
     """
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         newdata = []
         for line in value.splitlines():
             if line.strip():
@@ -63,7 +65,7 @@ def splitchar_list(c):
         """
         Split string per char into a list
         """
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             newdata = []
             for item in value.split(c):
                 if item.strip():
@@ -100,7 +102,7 @@ def strip_prefixes(*prefixes):
         """
         Remove a leading prefix from string
         """
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             for prefix in prefixes:
                 if value.lower().startswith(prefix):
                     return value[len(prefix):]
@@ -112,7 +114,7 @@ def sanitize_html(value):
     """
     Sanitize HTML
     """
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         washer = HTMLWasher()
         return washer.wash(value)
     else:
