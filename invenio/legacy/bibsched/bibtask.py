@@ -149,7 +149,7 @@ def task_low_level_submission(name, user, *argv):
         while True:
             try:
                 opts, args = getopt.gnu_getopt(argv, 'P:', ['priority='])
-            except getopt.GetoptError, err:
+            except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
                     argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
@@ -172,7 +172,7 @@ def task_low_level_submission(name, user, *argv):
         while True:
             try:
                 opts, args = getopt.gnu_getopt(argv, 'N:', ['name='])
-            except getopt.GetoptError, err:
+            except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
                     argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
@@ -192,7 +192,7 @@ def task_low_level_submission(name, user, *argv):
         while True:
             try:
                 opts, args = getopt.gnu_getopt(argv, 't:', ['runtime='])
-            except getopt.GetoptError, err:
+            except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
                     argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
@@ -215,7 +215,7 @@ def task_low_level_submission(name, user, *argv):
         while True:
             try:
                 opts, args = getopt.gnu_getopt(argv, 's:', ['sleeptime='])
-            except getopt.GetoptError, err:
+            except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
                     argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
@@ -238,7 +238,7 @@ def task_low_level_submission(name, user, *argv):
         while True:
             try:
                 opts, args = getopt.gnu_getopt(argv, 'I:', ['sequence-id='])
-            except getopt.GetoptError, err:
+            except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
                     argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
@@ -422,7 +422,7 @@ def task_init(
                 help_specific_usage, version, specific_params,
                 task_submit_elaborate_specific_parameter_fnc,
                 task_submit_check_options_fnc)
-        except (SystemExit, Exception), err:
+        except (SystemExit, Exception) as err:
             if not to_be_submitted:
                 register_exception(alert_admin=True)
                 write_message("Error in parsing the parameters: %s." % err, sys.stderr)
@@ -486,7 +486,7 @@ def task_init(
                     ret = _task_run(task_run_fnc)
                 if not ret:
                     write_message("Error occurred.  Exiting.", sys.stderr)
-            except Exception, e:
+            except Exception as e:
                 register_exception(alert_admin=True)
                 write_message("Unexpected error occurred: %s." % e, sys.stderr)
                 write_message("Traceback is:", sys.stderr)
@@ -545,7 +545,7 @@ def _task_build_params(
                 "fixed-time",
                 "email-logs-to="
             ] + long_params)
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         _usage(1, err, help_specific_usage=help_specific_usage, description=description)
     try:
         for opt in opts:
@@ -588,7 +588,7 @@ def _task_build_params(
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
                 _usage(1, help_specific_usage=help_specific_usage, description=description)
-    except StandardError, e:
+    except StandardError as e:
         _usage(e, help_specific_usage=help_specific_usage, description=description)
     if callable(task_submit_check_options_fnc):
         if not task_submit_check_options_fnc():
@@ -1144,7 +1144,7 @@ def guess_apache_process_user_from_ps():
                 if process in ('apache', 'apache2', 'httpd') :
                     if username not in apache_users and username != 'root':
                         apache_users.append(username)
-    except Exception, e:
+    except Exception as e:
         print >> sys.stderr, "WARNING: %s" % e
     return tuple(apache_users)
 

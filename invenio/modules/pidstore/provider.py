@@ -44,7 +44,7 @@ class PidProvider(object):
             def delete(self, pid, *args, **kwargs):
                 try:
                     ...
-                except Exception, e:
+                except Exception as e:
                     pid.log("DELETE","Deletion failed")
                     return False
                 else:

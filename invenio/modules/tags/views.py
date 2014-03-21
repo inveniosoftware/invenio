@@ -339,7 +339,7 @@ def delete():
             field = Field('data', id_tag)
             validate_tag_exists(None, field)
             validate_user_owns_tag(None, field)
-        except validators.ValidationError, ex:
+        except validators.ValidationError as ex:
             flash(ex.message, 'error')
 
     for id_tag in id_tags:

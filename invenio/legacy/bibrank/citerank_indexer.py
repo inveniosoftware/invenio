@@ -729,7 +729,7 @@ def get_dates(function, config, dict_of_ids):
     try:
         file_for_dates = config.get(function, "file_with_dates")
         dates = get_dates_from_file(file_for_dates, dict_of_ids)
-    except (ConfigParser.NoOptionError, StandardError), err:
+    except (ConfigParser.NoOptionError, StandardError) as err:
         write_message("If you want to read the dates from file set up the \
 'file_for_dates' variable in the config file [%s]" %err, verbose=3)
     try:
@@ -771,7 +771,7 @@ This package is compulsory for running the citerank methods.')
     try:
         file_for_citations = config.get(function, "file_with_citations")
         cit, dict_of_ids = get_citations_from_file(file_for_citations)
-    except (ConfigParser.NoOptionError, StandardError), err:
+    except (ConfigParser.NoOptionError, StandardError) as err:
         write_message("If you want to read the citation data from file set up \
 the file_for_citations parameter in the config file [%s]" %err, verbose=2)
         cit, dict_of_ids = get_citations_from_db()
@@ -782,7 +782,7 @@ the file_for_citations parameter in the config file [%s]" %err, verbose=2)
         return
     try:
         method = config.get(function, "citerank_method")
-    except ConfigParser.NoOptionError, err:
+    except ConfigParser.NoOptionError as err:
         write_message("Exception: %s " %err, sys.stderr)
         raise Exception
     write_message("Running %s method." % method, verbose=2)
@@ -790,7 +790,7 @@ the file_for_citations parameter in the config file [%s]" %err, verbose=2)
     if method == "citation_time":
         try:
             time_decay = float(config.get(function, "time_decay"))
-        except (ConfigParser.NoOptionError, ValueError), err:
+        except (ConfigParser.NoOptionError, ValueError) as err:
             write_message("Exception: %s" % err, sys.stderr)
             raise Exception
         date_coef = calculate_time_weights(len_, time_decay, dates)
@@ -805,7 +805,7 @@ the file_for_citations parameter in the config file [%s]" %err, verbose=2)
             write_message("Parameters: d = %s, conv_threshold = %s, \
 check_point = %s" %(str(damping_factor), \
 str(conv_threshold), str(check_point)), verbose=5)
-        except (ConfigParser.NoOptionError, StandardError), err:
+        except (ConfigParser.NoOptionError, StandardError) as err:
             write_message("Exception: %s" % err, sys.stderr)
             raise Exception
         if method == "pagerank_classic":
@@ -815,7 +815,7 @@ str(conv_threshold), str(check_point)), verbose=5)
                 use_ext_cit = config.get(function, "use_external_citations")
                 write_message("Pagerank will use external citations: %s" \
                    %str(use_ext_cit), verbose=5)
-            except (ConfigParser.NoOptionError, StandardError), err:
+            except (ConfigParser.NoOptionError, StandardError) as err:
                 write_message("%s" % err, verbose=2)
             if use_ext_cit == "yes":
                 try:
@@ -845,7 +845,7 @@ sys.stderr)
                 try:
                     alpha = float(config.get(function, "ext_alpha"))
                     beta = float(config.get(function, "ext_beta"))
-                except (ConfigParser.NoOptionError, StandardError), err:
+                except (ConfigParser.NoOptionError, StandardError) as err:
                     write_message("Exception: %s" % err, sys.stderr)
                     raise Exception
                 dict_of_ranks = run_pagerank_ext(cit, dict_of_ids, ref, \
@@ -858,7 +858,7 @@ sys.stderr)
                 time_decay = float(config.get(function, "time_decay"))
                 write_message("Parameter: time_decay = %s" \
                               %str(time_decay), verbose=5)
-            except (ConfigParser.NoOptionError, StandardError), err:
+            except (ConfigParser.NoOptionError, StandardError) as err:
                 write_message("Exception: %s" % err, sys.stderr)
                 raise Exception
             date_coef = calculate_time_weights(len_, time_decay, dates)

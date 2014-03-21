@@ -104,7 +104,7 @@ class SessionInterface(FlaskSessionInterface):
             session = self.session_class(data, sid=sid)
             if session.check_ip(request):
                 return session
-        except Exception, err:
+        except Exception as err:
             current_app.logger.warning("Detected error: %s" % err)
             pass
         except:

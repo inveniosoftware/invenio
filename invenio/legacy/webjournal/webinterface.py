@@ -126,20 +126,20 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             ln = wash_journal_language(argd['ln'])
             try:
                 journal_name = wash_journal_name(ln, argd['name'])
-            except InvenioWebJournalNoJournalOnServerError, e:
+            except InvenioWebJournalNoJournalOnServerError as e:
                 register_exception(req=req)
                 return e.user_box(req)
-            except InvenioWebJournalNoNameError, e:
+            except InvenioWebJournalNoNameError as e:
                 return e.user_box(req)
             try:
                 issue = wash_issue_number(ln, journal_name,
                                           argd['issue'])
                 issue_year = issue.split('/')[1]
                 issue_number = issue.split('/')[0]
-            except InvenioWebJournalIssueNumberBadlyFormedError, e:
+            except InvenioWebJournalIssueNumberBadlyFormedError as e:
                 register_exception(req=req)
                 return e.user_box(req)
-            except InvenioWebJournalJournalIdNotFoundDBError, e:
+            except InvenioWebJournalJournalIdNotFoundDBError as e:
                 register_exception(req=req)
                 return e.user_box(req)
             category = wash_category(ln, argd['category'], journal_name, issue).replace(' ', '%20')
@@ -159,9 +159,9 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             washed_journal_name = wash_journal_name(argd['ln'], journal_name)
             if washed_journal_name != journal_name:
                 redirect_p = True
-        except InvenioWebJournalNoNameError, e:
+        except InvenioWebJournalNoNameError as e:
             return e.user_box(req)
-        except InvenioWebJournalNoJournalOnServerError, e:
+        except InvenioWebJournalNoJournalOnServerError as e:
             register_exception(req=req)
             return e.user_box(req)
 
@@ -191,7 +191,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                             raise InvenioWebJournalIssueNotFoundDBError(argd['ln'],
                                                                         journal_name,
                                                                         '')
-                        except InvenioWebJournalIssueNotFoundDBError, e:
+                        except InvenioWebJournalIssueNotFoundDBError as e:
                             register_exception(req=req)
                             return e.user_box(req)
                 if not category:
@@ -215,18 +215,18 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             journal_name = washed_journal_name
             issue = wash_issue_number(argd['ln'], journal_name, journal_issue)
             category = wash_category(argd['ln'], category, journal_name, issue)
-        except InvenioWebJournalNoJournalOnServerError, e:
+        except InvenioWebJournalNoJournalOnServerError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoNameError, e:
+        except InvenioWebJournalNoNameError as e:
             return e.user_box(req)
-        except InvenioWebJournalIssueNumberBadlyFormedError, e:
+        except InvenioWebJournalIssueNumberBadlyFormedError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoCategoryError, e:
+        except InvenioWebJournalNoCategoryError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalJournalIdNotFoundDBError, e:
+        except InvenioWebJournalJournalIdNotFoundDBError as e:
             register_exception(req=req)
             return e.user_box(req)
 
@@ -270,10 +270,10 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         try:
             ln = wash_journal_language(argd['ln'])
             washed_journal_name = wash_journal_name(ln, argd['name'])
-        except InvenioWebJournalNoJournalOnServerError, e:
+        except InvenioWebJournalNoJournalOnServerError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoNameError, e:
+        except InvenioWebJournalNoNameError as e:
             return e.user_box(req)
 
         html = perform_request_contact(req, ln, washed_journal_name,
@@ -293,12 +293,12 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             ln = wash_journal_language(argd['ln'])
             washed_journal_name = wash_journal_name(ln, argd['name'])
             record = wash_popup_record(ln, argd['record'], washed_journal_name)
-        except InvenioWebJournalNoJournalOnServerError, e:
+        except InvenioWebJournalNoJournalOnServerError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoNameError, e:
+        except InvenioWebJournalNoNameError as e:
             return e.user_box(req)
-        except InvenioWebJournalNoPopupRecordError, e:
+        except InvenioWebJournalNoPopupRecordError as e:
             register_exception(req=req)
             return e.user_box(req)
 
@@ -329,21 +329,21 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                              argd['archive_date'])
             archive_select = argd['archive_select']
             archive_search = argd['archive_search']
-        except InvenioWebJournalNoJournalOnServerError, e:
+        except InvenioWebJournalNoJournalOnServerError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoNameError, e:
+        except InvenioWebJournalNoNameError as e:
             return e.user_box(req)
-        except InvenioWebJournalNoCurrentIssueError, e:
+        except InvenioWebJournalNoCurrentIssueError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalIssueNumberBadlyFormedError, e:
+        except InvenioWebJournalIssueNumberBadlyFormedError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalArchiveDateWronglyFormedError, e:
+        except InvenioWebJournalArchiveDateWronglyFormedError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalJournalIdNotFoundDBError, e:
+        except InvenioWebJournalJournalIdNotFoundDBError as e:
             register_exception(req=req)
             return e.user_box(req)
 
@@ -385,21 +385,21 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             issue_number = wash_issue_number(ln, journal_name,
                                              argd['issue'])
             category = wash_category(ln, argd['category'], journal_name, issue_number)
-        except InvenioWebJournalNoJournalOnServerError, e:
+        except InvenioWebJournalNoJournalOnServerError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoNameError, e:
+        except InvenioWebJournalNoNameError as e:
             return e.user_box(req)
-        except InvenioWebJournalNoCurrentIssueError, e:
+        except InvenioWebJournalNoCurrentIssueError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalIssueNumberBadlyFormedError, e:
+        except InvenioWebJournalIssueNumberBadlyFormedError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoCategoryError, e:
+        except InvenioWebJournalNoCategoryError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalJournalIdNotFoundDBError, e:
+        except InvenioWebJournalJournalIdNotFoundDBError as e:
             register_exception(req=req)
             return e.user_box(req)
         # the journal_defaults will be used by format elements that have no
@@ -437,24 +437,24 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             category = wash_category(ln, argd['category'], journal_name, issue_number)
             number = wash_article_number(ln, argd['number'], journal_name)
             recid = get_recid_from_legacy_number(issue, category, int(number))
-        except InvenioWebJournalNoJournalOnServerError, e:
+        except InvenioWebJournalNoJournalOnServerError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoNameError, e:
+        except InvenioWebJournalNoNameError as e:
             return e.user_box(req)
-        except InvenioWebJournalNoCurrentIssueError, e:
+        except InvenioWebJournalNoCurrentIssueError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalIssueNumberBadlyFormedError, e:
+        except InvenioWebJournalIssueNumberBadlyFormedError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoArticleNumberError, e:
+        except InvenioWebJournalNoArticleNumberError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoCategoryError, e:
+        except InvenioWebJournalNoCategoryError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalJournalIdNotFoundDBError, e:
+        except InvenioWebJournalJournalIdNotFoundDBError as e:
             register_exception(req=req)
             return e.user_box(req)
 
@@ -479,10 +479,10 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
         try:
             ln = wash_journal_language(argd['ln'])
             journal_name = wash_journal_name(ln, argd['name'])
-        except InvenioWebJournalNoJournalOnServerError, e:
+        except InvenioWebJournalNoJournalOnServerError as e:
             register_exception(req=req)
             return e.user_box(req)
-        except InvenioWebJournalNoNameError, e:
+        except InvenioWebJournalNoNameError as e:
             return e.user_box(req)
         redirect_to_url(req, CFG_SITE_SECURE_URL + \
                         '/admin/webjournal/webjournaladmin.py/administrate?journal_name=' + \

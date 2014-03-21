@@ -160,7 +160,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                         fd = open("%s/%s_RENAMED" % (curdir, path), "w")
                         fd.write("%s%s" % (filename, extension))
                         fd.close()
-                    except OSError, err:
+                    except OSError as err:
                         msg = "Cannot rename the file.[%s]"
                         msg %= str(err)
                         raise InvenioWebSubmitFunctionWarning(msg)
@@ -192,7 +192,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                                     'multipage-icon-delay' : 100,
                                     'verbosity' : 0,
                                 })
-                            except Exception, e:
+                            except Exception as e:
                                 register_exception(prefix='Impossible to create icon for %s (record %s)' % (fullpath, sysno), alert_admin=True)
                                 continue
                             iconpath = os.path.join(iconpath, iconname)
@@ -218,11 +218,11 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                                             fd = open("%s/%s_ICON_%s" % (curdir, path, iconsize + '_' + icon_suffix), "w")
                                         fd.write(os.path.basename(iconpath))
                                         fd.close()
-                                    except OSError, err:
+                                    except OSError as err:
                                         msg = "Cannot store icon filename.[%s]"
                                         msg %= str(err)
                                         raise InvenioWebSubmitFunctionWarning(msg)
-                                except InvenioBibDocFileError, e:
+                                except InvenioBibDocFileError as e:
                                     # Most probably icon already existed.
                                     pass
                             elif mybibdoc is not None:

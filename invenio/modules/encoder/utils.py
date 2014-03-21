@@ -144,7 +144,7 @@ def force_unicode(seq, encoding='utf-8', errors='ignore'):
             # errors), so that if seq is a SafeString, it ends up being a
             # SafeUnicode at the end.
             seq = seq.decode(encoding, errors)
-    except UnicodeDecodeError, e:
+    except UnicodeDecodeError as e:
         if not isinstance(seq, Exception):
             raise UnicodeDecodeError (seq, *e.args)
         else:

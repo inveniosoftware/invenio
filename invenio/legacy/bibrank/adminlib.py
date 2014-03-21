@@ -225,7 +225,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
                 try:
                     trans_names = get_name(rnkID, key, sel_type, "rnkMETHOD")
                     trans.append(trans_names[0][0])
-                except StandardError, e:
+                except StandardError as e:
                     trans.append('')
 
         for nr in range(0,len(langs)):
@@ -318,7 +318,7 @@ def perform_addrankarea(rnkcode='', ln=CFG_SITE_LANG, template='', confirm=-1):
                         text += """<b><span class="info"><br />Configuration file created using '%s' as template.</span></b>""" % template
                     else:
                         text += """<b><span class="info"><br />Empty configuration file created.</span></b>"""
-                except StandardError, e:
+                except StandardError as e:
                     text += """<b><span class="info"><br />Sorry, could not create configuration file: '%s.cfg', either because it already exists, or not enough rights to create file. <br />Please create the file in the path given.</span></b>""" % (configuration.get(get_rnk_code(rnkID)[0][0] + '.cfg', ''), )
             else:
                 text = """<b><span class="info">Sorry, could not add rank method, rank method with the same BibRank code probably exists.</span></b>"""
@@ -370,7 +370,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=CFG_SITE_LANG, template='', cfgfile
             for line in file.readlines():
                 textarea += line
         text += """<textarea class="admin_wvar" name="cfgfile" rows="15" cols="70">""" + textarea + """</textarea>"""
-    except StandardError, e:
+    except StandardError as e:
         text += """<b><span class="info">Cannot load file, either it does not exist, or not enough rights to read it: '%s.cfg'<br />Please create the file in the path given.</span></b>""" % (configuration.get(get_rnk_code(rnkID)[0][0] + '.cfg', ''), )
 
     output += createhiddenform(action="modifyrank",
@@ -394,7 +394,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=CFG_SITE_LANG, template='', cfgfile
                 file.close()
                 file2.close()
                 os.remove(configuration.get(oldcode + '.cfg', ''))
-            except StandardError, e:
+            except StandardError as e:
                 text = """<b><span class="info">Sorry, could not change name of cfg file, must be done manually: '%s.cfg'</span></b>""" % (configuration.get(oldcode + '.cfg', ''), )
         else:
             text = """<b><span class="info">Sorry, could not modify rank method.</span></b>"""
@@ -406,7 +406,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=CFG_SITE_LANG, template='', cfgfile
             file.write(cfgfile)
             file.close()
             text = """<b><span class="info"><br />Configuration file modified: '%s/bibrank/%s.cfg'</span></b>""" % (configuration.get(get_rnk_code(rnkID)[0][0] + '.cfg', ''), )
-        except StandardError, e:
+        except StandardError as e:
             text = """<b><span class="info"><br />Sorry, could not modify configuration file, please check for rights to do so: '%s.cfg'<br />Please modify the file manually.</span></b>""" % (configuration.get(get_rnk_code(rnkID)[0][0] + '.cfg', ''), )
         output += text
 
@@ -440,7 +440,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=CFG_SITE_LANG, template='', cfgfile
             file.close()
             text += """<textarea class="admin_wvar" readonly="true" rows="15" cols="70">""" + textarea + """</textarea>"""
             output += text
-    except StandardError, e:
+    except StandardError as e:
         output += """Cannot load file, either it does not exist, or not enough rights to read it: '%s'""" % (configuration.get(template, ''), )
 
     finoutput += addadminbox("View templates", [output])
@@ -489,11 +489,11 @@ def perform_deleterank(rnkID, ln=CFG_SITE_LANG, confirm=0):
                     try:
                         os.remove(configuration.get( rnkcode + ".cfg"))
                         text += """<br /><b><span class="info">Configuration file deleted: '%s.cfg'.</span></b>"""  % (configuration.get( rnkcode + ".cfg"), )
-                    except StandardError, e:
+                    except StandardError as e:
                         text += """<br /><b><span class="info">Sorry, could not delete configuration file: '%s/bibrank/%s.cfg'.</span><br />Please delete the file manually.</span></b>""" % (configuration.get( rnkcode + ".cfg"), )
                 else:
                     text = """<b><span class="info">Sorry, could not delete rank method</span></b>"""
-            except StandardError, e:
+            except StandardError as e:
                 text = """<b><span class="info">Sorry, could not delete rank method, most likely already deleted</span></b>"""
             output = text
 
@@ -525,7 +525,7 @@ def perform_showrankdetails(rnkID, ln=CFG_SITE_LANG):
     text = ""
     try:
         text = "Not yet implemented"
-    except StandardError, e:
+    except StandardError as e:
         text = "BibRank not yet run, cannot show statistics for method"
     output += addadminbox(subtitle, [text])
 
@@ -565,7 +565,7 @@ def perform_showrankdetails(rnkID, ln=CFG_SITE_LANG):
         for line in file.readlines():
             text += line
         text += """</pre>"""
-    except StandardError, e:
+    except StandardError as e:
         text = """Cannot load file, either it does not exist, or not enough rights to read it."""
     output += addadminbox(subtitle, [text])
 
@@ -581,7 +581,7 @@ def get_rnk_code(rnkID):
     try:
         res = run_sql("SELECT name FROM rnkMETHOD where id=%s" % (rnkID))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ()
 
 def get_rnk(rnkID=''):
@@ -594,7 +594,7 @@ def get_rnk(rnkID=''):
         else:
             res = run_sql("SELECT id,name,DATE_FORMAT(last_updated, '%%Y-%%m-%%d %%H:%%i:%%s') from rnkMETHOD")
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ()
 
 def get_translations(rnkID):
@@ -604,7 +604,7 @@ def get_translations(rnkID):
     try:
         res = run_sql("SELECT ln, type, value FROM rnkMETHODNAME where id_rnkMETHOD=%s ORDER BY ln,type" % (rnkID))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ()
 
 def get_rnk_nametypes():
@@ -631,7 +631,7 @@ def get_rnk_col(rnkID, ln=CFG_SITE_LANG):
         res2 = get_def_name('', "collection")
         result = filter(lambda x: res1.has_key(x[0]), res2)
         return result
-    except StandardError, e:
+    except StandardError as e:
         return ()
 
 def get_templates():
@@ -652,7 +652,7 @@ def attach_col_rnk(rnkID, colID):
     try:
         res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)" % (colID, rnkID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def detach_col_rnk(rnkID, colID):
@@ -663,7 +663,7 @@ def detach_col_rnk(rnkID, colID):
     try:
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s" % (colID, rnkID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def delete_rnk(rnkID, table=""):
@@ -679,7 +679,7 @@ def delete_rnk(rnkID, table=""):
             res = run_sql("truncate %s" % table)
             res = run_sql("truncate %sR" % table[:-1])
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def modify_rnk(rnkID, rnkcode):
@@ -690,7 +690,7 @@ def modify_rnk(rnkID, rnkcode):
     try:
         res = run_sql("UPDATE rnkMETHOD set name=%s WHERE id=%s", (rnkcode, rnkID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def add_rnk(rnkcode):
@@ -704,7 +704,7 @@ def add_rnk(rnkcode):
             return (1, res[0][0])
         else:
             raise StandardError
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def addadminbox(header='', datalist=[], cls="admin_wvar"):
@@ -934,7 +934,7 @@ def get_def_name(ID, table):
         res = list(res)
         res.sort(compare_on_val)
         return res
-    except StandardError, e:
+    except StandardError as e:
         return []
 
 def get_i8n_name(ID, ln, rtype, table):
@@ -969,7 +969,7 @@ def get_i8n_name(ID, ln, rtype, table):
         res = list(res)
         res.sort(compare_on_val)
         return res
-    except StandardError, e:
+    except StandardError as e:
         raise StandardError
 
 def get_name(ID, ln, rtype, table):
@@ -986,7 +986,7 @@ def get_name(ID, ln, rtype, table):
     try:
         res = run_sql("SELECT value FROM %s%s WHERE type='%s' and ln='%s' and id_%s=%s" % (table, name, rtype, ln, table, ID))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ()
 
 def modify_translations(ID, langs, sel_type, trans, table):
@@ -1017,7 +1017,7 @@ def modify_translations(ID, langs, sel_type, trans, table):
                     res = run_sql("INSERT INTO %s%s (id_%s, type, ln, value) VALUES (%%s,%%s,%%s,%%s)" % (table, name, table),
                                   (ID, sel_type, langs[nr][0], trans[nr]))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def write_outcome(res):

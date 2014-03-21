@@ -461,7 +461,7 @@ def prepare_option_parser():
             debug('Parsing range: %s' % value)
             value = ranges2ids(value)
             setattr(parser.values, option.dest, value)
-        except Exception, e:
+        except Exception as e:
             raise OptionValueError("It's impossible to parse the range '%s' for option %s: %s" % (value, opt, e))
 
     def _date_range_callback(option, opt, value, parser):
@@ -472,7 +472,7 @@ def prepare_option_parser():
         try:
             value = _parse_date_range(value)
             setattr(parser.values, option.dest, value)
-        except Exception, e:
+        except Exception as e:
             raise OptionValueError("It's impossible to parse the range '%s' for option %s: %s" % (value, opt, e))
 
     parser = OptionParserSpecial(usage="usage: %prog [options]",
@@ -753,7 +753,7 @@ def cli_textify(options):
                 #pylint: disable=E1103
                 bibdoc.extract_text(perform_ocr=perform_ocr)
                 print "DONE"
-            except InvenioBibDocFileError, e:
+            except InvenioBibDocFileError as e:
                 print >> sys.stderr, "WARNING: %s" % e
         else:
             print "not needed"
@@ -779,12 +779,12 @@ def cli_fix_bibdocfsinfo_cache(options):
         sys.stdout.flush()
         try:
             bibdoc = BibDoc(docid)
-        except InvenioBibDocFileError, err:
+        except InvenioBibDocFileError as err:
             print err
             continue
         try:
             bibdoc._sync_to_db()
-        except Exception, err:
+        except Exception as err:
             if bibdoc.bibrec_links:
                 recid = bibdoc.bibrec_links[0]["recid"]
                 if recid:
@@ -1255,7 +1255,7 @@ def main():
         else:
             print >> sys.stderr, "ERROR: Action %s is not valid" % getattr(options, 'action', None)
             sys.exit(1)
-    except Exception, e:
+    except Exception as e:
         register_exception()
         print >> sys.stderr, 'ERROR: %s' % e
         sys.exit(1)

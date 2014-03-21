@@ -238,7 +238,7 @@ def get_indico_credentials(path):
         fd = open(path, "r")
         _indico_credentials = fd.read()
         fd.close()
-    except IOError, e:
+    except IOError as e:
         return ('', '')
 
     return base64.decodestring(_indico_credentials).split('\n', 1)

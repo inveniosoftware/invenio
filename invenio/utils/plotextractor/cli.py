@@ -93,7 +93,7 @@ def main():
               squash_param, clean_param]
     try:
         opts, args = getopt.getopt(sys.argv[1:], param_abbrs, params)
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         write_message(str(err))
         usage()
         sys.exit(2)

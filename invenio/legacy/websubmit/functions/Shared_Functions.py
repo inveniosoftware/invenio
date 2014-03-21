@@ -74,7 +74,7 @@ def createRelatedFormats(fullpath, overwrite=True, debug=False):
                 try:
                     convert_file(path, newpath)
                     createdpaths.append(newpath)
-                except InvenioWebSubmitFileConverterError, msg:
+                except InvenioWebSubmitFileConverterError as msg:
                     if debug:
                         print >> sys.stderr, "...... Exception: %s" % msg
                     register_exception(alert_admin=True)

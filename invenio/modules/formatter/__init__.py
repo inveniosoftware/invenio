@@ -165,7 +165,7 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
         if of.lower() == 'xm':
             out = filter_hidden_fields(out, user_info)
         return out
-    except Exception, e:
+    except Exception as e:
         from invenio.ext.logging import register_exception
         register_exception(prefix="An error occured while formatting record %i in %s" % \
                            (recID, of),
@@ -616,7 +616,7 @@ def main():
                                     "lang=",
                                     "id=",
                                     "output="])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage(1, err)
         pass
     try:
@@ -647,7 +647,7 @@ def main():
 
         if options["recID"] == None:
             usage(1, "-i argument is needed")
-    except StandardError, e:
+    except StandardError as e:
         usage(e)
 
     print format_records(recIDs=options["recID"],

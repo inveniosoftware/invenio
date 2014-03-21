@@ -52,7 +52,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose, 
 
     try:
         recID = int(recID)
-    except Exception,e :
+    except Exception as e :
         return (None, "Warning: Error in record ID, please check that a number is given.", "", voutput)
 
     rec_terms = run_sql("""SELECT termlist FROM %sR WHERE id_bibrec=%%s""" % methods[rank_method_code]["rnkWORD_table"][:-1],  (recID,))

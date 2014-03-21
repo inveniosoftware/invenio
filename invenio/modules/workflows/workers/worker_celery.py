@@ -49,7 +49,7 @@ def celery_run(workflow_name, data, **kwargs):
                             db.session.merge(data[i].extra_data["repository"])
                             db.session.add(data[i].extra_data["repository"])
                             db.session.commit()
-                        except Exception, e:
+                        except Exception as e:
                             print "Celery : SQLAlchemy decoherence data object"
                             print e.message
     else:
@@ -66,7 +66,7 @@ def celery_run(workflow_name, data, **kwargs):
                         db.session.merge(data.extra_data["repository"])
                         db.session.add(data.extra_data["repository"])
                         db.session.commit()
-                    except Exception, e:
+                    except Exception as e:
                         print "Celery : SQLAlchemy decoherence data object"
                         print e.message
     run_worker(workflow_name, data, **kwargs)

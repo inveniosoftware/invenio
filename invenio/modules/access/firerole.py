@@ -91,18 +91,18 @@ def compile_role_definition(firerole_def_src):
                     if field in ('from', 'until'):
                         try:
                             expressions_list.append((False, time.mktime(time.strptime(expr[1:-1], '%Y-%m-%d'))))
-                        except Exception, msg:
+                        except Exception as msg:
                             raise InvenioWebAccessFireroleError("Syntax error while compiling rule %s (line %s): %s is not a valid date with format YYYY-MM-DD because %s!" % (row, line, expr, msg))
                     elif expr[0] == '/':
                         try:
                             expressions_list.append((True, re.compile(expr[1:-1], re.I)))
-                        except Exception, msg:
+                        except Exception as msg:
                             raise InvenioWebAccessFireroleError("Syntax error while compiling rule %s (line %s): %s is not a valid re because %s!" % (row, line, expr, msg))
                     else:
                         if field == 'remote_ip' and '/' in expr[1:-1]:
                             try:
                                 expressions_list.append((False, _ip_matcher_builder(expr[1:-1])))
-                            except Exception, msg:
+                            except Exception as msg:
                                 raise InvenioWebAccessFireroleError("Syntax error while compiling rule %s (line %s): %s is not a valid ip group because %s!" % (row, line, expr, msg))
                         else:
                             expressions_list.append((False, expr[1:-1]))
@@ -187,7 +187,7 @@ def acc_firerole_extract_emails(firerole_def_obj):
                     if email:
                         authorized_emails.add(email[0][0].lower().strip())
         return authorized_emails
-    except Exception, msg:
+    except Exception as msg:
         raise InvenioWebAccessFireroleError, msg
 
 
@@ -267,7 +267,7 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
                         return allow_p # ...
             if not_p and not next_expr_p: # Nothing has matched and we got not
                 return allow_p # Then the whole rule matched!
-    except Exception, msg:
+    except Exception as msg:
         register_exception(alert_admin=True)
         raise InvenioWebAccessFireroleError, msg
     return default_allow_p # By default we allow ;-) it'an OpenAccess project

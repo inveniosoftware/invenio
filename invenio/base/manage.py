@@ -95,7 +95,7 @@ def detect_system_details():
         try:
             out = mysql_info(separator="\n", line_format="    - %s: %s")
             print "* MySQL version:\n", out
-        except Exception, e:
+        except Exception as e:
             print >> sys.stderr, "* Error:", e
     except ImportError:
         print >> sys.stderr, '* Database manager could not be imported.'

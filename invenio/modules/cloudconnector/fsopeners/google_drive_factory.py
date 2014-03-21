@@ -44,7 +44,7 @@ class Factory(object):
                 filesystem = GoogleDriveFS(root, credentials)
                 filesystem.getinfo(root)
                 return filesystem
-            except ResourceNotFoundError, e:
+            except ResourceNotFoundError as e:
                 if(root != "/"):
                     filesystem = GoogleDriveFS("/", credentials)
                 resp = filesystem.makedir("/invenio")
@@ -53,7 +53,7 @@ class Factory(object):
                 self._update_cloudutils_settings(current_user,
                                                  {'google_drive': credentials})
                 return filesystem
-            except Exception, e:
+            except Exception as e:
 
                 import traceback
                 traceback.print_exc()
@@ -89,7 +89,7 @@ class Factory(object):
                                            callback_url,
                                            approval_prompt='force')
                 credentials_new = flow.step2_exchange(request.args['code'])
-            except Exception, e:
+            except Exception as e:
                 raise ErrorBuildingFS(e)
 
 

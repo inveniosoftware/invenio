@@ -154,7 +154,7 @@ def perform_administrate(ln=CFG_SITE_LANG, journal_name=None,
     if journal_name is None:
         try:
             journal_name = guess_journal_name(ln)
-        except InvenioWebJournalNoJournalOnServerError, e:
+        except InvenioWebJournalNoJournalOnServerError as e:
             return e.user_box()
 
     if not can_read_xml_config(journal_name):
@@ -383,7 +383,7 @@ def perform_request_issue_control(journal_name, issues,
             return out
         try:
             release_journal_issue(publish_issues, journal_name, ln)
-        except InvenioWebJournalJournalIdNotFoundDBError, e:
+        except InvenioWebJournalJournalIdNotFoundDBError as e:
             register_exception(req=None)
             return e.user_box()
         out = wjt.tmpl_admin_control_issue_success_msg(ln,
@@ -396,12 +396,12 @@ def perform_request_issue_control(journal_name, issues,
                 update_issue = issues[0]
             except:
                 raise InvenioWebJournalReleaseUpdateError(ln, journal_name)
-        except InvenioWebJournalReleaseUpdateError, e:
+        except InvenioWebJournalReleaseUpdateError as e:
             register_exception(req=None)
             return e.user_box()
         try:
             release_journal_update(update_issue, journal_name, ln)
-        except InvenioWebJournalJournalIdNotFoundDBError, e:
+        except InvenioWebJournalJournalIdNotFoundDBError as e:
             register_exception(req=None)
             return e.user_box()
         out = wjt.tmpl_admin_updated_issue_msg(ln,

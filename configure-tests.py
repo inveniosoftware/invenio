@@ -144,7 +144,7 @@ try:
     *****************************************************
     """ % werkzeug.__version__
         )
-except ImportError, msg:
+except ImportError as msg:
     error_messages.append("""
     *************************************************
     ** IMPORT ERROR %s
@@ -161,7 +161,7 @@ except ImportError, msg:
 ## 3) check for recommended modules:
 try:
     import rdflib
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -181,7 +181,7 @@ except ImportError, msg:
 
 try:
     import pyRXP
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
@@ -199,7 +199,7 @@ except ImportError, msg:
 
 try:
     import dateutil
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
@@ -218,7 +218,7 @@ except ImportError, msg:
 
 try:
     import libxml2
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
@@ -237,7 +237,7 @@ except ImportError, msg:
 
 try:
     import libxslt
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -256,7 +256,7 @@ except ImportError, msg:
 
 try:
     import Gnuplot
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -277,7 +277,7 @@ except ImportError, msg:
 
 try:
     import rauth
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -297,7 +297,7 @@ except ImportError, msg:
 
 try:
     import openid
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -319,7 +319,7 @@ try:
     import magic
     if not hasattr(magic, "open"):
         raise StandardError
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -356,7 +356,7 @@ except StandardError:
 
 try:
     import reportlab
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -379,7 +379,7 @@ try:
         import PyPDF2
     except ImportError:
         import pyPdf
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -417,7 +417,7 @@ try:
     import Stemmer
     try:
         from Stemmer import algorithms
-    except ImportError, msg:
+    except ImportError as msg:
         error_messages.append(
         """
         *****************************************************
@@ -441,7 +441,7 @@ try:
     path_to_python_h = get_python_inc() + os.sep + 'Python.h'
     if not os.path.exists(path_to_python_h):
         raise StandardError, "Cannot find %s" % path_to_python_h
-except StandardError, msg:
+except StandardError as msg:
     error_messages.append(
     """
     *****************************************************
@@ -484,7 +484,7 @@ try:
     else:
         if not set(CONFIGURATION_REQUIRED).issubset(options):
             raise StandardError, set(CONFIGURATION_REQUIRED).difference(options)
-except StandardError, msg:
+except StandardError as msg:
     warning_messages.append(
     """
     *****************************************************

@@ -76,7 +76,7 @@ def task_run_core():
             files_done_dir = files_dir + "DONE/"
             try:
                 files = os.listdir(files_dir)
-            except OSError, e:
+            except OSError as e:
                 os.mkdir(files_dir)
                 files = []
                 write_message(e, sys.stderr)

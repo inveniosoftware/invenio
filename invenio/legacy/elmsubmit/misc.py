@@ -304,7 +304,7 @@ def provide_dir_with_perms_then_exec(dir, function, perms, barrier_dir):
     try:
         targets_current_perms = get_perms(dir)
         targets_current_owner_uid = get_owner_uid(dir)
-    except OSError, e:
+    except OSError as e:
         if e.errno == 2:
             # dir definitely doesn't exist.
             raise
@@ -354,7 +354,7 @@ def provide_dir_with_perms_then_exec(dir, function, perms, barrier_dir):
         try:
             targets_current_perms = get_perms(dir)
             targets_current_owner_uid = get_owner_uid(dir)
-        except OSError, e:
+        except OSError as e:
             if e.errno == 2:
                 # race condition:
                 raise OSError("Directory structure altered during processing: %s removed during processing" % (dir))
@@ -414,7 +414,7 @@ def _get_perms_on(dirlist, perms=0300):
     try:
         targets_current_perms = get_perms(dir)
         targets_current_owner_uid = get_owner_uid(dir)
-    except OSError, e:
+    except OSError as e:
         if e.errno == 2:
             # dir definitely doesn't exist.
             raise
@@ -444,7 +444,7 @@ def _get_perms_on(dirlist, perms=0300):
             try:
                 parents_current_perms = get_perms(parent)
                 parents_current_owner_uid = get_owner_uid(parent)
-            except OSError, e:
+            except OSError as e:
                 if e.errno == 2:
                     # dir definitely doesn't exist.
                     raise
@@ -482,7 +482,7 @@ def _get_perms_on(dirlist, perms=0300):
         try:
             targets_current_perms = get_perms(dir)
             targets_current_owner_uid = get_owner_uid(dir)
-        except OSError, e:
+        except OSError as e:
             if e.errno == 2:
                 # race condition:
                 raise OSError("Directory structure altered during processing: %s removed during processing" % (dir))

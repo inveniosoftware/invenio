@@ -124,7 +124,7 @@ try:
         AVAILABLE_PARSERS.append('4suite')
 except ImportError:
     pass
-except Exception, err:
+except Exception as err:
     from warnings import warn
     warn("Error when importing 4suite: %s" % err)
     pass
@@ -225,7 +225,7 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
         elif parser == 'minidom':
             rec = _create_record_minidom(marcxml,
                 keep_singletons=keep_singletons)
-    except InvenioBibRecordParserError, ex1:
+    except InvenioBibRecordParserError as ex1:
         return (None, 0, str(ex1))
 
 #   _create_record = {
@@ -237,7 +237,7 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
 
 #   try:
 #       rec = _create_record[parser](marcxml, verbose)
-#   except InvenioBibRecordParserError, ex1:
+#   except InvenioBibRecordParserError as ex1:
 #       return (None, 0, str(ex1))
 
     if sort_fields_by_indicators:
@@ -1637,7 +1637,7 @@ def _create_record_lxml(marcxml,
         # if 1 <= verbose <=3 then show them to the user?
         # if verbose == 0 then continue
         # if verbose >3 then an exception will be thrown
-    except Exception, e:
+    except Exception as e:
         raise InvenioBibRecordParserError(str(e))
 
     record = {}
@@ -1716,7 +1716,7 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
 
     try:
         root = pyrxp_parser.parse(marcxml)
-    except pyRXP.error, ex1:
+    except pyRXP.error as ex1:
         raise InvenioBibRecordParserError(str(ex1))
 
     # If record is enclosed in a collection tag, extract it.
@@ -1828,7 +1828,7 @@ def _create_record_minidom(marcxml,
     """Creates a record using minidom."""
     try:
         dom = xml.dom.minidom.parseString(marcxml)
-    except xml.parsers.expat.ExpatError, ex1:
+    except xml.parsers.expat.ExpatError as ex1:
         raise InvenioBibRecordParserError(str(ex1))
 
     return _create_record_from_document(dom, keep_singletons=keep_singletons)
@@ -1839,7 +1839,7 @@ def _create_record_4suite(marcxml,
     try:
         dom = Ft.Xml.Domlette.NonvalidatingReader.parseString(marcxml,
             "urn:dummy")
-    except Ft.Xml.ReaderException, ex1:
+    except Ft.Xml.ReaderException as ex1:
         raise InvenioBibRecordParserError(ex1.message)
 
     return _create_record_from_document(dom, keep_singletons=keep_singletons)

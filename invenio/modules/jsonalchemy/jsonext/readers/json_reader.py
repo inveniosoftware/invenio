@@ -63,7 +63,7 @@ class JsonReader(Reader):
             self.json['__meta_metadata__.%s' % (field_name, )] = info
         except KeyError:
             self._set_default_value(json_id, field_name)
-        except Exception, e:
+        except Exception as e:
             self.json['__meta_metadata__']['__errors__']\
                     .append('Rule Error - Unable to apply rule for field %s - %s' % (field_name, str(e)),)
             return False

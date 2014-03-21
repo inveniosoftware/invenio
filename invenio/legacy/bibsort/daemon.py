@@ -75,7 +75,7 @@ def load_configuration():
     config = ConfigParser.ConfigParser()
     try:
         config.readfp(open(config_file))
-    except StandardError, err:
+    except StandardError as err:
         write_message("Cannot find configuration file: %s" \
                       %config_file, stream=sys.stderr)
         return False
@@ -85,7 +85,7 @@ def load_configuration():
             name = config.get(section, "name")
             definition = config.get(section, "definition")
             washer = config.get(section, "washer")
-        except (ConfigParser.NoOptionError, StandardError), err:
+        except (ConfigParser.NoOptionError, StandardError) as err:
             write_message("For each sort_field you need to define at least \
                           the name, the washer and the definition. \
                           [error: %s]" %err, stream=sys.stderr)
@@ -106,7 +106,7 @@ def dump_configuration():
     """Creates a dump of the data existing in the bibsort tables"""
     try:
         results = run_sql("SELECT id, name, definition, washer FROM bsrMETHOD")
-    except Error, err:
+    except Error as err:
         write_message("The error: [%s] occured while trying to get \
                       the bibsort data from the database." %err, sys.stderr)
         return False
@@ -126,7 +126,7 @@ def dump_configuration():
             output_file = open(output_file_name, 'w')
             config.write(output_file)
             output_file.close()
-        except Error, err:
+        except Error as err:
             write_message('Can not operate on the configuration file %s [%s].' \
                           %(output_file_name, err), stream=sys.stderr)
             return False
@@ -155,7 +155,7 @@ def update_sorting(methods, recids):
                     recid_max = int(rec_range[1])
                     for rec in range(recid_min, recid_max + 1):
                         recid_list.append(rec)
-                except Error, err:
+                except Error as err:
                     write_message("Error: [%s] occured while trying \
                           to parse the recids argument." %err, sys.stderr)
                     return False
@@ -177,7 +177,7 @@ def print_sorting_methods():
     """Outputs the available sorting methods from the DB"""
     try:
         results = run_sql("SELECT name FROM bsrMETHOD")
-    except Error, err:
+    except Error as err:
         write_message("The error: [%s] occured while trying to \
               get the bibsort data from the database." %err)
         return False

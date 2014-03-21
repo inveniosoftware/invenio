@@ -326,7 +326,7 @@ def main():
                                     "clean=",
                                     "no-fail-insert",
                                     "yes-i-know"])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         print err
         usage(1)
 
@@ -388,7 +388,7 @@ def main():
                     usage("Choose only one action among --dump, --load, --diff and --remove")
                 _action = 'remove'
                 _doctype = opt[1]
-    except StandardError, _exception:
+    except StandardError as _exception:
         print _exception
         usage(1)
 

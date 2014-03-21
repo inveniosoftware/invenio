@@ -113,7 +113,7 @@ def cmd_upgrade_check(upgrader=None):
         upgrader.pre_upgrade_checks(upgrades)
         logger.info("Upgrade check successful - estimated time for upgrading"
                     " Invenio is %s..." % upgrader.human_estimate(upgrades))
-    except RuntimeError, e:
+    except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
         logger.error("Upgrade check failed. Aborting.")
@@ -173,7 +173,7 @@ def cmd_upgrade(upgrader=None):
                            % (upgrader.get_warnings_count(), logfilename))
         else:
             logger.info("Upgrade completed successfully.")
-    except RuntimeError, e:
+    except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
         logger.info("Please check log file for further information:\n"
@@ -202,7 +202,7 @@ def cmd_upgrade_show_pending(upgrader=None):
                 logger.info(" * %s (%s)" % (u['id'], title))
             else:
                 logger.info(" * %s" % u['id'])
-    except RuntimeError, e:
+    except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
         sys.exit(1)
@@ -225,7 +225,7 @@ def cmd_upgrade_show_applied(upgrader=None):
 
         for u_id, applied in upgrades:
             logger.info(" * %s (%s)" % (u_id, applied))
-    except RuntimeError, e:
+    except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
         sys.exit(1)
@@ -257,7 +257,7 @@ def cmd_upgrade_create_release_recipe(pkg_path, repository=None,
                                                   release=True,
                                                   output_path=output_path,
                                                   upgrader=upgrader)
-    except RuntimeError, e:
+    except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
         sys.exit(1)
@@ -325,7 +325,7 @@ def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
         _write_template(upgrade_file, depends_on, repository, auto=auto)
 
         logger.info("Created new upgrade %s" % upgrade_file)
-    except RuntimeError, e:
+    except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
         sys.exit(1)

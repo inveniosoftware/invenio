@@ -40,7 +40,7 @@ def index(req, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -66,7 +66,7 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -103,7 +103,7 @@ def addsource(req, ln=CFG_SITE_LANG, oai_src_name='', oai_src_baseurl ='', oai_s
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -141,7 +141,7 @@ def delsource(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -170,7 +170,7 @@ def testsource(req, oai_src_id=None, ln=CFG_SITE_LANG, record_id=None):
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -202,7 +202,7 @@ def viewhistory(req, oai_src_id=0, ln=CFG_SITE_LANG, year = None, month = None):
         month = d_date.month
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -236,7 +236,7 @@ def viewhistoryday(req, oai_src_id=0, ln=CFG_SITE_LANG, year=None, month=None, d
         day = d_date.day
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -265,7 +265,7 @@ def viewentryhistory(req, oai_id=0, ln=CFG_SITE_LANG, start = 0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -291,7 +291,7 @@ def viewtasklogs(req, ln=CFG_SITE_LANG, task_id=0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -316,7 +316,7 @@ def viewhprecord(req, ln=CFG_SITE_LANG, hpupdate_id=0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -341,7 +341,7 @@ def accepthprecord(req, ln=CFG_SITE_LANG, hpupdate_id = 0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -367,7 +367,7 @@ def delhprecord(req, ln=CFG_SITE_LANG, hpupdate_id=0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -393,7 +393,7 @@ def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, **records):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -418,7 +418,7 @@ def harvest(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id=None):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -444,7 +444,7 @@ def preview_original_xml(req, oai_src_id=None, ln=CFG_SITE_LANG, record_id=None)
     navtrail_previous_links = oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -468,7 +468,7 @@ def preview_harvested_xml(req, oai_src_id=None, ln=CFG_SITE_LANG, record_id=None
     navtrail_previous_links = oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -552,7 +552,7 @@ def viewholdingpen(req, filter_key = "", ln=CFG_SITE_LANG):
     navtrail_previous_links = oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py">OAIHarvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAIHarvest Admin Interface - Error",
                     body=e,
                     uid=uid,

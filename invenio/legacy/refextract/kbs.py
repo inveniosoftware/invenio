@@ -620,7 +620,7 @@ def load_kb_from_iterable(kb, builder):
 def load_kb_from_file(path, builder):
     try:
         fh = open(path, "r")
-    except IOError, e:
+    except IOError as e:
         raise StandardError("Unable to open kb '%s': %s" % (path, e))
 
     def lazy_parser(fh):

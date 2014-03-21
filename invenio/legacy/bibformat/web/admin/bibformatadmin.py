@@ -54,7 +54,7 @@ def index(req, ln=CFG_SITE_LANG):
     if not bibformatadminlib.can_write_etc_bibformat_dir():
         try:
             raise InvenioBibFormatWarning(_('Cannot write in etc/bibformat dir of your Invenio installation. Check directory permission.'))
-        except InvenioBibFormatWarning, exc:
+        except InvenioBibFormatWarning as exc:
             register_exception(stream='warning', req=req)
             warnings.append(exc.message)
 
@@ -184,7 +184,7 @@ def output_format_show(req, bfo, ln=CFG_SITE_LANG,
         if not bibformatadminlib.can_read_output_format(bfo): #No read permission
             try:
                 raise InvenioBibFormatError(_('Output format %(x_name)s cannot not be read. %(x_text)s', x_name=bfo, x_text=""))
-            except InvenioBibFormatError, exc:
+            except InvenioBibFormatError as exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Output Format"),
                             body = """You don't have permission to
@@ -255,7 +255,7 @@ def output_format_show_attributes(req, bfo, ln=CFG_SITE_LANG):
         if not bibformatadminlib.can_read_output_format(bfo): #No read permission
             try:
                 raise InvenioBibFormatError(_('Output format %(x_name)s cannot not be read. %(x_text)s', x_name=bfo, x_text=""))
-            except InvenioBibFormatError, exc:
+            except InvenioBibFormatError as exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Output Format"),
                             body = """You don't have permission to
@@ -305,7 +305,7 @@ def output_format_show_dependencies(req, bfo, ln=CFG_SITE_LANG):
         if not bibformatadminlib.can_read_output_format(bfo): #No read permission
             try:
                 raise InvenioBibFormatError(_('Output format %(x_name)s cannot not be read. %(x_text)s', x_name=bfo, x_text=""))
-            except InvenioBibFormatError, exc:
+            except InvenioBibFormatError as exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Output Format"),
                             body = """You don't have permission
@@ -520,7 +520,7 @@ def format_template_show(req, bft, code=None, ln=CFG_SITE_LANG,
         if not bibformatadminlib.can_read_format_template(bft): #No read permission
             try:
                 raise InvenioBibFormatError(_('Format template %(x_name)s cannot not be read. %(x_text)s', x_name=format_template, x_text=""))
-            except InvenioBibFormatError, exc:
+            except InvenioBibFormatError as exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Format Template"),
                             body = """You don't have permission
@@ -595,7 +595,7 @@ def format_template_show_attributes(req, bft, ln=CFG_SITE_LANG, new=0):
         if not bibformatadminlib.can_read_format_template(bft): #No read permission
             try:
                 raise InvenioBibFormatError(_('Format template %(x_name)s cannot not be read. %(x_text)s', x_name=format_template, x_text=""))
-            except InvenioBibFormatError, exc:
+            except InvenioBibFormatError as exc:
                 register_exception(req=req)
                 return page(title=_("Restricted Format Template"),
                             body = """You don't have permission
@@ -1010,7 +1010,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
             if not bibformatadminlib.can_read_output_format(bfo): #No read permission
                 try:
                     raise InvenioBibFormatError(_('Output format %(x_name)s cannot not be read. %(x_text)s', x_name=bfo, x_text=""))
-                except InvenioBibFormatError, exc:
+                except InvenioBibFormatError as exc:
                     register_exception(req=req)
                     return page(title=_("Restricted Output Format"),
                             body = """You don't have permission
@@ -1032,7 +1032,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
             if not bibformatadminlib.can_read_format_template(bft): #No read permission
                 try:
                     raise InvenioBibFormatError(_('Format template %(x_tem)s cannot not be read. %(x_text)s', x_tem=bft, x_text=""))
-                except InvenioBibFormatError, exc:
+                except InvenioBibFormatError as exc:
                     register_exception(req=req)
                     return page(title=_("Restricted Format Template"),
                             body = """You don't have permission to
@@ -1052,7 +1052,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
                    not bibformat_dblayer.tag_exists_for_name(bfe): #No read permission
                 try:
                     raise InvenioBibFormatError(_('Format element %(x_name)s cannot not be read. %(x_text)s', x_name=bfe, x_text=""))
-                except InvenioBibFormatError, exc:
+                except InvenioBibFormatError as exc:
                     register_exception(req=req)
                     return page(title=_("Restricted Format Element"),
                             body = """You don't have permission
@@ -1066,7 +1066,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
         else: #No format specified
             try:
                 raise InvenioBibFormatError(_('No format specified for validation. Please specify one.'))
-            except InvenioBibFormatError, exc:
+            except InvenioBibFormatError as exc:
                 register_exception(req=req)
                 return page(title=_("Format Validation"),
                         body="No format has been specified.",

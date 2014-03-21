@@ -43,7 +43,7 @@ def main():
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hV", ["help", "version"])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage(1, err)
     try:
         for opt in opts:
@@ -52,6 +52,6 @@ def main():
             elif opt[0] in ["-V", "--version"]:
                 print elmsubmit.__revision__
                 sys.exit(0)
-    except StandardError, e:
+    except StandardError as e:
         usage(e)
     return elmsubmit.process_email(sys.stdin.read())

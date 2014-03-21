@@ -288,7 +288,7 @@ class WordTable:
                 try:
                     run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
                             (word, serialize_via_marshal(set)))
-                except Exception, e:
+                except Exception as e:
                     ## FIXME: This is for debugging encoding errors
                     register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=True)
         if not set: # never store empty words
@@ -364,7 +364,7 @@ class WordTable:
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
                 try:
                     self.chk_recID_range(i_low, i_high)
-                except StandardError, e:
+                except StandardError as e:
                     write_message("Exception caught: %s" % e, sys.stderr)
                     register_exception()
                     task_update_status("ERROR")
@@ -628,7 +628,7 @@ class WordTable:
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
                 try:
                     self.fix_recID_range(i_low, i_high)
-                except StandardError, e:
+                except StandardError as e:
                     write_message("Exception caught: %s" % e, sys.stderr)
                     register_exception()
                     task_update_status("ERROR")
@@ -755,7 +755,7 @@ def word_index(run):
             config_file = configuration.get(rank_method_code + '.cfg', '')
             config = ConfigParser.ConfigParser()
             config.readfp(open(config_file))
-        except StandardError, e:
+        except StandardError as e:
             write_message("Cannot find configurationfile: %s" % config_file, sys.stderr)
             raise StandardError
         options["current_run"] = rank_method_code
@@ -825,7 +825,7 @@ def word_index(run):
                 raise StandardError
             update_rnkWORD(options["table"], options["modified_words"])
             task_sleep_now_if_required(can_stop_too=True)
-        except StandardError, e:
+        except StandardError as e:
             register_exception(alert_admin=True)
             write_message("Exception caught: %s" % e, sys.stderr)
             sys.exit(1)
@@ -897,7 +897,7 @@ def check_term(term, termlength):
         term = str.replace(term, ",", "")
         if int(term):
             return False
-    except StandardError, e:
+    except StandardError as e:
         pass
     return True
 
@@ -1109,7 +1109,7 @@ def update_rnkWORD(table, terms):
                     Nj[j] += 1
                 run_sql("UPDATE %sR SET termlist=%%s WHERE id_bibrec=%%s" % table[:-1],
                         (serialize_via_marshal(doc_terms), j))
-            except (ZeroDivisionError, OverflowError), e:
+            except (ZeroDivisionError, OverflowError) as e:
                 ## This is to try to isolate division by zero errors.
                 register_exception(prefix="Error when analysing the record %s (%s): %s\n" % (j, repr(docs_terms), e), alert_admin=True)
         write_message("Phase 4: ......processed %s/%s records" % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
@@ -1135,7 +1135,7 @@ def update_rnkWORD(table, terms):
                 term_docs["Gi"] = (0, Git)
                 run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % table,
                         (serialize_via_marshal(term_docs), t))
-            except (ZeroDivisionError, OverflowError), e:
+            except (ZeroDivisionError, OverflowError) as e:
                 register_exception(prefix="Error when analysing the term %s (%s): %s\n" % (t, repr(terms_docs), e), alert_admin=True)
         write_message("Phase 5: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
         i += 5000
@@ -1188,7 +1188,7 @@ def getName(methname, ln=None, type='ln'):
             return res[0][0]
         else:
             raise Exception
-    except Exception, e:
+    except Exception as e:
         write_message("Cannot run rank method, either given code for method is wrong, or it has not been added using the webinterface.")
         raise Exception
 

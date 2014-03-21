@@ -119,7 +119,7 @@ def mail_cookie_check_common(cookie, delete=False):
     try:
         password = cookie[:16]+cookie[-16:]
         cookie_id = int(cookie[16:-16], 16)
-    except Exception, e:
+    except Exception as e:
         raise InvenioWebAccessMailCookieError, "Cookie not valid: %s" % e
     try:
         res = run_sql("SELECT kind, AES_DECRYPT(data,%s), onetime, status FROM accMAILCOOKIE WHERE "
@@ -148,7 +148,7 @@ def mail_cookie_check_role(cookie, uid):
         role_id = acc_get_role_id(role_name)
         assert(role_id != 0)
         assert(type(role_timeout) is timedelta)
-    except (TypeError, AssertionError, StandardError), e:
+    except (TypeError, AssertionError, StandardError) as e:
         raise InvenioWebAccessMailCookieError, e
     expiration = (datetime.today()+role_timeout).strftime(_datetime_format)
     acc_add_user_role(uid, role_id, expiration)
@@ -162,7 +162,7 @@ def mail_cookie_check_pw_reset(cookie):
         (kind, email) = mail_cookie_check_common(cookie)
         assert(kind == 'pw_reset')
         return email
-    except (TypeError, AssertionError, StandardError), e:
+    except (TypeError, AssertionError, StandardError) as e:
         raise InvenioWebAccessMailCookieError, e
 
 def mail_cookie_check_mail_activation(cookie):
@@ -175,7 +175,7 @@ def mail_cookie_check_mail_activation(cookie):
             return email
         else:
             raise InvenioWebAccessMailCookieError, "email '%s' doesn't exist" % email
-    except (TypeError, AssertionError), e:
+    except (TypeError, AssertionError) as e:
         raise InvenioWebAccessMailCookieError, e
 
 
@@ -186,7 +186,7 @@ def mail_cookie_check_authorize_action(cookie):
         (kind, params) = mail_cookie_check_common(cookie)
         assert(kind == 'authorize_action')
         return params
-    except (TypeError, AssertionError), e:
+    except (TypeError, AssertionError) as e:
         raise InvenioWebAccessMailCookieError, e
 
 

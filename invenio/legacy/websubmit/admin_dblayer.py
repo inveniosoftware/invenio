@@ -693,7 +693,7 @@ def regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_sub
         ## delete the functions within this step
         try:
             delete_all_functions_in_step_of_submission(doctype=doctype, action=action, step=step)
-        except InvenioWebSubmitAdminWarningDeleteFailed, e:
+        except InvenioWebSubmitAdminWarningDeleteFailed as e:
             ## unable to delete some or all functions
             ## pass the exception back up to the caller
             raise
@@ -706,7 +706,7 @@ def regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_sub
                 insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
                                                                   function=insert_functn_name,
                                                                   step=step, score=i)
-            except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+            except InvenioWebSubmitAdminWarningReferentialIntegrityViolation as e:
                 ## tried to insert a function that doesn't exist in WebSubmit DB
                 ## TODO : LOG ERROR
                 ## continue onto next loop iteration - don't increment value of I
@@ -784,7 +784,7 @@ def move_position_submissionfunction_up(doctype, action, function, funccurstep, 
                                                                       step=funccurstep,
                                                                       score=funccurscore)
                     return 0
-                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation as e:
                     return 1
             else:
                 ## could not update the function that was to be moved! Try to re-insert that which was deleted
@@ -793,7 +793,7 @@ def move_position_submissionfunction_up(doctype, action, function, funccurstep, 
                                                                       function=name_function_above,
                                                                       step=step_function_above,
                                                                       score=score_function_above)
-                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation as e:
                     pass
                 return 1 ## Returning an ERROR code to signal that the move did not work
         else:
@@ -902,7 +902,7 @@ def move_submission_function_from_one_position_to_another_position(doctype, acti
         delete_the_function_at_step_and_score_from_a_submission(doctype=doctype, action=action,
                                                                 function=movefuncname, step=movefuncfromstep,
                                                                 score=movefuncfromscore)
-    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+    except InvenioWebSubmitAdminWarningDeleteFailed as e:
         ## unable to delete the function - cannot perform the move.
         msg = """Unable to move function [%s] at step [%s], score [%s] of submission [%s] - couldn't """\
               """delete the function from its current position."""\
@@ -919,7 +919,7 @@ def move_submission_function_from_one_position_to_another_position(doctype, acti
         regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype=doctype,
                                                                                             action=action,
                                                                                             step=movefuncfromstep)
-    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+    except InvenioWebSubmitAdminWarningDeleteFailed as e:
         ## couldn't delete some or all functions
         msg = """Moved function [%s] to step [%s], score [%s] of submission [%s]. However, when trying to regulate"""\
               """ scores of functions in step [%s], failed to delete some functions. Check that they have not been lost."""\
@@ -1013,7 +1013,7 @@ def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncna
                                                                       function=movefuncname,
                                                                       step=movefunctostep,
                                                                       score=movefunctoscore)
-                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation as e:
                     return 1
                 return 0
             else:
@@ -1056,7 +1056,7 @@ def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncna
                                                                       function=movefuncname,
                                                                       step=movefunctostep,
                                                                       score=movefunctoscore)
-                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation as e:
                     return 1
                 return 0
             else:
@@ -1132,7 +1132,7 @@ def move_position_submissionfunction_down(doctype, action, function, funccurstep
                     insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
                                                                       function=name_function_below,
                                                                       step=funccurstep, score=funccurscore)
-                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation as e:
                     return 1
                 return 0
             else:
@@ -1142,7 +1142,7 @@ def move_position_submissionfunction_down(doctype, action, function, funccurstep
                                                                       function=name_function_below,
                                                                       step=step_function_below,
                                                                       score=score_function_below)
-                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation as e:
                     pass
                 return 1 ## Returning an ERROR code to signal that the move did not work
         else:
@@ -2211,14 +2211,14 @@ def insert_function_into_submission_at_step_and_score_then_regulate_scores_of_fu
     try:
         insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
                                                           function=function, step=step, score=score)
-    except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+    except InvenioWebSubmitAdminWarningReferentialIntegrityViolation as e:
         ## The function doesn't exist in WebSubmit and therefore cannot be used in the submission
         ## regulate the scores of all functions within the step, to correct the "hole" that was made
         try:
             regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype=doctype,
                                                                                                 action=action,
                                                                                                 step=step)
-        except InvenioWebSubmitAdminWarningDeleteFailed, f:
+        except InvenioWebSubmitAdminWarningDeleteFailed as f:
             ## can't regulate the functions' scores - couldn't delete some or all of them before re-inserting
             ## them in the correct position. Cannot fix this - report that some functions may have been lost.
             msg = """It wasn't possible to add the function [%s] to submission [%s] at step [%s], score [%s]."""\
@@ -2234,7 +2234,7 @@ def insert_function_into_submission_at_step_and_score_then_regulate_scores_of_fu
         regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype=doctype,
                                                                                             action=action,
                                                                                             step=step)
-    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+    except InvenioWebSubmitAdminWarningDeleteFailed as e:
         ## could not correctly regulate the functions - could not delete all functions in the step
         msg = """Could not regulate the scores of all functions within step [%s] of submission [%s]."""\
               """ It was not possible to delete some or all of them. Some functions may have been lost -"""\

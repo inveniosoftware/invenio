@@ -549,7 +549,7 @@ class Options:
                  'outputpath', 'password=', 'pipe=', 'port=', 'server=',
                  'timeout=', 'show', 'stdout', 'template', 'verbose',
                  'version', 'remove='] )
-        except getopt.error, exc:
+        except getopt.error as exc:
             print 'unoconv: %s, try unoconv -h for a list of all the options' % str(exc)
             sys.exit(255)
 
@@ -740,7 +740,7 @@ class Convertor:
         info(3, 'Connection type: %s' % op.connection)
         try:
             unocontext = resolver.resolve("uno:%s" % op.connection)
-        except NoConnectException, e:
+        except NoConnectException as e:
 #            info(3, "Existing listener not found.\n%s" % e)
             info(3, "Existing listener not found.")
 
@@ -775,7 +775,7 @@ class Convertor:
                         raise
                 else:
                     error("Failed to connect to %s (pid=%s) in %d seconds.\n%s" % (office.binary, ooproc.pid, op.timeout, e))
-            except Exception, e:
+            except Exception as e:
                 raise
                 error("Launch of %s failed.\n%s" % (office.binary, e))
 
@@ -938,7 +938,7 @@ class Convertor:
 
             try:
                 document.storeToURL(outputurl, tuple(outputprops) )
-            except IOException, e:
+            except IOException as e:
                 from invenio.ext.logging import get_pretty_traceback
                 print >> sys.stderr, get_pretty_traceback()
                 raise UnoException("Unable to store document to %s with properties %s. Exception: %s" % (outputurl, outputprops, e), None)
@@ -947,33 +947,33 @@ class Convertor:
             document.dispose()
             document.close(True)
 
-        except SystemError, e:
+        except SystemError as e:
             error("unoconv: SystemError during %s phase: %s" % (phase, e))
             exitcode = 1
 
-        except RuntimeException, e:
+        except RuntimeException as e:
             error("unoconv: RuntimeException during %s phase: Office probably died. %s" % (phase, e))
             exitcode = 6
 
-        except DisposedException, e:
+        except DisposedException as e:
             error("unoconv: DisposedException during %s phase: Office probably died. %s" % (phase, e))
             exitcode = 7
 
-        except IllegalArgumentException, e:
+        except IllegalArgumentException as e:
             error("UNO IllegalArgument during %s phase: Source file cannot be read. %s" % (phase, e))
             exitcode = 8
 
-        except IOException, e:
+        except IOException as e:
 #            for attr in dir(e): print '%s: %s', (attr, getattr(e, attr))
             error("unoconv: IOException during %s phase: %s" % (phase, e.Message))
             exitcode = 3
 
-        except CannotConvertException, e:
+        except CannotConvertException as e:
 #            for attr in dir(e): print '%s: %s', (attr, getattr(e, attr))
             error("unoconv: CannotConvertException during %s phase: %s" % (phase, e.Message))
             exitcode = 4
 
-        except UnoException, e:
+        except UnoException as e:
             if hasattr(e, 'ErrCode'):
                 error("unoconv: UnoException during %s phase in %s (ErrCode %d)" % (phase, repr(e.__class__), e.ErrCode))
                 exitcode = e.ErrCode
@@ -998,7 +998,7 @@ class Listener:
             product = self.svcmgr.createInstance("com.sun.star.configuration.ConfigurationProvider").createInstanceWithArguments("com.sun.star.configuration.ConfigurationAccess", UnoProps(nodepath="/org.openoffice.Setup/Product"))
             try:
                 unocontext = resolver.resolve("uno:%s" % op.connection)
-            except NoConnectException, e:
+            except NoConnectException as e:
                 pass
             else:
                 info(1, "Existing %s listener found, nothing to do." % product.ooName)
@@ -1007,7 +1007,7 @@ class Listener:
                 subprocess.call([office.binary, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nologo", "-nofirststartwizard", "-norestore", "-accept=%s" % op.connection], env=os.environ)
             else:
                 subprocess.call([office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nologo", "--nofirststartwizard", "--norestore", "--accept=%s" % op.connection], env=os.environ)
-        except Exception, e:
+        except Exception as e:
             error("Launch of %s failed.\n%s" % (office.binary, e))
         else:
             info(1, "Existing %s listener found, nothing to do." % product.ooName)
@@ -1047,7 +1047,7 @@ def die(ret, msg=None):
                     subprocess.Popen([office.binary, "--headless", "--invisible", "--nocrashreport", "--nodefault", "--nofirststartwizard", "--nologo", "--norestore", "--unaccept=%s" % op.connection], env=os.environ)
                 ooproc.wait()
                 info(2, '%s listener successfully disabled.' % product.ooName)
-            except Exception, e:
+            except Exception as e:
                 error("Terminate using %s failed.\n%s" % (office.binary, e))
 
         ### If there is no GUI attached to the instance, terminate instance
@@ -1151,7 +1151,7 @@ def main():
 
     try:
         main()
-    except KeyboardInterrupt, e:
+    except KeyboardInterrupt as e:
         die(6, 'Exiting on user request')
     except:
         from invenio.ext.logging import register_exception
@@ -1169,7 +1169,7 @@ def main():
             for inputfn in op.filenames:
                 convertor.convert(inputfn)
 
-    except NoConnectException, e:
+    except NoConnectException as e:
         error("unoconv: could not find an existing connection to LibreOffice at %s:%s." % (op.server, op.port))
         if op.connection:
             info(0, "Please start an LibreOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    soffice -nologo -nodefault -accept=\"%s\"" % (op.server, op.server, op.port, op.connection))

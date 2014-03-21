@@ -29,7 +29,7 @@ try:
     import getopt
     from time import gmtime, strftime, localtime
     import os.path
-except ImportError, e:
+except ImportError as e:
     sys.stderr.write("Error: %s" % e)
     sys.exit(1)
 
@@ -37,7 +37,7 @@ try:
     from invenio.legacy.search_engine import perform_request_search
     from invenio.modules.formatter.engines.bfx_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
     from . import api as bibconvert
-except ImportError, e:
+except ImportError as e:
     sys.stderr.write("Error: %s" % e)
     sys.exit(1)
 
@@ -45,7 +45,7 @@ try:
     from . import bfx_engine as bibconvert_bfx_engine
     from . import xslt_engine as bibconvert_xslt_engine
     from .registry import templates
-except ImportError, e:
+except ImportError as e:
     sys.stderr.write("Warning: %s" % e)
 
 def usage(exitcode=0, msg=""):
@@ -131,7 +131,7 @@ def main():
                                     "match",
                                     "config-alt"
                                     ])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage(1, "Error: " + str(err))
 
 # get options and arguments
@@ -192,13 +192,13 @@ def main():
         elif opt in ["-l", "--length"]:
             try:
                 conv_setting[0] = string.atoi(opt_value)
-            except ValueError, e:
+            except ValueError as e:
                 conv_setting[0] = 1
 
         elif opt in ["-o", "--oai"]:
             try:
                 oai_identifier_from = string.atoi(opt_value)
-            except ValueError, e:
+            except ValueError as e:
                 oai_identifier_from = 1
 
         elif opt in ["-b", "--header"]:
@@ -249,7 +249,7 @@ def main():
             sys.stderr.write("Error: cannot use BibConvert BFX engine.\n")
             sys.stderr.write("A compliant XSLT library is needed. See Invenio INSTALL guide.\n")
             sys.exit(1)
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write("An error occurred during the conversion.\n")
             sys.stderr.write(str(e))
             sys.exit(1)
@@ -267,7 +267,7 @@ def main():
             sys.stderr.write("Error: cannot use BibConvert XSL engine.\n")
             sys.stderr.write("A compliant XML parser is needed. See Invenio INSTALL guide.\n")
             sys.exit(1)
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write("An error occurred during the conversion.\n")
             sys.stderr.write(str(e))
             sys.exit(1)

@@ -294,7 +294,7 @@ def _discover_ontology(ontology_name):
     #                             return filepath
     #                         else:
     #                             log.warning('Found taxonony at: %s, but it is not readable. Continue searching...' % filepath)
-    #     except OSError, os_error_msg:
+    #     except OSError as os_error_msg:
     #         log.warning('OS Error when listing path "%s": %s' % (str(path), str(os_error_msg)))
     # log.debug("No taxonomy with pattern '%s' found" % ontology_name)
 
@@ -551,19 +551,19 @@ def _build_cache(source_file, skip_cache=False):
 
         try:
             store.parse(source_file)
-        except urllib2.URLError, exc:
+        except urllib2.URLError as exc:
             if source_file[0] == '/':
                 store.parse("file://" + source_file)
             else:
                 store.parse("file:///" + source_file)
 
-    except rdflib_exceptions_Error, e:
+    except rdflib_exceptions_Error as e:
         log.error("Serious error reading RDF file")
         log.error(e)
         log.error(traceback.format_exc())
         raise rdflib.exceptions.Error(e)
 
-    except (xml.sax.SAXParseException, ImportError), e:
+    except (xml.sax.SAXParseException, ImportError) as e:
         # File is not a RDF file. We assume it is a controlled vocabulary.
         log.error(e)
         log.error("The ontology file is probably not a valid RDF file. \
@@ -619,7 +619,7 @@ def _build_cache(source_file, skip_cache=False):
                 filestream = None
                 try:
                     filestream = open(cache_path, "wb")
-                except IOError, msg:
+                except IOError as msg:
                     # Impossible to write the cache.
                     log.error("Impossible to write cache to '%s'." % cache_path)
                     log.error(msg)
@@ -735,7 +735,7 @@ def _get_cache(cache_file, source_file=None):
         if cached_data['version_info']['rdflib'] != (rdflib and rdflib.__version__) or \
                         cached_data['version_info']['bibclassify'] != bconfig.VERSION:
             raise KeyError
-    except (cPickle.UnpicklingError, AttributeError, DeprecationWarning, EOFError), e:
+    except (cPickle.UnpicklingError, AttributeError, DeprecationWarning, EOFError) as e:
         log.warning("The existing cache in %s is not readable. "
                     "Removing and rebuilding it." % cache_file)
         filestream.close()
@@ -808,7 +808,7 @@ def _download_ontology(url, local_file):
         file_desc = open(local_file, 'w')
         file_desc.write(url_desc.read())
         file_desc.close()
-    except IOError, e:
+    except IOError as e:
         print e
         return False
     except:

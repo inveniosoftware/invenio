@@ -850,7 +850,7 @@ def main():
                                     "yes-i-know"
                                     ])
 
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage(1, err)
 
     if len(opts) == 0:
@@ -937,7 +937,7 @@ def main():
                 options['metadata'] = opt[1]
 
 
-    except StandardError, message:
+    except StandardError as message:
         usage(message)
 
     #---------------------------------------------------------------------------

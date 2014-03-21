@@ -79,7 +79,7 @@ def perform_request_index(req, journal_name, issue_number, ln,
         index_page_template = get_journal_template('index',
                                                    journal_name,
                                                    ln)
-    except InvenioWebJournalTemplateNotFoundError, e:
+    except InvenioWebJournalTemplateNotFoundError as e:
         register_exception(req=req)
         return e.user_box(req)
 
@@ -129,7 +129,7 @@ def perform_request_article(req, journal_name, issue_number, ln,
         index_page_template = get_journal_template('detailed',
                                                    journal_name,
                                                    ln)
-    except InvenioWebJournalTemplateNotFoundError, e:
+    except InvenioWebJournalTemplateNotFoundError as e:
         register_exception(req=req)
         return e.user_box(req)
 
@@ -185,7 +185,7 @@ def perform_request_contact(req, ln, journal_name, verbose=0):
         contact_page_template = get_journal_template('contact',
                                                      journal_name,
                                                      ln)
-    except InvenioWebJournalTemplateNotFoundError, e:
+    except InvenioWebJournalTemplateNotFoundError as e:
         register_exception(req=req)
         return e.user_box(req)
 
@@ -211,7 +211,7 @@ def perform_request_popup(req, ln, journal_name, record):
         popup_page_template = get_journal_template('popup',
                                                    journal_name,
                                                    ln)
-    except InvenioWebJournalTemplateNotFoundError, e:
+    except InvenioWebJournalTemplateNotFoundError as e:
         register_exception(req=req)
         return e.user_box(req)
 
@@ -233,7 +233,7 @@ def perform_request_search(req, journal_name, ln,
         search_page_template = get_journal_template('search',
                                                     journal_name,
                                                     ln)
-    except InvenioWebJournalTemplateNotFoundError, e:
+    except InvenioWebJournalTemplateNotFoundError as e:
         register_exception(req=req)
         return e.user_box(req)
 

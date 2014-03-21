@@ -340,7 +340,7 @@ def create_handler(root):
         except apache.SERVER_RETURN:
             ## This is one of mod_python way of communicating
             raise
-        except IOError, exc:
+        except IOError as exc:
             if 'Write failed, client closed connection' not in "%s" % exc:
                 ## Workaround for considering as false positive exceptions
                 ## rised by mod_python when the user close the connection

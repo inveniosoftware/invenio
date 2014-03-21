@@ -295,7 +295,7 @@ def interface(req,
     if not os.path.exists(curdir):
         try:
             os.makedirs(curdir)
-        except Exception, e:
+        except Exception as e:
             register_exception(req=req, alert_admin=True)
             return warning_page(_("Unable to create a directory for this submission. The administrator has been alerted."), req, ln)
 
@@ -919,7 +919,7 @@ def endaction(req,
     if not os.path.exists(curdir):
         try:
             os.makedirs(curdir)
-        except Exception, e:
+        except Exception as e:
             register_exception(req=req, alert_admin=True)
             return warning_page(_("Unable to create a directory for this submission. The administrator has been alerted."), req, ln)
 
@@ -1122,14 +1122,14 @@ def endaction(req,
                                                 last_step=last_step,
                                                 action_score=action_score,
                                                 ln=ln)
-    except InvenioWebSubmitFunctionError, e:
+    except InvenioWebSubmitFunctionError as e:
         register_exception(req=req, alert_admin=True, prefix='doctype="%s", action="%s", step="%s", form="%s", start_time="%s"' % (doctype, act, step, form, start_time))
         ## There was a serious function-error. Execution ends.
         if CFG_DEVEL_SITE:
             raise
         else:
             return warning_page(_("A serious function-error has been encountered. Adminstrators have been alerted. <br /><em>Please not that this might be due to wrong characters inserted into the form</em> (e.g. by copy and pasting some text from a PDF file)."), req, ln)
-    except InvenioWebSubmitFunctionStop, e:
+    except InvenioWebSubmitFunctionStop as e:
         ## For one reason or another, one of the functions has determined that
         ## the data-processing phase (i.e. the functions execution) should be
         ## halted and the user should be returned to the form interface once
@@ -1259,7 +1259,7 @@ def home(req, catalogues_text, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     try:
         uid = getUid(req)
         user_info = collect_user_info(req)
-    except Error, e:
+    except Error as e:
         return error_page(e, req, ln)
 
     # load the right message language
@@ -1470,7 +1470,7 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
     # get user ID:
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return error_page(e, req, ln)
     #parses database to get all data
     ## first, get the list of categories
@@ -1738,7 +1738,7 @@ def print_function_calls(req, doctype, action, step, form, start_time,
                                 ## function being called again with the legacy 3
                                 ## arguments.
                                 func_returnval = eval("function(parameters=parameters, curdir=curdir, form=form, user_info=user_info)", the_globals)
-                            except TypeError, err:
+                            except TypeError as err:
                                 ## If the error contains the string "got an
                                 ## unexpected keyword argument", it means that the
                                 ## function doesn't accept the "user_info"
@@ -1760,7 +1760,7 @@ def print_function_calls(req, doctype, action, step, form, start_time,
                                         "calling [%s] WebSubmit function: " \
                                         "[%s]" % (function_name, str(err))
                                     raise InvenioWebSubmitFunctionError(msg)
-                        except InvenioWebSubmitFunctionWarning, err:
+                        except InvenioWebSubmitFunctionWarning as err:
                             ## There was an unexpected behaviour during the
                             ## execution. Log the message into function's log
                             ## and go to next function
@@ -1781,7 +1781,7 @@ def print_function_calls(req, doctype, action, step, form, start_time,
                 else:
                     currfunction['error'] = 1
                 functions.append(currfunction)
-            except InvenioWebSubmitFunctionStop, err:
+            except InvenioWebSubmitFunctionStop as err:
                 ## The submission asked to stop execution. This is
                 ## ok. Do not alert admin, and raise exception further
                 log_function(curdir, "***Stop*** from %s: %s" \

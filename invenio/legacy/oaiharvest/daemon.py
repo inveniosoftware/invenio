@@ -393,7 +393,7 @@ def main():
                         sys.stderr.write("*WARNING* Your password will be sent in clear!\n")
                     try:
                         password = getpass.getpass()
-                    except KeyboardInterrupt, error:
+                    except KeyboardInterrupt as error:
                         sys.stderr.write("\n%s\n" % (error,))
                         sys.exit(0)
 

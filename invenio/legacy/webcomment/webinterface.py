@@ -429,7 +429,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                             try:
                                 raise InvenioWebCommentWarning(_('The size of file \\"%(x_file)s\\" (%(x_size)s) is larger than maximum allowed file size (%(x_max)s). Select files again.',
                                         x_file=cgi.escape(filename), x_size=str(file_size/1024) + 'KB', x_max=str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
-                            except InvenioWebCommentWarning, exc:
+                            except InvenioWebCommentWarning as exc:
                                 register_exception(stream='warning')
                                 warning_msgs.append((exc.message, ''))
                             #warning_msgs.append(('WRN_WEBCOMMENT_MAX_FILE_SIZE_REACHED', cgi.escape(filename), str(file_size/1024) + 'KB', str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
@@ -476,11 +476,11 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                     delete=True)
 
                     argd.update(cookie_argd)
-                except InvenioWebAccessMailCookieDeletedError, e:
+                except InvenioWebAccessMailCookieDeletedError as e:
                     return redirect_to_url(req, CFG_SITE_SECURE_URL + '/'+ CFG_SITE_RECORD +'/' + \
                                            str(self.recid) + (self.discussion==1 and \
                                                               '/reviews' or '/comments'))
-                except InvenioWebAccessMailCookieError, e:
+                except InvenioWebAccessMailCookieError as e:
                     # Invalid or empty cookie: continue
                     pass
 

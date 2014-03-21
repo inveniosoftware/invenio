@@ -244,7 +244,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
     info = [0, []] # Number of files read, name of the files
     try:
         files = os.listdir(folder)
-    except OSError, error:
+    except OSError as error:
         errors.append(("", error))
         return errors, info
     err_desc = {1: _("More than one possible recID, ambiguous behaviour"), 2: _("No records match that file name"),

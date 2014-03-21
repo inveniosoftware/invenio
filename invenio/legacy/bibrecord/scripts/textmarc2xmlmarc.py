@@ -451,7 +451,7 @@ def main():
     ## read command-line options
     try:
         opts, dummy_args = getopt.getopt(sys.argv[1:], "h", ['help'])
-    except getopt.error, msg:
+    except getopt.error as msg:
         usage(1, msg)
 
     help_p = 0           # default is not to print help

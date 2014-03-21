@@ -54,7 +54,7 @@ def format_element(bfo, input_units="m", output_format="%(H)02i:%(M)02i:%(S)02i"
             duration_in_seconds = int_duration * 60
         elif input_units == 'h':
             duration_in_seconds = int_duration * 3600
-    except Exception, e:
+    except Exception as e:
         pass
 
     if duration_in_seconds is None:

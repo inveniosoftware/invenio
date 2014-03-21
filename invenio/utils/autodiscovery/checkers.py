@@ -158,7 +158,7 @@ def check_signature(object_name, reference_object, other_object):
                     '%s (the reference object)'
                     ' is a function while %s (the other object) is not a'
                     ' function' % (reference_object, other_object))
-    except AutodiscoveryCheckerError, err:
+    except AutodiscoveryCheckerError as err:
         try:
             sourcefile = inspect.getsourcefile(other_object)
             sourceline = inspect.getsourcelines(other_object)[1]
@@ -180,11 +180,11 @@ def check_arguments_compatibility(the_callable, argd):
     >>> def foo(arg1, arg2, arg3='val1', arg4='val2', *args, **argd):
     ...     pass
     >>> try: check_arguments_compatibility(foo, {'arg1': 'bla', 'arg2': 'blo'})
-    ... except ValueError, err: print 'failed'
+    ... except ValueError as err: print 'failed'
     ... else: print 'ok'
     ok
     >>> try: check_arguments_compatibility(foo, {'arg1': 'bla'})
-    ... except ValueError, err: print 'failed'
+    ... except ValueError as err: print 'failed'
     ... else: print 'ok'
     failed
 
@@ -310,7 +310,7 @@ def create_enhanced_plugin_builder(compulsory_objects=None,
                         object_name))
                 try:
                     check_signature(object_name, the_object, object_signature)
-                except AutodiscoveryError, err:
+                except AutodiscoveryError as err:
                     raise AutodiscoveryError('Plugin "%s" contains '
                         'object "%s" with a wrong signature: %s' %
                         (plugin_name, object_name, err))
@@ -325,7 +325,7 @@ def create_enhanced_plugin_builder(compulsory_objects=None,
                             object_name,
                             the_object,
                             object_signature)
-                    except AutodiscoveryError, err:
+                    except AutodiscoveryError as err:
                         raise AutodiscoveryError('Plugin "%s" '
                             'contains object "%s" with a wrong signature: %s' %
                             (plugin_name, object_name, err))
@@ -339,7 +339,7 @@ def create_enhanced_plugin_builder(compulsory_objects=None,
 
             try:
                 the_other_data = wash_urlargd(the_other_data, other_data)
-            except Exception, err:
+            except Exception as err:
                 raise AutodiscoveryError('Plugin "%s" contains other '
                     'data with problems: %s' % (plugin_name, err))
 

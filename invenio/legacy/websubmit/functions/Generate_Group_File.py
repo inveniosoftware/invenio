@@ -49,7 +49,7 @@ def Generate_Group_File(parameters, curdir, form, user_info=None):
         group_file.write(parameters['group_name'])
         group_file.flush()
         group_file.close()
-    except IOError, err:
+    except IOError as err:
         ## Unable to write the Group file to curdir.
         err_msg = "Error: Unable to create Group file [%s/%s]. " \
           "Perhaps check directory permissions. " \

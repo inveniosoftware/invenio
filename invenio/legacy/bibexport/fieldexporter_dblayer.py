@@ -948,7 +948,7 @@ def _save_job_result_in_output_directory(job_result):
     for current_query_result in query_results:
         try:
             _save_query_result_in_file(current_query_result, output_directory, output_format)
-        except (IOError, OSError), exception:
+        except (IOError, OSError) as exception:
             job_result.set_status(job_result.STATUS_CODE_ERROR)
             job_result.add_status_message("Failed to write result in file for query " +
                                current_query_result.get_query().get_name())

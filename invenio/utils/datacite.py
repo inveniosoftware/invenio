@@ -324,10 +324,10 @@ class DataCiteRequest(object):
             res = opener.open(request)
             self.code = res.code
             self.data = res.read()
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError as e:
             self.code = e.code
             self.data = e.msg
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             raise HttpError(e)
 
     def get(self, url, params={}, headers={}):

@@ -705,7 +705,7 @@ Notice that the call uses (almost) the filename of your element. To find out whi
     <p>It is very important to document your element: this allows to generate a documentation for the elements accessible to people writing format templates. It is the only way for them to know what your element do. The key points are:
         <ul>
         <li>Provide a docstring for the <code>format_element</code> function</li>
-        <li>For each of the parameters of the <code>format_element</code> function (except for <code>bfo</code>), provide a description using a Java-like doc syntax in the doc string:<br/> <code>@param my_param: description for my param</code> (one line per parameter)</li>
+        <li>For each of the parameters of the <code>format_element</code> function (except for <code>bfo</code>) as provide a description using a Java-like doc syntax in the doc string:<br/> <code>@param my_param: description for my param</code> (one line per parameter)</li>
         <li>You can use one <code>@see</code> followed by a comma separated list of elements filenames to provide a reference to other elements of interests related to this one: <br/> <code>@see my_element1.py, my element2.py</code></li>
         </ul>
         </p>

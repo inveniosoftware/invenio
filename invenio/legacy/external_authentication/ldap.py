@@ -85,7 +85,7 @@ class ExternalAuthLDAP(ExternalAuth):
             try:
                 connection = ldap.initialize(server)
                 return command(connection)
-            except ldap.SERVER_DOWN, error_message:
+            except ldap.SERVER_DOWN as error_message:
                 continue
         raise InvenioWebAccessExternalAuthError
 

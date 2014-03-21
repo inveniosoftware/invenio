@@ -116,7 +116,7 @@ def run_sql_drop_silently(query):
     try:
         query = query.replace(" IF EXISTS", "")
         run_sql(query)
-    except Exception, e:
+    except Exception as e:
         if  str(e).find("Unknown table") > -1:
             pass
         else:
@@ -127,7 +127,7 @@ def get_idx_indexer(name):
     """Returns the indexer field value"""
     try:
         return run_sql("SELECT indexer FROM idxINDEX WHERE NAME=%s", (name, ))[0][0]
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 

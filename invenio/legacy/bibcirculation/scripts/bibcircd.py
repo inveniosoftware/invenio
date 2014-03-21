@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 # try:
 #     from invenio.legacy.bibcirculation.daemon import main
-# except ImportError, e:
+# except ImportError as e:
 #     print "Error: %s" % e
 #     import sys
 #     sys.exit(1)

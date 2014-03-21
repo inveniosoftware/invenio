@@ -703,7 +703,7 @@ def perform_modifyindextranslations(idxID, ln=CFG_SITE_LANG, sel_type='', trans=
                 try:
                     trans_names = get_name(idxID, key, sel_type, "idxINDEX")
                     trans.append(trans_names[0][0])
-                except StandardError, e:
+                except StandardError as e:
                     trans.append('')
 
         for nr in range(0,len(langs)):
@@ -781,7 +781,7 @@ def perform_modifyfieldtranslations(fldID, ln=CFG_SITE_LANG, sel_type='', trans=
                 try:
                     trans_names = get_name(fldID, key, sel_type, "field")
                     trans.append(trans_names[0][0])
-                except StandardError, e:
+                except StandardError as e:
                     trans.append('')
 
         for nr in range(0,len(langs)):
@@ -2145,7 +2145,7 @@ def get_col_fld(colID=-1, type = '', id_field=''):
         sql += " ORDER BY type, score desc, score_fieldvalue desc"
         res = run_sql(sql, tuple(params))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ""
 
 def get_idx(idxID=''):
@@ -2158,7 +2158,7 @@ def get_idx(idxID=''):
         sql += " ORDER BY id asc"
         res = run_sql(sql, tuple(params))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ""
 
 
@@ -2167,7 +2167,7 @@ def get_idx_synonym_kb(idxID):
 
     try:
         return run_sql("SELECT synonym_kbrs FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
-    except StandardError, e:
+    except StandardError as e:
         return e.__str__()
 
 
@@ -2176,7 +2176,7 @@ def get_idx_remove_stopwords(idxID):
 
     try:
         return run_sql("SELECT remove_stopwords FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2185,7 +2185,7 @@ def get_idx_remove_html_markup(idxID):
 
     try:
         return run_sql("SELECT remove_html_markup FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2194,7 +2194,7 @@ def get_idx_remove_latex_markup(idxID):
 
     try:
         return run_sql("SELECT remove_latex_markup FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def get_idx_tokenizer(idxID):
@@ -2202,7 +2202,7 @@ def get_idx_tokenizer(idxID):
 
     try:
         return run_sql("SELECT tokenizer FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2224,7 +2224,7 @@ def get_fld_tags(fldID='', tagID=''):
         sql += " ORDER BY score desc, tag.value, tag.name"
         res = run_sql(sql, tuple(params))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ""
 
 def get_tags(tagID=''):
@@ -2242,7 +2242,7 @@ def get_tags(tagID=''):
         sql += " ORDER BY name, value"
         res = run_sql(sql, tuple(params))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ""
 
 def get_fld(fldID=''):
@@ -2254,7 +2254,7 @@ def get_fld(fldID=''):
         else:
             res = run_sql("SELECT id, name, code FROM field WHERE id=%s ORDER by name, code", (fldID, ))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ""
 
 def get_fld_id(fld_name=''):
@@ -2263,7 +2263,7 @@ def get_fld_id(fld_name=''):
     try:
         res = run_sql('SELECT id FROM field WHERE name=%s', (fld_name,))
         return res[0][0]
-    except StandardError, e:
+    except StandardError as e:
         return ''
 
 def get_fld_value(fldvID = ''):
@@ -2277,7 +2277,7 @@ def get_fld_value(fldvID = ''):
             params.append(fldvID)
         res = run_sql(sql, tuple(params))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ""
 
 def get_idx_fld(idxID=''):
@@ -2291,7 +2291,7 @@ def get_idx_fld(idxID=''):
         sql += " ORDER BY id_idxINDEX asc"
         res = run_sql(sql, tuple(params))
         return res
-    except StandardError, e:
+    except StandardError as e:
         return ""
 
 def get_col_nametypes():
@@ -2337,7 +2337,7 @@ def remove_fld(colID,fldID, fldvID=''):
             params.append(fldvID)
         res = run_sql(sql, tuple(params))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def remove_idxfld(idxID, fldID):
@@ -2349,7 +2349,7 @@ def remove_idxfld(idxID, fldID):
         sql = "DELETE FROM idxINDEX_field WHERE id_field=%s and id_idxINDEX=%s"
         res = run_sql(sql, (fldID, idxID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def remove_fldtag(fldID,tagID):
@@ -2361,7 +2361,7 @@ def remove_fldtag(fldID,tagID):
         sql = "DELETE FROM field_tag WHERE id_field=%s AND id_tag=%s"
         res = run_sql(sql, (fldID, tagID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def delete_tag(tagID):
@@ -2371,7 +2371,7 @@ def delete_tag(tagID):
     try:
         res = run_sql("DELETE FROM tag where id=%s", (tagID, ))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2389,7 +2389,7 @@ def delete_idx(idxID):
         res = run_sql("DROP TABLE idxPHRASE%02dF" % idxID) # kwalitee: disable=sql
         res = run_sql("DROP TABLE idxPHRASE%02dR" % idxID) # kwalitee: disable=sql
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2404,7 +2404,7 @@ def delete_virtual_idx(idxID):
         run_sql("""DELETE FROM idxINDEX_idxINDEX
                    WHERE id_virtual=%s""", (idxID, ))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2418,7 +2418,7 @@ def delete_fld(fldID):
         res = run_sql("DELETE FROM idxINDEX_field WHERE id_field=%s", (fldID, ))
         res = run_sql("DELETE FROM field WHERE id=%s", (fldID, ))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def add_idx(idxNAME):
@@ -2502,7 +2502,7 @@ def add_idx(idxNAME):
             return (0, (0, "Forward table not created for unknown reason."))
         elif not res3:
             return (0, (0, "Reverse table not created for unknown reason."))
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2517,7 +2517,7 @@ def add_virtual_idx(id_virtual, id_normal):
         run_sql("""UPDATE idxINDEX SET indexer='virtual'
                    WHERE id=%s""", (id_virtual, ))
         return add_dependent_index(id_virtual, id_normal)
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2542,7 +2542,7 @@ def add_dependent_index(id_virtual, id_normal):
                    VALUES (%s, %s)""" % (id_virtual, id_normal)
         res = run_sql(query)
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2555,7 +2555,7 @@ def remove_dependent_index(id_virtual, id_normal):
                 """ % (id_virtual, id_normal)
         res = run_sql(query)
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2575,7 +2575,7 @@ def add_fld(name, code):
             return (1, fldID[0][0])
         else:
             raise StandardError
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def add_fld_tag(fldID, name, value):
@@ -2599,7 +2599,7 @@ def add_fld_tag(fldID, name, value):
 
         res = run_sql("INSERT INTO field_tag(id_field, id_tag, score) values(%s, %s, %s)",  (fldID, res[0][0], score))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def add_idx_fld(idxID, fldID):
@@ -2613,7 +2613,7 @@ def add_idx_fld(idxID, fldID):
         sql = "INSERT INTO idxINDEX_field(id_idxINDEX, id_field) values (%s, %s)"
         res = run_sql(sql,  (idxID, fldID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def modify_idx(idxID, idxNAME, idxDESC):
@@ -2623,7 +2623,7 @@ def modify_idx(idxID, idxNAME, idxDESC):
         res = run_sql("UPDATE idxINDEX SET name=%s WHERE id=%s", (idxNAME, idxID))
         res = run_sql("UPDATE idxINDEX SET description=%s WHERE ID=%s", (idxDESC, idxID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def modify_idx_stemming(idxID, idxSTEM):
@@ -2632,7 +2632,7 @@ def modify_idx_stemming(idxID, idxSTEM):
     try:
         run_sql("UPDATE idxINDEX SET stemming_language=%s WHERE ID=%s", (idxSTEM, idxID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2641,7 +2641,7 @@ def modify_idx_indexer(idxID, indexer):
     try:
         res = run_sql("UPDATE idxINDEX SET indexer=%s WHERE ID=%s", (indexer, idxID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2657,7 +2657,7 @@ def modify_idx_synonym_kb(idxID, idxKB, idxMATCH):
             field_value = idxKB + CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR + idxMATCH
         run_sql("UPDATE idxINDEX SET synonym_kbrs=%s WHERE ID=%s", (field_value, idxID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2670,7 +2670,7 @@ def modify_idx_stopwords(idxID, idxSTOPWORDS):
     try:
         run_sql("UPDATE idxINDEX SET remove_stopwords=%s WHERE ID=%s", (idxSTOPWORDS, idxID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def modify_idx_html_markup(idxID, idxHTML):
@@ -2679,7 +2679,7 @@ def modify_idx_html_markup(idxID, idxHTML):
     try:
         run_sql("UPDATE idxINDEX SET remove_html_markup=%s WHERE ID=%s", (idxHTML, idxID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2689,7 +2689,7 @@ def modify_idx_latex_markup(idxID, idxLATEX):
     try:
         run_sql("UPDATE idxINDEX SET remove_latex_markup=%s WHERE ID=%s", (idxLATEX, idxID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -2699,7 +2699,7 @@ def modify_idx_tokenizer(idxID, idxTOK):
     try:
         run_sql("UPDATE idxINDEX SET tokenizer=%s WHERE ID=%s", (idxTOK, idxID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def modify_fld(fldID, code):
@@ -2712,7 +2712,7 @@ def modify_fld(fldID, code):
         sql += " WHERE id=%s"
         res = run_sql(sql, (code, fldID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def modify_tag(tagID, name, value):
@@ -2727,7 +2727,7 @@ def modify_tag(tagID, name, value):
         sql = "UPDATE tag SET value=%s WHERE id=%s"
         res = run_sql(sql, (value, tagID))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def switch_score(fldID, id_1, id_2):
@@ -2741,7 +2741,7 @@ def switch_score(fldID, id_1, id_2):
         res = run_sql("UPDATE field_tag SET score=%s WHERE id_field=%s and id_tag=%s", (res2[0][0], fldID, id_1))
         res = run_sql("UPDATE field_tag SET score=%s WHERE id_field=%s and id_tag=%s", (res1[0][0], fldID, id_2))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 def get_lang_list(table, field, id):

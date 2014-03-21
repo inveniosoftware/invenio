@@ -32,7 +32,7 @@ def index(req, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Repository Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -60,7 +60,7 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Repository Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -103,7 +103,7 @@ def delset(req, oai_set_id=None, ln=CFG_SITE_LANG, func=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Repository Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -131,7 +131,7 @@ def touchset(req, oai_set_id=None, ln=CFG_SITE_LANG, func=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Repository Admin Interface - Error",
                     body=e,
                     uid=uid,
@@ -161,7 +161,7 @@ def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_coll
 
     try:
         uid = getUid(req)
-    except Error, e:
+    except Error as e:
         return page(title="OAI Repository Admin Interface - Error",
                     body=e,
                     uid=uid,

@@ -135,7 +135,7 @@ class DropboxClient(client.DropboxClient):
             try:
                 metadata = super(DropboxClient, self).metadata(path,
                     include_deleted=False, list=False)
-            except rest.ErrorResponse, e:
+            except rest.ErrorResponse as e:
                 if e.status == 404:
                     raise ResourceNotFoundError(path)
                 raise OperationFailedError(opname='metadata', path=path,
@@ -179,7 +179,7 @@ class DropboxClient(client.DropboxClient):
                     children.append(basename(child['path']))
                     self.cache[child['path']] = CacheItem(child)
                 item = self.cache[path] = CacheItem(metadata, children)
-            except rest.ErrorResponse, e:
+            except rest.ErrorResponse as e:
                 if not item or e.status != 304:
                     raise OperationFailedError(opname='metadata', path=path,
                                                 msg=str(e) )
@@ -197,7 +197,7 @@ class DropboxClient(client.DropboxClient):
         "Add newly created directory to cache."
         try:
             metadata = super(DropboxClient, self).file_create_folder(path)
-        except rest.ErrorResponse, e:
+        except rest.ErrorResponse as e:
             if e.status == 403:
                 raise DestinationExistsError(path)
             if e.status == 400:
@@ -212,7 +212,7 @@ class DropboxClient(client.DropboxClient):
     def file_copy(self, src, dst):
         try:
             metadata = super(DropboxClient, self).file_copy(src, dst)
-        except rest.ErrorResponse, e:
+        except rest.ErrorResponse as e:
             if e.status == 404:
                 raise ResourceNotFoundError(src)
             if e.status == 403:
@@ -230,7 +230,7 @@ class DropboxClient(client.DropboxClient):
     def file_move(self, src, dst):
         try:
             metadata = super(DropboxClient, self).file_move(src, dst)
-        except rest.ErrorResponse, e:
+        except rest.ErrorResponse as e:
             if e.status == 404:
                 raise ResourceNotFoundError(src)
             if e.status == 403:
@@ -249,7 +249,7 @@ class DropboxClient(client.DropboxClient):
     def file_delete(self, path):
         try:
             super(DropboxClient, self).file_delete(path)
-        except rest.ErrorResponse, e:
+        except rest.ErrorResponse as e:
             if e.status == 404:
                 raise ResourceNotFoundError(path)
             if e.status == 400 and 'must not be empty' in str(e):
@@ -264,9 +264,9 @@ class DropboxClient(client.DropboxClient):
     def put_file(self, path, f, overwrite=False):
         try:
             super(DropboxClient, self).put_file(path, f, overwrite=overwrite)
-        except rest.ErrorResponse, e:
+        except rest.ErrorResponse as e:
             raise OperationFailedError(opname='file_copy', msg=str(e) )
-        except TypeError, e:
+        except TypeError as e:
             raise ResourceInvalidError("put_file", path)
         except:
             raise RemoteConnectionError("Most probable reasons: " + \
@@ -279,7 +279,7 @@ class DropboxClient(client.DropboxClient):
         try:
             info = super(DropboxClient, self).media( path )
             return info.get('url', None)
-        except rest.ErrorResponse, e:
+        except rest.ErrorResponse as e:
             if e.status == 400:
                 raise UnsupportedError("create a link to a folder")
             if e.status == 404:

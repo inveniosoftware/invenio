@@ -527,7 +527,7 @@ class Template:
                                         'subname'               : "%s%s" % (usecase[1], usecase[0]),
                                         'pageno'                : usecase[2]
                                       }
-                except KeyError, e:
+                except KeyError as e:
                     pass
             body_content += """&nbsp;</td>
              </tr>

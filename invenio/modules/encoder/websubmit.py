@@ -58,11 +58,11 @@ def get_session_id(req, uid, user_info):
         try:
             from flask import session
             session_id = session.sid
-        except AttributeError, e:
+        except AttributeError as e:
             # req was maybe not available (for eg. when this is run
             # through Create_Modify_Interface.py)
             session_id = user_info['session']
-    except Exception, e:
+    except Exception as e:
         raise ValueError("Cannot retrieve user session")
 
     return session_id

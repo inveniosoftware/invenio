@@ -221,7 +221,7 @@ def _read_options(options_string):
                       "detect-author-keywords", "id:", "collection:", "modified:",
                       "extract-acronyms", "acronyms-file=", "only-core-tags"]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
-    except getopt.GetoptError, err1:
+    except getopt.GetoptError as err1:
         print >> sys.stderr, "Options problem: %s" % err1
         _display_help()
 

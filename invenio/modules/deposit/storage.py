@@ -60,9 +60,9 @@ class ExternalFile(object):
             size = int(info.getheader('Content-length'))
             if size > cfg['DEPOSIT_MAX_UPLOAD_SIZE']:
                 raise UploadError("File too big")
-        except InvenioBibdocfileUnauthorizedURL, e:
+        except InvenioBibdocfileUnauthorizedURL as e:
             raise UploadError(str(e))
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             raise UploadError('URL could not be opened: %s' % str(e))
 
     def close(self):

@@ -121,7 +121,7 @@ def task_submit_check_options():
     else:
         try:
             check_arguments_compatibility(_TASKLETS[tasklet], arguments)
-        except ValueError, err:
+        except ValueError as err:
             print >> sys.stderr, 'ERROR: wrong arguments (%s) specified for ' \
                 'tasklet "%s": %s' % (arguments, tasklet, err)
             return False

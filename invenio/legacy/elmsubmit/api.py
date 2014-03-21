@@ -45,7 +45,7 @@ def process_email(email_string):
 
     try:
         e = elmsubmit_EZEmail.ParseMessage(email_string)
-    except elmsubmit_EZEmail.EZEmailParseError, err:
+    except elmsubmit_EZEmail.EZEmailParseError as err:
         try:
             if err.basic_email_info['from'] is None:
                 raise ValueError

@@ -762,7 +762,7 @@ class WordTable:
             set = intbitset(self.value[word].keys())
             try:
                 run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(tab_name), (word, set.fastdump())) # kwalitee: disable=sql
-            except Exception, e:
+            except Exception as e:
                 ## We send this exception to the admin only when is not
                 ## already reparing the problem.
                 register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
@@ -1868,7 +1868,7 @@ def task_run_core():
                     wordTable.tablename
                 write_message(error_message, stream=sys.stderr)
                 raise StandardError(error_message)
-        except StandardError, e:
+        except StandardError as e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception(alert_admin=True)
             if _last_word_table:
@@ -1910,7 +1910,7 @@ def task_run_core():
                         wordTable.tablename
                 write_message(error_message, stream=sys.stderr)
                 raise StandardError(error_message)
-        except StandardError, e:
+        except StandardError as e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception()
             if _last_word_table:
@@ -1954,7 +1954,7 @@ def task_run_core():
                         wordTable.tablename
                 write_message(error_message, stream=sys.stderr)
                 raise StandardError(error_message)
-        except StandardError, e:
+        except StandardError as e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception()
             if _last_word_table:

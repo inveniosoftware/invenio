@@ -200,7 +200,7 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
         # Move to final destination if exist
         try:
             shutil.move(pdf_temp_path, outputfile)
-        except Exception, err:
+        except Exception as err:
             raise InvenioWebSubmitFileMetadataRuntimeError("Could not move %s to %s" % \
                                                            (pdf_temp_path, outputfile))
     else:

@@ -65,7 +65,7 @@ def run_export_method(jobname):
         output_directory = CFG_WEBDIR + os.sep + "export" + os.sep + "googlescholar"
         exporter = GoogleScholarExporter(output_directory)
         exporter.export()
-    except GoogleScholarExportException, ex:
+    except GoogleScholarExportException as ex:
         write_message("%s Exception: %s" %(ex.get_error_message(), ex.get_inner_exception()))
 
     write_message("bibexport_sitemap: job %s finished." % jobname)
@@ -197,7 +197,7 @@ class GoogleScholarExporter:
                 index_file.write('<a href="%s">%s</a><br>\n' % (file_name, file_name))
 
             index_file.write("</body></html>\n")
-        except (IOError, OSError), exception:
+        except (IOError, OSError) as exception:
             self._report_error("Failed to create index file.", exception)
 
         if index_file is not None:
@@ -233,7 +233,7 @@ class GoogleScholarExporter:
         try:
             output_file = gzip.GzipFile(filename = path, mode = "w")
             return output_file
-        except (IOError, OSError), exception:
+        except (IOError, OSError) as exception:
             self._report_error("Failed to open file file %s." % (path, ), exception)
             return None
 
@@ -247,7 +247,7 @@ class GoogleScholarExporter:
         """"Wirtes a the text passed as a parameter to file"""
         try:
             output_file.write(text_to_write)
-        except (IOError, OSError), exception:
+        except (IOError, OSError) as exception:
             self._report_error("Failed to write to file " + output_file.name, exception)
 
     def _get_record_NLM_XML(self, record):

@@ -195,7 +195,7 @@ def main():
     """Report stats on the Invenio bibliographic tables."""
     try:
         opts, dummyargs = getopt.getopt(sys.argv[1:], "hV", ["help", "version"])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage(1, err)
     if opts:
         for opt in opts:

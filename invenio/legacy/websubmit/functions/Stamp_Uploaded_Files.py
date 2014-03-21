@@ -277,7 +277,7 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
             ## warning to the admin?
             register_exception(req=user_info['req'])
             continue
-        except InvenioWebSubmitFunctionError, err:
+        except InvenioWebSubmitFunctionError as err:
             ## Unexpected error in stamping. The admin should be contacted
             ## because it has resulted in an unstable situation with the
             ## files. They are no longer in a well-defined state - some may
@@ -317,7 +317,7 @@ def visit_for_stamping(visit_for_stamping_arguments, dirname, filenames):
     if not os.path.exists(dirname_files_pre_stamping):
         try:
             os.makedirs(dirname_files_pre_stamping)
-        except OSError, err:
+        except OSError as err:
             ## Unable to make a directory in which to store the unstamped
             ## files.
             ## Register the exception:
@@ -433,7 +433,7 @@ def visit_for_stamping(visit_for_stamping_arguments, dirname, filenames):
                         shutil.move("%s/%s" % (dirname_files_pre_stamping, \
                                                file_to_stamp), \
                                     path_to_stamped_file)
-                    except IOError, err:
+                    except IOError as err:
                         ## It wasn't possible even to move the original file
                         ## back to the files directory. Register the
                         ## exception and stop the stamping process - it isn't

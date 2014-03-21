@@ -768,7 +768,7 @@ class tarArchiveTool(ArchiveTool):
 
         try:
             self._tarfile_obj.extract(tarinfo_obj, root_dir)
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             if e.errno == 13:
 
                 def f():
@@ -813,7 +813,7 @@ class tarArchiveTool(ArchiveTool):
             if force_file_permissions is not None:
                 try:
                     os.chmod(output_location, force_file_permissions)
-                except EnvironmentError, e:
+                except EnvironmentError as e:
                     if e.errno == 13:
                         f = lambda: os.chmod(output_location, force_file_permissions)
                         _provide_dir_with_perms_then_exec(dir=os.path.join(root_dir, dir), function=f, perms=0700, barrier_dir=root_dir)
@@ -824,7 +824,7 @@ class tarArchiveTool(ArchiveTool):
             if force_dir_permissions is not None:
                 try:
                     os.chmod(output_location, force_dir_permissions)
-                except EnvironmentError, e:
+                except EnvironmentError as e:
                     if e.errno == 13:
                         f = lambda: os.chmod(output_location, force_dir_permissions)
                         _provide_dir_with_perms_then_exec(dir=os.path.join(root_dir, dir), function=f, perms=0700, barrier_dir=root_dir)

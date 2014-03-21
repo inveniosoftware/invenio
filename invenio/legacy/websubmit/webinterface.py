@@ -151,7 +151,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                     if not os.path.exists(dir_to_open):
                         try:
                             os.makedirs(dir_to_open)
-                        except OSError, e:
+                        except OSError as e:
                             if e.errno != errno.EEXIST:
                                 # If the issue is only that directory
                                 # already exists, then continue, else
@@ -202,7 +202,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                 # Create uid/icons dir if needed
                                 try:
                                     os.makedirs(icons_dir)
-                                except OSError, e:
+                                except OSError as e:
                                     if e.errno != errno.EEXIST:
                                         # If the issue is only that
                                         # directory already exists,
@@ -213,7 +213,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                       os.path.join(icons_dir, icon_name))
                             added_files[key] = {'name': filename,
                                                 'iconName': icon_name}
-                        except InvenioWebSubmitIconCreatorError, e:
+                        except InvenioWebSubmitIconCreatorError as e:
                             # We could not create the icon
                             added_files[key] = {'name': filename}
                             continue
@@ -308,7 +308,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                     if not os.path.exists(dir_to_open):
                         try:
                             os.makedirs(dir_to_open)
-                        except OSError, e:
+                        except OSError as e:
                             if e.errno != errno.EEXIST:
                                 # If the issue is only that directory
                                 # already exists, then continue, else
@@ -586,7 +586,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                   original_user_files_absolute_path + os.sep + uploaded_file_name)
                         os.rename(icon_path + os.sep + icon_name,
                                   uploaded_file_path)
-                    except InvenioWebSubmitIconCreatorError, e:
+                    except InvenioWebSubmitIconCreatorError as e:
                         pass
 
                 user_files_path += '/' + filetype + '/' + uploaded_file_name

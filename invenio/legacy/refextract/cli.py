@@ -199,7 +199,7 @@ def main(config, args, run):
     try:
         run(config, args)
         write_message("Extraction complete", verbose=2)
-    except StandardError, e:
+    except StandardError as e:
         # Remove extra '\n'
         write_message(traceback.format_exc()[:-1], verbose=9)
         write_message("Error: %s" % e, verbose=0)
@@ -263,7 +263,7 @@ def write_references(config, xml_references):
             print >>ofilehdl, out.encode("utf-8")
         print >>ofilehdl, CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8")
         ofilehdl.flush()
-    except IOError, err:
+    except IOError as err:
         write_message("%s\n%s\n" % (config.xmlfile, err), \
                           sys.stderr, verbose=0)
         halt(err=IOError, msg="Error: Unable to write to '%s'" \

@@ -169,7 +169,7 @@ class Collection:
                     self.reclist = intbitset()
                     self.reclist_updated_since_start = 1
                 self.old_reclist = intbitset(self.reclist)
-            except Error, e:
+            except Error as e:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
 
@@ -274,7 +274,7 @@ class Collection:
         try:
             os.umask(022)
             f = open(fullfilename, "wb")
-        except IOError, v:
+        except IOError as v:
             try:
                 (code, message) = v
             except:
@@ -830,7 +830,7 @@ class Collection:
                 self.reclist_updated_since_start = 1
             else:
                 write_message("... no changes in reclist detected", verbose=6)
-        except Error, e:
+        except Error as e:
             print "Database Query Error %d: %s." % (e.args[0], e.args[1])
             sys.exit(1)
         # last but not least, update the speed-up flag:

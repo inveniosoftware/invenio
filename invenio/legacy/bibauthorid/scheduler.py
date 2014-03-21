@@ -92,7 +92,7 @@ def schedule(jobs, sizs, estimator, memfile_path=None):
             jobs[idx]()
             register_memory_usage()
             os._exit(os.EX_OK)
-        except Exception, e:
+        except Exception as e:
             f = open('/tmp/exception-%s' % str(os.getpid()), "w")
             f.write(str(e) + '\n')
             f.close()

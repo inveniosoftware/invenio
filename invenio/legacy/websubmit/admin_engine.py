@@ -124,7 +124,7 @@ def save_update_to_file(filepath, filecontent, notruncate=0, appendmode=0):
         ## open temp file for writing:
         try:
             fp = open("%s%s" % (fpath, tmpfname), "w")
-        except IOError, e:
+        except IOError as e:
             ## cannot open file
             msg = """Unable to write to file [%s%s] - cannot open file for writing""" % (fpath, fname)
             raise InvenioWebSubmitAdminWarningIOError(msg)
@@ -133,7 +133,7 @@ def save_update_to_file(filepath, filecontent, notruncate=0, appendmode=0):
             fp.write(filecontent)
             fp.flush()
             fp.close()
-        except IOError, e:
+        except IOError as e:
             ## could not write to temp file
             msg = """Unable to write to file [%s]""" % (tmpfname,)
             ## remove the "temp file"
@@ -156,7 +156,7 @@ def save_update_to_file(filepath, filecontent, notruncate=0, appendmode=0):
         ## append mode:
         try:
             fp = open("%s%s" % (fpath, fname), "a")
-        except IOError, e:
+        except IOError as e:
             ## cannot open file
             msg = """Unable to write to file [%s] - cannot open file for writing in append mode""" % (fname,)
             raise InvenioWebSubmitAdminWarningIOError(msg)
@@ -166,7 +166,7 @@ def save_update_to_file(filepath, filecontent, notruncate=0, appendmode=0):
             fp.write(filecontent)
             fp.flush()
             fp.close()
-        except IOError, e:
+        except IOError as e:
             ## could not write to temp file
             msg = """Unable to write to file [%s] in append mode""" % (fname,)
             ## close the file
@@ -433,7 +433,7 @@ def perform_request_organise_submission_page(doctype="",
         try:
             _delete_submission_collection(sbmcolid)
             user_msg.append("Submission-collection successfully deleted from submissions tree")
-        except InvenioWebSubmitAdminWarningDeleteFailed, excptn:
+        except InvenioWebSubmitAdminWarningDeleteFailed as excptn:
             user_msg.append(str(excptn))
         ## re-display submission-collections:
         (title, body) = _organise_submission_page_display_submission_tree(user_msg=user_msg)
@@ -646,14 +646,14 @@ def perform_request_add_function(funcname=None, funcdescr=None, funcaddcommit=""
             funcname = wash_single_urlarg(urlarg=funcname, argreqdtype=str, argdefault="", maxstrlen=40, minstrlen=1)
             if function_name_is_valid(fname=funcname) == 0:
                 funcname = ""
-        except ValueError, e:
+        except ValueError as e:
             funcname = ""
     else:
         funcname = ""
     if funcdescr is not None:
         try:
             funcdescr = wash_single_urlarg(urlarg=funcdescr, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             funcdescr = ""
     else:
         funcdescr = ""
@@ -717,28 +717,28 @@ def perform_request_add_action(actid=None, actname=None, working_dir=None, statu
             actid = wash_single_urlarg(urlarg=actid, argreqdtype=str, argdefault="", maxstrlen=3, minstrlen=3)
             if string_is_alphanumeric_including_underscore(txtstring=actid) == 0:
                 actid = ""
-        except ValueError, e:
+        except ValueError as e:
             actid = ""
     else:
         actid = ""
     if actname is not None:
         try:
             actname = wash_single_urlarg(urlarg=actname, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             actname = ""
     else:
         actname = ""
     if working_dir is not None:
         try:
             working_dir = wash_single_urlarg(urlarg=working_dir, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             working_dir = ""
     else:
         working_dir = ""
     if status_text is not None:
         try:
             status_text = wash_single_urlarg(urlarg=status_text, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             status_text = ""
     else:
         status_text = ""
@@ -801,14 +801,14 @@ def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
             chname = wash_single_urlarg(urlarg=chname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if function_name_is_valid(fname=chname) == 0:
                 chname = ""
-        except ValueError, e:
+        except ValueError as e:
             chname = ""
     else:
         chname = ""
     if chdesc is not None:
         try:
             chdesc = wash_single_urlarg(urlarg=chdesc, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             chdesc = ""
     else:
         chdesc = ""
@@ -876,70 +876,70 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
             elname = wash_single_urlarg(urlarg=elname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=elname) == 0:
                 elname = ""
-        except ValueError, e:
+        except ValueError as e:
             elname = ""
     else:
         elname = ""
     if elmarccode is not None:
         try:
             elmarccode = wash_single_urlarg(urlarg=elmarccode, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elmarccode = ""
     else:
         elmarccode = ""
     if eltype is not None:
         try:
             eltype = wash_single_urlarg(urlarg=eltype, argreqdtype=str, argdefault="", maxstrlen=1, minstrlen=1)
-        except ValueError, e:
+        except ValueError as e:
             eltype = ""
     else:
         eltype = ""
     if elsize is not None:
         try:
             elsize = wash_single_urlarg(urlarg=elsize, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elsize = ""
     else:
         elsize = ""
     if elrows is not None:
         try:
             elrows = wash_single_urlarg(urlarg=elrows, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elrows = ""
     else:
         elrows = ""
     if elcols is not None:
         try:
             elcols = wash_single_urlarg(urlarg=elcols, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elcols = ""
     else:
         elcols = ""
     if elmaxlength is not None:
         try:
             elmaxlength = wash_single_urlarg(urlarg=elmaxlength, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elmaxlength = ""
     else:
         elmaxlength = ""
     if elval is not None:
         try:
             elval = wash_single_urlarg(urlarg=elval, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elval = ""
     else:
         elval = ""
     if elfidesc is not None:
         try:
             elfidesc = wash_single_urlarg(urlarg=elfidesc, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elfidesc = ""
     else:
         elfidesc = ""
     if elmodifytext is not None:
         try:
             elmodifytext = wash_single_urlarg(urlarg=elmodifytext, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elmodifytext = ""
     else:
         elmodifytext = ""
@@ -1034,70 +1034,70 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
             elname = wash_single_urlarg(urlarg=elname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=elname) == 0:
                 elname = ""
-        except ValueError, e:
+        except ValueError as e:
             elname = ""
     else:
         elname = ""
     if elmarccode is not None:
         try:
             elmarccode = wash_single_urlarg(urlarg=elmarccode, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elmarccode = ""
     else:
         elmarccode = ""
     if eltype is not None:
         try:
             eltype = wash_single_urlarg(urlarg=eltype, argreqdtype=str, argdefault="", maxstrlen=1, minstrlen=1)
-        except ValueError, e:
+        except ValueError as e:
             eltype = ""
     else:
         eltype = ""
     if elsize is not None:
         try:
             elsize = wash_single_urlarg(urlarg=elsize, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elsize = ""
     else:
         elsize = ""
     if elrows is not None:
         try:
             elrows = wash_single_urlarg(urlarg=elrows, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elrows = ""
     else:
         elrows = ""
     if elcols is not None:
         try:
             elcols = wash_single_urlarg(urlarg=elcols, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elcols = ""
     else:
         elcols = ""
     if elmaxlength is not None:
         try:
             elmaxlength = wash_single_urlarg(urlarg=elmaxlength, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elmaxlength = ""
     else:
         elmaxlength = ""
     if elval is not None:
         try:
             elval = wash_single_urlarg(urlarg=elval, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elval = ""
     else:
         elval = ""
     if elfidesc is not None:
         try:
             elfidesc = wash_single_urlarg(urlarg=elfidesc, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elfidesc = ""
     else:
         elfidesc = ""
     if elmodifytext is not None:
         try:
             elmodifytext = wash_single_urlarg(urlarg=elmodifytext, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             elmodifytext = ""
     else:
         elmodifytext = ""
@@ -1260,14 +1260,14 @@ def perform_request_edit_jscheck(chname, chdesc=None, chcommit=""):
             chname = wash_single_urlarg(urlarg=chname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if function_name_is_valid(fname=chname) == 0:
                 chname = ""
-        except ValueError, e:
+        except ValueError as e:
             chname = ""
     else:
         chname = ""
     if chdesc is not None:
         try:
             chdesc = wash_single_urlarg(urlarg=chdesc, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             chdesc = ""
     else:
         chdesc = ""
@@ -1367,7 +1367,7 @@ def perform_request_edit_action(actid, actname=None, working_dir=None, status_te
             actid = wash_single_urlarg(urlarg=actid, argreqdtype=str, argdefault="", maxstrlen=3, minstrlen=3)
             if string_is_alphanumeric_including_underscore(txtstring=actid) == 0:
                 actid = ""
-        except ValueError, e:
+        except ValueError as e:
             actid = ""
         actid = actid.upper()
     else:
@@ -1375,21 +1375,21 @@ def perform_request_edit_action(actid, actname=None, working_dir=None, status_te
     if actname is not None:
         try:
             actname = wash_single_urlarg(urlarg=actname, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             actname = ""
     else:
         actname = ""
     if working_dir is not None:
         try:
             working_dir = wash_single_urlarg(urlarg=working_dir, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             working_dir = ""
     else:
         working_dir = ""
     if status_text is not None:
         try:
             status_text = wash_single_urlarg(urlarg=status_text, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             status_text = ""
     else:
         status_text = ""
@@ -1462,7 +1462,7 @@ def _functionedit_display_function_details(funcname, user_msg=""):
                                             globals(), locals(), [funcname])
             if hasattr(websubmit_function, funcname) and getattr(websubmit_function, funcname).__doc__:
                 docstring = getattr(websubmit_function, funcname).__doc__
-        except Exception, e:
+        except Exception as e:
             docstring = '''<span style="color:#f00;font-weight:700">Function documentation could
             not be loaded</span>.<br/>Please check function definition. Error was:<br/>%s''' % str(e)
 
@@ -1644,14 +1644,14 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
             funcname = wash_single_urlarg(urlarg=funcname, argreqdtype=str, argdefault="")
             if string_is_alphanumeric_including_underscore(txtstring=funcname) == 0:
                 funcname = ""
-        except ValueError, e:
+        except ValueError as e:
             funcname = ""
     else:
         funcname = ""
     if funcdescr is not None:
         try:
             funcdescr = wash_single_urlarg(urlarg=funcdescr, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             funcdescr = ""
     else:
         funcdescr = ""
@@ -1660,7 +1660,7 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
             funceditaddparam = wash_single_urlarg(urlarg=funceditaddparam, argreqdtype=str, argdefault="")
             if string_is_alphanumeric_including_underscore(txtstring=funceditaddparam) == 0:
                 funceditaddparam = ""
-        except ValueError, e:
+        except ValueError as e:
             funceditaddparam = ""
     else:
         funceditaddparam = ""
@@ -1669,14 +1669,14 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
             funceditaddparamfree = wash_single_urlarg(urlarg=funceditaddparamfree, argreqdtype=str, argdefault="")
             if string_is_alphanumeric_including_underscore(txtstring=funceditaddparamfree) == 0:
                 funceditaddparamfree = ""
-        except ValueError, e:
+        except ValueError as e:
             funceditaddparamfree = ""
     else:
         funceditaddparamfree = ""
     if funceditdelparam is not None:
         try:
             funceditdelparam = wash_single_urlarg(urlarg=funceditdelparam, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             funceditdelparam = ""
     else:
         funceditdelparam = ""
@@ -2012,28 +2012,28 @@ def perform_request_add_doctype(doctype=None, doctypename=None, doctypedescr=Non
             doctype = wash_single_urlarg(urlarg=doctype, argreqdtype=str, argdefault="", maxstrlen=10, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=doctype) == 0:
                 doctype = ""
-        except ValueError, e:
+        except ValueError as e:
             doctype = ""
     else:
         doctype = ""
     if doctypename is not None:
         try:
             doctypename = wash_single_urlarg(urlarg=doctypename, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             doctypename = ""
     else:
         doctypename = ""
     if doctypedescr is not None:
         try:
             doctypedescr = wash_single_urlarg(urlarg=doctypedescr, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             doctypedescr = ""
     else:
         doctypedescr = ""
     if clonefrom is not None:
         try:
             clonefrom = wash_single_urlarg(urlarg=clonefrom, argreqdtype=str, argdefault="None")
-        except ValueError, e:
+        except ValueError as e:
             clonefrom = "None"
     else:
         clonefrom = "None"
@@ -2658,7 +2658,7 @@ def perform_request_configure_doctype(doctype,
             doctype = wash_single_urlarg(urlarg=doctype, argreqdtype=str, argdefault="", maxstrlen=10, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=doctype) == 0:
                 doctype = ""
-        except ValueError, e:
+        except ValueError as e:
             doctype = ""
     else:
         doctype = ""
@@ -2667,35 +2667,35 @@ def perform_request_configure_doctype(doctype,
             action = wash_single_urlarg(urlarg=action, argreqdtype=str, argdefault="", maxstrlen=3, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=action) == 0:
                 action = ""
-        except ValueError, e:
+        except ValueError as e:
             action = ""
     else:
         action = ""
     if doctypename is not None:
         try:
             doctypename = wash_single_urlarg(urlarg=doctypename, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             doctypename = ""
     else:
         doctypename = ""
     if doctypedescr is not None:
         try:
             doctypedescr = wash_single_urlarg(urlarg=doctypedescr, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             doctypedescr = ""
     else:
         doctypedescr = ""
     if categid is not None:
         try:
             categid = wash_single_urlarg(urlarg=categid, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             categid = ""
     else:
         categid = ""
     if categdescr is not None:
         try:
             categdescr = wash_single_urlarg(urlarg=categdescr, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             categdescr = ""
     else:
         categdescr = ""
@@ -2704,56 +2704,56 @@ def perform_request_configure_doctype(doctype,
             doctype_cloneactionfrom = wash_single_urlarg(urlarg=doctype_cloneactionfrom, argreqdtype=str, argdefault="", maxstrlen=10, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=doctype_cloneactionfrom) == 0:
                 doctype_cloneactionfrom = ""
-        except ValueError, e:
+        except ValueError as e:
             doctype_cloneactionfrom = ""
     else:
         doctype_cloneactionfrom = ""
     if displayed is not None:
         try:
             displayed = wash_single_urlarg(urlarg=displayed, argreqdtype=str, argdefault="Y", maxstrlen=1, minstrlen=1)
-        except ValueError, e:
+        except ValueError as e:
             displayed = "Y"
     else:
         displayed = "Y"
     if buttonorder is not None:
         try:
             buttonorder = wash_single_urlarg(urlarg=buttonorder, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             buttonorder = ""
     else:
         buttonorder = ""
     if level is not None:
         try:
             level = wash_single_urlarg(urlarg=level, argreqdtype=str, argdefault="", maxstrlen=1, minstrlen=1)
-        except ValueError, e:
+        except ValueError as e:
             level = ""
     else:
         level = ""
     if score is not None:
         try:
             score = wash_single_urlarg(urlarg=score, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             score = ""
     else:
         score = ""
     if stpage is not None:
         try:
             stpage = wash_single_urlarg(urlarg=stpage, argreqdtype=int, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             stpage = ""
     else:
         stpage = ""
     if statustext is not None:
         try:
             statustext = wash_single_urlarg(urlarg=statustext, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             statustext = ""
     else:
         statustext = ""
     if endtxt is not None:
         try:
             endtxt = wash_single_urlarg(urlarg=endtxt, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             endtxt = ""
     else:
         endtxt = ""
@@ -2937,7 +2937,7 @@ def _update_submission_function_parameter_file(doctype, action, functionname,
     ## save file:
     try:
         save_update_to_file(filepath="%s/%s" % (CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR, filename), filecontent=paramfilecontent)
-    except InvenioWebSubmitAdminWarningIOError, e:
+    except InvenioWebSubmitAdminWarningIOError as e:
         ## could not correctly update the file!
         user_msg.append(str(e))
         (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
@@ -3049,10 +3049,10 @@ def _update_submissionfunction_parameter_value(doctype, action, functionname, pa
     try:
         update_value_of_function_parameter_for_doctype(doctype=doctype, paramname=paramname, paramval=paramval)
         user_msg.append("""The value of the parameter [%s] was updated for document type [%s]""" % (paramname, doctype))
-    except InvenioWebSubmitAdminWarningTooManyRows, e:
+    except InvenioWebSubmitAdminWarningTooManyRows as e:
         ## multiple rows found for param - update not carried out
         user_msg.append(str(e))
-    except InvenioWebSubmitAdminWarningNoRowsFound, e:
+    except InvenioWebSubmitAdminWarningNoRowsFound as e:
         ## no rows found - parameter does not exist for doctype, therefore no update
         user_msg.append(str(e))
     (title, body) = \
@@ -3178,52 +3178,52 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
     if addfunctionstep != "":
         try:
             addfunctionstep = str(wash_single_urlarg(urlarg=addfunctionstep, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             addfunctionstep = ""
     if addfunctionscore != "":
         try:
             addfunctionscore = str(wash_single_urlarg(urlarg=addfunctionscore, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             addfunctionscore = ""
     if deletefunctionstep != "":
         try:
             deletefunctionstep = str(wash_single_urlarg(urlarg=deletefunctionstep, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             deletefunctionstep = ""
     if deletefunctionscore != "":
         try:
             deletefunctionscore = str(wash_single_urlarg(urlarg=deletefunctionscore, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             deletefunctionscore = ""
     if movetofunctionstep != "":
         try:
             movetofunctionstep = str(wash_single_urlarg(urlarg=movetofunctionstep, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             movetofunctionstep = ""
     if movetofunctionscore != "":
         try:
             movetofunctionscore = str(wash_single_urlarg(urlarg=movetofunctionscore, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             movetofunctionscore = ""
     if moveupfunctionstep != "":
         try:
             moveupfunctionstep = str(wash_single_urlarg(urlarg=moveupfunctionstep, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             moveupfunctionstep = ""
     if moveupfunctionscore != "":
         try:
             moveupfunctionscore = str(wash_single_urlarg(urlarg=moveupfunctionscore, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             moveupfunctionscore = ""
     if movedownfunctionstep != "":
         try:
             movedownfunctionstep = str(wash_single_urlarg(urlarg=movedownfunctionstep, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             movedownfunctionstep = ""
     if movedownfunctionscore != "":
         try:
             movedownfunctionscore = str(wash_single_urlarg(urlarg=movedownfunctionscore, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             movedownfunctionscore = ""
 
 
@@ -3287,7 +3287,7 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
                                                                            movefunctoscore=movetofunctionscore)
             user_msg.append("""The function [%s] at step [%s], score [%s] was successfully moved."""\
                             % (movefromfunctionname, movefromfunctionstep, movefromfunctionscore))
-        except Exception, e:
+        except Exception as e:
             ## there was a problem
             user_msg.append(str(e))
         (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype,
@@ -3389,7 +3389,7 @@ def _add_function_to_submission(doctype, action, addfunctionname, addfunctionste
                                                                                                     function=addfunctionname,
                                                                                                     step=addfunctionstep,
                                                                                                     score=addfunctionscore)
-    except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+    except InvenioWebSubmitAdminWarningReferentialIntegrityViolation as e:
         ## Function didn't exist in WebSubmit! Not added to submission.
         user_msg.append(str(e))
         ## TODO : LOG ERROR
@@ -3399,14 +3399,14 @@ def _add_function_to_submission(doctype, action, addfunctionname, addfunctionste
                                                                                          addfunctionscore=addfunctionscore,
                                                                                          user_msg=user_msg)
         return (title, body)
-    except InvenioWebSubmitAdminWarningInsertFailed, e:
+    except InvenioWebSubmitAdminWarningInsertFailed as e:
         ## insert failed - some functions within the step may have been corrupted!
         user_msg.append(str(e))
         ## TODO : LOG ERROR
         (title, body) = \
                 _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
         return (title, body)
-    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+    except InvenioWebSubmitAdminWarningDeleteFailed as e:
         ## when regulating the scores of functions within the step, could not delete some or all of the functions
         ## within the step that the function was added to. Some functions may have been lost!
         user_msg.append(str(e))
@@ -3438,7 +3438,7 @@ def _delete_submission_function(doctype, action, deletefunctionname, deletefunct
         delete_function_at_step_and_score_from_submission(doctype=doctype, action=action,
                                                           function=deletefunctionname, step=deletefunctionstep,
                                                           score=deletefunctionscore)
-    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+    except InvenioWebSubmitAdminWarningDeleteFailed as e:
         ## unable to delete function - error message and return
         user_msg.append("""Unable to delete function [%s] at step [%s], score [%s] from submission [%s]""" \
                         % (deletefunctionname, deletefunctionstep, deletefunctionscore, "%s%s" % (action, doctype)))
@@ -3450,7 +3450,7 @@ def _delete_submission_function(doctype, action, deletefunctionname, deletefunct
         regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype=doctype,
                                                                                             action=action,
                                                                                             step=deletefunctionstep)
-    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+    except InvenioWebSubmitAdminWarningDeleteFailed as e:
         ## couldnt delete the functions before reordering them
         user_msg.append("""Deleted function [%s] at step [%s], score [%s] from submission [%s], but could not re-order""" \
                         """ scores of remaining functions within step [%s]""" \
@@ -3486,7 +3486,7 @@ def perform_request_configure_doctype_submissionpage_preview(doctype, action, pa
     if pagenum != "":
         try:
             pagenum = str(wash_single_urlarg(urlarg=pagenum, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             pagenum = ""
     ## ensure that the page number for this submission is valid:
     num_pages_submission = get_numbersubmissionpages_doctype_action(doctype=doctype, action=action)
@@ -3530,19 +3530,19 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
     if pagenum != "":
         try:
             pagenum = str(wash_single_urlarg(urlarg=pagenum, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             pagenum = ""
     if fieldname != "":
         try:
             fieldname = wash_single_urlarg(urlarg=fieldname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=fieldname) == 0:
                 fieldname = ""
-        except ValueError, e:
+        except ValueError as e:
             fieldname = ""
     if fieldtext != "":
         try:
             fieldtext = wash_single_urlarg(urlarg=fieldtext, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             fieldtext = ""
     if fieldlevel != "":
         try:
@@ -3552,39 +3552,39 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
             if fieldlevel not in ("m", "M", "o", "O"):
                 fieldlevel = "O"
             fieldlevel = fieldlevel.upper()
-        except ValueError, e:
+        except ValueError as e:
             fieldlevel = "O"
     if fieldshortdesc != "":
         try:
             fieldshortdesc = wash_single_urlarg(urlarg=fieldshortdesc, argreqdtype=str, argdefault="")
-        except ValueError, e:
+        except ValueError as e:
             fieldshortdesc = ""
     if fieldcheck != "":
         try:
             fieldcheck = wash_single_urlarg(urlarg=fieldcheck, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=fieldcheck) == 0:
                 fieldcheck = ""
-        except ValueError, e:
+        except ValueError as e:
             fieldcheck = ""
     if editfieldposn != "":
         try:
             editfieldposn = str(wash_single_urlarg(urlarg=editfieldposn, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             editfieldposn = ""
     if deletefieldposn != "":
         try:
             deletefieldposn = str(wash_single_urlarg(urlarg=deletefieldposn, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             deletefieldposn = ""
     if movefieldfromposn != "":
         try:
             movefieldfromposn = str(wash_single_urlarg(urlarg=movefieldfromposn, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             movefieldfromposn = ""
     if movefieldtoposn != "":
         try:
             movefieldtoposn = str(wash_single_urlarg(urlarg=movefieldtoposn, argreqdtype=int, argdefault=""))
-        except ValueError, e:
+        except ValueError as e:
             movefieldtoposn = ""
 
     ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
@@ -3717,12 +3717,12 @@ def _configure_doctype_edit_field_on_submissionpage(doctype, action, pagenum, fi
                                                       fieldcheck=fieldcheck)
         user_msg.append("The details of the field at position %s have been updated successfully" % (fieldposn,))
         update_modification_date_for_submission(doctype=doctype, action=action)
-    except InvenioWebSubmitAdminWarningTooManyRows, e:
+    except InvenioWebSubmitAdminWarningTooManyRows as e:
         ## multiple rows found at page position - not safe to edit:
         user_msg.append("Unable to update details of field at position %s on submission page %s - multiple fields found at this position" \
                         % (fieldposn, pagenum))
         ## TODO : LOG WARNING
-    except InvenioWebSubmitAdminWarningNoRowsFound, e:
+    except InvenioWebSubmitAdminWarningNoRowsFound as e:
         ## field not found - cannot edit
         user_msg.append("Unable to update details of field at position %s on submission page %s - field doesn't seem to exist there!" \
                         % (fieldposn, pagenum))
@@ -3849,7 +3849,7 @@ def _configure_doctype_add_field_to_submissionpage(doctype, action, pagenum, fie
                         % (fieldname, pagenum, "%s%s" % (action, doctype)))
         update_modification_date_for_submission(doctype=doctype, action=action)
         (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
-    except InvenioWebSubmitAdminWarningInsertFailed, e:
+    except InvenioWebSubmitAdminWarningInsertFailed as e:
         ## the insert of the new field failed for some reason
         ## TODO : LOG ERROR
         user_msg.append("""Couldn't add the field "%s" to page %s of submission %s - please try again""" \
@@ -3904,7 +3904,7 @@ def _configure_doctype_move_field_on_submissionpage(doctype, action, pagenum, mo
         try:
             raise InvenioWebSubmitWarning(_('Unable to move field at position %(x_from)s to position %(x_to)s on page %(x_page)s of submission \'%(x_sub)s%(x_subm)s\' - Invalid Field Position Numbers',
                                             x_from=movefieldfromposn, x_to=movefieldtoposn, x_page=pagenum, x_sub=action, x_subm=doctype))
-        except InvenioWebSubmitWarning, exc:
+        except InvenioWebSubmitWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE', \
@@ -3916,7 +3916,7 @@ def _configure_doctype_move_field_on_submissionpage(doctype, action, pagenum, mo
         try:
             raise InvenioWebSubmitWarning(_('Unable to swap field at position %(x_from)s with field at position %(x_to)s on page %(x_page)s of submission %(x_sub)s - could not move field at position %(x_subm)s to temporary field location',
                                             x_from=movefieldfromposn, x_to=movefieldtoposn, x_page=pagenum, x_sub=action, x_subm=doctype))
-        except InvenioWebSubmitWarning, exc:
+        except InvenioWebSubmitWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION', \
@@ -3928,7 +3928,7 @@ def _configure_doctype_move_field_on_submissionpage(doctype, action, pagenum, mo
         try:
             raise InvenioWebSubmitWarning(_('Unable to swap field at position %(x_from)s with field at position %(x_to)s on page %(x_page)s of submission %(x_sub)s - could not move field at position %(x_posfrom)s to position %(x_posto)s. Please ask Admin to check that a field was not stranded in a temporary position',
                                             x_from=movefieldfromposn, x_to=movefieldtoposn, x_page=pagenum, x_sub=action, x_posfrom=doctype, x_posto=movefieldtoposn))
-        except InvenioWebSubmitWarning, exc:
+        except InvenioWebSubmitWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD2_TO_FIELD1_POSITION', \
@@ -3940,7 +3940,7 @@ def _configure_doctype_move_field_on_submissionpage(doctype, action, pagenum, mo
         try:
             raise InvenioWebSubmitWarning(_('Unable to swap field at position %(x_from)s with field at position %(x_to)s on page %(x_page)s of submission %(x_sub)s - could not move field that was located at position %(x_posfrom)s to position %(x_posto)s from temporary position. Field is now stranded in temporary position and must be corrected manually by an Admin',
                                             x_from=movefieldfromposn, x_to=movefieldtoposn, x_page=pagenum, x_sub=action, x_posfrom=movefieldfromposn, x_posto=movefieldtoposn))
-        except InvenioWebSubmitWarning, exc:
+        except InvenioWebSubmitWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION', \
@@ -3952,7 +3952,7 @@ def _configure_doctype_move_field_on_submissionpage(doctype, action, pagenum, mo
         try:
             raise InvenioWebSubmitWarning(_('Unable to move field at position %(x_from)s to position %(x_to)s on page %(x_page)s of submission %(x_sub)s - could not decrement the position of the fields below position %(x_pos)s. Tried to recover - please check that field ordering is not broken',
                                             x_from=movefieldfromposn, x_to=movefieldtoposn, x_page=pagenum, x_sub=action, x_posfrom=movefieldfromposn))
-        except InvenioWebSubmitWarning, exc:
+        except InvenioWebSubmitWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_DECREMENT_POSITION_OF_FIELDS_BELOW_FIELD1', \
@@ -3964,7 +3964,7 @@ def _configure_doctype_move_field_on_submissionpage(doctype, action, pagenum, mo
         try:
             raise InvenioWebSubmitWarning(_('Unable to move field at position %(x_from)s to position %(x_to)s on page %(x_page)s of submission %(x_sub)s%(x_subm)s - could not increment the position of the fields at and below position %(x_frompos)s. The field that was at position %(x_topos)s is now stranded in a temporary position.',
                                             x_from=movefieldfromposn, x_to=movefieldtoposn, x_page=pagenum, x_sub=action, x_subm=doctype, x_frompos=movefieldtoposn, x_topos=movefieldfromposn))
-        except InvenioWebSubmitWarning, exc:
+        except InvenioWebSubmitWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_INCREMENT_POSITION_OF_FIELDS_AT_AND_BELOW_FIELD2', \
@@ -3976,7 +3976,7 @@ def _configure_doctype_move_field_on_submissionpage(doctype, action, pagenum, mo
         try:
             raise InvenioWebSubmitWarning(_('Moved field from position %(x_from)s to position %(x_to)s on page %(x_page)s of submission \'%(x_sub)s%(x_subm)s\'.',
                                             x_from=movefieldfromposn, x_to=movefieldtoposn, x_page=pagenum, x_sub=action, x_subm=doctype))
-        except InvenioWebSubmitWarning, exc:
+        except InvenioWebSubmitWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBSUBMITADMIN_MOVED_FIELD_ON_SUBMISSION_PAGE', movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
@@ -3998,7 +3998,7 @@ def _configure_doctype_delete_field_from_submissionpage(doctype, action, pagenum
         try:
             raise InvenioWebSubmitWarning(_('Unable to delete field at position %(x_from)s from page %(x_to)s of submission \'%(x_sub)s\'',
                                             x_from=fieldnum, x_page=pagenum, x_sub=action))
-        except InvenioWebSubmitWarning, exc:
+        except InvenioWebSubmitWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE', fieldnum, pagenum, "%s%s" % (action, doctype)))
@@ -4009,7 +4009,7 @@ def _configure_doctype_delete_field_from_submissionpage(doctype, action, pagenum
         try:
             raise InvenioWebSubmitWarning(_('Unable to delete field at position %(x_from)s from page %(x_to)s of submission \'%(x_sub)s%(x_subm)s\'',
                                             x_from=fieldnum, x_to=pagenum, x_sub=action, x_subm=doctype))
-        except InvenioWebSubmitWarning, exc:
+        except InvenioWebSubmitWarning as exc:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBSUBMITADMIN_DELETED_FIELD_FROM_SUBMISSION_PAGE', fieldnum, pagenum, "%s%s" % (action, doctype)))

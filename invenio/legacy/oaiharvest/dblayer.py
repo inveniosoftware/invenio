@@ -282,7 +282,7 @@ def update_lastrun(index):
         today = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         OaiHARVEST.query.filter(OaiHARVEST.id == index).update({"lastrun": today})
         return 1
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -302,6 +302,6 @@ def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
             my_new_harvest_log.bibupload_task_id = task_id
             db.session.add(my_new_harvest_log)
             db.session.commit()
-    except Exception, msg:
+    except Exception as msg:
         print "Logging exception : %s   " % (str(msg),)
 

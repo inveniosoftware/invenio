@@ -209,7 +209,7 @@ def add(bibrecdocs, curdir, sysno, file_path, doctype,
                     ' to ' + bibrecdocs.get_docname(bibdoc.id) + ': ' + iconpath)
 
 
-    except InvenioBibDocFileError, e:
+    except InvenioBibDocFileError as e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Revised_Files_to_Storage ' \
@@ -258,7 +258,7 @@ def revise(bibrecdocs, curdir, sysno, file_path, bibdoc_name, doctype,
                 _do_log(curdir, '  Added ' + bibrecdocs.get_docname(bibdoc.id) + ': ' + \
                         file_path)
 
-            except InvenioBibDocFileError, e:
+            except InvenioBibDocFileError as e:
                 _do_log(curdir, str(e))
                 register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
                                    'tried to revise a file %s ' \
@@ -291,7 +291,7 @@ def revise(bibrecdocs, curdir, sysno, file_path, bibdoc_name, doctype,
             _do_log(curdir, '  Addeded format ' + additional_format + \
                     ' to ' + bibrecdocs.get_docname(bibdoc.id) + ': ' + iconpath)
 
-    except InvenioBibDocFileError, e:
+    except InvenioBibDocFileError as e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Revised_Files_to_Storage ' \
@@ -333,7 +333,7 @@ def wash_function_parameters(parameters, curdir):
     # not (0)
     try:
         createRelatedFormats_p = int(parameters['createRelatedFormats'])
-    except ValueError, e:
+    except ValueError as e:
         createRelatedFormats_p = False
 
     # Icons size
@@ -395,7 +395,7 @@ def _create_icon(file_path, icon_size, format='gif', verbosity=9):
              'icon-file-format': format,
              'verbosity': verbosity})
         icon_path = icon_dir + os.sep + icon_name
-    except InvenioWebSubmitIconCreatorError, e:
+    except InvenioWebSubmitIconCreatorError as e:
         register_exception(prefix='Icon for file %s could not be created: %s' % \
                            (file_path, str(e)),
                            alert_admin=False)

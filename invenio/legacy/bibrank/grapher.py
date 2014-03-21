@@ -30,7 +30,7 @@ from invenio.config import CFG_TMPSHAREDDIR, CFG_WEBDIR, CFG_SITE_URL, CFG_BIBRA
 cfg_gnuplot_available = 1
 try:
     import Gnuplot
-except ImportError, e:
+except ImportError as e:
     cfg_gnuplot_available = 0
 
 GRAPH_TYPES = ((1, 'GNU plot'),(2, 'Flot'))

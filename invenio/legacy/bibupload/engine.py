@@ -311,23 +311,23 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     write_message(lambda: "     -Patch record generated. Changing opt_mode to correct.\nPatch:\n%s " % record_xml_output(record), verbose=2)
                 else:
                     write_message("     -No Patch Record.", verbose=2)
-            except InvenioBibUploadUnchangedRecordError, err:
+            except InvenioBibUploadUnchangedRecordError as err:
                 msg = "     -ISSUE: %s" % err
                 write_message(msg, verbose=1, stream=sys.stderr)
                 write_message(msg, "     Continuing anyway in case there are FFT or other tags")
-            except InvenioBibUploadConflictingRevisionsError, err:
+            except InvenioBibUploadConflictingRevisionsError as err:
                 msg = "     -ERROR: Conflicting Revisions - %s" % err
                 write_message(msg, verbose=1, stream=sys.stderr)
                 submit_ticket_for_holding_pen(rec_id, err, "Conflicting Revisions. Inserting record into holding pen.")
                 insert_record_into_holding_pen(record, str(rec_id))
                 return (2, int(rec_id), msg)
-            except InvenioBibUploadInvalidRevisionError, err:
+            except InvenioBibUploadInvalidRevisionError as err:
                 msg = "     -ERROR: Invalid Revision - %s" % err
                 write_message(msg)
                 submit_ticket_for_holding_pen(rec_id, err, "Invalid Revisions. Inserting record into holding pen.")
                 insert_record_into_holding_pen(record, str(rec_id))
                 return (2, int(rec_id), msg)
-            except InvenioBibUploadMissing005Error, err:
+            except InvenioBibUploadMissing005Error as err:
                 msg = "     -ERROR: Missing 005 - %s" % err
                 write_message(msg)
                 submit_ticket_for_holding_pen(rec_id, err, "Missing 005. Inserting record into holding pen.")
@@ -456,7 +456,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                 record = elaborate_fft_tags(record, rec_id, opt_mode,
                                         pretend=pretend, tmp_ids=tmp_ids,
                                         tmp_vers=tmp_vers)
-            except Exception, e:
+            except Exception as e:
                 register_exception()
                 msg = "   Stage 2 failed: Error while elaborating FFT tags: %s" % e
                 write_message(msg, verbose=1, stream=sys.stderr)
@@ -482,7 +482,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                         elif ('4', ' ') not in affected_tags['856']:
                             affected_tags['856'].append(('4', ' '))
                     write_message("     -Modified field list updated with FFT details: %s" % str(affected_tags), verbose=2)
-            except Exception, e:
+            except Exception as e:
                 register_exception(alert_admin=True)
                 msg = "   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e
                 write_message(msg, verbose=1, stream=sys.stderr)
@@ -681,7 +681,7 @@ def bibupload_post_phase(record, mode=None, rec_id="", pretend=False,
         if extract_tag_from_record(record, tag) is not None:
             try:
                 record = fun()
-            except Exception, e:
+            except Exception as e:
                 register_exception()
                 write_message("   Stage failed: Error while elaborating %s tags: %s" % (tag, e),
                               verbose=1, stream=sys.stderr)
@@ -725,7 +725,7 @@ def submit_ticket_for_holding_pen(rec_id, err, msg):
     if user:
         try:
             uid = get_uid_from_email(get_email_from_username(user))
-        except Exception, err:
+        except Exception as err:
             write_message("WARNING: can't reliably retrieve uid for user %s: %s" % (user, err), stream=sys.stderr)
 
     if check_bibcatalog():
@@ -791,7 +791,7 @@ def open_marc_file(path):
         marc_file = open(path, 'r')
         marc = marc_file.read()
         marc_file.close()
-    except IOError, erro:
+    except IOError as erro:
         write_message("Error: %s" % erro, verbose=1, stream=sys.stderr)
         write_message("Exiting.", sys.stderr)
         if erro.errno == 2:
@@ -1211,7 +1211,7 @@ def create_new_record(rec_id=None, pretend=False):
     if rec_id is not None:
         try:
             rec_id = int(rec_id)
-        except (ValueError, TypeError), error:
+        except (ValueError, TypeError) as error:
             write_message("   Error during the creation_new_record function: %s "
         % error, verbose=1, stream=sys.stderr)
             return None
@@ -1673,10 +1673,10 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
             try:
                 if not pretend:
                     bibdoc.add_file_new_format(url, description=description, comment=comment, flags=flags, modification_date=modification_date)
-            except StandardError, e:
+            except StandardError as e:
                 write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, docformat, docname, doctype, newname, description, comment, flags, modification_date, e), stream=sys.stderr)
                 raise
-        except Exception, e:
+        except Exception as e:
             write_message("Error in adding '%s' as a new format because of: %s" % (url, e), stream=sys.stderr)
             raise
         return True
@@ -1690,10 +1690,10 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
             try:
                 if not pretend:
                     bibdoc.add_file_new_version(url, description=description, comment=comment, flags=flags, modification_date=modification_date)
-            except StandardError, e:
+            except StandardError as e:
                 write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, docformat, docname, doctype, newname, description, comment, flags, modification_date, e), stream=sys.stderr)
                 raise
-        except Exception, e:
+        except Exception as e:
             write_message("Error in adding '%s' as a new version because of: %s" % (url, e), stream=sys.stderr)
             raise
         return True
@@ -1710,7 +1710,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         bibdoc.set_flag(flag, docformat)
                     else:
                         bibdoc.unset_flag(flag, docformat)
-        except StandardError, e:
+        except StandardError as e:
             write_message("('%s', '%s', '%s', '%s', '%s') description and comment not updated because '%s'." % (docname, docformat, description, comment, flags, e))
             raise
         return True
@@ -1815,7 +1815,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 url = url[0]
                 try:
                     check_valid_url(url)
-                except StandardError, e:
+                except StandardError as e:
                     raise StandardError, "fft '%s' specifies in $a a location ('%s') with problems: %s" % (fft, url, e)
             else:
                 url = ''
@@ -1880,7 +1880,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 if icon != KEEP_OLD_VALUE:
                     try:
                         check_valid_url(icon)
-                    except StandardError, e:
+                    except StandardError as e:
                         raise StandardError, "fft '%s' specifies in $x an icon ('%s') with problems: %s" % (fft, icon, e)
             else:
                 icon = ''
@@ -1986,7 +1986,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                     try:
                         downloaded_url = download_url(url, docformat)
                         write_message("%s saved into %s" % (url, downloaded_url), verbose=9)
-                    except Exception, err:
+                    except Exception as err:
                         write_message("Error in downloading '%s' because of: %s" % (url, err), stream=sys.stderr)
                         raise
                     if mode == 'correct' and bibdoc is not None and not new_revision_needed:
@@ -2043,7 +2043,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         bibdoc.set_status(restriction)
                     else:
                         bibdoc = None
-                except Exception, e:
+                except Exception as e:
                     write_message("('%s', '%s', '%s') not inserted because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
                     raise e
                 for (url, docformat, description, comment, flags, timestamp) in urls:
@@ -2061,7 +2061,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                                         bibrecdocs.change_name(newname = newname, docid = bibdoc.id)
                                         ## Let's refresh the list of bibdocs.
                                         bibrecdocs.build_bibdoc_list()
-                                except StandardError, e:
+                                except StandardError as e:
                                     write_message(e, stream=sys.stderr)
                                     raise
                 found_bibdoc = False
@@ -2093,7 +2093,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                             try:
                                 if not pretend:
                                     bibdoc.revert(version)
-                            except Exception, e:
+                            except Exception as e:
                                 write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
                                 raise
                         else:
@@ -2129,7 +2129,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                                         bibrecdocs.change_name(docid = bibdoc.id, newname=newname)
                                         ## Let's refresh the list of bibdocs.
                                         bibrecdocs.build_bibdoc_list()
-                                except StandardError, e:
+                                except StandardError as e:
                                     write_message('Error in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
                                     raise
                 found_bibdoc = False
@@ -2161,7 +2161,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                             try:
                                 if not pretend:
                                     bibdoc.revert(version)
-                            except Exception, e:
+                            except Exception as e:
                                 write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
                                 raise
                         else:
@@ -2206,7 +2206,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                                 bibdoc.set_status(restriction)
                                 for (url, docformat, description, comment, flags, timestamp) in urls:
                                     assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp))
-                        except Exception, e:
+                        except Exception as e:
                             register_exception()
                             write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
                             raise

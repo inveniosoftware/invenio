@@ -64,7 +64,7 @@ def check_term(term, col_size, term_rec, max_occ, min_occ, termlength):
             return ""
         if int(term):
             return ""
-    except StandardError, e:
+    except StandardError as e:
         pass
     return "true"
 
@@ -112,7 +112,7 @@ def create_rnkmethod_cache():
             config_file = configuration.get(rank_method_code + '.cfg', '')
             config = ConfigParser.ConfigParser()
             config.readfp(open(config_file))
-        except StandardError, e:
+        except StandardError as e:
             pass
 
         cfg_function = config.get("rank_method", "function")
@@ -137,7 +137,7 @@ def create_rnkmethod_cache():
         if config.has_option(cfg_function, "stemming") and config.get(cfg_function, "stemming"):
             try:
                 methods[rank_method_code]["stemmer"] = config.get(cfg_function, "stemming")
-            except Exception,e:
+            except Exception as e:
                 pass
 
         if config.has_option(cfg_function, "stopword"):
@@ -278,7 +278,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
                 result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
         else:
             result = rank_by_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
-    except Exception, e:
+    except Exception as e:
         register_exception()
         result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br />" % (e,)]), voutput)
 
@@ -326,7 +326,7 @@ def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbo
         result = result.items()
         result.sort(lambda x, y: cmp(x[1], y[1]))
         return (result, "(", ")", voutput)
-    except Exception, e:
+    except Exception as e:
         return (None, "Warning: %s method cannot be used for ranking your query." % rank_method_code, "", voutput)
 
 def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):

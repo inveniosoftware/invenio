@@ -58,7 +58,7 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
         # The user doesn't own this message
         try:
             raise InvenioWebMessageError(_('Sorry, this message in not in your mailbox.'))
-        except InvenioWebMessageError, exc:
+        except InvenioWebMessageError as exc:
             register_exception()
             body = webmessage_templates.tmpl_error(exc.message, ln)
             return body
@@ -75,7 +75,7 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
             # but not in table msgMESSAGE => table inconsistency
             try:
                 raise InvenioWebMessageError(_('This message does not exist.'))
-            except InvenioWebMessageError, exc:
+            except InvenioWebMessageError as exc:
                 register_exception()
                 body = webmessage_templates.tmpl_error(exc.message, ln)
                 return body
@@ -139,7 +139,7 @@ def perform_request_delete_msg(uid, msgid, ln=CFG_SITE_LANG):
         # The user doesn't own this message
         try:
             raise InvenioWebMessageError(_('Sorry, this message in not in your mailbox.'))
-        except InvenioWebMessageError, exc:
+        except InvenioWebMessageError as exc:
             register_exception()
             body = webmessage_templates.tmpl_error(exc.message, ln)
             return body
@@ -205,7 +205,7 @@ def perform_request_write(uid,
             # The user doesn't own this message
             try:
                 raise InvenioWebMessageError(_('Sorry, this message in not in your mailbox.'))
-            except InvenioWebMessageError, exc:
+            except InvenioWebMessageError as exc:
                 register_exception()
                 body = webmessage_templates.tmpl_error(exc.message, ln)
                 return body
@@ -221,7 +221,7 @@ def perform_request_write(uid,
                 # but not in table msgMESSAGE => table inconsistency
                 try:
                     raise InvenioWebMessageError(_('This message does not exist.'))
-                except InvenioWebMessageError, exc:
+                except InvenioWebMessageError as exc:
                     register_exception()
                     body = webmessage_templates.tmpl_error(exc.message, ln)
                     return body

@@ -216,7 +216,7 @@ def create_reference(counter_path, ref_format, nb_length=3, initial_value=0):
         fp = open(counter, "a+", 0)
         try:
             fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except IOError, err:
+        except IOError as err:
             ## See: http://docs.python.org/library/fcntl.html#fcntl.lockf
             ## This might mean that some other process is already creating
             ## the file, so no need to initialized as well.

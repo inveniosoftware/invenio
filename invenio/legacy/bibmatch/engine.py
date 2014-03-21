@@ -689,7 +689,7 @@ def match_records(records, qrystrs=None, search_mode=None, operator="and", \
     CFG_BIBMATCH_LOGGER.info("-- BibMatch starting match of %d records --" % (len(records),))
     try:
         server = InvenioConnector(server_url, user=user, password=password)
-    except InvenioConnectorAuthError, error:
+    except InvenioConnectorAuthError as error:
         if verbose > 0:
             sys.stderr.write("Authentication error when connecting to server: %s" \
                              % (str(error),))
@@ -868,7 +868,7 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
         ## Perform the search with retries
         try:
             result_recids = server.search_with_retry(**search_params)
-        except InvenioConnectorAuthError, error:
+        except InvenioConnectorAuthError as error:
             if verbose > 0:
                 sys.stderr.write("Authentication error when searching: %s" \
                                  % (str(error),))
@@ -959,7 +959,7 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
                     search_params = dict(p=qry, f=field, of='id', c=collections)
                     try:
                         current_resultset = server.search_with_retry(**search_params)
-                    except InvenioConnectorAuthError, error:
+                    except InvenioConnectorAuthError as error:
                         if (verbose > 0):
                             sys.stderr.write("Authentication error when searching: %s" \
                                              % (str(error),))
@@ -1100,7 +1100,7 @@ def main():
                    "ascii"
                  ])
 
-    except getopt.GetoptError, e:
+    except getopt.GetoptError as e:
         usage()
 
     match_results = []

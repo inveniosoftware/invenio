@@ -49,7 +49,7 @@ def get_bibsort_methods_details(method_list = None):
         try:
             results = run_sql("SELECT id, name, definition, washer \
                               FROM bsrMETHOD")
-        except Error, err:
+        except Error as err:
             write_message("The error: [%s] occured while trying to read " \
                           "the bibsort data from the database." \
                           %err, stream=sys.stderr)
@@ -62,7 +62,7 @@ def get_bibsort_methods_details(method_list = None):
             try:
                 res = run_sql("""SELECT id, name, definition, washer \
                               FROM bsrMETHOD where name = %s""", (method, ))
-            except Error, err:
+            except Error as err:
                 write_message("The error: [%s] occured while trying to get " \
                               "the bibsort data from the database for method %s." \
                               %(err, method), stream=sys.stderr)
@@ -188,7 +188,7 @@ def get_data_for_definition_rnk(method_name, rnk_name):
             write_message('Data extracted from table rnkMETHODDATA for sorting method %s' \
                           %method_name, verbose=5)
             return deserialize_via_marshal(res[0][0])
-    except Error, err:
+    except Error as err:
         write_message("No data could be found for sorting method %s. " \
                       "The following errror occured: [%s]" \
                       %(method_name, err), stream=sys.stderr)
@@ -259,7 +259,7 @@ def apply_washer(data_dict, washer):
         for recid in data_dict:
             new_val = method.get_transformed_value(data_dict[recid])
             data_dict[recid] = new_val
-    except InvenioBibSortWasherNotImplementedError, err:
+    except InvenioBibSortWasherNotImplementedError as err:
         write_message("Washer %s is not implemented [%s]." \
                       %(washer, err), stream=sys.stderr)
 
@@ -329,7 +329,7 @@ def write_to_methoddata_table(id_method, data_dict, data_dict_ordered, data_list
             VALUES (%s, %s, %s, %s, %s)", \
             (id_method, serialized_data_dict, serialized_data_dict_ordered, \
              serialized_data_list_sorted, date, ))
-    except Error, err:
+    except Error as err:
         write_message("The error [%s] occured when inserting new bibsort data "\
                       "into bsrMETHODATA table" %err, sys.stderr)
         return False
@@ -362,7 +362,7 @@ def write_to_buckets_table(id_method, bucket_no, bucket_data, bucket_last_value,
             (id_bsrMETHOD, bucket_no, bucket_data, bucket_last_value, last_updated) \
             VALUES (%s, %s, %s, %s, %s)", \
             (id_method, bucket_no, serialized_bucket_data, bucket_last_value, date, ))
-    except Error, err:
+    except Error as err:
         write_message("The error [%s] occured when inserting new bibsort data " \
                       "into bsrMETHODATA_BUCKETS table" %err, sys.stderr)
         return False
@@ -443,7 +443,7 @@ def get_modified_or_inserted_recs(method_list):
                 WHERE m.name in (%s) AND d.id_bsrMETHOD = m.id" % \
                 ("%s," * len(method_list))[:-1]
         last_updated = str(run_sql(query, tuple(method_list))[0][0])
-    except Error, err:
+    except Error as err:
         write_message("Error when trying to get the last_updated date " \
                       "from bsrMETHODDATA: [%s]" %err, sys.stderr)
         return 0
@@ -453,7 +453,7 @@ def get_modified_or_inserted_recs(method_list):
                           where modification_date >= %s", (last_updated, ))
         if results:
             recids = [result[0] for result in results]
-    except Error, err:
+    except Error as err:
         write_message("Error when trying to get the list of " \
                       "modified records: [%s]" %err, sys.stderr)
         return 0
@@ -651,7 +651,7 @@ def update_bibsort_tables(recids, method, update_timestamp = True):
         #update buckets
         try:
             perform_update_buckets(recids_current_ordered, recids_to_insert, recids_old_ordered, method_id, update_timestamp)
-        except Error, err:
+        except Error as err:
             write_message("[%s] The bucket data for method %s has not been updated" \
                           %(method, err), sys.stderr)
             return False

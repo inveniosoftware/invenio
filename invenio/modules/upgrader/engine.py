@@ -204,7 +204,7 @@ class InvenioUpgrader(object):
             self._setup_log_prefix(plugin_id=check.__name__)
             try:
                 check()
-            except RuntimeError, e:
+            except RuntimeError as e:
                 errors.append((check.__name__, e.args))
 
         for u in upgrades:
@@ -212,7 +212,7 @@ class InvenioUpgrader(object):
                 self._setup_log_prefix(plugin_id=u['id'])
                 try:
                     u['pre_upgrade']()
-                except RuntimeError, e:
+                except RuntimeError as e:
                     errors.append((u['id'], e.args))
 
         self._teardown_log_prefix()
@@ -260,14 +260,14 @@ class InvenioUpgrader(object):
                 self._setup_log_prefix(plugin_id=u['id'])
                 try:
                     u['post_upgrade']()
-                except RuntimeError, e:
+                except RuntimeError as e:
                     errors.append((u['id'], e.args))
 
         for check in self.global_post_upgrade:
             self._setup_log_prefix(plugin_id=check.__name__)
             try:
                 check()
-            except RuntimeError, e:
+            except RuntimeError as e:
                 errors.append((check.__name__, e.args))
 
         self._teardown_log_prefix()
@@ -289,7 +289,7 @@ class InvenioUpgrader(object):
             try:
                 upgrade['do_upgrade']()
                 self.register_success(upgrade)
-            except RuntimeError, e:
+            except RuntimeError as e:
                 msg = ["Upgrade error(s):"]
 
                 for m in e.args:

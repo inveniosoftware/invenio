@@ -690,7 +690,7 @@ def _decode_rfc2231_header(msg, header, value, force_processing=False):
         joined_pairs = map(f, params)
         unicode_value = '; '.join(joined_pairs)
 
-    except _StructuredHeaderPairError, e:
+    except _StructuredHeaderPairError as e:
         if force_processing:
             unicode_value = None
         else:
@@ -740,7 +740,7 @@ def _decode_rfc2047_header(msg, header, value, force_processing=False):
             unicode_value = None
         else:
             raise HeaderRFC2047Error(msg, header, value)
-    except _UnicodeDecodingError, e:
+    except _UnicodeDecodingError as e:
         if force_processing:
             unicode_value = None
         else:

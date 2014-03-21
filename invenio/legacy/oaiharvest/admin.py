@@ -1267,7 +1267,7 @@ def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oa
         run_sql("UPDATE oaiHARVEST SET setspecs=%s WHERE id=%s", (' '.join(oai_src_sets), oai_src_id))
         run_sql("UPDATE oaiHARVEST SET bibfilterprogram=%s WHERE id=%s", (oai_src_bibfilter, oai_src_id))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -1287,7 +1287,7 @@ def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix,  oai_src_lastrun,
             (oai_src_baseurl, oai_src_prefix, oai_src_config, oai_src_name, lastrun_mode,
              '-'.join(oai_src_post), oai_src_bibfilter, " ".join(oai_src_sets)))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -1296,7 +1296,7 @@ def delete_oai_src(oai_src_id):
     try:
         run_sql("DELETE FROM oaiHARVEST WHERE id=%s", (oai_src_id,))
         return (1, "")
-    except StandardError, e:
+    except StandardError as e:
         return (0, e)
 
 
@@ -1358,9 +1358,9 @@ def validate(oai_src_baseurl):
         elif errno == 2 or errno == 'socket error':
             return (2, "Could not connect with URL %s. Check URL or retry when server is available." % url)
         return (4, strerror)
-    except StandardError, e:
+    except StandardError as e:
         return (4, "An unknown error has occured: %s" % e)
-    except InvalidURL, e:
+    except InvalidURL as e:
         return (2, "Could not connect with URL %s. Check URL or retry when server is available: %s" % (url, e))
 
 

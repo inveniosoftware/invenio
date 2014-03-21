@@ -318,9 +318,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          webdoc_cache_dir,
                                          body,
                                          verbose)
-                    except IOError, e:
+                    except IOError as e:
                         print e
-                    except OSError, e:
+                    except OSError as e:
                         print e
 
                 # Title
@@ -332,9 +332,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          webdoc_cache_dir,
                                          title,
                                          verbose)
-                    except IOError, e:
+                    except IOError as e:
                         print e
-                    except OSError, e:
+                    except OSError as e:
                         print e
 
                 # Keywords
@@ -346,9 +346,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          webdoc_cache_dir,
                                          keywords,
                                          verbose)
-                    except IOError, e:
+                    except IOError as e:
                         print e
-                    except OSError, e:
+                    except OSError as e:
                         print e
 
                 # Navtrail
@@ -360,9 +360,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          webdoc_cache_dir,
                                          navtrail,
                                          verbose)
-                    except IOError, e:
+                    except IOError as e:
                         print e
-                    except OSError, e:
+                    except OSError as e:
                         print e
 
                 # Description
@@ -374,9 +374,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          webdoc_cache_dir,
                                          description,
                                          verbose)
-                    except IOError, e:
+                    except IOError as e:
                         print e
-                    except OSError, e:
+                    except OSError as e:
                         print e
 
                 # Last updated timestamp (CVS timestamp)
@@ -388,9 +388,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                          webdoc_cache_dir,
                                          lastupdated,
                                          verbose)
-                    except IOError, e:
+                    except IOError as e:
                         print e
-                    except OSError, e:
+                    except OSError as e:
                         print e
 
                 # Last updated cache file
@@ -399,9 +399,9 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                                      webdoc_cache_dir,
                                      convert_datestruct_to_dategui(time.localtime()),
                                      verbose=0)
-                except IOError, e:
+                except IOError as e:
                     print e
-                except OSError, e:
+                except OSError as e:
                     print e
 
             if verbose > 0:
@@ -846,7 +846,7 @@ def main():
                                     "verbose=",
                                     "language=",
                                     "mode="])
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage(1, err)
 
     try:
@@ -864,7 +864,7 @@ def main():
                                         if lang in CFG_SITE_LANGS]
             elif opt[0] in ["-m", "--mode"]:
                 options["mode"] = opt[1]
-    except StandardError, e:
+    except StandardError as e:
         usage(e)
 
     try:

@@ -144,7 +144,7 @@ def Make_Dummy_MARC_XML_Record(parameters, curdir, form, user_info=None):
         fp_dummyrec.write(record_text)
         fp_dummyrec.flush()
         fp_dummyrec.close()
-    except IOError, err:
+    except IOError as err:
         ## Unable to write the dummy MARC XML record to curdir.
         err_msg = "Error: Unable to create dummy MARC XML record [%s/%s]. " \
                   "After having escaped its data contents for XML, it could " \

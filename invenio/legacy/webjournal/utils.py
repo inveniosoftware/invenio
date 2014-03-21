@@ -353,7 +353,7 @@ def _cache_journal_articles(journal_name, issue, category, articles):
         journal_cache_file = open(journal_cache_path, 'r')
         journal_info = cPickle.load(journal_cache_file)
         journal_cache_file.close()
-    except cPickle.PickleError, e:
+    except cPickle.PickleError as e:
         journal_info = {}
     except IOError:
         journal_info = {}
@@ -391,7 +391,7 @@ def _get_cached_journal_articles(journal_name, issue, category):
         journal_cache_path = get_journal_article_cache_path(journal_name,
                                                             issue)
         last_update = os.path.getctime(journal_cache_path)
-    except Exception, e :
+    except Exception as e :
         return None
     now = time.time()
     if (last_update + 5*60) < now:
@@ -403,7 +403,7 @@ def _get_cached_journal_articles(journal_name, issue, category):
         journal_info = cPickle.load(journal_cache_file)
         journal_articles = journal_info.get('journal_articles', {}).get(category, None)
         journal_cache_file.close()
-    except cPickle.PickleError, e:
+    except cPickle.PickleError as e:
         journal_articles = None
     except IOError:
         journal_articles = None
@@ -1214,7 +1214,7 @@ def get_journal_id(journal_name, ln=CFG_SITE_LANG):
             journal_info_file = open(journal_info_path, 'r')
             journal_info = cPickle.load(journal_info_file)
             journal_id = journal_info.get('journal_id', None)
-        except cPickle.PickleError, e:
+        except cPickle.PickleError as e:
             journal_id = None
         except IOError:
             journal_id = None
@@ -1226,14 +1226,14 @@ def get_journal_id(journal_name, ln=CFG_SITE_LANG):
                           (journal_name,))
             if len(res) > 0:
                 journal_id = res[0][0]
-        except OperationalError, e:
+        except OperationalError as e:
             # Cannot connect to database. Try to read from cache
             journal_info_path = get_journal_info_path(journal_name)
             try:
                 journal_info_file = open(journal_info_path, 'r')
                 journal_info = cPickle.load(journal_info_file)
                 journal_id = journal_info['journal_id']
-            except cPickle.PickleError, e:
+            except cPickle.PickleError as e:
                 journal_id = None
             except IOError:
                 journal_id = None
@@ -1300,7 +1300,7 @@ def get_journals_ids_and_names():
                     journals.append({'journal_id': journal_id,
                                      'journal_name': journal_name,
                                      'current_issue': current_issue})
-            except cPickle.PickleError, e:
+            except cPickle.PickleError as e:
                 # Well, can't do anything...
                 continue
             except IOError:
@@ -1314,7 +1314,7 @@ def get_journals_ids_and_names():
             for journal_id, journal_name in res:
                 journals.append({'journal_id': journal_id,
                                  'journal_name': journal_name})
-        except OperationalError, e:
+        except OperationalError as e:
             # Cannot connect to database. Try to read from cache
             files = os.listdir("%s/webjournal" % CFG_CACHEDIR)
             info_files = [path + os.sep + 'info.dat' for path in files if \
@@ -1332,7 +1332,7 @@ def get_journals_ids_and_names():
                         journals.append({'journal_id': journal_id,
                                          'journal_name': journal_name,
                                          'current_issue': current_issue})
-                except cPickle.PickleError, e:
+                except cPickle.PickleError as e:
                     # Well, can't do anything...
                     continue
                 except IOError:
@@ -1522,7 +1522,7 @@ def cache_index_page(html, journal_name, category, issue, ln):
         cached_file = open(cache_path, "w")
         cached_file.write(html)
         cached_file.close()
-    except Exception, e:
+    except Exception as e:
         register_exception(req=None,
                            prefix="Could not store index page cache",
                            alert_admin=True)
@@ -1576,7 +1576,7 @@ def cache_article_page(html, journal_name, category, recid, issue, ln):
         cached_file = open(cache_path, "w")
         cached_file.write(html)
         cached_file.close()
-    except Exception, e:
+    except Exception as e:
         register_exception(req=None,
                            prefix="Could not store article cache",
                            alert_admin=True)
@@ -1609,7 +1609,7 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln, bfo=No
         try:
             from invenio.modules.formatter.format_elements import bfe_webjournal_cern_toolbar
             cached_file = NOT_FOR_ALERT_COMMENTS_RE.sub(bfe_webjournal_cern_toolbar.format_element(bfo), cached_file, 1)
-        except ImportError, e:
+        except ImportError as e:
             pass
 
     return cached_file
