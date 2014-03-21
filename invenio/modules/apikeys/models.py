@@ -22,7 +22,7 @@ Web API Key database models.
 """
 # General imports.
 from werkzeug import cached_property
-from urlparse import parse_qs, urlparse, urlunparse
+from six.moves.urllib.parse import parse_qs, urlparse, urlunparse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 

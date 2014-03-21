@@ -75,7 +75,7 @@ def login_redirect(referer=None):
     if referer is None:
         referer = request.values.get('referer')
     if referer:
-        from urlparse import urlparse
+        from six.moves.urllib.parse import urlparse
         # we should not redirect to these URLs after login
         blacklist = [url_for('webaccount.register'),
                      url_for('webaccount.logout'),

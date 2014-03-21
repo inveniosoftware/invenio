@@ -44,7 +44,7 @@ from flask import url_for
 from functools import wraps
 from warnings import warn
 from six import iteritems
-from urlparse import urlsplit, urlunsplit
+from six.moves.urllib.parse import urlsplit, urlunsplit
 from urllib import urlencode
 from itertools import chain, repeat
 

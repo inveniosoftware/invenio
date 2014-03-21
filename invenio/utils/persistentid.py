@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import re
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 
 
 doi_regexp = re.compile(

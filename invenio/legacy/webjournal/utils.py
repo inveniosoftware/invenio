@@ -31,7 +31,7 @@ import urllib
 from MySQLdb import OperationalError
 from xml.dom import minidom
 from six import iteritems
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 
 from invenio.config import \
      CFG_ETCDIR, \

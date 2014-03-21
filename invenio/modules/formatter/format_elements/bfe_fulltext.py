@@ -27,7 +27,7 @@ from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD, \
     CFG_BIBFORMAT_HIDDEN_FILE_FORMATS
 from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
 from cgi import escape, parse_qs
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 from os.path import basename
 import urllib
 

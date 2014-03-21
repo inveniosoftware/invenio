@@ -135,7 +135,7 @@ def register_manager(manager):
     """
     Register all manager plugins and default commands with the manager.
     """
-    from urlparse import urlparse
+    from six.moves.urllib.parse import urlparse
     from flask.ext.script.commands import Shell, Server, ShowUrls  # , Clean
 
     for script in find_modules('invenio.base.scripts'):
@@ -146,7 +146,7 @@ def register_manager(manager):
     #manager.add_command("clean", Clean())
     manager.add_command("show-urls", ShowUrls())
     manager.add_command("shell", Shell())
-    parsed_url=  urlparse(manager.app.config.get('CFG_SITE_URL'))
+    parsed_url = urlparse(manager.app.config.get('CFG_SITE_URL'))
     port = parsed_url.port or 80
     host = parsed_url.hostname or '127.0.0.1'
     manager.add_command("runserver", Server(host=host, port=port))
