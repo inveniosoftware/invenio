@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import six
+
 from wtforms import DateField
 from wtforms.validators import optional
 from invenio.modules.deposit.field_base import WebDepositField
@@ -41,7 +43,7 @@ class Date(WebDepositField, DateField):
         datetime objects or strings, depending on if they are loaded from
         an JSON or Python objects).
         """
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             self.object_data = datetime.strptime(value, self.format).date()
         elif isinstance(value, datetime):
             self.object_data = value.date()

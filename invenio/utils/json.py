@@ -24,6 +24,7 @@ import json
 CFG_JSON_AVAILABLE = True
 
 import re
+import six
 
 
 def json_unicode_to_utf8(data):
@@ -85,7 +86,7 @@ def wash_for_js(text):
     quotes.
     """
     from invenio.utils.html import escape_javascript_string
-    if isinstance(text, basestring):
+    if isinstance(text, six.string_types):
         return '"%s"' % escape_javascript_string(text,
                                                  escape_for_html=False,
                                                  escape_CDATA=False,

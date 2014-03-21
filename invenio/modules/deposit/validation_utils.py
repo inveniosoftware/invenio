@@ -21,6 +21,7 @@
 Validation functions
 """
 
+import six
 import re
 from wtforms.validators import ValidationError, StopValidation, Regexp
 from invenio.utils import persistentid as pidutils
@@ -85,7 +86,7 @@ class RequiredIf(object):
                 # Check if field value is required
                 if (callable(v) and v(other_val)) or (other_val == v):
                     # Field value is required - check the value
-                    if not field.data or isinstance(field.data, basestring) \
+                    if not field.data or isinstance(field.data, six.string_types) \
                        and not field.data.strip():
                         if self.message is None:
                             self.message = 'This field is required.'

@@ -25,6 +25,7 @@ Functions useful for text wrapping (in a box) and indenting.
 
 __revision__ = "$Id$"
 
+import six
 import sys
 import re
 import textwrap
@@ -530,7 +531,7 @@ def decode_to_unicode(text, default_encoding='utf-8'):
 def to_unicode(text):
     if isinstance(text, unicode):
         return text
-    if isinstance(text, basestring):
+    if isinstance(text, six.string_types):
         return decode_to_unicode(text)
     return unicode(text)
 

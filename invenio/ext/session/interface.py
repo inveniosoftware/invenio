@@ -24,6 +24,7 @@
     Implements Flask `SessionInterface`.
 """
 
+import six
 from six.moves import cPickle
 import zlib
 
@@ -63,7 +64,7 @@ class SessionInterface(FlaskSessionInterface):
         serializer_string = current_app.config.get('SESSION_SERIALIZER',
                                                    Serializer)
         return import_string(serializer_string)() \
-            if isinstance(serializer_string, basestring) \
+            if isinstance(serializer_string, six.string_types) \
             else serializer_string()
 
     @locked_cached_property
@@ -71,7 +72,7 @@ class SessionInterface(FlaskSessionInterface):
         session_class_string = current_app.config.get(
             'SESSION_CLASS', 'invenio.ext.session.legacy_session:Session')
         return import_string(session_class_string) \
-            if isinstance(session_class_string, basestring) \
+            if isinstance(session_class_string, six.string_types) \
             else session_class_string
 
     @locked_cached_property
@@ -79,7 +80,7 @@ class SessionInterface(FlaskSessionInterface):
         storage_string = current_app.config.get(
             'SESSION_BACKEND', 'invenio.ext.session.backends.cache:Storage')
         return import_string(storage_string)() \
-            if isinstance(storage_string, basestring) \
+            if isinstance(storage_string, six.string_types) \
             else storage_string()
 
     def generate_sid(self):

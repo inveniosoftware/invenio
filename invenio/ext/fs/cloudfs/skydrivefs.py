@@ -370,7 +370,7 @@ class SkyDriveFS(FS):
         """
         path = self._normpath(path)
 
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             string_data = data
         else:
             try:

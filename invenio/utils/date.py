@@ -42,6 +42,7 @@ Lexicon
 __revision__ = "$Id$"
 
 import re
+import six
 import time
 from datetime import (date as real_date,
                       datetime as real_datetime,
@@ -489,7 +490,7 @@ def pretty_date(ugly_time=False, ln=None):
 
     now = real_datetime.now()
 
-    if isinstance(ugly_time, basestring):
+    if isinstance(ugly_time, six.string_types):
         #try to convert it to epoch timestamp
         date_format = '%Y-%m-%d %H:%M:%S.%f'
         try:
