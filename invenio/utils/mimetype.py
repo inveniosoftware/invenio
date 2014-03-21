@@ -28,6 +28,7 @@ Usage example:
 import re
 from invenio.base.globals import cfg
 from mimetypes import MimeTypes
+from six import iteritems
 from werkzeug import cached_property, LocalProxy
 from thread import get_ident
 
@@ -83,7 +84,7 @@ class LazyMimeCache(object):
         _mimes.encodings_map.update({'.bz2' : 'bzip2'})
 
         if cfg['CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES']:
-            for key, value in cfg['CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES'].iteritems():
+            for key, value in iteritems(cfg['CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES']):
                 _mimes.add_type(key, value)
                 del key, value
 

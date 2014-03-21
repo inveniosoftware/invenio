@@ -32,6 +32,7 @@ import time
 from datetime import datetime
 from logging import getLogger, debug, DEBUG
 from optparse import OptionParser, OptionGroup, OptionValueError
+from six import iteritems
 from tempfile import mkstemp
 
 from invenio.base.factory import with_app_context
@@ -1137,7 +1138,7 @@ def cli_hide(options):
                     to_be_fixed.add(recid)
                     print '%s (docid: %s, recid: %s) will be hidden' % (bibdocfile.get_full_name(), docid, recid)
     wait_for_user('Proceeding to hide the matched documents...')
-    for docid, documents in documents_to_be_hidden.iteritems():
+    for docid, documents in iteritems(documents_to_be_hidden):
         bibdoc = BibDoc.create_instance(docid)
         for version, docformat in documents:
             bibdoc.set_flag('HIDDEN', docformat, version)
@@ -1171,7 +1172,7 @@ def cli_unhide(options):
                     to_be_fixed.add(recid)
                     print '%s (docid: %s, recid: %s) will be unhidden' % (bibdocfile.get_full_name(), docid, recid)
     wait_for_user('Proceeding to unhide the matched documents...')
-    for docid, documents in documents_to_be_unhidden.iteritems():
+    for docid, documents in iteritems(documents_to_be_unhidden):
         bibdoc = BibDoc.create_instance(docid)
         for version, docformat in documents:
             bibdoc.unset_flag('HIDDEN', docformat, version)

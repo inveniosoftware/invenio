@@ -19,6 +19,8 @@
 
 import inspect
 
+from six import iteritems
+
 from .errors import AutodiscoveryError, AutodiscoveryCheckerError
 from .helpers import get_callable_signature_as_string
 
@@ -217,7 +219,7 @@ def check_arguments_compatibility(the_callable, argd):
     while tmp_args:
         args_dict[tmp_args.pop()] = None
 
-    for arg, dummy_value in argd.iteritems():
+    for arg, dummy_value in iteritems(argd):
         if arg in args_dict:
             del args_dict[arg]
         elif not varkw:
@@ -300,7 +302,7 @@ def create_enhanced_plugin_builder(compulsory_objects=None,
 
         if compulsory_objects:
             for object_name, object_signature in \
-                    compulsory_objects.iteritems():
+                    iteritems(compulsory_objects):
                 the_object = getattr(the_plugin, object_name, None)
                 if the_object is None:
                     raise AutodiscoveryError('Plugin "%s" does not '
@@ -315,7 +317,7 @@ def create_enhanced_plugin_builder(compulsory_objects=None,
                 plugin[object_name] = the_object
 
         if optional_objects:
-            for object_name, object_signature in optional_objects.iteritems():
+            for object_name, object_signature in iteritems(optional_objects):
                 the_object = getattr(the_plugin, object_name, None)
                 if the_object is not None:
                     try:
@@ -331,7 +333,7 @@ def create_enhanced_plugin_builder(compulsory_objects=None,
 
         if other_data:
             the_other_data = {}
-            for data_name, (dummy, data_default) in other_data.iteritems():
+            for data_name, (dummy, data_default) in iteritems(other_data):
                 the_other_data[data_name] = getattr(the_plugin, data_name,
                                                     data_default)
 

@@ -24,6 +24,8 @@ __revision__ = "$Id$"
 
 import sys
 
+from six import iteritems
+
 from invenio.legacy.dbquery import run_sql
 
 def get_verbose_print(req, prefix, cur_verbosity_level):
@@ -74,7 +76,7 @@ def get_collection_name_by_id(colid):
 
     collections_id_load()
 
-    for (collection_name, collection_id) in collections_id.iteritems():
+    for (collection_name, collection_id) in iteritems(collections_id):
         if collection_id == colid:
             return collection_name
             break

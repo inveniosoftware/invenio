@@ -45,6 +45,7 @@ import time
 import re
 from urllib import quote
 from cgi import escape
+from six import iteritems
 
 from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 from invenio.config import CFG_BINDIR, CFG_SITE_URL
@@ -535,10 +536,10 @@ def create_photos_manager_interface(sysno, session_id, uid,
            'doctype': quote(doctype, safe=""),
            'indir': quote(indir, safe=""),
            'session_id': quote(session_id, safe=""),
-           'PHOTO_MANAGER_ICONS': '\n'.join([key + '/' + value for key, value in photo_manager_icons_dict.iteritems()]),
+           'PHOTO_MANAGER_ICONS': '\n'.join([key + '/' + value for key, value in iteritems(photo_manager_icons_dict)]),
            'PHOTO_MANAGER_ORDER': '\n'.join(photo_manager_order_list),
            'PHOTO_MANAGER_DELETE': '\n'.join(photo_manager_delete_list),
-           'PHOTO_MANAGER_NEW': '\n'.join([key + '/' + value for key, value in photo_manager_new_dict.iteritems()]),
+           'PHOTO_MANAGER_NEW': '\n'.join([key + '/' + value for key, value in iteritems(photo_manager_new_dict)]),
            'initial_slider_value': initial_slider_value,
            'max_slider_value': max_slider_value,
            'min_slider_value': min_slider_value,

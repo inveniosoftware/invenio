@@ -30,6 +30,7 @@ import os
 import getopt
 import re
 import getpass
+from six import iteritems
 from tempfile import mkstemp
 from time import sleep
 
@@ -292,7 +293,7 @@ class Querystring:
             # We gather all the values from the self.fields and put them
             # in a list together with any prefix/suffix associated with the field.
             new_query = self.pattern
-            for (field_prefix, field_reference, field_suffix), value_list in self.fields.iteritems():
+            for (field_prefix, field_reference, field_suffix), value_list in iteritems(self.fields):
                 new_values = []
                 for value in value_list:
                     new_values.append("%s%s%s" % (field_prefix, value, field_suffix))
@@ -302,7 +303,7 @@ class Querystring:
         else:
             # operator is OR, which means a more elaborate approach to multi-value fields
             field_tuples = []
-            for key, values in self.fields.iteritems():
+            for key, values in iteritems(self.fields):
                 field_list = []
                 for value in values:
                     # We add key here to be able to associate the value later
@@ -419,7 +420,7 @@ class Querystring:
         # Find all potential references to record tag values and
         # add to fields-dict as a list of values using field-name tuple as key.
         #
-        # Each reference will be split into prefix, field-ref and suffix. 
+        # Each reference will be split into prefix, field-ref and suffix.
         # Example:
         # 773__p:"[773__p]" 100__a:/.*[100__a].*/ =>
         # [('773__p:"', '773__p', '"'), ('100__a:/.*', '100__a', '.*/')]
@@ -432,7 +433,7 @@ class Querystring:
             field_prefix = field_prefix.lower()
             field_suffix = field_suffix.lower()
             # Find proper MARC tag(s) for the stripped field-name, if fieldname is used.
-            # e.g. author -> [100__a, 700__a] 
+            # e.g. author -> [100__a, 700__a]
             # FIXME: Local instance only!
             tag_list = get_field_tags_from_fieldname(fieldname)
             if len(tag_list) == 0:

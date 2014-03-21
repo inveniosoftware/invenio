@@ -25,6 +25,7 @@ from datetime import datetime, timedelta
 
 from invenio.base.wrappers import lazy_import
 from flask import url_for, current_app
+from six import iteritems
 from invenio.testsuite import InvenioTestCase, \
     make_test_suite, \
     run_test_suite
@@ -108,7 +109,7 @@ class CommunityRankerTest(InvenioTestCase):
             Collection has number of records set to 1.
         """
         c = Community()
-        for key,value in options.iteritems():
+        for key,value in iteritems(options):
             setattr(c, key, value)
         # add a collection with "one" record
         coll = Collection()

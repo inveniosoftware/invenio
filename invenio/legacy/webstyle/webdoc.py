@@ -23,6 +23,8 @@ WebDoc -- Transform webdoc sources into static html files
 __revision__ = \
     "$Id$"
 
+from six import iteritems
+
 from . import registry
 
 from invenio.config import \
@@ -544,7 +546,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
             topic.reverse()
 
     out = ''
-    for category, topic in topics.iteritems():
+    for category, topic in iteritems(topics):
         if category != '' and len(categ) > 1:
             out += '<strong>'+ _("%(category)s Pages")  % \
                    {'category': _(category).capitalize()} + '</strong>'
@@ -652,7 +654,7 @@ def transform(webdoc_source, verbose=0, req=None, languages=CFG_SITE_LANGS):
         # 5 Step
         ## Replace defined tags with their value from config file
         ## Eg. replace <CFG_SITE_URL> with 'http://cds.cern.ch/':
-        for defined_tag, value in defined_tags.iteritems():
+        for defined_tag, value in iteritems(defined_tags):
             if defined_tag.upper() == '<CFG_SITE_NAME_INTL>':
                 localized_webdoc = localized_webdoc.replace(defined_tag, \
                                                             value.get(ln, value['en']))
@@ -663,7 +665,7 @@ def transform(webdoc_source, verbose=0, req=None, languages=CFG_SITE_LANGS):
         ## Get the parameters defined in HTML comments, like
         ## <!-- WebDoc-Page-Title: My Title -->
         localized_body = localized_webdoc
-        for tag, pattern in pattern_tags.iteritems():
+        for tag, pattern in iteritems(pattern_tags):
             localized_body = pattern.sub(get_param_and_remove, localized_body)
 
         out = localized_body

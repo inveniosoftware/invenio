@@ -21,6 +21,8 @@ __revision__ = "$Id$"
 
 import re
 
+from six import iteritems
+
 from invenio.legacy.dbquery import run_sql, get_table_update_time, OperationalError, \
         deserialize_via_marshal
 from intbitset import intbitset
@@ -302,7 +304,7 @@ def calculate_co_cited_with_list(record_id, sort_order="d"):
             if not result_intermediate.has_key(ref_id):
                 result_intermediate[ref_id] = 1
             else: result_intermediate[ref_id] += 1
-    for key, value in result_intermediate.iteritems():
+    for key, value in iteritems(result_intermediate):
         if not (key==record_id):
             result.append([key, value])
     if result:

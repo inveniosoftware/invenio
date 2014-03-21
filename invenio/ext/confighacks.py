@@ -23,6 +23,7 @@
 """
 import os
 import sys
+from six import iteritems
 
 
 def setup_app(app):
@@ -53,7 +54,7 @@ def setup_app(app):
     # STEP 2: wrap application config and sets it as `invenio.config` module.
     sys.modules['invenio.config'] = Wrapper(app.config)
     sys.modules['invenio.dbquery_config'] = Wrapper(dict(
-        (k, v) for (k, v) in app.config.iteritems()
+        (k, v) for (k, v) in iteritems(app.config)
         if k.startswith('CFG_DATABASE')))
 
     # STEP 3: enable `from invenio import config` by setting an attribute.

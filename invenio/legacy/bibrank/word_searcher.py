@@ -21,6 +21,8 @@ import time
 import math
 import re
 
+from six import iteritems
+
 from invenio.legacy.dbquery import run_sql, deserialize_via_marshal
 from invenio.legacy.bibindex.engine_stemmer import stem
 from invenio.legacy.bibindex.engine_stopwords import is_stopword
@@ -67,7 +69,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose, 
 
     tf_values = {}
     #Calculate all term frequencies
-    for (term, tf) in rec_terms.iteritems():
+    for (term, tf) in iteritems(rec_terms):
         if len(term) >= methods[rank_method_code]["min_word_length"] and terms_recs.has_key(term) and tf[1] != 0:
             tf_values[term] =  int((1 + math.log(tf[0])) * tf[1]) #calculate term weigth
     tf_values = tf_values.items()
@@ -121,13 +123,13 @@ def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_te
 
     if not quick or (qtf >= 0 or (qtf < 0 and len(recdict) == 0)):
         #Only accept records existing in the hitset received from the search engine
-        for (j, tf) in invidx.iteritems():
+        for (j, tf) in iteritems(invidx):
             if j in hitset: #only include docs found by search_engine based on query
                 #calculate rank value
                 recdict[j] = recdict.get(j, 0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
     elif quick: #much used term, do not include all records, only use already existing ones
-        for (j, tf) in recdict.iteritems(): #i.e: if doc contains important term, also count unimportant
+        for (j, tf) in iteritems(recdict): #i.e: if doc contains important term, also count unimportant
             if invidx.has_key(j):
                 tf = invidx[j]
                 recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
@@ -155,7 +157,7 @@ def sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit
     hitset -= recdict.keys()
     #gives each record a score between 0-100
     divideby = max(recdict.values())
-    for (j, w) in recdict.iteritems():
+    for (j, w) in iteritems(recdict):
         w = int(w * 100 / divideby)
         if w >= rank_limit_relevance:
             reclist.append((j, w))
@@ -253,7 +255,7 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
 
     if not quick or (qtf >= 0 or (qtf < 0 and len(recdict) == 0)):
         #Only accept records existing in the hitset received from the search engine
-        for (j, tf) in invidx.iteritems():
+        for (j, tf) in iteritems(invidx):
             if j in hitset:#only include docs found by search_engine based on query
                 try: #calculates rank value
                     recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
@@ -261,7 +263,7 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
                     return (recdict, rec_termcount)
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
     elif quick: #much used term, do not include all records, only use already existing ones
-        for (j, tf) in recdict.iteritems(): #i.e: if doc contains important term, also count unimportant
+        for (j, tf) in iteritems(recdict): #i.e: if doc contains important term, also count unimportant
             if invidx.has_key(j):
                 tf = invidx[j]
                 recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
@@ -284,7 +286,7 @@ def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, 
 
     #gives each record a score between 0-100
     divideby = max(recdict.values())
-    for (j, w) in recdict.iteritems():
+    for (j, w) in iteritems(recdict):
         w = int(w * 100 / divideby)
         if w >= rank_limit_relevance:
             reclist.append((j, w))

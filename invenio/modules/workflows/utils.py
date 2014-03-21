@@ -20,6 +20,8 @@ import re
 import redis
 import traceback
 
+from six import iteritems
+
 from invenio.ext.logging import register_exception
 
 from .errors import WorkflowDefinitionError
@@ -136,7 +138,7 @@ def redis_create_search_entry(bwobject):
     extra_data = bwobject.get_extra_data()
     #creates database entries to not loose key value pairs in redis
 
-    for key, value in extra_data["redis_search"].iteritems():
+    for key, value in iteritems(extra_data["redis_search"]):
         redis_server.sadd("holdingpen_sort", str(key))
         redis_server.sadd("holdingpen_sort:%s" % (str(key),), str(value))
         redis_server.sadd("holdingpen_sort:%s:%s" % (str(key), str(value),),

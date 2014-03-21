@@ -26,6 +26,7 @@ import re
 
 from flask import g, url_for
 from intbitset import intbitset
+from six import iteritems
 from operator import itemgetter
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.orderinglist import ordering_list
@@ -130,7 +131,7 @@ def attribute_multi_dict_collection(creator, key_attr, val_attr):
         #def convert(self, other):
         #    print '===== CONVERT ===='
         #    print other
-        #    for k, vals in other.iteritems():
+        #    for k, vals in iteritems(other):
         #        for v in list(vals):
         #            print 'converting: ', k,': ',v
         #            yield creator(k, v)
@@ -390,7 +391,7 @@ class Collection(db.Model):
     #@externalcollections.setter
     #def externalcollections(self, data):
     #    if isinstance(data, dict):
-    #        for k, vals in data.iteritems():
+    #        for k, vals in iteritems(data):
     #            for v in list(vals):
     #                self._externalcollections[k] = v
     #    else:

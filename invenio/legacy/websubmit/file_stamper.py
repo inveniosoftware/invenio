@@ -38,6 +38,9 @@ __revision__ = "$Id$"
 
 
 import getopt, sys, re, os, time, shutil, tempfile
+
+from six import iteritems
+
 from invenio.config import \
 	CFG_PATH_PS2PDF, \
 	CFG_PATH_GFILE,\
@@ -1492,7 +1495,7 @@ def stamp_file(options):
             raise InvenioWebSubmitFileStamperError(msg)
 
     ## Set default options when not specified
-    for opt, value in optional_option_names_and_defaults.iteritems():
+    for opt, value in iteritems(optional_option_names_and_defaults):
         if not options.has_key(opt):
             options[opt] = value
 

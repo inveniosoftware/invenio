@@ -28,6 +28,7 @@
     * `invenio.ext.template.context_processor:\
        register_template_context_processor`
 """
+from six import iteritems
 
 from flask import request, jsonify, current_app, stream_with_context, \
     Response, render_template, get_flashed_messages, flash, g
@@ -86,7 +87,7 @@ def templated(template=None, stream=False, mimetype='text/html'):
 
             if request.is_xhr:
                 #FIXME think about more possible types
-                for k, v in ctx.iteritems():
+                for k, v in iteritems(ctx):
                     if isinstance(v, list):
                         try:
                             ctx[k] = [dict(zip(x.keys(),
@@ -147,7 +148,7 @@ def filtered_by(model=None, columns=None, form=None, filter_empty=False):
             if not model or not columns:
                 return f(*args, **kwargs)
             where = []
-            for column, op in columns.iteritems():
+            for column, op in iteritems(columns):
                 try:
                     values = request.values.getlist(column)
                     if not values:

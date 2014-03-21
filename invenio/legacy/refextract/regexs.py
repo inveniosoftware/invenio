@@ -19,6 +19,7 @@
 
 import re
 from datetime import datetime
+from six import iteritems
 
 # Pattern for PoS journal
 
@@ -124,7 +125,7 @@ def compute_arxiv_re(report_pattern, report_number):
                                         + old_arxiv_numbers, re.U|re.I)
     return report_re, report_number
 
-RE_OLD_ARXIV = [compute_arxiv_re(*i) for i in old_arxiv.iteritems()]
+RE_OLD_ARXIV = [compute_arxiv_re(*i) for i in iteritems(old_arxiv)]
 
 
 def compute_years():

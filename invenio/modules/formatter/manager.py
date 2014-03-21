@@ -29,6 +29,9 @@ generates new Jinja2 templates in CFG_BIBFORMAT_JINJA_TEMPLATE_PATH.
 import os
 import re
 import shutil
+
+from six import iteritems
+
 from invenio.ext.script import Manager
 
 manager = Manager(usage="Perform migration operations")
@@ -161,7 +164,7 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
         return filtered_format_template
 
     skip_templates = lambda (name, key): name[-3:] != 'xsl'
-    format_templates = filter(skip_templates, get_format_templates(True).iteritems())
+    format_templates = filter(skip_templates, iteritems(get_format_templates(True)))
 
     print '>>> Going to migrate %d format template(s) ...' % (
         len(format_templates), )
@@ -201,8 +204,7 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
     skip_legacy = lambda (name, key): name[-11:] != '_legacy.' + \
         CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
     output_formats = filter(skip_legacy,
-                            get_output_formats(with_attributes=True).
-                            iteritems())
+                            iteritems(get_output_formats(with_attributes=True)))
     print '>>> Going to migrate %d output format(s) ...' % (
         len(output_formats))
 

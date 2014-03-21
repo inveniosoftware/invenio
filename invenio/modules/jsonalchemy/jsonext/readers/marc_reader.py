@@ -23,6 +23,7 @@
 
 """
 import re
+from six import iteritems
 from werkzeug.utils import import_string
 
 from invenio.base.globals import cfg
@@ -105,7 +106,7 @@ class MarcReader(Reader):
             d[key] = value
         self.rec_tree = SaveDict()
         tmp = create_record(self.blob)[0]
-        for key, values in tmp.iteritems():
+        for key, values in iteritems(tmp):
             if key < '010' and key.isdigit():
                 self.rec_tree[key] = [value[3] for value in values]
             else:

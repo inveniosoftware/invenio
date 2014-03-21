@@ -28,6 +28,8 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
+from six import iteritems
+
 from invenio.legacy.dbquery import run_sql
 from invenio.modules.access.control import acc_add_authorization, acc_add_role, \
     acc_get_action_id
@@ -49,7 +51,7 @@ def retrieve_restricted_collection():
 def get_collections_for_group(restrictions, given_group):
     """Return a list of collections name accessible by the given group."""
     collections = []
-    for collection, group in restrictions.iteritems():
+    for collection, group in iteritems(restrictions):
         if group == given_group:
             collections.append(collection)
     return collections
@@ -95,7 +97,7 @@ def migrate():
     role_names = {}
     for apache_group in apache_groups:
         role_names[apache_group] = create_needed_roles(restrictions, apache_group)
-    for collection_name, apache_group in restrictions.iteritems():
+    for collection_name, apache_group in iteritems(restrictions):
         migrate_restricted_collection(collection_name, role_names[apache_group])
 
 if __name__ == "__main__":

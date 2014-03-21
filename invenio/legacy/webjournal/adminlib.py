@@ -29,6 +29,8 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
+from six import iteritems
+
 from invenio.ext.logging import register_exception
 from invenio.config import \
      CFG_SITE_URL, \
@@ -788,7 +790,7 @@ def move_drafts_articles_to_ready(journal_name, issue):
     task_sequence_id = str(bibtask_allocate_sequenceid())
     for category in categories:
         articles = get_journal_articles(journal_name, issue, category)
-        for order, recids in articles.iteritems():
+        for order, recids in iteritems(articles):
             for recid in recids:
                 record_xml = format_record(recid, of='xm')
                 if not record_xml:
@@ -850,7 +852,7 @@ def update_draft_record_metadata(record, protected_datafields, keyword_to_remove
                            the returned record.
     """
     new_record = {}
-    for tag, field in record.iteritems():
+    for tag, field in iteritems(record):
         if tag in protected_datafields:
             continue
         elif not keyword_to_remove in str(field) and \

@@ -20,6 +20,7 @@
 """
 __revision__ = "$Id$"
 
+from six import iteritems
 from invenio.modules.formatter.utils import parse_tag
 
 def format_element(bfo, tag, limit, instances_separator=" ",
@@ -111,7 +112,7 @@ def format_element(bfo, tag, limit, instances_separator=" ",
     x = 0
     instances_out = [] # Retain each instance output
     for instance in values:
-        filtered_values = [value for (subcode, value) in instance.iteritems()
+        filtered_values = [value for (subcode, value) in iteritems(instance)
                           if p_tag[3] == '' or p_tag[3] == '%' \
                            or p_tag[3] == subcode]
         if len(filtered_values) > 0:

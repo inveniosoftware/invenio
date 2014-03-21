@@ -26,6 +26,7 @@ import sys
 import ConfigParser
 from itertools import islice
 from datetime import datetime
+from six import iteritems
 
 from invenio.legacy.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
@@ -647,7 +648,7 @@ def ref_analyzer(citation_informations, dicts,
     # meaning: rec 8 contains these in bibliography
     write_message("Phase 1: Report numbers references")
     done = 0
-    for thisrecid, refnumbers in references_info['report-numbers'].iteritems():
+    for thisrecid, refnumbers in iteritems(references_info['report-numbers']):
         step("Report numbers references", thisrecid, done,
                                         len(references_info['report-numbers']))
         done += 1
@@ -685,7 +686,7 @@ def ref_analyzer(citation_informations, dicts,
     # e.g. Phys.Rev.Lett. 53 (1986) 2285
     write_message("Phase 2: Journal references")
     done = 0
-    for thisrecid, refs in references_info['journals'].iteritems():
+    for thisrecid, refs in iteritems(references_info['journals']):
         step("Journal references", thisrecid, done,
                                               len(references_info['journals']))
         done += 1
@@ -731,7 +732,7 @@ def ref_analyzer(citation_informations, dicts,
     # e.g. 10.1007/BF03170733
     write_message("Phase 3: DOI references")
     done = 0
-    for thisrecid, refs in references_info['doi'].iteritems():
+    for thisrecid, refs in iteritems(references_info['doi']):
         step("DOI references", thisrecid, done, len(references_info['doi']))
         done += 1
 
@@ -767,7 +768,7 @@ def ref_analyzer(citation_informations, dicts,
     # Search for stuff like CERN-TH-4859/87 in list of refs
     write_message("Phase 4: report numbers catchup")
     done = 0
-    for thisrecid, reportcodes in records_info['report-numbers'].iteritems():
+    for thisrecid, reportcodes in iteritems(records_info['report-numbers']):
         step("Report numbers catchup", thisrecid, done,
                                            len(records_info['report-numbers']))
         done += 1
@@ -795,7 +796,7 @@ def ref_analyzer(citation_informations, dicts,
     write_message("Phase 5: journals catchup")
     done = 0
     t5 = os.times()[4]
-    for thisrecid, rec_journals in records_info['journals'].iteritems():
+    for thisrecid, rec_journals in iteritems(records_info['journals']):
         step("Journals catchup", thisrecid, done,
                                                  len(records_info['journals']))
         done += 1
@@ -819,7 +820,7 @@ def ref_analyzer(citation_informations, dicts,
     write_message("Phase 6: DOI catchup")
     done = 0
     t6 = os.times()[4]
-    for thisrecid, dois in records_info['doi'].iteritems():
+    for thisrecid, dois in iteritems(records_info['doi']):
         step("DOI catchup", thisrecid, done, len(records_info['doi']))
         done += 1
 
@@ -854,21 +855,21 @@ def ref_analyzer(citation_informations, dicts,
     if task_get_task_param('verbose') >= 3:
         # Print only X first to prevent flood
         write_message("citation_list (x is cited by y):")
-        write_message(dict(islice(citations.iteritems(), 10)))
+        write_message(dict(islice(iteritems(citations), 10)))
         write_message("size: %s" % len(citations))
         write_message("reference_list (x cites y):")
-        write_message(dict(islice(references.iteritems(), 10)))
+        write_message(dict(islice(iteritems(references), 10)))
         write_message("size: %s" % len(references))
         write_message("selfcitedbydic (x is cited by y and one of the " \
                       "authors of x same as y's):")
-        write_message(dict(islice(selfcites.iteritems(), 10)))
+        write_message(dict(islice(iteritems(selfcites), 10)))
         write_message("size: %s" % len(selfcites))
         write_message("selfdic (x cites y and one of the authors of x " \
                       "same as y's):")
-        write_message(dict(islice(selfrefs.iteritems(), 10)))
+        write_message(dict(islice(iteritems(selfrefs), 10)))
         write_message("size: %s" % len(selfrefs))
         write_message("authorcitdic (author is cited in recs):")
-        write_message(dict(islice(authorcites.iteritems(), 10)))
+        write_message(dict(islice(iteritems(authorcites), 10)))
         write_message("size: %s" % len(authorcites))
 
     t7 = os.times()[4]

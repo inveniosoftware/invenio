@@ -17,7 +17,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from six import iteritems
+
 from invenio.utils.sherpa_romeo import SherpaRomeoSearch
+
 """
 Test Cases
 
@@ -110,8 +113,8 @@ class SherpaRomeoTesting:
 
     def test_publishers_search_conditions(self):
         self.sr.search_publisher("comput")
-        for publisher, conditions in \
-            self.sr.parser.get_conditions().iteritems():
+        for publisher, conditions in iteritems(
+                self.sr.parser.get_conditions()):
             try:
                 assert conditions != None
                 self.passed_tests = +1

@@ -26,7 +26,7 @@ import gc
 import inspect
 from fnmatch import fnmatch
 from urlparse import urlparse, urlunparse
-
+from six import iteritems
 from wsgiref.util import FileWrapper
 
 from invenio.legacy.wsgi.utils import table
@@ -123,7 +123,7 @@ class SimulatedModPythonRequest(object):
         self.__what_was_written = ""
         self.__cookies_out = {}
         self.g = {} ## global dictionary in case it's needed
-        for key, value in environ.iteritems():
+        for key, value in iteritems(environ):
             if key.startswith('HTTP_'):
                 self.__headers_in[key[len('HTTP_'):].replace('_', '-')] = value
         if environ.get('CONTENT_LENGTH'):
@@ -200,7 +200,7 @@ class SimulatedModPythonRequest(object):
     def send_http_header(self):
         for (k, v) in self.__low_level_headers:
             self.response.headers[k] = v
-        for k, v in self.headers_out.iteritems():
+        for k, v in iteritems(self.headers_out):
             self.response.headers[k] = v
 
         self.__write = self.response.stream.write

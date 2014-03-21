@@ -24,6 +24,7 @@
 
 from functools import wraps
 from flask import Flask, current_app, has_app_context
+from six import iteritems
 
 
 def with_app_context(app=None, new_context=False, **kwargs_config):
@@ -71,7 +72,7 @@ def unicodifier(obj):
     elif isinstance(obj, tuple):
         return tuple(unicodifier(elem) for elem in obj)
     elif isinstance(obj, dict):
-        return dict((key, unicodifier(value)) for key, value in obj.iteritems())
+        return dict((key, unicodifier(value)) for key, value in iteritems(obj))
     return obj
 
 
@@ -91,5 +92,5 @@ def utf8ifier(obj):
     elif isinstance(obj, tuple):
         return tuple(utf8ifier(elem) for elem in obj)
     elif isinstance(obj, dict):
-        return dict((key, utf8ifier(value)) for key, value in obj.iteritems())
+        return dict((key, utf8ifier(value)) for key, value in iteritems(obj))
     return obj

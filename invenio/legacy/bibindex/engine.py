@@ -28,6 +28,7 @@ import sys
 import time
 import fnmatch
 from datetime import datetime
+from six import iteritems
 from time import strptime
 
 from invenio.config import CFG_SOLR_URL
@@ -555,7 +556,7 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
         for index in indexes_for_recID_filtered:
             indexes_to_change[index].add(recID)
 
-    indexes_to_change = dict((k, list(sorted(v))) for k, v in indexes_to_change.iteritems() if v)
+    indexes_to_change = dict((k, list(sorted(v))) for k, v in iteritems(indexes_to_change) if v)
 
     return indexes_to_change
 
@@ -1331,7 +1332,7 @@ class WordTable:
         terms_done += terms_current_counter
         terms_current_counter = 0
         #partial removal
-        for term, indexes in for_partial_removal.iteritems():
+        for term, indexes in iteritems(for_partial_removal):
             self.value = {}
             terms_current_counter += 1
             hitlist = intbitset(terms_and_hitlists[term])

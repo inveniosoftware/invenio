@@ -27,6 +27,7 @@ from math import ceil
 from flask import make_response, g, request, flash, jsonify, \
     redirect, url_for, current_app, abort, session, Blueprint
 from flask.ext.login import current_user
+from six import iteritems
 from werkzeug.local import LocalProxy
 
 from .. import receivers
@@ -193,12 +194,12 @@ class SearchUrlargs(object):
     def user_storable_args(self):
         return dict(map(lambda (k, v): (v['store'], k),
                     filter(lambda (k, v): v['store'],
-                    self.DEFAULT_URLARGS.iteritems())))
+                    iteritems(self.DEFAULT_URLARGS))))
 
     @property
     def url_args(self):
         return filter(lambda (k, v): k in self.DEFAULT_URLARGS.keys(),
-                      self._url_args.iteritems())
+                      iteritems(self._url_args))
 
     @property
     def user_args(self):
@@ -211,7 +212,7 @@ class SearchUrlargs(object):
             self.user.settings = dict()
         return dict(map(lambda (k, v): (user_storable_args[k], v),
                     filter(lambda (k, v): k in args_keys,
-                    self.user.settings.iteritems())))
+                    iteritems(self.user.settings))))
 
 
 def _create_neareset_term_box(argd_orig):

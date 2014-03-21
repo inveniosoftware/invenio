@@ -20,9 +20,10 @@
 
 def websearch_before_browse_handler(collection, **kwargs):
     from flask import flash, g
+    from six import iteritems
     from invenio.legacy.search_engine import create_exact_author_browse_help_link
     keys = ['p', 'p1', 'p2', 'p3', 'f', 'f1', 'f2', 'f3', 'rm', 'cc', 'ln', 'jrec', 'rg', 'aas', 'action']
-    kwargs = dict(filter(lambda (k, v): k in keys, kwargs.iteritems()))
+    kwargs = dict(filter(lambda (k, v): k in keys, iteritems(kwargs)))
     print kwargs
     msg = create_exact_author_browse_help_link(**kwargs)
     if msg and len(msg)>0:

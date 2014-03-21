@@ -28,8 +28,8 @@ import time
 import datetime
 import re
 import inspect
-from cStringIO import StringIO
 from flask import current_app
+from six import iteritems, StringIO
 
 from invenio.base.globals import cfg
 from .models import HstEXCEPTION
@@ -144,7 +144,7 @@ def find_all_values_to_hide(local_variables, analyzed_stack=None):
         analyzed_stack = set()
     else:
         ret = set()
-    for key, value in local_variables.iteritems():
+    for key, value in iteritems(local_variables):
         if id(value) in analyzed_stack:
             ## Let's avoid loops
             continue

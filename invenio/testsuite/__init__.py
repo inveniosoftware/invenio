@@ -41,6 +41,7 @@ import StringIO
 from flask import url_for
 from functools import wraps
 from warnings import warn
+from six import iteritems
 from urlparse import urlsplit, urlunsplit
 from urllib import urlencode
 from itertools import chain, repeat
@@ -168,7 +169,7 @@ class InvenioTestCase(TestCase, unittest.TestCase):
             'database': 'CFG_DATABASE_NAME',
         }
         out = {}
-        for (k, v) in cfg.iteritems():
+        for (k, v) in iteritems(cfg):
             if hasattr(self, k):
                 out[v] = getattr(self, k)
         return out
@@ -216,7 +217,7 @@ def make_flask_test_suite(*test_cases):
     from operator import add
     from invenio.config import CFG_DEVEL_TEST_DATABASE_ENGINES
     create_type = lambda c: [type(k + c.__name__, (c,), d)
-                             for k, d in CFG_DEVEL_TEST_DATABASE_ENGINES.iteritems()]
+                             for k, d in iteritems(CFG_DEVEL_TEST_DATABASE_ENGINES)]
 
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                               for case in reduce(add, map(create_type,

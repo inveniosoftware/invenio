@@ -25,6 +25,7 @@ import datetime
 import six
 import copy
 
+from six import iteritems
 from werkzeug.utils import import_string
 
 from invenio.base.utils import try_to_eval
@@ -239,7 +240,7 @@ class SmartJson(SmartDict):
             tag = ''
             ind1 = ''
             ind2 = ''
-            for key, value in marc_dict.iteritems():
+            for key, value in iteritems(marc_dict):
                 if isinstance(value, six.string_types) or not isinstance(value, Iterable):
                     value = [value]
                 for v in value:

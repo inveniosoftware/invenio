@@ -27,6 +27,7 @@ import re
 import ConfigParser
 import copy
 
+from six import iteritems
 
 from invenio.config import \
      CFG_SITE_LANG, \
@@ -198,7 +199,7 @@ def get_bibrank_methods(colID, ln=CFG_SITE_LANG):
         create_rnkmethod_cache()
 
     avail_methods = []
-    for (rank_method_code, options) in methods.iteritems():
+    for (rank_method_code, options) in iteritems(methods):
         if options.has_key("function") and is_method_valid(colID, rank_method_code):
             if options.has_key(ln):
                 avail_methods.append((rank_method_code, options[ln]))

@@ -29,6 +29,7 @@ __lastupdated__ = """$Date$"""
 
 import time
 import cgi
+from six import iteritems
 from invenio.config import CFG_SITE_LANG, \
                            CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
@@ -895,7 +896,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         unordered_tabs = get_detailed_page_tabs(get_colID(\
                     guess_primary_collection_of_a_record(self.recid)),
                     self.recid, ln=argd['ln'])
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
         if argd['ln'] != CFG_SITE_LANG:
@@ -986,7 +987,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                                    ln=argd['ln'])
 
         unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)), self.recid, ln=argd['ln'])
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
         if argd['ln'] != CFG_SITE_LANG:
@@ -1088,7 +1089,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                                             barcode=barcode)
 
         unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)), self.recid, ln=ln)
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
         if argd['ln'] != CFG_SITE_LANG:
@@ -1174,7 +1175,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
                                                     self.recid,
                                                     ln=argd['ln'])
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
         if argd['ln'] != CFG_SITE_LANG:
@@ -1272,7 +1273,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
                                                     self.recid,
                                                     ln=argd['ln'])
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
         if argd['ln'] != CFG_SITE_LANG:

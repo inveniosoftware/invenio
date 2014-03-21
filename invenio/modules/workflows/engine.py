@@ -21,6 +21,7 @@ import cPickle
 import sys
 
 from datetime import datetime
+from six import iteritems
 from uuid import uuid1 as new_uuid
 
 
@@ -447,6 +448,6 @@ BibWorkflowEngine
         tmp = self.get_extra_data()
         if not tmp:
             tmp = {}
-        for key, value in kwargs.iteritems():
+        for key, value in iteritems(kwargs):
             tmp[key] = value
         self.set_extra_data(tmp)

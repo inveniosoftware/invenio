@@ -30,7 +30,7 @@ __revision__ = "$Id$"
 from invenio.config import CFG_INSPIRE_SITE
 from invenio.legacy.bibrank.citation_searcher import get_cited_by_list
 from invenio.legacy.bibrank.selfcites_indexer import get_self_citations_count
-from StringIO import StringIO
+from six import iteritems, StringIO
 
 from invenio.legacy.search_engine import search_pattern, perform_request_search
 from intbitset import intbitset
@@ -67,7 +67,7 @@ def render_self_citations(d_recids, ln):
     d_total_cites = {}
     d_avg_cites = {}
 
-    for coll, recids in d_recids.iteritems():
+    for coll, recids in iteritems(d_recids):
         if recids:
             d_total_cites[coll] = get_self_citations_count(recids)
             d_avg_cites[coll] = d_total_cites[coll] * 1.0 / len(recids)
@@ -88,7 +88,7 @@ def render_citations_breakdown(req, ln, collections, d_recid_citers,
 
     for low, high, fame in CFG_CITESUMMARY_FAME_THRESHOLDS:
         d_cites = {}
-        for coll, citers in d_recid_citers.iteritems():
+        for coll, citers in iteritems(d_recid_citers):
             d_cites[coll] = 0
             for dummy, lciters in citers:
                 numcites = 0
@@ -156,7 +156,7 @@ def render_extended_citation_summary(req, ln, recids, initial_collections,
     if CFG_INSPIRE_SITE:
         notrpp_searchpattern = searchpattern + ' -title:rpp'
         notrpp_recids = intbitset(perform_request_search(p=notrpp_searchpattern))
-    for coll, coll_recids in list(d_recids.iteritems()):
+    for coll, coll_recids in list(iteritems(d_recids)):
         d_recids[coll_self_cites(coll)] = coll_recids
         if CFG_INSPIRE_SITE:
             d_recids[coll_not_rpp(coll)] = notrpp_recids & coll_recids
@@ -219,7 +219,7 @@ def render_citesummary_overview(req, ln, collections, recids, recid_citers):
     total_cites = {}
     avg_cites = {}
 
-    for coll, citers in recid_citers.iteritems():
+    for coll, citers in iteritems(recid_citers):
         total_cites[coll] = sum([len(lciters) for dummy, lciters in citers])
         try:
             avg_cites[coll] = float(total_cites[coll]) / len(recids[coll])
@@ -247,7 +247,7 @@ def get_recids(recids, collections):
 def get_citers(d_recids):
     """For each recid fetches the list of citing papers"""
     d_recid_citers = {}
-    for coll, recids in d_recids.iteritems():
+    for coll, recids in iteritems(d_recids):
         d_recid_citers[coll] = get_cited_by_list(recids)
     return d_recid_citers
 
@@ -269,7 +269,7 @@ def render_citesummary_prologue(req, ln, recids, collections, search_patterns,
 def render_h_index(req, ln, collections, d_recid_citers):
     "Calculate and Render h-hep index"
     d_recid_citecount_l = {}
-    for coll, citers in d_recid_citers.iteritems():
+    for coll, citers in iteritems(d_recid_citers):
         if citers is None:
             d_recid_citecount_l[coll] = None
         else:
@@ -286,7 +286,7 @@ def render_h_index(req, ln, collections, d_recid_citers):
             return 0
         else:
             return 1
-    for coll, citecount in d_recid_citecount_l.iteritems():
+    for coll, citecount in iteritems(d_recid_citecount_l):
         if citecount is None:
             d_h_factors[coll] = 'n/a'
         else:

@@ -23,6 +23,7 @@ import cgi
 import glob
 import sys
 from logging import DEBUG
+from six import iteritems
 
 from invenio.config import \
      CFG_PATH_CONVERT, \
@@ -61,7 +62,7 @@ def createRelatedFormats(fullpath, overwrite=True, debug=False):
         missing_formats = get_missing_formats(filelist)
         if debug:
             print >> sys.stderr, "missing_formats: %s" % missing_formats
-        for path, formats in missing_formats.iteritems():
+        for path, formats in iteritems(missing_formats):
             if debug:
                 print >> sys.stderr, "... path: %s, formats: %s" % (path, formats)
             for aformat in formats:

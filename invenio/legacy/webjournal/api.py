@@ -22,6 +22,9 @@ WebJournal - Main Public interface of the WebJournals
 
 import datetime
 import time
+
+from six import iteritems
+
 from invenio.modules.formatter.engine import \
      BibFormatObject, \
      format_with_format_template
@@ -145,7 +148,7 @@ def perform_request_article(req, journal_name, issue_number, ln,
     # Check that this recid is indeed an article
     is_article = False
     articles = get_journal_articles(journal_name, issue_number, category)
-    for order, recids in articles.iteritems():
+    for order, recids in iteritems(articles):
         if recid in recids:
             is_article = True
             break

@@ -29,6 +29,7 @@ import re
 import sys
 import time
 from datetime import datetime
+from six import iteritems
 from zlib import compress
 import socket
 import marshal
@@ -355,10 +356,10 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                 # populate an intermediate dictionary
                 # used in upcoming step related to 'delete' mode
                 is_opt_mode_delete = True
-                for tag, fields in original_record.iteritems():
+                for tag, fields in iteritems(original_record):
                     existing_tags[tag] = [tag + (field[1] != ' ' and field[1] or '_') + (field[2] != ' ' and field[2] or '_') for field in fields]
             elif opt_mode == 'append':
-                for tag, fields in record.iteritems():
+                for tag, fields in iteritems(record):
                     if tag not in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
                         affected_tags[tag]=[(field[1], field[2]) for field in fields]
 
@@ -376,7 +377,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         # Delete tags specified if in delete mode
         if opt_mode == 'delete':
             record = delete_tags(record, rec_old)
-            for tag, fields in record.iteritems():
+            for tag, fields in iteritems(record):
                 retained_tags[tag] = [tag + (field[1] != ' ' and field[1] or '_') + (field[2] != ' ' and field[2] or '_') for field in fields]
             #identify the tags that have been deleted
             for tag in existing_tags.keys():
@@ -2030,7 +2031,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 
 
 
-        for docname, (doctype, newname, restriction, version, urls, more_infos, bibdoc_tmpid, bibdoc_tmpver) in docs.iteritems():
+        for docname, (doctype, newname, restriction, version, urls, more_infos, bibdoc_tmpid, bibdoc_tmpver) in iteritems(docs):
             write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, urls, mode), verbose=9)
             if mode in ('insert', 'replace'): # new bibdocs, new docnames, new marc
                 if newname in bibrecdocs.get_bibdoc_names():
@@ -2498,7 +2499,7 @@ def delete_tags(record, rec_old):
     @rtype: record structure
     """
     returned_record = copy.deepcopy(rec_old)
-    for tag, fields in record.iteritems():
+    for tag, fields in iteritems(record):
         if tag in ('001', ):
             continue
         for field in fields:
@@ -2559,7 +2560,7 @@ def delete_tags_to_correct(record, rec_old):
                 record_delete_field(rec_old, tag, ind1, ind2)
 
     ## Ok, we readd necessary fields!
-    for tag, fields in fields_to_readd.iteritems():
+    for tag, fields in iteritems(fields_to_readd):
         for sf_vals in fields:
             write_message("      Adding tag: " + tag[:3] + " ind1=" + tag[3] + " ind2=" + tag[4] + " code=" + str(sf_vals), verbose=9)
             record_add_field(rec_old, tag[:3], tag[3], tag[4], subfields=sf_vals)

@@ -40,8 +40,9 @@ import re
 import random
 import datetime
 
-from socket import gaierror
 from flask import Request
+from six import iteritems
+from socket import gaierror
 
 from invenio.base.wrappers import lazy_import
 from invenio.config import \
@@ -1384,7 +1385,7 @@ def collect_user_info(req, login_time=False, refresh=False):
 
                     run_sql('UPDATE user SET last_login=NOW() WHERE id=%s', (uid,))
             if prefs:
-                for key, value in prefs.iteritems():
+                for key, value in iteritems(prefs):
                     user_info[key.lower()] = value
             if login_time:
                 ## Heavy computational information

@@ -38,7 +38,7 @@ __revision__ = "$Id$"
 
 import gettext
 from flask.ext.babel import gettext, lazy_gettext
-
+from six import iteritems
 
 ## Placemark for the i18n function
 _ = lazy_gettext
@@ -144,7 +144,7 @@ def language_list_long(enabled_langs_only=True):
         return enabled_lang_list
     else:
         return [[lang, lang_long] for lang, lang_long in
-                all_language_names.iteritems()]
+                iteritems(all_language_names)]
 
 
 def is_language_rtl(ln):

@@ -34,10 +34,10 @@ from email.MIMEBase import MIMEBase
 from email import Encoders
 from email.MIMEImage import MIMEImage
 from email.Utils import formatdate
-from cStringIO import StringIO
 from flask import g
 from formatter import DumbWriter, AbstractFormatter
 from flask.ext.email.message import EmailMultiAlternatives, EmailMessage
+from six import iteritems, StringIO
 
 from invenio.base.globals import cfg
 default_ln = lambda ln: cfg.get('CFG_SITE_LANG') if ln is None else ln
@@ -347,7 +347,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
             # "related" block
             msg_related = MIMEMultipart('related')
             #msg_related.attach(msg_text)
-            for image_id, image_path in html_images.iteritems():
+            for image_id, image_path in iteritems(html_images):
                 attach_embed_image(msg_related, image_id, image_path)
             msg_root.attach(msg_related)
     else:

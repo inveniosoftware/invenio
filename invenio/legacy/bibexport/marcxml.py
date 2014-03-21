@@ -44,6 +44,7 @@ from invenio.config import CFG_WEBDIR, CFG_ETCDIR
 from invenio.legacy.bibsched.bibtask import write_message
 from invenio.legacy.search_engine import perform_request_search, print_record
 from ConfigParser import ConfigParser
+from six import iteritems
 import os
 import gzip
 import datetime
@@ -88,7 +89,7 @@ class MARCXMLExporter:
 
     def export(self):
         """Export all records and records modified last month"""
-        for export_name, export_pattern in self._export_criterias.iteritems():
+        for export_name, export_pattern in iteritems(self._export_criterias):
             LAST_MONTH_FILE_NAME = "lastmonth_" + export_name + '.xml'
             ALL_MONTH_FILE_NAME = "all_" + export_name + '.xml'
 

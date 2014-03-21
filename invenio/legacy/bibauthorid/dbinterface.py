@@ -32,11 +32,9 @@ from invenio.utils.html import X
 import os
 import gc
 
-#python2.4 compatibility
-from invenio.legacy.bibauthorid.general_utils import bai_all as all
-
 from itertools import groupby, count, ifilter, chain, imap
 from operator import itemgetter
+from six import iteritems
 
 from invenio.legacy.search_engine import perform_request_search
 from invenio.modules.access.engine import acc_authorize_action
@@ -2217,7 +2215,7 @@ def check_duplicated_papers(printer, repair=False):
     for x, y in recs:
         d.setdefault(x, []).append(y)
 
-    for pid , bibrec in d.iteritems():
+    for pid , bibrec in iteritems(d):
         if not len(bibrec) == len(set(bibrec)):
             all_ok = False
             dups = sorted(bibrec)
@@ -2261,7 +2259,7 @@ def check_duplicated_signatures(printer, repair=False):
     for x, y, z in brr:
         d.setdefault(z, []).append((x, y))
 
-    for bibrec, bibrefs in d.iteritems():
+    for bibrec, bibrefs in iteritems(d):
         if not len(bibrefs) == len(set(bibrefs)):
             all_ok = False
             dups = sorted(bibrefs)
@@ -3030,7 +3028,7 @@ def export_person_to_foaf(person_id):
     def export(val, indent=0):
         if isinstance(val, dict):
             contents = list()
-            for k,v in val.iteritems():
+            for k,v in iteritems(val):
                 if isinstance(v,tuple):
                     contents.append( ''.join( [ X[str(k)](indent=indent, body=export(c)) for c in v] ))
                 else:

@@ -21,6 +21,8 @@ import re
 import sys
 import csv
 
+from six import iteritems
+
 from invenio.legacy.refextract.config import CFG_REFEXTRACT_KBS
 from invenio.modules.knowledge.api import get_kbr_items
 from invenio.config import CFG_REFEXTRACT_KBS_OVERRIDE
@@ -106,7 +108,7 @@ def make_cache_key(custom_kbs_files=None):
     Then _inspire is appended if we are an INSPIRE site.
     """
     if custom_kbs_files:
-        serialized_args = ('%s=%s' % v for v in custom_kbs_files.iteritems())
+        serialized_args = ('%s=%s' % v for v in iteritems(custom_kbs_files))
         serialized_args = ';'.join(serialized_args)
     else:
         serialized_args = "default"

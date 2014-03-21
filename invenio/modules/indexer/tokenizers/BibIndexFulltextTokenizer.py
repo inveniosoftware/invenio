@@ -26,6 +26,7 @@ import logging
 import urllib2
 import re
 
+from six import iteritems
 
 from invenio.config import \
      CFG_SOLR_URL, \
@@ -120,7 +121,7 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
                     return []
                 write_message("... %s is an external URL" % url_direct_or_indirect, verbose=2)
                 urls_to_index = set()
-                for splash_re, url_re in CFG_BIBINDEX_SPLASH_PAGES.iteritems():
+                for splash_re, url_re in iteritems(CFG_BIBINDEX_SPLASH_PAGES):
                     if re.match(splash_re, url_direct_or_indirect):
                         write_message("... %s is a splash page (%s)" % (url_direct_or_indirect, splash_re), verbose=2)
                         html = urllib2.urlopen(url_direct_or_indirect).read()

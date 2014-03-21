@@ -25,6 +25,7 @@ import types
 
 from pprint import pformat
 from flask import current_app
+from six import iteritems, StringIO
 from invenio.ext.script import Manager, change_command_name, \
     generate_secret_key
 
@@ -115,7 +116,7 @@ def list():
     """
     Print a list of all conf options and values from CONF.
     """
-    for key, value in current_app.config.iteritems():
+    for key, value in iteritems(current_app.config):
         print key, '=', pformat(value)
 
 

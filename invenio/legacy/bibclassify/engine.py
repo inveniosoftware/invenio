@@ -29,12 +29,12 @@ But unfortunately there is a confusion between running in a standalone mode
 and producing output suitable for printing, and running in a web-based
 mode where the webtemplate is used. For the moment the pieces of the representation
 code are left in this module.
-
-This module is STANDALONE safe
 """
 
 import os
 import time
+
+from six import iteritems
 
 import config as bconfig
 
@@ -534,7 +534,7 @@ def _get_acronyms(acronyms):
     """Returns a formatted list of acronyms."""
     acronyms_str = []
     if acronyms:
-        for acronym, expansions in acronyms.iteritems():
+        for acronym, expansions in iteritems(acronyms):
             expansions_str = ", ".join(["%s (%d)" % expansion
                                         for expansion in expansions])
             acronyms_str.append("%s  %s" % (acronym, expansions_str))
@@ -649,7 +649,7 @@ def clean_before_output(kw_matches):
     ie. stripped off the standalone and other unwanted elements"""
     filtered_kw_matches = {}
 
-    for kw_match, info in kw_matches.iteritems():
+    for kw_match, info in iteritems(kw_matches):
         if not kw_match.nostandalone:
             filtered_kw_matches[kw_match] = info
 

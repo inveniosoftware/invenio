@@ -25,6 +25,9 @@ __revision__ = \
 __lastupdated__ = """$Date$"""
 
 import cgi
+
+from six import iteritems
+
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_LANGS
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.webpage import page
@@ -162,7 +165,7 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
         if categ != 'help':
             body += ' <small>' + _('See also') + ' ' + \
                               ', '.join([ link for (category, link) in \
-                                          see_also_links.iteritems() \
+                                          iteritems(see_also_links) \
                                           if category != categ]) + '.</small>'
 
         body += '</h5>' + get_webdoc_topics(sort_by='name', sc=1,

@@ -25,6 +25,7 @@ import invenio.config
 import pkg_resources
 import re
 
+from six import iteritems
 
 #-----------------------#
 # General Configuration #
@@ -143,7 +144,7 @@ def create_metadata_re_dict():
     """ Creates a dictionary with Regex patterns from the metadata template dictionary
     """
     metadata_re_dictionary = {}
-    for key, value in CFG_BIBENCODE_FFMPEG_METADATA_TEMPLATE.iteritems():
+    for key, value in iteritems(CFG_BIBENCODE_FFMPEG_METADATA_TEMPLATE):
         metadata_re_dictionary[key] = re.compile("^\s*%s\s*:\s(((\S*)\s*(\S*))*)$" % key)
     return metadata_re_dictionary
 CFG_BIBENCODE_FFMPEG_METADATA_RE_DICT = create_metadata_re_dict()

@@ -26,6 +26,8 @@ import urllib
 
 import cgi
 
+from six import iteritems
+
 from invenio.config import CFG_SITE_LANG
 from .config import CFG_EXTERNAL_COLLECTIONS, CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from .parser import CDSIndicoCollectionResutsParser, \
@@ -64,7 +66,7 @@ class ExternalSearchEngine(object):
         self.fetch_format = ""
         self.record_url = None
         self.selected_by_default = False
-        for (name, value) in configuration.iteritems():
+        for (name, value) in iteritems(configuration):
             setattr(self, name, value)
         if self.parser_params:
             setattr(self, 'parser', self.parser_params['parser'](self.parser_params))
@@ -672,7 +674,7 @@ external_collections_dictionary = {}
 
 def build_external_collections_dictionary():
     """Build the dictionary of the external collections."""
-    for (name, configuration) in CFG_EXTERNAL_COLLECTIONS.iteritems():
+    for (name, configuration) in iteritems(CFG_EXTERNAL_COLLECTIONS):
         engine_name = configuration.pop('engine', 'External') + 'SearchEngine'
         configuration['name'] = name
         if globals().has_key(engine_name):

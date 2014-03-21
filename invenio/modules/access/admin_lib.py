@@ -26,6 +26,8 @@ __lastupdated__ = """$Date$"""
 import re
 import time
 
+from six import iteritems
+
 from invenio.config import \
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
     CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
@@ -164,7 +166,7 @@ def perform_managerobotlogin(req, robot_name='', new_pwd1='', new_pwd2='', login
     (auth_code, auth_message) = acce.acc_authorize_action(req, 'cfgrobotkeys', login_method='*', robot='*')
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    available_robot_login_methods = [name for (name, method) in CFG_EXTERNAL_AUTHENTICATION.iteritems() if method and method.robot_login_method_p()]
+    available_robot_login_methods = [name for (name, method) in iteritems(CFG_EXTERNAL_AUTHENTICATION) if method and method.robot_login_method_p()]
 
     errors = []
     warnings = []

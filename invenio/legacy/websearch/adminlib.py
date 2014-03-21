@@ -25,6 +25,9 @@ import cgi
 import random
 import time
 import sys
+
+from six import iteritems
+
 from invenio.utils.date import strftime
 
 if sys.hexversion < 0x2040000:
@@ -1765,7 +1768,7 @@ def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', con
     <dd>
     ''' % {'colID': colID}
 
-    for (tab_id, tab_info) in get_detailed_page_tabs(colID).iteritems():
+    for (tab_id, tab_info) in iteritems(get_detailed_page_tabs(colID)):
         if tab_id == 'comments' and \
            not CFG_WEBCOMMENT_ALLOW_REVIEWS and \
            not CFG_WEBCOMMENT_ALLOW_COMMENTS:

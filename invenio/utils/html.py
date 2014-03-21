@@ -21,6 +21,7 @@
 from __future__ import absolute_import
 
 from HTMLParser import HTMLParser
+from six import iteritems
 from werkzeug.local import LocalProxy
 from invenio.base.globals import cfg
 from invenio.utils.text import indent_text, encode_for_xml
@@ -724,14 +725,14 @@ def create_tag(tag, escaper=EscapedHTMLString, opening_only=False, body=None, es
 
     if attrs is None:
         attrs = {}
-    for key, value in other_attrs.iteritems():
+    for key, value in iteritems(other_attrs):
         if value is not None:
             if key.endswith('_'):
                 attrs[key[:-1]] = value
             else:
                 attrs[key] = value
     out = "<%s" % tag
-    for key, value in attrs.iteritems():
+    for key, value in iteritems(attrs):
         if escape_attr:
             value = escaper(value, escape_quotes=True)
         out += ' %s="%s"' % (key, value)

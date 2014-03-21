@@ -32,6 +32,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
+from six import iteritems
 from tempfile import mkstemp
 from pprint import pformat
 
@@ -382,7 +383,7 @@ def oairepositoryupdater_task():
 
         # Get the sets that should be in this record according to
         # settings
-        updated_oai_sets = set(_set for _set, _recids in recids_for_set.iteritems()
+        updated_oai_sets = set(_set for _set, _recids in iteritems(recids_for_set)
              if recid in _recids)
         write_message("Record %s now belongs to these oai_sets: %s" % (recid, ", ".join(updated_oai_sets)), verbose=3)
 

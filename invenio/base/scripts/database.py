@@ -24,6 +24,7 @@ import datetime
 
 from pipes import quote
 from flask import current_app
+from six import iteritems
 from invenio.ext.script import Manager, change_command_name, print_progress
 
 manager = Manager(usage="Perform database operations")
@@ -51,7 +52,7 @@ def init(user='root', password='', yes_i_know=False):
     if db.engine.name == 'mysql':
         #FIXME improve escaping
         args = dict((k, str(v).replace('$', '\$'))
-                    for (k, v) in current_app.config.iteritems()
+                    for (k, v) in iteritems(current_app.config)
                     if k.startswith('CFG_DATABASE'))
         args = dict(zip(args, map(quote, args.values())))
         prefix = ('{cmd} -u {user} --password={password} '
@@ -260,7 +261,7 @@ def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
 
     dbfixture = SQLAlchemyFixture(env=models, engine=db.metadata.bind,
                                   session=db.session)
-    data = dbfixture.data(*[f for (n, f) in fixtures.iteritems() if n in models])
+    data = dbfixture.data(*[f for (n, f) in iteritems(fixtures) if n in models])
     if len(models) != len(fixtures):
         print ">>> ERROR: There are", len(models), "tables and", len(fixtures), "fixtures."
         print ">>>", set(fixture_names) ^ set(models.keys())

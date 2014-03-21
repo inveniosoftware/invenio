@@ -31,6 +31,7 @@ import time
 import base64
 
 from cPickle import dumps
+from six import iteritems
 from zlib import decompress, compress
 
 from invenio.utils.json import json, json_unicode_to_utf8
@@ -365,7 +366,7 @@ class ExternalAuthRobot(ExternalAuth):
         if referer is None:
             referer = CFG_SITE_URL
         if login_method is None:
-            for a_login_method, details in CFG_EXTERNAL_AUTHENTICATION.iteritems():
+            for a_login_method, details in iteritems(CFG_EXTERNAL_AUTHENTICATION):
                 if details[2]:
                     login_method = a_login_method
                     break

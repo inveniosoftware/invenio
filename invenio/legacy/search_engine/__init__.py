@@ -50,6 +50,8 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
+from six import iteritems
+
 ## import Invenio stuff:
 from invenio.base.globals import cfg
 from invenio.config import \
@@ -4408,7 +4410,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         continue
                     unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
                                                             recIDs[irec], ln=ln)
-                    ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+                    ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
                     ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
 
                     link_ln = ''
@@ -6664,7 +6666,7 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
         n = []   # original names
         ln = []  # lowercased names
         ## build lists within one iteration
-        for (val, freq) in valuefreqdict.iteritems():
+        for (val, freq) in iteritems(valuefreqdict):
             f.append(-1 * freq)
             if val in displaytmp:
                 n.append(displaytmp[val])

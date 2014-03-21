@@ -91,6 +91,7 @@ import tokenize
 from optparse import OptionParser
 from keyword import iskeyword
 from fnmatch import fnmatch
+from six import iteritems
 
 __version__ = '0.2.0'
 __revision__ = '$Rev$'
@@ -451,7 +452,7 @@ def find_checks(argument_name):
     """
     checks = []
     function_type = type(find_checks)
-    for name, function in globals().iteritems():
+    for name, function in iteritems(globals()):
         if type(function) is function_type:
             args = inspect.getargspec(function)[0]
             if len(args) >= 1 and args[0].startswith(argument_name):

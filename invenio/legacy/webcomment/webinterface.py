@@ -25,6 +25,9 @@ __lastupdated__ = """$Date$"""
 __revision__ = """$Id$"""
 
 import cgi
+
+from six import iteritems
+
 from invenio.modules.comments.api import check_recID_is_in_range, \
                                perform_request_display_comments_or_remarks, \
                                perform_request_add_comment_or_remark, \
@@ -182,7 +185,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
                                                     self.recid,
                                                     ln=argd['ln'])
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
         if argd['ln'] != CFG_SITE_LANG:

@@ -31,6 +31,8 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
+from six import iteritems
+
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
 from invenio.modules.access.local_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
@@ -261,8 +263,8 @@ def acc_is_role(name_action, **arguments):
             other_roles_to_check_dict[(id_accROLE, argumentlistid)][keyword] = value
         except KeyError:
             other_roles_to_check_dict[(id_accROLE, argumentlistid)] = {keyword : value}
-    for ((id_accROLE, argumentlistid), stored_arguments) in other_roles_to_check_dict.iteritems():
-        for key, value in stored_arguments.iteritems():
+    for ((id_accROLE, argumentlistid), stored_arguments) in iteritems(other_roles_to_check_dict):
+        for key, value in iteritems(stored_arguments):
             if (value != arguments.get(key, '*') != '*') and value != '*':
                 break
         else:
@@ -1316,7 +1318,7 @@ def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
                      your_admin_activities['runbibdocfile'][1])
 
     ret = {}
-    for action, (name, url) in your_admin_activities.iteritems():
+    for action, (name, url) in iteritems(your_admin_activities):
         ret[_(name)] = url % ln
 
     return ret
@@ -1798,7 +1800,7 @@ def acc_add_default_settings(superusers=(),
     insroles = []
     def_roles = dict([(role[0], role[1:]) for role in DEF_ROLES])
     def_roles.update(dict([(role[0], role[1:]) for role in additional_def_roles]))
-    for name, (description, firerole_def_src) in def_roles.iteritems():
+    for name, (description, firerole_def_src) in iteritems(def_roles):
         # try to add, don't care if description is different
         role_id = acc_add_role(name_role=name,
                          description=description, firerole_def_ser=serialize(

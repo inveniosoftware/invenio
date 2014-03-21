@@ -284,7 +284,9 @@ codepoint2name = {}
 # (or a character reference if the character is outside the Latin-1 range)
 entitydefs = {}
 
-for (name, codepoint) in name2codepoint.iteritems():
+from six import iteritems
+
+for (name, codepoint) in iteritems(name2codepoint):
     codepoint2name[codepoint] = name
     if codepoint <= 0xff:
         entitydefs[name] = unichr(codepoint)

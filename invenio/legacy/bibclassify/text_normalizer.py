@@ -31,6 +31,8 @@ references section and to replace unicode characters.
 import re
 import config as bconfig
 
+from six import iteritems
+
 from invenio.legacy.docextract.pdf import replace_undesirable_characters
 from invenio.legacy.refextract.find import find_reference_section, find_end_of_reference_section
 
@@ -236,7 +238,7 @@ _GREEK_REPLACEMENTS = {
 
 def _replace_greek_characters(line):
     """Replace greek characters in a string."""
-    for greek_char, replacement in _GREEK_REPLACEMENTS.iteritems():
+    for greek_char, replacement in iteritems(_GREEK_REPLACEMENTS):
         try:
             line = line.replace(greek_char, replacement)
         except UnicodeDecodeError:

@@ -89,6 +89,7 @@ import shutil
 import socket
 import string
 import sys
+from six import iteritems
 from warnings import warn
 
 
@@ -1210,7 +1211,7 @@ def prepare_conf(options):
     from flask import current_app
     conf = ConfigParser()
     conf.add_section('Invenio')
-    for (k, v) in current_app.config.iteritems():
+    for (k, v) in iteritems(current_app.config):
         conf.set('Invenio', k, v)
     return conf
 
