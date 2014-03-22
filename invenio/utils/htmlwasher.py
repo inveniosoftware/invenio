@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.utils.html import HTMLWasher
-import htmlentitydefs
+from six.moves import html_entities
 import cgi
 import re
 
@@ -113,7 +113,7 @@ class EmailWasher(HTMLWasher):
     def handle_entityref(self, name):
         """Process a general entity reference of the form "&name;".
         Transform to text whenever possible."""
-        char_code = htmlentitydefs.name2codepoint.get(name, None)
+        char_code = html_entities.name2codepoint.get(name, None)
         if char_code is not None:
             try:
                 self.result += unichr(char_code).encode("utf-8")

@@ -17,7 +17,7 @@
 
 """hOCR parser and tools"""
 
-from htmlentitydefs import entitydefs
+from six.moves.html_entities import entitydefs
 import HTMLParser
 import re
 import os.path
