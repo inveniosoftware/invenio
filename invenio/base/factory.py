@@ -28,6 +28,7 @@ import sys
 import os
 
 from pkg_resources import iter_entry_points
+from werkzeug.local import LocalProxy
 
 #from invenio.ext.logging import register_exception
 from .helpers import with_app_context, unicodifier
@@ -44,14 +45,11 @@ def cleanup_legacy_configuration(app):
     Cleanup legacy issue in configuration
     """
     from .i18n import language_list_long
-    ## ... and map certain common parameters
-    app.config['CFG_LANGUAGE_LIST_LONG'] = [
-        (lang, longname.decode('utf-8'))
-        for (lang, longname) in language_list_long()
-    ]
-
     ## Invenio is all using str objects. Let's change them to unicode
     app.config.update(unicodifier(dict(app.config)))
+    ## ... and map certain common parameters
+    app.config['CFG_LANGUAGE_LIST_LONG'] = LocalProxy(language_list_long)
+
 
 
 def register_legacy_blueprints(app):

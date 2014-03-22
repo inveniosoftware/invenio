@@ -34,8 +34,7 @@ the _() convention.
 For more information, see ABOUT-NLS file.
 """
 
-__revision__ = "$Id$"
-
+import babel
 import gettext
 from flask.ext.babel import gettext, lazy_gettext
 from six import iteritems
@@ -105,46 +104,13 @@ def language_list_long(enabled_langs_only=True):
     site by the local administrator.  Useful for recognizing all I18N
     translations in webdoc sources or bibformat templates.
     """
-    from invenio.config import CFG_SITE_LANGS
-    all_language_names = {'af': 'Afrikaans',
-                          'ar': 'العربية',
-                          'bg': 'Български',
-                          'ca': 'Català',
-                          'cs': 'Česky',
-                          'de': 'Deutsch',
-                          'el': 'Ελληνικά',
-                          'en': 'English',
-                          'es': 'Español',
-                          'fa': 'فارسی',
-                          'fr': 'Français',
-                          'hr': 'Hrvatski',
-                          'gl': 'Galego',
-                          'it': 'Italiano',
-                          'ka': 'ქართული',
-                          'rw': 'Kinyarwanda',
-                          'lt': 'Lietuvių',
-                          'hu': 'Magyar',
-                          'ja': '日本語',
-                          'no': 'Norsk/Bokmål',
-                          'pl': 'Polski',
-                          'pt': 'Português',
-                          'ro': 'Română',
-                          'ru': 'Русский',
-                          'sk': 'Slovensky',
-                          'sv': 'Svenska',
-                          'uk': 'Українська',
-                          'zh_CN': '中文(简)',
-                          'zh_TW': '中文(繁)',
-                          }
-
     if enabled_langs_only:
-        enabled_lang_list = []
-        for lang in CFG_SITE_LANGS:
-            enabled_lang_list.append([lang, all_language_names[lang]])
-        return enabled_lang_list
+        from invenio.config import CFG_SITE_LANGS
     else:
-        return [[lang, lang_long] for lang, lang_long in
-                iteritems(all_language_names)]
+        from invenio.base.config import CFG_SITE_LANGS
+
+    return map(lambda ln: [ln, babel.Locale.parse(ln).get_language_name()],
+               CFG_SITE_LANGS)
 
 
 def is_language_rtl(ln):
