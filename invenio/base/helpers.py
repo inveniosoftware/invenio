@@ -24,7 +24,7 @@
 
 from functools import wraps
 from flask import Flask, current_app, has_app_context
-from six import iteritems
+from six import iteritems, text_type, string_types
 
 
 def with_app_context(app=None, new_context=False, **kwargs_config):
@@ -63,9 +63,9 @@ def unicodifier(obj):
     :param obj: the object to convert
         (can be e.g. unicode, str, list, tuple, dict)
     """
-    if isinstance(obj, unicode):
+    if isinstance(obj, text_type):
         return obj
-    elif isinstance(obj, str):
+    elif isinstance(obj, string_types):
         return obj.decode('utf8')
     elif isinstance(obj, list):
         return [unicodifier(elem) for elem in obj]
@@ -83,10 +83,10 @@ def utf8ifier(obj):
     :param obj: the object to convert
         (can be e.g. unicode, str, list, tuple, dict)
     """
-    if isinstance(obj, str):
-        return obj
-    elif isinstance(obj, unicode):
+    if isinstance(obj, text_type):
         return obj.encode('utf8')
+    elif isinstance(obj, string_types):
+        return obj
     elif isinstance(obj, list):
         return [utf8ifier(elem) for elem in obj]
     elif isinstance(obj, tuple):
