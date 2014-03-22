@@ -59,7 +59,7 @@ def format_element(bfo, lowest_issue):
     for issue_number in released_issues:
         number, year = issue_number.split('/')
         year = int(year)
-        if not issues_by_year.has_key(year):
+        if year not in issues_by_year:
             issues_by_year[year] = []
         issues_by_year[year].append(issue_number)
 
@@ -84,7 +84,7 @@ def format_element(bfo, lowest_issue):
         max_issues = get_journal_nb_issues_per_year(journal_name)
         for year in range(min_year, max_year + 1):
             for number in range(1, max_issues + 1):
-                if not issues_by_year.has_key(year):
+                if year not in issues_by_year:
                     issues_by_year[year] = []
                 issue_number = ("%0" + str(len(str(max_issues))) + "i/%i") % \
                                (number, year)

@@ -1498,7 +1498,7 @@ def stamp_file(options):
 
     ## Set default options when not specified
     for opt, value in iteritems(optional_option_names_and_defaults):
-        if not options.has_key(opt):
+        if opt not in options:
             options[opt] = value
 
     ## Do we have an input file to work on?

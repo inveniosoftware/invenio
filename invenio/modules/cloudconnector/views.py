@@ -117,7 +117,7 @@ def delete(service):
 @blueprint.route('/<service>/upload', methods=['GET', 'POST'])
 @login_required
 def upload(service):
-    if request.form.has_key('files'):
+    if 'files' in request.form:
         session['return_url'] = request.form['return_url']
         files = request.form['files']
         session['files_to_upload'] = files[2:-2].split("', '")

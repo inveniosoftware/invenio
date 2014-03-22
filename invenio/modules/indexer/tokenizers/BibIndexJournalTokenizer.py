@@ -80,7 +80,7 @@ class BibIndexJournalTokenizer(BibIndexEmptyTokenizer):
                 # delete pageend if value is pagestart-pageend
                 # FIXME: pages may not be in 'c' subfield
                 value = value.split('-', 1)[0]
-            if dpubinfos.has_key(nb_instance):
+            if nb_instance in dpubinfos:
                 dpubinfos[nb_instance][subfield] = value
             else:
                 dpubinfos[nb_instance] = {subfield: value}

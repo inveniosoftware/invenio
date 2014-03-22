@@ -86,7 +86,7 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
                 argd[param] = ''
 
         ## But still remove 'ln' parameter that was automatically added.
-        if argd.has_key('ln'):
+        if 'ln' in argd:
             del argd['ln']
 
         ## check request for OAI compliancy

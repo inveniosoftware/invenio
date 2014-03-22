@@ -627,7 +627,7 @@ def cli_cmd_reset_fieldnames(conf):
                             "record ID": _("record ID")}
         ## update I18N names for every language:
         for (field_id, field_name) in field_id_name_list:
-            if field_name_names.has_key(field_name):
+            if field_name in field_name_names:
                 try:
                     run_sql("""INSERT INTO fieldname (id_field,ln,type,value) VALUES
                                 (%s,%s,%s,%s)""", (field_id, lang, 'ln',
@@ -644,7 +644,7 @@ def cli_cmd_reset_fieldnames(conf):
                                  "citerank_pagerank_c": _("all-time-best cite rank"),
                                  "citerank_pagerank_t": _("time-decay cite rank"),}
         for (rankmethod_id, rankmethod_name) in rankmethod_id_name_list:
-            if rankmethod_name_names.has_key(rankmethod_name):
+            if rankmethod_name in rankmethod_name_names:
                 try:
                     run_sql("""INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES
                                 (%s,%s,%s,%s)""", (rankmethod_id, lang, 'ln',

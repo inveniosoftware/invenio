@@ -187,7 +187,7 @@ def Second_Report_Number_Generation(parameters, curdir, form, user_info=None):
     ## Report number length
     ############
     new_nb_length = 3
-    if parameters.has_key('2nd_nb_length') and \
+    if '2nd_nb_length' in parameters and \
            parameters['2nd_nb_length'].isdigit():
         new_nb_length = int(parameters['2nd_nb_length'])
     ############

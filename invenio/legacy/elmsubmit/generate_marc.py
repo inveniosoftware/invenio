@@ -71,7 +71,7 @@ def print_marc(marc_dict):
             # make a list and a dictionary with occurance numbers
             for subfield_tuple in marc_dict[key]:
                 prefix_list.append(subfield_tuple[0])
-                if prefix_dict.has_key(subfield_tuple[0]) == 1:
+                if (subfield_tuple[0] in prefix_dict) == 1:
                     prefix_dict[subfield_tuple[0]] = prefix_dict[subfield_tuple[0]] + 1
                 else:
                     prefix_dict[subfield_tuple[0]] = 1
@@ -157,7 +157,7 @@ def generate_data_field(field, value, marc_dict):
 
             for value_part in value:
                 (datafield, subfield) = process_marc(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field])
-                if marc_dict.has_key(datafield) == 1:
+                if (datafield in marc_dict) == 1:
                     marc_dict[datafield].append((subfield, value_part))
                 else:
                     marc_dict[datafield] = [(subfield, value_part)]
@@ -171,13 +171,13 @@ def generate_data_field(field, value, marc_dict):
             for value_part in value:
                 if value.index(value_part) == 0:
                     (datafield, subfield) = process_marc(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field][0])
-                    if marc_dict.has_key(datafield) == 1:
+                    if (datafield in marc_dict) == 1:
                         marc_dict[datafield].append((subfield, value_part))
                     else:
                         marc_dict[datafield] = [(subfield, value_part)]
                 else:
                     (datafield, subfield) = process_marc(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field][1])
-                    if marc_dict.has_key(datafield) == 1:
+                    if (datafield in marc_dict) == 1:
                         marc_dict[datafield].append((subfield, value_part))
                     else:
                         marc_dict[datafield] = [(subfield, value_part)]

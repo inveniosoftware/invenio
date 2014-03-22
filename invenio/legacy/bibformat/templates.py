@@ -1250,7 +1250,7 @@ class Template:
                 else:
                     out += '''<option value="%(template)s" selected="selected">%(name)s</option>''' % attrs
 
-            if not format_templates.has_key(rule['template']) and rule['template'] != "":
+            if rule['template'] not in format_templates and rule['template'] != "":
                 #case where a non existing format template is use in output format
                 #we need to add it as option
                 out += '''<option value="%s" selected="selected">%s</option>''' % (rule['template'],
@@ -1312,7 +1312,7 @@ class Template:
             else:
                 out += '''<option value="%(template)s" selected="selected">%(name)s</option>''' % attrs
 
-        if not format_templates.has_key(default) and default!= "":
+        if default not in format_templates and default!= "":
             #case where a non existing format tempate is use in output format
             #we need to add it as option (only if it is not empty string)
             out += '''<option value="%s" selected="selected">%s</option>''' % (default,default)

@@ -59,7 +59,7 @@ class Template(DefaultTemplate):
                 subject = ticket_info['subject']
                 status = ticket_info['status']
                 text = ""
-                if ticket_info.has_key('text'):
+                if 'text' in ticket_info:
                     text = ticket_info['text']
                 display = '<a href="'+ticket_info['url_display']+'">'+_("show")+'</a>'
                 close = '<a href="'+ticket_info['url_close']+'">'+_("close")+'</a>'

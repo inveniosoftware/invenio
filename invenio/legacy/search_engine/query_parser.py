@@ -743,7 +743,7 @@ class SpiresToInvenioSyntaxConverter:
             return True
         if CFG_WEBSEARCH_SPIRES_SYNTAX > 1:
             for word in query.split(' '):
-                if self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.has_key(word):
+                if word in self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS:
                     return True
         return False
 

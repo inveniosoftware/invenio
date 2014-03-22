@@ -93,7 +93,7 @@ def CaseEDS(parameters, curdir, form, user_info=None):
         fp = open("%s/%s" % (curdir, casevariable), "r")
         value = fp.read()
         fp.close()
-        if cases.has_key(value):
+        if value in cases:
             nextstep = cases[value]
         else:
             nextstep = casedefault

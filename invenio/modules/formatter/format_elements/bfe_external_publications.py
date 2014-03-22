@@ -26,7 +26,7 @@ def format_element(bfo, separator='<br/>'):
 
     out = ['<a href="'+pub['d']+'">'+pub['p']+'</a>'
            for pub in publications
-           if pub.has_key('d') and pub.has_key('p')]
+           if 'd' in pub and 'p' in pub]
     return separator.join(out)
 
 def escape_values(bfo):

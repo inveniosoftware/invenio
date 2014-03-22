@@ -241,7 +241,7 @@ def task_run_core():
 
             if content != '' and looks_like_dictionary(item_info):
                 item_info = eval(item_info)
-                if item_info.has_key('title'):
+                if 'title' in item_info:
                     book_title = item_info['title']
                     subject = "ILL RECALL: " + str(book_title)
                     update_expired_loan(loan_id=ill_id, ill=1)

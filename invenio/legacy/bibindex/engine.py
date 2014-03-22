@@ -800,7 +800,7 @@ class WordTable:
                 except (EOFError, KeyboardInterrupt):
                     return
 
-        if self.value.has_key(word):
+        if word in self.value:
             write_message("The word '%s' is found %d times." \
                 % (word, len(self.value[word])))
         else:
@@ -879,7 +879,7 @@ class WordTable:
         # canonical IDs:
         if self.index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
             for recID in range(recID1, recID2 + 1):
-                if not wlist.has_key(recID):
+                if recID not in wlist:
                     wlist[recID] = []
                 wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
                                           wlist[recID])
@@ -891,7 +891,7 @@ class WordTable:
                 record = get_record(recID)
                 if record:
                     new_words = tokenizing_function(record)
-                    if not wlist.has_key(recID):
+                    if recID not in wlist:
                         wlist[recID] = []
                     wlist[recID] = list_union(new_words, wlist[recID])
         # case of special indexes:
@@ -900,7 +900,7 @@ class WordTable:
                 tokenizing_function = self.tag_to_words_fnc_map.get(tag, self.default_tokenizer_function)
                 for recID in range(recID1, recID2 + 1):
                     new_words = tokenizing_function(recID)
-                    if not wlist.has_key(recID):
+                    if recID not in wlist:
                         wlist[recID] = []
                     wlist[recID] = list_union(new_words, wlist[recID])
         # usual tag-by-tag indexing for the rest:
@@ -910,7 +910,7 @@ class WordTable:
                 phrases = self.get_phrases_for_tokenizing(tag, recID1, recID2)
                 for row in sorted(phrases):
                     recID, phrase = row
-                    if not wlist.has_key(recID):
+                    if recID not in wlist:
                         wlist[recID] = []
                     new_words = tokenizing_function(phrase)
                     wlist[recID] = list_union(new_words, wlist[recID])
@@ -918,7 +918,7 @@ class WordTable:
 
         # lookup index-time synonyms:
         synonym_kbrs = get_all_synonym_knowledge_bases()
-        if synonym_kbrs.has_key(self.index_name):
+        if self.index_name in synonym_kbrs:
             if len(wlist) == 0: return 0
             recIDs = wlist.keys()
             for recID in recIDs:
@@ -1072,7 +1072,7 @@ class WordTable:
         try:
             if self.wash_index_terms:
                 word = wash_index_term(word, self.wash_index_terms)
-            if self.value.has_key(word):
+            if word in self.value:
                 # the word 'word' exist already: update sign
                 self.value[word][recID] = sign
             else:
@@ -1244,7 +1244,7 @@ class WordTable:
                 % self.tablename[:-1]
         res = run_sql(query, (low, high))
         for row in res:
-            if not state.has_key(row[0]):
+            if row[0] not in state:
                 state[row[0]] = []
             state[row[0]].append(row[1])
 
@@ -1342,7 +1342,7 @@ class WordTable:
                 hitlist -= self._find_common_hitlist(term, id_dependent, indexes)
             for recID in hitlist:
                 self.remove_single_word_reversed_table(term, recID)
-                if self.value.has_key(term):
+                if term in self.value:
                     self.value[term][recID] = -1
                 else:
                     self.value[term] = {recID: -1}
@@ -1421,7 +1421,7 @@ class WordTable:
             intersection = zip(*run_sql(query % (self.tablename[:-3], id_dependent, self.tablename[:-3], _id))) # kwalitee: disable=sql
             terms = bool(intersection) and intersection[0] or []
             for term in terms:
-                if left_in_other_indexes.has_key(term):
+                if term in left_in_other_indexes:
                     left_in_other_indexes[term].append(_id)
                 else:
                     left_in_other_indexes[term] = [_id]

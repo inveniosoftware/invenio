@@ -87,7 +87,7 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
 
     # What is the length of the generated report number?
     nb_length = 3
-    if parameters.has_key('nblength') and parameters['nblength'].isdigit():
+    if 'nblength' in parameters and parameters['nblength'].isdigit():
         nb_length = int(parameters['nblength'])
 
     # Generate Year
@@ -166,7 +166,7 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
                 return ""
         # What is the initial value, if any, of the generated report number?
         initial_value = 0
-        if parameters.has_key('initialvalue') and parameters['initialvalue'].isdigit():
+        if 'initialvalue' in parameters and parameters['initialvalue'].isdigit():
             initial_value = int(parameters['initialvalue'])-1
         # create it
         rn = create_reference(counter_path, rn_format, nb_length, initial_value)

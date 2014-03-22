@@ -3090,9 +3090,9 @@ class Template:
         warnings_html = ""
 
         add_note_p = False
-        if user_can_add_notes and (optional_params.has_key("Add note") or optional_params.has_key("Incomplete note")):
+        if user_can_add_notes and ("Add note" in optional_params or "Incomplete note" in optional_params):
             add_note_p = True
-            if optional_params.has_key("Add note") and optional_params['Add note']:
+            if "Add note" in optional_params and optional_params['Add note']:
                 replied_to_note = optional_params['Add note']
                 note_body_html = self.tmpl_quote_comment_html(replied_to_note[2],
                                                               replied_to_note[1],
@@ -3107,21 +3107,21 @@ class Template:
                                                                     replied_to_note[3],
                                                                     ln)
                 note_title = "Re: " + replied_to_note[2]
-            elif optional_params.has_key("Incomplete note") and optional_params['Incomplete note']:
+            elif "Incomplete note" in optional_params and optional_params['Incomplete note']:
                 incomplete_note = optional_params['Incomplete note']
                 note_body_html = incomplete_note[1]
                 # TODO: Do we need to format incomplete body correctly as textual
                 # and html as above?
                 note_body_textual = incomplete_note[1]
                 note_title = incomplete_note[0]
-                if optional_params.has_key("Warnings"):
+                if "Warnings" in optional_params:
                     warnings = optional_params["Warnings"]
                     warnings_html = self.tmpl_warnings(warnings, ln)
             else:
                 note_body_html = ""
                 note_body_textual = ""
                 note_title = ""
-                if optional_params.has_key("Warnings"):
+                if "Warnings" in optional_params:
                     warnings = optional_params["Warnings"]
                     warnings_html = self.tmpl_warnings(warnings, ln)
             # TODO: calculate the url
@@ -3894,9 +3894,9 @@ class Template:
         warnings_html = ""
 
         add_note_p = False
-        if user_can_add_notes and (optional_params.has_key("Add note") or optional_params.has_key("Incomplete note")):
+        if user_can_add_notes and ("Add note" in optional_params or "Incomplete note" in optional_params):
             add_note_p = True
-            if optional_params.has_key("Add note") and optional_params['Add note']:
+            if "Add note" in optional_params and optional_params['Add note']:
                 replied_to_note = optional_params['Add note']
                 note_body_html = self.tmpl_quote_comment_html(replied_to_note[2],
                                                               replied_to_note[1],
@@ -3911,21 +3911,21 @@ class Template:
                                                                     replied_to_note[3],
                                                                     ln)
                 note_title = "Re: " + replied_to_note[2]
-            elif optional_params.has_key("Incomplete note") and optional_params['Incomplete note']:
+            elif "Incomplete note" in optional_params and optional_params['Incomplete note']:
                 incomplete_note = optional_params['Incomplete note']
                 note_body_html = incomplete_note[1]
                 # TODO: Do we need to format incomplete body correctly as textual
                 # and html as above?
                 note_body_textual = incomplete_note[1]
                 note_title = incomplete_note[0]
-                if optional_params.has_key("Warnings"):
+                if "Warnings" in optional_params:
                     warnings = optional_params["Warnings"]
                     warnings_html = self.tmpl_warnings(warnings, ln)
             else:
                 note_body_html = ""
                 note_body_textual = ""
                 note_title = ""
-                if optional_params.has_key("Warnings"):
+                if "Warnings" in optional_params:
                     warnings = optional_params["Warnings"]
                     warnings_html = self.tmpl_warnings(warnings, ln)
             # TODO: calculate the url

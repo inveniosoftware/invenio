@@ -138,7 +138,7 @@ def perform_request_record(requestType, uid, data):
         return result
 
     if requestType == 'submit':
-        if data.has_key('duplicate'):
+        if 'duplicate' in data:
             recid2 = data['duplicate']
             record2 = _get_record_slave(recid2, result, 'recid', uid)
             if result['resultCode'] != 0: #return in case of error

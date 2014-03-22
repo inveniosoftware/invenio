@@ -847,7 +847,7 @@ def check_argd(argd):
         errors.append(("badResumptionToken", "ResumptionToken invalid: %s" % argd.get('resumptionToken', None)))
 
     ## datestamp formats
-    if argd.has_key('from') and \
+    if 'from' in argd and \
            'from' in CFG_VERBS.get(argd['verb'], []):
         from_length = len(argd['from'])
         if check_date(argd['from']) == "":
@@ -855,7 +855,7 @@ def check_argd(argd):
     else:
         from_length = 0
 
-    if argd.has_key('until') and \
+    if 'until' in argd and \
            'until' in CFG_VERBS.get(argd['verb'], []):
         until_length = len(argd['until'])
         if check_date(argd['until']) == "":
@@ -868,7 +868,7 @@ def check_argd(argd):
             if from_length != until_length:
                 errors.append(("badArgument", "From and until have two different formats: %s Vs. %s" % (from_length, until_length)))
 
-    if argd.has_key('from') and argd.has_key('until') \
+    if 'from' in argd and 'until' in argd \
            and argd['from'] > argd['until'] and \
            'from' in CFG_VERBS.get(argd['verb'], []) and \
            'until' in CFG_VERBS.get(argd['verb'], []):
@@ -883,20 +883,20 @@ def check_argd(argd):
 
     ## parameters for GetRecord
     if argd['verb'] == "GetRecord" and \
-           not argd.has_key('identifier'):
+           'identifier' not in argd:
         errors.append(("badArgument", "Record identifier missing"))
 
     if argd['verb'] == "GetRecord" and \
-           not argd.has_key('metadataPrefix'):
+           'metadataPrefix' not in argd:
         errors.append(("badArgument", "Missing metadataPrefix"))
 
     ## parameters for ListRecords and ListIdentifiers
     if (argd['verb'] == "ListRecords" or argd['verb'] == "ListIdentifiers") and \
-           (not argd.has_key('resumptionToken') and not argd.has_key('metadataPrefix')):
+           ('resumptionToken' not in argd and 'metadataPrefix' not in argd):
         errors.append(("badArgument", "Missing metadataPrefix"))
 
     ## Metadata prefix defined and valid
-    if argd.has_key('metadataPrefix') and \
+    if 'metadataPrefix' in argd and \
            not argd['metadataPrefix'] in CFG_OAI_METADATA_FORMATS:
         errors.append(("cannotDisseminateFormat", "Chosen format is not supported. Valid formats are: %s" % ', '.join(CFG_OAI_METADATA_FORMATS.keys())))
 

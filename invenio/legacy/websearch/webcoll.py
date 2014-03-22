@@ -92,7 +92,7 @@ CFG_CACHE_LAST_FAST_UPDATED_TIMESTAMP_FILE = "%s/collections/last_fast_updated" 
 def get_collection(colname):
     """Return collection object from the collection house for given colname.
        If does not exist, then create it."""
-    if not COLLECTION_HOUSE.has_key(colname):
+    if colname not in COLLECTION_HOUSE:
         colobject = Collection(colname)
         COLLECTION_HOUSE[colname] = colobject
     return COLLECTION_HOUSE[colname]
@@ -398,7 +398,7 @@ class Collection:
 
     def create_external_collections_box(self, ln=CFG_SITE_LANG):
         external_collection_load_states()
-        if not dico_collection_external_searches.has_key(self.id):
+        if self.id not in dico_collection_external_searches:
             return ""
 
         engines_list = external_collection_sort_engine_by_name(dico_collection_external_searches[self.id])
@@ -779,7 +779,7 @@ class Collection:
             # do we have to recalculate?
             #return self.nbrecs
         #write_message("... calculating nbrecs of external collection %s" % self.name, verbose=6)
-        if external_collections_dictionary.has_key(self.name):
+        if self.name in external_collections_dictionary:
             engine = external_collections_dictionary[self.name]
             if engine.parser:
                 self.nbrecs_tmp = engine.parser.parse_nbrecs(timeout)

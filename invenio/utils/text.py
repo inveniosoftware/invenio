@@ -243,7 +243,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     title = unicode(title, 'utf-8')
 
     astyle = dict(CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT'])
-    if CFG_WRAP_TEXT_IN_A_BOX_STYLES.has_key(style):
+    if style in CFG_WRAP_TEXT_IN_A_BOX_STYLES:
         astyle.update(CFG_WRAP_TEXT_IN_A_BOX_STYLES[style])
     astyle.update(args)
 

@@ -59,16 +59,16 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
         # If it is an Ajax request, extract any JSON data.
         ajax_request, recid1, recid2 = False, None, None
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
-        if form.has_key('jsondata'):
+        if 'jsondata' in form:
             json_data = json.loads(str(form['jsondata']))
             # Deunicode all strings (Invenio doesn't have unicode
             # support).
             json_data = json_unicode_to_utf8(json_data)
             ajax_request = True
             json_response = {}
-            if json_data.has_key('recID1'):
+            if 'recID1' in json_data:
                 recid1 = json_data['recID1']
-            if json_data.has_key('recID2'):
+            if 'recID2' in json_data:
                 recid2 = json_data['recID2']
 
         # Authorization.

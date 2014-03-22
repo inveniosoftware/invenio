@@ -222,12 +222,12 @@ class Template:
         field = ""
         collection = ""
 
-        if dyn_config.has_key('field'):
+        if 'field' in dyn_config:
             field = dyn_config['field']
 
-        if dyn_config.has_key('expression'):
+        if 'expression' in dyn_config:
             expression = dyn_config['expression']
-        if dyn_config.has_key('collection'):
+        if 'collection' in dyn_config:
             collection = dyn_config['collection']
 
         pleaseconf = _("Please configure")+"<P>"

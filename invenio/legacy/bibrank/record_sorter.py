@@ -178,12 +178,12 @@ def is_method_valid(colID, rank_method_code):
     except TypeError:
         return 0
 
-    if enabled_colls.has_key(colID):
+    if colID in enabled_colls:
         return 1
     else:
         while colID:
             colID = run_sql("SELECT id_dad FROM collection_collection WHERE id_son=%s", (colID,))
-            if colID and enabled_colls.has_key(colID[0][0]):
+            if colID and colID[0][0] in enabled_colls:
                 return 1
             elif colID:
                 colID = colID[0][0]
@@ -195,15 +195,15 @@ def get_bibrank_methods(colID, ln=CFG_SITE_LANG):
     name of them in the language defined by the ln parameter.
     """
 
-    if not globals().has_key('methods'):
+    if 'methods' not in globals():
         create_rnkmethod_cache()
 
     avail_methods = []
     for (rank_method_code, options) in iteritems(methods):
-        if options.has_key("function") and is_method_valid(colID, rank_method_code):
-            if options.has_key(ln):
+        if "function" in options and is_method_valid(colID, rank_method_code):
+            if ln in options:
                 avail_methods.append((rank_method_code, options[ln]))
-            elif options.has_key(CFG_SITE_LANG):
+            elif CFG_SITE_LANG in options:
                 avail_methods.append((rank_method_code, options[CFG_SITE_LANG]))
             else:
                 avail_methods.append((rank_method_code, rank_method_code))
@@ -231,7 +231,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
 
     try:
         hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
-        if not globals().has_key('methods'):
+        if 'methods' not in globals():
             create_rnkmethod_cache()
 
         function = methods[rank_method_code]["function"]
@@ -386,14 +386,14 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 
     if not lwords_hitset: #rank all docs, can this be speed up using something else than for loop?
         for recID in lrecIDs:
-            if rnkdict.has_key(recID):
+            if recID in rnkdict:
                 reclist.append((recID, rnkdict[recID]))
                 del rnkdict[recID]
             else:
                 reclist_addend.append((recID, 0))
     else: #rank docs in hitset, can this be speed up using something else than for loop?
         for recID in lwords_hitset:
-            if rnkdict.has_key(recID) and recID in hitset:
+            if recID in rnkdict and recID in hitset:
                 reclist.append((recID, rnkdict[recID]))
                 del rnkdict[recID]
             elif recID in hitset:

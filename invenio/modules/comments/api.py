@@ -1475,7 +1475,7 @@ def group_comments_by_round(comments, ranking=0):
     ordered_comment_round_names = []
     for comment in comments:
         comment_round_name = ranking and comment[11] or comment[7]
-        if not comment_rounds.has_key(comment_round_name):
+        if comment_round_name not in comment_rounds:
             comment_rounds[comment_round_name] = []
             ordered_comment_round_names.append(comment_round_name)
         comment_rounds[comment_round_name].append(comment)

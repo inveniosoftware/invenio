@@ -579,7 +579,7 @@ def create_file_upload_interface(recid,
                     _("The uploaded file name is too long and has therefore not been considered").replace('"', '\\"')
 
             elif file_action == 'add' and \
-                     max_files_for_doctype.has_key(file_doctype) and \
+                     file_doctype in max_files_for_doctype and \
                      max_files_for_doctype[file_doctype] < \
                      (len([bibdoc for bibdoc in abstract_bibdocs \
                            if bibdoc['get_type'] == file_doctype]) + 1):
@@ -790,7 +790,7 @@ def create_file_upload_interface(recid,
     # doctypes is prepared here, and will be passed as parameter to
     # the display_revise_panel function
     cleaned_doctypes = [doctype for doctype in doctypes if
-                        not max_files_for_doctype.has_key(doctype) or
+                        doctype not in max_files_for_doctype or
                         (max_files_for_doctype[doctype] > \
                         len([bibdoc for bibdoc in abstract_bibdocs \
                              if bibdoc['get_type'] == doctype]))]
@@ -1161,14 +1161,14 @@ def build_updated_files_list(bibdocs, actions, recid, display_hidden_files=False
             checksum = calculate_md5(file_path)
             order = i
             if action == "revise" and \
-                   abstract_bibdocs.has_key(bibdoc_name):
+                   bibdoc_name in abstract_bibdocs:
                 # Keep previous values
                 order = abstract_bibdocs[bibdoc_name]['order']
                 doctype = abstract_bibdocs[bibdoc_name]['get_type']
             if bibdoc_name.strip() == '' and rename.strip() == '':
                 bibdoc_name = os.path.extsep.join(filename.split(os.path.extsep)[:-1])
             elif rename.strip() != '' and \
-                     abstract_bibdocs.has_key(bibdoc_name):
+                     bibdoc_name in abstract_bibdocs:
                 # Keep previous position
                 del abstract_bibdocs[bibdoc_name]
 
@@ -1201,7 +1201,7 @@ def build_updated_files_list(bibdocs, actions, recid, display_hidden_files=False
                                         description, comment)
             abstract_bibdocs[bibdoc_name]['updated'] = True
         elif action == "delete":
-            if abstract_bibdocs.has_key(bibdoc_name):
+            if bibdoc_name in abstract_bibdocs:
                 del abstract_bibdocs[bibdoc_name]
         elif action == "addFormat" and \
                os.path.exists(file_path):
@@ -1651,7 +1651,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
                   string, string, string, string, string)
     """
     # Action performed ...
-    if form.has_key("fileAction") and \
+    if "fileAction" in form and \
            form['fileAction'] in CFG_ALLOWED_ACTIONS:
         file_action = str(form['fileAction']) # "add", "revise",
                                               # "addFormat" or "delete"
@@ -1659,7 +1659,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
         file_action = ""
 
     # ... on file ...
-    if form.has_key("fileTarget"):
+    if "fileTarget" in form:
         file_target = str(form['fileTarget']) # contains bibdocname
         # Also remember its doctype to make sure we do valid actions
         # on it
@@ -1677,13 +1677,13 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
     # Only useful when adding file: otherwise fileTarget doctype is
     # preserved
     file_doctype = file_target_doctype
-    if form.has_key("fileDoctype") and \
+    if "fileDoctype" in form and \
            file_action == 'add':
         file_doctype = str(form['fileDoctype'])
 
     # ... keeping previous version? ...
     if file_target_doctype != '' and \
-           not form.has_key("keepPreviousFiles"):
+           "keepPreviousFiles" not in form:
         # no corresponding key. Two possibilities:
         if file_target_doctype in can_keep_doctypes or \
                '*' in can_keep_doctypes:
@@ -1703,7 +1703,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
             keep_previous_files = keep_default
 
     # ... and decription? ...
-    if form.has_key("description") and \
+    if "description" in form and \
         (((file_action == 'revise' and \
            (file_target_doctype in can_describe_doctypes)) or \
           (file_action == 'add' and \
@@ -1714,7 +1714,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
         file_description = ''
 
     # ... and comment? ...
-    if form.has_key("comment") and \
+    if "comment" in form and \
         (((file_action == 'revise' and \
            (file_target_doctype in can_comment_doctypes)) or \
           (file_action == 'add' and \
@@ -1725,7 +1725,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
         file_comment = ''
 
     # ... and rename to ? ...
-    if form.has_key("rename") and \
+    if "rename" in form and \
         ((file_action == "revise" and \
           ((file_target_doctype in can_rename_doctypes) or \
            '*'  in can_rename_doctypes)) or \
@@ -1733,7 +1733,7 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
           can_name_new_files)):
         file_rename = str(form['rename']) # contains new bibdocname if applicable
     elif file_action == "add" and \
-             doctypes_to_default_filename.has_key(file_doctype):
+             file_doctype in doctypes_to_default_filename:
         # Admin-chosen name.
         file_rename = doctypes_to_default_filename[file_doctype]
         if file_rename.lower().startswith('file:'):
@@ -1757,13 +1757,13 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
 
     # ... and file restriction ? ...
     file_restriction = ''
-    if form.has_key("fileRestriction"):
+    if "fileRestriction" in form:
         # We cannot clean that value as it could be a restriction
         # declared in another submission. We keep this value.
         file_restriction = str(form['fileRestriction'])
 
     # ... and the file itself ? ...
-    if form.has_key('myfile') and \
+    if 'myfile' in form and \
            hasattr(form['myfile'], "filename") and \
            form['myfile'].filename:
         dir_to_open = os.path.join(working_dir, 'files', 'myfile')
@@ -2056,7 +2056,7 @@ def add_format(file_path, bibdoc_name, recid, doctype, working_dir,
         else:
             # File has been later renamed or deleted.
             # Remember to add it later if file is found
-            if pending_bibdocs.has_key(bibdoc_name):
+            if bibdoc_name in pending_bibdocs:
                 pending_bibdocs[bibdoc_name][3].append(file_path)
             # else: we previously added a file by mistake. Do
             # not care, it will be deleted
@@ -2085,7 +2085,7 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
         if os.path.exists(file_path) or not file_path:
             brd = BibRecDocs(recid)
             # Perform pending actions
-            if pending_bibdocs.has_key(bibdoc_name):
+            if bibdoc_name in pending_bibdocs:
                 # We have some pending actions to apply before
                 # going further.
                 if description == '':
@@ -2274,7 +2274,7 @@ def delete(bibdoc_name, recid, working_dir, pending_bibdocs,
             bibrecdocs.delete_bibdoc(bibdoc_name)
             _do_log(working_dir, 'Deleted ' + bibdoc_name)
 
-        if pending_bibdocs.has_key(bibdoc_name):
+        if bibdoc_name in pending_bibdocs:
             del pending_bibdocs[bibdoc_name]
 
     except InvenioBibDocFileError as e:
@@ -2285,7 +2285,7 @@ def delete(bibdoc_name, recid, working_dir, pending_bibdocs,
             time.sleep(1)
             bibrecdocs.delete_bibdoc(bibdoc_name)
             _do_log(working_dir, 'Deleted ' + bibdoc_name)
-            if pending_bibdocs.has_key(bibdoc_name):
+            if bibdoc_name in pending_bibdocs:
                 del pending_bibdocs[bibdoc_name]
         except InvenioBibDocFileError as e:
             _do_log(working_dir, str(e))

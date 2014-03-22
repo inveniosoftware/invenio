@@ -71,25 +71,25 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = ""
-        if args.has_key('p'):
+        if 'p' in args:
             out += "<strong>" + _("Pattern") + ":</strong> " + "; ".join(args['p']) + "<br />"
-        if args.has_key('f'):
+        if 'f' in args:
             out += "<strong>" + _("Field") + ":</strong> " + "; ".join(args['f']) + "<br />"
-        if args.has_key('p1'):
+        if 'p1' in args:
             out += "<strong>" + _("Pattern 1") + ":</strong> " + "; ".join(args['p1']) + "<br />"
-        if args.has_key('f1'):
+        if 'f1' in args:
             out += "<strong>" + _("Field 1") + ":</strong> " + "; ".join(args['f1']) + "<br />"
-        if args.has_key('p2'):
+        if 'p2' in args:
             out += "<strong>" + _("Pattern 2") + ":</strong> " + "; ".join(args['p2']) + "<br />"
-        if args.has_key('f2'):
+        if 'f2' in args:
             out += "<strong>" + _("Field 2") + ":</strong> " + "; ".join(args['f2']) + "<br />"
-        if args.has_key('p3'):
+        if 'p3' in args:
             out += "<strong>" + _("Pattern 3") + ":</strong> " + "; ".join(args['p3']) + "<br />"
-        if args.has_key('f3'):
+        if 'f3' in args:
             out += "<strong>" + _("Field 3") + ":</strong> " + "; ".join(args['f3']) + "<br />"
-        if args.has_key('c'):
+        if 'c' in args:
             out += "<strong>" + _("Collections") + ":</strong> " + "; ".join(args['c']) + "<br />"
-        elif args.has_key('cc'):
+        elif 'cc' in args:
             out += "<strong>" + _("Collection") + ":</strong> " + "; ".join(args['cc']) + "<br />"
         return out
 
@@ -508,7 +508,7 @@ class Template:
             primary_collection = guess_primary_collection_of_a_record(recid)
             if primary_collection in collection_list or \
                 primary_collection == CFG_SITE_NAME: # common case, when the primary coll can not be guessed
-                if not recids_by_collection.has_key(primary_collection):
+                if primary_collection not in recids_by_collection:
                     recids_by_collection[primary_collection] = []
                 recids_by_collection[primary_collection].append(recid)
             else:
@@ -518,12 +518,12 @@ class Template:
                 for ancestor in ancestors:
                     nancestors += 1
                     if ancestor in collection_list:
-                        if not recids_by_collection.has_key(ancestor):
+                        if ancestor not in recids_by_collection:
                             recids_by_collection[ancestor] = []
                         recids_by_collection[ancestor].append(recid)
                         break
                     elif len(ancestors) == nancestors:
-                        if not recids_by_collection.has_key('None of the above'):
+                        if 'None of the above' not in recids_by_collection:
                             recids_by_collection['None of the above'] = []
                         recids_by_collection['None of the above'].append(recid)
 
@@ -596,7 +596,7 @@ url: <%(url)s>
                     break
 
         if index < CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
-            if recids_by_collection.has_key('None of the above'):
+            if 'None of the above' in recids_by_collection:
                 if len(recids_by_collection.keys()) > 1:
                     body += "\nNone of the above collections:\n"
                 else:

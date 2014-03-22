@@ -373,7 +373,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
     response = {}
     request_type = data['requestType']
     undo_redo = None
-    if data.has_key("undoRedo"):
+    if "undoRedo" in data:
         undo_redo = data["undoRedo"]
     # Call function based on request type.
     if request_type == 'searchForRecord':
@@ -396,7 +396,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
                           'disableHpChange', 'deactivateHoldingPenChangeset'):
         # Record updates.
         cacheMTime = data['cacheMTime']
-        if data.has_key('hpChanges'):
+        if 'hpChanges' in data:
             hpChanges = data['hpChanges']
         else:
             hpChanges = {}
@@ -432,7 +432,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
         response.update(perform_request_get_pdf_url(recid))
     elif request_type in ('refextract', ):
         txt = None
-        if data.has_key('txt'):
+        if 'txt' in data:
             txt = data["txt"]
         response.update(perform_request_ref_extract(recid, uid, txt))
     elif request_type in ('refextracturl', ):
@@ -612,7 +612,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         existing_cache = cache_exists(recid, uid)
         read_only_mode = False
 
-        if data.has_key("inReadOnlyMode"):
+        if "inReadOnlyMode" in data:
             read_only_mode = data['inReadOnlyMode']
 
         if record_status == 0:
@@ -637,7 +637,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 pending_changes = []
                 disabled_hp_changes = {}
             if read_only_mode:
-                if data.has_key('recordRevision') and data['recordRevision'] != 'sampleValue':
+                if 'recordRevision' in data and data['recordRevision'] != 'sampleValue':
                     record_revision_ts = data['recordRevision']
                     record_xml = get_marcxml_of_revision(recid, \
                                                          record_revision_ts)
@@ -867,7 +867,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
     elif request_type == 'deleteRecordCache':
         # Delete the cache file. Ignore the request if the cache has been
         # modified in another editor.
-        if data.has_key('cacheMTime'):
+        if 'cacheMTime' in data:
             if cache_exists(recid, uid) and get_cache_mtime(recid, uid) == \
                 data['cacheMTime']:
                 delete_cache_file(recid, uid)
@@ -962,22 +962,22 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
 
         # process all the Holding Pen changes operations ... regardles the
         # request type
-        if hpChanges.has_key("toDisable"):
+        if "toDisable" in hpChanges:
             for changeId in hpChanges["toDisable"]:
                 pending_changes[changeId]["applied_change"] = True
 
-        if hpChanges.has_key("toEnable"):
+        if "toEnable" in hpChanges:
             for changeId in hpChanges["toEnable"]:
                 pending_changes[changeId]["applied_change"] = False
 
-        if hpChanges.has_key("toOverride"):
+        if "toOverride" in hpChanges:
             pending_changes = hpChanges["toOverride"]
 
-        if hpChanges.has_key("changesetsToDeactivate"):
+        if "changesetsToDeactivate" in hpChanges:
             for changesetId in hpChanges["changesetsToDeactivate"]:
                 deactivated_hp_changes[changesetId] = True
 
-        if hpChanges.has_key("changesetsToActivate"):
+        if "changesetsToActivate" in hpChanges:
             for changesetId in hpChanges["changesetsToActivate"]:
                 deactivated_hp_changes[changesetId] = False
 
@@ -1212,8 +1212,8 @@ def perform_request_autocomplete(request_type, recid, uid, data):
     searchby = data['value']
         #we check if the data is properly defined
     fulltag = ''
-    if data.has_key('maintag') and data.has_key('subtag1') and \
-            data.has_key('subtag2') and data.has_key('subfieldcode'):
+    if 'maintag' in data and 'subtag1' in data and \
+            'subtag2' in data and 'subfieldcode' in data:
         maintag = data['maintag']
         subtag1 = data['subtag1']
         subtag2 = data['subtag2']
@@ -1245,7 +1245,7 @@ def perform_request_autocomplete(request_type, recid, uid, data):
             response['autosuggest'] = new_suggest_vals
     if (request_type == 'autocomplete'):
         #call the values function with the correct kb_name
-        if CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.has_key(fulltag):
+        if fulltag in CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS:
             kbname = CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS[fulltag]
             #check if the seachby field has semicolons. Take all
             #the semicolon-separated items..

@@ -74,24 +74,24 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
             # Check to which bibdoc ID this copyright applies
             bibdoc_id = 0
             material = None
-            if copyright_info.has_key('8'):
+            if '8' in copyright_info:
                 try:
                     bibdoc_id = int(copyright_info['8'])
                 except:
                     pass
-            elif copyright_info.has_key('3'):
+            elif '3' in copyright_info:
                 # in that case, map using subfield $3
                 material = copyright_info['3']
 
             # Retrieve what to display to user
             label = ''
-            if copyright_info.has_key('f'):
+            if 'f' in copyright_info:
                 # Copyright message. Use this as label
                 label = copyright_info['f']
-            elif copyright_info.has_key('d'):
+            elif 'd' in copyright_info:
                 # Copyright holder
                 year = ''
-                if copyright_info.has_key('g'):
+                if 'g' in copyright_info:
                     # Year was given. Use it too
                     year = "%s " % copyright_info['g']
                 label = "&copy; " + year + copyright_info['d']
@@ -103,7 +103,7 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
                     # page"
                     add_CERN_license_link_to_bibdocs.append(bibdoc_id)
 
-            elif copyright_info.has_key('e'):
+            elif 'e' in copyright_info:
                 # There is no copyright information available here?
                 # Display contact person
                 label = "Copyright info: " +  copyright_info['e']
@@ -111,13 +111,13 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
                 continue
 
             # Append our copyright to the list, for given BibDoc
-            if not copyrights_and_licenses_list.has_key(bibdoc_id) and not (material and bibdoc_id == 0):
+            if bibdoc_id not in copyrights_and_licenses_list and not (material and bibdoc_id == 0):
                 copyrights_and_licenses_list[bibdoc_id] = {'copyright':[], 'license': []}
-            elif material and not copyrights_and_licenses_list.has_key(material):
+            elif material and material not in copyrights_and_licenses_list:
                 copyrights_and_licenses_list[material] = {'copyright':[], 'license': []}
             if not (material and bibdoc_id == 0):
                 copyrights_and_licenses_list[bibdoc_id]['copyright'].append((label, copyright_info.get('d', '')))
-            elif copyrights_and_licenses_list.has_key(material):
+            elif material in copyrights_and_licenses_list:
                 copyrights_and_licenses_list[material]['copyright'].append((label, copyright_info.get('d', '')))
 
         # Now get the licenses. Try to map to a copyright
@@ -126,21 +126,21 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
             # Check to which bibdoc ID this license applies
             bibdoc_id = 0
             material = None
-            if license_info.has_key('8'):
+            if '8' in license_info:
                 try:
                     bibdoc_id = int(license_info['8'])
                 except:
                     pass
-            elif license_info.has_key('3'):
+            elif '3' in license_info:
                 # in that case, map using subfield $3
                 material = license_info['3']
             label = ''
             url = ''
             license_body = ''
-            if license_info.has_key('a'):
+            if 'a' in license_info:
                 # Terms governing use
                 label = license_info['a']
-            if license_info.has_key('b'):
+            if 'b' in license_info:
                 # Body imposing the license
                 license_body = license_info['b']
             if not url and \
@@ -150,18 +150,18 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
             if not url and license_to_url_kb:
                 # Look for URL in knowledge base
                 url = bfo.kb(license_to_url_kb, label)
-            if license_info.has_key('u'):
+            if 'u' in license_info:
                 # License URL
                 url = license_info['u']
 
             # Append our license to the list, for given BibDoc
-            if not copyrights_and_licenses_list.has_key(bibdoc_id) and not (material and bibdoc_id == 0):
+            if bibdoc_id not in copyrights_and_licenses_list and not (material and bibdoc_id == 0):
                 copyrights_and_licenses_list[bibdoc_id] = {'copyright':[], 'license': []}
-            elif material and not copyrights_and_licenses_list.has_key(material):
+            elif material and material not in copyrights_and_licenses_list:
                 copyrights_and_licenses_list[material] = {'copyright':[], 'license': []}
             if not (material and bibdoc_id == 0):
                 copyrights_and_licenses_list[bibdoc_id]['license'].append([label, license_body, url])
-            elif copyrights_and_licenses_list.has_key(material):
+            elif material in copyrights_and_licenses_list:
                 copyrights_and_licenses_list[material]['license'].append([label, license_body, url])
 
         # We also need to add the auto CERN licenses to specified BibDocs

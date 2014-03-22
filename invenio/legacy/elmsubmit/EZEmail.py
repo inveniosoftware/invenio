@@ -1203,7 +1203,7 @@ def _get_unused_random(rand_function, used_random):
 
     r = rand_function()
 
-    while used_random.has_key(r):
+    while r in used_random:
         r = rand_function()
 
     used_random[r] = True

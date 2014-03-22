@@ -70,7 +70,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
 
     main_urls = parsed_urls['main_urls']
     others_urls = parsed_urls['others_urls']
-    if parsed_urls.has_key('cern_urls'):
+    if 'cern_urls' in parsed_urls:
         cern_urls = parsed_urls['cern_urls']
 
     # Prepare style and icon
@@ -262,7 +262,7 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
         distinct_main_and_additional_files = True
     # Parse URLs
     for complete_url in urls:
-        if complete_url.has_key('u'):
+        if 'u' in complete_url:
             url = complete_url['u']
             (dummy, host, path, dummy, params, dummy) = urlparse(url)
             subformat = complete_url.get('x', '')
@@ -276,7 +276,7 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                 continue
 
             descr = _("Fulltext")
-            if complete_url.has_key('y'):
+            if 'y' in complete_url:
                 descr = complete_url['y']
                 if descr == 'Fulltext':
                     descr = _("Fulltext")
@@ -291,9 +291,9 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                         'doc.cern.ch' in url or \
                         'preprints.cern.ch' in url):
                     url_params_dict = dict([part.split('=') for part in params.split('&') if len(part.split('=')) == 2])
-                    if url_params_dict.has_key('categ') and \
+                    if 'categ' in url_params_dict and \
                            (url_params_dict['categ'].split('.', 1)[0] in cern_arxiv_categories) and \
-                           url_params_dict.has_key('id'):
+                           'id' in url_params_dict:
                         # Old arXiv links, used to be handled by
                         # setlink. Provide direct links to arXiv
                         for file_format, label in [('pdf', "PDF")]:#,
@@ -331,7 +331,7 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                         else:
                             if not descr:
                                 descr = _('Fulltext')
-                            if not parsed_urls['main_urls'].has_key(descr):
+                            if descr not in parsed_urls['main_urls']:
                                 parsed_urls['main_urls'][descr] = []
                             params_dict = parse_qs(params)
                             if 'subformat' in params_dict:

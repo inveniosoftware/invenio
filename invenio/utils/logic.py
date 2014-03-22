@@ -582,7 +582,7 @@ def occur_check(var, x, s):
 
     if var == x:
         return True
-    elif is_variable(x) and s.has_key(x):
+    elif is_variable(x) and x in s:
         return occur_check(var, s[x], s) # fixed
     # What else might x be?  an Expr, a list, a string?
     elif isinstance(x, Expr):

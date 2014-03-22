@@ -154,7 +154,7 @@ def wash_search_urlargd(form):
     """
 
     argd = wash_urlargd(form, search_results_default_urlargd)
-    if argd.has_key('as'):
+    if 'as' in argd:
         argd['aas'] = argd['as']
         del argd['as']
     if argd.get('aas', CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE) not in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES:
@@ -270,7 +270,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
-                if not form.has_key('rg'):
+                if 'rg' not in form:
                     # fetch user rg preference only if not overridden via URL
                     argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
@@ -374,7 +374,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
-                if not form.has_key('rg'):
+                if 'rg' not in form:
                     # fetch user rg preference only if not overridden via URL
                     argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
@@ -441,7 +441,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
-                if not form.has_key('rg'):
+                if 'rg' not in form:
                     # fetch user rg preference only if not overridden via URL
                     argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
@@ -578,7 +578,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         if uid > 0:
             pref = get_user_preferences(uid)
             try:
-                if not form.has_key('rg'):
+                if 'rg' not in form:
                     # fetch user rg preference only if not overridden via URL
                     argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
@@ -677,7 +677,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                     argd['c'] = CFG_SITE_NAME
 
                 # Treat `as' argument specially:
-                if argd.has_key('as'):
+                if 'as' in argd:
                     argd['aas'] = argd['as']
                     del argd['as']
                 if argd.get('aas', CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE) not in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES:
@@ -792,7 +792,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         argd = wash_urlargd(form, accepted_args)
 
         # Treat `as' argument specially:
-        if argd.has_key('as'):
+        if 'as' in argd:
             argd['aas'] = argd['as']
             del argd['as']
         if argd.get('aas', CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE) not in (0, 1):
@@ -801,7 +801,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         # If we specify no collection, then we don't need to redirect
         # the user, so that accessing <http://yoursite/> returns the
         # default collection.
-        if not form.has_key('c'):
+        if 'c' not in form:
             return display_collection(req, **argd)
 
         # make the collection an element of the path, and keep the
@@ -817,7 +817,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         # Treat `as' argument specially:
         # We are going to redirect, so replace `aas' by `as' visible argument:
-        if argd.has_key('aas'):
+        if 'aas' in argd:
             argd['as'] = argd['aas']
             del argd['aas']
 
@@ -1104,7 +1104,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
-                if not form.has_key('rg'):
+                if 'rg' not in form:
                     # fetch user rg preference only if not overridden via URL
                     argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):

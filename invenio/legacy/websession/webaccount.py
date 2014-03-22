@@ -292,7 +292,7 @@ def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0):
 
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
     prefs = get_user_preferences(uid)
-    if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']] is not None:
+    if prefs['login_method'] in CFG_EXTERNAL_AUTHENTICATION and CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']] is not None:
         CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = 3
 
     out = websession_templates.tmpl_user_preferences(

@@ -43,15 +43,15 @@ def format_element(bfo, reference_prefix, reference_suffix):
     for reference in references:
         ref_out = ''
 
-        if reference.has_key('o'):
+        if 'o' in reference:
             if out != "":
                 ref_out = '</li>'
             ref_out += "<li><small>"+ reference['o']+ "</small> "
 
-        if reference.has_key('m'):
+        if 'm' in reference:
             ref_out += "<small>"+ reference['m']+ "</small> "
 
-        if reference.has_key('r'):
+        if 'r' in reference:
             if CFG_ADS_SITE:
                 # 999 $r contains external sysno to be resolved:
                 recid_to_display = get_mysql_recid_from_aleph_sysno(reference['r'])
@@ -65,7 +65,7 @@ def format_element(bfo, reference_prefix, reference_suffix):
                        '&amp;ln=' + bfo.lang + \
                        '">'+ reference['r']+ "</a>] </small> <br />"
 
-        if reference.has_key('t'):
+        if 't' in reference:
             ejournal = bfo.kb("ejournals", reference.get('t', ""))
             if ejournal != "":
                 ref_out += ' <small> <a href="https://cds.cern.ch/ejournals.py?publication='\

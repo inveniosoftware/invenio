@@ -49,17 +49,17 @@ class AsyncDownloadTest(InvenioTestCase):
             """Function called when a page is received."""
             is_ok = pagegetter.status is not None
 
-            if check.has_key('content') and is_ok:
+            if 'content' in check and is_ok:
                 is_ok = pagegetter.data.find(check['content']) > 0
 
-            check['result'] = is_ok == check.has_key('content')
+            check['result'] = is_ok == ('content' in check)
 
         pagegetters = [HTTPAsyncPageGetter(check['url']) for check in checks]
         finished_list = async_download(pagegetters, finished, checks, 20)
 
         for (finished, check) in zip(finished_list, checks):
             if not finished:
-                check['result'] = not check.has_key('content')
+                check['result'] = 'content' not in check
 
         errors = [check for check in checks if not check['result']]
 

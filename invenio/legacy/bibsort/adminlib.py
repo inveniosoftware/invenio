@@ -402,7 +402,7 @@ def perform_modifytranslations(ln, bsrID, trans=None, confirm=0):
 
     bsr_dict = dict(get_i8n_name(bsrID, ln, sel_type, table_name))
 
-    if bsrID and bsr_dict.has_key(bsrID):
+    if bsrID and bsrID in bsr_dict:
         header = ['Language', 'Translation']
         actions = []
         if not confirm:

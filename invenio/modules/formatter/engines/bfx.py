@@ -269,9 +269,9 @@ class BFXParser:
         #test mode
         attrs = get_node_attributes(node)
         #get template name and give control to ctl_template
-        if attrs.has_key('name'):
+        if 'name' in attrs:
             name = attrs['name']
-            if self.templates.has_key(name):
+            if name in self.templates:
                 try:
                     raise InvenioBibFormatBfxError(_('Duplicate name: %(x_name)s.', x_name=name))
                 except InvenioBibFormatBfxError as exc:
@@ -303,9 +303,9 @@ class BFXParser:
         #test mode
         attrs = get_node_attributes(node)
         #get template name
-        if attrs.has_key('name'):
+        if 'name' in attrs:
             name = attrs['name']
-            if self.templates.has_key(name):
+            if name in self.templates:
                 try:
                     raise InvenioBibFormatBfxError(_('Duplicate name: %(x_name)s.', x_name=name))
                 except InvenioBibFormatBfxError as exc:
@@ -322,7 +322,7 @@ class BFXParser:
                 logging.error(exc.message)
             return None
         #get template description
-        if attrs.has_key('description'):
+        if 'description' in attrs:
             description = attrs['description']
         else:
             description = ''
@@ -333,7 +333,7 @@ class BFXParser:
                 logging.warning(exc.message)
         self.templates[name]['description'] = description
         #get content-type of resulting output
-        if attrs.has_key('content'):
+        if 'content' in attrs:
             content_type = attrs['content']
         else:
             content_type = 'text/xml'
@@ -358,7 +358,7 @@ class BFXParser:
             return None
         #exec mode
         attrs = get_node_attributes(node)
-        if not attrs.has_key('name'):
+        if 'name' not in attrs:
             try:
                 raise InvenioBibFormatBfxError(_('Missing attribute "name" in TEMPLATE_REF.'))
             except InvenioBibFormatBfxError as exc:
@@ -367,7 +367,7 @@ class BFXParser:
             return None
         name = attrs['name']
         #first check for a template in the same file, that is in the already cached templates
-        if self.templates.has_key(name):
+        if name in self.templates:
             node_to_walk = self.templates[name]['node']
             self.walk(node_to_walk, out_file)
         else:
@@ -390,7 +390,7 @@ class BFXParser:
             return None
         #exec mode
         parameters = get_node_attributes(node)
-        if not parameters.has_key('name'):
+        if 'name' not in parameters:
             try:
                 raise InvenioBibFormatBfxError(_('Missing attribute "name" in ELEMENT.'))
             except InvenioBibFormatBfxError as exc:
@@ -416,7 +416,7 @@ class BFXParser:
             return None
         #exec mode
         attrs = get_node_attributes(node)
-        if not attrs.has_key('name'):
+        if 'name' not in attrs:
             try:
                 raise InvenioBibFormatBfxError(_('Missing attribute "name" in FIELD.'))
             except InvenioBibFormatBfxError as exc:
@@ -424,7 +424,7 @@ class BFXParser:
                 logging.error(exc.message)
             return None
         display = ''
-        if attrs.has_key('display'):
+        if 'display' in attrs:
             display = attrs['display']
         var = attrs['name']
         if not self.translator.is_defined(var):
@@ -449,7 +449,7 @@ class BFXParser:
             return None
         #exec mode
         attrs = get_node_attributes(node)
-        if not attrs.has_key('value'):
+        if 'value' not in attrs:
             try:
                 raise InvenioBibFormatBfxError(_('Missing attribute "value" in TEXT.'))
             except InvenioBibFormatBfxError as exc:
@@ -475,7 +475,7 @@ class BFXParser:
             return None
         #exec mode
         attrs = get_node_attributes(node)
-        if not attrs.has_key('object'):
+        if 'object' not in attrs:
             try:
                 raise InvenioBibFormatBfxError(_('Missing attribute "object" in LOOP.'))
             except InvenioBibFormatBfxError as exc:
@@ -525,7 +525,7 @@ class BFXParser:
             return None
         #exec mode
         attrs = get_node_attributes(node)
-        if not attrs.has_key('name'):
+        if 'name' not in attrs:
             try:
                 raise InvenioBibFormatBfxError(_('Missing attrbute "name" in IF.'))
             except InvenioBibFormatBfxError as exc:
@@ -544,59 +544,59 @@ class BFXParser:
         value = self.translator.get_value(var)
         value = value.strip()
         #equal
-        if attrs.has_key('eq'):
+        if 'eq' in attrs:
             pattern = attrs['eq']
             if is_number(pattern) and is_number(value):
                 result = (float(value)==float(pattern))
             else:
                 result = (value==pattern)
         #not equal
-        elif attrs.has_key('neq'):
+        elif 'neq' in attrs:
             pattern = attrs['neq']
             if is_number(pattern) and is_number(value):
                 result = (float(value)!=float(pattern))
             else:
                 result = (value!=pattern)
         #lower than
-        elif attrs.has_key('lt'):
+        elif 'lt' in attrs:
             pattern = attrs['lt']
             if is_number(pattern) and is_number(value):
                 result = (float(value)<float(pattern))
             else:
                 result = (value<pattern)
         #greater than
-        elif attrs.has_key('gt'):
+        elif 'gt' in attrs:
             pattern = attrs['gt']
             if is_number(pattern) and is_number(value):
                 result = (float(value)>float(pattern))
             else:
                 result = (value>pattern)
         #lower or equal than
-        elif attrs.has_key('le'):
+        elif 'le' in attrs:
             pattern = attrs['le']
             if is_number(pattern) and is_number(value):
                 result = (float(value)<=float(pattern))
             else:
                 result = (value<=pattern)
         #greater or equal than
-        elif attrs.has_key('ge'):
+        elif 'ge' in attrs:
             pattern = attrs['ge']
             if is_number(pattern) and is_number(value):
                 result = (float(value)>=float(pattern))
             else:
                 result = (value>=pattern)
         #in
-        elif attrs.has_key('in'):
+        elif 'in' in attrs:
             pattern = attrs['in']
             values = pattern.split()
             result = (value in values)
         #not in
-        elif attrs.has_key('nin'):
+        elif 'nin' in attrs:
             pattern = attrs['nin']
             values = pattern.split()
             result = (value not in values)
         #match against a regular expression
-        elif attrs.has_key('like'):
+        elif 'like' in attrs:
             pattern = attrs['like']
             try:
                 expr = re.compile(pattern)
@@ -730,7 +730,7 @@ class MARCTranslator:
                 else:
                     parent_name = match.group('parent')
                     if parent_name:
-                        if not self.memory.has_key(parent_name):
+                        if parent_name not in self.memory:
                             try:
                                 raise InvenioBibFormatBfxError(_('Field %(x_field)s is not defined.',x_field=parent_name))
                             except InvenioBibFormatBfxError as exc:
@@ -776,7 +776,7 @@ class MARCTranslator:
         todo: define variable types in config file, remove this function, results in a clearer concept
         '''
         level = 0 #default value
-        if self.memory.has_key(name):
+        if name in self.memory:
             expr = re.compile(address_pattern)
             if self.memory[name]['addresses']:
                 match = expr.match(self.memory[name]['addresses'][0])
@@ -800,7 +800,7 @@ class MARCTranslator:
         Check whether a variable is defined.
         @param name: the name of the variable
         '''
-        return self.memory.has_key(name)
+        return name in self.memory
 
     def get_num_elements(self, name):
         '''
@@ -1006,7 +1006,7 @@ def convert_record(old_record):
                 for old_subfield in old_field_instance[0]:
                     new_code = old_subfield[0]
                     new_value = old_subfield[1]
-                    if new_field_instance.has_key(new_code):
+                    if new_code in new_field_instance:
                         try:
                             raise InvenioBibFormatBfxError(_('Repeating subfield codes in the same instance!'))
                         except InvenioBibFormatBfxError as exc:
@@ -1014,7 +1014,7 @@ def convert_record(old_record):
                             logging.error(exc.message)
 #                        print 'Error: Repeating subfield codes in the same instance!'
                     new_field_instance[new_code] = new_value
-                if not fields.has_key(new_tag):
+                if new_tag not in fields:
                     fields[new_tag] = []
                 fields[new_tag].append(new_field_instance)
     return fields
@@ -1048,9 +1048,9 @@ def record_fields_value(record, tag, subfield):
     @param subfield: a subfield code; required
     '''
     output = []
-    if record.has_key(tag):
+    if tag in record:
         for field_instance in record[tag]:
-            if field_instance.has_key(subfield):
+            if subfield in field_instance:
                 output.append(field_instance[subfield])
     return output
 
@@ -1063,7 +1063,7 @@ def record_add_field_instance(record, tag, field_instance):
     @param field_instance: the field instance to add
     @return: None
     '''
-    if not record.has_key(tag):
+    if tag not in record:
         record[tag] = []
     record[tag] = [field_instance] + record[tag]
     return None
@@ -1215,12 +1215,12 @@ def merge(record1, record2):
         if new_field_instances:
             #controlfield
             if len(tag) == 3:
-                if not new_record.has_key(tag):
+                if tag not in new_record:
                     new_record[tag] = []
                     new_record[tag].extend(new_field_instances)
             #datafield
             if len(tag) == 5:
-                if not new_record.has_key(tag):
+                if tag not in new_record:
                     new_record[tag] = []
                 new_record[tag].extend(new_field_instances)
     return new_record

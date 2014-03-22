@@ -495,7 +495,7 @@ class InvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsParser)
         """Parse buffer to extract records. Format the records using the selected output format."""
 
         (recids, records) = self.parse_and_extract_records(of)
-        if req and cgi.parse_qs(req.args).has_key('jrec'):
+        if req and 'jrec' in cgi.parse_qs(req.args):
             counter = int(cgi.parse_qs(req.args)['jrec'][0]) - 1
         else:
             counter = 0

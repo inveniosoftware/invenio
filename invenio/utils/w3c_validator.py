@@ -63,7 +63,7 @@ def w3c_validate(text, host=CFG_W3C_VALIDATOR_HOST,
     h = _post_multipart(host, selector, \
         [('output', 'soap12')], [('uploaded_file', 'foobar.html', text)])
     errcode, errmsg, headers = h.getreply()
-    if headers.has_key('X-W3C-Validator-Status'):
+    if 'X-W3C-Validator-Status' in headers:
         if headers['X-W3C-Validator-Status'] == 'Valid':
             return (True, [], [])
         else:
@@ -104,7 +104,7 @@ def w3c_validate_p(text, host=CFG_W3C_VALIDATOR_HOST,
     h = _post_multipart(host, selector, \
         [('output', 'soap12')], [('uploaded_file', 'foobar.html', text)])
     errcode, errmsg, headers = h.getreply()
-    if headers.has_key('X-W3C-Validator-Status'):
+    if 'X-W3C-Validator-Status' in headers:
         return headers['X-W3C-Validator-Status'] == 'Valid'
     return False
 

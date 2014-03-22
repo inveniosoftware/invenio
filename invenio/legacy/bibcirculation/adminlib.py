@@ -3991,7 +3991,7 @@ def register_ill_from_proposal(req, ill_request_id, bor_id=None, ln=CFG_SITE_LAN
         else:
             bid = bor_id
 
-        if book_info.has_key('recid') and bid:
+        if 'recid' in book_info and bid:
             recid = book_info['recid']
             if not db.has_loan_request(bid, recid, ill=1):
                 db.tag_requests_as_done(bid, recid=recid)
@@ -4895,7 +4895,7 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status,
         book_info = db.get_ill_book_info(ill_request_id)
         if looks_like_dictionary(book_info):
             book_info = eval(book_info)
-            if book_info.has_key('recid'):
+            if 'recid' in book_info:
                 subject += "'" + book_title_from_MARC(int(book_info['recid'])) + "'"
         bid = db.get_ill_borrower(ill_request_id)
         msg = load_template("ill_received")
@@ -5035,7 +5035,7 @@ def purchase_details_step2(req, delete_key, ill_request_id, new_status,
         book_info = db.get_ill_book_info(ill_request_id)
         if looks_like_dictionary(book_info):
             book_info = eval(book_info)
-            if book_info.has_key('recid'):
+            if 'recid' in book_info:
                 bid = db.get_ill_borrower(ill_request_id)
                 if db.has_loan_request(bid, book_info['recid']):
                     subject += "'" + book_title_from_MARC(int(book_info['recid'])) + "'"
@@ -5072,7 +5072,7 @@ def purchase_details_step2(req, delete_key, ill_request_id, new_status,
         book_info = db.get_ill_book_info(ill_request_id)
         if looks_like_dictionary(book_info):
             book_info = eval(book_info)
-            if book_info.has_key('recid'):
+            if 'recid' in book_info:
                 subject += "'" + book_title_from_MARC(int(book_info['recid'])) + "'"
         bid = db.get_ill_borrower(ill_request_id)
 

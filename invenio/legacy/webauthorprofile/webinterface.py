@@ -240,7 +240,7 @@ class WebAuthorPages(WebInterfaceDirectory):
         else:
             self.person_id = self.original_search_parameter
 
-        if form.has_key('jsondata'):
+        if 'jsondata' in form:
             req.content_type = "application/json"
             self.create_authorpage_websearch(req, form, self.person_id, ln)
             return
@@ -458,7 +458,7 @@ class WebAuthorPages(WebInterfaceDirectory):
         #not_complete = False in eval
         #req.write(str(eval))
 
-        if form.has_key('jsondata'):
+        if 'jsondata' in form:
             json_response = {'boxes_info': {}}
             json_data = json.loads(str(form['jsondata']))
             json_data = json_unicode_to_utf8(json_data)

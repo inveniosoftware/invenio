@@ -219,7 +219,7 @@ def perform_request_format_template_show_attributes(bft, ln=CFG_SITE_LANG, new=F
     all_templates = []
     if new:
         all_templates_attrs = bibformat_engine.get_format_templates(with_attributes=True)
-        if all_templates_attrs.has_key(bft): # Sanity check. Should always be true at this stage
+        if bft in all_templates_attrs: # Sanity check. Should always be true at this stage
             del all_templates_attrs[bft] # Remove in order not to make a duplicate of self..
 
     # Sort according to name, inspired from Python Cookbook
@@ -1061,7 +1061,7 @@ def get_elements_used_by_template(filename):
     format_elements_iter = bibformat_engine.pattern_tag.finditer(code)
     for result in format_elements_iter:
         function_name = result.group("function_name").lower()
-        if function_name is not None and not format_elements.has_key(function_name) \
+        if function_name is not None and function_name not in format_elements \
                and not function_name == "field":
             filename = bibformat_engine.resolve_format_element_filename("BFE_"+function_name)
             if filename is not None:
@@ -1071,7 +1071,7 @@ def get_elements_used_by_template(filename):
                                                   'tags':tags}
         elif function_name == "field":
             # Handle bfe_field element in a special way
-            if not format_elements.has_key(function_name):
+            if function_name not in format_elements:
                 #Indicate usage of bfe_field if not already done
                 filename = bibformat_engine.resolve_format_element_filename("BFE_"+function_name)
                 format_elements[function_name] = {'name':function_name.lower(),

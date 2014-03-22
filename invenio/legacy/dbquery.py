@@ -129,7 +129,7 @@ def _db_login(dbhost=None, relogin=0):
         connection.autocommit(True)
         return connection
     else:
-        if _DB_CONN[dbhost].has_key(thread_ident):
+        if thread_ident in _DB_CONN[dbhost]:
             return _DB_CONN[dbhost][thread_ident]
         else:
             connection = _DB_CONN[dbhost][thread_ident] = connect(host=dbhost,

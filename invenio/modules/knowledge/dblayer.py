@@ -171,7 +171,7 @@ def get_kb_dyn_config(kb_id):
         mydict['expression'] = row[1]
         mydict['coll_id'] = row[2]
     #put a collection field if collection exists..
-    if mydict.has_key('coll_id'):
+    if 'coll_id' in mydict:
         c_id =  mydict['coll_id']
         res = run_sql("""SELECT name from collection where id = %s""", (c_id,))
         if res:

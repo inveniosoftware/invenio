@@ -840,10 +840,10 @@ class BibRecordDeleteFieldFromTest(InvenioTestCase):
         bibrecord.record_delete_field(self.rec, "100", field_position_global=4)
         self.assertEqual(self.rec['100'], [([('a', 'Doe1, John')], ' ', ' ', '', 3)])
         bibrecord.record_delete_field(self.rec, "100", field_position_global=3)
-        self.failIf(self.rec.has_key('100'))
+        self.failIf('100' in self.rec)
         bibrecord.record_delete_field(self.rec, "001", field_position_global=1)
         bibrecord.record_delete_field(self.rec, "245", field_position_global=6)
-        self.failIf(self.rec.has_key('001'))
+        self.failIf('001' in self.rec)
         self.assertEqual(self.rec['245'], [([('a', 'On the foo and bar1')], ' ', '1', '', 5)])
 
         # Some crash tests

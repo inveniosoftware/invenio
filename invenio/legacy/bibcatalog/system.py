@@ -166,9 +166,9 @@ def get_bibcat_from_prefs(uid):
        @rtype: tuple
     """
     user_pref = get_user_preferences(uid)
-    if not user_pref.has_key('bibcatalog_username'):
+    if 'bibcatalog_username' not in user_pref:
         return (None, None)
-    if not user_pref.has_key('bibcatalog_password'):
+    if 'bibcatalog_password' not in user_pref:
         return (None, None)
     return (user_pref['bibcatalog_username'], user_pref['bibcatalog_password'])
 

@@ -91,7 +91,7 @@ def get_refers_to(recordid):
     """Return a list of records referenced by this record"""
     ret = []
     cache_cited_by_dictionary = get_citation_dict("reversedict")
-    if cache_cited_by_dictionary.has_key(recordid):
+    if recordid in cache_cited_by_dictionary:
         ret = cache_cited_by_dictionary[recordid]
     return ret
 
@@ -99,7 +99,7 @@ def get_cited_by(recordid):
     """Return a list of records that cite recordid"""
     ret = []
     cache_cited_by_dictionary = get_citation_dict("citationdict")
-    if cache_cited_by_dictionary.has_key(recordid):
+    if recordid in cache_cited_by_dictionary:
         ret = cache_cited_by_dictionary[recordid]
     return ret
 
@@ -266,7 +266,7 @@ def get_self_cited_by(record_id):
     """
     cache_selfcit_dictionary = get_citation_dict("selfcitdict")
     result = []
-    if cache_selfcit_dictionary and cache_selfcit_dictionary.has_key(record_id):
+    if cache_selfcit_dictionary and record_id in cache_selfcit_dictionary:
         result.extend(cache_selfcit_dictionary[record_id])
     if not result:
         return None
@@ -278,7 +278,7 @@ def get_self_cited_in(record_id):
     """
     cache_selfcitedby_dictionary = get_citation_dict("selfcitedbydict")
     result = []
-    if cache_selfcitedby_dictionary and cache_selfcitedby_dictionary.has_key(record_id):
+    if cache_selfcitedby_dictionary and record_id in cache_selfcitedby_dictionary:
         result.extend(cache_selfcitedby_dictionary[record_id])
     if not result:
         return None
@@ -301,7 +301,7 @@ def calculate_co_cited_with_list(record_id, sort_order="d"):
         if cache_reference_list_dictionary:
             reference_list = cache_reference_list_dictionary.get(cit_id, [])
         for ref_id in reference_list:
-            if not result_intermediate.has_key(ref_id):
+            if ref_id not in result_intermediate:
                 result_intermediate[ref_id] = 1
             else: result_intermediate[ref_id] += 1
     for key, value in iteritems(result_intermediate):

@@ -662,7 +662,7 @@ def perform_modifyindextranslations(idxID, ln=CFG_SITE_LANG, sel_type='', trans=
     if confirm in ["2", 2] and idxID:
         finresult = modify_translations(idxID, langs, sel_type, trans, "idxINDEX")
     idx_dict = dict(get_def_name('', "idxINDEX"))
-    if idxID and idx_dict.has_key(int(idxID)):
+    if idxID and int(idxID) in idx_dict:
         idxID = int(idxID)
         subtitle = """<a name="2"></a>2. Modify translations for index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
 
@@ -741,7 +741,7 @@ def perform_modifyfieldtranslations(fldID, ln=CFG_SITE_LANG, sel_type='', trans=
     if confirm in ["2", 2] and fldID:
         finresult = modify_translations(fldID, langs, sel_type, trans, "field")
     fld_dict = dict(get_def_name('', "field"))
-    if fldID and fld_dict.has_key(int(fldID)):
+    if fldID and int(fldID) in fld_dict:
         fldID = int(fldID)
         subtitle = """<a name="3"></a>3. Modify translations for logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[fldID], CFG_SITE_URL)
 
@@ -838,7 +838,7 @@ def perform_showdetailsfieldtag(fldID, tagID, ln=CFG_SITE_LANG, callback="yes", 
 
     res = run_sql("SELECT id_field,id_tag FROM field_tag,tag WHERE tag.id=field_tag.id_tag AND tag.value like %s", (tag, ))
     for (id_field, id_tag) in res:
-        if not exist.has_key(id_field):
+        if id_field not in exist:
             output += "%s, " % fld_dict[int(id_field)]
 
     body = [output]
@@ -870,7 +870,7 @@ def perform_showdetailsfield(fldID, ln=CFG_SITE_LANG, callback="yes", confirm=-1
             output += "<br /><b>%s:&nbsp;</b>" % sort_types[ftype]
             ltype = ftype
             exist = {}
-        if not exist.has_key(id_collection):
+        if id_collection not in exist:
             output += "%s, " % col_dict[int(id_collection)]
         exist[id_collection] = 1
 
@@ -925,7 +925,7 @@ def perform_deletefield(fldID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     """
 
     fld_dict = dict(get_def_name('', "field"))
-    if not fld_dict.has_key(int(fldID)):
+    if int(fldID) not in fld_dict:
         return """<b><span class="info">Field does not exist</span></b>"""
 
     subtitle = """<a name="4"></a>4. Delete the logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[int(fldID)], CFG_SITE_URL)
@@ -1871,7 +1871,7 @@ def perform_addtag(fldID, ln=CFG_SITE_LANG, value=['',-1], name='', callback="ye
     fld_tags = dict(map(lambda x: (x[1], x[0]), fld_tags))
 
     for (id_tag, tname, tvalue) in tags:
-        if not fld_tags.has_key(id_tag):
+        if id_tag not in fld_tags:
             text += """<option value="%s" %s>%s</option>""" % (tvalue, (tvalue==value[1] and 'selected="selected"' or ''), "%s - %s" % (tvalue, tname))
     text += """</select>"""
 
@@ -2086,7 +2086,7 @@ def perform_deletetag(fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm
     text += """<option value="-1">- Select MARC tag -"""
     i = 0
     for (id, name, value) in tags:
-        if not fld_tag.has_key(id):
+        if id not in fld_tag:
             text += """<option value="%s" %s>%s</option>""" % (id, id  == int(tagID) and 'selected="selected"' or '', "%s - %s" % (value, name))
             i += 1
 
@@ -2749,7 +2749,7 @@ def get_lang_list(table, field, id):
     exists = {}
     lang = ''
     for lng in langs:
-        if not exists.has_key(lng[0]):
+        if lng[0] not in exists:
             lang += lng[0] + ", "
         exists[lng[0]] = 1
     if lang.endswith(", "):

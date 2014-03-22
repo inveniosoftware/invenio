@@ -617,7 +617,7 @@ def task_get_option(key, default=None):
 def task_has_option(key):
     """Map the has_key query to _OPTIONS"""
     try:
-        return _OPTIONS.has_key(key)
+        return key in _OPTIONS
     except NameError:
         return False
 

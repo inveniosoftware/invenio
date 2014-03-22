@@ -209,7 +209,7 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
             until_p = field == 'until' # Is it related to dates?
             from_p = field == 'from' # Idem.
             next_expr_p = False # Silly flag to break 2 for cycles
-            if not user_info.has_key(field) and not from_p and not until_p:
+            if field not in user_info and not from_p and not until_p:
                 continue
             for reg_p, expr in expressions_list: # For every element in the rule
                 if group_p: # Special case: groups
