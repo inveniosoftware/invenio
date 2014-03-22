@@ -29,9 +29,8 @@ import six
 import sys
 import re
 import textwrap
-import htmlentitydefs
 import pkg_resources
-from invenio.base.globals import cfg
+from six.moves import html_entities
 try:
     import chardet
     CHARDET_AVAILABLE = True
@@ -674,7 +673,7 @@ def xml_entities_to_utf8(text, skip=('lt', 'gt', 'amp')):
             # named entity
             if text[1:-1] not in skip:
                 try:
-                    text = unichr(htmlentitydefs.name2codepoint[text[1:-1]]).encode("utf-8")
+                    text = unichr(html_entities.name2codepoint[text[1:-1]]).encode("utf-8")
                 except KeyError:
                     pass
         return text # leave as is

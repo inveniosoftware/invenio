@@ -37,7 +37,7 @@ import threading
 import time
 
 from logging import DEBUG, getLogger
-from htmlentitydefs import entitydefs
+from six.moves.html_entities import entitydefs
 from optparse import OptionParser
 from six import iteritems
 

@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import re
 from HTMLParser import HTMLParser
 import textwrap
-import htmlentitydefs
+from six.moves import html_entities
 
 from invenio.config import \
      CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL, \
@@ -152,7 +152,7 @@ class RecordHTMLParser(HTMLParser):
             # &amp;nbsp; will be considered as a &nbsp;
             self.result += '&nbsp;'
             return
-        char_code = htmlentitydefs.name2codepoint.get(name, None)
+        char_code = html_entities.name2codepoint.get(name, None)
         if char_code is not None:
             try:
                 self.result += unichr(char_code).encode("utf-8")
