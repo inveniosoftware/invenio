@@ -79,7 +79,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         self.req = self._get_request_info()
         acc = {}
 
-        if uid > 0:
+        if uid is not None and uid > 0:
             data = self._login(uid, force)
             acc = self._precache(data, force)
         else:
