@@ -95,7 +95,7 @@ def get_cache(taxonomy_id):
     # invenio.data_cacher.DataCacher, but it has no effect
     # on proper functionality.
 
-    if _CACHE.has_key(taxonomy_id):
+    if taxonomy_id in _CACHE:
         ctime, taxonomy = _CACHE[taxonomy_id]
 
         # check it is fresh version

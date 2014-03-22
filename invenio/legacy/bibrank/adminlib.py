@@ -105,7 +105,7 @@ def perform_modifycollection(rnkID='', ln=CFG_SITE_LANG, func='', colID='', conf
 
         col_list = get_def_name('', "collection")
         col_rnk = dict(get_rnk_col(rnkID))
-        col_list = filter(lambda x: not col_rnk.has_key(x[0]), col_list)
+        col_list = filter(lambda x: x[0] not in col_rnk, col_list)
 
         if col_list:
             text  = """
@@ -184,7 +184,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
 
     rnk_name = get_def_name(rnkID, "rnkMETHOD")[0][1]
     rnk_dict = dict(get_i8n_name('', ln, get_rnk_nametypes()[0][0], "rnkMETHOD"))
-    if rnkID and rnk_dict.has_key(int(rnkID)):
+    if rnkID and int(rnkID) in rnk_dict:
         rnkID = int(rnkID)
         subtitle = """<a name="3">3. Modify translations for rank method '%s'</a>""" % rnk_name
 
@@ -547,11 +547,11 @@ def perform_showrankdetails(rnkID, ln=CFG_SITE_LANG):
     languages = dict(get_languages())
     if trans:
         for lang, type, name in trans:
-            if lang and languages.has_key(lang) and type and name:
+            if lang and lang in languages and type and name:
                 if prev_lang != lang:
                     prev_lang = lang
                     text += """%s: <br />""" % (languages[lang])
-                if types.has_key(type):
+                if type in types:
                     text+= """<span style="margin-left: 10px">'%s'</span><span class="note">(%s)</span><br />""" % (name, types[type])
     else:
         text = """No translations exists"""
@@ -629,7 +629,7 @@ def get_rnk_col(rnkID, ln=CFG_SITE_LANG):
     try:
         res1 = dict(run_sql("SELECT id_collection, '' FROM collection_rnkMETHOD WHERE id_rnkMETHOD=%s" % rnkID))
         res2 = get_def_name('', "collection")
-        result = filter(lambda x: res1.has_key(x[0]), res2)
+        result = filter(lambda x: x[0] in res1, res2)
         return result
     except StandardError as e:
         return ()
@@ -957,14 +957,14 @@ def get_i8n_name(ID, ln, rtype, table):
             else:
                 res1 = run_sql("SELECT id_%s,value FROM %s%s WHERE ln='%s' and type='%s'"  % (table, table, name, CFG_SITE_LANG, rtype))
             res2 = dict(res)
-            result = filter(lambda x: not res2.has_key(x[0]), res1)
+            result = filter(lambda x: x[0] not in res2, res1)
             res = res + result
         if ID:
             res1 = run_sql("SELECT id,name FROM %s where id=%s" % (table, ID))
         else:
             res1 = run_sql("SELECT id,name FROM %s" % table)
         res2 = dict(res)
-        result = filter(lambda x: not res2.has_key(x[0]), res1)
+        result = filter(lambda x: x[0] not in res2, res1)
         res = res + result
         res = list(res)
         res.sort(compare_on_val)

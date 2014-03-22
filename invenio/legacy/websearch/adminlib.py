@@ -109,7 +109,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
         finresult = modify_translations(colID, sitelangs, sel_type, trans, "collection")
     col_dict = dict(get_def_name('', "collection"))
 
-    if colID and col_dict.has_key(int(colID)):
+    if colID and int(colID) in col_dict:
         colID = int(colID)
         subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a href="%s/help/admin/websearch-admin-guide#3.3">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
@@ -182,7 +182,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
 
     col_dict = dict(get_def_name('', "collection"))
     rnk_dict = dict(get_def_name('', "rnkMETHOD"))
-    if colID and col_dict.has_key(int(colID)):
+    if colID and int(colID) in col_dict:
         colID = int(colID)
         if func in ["0", 0] and confirm in ["1", 1]:
             finresult = attach_rnk_col(colID, rnkID)
@@ -208,7 +208,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
 
         rnk_list = get_def_name('', "rnkMETHOD")
         rnk_dict_in_col = dict(get_col_rnk(colID, ln))
-        rnk_list = filter(lambda x: not rnk_dict_in_col.has_key(x[0]), rnk_list)
+        rnk_list = filter(lambda x: x[0] not in rnk_dict_in_col, rnk_list)
         if rnk_list:
             text  = """
             <span class="adminlabel">Enable:</span>
@@ -387,7 +387,7 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
     output  = ""
 
     col_dict = dict(get_def_name('', "collection"))
-    if colID and col_dict.has_key(int(colID)):
+    if colID and int(colID) in col_dict:
         colID = int(colID)
         subtitle = """<a name="1">1. Modify collection query for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.1">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
@@ -742,7 +742,7 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
     if pbxID not in [-1, "-1"] and confirm in [1, "1"]:
         ares = get_pbx()
         pbx_dict = dict(map(lambda x: (x[0], x[1]), ares))
-        if pbx_dict.has_key(int(pbxID)):
+        if int(pbxID) in pbx_dict:
             pname = pbx_dict[int(pbxID)]
             ares = delete_pbx(int(pbxID))
         else:
@@ -761,7 +761,7 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
         """
         text += """<option value="-1">- Select portalbox -"""
         for (id, t_title, t_body) in res:
-            if not col_pbx.has_key(id):
+            if id not in col_pbx:
                 text += """<option value="%s" %s>%s - %s...""" % (id, id  == int(pbxID) and 'selected="selected"' or '', t_title, cgi.escape(t_body[0:10]))
             text += "</option>"
         text += """</select><br />"""
@@ -1223,10 +1223,10 @@ def perform_rearrangefieldvalue(colID, fldID, ln, callback='yes', confirm=-1):
     col_fldv = dict(map(lambda x: (x[1], x[0]), col_fldv))
     fldv_names = get_fld_value()
     fldv_names = map(lambda x: (x[0], x[1]), fldv_names)
-    if not col_fldv.has_key(None):
+    if None not in col_fldv:
         vscore = len(col_fldv)
         for (fldvID, name) in fldv_names:
-            if col_fldv.has_key(fldvID):
+            if fldvID in col_fldv:
                 run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s", (vscore, colID, fldID, fldvID))
                 vscore -= 1
         output += write_outcome((1, ""))
@@ -1251,7 +1251,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
     if len(col_fld) > 0:
         score = len(col_fld)
         for (fldID, name) in fld_names:
-            if col_fld.has_key(fldID):
+            if fldID in col_fld:
                 run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s", (score, colID, fldID))
                 score -= 1
         output += write_outcome((1, ""))
@@ -1351,7 +1351,7 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
     <option value="-1">- Select field -</option>
     """
     for (id, var) in res:
-        if fmeth == 'seo' or (fmeth != 'seo' and not col_fld.has_key(id)):
+        if fmeth == 'seo' or (fmeth != 'seo' and id not in col_fld):
             text += """<option value="%s" %s>%s</option>
             """ % (id, '', fld_dict[id])
 
@@ -1850,7 +1850,7 @@ def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm
         <option value="-1">- Select output format -</option>
         """
         for (id, name) in res:
-            if not col_fmt.has_key(id):
+            if id not in col_fmt:
                 text += """<option value="%s" %s>%s</option>
                 """ % (id, id  == int(fmtID) and 'selected="selected"' or '', name)
         text += """</select><br />
@@ -1905,7 +1905,7 @@ def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
         """
         text += """<option value="-1">- Select output format -"""
         for (id, name) in res:
-            if not col_fmt.has_key(id):
+            if id not in col_fmt:
                 text += """<option value="%s" %s>%s""" % (id, id  == int(fmtID) and 'selected="selected"' or '', name)
             text += "</option>"
         text += """</select><br />"""
@@ -1983,7 +1983,7 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
 
     output = ""
     fin_output = ""
-    if not col_dict.has_key(1):
+    if 1 not in col_dict:
         res = add_col(CFG_SITE_NAME, '')
         if res:
             fin_output += """<b><span class="info">Created root collection.</span></b><br />"""
@@ -2064,7 +2064,7 @@ def show_coll_not_in_tree(colID, ln, col_dict):
     res = run_sql("SELECT id from collection")
     if len(res) != len(in_tree):
         for id in res:
-            if not in_tree.has_key(id[0]):
+            if id[0] not in in_tree:
                 output += """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a> ,
                 """ % (CFG_SITE_URL, id[0], ln, col_dict[id[0]])
         output += "<br /><br />"
@@ -2222,7 +2222,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     """ % CFG_SITE_URL
 
     col_dict = dict(get_def_name('', "collection"))
-    if colID != 1 and colID and col_dict.has_key(int(colID)):
+    if colID != 1 and colID and int(colID) in col_dict:
         colID = int(colID)
         subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.4">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
         res = run_sql("SELECT id_dad,id_son,type,score from collection_collection WHERE id_dad=%s", (colID, ))
@@ -2269,7 +2269,7 @@ def perform_editcollection(colID=1, ln=CFG_SITE_LANG, mtype='', content=''):
 
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
-    if not col_dict.has_key(colID):
+    if colID not in col_dict:
         return """<b><span class="info">Collection deleted.</span></b>
         """
 
@@ -2462,7 +2462,7 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
 
     col_dict = dict(get_def_name('', "collection"))
     action_id = acc_get_action_id(VIEWRESTRCOLL)
-    if colID and col_dict.has_key(int(colID)):
+    if colID and int(colID) in col_dict:
         colID = int(colID)
         subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.2">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
@@ -2810,7 +2810,7 @@ def get_col_rnk(colID, ln):
     try:
         res1 = dict(run_sql("SELECT id_rnkMETHOD, '' FROM collection_rnkMETHOD WHERE id_collection=%s", (colID, )))
         res2 = get_def_name('', "rnkMETHOD")
-        result = filter(lambda x: res1.has_key(x[0]), res2)
+        result = filter(lambda x: x[0] in res1, res2)
         return result
     except StandardError as e:
         return ()
@@ -3412,7 +3412,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
     if len(res) > 0:
         tabs_state = res[0][0].split(';')
         for tab_state in tabs_state:
-            if tabs.has_key(tab_state):
+            if tab_state in tabs:
                 tabs[tab_state]['visible'] = True;
 
     else:

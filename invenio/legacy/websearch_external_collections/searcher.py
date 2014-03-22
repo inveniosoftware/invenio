@@ -208,7 +208,7 @@ class CDSIndicoSearchEngine(ExternalSearchEngine):
         index = basic[2]
         search_type = basic[3]
 
-        if self.index_translator.has_key(index):
+        if index in self.index_translator:
             index = self.index_translator[index]
         else:
             index = None
@@ -228,7 +228,7 @@ class CDSIndicoSearchEngine(ExternalSearchEngine):
         if not url:
             return None
 
-        if self.lang_translator.has_key(lang):
+        if lang in self.lang_translator:
             dest_lang = self.lang_translator[lang]
         else:
             dest_lang = self.lang_translator['default']
@@ -592,33 +592,33 @@ class InvenioSearchEngine(ExternalSearchEngine):
                 # added to a basket at once. Create a static variable for that.
                 req_args = "p=" + search_url_recids + "&rg=" + str(100)
             req_args_dict = cgi.parse_qs(req_args)
-            if req_args_dict.has_key('p'):
+            if 'p' in req_args_dict:
                 search_url_params += urllib.quote(req_args_dict['p'][0])
-            if req_args_dict.has_key('f'):
+            if 'f' in req_args_dict:
                 search_url_params += '&f=' + req_args_dict['f'][0]
-            if req_args_dict.has_key('jrec'):
+            if 'jrec' in req_args_dict:
                 search_url_params += '&jrec=' + req_args_dict['jrec'][0]
-            if req_args_dict.has_key('rg'):
+            if 'rg' in req_args_dict:
                 search_url_params += '&rg=' + req_args_dict['rg'][0]
             else:
                 search_url_params += '&rg=' + str(limit)
-            if req_args_dict.has_key('d1d'):
+            if 'd1d' in req_args_dict:
                 search_url_params += '&d1d=' + req_args_dict['d1d'][0]
-            if req_args_dict.has_key('d1m'):
+            if 'd1m' in req_args_dict:
                 search_url_params += '&d1m=' + req_args_dict['d1m'][0]
-            if req_args_dict.has_key('d1y'):
+            if 'd1y' in req_args_dict:
                 search_url_params += '&d1y=' + req_args_dict['d1y'][0]
-            if req_args_dict.has_key('d2d'):
+            if 'd2d' in req_args_dict:
                 search_url_params += '&d2d=' + req_args_dict['d2d'][0]
-            if req_args_dict.has_key('d2m'):
+            if 'd2m' in req_args_dict:
                 search_url_params += '&d2m=' + req_args_dict['d2m'][0]
-            if req_args_dict.has_key('d2y'):
+            if 'd2y' in req_args_dict:
                 search_url_params += '&d2y=' + req_args_dict['d2y'][0]
-            if req_args_dict.has_key('ap'):
+            if 'ap' in req_args_dict:
                 search_url_params += '&ap=' + req_args_dict['ap'][0]
-            if req_args_dict.has_key('sf'):
+            if 'sf' in req_args_dict:
                 search_url_params += '&sf=' + req_args_dict['sf'][0]
-            if req_args_dict.has_key('so'):
+            if 'so' in req_args_dict:
                 search_url_params += '&so=' + req_args_dict['so'][0]
             if not '&userurl=true' in req_args:
                 search_url_params += '&of=' + self.fetch_format
@@ -677,7 +677,7 @@ def build_external_collections_dictionary():
     for (name, configuration) in iteritems(CFG_EXTERNAL_COLLECTIONS):
         engine_name = configuration.pop('engine', 'External') + 'SearchEngine'
         configuration['name'] = name
-        if globals().has_key(engine_name):
+        if engine_name in globals():
             external_collections_dictionary[name] = globals()[engine_name](configuration)
         else:
             sys.stderr.write("Error : not found " + engine_name + "\n")

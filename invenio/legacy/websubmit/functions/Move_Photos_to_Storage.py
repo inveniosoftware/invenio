@@ -337,7 +337,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
     # Prepare the list of photos to display.
     photos_img = []
     for doc_id in photo_manager_order_list:
-        if not photo_manager_icons_dict.has_key(doc_id):
+        if doc_id not in photo_manager_icons_dict:
             continue
         icon_url = photo_manager_icons_dict[doc_id]
         if PHOTO_MANAGER_ORDER:

@@ -485,8 +485,8 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         include_headers = False
         # User submitted either through WebSubmit, or admin interface.
-        if form.has_key('doctype') and form.has_key('indir') \
-               and form.has_key('access'):
+        if 'doctype' in form and 'indir' in form \
+               and 'access' in form:
             # Submitted through WebSubmit. Check rights
             include_headers = True
             working_dir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR,

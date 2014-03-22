@@ -72,7 +72,7 @@ class WebInterfaceBibSchedPages(WebInterfaceDirectory):
         body_content = ''
         if len(motd_msg) > 0:
             body_content += '<div class="clean_error">' + motd_msg + '</div><br />'
-        if not form.has_key('jsondata'):
+        if 'jsondata' not in form:
             body_content = '<div id="bibsched_table">'
         if len(bibsched_tasks) > 0:
             for task in bibsched_tasks:
@@ -92,7 +92,7 @@ class WebInterfaceBibSchedPages(WebInterfaceDirectory):
             body_content += '<br /><img src="%s"><span class="bibsched_status"> BibSched is working without errors</span><br />' % ("/img/aid_check.png")
         body_content += '<br /><span class="mode">Mode: %s</span>' % (get_bibsched_mode())
         body_content += '<br /><br /><span class="last_updated">Last updated: %s</span>' % (time.strftime("%a %b %d, %Y  %-I:%M:%S %p", time.localtime(time.time())))
-        if form.has_key('jsondata'):
+        if 'jsondata' in form:
             json_response = {}
             json_response.update({'bibsched': body_content})
             return json.dumps(json_response)

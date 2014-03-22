@@ -90,7 +90,7 @@ class ExternalAuthSSO(ExternalAuth):
         Return True if the current request handler is actually under
         Shibboleth control.
         """
-        return req.subprocess_env.has_key(CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE)
+        return CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE in req.subprocess_env
 
     def auth_user(self, username, password, req=None):
         """
@@ -109,7 +109,7 @@ class ExternalAuthSSO(ExternalAuth):
         """
         if req:
             req.add_common_vars()
-            if req.subprocess_env.has_key(CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE):
+            if CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE in req.subprocess_env:
                 return req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE], req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_LOGIN_VARIABLE]
         return None, None
 
@@ -138,7 +138,7 @@ class ExternalAuthSSO(ExternalAuth):
         """
         if req:
             req.add_common_vars()
-            if req.subprocess_env.has_key(CFG_EXTERNAL_AUTH_SSO_LOGIN_VARIABLE):
+            if CFG_EXTERNAL_AUTH_SSO_LOGIN_VARIABLE in req.subprocess_env:
                 return req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_LOGIN_VARIABLE]
         else:
             return None
@@ -148,7 +148,7 @@ class ExternalAuthSSO(ExternalAuth):
             return self.egroup_cache
         elif req:
             req.add_common_vars()
-            if req.subprocess_env.has_key(CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE):
+            if CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE in req.subprocess_env:
                 groups = req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE].split(CFG_EXTERNAL_AUTH_SSO_GROUPS_SEPARATOR)
                 # Filtering out uncomfortable groups
                 groups = [group for group in groups if group not in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS]
@@ -169,10 +169,10 @@ class ExternalAuthSSO(ExternalAuth):
         if req:
             ret = {}
             req.add_common_vars()
-            if req.subprocess_env.has_key('HTTP_SHIB_AUTHENTICATION_METHOD'):
+            if 'HTTP_SHIB_AUTHENTICATION_METHOD' in req.subprocess_env:
                 ret['authmethod'] = req.subprocess_env['HTTP_SHIB_AUTHENTICATION_METHOD']
             ret['external'] = '1'
-            if req.subprocess_env.has_key('ADFS_IDENTITYCLASS') and \
+            if 'ADFS_IDENTITYCLASS' in req.subprocess_env and \
               req.subprocess_env['ADFS_IDENTITYCLASS'] in ('CERN Registered', 'CERN Shared'):
                 ret['external'] = '0'
             return ret

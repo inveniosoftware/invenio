@@ -96,9 +96,9 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             })
 
         curdir = None
-        if not form.has_key("indir") or \
-               not form.has_key("doctype") or \
-               not form.has_key("access"):
+        if "indir" not in form or \
+               "doctype" not in form or \
+               "access" not in form:
             raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
         else:
             curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR,
@@ -107,7 +107,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                   argd['access'])
 
         user_info = collect_user_info(req)
-        if form.has_key("session_id"):
+        if "session_id" in form:
             # Are we uploading using Flash, which does not transmit
             # cookie? The expect to receive session_id as a form
             # parameter.  First check that IP addresses do not
@@ -254,9 +254,9 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             })
 
         curdir = None
-        if not form.has_key("indir") or \
-               not form.has_key("doctype") or \
-               not form.has_key("access"):
+        if "indir" not in form or \
+               "doctype" not in form or \
+               "access" not in form:
             raise apache.SERVER_RETURN(apache.HTTP_BAD_REQUEST)
         else:
             curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR,
@@ -265,7 +265,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                   argd['access'])
 
         user_info = collect_user_info(req)
-        if form.has_key("session_id"):
+        if "session_id" in form:
             # Are we uploading using Flash, which does not transmit
             # cookie? The expect to receive session_id as a form
             # parameter.  First check that IP addresses do not
@@ -517,10 +517,10 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         if not is_html_text_editor_installed():
             return apache.HTTP_NOT_FOUND
 
-        if not form.has_key('type'):
+        if 'type' not in form:
             form['type'] = 'File'
 
-        if not form.has_key('upload') or \
+        if 'upload' not in form or \
                not form['type'] in \
                ['File', 'Image', 'Flash', 'Media']:
             #return apache.HTTP_NOT_FOUND

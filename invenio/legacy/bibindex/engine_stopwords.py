@@ -49,7 +49,7 @@ def map_stopwords_names_to_stopwords_kb():
     index_stopwords = get_all_index_names_and_column_values("remove_stopwords")
     for index, stopwords in index_stopwords:
         if stopwords and stopwords != 'No':
-            if not stopwords_kb_map.has_key(stopwords):
+            if stopwords not in stopwords_kb_map:
                 stopwords_kb_map[stopwords] = create_stopwords(stopwords)
     return stopwords_kb_map
 
@@ -65,7 +65,7 @@ def is_stopword(word, stopwords=None):
        :param stopwords: name of stopwords knowledge base we want to search in
     """
     # note: input word is assumed to be in lowercase
-    if stopwords_kb.has_key(stopwords):
-        if stopwords_kb[stopwords].has_key(word):
+    if stopwords in stopwords_kb:
+        if word in stopwords_kb[stopwords]:
             return True
     return False

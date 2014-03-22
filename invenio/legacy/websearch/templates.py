@@ -458,7 +458,7 @@ class Template:
         parameters = drop_default_urlargd(parameters, self.search_results_default_urlargd)
 
         # Treat `as' argument specially:
-        if parameters.has_key('aas'):
+        if 'aas' in parameters:
             parameters['as'] = parameters['aas']
             del parameters['aas']
 
@@ -485,7 +485,7 @@ class Template:
         parameters = drop_default_urlargd(parameters, self.search_results_default_urlargd)
 
         # Treat `as' argument specially:
-        if parameters.has_key('aas'):
+        if 'aas' in parameters:
             parameters['as'] = parameters['aas']
             del parameters['aas']
 
@@ -2541,7 +2541,7 @@ class Template:
                 fieldargs = cgi.parse_qs(pl_in_url)
                 for fieldcode in all_fieldcodes:
                     # get_fieldcodes():
-                    if fieldargs.has_key(fieldcode):
+                    if fieldcode in fieldargs:
                         for val in fieldargs[fieldcode]:
                             out += self.tmpl_input_hidden(name=fieldcode, value=val)
             out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d" />""" % {
@@ -2731,7 +2731,7 @@ class Template:
                 fieldargs = cgi.parse_qs(pl_in_url)
                 for fieldcode in all_fieldcodes:
                     # get_fieldcodes():
-                    if fieldargs.has_key(fieldcode):
+                    if fieldcode in fieldargs:
                         for val in fieldargs[fieldcode]:
                             out += self.tmpl_input_hidden(name=fieldcode, value=val)
             out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d" />""" % {
@@ -2997,7 +2997,7 @@ class Template:
             </script>"""
         count = 0
         for coll in colls:
-            if results_final_nb.has_key(coll['code']) and results_final_nb[coll['code']] > 0:
+            if coll['code'] in results_final_nb and results_final_nb[coll['code']] > 0:
                 count += 1
                 out += """
                       <span %(collclass)s><strong><a href="#%(coll)s">%(coll_name)s</a></strong>, <a href="#%(coll)s">%(number)s</a><br /></span>""" % \
@@ -3007,7 +3007,7 @@ class Template:
                                        'number' : _("%(x_rec)s records found", x_rec=('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>'))}
             # the following is used for hosted collections that have timed out,
             # i.e. for which we don't know the exact number of results yet.
-            elif results_final_nb.has_key(coll['code']) and results_final_nb[coll['code']] == -963:
+            elif coll['code'] in results_final_nb and results_final_nb[coll['code']] == -963:
                 count += 1
                 out += """
                       <span %(collclass)s><strong><a href="#%(coll)s">%(coll_name)s</a></strong><br /></span>""" % \

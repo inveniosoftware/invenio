@@ -212,11 +212,11 @@ def single_tag_rank(config):
     records = filter(lambda x: x[0] in options["validset"], records)
     rnkset = {}
     for key, value in records:
-        if kb_data.has_key(value):
-            if not rnkset.has_key(key):
+        if value in kb_data:
+            if key not in rnkset:
                 rnkset[key] = float(kb_data[value])
             else:
-                if kb_data.has_key(rnkset[key]) and float(kb_data[value]) > float((rnkset[key])[1]):
+                if rnkset[key] in kb_data and float(kb_data[value]) > float((rnkset[key])[1]):
                     rnkset[key] = float(kb_data[value])
         else:
             rnkset[key] = 0
@@ -265,7 +265,7 @@ def del_recids(rank_method_code, range_rec):
         write_message("Old size: %s" % len(rec_dict))
         for (recids, recide) in range_rec:
             for i in range(int(recids), int(recide)):
-                if rec_dict.has_key(i):
+                if i in rec_dict:
                     del rec_dict[i]
         write_message("New size: %s" % len(rec_dict))
         begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())

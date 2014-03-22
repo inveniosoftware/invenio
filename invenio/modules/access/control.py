@@ -164,14 +164,14 @@ def acc_update_action(id_action=0, name_action='', verbose=0, **update):
         return 0
 
     try:
-        if update.has_key('description'):
+        if 'description' in update:
             # change the description, no other effects
             if verbose:
                 print('desc')
             run_sql("""UPDATE accACTION SET description = %s WHERE id = %s""",
                 (update['description'], id_action))
 
-        if update.has_key('allowedkeywords'):
+        if 'allowedkeywords' in update:
             # change allowedkeywords
             if verbose:
                 print('keys')
@@ -193,7 +193,7 @@ def acc_update_action(id_action=0, name_action='', verbose=0, **update):
                     (id_action, update['allowedkeywords'] and
                         'AND id_accARGUMENT != -1' or ''))
 
-        if update.has_key('optional'):
+        if 'optional' in update:
             # check if there changing optional or not
             if verbose:
                 print('optional')
@@ -1584,10 +1584,10 @@ def acc_find_possible_actions(id_role, id_action):
         a, kw, value = res # rolekey, argumentlistid, keyword, value
         if kw not in keywords:
             continue
-        if not arglistids.has_key(a):
+        if a not in arglistids:
             arglistids[a] = {}
         # fill dictionary
-        if not arglistids[a].has_key(kw):
+        if kw not in arglistids[a]:
             arglistids[a][kw] = [value]
         elif not value in arglistids[a][kw]:
             arglistids[a][kw] = arglistids[a][kw] + [value]
@@ -1603,7 +1603,7 @@ def acc_find_possible_actions(id_role, id_action):
             next_arglistid.append([a, row[:] ])
         # run through the rest of the keywords
         for kw in keywords[1:]:
-            if not arglistids[a].has_key(kw):
+            if kw not in arglistids[a]:
                 arglistids[a][kw] = ['optional value']
 
             new_list = arglistids[a][kw][:]

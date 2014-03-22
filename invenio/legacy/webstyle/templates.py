@@ -359,7 +359,7 @@ class Template:
         browser_s = _("Browser")
         if req:
             try:
-                if req.headers_in.has_key('User-Agent'):
+                if 'User-Agent' in req.headers_in:
                     browser_s += ': ' + req.headers_in['User-Agent']
                 else:
                     browser_s += ': ' + info_not_available

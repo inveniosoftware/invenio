@@ -734,7 +734,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 ## I.e. if the login method is not of robot type:
                 if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
                     # Let's prevent the user to switch login_method
-                    if user_prefs.has_key("login_method") and \
+                    if "login_method" in user_prefs and \
                             user_prefs["login_method"] != login_method:
                         return (None, p_email, p_pw, 11)
                 user_prefs["login_method"] = login_method
@@ -1035,8 +1035,8 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
 
     # For BibEdit and BibDocFile menu items, take into consideration
     # current record whenever possible
-    if activities.has_key(_("Run Record Editor")) or \
-           activities.has_key(_("Run Document File Manager")) and \
+    if _("Run Record Editor") in activities or \
+           _("Run Document File Manager") in activities and \
            user_info['uri'].startswith('/' + CFG_SITE_RECORD + '/'):
         try:
             # Get record ID and try to cast it to an int
@@ -1044,9 +1044,9 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
         except:
             pass
         else:
-            if activities.has_key(_("Run Record Editor")):
+            if _("Run Record Editor") in activities:
                 activities[_("Run Record Editor")] = activities[_("Run Record Editor")] + '&amp;#state=edit&amp;recid=' + str(current_record_id)
-            if activities.has_key(_("Run Document File Manager")):
+            if _("Run Document File Manager") in activities:
                 activities[_("Run Document File Manager")] = activities[_("Run Document File Manager")] + '&amp;recid=' + str(current_record_id)
 
     try:
@@ -1119,7 +1119,7 @@ def get_uid_based_on_pref(prefname, prefvalue):
     for pref in prefs:
         try:
             settings = deserialize_via_marshal(pref[1])
-            if (settings.has_key(prefname)) and (settings[prefname] == prefvalue):
+            if (prefname in settings) and (settings[prefname] == prefvalue):
                 the_uid = pref[0]
         except:
             pass
@@ -1269,9 +1269,9 @@ def collect_user_info(req, login_time=False, refresh=False):
         elif type(req) is dict:
             ## req is by mistake already a user_info
             try:
-                assert(req.has_key('uid'))
-                assert(req.has_key('email'))
-                assert(req.has_key('nickname'))
+                assert('uid' in req)
+                assert('email' in req)
+                assert('nickname' in req)
             except AssertionError:
                 ## mmh... misuse of collect_user_info. Better warn the admin!
                 register_exception(alert_admin=True)

@@ -78,7 +78,7 @@ def read_metadata(inputfile, force=None, remote=False,
     # Loop through the plugins to find a good one for given file
     for plugin_name, plugin in iteritems(metadata_extractor_plugins):
         # Local file
-        if plugin.has_key('can_read_local') and \
+        if 'can_read_local' in plugin and \
             plugin['can_read_local'](inputfile) and not remote and \
             (not force or plugin_name == force):
             if verbose > 5:
@@ -91,7 +91,7 @@ def read_metadata(inputfile, force=None, remote=False,
                 metadata.update(fetched_metadata)
 
         # Remote file
-        elif remote and plugin.has_key('can_read_remote') and \
+        elif remote and 'can_read_remote' in plugin and \
             plugin['can_read_remote'](inputfile) and \
             (not force or plugin_name == force):
             if verbose > 5:
@@ -142,7 +142,7 @@ def write_metadata(inputfile, outputfile, metadata_dictionary,
 
     # Loop through the plugins to find a good one to ext
     for plugin_name, plugin in iteritems(metadata_extractor_plugins):
-        if plugin.has_key('can_write_local') and \
+        if 'can_write_local' in plugin and \
             plugin['can_write_local'](inputfile) and \
             (not force or plugin_name == force):
             if verbose > 5:

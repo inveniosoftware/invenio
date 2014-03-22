@@ -33,14 +33,14 @@ def Move_Files_Archive(parameters, curdir, form, user_info=None):
             files.sort()
             for file in files:
                 dummy, filename, extension = decompose_file(file)
-                if not formats.has_key(filename):
+                if filename not in formats:
                     formats[filename] = []
                 formats[filename].append(normalize_format(extension))
             # first delete all missing files
             bibarchive = BibRecDocs(sysno)
             existingBibdocs = bibarchive.list_bibdocs(type)
             for existingBibdoc in existingBibdocs:
-                if not formats.has_key(bibarchive.get_docname(existingBibdoc.id)):
+                if bibarchive.get_docname(existingBibdoc.id) not in formats:
                     existingBibdoc.delete()
             # then create/update the new ones
             for key in formats.keys():

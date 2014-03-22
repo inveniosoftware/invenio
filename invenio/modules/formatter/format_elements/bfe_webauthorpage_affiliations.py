@@ -32,8 +32,8 @@ def format_element(bfo):
     recid = bfo.recID
 
     for f in fields + fields2:
-        if f.has_key('a'):
-            if f.has_key('u'):
+        if 'a' in f:
+            if 'u' in f:
                 u = f['u']
             else:
                 u = ''

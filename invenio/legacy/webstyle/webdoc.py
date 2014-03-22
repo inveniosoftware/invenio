@@ -511,10 +511,10 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
     ln_link = (ln != CFG_SITE_LANG and '?ln=' + ln) or ''
 
     for category in categ:
-        if not webdoc_dirs.has_key(category):
+        if category not in webdoc_dirs:
             continue
         (source_path, cache_path) =  webdoc_dirs[category]
-        if not topics.has_key(category):
+        if category not in topics:
             topics[category] = []
         # Build list of tuples(webdoc_name, webdoc_date, webdoc_url)
         for webdoc_name, webdocfile in registry.doc_category_topics(source_path).items():
@@ -687,7 +687,7 @@ def transform(webdoc_source, verbose=0, req=None, languages=CFG_SITE_LANGS):
 
     # Remove duplicates
     filtered_html_texts = []
-    if html_texts.has_key(CFG_SITE_LANG):
+    if CFG_SITE_LANG in html_texts:
         filtered_html_texts = [(html_text[0], \
                                 (html_text[1] != html_texts[CFG_SITE_LANG][1] and html_text[1]) or None, \
                                 (html_text[2] != html_texts[CFG_SITE_LANG][2] and html_text[2]) or None, \
@@ -877,7 +877,7 @@ def main():
     if len(args) > 0:
         options["webdoc"] = args[0]
 
-    if not options.has_key("webdoc"):
+    if "webdoc" not in options:
         usage(0)
 
     # check if webdoc exists

@@ -99,7 +99,7 @@ def format_element(bfo, limit, separator=' ; ',
     # Process authors to add link, highlight and format affiliation
     for author in authors:
 
-        if author.has_key('a'):
+        if 'a' in author:
             if highlight == 'yes':
                 from invenio.modules.formatter import utils as bibformat_utils
                 author['a'] = bibformat_utils.highlight(author['a'],
@@ -129,7 +129,7 @@ def format_element(bfo, limit, separator=' ; ',
                                   '&amp;ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'
 
-        if author.has_key('u'):
+        if 'u' in author:
             if print_affiliations == "yes":
                 if 'u0' in author:
                     recIDs = get_low_level_recIDs_from_control_no(author['u0'])

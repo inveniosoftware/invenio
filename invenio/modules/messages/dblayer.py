@@ -452,7 +452,7 @@ def send_message(uids_to, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW']):
         query_params = []
         def not_users_quotas_has_key(key):
             """ not(is key in users over  quota?)"""
-            return not(users_quotas.has_key(key))
+            return not(key in users_quotas)
         user_ids_to = filter(not_users_quotas_has_key, uids_to)
         user_problem = filter(users_quotas.has_key, uids_to)
         if len(user_ids_to) > 0:

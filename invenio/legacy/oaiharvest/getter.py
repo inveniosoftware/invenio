@@ -315,7 +315,7 @@ def OAI_Request(server, script, params, method="POST", secure=False,
 
         status = "%d" % response.status
 
-        if http_response_status_code.has_key(status):
+        if status in http_response_status_code:
             sys.stderr.write("%s(%s) : %s : %s\n" % (status,
                 http_response_status_code[status],
                 response.reason,

@@ -242,7 +242,7 @@ class InvenioConnector(object):
             if of.lower() != 'id':
                 results = format_records(results, of)
         else:
-            if not self.cached_queries.has_key(params + str(parse_results)) or not read_cache:
+            if params + str(parse_results) not in self.cached_queries or not read_cache:
                 if self.user:
                     results = self.browser.open(self.server_url + "/search?" + params)
                 else:
@@ -328,7 +328,7 @@ class InvenioConnector(object):
         """
         Returns the records from the (public) basket with given bskid
         """
-        if not self.cached_baskets.has_key(bskid) or not read_cache:
+        if bskid not in self.cached_baskets or not read_cache:
             if self.user:
                 if group_basket:
                     group_basket = '&category=G'
@@ -350,7 +350,7 @@ class InvenioConnector(object):
         """
         Returns the record with given recid
         """
-        if self.cached_records.has_key(recid) or not read_cache:
+        if recid in self.cached_records or not read_cache:
             return self.cached_records[recid]
         else:
             return self.search(p="recid:" + str(recid))
@@ -431,7 +431,7 @@ class Record(dict):
         if subcode is not None:
             subfields = []
             for datafield in datafields:
-                if datafield.has_key(subcode):
+                if subcode in datafield:
                     subfields.extend(datafield[subcode])
             return subfields
         else:
@@ -542,7 +542,7 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
             self.cur_datafield = ""
             self.cur_tag = tag
             self.cur_controlfield = []
-            if not self.cur_record.has_key(tag):
+            if tag not in self.cur_record:
                 self.cur_record[tag] = self.cur_controlfield
             self.in_controlfield = True
 
@@ -553,7 +553,7 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
             if ind1 == " ": ind1 = "_"
             ind2 = attributes["ind2"]
             if ind2 == " ": ind2 = "_"
-            if not self.cur_record.has_key(tag + ind1 + ind2):
+            if tag + ind1 + ind2 not in self.cur_record:
                 self.cur_record[tag + ind1 + ind2] = []
             self.cur_datafield = {}
             self.cur_record[tag + ind1 + ind2].append(self.cur_datafield)
@@ -561,7 +561,7 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
 
         elif name == "subfield":
             subcode = attributes["code"]
-            if not self.cur_datafield.has_key(subcode):
+            if subcode not in self.cur_datafield:
                 self.cur_subfield = []
                 self.cur_datafield[subcode] = self.cur_subfield
             else:
@@ -586,7 +586,7 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
         elif name == "controlfield":
             if self.cur_tag == "001":
                 self.recid = int(self.buffer)
-                if self.cached_records.has_key(self.recid):
+                if self.recid in self.cached_records:
                     # Record has already been parsed, no need to add
                     pass
                 else:

@@ -46,7 +46,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
 
     main_urls = parsed_urls['main_urls']
     others_urls = parsed_urls['others_urls']
-    if parsed_urls.has_key('cern_urls'):
+    if 'cern_urls' in parsed_urls:
         cern_urls = parsed_urls['cern_urls']
 
     # Prepare style

@@ -756,8 +756,8 @@ def can_record_have_physical_copies(recid):
     col_id = get_colID(guess_primary_collection_of_a_record(recid))
     collections = get_detailed_page_tabs(col_id, recid)
 
-    if (not collections.has_key("holdings")) or \
-        (not collections["holdings"].has_key("visible")):
+    if ("holdings" not in collections) or \
+        ("visible" not in collections["holdings"]):
         return False
 
     return collections["holdings"]["visible"] == True

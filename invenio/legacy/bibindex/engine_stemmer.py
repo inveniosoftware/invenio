@@ -58,9 +58,9 @@ try:
         Return false otherwise.
         """
         thread_ident = get_ident()
-        if not _stemmers.has_key(thread_ident):
+        if thread_ident not in _stemmers:
             _stemmers[thread_ident] = _create_stemmers()
-        return _stemmers[thread_ident].has_key(lang)
+        return lang in _stemmers[thread_ident]
 
     def stem(word, lang):
         """Return WORD stemmed according to language LANG (e.g. 'en')."""

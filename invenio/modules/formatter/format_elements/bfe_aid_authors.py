@@ -97,7 +97,7 @@ def format_element(bfo, limit, separator='; ',
     # Process authors to add link, affiliation and highlight
     for author in authors:
 
-        if author.has_key('a'):
+        if 'a' in author:
             author['a'] = author['a'][0] # There should not be
             if highlight == 'yes':
                 from invenio.modules.formatter import utils as bibformat_utils
@@ -130,7 +130,7 @@ def format_element(bfo, limit, separator='; ',
 
                 # if there is an ID, search using that.
                 id_link = ''
-                if id_links == "yes" and author.has_key('i'):
+                if id_links == "yes" and 'i' in author:
                     author['i'] = author['i'][0]  #possible to have more IDs?
                     id_link = '<a class="authoridlink" href="' + \
                               CFG_SITE_URL + \
@@ -151,14 +151,14 @@ def format_element(bfo, limit, separator='; ',
                                     id_link
 
         if print_affiliations == "yes":
-            if author.has_key('e'):
+            if 'e' in author:
                 author['e'] = affiliation_prefix + \
                               affiliations_separator.join(author['e']) + \
                               affiliation_suffix
 
 
 
-            if author.has_key('u'):
+            if 'u' in author:
                 author['ilink'] = ['%s' % string.lstrip()
                                    for string in author['u']]
                 author['u'] = affiliation_prefix + \
@@ -174,7 +174,7 @@ def format_element(bfo, limit, separator='; ',
     last = ''
     authors.reverse()
     for author in authors:
-        if not author.has_key('u'):
+        if 'u' not in author:
             author['u'] = ''
         #print 'this->'+ author['a']+'\n'
         if last == author['u']:

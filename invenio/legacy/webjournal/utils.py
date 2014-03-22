@@ -219,17 +219,17 @@ def get_order_dict_from_recid_list(recids, journal_name, issue_number,
         for article_info in articles_info:
             if article_info.get('n', '') == issue_number or \
                    '0' + article_info.get('n', '') == issue_number:
-                if article_info.has_key('c') and \
+                if 'c' in article_info and \
                        article_info['c'].isdigit():
                     order_number = int(article_info.get('c', ''))
                     if (newest_first or newest_only) and \
                            is_new_article(journal_name, issue_number, record):
-                        if ordered_new_records.has_key(order_number):
+                        if order_number in ordered_new_records:
                             ordered_new_records[order_number].append(record)
                         else:
                             ordered_new_records[order_number] = [record]
                     elif not newest_only:
-                        if ordered_records.has_key(order_number):
+                        if order_number in ordered_records:
                             ordered_records[order_number].append(record)
                         else:
                             ordered_records[order_number] = [record]
@@ -362,7 +362,7 @@ def _cache_journal_articles(journal_name, issue, category, articles):
     except ValueError:
         journal_info = {}
 
-    if not journal_info.has_key('journal_articles'):
+    if 'journal_articles' not in journal_info:
         journal_info['journal_articles'] = {}
     journal_info['journal_articles'][category] = articles
 
@@ -518,7 +518,7 @@ def get_xml_from_config(nodes, journal_name):
     """
     # Get and open the config file
     results = {}
-    if cached_parsed_xml_config.has_key(journal_name):
+    if journal_name in cached_parsed_xml_config:
         config_file = cached_parsed_xml_config[journal_name]
     else:
         config_path = os.path.join(journals_registry[journal_name],
@@ -672,7 +672,7 @@ def get_journal_collection_to_refresh_on_release(journal_name):
     from invenio.legacy.search_engine import collection_reclist_cache
     config_strings = get_xml_from_config(["update_on_release/collection"], journal_name)
     return [coll for coll in config_strings.get('update_on_release/collection', []) if \
-            collection_reclist_cache.cache.has_key(coll)]
+            coll in collection_reclist_cache.cache]
 
 def get_journal_index_to_refresh_on_release(journal_name):
     """
@@ -801,7 +801,7 @@ def get_first_issue_from_config(journal_name):
     and year.
     """
     config_strings = get_xml_from_config(["first_issue"], journal_name)
-    if config_strings.has_key('first_issue'):
+    if 'first_issue' in config_strings:
         return config_strings['first_issue'][0]
     return time.strftime("%W/%Y", time.localtime())
 
@@ -1259,7 +1259,7 @@ def guess_journal_name(ln, journal_name=None):
         raise InvenioWebJournalNoJournalOnServerError(ln)
 
     elif not journal_name and \
-             journals_id_and_names[0].has_key('journal_name'):
+             'journal_name' in journals_id_and_names[0]:
         return journals_id_and_names[0]['journal_name']
 
     elif len(journals_id_and_names) > 0:
@@ -1730,14 +1730,14 @@ def get_recid_from_legacy_number(issue_number, category, number):
             if order.isdigit():
                 # Order must be an int. Otherwise skip
                 order = int(order)
-                if order == 1 and positive_index_records.has_key(1):
+                if order == 1 and 1 in positive_index_records:
                     # This is then a negative number for this record
                     index = (len(negative_index_records.keys()) > 0 and \
                              min(negative_index_records.keys()) -1) or 0
                     negative_index_records[index] = recid
                 else:
                     # Positive number for this record
-                    if not positive_index_records.has_key(order):
+                    if order not in positive_index_records:
                         positive_index_records[order] = recid
                     else:
                         # We make the assumption that we cannot have
@@ -1756,7 +1756,7 @@ def get_recid_from_legacy_number(issue_number, category, number):
         if len(negative_indexes) > abs(number):
             recid_to_return = negative_index_records[negative_indexes[abs(number)]]
     else:
-        if positive_index_records.has_key(number):
+        if number in positive_index_records:
             recid_to_return = positive_index_records[number]
 
     return recid_to_return

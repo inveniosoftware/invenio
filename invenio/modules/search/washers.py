@@ -71,7 +71,7 @@ def wash_search_urlargd(form):
     """
     from invenio.ext.legacy.handler import wash_urlargd
     argd = wash_urlargd(form, search_results_default_urlargd)
-    if argd.has_key('as'):
+    if 'as' in argd:
         argd['aas'] = argd['as']
         del argd['as']
     if argd.get('aas', cfg['CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE']) \

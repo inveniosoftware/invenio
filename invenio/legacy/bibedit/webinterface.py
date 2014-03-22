@@ -83,13 +83,13 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
 
         # If it is an Ajax request, extract any JSON data.
         ajax_request, recid = False, None
-        if form.has_key('jsondata'):
+        if 'jsondata' in form:
             json_data = json.loads(str(form['jsondata']))
             # Deunicode all strings (Invenio doesn't have unicode
             # support).
             json_data = json_unicode_to_utf8(json_data)
             ajax_request = True
-            if json_data.has_key('recID'):
+            if 'recID' in json_data:
                 recid = json_data['recID']
             json_response = {'resultCode': 0, 'ID': json_data['ID']}
 
@@ -232,7 +232,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
 
         # If it is an Ajax request, extract any JSON data.
         ajax_request = False
-        if form.has_key('jsondata'):
+        if 'jsondata' in form:
             json_data = json.loads(str(form['jsondata']))
             # Deunicode all strings (Invenio doesn't have unicode
             # support).

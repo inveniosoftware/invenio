@@ -116,21 +116,21 @@ class ExternalOpenID(ExternalAuth):
 
         sreg_resp = sreg.SRegResponse.fromSuccessResponse(response)
         if sreg_resp:
-            if sreg_resp.getExtensionArgs().has_key('nickname'):
+            if 'nickname' in sreg_resp.getExtensionArgs():
                 nickname = sreg_resp.getExtensionArgs()['nickname']
 
         ax_resp = ax.FetchResponse.fromSuccessResponse(response)
         if ax_resp and not nickname:
             extensions = ax_resp.getExtensionArgs()
 
-            if extensions.has_key('type.ext0') and \
-                extensions.has_key('value.ext0.1'):
+            if 'type.ext0' in extensions and \
+                'value.ext0.1' in extensions:
                 if extensions['type.ext0'] == \
                     'http://axschema.org/namePerson/friendly':
                     nickname = extensions['value.ext0.1']
 
-            if extensions.has_key('type.ext1') and \
-                extensions.has_key('value.ext1.1') and not nickname:
+            if 'type.ext1' in extensions and \
+                'value.ext1.1' in extensions and not nickname:
                 if extensions['type.ext1'] == \
                     'http://axschema.org/namePerson/friendly':
                     nickname = extensions['value.ext1.1']
@@ -151,14 +151,14 @@ class ExternalOpenID(ExternalAuth):
 
         if ax_resp:
             extensions = ax_resp.getExtensionArgs()
-            if extensions.has_key('type.ext0') and \
-                extensions.has_key('value.ext0.1'):
+            if 'type.ext0' in extensions and \
+                'value.ext0.1' in extensions:
                 if extensions['type.ext0'] == \
                     'http://axschema.org/contact/email':
                     email = extensions['value.ext0.1']
 
-            if extensions.has_key('type.ext1') and \
-                extensions.has_key('value.ext1.1') and not email:
+            if 'type.ext1' in extensions and \
+                'value.ext1.1' in extensions and not email:
                 if extensions['type.ext1'] == \
                     'http://axschema.org/contact/email':
                     email = extensions['value.ext1.1']
@@ -181,10 +181,10 @@ class ExternalOpenID(ExternalAuth):
 
         args = wash_urlargd(req.form, content)
 
-        if args.has_key('ln'):
+        if 'ln' in args:
             del args['ln']
 
-        if args.has_key('referer'):
+        if 'referer' in args:
             if not args['referer']:
                 del args['referer']
 

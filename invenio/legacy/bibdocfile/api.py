@@ -1288,7 +1288,7 @@ class BibRecDocs(object):
                         zero_version_bug = True
                     docformat = name[len(file_strip_ext(name)):]
                     docformat = normalize_format(docformat)
-                    if not versions.has_key(version):
+                    if version not in versions:
                         versions[version] = {}
                     new_name = 'FIXING-%s-%s' % (str(counter), name)
                     try:
@@ -1296,7 +1296,7 @@ class BibRecDocs(object):
                     except Exception as e:
                         register_exception()
                         raise InvenioBibDocFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name), e)
-                    if versions[version].has_key(docformat):
+                    if docformat in versions[version]:
                         new_bibdocs.append((new_name, version))
                     else:
                         versions[version][docformat] = new_name
@@ -2650,7 +2650,7 @@ class BibDoc(object):
             added_files = dict(new_files)
             deleted_files = {}
             for key, value in iteritems(old_files):
-                if added_files.has_key(key):
+                if key in added_files:
                     del added_files[key]
                 else:
                     deleted_files[key] = value
@@ -2736,7 +2736,7 @@ class BibDoc(object):
             docid = row[0]
             doctype = row[1]
             if row[2] != 'DELETED':
-                if not self.related_files.has_key(doctype):
+                if doctype not in self.related_files:
                     self.related_files[doctype] = []
                 cur_doc = BibDoc.create_instance(docid=docid, human_readable=self.human_readable)
                 self.related_files[doctype].append(cur_doc)

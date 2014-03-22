@@ -234,7 +234,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         if not unique_p:
             write_message(msg, verbose=1, stream=sys.stderr)
             return (1, int(rec_id), msg)
-        if not record.has_key('001'):
+        if '001' not in record:
             # Found record ID by means of SYSNO or OAIID or DOI, and the
             # input MARCXML buffer does not have this 001 tag, so we
             # should add it now:
@@ -412,7 +412,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
 
         # 005 tag should be added everytime the record is modified
         # If an exiting record is modified, its 005 tag should be overwritten with a new revision value
-        if record.has_key('005'):
+        if '005' in record:
             record_delete_field(record, '005')
             write_message("  Deleted the existing 005 tag.", verbose=2)
         last_revision = run_sql("SELECT MAX(job_date) FROM hstRECORD WHERE id_bibrec=%s", (rec_id, ))[0][0]
@@ -1933,7 +1933,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 if flag not in CFG_BIBDOCFILE_AVAILABLE_FLAGS:
                     raise StandardError, "fft '%s' specifies a non available flag: %s" % (fft, flag)
 
-            if docs.has_key(name): # new format considered
+            if name in docs: # new format considered
                 (doctype2, newname2, restriction2, version2, urls, dummybibdoc_moreinfos2, dummybibdoc_tmpid2, dummybibdoc_tmpver2 ) = docs[name]
                 if doctype2 != doctype:
                     raise StandardError, "fft '%s' specifies a different doctype from previous fft with docname '%s'" % (str(fft), name)

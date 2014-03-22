@@ -1005,12 +1005,12 @@ def get_format_template(filename, with_attributes=False):
            not filename.endswith(".xsl"):
         return None
 
-    if format_templates_cache.has_key(filename):
+    if filename in format_templates_cache:
         # If we must return with attributes and template exist in
         # cache with attributes then return cache.
         # Else reload with attributes
         if with_attributes and \
-               format_templates_cache[filename].has_key('attrs'):
+               'attrs' in format_templates_cache[filename]:
             return format_templates_cache[filename]
 
     format_template = {'code': ""}
@@ -1154,11 +1154,11 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
     else:
         name = element_name.upper()
 
-    if format_elements_cache.has_key(name):
+    if name in format_elements_cache:
         element = format_elements_cache[name]
         if not with_built_in_params or \
                (with_built_in_params and \
-                element['attrs'].has_key('builtin_params')):
+                'builtin_params' in element['attrs']):
             return element
 
     if filename is None:
@@ -1347,7 +1347,7 @@ def get_format_element_attrs_from_function(function, element_name,
         params_iterator = pattern_format_element_params.finditer(docstring)
         for match in params_iterator:
             name = match.group('name')
-            if params.has_key(name):
+            if name in params:
                 params[name]['description'] = match.group('desc').rstrip('.')
 
     attrs['params'] = params.values()
@@ -1538,11 +1538,10 @@ def get_output_format(code, with_attributes=False, verbose=0):
 
     # Get from cache whenever possible
     global format_outputs_cache
-    if format_outputs_cache.has_key(filename):
+    if filename in format_outputs_cache:
         # If was must return with attributes but cache has not
         # attributes, then load attributes
-        if with_attributes and not \
-               format_outputs_cache[filename].has_key('attrs'):
+        if with_attributes and 'attrs' not in format_outputs_cache[filename]:
             format_outputs_cache[filename]['attrs'] = get_output_format_attrs(code, verbose)
 
         return format_outputs_cache[filename]
@@ -2105,7 +2104,7 @@ class BibFormatObject:
                 for instance in instances:
                     instance_dict = {}
                     for subfield in instance[0]:
-                        if not instance_dict.has_key(subfield[0]):
+                        if subfield[0] not in instance_dict:
                             instance_dict[subfield[0]] = []
                         if escape == 0:
                             instance_dict[subfield[0]].append(subfield[1])

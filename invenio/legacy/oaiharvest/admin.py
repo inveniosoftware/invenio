@@ -735,7 +735,7 @@ def build_month_history_table(oai_src_id, date, ln):
                          oaiharvest_templates.format_time(item.date_harvested) + "_" + item.oai_id
             result += build_history_row(item, ln, show_selection=True, show_oai_source=
             False, show_record_ids=True, identifier=identifier)
-            if not identifiers.has_key(item.date_harvested.day):
+            if item.date_harvested.day not in identifiers:
                 identifiers[item.date_harvested.day] = []
             identifiers[item.date_harvested.day].append(identifier)
         if stats[day] > day_limit:
@@ -760,7 +760,7 @@ def build_history_table(data, ln=CFG_SITE_LANG, show_selection=True,
                                     show_oai_source=show_oai_source, show_record_ids=show_record_ids,
                                     identifier=identifier)
         if show_selection:
-            if not identifiers.has_key(item.date_harvested.day):
+            if item.date_harvested.day not in identifiers:
                 identifiers[item.date_harvested.day] = []
             identifiers[item.date_harvested.day].append(identifier)
     result += oaiharvest_templates.tmpl_table_end()

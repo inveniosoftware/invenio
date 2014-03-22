@@ -110,7 +110,7 @@ def bibrankgkb(config):
             temp = convert(conv, temp)
         if len(journals) != 0:
             for element in temp.keys():
-                if not journals.has_key(element):
+                if element not in journals:
                     journals[element] = temp[element]
         else:
             journals = temp
@@ -149,7 +149,7 @@ def get_from_source(type, data):
             write_message(jvalue)
             write_message(jname)
         for key, value in jvalue:
-            if jname.has_key(key):
+            if key in jname:
                 key2 = jname[key].strip()
                 datastruct[key2] = value
                 #print "%s---%s" % (key2, value)
@@ -194,9 +194,9 @@ def convert(convstruct, journals):
         invconvstruct = dict(map(lambda x: (x[1], x[0]), convstruct.items()))
         tempjour = {}
         for name in journals.keys():
-            if convstruct.has_key(name):
+            if name in convstruct:
                 tempjour[convstruct[name]] = journals[name]
-            elif invconvstruct.has_key(name):
+            elif name in invconvstruct:
                 tempjour[name] = journals[name]
         return tempjour
     else:

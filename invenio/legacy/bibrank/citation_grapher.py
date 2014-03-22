@@ -68,7 +68,7 @@ def calculate_citation_history_coordinates(recid):
                 tmpval = int(cit_year[0][0:4])
             except ValueError:
                 numeric=0
-            if numeric and initial_result.has_key(int(cit_year[0][0:4])):
+            if numeric and int(cit_year[0][0:4]) in initial_result:
                 initial_result[int(cit_year[0][0:4])] += 1
     for key, value in initial_result.items():
         result.append((key, value))

@@ -102,7 +102,7 @@ def kb_upload(req, kb, ln=CFG_SITE_LANG):
         #get the form
         form = req.form
         #get the contents from the form
-        if not form.has_key('file') or not form['file'].filename:
+        if 'file' not in form or not form['file'].filename:
             return page(title=_("Cannot upload file"),
                         body = _("You have not selected a file to upload"),
                         language=ln,

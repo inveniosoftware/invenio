@@ -71,7 +71,7 @@ def dict_union(list1, list2):
     for (e, count) in iteritems(list1):
         union_dict[e] = count
     for (e, count) in iteritems(list2):
-        if not union_dict.has_key(e):
+        if e not in union_dict:
             union_dict[e] = count
         else:
             union_dict[e] = (union_dict[e][0] + count[0], count[1])
@@ -115,10 +115,10 @@ def get_words_from_phrase(phrase, weight, lang="",
         if options["remove_stopword"] == "True" and not is_stopword(word) and check_term(word, 0):
             if lang and lang !="none" and options["use_stemming"]:
                 word = stem(word, lang)
-                if not words.has_key(word):
+                if word not in words:
                     words[word] = (0, 0)
             else:
-                if not words.has_key(word):
+                if word not in words:
                     words[word] = (0, 0)
             words[word] = (words[word][0] + weight, 0)
         elif options["remove_stopword"] == "True" and not is_stopword(word):
@@ -127,7 +127,7 @@ def get_words_from_phrase(phrase, weight, lang="",
                 if lang and lang !="none" and options["use_stemming"]:
                     word_ = stem(word_, lang)
                 if word_:
-                    if not words.has_key(word_):
+                    if word_ not in words:
                         words[word_] = (0,0)
                     words[word_] = (words[word_][0] + weight, 0)
     return words
@@ -250,11 +250,11 @@ class WordTable:
 
         set_changed_p = 0
         for recID,sign in iteritems(recIDs):
-            if sign[0] == -1 and set.has_key(recID):
+            if sign[0] == -1 and recID in set:
                 # delete recID if existent in set and if marked as to be deleted
                 del set[recID]
                 set_changed_p = 1
-            elif sign[0] > -1 and not set.has_key(recID):
+            elif sign[0] > -1 and recID not in set:
                 # add recID if not existent in set and if marked as to be added
                 set[recID] = sign
                 set_changed_p = 1
@@ -324,7 +324,7 @@ class WordTable:
                 except (EOFError, KeyboardInterrupt):
                     return
 
-        if self.value.has_key(word):
+        if word in self.value:
             write_message("The word '%s' is found %d times." \
                 % (word, len(self.value[word])))
         else:
@@ -453,7 +453,7 @@ class WordTable:
             for row in res:
                 recID, phrase = row
                 if recID in options["validset"]:
-                    if not wlist.has_key(recID): wlist[recID] = {}
+                    if recID not in wlist: wlist[recID] = {}
                     new_words = get_words_function(phrase, weight, lang) # ,self.separators
                     wlist[recID] = dict_union(new_words,wlist[recID])
 
@@ -509,7 +509,7 @@ class WordTable:
         "Adds/deletes a word to the word list."
         try:
             word = wash_index_term(word)
-            if self.value.has_key(word):
+            if word in self.value:
                 # the word 'word' exist already: update sign
                 self.value[word][recID] = sign
                 # PROBLEM ?
@@ -687,7 +687,7 @@ class WordTable:
                 % (self.tablename[:-1], low, high)
         res = run_sql(query)
         for row in res:
-            if not state.has_key(row[0]):
+            if row[0] not in state:
                 state[row[0]]=[]
             state[row[0]].append(row[1])
 
@@ -918,7 +918,7 @@ def check_rnkWORD(table):
                              query_params)
         for (t, hitlist) in terms_docs:
             term_docs = deserialize_via_marshal(hitlist)
-            if (term_docs.has_key("Gi") and term_docs["Gi"][1] == 0) or not term_docs.has_key("Gi"):
+            if ("Gi" in term_docs and term_docs["Gi"][1] == 0) or "Gi" not in term_docs:
                 write_message("ERROR: Missing value for term: %s (%s) in %s: %s" % (t, repr(t), table, len(term_docs)))
                 errors[t] = 1
         i += 5000
@@ -929,7 +929,7 @@ def check_rnkWORD(table):
         for (j, termlist) in docs_terms:
             termlist = deserialize_via_marshal(termlist)
             for (t, tf) in iteritems(termlist):
-                if tf[1] == 0 and not errors.has_key(t):
+                if tf[1] == 0 and t not in errors:
                     errors[t] = 1
                     write_message("ERROR: Gi missing for record %s and term: %s (%s) in %s" % (j,t,repr(t), table))
                     terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term=%%s" % table, (t,))
@@ -959,7 +959,7 @@ def rank_method_code_statistics(table):
         for (t, hitlist) in terms_docs:
             term_docs=deserialize_via_marshal(hitlist)
             terms[len(term_docs)] = terms.get(len(term_docs), 0) + 1
-            if term_docs.has_key("Gi"):
+            if "Gi" in term_docs:
                 Gi[t] = term_docs["Gi"]
         i=i + 10000
     terms=terms.items()
@@ -995,7 +995,7 @@ def update_rnkWORD(table, terms):
             terms_docs = get_from_forward_index(terms, i, (i+5000), table)
             for (t, hitlist) in terms_docs:
                 term_docs = deserialize_via_marshal(hitlist)
-                if term_docs.has_key("Gi"):
+                if "Gi" in term_docs:
                     del term_docs["Gi"]
                 for (j, tf) in iteritems(term_docs):
                     if (task_get_option("quick") == "yes" and tf[1] == 0) or task_get_option("quick") == "no":
@@ -1030,7 +1030,7 @@ def update_rnkWORD(table, terms):
             for (t, hitlist) in terms_docs:
                 Gi[t] = 0
                 term_docs = deserialize_via_marshal(hitlist)
-                if term_docs.has_key("Gi"):
+                if "Gi" in term_docs:
                     del term_docs["Gi"]
                 for (j, tf) in iteritems(term_docs):
                     Nj[j] = 0
@@ -1050,7 +1050,7 @@ def update_rnkWORD(table, terms):
             terms_docs = get_from_forward_index(terms, i, (i+5000), table)
             for (t, hitlist) in terms_docs:
                 term_docs = deserialize_via_marshal(hitlist)
-                if term_docs.has_key("Gi"):
+                if "Gi" in term_docs:
                     del term_docs["Gi"]
                 Fi = 0
                 Gi[t] = 1
@@ -1069,7 +1069,7 @@ def update_rnkWORD(table, terms):
             terms_docs = get_from_forward_index(terms, i, (i+5000), table)
             for (t, hitlist) in terms_docs:
                 term_docs = deserialize_via_marshal(hitlist)
-                if term_docs.has_key("Gi"):
+                if "Gi" in term_docs:
                     Gi[t] = term_docs["Gi"][1]
                 elif len(term_docs) == 1:
                     Gi[t] = 1
@@ -1095,7 +1095,7 @@ def update_rnkWORD(table, terms):
             doc_terms = deserialize_via_marshal(termlist)
             try:
                 for (t, tf) in iteritems(doc_terms):
-                    if Gi.has_key(t):
+                    if t in Gi:
                         Nj[j] = Nj.get(j, 0) + math.pow(Gi[t] * (1 + math.log(tf[0])), 2)
                         Git = int(math.floor(Gi[t]*100))
                         if Git >= 0:
@@ -1124,10 +1124,10 @@ def update_rnkWORD(table, terms):
         for (t, hitlist) in terms_docs:
             try:
                 term_docs = deserialize_via_marshal(hitlist)
-                if term_docs.has_key("Gi"):
+                if "Gi" in term_docs:
                     del term_docs["Gi"]
                 for (j, tf) in iteritems(term_docs):
-                    if Nj.has_key(j):
+                    if j in Nj:
                         term_docs[j] = (tf[0], Nj[j])
                 Git = int(math.floor(Gi[t]*100))
                 if Git >= 0:

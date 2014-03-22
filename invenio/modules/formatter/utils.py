@@ -613,9 +613,9 @@ def get_pdf_snippets(recID, patterns, user_info):
 
     nb_chars = CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.get('', 0)
     max_snippets = CFG_WEBSEARCH_FULLTEXT_SNIPPETS.get('', 0)
-    if CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.has_key(text_path_courtesy):
+    if text_path_courtesy in CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS:
         nb_chars=CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS[text_path_courtesy]
-    if CFG_WEBSEARCH_FULLTEXT_SNIPPETS.has_key(text_path_courtesy):
+    if text_path_courtesy in CFG_WEBSEARCH_FULLTEXT_SNIPPETS:
         max_snippets=CFG_WEBSEARCH_FULLTEXT_SNIPPETS[text_path_courtesy]
 
     if text_path and nb_chars and max_snippets:

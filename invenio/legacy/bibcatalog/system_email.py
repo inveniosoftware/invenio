@@ -83,7 +83,7 @@ class BibCatalogSystemEmail(BibCatalogSystem):
             requestorset = " requestor:" + escape_shell_arg(requestor) + '\n'
         if owner:
             ownerprefs = invenio.legacy.webuser.get_user_preferences(owner)
-            if ownerprefs.has_key("bibcatalog_username"):
+            if "bibcatalog_username" in ownerprefs:
                 owner = ownerprefs["bibcatalog_username"]
             ownerset = " owner:" + escape_shell_arg(owner) + '\n'
 

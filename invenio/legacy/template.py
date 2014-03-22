@@ -179,7 +179,7 @@ def check(default_base_dir=None, custom_base_dir=None):
         # Check customized functions parameters
         for (default_function_name, default_function) in \
                 inspect.getmembers(default_template.Template, inspect.isroutine):
-            if custom_template.Template.__dict__.has_key(default_function_name):
+            if default_function_name in custom_template.Template.__dict__:
                 # Customized function exists
                 custom_function = custom_template.Template.__dict__[default_function_name]
 
@@ -223,9 +223,9 @@ def check(default_base_dir=None, custom_base_dir=None):
                                          inspect.getsourcelines(custom_function)[1]))
                         # If parameter is deprecated, report it
                         module_name = default_tpl_name.split("_")[0]
-                        if CFG_WEBSTYLE_DEPRECATED_PARAMETERS.has_key(module_name) and \
-                               CFG_WEBSTYLE_DEPRECATED_PARAMETERS[module_name].has_key(default_function_name) and \
-                               CFG_WEBSTYLE_DEPRECATED_PARAMETERS[module_name][default_function_name].has_key(cust_arg):
+                        if module_name in CFG_WEBSTYLE_DEPRECATED_PARAMETERS and \
+                               default_function_name in CFG_WEBSTYLE_DEPRECATED_PARAMETERS[module_name] and \
+                               cust_arg in CFG_WEBSTYLE_DEPRECATED_PARAMETERS[module_name][default_function_name]:
                             messages.append(('C', CFG_WEBSTYLE_DEPRECATED_PARAMETERS[module_name][default_function_name][cust_arg],
                                              custom_tpl_name,
                                              custom_function.__name__,
@@ -267,7 +267,7 @@ def check(default_base_dir=None, custom_base_dir=None):
         for (custom_function_name, custom_function) in \
                 inspect.getmembers(custom_template.Template, inspect.isroutine):
 
-            if not default_template.Template.__dict__.has_key(custom_function_name):
+            if custom_function_name not in default_template.Template.__dict__:
                 messages.append(('W', "unknown function",
                                  custom_tpl_name,
                                  custom_function_name,
@@ -275,8 +275,8 @@ def check(default_base_dir=None, custom_base_dir=None):
 
                 # If the function was deprecated, report it
                 module_name = default_tpl_name.split("_")[0]
-                if CFG_WEBSTYLE_DEPRECATED_FUNCTIONS.has_key(module_name) and \
-                       CFG_WEBSTYLE_DEPRECATED_FUNCTIONS[module_name].has_key(custom_function_name):
+                if module_name in CFG_WEBSTYLE_DEPRECATED_FUNCTIONS and \
+                       custom_function_name in CFG_WEBSTYLE_DEPRECATED_FUNCTIONS[module_name]:
                     messages.append(('C', CFG_WEBSTYLE_DEPRECATED_FUNCTIONS[module_name][custom_function_name],
                                  custom_tpl_name,
                                  custom_function_name,

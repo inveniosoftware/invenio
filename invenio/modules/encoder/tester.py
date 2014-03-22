@@ -124,7 +124,7 @@ def download(url, localFileName = None):
     localName = url2name(url)
     req = urllib2.Request(url)
     r = make_invenio_opener('BibEncode').open(req)
-    if r.info().has_key('Content-Disposition'):
+    if 'Content-Disposition' in r.info():
         # If the response has Content-Disposition, we take file name from it
         localName = r.info()['Content-Disposition'].split('filename=')[1]
         if localName[0] == '"' or localName[0] == "'":

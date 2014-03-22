@@ -51,7 +51,7 @@ class BibIndexFiletypeTokenizer(BibIndexEmptyTokenizer):
         """
         values = []
         try:
-            if record.has_key('filetypes'):
+            if 'filetypes' in record:
                 values = record['filetypes']
         except KeyError:
             pass

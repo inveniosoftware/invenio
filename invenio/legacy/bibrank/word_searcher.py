@@ -70,7 +70,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose, 
     tf_values = {}
     #Calculate all term frequencies
     for (term, tf) in iteritems(rec_terms):
-        if len(term) >= methods[rank_method_code]["min_word_length"] and terms_recs.has_key(term) and tf[1] != 0:
+        if len(term) >= methods[rank_method_code]["min_word_length"] and term in terms_recs and tf[1] != 0:
             tf_values[term] =  int((1 + math.log(tf[0])) * tf[1]) #calculate term weigth
     tf_values = tf_values.items()
     tf_values.sort(lambda x, y: cmp(y[1], x[1])) #sort based on weigth
@@ -115,7 +115,7 @@ def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_te
 
 
     (t, qtf) = term
-    if invidx.has_key("Gi"): #Gi = weigth for this term, created by bibrank_word_indexer
+    if "Gi" in invidx: #Gi = weigth for this term, created by bibrank_word_indexer
         Gi = invidx["Gi"][1]
         del invidx["Gi"]
     else: #if not existing, bibrank should be run with -R
@@ -130,7 +130,7 @@ def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_te
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
     elif quick: #much used term, do not include all records, only use already existing ones
         for (j, tf) in iteritems(recdict): #i.e: if doc contains important term, also count unimportant
-            if invidx.has_key(j):
+            if j in invidx:
                 tf = invidx[j]
                 recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
@@ -199,7 +199,7 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance, verb
             lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
             terms = string.split(string.lower(re.sub(methods[rank_method_code]["chars_alphanumericseparators"], ' ', term)))
             for term in terms:
-                if methods[rank_method_code].has_key("stemmer"): # stem word
+                if "stemmer" in methods[rank_method_code]: # stem word
                     term = stem(string.replace(term, ' ', ''), methods[rank_method_code]["stemmer"])
                 if lwords_old[i] != term: #add if stemmed word is different than original word
                     lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
@@ -247,7 +247,7 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
 
 
     (t, qtf) = term
-    if invidx.has_key("Gi"):#Gi = weigth for this term, created by bibrank_word_indexer
+    if "Gi" in invidx:#Gi = weigth for this term, created by bibrank_word_indexer
         Gi = invidx["Gi"][1]
         del invidx["Gi"]
     else: #if not existing, bibrank should be run with -R
@@ -264,7 +264,7 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
     elif quick: #much used term, do not include all records, only use already existing ones
         for (j, tf) in iteritems(recdict): #i.e: if doc contains important term, also count unimportant
-            if invidx.has_key(j):
+            if j in invidx:
                 tf = invidx[j]
                 recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
@@ -318,7 +318,7 @@ def rank_method_stat(rank_method_code, reclist, lwords):
             term_recs = run_sql("""SELECT hitlist FROM %s WHERE term=%%s""" % table, (term,))
             if term_recs:
                 term_recs = deserialize_via_marshal(term_recs[0][0])
-                if term_recs.has_key(reclist[len(reclist) - i][0]):
+                if reclist[len(reclist) - i][0] in term_recs:
                     voutput += "%s-%s / " % (term, term_recs[reclist[len(reclist) - i][0]])
         voutput += "<br />"
 
@@ -328,7 +328,7 @@ def rank_method_stat(rank_method_code, reclist, lwords):
         count[reclist[i][1]] = count.get(reclist[i][1], 0) + 1
     i = 100
     while i >= 0:
-        if count.has_key(i):
+        if i in count:
             voutput += "%s-%s<br />" % (i, count[i])
         i -= 1
 

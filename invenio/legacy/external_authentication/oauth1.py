@@ -126,7 +126,7 @@ class ExternalOAuth1(ExternalAuth):
         # Some providers send the identity and access token together.
         email, identity = self._get_user_email_and_id(response.content, req)
 
-        if not identity and config.has_key('request_url'):
+        if not identity and 'request_url' in config:
             # For some providers, to reach user profile we need to make request
             # to a specific url.
             params = config.get('request_parameters', {})
@@ -187,9 +187,7 @@ class ExternalOAuth1(ExternalAuth):
 
         if req.g['oauth1_provider_name']:
             path = None
-            if CFG_OAUTH1_CONFIGURATIONS[req.g['oauth1_provider_name']].has_key(
-                                                                     'nickname'
-                                                                     ):
+            if 'nickname' in CFG_OAUTH1_CONFIGURATIONS[req.g['oauth1_provider_name']]:
                 path = CFG_OAUTH1_CONFIGURATIONS[req.g['oauth1_provider_name']]['nickname']
 
             if path:
@@ -213,12 +211,12 @@ class ExternalOAuth1(ExternalAuth):
         identity = None
         email = None
 
-        if CFG_OAUTH1_CONFIGURATIONS[req.g['oauth1_provider_name']].has_key('id'):
+        if 'id' in CFG_OAUTH1_CONFIGURATIONS[req.g['oauth1_provider_name']]:
             path = CFG_OAUTH1_CONFIGURATIONS[req.g['oauth1_provider_name']]['id']
             identity = get_substructure(container, path)
 
         if identity:
-            if CFG_OAUTH1_CONFIGURATIONS[req.g['oauth1_provider_name']].has_key('email'):
+            if 'email' in CFG_OAUTH1_CONFIGURATIONS[req.g['oauth1_provider_name']]:
                 path = CFG_OAUTH1_CONFIGURATIONS[req.g['oauth1_provider_name']]['email']
                 email = get_substructure(container, path)
 

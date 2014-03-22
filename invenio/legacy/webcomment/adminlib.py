@@ -191,7 +191,7 @@ def query_get_users_reported():
     users = {}
     for cmt in res1:
         uid = int(cmt[3])
-        if users.has_key(uid):
+        if uid in users:
             users[uid] = (users[uid][0]+int(cmt[0]), int(cmt[6])>0 and users[uid][1] or users[uid][1]+1, int(cmt[6])>0 and users[uid][2]+1 or users[uid][2],
                           users[uid][3]+int(cmt[1]), users[uid][4]+int(cmt[2]), int(cmt[3]), cmt[4], cmt[5])
         else:

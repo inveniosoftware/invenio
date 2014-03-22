@@ -243,7 +243,7 @@ def add_cookies(req, cookies):
     Sets one or more cookie in outgoing headers and adds a cache
     directive so that caches don't cache the cookie.
     """
-    if not req.headers_out.has_key("Set-Cookie"):
+    if "Set-Cookie" not in req.headers_out:
         g = _RE_BAD_MSIE.search(req.headers_in.get('User-Agent', "MSIE 6.0"))
         bad_msie = g and float(g.group(1)) < 9.0
         if not (bad_msie and req.is_https()):
@@ -259,7 +259,7 @@ def get_cookies(req, Class=Cookie, **kw):
     this module.
     """
 
-    if not req.headers_in.has_key("cookie"):
+    if "cookie" not in req.headers_in:
         return {}
 
     cookies = req.headers_in["cookie"]
@@ -270,7 +270,7 @@ def get_cookies(req, Class=Cookie, **kw):
 
 def get_cookie(req, name, Class=Cookie, **kw):
     cookies = get_cookies(req, Class, names=[name], **kw)
-    if cookies.has_key(name):
+    if name in cookies:
         return cookies[name]
 
 
@@ -322,7 +322,7 @@ class Field:
         self.type_options = type_options
         self.disposition = disp
         self.disposition_options = disp_options
-        if disp_options.has_key("filename"):
+        if "filename" in disp_options:
             self.filename = disp_options["filename"]
         else:
             self.filename = None
@@ -467,7 +467,7 @@ class FieldStorage:
 
         self.clen = clen
         self.count = 0
-        if not req.headers_in.has_key("content-type"):
+        if "content-type" not in req.headers_in:
             ctype = "application/x-www-form-urlencoded"
         else:
             ctype = req.headers_in["content-type"]
@@ -564,14 +564,14 @@ class FieldStorage:
             if skip_this_part:
                 continue
 
-            if disp_options.has_key("name"):
+            if "name" in disp_options:
                 name = disp_options["name"]
             else:
                 name = None
 
             # create a file object
             # is this a file?
-            if disp_options.has_key("filename"):
+            if "filename" in disp_options:
                 if file_callback and callable(file_callback):
                     file = file_callback(disp_options["filename"])
                 else:
@@ -592,7 +592,7 @@ class FieldStorage:
             file.seek(0)
 
             # make a Field
-            if disp_options.has_key("filename"):
+            if "filename" in disp_options:
                 field = Field(name)
                 field.filename = disp_options["filename"]
             else:
@@ -614,7 +614,7 @@ class FieldStorage:
 
     def __setitem__(self, key, value):
         table = self.list.table()
-        if table.has_key(key):
+        if key in table:
             items = table[key]
             for item in items:
                 self.list.remove(item)

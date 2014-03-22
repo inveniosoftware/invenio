@@ -1192,7 +1192,7 @@ def perform_request_search(uid,
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
-                    if personal_search_results.has_key(bskid):
+                    if bskid in personal_search_results:
                         personal_search_results[bskid][2] += 1
                         personal_search_results[bskid][3].append(recid)
                     else:
@@ -1207,7 +1207,7 @@ def perform_request_search(uid,
                     topic       = info_per_basket_by_matching_notes[2]
                     recid_list  = info_per_basket_by_matching_notes[3]
                     recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
-                    if personal_search_results.has_key(bskid):
+                    if bskid in personal_search_results:
                         no_personal_search_results_per_basket_so_far = personal_search_results[bskid][2]
                         personal_search_results[bskid][3] = list(set(personal_search_results[bskid][3]).union(recids_per_basket_by_matching_notes))
                         personal_search_results[bskid][2] = len(personal_search_results[bskid][3])
@@ -1273,7 +1273,7 @@ def perform_request_search(uid,
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
-                    if group_search_results.has_key(bskid):
+                    if bskid in group_search_results:
                         group_search_results[bskid][4] += 1
                         group_search_results[bskid][5].append(recid)
                     else:
@@ -1293,7 +1293,7 @@ def perform_request_search(uid,
                     share_rights = info_per_basket_by_matching_notes[4]
                     recid_list  = info_per_basket_by_matching_notes[5]
                     recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
-                    if group_search_results.has_key(bskid):
+                    if bskid in group_search_results:
                         no_group_search_results_per_basket_so_far = group_search_results[bskid][4]
                         group_search_results[bskid][5] = list(set(group_search_results[bskid][5]).union(recids_per_basket_by_matching_notes))
                         group_search_results[bskid][4] = len(group_search_results[bskid][5])
@@ -1358,7 +1358,7 @@ def perform_request_search(uid,
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
-                    if public_search_results.has_key(bskid):
+                    if bskid in public_search_results:
                         public_search_results[bskid][2] += 1
                         public_search_results[bskid][3].append(recid)
                     else:
@@ -1376,7 +1376,7 @@ def perform_request_search(uid,
                     share_rights = info_per_basket_by_matching_notes[2]
                     recid_list  = info_per_basket_by_matching_notes[3]
                     recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
-                    if public_search_results.has_key(bskid):
+                    if bskid in public_search_results:
                         no_public_search_results_per_basket_so_far = public_search_results[bskid][2]
                         public_search_results[bskid][3] = list(set(public_search_results[bskid][3]).union(recids_per_basket_by_matching_notes))
                         public_search_results[bskid][2] = len(public_search_results[bskid][3])
@@ -1441,7 +1441,7 @@ def perform_request_search(uid,
                 #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
-                    if all_public_search_results.has_key(bskid):
+                    if bskid in all_public_search_results:
                         all_public_search_results[bskid][2] += 1
                         all_public_search_results[bskid][3].append(recid)
                     else:
@@ -1459,7 +1459,7 @@ def perform_request_search(uid,
                     share_rights = info_per_basket_by_matching_notes[2]
                     recid_list  = info_per_basket_by_matching_notes[3]
                     recids_per_basket_by_matching_notes = set(map(int, recid_list.strip(',').split(',')))
-                    if all_public_search_results.has_key(bskid):
+                    if bskid in all_public_search_results:
                         no_all_public_search_results_per_basket_so_far = all_public_search_results[bskid][2]
                         all_public_search_results[bskid][3] = list(set(all_public_search_results[bskid][3]).union(recids_per_basket_by_matching_notes))
                         all_public_search_results[bskid][2] = len(all_public_search_results[bskid][3])

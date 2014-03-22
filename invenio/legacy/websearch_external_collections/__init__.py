@@ -164,14 +164,14 @@ def select_external_engines(collection_name, selected_external_searches):
     seealso_engines = set()
     search_engines = set()
 
-    if dico_collection_seealso.has_key(collection_id):
+    if collection_id in dico_collection_seealso:
         seealso_engines = copy(dico_collection_seealso[collection_id])
 
-    if dico_collection_external_searches.has_key(collection_id):
+    if collection_id in dico_collection_external_searches:
         seealso_engines = seealso_engines.union(dico_collection_external_searches[collection_id])
 
     for ext_search_name in selected_external_searches:
-        if external_collections_dictionary.has_key(ext_search_name):
+        if ext_search_name in external_collections_dictionary:
             engine = external_collections_dictionary[ext_search_name]
             if engine.parser:
                 search_engines.add(engine)
@@ -229,13 +229,13 @@ def external_collection_load_states():
             search_type = int(result[1])
             engine_name = result[2]
 
-            if not external_collections_dictionary.has_key(engine_name):
+            if engine_name not in external_collections_dictionary:
                 warning("No search engine : " + engine_name)
                 continue
 
             engine = external_collections_dictionary[engine_name]
 
-            if not external_collections_state.has_key(collection_id):
+            if collection_id not in external_collections_state:
                 external_collections_state[collection_id] = {}
             col_states = external_collections_state[collection_id]
 
@@ -252,17 +252,17 @@ def external_collection_load_states():
             if dictionary is None:
                 continue
 
-            if not dictionary.has_key(collection_id):
+            if collection_id not in dictionary:
                 dictionary[collection_id] = set()
             engine_set = dictionary[collection_id]
             engine_set.add(engine)
 
 def external_collection_get_state(external_collection, collection_id):
     external_collection_load_states()
-    if not external_collections_state.has_key(collection_id):
+    if collection_id not in external_collections_state:
         return 0
     col_states = external_collections_state[collection_id]
-    if not col_states.has_key(external_collection):
+    if external_collection not in col_states:
         return 0
     return col_states[external_collection]
 
@@ -302,7 +302,7 @@ def external_collection_sort_engine_by_name(engines_set):
 def external_collection_getid(external_collection):
     """Return the id of an external_collection. Will create a new entry in DB if needed."""
 
-    if external_collection.__dict__.has_key('id'):
+    if 'id' in external_collection.__dict__:
         return external_collection.id
 
     query = 'SELECT id FROM externalcollection WHERE name="%(name)s";' % {'name': external_collection.name}
@@ -318,7 +318,7 @@ def external_collection_getid(external_collection):
 def get_external_collection_engine(external_collection_name):
     """Return the external collection engine given its name"""
 
-    if external_collections_dictionary.has_key(external_collection_name):
+    if external_collection_name in external_collections_dictionary:
         return external_collections_dictionary[external_collection_name]
     else:
         return None
@@ -400,7 +400,7 @@ def select_hosted_search_engines(selected_hosted_collections):
     hosted_search_engines = set()
 
     for hosted_collection_name in selected_hosted_collections:
-        if external_collections_dictionary.has_key(hosted_collection_name):
+        if hosted_collection_name in external_collections_dictionary:
             engine = external_collections_dictionary[hosted_collection_name]
             # the hosted collection cannot present its results unless it has a parser implemented
             if engine.parser:

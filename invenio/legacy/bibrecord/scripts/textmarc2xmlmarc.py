@@ -56,14 +56,14 @@ class Field:
 
     def has_subfield(self, subfield_code):
         "Does the field contain this subfield?"
-        if self.value.has_key(subfield_code):
+        if subfield_code in self.value:
             return 1
         else:
             return 0
 
     def get_subfield(self, subfield_code=''):
         "Returns the value of a given subfield."
-        if self.value.has_key(subfield_code):
+        if subfield_code in self.value:
             return self.value[subfield_code][0] # return first subfield
         else:
             return ""
@@ -73,7 +73,7 @@ class Field:
         c = string.strip(subfield_code)
         v = string.strip(subfield_value)
         if v: # let us disregard empty subfields
-            if self.value.has_key(c):
+            if c in self.value:
                 self.value[c].append(v)
             else:
                 self.value[c] = [v]
@@ -108,14 +108,14 @@ class Record:
     def add(self, field_tag, field_value):
         "Adds the field to the record."
         t = string.strip(field_tag)
-        if self.field.has_key(t):
+        if t in self.field:
             self.field[t].append(field_value)
         else:
             self.field[t] = [field_value]
 
     def has_basenb(self, bases):
         "Tests whether one of record's BASE values is among one of the values passed in argument tuple."
-        if self.field.has_key('BASE'):
+        if 'BASE' in self.field:
             for f in self.field['BASE']:
                 try:
                     b = int(f.get_subfield()) # get BASE number
@@ -123,7 +123,7 @@ class Record:
                         return 1
                 except:
                     pass
-        if self.field.has_key('BA'):
+        if 'BA' in self.field:
             for f in self.field['BA']:
                 try:
                     b = int(f.get_subfield()) # get BASE number
@@ -131,7 +131,7 @@ class Record:
                         return 1
                 except:
                     pass
-        if self.field.has_key('BAS'):
+        if 'BAS' in self.field:
             for f in self.field['BAS']:
                 try:
                     b = int(f.get_subfield('a')) # get BASE number
@@ -139,7 +139,7 @@ class Record:
                         return 1
                 except:
                     pass
-        if self.field.has_key('960'):
+        if '960' in self.field:
             for f in self.field['960']:
                 try:
                     b = int(f.get_subfield('a')) # get BASE number

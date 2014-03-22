@@ -111,7 +111,7 @@ def _verify_filename(name, seen_filenames, filename_collision, num_random_bits, 
 
     # name could be a filename or directory.
 
-    if seen_filenames.has_key(name):
+    if name in seen_filenames:
         seen_filenames[name] += 1
         times = seen_filenames[name]
 
@@ -126,7 +126,7 @@ def _verify_filename(name, seen_filenames, filename_collision, num_random_bits, 
             # incrementing, we need to check the increment
             # doesn't collide as well:
             incremented_basename = str(times) + '.' + basename
-            while seen_filenames.has_key(os.path.join(dirname, incremented_basename)):
+            while os.path.join(dirname, incremented_basename) in seen_filenames:
                 times += 1
                 incremented_basename = str(times) + '.' + basename
 
@@ -139,7 +139,7 @@ def _verify_filename(name, seen_filenames, filename_collision, num_random_bits, 
             # Just in case of random collision, we introduce the while loop.
             randbasename = _random_alphanum_string(num_random_bits, chars=rename_from_set)
             tries = 1
-            while seen_filenames.has_key(os.path.join(dirname, randbasename)):
+            while os.path.join(dirname, randbasename) in seen_filenames:
                 randbasename = _random_alphanum_string(num_random_bits, chars=rename_from_set)
                 # If user gives small set rename_from_set and low number of bits,
                 # then it is possible we will exhaust all posibile combinations:

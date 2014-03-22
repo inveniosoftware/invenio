@@ -66,7 +66,7 @@ def get_collection_id(name):
 
     collections_id_load()
 
-    if collections_id.has_key(name):
+    if name in collections_id:
         return collections_id[name]
     else:
         return None

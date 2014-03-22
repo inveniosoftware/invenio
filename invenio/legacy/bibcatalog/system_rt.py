@@ -108,13 +108,13 @@ class BibCatalogSystemRT(BibCatalogSystem):
             #search for this person's bibcatalog_username in preferences
             creatorprefs = invenio.legacy.webuser.get_user_preferences(creator)
             creator = "Nobody can Have This Kind of Name"
-            if creatorprefs.has_key("bibcatalog_username"):
+            if "bibcatalog_username" in creatorprefs:
                 creator = creatorprefs["bibcatalog_username"]
             search_atoms.append("Creator = " + escape_shell_arg(str(creator)))
         if (len(str(owner)) > 0):
             ownerprefs = invenio.legacy.webuser.get_user_preferences(owner)
             owner = "Nobody can Have This Kind of Name"
-            if ownerprefs.has_key("bibcatalog_username"):
+            if "bibcatalog_username" in ownerprefs:
                 owner = ownerprefs["bibcatalog_username"]
             search_atoms.append("Owner = " + escape_shell_arg(str(owner)))
         if (len(date_from) > 0):
@@ -191,7 +191,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if owner:
             #get the owner name from prefs
             ownerprefs = invenio.legacy.webuser.get_user_preferences(owner)
-            if ownerprefs.has_key("bibcatalog_username"):
+            if "bibcatalog_username" in ownerprefs:
                 owner = ownerprefs["bibcatalog_username"]
                 ownerset = " owner=" + escape_shell_arg(owner)
         if text:
@@ -254,7 +254,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if (attribute == 'owner'):
             #convert from invenio to RT
             ownerprefs = invenio.legacy.webuser.get_user_preferences(new_value)
-            if not ownerprefs.has_key("bibcatalog_username"):
+            if "bibcatalog_username" not in ownerprefs:
                 return 0
             else:
                 owner = escape_shell_arg(ownerprefs["bibcatalog_username"])
@@ -285,7 +285,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
     def ticket_get_attribute(self, uid, ticketid, attribute):
         """return an attribute of a ticket"""
         ticinfo = self.ticket_get_info(uid, ticketid, [attribute])
-        if ticinfo.has_key(attribute):
+        if attribute in ticinfo:
             return ticinfo[attribute]
         return None
 
@@ -343,11 +343,11 @@ class BibCatalogSystemRT(BibCatalogSystem):
             candict = {}
             for f in BibCatalogSystem.TICKET_ATTRIBUTES:
                 tcased = f.title()
-                if tdict.has_key(tcased):
+                if tcased in tdict:
                     candict[f] = tdict[tcased]
-            if tdict.has_key('CF.{RecordID}'):
+            if 'CF.{RecordID}' in tdict:
                 candict['recordid'] = tdict['CF.{RecordID}']
-            if tdict.has_key('id'):
+            if 'id' in tdict:
                 candict['ticketid'] = tdict['id']
             #make specific URL attributes:
             url_display = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Display.html?id="+str(ticketid)
@@ -357,7 +357,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             url_modify = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/ModifyAll.html?id="+str(ticketid)
             candict['url_modify'] = url_modify
             #change the ticket owner into invenio UID
-            if tdict.has_key('owner'):
+            if 'owner' in tdict:
                 rt_owner = tdict["owner"]
                 uid = invenio.legacy.webuser.get_uid_based_on_pref("bibcatalog_username", rt_owner)
                 candict['owner'] = uid
@@ -366,7 +366,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             else: #return only the fields that were requested
                 tdict = {}
                 for myatt in attributes:
-                    if candict.has_key(myatt):
+                    if myatt in candict:
                         tdict[myatt] = candict[myatt]
                 return tdict
         else:

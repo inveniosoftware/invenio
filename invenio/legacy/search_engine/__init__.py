@@ -567,7 +567,7 @@ class CollectionI18nNameDataCacher(DataCacher):
                 return {}
             for c, ln, i18nname in res:
                 if i18nname:
-                    if not ret.has_key(c):
+                    if c not in ret:
                         ret[c] = {}
                     ret[c][ln] = i18nname
             return ret
@@ -624,7 +624,7 @@ class FieldI18nNameDataCacher(DataCacher):
                 return {}
             for f, ln, i18nname in res:
                 if i18nname:
-                    if not ret.has_key(f):
+                    if f not in ret:
                         ret[f] = {}
                     ret[f][ln] = i18nname
             return ret
@@ -735,7 +735,7 @@ def get_words_from_pattern(pattern):
     # clean trailing punctuation signs inside pattern
     pattern = re_punctuation_followed_by_space.sub(' ', pattern)
     for word in string.split(pattern):
-        if not words.has_key(word):
+        if word not in words:
             words[word] = 1
     return words.keys()
 
@@ -1397,13 +1397,13 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
     # check what type is 'cc':
     if type(cc) is list:
         for ci in cc:
-            if collection_reclist_cache.cache.has_key(ci):
+            if ci in collection_reclist_cache.cache:
                 # yes this collection is real, so use it:
                 cc = ci
                 break
     else:
         # check once if cc is real:
-        if not collection_reclist_cache.cache.has_key(cc):
+        if cc not in collection_reclist_cache.cache:
             if cc:
                 raise InvenioWebSearchUnknownCollectionError(cc)
             else:
@@ -1424,7 +1424,7 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
     # remove all 'unreal' collections:
     colls_real = []
     for coll in colls:
-        if collection_reclist_cache.cache.has_key(coll):
+        if coll in collection_reclist_cache.cache:
             colls_real.append(coll)
         else:
             if coll:
@@ -2304,7 +2304,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
 
     ## eventually look up runtime synonyms:
     hitset_synonyms = intbitset()
-    if CFG_WEBSEARCH_SYNONYM_KBRS.has_key(f):
+    if f in CFG_WEBSEARCH_SYNONYM_KBRS:
         if ignore_synonyms is None:
             ignore_synonyms = []
         ignore_synonyms.append(p)
@@ -4193,7 +4193,7 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
                 # no sort pattern defined, so join them all together
                 val = string.join(vals)
             val = strip_accents(val.lower()) # sort values regardless of accents and case
-            if recIDs_dict.has_key(val):
+            if val in recIDs_dict:
                 recIDs_dict[val].append(recID)
             else:
                 recIDs_dict[val] = [recID]
@@ -5464,7 +5464,7 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
            and req.args and not isinstance(req.args, dict): # we do not want to add options while browsing or while calling via command-line
         fieldargs = cgi.parse_qs(req.args)
         for fieldcode in get_fieldcodes():
-            if fieldargs.has_key(fieldcode):
+            if fieldcode in fieldargs:
                 for val in fieldargs[fieldcode]:
                     pl += "+%s:\"%s\" " % (fieldcode, val)
                     pl_in_url += "&amp;%s=%s" % (urllib.quote(fieldcode), urllib.quote(val))
@@ -6135,7 +6135,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
     results_final_colls = []
     wlqh_results_overlimit = 0
     for coll in colls_to_search:
-        if results_final.has_key(coll) and len(results_final[coll]):
+        if coll in results_final and len(results_final[coll]):
             if of.startswith("h"):
                 req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                             jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,

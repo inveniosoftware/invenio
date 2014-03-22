@@ -126,8 +126,7 @@ class ExternalOAuth2(ExternalAuth):
         ## This is to ease exception frame analysis
         token_content = token.content
 
-        if token.content.has_key('error') or not \
-                                        token_content.has_key('access_token'):
+        if 'error' in token.content or 'access_token' not in token_content:
             if token_content.get('error') == 'access_denied':
                 req.g['oauth2_msg'] = 21
                 return None, None
@@ -194,9 +193,7 @@ class ExternalOAuth2(ExternalAuth):
 
         if req.g['oauth2_provider_name'] and req.g['oauth2_response']:
             path = None
-            if CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']].has_key(
-                                                                     'nickname'
-                                                                     ):
+            if 'nickname' in CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]:
                 path = CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]['nickname']
 
             if path:
@@ -224,12 +221,12 @@ class ExternalOAuth2(ExternalAuth):
         #if req.g['oauth2_provider_name'] == 'orcid':
 
 
-        if CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']].has_key('id'):
+        if 'id' in CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]:
             path = CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]['id']
             identity = get_substructure(container, path)
 
         if identity:
-            if CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']].has_key('email'):
+            if 'email' in CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]:
                 path = CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]\
                     ['email']
                 email = get_substructure(container, path)
