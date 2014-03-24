@@ -35,7 +35,7 @@ from invenio.dateutils import convert_datetext_to_dategui, \
                               create_year_selectbox
 from invenio.urlutils import create_html_link, create_url
 from invenio.htmlutils import escape_html
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webuser import get_user_info
 
@@ -681,21 +681,28 @@ class Template:
                      'add_button'         : add_button}
         return out
 
-    def tmpl_account_new_mail(self, nb_new_mail=0, total_mail=0, ln=CFG_SITE_LANG):
+    def tmpl_account_user_messages(self, total = 0, unread = 0, ln = CFG_SITE_LANG):
         """
-        display infos about inbox (used by myaccount.py)
-        @param nb_new_mail: number of new mails
+        Information about the user's messages for the "Your Account" page.
+        @param total: total number of messages
+        @param unread: number of unread messages
         @param ln: language
-        return: html output.
+        return: information in HTML
         """
+
         _ = gettext_set_language(ln)
-        out = _("You have %(x_nb_new)s new messages out of %(x_nb_total)s messages") % \
-              {'x_nb_new': '<b>' + str(nb_new_mail) + '</b>',
-               'x_nb_total': create_html_link(CFG_SITE_URL + '/yourmessages/',
-                                              {'ln': ln},
-                                              str(total_mail),
-                                              {},
-                                              False, False)}
-        return out + '.'
 
+        if total > 0:
+            out = _("You have received a total of %(x_url_open)s%(x_total)s messages (%(x_unread)s unread)%(x_url_close)s.") % \
+                  {'x_url_open'  : '<strong><a href="%s/yourmessages/display?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                   'x_total'     : str(total),
+                   'x_unread'    : str(unread),
+                   'x_url_close' : '</a></strong>'}
+        else:
+            out = _("You have not received any messages yet.")
 
+        out += " " + _("You might be interested in %(x_url_open)swriting a new message%(x_url_close)s.") % \
+                     {'x_url_open'  : '<a href="%s/yourmessages/write?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                      'x_url_close' : '</a>',}
+
+        return out

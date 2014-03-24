@@ -21,7 +21,6 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql
-from invenio.webaccount import warning_guest_user
 from invenio.messages import gettext_set_language
 from invenio.webuser import isGuestUser
 from urllib import quote
@@ -151,31 +150,27 @@ def perform_request_yoursearches_display(uid,
         p=p,
         ln = ln)
 
-def account_list_searches(uid,
-                          ln=CFG_SITE_LANG):
+def account_user_searches(uid, ln = CFG_SITE_LANG):
     """
-    Display a short summary of the searches the user has performed.
+    Information on the user's searches for the "Your Account" page
     @param uid: The user id
     @type uid: int
-    @return: A short summary of the user searches.
+    @param ln: The interface language
+    @type ln: str
+    @return: A short summary on the user's searches.
     """
 
-    # load the right language
-    _ = gettext_set_language(ln)
-    
-    query = """ SELECT  COUNT(uq.id_query)
-                FROM    user_query uq
-                WHERE   uq.id_user=%s"""
+    # Calculate the number of total and unique queries
+    query = """ SELECT  COUNT(id_query),
+                        COUNT(DISTINCT(id_query))
+                FROM    user_query
+                WHERE   id_user=%s"""
     params = (uid,)
-    result = run_sql(query, params, 1)
-    if result:
-        nb_queries_total = result[0][0]
-    else:
-        nb_queries_total = 0
+    res = run_sql(query, params)
 
-    out = _("You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s is available with a possibility to (a) view search results and (b) subscribe to an automatic email alerting service for these queries.") % \
-        {'x_nb': nb_queries_total,
-         'x_url_open': '<a href="%s/yoursearches/display?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
-         'x_url_close': '</a>'}
+    total = res[0][0]
+    unique = res[0][1]
+
+    out = websearch_templates.tmpl_account_user_searches(unique, total, ln)
 
     return out

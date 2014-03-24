@@ -761,21 +761,31 @@ def perform_request_reject_member(uid,
                                                  ln=ln)
     return body
 
-def account_group(uid, ln=CFG_SITE_LANG):
-    """Display group info for myaccount.py page.
-    @param uid: user id (int)
-    @param ln: language
-    @return: html body
+def account_user_groups(uid, ln=CFG_SITE_LANG):
     """
-    nb_admin_groups = db.count_nb_group_user(uid,
+    Information on the user's groups for the "Your Account" page
+    @param uid: user id (int)
+    @param ln: language (str)
+    @return: information in HTML
+    """
+
+    nb_admin_groups = db.count_nb_group_user(
+        uid,
         CFG_WEBSESSION_USERGROUP_STATUS["ADMIN"])
-    nb_member_groups = db.count_nb_group_user(uid,
+
+    nb_member_groups = db.count_nb_group_user(
+        uid,
         CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
+
     nb_total_groups = nb_admin_groups + nb_member_groups
-    return websession_templates.tmpl_group_info(nb_admin_groups,
+
+    out = websession_templates.tmpl_account_user_groups(
+        nb_admin_groups,
         nb_member_groups,
         nb_total_groups,
-        ln=ln)
+        ln = ln)
+
+    return out
 
 def get_navtrail(ln=CFG_SITE_LANG, title=""):
     """Gets the navtrail for title.

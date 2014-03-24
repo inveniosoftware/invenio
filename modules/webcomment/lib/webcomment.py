@@ -2190,3 +2190,20 @@ def perform_display_your_comments(user_info,
                                                    nb_total_results=nb_total_results,
                                                    nb_total_pages=nb_total_pages,
                                                    ln=ln)
+
+def account_user_comments(uid, ln = CFG_SITE_LANG):
+    """
+    Information on the user comments for the "Your Account" page.
+    """
+
+    query = """ SELECT  COUNT(id)
+                FROM    cmtRECORDCOMMENT
+                WHERE   id_user = %s
+                    AND star_score = 0"""
+    params = (uid,)
+    result = run_sql(query, params)
+    comments = result[0][0]
+
+    out = webcomment_templates.tmpl_account_user_comments(comments, ln)
+
+    return out

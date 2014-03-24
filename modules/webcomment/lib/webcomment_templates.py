@@ -2547,3 +2547,20 @@ class Template:
         out += '<br/><div id="yourcommentsnavigationlinks">' + page_links + '</div>'
 
         return out
+
+    def tmpl_account_user_comments(self, comments, ln = CFG_SITE_LANG):
+        """
+        Information on the user's comments for the "Your Account" page.
+        """
+
+        _ = gettext_set_language(ln)
+
+        if comments > 0:
+            out = _("You have submitted %(x_url_open)s%(x_comments)s comments%(x_url_close)s so far.") % \
+                  {'x_url_open'  : '<strong><a href="%s/yourcomments/?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                   'x_comments'  : str(comments),
+                   'x_url_close' : '</a></strong>',}
+        else:
+            out = _("You have not yet submitted any comment. Browse documents from the search interface and take part to discussions!")
+
+        return out

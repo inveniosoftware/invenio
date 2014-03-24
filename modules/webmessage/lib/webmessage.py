@@ -458,17 +458,20 @@ def perform_request_send(uid,
         title = _("Your Messages")
         return (body, title, get_navtrail(ln))
 
-def account_new_mail(uid, ln=CFG_SITE_LANG):
+def account_user_messages(uid, ln = CFG_SITE_LANG):
     """
-    display new mail info for myaccount.py page.
+    Information on the user's messages for the "Your Account" page
     @param uid: user id (int)
-    @param ln: language
-    @return: html body
+    @param ln: interface language (str)
+    @return: information in HTML
     """
-    nb_new_mail = db.get_nb_new_messages_for_user(uid)
-    total_mail = db.get_nb_readable_messages_for_user(uid)
-    return webmessage_templates.tmpl_account_new_mail(nb_new_mail,
-                                                      total_mail, ln)
+
+    total = db.get_nb_readable_messages_for_user(uid)
+    unread = db.get_nb_new_messages_for_user(uid)
+
+    out = webmessage_templates.tmpl_account_user_messages(total, unread, ln)
+
+    return out
 
 def get_navtrail(ln=CFG_SITE_LANG, title=""):
     """

@@ -127,23 +127,39 @@ from invenio.search_engine import get_fieldvalues
 ########################## General functions ##################################
 
 def count_baskets(uid):
-    """Return (nb personal baskets, nb group baskets, nb external
-    baskets) tuple for given user"""
-    query1 = "SELECT COUNT(id) FROM bskBASKET WHERE id_owner=%s"
-    res1 = run_sql(query1, (int(uid),))
-    personal = __wash_sql_count(res1)
-    query2 = """SELECT count(ugbsk.id_bskbasket)
-                FROM usergroup_bskBASKET ugbsk LEFT JOIN user_usergroup uug
-                                               ON ugbsk.id_usergroup=uug.id_usergroup
-                WHERE uug.id_user=%s AND uug.user_status!=%s
-                GROUP BY ugbsk.id_usergroup"""
-    params = (int(uid), CFG_WEBSESSION_USERGROUP_STATUS['PENDING'])
-    res2 = run_sql(query2, params)
-    if len(res2):
-        groups = reduce(lambda x, y: x + y, map(lambda x: x[0], res2))
+    """
+    Return (number of personal baskets,
+            number of group baskets,
+            number of external baskets)
+    tuple for the given user based on their user id.
+    """
+
+    # TODO: Maybe put this in a try..except ?
+    uid = int(uid)
+
+    query_personal = """SELECT  COUNT(id)
+                        FROM    bskBASKET
+                        WHERE   id_owner=%s"""
+    params_personal = (uid,)
+    res_personal = run_sql(query_personal, params_personal)
+    personal = __wash_sql_count(res_personal)
+
+    query_group = """   SELECT      COUNT(ugbsk.id_bskbasket)
+                        FROM        usergroup_bskBASKET ugbsk
+                        LEFT JOIN   user_usergroup uug
+                            ON      ugbsk.id_usergroup = uug.id_usergroup
+                        WHERE       uug.id_user = %s
+                            AND     uug.user_status != %s
+                        GROUP BY    ugbsk.id_usergroup"""
+    params_group = (uid, CFG_WEBSESSION_USERGROUP_STATUS['PENDING'])
+    res_group = run_sql(query_group, params_group)
+    if len(res_group):
+        groups = reduce(lambda x, y: x + y, map(lambda x: x[0], res_group))
     else:
         groups = 0
+
     external = count_external_baskets(uid)
+
     return (personal, groups, external)
 
 def check_user_owns_baskets(uid, bskids):
@@ -1567,13 +1583,16 @@ def get_all_external_basket_ids_and_names(uid):
 def count_external_baskets(uid):
     """Returns the number of external baskets the user is subscribed to."""
 
+    # TODO: Maybe put this in a try..except ?
+    uid = int(uid)
+
     query = """ SELECT      COUNT(ubsk.id_bskBASKET)
                 FROM        user_bskBASKET ubsk
                 LEFT JOIN   bskBASKET bsk
                     ON      (bsk.id=ubsk.id_bskBASKET AND ubsk.id_user=%s)
                 WHERE       bsk.id_owner!=%s"""
 
-    params = (int(uid), int(uid))
+    params = (uid, uid)
 
     res = run_sql(query, params)
 

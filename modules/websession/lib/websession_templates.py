@@ -691,14 +691,14 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = _("You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)s.") %\
-            {'x_user': user,
-             'x_url1_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/logout?ln=' + ln + '">',
+        out = _("You are logged in as %(x_user)s. You may want to %(x_url1_open)sedit your account settings%(x_url1_close)s or %(x_url2_open)slogout%(x_url2_close)s.") %\
+            {'x_user': "<strong>" + cgi.escape(user) + "</strong>",
+             'x_url1_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/edit?ln=' + ln + '">',
              'x_url1_close': '</a>',
-             'x_url2_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/edit?ln=' + ln + '">',
-             'x_url2_close': '</a>',
-             }
-        return out + "<br /><br />"
+             'x_url2_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/logout?ln=' + ln + '">',
+             'x_url2_close': '</a>',}
+
+        return out
 
     def tmpl_account_template(self, title, body, ln, url):
         """
@@ -715,18 +715,32 @@ class Template:
           - 'url' *string* - The URL to go to the proper section
         """
 
-        out ="""
-              <table class="youraccountbox" width="90%%" summary=""  >
-                            <tr>
-                             <th class="youraccountheader"><a href="%s">%s</a></th>
-                            </tr>
-                            <tr>
-                             <td class="youraccountbody">%s</td>
-                            </tr>
-                          </table>""" % (url, title, body)
+        out = """
+                <div class="youraccount_grid_column_content">
+                    <div class="youraccount_grid_column_title"><a href="%s">%s</a></div>
+                    <div class="youraccount_grid_column_body">%s</div>
+                </div>
+        """ % (url, title, body)
+
         return out
 
-    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, loans, groups, submissions, approvals, tickets, administrative, comments):
+    def tmpl_account_page(
+        self,
+        ln,
+        warnings,
+        warning_list,
+        account,
+        baskets,
+        alerts,
+        searches,
+        messages,
+        loans,
+        groups,
+        submissions,
+        approvals,
+        tickets,
+        administrative,
+        comments):
         """
         Displays the your account page
 
@@ -734,7 +748,7 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'accBody' *string* - The body of the heading block
+          - 'account' *string* - The body of the heading block
 
           - 'baskets' *string* - The body of the baskets block
 
@@ -764,53 +778,88 @@ class Template:
         if warnings == "1":
             out += self.tmpl_general_warnings(warning_list)
 
-        out += self.tmpl_account_template(_("Your Account"), accBody, ln, '/youraccount/edit?ln=%s' % ln)
-        if messages:
-            out += self.tmpl_account_template(_("Your Messages"), messages, ln, '/yourmessages/display?ln=%s' % ln)
+        # Store all the information to be displayed in the items list.
+        # Only store items that should be displayed.
+        # NOTE: The order in which we append items to the list matters!
+        items = []
+        account        is not None and items.append(self.tmpl_account_template(
+            _("Your Account"), account, ln, "/youraccount/edit?ln=%s" % ln))
+        groups         is not None and items.append(self.tmpl_account_template(
+            _("Your Groups"), groups, ln, "/yourgroups/display?ln=%s" % ln))
+        administrative is not None and items.append(self.tmpl_account_template(
+            _("Your Administrative Activities"), administrative, ln, "/admin"))
+        messages       is not None and items.append(self.tmpl_account_template(
+            _("Your Messages"), messages, ln, "/yourmessages/display?ln=%s" % ln))
+        searches       is not None and items.append(self.tmpl_account_template(
+            _("Your Searches"), searches, ln, "/yoursearches/display?ln=%s" % ln))
+        alerts         is not None and items.append(self.tmpl_account_template(
+            _("Your Alerts"), alerts, ln, "/youralerts/display?ln=%s" % ln))
+        baskets        is not None and items.append(self.tmpl_account_template(
+            _("Your Baskets"), baskets, ln, "/yourbaskets/display?ln=%s" % ln))
+        comments       is not None and items.append(self.tmpl_account_template(
+            _("Your Comments"), comments, ln, "/yourcomments/?ln=%s" % ln))
+        submissions    is not None and items.append(self.tmpl_account_template(
+            _("Your Submissions"), submissions, ln, "/yoursubmissions.py?ln=%s" % ln))
+        approvals      is not None and items.append(self.tmpl_account_template(
+            _("Your Approvals"), approvals, ln, "/yourapprovals.py?ln=%s" % ln))
+        loans          is not None and items.append(self.tmpl_account_template(
+            _("Your Loans"), loans, ln, "/yourloans/display?ln=%s" % ln))
+        tickets        is not None and items.append(self.tmpl_account_template(
+            _("Your Tickets"), tickets, ln, "/yourtickets?ln=%s" % ln))
 
-        if loans:
-            out += self.tmpl_account_template(_("Your Loans"), loans, ln, '/yourloans/display?ln=%s' % ln)
+        # Prepare 3 more lists, 1 for each of the 3 columns
+        items_in_column_1_of_3 = []
+        items_in_column_2_of_3 = []
+        items_in_column_3_of_3 = []
 
-        if baskets:
-            out += self.tmpl_account_template(_("Your Baskets"), baskets, ln, '/yourbaskets/display?ln=%s' % ln)
+        # Sort-of-intelligently arrange the items in the 3 lists
+        while items:
+            # While there are still items to display, get the first item,
+            # removing it from the list of items to display.
+            item = items.pop(0)
+            # The following "1-liner" does the following (>= Python 2.5):
+            # * For each of the 3 lists (1 for each column)
+            #   calculate the sum of the length of its items (see the lambda).
+            #   The lenght of an itme is the literal length of the string
+            #   to be displayed, which includes HTML code. This of course is
+            #   not the most accurate way, but a good approximation and also
+            #   very efficient.
+            # * Pick the list that has the smallest sum.
+            # * Append the current item to that list.
+            min(items_in_column_1_of_3,
+                items_in_column_2_of_3,
+                items_in_column_3_of_3,
+                key = lambda l: sum([len(i) for i in l])
+            ).append(item)
 
-        if comments:
-            comments_description = _("You can consult the list of %(x_url_open)syour comments%(x_url_close)s submitted so far.")
-            comments_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourcomments/?ln=' + ln + '">',
-                                     'x_url_close': '</a>'}
-            out += self.tmpl_account_template(_("Your Comments"), comments_description, ln, '/yourcomments/?ln=%s' % ln)
-        if alerts:
-            out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/display?ln=%s' % ln)
+        # Finally, create the HTML code for the entire grid.
+        out += """
+        <div class="youraccount_grid">
+            <div class="youraccount_grid_column_1_3">"""
 
-        if searches:
-            out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/yoursearches/display?ln=%s' % ln)
+        for item_in_column_1_of_3 in items_in_column_1_of_3:
+            out += item_in_column_1_of_3
 
-        if groups:
-            groups_description = _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are administering or are a member of.")
-            groups_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourgroups/display?ln=' + ln + '">',
-                               'x_url_close': '</a>'}
-            out += self.tmpl_account_template(_("Your Groups"), groups_description, ln, '/yourgroups/display?ln=%s' % ln)
+        out += """
+            </div>
+            <div class="youraccount_grid_column_1_3">"""
 
-        if submissions:
-            submission_description = _("You can consult the list of %(x_url_open)syour submissions%(x_url_close)s and inquire about their status.")
-            submission_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yoursubmissions.py?ln=' + ln + '">',
-                                   'x_url_close': '</a>'}
-            out += self.tmpl_account_template(_("Your Submissions"), submission_description, ln, '/yoursubmissions.py?ln=%s' % ln)
+        for item_in_column_2_of_3 in items_in_column_2_of_3:
+            out += item_in_column_2_of_3
 
-        if approvals:
-            approval_description =  _("You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with the documents you approved or refereed.")
-            approval_description %=  {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourapprovals.py?ln=' + ln + '">',
-                                  'x_url_close': '</a>'}
-            out += self.tmpl_account_template(_("Your Approvals"), approval_description, ln, '/yourapprovals.py?ln=%s' % ln)
+        out += """
+            </div>
+            <div class="youraccount_grid_column_1_3">
+        """
 
-        #check if this user might have tickets
-        if tickets:
-            ticket_description =  _("You can consult the list of %(x_url_open)syour tickets%(x_url_close)s.")
-            ticket_description %=  {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourtickets?ln=' + ln + '">',
-                                    'x_url_close': '</a>'}
-            out += self.tmpl_account_template(_("Your Tickets"), ticket_description, ln, '/yourtickets?ln=%s' % ln)
-        if administrative:
-            out += self.tmpl_account_template(_("Your Administrative Activities"), administrative, ln, '/admin')
+        for item_in_column_3_of_3 in items_in_column_3_of_3:
+            out += item_in_column_3_of_3
+
+        out += """
+            </div>
+        </div>
+        """
+
         return out
 
     def tmpl_account_emailMessage(self, ln, msg):
@@ -1228,25 +1277,19 @@ class Template:
 
     def tmpl_account_adminactivities(self, ln, uid, guest, roles, activities):
         """
-        Displays the admin activities block for this user
+        Displays the admin activities block for this user.
 
         Parameters:
-
           - 'ln' *string* - The language to display the interface in
-
           - 'uid' *string* - The used id
-
           - 'guest' *boolean* - If the user is guest
-
           - 'roles' *array* - The current user roles
-
           - 'activities' *array* - The user allowed activities
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = ""
         # guest condition
         if guest:
             return _("You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s first.") % \
@@ -1255,66 +1298,70 @@ class Template:
 
         # no rights condition
         if not roles:
-            return "<p>" + _("You are not authorized to access administrative functions.") + "</p>"
+            return _("You are not authorized to access administrative functions.")
 
         # displaying form
-        out += "<p>" + _("You are enabled to the following roles: %(x_role)s.") % {'x_role': ('<em>' + ", ".join(roles) + "</em>")} + '</p>'
+        out = _("You are enabled to the following roles: %(x_role)s.") % \
+              {'x_role': ('<em>' + ", ".join(roles) + "</em>")}
 
         if activities:
             # print proposed links:
             activities.sort(lambda x, y: cmp(x.lower(), y.lower()))
-            tmp_out = ''
+            tmp_out = activities and '<ul>' or ''
             for action in activities:
                 if action == "runbibedit":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/edit/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Record Editor"))
+                    tmp_out += """<li><a href="%s/%s/edit/">%s</a></li>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Record Editor"))
                 if action == "runbibeditmulti":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/multiedit/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Multi-Record Editor"))
+                    tmp_out += """<li><a href="%s/%s/multiedit/">%s</a></li>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Multi-Record Editor"))
                 if action == "runauthorlist":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/authorlist/">%s</a>""" % (CFG_SITE_URL, _("Run Author List Manager"))
+                    tmp_out += """<li><a href="%s/authorlist/">%s</a></li>""" % (CFG_SITE_URL, _("Run Author List Manager"))
                 if action == "runbibcirculation":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibcirculation/bibcirculationadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run BibCirculation"))
+                    tmp_out += """<li><a href="%s/admin/bibcirculation/bibcirculationadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Run BibCirculation"))
                 if action == "runbibmerge":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/merge/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Record Merger"))
+                    tmp_out += """<li><a href="%s/%s/merge/">%s</a></li>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Record Merger"))
                 if action == "runbibswordclient":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/bibsword/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run BibSword Client"))
+                    tmp_out += """<li><a href="%s/%s/bibsword/">%s</a></li>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run BibSword Client"))
                 if action == "runbatchuploader":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/batchuploader/metadata?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Batch Uploader"))
+                    tmp_out += """<li><a href="%s/batchuploader/metadata?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Run Batch Uploader"))
                 if action == "cfgbibformat":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
+                    tmp_out += """<li><a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
                 if action == "cfgbibknowledge":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/kb?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibKnowledge"))
+                    tmp_out += """<li><a href="%s/kb?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure BibKnowledge"))
                 if action == "cfgoaiharvest":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure OAI Harvest"))
+                    tmp_out += """<li><a href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure OAI Harvest"))
                 if action == "cfgoairepository":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/oairepository/oairepositoryadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln,  _("Configure OAI Repository"))
+                    tmp_out += """<li><a href="%s/admin/oairepository/oairepositoryadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln,  _("Configure OAI Repository"))
                 if action == "cfgbibindex":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibIndex"))
+                    tmp_out += """<li><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure BibIndex"))
                 if action == "cfgbibrank":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibRank"))
+                    tmp_out += """<li><a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure BibRank"))
                 if action == "cfgwebaccess":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/webaccessadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebAccess"))
+                    tmp_out += """<li><a href="%s/admin/webaccess/webaccessadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure WebAccess"))
                 if action == "cfgwebcomment":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebComment"))
+                    tmp_out += """<li><a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure WebComment"))
                 if action == "cfgweblinkback":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/weblinkback/weblinkbackadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebLinkback"))
+                    tmp_out += """<li><a href="%s/admin/weblinkback/weblinkbackadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure WebLinkback"))
                 if action == "cfgwebjournal":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webjournal/webjournaladmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebJournal"))
+                    tmp_out += """<li><a href="%s/admin/webjournal/webjournaladmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure WebJournal"))
                 if action == "cfgwebsearch":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSearch"))
+                    tmp_out += """<li><a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure WebSearch"))
                 if action == "cfgwebsubmit":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSubmit"))
+                    tmp_out += """<li><a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure WebSubmit"))
                 if action == "runbibdocfile":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/managedocfiles?ln=%s">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, ln, _("Run Document File Manager"))
+                    tmp_out += """<li><a href="%s/%s/managedocfiles?ln=%s">%s</a></li>""" % (CFG_SITE_URL, CFG_SITE_RECORD, ln, _("Run Document File Manager"))
                 if action == "cfgbibsort":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibsort/bibsortadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibSort"))
+                    tmp_out += """<li><a href="%s/admin/bibsort/bibsortadmin.py?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Configure BibSort"))
                 if action == "runinfomanager":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/info/manage?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Info Space Manager"))
-            if tmp_out:
-                out += _("Here are some interesting web admin links for you:") + tmp_out
+                    tmp_out += """<li><a href="%s/info/manage?ln=%s">%s</a></li>""" % (CFG_SITE_URL, ln, _("Run Info Space Manager"))
+            tmp_out += activities and '</ul>' or ''
 
-                out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.") %\
-                {'x_url_open': '<a href="' + CFG_SITE_URL + '/help/admin?ln=' + ln + '">',
-                    'x_url_close': '</a>'}
+            if tmp_out:
+                out += "<br /><br />" + _("Here are some interesting web admin links for you:") + tmp_out
+
+                out += _("For the complete list of administrative activities, see the %(x_url_open)sAdmin Area%(x_url_close)s.") %\
+                       {'x_url_open'  : '<a href="%s/help/admin?ln=%s">' % (CFG_SITE_URL, ln),
+                        'x_url_close' : '</a>'}
+
         return out
 
     def tmpl_create_userinfobox(self, ln, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats):
@@ -2600,22 +2647,40 @@ Best regards.
         body += '<br />'
         return subject, body
 
-    def tmpl_group_info(self, nb_admin_groups=0, nb_member_groups=0, nb_total_groups=0, ln=CFG_SITE_LANG):
+    def tmpl_account_user_groups(
+        self,
+        nb_admin_groups = 0,
+        nb_member_groups = 0,
+        nb_total_groups = 0,
+        ln = CFG_SITE_LANG):
         """
-        display infos about groups (used by myaccount.py)
-        @param nb_admin_group: number of groups the user is admin of
-        @param nb_member_group: number of groups the user is member of
-        @param total_group: number of groups the user belongs to
+        Information on the user's groups for the "Your Account" page
+        @param nb_admin_groups: number of groups the user is admin of
+        @param nb_member_groups: number of groups the user is member of
+        @param nb_total_groups: number of groups the user belongs to
         @param ln: language
         return: html output.
         """
+
         _ = gettext_set_language(ln)
-        out = _("You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i).")
-        out %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourgroups/display?ln=' + ln + '">',
-                'x_nb_total': nb_total_groups,
-                'x_url_close': '</a>',
-                'x_nb_admin': nb_admin_groups,
-                'x_nb_member': nb_member_groups}
+
+        if nb_total_groups > 0:
+            out = _("You are a member of %(x_url_open)s%(x_total)s groups%(x_url_close)s") % \
+                  {'x_url_open'  : '<strong><a href="%s/yourgroups/display?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                   'x_total'     : str(nb_total_groups),
+                   'x_url_close' : '</a></strong>',}
+            if nb_admin_groups > 0:
+                out += ", " + _("%(x_admin)s of which you administer") % \
+                              {'x_admin' : str(nb_admin_groups),}
+            out += "."
+        else:
+            out = _("You are not member of any groups.")
+
+        out += " " + _("You might be interested in %(x_join_url_open)sjoining a group%(x_url_close)s or %(x_create_url_open)screating a new one%(x_url_close)s.") % \
+               {'x_join_url_open'    : '<a href="%s/yourgroups/join?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                'x_create_url_open'  : '<a href="%s/yourgroups/create?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                'x_url_close'        : '</a>',}
+
         return out
 
     def tmpl_general_warnings(self, warning_list, ln=CFG_SITE_LANG):
@@ -2882,3 +2947,29 @@ type="text" name="identifier" value="" >
     }
 </script>"""
         return out
+
+def account_user_approvals(ln = CFG_SITE_LANG):
+    """
+    Information on the user approvals for the "Your Account" page.
+    """
+
+    _ = gettext_set_language(ln)
+
+    out =  _("You can review all the documents you approved or refereed in %(x_url_open)syour approvals%(x_url_close)s.") % \
+           {'x_url_open'  : '<strong><a href="%s/yourapprovals.py?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+            'x_url_close' : '</a></strong>',}
+
+    return out
+
+def account_user_tickets(ln = CFG_SITE_LANG):
+    """
+    Information on the user tickets for the "Your Account" page.
+    """
+
+    _ = gettext_set_language(ln)
+
+    out =  _("You can review %(x_url_open)syour tickets%(x_url_close)s.") % \
+           {'x_url_open': '<strong><a href="%s/yourtickets?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+            'x_url_close': '</a></strong>',}
+
+    return out

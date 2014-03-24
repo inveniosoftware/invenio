@@ -2903,3 +2903,20 @@ def displaycplxdoc_displayauthaction(action, linkText):
         "action" : action,
         "linkText" : linkText
         }
+
+def account_user_submissions(ln = CFG_SITE_LANG):
+    """
+    Information on the user submissions for the "Your Account" page.
+    """
+
+    # TODO: give more information, such as the number of submissions the user has,
+    # how many are finished, pending etc. For that we need to pass the user id and
+    # introduce another function (in websubmit.py?) that calculates those numbers.
+
+    _ = gettext_set_language(ln)
+
+    out = _("You can review the status of all %(x_url_open)syour submissions%(x_url_close)s.") % \
+          {'x_url_open'  : '<strong><a href="%s/yoursubmissions.py?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+           'x_url_close' : '</a></strong>',}
+
+    return out
