@@ -1,6 +1,5 @@
-{% extends "workflows/hp_detailed_layout.html" %}
-{% import 'workflows/hp_utils.html' as utils %}
-{% import 'workflows/edit_field_macro.html' as field_macro %}
+{% extends "workflows/hp_detailed_base.html" %}
+{% import 'workflows/utils.html' as utils %}
 
 {% block header%}
     {{ super() }}
@@ -51,7 +50,7 @@
                 <div class="well">
                     <form id="edit_form" class="form-horizontal" role="form" method="POST" name="">
                         {% for field in edit_record_widget %}
-                            {{ field_macro.render_field(field) }}
+                            {{ utils.render_field(field) }}
                         {% endfor %}
                     </form>
                 </div>

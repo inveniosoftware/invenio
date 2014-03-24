@@ -16,70 +16,34 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "workflows/layout.html" %}
-
-{% js url_for('workflows.static', filename='js/workflows/index.js'), '50-workflows' %}
-{% js url_for('workflows.static', filename='js/workflows/utilities.js'), '50-workflows' %}
-
-{% block javascript %}
-    {{ super() }}
-    <script type="text/javascript">
-        $(document).ready(function(){
-            var url_redis_get = "{{ url_for('workflows.get_redis_keys') }}";
-            var url_entry_details = "{{ url_for('workflows.entry_details') }}";
-            var url_workflow_details = "{{ url_for('workflows.workflow_details') }}";
-
-            WORKFLOWS_INDEX.init_index(url_redis_get,
-                                       url_entry_details,
-                                       url_workflow_details);
-        });
-    </script>
-{% endblock javascript %}
+{% extends "workflows/admin_base.html" %}
 
 {% block workflowbody %}
-    <div class="alert alert-block">
+    <div class="alert alert-warning">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
       <h4>Warning!</h4>
       Much of the functionality of the BibWorkflow admin pages are placeholder
       only and are not working as expected.
     </div>
+
     <h1>Workflows list</h1>
-    <form>
-        <fieldset>
-            <legend>Filter</legend>
-            <label>Available fields
-                <select id="search_key_1">
-                {% for key in filter_keys %}
-                    <option>{{ key }}</option>
-                {% endfor %}
-                </select>
-                <select id="search_key_2" disabled>
-                </select>
-            </label>
-            <span class="btn" id="search_button">Add filter</span>
-        </fieldset>
-    </form>
-    <div class="well" id="search_tags">
-    </div>
+    
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Workflow name</th>
-                <th>User</th>
                 <th>Started</th>
                 <th>Modified</th>
                 <th>Last task</th>
                 <th>Progress</th>
                 <th>Error msg.</th>
+                <th>View</th>
             </tr>
         </thead>
         <tbody>
             {% for workflow in workflows %}
                 <tr class="workflow" name="{{ workflow.uuid }}">
-                    <td>{{ workflow.uuid }}</td>
                     <td>{{ workflow.name }}</td>
-                    <td>{{ workflow.uid }}</td>
                     <td>{{ workflow.created }}</td>
                     <td>{{ workflow.modified }}</td>
                     <td title="{{ workflow.last_task_description }}">{{ workflow.last_task_name }}</td>
@@ -113,23 +77,20 @@ Finished: {{ workflow.counter_finished }}">
                                 </div>
                     </td>
                     <td>{{ workflow.error_msg }}</td>
+                    <td><a href="{{ url_for('workflows.workflow_details', id_workflow=workflow.uuid) }}/">View</a></td>
                 </tr>
                 {%- if workflow.objects -%}
                 <tr>
                     <td colspan="8">
-                    <table>
+                    <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>Name</th>
-                                <th>User</th>
-                                <th>Cr. date</th>
-                                <th>Mod. date</th>
-                                <th>Description</th>
-                                <th>Version</th>
-                                <th>Message</th>
-                                <th>Parent ID</th>
+                                <th>Created</th>
+                                <th>Modified</th>
+                                <th>Task</th>
                                 <th>Status</th>
+                                <th>View</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -137,23 +98,19 @@ Finished: {{ workflow.counter_finished }}">
 
                                 <tr class="object" name="{{ object.id }}">
                                     <td>{{ object.id }}</td>
-                                    <td>{{ object.name|truncate(20) }}</td>
-                                    <td>{{ workflow.uid }}</td>
                                     <td>{{ object.created }}</td>
                                     <td>{{ object.modified }}</td>
                                     <td title="{{ workflow.last_task_description }}">{{ workflow.last_task_name }}</td>
                                     <td>
                                         {% if object.version == 0 %}
-                                            <span class="badge badge-info">Initial</span>
+                                            <span class="badge alert-info">Initial</span>
                                         {% elif object.version == 1 %}
-                                            <span class="badge badge-success">Final</span>
+                                            <span class="badge alert-success">Final</span>
                                         {% elif object.version == 2 %}
-                                            <span class="badge badge-important">Error</span>
+                                            <span class="badge alert-danger">Error</span>
                                         {% endif %}
                                     </td>
-                                    <td title="{{ object.error_msg }}">{{ object.error_msg|truncate(50) }}</td>
-                                    <td>{{ object.id_parent }}</td>
-                                    <td>{{ object.state }}</td>
+                                    <td><a href="{{ url_for('workflows.details', objectid=object.id) }}/">View</a></tr>
                                 </tr>
 
                         {% endfor %}

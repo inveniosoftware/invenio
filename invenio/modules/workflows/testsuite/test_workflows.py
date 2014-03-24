@@ -32,8 +32,8 @@ class WorkflowViewTest(InvenioTestCase):
         # FIXME: tmp 401 due to missing file
         self.assert401(response)
 
-    def test_entry_details_availability(self):
-        response = self.client.get(url_for('workflows.entry_details'))
+    def test_workflow_list_availability(self):
+        response = self.client.get(url_for('workflows.show_workflows'))
         # FIXME: tmp 401 due to missing file
         self.assert401(response)
 

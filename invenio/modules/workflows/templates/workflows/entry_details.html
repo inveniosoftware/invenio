@@ -16,7 +16,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "workflows/layout_workflow_details.html" %}
+{% extends "workflows/admin_base.html" %}
 {% import 'workflows/utils.html' as utils %}
 
 {% js url_for('workflows.static', filename='js/workflows/entry_details.js'), '50-workflows' %}
@@ -33,16 +33,12 @@
     </script>
 {% endblock javascript %}
 
-{% block modalbody %}
+{% block workflowbody %}
 
-<div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">{{ entry.id }}</h3>
-</div>
-<div class="modal-body">
     <div class="row">
         <div class="col-md-12">
-            Owner: <b>{{ entry.id_user }}</b> | Creation date: <b>{{ entry.created }}</b>
+            <h3 id="myModalLabel">{{ entry.id }}</h3>
+            <p>Owner: <strong>{{ entry.id_user }}</strong> | Creation date: <strong>{{ entry.created }}</strong></p>
         </div>
     </div>
     <div class="row">
@@ -67,9 +63,11 @@
             {% endfor %}
         </div>
     </div>
-</div>
-<div class="modal-footer">
-    <a class="btn btn-primary" href="{{ url_for('holdingpen.details', bwobject_id=entry.id)}}" >Open in HoldingPen <i class="glyphicon glyphicon-wrench"></i></a>
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-</div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary" href="{{ url_for('holdingpen.details', objectid=entry.id)}}" >Open in HoldingPen <i class="glyphicon glyphicon-wrench"></i></a>
+        </div>
+    </div>
+
 {% endblock %}

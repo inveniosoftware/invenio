@@ -16,8 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "workflows/hp_detailed_layout.html" %}
-{% import 'workflows/hp_utils.html' as utils %}
+{% extends "workflows/hp_detailed_base.html" %}
+{% import 'workflows/utils.html' as utils %}
 
 {%- block header%}
     {{ super() }}
@@ -25,9 +25,9 @@
 {%- endblock header %}
 
 {% js url_for('static', filename='js/prism.js'), '40-workflows' %}
+{% js url_for('workflows.static', filename='js/workflows/utilities.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/hp_details.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/widgets/approval.js'), '50-workflows' %}
-{% js url_for('workflows.static', filename='js/workflows/hp_datapreview.js'), '50-workflows' %}
 
 {%- block javascript %}
     {{ super() }}
