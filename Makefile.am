@@ -163,7 +163,7 @@ install-jquery-plugins:
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.datepicker.min.js && \
 	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js && \
-	wget http://jquery.bassistance.de/treeview/jquery.treeview.zip && \
+	wget http://invenio-software.org/download/jquery/jquery.treeview.zip && \
 	unzip jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
 	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
