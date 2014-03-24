@@ -167,7 +167,7 @@ install-jquery-plugins:
 	rm uploadify.zip && rm -r uploadify && \
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
 	wget http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js -O jquery.hotkeys.js && \
-	wget http://jquery.bassistance.de/treeview/jquery.treeview.zip && \
+	wget http://invenio-software.org/download/jquery/jquery.treeview.zip && \
 	unzip jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
 	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
