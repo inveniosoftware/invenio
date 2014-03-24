@@ -44,7 +44,7 @@ blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
 
 default_breadcrumb_root(blueprint, '.holdingpen')
 
-REG_TD = re.compile("<td id=\"(.+?)\">(.+?)</td>", re.DOTALL)
+REG_TD = re.compile("<td title=\"(.+?)\">(.+?)</td>", re.DOTALL)
 
 
 @blueprint.route('/', methods=['GET', 'POST'])

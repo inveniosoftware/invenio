@@ -16,34 +16,34 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-<td id="id">
+<td title="id">
 {{object.id}}
 </td>
-<td id="checkbox">
+<td title="checkbox">
 <input type="checkbox" class="hp-check">
 </td>
-<td id="title">
+<td title="title">
 {{ record.get('title', {}) }}
 </td>
-<td id="source">
+<td title="source">
 {{ extra_data.get('source', "No source") }}
 </td>
-<td id="category">
+<td title="category">
 {{ ", ".join(categories) or "No category" }}
 </td>
-<td id="pretty_date">
+<td title="pretty_date">
 {{ pretty_date(object.created)}}
 </td>
-<td id="version">
+<td title="version">
 {% if object.version == 1 %}<span class="label label-success">Completed</span>
 {% elif object.version == 2 %}<span class="label label-warning">Halted</span>
 {% else %}<span class="label label-info">Running</span>
 {% endif %}
 </td>
-<td id="type">
+<td title="type">
 {{object.data_type}}
 </td>
-<td id="details">
+<td title="details">
 {% if widget == None %}
     <a href="{{url_for('holdingpen.details', objectid=object.id)}}">Details</a>
 {% else %}
@@ -51,7 +51,7 @@
     <a href="{{url_for('holdingpen.show_widget', objectid=object.id)}}">Details</a>
 {% endif %}
 </td>
-<td id="widget">
+<td title="widget">
 {% if widget != None %}
     {% set widget = widget() %}
     {% if mini_widget != None %}
