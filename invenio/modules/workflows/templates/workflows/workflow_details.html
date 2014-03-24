@@ -16,17 +16,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "workflows/layout_workflow_details.html" %}
+{% extends "workflows/admin_base.html" %}
 {% import 'workflows/utils.html' as utils %}
-{% block modalbody %}
-<div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">{{ workflow_metadata.name }}</h3>
-</div>
-<div class="modal-body">
+
+{% block workflowbody %}
+
     <div class="row">
         <div class="col-md-12">
-                        Owner: <b>{{ workflow_metadata.uid }}</b> | Creation date: <b>{{ workflow_metadata.created }}</b> | Last modification date: <b>{{ workflow_metadata.modified }}</b>
+            <h3 class="modal-title" id="myModalLabel">{{ workflow_metadata.name }}</h3>
+            <p>Owner: <strong>{{ workflow_metadata.uid }}</strong> | Creation date: <strong>{{ workflow_metadata.created }}</strong> | Last modification date: <strong>{{ workflow_metadata.modified }}</strong></p>
         </div>
     </div>
     <div class="row">
@@ -59,8 +57,5 @@
         Log:
         <pre>{{ log }}</pre>
     </div>
-</div>
-<div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-</div>
+
 {% endblock %}

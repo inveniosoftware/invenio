@@ -38,7 +38,7 @@ blueprint = Blueprint('workflows', __name__, url_prefix="/admin/workflows",
                       template_folder='../templates',
                       static_folder='../static')
 
-default_breadcrumb_root(blueprint, '.admin.workflows')
+default_breadcrumb_root(blueprint, '.workflows')
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
@@ -55,20 +55,21 @@ def index():
     return dict(workflows=w, filter_keys=filter_keys)
 
 
-@blueprint.route('/entry_details', methods=['GET', 'POST'])
+@blueprint.route('/details/<int:objectid>', methods=['GET', 'POST'])
+@register_breadcrumb(blueprint, '.details', _("Record Details"))
 @login_required
-@register_breadcrumb(blueprint, '.entry_details', _("Entry"))
-@wash_arguments({'id_entry': (int, 0)})
-@wash_arguments({'of': (unicode, "hd")})
-def entry_details(id_entry, of):
+@templated('workflows/entry_details.html')
+def details(objectid):
     """
     Displays entry details.
     """
     from flask import Markup
     from pprint import pformat
 
+    of = "hd"
+
     bwobject = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id == id_entry
+        BibWorkflowObject.id == objectid
     ).first()
 
     workflow_object = Workflow.query.filter(
@@ -88,16 +89,17 @@ def entry_details(id_entry, of):
     engine_log = BibWorkflowEngineLog.query.filter(
         BibWorkflowEngineLog.id_object == workflow_object.uuid
     )
-    return render_template('workflows/entry_details.html',
-                           entry=bwobject,
-                           log=engine_log,
-                           data_preview=data,
-                           workflow_func=workflow.workflow)
+    return dict(entry=bwobject,
+                log=engine_log,
+                data_preview=data,
+                workflow_func=workflow.workflow)
 
 
-@blueprint.route('/workflow_details', methods=['GET', 'POST'])
+@blueprint.route('/workflow_details/<id_workflow>',
+                 methods=['GET', 'POST'])
+@register_breadcrumb(blueprint, '.workflow_details', _("Workflow Details"))
 @login_required
-@wash_arguments({'id_workflow': (unicode, "")})
+@templated('workflows/workflow_details.html')
 def workflow_details(id_workflow):
     workflow_object = Workflow.query.filter(
         Workflow.uuid == id_workflow
@@ -105,15 +107,14 @@ def workflow_details(id_workflow):
 
     # Workflow class: workflow.workflow is the workflow list
     workflow = get_workflow_definition(workflow_object.name)
-    return render_template('workflows/workflow_details.html',
-                           workflow_metadata=workflow_object,
-                           log="",
-                           workflow_func=workflow.workflow)
+    return dict(workflow_metadata=workflow_object,
+                log="",
+                workflow_func=workflow.workflow)
 
 
 @blueprint.route('/workflows', methods=['GET', 'POST'])
 @login_required
-@templated('workflows/workflows.html')
+@templated('workflows/workflow_list.html')
 def show_workflows():
     return dict(workflows=workflows)
 
