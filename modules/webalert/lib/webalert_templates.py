@@ -99,35 +99,30 @@ class Template:
             out += "<strong>" + _("Collection") + ":</strong> " + "; ".join(args['cc']) + "<br />"
         return out
 
-    def tmpl_account_list_alerts(self, ln, alerts):
+    def tmpl_account_user_alerts(self, alerts, ln = CFG_SITE_LANG):
         """
-        Displays all the alerts in the main "Your account" page
+        Information on the user's alerts for the "Your Account" page.
 
         Parameters:
-
+          - 'alerts' *int* - The number of alerts
           - 'ln' *string* - The language to display the interface in
-
-          - 'alerts' *array* - The existing alerts IDs ('id' + 'name' pairs)
         """
 
-        # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<form name="displayalert" action="../youralerts/display" method="post">
-                 %(you_own)s:
-                <select name="id_alert">
-                  <option value="0">- %(alert_name)s -</option>""" % {
-                 'you_own' : _("You own the following alerts:"),
-                 'alert_name' : _("alert name"),
-               }
-        for alert in alerts :
-            out += """<option value="%(id)s">%(name)s</option>""" % \
-                   {'id': alert['id'], 'name': cgi.escape(alert['name'])}
-        out += """</select>
-                &nbsp;<input class="formbutton" type="submit" name="action" value="%(show)s" />
-                </form>""" % {
-                  'show' : _("SHOW"),
-                }
+        if alerts > 0:
+            out = _('You have defined a total of %(x_url_open)s%(x_alerts_number)s alerts%(x_url_close)s.') % \
+                  {'x_url_open' : '<strong><a href="%s/youralerts/display?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                   'x_alerts_number': str(alerts),
+                   'x_url_close' : '</a></strong>'}
+        else:
+            out = _('You have not defined any alerts yet.')
+
+        out += " " + _('You may define new alerts based on %(x_yoursearches_url_open)syour searches%(x_url_close)s or just by %(x_search_interface_url_open)ssearching for something new%(x_url_close)s.') % \
+               {'x_yoursearches_url_open'     : '<a href="%s/yoursearches/display?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                'x_search_interface_url_open' : '<a href="%s/?ln=%s">' % (CFG_SITE_URL, ln),
+                'x_url_close'                 : '</a>',}
+
         return out
 
     def tmpl_input_alert(self,
@@ -141,9 +136,7 @@ class Template:
                          old_id_basket,
                          id_basket,
                          id_query,
-                         is_active,
-                         guest,
-                         guesttxt):
+                         is_active):
         """
         Displays an alert adding form.
 
@@ -170,10 +163,6 @@ class Template:
           - 'id_query' *string* - The id of the query associated to this alert
 
           - 'is_active' *boolean* - is the alert active or not
-
-          - 'guest' *bool* - If the user is a guest user
-
-          - 'guesttxt' *string* - The HTML content of the warning box for guest users (produced by webaccount.tmpl_warning_guest_user)
         """
 
         # load the right message language
@@ -273,9 +262,6 @@ class Template:
         if action == "update":
             out += '<input type="hidden" name="old_idb" value="%s" />' % old_id_basket
         out += "</form>"
-
-        if guest:
-            out += guesttxt
 
         return out
 
@@ -776,10 +762,6 @@ Need human intervention?  Contact <%s>
               - 'args' *string* - The query string
 
               - 'textargs' *string* - The textual description of the query string
-
-          - 'guest' *bool* - If the user is a guest user
-
-          - 'guesttxt' *string* - The HTML content of the warning box for guest users (produced by webaccount.tmpl_warning_guest_user)
         """
 
         # load the right message language

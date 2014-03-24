@@ -2573,30 +2573,15 @@ def create_webbasket_navtrail(uid,
 
     return out
 
-def account_list_baskets(uid, ln=CFG_SITE_LANG):
-    """Display baskets informations on account page"""
-    _ = gettext_set_language(ln)
+def account_user_baskets(uid, ln=CFG_SITE_LANG):
+    """
+    Display baskets informations on account page
+    """
+
     (personal, group, external) = db.count_baskets(uid)
-    link = '<a href="%s">%s</a>'
-    base_url = CFG_SITE_URL + '/yourbaskets/display?category=%s&amp;ln=' + ln
-    personal_text = personal
-    if personal:
-        url = base_url % CFG_WEBBASKET_CATEGORIES['PRIVATE']
-        personal_text = link % (url, personal_text)
-    group_text = group
-    if group:
-        url = base_url % CFG_WEBBASKET_CATEGORIES['GROUP']
-        group_text = link % (url, group_text)
-    external_text = external
-    if external:
-        url = base_url % CFG_WEBBASKET_CATEGORIES['EXTERNAL']
-    else:
-        url = CFG_SITE_URL + '/yourbaskets/list_public_baskets?ln=' + ln
-    external_text = link % (url, external_text)
-    out = _("You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets.") %\
-        {'x_nb_perso': personal_text,
-         'x_nb_group': group_text,
-         'x_nb_public': external_text}
+
+    out = webbasket_templates.tmpl_account_user_baskets(personal, group, external, ln)
+
     return out
 
 def page_start(req, of='xm'):

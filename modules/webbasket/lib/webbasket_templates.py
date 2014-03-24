@@ -4185,6 +4185,34 @@ class Template:
 
         return out
 
+    def tmpl_account_user_baskets(self, personal, group, external, ln = CFG_SITE_LANG):
+        """
+        Information on the user's baskets for the "Your Account" page.
+        """
+
+        _ = gettext_set_language(ln)
+
+        if (personal, group, external) == (0, 0, 0):
+            out = _("You have not created any personal baskets yet, you are not part of any group baskets and you have not subscribed to any public baskets.")
+        else:
+            x_generic_url_open = '<a href="%s/yourbaskets/display?category=%%s&amp;ln=%s">' % (CFG_SITE_SECURE_URL, ln)
+            out = _("You have %(x_personal_url_open)s%(x_personal_nb)s personal baskets%(x_personal_url_close)s, you are part of %(x_group_url_open)s%(x_group_nb)s group baskets%(x_group_url_close)s and you are subscribed to %(x_public_url_open)s%(x_public_nb)s public baskets%(x_public_url_close)s.") % \
+                {'x_personal_url_open'  : '<strong>%s' % (personal > 0 and x_generic_url_open % (CFG_WEBBASKET_CATEGORIES['PRIVATE'],) or '',),
+                 'x_personal_nb'        : str(personal),
+                 'x_personal_url_close' : '%s</strong>' % (personal > 0 and '</a>' or '',),
+                 'x_group_url_open'     : '<strong>%s' % (group > 0 and x_generic_url_open % (CFG_WEBBASKET_CATEGORIES['GROUP'],) or '',),
+                 'x_group_nb'           : str(group),
+                 'x_group_url_close'    : '%s</strong>' % (group > 0 and '</a>' or '',),
+                 'x_public_url_open'    : '<strong>%s' % (external > 0 and x_generic_url_open % (CFG_WEBBASKET_CATEGORIES['EXTERNAL'],) or '',),
+                 'x_public_nb'          : str(external),
+                 'x_public_url_close'   : '%s</strong>' % (external > 0 and '</a>' or '',),}
+
+        out += " " + _("You might be interested in looking through %(x_url_open)sall the public baskets%(x_url_close)s.") % \
+            {'x_url_open'  : '<a href="%s/yourbaskets/list_public_baskets?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+             'x_url_close' : '</a>',}
+
+        return out
+
 #############################################
 ########## SUPPLEMENTARY FUNCTIONS ##########
 #############################################

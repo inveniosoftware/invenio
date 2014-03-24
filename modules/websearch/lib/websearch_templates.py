@@ -5126,10 +5126,6 @@ class Template:
 
         @param guest: Whether the user is a guest or not
         @type guest: boolean
-
-        @param guesttxt: The HTML content of the warning box for guest users
-            (produced by webaccount.tmpl_warning_guest_user)
-        @type guesttxt: string
         """
 
         # Load the right language
@@ -5256,6 +5252,26 @@ class Template:
   </tbody>
 </table>""" % {'paging_navigation_html': paging_navigation_html,
                'yoursearches': yoursearches}
+
+        return out
+
+    def tmpl_account_user_searches(self, unique, total, ln = CFG_SITE_LANG):
+        """
+        Information on the user's searches for the "Your Account" page
+        """
+
+        _ = gettext_set_language(ln)
+
+        if unique > 0:
+            out = _("You have performed %(x_url_open)s%(unique)s unique searches%(x_url_close)s in a total of %(total)s searches.") % \
+                  {'x_url_open'  : '<strong><a href="%s/yoursearches/display?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                   'unique'      : str(unique),
+                   'x_url_close' : '</a></strong>',
+                   'total'       : str(total),}
+        else:
+            out = _("You have not searched for anything yet. You may want to start by the %(x_url_open)ssearch interface%(x_url_close)s first.") % \
+                  {'x_url_open'  : '<a href="%s/?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
+                   'x_url_close' : '</a>'}
 
         return out
 

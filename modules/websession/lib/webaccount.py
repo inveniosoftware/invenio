@@ -47,6 +47,16 @@ websession_templates = invenio.template.load('websession')
 
 from invenio import web_api_key
 
+from invenio.webbasket import account_user_baskets
+from invenio.webalert import account_user_alerts
+from invenio.websearch_yoursearches import account_user_searches
+from invenio.webmessage import account_user_messages
+from invenio.webgroup import account_user_groups
+from invenio.websubmit_templates import account_user_submissions
+from invenio.websession_templates import account_user_approvals
+from invenio.webcomment import account_user_comments
+from invenio.websession_templates import account_user_tickets
+
 def perform_info(req, ln):
     """Display the main features of CDS personalize"""
     uid = getUid(req)
@@ -74,15 +84,19 @@ def perform_display_external_user_settings(settings, ln):
             html_settings += websession_templates.tmpl_external_setting(ln, key, value)
     return print_settings and websession_templates.tmpl_external_user_settings(ln, html_settings) or ""
 
-def perform_youradminactivities(user_info, ln):
-    """Return text for the `Your Admin Activities' box.  Analyze
-       whether user UID has some admin roles, and if yes, then print
-       suitable links for the actions he can do.  If he's not admin,
-       print a simple non-authorized message."""
+def account_user_administration(user_info, ln = CFG_SITE_LANG):
+    """
+    Information for for the "Your Admin Activities" box.
+    Analyzes whether user UID has some admin roles, and if yes, then returns
+    suitable links for the action they  can do. If they are not admin, return
+    a simple non-authorized message.
+    """
+
     your_role_actions = acc_find_user_role_actions(user_info)
     your_roles = []
     your_admin_activities = []
     guest = int(user_info['guest'])
+
     for (role, action) in your_role_actions:
         if role not in your_roles:
             your_roles.append(role)
@@ -90,48 +104,68 @@ def perform_youradminactivities(user_info, ln):
             your_admin_activities.append(action)
 
     if SUPERADMINROLE in your_roles:
-        for action in ("runbibedit", "cfgbibformat", "cfgoaiharvest", "cfgoairepository", "cfgbibrank", "cfgbibindex", "cfgwebaccess", "cfgwebcomment", "cfgwebsearch", "cfgwebsubmiit", "cfgbibknowledge", "runbatchuploader"):
+        for action in ("runbibedit",
+                       "cfgbibformat",
+                       "cfgoaiharvest",
+                       "cfgoairepository",
+                       "cfgbibrank",
+                       "cfgbibindex",
+                       "cfgwebaccess",
+                       "cfgwebcomment",
+                       "cfgwebsearch",
+                       "cfgwebsubmiit",
+                       "cfgbibknowledge",
+                       "runbatchuploader"):
             if action not in your_admin_activities:
                 your_admin_activities.append(action)
 
-    return websession_templates.tmpl_account_adminactivities(
-             ln = ln,
-             uid = user_info['uid'],
-             guest = guest,
-             roles = your_roles,
-             activities = your_admin_activities,
-           )
+    out = websession_templates.tmpl_account_adminactivities(
+        ln = ln,
+        uid = user_info['uid'],
+        guest = guest,
+        roles = your_roles,
+        activities = your_admin_activities)
 
-def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, sbms, appr, admn, ln, comments):
-    """Display a dynamic page that shows the user's account."""
+    return out
 
-    # load the right message language
+def perform_display_account(
+    uid,
+    user_info,
+    user_name,
+    user_baskets_p,
+    user_alerts_p,
+    user_searches_p,
+    user_messages_p,
+    user_loans_p,
+    user_groups_p,
+    user_submissions_p,
+    user_approvals_p,
+    user_administration_p,
+    user_comments_p,
+    user_tickets_p,
+    ln):
+    """
+    Display a dynamic page that shows the user's account.
+    """
+
+    # Load the right message language
     _ = gettext_set_language(ln)
 
-    uid = getUid(req)
-    user_info = collect_user_info(req)
-    #your account
-    if int(user_info['guest']):
-        user = "guest"
-        login = "%s/youraccount/login?ln=%s" % (CFG_SITE_SECURE_URL, ln)
-        accBody = _("You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)s as a regular user.") %\
-            {'x_url_open': '<a href="' + login + '">',
-             'x_url_close': '</a>'}
-        accBody += "<br /><br />"
-        bask=aler=msgs=comments= _("The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%(x_url_close)s first") %\
-            {'x_fmt_open': '<strong class="headline">',
-             'x_fmt_close': '</strong>',
-             'x_url_open': '<a href="' + login + '">',
-             'x_url_close': '</a>'}
-        sear= _("No queries found")
-    else:
-        user = username
-        accBody = websession_templates.tmpl_account_body(
-                    ln = ln,
-                    user = user,
-                  )
+    user_account         = websession_templates.tmpl_account_body(ln = ln, user = user_name)
+    user_baskets         = user_baskets_p        and account_user_baskets(uid, ln)              or None
+    user_alerts          = user_alerts_p         and account_user_alerts(uid, ln)               or None
+    user_searches        = user_searches_p       and account_user_searches(uid, ln)             or None
+    user_messages        = user_messages_p       and account_user_messages(uid, ln)             or None
+    # TODO: Write a function that returns "Loans" information for the user
+    user_loans           = user_loans_p          and None                                       or None
+    user_groups          = user_groups_p         and account_user_groups(uid, ln)               or None
+    user_submissions     = user_submissions_p    and account_user_submissions(ln)               or None
+    user_approvals       = user_approvals_p      and account_user_approvals(ln)                 or None
+    user_administration  = user_administration_p and account_user_administration(user_info, ln) or None
+    user_comments        = user_comments_p       and account_user_comments(uid, ln)             or None
+    user_tickets         = user_tickets_p        and account_user_tickets(ln)                   or None
 
-    #Display warnings if user is superuser
+    # Display warnings if user is superuser
     roles = acc_find_user_role_actions(user_info)
     warnings = "0"
     warning_list = []
@@ -150,26 +184,22 @@ def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, s
         warnings = "1"
         warning_list.append(email_autogenerated_warning)
 
-    #check if tickets ok
-    tickets = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
-
     return websession_templates.tmpl_account_page(
-             ln = ln,
-             warnings = warnings,
-             warning_list = warning_list,
-             accBody = accBody,
-             baskets = bask,
-             alerts = aler,
-             searches = sear,
-             messages = msgs,
-             loans = loan,
-             groups = grps,
-             submissions = sbms,
-             approvals = appr,
-             tickets = tickets,
-             administrative = admn,
-             comments = comments,
-           )
+        ln = ln,
+        warnings = warnings,
+        warning_list = warning_list,
+        account = user_account,
+        baskets = user_baskets,
+        alerts = user_alerts,
+        searches = user_searches,
+        messages = user_messages,
+        loans = user_loans,
+        groups = user_groups,
+        submissions = user_submissions,
+        approvals = user_approvals,
+        tickets = user_tickets,
+        administrative = user_administration,
+        comments = user_comments)
 
 def superuser_account_warnings():
     """Check to see whether admin accounts have default / blank password etc. Returns a list"""
@@ -257,18 +287,6 @@ def template_account(title, body, ln):
              title = title,
              body = body
            )
-
-def warning_guest_user(type, ln=CFG_SITE_LANG):
-    """It returns an alert message,showing that the user is a guest user and should log into the system."""
-
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    return websession_templates.tmpl_warning_guest_user(
-             ln = ln,
-             type = type,
-           )
-
 
 def perform_delete(ln):
     """Delete  the account of the user, not implement yet."""

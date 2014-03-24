@@ -27,7 +27,6 @@ from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql
 from invenio.webuser import isGuestUser
 from invenio.errorlib import register_exception
-from invenio.webaccount import warning_guest_user
 from invenio.webbasket_dblayer import \
     check_user_owns_baskets, \
     get_all_user_personal_basket_ids_by_topic
@@ -141,10 +140,7 @@ def perform_input_alert(action,
              old_id_basket = old_id_basket,
              id_basket = id_basket,
              id_query = id_query,
-             is_active = is_active,
-             guest = isGuestUser(uid),
-             guesttxt = warning_guest_user(type="alerts", ln=ln)
-           )
+             is_active = is_active)
 
 def check_alert_is_unique(id_basket, id_query, uid, ln=CFG_SITE_LANG ):
     """check the user does not have another alert for the specified query and basket"""
@@ -566,30 +562,22 @@ def is_selected(var, fld):
     else:
         return ""
 
-def account_list_alerts(uid, ln=CFG_SITE_LANG):
-    """account_list_alerts: list alert for the account page
+def account_user_alerts(uid, ln=CFG_SITE_LANG):
+    """
+    Information on the user's alerts for the "Your Account" page.
     input:  the user id
             language
-    output: the list of alerts Web page"""
-    query = """ SELECT q.id, q.urlargs, a.id_user, a.id_query,
-                       a.id_basket, a.alert_name, a.frequency,
-                       a.notification,
-                       DATE_FORMAT(a.date_creation,'%%d %%b %%Y'),
-                       DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y'),
-                       a.id_basket
-                FROM query q, user_query_basket a
-                WHERE a.id_user=%s AND a.id_query=q.id
-                ORDER BY a.alert_name ASC """
-    res = run_sql(query, (uid,))
-    alerts = []
-    if len(res):
-        for row in res:
-            alerts.append({
-                            'id' : row[0],
-                            'name' : row[5]
-                          })
+    output: the information in HTML
+    """
 
-    return webalert_templates.tmpl_account_list_alerts(ln=ln, alerts=alerts)
+    query = """ SELECT  COUNT(*)
+                FROM    user_query_basket
+                WHERE   id_user = %s"""
+    params = (uid,)
+    result = run_sql(query, params)
+    alerts = result[0][0]
+
+    return webalert_templates.tmpl_account_user_alerts(alerts, ln)
 
 def perform_request_youralerts_popular(ln=CFG_SITE_LANG):
     """
@@ -636,7 +624,7 @@ def count_user_alerts_for_given_query(id_user,
     """
 
     query = """ SELECT  COUNT(id_query)
-                FROM    user_query_basket AS uqb
+                FROM    user_query_basket
                 WHERE   id_user=%s
                     AND id_query=%s"""
     params = (id_user, id_query)

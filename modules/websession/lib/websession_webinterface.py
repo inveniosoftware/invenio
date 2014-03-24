@@ -44,11 +44,7 @@ from invenio.config import \
 from invenio import webuser
 from invenio.webpage import page
 from invenio import webaccount
-from invenio import webbasket
-from invenio import webalert
-from invenio import websearch_yoursearches
 from invenio.dbquery import run_sql
-from invenio.webmessage import account_new_mail
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio import webinterface_handler_config as apache
@@ -74,12 +70,9 @@ from invenio.session import get_session
 
 from invenio import web_api_key
 
-
 import invenio.template
 websession_templates = invenio.template.load('websession')
 bibcatalog_templates = invenio.template.load('bibcatalog')
-
-
 
 class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
@@ -227,39 +220,50 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                navmenuid='youraccount')
 
         if webuser.isGuestUser(uid):
-            return page(title=_("Your Account"),
-                        body=webaccount.perform_info(req, args['ln']),
-                        description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        uid=uid,
-                        req=req,
+            # TODO: use CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS to decide whether to redirect the user to
+            # the login page or show them the page that is currently shown.
+            return page(title = _("Your Account"),
+                        body = webaccount.perform_info(req, args['ln']),
+                        description = "%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                        keywords = _("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                        uid = uid,
+                        req = req,
                         secure_page_p = 1,
-                        language=args['ln'],
-                        lastupdated=__lastupdated__,
-                        navmenuid='youraccount')
+                        language = args['ln'],
+                        lastupdated = __lastupdated__,
+                        navmenuid = 'youraccount')
 
-        username = webuser.get_nickname_or_email(uid)
+        user_name = webuser.get_nickname_or_email(uid)
         user_info = webuser.collect_user_info(req)
-        bask = user_info['precached_usebaskets'] and webbasket.account_list_baskets(uid, ln=args['ln']) or ''
-        aler = user_info['precached_usealerts'] and webalert.account_list_alerts(uid, ln=args['ln']) or ''
-        sear = websearch_yoursearches.account_list_searches(uid, ln=args['ln'])
-        msgs = user_info['precached_usemessages'] and account_new_mail(uid, ln=args['ln']) or ''
-        grps = user_info['precached_usegroups'] and webgroup.account_group(uid, ln=args['ln']) or ''
-        appr = user_info['precached_useapprove']
-        sbms = user_info['precached_viewsubmissions']
-        comments = user_info['precached_sendcomments']
-        loan = ''
-        admn = webaccount.perform_youradminactivities(user_info, args['ln'])
-        return page(title=_("Your Account"),
-                    body=webaccount.perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, sbms, appr, admn, args['ln'], comments),
-                    description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                    uid=uid,
-                    req=req,
-                    secure_page_p = 1,
-                    language=args['ln'],
-                    lastupdated=__lastupdated__,
-                    navmenuid='youraccount')
+
+        body = webaccount.perform_display_account(
+            uid,
+            user_info,
+            user_name,
+            user_baskets_p        = user_info['precached_usebaskets'],
+            user_alerts_p         = user_info['precached_usealerts'],
+            user_searches_p       = True,
+            user_messages_p       = user_info['precached_usemessages'],
+            user_loans_p          = False,
+            user_groups_p         = user_info['precached_usegroups'],
+            user_submissions_p    = user_info['precached_viewsubmissions'],
+            user_approvals_p      = user_info['precached_useapprove'],
+            user_administration_p = True,
+            user_comments_p       = user_info['precached_sendcomments'],
+            user_tickets_p        = (acc_authorize_action(user_info, 'runbibedit')[0] == 0),
+            ln = args['ln'])
+
+        return page(
+            title         = _("Your Account"),
+            body          = body,
+            description   = "%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+            keywords      = _("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+            uid           = uid,
+            req           = req,
+            secure_page_p = 1,
+            language      = args['ln'],
+            lastupdated   = __lastupdated__,
+            navmenuid     = 'youraccount')
 
     def apikey(self, req, form):
         args = wash_urlargd(form, {
@@ -713,7 +717,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                navmenuid='admin')
 
         return page(title=_("Your Administrative Activities"),
-                    body=webaccount.perform_youradminactivities(user_info, args['ln']),
+                    body=webaccount.account_user_administration(user_info, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),

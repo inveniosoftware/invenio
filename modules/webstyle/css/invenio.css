@@ -861,6 +861,50 @@ th.youraccountheader a:link, th.youraccountheader a:visited {
 th.youraccountheader a:hover {
   text-decoration:underline;
 }
+
+div.youraccount_grid {
+  width: 100%;
+}
+
+div.youraccount_grid:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+div.youraccount_grid_column_1_3 {
+  width: 33.33%;
+  float: left;
+}
+
+div.youraccount_grid_column_content {
+  margin: 7px 7px 14px 7px;
+  border: 1px solid #FFCC00;
+  /*border-radius: 0px 0px 15px 0px;*/
+}
+
+div.youraccount_grid_column_title {
+  border-bottom: 1px solid #FFCC00;
+  background-color: #FFFFCC;
+  padding: 7px;
+}
+
+div.youraccount_grid_column_title a, div.youraccount_grid_column_title a:link, div.youraccount_grid_column_title a:visited, div.youraccount_grid_column_title a:active {
+  color: black;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+div.youraccount_grid_column_title a:hover {
+  color: black;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+div.youraccount_grid_column_body {
+  padding: 10px;
+}
+
 .adminbox {
   color: #000;
   background: #f1f1f1;
