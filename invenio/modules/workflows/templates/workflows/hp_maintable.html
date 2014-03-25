@@ -78,7 +78,7 @@
                     <ul class="dropdown-menu">
                     {% if user_list %}
                         {% set i = 0 %}
-                        {% for task, object_count in widget_list.iteritems() %}
+                        {% for task, object_count in widget_list.items() %}
                             <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{task}}: {{object_count}}</a></li>
                             {% set i = i+1 %}
                         {% endfor %}
