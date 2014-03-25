@@ -33,6 +33,7 @@ install:
   - "sudo apt-get update"
   - "sudo apt-get install apache2 libapache2-mod-wsgi ssl-cert poppler-utils --fix-missing"
   - "sudo a2enmod actions"
+  - "sudo a2enmod version"
   - "sudo a2enmod rewrite"
   - "sudo mkdir /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/apache2/ssl/apache.pem"
