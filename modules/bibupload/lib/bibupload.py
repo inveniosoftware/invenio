@@ -87,6 +87,7 @@ from invenio.errorlib import register_exception
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.intbitset import intbitset
 from invenio.urlutils import make_user_agent_string
+from invenio.textutils import wash_for_xml
 from invenio.config import CFG_BIBDOCFILE_FILEDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, \
@@ -827,6 +828,7 @@ def open_marc_file(path):
 def xml_marc_to_records(xml_marc):
     """create the records"""
     # Creation of the records from the xml Marc in argument
+    xml_marc = wash_for_xml(xml_marc)
     recs = create_records(xml_marc, 1, 1)
     if recs == []:
         msg = "ERROR: Cannot parse MARCXML file."
