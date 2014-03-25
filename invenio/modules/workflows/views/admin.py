@@ -18,6 +18,7 @@
 """Holding Pen & BibWorkflow web interface"""
 
 from __future__ import print_function
+from six import text_type
 
 from flask import render_template, Blueprint
 from flask.ext.login import login_required
@@ -121,7 +122,7 @@ def show_workflows():
 
 @blueprint.route('/run_workflow', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'workflow_name': (unicode, "")})
+@wash_arguments({'workflow_name': (text_type, "")})
 def run_workflow(workflow_name, data={"data": 10}):
     start_delayed(workflow_name, data)
     return "Workflow has been started."
@@ -130,7 +131,7 @@ def run_workflow(workflow_name, data={"data": 10}):
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])
 @login_required
 @wash_arguments({'oid': (int, 0),
-                 'of': (unicode, 'default')})
+                 'of': (text_type, 'default')})
 def entry_data_preview(oid, of):
     workflow_object = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
                                                      oid).first()
@@ -139,7 +140,7 @@ def entry_data_preview(oid, of):
 
 @blueprint.route('/get_redis_keys', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'key': (unicode, "")})
+@wash_arguments({'key': (text_type, "")})
 def get_redis_keys(key):
     keys = utils_get_redis_keys(str(key))
     options = ""
@@ -150,7 +151,7 @@ def get_redis_keys(key):
 
 @blueprint.route('/get_redis_values', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'key': (unicode, "")})
+@wash_arguments({'key': (text_type, "")})
 def get_redis_values(key):
     values = filter_holdingpen_results(key)
     return str(values)

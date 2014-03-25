@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111 1307, USA.
 
+import six
+
 from invenio.modules.workflows.models import (BibWorkflowObject,
                                               BibWorkflowEngineLog)
 from invenio.modules.workflows.api import start_delayed
@@ -211,7 +213,7 @@ def write_something_generic(messagea, func):
     """
 
     def _write_something_generic(obj, eng):
-        if isinstance(messagea, basestring):
+        if isinstance(messagea, six.string_types):
             if isinstance(func, list):
                 for function in func:
                     function(messagea)
@@ -238,7 +240,7 @@ def write_something_generic(messagea, func):
                     while callable(func_messagea):
                         func_messagea = func_messagea(obj, eng)
                     temp += str(func_messagea)
-                elif isinstance(func_messagea, basestring):
+                elif isinstance(func_messagea, six.string_types):
                     temp += func_messagea
             if isinstance(func, list):
                 for function in func:

@@ -19,6 +19,8 @@
 
 import re
 
+from six import iteritems, text_type
+
 from flask import (render_template, Blueprint,
                    request, current_app,
                    jsonify, session, url_for,
@@ -76,7 +78,7 @@ def maintable():
     bwolist = get_holdingpen_objects()
     widget_list = get_widget_list(bwolist)
     widget_static = []
-    for name, widget in widgets.iteritems():
+    for name, widget in iteritems(widgets):
         if getattr(widget, "static", None):
             widget_static.extend(widget.static)
 
@@ -87,7 +89,7 @@ def maintable():
 
 @blueprint.route('/batch_widget', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'bwolist': (unicode, "")})
+@wash_arguments({'bwolist': (text_type, "")})
 def batch_widget(bwolist):
     """
     Renders widget accepting single or multiple records.
@@ -133,7 +135,7 @@ def batch_widget(bwolist):
 
 @blueprint.route('/load_table', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'version_showing': (unicode, "default")})
+@wash_arguments({'version_showing': (text_type, "default")})
 @templated('workflows/hp_maintable.html')
 def load_table(version_showing):
     """
@@ -350,7 +352,7 @@ def delete_from_db(objectid):
 
 @blueprint.route('/delete_multi', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'bwolist': (unicode, "")})
+@wash_arguments({'bwolist': (text_type, "")})
 def delete_multi(bwolist):
     from ..utils import parse_bwids
     bwolist = parse_bwids(bwolist)
@@ -386,8 +388,8 @@ def show_widget(objectid):
 
 @blueprint.route('/resolve', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'objectid': (unicode, '-1'),
-                 'widget': (unicode, 'default')})
+@wash_arguments({'objectid': (text_type, '-1'),
+                 'widget': (text_type, 'default')})
 def resolve_widget(objectid, widget):
     """
     Resolves the action taken in a widget.
@@ -400,8 +402,8 @@ def resolve_widget(objectid, widget):
 
 @blueprint.route('/resolve_edit', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'objectid': (unicode, '0'),
-                 'form': (unicode, '')})
+@wash_arguments({'objectid': (text_type, '0'),
+                 'form': (text_type, '')})
 def resolve_edit(objectid, form):
     """
     Performs the changes to the record made in the edit record widget.
@@ -413,8 +415,8 @@ def resolve_edit(objectid, form):
 
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'objectid': (unicode, '0'),
-                 'of': (unicode, None)})
+@wash_arguments({'objectid': (text_type, '0'),
+                 'of': (text_type, None)})
 def entry_data_preview(objectid, of):
     """
     Presents the data in a human readble form or in xml code
@@ -459,7 +461,7 @@ def get_context():
     except KeyError:
         context['version_showing'] = ObjectVersion.HALTED
 
-    context['widgets'] = [name for name, widget in widgets.iteritems()
+    context['widgets'] = [name for name, widget in iteritems(widgets)
                           if getattr(widget, "static", None)]
     return jsonify(context)
 
