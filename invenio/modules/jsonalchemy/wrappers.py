@@ -106,7 +106,7 @@ class SmartJson(SmartDict):
                     FieldParser.field_extensions()[ext]\
                             .evaluate(self, main_key, action, args)
             if 'decorators' not in exclude:
-                for ext, args in six.iteritem(self.meta_metadata[main_key]['after']):
+                for ext, args in six.iteritems(self.meta_metadata[main_key]['after']):
                     if ext in exclude:
                         continue
                     FieldParser.decorator_after_extensions()[ext]\
@@ -200,7 +200,7 @@ class SmartJson(SmartDict):
         """
         dict_ = copy.copy(self._dict)
         if with_calculated_fields:
-            for key, value in six.iteritem(self._dict):
+            for key, value in six.iteritems(self._dict):
                 if value is None and \
                         self.meta_metadata[key]['type'] == 'calculated':
                     dict_[key] = self[key]
