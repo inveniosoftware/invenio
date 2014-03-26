@@ -126,5 +126,6 @@ class Validator(ValidatorBase):
         :param field: field name.
         :param value: field value.
         """
-        if not re.match('[a-f0-9]{24}', value):
+        # FIXME: not real UUID validation
+        if not re.match('[a-f0-9\-]{24}', value):
             self._error(field, errors.ERROR_BAD_TYPE % 'ObjectId')
