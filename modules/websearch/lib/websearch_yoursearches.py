@@ -19,10 +19,9 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
-from invenio.webuser import isGuestUser
 from urllib import quote
 from invenio.webalert import count_user_alerts_for_given_query
 

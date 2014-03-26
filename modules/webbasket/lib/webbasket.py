@@ -1053,7 +1053,7 @@ def perform_request_search(uid,
                            p="",
                            b="",
                            n=0,
-                           #format='xm',
+                           #record_format='xm',
                            ln=CFG_SITE_LANG):
     """Search the baskets...
     @param uid: user id
@@ -1160,12 +1160,12 @@ def perform_request_search(uid,
 
         # The search format for external records. This means in which format will
         # the external records be fetched from the database to be searched then.
-        format = 'xm'
+        record_format = 'xm'
 
         ### Calculate the search results for the user's personal baskets ###
         if b.startswith("P") or not b:
             personal_search_results = {}
-            personal_items = db.get_all_items_in_user_personal_baskets(uid, selected_topic, format)
+            personal_items = db.get_all_items_in_user_personal_baskets(uid, selected_topic, record_format)
             personal_local_items = personal_items[0]
             personal_external_items = personal_items[1]
             personal_external_items_xml_records = {}
@@ -1239,7 +1239,7 @@ def perform_request_search(uid,
         ### Calculate the search results for the user's group baskets ###
         if b.startswith("G") or not b:
             group_search_results = {}
-            group_items = db.get_all_items_in_user_group_baskets(uid, selected_group_id, format)
+            group_items = db.get_all_items_in_user_group_baskets(uid, selected_group_id, record_format)
             group_local_items = group_items[0]
             group_external_items = group_items[1]
             group_external_items_xml_records = {}
@@ -1328,7 +1328,7 @@ def perform_request_search(uid,
         ### Calculate the search results for the user's public baskets ###
         if b.startswith("E") or not b:
             public_search_results = {}
-            public_items = db.get_all_items_in_user_public_baskets(uid, format)
+            public_items = db.get_all_items_in_user_public_baskets(uid, record_format)
             public_local_items = public_items[0]
             public_external_items = public_items[1]
             public_external_items_xml_records = {}
@@ -1411,7 +1411,7 @@ def perform_request_search(uid,
         ### Calculate the search results for all the public baskets ###
         if b.startswith("A"):
             all_public_search_results = {}
-            all_public_items = db.get_all_items_in_all_public_baskets(format)
+            all_public_items = db.get_all_items_in_all_public_baskets(record_format)
             all_public_local_items = all_public_items[0]
             all_public_external_items = all_public_items[1]
             all_public_external_items_xml_records = {}
@@ -1695,14 +1695,15 @@ def perform_request_delete_note(uid,
             #warnings_notes.append('WRN_WEBBASKET_DELETE_INVALID_NOTE')
             warnings_html += webbasket_templates.tmpl_warnings(exc.message, ln)
 
-    (body, warnings, navtrail) = perform_request_display(uid=uid,
-                                                         selected_category=category,
-                                                         selected_topic=topic,
-                                                         selected_group_id=group_id,
-                                                         selected_bskid=bskid,
-                                                         selected_recid=recid,
-                                                         of='hb',
-                                                         ln=CFG_SITE_LANG)
+    (body, dummy, navtrail) = perform_request_display(
+        uid=uid,
+        selected_category=category,
+        selected_topic=topic,
+        selected_group_id=group_id,
+        selected_bskid=bskid,
+        selected_recid=recid,
+        of='hb',
+        ln=CFG_SITE_LANG)
 
     body = warnings_html + body
     #warnings.extend(warnings_notes)
@@ -2042,7 +2043,7 @@ def perform_request_delete(uid, bskid, confirmed=0,
     if not(db.check_user_owns_baskets(uid, [bskid])):
         try:
             raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBBASKET_NO_RIGHTS',))
@@ -2111,7 +2112,7 @@ def perform_request_edit(uid, bskid, topic="", new_name='',
     if rights != CFG_WEBBASKET_SHARE_LEVELS['MANAGE']:
         try:
             raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
-        except InvenioWebBasketWarning, exc:
+        except InvenioWebBasketWarning:
             register_exception(stream='warning')
             #warnings.append(exc.message)
         #warnings.append(('WRN_WEBBASKET_NO_RIGHTS',))
@@ -2470,7 +2471,7 @@ def create_basket_navtrail(uid,
         if bskid:
             basket = db.get_public_basket_infos(bskid)
             if basket:
-                basket_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">""" % \
+                basket_html = """ &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>""" % \
                               (CFG_SITE_URL,
                                'category=' + category + '&amp;ln=' + ln + \
                                          '#bsk' + str(bskid),

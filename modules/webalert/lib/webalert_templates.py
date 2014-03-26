@@ -134,7 +134,6 @@ class Template:
                          notification,
                          baskets,
                          old_id_basket,
-                         id_basket,
                          id_query,
                          is_active):
         """
@@ -157,8 +156,6 @@ class Template:
           - 'baskets' *array* - The existing baskets ('id' + 'name' pairs)
 
           - 'old_id_basket' *string* - The id of the previous basket of this alert
-
-          - 'id_basket' *string* - The id of the basket of this alert
 
           - 'id_query' *string* - The id of the query associated to this alert
 
@@ -832,7 +829,7 @@ Need human intervention?  Contact <%s>
                                   'selected': bskid == '' and ' selected="selected"' or '',
                                   'label': _("Don't store results in basket...")}
 
-        # Create the <optgroup>s and <option>s for the user personal baskets.
+        # Create the optgroups and options for the user personal baskets.
         if personal_baskets_list:
             out += """
                 <optgroup label="%s">""" % ('* ' + _('Your personal baskets') + ' *',)

@@ -25,7 +25,6 @@ from urllib import quote
 
 from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql
-from invenio.webuser import isGuestUser
 from invenio.errorlib import register_exception
 from invenio.webbasket_dblayer import \
     check_user_owns_baskets, \

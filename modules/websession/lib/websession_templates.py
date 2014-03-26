@@ -69,7 +69,6 @@ class Template:
                'message' : message,
                'url'     : url,
                'link'    : link,
-               'ln'      : ln
              }
 
         return out
@@ -315,7 +314,6 @@ class Template:
                 </form>
                 """ % {
                     'change_pass' : _("If you want to change your password, please enter the old one and set the new value in the form below."),
-                    'mandatory' : _("mandatory"),
                     'old_password' : _("Old password"),
                     'new_password' : _("New password"),
                     'csrf_token': cgi.escape(csrf_token, True),
@@ -562,7 +560,7 @@ class Template:
 
         return out
 
-    def tmpl_account_info(self, ln, uid, guest, CFG_CERN_SITE):
+    def tmpl_account_info(self, ln, uid, guest):
         """
         Displays the account information
 
@@ -573,8 +571,6 @@ class Template:
           - 'uid' *string* - The user id
 
           - 'guest' *boolean* - If the user is guest
-
-          - 'CFG_CERN_SITE' *boolean* - If the site is a CERN site
         """
 
         # load the right message language
@@ -645,7 +641,7 @@ class Template:
 
         return out
 
-    def tmpl_warning_guest_user(self, ln, type):
+    def tmpl_warning_guest_user(self, warning_type, ln):
         """
         Displays a warning message about the specified type
 
@@ -653,16 +649,16 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'type' *string* - The type of data that will get lost in case of guest account (for the moment: 'alerts' or 'baskets')
+          - 'warning_type' *string* - The type of data that will get lost in case of guest account (for the moment: 'alerts' or 'baskets')
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
-        if (type=='baskets'):
+        if (warning_type == 'baskets'):
             msg = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
-        elif (type=='alerts'):
+        elif (warning_type == 'alerts'):
             msg = _("You are logged in as a guest user, so your alerts will disappear at the end of the current session.") + ' '
-        elif (type=='searches'):
+        elif (warning_type == 'searches'):
             msg = _("You are logged in as a guest user, so your searches will disappear at the end of the current session.") + ' '
         msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") % {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
                                                                                                'x_url_close': '</a>'}
@@ -1822,7 +1818,7 @@ class Template:
       </td>
     </tr>""" %(_("You are not a member of any groups."),)
         for group_data in groups:
-            (id, name, description) = group_data
+            (dummy, name, description) = group_data
             group_text += """
     <tr class="mailboxrecord">
       <td>%s</td>
@@ -1885,7 +1881,7 @@ class Template:
       </td>
     </tr>""" %(_("You are not a member of any external groups."),)
         for group_data in groups:
-            (id, name, description) = group_data
+            (dummy, name, description) = group_data
             group_text += """
     <tr class="mailboxrecord">
       <td>%s</td>
@@ -2645,13 +2641,11 @@ Best regards.
     def tmpl_account_user_groups(
         self,
         nb_admin_groups = 0,
-        nb_member_groups = 0,
         nb_total_groups = 0,
         ln = CFG_SITE_LANG):
         """
         Information on the user's groups for the "Your Account" page
         @param nb_admin_groups: number of groups the user is admin of
-        @param nb_member_groups: number of groups the user is member of
         @param nb_total_groups: number of groups the user belongs to
         @param ln: language
         return: html output.

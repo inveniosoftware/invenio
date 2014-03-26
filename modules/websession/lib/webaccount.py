@@ -29,10 +29,8 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_ADMIN_EMAIL, \
-     CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      CFG_SITE_RECORD
-from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTH_DEFAULT
 from invenio.dbquery import run_sql
@@ -65,9 +63,7 @@ def perform_info(req, ln):
     return websession_templates.tmpl_account_info(
             ln = ln,
             uid = uid,
-            guest = int(user_info['guest']),
-            CFG_CERN_SITE = CFG_CERN_SITE,
-           )
+            guest = int(user_info['guest']))
 
 def perform_display_external_user_settings(settings, ln):
     """show external user settings which is a dictionary."""
@@ -235,7 +231,7 @@ def superuser_account_warnings():
         # no account nick-named `admin' exists; keep on going
         res1 = []
 
-    for user in res1:
+    for dummy in res1:
         warning_array.append("warning_empty_admin_password")
 
     #Check if the admin email has been changed from the default
