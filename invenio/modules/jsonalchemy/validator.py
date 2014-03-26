@@ -24,6 +24,7 @@
     See http://cerberus.readthedocs.org/en/latest
 """
 import datetime
+import re
 import six
 
 from cerberus import Validator as ValidatorBase
@@ -59,7 +60,6 @@ class Validator(ValidatorBase):
             document[field] = parser.parse(document[field])
         else:
             document[field] = eval(type_)(document[field])
-
 
     def _validate(self, document, schema=None, update=False):
         self._errors = {}
@@ -120,11 +120,11 @@ class Validator(ValidatorBase):
         return len(self._errors) == 0
 
     def _validate_type_objectid(self, field, value):
-       """ 
-       Enables validation for `objectid` schema attribute.
+        """
+        Enables validation for `objectid` schema attribute.
 
-       :param field: field name.
-       :param value: field value.
-       """
-       if not re.match('[a-f0-9]{24}', value):
-           self._error(field, ERROR_BAD_TYPE % 'ObjectId')
+        :param field: field name.
+        :param value: field value.
+        """
+        if not re.match('[a-f0-9]{24}', value):
+            self._error(field, errors.ERROR_BAD_TYPE % 'ObjectId')
