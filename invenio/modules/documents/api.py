@@ -24,7 +24,7 @@ from fs.opener import opener
 
 from invenio.modules.jsonalchemy.wrappers import SmartJson
 from invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy import SQLAlchemyStorage
-from invenio.modules.jsonalchemy.jsonext.readers.json_reader import reader
+from invenio.modules.jsonalchemy.reader import Reader
 
 
 from . import signals, errors
@@ -38,13 +38,13 @@ class Document(SmartJson):
     storage_engine = SQLAlchemyStorage(DocumentModel)
 
     @classmethod
-    def create(cls, data, model='base'):
-        record = reader(data, namespace='documentext', model=model)
-        document = cls(record.translate())
+    def create(cls, data, model='document_base', master_format='json',
+               **kwargs):
+        document = Reader.translate(data, cls, master_format=master_format,
+                                    model=model, namespace='documentext',
+                                    **kwargs)
         cls.storage_engine.save_one(document.dumps())
-
         signals.document_created.connect(document)
-
         return document
 
     @classmethod
