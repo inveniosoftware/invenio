@@ -412,7 +412,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                   p=argd['p'],
                                                   b=argd['b'],
                                                   n=argd['n'],
-#                                                  format=argd['of'],
+#                                                  record_format=argd['of'],
                                                   ln=argd['ln'])
 
         # register event in webstat

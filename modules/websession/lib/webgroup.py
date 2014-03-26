@@ -781,7 +781,6 @@ def account_user_groups(uid, ln=CFG_SITE_LANG):
 
     out = websession_templates.tmpl_account_user_groups(
         nb_admin_groups,
-        nb_member_groups,
         nb_total_groups,
         ln = ln)
 

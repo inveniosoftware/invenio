@@ -469,21 +469,22 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
     params = (cmt_id, uid, client_ip_address, action_date, action_code)
     run_sql(query, params)
     if nb_abuse_reports % CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN == 0:
-        (cmt_id2,
+        (dummy,
          id_bibrec,
          id_user,
          cmt_body,
          cmt_date,
          cmt_star,
-         cmt_vote, cmt_nb_votes_total,
+         dummy,
+         dummy,
          cmt_title,
          cmt_reported,
-         round_name,
-         restriction) = query_get_comment(cmt_id)
+         dummy,
+         dummy) = query_get_comment(cmt_id)
         (user_nb_abuse_reports,
          user_votes,
          user_nb_votes_total) = query_get_user_reports_and_votes(int(id_user))
-        (nickname, user_email, last_login) = query_get_user_contact_info(id_user)
+        (nickname, user_email, dummy) = query_get_user_contact_info(id_user)
         from_addr = '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
         comment_collection = get_comment_collection(cmt_id)
         to_addrs = get_collection_moderators(comment_collection)
@@ -508,12 +509,10 @@ Comment:    comment_id      = %(cmt_id)s
 ---end body---
 
 Please go to the record page %(comment_admin_link)s to delete this message if necessary. A warning will be sent to the user in question.''' % \
-                {   'cfg-report_max'        : CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,
-                    'nickname'              : nickname,
+                {   'nickname'              : nickname,
                     'user_email'            : user_email,
                     'uid'                   : id_user,
                     'user_nb_abuse_reports' : user_nb_abuse_reports,
-                    'user_votes'            : user_votes,
                     'votes'                 : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
                                               "total number of positive votes\t= %s\n\t\ttotal number of negative votes\t= %s" % \
                                               (user_votes, (user_nb_votes_total - user_votes)) or "\n",
@@ -874,7 +873,6 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     #change general unicode back to utf-8
     msg = msg.encode('utf-8')
     note = note.encode('utf-8')
-    msg_original = msg
     (restriction, round_name) = get_record_status(recID)
     if attached_files is None:
         attached_files = {}
@@ -1116,7 +1114,7 @@ def get_users_subscribed_to_discussion(recID, check_authorizations=True):
         uid = row[0]
         if check_authorizations:
             user_info = collect_user_info(uid)
-            (auth_code, auth_msg) = check_user_can_view_comments(user_info, recID)
+            (auth_code, dummy) = check_user_can_view_comments(user_info, recID)
         else:
             # Don't check and grant access
             auth_code = False
@@ -1562,7 +1560,6 @@ def perform_request_add_comment_or_remark(recID=0,
     if warnings is None:
         warnings = []
 
-    actions = ['DISPLAY', 'REPLY', 'SUBMIT']
     _ = gettext_set_language(ln)
 
     ## check arguments
@@ -1757,18 +1754,18 @@ def notify_admin_of_new_comment(comID):
          id_user,
          body,
          date_creation,
-         star_score, nb_votes_yes, nb_votes_total,
+         star_score, dummy, dummy,
          title,
-         nb_abuse_reports, round_name, restriction) = comment
+         dummy, dummy, dummy) = comment
     else:
         return
     user_info = query_get_user_contact_info(id_user)
     if len(user_info) > 0:
-        (nickname, email, last_login) = user_info
+        (nickname, email, dummy) = user_info
         if not len(nickname) > 0:
             nickname = email.split('@')[0]
     else:
-        nickname = email = last_login = "ERROR: Could not retrieve"
+        nickname = email = "ERROR: Could not retrieve"
 
     review_stuff = '''
     Star score  = %s

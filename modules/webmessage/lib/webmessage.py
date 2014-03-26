@@ -191,7 +191,7 @@ def perform_request_write(uid,
     @type ln: string
     @return: body with warnings.
     """
-    warnings = []
+
     body = ""
     _ = gettext_set_language(ln)
     msg_from_nickname = ""

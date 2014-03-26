@@ -41,9 +41,7 @@ from invenio.config import \
      CFG_SITE_RECORD
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
-from invenio.webbasket_dblayer import get_basket_item_title_and_URL, \
-                                      get_basket_ids_and_names
-from invenio.bibformat import format_record
+from invenio.webbasket_dblayer import get_basket_ids_and_names
 
 class Template:
     """Templating class for webbasket module"""
@@ -3026,7 +3024,7 @@ class Template:
     </tr>""" % _("The item you have selected does not exist.")
 
                 else:
-                    (recid, colid, dummy, last_cmt, val, dummy) = item
+                    (recid, colid, dummy, dummy, val, dummy) = item
 
                     if recid < 0:
                         external_item_img = '<img src="%s/img/wb-external-item.png" alt="%s" style="vertical-align: top;" />&nbsp;' % \
@@ -3889,8 +3887,7 @@ class Template:
     </tr>""" % {'count': index_item,
                 'icon': external_item_img,
                 'content': colid >= 0 and val or val and self.tmpl_create_pseudo_item(val) or _("This record does not seem to exist any more"),
-                'notes': notes,
-                'ln': ln}
+                'notes': notes,}
 
             item_html += """
   </tbody>"""
@@ -4169,9 +4166,9 @@ class Template:
                     recid)
 
         export_as_html = ""
-        for format in list_of_export_as_formats:
+        for of in list_of_export_as_formats:
             export_as_html += """<a style="text-decoration:underline;font-weight:normal" href="%s&amp;of=%s">%s</a>, """ % \
-                              (href, format[1], format[0])
+                              (href, of[1], of[0])
         if export_as_html:
             export_as_html = export_as_html[:-2]
         out = """
@@ -4361,13 +4358,13 @@ def create_add_box_select_options(category,
         if len(personal_basket_list) == 1:
             bskids = personal_basket_list[0][1].split(',')
             if len(bskids) == 1:
-               b = CFG_WEBBASKET_CATEGORIES['PRIVATE'] + '_' + bskids[0]
+                b = CFG_WEBBASKET_CATEGORIES['PRIVATE'] + '_' + bskids[0]
         elif len(group_basket_list) == 1:
             bskids = group_basket_list[0][1].split(',')
             if len(bskids) == 1:
-               b = CFG_WEBBASKET_CATEGORIES['GROUP'] + '_' + bskids[0]
+                b = CFG_WEBBASKET_CATEGORIES['GROUP'] + '_' + bskids[0]
 
-    # Create the <optgroup>s and <option>s for the user personal baskets.
+    # Create the optgroups and options for the user personal baskets.
     if personal_basket_list:
         out += """
             <optgroup label="%s">""" % ('* ' + _('Your personal baskets') + ' *',)
@@ -4390,7 +4387,7 @@ def create_add_box_select_options(category,
         out += """
             </optgroup>"""
 
-    # Create the <optgroup>s and <option>s for the user group baskets.
+    # Create the optgroups and options for the user group baskets.
     if group_basket_list:
         out += """
             <optgroup label="%s">""" % ('* ' + _('Your group baskets') + ' *',)

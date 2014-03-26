@@ -26,7 +26,6 @@ __lastupdated__ = """$Date$"""
 
 import cgi
 from datetime import timedelta
-import os
 import re
 
 from invenio.config import \
@@ -38,7 +37,6 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
-     CFG_CERN_SITE, \
      CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
      CFG_OPENAIRE_SITE
 from invenio import webuser
@@ -61,7 +59,7 @@ from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
     InvenioWebAccessMailCookieDeletedError, mail_cookie_check_authorize_action
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, \
     CFG_EXTERNAL_AUTH_USING_SSO, CFG_EXTERNAL_AUTH_LOGOUT_SSO, \
-    CFG_EXTERNAL_AUTHENTICATION, CFG_EXTERNAL_AUTH_SSO_REFRESH, \
+    CFG_EXTERNAL_AUTHENTICATION, \
     CFG_OPENID_CONFIGURATIONS, CFG_OAUTH2_CONFIGURATIONS, \
     CFG_OAUTH1_CONFIGURATIONS, CFG_OAUTH2_PROVIDERS, CFG_OAUTH1_PROVIDERS, \
     CFG_OPENID_PROVIDERS, CFG_OPENID_AUTHENTICATION, \
@@ -130,7 +128,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         body += "<p>" + _("You can now go to %(x_url_open)syour account page%(x_url_close)s.") % {'x_url_open' : '<a href="/youraccount/display?ln=%s">' % args['ln'], 'x_url_close' : '</a>'} + "</p>"
                     return page(title=_("Email address successfully activated"),
                     body=body, req=req, language=args['ln'], uid=webuser.getUid(req), lastupdated=__lastupdated__, navmenuid='youraccount', secure_page_p=1)
-                except InvenioWebAccessMailCookieDeletedError, e:
+                except InvenioWebAccessMailCookieDeletedError:
                     body = "<p>" + _("You have already confirmed the validity of your email address!") + "</p>"
                     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
                         body += "<p>" + _("Please, wait for the administrator to "
@@ -910,7 +908,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if args['action']:
             cookie = args['action']
             try:
-                action, arguments = mail_cookie_check_authorize_action(cookie)
+                dummy, dummy = mail_cookie_check_authorize_action(cookie)
             except InvenioWebAccessMailCookieError:
                 pass
         if not CFG_EXTERNAL_AUTH_USING_SSO:
