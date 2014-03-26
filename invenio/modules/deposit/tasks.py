@@ -77,6 +77,30 @@ def has_submission(obj, eng):
     return d.has_sip()
 
 
+def is_sip_uploaded(sip, record=None):
+    """
+    Check if a submission information package for a record has been uploaded
+    """
+    if not sip.is_sealed():
+        return False
+
+    if record is None:
+        record = get_record(sip.metadata.get('recid'), reset_cache=True)
+
+    sip_version_id = sip.metadata.get('modification_date')
+    if sip_version_id:
+        sip_version_id = dateutil.parser.parse(sip_version_id)
+    record_version_id = record.get('modification_date') if record else None
+
+    # Check of record in latest SIP has been uploaded (record version must
+    # be newer than SIP record version.
+    if record_version_id is None or (sip_version_id and
+                                     sip_version_id >= record_version_id):
+        return False
+    else:
+        return True
+
+
 def authorize_user(action, **params):
     """
     Check if current user is authorized to perform the action.
@@ -175,20 +199,10 @@ def load_record(draft_id='_default', producer='json_for_form',
     """
     def _load_record(obj, eng):
         d = Deposition(obj)
-
-        # Get record
         sip = d.get_latest_sip(sealed=True)
         record = get_record(sip.metadata.get('recid'), reset_cache=True)
 
-        sip_version_id = sip.metadata.get('modification_date')
-        if sip_version_id:
-            sip_version_id = dateutil.parser.parse(sip_version_id)
-        record_version_id = record.get('modification_date') if record else None
-
-        # Check of record in latest SIP has been uploaded (record version must
-        # be newer than SIP record version.
-        if record_version_id is None or (sip_version_id and
-                                         sip_version_id >= record_version_id):
+        if not is_sip_uploaded(sip, record=record):
             if getattr(request, 'is_api_request', False):
                 d.set_render_context(dict(
                     response=dict(
@@ -248,7 +262,7 @@ def load_record(draft_id='_default', producer='json_for_form',
     return _load_record
 
 
-def merge_changes(dest, a, b):
+def merge_changes(deposition, dest, a, b):
     """
     Find changes between two dictionaries A and B, and apply the changes
     to a destination dictionary.
@@ -319,6 +333,7 @@ def merge_record(draft_id='_default', pre_process_load=None,
 
         # Merge changes from changed record into the current record.
         sip.metadata = merge_func(
+            d,
             current_full_json,
             current_simple_json,
             changed_simple_json,
