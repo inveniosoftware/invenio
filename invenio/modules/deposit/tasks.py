@@ -248,60 +248,86 @@ def load_record(draft_id='_default', producer='json_for_form',
     return _load_record
 
 
+def merge_changes(dest, a, b):
+    """
+    Find changes between two dictionaries A and B, and apply the changes
+    to a destination dictionary.
+
+    This method is useful when A is a subset of the destination dictionary.
+    """
+    # Generate patch
+    patch = dictdiffer.diff(a, b)
+
+    # Apply patch (returns a deep copy of dest with patch applied)
+    return dictdiffer.patch(patch, dest)
+
+
 def merge_record(draft_id='_default', pre_process_load=None,
-                 post_process_load=None, process_export=None):
+                 post_process_load=None, process_export=None,
+                 merge_func=merge_changes):
     """
     Merge recjson with a record
 
     This task will load the current record, diff the changes from the
     deposition against it, and apply the patch.
+
+    The merge algorithm works in the following way:
+
+      * First the current record is loaded.
+      * Then all fields which is not related to the deposition is removed from
+        the current record, to produce a simplified version of the record.
+      * Next the simplified version of the record is compared against the
+        changes the user have made.
+      * These changes are then applied to the full current record.
     """
+    if not merge_func or not callable(merge_func):
+        raise RuntimeError("No merge function given.")
+
     def _merge_record(obj, eng):
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=False)
 
+        # Get the current record, which contains all fields.
         current_record = get_record(
             sip.metadata.get('recid'), reset_cache=True
         )
 
-        # Diff current record  with changes from editing deposition (note,
-        # only fields which actually concerns the deposition is diff'ed).
         form_class = d.get_draft(draft_id).form_class
 
-        initial_record = deposition_record(
+        # Create a simplified record from the current record, that only
+        # contains fields concerning this deposition.
+        current_simple_record = deposition_record(
             current_record,
             [form_class],
             pre_process_load=pre_process_load,
             post_process_load=post_process_load,
             process_export=partial(process_export, d),
         )
-        changed_record = make_record(sip.metadata, is_dump=True)
+        # Create a simplified record from the changes the user have made.
+        changed_simple_record = make_record(sip.metadata, is_dump=True)
 
-        # Generate patch
-        initial_json = initial_record.dumps(clean=True)
-        changed_json = changed_record.dumps(clean=True)
-
-        patch = list(dictdiffer.diff(
-            initial_json,
-            changed_json,
-        ))
-
-        # Initial patch of current record.
-        for k in initial_record:
+        # Make an initial patch of current record (e.g. some default values set
+        # by the form, might not exists in the current record)
+        for k in current_simple_record:
             if k not in current_record:
-                current_record[k] = initial_record[k]
+                current_record[k] = current_simple_record[k]
 
-        # Apply patch
-        current_json = current_record.dumps(clean=True)
+        # Export clean dumps
+        current_simple_json = current_simple_record.dumps(clean=True)
+        changed_simple_json = changed_simple_record.dumps(clean=True)
+        current_full_json = current_record.dumps(clean=True)
 
-        sip.metadata = dictdiffer.patch(
-            patch,
-            current_json
+        # Merge changes from changed record into the current record.
+        sip.metadata = merge_func(
+            current_full_json,
+            current_simple_json,
+            changed_simple_json,
         )
 
         # Ensure we are based on latest version_id to prevent being rejected in
         # the bibupload queue.
-        sip.metadata['modification_date'] = current_json['modification_date']
+        sip.metadata['modification_date'] = \
+            current_full_json['modification_date']
 
         d.update()
     return _merge_record
