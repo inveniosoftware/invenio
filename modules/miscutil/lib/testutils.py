@@ -214,7 +214,7 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
     browser.submit()
     username_account_page_body = browser.response().read()
     try:
-        username_account_page_body.index("You are logged in as %s." % username)
+        username_account_page_body.index("You are logged in as %s." % ("<strong>" + cgi.escape(username) + "</strong>"),)
     except ValueError:
         raise InvenioTestUtilsBrowserException('ERROR: Cannot login as %s.' % username)
     return browser

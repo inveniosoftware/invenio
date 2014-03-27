@@ -813,13 +813,17 @@ class Template:
             # While there are still items to display, get the first item,
             # removing it from the list of items to display.
             item = items.pop(0)
-            # The following "1-liner" does the following (>= Python 2.5):
+            # The following "one-liner" does the following (>= Python 2.5):
             # * For each of the 3 lists (1 for each column)
             #   calculate the sum of the length of its items (see the lambda).
-            #   The lenght of an itme is the literal length of the string
-            #   to be displayed, which includes HTML code. This of course is
-            #   not the most accurate way, but a good approximation and also
+            #   The lenght of an item is the literal length of the string
+            #   to be displayed, which includes HTML code. This, of course, is
+            #   not the most accurate way, but it is a good approximation and also
             #   very efficient.
+            #   [A more accurate way would be to wash the HTML tags first
+            #   (HTMLParser/re/...) and then compare the string sizes. But we should
+            #   still account for line breaks, paragraphs, list items and other HTML
+            #   tags that introduce white space.]
             # * Pick the list that has the smallest sum.
             # * Append the current item to that list.
             min(items_in_column_1_of_3,
