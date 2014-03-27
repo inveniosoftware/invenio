@@ -22,7 +22,6 @@
     -----------------------------------
 """
 import copy
-import datetime
 import six
 
 from invenio.utils.datastructures import DotableDict, SmartDict
@@ -52,7 +51,7 @@ class SmartJson(SmartDict):
             self._dict['__meta_metadata__'] = dict()
             self._dict['__meta_metadata__']['__additional_info__'] = kwargs
             self._dict['__meta_metadata__']['__model_info__'] = \
-                    dict(names=model_names)
+                dict(names=model_names)
             self._dict['__meta_metadata__']['__aliases__'] = dict()
             self._dict['__meta_metadata__']['__errors__'] = list()
             self._dict['__meta_metadata__']['__continuable_errors__'] = list()
@@ -100,17 +99,19 @@ class SmartJson(SmartDict):
             action = kwargs.get('action', 'get')
             exclude = kwargs.get('exclude', [])
             if 'extensions' not in exclude:
-                for ext, args in six.iteritems(self.meta_metadata[main_key]['ext']):
+                for ext, args in \
+                        six.iteritems(self.meta_metadata[main_key]['ext']):
                     if ext in exclude:
                         continue
                     FieldParser.field_extensions()[ext]\
-                            .evaluate(self, main_key, action, args)
+                        .evaluate(self, main_key, action, args)
             if 'decorators' not in exclude:
-                for ext, args in six.iteritems(self.meta_metadata[main_key]['after']):
+                for ext, args in \
+                        six.iteritems(self.meta_metadata[main_key]['after']):
                     if ext in exclude:
                         continue
                     FieldParser.decorator_after_extensions()[ext]\
-                            .evaluate(self, main_key, action, args)
+                        .evaluate(self, main_key, action, args)
 
             return self._dict_bson[key]
         else:
@@ -118,32 +119,35 @@ class SmartJson(SmartDict):
                 rest_of_key = SmartDict.main_key_pattern.findall(key)[0]
             except IndexError:
                 rest_of_key = ''
-            return self[self._dict['__meta_metadata__']['__aliases__']\
-                    [main_key] + rest_of_key]
+            return self[
+                self._dict['__meta_metadata__']['__aliases__'][main_key]
+                + rest_of_key]
 
     def __setitem__(self, key, value, extend=False, **kwargs):
         main_key = SmartDict.main_key_pattern.sub('', key)
-        #If we have meta_metadata for the main key go ahead
+        # If we have meta_metadata for the main key go ahead
         if main_key in self.meta_metadata:
             self._dict_bson.__setitem__(key, value, extend)
-        #Othewise we need the meta_metadata
+        # Othewise we need the meta_metadata
         else:
             Reader.set(self, main_key)
             self._dict_bson.__setitem__(key, value, extend, **kwargs)
         action = kwargs.get('action', 'set')
         exclude = kwargs.get('exclude', [])
         if 'decorators' not in exclude:
-            for ext, args in six.iteritems(self.meta_metadata[main_key]['after']):
+            for ext, args in \
+                    six.iteritems(self.meta_metadata[main_key]['after']):
                 if ext in exclude:
                     continue
                 FieldParser.decorator_after_extensions()[ext]\
-                        .evaluate(self, main_key, action, args)
+                    .evaluate(self, main_key, action, args)
         if 'extensions' not in exclude:
-            for ext, args in six.iteritems(self.meta_metadata[main_key]['ext']):
+            for ext, args in \
+                    six.iteritems(self.meta_metadata[main_key]['ext']):
                 if ext in exclude:
                     continue
                 FieldParser.field_extensions()[ext]\
-                        .evaluate(self, main_key, action, args)
+                    .evaluate(self, main_key, action, args)
 
     def __str__(self):
         return self.dumps(without_meta_metadata=True).__str__()
@@ -170,6 +174,7 @@ class SmartJson(SmartDict):
             if key == '__meta_metadata__' and without_meta_metadata:
                 continue
             yield (key, self[key])
+    iteritems = items
 
     def keys(self, without_meta_metadata=False):
         for key in super(SmartJson, self).keys():
@@ -244,7 +249,6 @@ class SmartJson(SmartDict):
 
         return dict_
 
-
     def produce(self, producer_code, fields=None):
         """
         Depending on the ``producer_code`` it creates a different flavor of JSON
@@ -260,7 +264,7 @@ class SmartJson(SmartDict):
         return producers[producer_code](self, fields=fields)
 
     def set_default_values(self, fields=None):
-        #TODO
+        # TODO
         raise NotImplementedError('Missing implementation in this version')
 
     def validate(self, validator=None):
@@ -270,14 +274,17 @@ class SmartJson(SmartDict):
         if validator is None:
             from .validator import Validator as validator
         schema = dict()
-        model_fields = ModelParser.resolve_models(self.model_info.names,
-                self.additional_info.namespace).get('fields', {})
+        model_fields = ModelParser.resolve_models(
+            self.model_info.names,
+            self.additional_info.namespace).get('fields', {})
         for field in self.keys():
-            if field not in model_fields and not field == '__meta_metadata__':
+            if not field == '__meta_metadata__' and field not in model_fields \
+                    and self.meta_metadata[field]['json_id'] not in model_fields:
                 model_fields[field] = self.meta_metadata[field]['json_id']
-        for json_id in model_fields.values():
+        for json_id in model_fields.keys():
             try:
-                schema.update(FieldParser.field_definitions(self.additional_info.namespace)[json_id].get('schema', {}))
+                schema.update(FieldParser.field_definitions(
+                    self.additional_info.namespace)[json_id].get('schema', {}))
             except TypeError:
                 pass
         _validator = validator(schema=schema)
@@ -292,6 +299,7 @@ class SmartJson(SmartDict):
         file
         """
         from collections import Iterable
+
         def encode_for_marcxml(value):
             from invenio.utils.text import encode_for_xml
             if isinstance(value, unicode):
@@ -306,28 +314,37 @@ class SmartJson(SmartDict):
             ind1 = ''
             ind2 = ''
             for key, value in six.iteritems(marc_dict):
-                if isinstance(value, six.string_types) or not isinstance(value, Iterable):
+                if isinstance(value, six.string_types) or \
+                        not isinstance(value, Iterable):
                     value = [value]
                 for v in value:
                     if v is None:
                         continue
                     if key.startswith('00') and len(key) == 3:
                         # Control Field (No indicators no subfields)
-                        export += '<controlfield tag="%s">%s</controlfield>\n' % (key, encode_for_marcxml(v))
+                        export += '<controlfield tag="%s">%s</controlfield>\n'\
+                            % (key, encode_for_marcxml(v))
                     elif len(key) == 6:
-                        if not (tag == key[:3] and ind1 == key[3].replace('_', '') and ind2 == key[4].replace('_', '')):
+                        if not (tag == key[:3]
+                                and ind1 == key[3].replace('_', '')
+                                and ind2 == key[4].replace('_', '')):
                             tag = key[:3]
                             ind1 = key[3].replace('_', '')
                             ind2 = key[4].replace('_', '')
                             if content:
-                                export += '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>\n' % (tag, ind1, ind2, content)
+                                export += '<datafield tag="%s" ind1="%s"'\
+                                    'ind2="%s">%s</datafield>\n' \
+                                    % (tag, ind1, ind2, content)
                                 content = ''
-                        content += '<subfield code="%s">%s</subfield>' % (key[5], encode_for_marcxml(v))
+                        content += '<subfield code="%s">%s</subfield>'\
+                            % (key[5], encode_for_marcxml(v))
                     else:
                         pass
 
             if content:
-                export += '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>\n' % (tag, ind1, ind2, content)
+                export += \
+                    '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>\n'\
+                    % (tag, ind1, ind2, content)
 
         export += '</record>'
         return export
@@ -337,7 +354,7 @@ class SmartJson(SmartDict):
         It creates the recstruct representation using the legacy rules defined
         in the configuration file
         """
-        #FIXME: it might be a bit overkilling
+        # FIXME: it might be a bit overkilling
         from invenio.legacy.bibrecord import create_record
         return create_record(self.legacy_export_as_marc())[0]
 

@@ -76,7 +76,8 @@ class Reader(object):  # pylint: disable=R0921
         using the rules describes in the field and model definitions.
 
         :param blob: incoming blob (like MARC)
-        :param json_class: Any subclass of :class:`~invenio.modules.jsonalchemy.wrappers.SmartJson`
+        :param json_class: Any subclass of
+            :class:`~invenio.modules.jsonalchemy.wrappers.SmartJson`
         :param master_format: Master format of the input blob.
         :param kwargs: parameter to pass to json_class
 
@@ -86,15 +87,15 @@ class Reader(object):  # pylint: disable=R0921
         from .wrappers import SmartJson
         if blob is None:
             raise ReaderException(
-                    "To perform a 'translate' operation a blob is needed")
+                "To perform a 'translate' operation a blob is needed")
         if not issubclass(json_class, SmartJson):
             raise ReaderException("The json class must be of type 'SmartJson'")
 
         json = json_class(master_format=master_format, **kwargs)
         # fill up with all possible fields
         fields = ModelParser.resolve_models(json.model_info.names,
-                                            json.additional_info.namespace)\
-                                           .get('fields')
+                                            json.additional_info.namespace
+                                            ).get('fields')
         cls.add(json, fields, blob, fetch_model_info=True)
         return json
 
@@ -117,9 +118,9 @@ class Reader(object):  # pylint: disable=R0921
         if isinstance(fields, six.string_types):
             fields = (fields, )
         if isinstance(fields, (list, tuple)):
-            model_fields = ModelParser.resolve_models(json.model_info.names,
-                    json.additional_info.namespace)\
-                    .get('fields')
+            model_fields = ModelParser.resolve_models(
+                json.model_info.names,
+                json.additional_info.namespace).get('fields')
             fields = dict((field_name, model_fields.get(field_name, field_name))
                           for field_name in fields)
 
@@ -143,14 +144,14 @@ class Reader(object):  # pylint: disable=R0921
         reader = None
         json_id = None
         if field not in json.meta_metadata:
-            #We don't have any meta_metadata, look for it.
+            # We don't have any meta_metadata, look for it.
             reader = cls(json=json, no_blob=True)
             json_id = \
                 ModelParser.resolve_models(json.model_info,
-                                           json.additional_info.namespace)\
-                    ['fields'].get(field, field)
+                                           json.additional_info.namespace
+                                           )['fields'].get(field, field)
             json['__meta_metadata__'][field] = \
-                    reader._find_field_metadata(json_id, field)
+                reader._find_field_metadata(json_id, field)
 
         if value:
             json[field] = value
@@ -159,8 +160,8 @@ class Reader(object):  # pylint: disable=R0921
                 reader = cls(json=json, no_blob=True)
                 json_id = \
                     ModelParser.resolve_models(json.model_info,
-                                               json.additional_info.namespace)\
-                        ['fields'].get(field, field)
+                                               json.additional_info.namespace
+                                               )['fields'].get(field, field)
 
             reader._set_default_value(json_id, field)
 
@@ -206,7 +207,6 @@ class Reader(object):  # pylint: disable=R0921
         reader._update_meta_metadata(fields, section, keep_core_values,
                                      store_backup)
 
-
     def _process_model_info(self):
         """
         Dummy method to guess the model of a given input.
@@ -215,8 +215,8 @@ class Reader(object):  # pylint: disable=R0921
         :return: List of models found in the blob
         """
         if self._json.model_info.names == ['__default__']:
-             self._json['__meta_metadata__']['__model_info__']['names'] = \
-                     self._guess_model_from_input()
+            self._json['__meta_metadata__']['__model_info__']['names'] = \
+                self._guess_model_from_input()
 
         model = ModelParser.resolve_models(self._json.model_info.names,
                                            self._json.additional_info.namespace)
@@ -278,8 +278,8 @@ class Reader(object):  # pylint: disable=R0921
         """
         try:
             rule = FieldParser.field_definitions(
-                    self._json.additional_info.namespace)[json_id]
-        except KeyError as e:
+                self._json.additional_info.namespace)[json_id]
+        except KeyError:
             self._json.continuable_errors.append(
                 "Error - Unable to find '%s' field definition" % (json_id, ))
             return False
@@ -292,10 +292,10 @@ class Reader(object):  # pylint: disable=R0921
 
         self._parsed.append((json_id, field_name))
 
-        ## In this two method calls the decorators are never apply because of
-        ## default types, i.e. when keywords are evaluated the first keyword
-        ## which is parsed creates a string not a list, therefore all the
-        ## extensions and decorator that are expecting a list will fail.
+        # In this two method calls the decorators are never apply because of
+        # default types, i.e. when keywords are evaluated the first keyword
+        # which is parsed creates a string not a list, therefore all the
+        # extensions and decorator that are expecting a list will fail.
         self._apply_rules(json_id, field_name, rule)
         self._apply_virtual_rules(json_id, field_name, rule)
 
@@ -303,12 +303,14 @@ class Reader(object):  # pylint: disable=R0921
             self._set_default_value(json_id, field_name)
         else:
             self._set_default_type(json_id, field_name)
-            for ext, args in six.iteritems(self._json.meta_metadata[field_name]['after']):
+            for ext, args in \
+                    six.iteritems(self._json.meta_metadata[field_name]['after']):
                 FieldParser.decorator_after_extensions()[ext]\
-                        .evaluate(self._json, field_name, 'set', args)
-            for ext, args in six.iteritems(self._json.meta_metadata[field_name]['ext']):
+                    .evaluate(self._json, field_name, 'set', args)
+            for ext, args in \
+                    six.iteritems(self._json.meta_metadata[field_name]['ext']):
                 FieldParser.field_extensions()[ext]\
-                        .evaluate(self._json, field_name, 'set', args)
+                    .evaluate(self._json, field_name, 'set', args)
         return field_name in self._json
 
     def _apply_rules(self, json_id, field_name, rule):
@@ -338,9 +340,9 @@ class Reader(object):  # pylint: disable=R0921
                                                         'extensions'])
                     except Exception as e:
                         self._json.errors.append(
-                                "Rule Error - Unable to apply rule for field "
-                                "'%s' with value '%s'. \n%s"
-                                % (field_name, element, str(e)),)
+                            "Rule Error - Unable to apply rule for field "
+                            "'%s' with value '%s'. \n%s"
+                            % (field_name, element, str(e)),)
 
     def _apply_virtual_rules(self, json_id, field_name, rule):
         """Tries to apply either a 'derived' or 'calculated' rule"""
@@ -364,9 +366,8 @@ class Reader(object):  # pylint: disable=R0921
                                            exclude=['decorators', 'extensions'])
                 except Exception as e:
                     self._json.errors.append(
-                                "Rule Error - Unable to apply rule for virtual "
-                                "field '%s'. \n%s"
-                                % (field_name, str(e)),)
+                        "Rule Error - Unable to apply rule for virtual "
+                        "field '%s'. \n%s" % (field_name, str(e)),)
 
     def _set_default_value(self, json_id, field_name):
         """Finds the default value inside the schema, if any"""
@@ -381,10 +382,10 @@ class Reader(object):  # pylint: disable=R0921
                 return default
             return None
 
-        value = set_default_value(field_name,
-                    FieldParser.field_definitions(
-                        self._json.additional_info.namespace)[json_id]\
-                            .get('schema', {}).get(json_id, {}))
+        value = set_default_value(
+            field_name, FieldParser.field_definitions(
+                self._json.additional_info.namespace)[json_id]
+            .get('schema', {}).get(json_id, {}))
         if value is not None:
             info = self._find_field_metadata(json_id, field_name,
                                              self._json.get(field_name))
@@ -394,6 +395,7 @@ class Reader(object):  # pylint: disable=R0921
     def _set_default_type(self, json_id, field_name):
         """Finds the default type inside the schema, if `force` is used"""
         from .validator import Validator
+
         def set_default_type(field, schema):
             """Helper function to allow subfield default values"""
             if 'type' in schema and schema.get('force', False):
@@ -407,8 +409,8 @@ class Reader(object):  # pylint: disable=R0921
             return
 
         schema = FieldParser.field_definitions(
-                self._json.additional_info.namespace)[json_id]\
-                            .get('schema', {}).get(json_id, {})
+            self._json.additional_info.namespace)[json_id]\
+            .get('schema', {}).get(json_id, {})
         set_default_type(field_name, schema)
 
     def _remove_none_values(self, obj):
@@ -428,7 +430,7 @@ class Reader(object):  # pylint: disable=R0921
 
     def _update(self, fields):
         """From the list of field names it tries to update their content."""
-        #TODO
+        # TODO
         raise NotImplementedError('Missing implementation in current version')
 
     def _find_field_metadata(self, json_id, field_name,
@@ -449,19 +451,20 @@ class Reader(object):  # pylint: disable=R0921
         """
         try:
             rule = FieldParser.field_definitions(
-                    self._json.additional_info.namespace)[json_id]
+                self._json.additional_info.namespace)[json_id]
         except KeyError:
             self._json.continuable_errors.append(
-                    "Adding a new field '%s' ('%s') without definition"
-                    % (field_name, json_id))
+                "Adding a new field '%s' ('%s') without definition"
+                % (field_name, json_id))
             rule = {}
             field_def = {}
             field_type = 'UNKNOWN'
 
         if field_def is None:
-            if self._json.additional_info.master_format in rule.get('rules', {}):
-                field_def = rule['rules']\
-                        [self._json.additional_info.master_format][0]
+            if self._json.additional_info.master_format in \
+                    rule.get('rules', {}):
+                field_def = rule['rules'][
+                    self._json.additional_info.master_format][0]
                 field_type = 'creator'
             elif 'derived' in rule.get('rules', {}):
                 field_def = rule['rules']['derived'][0]
@@ -488,20 +491,22 @@ class Reader(object):  # pylint: disable=R0921
         else:
             info['function'] = field_def['source_tags']
 
-        #Decorator extensions
+        # Decorator extensions
         info['after'] = dict()
-        for name, parser in six.iteritems(FieldParser.decorator_after_extensions()):
+        for name, parser in \
+                six.iteritems(FieldParser.decorator_after_extensions()):
             try:
-                ext = parser.add_info_to_field(json_id, info,
-                        field_def['decorators']['after'].get(name))
+                ext = parser.add_info_to_field(
+                    json_id, info,
+                    field_def['decorators']['after'].get(name))
                 if ext is not None:
                     info['after'][name] = ext
             except KeyError as e:
-                #Only raise if the error is different the KeyError 'decorators'
+                # Only raise if the error is different the KeyError 'decorators'
                 if not e.message == 'decorators':
                     raise e
 
-        #Field extensions
+        # Field extensions
         info['ext'] = dict()
         for name, parser in six.iteritems(FieldParser.field_extensions()):
             try:
@@ -509,7 +514,7 @@ class Reader(object):  # pylint: disable=R0921
                 if ext is not None:
                     info['ext'][name] = ext
             except NotImplementedError:
-                #Maybe your extension doesn't have anything to add to the field
+                # Maybe your extension doesn't have anything to add to the field
                 pass
 
         return info
@@ -523,7 +528,7 @@ class Reader(object):  # pylint: disable=R0921
         If there is some information about this field in the json structure it
         will keep some core information like the source format.
         """
-        #TODO
+        # TODO
         raise NotImplementedError('Missing implementation on this version')
 
     def _evaluate_before_decorators(self, field_def):

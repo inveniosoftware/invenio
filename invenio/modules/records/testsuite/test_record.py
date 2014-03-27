@@ -69,15 +69,15 @@ class TestRecord(InvenioTestCase):
     @nottest
     def test_records_created(self):
         """Record - demo file how many records are created """
-        xmltext = pkg_resources.resource_string('invenio.testsuite',
-                os.path.join('data', 'demo_record_marc_data.xml'))
+        xmltext = pkg_resources.resource_string(
+            'invenio.testsuite',
+            os.path.join('data', 'demo_record_marc_data.xml'))
         recs = [record for record in Record.create_many(xmltext, master_format='marc')]
         self.assertEqual(141, len(recs))
 
     def test_accented_unicode_letterst_test(self):
         """Record - accented Unicode letters"""
         xml = '''<record>
-          <controlfield tag="001">33</controlfield>
           <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
           </datafield>
@@ -98,10 +98,10 @@ class TestRecord(InvenioTestCase):
         rec = Record(master_format='marc', namespace='testsuite')
         self.assertTrue('__meta_metadata__' in rec)
         self.assertEquals(list(rec.keys()), ['__meta_metadata__'])
-        rec['title'] = {'title':'My title'}
+        rec['title'] = {'title': 'My title'}
         self.assertTrue('title' in rec)
         self.assertTrue('title' in rec['__meta_metadata__'])
-        rec.set('title', {'title':'Second title?'}, extend=True)
+        rec.set('title', {'title': 'Second title?'}, extend=True)
         self.assertEquals(len(rec['title']), 2)
 
     def test_validate(self):
@@ -470,7 +470,7 @@ class TestMarcRecordCreation(InvenioTestCase):
         self.assertTrue('reference' in r)
         self.assertEquals(len(r['reference']), 36)
 
-TEST_SUITE = make_test_suite(TestRecord, )
+TEST_SUITE = make_test_suite(TestRecord, TestMarcRecordCreation)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)

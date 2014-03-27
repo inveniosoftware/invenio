@@ -24,7 +24,9 @@
 """
 import re
 
+from invenio.modules.jsonalchemy.reader import ModelParser
 from invenio.modules.jsonalchemy.reader import Reader
+
 
 class JsonReader(Reader):
     """Default reader"""
@@ -40,7 +42,19 @@ class JsonReader(Reader):
         return blob.splitlines()
 
     def _prepare_blob(self):
-        pass
+        """
+
+        """
+        model_fields = ModelParser.resolve_models(
+            self._json.model_info.names,
+            self._json.additional_info.namespace).get('fields', {})
+        model_json_ids = list(model_fields.keys())
+        model_field_names = list(model_fields.values())
+        for key in list(self._blob.keys()):
+            if key in model_field_names and key not in model_json_ids:
+                _key = model_json_ids[model_field_names.index(key)]
+                self._blob[_key] = self._blob[key]
+                del self._blob[key]
 
     def _get_elements_from_blob(self, regex_key):
         if regex_key in ('entire_record', '*'):
