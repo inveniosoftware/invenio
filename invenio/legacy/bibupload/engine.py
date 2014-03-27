@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -720,7 +720,7 @@ def submit_ticket_for_holding_pen(rec_id, err, msg):
     @err: the corresponding Exception
     msg: verbose message
     """
-    from invenio import bibtask
+    from invenio.legacy.bibsched import bibtask
     from invenio.legacy.webuser import get_email_from_username, get_uid_from_email
     user = task_get_task_param("user")
     uid = None
