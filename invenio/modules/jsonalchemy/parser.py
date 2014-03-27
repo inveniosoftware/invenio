@@ -23,23 +23,19 @@
 
     Fields and models configuration loader.
 
-    This module uses `pyparsing <http://pyparsing.wikispaces.com/>` to read from
-    thedifferent configuration files the field and model definitions.
+    This module uses `pyparsing <http://pyparsing.wikispaces.com/>` to read
+    from thedifferent configuration files the field and model definitions.
 
     Extensions to both parsers could be added inside jsonext.parsers
 """
 import os
-import re
 import six
 
 from pyparsing import ParseException, FollowedBy, Suppress, OneOrMore, Word, \
-    LineEnd, ZeroOrMore, Optional, Literal, alphas, alphanums, FollowedBy, \
-    originalTextFor, oneOf, nestedExpr, quotedString, removeQuotes, lineEnd, \
-    empty, col, restOfLine, delimitedList, Each, Keyword, MatchFirst, \
-    ZeroOrMore, StringEnd, Or, commaSeparatedList, Group, Forward, ParseResults
-
-
-from invenio.utils.datastructures import LazyDict
+    LineEnd, ZeroOrMore, Optional, Literal, alphas, alphanums, \
+    originalTextFor, nestedExpr, quotedString, removeQuotes, lineEnd, \
+    empty, col, restOfLine, delimitedList, Each, Keyword, commaSeparatedList, \
+    Group
 
 from .errors import FieldParserException, ModelParserException
 from .registry import fields_definitions, models_definitions, parsers
@@ -55,7 +51,8 @@ DICT_ACCESS = LIST_ACCESS = originalTextFor(IDENT + nestedExpr('[', ']'))
 
 PYTHON_ALLOWED_EXPR = (DICT_DEF ^ LIST_DEF ^ DICT_ACCESS ^
                        LIST_ACCESS ^ restOfLine
-                      ).setParseAction(lambda toks: toks[0])
+                       ).setParseAction(lambda toks: toks[0])
+
 
 def indentedBlock(expr, indent_stack, indent=True):
     """
@@ -81,13 +78,13 @@ def indentedBlock(expr, indent_stack, indent=True):
         cur_col = col(location, string)
         if not(cur_col < indent_stack[-1] and cur_col <= indent_stack[-2]):
             raise ParseException(string, location, "not an unindent")
-# I will lock my computer next time 
+
     def do_unindent():
         """Helper function to unindent"""
         indent_stack.pop()
 
     indent = lineEnd.suppress() + empty + empty.copy()\
-            .setParseAction(check_sub_indent)
+        .setParseAction(check_sub_indent)
     undent = FollowedBy(empty).setParseAction(check_unindent)
     undent.setParseAction(do_unindent)
 
@@ -104,63 +101,65 @@ def _create_field_parser():
     indent_stack = [1]
 
     #Independent/special decorators
-    persistent_identifier = (Keyword('@persistent_identifier').suppress() +
-                             nestedExpr()
-                            ).setResultsName('pid')\
-                            .setParseAction(lambda toks: int(toks[0][0]))
+    persistent_identifier = (
+        Keyword('@persistent_identifier').suppress() + nestedExpr()
+    ).setResultsName('pid').setParseAction(lambda toks: int(toks[0][0]))
     override = Keyword('@override').suppress()\
-               .setResultsName('override')\
-               .setParseAction(lambda toks: True)
+        .setResultsName('override')\
+        .setParseAction(lambda toks: True)
     extend = Keyword('@extend').suppress()\
-             .setResultsName('extend')\
-             .setParseAction(lambda toks: True)
+        .setResultsName('extend')\
+        .setParseAction(lambda toks: True)
     rule_decorators = (Optional(persistent_identifier) &
                        Optional(override) &
                        Optional(extend))
 
     # Field definition decorators
-    field_decorators = Each([Optional(p.parser.parse_element(indent_stack))
-        for p in parsers if issubclass(p.parser, DecoratorBaseExtensionParser)])
+    field_decorators = Each(
+        [Optional(p.parser.parse_element(indent_stack))
+         for p in parsers if issubclass(p.parser,
+                                        DecoratorBaseExtensionParser)])
 
     # Creator rules
-    creator_body = (Optional(field_decorators).setResultsName('decorators') +
-                    Word(alphas, alphanums + '_') +
-                    Literal(',').suppress() +
-                    quotedString\
-                        .setParseAction(removeQuotes) +
-                    Literal(',').suppress() +
-                    PYTHON_ALLOWED_EXPR
-                   ).setParseAction(lambda toks: {
-                       'source_format': toks[-3],
-                       'source_tags': toks[-2].split(' '),
-                       'function': compile(toks[-1].strip(), '', 'eval'),
-                       'type': 'creator',
-                       'decorators': toks.decorators.asDict()})\
-                   .setResultsName('creator_def', listAllMatches=True)
+    creator_body = (
+        Optional(field_decorators).setResultsName('decorators') +
+        Word(alphas, alphanums + '_') +
+        Literal(',').suppress() +
+        quotedString.setParseAction(removeQuotes) +
+        Literal(',').suppress() +
+        PYTHON_ALLOWED_EXPR
+    ).setParseAction(lambda toks: {
+        'source_format': toks[-3],
+        'source_tags': toks[-2].split(' '),
+        'function': compile(toks[-1].strip(), '', 'eval'),
+        'type': 'creator',
+        'decorators': toks.decorators.asDict()}
+        ).setResultsName('creator_def', listAllMatches=True)
     creator = (Keyword('creator:').suppress() +
                indentedBlock(OneOrMore(creator_body), indent_stack))
 
     # Derived and calculated rules
     der_calc_body = (Optional(field_decorators).setResultsName('decorators') +
                      PYTHON_ALLOWED_EXPR)
-    derived = (Keyword('derived:').suppress() +
-               indentedBlock(der_calc_body, indent_stack)
-              ).setParseAction(lambda toks: {
-                  'source_format': 'derived',
-                  'source_tags': None,
-                  'function': compile(toks[-1].strip(), '', 'eval'),
-                  'type': 'derived',
-                  'decorators': toks.decorators.asDict()})\
-              .setResultsName('derived_def')
-    calculated = (Keyword('calculated:').suppress() +
-                  indentedBlock(der_calc_body, indent_stack)
-                 ).setParseAction(lambda toks: {
-                     'source_format': 'calculated',
-                     'source_tags': None,
-                     'function': compile(toks[-1].strip(), '', 'eval'),
-                     'type': 'calculated',
-                     'decorators': toks.decorators.asDict()})\
-                 .setResultsName('calculated_def')
+    derived = (
+        Keyword('derived:').suppress() +
+        indentedBlock(der_calc_body, indent_stack)
+    ).setParseAction(lambda toks: {
+        'source_format': 'derived',
+        'source_tags': None,
+        'function': compile(toks[-1].strip(), '', 'eval'),
+        'type': 'derived',
+        'decorators': toks.decorators.asDict()}).setResultsName('derived_def')
+    calculated = (
+        Keyword('calculated:').suppress() +
+        indentedBlock(der_calc_body, indent_stack)
+    ).setParseAction(lambda toks: {
+        'source_format': 'calculated',
+        'source_tags': None,
+        'function': compile(toks[-1].strip(), '', 'eval'),
+        'type': 'calculated',
+        'decorators': toks.decorators.asDict()
+    }).setResultsName('calculated_def')
 
     rule_sections = [Optional(creator | derived | calculated), ]
     rule_sections.extend([Optional(p.parser.parse_element(indent_stack))
@@ -171,14 +170,14 @@ def _create_field_parser():
                Optional(Suppress(',') +
                         delimitedList(Word(alphanums + '_'))) +
                Suppress(':')
-              ).setResultsName('field')\
-               .setParseAction(lambda toks: {'json_id': toks[0],
-                                             'aliases': toks[1:]})
+               ).setResultsName('field')\
+        .setParseAction(lambda toks: {'json_id': toks[0],
+                                      'aliases': toks[1:]})
 
     rule = Group(Optional(rule_decorators) +
                  json_id +
                  indentedBlock(Each(rule_sections), indent_stack)
-                )
+                 )
 
     return OneOrMore(COMMENT.suppress() | rule)
 
@@ -213,11 +212,11 @@ def _create_model_parser():
                   Optional(Literal('=').suppress() + Word(alphanums + '_')))
     fields = (Keyword('fields:').suppress() +
               indentedBlock(ZeroOrMore(field), indent_stack)
-             ).setParseAction(build_dict_for_fields).setResultsName('fields')
+              ).setParseAction(build_dict_for_fields).setResultsName('fields')
 
     bases = (Keyword('bases:').suppress() +
              indentedBlock(commaSeparatedList, indent_stack)
-            ).setResultsName('bases')
+             ).setResultsName('bases')
 
     sections = [fields, Optional(bases), ]
     sections.extend([Optional(p.parser.parse_element(indent_stack))
@@ -238,7 +237,6 @@ class FieldParser(object):
     _legacy_field_matchings = {}
     """Dictionary containing matching between the legacy master format and the
     current json"""
-
 
     _field_extensions = None
     """Field only parser extensions"""
@@ -363,14 +361,14 @@ class FieldParser(object):
 
             for rule in rules:
                 if (rule.field['json_id'] in
-                        self.__class__._field_definitions[self.__namespace]
-                        ) and not rule.extend and not rule.override:
+                        self.__class__._field_definitions[self.__namespace])\
+                        and not rule.extend and not rule.override:
                     raise FieldParserException(
                         "Name error: '%s' field is duplicated '%s'"
                         % (rule.field['json_id'], field_file))
                 if (rule.field['json_id'] not in
-                        self.__class__._field_definitions[self.__namespace]
-                        ) and (rule.extend or rule.override):
+                        self.__class__._field_definitions[self.__namespace])\
+                        and (rule.extend or rule.override):
                     stand_by_rules.append(rule)
                 else:
                     self._create_rule(rule)
@@ -379,7 +377,7 @@ class FieldParser(object):
             if rule.field['json_id'] not in \
                     self.__class__._field_definitions[self.__namespace]:
                 raise FieldParserException(
-                    "Name error: '%s' field is not defined but is " \
+                    "Name error: '%s' field is not defined but is "
                     "marked as 'extend' or 'override'"
                     % (rule.field['json_id'], ))
             self._create_rule(rule)
@@ -432,8 +430,7 @@ class FieldParser(object):
                 rules[field_def['source_format']] = list()
             rules[field_def['source_format']].append(field_def)
 
-        if 'json' not in rules and \
-                'calculated' not in rules and 'derived' not in rules:
+        if 'json' not in rules:
             rules['json'] = [{'source_format': 'json',
                               'source_tags': [json_id],
                               'function': compile('value', '', 'eval'),
@@ -441,7 +438,7 @@ class FieldParser(object):
                               'decorators': {'before': {},
                                              'on': {},
                                              'after': {}
-                                            }
+                                             }
                               }]
 
         rule_dict = dict()
@@ -455,10 +452,10 @@ class FieldParser(object):
             self.__class__._field_definitions[self.__namespace][json_id]\
                 .update(rule_dict)
         elif rule.extend:
-            self.__class__._field_definitions[self.__namespace][json_id]\
-                ['aliases'].extend(rule_dict['aliases'])
-            self.__class__._field_definitions[self.__namespace][json_id]\
-                ['extend'] = True
+            self.__class__._field_definitions[self.__namespace][json_id][
+                'aliases'].extend(rule_dict['aliases'])
+            self.__class__._field_definitions[self.__namespace][json_id][
+                'extend'] = True
         else:
             self.__class__._field_definitions[self.__namespace][json_id] = \
                 rule_dict
@@ -473,9 +470,9 @@ class FieldParser(object):
         json_id = rule.field['json_id']
         for name, parser in six.iteritems(self.__class__.field_extensions()):
             if getattr(rule, name, None):
-                self.__class__._field_definitions[self.__namespace]\
-                    [json_id][name] = parser.create_element(rule,
-                                                            self.__namespace)
+                self.__class__._field_definitions[self.__namespace][
+                    json_id][name] = parser.create_element(rule,
+                                                           self.__namespace)
 
     def __create_decorators_content(self, rule, field_def):
         """Extracts from the rule all the possible decorators"""
@@ -504,7 +501,6 @@ class FieldParser(object):
         field_def['decorators'] = decorators
 
 
-
 class ModelParser(object):
     """Record model parser"""
 
@@ -515,7 +511,6 @@ class ModelParser(object):
     """Model only parser extensions"""
 
     def __init__(self, namespace):
-        #Autodiscover .cfg files
         self.files = list(models_definitions(namespace))
         self.__namespace = namespace
 
@@ -553,23 +548,23 @@ class ModelParser(object):
         :return: Dictionary containing the union of the model definitions.
         """
         if model_list == '__default__':
-            return {'fields': \
-                    dict(zip(FieldParser.field_definitions(namespace).keys(),
-                             FieldParser.field_definitions(namespace).keys())),
-                    'bases': [],
-                   }
+            return {
+                'fields': dict(
+                    zip(FieldParser.field_definitions(namespace).keys(),
+                        FieldParser.field_definitions(namespace).keys())),
+                'bases': [],
+            }
 
         if isinstance(model_list, six.string_types):
             try:
                 return cls.model_definitions(namespace)[model_list]
             except KeyError:
-                return \
-                    {'fields': \
-                      dict(zip(FieldParser.field_definitions(namespace).keys(),
-                               FieldParser.field_definitions(namespace).keys())
-                          ),
-                      'bases': [],
-                    }
+                return {
+                    'fields': dict(
+                        zip(FieldParser.field_definitions(namespace).keys(),
+                            FieldParser.field_definitions(namespace).keys())),
+                    'bases': [],
+                }
 
         new_model = {'fields': dict(), 'bases': list()}
         for model in model_list:
@@ -655,16 +650,15 @@ class ModelParser(object):
                 raise ModelParserException(
                     "At least one field is no find in the field "
                     "definitions for file '%s'" % (model_file))
-            self.__class__._model_definitions[self.__namespace][model_name]\
-                ['fields'] = model_definition.fields
-            self.__class__._model_definitions[self.__namespace][model_name]\
-                ['bases'] = model_definition.bases.asList() \
-                    if model_definition.bases else []
+            self.__class__._model_definitions[self.__namespace][model_name][
+                'fields'] = model_definition.fields
+            self.__class__._model_definitions[self.__namespace][model_name][
+                'bases'] = model_definition.bases.asList() \
+                if model_definition.bases else []
 
             self.__resolve_parser_extensions(model_name, model_definition)
 
         self.__resolve_inheritance()
-
 
     def __resolve_inheritance(self):
         """Resolves the inheritance"""
@@ -684,7 +678,14 @@ class ModelParser(object):
                 base_model = self.__class__.model_definitions(
                     self.__namespace)[inherit_from]
                 fields.update(resolve_field_inheritance(base_model))
-            fields.update(model_definition['fields'])
+            if fields:
+                inverted_fields = dict((v, k) for k, v in six.iteritems(fields))
+                inverted_model_fields = dict((v, k) for k, v in six.iteritems(
+                    model_definition['fields']))
+                inverted_fields.update(inverted_model_fields)
+                fields = dict((v, k) for k, v in six.iteritems(inverted_fields))
+            else:
+                fields.update(model_definition['fields'])
             return fields
 
         for model_definition in \
@@ -704,8 +705,8 @@ class ModelParser(object):
         """
         for name, parser in six.iteritems(self.__class__.parser_extensions()):
             if name in model_def:
-                self.__class__._model_definitions[self.__namespace]\
-                    [model_name][name] = parser.create_element(
+                self.__class__._model_definitions[self.__namespace][
+                    model_name][name] = parser.create_element(
                         model_def, self.__namespace)
 
 
@@ -722,8 +723,8 @@ def guess_legacy_field_names(fields, master_format, namespace):
         fields = (fields, )
     for field in fields:
         try:
-            res[field] = FieldParser.legacy_field_matchings(namespace)\
-                [master_format].get(field, [])
+            res[field] = FieldParser.legacy_field_matchings(
+                namespace)[master_format].get(field, [])
         except (KeyError, TypeError):
             res[field] = []
     return res
@@ -763,7 +764,6 @@ class BaseExtensionParser(type):  # pylint: disable=R0921
             dict_['__parsername__'] = name.lower().replace('parser', '')
 
         return super(BaseExtensionParser, mcs).__new__(mcs, name, bases, dict_)
-
 
     @classmethod
     def parse_element(mcs, indent_stack):
@@ -820,6 +820,7 @@ class FieldBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pyli
         """
         raise NotImplementedError()
 
+
 class ModelBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pylint: disable=W0223,W0232,R0903,R0921
     """Base class for model parser extensions."""
 
@@ -875,6 +876,7 @@ class DecoratorBeforeEvalBaseExtensionParser(DecoratorBaseExtensionParser):  # p
     def evaluate(cls, reader, args):
         """Evaluates ``args`` and returns a boolean depending on them"""
         raise NotImplementedError()
+
 
 class DecoratorOnEvalBaseExtensionParser(DecoratorBaseExtensionParser):  # pylint: disable=W0223,W0232,R0903,R0921
     """
