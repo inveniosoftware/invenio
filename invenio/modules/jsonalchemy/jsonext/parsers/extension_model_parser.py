@@ -17,8 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from pyparsing import Suppress, OneOrMore, Keyword, Word, alphanums, \
-    delimitedList
+from pyparsing import Keyword, Word, alphanums, delimitedList
 from werkzeug.utils import import_string
 
 from invenio.base.utils import try_to_eval
@@ -27,7 +26,7 @@ from invenio.modules.jsonalchemy.parser import ModelBaseExtensionParser, \
     indentedBlock
 
 
-class ExtensionModelParser(ModelBaseExtensionParser): # pylint: disable=W0232
+class ExtensionModelParser(ModelBaseExtensionParser):  # pylint: disable=W0232
     """
     Handles the extension section in the model definitions::
 
@@ -46,10 +45,10 @@ class ExtensionModelParser(ModelBaseExtensionParser): # pylint: disable=W0232
         import_str = Word(alphanums + '_' + '.' + ':')
         return (Keyword('extensions:').suppress() +
                 indentedBlock(delimitedList(import_str), indent_stack)
-               ).setResultsName('extensions')
+                ).setResultsName('extensions')
 
     @classmethod
-    def create_element(cls, rule, namespace): # pylint: disable=W0613
+    def create_element(cls, rule, namespace):  # pylint: disable=W0613
         """Simply returns the list of extensions"""
         return rule.extensions.asList()
 
@@ -75,6 +74,8 @@ class ExtensionModelParser(ModelBaseExtensionParser): # pylint: disable=W0232
     @classmethod
     def evaluate(cls, obj, args):
         """Extend the incoming object with all the new things from args"""
+        if args is None:
+            return
         extensions = []
         for ext in args:
             try:
