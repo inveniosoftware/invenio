@@ -134,10 +134,10 @@ CFG_APACHE_PASSWORD_FILE = "demo-site-apache-user-passwords"
 CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY = ['reportnumber', 'recid', ]
 CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS = r"invenio_webupload|Invenio-.*"
 CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS = {
-'127.0.0.1': ['*'], # useful for testing
-'127.0.1.1': ['*'], # useful for testing
-'10.0.0.1': ['BOOK', 'REPORT'], # Example 1
-'10.0.0.2': ['POETRY', 'PREPRINT'], # Example 2
+    '127.0.0.1': ['*'],  # useful for testing
+    '127.0.1.1': ['*'],  # useful for testing
+    '10.0.0.1': ['BOOK', 'REPORT'],  # Example 1
+    '10.0.0.2': ['POETRY', 'PREPRINT'],  # Example 2
 }
 CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL = "info@invenio-software.org"
 CFG_BIBAUTHORID_ENABLED = True
@@ -190,64 +190,68 @@ CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING = "pending"
 CFG_BIBCIRCULATION_REQUEST_STATUS_PROPOSED = "proposed"
 CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING = "waiting"
 CFG_BIBCLASSIFY_WEB_MAXKW = 100
-CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS = ['hpg', 'link', 'lis', 'llb', 'mat', 'mpp', 'msg', 'docx', 'docm', 'xlsx', 'xlsm', 'xlsb', 'pptx', 'pptm', 'ppsx', 'ppsm', ]
+CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS = [
+    'hpg', 'link', 'lis', 'llb', 'mat', 'mpp', 'msg', 'docx', 'docm', 'xlsx',
+    'xlsm', 'xlsb', 'pptx', 'pptm', 'ppsx', 'ppsm', ]
 CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES = {
-"application/xml-dtd": ".dtd",
+    "application/xml-dtd": ".dtd",
 }
-CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM = ('txt', 'html', 'xml', 'odt', 'doc', 'docx', 'djvu', 'pdf', 'ps', 'ps.gz')
+CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM = (
+    'txt', 'html', 'xml', 'odt', 'doc', 'docx', 'djvu', 'pdf', 'ps', 'ps.gz')
 CFG_BIBDOCFILE_DESIRED_CONVERSIONS = {
-'pdf' : ('pdf;pdfa', ),
-'ps.gz' : ('pdf;pdfa', ),
-'djvu' : ('pdf', ),
-'sxw': ('doc', 'odt', 'pdf;pdfa', ),
-'docx' : ('doc', 'odt', 'pdf;pdfa', ),
-'doc' : ('odt', 'pdf;pdfa', 'docx'),
-'rtf' : ('pdf;pdfa', 'odt', ),
-'odt' : ('pdf;pdfa', 'doc', ),
-'pptx' : ('ppt', 'odp', 'pdf;pdfa', ),
-'ppt' : ('odp', 'pdf;pdfa', 'pptx'),
-'sxi': ('odp', 'pdf;pdfa', ),
-'odp' : ('pdf;pdfa', 'ppt', ),
-'xlsx' : ('xls', 'ods', 'csv'),
-'xls' : ('ods', 'csv'),
-'ods' : ('xls', 'xlsx', 'csv'),
-'sxc': ('xls', 'xlsx', 'csv'),
-'tiff' : ('pdf;pdfa', ),
-'tif' : ('pdf;pdfa', ),}
+    'pdf': ('pdf;pdfa', ),
+    'ps.gz': ('pdf;pdfa', ),
+    'djvu': ('pdf', ),
+    'sxw': ('doc', 'odt', 'pdf;pdfa', ),
+    'docx': ('doc', 'odt', 'pdf;pdfa', ),
+    'doc': ('odt', 'pdf;pdfa', 'docx'),
+    'rtf': ('pdf;pdfa', 'odt', ),
+    'odt': ('pdf;pdfa', 'doc', ),
+    'pptx': ('ppt', 'odp', 'pdf;pdfa', ),
+    'ppt': ('odp', 'pdf;pdfa', 'pptx'),
+    'sxi': ('odp', 'pdf;pdfa', ),
+    'odp': ('pdf;pdfa', 'ppt', ),
+    'xlsx': ('xls', 'ods', 'csv'),
+    'xls': ('ods', 'csv'),
+    'ods': ('xls', 'xlsx', 'csv'),
+    'sxc': ('xls', 'xlsx', 'csv'),
+    'tiff': ('pdf;pdfa', ),
+    'tif': ('pdf;pdfa', ), }
 CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES = [
-('Main', 'Main document'),
-('LaTeX', 'LaTeX'),
-('Source', 'Source'),
-('Additional', 'Additional File'),
-('Audio', 'Audio file'),
-('Video', 'Video file'),
-('Script', 'Script'),
-('Data', 'Data'),
-('Figure', 'Figure'),
-('Schema', 'Schema'),
-('Graph', 'Graph'),
-('Image', 'Image'),
-('Drawing', 'Drawing'),
-('Slides', 'Slides')]
+    ('Main', 'Main document'),
+    ('LaTeX', 'LaTeX'),
+    ('Source', 'Source'),
+    ('Additional', 'Additional File'),
+    ('Audio', 'Audio file'),
+    ('Video', 'Video file'),
+    ('Script', 'Script'),
+    ('Data', 'Data'),
+    ('Figure', 'Figure'),
+    ('Schema', 'Schema'),
+    ('Graph', 'Graph'),
+    ('Image', 'Image'),
+    ('Drawing', 'Drawing'),
+    ('Slides', 'Slides')]
 CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC = {
-'can_revise_doctypes': ['*'],
-'can_comment_doctypes': ['*'],
-'can_describe_doctypes': ['*'],
-'can_delete_doctypes': ['*'],
-'can_keep_doctypes': ['*'],
-'can_rename_doctypes': ['*'],
-'can_add_format_to_doctypes': ['*'],
-'can_restrict_doctypes': ['*'],
+    'can_revise_doctypes': ['*'],
+    'can_comment_doctypes': ['*'],
+    'can_describe_doctypes': ['*'],
+    'can_delete_doctypes': ['*'],
+    'can_keep_doctypes': ['*'],
+    'can_rename_doctypes': ['*'],
+    'can_add_format_to_doctypes': ['*'],
+    'can_restrict_doctypes': ['*'],
 }
 CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS = [
-('', 'Public'),
-('restricted', 'Restricted')]
+    ('', 'Public'),
+    ('restricted', 'Restricted')]
 CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE = 0
 CFG_BIBDOCFILE_FILESYSTEM_BIBDOC_GROUP_LIMIT = 5000
 CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY = 0.1
 CFG_BIBDOCFILE_USE_XSENDFILE = 0
-CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS = ['100__u', '700__u', '701__u', '502__c', ]
-CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE = { 'POETRY' : 'record_poem'}
+CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS = [
+    '100__u', '700__u', '701__u', '502__c', ]
+CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE = {'POETRY': 'record_poem'}
 CFG_BIBEDIT_KB_INSTITUTIONS = "InstitutionsCollection"
 CFG_BIBEDIT_KB_SUBJECTS = "Subjects"
 CFG_BIBEDIT_LOCKLEVEL = 3
@@ -263,7 +267,8 @@ CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS = []
 CFG_BIBFORMAT_HIDDEN_FILE_FORMATS = []
 CFG_BIBFORMAT_HIDDEN_TAGS = ['595', ]
 CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES = False
-CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS = r"[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
+CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS = \
+    r"[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
 CFG_BIBINDEX_CHARS_PUNCTUATION = r"[\.\,\:\;\?\!\"]"
 CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY = 1
 CFG_BIBINDEX_MIN_WORD_LENGTH = 0
@@ -273,77 +278,81 @@ CFG_BIBINDEX_REMOVE_HTML_MARKUP = 0
 CFG_BIBINDEX_REMOVE_LATEX_MARKUP = 0
 CFG_BIBINDEX_REMOVE_STOPWORDS = 0
 CFG_BIBINDEX_SPLASH_PAGES = {
-"http://documents\.cern\.ch/setlink\?.*": ".*",
-"http://ilcagenda\.linearcollider\.org/subContributionDisplay\.py\?.*|http://ilcagenda\.linearcollider\.org/contributionDisplay\.py\?.*": "http://ilcagenda\.linearcollider\.org/getFile\.py/access\?.*|http://ilcagenda\.linearcollider\.org/materialDisplay\.py\?.*",
+    "http://documents\.cern\.ch/setlink\?.*": ".*",
+    "http://ilcagenda\.linearcollider\.org/subContributionDisplay\.py\?.*|"
+    "http://ilcagenda\.linearcollider\.org/contributionDisplay\.py\?.*":
+        "http://ilcagenda\.linearcollider\.org/getFile\.py/access\?.*|"
+        "http://ilcagenda\.linearcollider\.org/materialDisplay\.py\?.*",
 }
 CFG_BIBINDEX_SYNONYM_KBRS = {
-'global': ['INDEX-SYNONYM-TITLE', 'exact'],
-'title': ['INDEX-SYNONYM-TITLE', 'exact'],
+    'global': ['INDEX-SYNONYM-TITLE', 'exact'],
+    'title': ['INDEX-SYNONYM-TITLE', 'exact'],
 }
 CFG_BIBINDEX_URLOPENER_PASSWORD = "mysuperpass"
 CFG_BIBINDEX_URLOPENER_USERNAME = "mysuperuser"
 CFG_BIBMATCH_FUZZY_EMPTY_RESULT_LIMIT = 1
 CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT = 0.65
 CFG_BIBMATCH_FUZZY_WORDLIMITS = {
-'100__a': 2,
-'245__a': 4
+    '100__a': 2,
+    '245__a': 4
 }
 CFG_BIBMATCH_LOCAL_SLEEPTIME = 0.0
-CFG_BIBMATCH_MATCH_VALIDATION_RULESETS = [('default', [{ 'tags' : '245__%,242__%',
-'threshold' : 0.8,
-'compare_mode' : 'lazy',
-'match_mode' : 'title',
-'result_mode' : 'normal' },
-{ 'tags' : '037__a,088__a',
-'threshold' : 1.0,
-'compare_mode' : 'lazy',
-'match_mode' : 'identifier',
-'result_mode' : 'final' },
-{ 'tags' : '100__a,700__a',
-'threshold' : 0.8,
-'compare_mode' : 'normal',
-'match_mode' : 'author',
-'result_mode' : 'normal' },
-{ 'tags' : '773__a',
-'threshold' : 1.0,
-'compare_mode' : 'lazy',
-'match_mode' : 'title',
-'result_mode' : 'normal' }]),
-('980__ \$\$a(THESIS|Thesis)', [{ 'tags' : '100__a',
-'threshold' : 0.8,
-'compare_mode' : 'strict',
-'match_mode' : 'author',
-'result_mode' : 'normal' },
-{ 'tags' : '700__a,701__a',
-'threshold' : 1.0,
-'compare_mode' : 'lazy',
-'match_mode' : 'author',
-'result_mode' : 'normal' },
-{ 'tags' : '100__a,700__a',
-'threshold' : 0.8,
-'compare_mode' : 'ignored',
-'match_mode' : 'author',
-'result_mode' : 'normal' }]),
-('260__', [{ 'tags' : '260__c',
-'threshold' : 0.8,
-'compare_mode' : 'lazy',
-'match_mode' : 'date',
-'result_mode' : 'normal' }]),
-('0247_', [{ 'tags' : '0247_a',
-'threshold' : 1.0,
-'compare_mode' : 'lazy',
-'match_mode' : 'identifier',
-'result_mode' : 'final' }]),
-('020__', [{ 'tags' : '020__a',
-'threshold' : 1.0,
-'compare_mode' : 'lazy',
-'match_mode' : 'identifier',
-'result_mode' : 'joker' }])
+CFG_BIBMATCH_MATCH_VALIDATION_RULESETS = [
+    ('default', [{'tags': '245__%,242__%',
+                  'threshold': 0.8,
+                  'compare_mode': 'lazy',
+                  'match_mode': 'title',
+                  'result_mode': 'normal'},
+                 {'tags': '037__a,088__a',
+                  'threshold': 1.0,
+                  'compare_mode': 'lazy',
+                  'match_mode': 'identifier',
+                  'result_mode': 'final'},
+                 {'tags': '100__a,700__a',
+                  'threshold': 0.8,
+                  'compare_mode': 'normal',
+                  'match_mode': 'author',
+                  'result_mode': 'normal'},
+                 {'tags': '773__a',
+                  'threshold': 1.0,
+                  'compare_mode': 'lazy',
+                  'match_mode': 'title',
+                  'result_mode': 'normal'}]),
+    ('980__ \$\$a(THESIS|Thesis)', [{'tags': '100__a',
+                                     'threshold': 0.8,
+                                     'compare_mode': 'strict',
+                                     'match_mode': 'author',
+                                     'result_mode': 'normal'},
+                                    {'tags': '700__a,701__a',
+                                     'threshold': 1.0,
+                                     'compare_mode': 'lazy',
+                                     'match_mode': 'author',
+                                     'result_mode': 'normal'},
+                                    {'tags': '100__a,700__a',
+                                     'threshold': 0.8,
+                                     'compare_mode': 'ignored',
+                                     'match_mode': 'author',
+                                     'result_mode': 'normal'}]),
+    ('260__', [{'tags': '260__c',
+                'threshold': 0.8,
+                'compare_mode': 'lazy',
+                'match_mode': 'date',
+                'result_mode': 'normal'}]),
+    ('0247_', [{'tags': '0247_a',
+                'threshold': 1.0,
+                'compare_mode': 'lazy',
+                'match_mode': 'identifier',
+                'result_mode': 'final'}]),
+    ('020__', [{'tags': '020__a',
+                'threshold': 1.0,
+                'compare_mode': 'lazy',
+                'match_mode': 'identifier',
+                'result_mode': 'joker'}])
 ]
 CFG_BIBMATCH_QUERY_TEMPLATES = {
-'title' : '[title]',
-'title-author' : '[title] [author]',
-'reportnumber' : 'reportnumber:[reportnumber]'
+    'title': '[title]',
+    'title-author': '[title] [author]',
+    'reportnumber': 'reportnumber:[reportnumber]'
 }
 CFG_BIBMATCH_REMOTE_SLEEPTIME = 2.0
 CFG_BIBMATCH_SEARCH_RESULT_MATCH_LIMIT = 15
@@ -359,7 +368,8 @@ CFG_BIBRANK_SHOW_READING_STATS = 1
 CFG_BIBSCHED_EDITOR = which("vim")
 CFG_BIBSCHED_GC_TASKS_OLDER_THAN = 30
 CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE = ['bibupload', 'oairepositoryupdater', ]
-CFG_BIBSCHED_GC_TASKS_TO_REMOVE = ['bibindex', 'bibreformat', 'webcoll', 'bibrank', 'inveniogc', ]
+CFG_BIBSCHED_GC_TASKS_TO_REMOVE = [
+    'bibindex', 'bibreformat', 'webcoll', 'bibrank', 'inveniogc', ]
 CFG_BIBSCHED_LOG_PAGER = which("less")
 CFG_BIBSCHED_MAX_ARCHIVED_ROWS_DISPLAY = 500
 CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS = 1
@@ -378,7 +388,7 @@ CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG = "035__9"
 CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG = "035__a"
 CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG = "970__a"
 CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS = [
-('http(s)?://.*', {}),
+    ('http(s)?://.*', {}),
 ]
 CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS = ['/tmp', '/home', '/Users']
 CFG_BIBUPLOAD_REFERENCE_TAG = "999"
@@ -414,7 +424,10 @@ CFG_OAI_DELETED_POLICY = "persistent"
 CFG_OAI_EXPIRE = 90000
 CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN = True
 CFG_OAI_FAILED_HARVESTING_STOP_QUEUE = 1
-CFG_OAI_FRIENDS = ['http://cds.cern.ch/oai2d', 'http://openaire.cern.ch/oai2d', 'http://export.arxiv.org/oai2', ]
+CFG_OAI_FRIENDS = ['http://cds.cern.ch/oai2d',
+                   'http://openaire.cern.ch/oai2d',
+                   'http://export.arxiv.org/oai2',
+                   ]
 CFG_OAI_ID_FIELD = "909COo"
 CFG_OAI_ID_PREFIX = "atlantis.cern.ch"
 CFG_OAI_IDENTIFY_DESCRIPTION = """<description>
@@ -426,13 +439,15 @@ http://www.openarchives.org/OAI/1.1/eprints.xsd">
 <URL>http://localhost</URL>
 </content>
 <metadataPolicy>
-<text>Free and unlimited use by anybody with obligation to refer to original record</text>
+<text>Free and unlimited use by anybody with obligation to refer to original \
+record</text>
 </metadataPolicy>
 <dataPolicy>
 <text>Full content, i.e. preprints may not be harvested by robots</text>
 </dataPolicy>
 <submissionPolicy>
-<text>Submission restricted. Submitted documents are subject of approval by OAI repository admins.</text>
+<text>Submission restricted. Submitted documents are subject of approval by \
+OAI repository admins.</text>
 </submissionPolicy>
 </eprints>
 </description>"""
@@ -442,8 +457,11 @@ CFG_OAI_LICENSE_TERMS_SUBFIELD = "a"
 CFG_OAI_LICENSE_URI_SUBFIELD = "u"
 CFG_OAI_LOAD = 500
 CFG_OAI_METADATA_FORMATS = {
-'marcxml': ('XOAIMARC', 'http://www.openarchives.org/OAI/1.1/dc.xsd', 'http://purl.org/dc/elements/1.1/'),
-'oai_dc': ('XOAIDC', 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd', 'http://www.loc.gov/MARC21/slim'),
+    'marcxml': ('XOAIMARC', 'http://www.openarchives.org/OAI/1.1/dc.xsd',
+                            'http://purl.org/dc/elements/1.1/'),
+    'oai_dc': ('XOAIDC',
+               'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
+               'http://www.loc.gov/MARC21/slim'),
 }
 CFG_OAI_PREVIOUS_SET_FIELD = "909COq"
 CFG_OAI_PROVENANCE_ALTERED_SUBFIELD = "t"
@@ -504,7 +522,10 @@ CFG_PATH_WGET = which("wget")
 CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT = 750
 CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT = 2
 CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT = 75
-CFG_PLOTEXTRACTOR_DISALLOWED_TEX = ['begin', 'end', 'section', 'includegraphics', 'caption', 'acknowledgements', ]
+CFG_PLOTEXTRACTOR_DISALLOWED_TEX = [
+    'begin', 'end', 'section', 'includegraphics', 'caption',
+    'acknowledgements',
+]
 CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT = 2.0
 CFG_PLOTEXTRACTOR_SOURCE_BASE_URL = "http://arxiv.org/"
 CFG_PLOTEXTRACTOR_SOURCE_PDF_FOLDER = "pdf/"
@@ -515,7 +536,9 @@ CFG_SITE_ADMIN_EMAIL = "info@invenio-software.org"
 CFG_SITE_ADMIN_EMAIL_EXCEPTIONS = 1
 CFG_SITE_EMERGENCY_EMAIL_ADDRESSES = {}
 CFG_SITE_LANG = "en"
-CFG_SITE_LANGS = ['af', 'ar', 'bg', 'ca', 'cs', 'de', 'el', 'en', 'es', 'fr', 'hr', 'gl', 'ka', 'it', 'rw', 'lt', 'hu', 'ja', 'no', 'pl', 'pt', 'ro', 'ru', 'sk', 'sv', 'uk', 'zh_CN', 'zh_TW', ]
+CFG_SITE_LANGS = ['af', 'ar', 'bg', 'ca', 'cs', 'de', 'el', 'en', 'es', 'fr',
+                  'hr', 'gl', 'ka', 'it', 'rw', 'lt', 'hu', 'ja', 'no', 'pl',
+                  'pt', 'ro', 'ru', 'sk', 'sv', 'uk', 'zh_CN', 'zh_TW', ]
 CFG_SITE_NAME = "Atlantis Institute of Fictive Science"
 CFG_SITE_RECORD = "record"
 SECRET_KEY = "change_me"
@@ -548,7 +571,7 @@ CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS = 0
 CFG_WEBCOMMENT_AUTHOR_DELETE_COMMENT_OPTION = 1
 CFG_WEBCOMMENT_DEFAULT_MODERATOR = "info@invenio-software.org"
 CFG_WEBCOMMENT_EMAIL_REPLIES_TO = {
-'Articles': ['506__d', '506__m'],
+    'Articles': ['506__d', '506__m'],
 }
 CFG_WEBCOMMENT_MAX_ATTACHED_FILES = 5
 CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE = 5242880
@@ -557,13 +580,13 @@ CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW = 1
 CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN = 5
 CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW = 1
 CFG_WEBCOMMENT_RESTRICTION_DATAFIELD = {
-'Articles': '5061_a',
-'Pictures': '5061_a',
-'Theses': '5061_a',
+    'Articles': '5061_a',
+    'Pictures': '5061_a',
+    'Theses': '5061_a',
 }
 CFG_WEBCOMMENT_ROUND_DATAFIELD = {
-'Articles': '562__c',
-'Pictures': '562__c',
+    'Articles': '562__c',
+    'Pictures': '562__c',
 }
 CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS = 20
 CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS = 20
@@ -588,10 +611,10 @@ CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS = 10
 CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT = 5
 CFG_WEBSEARCH_FIELDS_CONVERT = {}
 CFG_WEBSEARCH_FULLTEXT_SNIPPETS = {
-'': 4,
+    '': 4,
 }
 CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS = {
-'': 100,
+    '': 100,
 }
 CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR = "native"
 CFG_WEBSEARCH_I18N_LATEST_ADDITIONS = 0
@@ -614,7 +637,7 @@ CFG_WEBSEARCH_SIMPLESEARCH_PATTERN_BOX_WIDTH = 40
 CFG_WEBSEARCH_SPIRES_SYNTAX = 1
 CFG_WEBSEARCH_SPLIT_BY_COLLECTION = 1
 CFG_WEBSEARCH_SYNONYM_KBRS = {
-'journal': ['SEARCH-SYNONYM-JOURNAL', 'leading_to_number'],
+    'journal': ['SEARCH-SYNONYM-JOURNAL', 'leading_to_number'],
 }
 CFG_WEBSEARCH_USE_ALEPH_SYSNOS = 0
 CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS = []
@@ -640,5 +663,5 @@ CFG_WEBSTYLE_TEMPLATE_SKIN = "default"
 CFG_WEBSUBMIT_USE_MATHJAX = 0
 CFG_XAPIAN_ENABLED = ""
 CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE = 0
-CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES = [0, 1,]
+CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES = [0, 1, ]
 # END OF GENERATED FILE
