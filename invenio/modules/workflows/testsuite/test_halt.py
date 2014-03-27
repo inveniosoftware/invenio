@@ -41,7 +41,7 @@ class WorkflowTestBranch(InvenioTestCase):
 
         workflows['halttest'] = HaltTest
 
-        data = [{'somekey', 'somevalue'}, ]
+        data = [{'somekey', 'somevalue'}]
         eng = start('halttest', data)
         idx, obj = list(eng.getObjects())[0]
 

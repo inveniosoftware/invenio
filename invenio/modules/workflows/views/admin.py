@@ -20,7 +20,7 @@
 from __future__ import print_function
 from six import text_type
 
-from flask import render_template, Blueprint
+from flask import Blueprint
 from flask.ext.login import login_required
 
 from invenio.base.i18n import _

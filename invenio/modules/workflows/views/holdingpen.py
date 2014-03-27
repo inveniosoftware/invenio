@@ -23,7 +23,7 @@ from six import iteritems, text_type
 
 from flask import (render_template, Blueprint,
                    request, current_app,
-                   jsonify, session, url_for,
+                   jsonify, url_for,
                    flash)
 from flask.ext.login import login_required
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
@@ -179,7 +179,7 @@ def load_table(version_showing):
         sEcho = current_app.config.get('sEcho', 0) + 1
 
     bwolist = get_holdingpen_objects(sSearch=a_search,
-                                   version_showing=VERSION_SHOWING)
+                                     version_showing=VERSION_SHOWING)
 
     if 'iSortCol_0' in current_app.config:
         i_sortcol_0 = int(i_sortcol_0)
@@ -396,7 +396,7 @@ def resolve_widget(objectid, widget):
     Calls the run_widget function of the specific widget.
     """
     widget_form = widgets[widget]
-    # widget_form().run_widget(objectid)
+    widget_form().run_widget(objectid)
     return "Done"
 
 

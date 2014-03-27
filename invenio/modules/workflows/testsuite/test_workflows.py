@@ -19,7 +19,7 @@
 
 """Unit tests for workflows views."""
 
-from flask import url_for, current_app
+from flask import url_for
 from invenio.testsuite import InvenioTestCase, make_test_suite, \
     run_test_suite
 

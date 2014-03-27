@@ -30,7 +30,7 @@ def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"
         except KeyError:
             eng.extra_data["_Iterators"] = {}
 
-        if not step in eng.extra_data["_Iterators"]:
+        if step not in eng.extra_data["_Iterators"]:
             eng.extra_data["_Iterators"][step] = {}
             if cache_data:
                 eng.extra_data["_Iterators"][step]["cache"] = get_list_function(obj, eng)
