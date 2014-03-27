@@ -5148,14 +5148,12 @@ class Template:
 
         # Diplay a message about the number of searches.
         if p:
-            msg = _("You have performed %(searches_distinct)s unique searches in a total of %(searches_total)s searches including the term %(p)s.") % \
+            msg = _("You have performed %(searches_distinct)s unique searches including the term %(p)s.") % \
                 {'searches_distinct': '<strong>' + str(nb_queries_distinct) + '</strong>',
-                 'searches_total': '<strong>' + str(nb_queries_total) + '</strong>',
                  'p': '<strong>' + cgi.escape(p) + '</strong>'}
         else:
-            msg = _("You have performed %(searches_distinct)s unique searches in a total of %(searches_total)s searches.") % \
-                {'searches_distinct': '<strong>' + str(nb_queries_distinct) + '</strong>',
-                 'searches_total': '<strong>' + str(nb_queries_total) + '</strong>'}
+            msg = _("You have performed %(searches_distinct)s unique searches.") % \
+                {'searches_distinct': '<strong>' + str(nb_queries_distinct) + '</strong>',}
         out = '<p>' + msg + '</p>'
 
         # Search form
@@ -5263,11 +5261,10 @@ class Template:
         _ = gettext_set_language(ln)
 
         if unique > 0:
-            out = _("You have performed %(x_url_open)s%(unique)s unique searches%(x_url_close)s in a total of %(total)s searches.") % \
+            out = _("You have performed %(x_url_open)s%(x_unique)s unique searches%(x_url_close)s.") % \
                   {'x_url_open'  : '<strong><a href="%s/yoursearches/display?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
-                   'unique'      : str(unique),
-                   'x_url_close' : '</a></strong>',
-                   'total'       : str(total),}
+                   'x_unique'      : str(unique),
+                   'x_url_close' : '</a></strong>',}
         else:
             out = _("You have not searched for anything yet. You may want to start by the %(x_url_open)ssearch interface%(x_url_close)s first.") % \
                   {'x_url_open'  : '<a href="%s/?ln=%s">' % (CFG_SITE_SECURE_URL, ln),
