@@ -155,6 +155,7 @@ def index(p, so, page):
     communities = Community.filter_communities(p, so)
     form = SearchForm()
     per_page = cfg.get('COMMUNITIES_DISPLAYED_PER_PAGE', 10)
+    page = max(page, 1)
 
     ctx.update({
         'pagination': Pagination(page, per_page, communities.count()),
