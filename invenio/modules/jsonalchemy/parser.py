@@ -694,9 +694,8 @@ class ModelParser(object):
                 model_definition)
             for name, model_ext in \
                     six.iteritems(self.__class__.parser_extensions()):
-                if name in model_definition:
-                    model_definition[name] = resolve_ext_inheritance(
-                        name, model_definition)
+                model_definition[name] = resolve_ext_inheritance(
+                    name, model_definition)
 
     def __resolve_parser_extensions(self, model_name, model_def):
         """
