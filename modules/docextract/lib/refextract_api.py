@@ -25,7 +25,6 @@ present here can be considered private by the invenio modules.
 
 
 import os
-import sys
 
 from urllib import urlretrieve
 from tempfile import mkstemp
@@ -117,7 +116,9 @@ def extract_references_from_file(path, recid=None):
         docbody, dummy = get_plaintext_document_body(path, keep_layout=True)
         reflines, dummy, dummy = extract_references_from_fulltext(docbody)
 
-    return parse_references(reflines, recid=recid)
+    references = parse_references(reflines, recid=recid)
+    references['999C6'][0].add_subfield('v', os.path.basename(path))
+    return references
 
 
 def extract_references_from_string_xml(source,
