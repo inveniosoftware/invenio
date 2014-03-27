@@ -126,6 +126,15 @@ class Validator(ValidatorBase):
         :param field: field name.
         :param value: field value.
         """
-        # FIXME: not real UUID validation
-        if not re.match('[a-f0-9\-]{24}', value):
+        if not re.match('[a-f0-9]{24}', value):
             self._error(field, errors.ERROR_BAD_TYPE % 'ObjectId')
+
+    def _validate_type_uuid(self, field, value):
+        """
+        Enables validation for `uuid.uuid4()` schema attribute.
+
+        :param field: field name.
+        :param value: field value.
+        """
+        if not re.match('[a-f0-9\-]{36}', value):
+            self._error(field, errors.ERROR_BAD_TYPE % 'UUID')
