@@ -1520,9 +1520,11 @@ class BibRecDocs(object):
             if hasattr(bibdoc, 'has_text'):
                 if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
                     re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
-                    perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
+                    doc_name = bibdoc.get_docname() or ""
+
+                    perform_ocr = bool(re_perform_ocr.match(doc_name))
                     from invenio.legacy.bibsched.bibtask import write_message
-                    write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
+                    write_message("... will extract words from %s (docid: %s) %s" % (doc_name, bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
                     bibdoc.extract_text(perform_ocr=perform_ocr)
                 texts.append(bibdoc.get_text())
 
