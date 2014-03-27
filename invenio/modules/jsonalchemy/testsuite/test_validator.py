@@ -35,21 +35,25 @@ class TestValidator(InvenioTestCase):
     def test_objectid(self):
         """Objectid type validation"""
         self.validator._validate_type_objectid(
-            'uuid', 'abcde12345fghij67890wxyz')
-        assert len(self.validator.errors()) == 0
+            '_id', 'abcde12345fabcd67890efab')
+        self.assertEqual(self.validator.errors, {})
+        self.validator._errors = {}
         self.validator._validate_type_objectid(
-            'uuid', 'abcde-12345-fghij-67890z')
-        assert len(self.validator.errors()) == 1
+            '_id', 'abcde-12345-fabcd-67890e')
+        self.assertEqual(self.validator.errors,
+                         {'_id': 'must be of ObjectId type'})
 
     def test_uuid(self):
         """Objectid type validation"""
         _uuid = str(uuid.uuid4())
         self.validator._validate_type_uuid(
-            'uuid', _uuid)
-        assert len(self.validator.errors()) == 0
+            '_id', _uuid)
+        self.assertEqual(self.validator.errors, {})
+        self.validator._errors = {}
         self.validator._validate_type_uuid(
-            'uuid', _uuid.replace('-', '_'))
-        assert len(self.validator.errors()) == 1
+            '_id', _uuid.replace('-', '_'))
+        self.assertEqual(self.validator.errors,
+                         {'_id': 'must be of UUID type'})
 
 
 TEST_SUITE = make_test_suite(TestValidator)
