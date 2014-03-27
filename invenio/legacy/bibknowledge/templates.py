@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -48,8 +48,11 @@ class Template:
 
         #top of the page and table header
         searchforaterm_field = '<input type="text" name="search" value="%s" />' % cgi.escape(lookup_term, 1)
-        searchforaterm = _("Limit display to knowledge bases matching %(keyword_field)s in their rules and descriptions") % \
-                         {'keyword_field': searchforaterm_field}
+        searchforaterm = _(
+            "Limit display to knowledge bases matching %(keyword_field)s in "
+            "their rules and descriptions", keyword_field=searchforaterm_field
+        )
+
         out = '''
 
         <!--make a search box-->
