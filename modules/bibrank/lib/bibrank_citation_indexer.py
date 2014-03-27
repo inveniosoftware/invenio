@@ -1041,11 +1041,8 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
         for reportcode in (r for r in reportcodes if r):
             if reportcode.startswith('arXiv'):
                 std_reportcode = standardize_report_number(reportcode)
-                report_pattern = r'^%s( *\[[a-zA-Z.-]*\])?' % \
-                                                re.escape(std_reportcode)
-                recids = get_recids_matching_query(p=report_pattern,
+                recids = get_recids_matching_query(p='%s*' % std_reportcode,
                                                    f=tags['refs_report_number'],
-                                                   m='r',
                                                    config=config)
             else:
                 recids = get_recids_matching_query(p=reportcode,
