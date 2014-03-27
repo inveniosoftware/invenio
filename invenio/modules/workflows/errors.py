@@ -117,7 +117,7 @@ class WorkflowWorkerError(Exception):
 
 class WorkflowObjectVersionError(Exception):
     """ Raised when workflow object has an unknown or missing version """
-    
+
     def __init__(self, message, id_object, obj_version):
         self.message = message
         self.obj_version = obj_version

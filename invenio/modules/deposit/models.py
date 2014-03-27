@@ -22,7 +22,6 @@ work with the data attributes.
 """
 
 from uuid import uuid4
-import copy
 import json
 import os
 from datetime import datetime
@@ -43,7 +42,6 @@ from invenio.modules.workflows.models import BibWorkflowObject, Workflow, Object
 from invenio.modules.workflows.engine import BibWorkflowEngine, WorkflowStatus
 from invenio.modules.workflows.api import continue_oid
 
-from . import forms
 from .form import CFG_FIELD_FLAGS, DataExporter
 from .signals import file_uploaded
 from .storage import Storage, DepositionStorage

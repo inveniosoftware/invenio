@@ -119,9 +119,9 @@ approve_record.__description__ = "This task assigns the approval widget to a rec
 
 
 def filtering_oai_pmh_identifier(obj, eng):
-    if not "_function_reserved_filtering_oai_pmh_identifier" in eng.extra_data:
+    if "_function_reserved_filtering_oai_pmh_identifier" not in eng.extra_data:
         eng.extra_data["_function_reserved_filtering_oai_pmh_identifier"] = {}
-    if not "identifiers" in eng.extra_data["_function_reserved_filtering_oai_pmh_identifier"]:
+    if "identifiers" not in eng.extra_data["_function_reserved_filtering_oai_pmh_identifier"]:
         eng.extra_data["_function_reserved_filtering_oai_pmh_identifier"]["identifiers"] = []
     try:
         if not isinstance(obj.data, list):
@@ -420,7 +420,7 @@ harvest_records.__id__ = "h"
 
 def get_records_from_file(path=None):
     def _get_records_from_file(obj, eng):
-        if not "_LoopData" in eng.extra_data:
+        if "_LoopData" not in eng.extra_data:
             eng.extra_data["_LoopData"] = {}
         if "get_records_from_file" not in eng.extra_data["_LoopData"]:
             eng.extra_data["_LoopData"]["get_records_from_file"] = {}
@@ -608,7 +608,7 @@ def quick_match_record(obj, eng):
     except KeyError:
         identifiers = {}
 
-    if not "recid" in identifiers:
+    if "recid" not in identifiers:
         for identifier in identifiers:
             recid = function_dictionnary[identifier](identifiers[identifier]["value"])
             if recid:
@@ -650,7 +650,7 @@ def plot_extract(plotextractor_types):
         if "_result" not in obj.extra_data:
             obj.extra_data["_result"] = {}
 
-        if not 'p_extraction-source' in obj.extra_data["_repository"]["arguments"]:
+        if 'p_extraction-source' not in obj.extra_data["_repository"]["arguments"]:
             p_extraction_source = plotextractor_types
         else:
             p_extraction_source = obj.extra_data["_repository"]["arguments"]['p_extraction-source']
@@ -694,7 +694,7 @@ def plot_extract(plotextractor_types):
                 run_shell_command('rm -r %s', (sub_dir,))
             else:
                 for tex_file in tex_files:
-                # Extract images, captions and labels
+                    # Extract images, captions and labels
                     partly_extracted_image_data = extract_captions(tex_file, sub_dir,
                                                                    converted_image_list)
                     if partly_extracted_image_data:

@@ -72,5 +72,3 @@ def task_update_status(val):
         task_update_status_nested(val)
 
     return _task_update_status
-
-

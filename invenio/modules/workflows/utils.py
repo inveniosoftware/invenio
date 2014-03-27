@@ -107,8 +107,8 @@ def determineDataType(data):
             data_type = mime_checker.from_buffer(data)  # noqa
         except:
             register_exception(stream="warning", prefix=
-            "BibWorkflowObject.determineDataType:" +
-            " Impossible to resolve data type.")
+                               "BibWorkflowObject.determineDataType:" +
+                               " Impossible to resolve data type.")
             data_type = ""
     return data_type
 

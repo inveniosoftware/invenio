@@ -43,24 +43,25 @@ from invenio.base.config import CFG_TMPSHAREDDIR
 
 class generic_harvesting_workflow(object):
     object_type = "harvest"
-    workflow = [init_harvesting,
-                foreach(get_repositories_list(['arxivb']), "repository"),
+    workflow = [
+        init_harvesting,
+        foreach(get_repositories_list(['arxivb']), "repository"),
+        [
+            harvest_records,
+            foreach(get_files_list(CFG_TMPSHAREDDIR, get_eng_uuid_harvested)),
+            [
+                foreach(get_records_from_file()),
                 [
-                    harvest_records,
-                    foreach(get_files_list(CFG_TMPSHAREDDIR, get_eng_uuid_harvested)),
-                    [
-                        foreach(get_records_from_file()),
-                        [
-                            start_workflow("full_doc_process", None),
-                            write_something_bibsched(["Workflow started : ", get_nb_workflow_created, " "]),
-                        ],
-                        end_for
-                    ],
-                    end_for
+                    start_workflow("full_doc_process", None),
+                    write_something_bibsched(["Workflow started : ",
+                                              get_nb_workflow_created, " "]),
                 ],
-                end_for,
-                wait_for_workflows_to_complete,
-                write_something_bibsched("the end"),
-                workflows_reviews()
+                end_for
+            ],
+            end_for
+        ],
+        end_for,
+        wait_for_workflows_to_complete,
+        write_something_bibsched("the end"),
+        workflows_reviews()
     ]
-

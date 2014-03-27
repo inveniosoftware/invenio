@@ -47,54 +47,55 @@ from invenio.legacy.bibsched.bibtask import task_update_progress, write_message
 
 class generic_harvesting_workflow_with_bibsched(object):
     repository = 'arXivb'
-    workflow = [write_something_generic("Initialisation", [task_update_progress, write_message]),
-                init_harvesting,
-                write_something_generic("Starting", [task_update_progress, write_message]),
-                foreach(get_repositories_list([repository]), "_repository"),
+    workflow = [
+        write_something_generic("Initialisation", [task_update_progress, write_message]),
+        init_harvesting,
+        write_something_generic("Starting", [task_update_progress, write_message]),
+        foreach(get_repositories_list([repository]), "_repository"),
+        [
+            write_something_generic("Harvesting", [task_update_progress, write_message]),
+            harvest_records,
+            write_something_generic("Reading Files", [task_update_progress, write_message]),
+            foreach(get_obj_extra_data_key("harvested_files_list")),
+            [
+                write_something_generic("Creating Workflows", [task_update_progress, write_message]),
+                foreach(get_records_from_file()),
                 [
-                    write_something_generic("Harvesting", [task_update_progress, write_message]),
-                    harvest_records,
-                    write_something_generic("Reading Files", [task_update_progress, write_message]),
-                    foreach(get_obj_extra_data_key("harvested_files_list")),
+                    workflow_if(filtering_oai_pmh_identifier),
                     [
-                        write_something_generic("Creating Workflows", [task_update_progress, write_message]),
-                        foreach(get_records_from_file()),
+                        workflow_if(num_workflow_running_greater(10), neg=True),
                         [
-                            workflow_if(filtering_oai_pmh_identifier),
-                            [
-                                workflow_if(num_workflow_running_greater(10), neg=True),
-                                [
-                                    start_workflow("full_doc_process", None),
+                            start_workflow("full_doc_process", None),
 
-                                    write_something_generic(["Workflow started : ", get_nb_workflow_created, " "],
-                                                            [task_update_progress, write_message]),
-                                ],
-                                workflow_else,
-                                [
-                                    write_something_generic(["Max Simultaneous Workflow, Wait for one to finish"],
-                                                            [task_update_progress, write_message]),
-                                    wait_for_a_workflow_to_complete,
-                                    start_workflow("full_doc_process", None),
-                                    write_something_generic(["Workflow started : ", get_nb_workflow_created, " "],
-                                                            [task_update_progress, write_message]),
-                                ],
-                            ],
+                            write_something_generic(["Workflow started : ", get_nb_workflow_created, " "],
+                                                    [task_update_progress, write_message]),
                         ],
-                        end_for
+                        workflow_else,
+                        [
+                            write_something_generic(["Max Simultaneous Workflow, Wait for one to finish"],
+                                                    [task_update_progress, write_message]),
+                            wait_for_a_workflow_to_complete,
+                            start_workflow("full_doc_process", None),
+                            write_something_generic(["Workflow started : ", get_nb_workflow_created, " "],
+                                                    [task_update_progress, write_message]),
+                        ],
                     ],
-                    end_for
                 ],
-                end_for,
-                write_something_generic(["Processing : ", get_nb_workflow_created, " records"],
-                                        [task_update_progress, write_message]),
-                simple_for(0, get_nb_workflow_created, 1),
-                [
-                    wait_for_a_workflow_to_complete,
-                    write_something_generic([get_workflows_progress, " % Complete"],
-                                            [task_update_progress, write_message]),
-                ],
-                end_for,
-                write_something_generic("Finishing", [task_update_progress, write_message]),
-                workflows_reviews(stop_if_error=True),
-                update_last_update(get_repositories_list([repository]))
-                ]
+                end_for
+            ],
+            end_for
+        ],
+        end_for,
+        write_something_generic(["Processing : ", get_nb_workflow_created, " records"],
+                                [task_update_progress, write_message]),
+        simple_for(0, get_nb_workflow_created, 1),
+        [
+            wait_for_a_workflow_to_complete,
+            write_something_generic([get_workflows_progress, " % Complete"],
+                                    [task_update_progress, write_message]),
+        ],
+        end_for,
+        write_something_generic("Finishing", [task_update_progress, write_message]),
+        workflows_reviews(stop_if_error=True),
+        update_last_update(get_repositories_list([repository]))
+    ]
