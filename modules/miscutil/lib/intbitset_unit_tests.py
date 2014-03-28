@@ -358,6 +358,11 @@ class IntBitSetTest(InvenioTestCase):
         for set1 in self.sets + [[]]:
             self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
 
+    def test_iterator(self):
+        """intbitset - initialization from iterator"""
+        self.assertEqual(intbitset([1,2,3]), intbitset(iter([1,2,3])))
+        self.assertEqual(intbitset([]), intbitset(iter([])))
+
     def test_pickling(self):
         """intbitset - pickling"""
         import cPickle

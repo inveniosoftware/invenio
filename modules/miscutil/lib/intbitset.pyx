@@ -199,7 +199,7 @@ cdef class intbitset:
                 tuple_of_tuples = rhs and hasattr(rhs, '__getitem__') and hasattr(rhs[0], '__getitem__')
                 try:
                     if preallocate < 0:
-                        if rhs and (not hasattr(rhs, '__getitem__') or type(rhs[0]) is int):
+                        if rhs and not hasattr(rhs, 'next') and (not hasattr(rhs, '__getitem__') or type(rhs[0]) is int):
                             preallocate = max(rhs)
                         else:
                             preallocate = 0
