@@ -26,9 +26,11 @@ services:
   - redis # will start memcached
   - mongodb # will start mongodb
 
+language: python
+
 python:
-  - "2.7"
   - "2.6"
+  - "2.7"
 
 install:
   - "sudo apt-get update"
@@ -38,10 +40,6 @@ install:
   - "sudo a2enmod rewrite"
   - "sudo mkdir /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/apache2/ssl/apache.pem"
-  - "travis_retry sudo pip install --upgrade virtualenvwrapper"
-  - ". `which virtualenvwrapper.sh`"
-  - "mkvirtualenv invenio"
-  - "workon invenio"
   - "travis_retry pip install . --process-dependency-links --allow-all-external"
   - "travis_retry pip install -r requirements-mongo.txt --allow-all-external"
   - "pybabel compile -f -d invenio/base/translations/"
@@ -52,8 +50,8 @@ install:
 
 before_script:
   - "inveniomanage apache create-config"
-  - "sudo ln -s /home/travis/.virtualenvs/invenio/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
-  - "sudo ln -s /home/travis/.virtualenvs/invenio/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
+  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
+  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
   - "sudo /usr/sbin/a2dissite default || echo ':('"
 #  - "sudo /usr/sbin/a2ensite invenio || echo ':('" # enable Invenio web site
 #  - "sudo /usr/sbin/a2ensite invenio-ssl || echo ':('" # enable Invenio secure web site
