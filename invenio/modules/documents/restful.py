@@ -26,6 +26,7 @@ from flask.ext.restful import Resource, abort, marshal_with, fields, reqparse
 from flask.ext.restful.utils import unpack
 from functools import wraps
 from werkzeug.utils import secure_filename
+from werkzeug.http import parse_options_header
 
 from invenio.ext.restful import require_api_auth, error_codes, require_oauth_scopes, require_header
 
@@ -54,12 +55,12 @@ def error_handler(f):
             return f(*args, **kwargs)
         except errors.DocumentNotFound as e:
             abort(404, message="Document does not exists.", status=404)
-        except Exception as e:
-            current_app.logger.error(e)
-            if len(e.args) >= 1:
-                abort(400, message=e.args[0], status=400)
-            else:
-                abort(500, message="Internal server error", status=500)
+        #except Exception as e:
+        #    current_app.logger.error(e)
+        #    if len(e.args) >= 1:
+        #        abort(400, message=e.args[0], status=400)
+        #    else:
+        #        abort(500, message="Internal server error", status=500)
     return inner
 
 
@@ -79,6 +80,10 @@ def filter_errors(result):
     return error_messages
 
 
+def check_content_length(value):
+    """greater than 0"""
+    return int(value) > 0
+
 # =========
 # Mix-ins
 # =========
@@ -97,39 +102,45 @@ class DocumentListResource(Resource):
     """
     method_decorators = document_decorators
 
-    def get(self):
+    def get(self, oauth):
         """
         List all files.
         """
-        result = Document.storage_engine.model.query.all()
-        return filter(
-            lambda x: x.get('creator') == current_user.get_id(),
-            map(lambda o: Document.get_document(o.id).dumps(), result)
-        )
+        return Document.storage_engine.search(
+            {'creator': current_user.get_id()})
 
     @require_header('Content-Type', 'application/json')
-    def post(self):
+    def post(self, oauth):
         """
         Create a new document
         """
         abort(405)
 
-    @require_header('Content-Length', lambda v: v is not None)
-    def put(self):
+    #@require_header('Content-Length', check_content_length)
+    def put(self, oauth):
+        filename = parse_options_header(
+            request.headers.get('Content-Disposition', ''))[1].get('filename')
+
         d = Document.create({'deleted': False})
-        d.setcontents(request.stream, name=request.args.get('name'))
+        from fs.opener import opener
+        opener.opendir(current_app.instance_path + '/files/' +
+            d['uuid'].replace('-', '/') + '/', create_dir=True)
+        d.setcontents(
+            request.stream,
+            name=lambda s: current_app.instance_path + '/files/' +
+            s['uuid'].replace('-', '/') + '/' + secure_filename(filename))
         return d.dumps()
 
-    def delete(self):
+    def delete(self, oauth):
         abort(405)
 
-    def head(self):
+    def head(self, oauth):
         abort(405)
 
-    def options(self):
+    def options(self, oauth):
         abort(405)
 
-    def patch(self):
+    def patch(self, oauth):
         abort(405)
 
 
