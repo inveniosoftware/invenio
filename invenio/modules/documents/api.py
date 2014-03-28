@@ -20,22 +20,34 @@
 import fs
 import six
 
+from flask import g
 from fs.opener import opener
+from werkzeug.local import LocalProxy
 
+from invenio.base.globals import cfg
+from invenio.modules.jsonalchemy.jsonext.engines.mongodb_pymongo import \
+    MongoDBStorage
 from invenio.modules.jsonalchemy.wrappers import SmartJson
-from invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy import SQLAlchemyStorage
 from invenio.modules.jsonalchemy.reader import Reader
 
-
 from . import signals, errors
-from .models import Document as DocumentModel
+
+
+def get_storage_engine():
+    if not hasattr(g, "documents_storage_engine"):
+        g.documents_storage_engine = MongoDBStorage(
+            "Document",
+            host=cfg["DOCUMENTS_MONGODB_HOST"],
+            port=cfg["DOCUMENTS_MONGODB_PORT"],
+            database=cfg["CFG_DATABASE_NAME"])
+    return g.documents_storage_engine
 
 
 class Document(SmartJson):
     """
     Document
     """
-    storage_engine = SQLAlchemyStorage(DocumentModel)
+    storage_engine = LocalProxy(get_storage_engine)
 
     @classmethod
     def create(cls, data, model='document_base', master_format='json',
@@ -44,7 +56,7 @@ class Document(SmartJson):
                                     model=model, namespace='documentext',
                                     **kwargs)
         cls.storage_engine.save_one(document.dumps())
-        signals.document_created.connect(document)
+        signals.document_created.send(document)
         return document
 
     @classmethod
@@ -64,7 +76,14 @@ class Document(SmartJson):
         return document
 
     def _save(self):
-        self.storage_engine.update_one(self.dumps(), id=self['_id'])
+        try:
+            return self.storage_engine.update_one(self.dumps(), id=self['_id'])
+        except:
+            return self.storage_engine.save_one(self.dumps(), id=self['_id'])
+
+    def update(self):
+        """Update document object."""
+        return self._save()
 
     def setcontents(self, source, name=None, chunk_size=65536):
         """
@@ -91,14 +110,14 @@ class Document(SmartJson):
         else:
             name = fs.path.abspath(name)
 
-        signals.document_before_content_set.connect(self, name)
+        signals.document_before_content_set.send(self, name)
 
         data = f.read()
         _fs, filename = opener.parse(name)
         _fs.setcontents(filename, data, chunk_size)
         _fs.close()
 
-        signals.document_after_content_set.connect(self, name)
+        signals.document_after_content_set.send(self, name)
 
         try:
             f.close()
@@ -124,7 +143,7 @@ class Document(SmartJson):
         self['deleted'] = True
 
         if force:
-            signals.document_before_file_delete.connect(self)
+            signals.document_before_file_delete.send(self)
             fs, filename = opener.parse(self['uri'])
             fs.remove(filename)
             self['uri'] = None
