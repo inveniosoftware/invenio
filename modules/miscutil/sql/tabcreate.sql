@@ -4721,6 +4721,14 @@ CREATE TABLE IF NOT EXISTS `aidINVERTEDLISTS` (
  PRIMARY KEY (`qgram`)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS `aidAFFILIATIONS` (
+  `personid` BIGINT( 16 ) UNSIGNED NOT NULL ,
+  `affiliation` VARCHAR( 256 ) NOT NULL,
+  `last_recid` MEDIUMINT( 8 ) UNSIGNED NOT NULL,
+  `last_occurence` datetime NOT NULL,
+ PRIMARY KEY (`personid`)
+) ENGINE=MyISAM;
+
 -- refextract tables:
 
 CREATE TABLE IF NOT EXISTS `xtrJOB` (
@@ -5048,5 +5056,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_02_oaiHARVEST_ar
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_09_09_tag_recjsonvalue_not_null',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2015_03_03_tag_value',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_2_0',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_01_new_aidAFFILIATIONS',NOW());
 
 -- end of file
