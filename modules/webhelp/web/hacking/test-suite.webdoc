@@ -382,7 +382,7 @@ browser.submit()
 username_account_page_body = browser.response().read()
 try:
     string.index(username_account_page_body,
-                 "You are logged in as userfoo.")
+                 "You are logged in as &lt;strong&gt;userfoo&lt;/strong&gt;.")
 except ValueError:
     self.fail('ERROR: Cannot login as userfoo.')
 </pre>
