@@ -52,6 +52,8 @@ pylib_DATA = \
 	bibauthorid_bib_matrix_unit_tests.py \
 	bibauthorid_cluster_set_unit_tests.py \
 	bibauthorid_dbinterface_unit_tests.py \
+	bibauthorid_affiliations.py \
+	bibauthorid_affiliations_regression_tests.py \
 	bibauthorid_prob_matrix_unit_tests.py
 
 jsdir=$(localstatedir)/www/js
