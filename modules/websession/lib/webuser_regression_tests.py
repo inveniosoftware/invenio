@@ -63,7 +63,7 @@ class WebSessionYourSettingsTests(InvenioTestCase):
         browser['p_pw'] = ''
         browser.submit()
 
-        expected_response = "You are logged in as admin"
+        expected_response = "You are logged in as <strong>admin</strong>."
         login_response_body = browser.response().read()
         try:
             login_response_body.index(expected_response)
@@ -196,7 +196,7 @@ class WebSessionYourSettingsTests(InvenioTestCase):
         browser['p_pw'] = ''
         browser.submit()
 
-        expected_response = "You are logged in as admin"
+        expected_response = "You are logged in as <strong>admin</strong>."
         login_response_body = browser.response().read()
         try:
             login_response_body.index(expected_response)
@@ -261,7 +261,7 @@ class WebSessionYourSettingsTests(InvenioTestCase):
         browser['p_pw'] = ''
         browser.submit()
 
-        expected_response = "You are logged in as admin"
+        expected_response = "You are logged in as <strong>admin</strong>."
         login_response_body = browser.response().read()
         try:
             login_response_body.index(expected_response)
