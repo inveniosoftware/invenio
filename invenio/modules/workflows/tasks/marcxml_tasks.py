@@ -604,7 +604,7 @@ def quick_match_record(obj, eng):
         if not identifiers:
             return False
         else:
-            obj.persistent_ids = identifiers
+            obj.extra_data["persistent_ids"] = identifiers
     except KeyError:
         identifiers = {}
 
@@ -613,7 +613,7 @@ def quick_match_record(obj, eng):
             recid = function_dictionnary[identifier](identifiers[identifier]["value"])
             if recid:
                 obj.data['recid']['value'] = recid
-                obj.persistent_ids["recid"] = recid
+                obj.extra_data["persistent_ids"]["recid"] = recid
                 return True
         return False
     else:
