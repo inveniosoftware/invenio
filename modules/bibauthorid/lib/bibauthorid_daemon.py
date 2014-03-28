@@ -33,7 +33,7 @@ from invenio.bibauthorid_backinterface import get_db_time
 from invenio.bibauthorid_backinterface import get_authors_of_claimed_paper
 from invenio.bibauthorid_backinterface import get_claimed_papers_from_papers
 from invenio.bibauthorid_backinterface import get_all_valid_papers
-
+from invenio.bibauthorid_affiliations import process_affiliations
 
 #python 2.4 compatibility
 from invenio.bibauthorid_general_utils import bai_any as any
@@ -151,6 +151,9 @@ def _task_run_core():
         bibtask.task_update_progress('Updating personid...')
         run_rabbit(record_ids, all_records)
         bibtask.task_update_progress('PersonID update finished!')
+        # bibtask.task_update_progress('Updating affiliations...')
+        # process_affiliations(record_ids, all_records)
+        # bibtask.task_update_progress('Affiliations update finished!')
 
     if bibtask.task_get_option("disambiguate"):
         bibtask.task_update_progress('Performing full disambiguation...')
