@@ -21,18 +21,22 @@ from invenio.modules.jsonalchemy.jsonext.functions.util_merge_fields_info_list \
     import util_merge_fields_info_list
 
 
-def sync_authors(self, field_name, connected_field, action):  # pylint: disable=W0613
-    """Sync authors content only when `__setitem__` or similar is used"""
+def sync_meeting_names(self, field_name, connected_field, action):  # pylint: disable=W0613
+    """
+    Sync corparate names content only when `__setitem__` or similar is used
+    """
     if action == 'set':
-        if field_name == 'authors' and self.get('authors'):
-            self.__setitem__('_first_author', self['authors'][0],
+        if field_name == 'corporate_names' and self.get('corporate_names'):
+            self.__setitem__('_first_corporate_name',
+                             self['corporate_names'][0],
                              exclude=['connect'])
-            if self['authors'][1:]:
-                self.__setitem__('_additional_authors', self['authors'][1:],
+            if self['corporate_names'][1:]:
+                self.__setitem__('_additional_corporate_names',
+                                 self['corporate_names'][1:],
                                  exclude=['connect'])
         elif field_name in ('_first_author', '_additional_authors'):
             self.__setitem__(
-                'authors',
-                util_merge_fields_info_list(self, ['_first_author',
-                                            '_additional_authors']),
+                'corporate_names',
+                util_merge_fields_info_list(self, ['_first_corporate_name',
+                                            '_additional_corporate_names']),
                 exclude=['connect'])
