@@ -233,7 +233,6 @@ class BibWorkflowObject(db.Model):
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
     status = db.Column(db.String(255), default="", nullable=False)
-    persistent_ids = db.Column(db.JSON, default={}, nullable=True)
     data_type = db.Column(db.String(150), default="",
                           nullable=True)
     uri = db.Column(db.String(500), default="")
