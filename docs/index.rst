@@ -1,14 +1,16 @@
 :orphan:
 
-Welcome to Invenio
-==================
+=====================
+Invenio documentation
+=====================
 
 .. image:: _static/logo-full.png
    :alt: Invenio: digital repository software
-   :class: floatingflask
+   :class: pull-right
+
 
 Welcome to Invenio's documentation.  This documentation is divided into
-different parts.  I recommend that you get started with
+different parts.  We recommend that you get started with
 :ref:`installation` and then head over to the :ref:`quickstart`.
 Besides the quickstart, there is also a more detailed :ref:`tutorial` that
 shows how to create a complete application with Invenio.  If

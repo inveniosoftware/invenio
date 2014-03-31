@@ -39,8 +39,8 @@ The CERN development team currently consists of:
      Contributions to the Italian translation.
 
  - Jiri Kuncar <jiri.kuncar@cern.ch>
-     Fix for demo site installation.  Contributions to the Czech
-     translation.
+     General system architecture of Invenio 2.0. Contributions to
+     the Czech translation.
 
  - Esteban J. G. Gabancho <esteban.jose.garcia.gabancho@cern.ch>
      Initial release of WebApiKey, enhancements for WebSubmit.

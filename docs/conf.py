@@ -15,11 +15,15 @@ from __future__ import print_function
 
 import sys, os
 try:
-    import sphinx_bootstrap_theme
-    _html_theme = 'bootstrap'
-    _html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+    import sphinx_rtd_theme
+    _html_theme = "sphinx_rtd_theme"
+    _html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+#try:
+#    import sphinx_bootstrap_theme
+#    _html_theme = 'bootstrap'
+#    _html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 except:
-    print('Please run: `pip install sphinx_bootstrap_theme`', file=sys.stderr)
+    print('Please run: `pip install sphinx_bootstrap_theme sphinx_bootstrap_theme`', file=sys.stderr)
     _html_theme = 'default'
     _html_theme_path = []
 
@@ -39,7 +43,7 @@ sys.path.append(os.path.abspath('../invenio'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['flask_app', 'sphinx.ext.autodoc']
+extensions = ['flask_app', 'sphinx.ext.autodoc', 'sphinx.ext.intersphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -259,3 +263,15 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+# -- Options for Intersphinx mapping ------------------------------------------
+
+# See <http://sphinx-doc.org/ext/intersphinx.html>
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/2.7/', None),
+    'flask_registry': ('http://flask-registry.readthedocs.org/en/latest/', None),
+    'flask_menu': ('http://flask-menu.readthedocs.org/en/latest/', None),
+    'flask_breadcrumbs': ('http://flask-breadcrumbs.readthedocs.org/en/latest/', None),
+    'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
+    'flask': ('http://flask.pocoo.org/docs/', None),
+}
