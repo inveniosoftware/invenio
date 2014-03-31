@@ -23,7 +23,12 @@
 
 from __future__ import absolute_import
 
-import unittest
+import sys
+pyv = sys.version_info
+if pyv[0] == 2 and pyv[1] < 7:
+    import unittest2 as unittest
+else:
+    import unittest
 
 from contextlib import contextmanager
 from flask import request_started, request
