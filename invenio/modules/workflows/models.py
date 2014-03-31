@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -317,12 +317,12 @@ class BibWorkflowObject(db.Model):
     def __eq__(self, other):
         if isinstance(other, BibWorkflowObject):
             if self._data == other._data and \
-                            self._extra_data == other._extra_data and \
-                            self.id_workflow == other.id_workflow and \
-                            self.version == other.version and \
-                            self.id_parent == other.id_parent and \
-                    isinstance(self.created, datetime) and \
-                    isinstance(self.modified, datetime):
+               self._extra_data == other._extra_data and \
+               self.id_workflow == other.id_workflow and \
+               self.version == other.version and \
+               self.id_parent == other.id_parent and \
+               isinstance(self.created, datetime) and \
+               isinstance(self.modified, datetime):
                 return True
             else:
                 return False
@@ -457,7 +457,7 @@ class BibWorkflowObject(db.Model):
                         return format_record(recID=None,
                                              of=format,
                                              xml_record=data)
-                    except TypeError as e:
+                    except TypeError:
                         # Wrong kind of type
                         pass
                 else:

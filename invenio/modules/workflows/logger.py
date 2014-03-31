@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,8 +18,6 @@
 
 import logging
 
-from invenio.ext.sqlalchemy import db
-
 
 def get_logger(logger_name, db_handler_obj,
                level=10, **kwargs):
@@ -33,16 +31,11 @@ def get_logger(logger_name, db_handler_obj,
     # Get a basic logger object
     logger = logging.getLogger(logger_name)
 
-    # Create formatter and add it to the handlers
-    formatter = logging.Formatter('%(levelname)s %(asctime)s %(name)s    %(message)s')
-
-    db_handler_obj.setFormatter(formatter)
-    db_handler_obj.setLevel(level)
-    should_we_add = True
-    for handler in logger.handlers:
-        if handler.name == db_handler_obj.name:
-            should_we_add = False
-    if should_we_add:
+    if not logger.handlers:
+        # Create formatter and add it to the handlers
+        formatter = logging.Formatter('%(levelname)s %(asctime)s %(name)s    %(message)s')
+        db_handler_obj.setFormatter(formatter)
+        db_handler_obj.setLevel(level)
         logger.addHandler(db_handler_obj)
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
@@ -63,21 +56,20 @@ def get_logger(logger_name, db_handler_obj,
     return wrapped_logger
 
 
-class BibWorkflowLogHandler(logging.Handler):
+class BibWorkflowLogHandler(logging.Handler, object):
     """
     Implements a handler for logging to database
     """
 
     def __init__(self, model, id_name):
-
-        logging.Handler.__init__(self)
+        super(BibWorkflowLogHandler, self).__init__()
 
         self.model = model
         self.id_name = id_name
 
-
-
     def emit(self, record):
+        from invenio.ext.sqlalchemy import db
+
         log_obj = self.model(id_object=getattr(record.obj, self.id_name),
                              log_type=record.levelno,
                              message=record.msg)

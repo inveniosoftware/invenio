@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,7 +33,7 @@ from ..utils import (get_workflow_definition,
                      filter_holdingpen_results)
 
 from ..models import Workflow, BibWorkflowObject, BibWorkflowEngineLog
-from ..loader import workflows
+from ..registry import workflows
 
 blueprint = Blueprint('workflows', __name__, url_prefix="/admin/workflows",
                       template_folder='../templates',

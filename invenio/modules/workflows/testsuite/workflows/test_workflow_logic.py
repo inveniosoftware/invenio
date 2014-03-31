@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,11 +24,12 @@ from invenio.modules.workflows.tasks.logic_tasks import (end_for,
                                                          workflow_else,
                                                          workflow_if,
                                                          compare_logic)
-from invenio.modules.workflows.tasks.test_tasks import task_a_bis
+from invenio.modules.workflows.tasks.sample_tasks import add_data
 
 from invenio.modules.workflows.tasks.workflows_tasks import interrupt_workflow
 
-from invenio.modules.workflows.tasks.marcxml_tasks import get_data, set_obj_extra_data_key
+from invenio.modules.workflows.tasks.marcxml_tasks import (get_data,
+                                                           set_obj_extra_data_key)
 
 
 class test_workflow_logic(object):
@@ -40,7 +41,7 @@ class test_workflow_logic(object):
         [
             simple_for(0, 4, 1, "Iterator"),
             [
-                task_a_bis(1),
+                add_data(1),
             ],
             end_for,
 

@@ -17,14 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.base.utils import (autodiscover_workflows,
-                                autodiscover_widgets)
+from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
+from flask.ext.registry import RegistryProxy
 from invenio.utils.datastructures import LazyDict
-from werkzeug.utils import import_string, find_modules
-
-"""
-Loader for workflows and widgets
-"""
 
 
 def plugin_builder(plugin):
@@ -42,28 +37,31 @@ def plugin_builder(plugin):
         return plugin_candidate
 
 
-def load_workflows():
-    workflows = {}
-    for package in autodiscover_workflows():
-        for module in find_modules(package.__name__, include_packages=True):
-            workflow = plugin_builder(import_string(module))
-            if workflow is not None:
-                workflows[workflow.__name__] = workflow
-
-    return workflows
+workflows_registry = RegistryProxy(
+    'workflows',
+    ModuleAutoDiscoverySubRegistry,
+    'workflows'
+)
 
 
-def load_widgets():
-    widgets = {}
-    for package in autodiscover_widgets():
-        for module in find_modules(package.__name__, include_packages=True):
-            widget = plugin_builder(import_string(module))
-            if widget is not None:
-                widgets[widget.__name__] = widget
+widgets_registry = RegistryProxy(
+    'widgets',
+    ModuleAutoDiscoverySubRegistry,
+    'widgets'
+)
 
-    return widgets
 
-workflows = LazyDict(load_workflows)
-widgets = LazyDict(load_widgets)
+def load_modules_from_registry(registry):
+    def load_me():
+        loaded_dict = {}
+        for package in registry:
+            name = package.__name__.split('.')[-1]
+            loaded_dict[name] = plugin_builder(package)
+        return loaded_dict
+    return load_me
+
+
+workflows = LazyDict(load_modules_from_registry(workflows_registry))
+widgets = LazyDict(load_modules_from_registry(widgets_registry))
 
 __all__ = ['widgets', 'workflows']

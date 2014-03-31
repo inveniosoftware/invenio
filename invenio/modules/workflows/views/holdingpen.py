@@ -34,7 +34,7 @@ from invenio.base.i18n import _
 from invenio.utils.date import pretty_date
 
 from ..models import BibWorkflowObject, Workflow, ObjectVersion
-from ..loader import widgets
+from ..registry import widgets
 from ..utils import (get_workflow_definition,
                      sort_bwolist)
 from ..api import continue_oid_delayed, start

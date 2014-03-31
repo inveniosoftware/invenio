@@ -78,7 +78,7 @@ class WorkflowsTaskResult(object):
 
 def get_workflow_definition(name):
     """ Tries to load the given workflow from the system. """
-    from .loader import workflows
+    from .registry import workflows
 
     try:
         return workflows[name]

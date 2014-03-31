@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -68,7 +68,6 @@ class BibWorkflowEngine(GenericWorkflowEngine):
     :param kwargs:
     """
 
-
     def __init__(self, name=None, uuid=None, curr_obj=0,
                  workflow_object=None, id_user=0, module_name="Unknown",
                  **kwargs):
@@ -90,8 +89,9 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                                        module_name=module_name, uuid=uuid)
                 self.save(status=WorkflowStatus.NEW)
 
-        if not self.db_obj.uuid in self.log.name:
-            db_handler_obj = BibWorkflowLogHandler(BibWorkflowEngineLog, "uuid")
+        if self.db_obj.uuid not in self.log.name:
+            db_handler_obj = BibWorkflowLogHandler(BibWorkflowEngineLog,
+                                                   "uuid")
             self.log = get_logger(logger_name="workflow.%s" % self.db_obj.uuid,
                                   db_handler_obj=db_handler_obj,
                                   obj=self)
@@ -259,7 +259,7 @@ BibWorkflowEngine
             self._i[1][-1] -= 1
         elif task == 'current':
             # restart the task again
-            self._i[1][-1] -= 0
+            pass
         elif task == 'next':
             # continue with the next task
             self._i[1][-1] += 1

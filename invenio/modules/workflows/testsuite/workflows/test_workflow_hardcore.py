@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -9,7 +9,7 @@
 ##
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
@@ -18,18 +18,16 @@
 
 """ Implements a workflow for testing """
 
-from invenio.modules.workflows.tasks.simplified_data_tasks import task_a, task_b
+from invenio.modules.workflows.tasks.sample_tasks import (task_reduce_and_halt,
+                                                          sleep_task)
 
 
-class simplified_data_test_workflow(object):
+class test_workflow_hardcore(object):
     """
-A simplified test workflow for unit-tests.
-"""
-    workflow = [task_a(1),
-                task_b,
-                task_a(1),
-                task_a(4),
-                task_a(1),
-                task_a(1),
-                task_b,
-                task_a(13)]
+    Test workflow for unit-tests.
+    """
+    workflow = [
+        sleep_task(0.001),
+        task_reduce_and_halt,
+        sleep_task(1)
+    ]
