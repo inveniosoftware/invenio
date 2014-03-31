@@ -1,12 +1,11 @@
-**********************
 Demo and Example Sites
-**********************
+======================
 
 There are several Invenio installations that you can have a look at in
 order to see it in action:
 
 Demo Sites
-==========
+----------
 
 `Atlantis Institute of Fictive Science <http://invenio-demo.cern.ch/>`_
     *running Invenio 1.1.2, released 2013-08-19*
@@ -35,7 +34,7 @@ Demo Sites
     `SQLAlchemy <http://www.sqlalchemy.org/>`_).
 
 Production Sites
-================
+----------------
 
 .. image:: _static/CDS20120611.png
    :width: 200 px

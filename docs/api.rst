@@ -6,6 +6,12 @@ API
 Base
 ----
 
+.. automodule:: invenio.base
+   :members:
+
+.. automodule:: invenio.base.wrappers
+   :members:
+
 .. automodule:: invenio.base.factory
    :members:
 
