@@ -566,9 +566,20 @@ class BibWorkflowObjectLog(db.Model):
     created = db.Column(db.DateTime, default=datetime.now)
     message = db.Column(db.TEXT, default="", nullable=False)
 
+    def __str__(self):
+        return "%(severity)s: %(created)s - %(message)s" % {
+            "severity": self.log_type,
+            "created": self.created,
+            "message": self.message
+        }
+
     def __repr__(self):
-        return "<BibWorkflowObjectLog(%i, %s, %s, %s)>" % \
-               (self.id, self.id_object, self.message, self.created)
+        return "BibWorkflowObjectLog(%s)" % (", ".join(
+            "log_type='%s'" % self.log_type,
+            "created='%s'" % self.created,
+            "message='%s'" % self.message,
+            "id_object='%'" % self.id_object)
+        )
 
     @classmethod
     def get(cls, *criteria, **filters):
@@ -582,9 +593,8 @@ class BibWorkflowObjectLog(db.Model):
     @classmethod
     def get_most_recent(cls, *criteria, **filters):
         """ Returns the most recently created log. """
-
-        most_recent = cls.get(*criteria, **filters). \
-            order_by(desc(BibWorkflowObjectLog.created)).first()
+        most_recent = cls.get(*criteria, **filters).order_by(
+            desc(BibWorkflowObjectLog.created)).first()
         if most_recent is None:
             raise NoResultFound
         else:
@@ -604,9 +614,20 @@ class BibWorkflowEngineLog(db.Model):
     created = db.Column(db.DateTime, default=datetime.now)
     message = db.Column(db.TEXT, default="", nullable=False)
 
+    def __str__(self):
+        return "%(severity)s: %(created)s - %(message)s" % {
+            "severity": self.log_type,
+            "created": self.created,
+            "message": self.message
+        }
+
     def __repr__(self):
-        return "\nseverity: %s\ndate: %s\nmessage: %s" % \
-               (self.log_type, self.created, self.message)
+        return "BibWorkflowEngineLog(%s)" % (", ".join(
+            "log_type='%s'" % self.log_type,
+            "created='%s'" % self.created,
+            "message='%s'" % self.message,
+            "id_object='%'" % self.id_object)
+        )
 
     @classmethod
     def get(cls, *criteria, **filters):
@@ -620,9 +641,8 @@ class BibWorkflowEngineLog(db.Model):
     @classmethod
     def get_most_recent(cls, *criteria, **filters):
         """ Returns the most recently created log. """
-
-        most_recent = cls.get(*criteria, **filters). \
-            order_by(desc(BibWorkflowEngineLog.created)).first()
+        most_recent = cls.get(*criteria, **filters).order_by(
+            desc(BibWorkflowEngineLog.created)).first()
         if most_recent is None:
             raise NoResultFound
         else:

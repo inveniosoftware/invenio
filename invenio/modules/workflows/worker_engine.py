@@ -190,6 +190,7 @@ def generate_snapshot(workflow_object, engine):
                                          obj_version=workflow_object.version,
                                          id_object=workflow_object.id)
     else:
+        # Ehm, this version does not exist..
         raise WorkflowObjectVersionError("Object version is unknown: %s" %
                                          (workflow_object.version,),
                                          obj_version=workflow_object.version,

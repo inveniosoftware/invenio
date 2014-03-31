@@ -111,7 +111,7 @@ class WorkflowWorkerError(Exception):
 
     def __str__(self):
         """String representation."""
-        return "WorkflowDefinitionError(%s, worker_name: %s, payload: %r)" % \
+        return "WorkflowWorkerError(%s, worker_name: %s, payload: %r)" % \
                (repr(self.message), self.worker_name, repr(self.payload) or "None")
 
 
@@ -134,3 +134,8 @@ class WorkflowObjectVersionError(Exception):
         """String representation."""
         return "WorkflowObjectVersionError(%s, obj_version: %s, id_object: %s)" % \
                (self.message, str(self.obj_version), str(self.id_object))
+
+
+class WorkflowAPIError(Exception):
+    """ Raised when there is a problem with parameters at the API level """
+    pass

@@ -19,7 +19,8 @@
 import six
 
 from invenio.modules.workflows.models import (BibWorkflowObject,
-                                              BibWorkflowEngineLog)
+                                              BibWorkflowEngineLog,
+                                              ObjectVersion)
 from invenio.modules.workflows.api import start_delayed
 from invenio.modules.workflows.errors import WorkflowError
 
@@ -90,18 +91,14 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
 
     def _start_workflow(obj, eng):
 
-        myobject = BibWorkflowObject()
+        myobject = BibWorkflowObject.create_object_revision(obj,
+                                                            version=ObjectVersion.INITIAL,
+                                                            data_type="record")
 
-        if copy is True:
-            myobject.copy(obj)
-        if data is not None:
-            myobject.set_data(data)
-        extra = myobject.get_extra_data()
-        myobject.set_extra_data(extra)
-        myobject.data_type = "record"
-        myobject.save()
-        workflow_id = start_delayed(workflow_to_run, data=[myobject],
-                                    stop_on_error=True, **kwargs)
+        workflow_id = start_delayed(workflow_to_run,
+                                    data=[myobject],
+                                    stop_on_error=True,
+                                    **kwargs)
 
         eng.log.info("Workflow launched")
         try:

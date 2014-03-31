@@ -114,10 +114,8 @@ def start_delayed(workflow_name, data, **kwargs):
         if isinstance(data, BibWorkflowObject):
             data = BibWorkflowObjectIdContainer(data).to_dict()
 
-    result =  WORKER().run_worker(workflow_name, data, **kwargs)
-    from invenio.ext.sqlalchemy import db
-    db.session.close()
-    return result
+    return WORKER().run_worker(workflow_name, data, **kwargs)
+
 
 def start_by_wid(wid, **kwargs):
     """
@@ -155,10 +153,9 @@ def start_by_wid_delayed(wid, **kwargs):
 
     :return: BibWorkflowEngine that ran the workflow.
     """
-    result = WORKER().restart_worker(wid, **kwargs).uuid
-    from invenio.ext.sqlalchemy import db
-    db.session.close()
+    result = WORKER().restart_worker(wid, **kwargs)
     return result
+
 
 def start_by_oids(workflow_name, oids, **kwargs):
     """
@@ -178,6 +175,12 @@ def start_by_oids(workflow_name, oids, **kwargs):
     :return: BibWorkflowEngine that ran the workflow.
     """
     from .models import BibWorkflowObject
+
+    if not oids:
+        # oids is not defined!
+        from .errors import WorkflowAPIError
+        raise WorkflowAPIError("No Object IDs are defined")
+
     objects = BibWorkflowObject.query.filter(
         BibWorkflowObject.id.in_(list(oids))
     ).all()
@@ -266,9 +269,7 @@ def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
     :return: BibWorkflowEngine that ran the workflow
     """
 
-    result = WORKER().continue_worker(oid, start_point, **kwargs).uuid
-    from invenio.ext.sqlalchemy import db
-    db.session.close()
+    result = WORKER().continue_worker(oid, start_point, **kwargs)
     return result
 
 def resume_objects_in_workflow(id_workflow, start_point="continue_next",
