@@ -58,6 +58,7 @@ import re
 
 from setuptools import setup, find_packages
 
+
 # Get the version string.  Cannot be done with import!
 with open(os.path.join('invenio', 'version.py'), 'rt') as f:
     version = re.search(
@@ -69,13 +70,10 @@ with open(os.path.join('invenio', 'version.py'), 'rt') as f:
 def match_feature_name(filename):
     return re.match(r".*requirements-(\w+).txt$", filename).group(1)
 
+
 def match_egg_name_and_version(dependency_link, version='>='):
-    return version.join(
-        re.sub(
-            r'.+://.*[@#&]egg=([^&]*)&?.*$',
-            r'\1',
-            dependency_link
-        ).rsplit('-', 1))
+    eggname = re.sub(r'^.+://.*[@#&]egg=([^&]+).*$', r'\1', dependency_link)
+    return re.sub(r'-([\d\.]+(?:-dev)?)$', r'{0}\1'.format(version), eggname)
 
 
 def read_requirements(filename='requirements.txt'):
@@ -92,6 +90,7 @@ def read_requirements(filename='requirements.txt'):
             else:
                 req.append(str(line))
     return req, dep
+
 
 install_requires, dependency_links = read_requirements()
 
