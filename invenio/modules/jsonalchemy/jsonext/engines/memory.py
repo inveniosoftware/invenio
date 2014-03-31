@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,6 +23,8 @@
 
 """
 
+import six
+
 from invenio.modules.jsonalchemy.storage import Storage
 
 
@@ -37,27 +39,27 @@ class MemoryStorage(Storage):
         """
         self._database = kwargs.get('database', {})
 
-    def save_one(self, json, id=None):
+    def save_one(self, data, id=None):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.save_one`"""
         if id is not None:
-            json['_id'] = id
-        id = json['_id']
-        self._database[id] = json
-        return json
+            data['_id'] = id
+        id = data['_id']
+        self._database[id] = data
+        return data
 
     def save_many(self, jsons, ids=None):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.save_many`
         """
         return map(lambda k: self.save_one(*k), zip(jsons, ids))
 
-    def update_one(self, json, id=None):
+    def update_one(self, data, id=None):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.update_one`
         """
         if id is not None:
-            json['_id'] = id
-        id = json['_id']
+            data['_id'] = id
+        id = data['_id']
 
-        return self._database[id].update(json)
+        return self._database[id].update(data)
 
     def update_many(self, jsons, ids=None):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.update_many`
@@ -86,4 +88,12 @@ class MemoryStorage(Storage):
 
     def search(self, query):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.search`"""
-        raise NotImplementedError()
+        def _find(item):
+            for k, v in six.iteritems(query):
+                test_v = item.get(k)
+                if test_v is None and v is not None:
+                    return False
+                elif test_v != v:
+                    return False
+            return True
+        return filter(_find, self._database.values())
