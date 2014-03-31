@@ -38,7 +38,7 @@ from invenio.config import CFG_PREFIX
 
 class full_doc_process(object):
     object_type = "record"
-    workflow = [convert_record_with_repository("oaiarXiv2inspire_nofilter.xsl"), convert_record_to_bibfield,
+    workflow = [convert_record_with_repository("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield,
                 workflow_if(quick_match_record, True),
                 [
                     plot_extract(["latex"]),
