@@ -20,32 +20,16 @@
 
 __revision__ = "$Id$"
 
-import os
-
-from invenio.pluginutils import PluginContainer
-
-from invenio.config import CFG_PYLIBDIR
-
-from invenio.bibingest_config import \
+from .config import \
     CFG_BIBINGEST_COLLECTIONS, \
     CFG_BIBINGEST_DEFAULT_COLLECTION_NAME, \
-    CFG_BIBINGEST_STORAGE_ENGINES_PATH, \
-    CFG_BIBINGEST_INGESTION_PACKAGES_PATH, \
     CFG_BIBINGEST_ONE_STORAGE_ENGINE_INSTANCE_PER_STORAGE_ENGINE, \
     CFG_BIBINGEST_ONE_INGESTION_PACKAGE_INSTANCE_PER_REQUEST
 
-_STORAGE_ENGINES = PluginContainer(\
-    os.path.join(CFG_PYLIBDIR,
-                 'invenio',
-                 CFG_BIBINGEST_STORAGE_ENGINES_PATH,
-                 '*.py'))
+from .regitry import ingestion_packages, storage_engines
 
-_INGESTION_PACKAGES = PluginContainer(\
-    os.path.join(CFG_PYLIBDIR,
-                 'invenio',
-                 CFG_BIBINGEST_INGESTION_PACKAGES_PATH,
-                 '*.py'))
-
+_STORAGE_ENGINES = storage_engines
+_INGESTION_PACKAGES = ingestion_packages
 _collections = {}
 
 # ****************

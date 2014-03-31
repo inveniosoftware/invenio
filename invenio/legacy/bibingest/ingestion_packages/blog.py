@@ -16,11 +16,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""The Blog post comment ingestion package."""
+"""The Blog ingestion package."""
 
 __revision__ = "$Id$"
 
-from invenio.bibingest_ingestion_package_interface import IngestionPackage, valid_string
+from invenio.legacy.bibingest.ingestion_package_interface \
+    import IngestionPackage, valid_string
 
 _ADDITIONAL_ACCEPTED_FIELD_NAMES = {
     # Don't use underscores ('_') for the field names.
@@ -29,7 +30,7 @@ _ADDITIONAL_ACCEPTED_FIELD_NAMES = {
     'url' : (lambda:None, valid_string),
 }
 
-class Comment(IngestionPackage):
+class Blog(IngestionPackage):
     """The Ingestion Package default class"""
 
     def __init__(self, storage_engine_instance, storage_engine_settings = None):
@@ -40,9 +41,12 @@ class Comment(IngestionPackage):
         IngestionPackage.__init__(self, storage_engine_instance, storage_engine_settings)
         self._accepted_field_names.update(_ADDITIONAL_ACCEPTED_FIELD_NAMES)
 
-def comment(storage_engine_instance, storage_engine_settings = None):
+def blog(storage_engine_instance, storage_engine_settings = None):
     """
     Instantiates the ingestion package with the given storage engine instance.
     """
 
-    return Comment(storage_engine_instance, storage_engine_settings)
+    return Blog(storage_engine_instance, storage_engine_settings)
+
+
+package = blog

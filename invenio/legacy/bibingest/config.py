@@ -37,11 +37,6 @@ CFG_BIBINGEST_ONE_INGESTION_PACKAGE_INSTANCE_PER_REQUEST = False
 #CFG_BIBINGEST_ONE_INGESTION_PACKAGE_INSTANCE_PER_COLLECTION = \
 #    not CFG_BIBINGEST_ONE_INGESTION_PACKAGE_INSTANCE_PER_REQUEST
 
-# The physical paths in the invenio python library where the storage engines
-# and ingestion packages plugins are found. To be used by invenio pluginutils.
-CFG_BIBINGEST_STORAGE_ENGINES_PATH = 'bibingest_storage_engines'
-CFG_BIBINGEST_INGESTION_PACKAGES_PATH = 'bibingest_ingestion_packages'
-
 # If True, whenever an ingestion package is updated old versions will be kept
 CFG_BIBINGEST_VERSIONING = True
 
