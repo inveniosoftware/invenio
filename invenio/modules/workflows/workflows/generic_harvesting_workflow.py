@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,20 +21,22 @@
 from ..tasks.marcxml_tasks import (get_repositories_list,
                                    init_harvesting,
                                    harvest_records,
-                                   get_files_list,
-                                   get_eng_uuid_harvested,
                                    get_records_from_file,
-                                   get_obj_extra_data_key, filtering_oai_pmh_identifier, update_last_update)
+                                   get_obj_extra_data_key,
+                                   filtering_oai_pmh_identifier,
+                                   update_last_update)
 
 from ..tasks.workflows_tasks import (start_workflow,
-                                     wait_for_workflows_to_complete,
                                      workflows_reviews,
                                      get_nb_workflow_created,
-                                     num_workflow_running_greater, wait_for_a_workflow_to_complete)
+                                     num_workflow_running_greater,
+                                     wait_for_a_workflow_to_complete)
 
 from ..tasks.logic_tasks import (foreach,
                                  end_for,
-                                 workflow_if, workflow_else, simple_for)
+                                 workflow_if,
+                                 workflow_else,
+                                 simple_for)
 
 
 class generic_harvesting_workflow(object):

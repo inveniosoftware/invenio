@@ -18,17 +18,12 @@
 
 import six
 
-from invenio.modules.workflows.models import (BibWorkflowObject,
-                                              BibWorkflowEngineLog,
-                                              ObjectVersion)
-from invenio.modules.workflows.api import start_delayed
-from invenio.modules.workflows.errors import WorkflowError
-
 from time import sleep
 
 
 def interrupt_workflow(obj, eng):
     eng.halt("interrupting workflow.")
+
 
 def get_nb_workflow_created(obj, eng):
     """
@@ -88,6 +83,9 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
      :param kwargs: **kargs allow you to add some key:value into the extra data of
      the object.
      """
+    from invenio.modules.workflows.models import (BibWorkflowObject,
+                                                  ObjectVersion)
+    from invenio.modules.workflows.api import start_delayed
 
     def _start_workflow(obj, eng):
 
@@ -129,6 +127,9 @@ def wait_for_workflows_to_complete(obj, eng):
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
+    from invenio.modules.workflows.models import BibWorkflowEngineLog
+    from invenio.modules.workflows.errors import WorkflowError
+
     if '_workflow_ids' in eng.extra_data:
         for workflow_id in eng.extra_data['_workflow_ids']:
             try:
@@ -163,6 +164,9 @@ def wait_for_a_workflow_to_complete_obj(obj, eng):
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
+    from invenio.modules.workflows.models import BibWorkflowEngineLog
+    from invenio.modules.workflows.errors import WorkflowError
+
     if not obj.data:
         eng.extra_data["_nb_workflow"] = 0
         eng.extra_data["_nb_workflow_failed"] = 0
@@ -195,6 +199,8 @@ def wait_for_a_workflow_to_complete(obj, eng):
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
+    from invenio.modules.workflows.errors import WorkflowError
+
     if '_workflow_ids' in eng.extra_data:
         to_wait = None
         i = 0
@@ -326,6 +332,8 @@ def workflows_reviews(stop_if_error=False):
     if a child workflow has crashed.
     :type stop_if_error: Boolean
     """
+    from invenio.modules.workflows.errors import WorkflowError
+
     def _workflows_reviews(obj, eng):
         """
          This function write a  little report about

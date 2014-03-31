@@ -16,6 +16,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Set of workflow logic tasks.
+"""
+
 
 def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"):
     """

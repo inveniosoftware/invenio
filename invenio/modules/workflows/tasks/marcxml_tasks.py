@@ -24,55 +24,18 @@ import re
 import traceback
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
-from invenio.legacy.bibupload.engine import (find_record_from_recid,
-                                             find_record_from_sysno,
-                                             find_records_from_extoaiid,
-                                             find_record_from_oaiid,
-                                             find_record_from_doi
-                                             )
-from invenio.legacy.oaiharvest.dblayer import update_lastrun, create_oaiharvest_log_str
-from invenio.base.config import (CFG_TMPSHAREDDIR,
-                                 CFG_TMPDIR,
-                                 CFG_INSPIRE_SITE)
-from invenio.legacy.oaiharvest.utils import (record_extraction_from_file,
-                                             collect_identifiers,
-                                             harvest_step,
-                                             translate_fieldvalues_from_latex,
-                                             find_matching_files,
-                                             )
-from invenio.legacy.bibsched.bibtask import (task_sleep_now_if_required,
-                                             task_low_level_submission
-                                             )
-from invenio.modules.oaiharvester.models import OaiHARVEST
-from invenio.modules.records.api import Record, create_record
-from invenio.modules.workflows.errors import WorkflowError
-from invenio.legacy.refextract.api import extract_references_from_file_xml
-from invenio.legacy.bibrecord import (create_records,
-                                      record_xml_output
-                                      )
-from invenio.utils.plotextractor.output_utils import (create_MARC,
-                                                      create_contextfiles,
-                                                      prepare_image_data,
-                                                      remove_dups
-                                                      )
-from invenio.utils.plotextractor.getter import (harvest_single,
-                                                make_single_directory
-                                                )
 
-from invenio.utils.plotextractor.cli import (get_defaults,
-                                             extract_captions,
-                                             extract_context
-                                             )
+from invenio.base.globals import cfg
+from invenio.base.wrappers import lazy_import
+
 from invenio.utils.shell import (run_shell_command,
-                                 Timeout
-                                 )
-import invenio.legacy.template
-from invenio.utils.plotextractor.converter import (untar,
-                                                   convert_images
-                                                   )
+                                 Timeout)
+from invenio.utils.plotextractor.converter import untar
 
-
-oaiharvest_templates = invenio.legacy.template.load('oaiharvest')
+bibtask = lazy_import("invenio.legacy.bibsched.bibtask")
+records_api = lazy_import("invenio.modules.records.api")
+workflows_error = lazy_import("invenio.modules.workflows.errors")
+plotextractor_getter = lazy_import("invenio.utils.plotextractor.getter")
 
 REGEXP_REFS = re.compile("<record.*?>.*?<controlfield .*?>.*?</controlfield>(.*?)</record>", re.DOTALL)
 REGEXP_AUTHLIST = re.compile("<collaborationauthorlist.*?</collaborationauthorlist>", re.DOTALL)
@@ -341,7 +304,7 @@ def convert_record_to_bibfield(obj, eng):
 
     """
     obj.extra_data["last_task_name"] = "last task name: convert_record_to_bibfield"
-    obj.data = create_record(obj.data, master_format="marc").dumps()
+    obj.data = records_api.create_record(obj.data, master_format="marc").dumps()
     eng.log.info("Field conversion succeeded")
 
 
@@ -370,6 +333,7 @@ def get_repositories_list(repositories=()):
     It will allows in the future to do all the correct operations.
     :param repositories:
     """
+    from invenio.modules.oaiharvester.models import OaiHARVEST
 
     def _get_repositories_list(obj, eng):
         repositories_to_harvest = repositories
@@ -404,9 +368,12 @@ def harvest_records(obj, eng):
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
+    from invenio.legacy.oaiharvest.utils import (collect_identifiers,
+                                                 harvest_step)
+
     harvested_identifier_list = []
 
-    harvestpath = "%s_%d_%s_" % ("%s/oaiharvest_%s" % (CFG_TMPSHAREDDIR, eng.uuid),
+    harvestpath = "%s_%d_%s_" % ("%s/oaiharvest_%s" % (cfg['CFG_TMPSHAREDDIR'], eng.uuid),
                                  1, time.strftime("%Y%m%d%H%M%S"))
 
     # ## go ahead: check if user requested from-until harvesting
@@ -418,7 +385,7 @@ def harvest_records(obj, eng):
     except TypeError:
         obj.extra_data["options"] = {"dates": [], "identifiers": []}
 
-    task_sleep_now_if_required()
+    bibtask.task_sleep_now_if_required()
 
     arguments = obj.extra_data["_repository"]["arguments"]
     if arguments:
@@ -434,8 +401,8 @@ def harvest_records(obj, eng):
     except Exception as e:
         eng.log.error("Error while harvesting %s. Skipping." % (obj.data,))
 
-        raise WorkflowError("Error while harvesting %r. Skipping : %s." % (obj.data, repr(e)),
-                            id_workflow=eng.uuid, id_object=obj.id)
+        raise workflows_error.WorkflowError("Error while harvesting %r. Skipping : %s." % (obj.data, repr(e)),
+                                            id_workflow=eng.uuid, id_object=obj.id)
 
     if len(harvested_files_list) == 0:
         eng.log.info("No records harvested for %s" % (obj.data["name"],))
@@ -446,8 +413,9 @@ def harvest_records(obj, eng):
     if len(harvested_files_list) != len(harvested_identifier_list[0]):
         # Harvested files and its identifiers are 'out of sync', abort harvest
 
-        raise WorkflowError("Harvested files miss identifiers for %s" % (arguments,), id_workflow=eng.uuid,
-                            id_object=obj.id)
+        raise workflows_error.WorkflowError("Harvested files miss identifiers for %s" % (arguments,),
+                                            id_workflow=eng.uuid,
+                                            id_object=obj.id)
     obj.extra_data['harvested_files_list'] = harvested_files_list
     eng.log.info("%d files harvested and processed \n End harvest records task" % (len(harvested_files_list),))
 
@@ -461,6 +429,7 @@ def get_records_from_file(path=None):
     :param path:
     :return:
     """
+    from invenio.legacy.oaiharvest.utils import record_extraction_from_file
 
     def _get_records_from_file(obj, eng):
         if "_LoopData" not in eng.extra_data:
@@ -532,8 +501,8 @@ def set_obj_extra_data_key(key, value):
                 my_value = my_value(obj, eng)
 
         if callable(my_key):
-           while callable(my_key):
-               my_key = my_key(obj, eng)
+            while callable(my_key):
+                my_key = my_key(obj, eng)
 
         obj.extra_data[str(my_key)] = my_value
 
@@ -580,7 +549,7 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
     """
 
     :param stylesheet:
-    :return: :raise WorkflowError:
+    :return: :raise workflows_error.WorkflowError:
     """
 
     def _convert_record(obj, eng):
@@ -598,8 +567,9 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
             msg = "Could not convert record: %s\n%s" % \
                   (str(e), traceback.format_exc())
             obj.extra_data["_error_msg"] = msg
-            raise WorkflowError("Error: %s" % (msg,),
-                                id_workflow=eng.uuid, id_object=obj.id)
+            raise workflows_error.WorkflowError("Error: %s" % (msg,),
+                                                id_workflow=eng.uuid,
+                                                id_object=obj.id)
 
     return _convert_record
 
@@ -646,6 +616,7 @@ def update_last_update(repository_list):
     :param repository_list:
     :return:
     """
+    from invenio.legacy.oaiharvest.dblayer import update_lastrun
 
     def _update_last_update(obj, eng):
         if "_should_last_run_be_update" in obj.extra_data:
@@ -673,11 +644,11 @@ def fulltext_download(obj, eng):
     """
     if "result" not in obj.extra_data:
         obj.extra_data["_result"] = {}
-    task_sleep_now_if_required()
+    bibtask.task_sleep_now_if_required()
     if "pdf" not in obj.extra_data["_result"]:
-        extract_path = make_single_directory(CFG_TMPSHAREDDIR, eng.uuid)
-        tarball, pdf = harvest_single(obj.data["system_number_external"]["value"],
-                                      extract_path, ["pdf"])
+        extract_path = plotextractor_getter.make_single_directory(cfg['CFG_TMPSHAREDDIR'], eng.uuid)
+        tarball, pdf = plotextractor_getter.harvest_single(obj.data["system_number_external"]["value"],
+                                                           extract_path, ["pdf"])
         arguments = obj.extra_data["_repository"]["arguments"]
         try:
             if not arguments['t_doctype'] == '':
@@ -695,13 +666,13 @@ def fulltext_download(obj, eng):
                             "    <subfield code=\"a\">%(url)s</subfield>\n"
                             "    <subfield code=\"t\">%(doctype)s</subfield>\n"
                             "    </datafield>"
-
-                           ) % {'url': obj.extra_data["_result"]["pdf"],
-                                'doctype': doctype}
+                            ) % {'url': obj.extra_data["_result"]["pdf"],
+                                 'doctype': doctype}
             updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>\n' + fulltext_xml + \
                           '</record>\n</collection>'
 
-            new_dict_representation = create_record(updated_xml, master_format="marc").dumps()
+            new_dict_representation = records_api.create_record(updated_xml,
+                                                                master_format="marc").dumps()
             try:
                 obj.data['fft'].append(new_dict_representation["fft"])
             except (KeyError, TypeError):
@@ -724,11 +695,17 @@ def quick_match_record(obj, eng):
     :param eng: BibWorkflowEngine processing the object
 
     """
+    from invenio.legacy.bibupload.engine import (find_record_from_recid,
+                                                 find_record_from_sysno,
+                                                 find_records_from_extoaiid,
+                                                 find_record_from_oaiid,
+                                                 find_record_from_doi)
+
     function_dictionnary = {'recid': find_record_from_recid, 'system_number': find_record_from_sysno,
                             'oaiid': find_record_from_oaiid, 'system_number_external': find_records_from_extoaiid,
                             'doi': find_record_from_doi}
 
-    my_json_reader = Record(obj.data)
+    my_json_reader = records_api.Record(obj.data)
 
     try:
         identifiers = my_json_reader.get('_persistent_identifier')
@@ -757,15 +734,12 @@ def upload_record(mode="ir"):
     :param mode:
     :return:
     """
-
     def _upload_record(obj, eng):
-        from invenio.legacy.bibsched.bibtask import task_low_level_submission
-
         eng.log_info("Saving data to temporary file for upload")
         filename = obj.save_to_file()
         params = ["-%s" % (mode,), filename]
-        task_id = task_low_level_submission("bibupload", "bibworkflow",
-                                            *tuple(params))
+        task_id = bibtask.task_low_level_submission("bibupload", "bibworkflow",
+                                                    *tuple(params))
         eng.log_info("Submitted task #%s" % (task_id,))
 
     _upload_record.__title__ = "Upload Record"
@@ -780,8 +754,16 @@ def plot_extract(plotextractor_types):
     """
 
     :param plotextractor_types:
-    :return: :raise WorkflowError:
+    :return: :raise workflows_error.WorkflowError:
     """
+    from invenio.utils.plotextractor.output_utils import (create_MARC,
+                                                          create_contextfiles,
+                                                          prepare_image_data,
+                                                          remove_dups)
+    from invenio.utils.plotextractor.cli import (get_defaults,
+                                                 extract_captions,
+                                                 extract_context)
+    from invenio.utils.plotextractor.converter import convert_images
 
     def _plot_extract(obj, eng):
         """
@@ -789,7 +771,7 @@ def plot_extract(plotextractor_types):
         """
         # Download tarball for each harvested/converted record, then run plotextrator.
         # Update converted xml files with generated xml or add it for upload
-        task_sleep_now_if_required()
+        bibtask.task_sleep_now_if_required()
         if "_result" not in obj.extra_data:
             obj.extra_data["_result"] = {}
 
@@ -806,19 +788,20 @@ def plot_extract(plotextractor_types):
             if "tarball" not in obj.extra_data["_result"]:
                 # turn oaiharvest_23_1_20110214161632_converted -> oaiharvest_23_1_material
                 # to let harvested material in same folder structure
-                extract_path = make_single_directory(CFG_TMPSHAREDDIR, eng.uuid)
-                tarball, pdf = harvest_single(obj.data["system_number_external"]["value"], extract_path, ["tarball"])
+                extract_path = plotextractor_getter.make_single_directory(cfg['CFG_TMPSHAREDDIR'], eng.uuid)
+                tarball, pdf = plotextractor_getter.harvest_single(obj.data["system_number_external"]["value"], extract_path, ["tarball"])
                 tarball = str(tarball)
                 if tarball is None:
-                    raise WorkflowError(str("Error harvesting tarball from id: %s %s" %
-                                            (obj.data["system_number_external"]["value"], extract_path)),
-                                        eng.uuid, id_object=obj.id)
+                    raise workflows_error.WorkflowError(str("Error harvesting tarball from id: %s %s" %
+                                                        (obj.data["system_number_external"]["value"], extract_path)),
+                                                        eng.uuid,
+                                                        id_object=obj.id)
 
                 obj.extra_data["_result"]["tarball"] = tarball
             else:
                 tarball = obj.extra_data["_result"]["tarball"]
 
-            sub_dir, refno = get_defaults(tarball, CFG_TMPDIR, "")
+            sub_dir, refno = get_defaults(tarball, cfg['CFG_TMPDIR'], "")
 
             tex_files = None
             image_list = None
@@ -857,7 +840,8 @@ def plot_extract(plotextractor_types):
                 if marc_xml:
                     # We store the path to the directory  the tarball contents live
                     # Read and grab MARCXML from plotextractor run
-                    new_dict_representation = create_record(marc_xml, master_format="marc").dumps()
+                    new_dict_representation = records_api.create_record(marc_xml,
+                                                                        master_format="marc").dumps()
                     try:
                         obj.data['fft'].append(new_dict_representation["fft"])
                     except KeyError:
@@ -876,20 +860,21 @@ def refextract(obj, eng):
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
+    from invenio.legacy.refextract.api import extract_references_from_file_xml
 
-    task_sleep_now_if_required()
+    bibtask.task_sleep_now_if_required()
     if "_result" not in obj.extra_data:
         obj.extra_data["_result"] = {}
     if "pdf" not in obj.extra_data["_result"]:
-        extract_path = make_single_directory(CFG_TMPSHAREDDIR, eng.uuid)
-        tarball, pdf = harvest_single(obj.data["system_number_external"]["value"], extract_path, ["pdf"])
+        extract_path = plotextractor_getter.make_single_directory(cfg['CFG_TMPSHAREDDIR'], eng.uuid)
+        tarball, pdf = plotextractor_getter.harvest_single(obj.data["system_number_external"]["value"], extract_path, ["pdf"])
 
         if pdf is not None:
             obj.extra_data["_result"]["pdf"] = pdf
 
     elif not os.path.isfile(obj.extra_data["_result"]["pdf"]):
-        extract_path = make_single_directory(CFG_TMPSHAREDDIR, eng.uuid)
-        tarball, pdf = harvest_single(obj.data["system_number_external"]["value"], extract_path, ["pdf"])
+        extract_path = plotextractor_getter.make_single_directory(cfg['CFG_TMPSHAREDDIR'], eng.uuid)
+        tarball, pdf = plotextractor_getter.harvest_single(obj.data["system_number_external"]["value"], extract_path, ["pdf"])
         if pdf is not None:
             obj.extra_data["_result"]["pdf"] = pdf
 
@@ -900,7 +885,7 @@ def refextract(obj, eng):
             updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n<record>' + references_xml.group(1) + \
                           "</record>\n</collection>"
 
-            new_dict_representation = create_record(updated_xml, master_format="marc").dumps()
+            new_dict_representation = records_api.create_record(updated_xml, master_format="marc").dumps()
             try:
                 obj.data['reference'].append(new_dict_representation["reference"])
             except KeyError:
@@ -919,20 +904,27 @@ def author_list(obj, eng):
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
+    from invenio.legacy.oaiharvest.utils import (translate_fieldvalues_from_latex,
+                                                 find_matching_files)
+    from invenio.legacy.bibrecord import create_records, record_xml_output
+    from invenio.legacy.bibconvert.xslt_engine import convert
+    from invenio.utils.plotextractor.cli import get_defaults
+
     identifiers = obj.data["system_number_external"]["value"]
-    task_sleep_now_if_required()
+    bibtask.task_sleep_now_if_required()
     if "_result" not in obj.extra_data:
         obj.extra_data["_result"] = {}
     if "tarball" not in obj.extra_data["_result"]:
-        extract_path = make_single_directory(CFG_TMPSHAREDDIR, eng.uuid)
-        tarball, pdf = harvest_single(obj.data["system_number_external"]["value"], extract_path, ["tarball"])
+        extract_path = plotextractor_getter.make_single_directory(cfg['CFG_TMPSHAREDDIR'], eng.uuid)
+        tarball, pdf = plotextractor_getter.harvest_single(obj.data["system_number_external"]["value"], extract_path, ["tarball"])
         tarball = str(tarball)
         if tarball is None:
-            raise WorkflowError(str("Error harvesting tarball from id: %s %s" % (identifiers, extract_path)),
-                                eng.uuid, id_object=obj.id)
+            raise workflows_error.WorkflowError(str("Error harvesting tarball from id: %s %s" % (identifiers, extract_path)),
+                                                eng.uuid,
+                                                id_object=obj.id)
         obj.extra_data["_result"]["tarball"] = tarball
 
-    sub_dir, dummy = get_defaults(obj.extra_data["_result"]["tarball"], CFG_TMPDIR, "")
+    sub_dir, dummy = get_defaults(obj.extra_data["_result"]["tarball"], cfg['CFG_TMPDIR'], "")
 
     try:
         untar(obj.extra_data["_result"]["tarball"], sub_dir)
@@ -953,8 +945,6 @@ def author_list(obj, eng):
             authors += match[0]
             # Generate file to store conversion results
     if authors is not '':
-        from invenio.legacy.bibconvert.xslt_engine import convert
-
         authors = convert(authors, "authorlist2marcxml.xsl")
         authorlist_record = create_records(authors)
         if len(authorlist_record) == 1:
@@ -964,26 +954,13 @@ def author_list(obj, eng):
             # Convert any LaTeX symbols in authornames
         translate_fieldvalues_from_latex(authorlist_record, '100', code='a')
         translate_fieldvalues_from_latex(authorlist_record, '700', code='a')
-        # Look for any UNDEFINED fields in authorlist
-        #key = "UNDEFINED"
-        #matching_fields = record_find_matching_fields(key, authorlist_record, tag='100') +\
-        #                  record_find_matching_fields(key, authorlist_record, tag='700')
 
-        #if len(matching_fields) > 0:
-
-        # UNDEFINED found. Create ticket in author queue
-        #             ticketid = create_authorlist_ticket(matching_fields, \
-        #                                                 identifiers, arguments.get('a_rt-queue'))
-        #             if ticketid:
-        #                 eng.log.info("authorlist RT ticket %d submitted for %s" % (ticketid, identifiers))
-        #             else:
-        #                 eng.log.error("Error while submitting RT ticket for %s" % (identifiers,))
         updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' + record_xml_output(authorlist_record) \
                       + '</collection>'
         if not None == updated_xml:
             # We store the path to the directory  the tarball contents live
             # Read and grab MARCXML from plotextractor run
-            new_dict_representation = create_record(updated_xml, master_format="marc").dumps()
+            new_dict_representation = records_api.create_record(updated_xml, master_format="marc").dumps()
             obj.data['authors'] = new_dict_representation["authors"]
             obj.data['number_of_authors'] = new_dict_representation["number_of_authors"]
             obj.add_task_result("authors", new_dict_representation["authors"])
@@ -1000,19 +977,21 @@ def upload_step(obj, eng):
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
+    from invenio.legacy.oaiharvest.dblayer import create_oaiharvest_log_str
+
     uploaded_task_ids = []
     #Work comment:
     #
     #Prepare in case of filtering the files to up,
     #no filtering, no other things to do
-    new_dict_representation = Record(obj.data)
+    new_dict_representation = records_api.Record(obj.data)
     marcxml_value = new_dict_representation.legacy_export_as_marc()
     task_id = None
     # Get a random sequence ID that will allow for the tasks to be
     # run in order, regardless if parallel task execution is activated
     sequence_id = random.randrange(1, 60000)
-    task_sleep_now_if_required()
-    extract_path = make_single_directory(CFG_TMPSHAREDDIR, eng.uuid)
+    bibtask.task_sleep_now_if_required()
+    extract_path = plotextractor_getter.make_single_directory(cfg['CFG_TMPSHAREDDIR'], eng.uuid)
     # Now we launch BibUpload tasks for the final MARCXML files
     filepath = extract_path + os.sep + str(obj.id)
     file_fd = open(filepath, 'w')
@@ -1032,7 +1011,7 @@ def upload_step(obj, eng):
             if arguments.get('u_priority', 5):
                 args.extend(['-P', str(arguments.get('u_priority', 5))])
             args.append(filepath)
-            task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
+            task_id = bibtask.task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
             create_oaiharvest_log_str(task_id, obj.extra_data["_repository"]["id"], marcxml_value)
         except Exception as msg:
             eng.log.error("An exception during submitting oaiharvest task occured : %s " % (str(msg)))
@@ -1047,14 +1026,14 @@ def upload_step(obj, eng):
         eng.log.info("material harvested from source %s was successfully uploaded" %
                      (obj.extra_data["_repository"]["name"],))
 
-    if CFG_INSPIRE_SITE:
+    if cfg['CFG_INSPIRE_SITE']:
         # Launch BibIndex,Webcoll update task to show uploaded content quickly
         bibindex_params = ['-w', 'collection,reportnumber,global',
                            '-P', '6',
                            '-I', str(sequence_id),
                            '--post-process',
                            'bst_run_bibtask[taskname="webcoll", user="oaiharvest", P="6", c="HEP"]']
-        task_low_level_submission("bibindex", "oaiharvest", *tuple(bibindex_params))
+        bibtask.task_low_level_submission("bibindex", "oaiharvest", *tuple(bibindex_params))
     eng.log.info("end of upload")
 
 
@@ -1089,13 +1068,14 @@ def bibclassify(taxonomy, rebuild_cache=False, no_cache=False, output_mode='text
             obj.extra_data["_result"] = {}
 
         if "pdf" in obj.extra_data["_result"]:
-            obj.extra_data["_result"]["bibclassify"] = api.bibclassify_exhaustive_call(obj.extra_data["_result"]["pdf"],
-                                                                                       taxonomy, rebuild_cache,
-                                                                                       no_cache,
-                                                                                       output_mode, output_limit,
-                                                                                       spires,
-                                                                                       match_mode, with_author_keywords,
-                                                                                       extract_acronyms, only_core_tags
+            obj.extra_data["_result"]["bibclassify"] = api.bibclassify_exhaustive_call(
+                obj.extra_data["_result"]["pdf"],
+                taxonomy, rebuild_cache,
+                no_cache,
+                output_mode, output_limit,
+                spires,
+                match_mode, with_author_keywords,
+                extract_acronyms, only_core_tags
             )
             obj.add_task_result("bibclassify", obj.extra_data["_result"]["bibclassify"])
         else:

@@ -69,7 +69,7 @@ from invenio.modules.workflows.models import (BibWorkflowEngineLog,
                                               BibWorkflowObjectLog,
                                               Workflow,
                                               )
-
+from invenio.modules.workflows.registry import workflows as registry_workflows
 from invenio.modules.workflows.api import start
 from invenio.modules.workflows.errors import WorkflowError
 import invenio.legacy.template
@@ -459,9 +459,6 @@ def main():
     num_of_critical_parameter = 0
     num_of_critical_parameterb = 0
     repositories = []
-    from invenio.modules.workflows.loader import load_workflows
-
-    available_workflows = load_workflows()
 
     for opt in sys.argv[1:]:
         if opt in "-r" or opt in "--repository":
@@ -486,7 +483,7 @@ def main():
         workflows = sys.argv[position + 1].split(",")
 
         for workflow_candidate in workflows:
-            if workflow_candidate not in available_workflows:
+            if workflow_candidate not in registry_workflows:
                 usage(1, "The workflow %s doesn't exist." % workflow_candidate)
 
     if num_of_critical_parameter == 1 and num_of_critical_parameterb == 0:
@@ -494,7 +491,7 @@ def main():
         for name_repository in repositories:
             try:
                 oaiharvest_instance = OaiHARVEST.get(OaiHARVEST.name == name_repository).one()
-                if oaiharvest_instance.workflows not in available_workflows:
+                if oaiharvest_instance.workflows not in registry_workflows:
                     usage(1, "The repository %s doesn't have a valid workflow specified." % name_repository)
             except orm.exc.NoResultFound:
                 usage(1, "The repository %s doesn't exist in our database." % name_repository)

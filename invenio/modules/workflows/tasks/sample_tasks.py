@@ -16,22 +16,33 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Collection of tasks used for tests.
+"""
+
 from __future__ import print_function
 
-import datetime
+import time
 
 
-def add_data(a):
+def add_data(data):
     """ Task using closure to allow parameters """
     def _add_data(obj, eng):
-        """Function task_a docstring"""
-        obj.data += a
+        """ Adds data to obj.data """
+        obj.data += data
     return _add_data
 
-def check_data(obj, eng):
+
+def halt_if_data_less_than(threshold):
     """ Static task with no parameters """
-    if obj.data < 5:
-        eng.halt("Value of data is too small.")
+    def _halt_if_data_less_than(obj, eng):
+        """
+        Halts workflow execution for this object
+        if its value is less than given threshold.
+        """
+        if obj.data < threshold:
+            eng.halt("Value of data is too small.")
+    return _halt_if_data_less_than
 
 
 def print_data(obj, eng):
@@ -39,6 +50,77 @@ def print_data(obj, eng):
     print(obj.data)
 
 
-def set_data(obj, eng):
-    """ Static task with no parameters """
-    obj.data = 124
+def set_data(data):
+    """ Task using closure to allow parameters """
+    def _set_data(obj, eng):
+        """ Sets obj.data to given data """
+        obj.data = data
+    return _set_data
+
+
+def reduce_data_by_one(times):
+    def _reduce_data_by_one(obj, eng):
+        a = times
+        while a > 0:
+            obj.data -= 1
+            a -= 1
+        obj.log.info("value is now: " + str(obj.data))
+
+    return _reduce_data_by_one
+
+
+def add_metadata():
+    def _add_metadata(obj, eng):
+        if (obj['content_type'] == 'book'):
+            obj.add_field("meta1", "elefant")
+        else:
+            obj.add_field("meta1", "hippo")
+
+    return _add_metadata
+
+
+def task_b(obj, eng):
+    """Function task_b docstring"""
+    if obj.data < 20:
+        eng.log.info("data < 20")
+        obj.add_task_result("task_b", {'a': 12, 'b': 13, 'c': 14})
+
+
+def sleep_task(t):
+    def _sleep_task(dummy_obj, eng):
+        time.sleep(t)
+
+    return _sleep_task
+
+
+def lower_than_20(obj, eng):
+    """Function checks if variable is lower than 20"""
+    if obj.data < 20:
+        eng.halt("Value of filed: a in object is lower than 20.")
+
+
+def halt_if_higher_than_20(obj, eng):
+    """Function checks if variable is higher than 20"""
+    eng.log.info("value" + str(obj.data))
+    if obj.data > 20:
+        eng.halt("Value of filed: a in object is higher than 20.")
+
+
+def subtract(value):
+    def _subtract(obj, dummy_eng):
+        """Function subtract value from variable"""
+        obj.data -= value
+
+    return _subtract
+
+
+def task_reduce_and_halt(obj, eng):
+    eng.log.info("value" + str(obj.data))
+    if obj.data > 0:
+        eng.log.error(obj.data)
+        obj.data -= 1
+        eng.log.error(obj.data)
+        obj.save()
+        eng.halt("test halt")
+    else:
+        return None
