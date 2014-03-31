@@ -20,7 +20,8 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibingest_ingestion_package_interface import IngestionPackage, valid_string
+from invenio.legacy.bibingest.ingestion_package_interface \
+    import IngestionPackage, valid_string
 
 _ADDITIONAL_ACCEPTED_FIELD_NAMES = {
     # Don't use underscores ('_') for the field names.
@@ -46,3 +47,6 @@ def blogpost(storage_engine_instance, storage_engine_settings = None):
     """
 
     return BlogPost(storage_engine_instance, storage_engine_settings)
+
+
+package = blogpost

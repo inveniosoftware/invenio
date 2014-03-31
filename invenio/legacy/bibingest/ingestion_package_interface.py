@@ -27,8 +27,8 @@ try:
 except:
     import md5
 
-from invenio.bibingest_config import CFG_BIBINGEST_ONE_STORAGE_ENGINE_INSTANCE_PER_STORAGE_ENGINE, \
-                                     CFG_BIBINGEST_VERSIONING
+from .config import CFG_BIBINGEST_VERSIONING, \
+    CFG_BIBINGEST_ONE_STORAGE_ENGINE_INSTANCE_PER_STORAGE_ENGINE
 
 # ********************
 # Validation functions

@@ -20,29 +20,15 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibingest_ingestion_package_interface import IngestionPackage, valid_string
+from invenio.legacy.bibingest.ingestion_package_interface \
+    import IngestionPackage, valid_string
 
-_ADDITIONAL_ACCEPTED_FIELD_NAMES = {
-    # Don't use underscores ('_') for the field names.
-
-    # the URL of the blog
-    'url' : (lambda:None, valid_string),
-}
-
-class Blog(IngestionPackage):
-    """The Ingestion Package default class"""
-
-    def __init__(self, storage_engine_instance, storage_engine_settings = None):
-        """
-        The constructor.
-        """
-
-        IngestionPackage.__init__(self, storage_engine_instance, storage_engine_settings)
-        self._accepted_field_names.update(_ADDITIONAL_ACCEPTED_FIELD_NAMES)
-
-def blog(storage_engine_instance, storage_engine_settings = None):
+def default(storage_engine_instance, storage_engine_settings = None):
     """
     Instantiates the ingestion package with the given storage engine instance.
     """
 
-    return Blog(storage_engine_instance, storage_engine_settings)
+    return IngestionPackage(storage_engine_instance, storage_engine_settings)
+
+
+package = default

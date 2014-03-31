@@ -16,15 +16,37 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""The Blog ingestion package."""
+"""The Blog post comment ingestion package."""
 
 __revision__ = "$Id$"
 
-from invenio.bibingest_ingestion_package_interface import IngestionPackage
+from invenio.legacy.bibingest.ingestion_package_interface \
+    import IngestionPackage, valid_string
 
-def default(storage_engine_instance, storage_engine_settings = None):
+_ADDITIONAL_ACCEPTED_FIELD_NAMES = {
+    # Don't use underscores ('_') for the field names.
+
+    # the URL of the blog
+    'url' : (lambda:None, valid_string),
+}
+
+class Comment(IngestionPackage):
+    """The Ingestion Package default class"""
+
+    def __init__(self, storage_engine_instance, storage_engine_settings = None):
+        """
+        The constructor.
+        """
+
+        IngestionPackage.__init__(self, storage_engine_instance, storage_engine_settings)
+        self._accepted_field_names.update(_ADDITIONAL_ACCEPTED_FIELD_NAMES)
+
+def comment(storage_engine_instance, storage_engine_settings = None):
     """
     Instantiates the ingestion package with the given storage engine instance.
     """
 
-    return IngestionPackage(storage_engine_instance, storage_engine_settings)
+    return Comment(storage_engine_instance, storage_engine_settings)
+
+
+package = comment

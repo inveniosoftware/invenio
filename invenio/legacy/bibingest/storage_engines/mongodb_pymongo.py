@@ -20,14 +20,12 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibingest_storage_engine_interface import StorageEngine
-from invenio.config import CFG_LOGDIR
+from invenio.legacy.bibingest.storage_engine_interface import StorageEngine
+from invenio.base.config import CFG_LOGDIR
 
 import pymongo
 from bson.objectid import ObjectId
 from time import sleep, localtime, strftime
-
-_ENGINE_NAME = 'mongodb_pymongo'
 
 # Helper functions for the mappings
 # Field mappings
@@ -104,11 +102,12 @@ def _check_connection(function):
             count += 1
     return retry
 
-def _log(message, error = False):
+def _log(message, error=False):
     """
     Private function that logs the given message
     """
-    log = open(CFG_LOGDIR + "/bibingest-%s.%s" % (_ENGINE_NAME, error and 'err' or 'log'), "a")
+    log = open(CFG_LOGDIR + "/bibingest-%s.%s"
+               % (MongoDB.__engine_name__, error and 'err' or 'log'), "a")
     log.write(strftime("%Y-%m-%d %H:%M:%S --> ", localtime()))
     log.write(message)
     log.write("\n")
@@ -118,6 +117,8 @@ class MongoDB(StorageEngine):
     """
     The Ingestion Storage Engine Implementation for MongoDB.
     """
+
+    __engine_name__ = 'mongodb_pymongo'
 
     def __init__(self, configuration = None):
         """
@@ -432,3 +433,5 @@ def mongodb_pymongo(configuration = None):
     """
 
     return MongoDB(configuration)
+
+storage_engine = MongoDB
