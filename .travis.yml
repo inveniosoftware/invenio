@@ -21,10 +21,10 @@ notifications:
   email: false
 
 services:
-  - mysql # will start mysqld
-  - rabbitmq # will start rabbitmq-server
-  - redis # will start memcached
-  - mongodb # will start mongodb
+  - mysql
+  - rabbitmq
+  - redis
+  - mongodb
 
 language: python
 
