@@ -190,10 +190,12 @@ def require_header(header, value):
             else:
                 test_value = request.headers.get(header, '')
 
-            if test_value != value:
+            if (callable(value) and not value(test_value)) or \
+                    test_value != value:
+                msg = value if not callable(value) else value.__doc__
                 restful.abort(
                     415,
-                    message="Expected %s: %s" % (header, value),
+                    message="Expected %s: %s" % (header, msg),
                     status=415,
                 )
             return f(*args, **kwargs)
