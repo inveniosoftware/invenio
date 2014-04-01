@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,7 +41,7 @@ class WorkflowTestBranch(InvenioTestCase):
 
         workflows['halttest'] = HaltTest
 
-        data = [{'somekey', 'somevalue'}]
+        data = [set(('somekey', 'somevalue'))]
         eng = start('halttest', data)
         idx, obj = list(eng.getObjects())[0]
 
@@ -67,7 +67,7 @@ class WorkflowTestBranch(InvenioTestCase):
 
         workflows['branchtest'] = BranchTest
 
-        data = [{'somekey', 'somevalue'}, ]
+        data = [set(('somekey', 'somevalue'))]
         eng = start('branchtest', data)
         idx, obj = list(eng.getObjects())[0]
 
