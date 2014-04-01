@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -112,14 +112,17 @@
 {%- endblock -%}
 
 {% block javascript %}
+  {{ super() }}
   {% if recids|length %}
     <script>
     (function($) {
 
       var popupTimer // global popup timer
-      {% if current_user.settings.get('websearch_hotkeys', '1') == '1' -%}
-        , hotkeys = Hotkeys({}) // enable hotkeys
-      {%- endif %}
+
+      // disable hotkeys due to conflict with typeahead hotkeys
+{#      {% if current_user.settings.get('websearch_hotkeys', '1') == '1' -%}#}
+{#        , hotkeys = Hotkeys({}) // enable hotkeys#}
+{#      {%- endif %}#}
 
       // side facet list
       $('#facet_list').affix({
@@ -204,6 +207,7 @@
         });
 
       }).on('loaded', function(event) {
+
         var typeahead = $('form[name=search] input[name=p]').data('typeahead')
           , facet = $('#facet_list').data('facet')
 
@@ -215,7 +219,9 @@
           facet.$element.trigger($.Event('added', {op: v[0], key: v[1], value: v[2]}));
         });
 
-        if ($.inArray(event.name+':', typeahead.options.source)<0) {
+        // doesnt work with the current typeahead
+
+        /*if ($.inArray(event.name+':', typeahead.options.source)<0) {
           typeahead.options.source.push(event.name+':');
         }
 
@@ -225,7 +231,7 @@
 
         typeahead.options.sources[event.name] = $.map(event.facet, function(i) {
           return i[0];
-        });
+        });*/
 
         $('[data-facet="toggle"]')
           .filter('[data-facet-key="'+event.name+'"]')
@@ -422,5 +428,4 @@
 
     </script>
   {% endif %}
-  {{ super() }}
 {% endblock %}

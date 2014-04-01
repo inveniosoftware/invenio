@@ -156,6 +156,18 @@ module.exports = {
             return dest + res;
         }
     },
+    jqueryCaret: {
+        expand: true,
+        flatten: true,
+        cwd: '<%= globalConfig.bower_path %>/',
+        src: ['jquery.caret/dist/jquery.caret-1.5.0.js'],
+        dest: '<%= globalConfig.installation_path %>/js/',
+        rename: function(dest, src) {
+            var res = src.replace(src.substring(0),
+                                  'jquery-caret.js');
+            return dest + res;
+        }
+    },
     MultiFile: {
         expand: true,
         flatten: true,

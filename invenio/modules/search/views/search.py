@@ -486,7 +486,7 @@ def autocomplete(field, q):
                                           get_index_id_from_index_name(field))
 
     results = IdxPHRASE.query.filter(IdxPHRASE.term.contains(q)).limit(20).all()
-    results = map(lambda r: r.term, results)
+    results = map(lambda r: {'value': r.term}, results)
 
     return jsonify(results=results)
 
