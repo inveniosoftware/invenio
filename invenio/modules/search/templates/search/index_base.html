@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,8 +19,8 @@
 
 {%- from "_formhelpers.html" import render_filter_form with context -%}
 {%- from "search/helpers.html" import collection_tree, portalbox_sidebar,
-search_also, search_form, search_form_javascript with context -%}
-{%- extends "page.html" %}
+search_also, with context -%}
+{%- extends "search/searchbar_frame.html" %}
 
 {% set title = None %}
 
@@ -91,10 +91,6 @@ search_also, search_form, search_form_javascript with context -%}
 </style>
 {%- endblock extra_style -%}
 
-{%- block search_form -%}
-  {{ search_form(collection, easy_search_form) }}
-{%- endblock search_form -%}
-
 {%- block index -%}
 <div class="row websearch clearfix"><!-- row 2 -->
   {%- block portalbox_lt -%}{{ portalbox_sidebar(portalboxes.lt, class="col-md-2") }}{%- endblock -%}
@@ -160,34 +156,27 @@ search_also, search_form, search_form_javascript with context -%}
 {%- endblock index -%}
 {% endblock collection_records %}{%- endmacro -%}
 
-
-{%- block header -%}
-  {{ super() }}
-  {%- js url_for('search.static', filename='js/search/typeahead.js') -%}
-  {%- js url_for('static', filename='js/bootstrap-select.js') -%}
-{%- endblock -%}
-
 {% block title %}
   {{ portalboxes.tp }}
   {{ super() }}
   {{ portalboxes.te }}
 {% endblock %}
 
-{% block body %}
-{% if collection.is_restricted %}
-  {{ collection_records(collection) }}
-{% else %}
-  {# cache 24*60*60, collection.name, g.ln #}
+{% block inner_content %}
+  {% if collection.is_restricted %}
     {{ collection_records(collection) }}
-  {# endcache #}
-{% endif %}
+  {% else %}
+    {# cache 24*60*60, collection.name, g.ln #}
+      {{ collection_records(collection) }}
+    {# endcache #}
+  {% endif %}
 {% endblock %}
 
 {% block javascript %}
-<script>
-(function($) {
-  $('[rel=tooltip]').tooltip();
-})(jQuery);
-</script>
-{{ search_form_javascript(collection)}}
+  {{ super() }}
+  <script>
+  (function($) {
+    $('[rel=tooltip]').tooltip();
+  })(jQuery);
+  </script>
 {% endblock %}
