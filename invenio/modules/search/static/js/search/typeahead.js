@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013 CERN.
+ * Copyright (C) 2013, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -19,348 +19,483 @@
 
 
 /* A file contatining fuctions treating the search field. */
+/**
+ * @requires jQuery-caret: https://github.com/acdvorak/jquery.caret
+ * @requires search_parser.js: invenio/modules/search
+ *
+ *
+ * CONFIGURATION
+
+  Example:
+
+  searchField.searchTypeahead({
+    value_hints_url: '/list/%TYPE?q=%QUERY',
+    options_sets: {
+      invenio: invenio_parser_options,
+      spires: spires_parser_options
+    },
+    default_set: 'invenio'
+  }
+
+  searchField - jQuery selector
+  value_hints_url - url for getting remote queries - other than keywords e.g. authors
+  options_sets - syntax schema, there can be many of them switched with custom keywords
+  default_set - default options set, used when the typeahead field is empty
+
+  Below an example of one of the options set
+
+  var invenio_parser_options = {
+      keywords: {
+        SEARCH: {
+          SPIRES_SWITCH: {
+            min_length: 1,
+            keyword_function: setSpireSyntax,
+            detection_condition: isFirstWord,
+            values: ['find'],
+            autocomplete_suffix: ' '
+          },
+          LOGICAL_EXP: {
+            min_length: 1,
+            values: ['AND', 'OR', 'AND NOT'],
+            autocomplete_suffix: ' '
+          }
+        },
+        ORDER: {
+          QUERY_TYPE: {
+            min_length: 1,
+            finish_condition: endsWithColon,
+            values: area_keywords,
+            autocomplete_suffix: ':'
+          },
+          QUERY_VALUE: {
+            min_length: 3,
+            finish_condition: notEndsWithColon
+          }
+        }
+      },
+      get_next_word_type: get_next_word_type,
+      value_type_interpretation: {
+        author: 'exactauthor'
+      },
+      separators: [' ', '(', ')', ':']
+    };
+
+    separators - all keywords separators
+    value_type_interpretation - keys are QUERY_TYPE values,
+     whereas values are the corresponding strings used
+     for substitution of '%TYPE' string in value_hints_url
+     in the main configuration options.
+
+    get_next_word_type(previous_word_type, word_types) -
+      function used by ORDER method to get the next word type
+      can return array of keywords names, but there cannot be
+      two of them from ORDER method
+        word_types - all the keywords names
+
+    keywords - a dictionary with all the words types interpreted
+      by the parser.
+
+      First key is the method used for parsing.
+
+      There are two methods:
+        SEARCH - searches for the keyword in a parsed string and
+          marks it corespondingly,
+        ORDER - detects the kind of typeahead basing the decision
+          on the order of words using get_next_word_type function
+
+      Method SEARCH has priority over method ORDER. It may be used
+      to find keywords containing separators as well as special
+      functional keywords which are used to change option set
+      (key options_sets in configuration).
+
+    Parsing algorithm:
+      1. do SEARCH method - look for keywords
+      2. find separators which are not marked as words
+        with SEARCH method
+      3. do ORDER method - get type of every not marked
+        keyword basing on the get_next_word_type function
+
+    Inside methods configuration there are keywords defined.
+
+    KEYWORDS_GROUP_NAME: {
+      min_length: 1,
+      keyword_function: function(search_typeahead),
+      detection_condition: function(str, char_roles, start_idx),
+      finish_condition: function(str, char_roles, end_idx)
+      values: [],
+      autocomplete_suffix: ' '
+    }
+
+    KEYWORDS_GROUP_NAME - just identifier of the group
+    min_length - minimal length to show the hints
+    keyword_function - function run on keyword detection
+      search_typeahead - typeahead object
+    detection_condition - addtional detection condition boolean function
+      tested for SEARCH method keywords (optional)
+      when false the string part will not be marked as the
+      keyword despite such a string was found
+    finish_condition - addtional word finish condition boolean
+      function tested for ORDER method keywords
+      when false the keyword will be marked continually despde
+      a following separator (optional)
+    values - possible values of a keyword - required for all
+      keywords beside QUERY_VALUE which values are get remotely
+    autocomplete_suffix - string added after the autocompleted
+      value, may be a default separator
+ *
+ */
 
 !function( $ ){
 
   "use strict"
 
-  function SearchTypeahead(autocompleteTypeKeys, keywords) {
+  function SearchTypeahead(element, options) {
 
-    var field = this;
+    this.$element = $(element);
+    this.options = $.extend({}, $.fn.searchTypeahead.defaults,
+      options);
 
-    var lowercaseKeywords = [];
-    for (var idx in keywords) {
-      lowercaseKeywords.push(keywords[idx].toLowerCase())
+    this.dontBracket = false;
+    this.value_types = this.options.value_types;
+    var that = this;
+
+    for (var i in this.options.options_sets) {
+      this.options.options_sets[i] =
+        this.initializeOptionsSet(this.options.options_sets[i]);
     }
 
-    function getLastClosedBracketIdx(str) {
-      var lastClosedIdx = str.lastIndexOf("\"");
+    this.parser = new SearchParser(this.options.options_sets, this.options.default_set);
 
-      // count number of occurencies
-      var count = str.match(/\"/g);
-      if (count == null)
-        return -1;
+    this.init();
 
-      if ((count.length % 2) == 0)
-        return lastClosedIdx;
+    this.ttTypeahead = this.$element.data("ttTypeahead");
 
-      return str.lastIndexOf("\"", lastClosedIdx - 1);
-    }
-
-    function getLastBracketsIdx(str) {
-      var bracketsIdx = str.lastIndexOf('"');
-      if (bracketsIdx == -1)
-        return {
-          lastClosed: -1,
-          lastOpened: -1,
-        };
-
-      var closedBracketIdx = getLastClosedBracketIdx(str);
-
-      // open bracket
-      if (bracketsIdx > closedBracketIdx)
-        return {
-          lastClosed: closedBracketIdx,
-          lastOpened: bracketsIdx
-        }
-
-      return {
-        lastClosed: closedBracketIdx,
-        lastOpened: -1
-      };
-    }
-
-    function getLastOccurence(str, pattern, limit) {
-      var result, savedRes;
-
-      if (typeof limit == 'undefined') {
-        limit = str.length;
-      }
-
-      do {
-        savedRes = result;
-        result = pattern.exec(str);
-      } while (result !== null && result.index <= limit);
-
-      if (typeof savedRes == 'undefined')
-        return {
-          start: -1,
-          end: -1
-        }
-
-      return {
-        start: savedRes.index,
-        end: savedRes.index + savedRes[0].length
-      }
-    }
-
-    function getLastSpace(str, limit) {
-      // actually one or more spaces
-      return getLastOccurence(str, /\s+/g, limit);
-    }
-
-    function getLastColon(str, limit) {
-      // colon, any number of spaces then optional qoutation mark
-      // all must be precieded by non-whitespace character, which is not included
-      // in (start, end) range
-      var res = getLastOccurence(str, /[^\s]:\s*[\"]*/g, limit - 1);
-      /*"*/ // just to fix broken string highlighting in sublime :)
-      
-      // +1 because of checking for a preceding char
-      if (res.start > -1)
-        res.start += 1;
-
-      return res;
-    }
-
-    function getAutocompleteValueCutoffInd(str, initialIdx) {
-
-      /*
-        @returns dictionary with two values different only 
-          in case of existing open bracket
-          inner - index of the content after the brackets
-          withBrackets - index of an eventual bracket
-      */
-
-      if (typeof initialIdx == 'undefined') {
-        initialIdx = str.length;
-      }
-
-      var bracketsIdx = getLastBracketsIdx(str);
-
-      // value cutoff at an opened bracket
-      if (bracketsIdx.lastOpened > -1) {
-        return {
-          inner: bracketsIdx.lastOpened + 1,
-          withBrackets: bracketsIdx.lastOpened
-        }
-      }
-      // closed bracket is the last sign
-      if (bracketsIdx.lastClosed == str.length - 1) {
-        return {
-          inner: str.length - 1,
-          withBrackets: str.length - 1
-        }
-      }
-
-      var spaceIdx = getLastSpace(str);
-
-      // length - 2 to avoid getting the colon when it is the last character
-      var colonIdx = getLastColon(str, str.length - 2);
-
-      return {
-        inner: Math.max(colonIdx.end, spaceIdx.end, 0),
-        withBrackets: Math.max(colonIdx.end, spaceIdx.end, 0)
-      }
-    }
-
-    function getLastQueryCutoffIdx(str) {
-
-      // cutoff index of last query, so expresion like a keyword:
-      // AND, OR... author:, abstract:,
-      // or a type:value pair e.g.:
-      // author:"Robertson N A", author:Robe
-      // whatever is after the colon
-
-      var cutoff = getAutocompleteValueCutoffInd(str);
-      var colonIdx = getLastColon(str, cutoff.inner);
-
-      if (colonIdx.end !== cutoff.inner)
-        return {
-          typeStart: -1,
-          typeEnd: -1,
-          valueWithBracketsStart: cutoff.withBrackets,
-          valueStart: cutoff.inner
-        }
-
-      // look for a type before the colon
-      var spaceIdx = getLastSpace(str, colonIdx.start);
-
-      return {
-        typeStart: Math.max(spaceIdx.end, 0),
-        typeEnd: colonIdx.start,
-        valueWithBracketsStart: cutoff.withBrackets,
-        valueStart: colonIdx.end
-      }
-    }
-
-    function getQuery(str) {
-
-      /// converts input field string to format type:value
-      /// parsable later with parseQuery()
-
-      var indices = getLastQueryCutoffIdx(str);
-      var searchQuery = str.substring(indices.valueWithBracketsStart, str.lenght);
-      
-      if (indices.typeStart == -1 || indices.typeEnd == -1)
-        return searchQuery;
-      
-      var type = str.substring(indices.typeStart, indices.typeEnd);
-
-      if (searchQuery && type in autocompleteTypeKeys)
-          return type + ':' + searchQuery;
-
-      return searchQuery;
-    }
-
-    function bracketStr(str) {
-      if (str[0] == '\"')
-        return str + '"';
-      return '"' + str + '"';
-    }
-
-    function parseQuery(str, colonChar)
-    /// divides by colon sign already prepared query
-    {
-      if (typeof colonChar == 'undefined')
-        colonChar = ':'
-
-      var colonIdx = str.indexOf(colonChar);
-      if (colonIdx == -1)
-        return {
-          value: str,
-          type: 'KWORD'
-        }
-
-      return {
-        value: str.substring(colonIdx + colonChar.length, str.length),
-        type: str.substring(0, colonIdx)
-      }
-    }
-
-    function mergeWithInputValue(value, typedText) {
-
-      if (value.length == 0)
-        return typedText;
-
-      // the last char is closed bracket
-      // open the bracket to autocomplete the stuf inside the brackets
-      if (typedText[typedText.length - 1] == '\"' && getLastBracketsIdx(typedText).lastOpened == -1)
-        typedText = typedText.substring(0, typedText.length - 1);
-
-      // fix for completition of when the last value is a boolean keyword (ends with a space)
-      // ignore the space at the end
-      if (typedText[typedText.length - 1] == ' ')
-        typedText = typedText.substring(0, typedText.length - 1);
-
-      // substitute with query on blur - query if full query
-      var query = parseQuery(value);
-      // type 'KWORD' means that 'value' doesn't have the query type (apparently no colon ;) )
-      // so for example it's just a value for the completition from the dropdown
-      if (query.type !== 'KWORD' && query.value) {
-        
-        var parsingIndices = getLastQueryCutoffIdx(typedText);
-        var strPrecedingQuery = typedText.substring(0, parsingIndices.typeStart);
-        if (query.value.indexOf(' ') > -1)
-          query.value = bracketStr(query.value);
-        return strPrecedingQuery + query.type + ':' + query.value;
-      }
-
-      // cases below: 
-      // autocomplete, select from dropdown ... also blur when user types a keyword
-      // leaving the evental type label in the input box, adding autocompletition stuff
-      var cutOffIdx = getAutocompleteValueCutoffInd(typedText).withBrackets;
-      var strPrecedingQuery = typedText.substring(0, cutOffIdx);
-
-      // the case on blur after typing the whole keyword
-      if (lowercaseKeywords.indexOf(value.toLowerCase()) > -1) {
-        return strPrecedingQuery + value;  
-      }
-
-      // autocompletition with a value containing spaces
-      // (in keywords spaces can be only at the end - which is the previous case)
-      if (value.indexOf(' ') > -1) {
-        value = bracketStr(value);
-      }
-
-      return strPrecedingQuery + value; 
-    }
-
-    field.typeahead({
-      local: keywords,
-      remote: {
-        url: '/list/%TYPE?q=%QUERY',
-        
-        replace: function(url, uriEncodedQuery) {
-
-          var query = parseQuery(uriEncodedQuery, '%3A')
-
-          url = url.replace('%TYPE', autocompleteTypeKeys[query.type]);
-          url = url.replace('%QUERY', query.value);
-
-          // console.log('server query: ' + url);
-
-          return url;
-        },
-
-        filter: function(response) {
-          return response.results;
-        }
-
-      },
-      name: 'search',
-      limit: 10
-    });
-
-    var orgTypeahead = {
-      setInputValue: field.data("ttView").inputView.setInputValue,
-      getQuery: field.data("ttView").inputView.getQuery,
-      getSuggestions: field.data('ttView').datasets[0].getSuggestions
+    // saves overwritten functions
+    this.orgTypeahead = {
+      setInputValue: this.ttTypeahead.input.setInputValue,
+      setHintValue: this.ttTypeahead.input.setHintValue,
     };
 
-    field.data("ttView").inputView.getQuery = function() {
-
-      return getQuery(orgTypeahead.getQuery());
+    this.ttTypeahead.input.setInputValue = function(value, silent) {
+      return that.setInputFieldValue.apply(that, [value, silent]);
     }
 
-    field.data("ttView").inputView.setInputValue = function(value, silent) {
+    // update parser state on input event
+    this.$element.on('input', function(event) {
+      var input_field_value = $(this).val();
+      that.parser.updateSource(input_field_value, $(this).caret());
+    });
 
-      var typedText = this.$input.val();
-      var merged = mergeWithInputValue(value, typedText);
-      return orgTypeahead.setInputValue.apply(field.data("ttView"), [merged, silent]);
-    }
+    // disable grey hint in input field background - not compatible yet
+    // with this kind of typeahead
+    this.ttTypeahead.input.setHintValue = function(value) {}
+  }
 
-    var dataset = field.data('ttView').datasets[0];
+  var plugin_object_class = SearchTypeahead;
+  var data_key = 'search_typeahead';
 
-    dataset.getSuggestions = function(query, cb) { 
+  SearchTypeahead.prototype = {
 
-      var parsedQuery = parseQuery(query);
+    /**
+     * Setups the typeahead element
+     */
+    init: function() {
 
-      // console.log(parsedQuery.value + "++++" + parsedQuery.type);
+      var that = this;
 
-      // eventually remove the quotation mark
-      if (parsedQuery.value[0] == '"') // '"'
+      var engine = new Bloodhound({
+        remote: {
+          url: this.options.value_hints_url,
+          replace: function(url, query) {
+            return that.getUrl.call(that, url, query);
+          },
+          filter: this.processResponse
+        },
+        datumTokenizer: function(d) {
+          return Bloodhound.tokenizers.whitespace(d.value);
+        },
+        // not used after the modifications but required by bloodhound
+        queryTokenizer: Bloodhound.tokenizers.whitespace
+      });
+
+      for (var set_name in this.options.options_sets) {
+        var options = this.options.options_sets[set_name];
+        options.indices = this.createIndices(engine, options.keywords);
+      }
+
+      var that = this;
+      engine.get = function(field_value, cb) {
+        return that.getHints(field_value, cb, this);
+      };
+
+      engine.initialize();
+
+      this.$element.typeahead({
+        // min length is controlled in getHints function
+        // this setting is to pass by everything
+        minLength: 1
+      },
       {
-          parsedQuery.value = parsedQuery.value.substring(1, parsedQuery.value.length);
-          query = parsedQuery.type + ':' + parsedQuery.value;
+        source: engine.ttAdapter(),
+        displayKey: 'value'
+      });
+    },
+
+    /**
+     * Initialize an option set
+     *
+     * @param options option set
+     * @returns initialized set
+     */
+    initializeOptionsSet: function(options) {
+      options.word_types = {};
+      options.keywords_flat = {};
+      for (var method_key in options.keywords) {
+        var method = options.keywords[method_key];
+        for (var word_type in method) {
+          var conf = method[word_type];
+          options.keywords_flat[word_type] = conf;
+        }
       }
 
-      if (parsedQuery.type == "KWORD")
-      {
-        // a hack to disable remote queries 
-        // there's an "if" to check "transport" existence
-        // inside original getSuggestions() function
-        var transportCopy = dataset.transport;
-        dataset.transport = 0;
-        var result = orgTypeahead.getSuggestions(query, cb);
-        dataset.transport = transportCopy;
-        return result;
+      return options;
+    },
+
+    /**
+     * Creates search indices for typeahead engine
+     *
+     * @param engine empty engine should be passed here
+     * @param keywords keywords configuration -
+     *  the part passed in to the class constructor at key
+     *  keywords
+     * @returns {Array} Array of search indices
+     */
+    createIndices: function(engine, keywords) {
+      var search_indices = [];
+
+      for (var method_key in keywords) {
+        var method = keywords[method_key];
+        for (var word_type in method) {
+          var conf = method[word_type];
+          if (conf.values == undefined)
+            continue;
+
+          var index = deepCopy(engine.index);
+          index.add(convertToTypeaheadDict(conf));
+          search_indices[word_type] = index;
+        }
       }
 
-      // do the remote query only if the type is valid and query length
-      // is at least 3 - which is also a server requirement
-      if (parsedQuery.type in autocompleteTypeKeys && typeof(autocompleteTypeKeys[parsedQuery.type]) == 'string' && parsedQuery.value.length > 2) {
+      return search_indices;
 
-        // the same hack as above to disable the local queries
-        var localCopy = dataset.local;
-        dataset.local = [];
-        var result = orgTypeahead.getSuggestions(query, cb);
-        dataset.local = localCopy;
-        return result;
+      function deepCopy(obj) {
+        /// clones an object
+        return jQuery.extend(true, {}, obj);
       }
+
+      function convertToTypeaheadDict(conf) {
+        var suffix = '';
+        if (conf.autocomplete_suffix)
+          suffix += conf.autocomplete_suffix;
+        return $.map(conf.values,
+          function(val, i) {
+            var result = {
+              value: val + suffix,
+              raw_value: val,
+              suffix: suffix
+            };
+            return result;
+          }
+        );
+      }
+    },
+
+    /**
+     * Updates the template url with a query
+     *
+     * @param url template url containing '%TYPE' in
+     *  the place of query type and '%QUERY' in the place
+     *  of query value
+     * @param query {Object} an object with properties:
+     *  remote: the string to be put instead of %TYPE
+     *  value: the string to be put instead of %QUERY
+     * @returns {String} the result url
+     */
+    getUrl: function(url, query) {
+
+      url = url.replace('%TYPE', query.remote);
+      url = url.replace('%QUERY', query.value);
+
+      return url;
+    },
+
+    /**
+     * Processes the coming response to get the one in the format
+     * expected by typeahead - an Array of dictionaries
+     *
+     * @param response
+     * @returns {*}
+     */
+    processResponse: function(response) {
+      return response.results;
+    },
+
+    /**
+     * Fetches hints for typeahead
+     *
+     * @param field_value the new value of the input field
+     * @param cb typeahead callback
+     * @param bloodhound bloodhound engine
+     */
+    getHints: function(field_value, cb, bloodhound) {
+      var matches = [];
+
+      this.i = 1;
+
+      var caretIdx = this.$element.caret();
+
+      this.parser.updateSource(field_value, caretIdx);
+      this.query_range = this.parser.getQueryRangeIdx(caretIdx);
+      var query = this.parser.getAutocompleteQuery(
+        this.query_range.start, caretIdx);
+
+      var options_set = this.options.options_sets[this.parser.getOptionsSetName()];
+
+      if (!query.type) {
+        cb && cb([]);
+        return;
+      }
+
+      if (query.type == options_set.word_types.QUERY_VALUE && query.remote) {
+        if (query.value.length < getMinLength(query.type)) {
+          cb && cb([]);
+          return;
+        }
+        // later used in setInputValue cannot be passed in another way
+        this.dontBracket = false;
+        bloodhound._getFromRemote(query, returnRemoteMatches);
+        return;
+      } else {
+
+        // assure it's an array
+        query.type = [].concat(query.type);
+        var search_indices = options_set.indices;
+
+        for (var i in query.type) {
+          var type_name = query.type[i];
+          if (query.value.length < getMinLength(type_name))
+            continue;
+          if (!search_indices[type_name])
+            continue;
+          matches = matches.concat(search_indices[type_name].get(query.value));
+        }
+        if (matches.length > 0) {
+          matches = bloodhound.sorter(matches).slice(0, bloodhound.limit);
+        }
+        this.dontBracket = true;
+        cb && cb(matches);
+      }
+
+      function returnRemoteMatches(remoteMatches) {
+          cb && cb(bloodhound.sorter(remoteMatches));
+      }
+
+      function getMinLength(type) {
+        return options_set.keywords_flat[type].min_length;
+      }
+    },
+
+    /**
+     * Merges the current input field value with a hint
+     * from typeahead
+     *
+     * @param {String} to_merge the value to be merged
+     * @returns {string} merged string
+     */
+    mergeWithCurrentValue: function(to_merge, query_range) {
+      var input_field_value = this.$element.val();
+
+      var precedingStr = input_field_value.slice(
+        0, query_range.start);
+      var followingStr = input_field_value.slice(
+        query_range.end, input_field_value.length);
+
+      if (precedingStr[precedingStr.length - 1] == '"'
+        && to_merge[0] == '"')
+          precedingStr = precedingStr.slice(0, precedingStr.length - 1);
+
+      return precedingStr + to_merge + followingStr;
+    },
+
+    /**
+     * Does all the tricks which need to be done at setting
+     * value of the input field
+     *
+     * @param {String} value typeahead suggestion
+     * @param silent corresponding Typeahead JS parameter
+     * @returns {*}
+     */
+    setInputFieldValue: function(value, silent) {
+
+      var bracketedValue = value;
+      if (value.indexOf(' ') > -1 && !this.dontBracket) {
+        bracketedValue = bracketStr(value);
+      }
+
+      var merged = this.mergeWithCurrentValue(bracketedValue, this.query_range);
+      if (this.ttTypeahead.input.getQuery() == value)
+        this.ttTypeahead.input.setQuery(merged);
+
+      // run original setInputValue with merged value
+      var result = this.orgTypeahead.setInputValue.call(
+        this.ttTypeahead.input, merged, silent);
+
+      // update query range
+      this.query_range.end =
+        this.query_range.start + bracketedValue.length;
+
+      // set caret position
+      var new_caret_pos = this.query_range.end;
+      this.$element.caret(new_caret_pos);
+
+      // update parser
+      this.parser.updateSource(merged, new_caret_pos);
+      return result;
+
+      function bracketStr(str) {
+        if (str[0] == '\"')
+          return str + '"';
+        return '"' + str + '"';
+      }
+    },
+
+    /**
+     * The function should be used to set field value of
+     * typeahead-enabled input field using javascript.
+     * It updates internal query value of typeahead.js
+     * to which the field is reseted on blur event.
+     *
+     * @method setFieldValue
+     * @param {String} new_value new value to set
+     */
+    setFieldValue: function(new_value) {
+      this.$element.val(new_value)
+      this.ttTypeahead.input.setQuery(new_value);
     }
   }
 
-  $.fn.searchTypeahead = SearchTypeahead;
+  $.fn.searchTypeahead = function ( option ) {
+    return this.each(function () {
+      var $this = $(this)
+        , data = $this.data(data_key)
+        , options = typeof option == 'object' && option
+      if (!data) $this.data(data_key, (data = new plugin_object_class(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  $.fn.searchTypeahead.defaults = {}
+
+  $.fn.searchTypeahead.Constructor = plugin_object_class;
 
 }( window.jQuery )

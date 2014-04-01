@@ -34,7 +34,8 @@
     "plupload": "*",
     "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",
     "font-awesome": "*",
-    "bootstrap-tagsinput": "*"
+    "bootstrap-tagsinput": "*",
+    "jquery.caret": "https://github.com/acdvorak/jquery.caret.git"
   },
   "resolutions": {
     "jquery": "2.1.0"

@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -457,105 +457,6 @@
 
 
 {% macro search_form(collection, easy_search_form) %}{% block search_form scoped %}
-{%- block search_form_style %}
-  <style>
-    #search-label {
-      font-size: 14px;
-    }
-
-    /* -------------- */
-
-    /*
-    to make "add to search" form look consistent
-    in much shrinked window
-
-    values copied from bootstrap ones for higher than xs size counterparts -> to be unified using "less"
-    */
-
-    .navbar-collapse {
-      border-top: none;
-    }
-
-    .navbar-collapse .navbar-nav.navbar-left:first-child {
-      margin-left: -15px;
-    }
-
-    .navbar-form {
-      padding-top: 0;
-      padding-bottom: 0;
-      margin-right: 0;
-      margin-left: 0;
-      border: 0;
-    }
-
-    /* ------------ */
-
-    .navbar-row {
-      width: 100%;
-      margin: inherit;
-    }
-
-    .navbar-row .navbar-row-container {
-      /* same colour as navbar border*/
-      border-top: 1px solid #e7e7e7;
-      padding-top: 20px;
-      padding-bottom: 20px;
-    }
-
-    .navbar-collapse {
-      max-height: none;
-    }
-
-    /*
-      somehow original bootstrap's -4px doesn't look good
-      and results in thick (double) borders around buttons
-    */
-    .input-group-btn > .btn + .btn,
-    .input-group-btn > .btn {
-      margin-left: -5px;
-    }
-
-    /*
-      too keep searchbar with buttons in one line
-    */
-    @media (min-width: 768px) { /* ld size */
-       #searchform-input-group {
-         width: 670px;
-       }
-    }
-
-    @media (min-width: 992px) { /* md size */
-       #searchform-input-group {
-         width: 710px;
-       }
-    }
-
-    @media (min-width: 1200px) { /* ld size */
-       #searchform-input-group {
-         width: 920px;
-       }
-    }
-
-    /*
-      showing dropdown stil as dropdown
-      on shrinked window
-    */
-    @media (max-width: 767px) {
-      .navbar-nav .open .dropdown-menu {
-        position: absolute;
-        margin-top: 2px;
-        background-color: #ffffff;
-        border: 1px solid rgba(0, 0, 0, 0.15);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-      }
-
-      .navbar-default .navbar-nav .open .dropdown-menu > li > a {
-        color: #333333;
-      }
-    }
-
-  </style>
-{%- endblock search_form_style %}
 {%- block search_form_body scoped %}
   <div id="search-box-main" class="row">
     <div class="col-sm-12">
@@ -875,49 +776,38 @@
 
     // -------------- SEARCH FIELD TYPEAHEAD ----------------
 
-    var source = $.map({{ collection.search_within[1:]|tojson|safe }},
-          function(val, i) { return val[0]+':';}); //['author:', 'title:', 'isbn:'];
-
-    var autocompleteQueriesType = {};
-
-    // keys existence in this dict is needed for autocompletition
-    for (var i in source) {
-      var key = source[i]
-      if (key[key.length - 1] == ':')
-        key = key.substring(0, key.length - 1);
-      autocompleteQueriesType[key] = undefined;
-    }
-
-    autocompleteQueriesType['author'] = 'exactauthor';
-
-    source.push('AND ');
-    source.push('OR ');
-    source.push('AND NOT ');
-
-    {% for id, soo in collection.search_options|groupby('id_field') %}
-      source.push('{{ soo[0].field.code }}:');
-    {% endfor %}
-
-    // autocompleteQueriesType = {
-    // {% for id, soo in collection.search_options|groupby('id_field') %}
-    //   '{{ soo[0].field.code }}': [{% for so in soo %}
-    //         '{{ so.fieldvalue.name }}' {{ ',' if not loop.last }}
-    //         {% endfor %}
-    //     ]{{ ',' if not loop.last }}
-    // {% endfor %}
-    // };
-    //
-
     var searchField = $('form[name=search] input[name=p]');
 
-    searchField.searchTypeahead(autocompleteQueriesType, source);
+    var area_keywords = $.map({{ collection.search_within[1:]|tojson|safe }},
+      function(val, i) {
+        return val[0];
+      }
+    );
+
+    {%- for id, soo in collection.search_options|groupby('id_field') -%}
+      area_keywords.push('{{ soo[0].field.code }}:');
+    {%- endfor -%}
+
+    {% block searchfield_typeahead_configuration %}
+
+      var parser_options = getDefaultParserConf(area_keywords);
+
+      searchField.searchTypeahead({
+        value_hints_url: '/list/%TYPE?q=%QUERY',
+        options_sets: {
+          invenio: parser_options
+        },
+        default_set: 'invenio'
+      });
+
+    {% endblock searchfield_typeahead_configuration %}
 
 
     // END -------------- SEARCH TYPEAHEAD -------------- END
 
     // ------------ typehead for "Add to search" form ----------------
 
-    $('[data-provide="typeahead-url"]').each(function (i, field) {
+    /*$('[data-provide="typeahead-url"]').each(function (i, field) {
       field = $(field);
       field.typeahead({
         prefetch: {
@@ -928,7 +818,7 @@
         },
         limit: 10
       });
-    });
+    });*/
 
     // ---------------------------------------------------------------
 
