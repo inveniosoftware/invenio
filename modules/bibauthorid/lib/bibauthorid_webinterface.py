@@ -3017,7 +3017,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                                                    session['uid'])
         else:
             uid = getUid(req)
-            add_cname_to_hepname_record(cname, hepname, uid)
+            add_cname_to_hepname_record({cname: hepname}, uid)
 
     def suggest_orcid(self, req, form):
         argd = wash_urlargd(form, {'orcid': (str, None),

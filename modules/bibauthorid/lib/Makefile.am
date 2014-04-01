@@ -61,7 +61,10 @@ pylib_DATA = \
 	bibauthorid_prob_matrix_unit_tests.py \
 	bibauthorid_webutils.py \
 	bibauthorid_logutils.py \
-	bibauthorid_testutils.py
+	bibauthorid_testutils.py \
+	bibauthorid_hoover.py
+		bibauthorid_hoover_regression_tests.py \
+		bibauthorid_hoover_exceptions.py
 
 jsdir=$(localstatedir)/www/js
 

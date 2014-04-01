@@ -183,7 +183,7 @@ def get_processed_external_recids(pid):
 
 
 def get_all_personids_recs(pid, claimed_only=False):
-    return dbinter.get_papers_of_author(pid, claimed_only)
+    return [x[3] for x in dbinter.get_papers_of_author(pid, not claimed_only)]
 
 
 def mark_internal_id_as_old(person_id, uid):

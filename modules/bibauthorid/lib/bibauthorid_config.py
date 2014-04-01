@@ -149,7 +149,6 @@ else:
 
 WEDGE_THRESHOLD = 0.70
 
-
 # Rabbit use or ignore external ids
 RABBIT_USE_EXTERNAL_IDS = True
 

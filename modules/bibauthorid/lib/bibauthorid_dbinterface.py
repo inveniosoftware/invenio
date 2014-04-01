@@ -31,7 +31,7 @@ import invenio.bibauthorid_config as bconfig
 
 import gc
 import datetime
-from itertools import groupby, count, ifilter, chain, imap, repeat
+from itertools import groupby, count, ifilter, chain, imap, repeat, izip
 from operator import itemgetter
 
 from invenio.search_engine_utils import get_fieldvalues
@@ -129,7 +129,7 @@ def move_signature(sig, pid, force_claimed=False, set_unclaimed=False):
     if not force_claimed:
         query += " and (flag <> 2 and flag <> -2)"
 
-    run_sql(query, (pid, sig[0], sig[1], sig[2]))
+    run_sql(query, (pid, int(sig[0]), sig[1], sig[2]))
 
 
 def modify_signature(old_ref, rec, new_ref, new_name):
@@ -301,7 +301,7 @@ def confirm_papers_to_author(pid, sigs_str, user_level=0):  # confirm_papers_to_
                 'and bibrec=%s',
                 (pid, '2', user_level, table, ref, rec))
     update_canonical_names_of_authors(pids_to_update)
-
+    #UPDATE EXTERNAL IDS OF AUTHOR!!
     return statuses
 
 
@@ -792,39 +792,43 @@ def get_all_paper_data_of_author(pid):
     return _select_from_aidpersonidpapers_where(select=['personid', 'bibref_table', 'bibref_value', 'bibrec', 'flag'], pid=pid)
 
 
-def get_papers_of_author(pid, claimed_only=False, include_rejected=False):  # get_all_paper_records
+def get_papers_of_author(pid, include_claimed=True, include_unclaimed=True, include_rejected=False):   ### get_all_paper_records
     '''
-    Gets all papers for the specific author. If 'claimed_only' flag is enabled
-    it takes into account only claimed papers. Additionally if
-    'include_rejected' flag is enabled, it takes into account rejected
-    papers as well.
+    Gets all papers for the specific author. If 'include_claimed' flag is enabled
+    it takes into account claimed papers. Additionally if
+    'include_unclaimed' flag is enabled, it takes also into account unclaimed
+    papers as well. Finally, if 'include_rejected' flag is enabled, it takes also
+    into account rejecte papers.
 
     @param pid: author identifier
     @type pid: int
-    @param claimed_only: include a paper only if it is claimed
-    @type claimed_only: bool
-    @param include_rejected: include rejected papers (only when claimed_only flag is enabled)
+    @param include_claimed: include a paper if it is claimed
+    @type include_claimed: bool
+    @param include_unclaimed: include unclaimed papers
+    @type include_unclaimed: bool
+    @param include_rejected: include rejected papers
     @type include_rejected: bool
 
-    @return: paper identifiers
-    @rtype: set set((int),)
+    @return: records ((personid, bibref_table, bibref_value, bibrec, flag),)
+    @rtype: generator ((int, str, int, int, int),)
     '''
-    query = ('select bibrec '
-             'from aidPERSONIDPAPERS '
-             'where personid=%s')
+    args = []
+    if include_claimed:
+        args.append("flag=2")
+    if include_unclaimed:
+        args.append("(flag>-2 and flag<2)")
+    if include_rejected:
+        args.append("flag=-2")
 
-    # Standard case: get all assigned papers excluding rejected
-    if not claimed_only and not include_rejected:
-        query += " and flag>-2"
-    # Get claimed and rejected papers only (human interaction footprint)
-    elif claimed_only and include_rejected:
-        query += " and (flag=2 or flag=-2)"
-    # Standard case: get only claimed papers
-    elif claimed_only and not include_rejected:
-        query += " and flag=2"
+    where_str = ""
+    if args:
+        where_str = " and ( %s )" % " or ".join(args)
+        query = ('select personid, bibref_table, bibref_value, bibrec, flag '
+                 'from aidPERSONIDPAPERS '
+                 'where personid=%s' + where_str)
 
-    return set(run_sql(query, (pid,)))
-
+        return set(run_sql(query, (pid,) ))
+    return set()
 
 def get_confirmed_papers_of_authors(pids):  # get_all_papers_of_pids
     '''
@@ -1568,7 +1572,7 @@ def update_external_ids_of_authors(pids=None, overwrite=False, limit_to_claimed_
         for ext_system_id in collected.keys():
             for ext_id in collected[ext_system_id]:
                 if ext_system_id not in present or ext_id not in present[ext_system_id]:
-                    _add_external_id_to_author(pid, ext_system_id, ext_id)
+                    add_external_id_to_author(pid, ext_system_id, ext_id, avoid_id_duplication=False)
 
     if force_cache_tables:
         destroy_partial_marc_caches()
@@ -1727,7 +1731,7 @@ def add_orcid_id_to_author(pid, orcid_id):
     @param orcid_id: ORCID external identifier
     @type orcid_id: str
     '''
-    _add_external_id_to_author(pid, 'ORCID', orcid_id)
+    add_external_id_to_author(pid, 'ORCID', orcid_id)
 
 
 def webuser_merge_user(old_uid, new_uid):
@@ -1787,7 +1791,7 @@ def remove_arxiv_papers_of_author(pid):
             'where tag=%s and personid=%s', ('arxiv_papers', pid))
 
 
-def _add_external_id_to_author(pid, ext_sys, ext_id):  # add_personID_external_id
+def add_external_id_to_author(pid, ext_sys, ext_id, avoid_id_duplication=True):   ### add_personID_external_id
     '''
     Adds the external identifier of the specified system to the given author.
 
@@ -1798,8 +1802,14 @@ def _add_external_id_to_author(pid, ext_sys, ext_id):  # add_personID_external_i
     @param ext_id: external identifier
     @type ext_id: str
     '''
-    run_sql('insert into aidPERSONIDDATA (personid, tag, data) '
-            'values (%s, %s, %s)', (pid, 'extid:%s' % ext_sys, ext_id))
+    present = False
+    if avoid_id_duplication:
+        id_string = "extid:%s" % ext_sys
+        present = run_sql('select data from aidPERSONIDDATA where personid=%s and tag=%s and data=%s' , (pid, id_string, ext_id))
+
+    if not present:
+        run_sql('insert into aidPERSONIDDATA (personid, tag, data) '
+                'values (%s, %s, %s)', (pid, 'extid:%s' % ext_sys, ext_id))
 
 
 def _remove_external_id_from_author(pid, ext_sys, ext_id=None):  # remove_personID_external_id
@@ -2282,7 +2292,7 @@ def get_author_data_associations(table_name="`aidPERSONIDDATA`"):  # get_full_pe
                    'from %s' % table_name)
 
 
-def _get_inspire_id_of_author(pid):  # get_inspire_ids_by_pids
+def get_inspire_id_of_author(pid):   ### get_inspire_ids_by_pids
     '''
     Gets the external identifier of Inspire system for the given author.
 
@@ -2292,8 +2302,14 @@ def _get_inspire_id_of_author(pid):  # get_inspire_ids_by_pids
     @return: Inspire external identifier
     @rtype: tuple ((str),)
     '''
-    return _select_from_aidpersoniddata_where(select=['data'], pid=pid, tag='extid:INSPIREID')
-
+    result =  _select_from_aidpersoniddata_where(select=['data'], pid=pid, tag='extid:INSPIREID')
+    ##WRONG exception here
+    if result:
+        if len(result) > 1:
+            from invenio.bibauthorid_hoover_exceptions import MultipleIdsOnSingleAuthorException
+            raise MultipleIdsOnSingleAuthorException('Conflict in aidPERSONIDDATA', pid, 'INSPIREID', result)
+        return result[0][0]
+    return tuple()
 
 def get_orcid_id_of_author(pid):  # get_orcids_by_pids
     '''
@@ -2471,6 +2487,7 @@ def remove_empty_authors(remove=True):  # delete_empty_persons
     pids_with_papers = set(pid[0] for pid in pids)
     pids_tags = _select_from_aidpersoniddata_where(select=['personid', 'tag'])
     pids_with_data = set(pid for pid, tag in pids_tags)
+    #if a pid has another tag besides canonical name
     not_empty_pids = set(pid for pid, tag in pids_tags if tag not in bconfig.NON_EMPTY_PERSON_TAGS)
 
     empty_pids = pids_with_data - (pids_with_papers | not_empty_pids)
@@ -3972,7 +3989,7 @@ def get_inverted_lists(qgrams):
                    % _get_sqlstr_from_set(qgrams, f=lambda x: "'%s'" % x))
 
 
-def populate_partial_marc_caches(selected_bibrecs=None, verbose=True):
+def populate_partial_marc_caches(selected_bibrecs=None, verbose=True, create_inverted_dicts=False):
     '''
     Populates marc caches.
     '''
@@ -4107,8 +4124,23 @@ def populate_partial_marc_caches(selected_bibrecs=None, verbose=True):
     MARC_100_700_CACHE['b100'] = bibd_10x
     MARC_100_700_CACHE['b700'] = bibd_70x
 
+    if (create_inverted_dicts or 'inverted_b100' in MARC_100_700_CACHE):
+        #MARC_100_700_CACHE['reversed_b100'] = dict((v,k) for k,v in MARC_100_700_CACHE['b100'].items())
+        MARC_100_700_CACHE['inverted_b100'] = dict(izip(MARC_100_700_CACHE['b100'].itervalues(), MARC_100_700_CACHE['b100'].iterkeys()))
+        #MARC_100_700_CACHE['reversed_b700'] = dict((v,k) for k,v in MARC_100_700_CACHE['b700'].items())
+        MARC_100_700_CACHE['inverted_b700'] = dict(izip(MARC_100_700_CACHE['b700'].itervalues(), MARC_100_700_CACHE['b700'].iterkeys()))
 
-def search_engine_is_operating():  # check_search_engine_status
+        def create_lookup_dict(brb):
+            b = defaultdict(set)
+            for k,v in brb.iteritems():
+                for identifier in v['id'].iterkeys():
+                    b[identifier].add(k)
+            return dict(b)
+
+        MARC_100_700_CACHE['b100_id_recid_lookup_table'] = create_lookup_dict(MARC_100_700_CACHE['brb100'])
+        MARC_100_700_CACHE['b700_id_recid_lookup_table'] = create_lookup_dict(MARC_100_700_CACHE['brb700'])
+
+def search_engine_is_operating():   ### check_search_engine_status
     '''
     Examines if the bibauthorid search engine is operating.
 
@@ -4581,6 +4613,7 @@ def get_grouped_records(sig, *args):
     @param args: tags
     @type args: tuple (str,)
     '''
+
     if MARC_100_700_CACHE:
         return _get_grouped_records_using_marc_caches(sig, *args)
     else:

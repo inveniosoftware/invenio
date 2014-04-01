@@ -1400,7 +1400,7 @@ def get_hepdata_by_recid(parent_recid, recid):
     """Retrieve a dataset encoded in a given record
     @param parent_recid: record identifier of the publication attaching the dataset
     @type parent_recid: Integer
-    @param recid: Identifier of te record identifying the dataset
+    @param recid: Identifier of the record identifying the dataset
     @type recid: Integer
     @rtype: Dataset
     @returns: A dataset represented by a record of a given number

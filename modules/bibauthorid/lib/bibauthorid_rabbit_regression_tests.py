@@ -40,7 +40,7 @@ from invenio.bibauthorid_testutils import add_001_field
 from invenio.bibauthorid_testutils import is_test_paper_claimed
 
 from invenio.bibauthorid_dbinterface import get_authors_by_name
-from invenio.bibauthorid_dbinterface import _add_external_id_to_author
+from invenio.bibauthorid_dbinterface import add_external_id_to_author
 from invenio.bibauthorid_dbinterface import _remove_external_id_from_author
 from invenio.bibauthorid_name_utils import create_matchable_name
 from invenio.testutils import (InvenioTestCase,
@@ -112,7 +112,7 @@ class AuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
     def setUp(self):
         super(AuthorRabbitTestCase, self).setUp()
         self.main_marcxml_record = get_new_marc_for_test('Rabbit Test Paper', author_name=self.author_name,
-                                                         ext_id=self.ext_id)
+                                                         identifiers=[(self.ext_id, 'i',)])
         self.main_bibrec = get_bibrec_for_record(self.main_marcxml_record, opt_mode='insert')
         self.main_marcxml_record = add_001_field(self.main_marcxml_record, self.main_bibrec)
         self.bibrecs_to_clean = [self.main_bibrec]
@@ -277,7 +277,8 @@ class AuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
             rabbit([self.main_bibrec], verbose=True)
             personid_to_test = get_authors_by_name(self.author_name)[0]
 
-            _add_external_id_to_author(personid_to_test, 'INSPIREID', self.ext_id)
+            #PERSONID_EXTERNAL_IDENTIFIER_MAP.values() TODO
+            add_external_id_to_author(personid_to_test, 'INSPIREID', self.ext_id)
 
             self.main_marcxml_record = get_modified_marc_for_test(self.main_marcxml_record,
                                                                   author_name=self.heavily_modified_name,
@@ -327,7 +328,7 @@ class CoauthorsRabbitTestCase(BibAuthorIDRabbitTestCase):
         super(CoauthorsRabbitTestCase, self).setUp()
         self.main_marcxml_record = get_new_marc_for_test('Rabbit Test Paper', author_name=self.author_name,
                                                          co_authors_names=self.co_authors_names,
-                                                         ext_id=self.ext_id)
+                                                         identifiers=None)
         self.main_bibrec = get_bibrec_for_record(self.main_marcxml_record, opt_mode='insert')
         self.main_marcxml_record = add_001_field(self.main_marcxml_record, self.main_bibrec)
         self.bibrecs_to_clean = list()
@@ -341,6 +342,7 @@ class CoauthorsRabbitTestCase(BibAuthorIDRabbitTestCase):
             self.assertTrue(person_in_aidpersonidpapers(self.author_name, self.main_bibrec))
             self.assertTrue(person_in_aidpersoniddata(self.author_name))
 
+            self.current_bdentifiers = [(self.ext_id, 'i',)] + [None for i in range(len(self.co_authors_names))]
             self.current_bibref_values_of_coauthors = list()
             for coauthor_name in self.co_authors_names:
                 bibref_value = get_bibref_value_for_name(coauthor_name)
@@ -644,7 +646,7 @@ class RetrieveOrcidTest(InvenioTestCase):
         add_orcid_id_to_author(self._pid, self._orcid)
         marc = get_new_marc_for_test('Orcid test paper',
                                      author_name='Author, SomeAuthor',
-                                     ext_id='ORCID:' + self._orcid)
+                                     identifiers=['ORCID:' + self._orcid])
         self._rec = get_bibrec_for_record(marc, opt_mode="insert")
         rabbit([self._rec])
         populate_partial_marc_caches([self._rec])

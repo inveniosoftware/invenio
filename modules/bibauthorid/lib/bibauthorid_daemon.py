@@ -69,6 +69,9 @@ Examples:
 
       --update-search-index Updates the search engine index.
 
+      --force-identifier-consistency Forces the consistency of the identifers
+                                     in the database
+
   OPTIONS
     Options for update personid
       (default)             Will update only the modified records since last
@@ -98,6 +101,18 @@ Examples:
                                   and for testing. The flag is only valid when some last names are specified.
 
     There are no options for the merger.
+
+    Options for force identifier consistency
+        --check-db                Perform a thorough check on the database to discover any possible inconsistencies.
+
+        --do-not-modify-records   Do not perform any changes in the database.
+
+        --packet-size= (optional) The number of marcxml changes that a bibupload task created by the algorithm will contain.
+                                  By default this is set to 1000 marcxml updates per bibupload task.
+
+        --do-not-modify-hepnames  Do perform changes in the database but do not alter the HepNames collection in any way.
+        --open-tickets            Open tickets regarding profile problems in rt.
+        --queue=       (optional) The name of the queue to be used in the rt system for the tickets
 """,
                       version="Invenio Bibauthorid v%s" % bconfig.VERSION,
                       specific_params=("i:",
@@ -111,7 +126,14 @@ Examples:
                                        "from-scratch",
                                        "last-names=",
                                        "st",
-                                       "single-threaded"
+                                       "single-threaded",
+                                       "force-identifier-consistency",
+                                       "check-db",
+                                       "do-not-modify-records",
+                                       "packet-size=",
+                                       "do-not-modify-hepnames",
+                                       "open-tickets",
+                                       "queue="
                                        ]),
                       task_submit_elaborate_specific_parameter_fnc=_task_submit_elaborate_specific_parameter,
                       task_submit_check_options_fnc=_task_submit_check_options,
@@ -149,7 +171,26 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
         value = [token.strip() for token in value.split(',')]
         bibtask.task_set_option("last-names", value)
     elif key in ("--single-threaded",):
-        bibtask.task_set_option("single-threaded", True)
+        bibtask.task_set_option("single_threaded", True)
+    elif key in ("--force-identifier-consistency",):
+        bibtask.task_set_option("force_identifier_consistency", True)
+    elif key in ("--check-db",):
+        bibtask.task_set_option("check_db", True)
+    elif key in ("--do-not-modify-records",):
+        bibtask.task_set_option("dry_run", True)
+    elif key in ("--packet-size"):
+        if value.count("="):
+            value = value[1:]
+        value = int(value)
+        bibtask.task_set_option("packet_size", value)
+    elif key in ("--do-not-modify-hepnames",):
+        bibtask.task_set_option("dry_hepnames_run", True)
+    elif key in ("--open-tickets",):
+        bibtask.task_set_option("open_tickets", True)
+    elif key in ("--queue",):
+        if value.count("="):
+            value = value[1:]
+        bibtask.task_set_option("queue", value)
     else:
         return False
 
@@ -189,6 +230,22 @@ def _task_run_core():
             bibtask.task_update_progress('Performing full disambiguation...')
             run_tortoise(from_scratch)
             bibtask.task_update_progress('Full disambiguation finished!')
+
+    if bibtask.task_get_option("force_identifier_consistency"):
+        check_db = bibtask.task_get_option("check_db")
+        dry_run_b = bibtask.task_get_option("dry_run")
+        query_file_size = bibtask.task_get_option("packet_size")
+        dry_hepnames = bibtask.task_get_option("dry_hepnames_run")
+        tickets = bibtask.task_get_option("open_tickets")
+        queue = bibtask.task_get_option("queue")
+        bibtask.task_update_progress('Initializing hoover')
+        if query_file_size:
+            run_hoover(check_db_consistency=check_db, dry_run=dry_run_b, packet_size=query_file_size, dry_hepnames_run=dry_hepnames, open_tickets=tickets)
+        if queue:
+            run_hoover(check_db_consistency=check_db, dry_run=dry_run_b, dry_hepnames_run=dry_hepnames, open_tickets=tickets, queue=queue)
+        else:
+            run_hoover(check_db_consistency=check_db, dry_run=dry_run_b, dry_hepnames_run=dry_hepnames, open_tickets=tickets)
+        bibtask.task_update_progress('Terminating hoover')
 
     if bibtask.task_get_option("merge"):
         bibtask.task_update_progress('Merging results...')
@@ -233,13 +290,16 @@ def _task_submit_check_options():
     disambiguate = bibtask.task_get_option("disambiguate")
     merge = bibtask.task_get_option("merge")
     update_search_index = bibtask.task_get_option("update_search_index")
+    force_identifier_consistency = bibtask.task_get_option("force_identifier_consistency")
 
     record_ids = bibtask.task_get_option("record_ids")
     all_records = bibtask.task_get_option("all_records")
     from_scratch = bibtask.task_get_option("from_scratch")
 
+    query_file_size = bibtask.task_get_option("packet_size")
+
     commands = (bool(update_personid) + bool(disambiguate) +
-                bool(merge) + bool(update_search_index))
+                bool(merge) + bool(update_search_index) + bool(force_identifier_consistency))
 
     if commands == 0:
         bibtask.write_message(
@@ -286,6 +346,12 @@ def _task_submit_check_options():
             bibtask.write_message("ERROR: There are no options which can be "
                                   "specified along with --merge", stream=sys.stdout, verbose=0)
             return False
+
+    if force_identifier_consistency:
+        if query_file_size:
+            if not query_file_size.isdigit():
+                bibtask.write_message("ERROR: --query-file-size excepts number. "
+                                    "Provided: %s." %query_file_size)
 
     return True
 
@@ -357,11 +423,15 @@ def run_rabbit(paperslist, all_records=False):
             'bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist),
             partial=True)
 
+def run_hoover(authors=None, check_db_consistency=False, dry_run=False, packet_size=1000, dry_hepnames_run=False, open_tickets=False, queue='test'):
+    from invenio.bibauthorid_hoover import hoover
+    hoover(authors, check_db_consistency, dry_run, packet_size, dry_hepnames_run, open_tickets)
 
 def run_tortoise(from_scratch, last_names_thresholds=None,
                  single_threaded=False):
 
     _prepare_tortoise_cache()
+
 
     from invenio.bibauthorid_tortoise import tortoise, \
         tortoise_from_scratch, tortoise_last_name, tortoise_last_names
