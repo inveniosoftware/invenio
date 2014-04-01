@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,7 +41,9 @@ __revision__ = "$Id$"
 import getopt
 import sys
 import zlib
+import six
 
+from flask import current_app
 from invenio.base.globals import cfg
 
 # Functions to format a single record
@@ -168,6 +170,8 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
             out = filter_hidden_fields(out, user_info)
         return out
     except Exception as e:
+        if current_app.debug:
+            six.reraise(*sys.exc_info())
         from invenio.ext.logging import register_exception
         register_exception(prefix="An error occured while formatting record %i in %s" % \
                            (recID, of),
