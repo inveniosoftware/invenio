@@ -868,22 +868,41 @@
     {% endblock searchfield_typeahead_configuration %}
 
 
-    // END -------------- SEARCH TYPEAHEAD -------------- END
+    // END -------------- SEARCH FIELD TYPEAHEAD -------------- END
 
-    // ------------ typehead for "Add to search" form ----------------
+    // ------------ typeahead for "Add to search" form ----------------
 
-    /*$('[data-provide="typeahead-url"]').each(function (i, field) {
-      field = $(field);
-      field.typeahead({
-        prefetch: {
-          url: field.data('source'),
-          filter: function(data) {
-            return data.results;
-          }
+    $('[data-provide="typeahead-url"]').each(function (i, field) {
+
+      var $field = $(field);
+
+      var engine = new Bloodhound({
+        datumTokenizer: function(d) {
+          return Bloodhound.tokenizers.whitespace(d.value);
         },
-        limit: 10
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        limit: 10,
+        remote: {
+          url: $field.data('source'),
+          replace: function(url, query) {
+            return url + '?q=' + query;
+          },
+          filter: function(response) {
+            return response.results;
+          }
+        }
       });
-    });*/
+
+      engine.initialize();
+
+      $field.typeahead({
+        minLength: 3
+      },
+      {
+        source: engine.ttAdapter(),
+        displayKey: 'value'
+      });
+    });
 
     // ---------------------------------------------------------------
 
