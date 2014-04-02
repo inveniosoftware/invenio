@@ -126,9 +126,6 @@ class Formatname(db.Model):
 class Bibfmt(db.Model):
     """Represents a Bibfmt record."""
 
-    def __init__(self):
-        pass
-
     __tablename__ = 'bibfmt'
 
     id_bibrec = db.Column(
@@ -145,6 +142,13 @@ class Bibfmt(db.Model):
         server_default='',
         primary_key=True,
         index=True)
+
+    kind = db.Column(
+        db.String(10),
+        nullable=False,
+        server_default='',
+        index=True
+        )
 
     last_updated = db.Column(
         db.DateTime,
