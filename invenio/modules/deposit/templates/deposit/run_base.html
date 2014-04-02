@@ -54,6 +54,7 @@
 {%- endmacro -%}
 
 {%- macro field_display(thisfield, field_size=None, field_class="form-control", container_class="form-group") -%}
+    {%- set field_size = field_size if field_size else (form.field_sizes.get(thisfield.name) if form.field_sizes else none) -%}
     {% include "deposit/run_field.html" %}
 {%- endmacro -%}
 

@@ -46,6 +46,9 @@ from invenio.legacy.bibsched.bibtask import task_low_level_submission, \
 from invenio.modules.pidstore.models import PersistentIdentifier
 
 
+#
+# Helpers
+#
 def filter_empty_helper(keys=None):
     """ Remove empty elements from a list"""
     def _inner(elem):
@@ -59,6 +62,9 @@ def filter_empty_helper(keys=None):
     return _inner
 
 
+#
+# Workflow tasks
+#
 def is_api_request(obj, eng):
     """ Check if request is an API request """
     return getattr(request, 'is_api_request', False)
@@ -269,7 +275,7 @@ def merge_record(draft_id='_default', pre_process_load=None,
             post_process_load=post_process_load,
             process_export=partial(process_export, d),
         )
-        changed_record = make_record(sip.metadata)
+        changed_record = make_record(sip.metadata, is_dump=True)
 
         # Generate patch
         initial_json = initial_record.dumps(clean=True)
@@ -394,15 +400,18 @@ def prepare_sip():
         if sip is None:
             sip = d.create_sip()
 
-        sip.metadata['fft'] = sip.metadata['files']
-        del sip.metadata['files']
+        # FIXME: Move to somewhere more appropriate
+        # create_sip by default stick files into the files attribute.
+        if 'files' in sip.metadata:
+            sip.metadata['fft'] = sip.metadata['files']
+            del sip.metadata['files']
 
         sip.agents = [Agent(role='creator', from_request_context=True)]
         d.update()
     return _prepare_sip
 
 
-def process_sip_metadata(processor):
+def process_sip_metadata(processor=None):
     """
     Process metadata in submission information package using a custom
     processor.
@@ -410,21 +419,26 @@ def process_sip_metadata(processor):
     def _prepare_sip(obj, dummy_eng):
         d = Deposition(obj)
         metadata = d.get_latest_sip(sealed=False).metadata
-        processor(d, metadata)
+
+        if processor is not None:
+            processor(d, metadata)
+        elif processor is None and hasattr(d.type, 'process_sip_metadata'):
+            d.type.process_sip_metadata(d, metadata)
+
         d.update()
     return _prepare_sip
 
 
-def finalize_record_sip():
+def finalize_record_sip(is_dump=True):
     """
     Finalizes the SIP by generating the MARC and storing it in the SIP.
     """
     def _finalize_sip(obj, dummy_eng):
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=False)
-
-        sip.package = make_record(sip.metadata).legacy_export_as_marc()
-
+        sip.package = make_record(
+            sip.metadata, is_dump=is_dump
+        ).legacy_export_as_marc()
         d.update()
     return _finalize_sip
 

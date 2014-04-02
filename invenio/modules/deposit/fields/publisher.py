@@ -31,14 +31,3 @@ class PublisherField(WebDepositField, TextField):
         )
         defaults.update(kwargs)
         super(PublisherField, self).__init__(**defaults)
-
-    # def post_process(self, form, extra_processors=[]):
-    #     sherpa_romeo_publisher_validate(self, form) #FIXME
-    #     super(PublisherField, self).post_process(form, extra_processors=extra_processors)
-
-    # def autocomplete(self, term, limit): #FIXME
-    #      # Load custom auto complete function
-    #     autocomplete = self.config.get_autocomplete_function()
-    #     if autocomplete is not None:
-    #         return autocomplete(self.data)
-    #     return sherpa_romeo_publishers(self.data)

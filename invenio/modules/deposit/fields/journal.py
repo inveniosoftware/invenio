@@ -31,33 +31,3 @@ class JournalField(WebDepositField, TextField):
         )
         defaults.update(kwargs)
         super(JournalField, self).__init__(**defaults)
-
-
-
-# from wtforms import TextField
-# from invenio.modules.knowledge.api import get_kb_mappings
-# from invenio.modules.deposit.field_base import WebDepositField
-
-# __all__ = ['JournalField']
-
-
-# def _kb_transform(val):
-#     ret = {}
-#     ret['value'] = val['key']
-#     ret['label'] = val['key']
-#     return ret
-
-
-# class JournalField(WebDepositField, TextField):
-
-#     def __init__(self, **kwargs):
-#         self._icon_html = ''
-#         super(JournalField, self).__init__(**kwargs)
-
-#     def pre_validate(self, form):
-#         return dict(error=0, error_message='')
-
-#     def autocomplete(self, term, limit):
-#         if not term:
-#             term = ''
-#         return map(_kb_transform, get_kb_mappings('journal_name', '', term)[:limit])
