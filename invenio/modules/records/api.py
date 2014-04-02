@@ -72,17 +72,19 @@ class Record(SmartJson):
         # this might be deprecated in the near future as soon as json will
         # become the master format, until then ...
         blob = cls.get_blob(recid)
-        record_sql_model = RecordModel.query.get(recid)
-        if record_sql_model is None or blob is None:
+        record_sql = RecordModel.query.get(recid)
+        if record_sql is None or blob is None:
             return None
         additional_info = record_sql_model.additional_info \
             if record_sql_model.additional_info \
             else {'master_format': 'marc'}
         record = cls.create(blob, **additional_info)
+        record['modification_date'] = record_sql.modification_date
+        record['creation_date'] = record_sql.creation_date
         record._save()
-        record_sql_model.additional_info = record.additional_info
+        record_sql.additional_info = record.additional_info
         from invenio.ext.sqlalchemy import db
-        db.session.merge(record_sql_model)
+        db.session.merge(record_sql)
         db.session.commit()
         return record
 
@@ -92,23 +94,14 @@ class Record(SmartJson):
         #FIXME: start using bibarchive or bibingest for this
         from invenio.modules.formatter.models import Bibfmt
         from zlib import decompress
-
-        record_blob = Bibfmt.query.get((recid, 'xm'))
-        if record_blob is None:
+        blobs = Bibfmt.query.filter_by(id_bibrec=recid, kind='master')
+        if blobs is None:
             return None
-        return decompress(record_blob.value)
+        return [decompress(blob.value) for blob in blobs]
 
     @property
     def blob(self):
-        """Get the blob from where the record was created."""
-        #FIXME: start using bibarchive or bibingest for this
-        from invenio.modules.formatter.models import Bibfmt
-        from zlib import decompress
-
-        record_blob = Bibfmt.query.get((self['recid'], 'xm'))
-        if record_blob is None:
-            return None
-        return decompress(record_blob.value)
+        return self.__class__.get_blob(self['recid'])
 
     @cached_property
     def persistent_identifiers(self):
@@ -152,6 +145,14 @@ class Record(SmartJson):
 
     def _save(self):
         self.__class__.storage_engine.update_one(self.dumps())
+        record_sql = RecordModel.query.get(self['recid'])
+        record_sql.modification_date = self['modification_date']
+        record_sql.creation_date = self['creation_date']
+        record_sql.master_format = self.additional_info.master_format
+        record_sql.additional_info = self.additional_info
+        from invenio.ext.sqlalchemy import db
+        db.session.merge(record_sql)
+        db.session.commit()
 
     # Legacy methods, try not to use them as they are already deprecated
 

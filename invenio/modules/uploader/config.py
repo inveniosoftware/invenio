@@ -18,8 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 UPLOADER_WORKFLOWS = {
-        'insert': 'invenio.modules.uploader.workflows.insert:insert'
-        }
+    'insert': 'invenio.modules.uploader.workflows.insert:insert'
+}
 
 UPLOADER_VALIDATION_MODE = 'strict'
 
