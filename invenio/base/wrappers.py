@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,11 +23,12 @@
 
     Implements the Flask application wrapper.
 
-    The function `url_for` in standard :class:`~flask.Flask` application
-    changes only protocol for secure sites (http -> https). However, in case
-    the application uses non standard ports (http://example.org:4000,
-    https://example:4001) or even different urls (http://www.example.org,
-    https://secure.example.org) following :class:`Flask` wrapper is necessary.
+    The function :func:`~flask.url_for` in standard :class:`~flask.Flask`
+    application changes only protocol for secure sites from 'http' to 'https'.
+    However, in case the application uses non standard ports (e.g.
+    http://example.org:4000, https://example:4001) or even different urls (e.g.
+    http://www.example.org, https://secure.example.org) following
+    :class:`Flask` wrapper is necessary.
 
     Configuration:
 
@@ -42,22 +43,62 @@
                           using HTTPS, then you may leave this empty.
     ===================== ====================================================
 
+
+
+    Following example shows how to make http and https url scheme loos the
+    same::
+
+        >>> from flask import url_for
+        >>> from invenio.base.factory import create_app
+        >>> app = create_app()
+        >>> app.config['CFG_SITE_URL'] = 'http://localhost:4000'
+        >>> app.config['CFG_SITE_SECURE_URL'] = 'http://localhost:4000'
+        >>> ctx = app.test_request_context()
+        >>> ctx.push()
+        >>> url_for('search.search')
+        '/search'
+        >>> url_for('search.search', _external=True)
+        'http://localhost:4000/search'
+        >>> url_for('search.search', _external=True, _scheme='https')
+        'http://localhost:4000/search'
+
+    There is also special wrapper for static files that serves them from
+    corresponding static folder depending on class:`~flask.Blueprint` or
+    application.
+
+        >>> url_for('static', filename='favicon.ico', _external=True)
+        'http://localhost:4000/favicon.ico'
+        >>> app.send_static_file('favicon.ico')
+        <Response streamed [200 OK]>
+        >>> url_for('search.static', filename='js/search/facet.js')
+        '/js/search/facet.js'
+        >>> app.send_static_file('js/search/facet.js')
+        <Response streamed [200 OK]>
+        >>> app.send_static_file('sorry-i-am-not-here.txt')
+        Traceback (most recent call last):
+         ...
+        NotFound: 404: Not Found
+        >>> ctx.pop()
 """
 import os
 
 from functools import wraps
 from flask import Flask as FlaskBase, current_app, send_file
-from werkzeug import import_string
+from werkzeug.utils import import_string
 from werkzeug.exceptions import NotFound
 from werkzeug.local import LocalProxy
 from invenio.utils.datastructures import LazyDict
 
 
-def _decorate_url_adapter_build(f):
-    @wraps(f)
+def _decorate_url_adapter_build(wrapped):
+    """Changes behavior of :func:`flask.url_for` for http and https scheme."""
+
+    @wraps(wrapped)
     def decorator(*args, **kwargs):
-        # Overwrites blueprint static url.
-        # NOTE: Custom blueprint 'static' endpoint will not work!
+        """Overwrites blueprint static url.
+
+        :note: Custom blueprint 'static' endpoint will **NOT** work!
+        """
         args = list(args)
         if args[0].endswith('.static'):
             args[0] = 'static'
@@ -67,9 +108,9 @@ def _decorate_url_adapter_build(f):
             'https': current_app.config['CFG_SITE_SECURE_URL']
         }
         force_external = kwargs.get('force_external', True)
-        url_scheme = getattr(f.im_self, 'url_scheme', 'http')
+        url_scheme = getattr(wrapped.im_self, 'url_scheme', 'http')
         kwargs['force_external'] = False
-        url = f(*args, **kwargs)
+        url = wrapped(*args, **kwargs)
         if force_external:
             url = url_scheme_prefixes.get(url_scheme) + url
         return url
@@ -82,17 +123,19 @@ def get_static_map():
     out = {}
 
     def generator(app, directory, files):
+        """Inserts files from all static directories to `STATIC_MAP`."""
         prefix = app.static_folder
-        for f in files:
-            path = os.path.join(directory, f)
+        for file_ in files:
+            path = os.path.join(directory, file_)
             if os.path.isdir(path):
                 continue
             filename = os.path.relpath(path, prefix.rstrip('/'))
             if filename not in out:
                 out[filename] = path
             else:
-                current_app.logger.info('Filename "%s" already exists: "%s" (%s)',
-                                        path, out[filename], app.name)
+                current_app.logger.info(
+                    'Filename "%s" already exists: "%s" (%s)',
+                    path, out[filename], app.name)
 
     if current_app.has_static_folder:
         os.path.walk(current_app.static_folder, generator, current_app)
@@ -104,26 +147,40 @@ def get_static_map():
 
     return out
 
-static_map = LazyDict(get_static_map)
+STATIC_MAP = LazyDict(get_static_map)
 
 
-class Flask(FlaskBase):
-    """For more information about :class:`Flask` see :class:`~flask.Flask`."""
+class Flask(FlaskBase):  # pylint: disable=R0904
+    """For more information about :class:`Flask` class see the official
+    documentation of :class:`flask.Flask`."""
 
     def create_url_adapter(self, request):
+        """Changes behavior of default `create_url_adapter` method to allow
+        advance url generation."""
         url_adapter = super(self.__class__, self).create_url_adapter(request)
         if url_adapter is not None and hasattr(url_adapter, 'build'):
             url_adapter.build = _decorate_url_adapter_build(url_adapter.build)
         return url_adapter
 
     def send_static_file(self, filename):
-        if not filename in static_map:
+        """Sends the contents of a file to the client only for filenames from
+        `STATIC_MAP`.
+
+        :param filename: name or relative path of a static file
+        :returns: result of :func:`flask.send_file`
+        :raises: :class:`werkzeug.exceptions.NotFound` if `filename` is not
+            in `STATIC_MAP`
+        """
+        if filename not in STATIC_MAP:
             raise NotFound
-        return send_file(static_map[filename])
+        return send_file(STATIC_MAP[filename])
 
 
 def lazy_import(name):
-    """
-    Lazy import of name using `Werzeug.local.import_string`.
+    """Lazy import of `name` using :func:`werkzeug.utils.import_string`
+    and :class:`werkzeug.local.LocalProxy`.
+
+    :param name: importable string
+    :return: proxy to result of :func:`~werkzeug.utils.import_string`
     """
     return LocalProxy(lambda: import_string(name))
