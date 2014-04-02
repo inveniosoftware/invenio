@@ -18,6 +18,8 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
+import six
+
 from invenio.modules.records.api import Record
 from .models import DepositionDraft
 
@@ -78,10 +80,14 @@ def deposition_record(record, form_classes, pre_process_load=None,
     )
 
 
-def make_record(values):
+def make_record(values, is_dump=True):
     """
     Export recjson from drafts
     """
-    record = Record(json=values, master_format='marc')
-
+    if is_dump:
+        record = Record(json=values, master_format='marc')
+    else:
+        record = Record(master_format='marc')
+        for k, v in six.iteritems(values):
+            record[k] = v
     return record

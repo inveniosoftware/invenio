@@ -19,13 +19,7 @@
 import os
 import sys
 
-DEPOSIT_TYPES = [
-    'invenio.modules.deposit.workflows.article_metadata.Article',
-    'invenio.modules.deposit.workflows.photo_metadata.Photo',
-    'invenio.modules.deposit.workflows.poetry_metadata.Poetry',
-    'invenio.modules.deposit.workflows.preprint_metadata.Preprint',
-    'invenio.modules.deposit.workflows.thesis_metadata.Thesis',
-]
+DEPOSIT_TYPES = []
 """
 List of DepositionType import strings
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -10,26 +10,14 @@
 ##
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.modules.deposit import forms
-from invenio.modules.deposit.models import DepositionType
-from invenio.modules.deposit.tasks import render_form
+from __future__ import print_function, absolute_import
+from .simplerecord import SimpleRecordDeposition
 
-__all__ = ['TestWorkflow']
-
-
-class TestWorkflow(DepositionType):
-    workflow = [render_form(draft_id='default'), ]
-    name = "TestWorkflow"
-    name_plural = "TestWorkflows"
-    group = ""
-    enabled = False
-    draft_definitions = {
-        'default': forms.ArticleForm,
-    }
+__all__ = ['SimpleRecordDeposition']

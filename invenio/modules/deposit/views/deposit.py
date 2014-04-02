@@ -129,9 +129,10 @@ def index():
 
 @blueprint.route('/<depositions:deposition_type>')
 @login_required
-@register_breadcrumb(blueprint, '.type', _('Type'))  # deptype.name_plural
+@register_breadcrumb(blueprint, '.type', _('Select or create'))
 def deposition_type_index(deposition_type):
-    if len(DepositionType.keys()) <= 1 and not DepositionType.get_default():
+    if len(DepositionType.keys()) <= 1 and \
+       DepositionType.get_default() is not None:
         abort(404)
 
     deptype = DepositionType.get(deposition_type)
@@ -156,7 +157,8 @@ def deposition_type_index(deposition_type):
     )
 
 
-@blueprint.route('/<depositions:deposition_type>/create', methods=['POST', 'GET'])
+@blueprint.route('/<depositions:deposition_type>/create',
+                 methods=['POST', 'GET'])
 @blueprint.route('/create/', methods=['POST', 'GET'])
 @login_required
 @deposition_error_handler()
@@ -187,7 +189,8 @@ def create(deposition_type=None):
     ))
 
 
-@blueprint.route('/<depositions:deposition_type>/<int:uuid>/<draft_id>', methods=['POST'])
+@blueprint.route('/<depositions:deposition_type>/<int:uuid>/<draft_id>',
+                 methods=['POST'])
 @blueprint.route('/<int:uuid>/<draft_id>', methods=['POST'])
 @login_required
 @deposition_error_handler()
@@ -344,8 +347,10 @@ def discard(deposition_type=None, uuid=None):
     ))
 
 
-@blueprint.route('/<depositions:deposition_type>/<int:uuid>/<draft_id>/status/',
-                 methods=['GET', 'POST'])
+@blueprint.route(
+    '/<depositions:deposition_type>/<int:uuid>/<draft_id>/status/',
+    methods=['GET', 'POST']
+)
 @blueprint.route('/<int:uuid>/<draft_id>/status/', methods=['GET', 'POST'])
 @login_required
 @deposition_error_handler()
@@ -481,7 +486,8 @@ def get_file(deposition_type=None, uuid=None):
 @blueprint.route(
     '/<depositions:deposition_type>/<int:uuid>/<draft_id>/<field_name>/',
     methods=['GET', 'POST'])
-@blueprint.route('/<int:uuid>/<draft_id>/<field_name>/', methods=['GET', 'POST'])
+@blueprint.route('/<int:uuid>/<draft_id>/<field_name>/',
+                 methods=['GET', 'POST'])
 @login_required
 def autocomplete(deposition_type=None, uuid=None, draft_id=None,
                  field_name=None):
