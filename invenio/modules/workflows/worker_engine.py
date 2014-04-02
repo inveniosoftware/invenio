@@ -65,15 +65,12 @@ def restart_worker(wid, **kwargs):
 
         # Then we reset their children to the same state as initial
         for initial_object in initials:
-            #print str(initial_object)
             running_object = BibWorkflowObject.query.filter(
                 BibWorkflowObject.id_parent == initial_object.id
             ).one()
-            #print str(running_object)
             running_object.copy(initial_object)
             running_object.id_parent = initial_object.id
             running_object.save()
-            #print str(running_object)
             data.append(running_object)
 
     from invenio.modules.workflows.engine import WorkflowStatus
@@ -91,7 +88,6 @@ def restart_worker(wid, **kwargs):
                                **kwargs)
     engine.save()
     objects = get_workflow_object_instances(data, engine)
-    #print str(objects)
     run_workflow(wfe=engine, data=objects, **kwargs)
     return engine
 
@@ -112,7 +108,6 @@ def continue_worker(oid, restart_point="continue_next",
     special arguments for the different steps.
     """
     workflow_object = BibWorkflowObject.query.get(oid)
-    print str(workflow_object)
     workflow = Workflow.query.get(workflow_object.id_workflow)
 
     engine = BibWorkflowEngine(workflow.name,

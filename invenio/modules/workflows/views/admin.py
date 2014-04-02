@@ -25,7 +25,6 @@
     WARNING: Currently not fully working.
 """
 
-from __future__ import print_function
 from six import text_type
 
 from flask import Blueprint
@@ -166,10 +165,8 @@ def get_redis_values(key):
 def _entry_data_preview(data, of='default'):
     if format == 'hd' or format == 'xm':
         from invenio.modules.formatter import format_record
-        try:
-            data['record'] = format_record(recID=None, of=of,
-                                           xml_record=data['record'])
-            return data['record']
-        except ValueError:
-            print("This is not a XML string")
+
+        data['record'] = format_record(recID=None, of=of,
+                                       xml_record=data['record'])
+        return data['record']
     return data

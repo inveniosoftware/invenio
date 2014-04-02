@@ -24,7 +24,6 @@ from six.moves import cPickle
 from six import iteritems, reraise
 from uuid import uuid1 as new_uuid
 
-
 import base64
 
 from workflow.engine import (GenericWorkflowEngine,
@@ -33,17 +32,22 @@ from workflow.engine import (GenericWorkflowEngine,
                              StopProcessing,
                              JumpTokenBack,
                              JumpTokenForward,
-                             WorkflowError)
+                             WorkflowError,
+                             )
 from invenio.config import CFG_DEVEL_SITE
 from .models import (Workflow,
                      BibWorkflowObject,
                      BibWorkflowEngineLog,
-                     ObjectVersion)
-from .utils import dictproperty
+                     ObjectVersion,
+                     )
+from .utils import (dictproperty,
+                    get_workflow_definition,
+                    )
 from .logger import (get_logger,
-                     BibWorkflowLogHandler)
-from .errors import (WorkflowHalt,
-                     WorkflowDefinitionError)
+                     BibWorkflowLogHandler,
+                     )
+from .errors import WorkflowHalt
+
 
 DEBUG = CFG_DEVEL_SITE > 0
 

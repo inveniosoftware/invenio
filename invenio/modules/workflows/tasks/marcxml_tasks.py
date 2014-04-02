@@ -24,7 +24,6 @@ import re
 import traceback
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
-
 from invenio.base.globals import cfg
 from invenio.base.wrappers import lazy_import
 
@@ -972,7 +971,6 @@ def author_list(obj, eng):
             obj.data['number_of_authors'] = new_dict_representation["number_of_authors"]
             obj.add_task_result("authors", new_dict_representation["authors"])
             obj.add_task_result("number_of_authors", new_dict_representation["number_of_authors"])
-
 
 author_list.__id__ = "u"
 

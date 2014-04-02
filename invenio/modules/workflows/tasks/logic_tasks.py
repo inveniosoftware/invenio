@@ -240,8 +240,6 @@ def compare_logic(a, b, op):
     - lte A lesser than or equal B
     :return: Boolean: result of the test
     """
-
-
     def _compare_logic(obj, eng):
         my_a = a
         my_b = b
@@ -281,6 +279,5 @@ def compare_logic(a, b, op):
                     return False
         else:
             return False
-
 
     return _compare_logic

@@ -30,7 +30,6 @@ from invenio.modules.workflows.tasks.workflows_tasks import (start_workflow,
                                                              wait_for_workflows_to_complete)
 
 from invenio.modules.workflows.tasks.logic_tasks import simple_for, end_for, workflow_if, workflow_else
-from invenio.modules.workflows.tasks.sample_tasks import print_data
 from invenio.modules.workflows.tasks.marcxml_tasks import set_obj_extra_data_key
 
 
@@ -43,7 +42,6 @@ class test_workflow_workflows(object):
         log_info("starting"),
         simple_for(0, 20, 1, "X"),
         [
-            print_data,
             start_workflow("test_workflow", 22),
             log_info(get_nb_workflow_created),
         ],
@@ -52,7 +50,7 @@ class test_workflow_workflows(object):
         simple_for(0, 20, 1),
         [
             write_something_generic(["We are waiting for ", get_list_of_workflows_to_wait], [log_info]),
-            wait_for_a_workflow_to_complete,
+            wait_for_a_workflow_to_complete(0.1),
         ],
         end_for,
         workflows_reviews(True),
@@ -65,7 +63,7 @@ class test_workflow_workflows(object):
             ],
             workflow_else,
             [
-                wait_for_a_workflow_to_complete,
+                wait_for_a_workflow_to_complete(0.1),
                 start_workflow("test_workflow", 22),
             ],
             set_obj_extra_data_key("nbworkflowrunning", get_nb_workflow_running),

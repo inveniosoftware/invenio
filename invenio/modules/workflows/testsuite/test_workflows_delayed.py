@@ -18,45 +18,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.base.factory import with_app_context
-from invenio.testsuite import InvenioTestCase, make_test_suite, \
-    run_test_suite
+
+from invenio.testsuite import (InvenioTestCase,
+                               make_test_suite,
+                               run_test_suite,)
 
 
 class WorkflowDelayedTest(InvenioTestCase):
     def tearDown(self):
         """ Clean up created objects """
-        from invenio.modules.workflows.models import (BibWorkflowObject,
-                                                      Workflow,
-                                                      BibWorkflowEngineLog,
-                                                      BibWorkflowObjectLog)
-        from invenio.ext.sqlalchemy import db
-
-        workflows = Workflow.get(Workflow.module_name == "unit_tests").all()
-        for workflow in workflows:
-            BibWorkflowObject.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).delete()
-
-            objects = BibWorkflowObjectLog.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).all()
-            for obj in objects:
-                db.session.delete(obj)
-            db.session.delete(workflow)
-
-            objects = BibWorkflowObjectLog.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).all()
-            for obj in objects:
-                BibWorkflowObjectLog.delete(id=obj.id)
-            BibWorkflowEngineLog.delete(uuid=workflow.uuid)
-            # Deleting dumy object created in tests
-        db.session.query(BibWorkflowObject).filter(
-            BibWorkflowObject.id_workflow.in_([11, 123, 253])
-        ).delete(synchronize_session='fetch')
-        Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
-        db.session.commit()
+        from invenio.modules.workflows.utils import tearDown as mtearDown
+        mtearDown(self)
 
     def test_workflow_delay(self):
         from invenio.modules.workflows.models import BibWorkflowObject
@@ -74,7 +46,7 @@ class WorkflowDelayedTest(InvenioTestCase):
         self.assertEqual(test_objectb.get_data(), 38)
 
         asyncr = start_by_wid_delayed(engineb.uuid)
-        engineb = asyncr.get()
+        asyncr.get()
         self.assertEqual(test_objectb.get_data(), 38)
         test_objecte = BibWorkflowObject()
         test_objecte.set_data(2)
@@ -164,22 +136,16 @@ class WorkflowDelayedTest(InvenioTestCase):
         engine = start("test_workflow_workflows", [test_object], module_name="unit_tests")
         from invenio.modules.workflows.engine import WorkflowStatus
 
-
         self.assertEqual(engine.get_extra_data()["_nb_workflow_failed"], 0)
         self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
-        print test_object.get_extra_data()["_tasks_results"]
         self.assertEqual(test_object.get_extra_data()["_tasks_results"]["_workflows_reviews"][0].result["failed"], 0)
-        self.assertEqual(test_object.get_extra_data()["nbworkflowrunning"],4)
+        self.assertEqual(test_object.get_extra_data()["nbworkflowrunning"], 4)
         self.assertEqual(engine.get_extra_data()["_nb_workflow_finish"], 21)
 
-@with_app_context()
-def main():
-    """
-    Main function which is used to run tests.
-    """
-    test_suite = make_test_suite(WorkflowDelayedTest)
-    run_test_suite(test_suite)
 
+TEST_SUITE = make_test_suite(WorkflowDelayedTest,
+                             )
 
 if __name__ == "__main__":
-    main()
+    run_test_suite(TEST_SUITE)
+

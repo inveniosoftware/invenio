@@ -73,7 +73,7 @@ class generic_harvesting_workflow_with_bibsched(object):
                         [
                             write_something_generic(["Max Simultaneous Workflow, Wait for one to finish"],
                                                     [task_update_progress, write_message]),
-                            wait_for_a_workflow_to_complete,
+                            wait_for_a_workflow_to_complete(0.5),
                             start_workflow("full_doc_process", None),
                             write_something_generic(["Workflow started : ", get_nb_workflow_created, " "],
                                                     [task_update_progress, write_message]),

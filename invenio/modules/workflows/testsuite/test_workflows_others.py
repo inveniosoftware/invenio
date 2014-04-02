@@ -18,9 +18,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.base.factory import with_app_context
-from invenio.testsuite import InvenioTestCase, make_test_suite, \
-    run_test_suite
+from invenio.testsuite import (InvenioTestCase,
+                               make_test_suite,
+                               run_test_suite,
+                               )
 
 
 class WorkflowOthers(InvenioTestCase):
@@ -29,7 +30,6 @@ class WorkflowOthers(InvenioTestCase):
         from invenio.modules.workflows.models import BibWorkflowObject
         from invenio.modules.workflows.worker_result import AsynchronousResultWrapper
 
-
         bwoic = BibWorkflowObjectIdContainer(None)
         self.assertEqual(bwoic.get_object(), None)
         test_object = BibWorkflowObject()
@@ -37,13 +37,11 @@ class WorkflowOthers(InvenioTestCase):
         test_object.save()
         bwoic2 = BibWorkflowObjectIdContainer(test_object)
         self.assertEqual(bwoic2.get_object().id, test_object.id)
-
         result = bwoic2.to_dict()
-
         self.assertEqual(bwoic2.from_dict(result).id, test_object.id)
         test_object.delete(test_object.id)
         try:
-            AsynchronousResultWrapper()
+            AsynchronousResultWrapper(None)
         except Exception as e:
             self.assertEqual(isinstance(e, TypeError), True)
 
@@ -58,14 +56,9 @@ class WorkflowOthers(InvenioTestCase):
             return
         self.assertEqual(False, True)
 
-@with_app_context()
-def main():
-    """
-    Main function which is used to run tests.
-    """
-    test_suite = make_test_suite(WorkflowOthers)
-    run_test_suite(test_suite)
 
+TEST_SUITE = make_test_suite(WorkflowOthers,
+                             )
 
 if __name__ == "__main__":
-    main()
+    run_test_suite(TEST_SUITE)

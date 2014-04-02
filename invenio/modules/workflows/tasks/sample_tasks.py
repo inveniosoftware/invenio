@@ -19,16 +19,15 @@
 """
 Collection of tasks used for tests.
 """
-
-from __future__ import print_function
-
 import time
 
 
-def add_data(data):
+def add_data(data_param):
     """ Task using closure to allow parameters """
     def _add_data(obj, eng):
         """ Adds data to obj.data """
+        #due to python 2 way of managing closure
+        data = data_param
         obj.data += data
     return _add_data
 
@@ -43,11 +42,6 @@ def halt_if_data_less_than(threshold):
         if obj.data < threshold:
             eng.halt("Value of data is too small.")
     return _halt_if_data_less_than
-
-
-def print_data(obj, eng):
-    """ Static task with no parameters """
-    print(obj.data)
 
 
 def set_data(data):

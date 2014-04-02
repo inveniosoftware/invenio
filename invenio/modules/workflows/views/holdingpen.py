@@ -36,7 +36,9 @@ from flask import (render_template,
                    jsonify, url_for,
                    flash, session)
 from flask.ext.login import login_required
-from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
+from flask.ext.breadcrumbs import (default_breadcrumb_root,
+                                   register_breadcrumb,
+                                   )
 from flask.ext.menu import register_menu
 
 from invenio.base.decorators import templated, wash_arguments
@@ -46,7 +48,8 @@ from invenio.utils.date import pretty_date
 from ..models import BibWorkflowObject, Workflow, ObjectVersion
 from ..registry import actions
 from ..utils import (get_workflow_definition,
-                     sort_bwolist)
+                     sort_bwolist,
+                     )
 from ..api import continue_oid_delayed, start
 
 
@@ -502,7 +505,6 @@ def extract_data(bwobject):
 def edit_record(form):
     """Call the edit record action."""
     for key in form.iterkeys():
-        # print '%s: %s' % (key, form[key])
         pass
 
 

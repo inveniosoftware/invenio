@@ -27,7 +27,8 @@
 
 
 from werkzeug.utils import (import_string,
-                            cached_property)
+                            cached_property,
+                            )
 
 from invenio.base.globals import cfg
 from invenio.base.config import CFG_BIBWORKFLOW_WORKER
@@ -76,7 +77,7 @@ def start(workflow_name, data, **kwargs):
     The workflow engine object generated is returned upon completion.
 
     :param workflow_name: the workflow name to run. Ex: "my_workflow"
-    :type workflow_name: String
+    :type workflow_name: str or String
 
     :param data: the workflow name to run. Ex: "my_workflow"
     :type data: list of objects/dicts
@@ -97,7 +98,7 @@ def start_delayed(workflow_name, data, **kwargs):
     Otherwise, see documentation of start().
 
     :param workflow_name: the workflow name to run. Ex: "my_workflow"
-    :type workflow_name: String
+    :type workflow_name:  String or str
 
     :param data: the workflow name to run. Ex: "my_workflow"
     :type data: list of objects/dicts
@@ -133,7 +134,7 @@ def start_by_wid(wid, **kwargs):
     such as a taskid from BibSched, the current user etc.
 
     :param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000"
-    :type wid: String
+    :type wid: str
 
     :return: BibWorkflowEngine that ran the workflow.
     """
@@ -156,7 +157,7 @@ def start_by_wid_delayed(wid, **kwargs):
     such as a taskid from BibSched, the current user etc.
 
     :param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000"
-    :type wid: String
+    :type wid: str
 
     :return: BibWorkflowEngine that ran the workflow.
     """
@@ -173,10 +174,10 @@ def start_by_oids(workflow_name, oids, **kwargs):
     such as a taskid from BibSched, the current user etc.
 
     :param workflow_name: the workflow name to run. Ex: "my_workflow"
-    :type workflow_name: String
+    :type workflow_name: str
 
     :param oids: list of BibWorkflowObject id's to run.
-    :type oids: list of strings/integers
+    :type oids: list of str or integers
 
     :return: BibWorkflowEngine that ran the workflow.
     """
@@ -207,10 +208,10 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
     a task queue such as Celery (http://celeryproject.org).
 
     :param workflow_name: the workflow name to run. Ex: "my_workflow"
-    :type workflow_name: String
+    :type workflow_name: str
 
     :param oids: list of BibWorkflowObject id's to run.
-    :type oids: list of strings/integers
+    :type oids: list of str or int
 
     :return: BibWorkflowEngine that ran the workflow.
     """
@@ -237,13 +238,13 @@ def continue_oid(oid, start_point="continue_next", **kwargs):
     a task queue such as Celery (http://celeryproject.org).
 
     :param oid: id of BibWorkflowObject to run.
-    :type oid: String
+    :type oid: str
 
     :param start_point: where should the workflow start from? One of:
         * restart_prev: will restart from the previous task
         * continue_next: will continue to the next task
         * restart_task: will restart the current task
-    :type start_point: String
+    :type start_point: str
 
     :return: BibWorkflowEngine that ran the workflow
     """
@@ -266,13 +267,13 @@ def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
     a task queue such as Celery (http://celeryproject.org).
 
     :param oid: id of BibWorkflowObject to run.
-    :type oid: String
+    :type oid: str
 
     :param start_point: where should the workflow start from? One of:
         * restart_prev: will restart from the previous task
         * continue_next: will continue to the next task
         * restart_task: will restart the current task
-    :type start_point: String
+    :type start_point: str
 
     :return: BibWorkflowEngine that ran the workflow
     """
@@ -294,13 +295,13 @@ def resume_objects_in_workflow(id_workflow, start_point="continue_next",
     the objects resume with their next task in the workflow.
 
     :param id_workflow: id of Workflow with objects to resume.
-    :type id_workflow: String
+    :type id_workflow: str
 
     :param start_point: where should the workflow start from? One of:
         * restart_prev: will restart from the previous task
         * continue_next: will continue to the next task
         * restart_task: will restart the current task
-    :type start_point: String
+    :type start_point: str
 
     yield: BibWorkflowEngine that ran the workflow
     """

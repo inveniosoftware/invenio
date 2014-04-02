@@ -118,37 +118,8 @@ distances from it.
 
     def tearDown(self):
         """ Clean up created objects """
-        from invenio.modules.workflows.models import (BibWorkflowObject,
-                                                      Workflow,
-                                                      BibWorkflowEngineLog,
-                                                      BibWorkflowObjectLog)
-        from invenio.ext.sqlalchemy import db
-
-        workflows = Workflow.get(Workflow.module_name == "unit_tests").all()
-        for workflow in workflows:
-            BibWorkflowObject.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).delete()
-
-            objects = BibWorkflowObjectLog.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).all()
-            for obj in objects:
-                db.session.delete(obj)
-            db.session.delete(workflow)
-
-            objects = BibWorkflowObjectLog.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).all()
-            for obj in objects:
-                BibWorkflowObjectLog.delete(id=obj.id)
-            BibWorkflowEngineLog.delete(uuid=workflow.uuid)
-            # Deleting dumy object created in tests
-        db.session.query(BibWorkflowObject).filter(
-            BibWorkflowObject.id_workflow.in_([11, 123, 253])
-        ).delete(synchronize_session='fetch')
-        Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
-        db.session.commit()
+        from invenio.modules.workflows.utils import tearDown as mtearDown
+        mtearDown(self)
         self.cleanup_registries()
 
     def test_halt(self):
@@ -541,20 +512,31 @@ test purpose, this object will log several things"""
         obj_running.save(version=ObjectVersion.RUNNING)
 
         try:
-            engine = start_by_oids('test_workflow', [obj_running.id], module_name="unit_tests")
+            start_by_oids('test_workflow', [obj_running.id], module_name="unit_tests")
         except Exception as e:
             self.assertEqual(isinstance(e, WorkflowObjectVersionError), True)
             obj_running.delete(e.id_object)
         obj_running.delete(obj_running)
         obj_running = BibWorkflowObject()
         obj_running.set_data(1234)
-        obj_running.save(version=4L)
+        obj_running.save(version=ObjectVersion.RUNNING)
         try:
-            engine = start_by_oids('test_workflow', [obj_running.id], module_name="unit_tests")
+            start_by_oids('test_workflow', [obj_running.id], module_name="unit_tests")
         except Exception as e:
             self.assertEqual(isinstance(e, WorkflowObjectVersionError), True)
             obj_running.delete(e.id_object)
         obj_running.delete(obj_running)
+
+        obj_running = BibWorkflowObject()
+        obj_running.set_data(1234)
+        obj_running.save(version=5)
+        try:
+            start_by_oids('test_workflow', [obj_running.id], module_name="unit_tests")
+        except Exception as e:
+            self.assertEqual(isinstance(e, WorkflowObjectVersionError), True)
+            obj_running.delete(e.id_object)
+        obj_running.delete(obj_running)
+
 
 
 
@@ -707,37 +689,8 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
 
     def tearDown(self):
         """ Clean up created objects """
-        from invenio.modules.workflows.models import (BibWorkflowObject,
-                                                      Workflow,
-                                                      BibWorkflowEngineLog,
-                                                      BibWorkflowObjectLog)
-        from invenio.ext.sqlalchemy import db
-
-        workflows = Workflow.get(Workflow.module_name == "unit_tests").all()
-        for workflow in workflows:
-            BibWorkflowObject.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).delete()
-
-            objects = BibWorkflowObjectLog.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).all()
-            for obj in objects:
-                db.session.delete(obj)
-            db.session.delete(workflow)
-
-            objects = BibWorkflowObjectLog.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).all()
-            for obj in objects:
-                BibWorkflowObjectLog.delete(id=obj.id)
-            BibWorkflowEngineLog.delete(uuid=workflow.uuid)
-            # Deleting dumy object created in tests
-        db.session.query(BibWorkflowObject).filter(
-            BibWorkflowObject.id_workflow.in_([11, 123, 253])
-        ).delete(synchronize_session='fetch')
-        Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
-        db.session.commit()
+        from invenio.modules.workflows.utils import tearDown as mtearDown
+        mtearDown(self)
 
     def test_logic_tasks(self):
         """

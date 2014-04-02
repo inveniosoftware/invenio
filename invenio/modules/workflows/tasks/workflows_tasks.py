@@ -19,16 +19,29 @@
 import six
 
 from time import sleep
+from invenio.modules.workflows.errors import WorkflowError
+from invenio.modules.workflows.models import BibWorkflowEngineLog
 
 
 def interrupt_workflow(obj, eng):
+    """
+    Small function mailny for testing which stops the workflow.
+    The object will be in the state HALTED.
+
+    :param obj: BibworkflowObject to process
+    :param eng: BibWorkflowEngine processing the object
+    """
     eng.halt("interrupting workflow.")
 
 
 def get_nb_workflow_created(obj, eng):
     """
-    :param obj: Bibworkflow Object to process
+    This function will return the number of workflows created
+    for this instance.
+
+    :param obj: BibworkflowObject to process
     :param eng: BibWorkflowEngine processing the object
+    :return the number of workflow created since the last clean.
     """
     try:
         return eng.extra_data["_nb_workflow"]
@@ -38,10 +51,23 @@ def get_nb_workflow_created(obj, eng):
 
 def num_workflow_running_greater(num):
     """
+    This function has been created to correct the problem of saturation
+    of messaging queue which  can lead to the complete destruction of
+    the computing node.
 
-    :param num: the number that you want to compare with the number de workflow running
+    This function should be used with the function to create workflow and wait
+    for workflow to finish.
+
+    This allows to control the number of workflow in the messaging queue
+
+    This function will just return True if the number of workflow
+    in the messaging queue is higher than num or False.
+
+    :param num: the number that you want to compare with the number of workflows in
+    the message queue
     :type num: number
-    :return True if you need to wait or false if you don't need to wait
+    :return True if you need to wait ( number of workflow in message queue greater
+    than num) or false if you don't need to wait.
     """
 
     def _num_workflow_running_greater(obj, eng):
@@ -90,9 +116,13 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
 
     def _start_workflow(obj, eng):
 
-        myobject = BibWorkflowObject.create_object_revision(obj,
-                                                            version=ObjectVersion.INITIAL,
-                                                            data_type="record")
+        if copy:
+            myobject = BibWorkflowObject.create_object_revision(obj,
+                                                                version=ObjectVersion.INITIAL,
+                                                                data_type="record")
+        else:
+            myobject = BibWorkflowObject()
+
         if data:
             myobject.set_data(data)
             myobject.save()
@@ -137,23 +167,7 @@ def wait_for_workflows_to_complete(obj, eng):
 
     if '_workflow_ids' in eng.extra_data:
         for workflow_id in eng.extra_data['_workflow_ids']:
-            try:
-                workflow_id.get()
-                eng.extra_data["_nb_workflow_finish"] += 1
-            except WorkflowError as e:
-                eng.log.error(str(e))
-                workflowlog = BibWorkflowEngineLog.query.filter(
-                    BibWorkflowEngineLog.id_object == e.id_workflow
-                ).filter(BibWorkflowEngineLog.log_type == 40).all()
-                for log in workflowlog:
-                    eng.log.error(log.message)
-
-                eng.extra_data["_nb_workflow_failed"] += 1
-                eng.extra_data["_nb_workflow_finish"] += 1
-            except Exception as e:
-                eng.log.error("Error: Workflow failed %s" % str(e))
-                eng.extra_data["_nb_workflow_failed"] += 1
-                eng.extra_data["_nb_workflow_finish"] += 1
+            workflow_result_management(workflow_id, eng)
     else:
         eng.extra_data["_nb_workflow"] = 0
         eng.extra_data["_nb_workflow_failed"] = 0
@@ -177,8 +191,62 @@ def wait_for_a_workflow_to_complete_obj(obj, eng):
         eng.extra_data["_nb_workflow_failed"] = 0
         eng.extra_data["_nb_workflow_finish"] = 0
         return None
+    workflow_result_management(obj.data, eng)
+
+
+def wait_for_a_workflow_to_complete(scanning_time=0.5):
+    """
+
+    :param scanning_time: time value in second to define which interval
+    is used, to look into the message queue for finished workflows.
+    :type scanning_time: number
+    :return:
+    """
+
+    def _wait_for_a_workflow_to_complete(obj, eng):
+        """
+        This function wait for the asynchronous workflow specified
+        in obj.data ( asyncresult )
+        It acts like a barrier
+        :param obj: Bibworkflow Object to process
+        :param eng: BibWorkflowEngine processing the object
+        """
+        if '_workflow_ids' in eng.extra_data:
+            to_wait = None
+            i = 0
+            while not to_wait and len(eng.extra_data["_workflow_ids"]) > 0:
+                for i in range(0, len(eng.extra_data["_workflow_ids"])):
+                    if eng.extra_data["_workflow_ids"][i].status == "SUCCESS":
+                        to_wait = eng.extra_data["_workflow_ids"][i]
+                        break
+                    if eng.extra_data["_workflow_ids"][i].status == "FAILURE":
+                        to_wait = eng.extra_data["_workflow_ids"][i]
+                        break
+                sleep(scanning_time)
+            if not to_wait:
+                return None
+            workflow_result_management(to_wait, eng)
+
+            del eng.extra_data["_workflow_ids"][i]
+
+        else:
+            eng.extra_data["_nb_workflow"] = 0
+            eng.extra_data["_nb_workflow_failed"] = 0
+            eng.extra_data["_nb_workflow_finish"] = 0
+
+    return _wait_for_a_workflow_to_complete
+
+
+def workflow_result_management(async_result, eng):
+    """
+    This function is here mainly to factorize the code .
+
+    :param async_result: asynchronous result that we want to query to
+    get data.
+    :param eng: workflowenginne for loging and state change.
+    """
     try:
-        obj.data.get()
+        async_result.get()
         eng.extra_data["_nb_workflow_finish"] += 1
     except WorkflowError as e:
         eng.log.error("Error: Workflow failed %s" % str(e))
@@ -188,56 +256,13 @@ def wait_for_a_workflow_to_complete_obj(obj, eng):
 
         for log in workflowlog:
             eng.log.error(log.message)
+        eng.extra_data["_uuid_workflow_crashed"].append(e.id_workflow)
         eng.extra_data["_nb_workflow_failed"] += 1
         eng.extra_data["_nb_workflow_finish"] += 1
     except Exception as e:
         eng.log.error("Error: Workflow failed %s" % str(e))
         eng.extra_data["_nb_workflow_failed"] += 1
         eng.extra_data["_nb_workflow_finish"] += 1
-
-
-def wait_for_a_workflow_to_complete(obj, eng):
-    """
-    This function wait for the asynchronous workflow specified
-    in obj.data ( asyncresult )
-    It acts like a barrier
-    :param obj: Bibworkflow Object to process
-    :param eng: BibWorkflowEngine processing the object
-    """
-    from invenio.modules.workflows.errors import WorkflowError
-
-    if '_workflow_ids' in eng.extra_data:
-        to_wait = None
-        i = 0
-        while not to_wait and len(eng.extra_data["_workflow_ids"]) > 0:
-            for i in range(0, len(eng.extra_data["_workflow_ids"])):
-                if eng.extra_data["_workflow_ids"][i].status == "SUCCESS":
-                    to_wait = eng.extra_data["_workflow_ids"][i]
-                    break
-                if eng.extra_data["_workflow_ids"][i].status == "FAILURE":
-                    to_wait = eng.extra_data["_workflow_ids"][i]
-                    break
-            sleep(1)
-        if not to_wait:
-            return None
-        try:
-            to_wait.get()
-            eng.extra_data["_nb_workflow_finish"] += 1
-        except WorkflowError as e:
-            eng.extra_data["_uuid_workflow_crashed"].append(e.id_workflow)
-            eng.extra_data["_nb_workflow_failed"] += 1
-            eng.extra_data["_nb_workflow_finish"] += 1
-        except:
-            eng.extra_data["_nb_workflow_failed"] += 1
-            eng.extra_data["_nb_workflow_finish"] += 1
-
-        del eng.extra_data["_workflow_ids"][i]
-
-    else:
-        eng.extra_data["_nb_workflow"] = 0
-        eng.extra_data["_nb_workflow_failed"] = 0
-        eng.extra_data["_nb_workflow_finish"] = 0
-
 
 def write_something_generic(messagea, func):
     """
@@ -251,9 +276,9 @@ def write_something_generic(messagea, func):
     should always take in parameter a string which is the message.
 
     :param func: the list of function that will be used to propagate the message
-    :type func: List of functions
+    :type func: list of functions or a functions.
     :param messagea: the message that you want to propagate
-    :type messagea: List of strings and functions.
+    :type messagea: list of strings and functions.
     """
 
     def _write_something_generic(obj, eng):
@@ -333,6 +358,9 @@ def workflows_reviews(stop_if_error=False, clean=True):
     This function just give you a little review of you children workflows.
     This function can be used to stop the workflow if a child has crashed.
 
+    :param clean: optionnal, allowxs the cleaning of data about workflow for example
+     start again from clean basis.
+    :type clean: bool
     :param stop_if_error: give to the function the indication it it should stop
     if a child workflow has crashed.
     :type stop_if_error: bool
@@ -366,8 +394,13 @@ def workflows_reviews(stop_if_error=False, clean=True):
 
 def log_info(message):
     """
+    A simple function to log a simple thing,
+    if you want more sophisticated way, thanks to see
+    the function write_something_generic.
 
-    :param message:
+    :param message: this value represent what we want to log,
+    if meessage is a function then it will be executed.
+    :type message: str or function
     :return:
     """
 

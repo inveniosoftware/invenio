@@ -17,17 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function, absolute_import
-
-import re
 import redis
 
 from six import iteritems
 
-
 from .errors import WorkflowDefinitionError
-
-REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
 
 
 def session_manager(orig_func):
@@ -46,6 +40,40 @@ def session_manager(orig_func):
 
     return new_func
 
+
+def tearDown(self):
+        """ Clean up created objects """
+        from invenio.modules.workflows.models import (BibWorkflowObject,
+                                                      Workflow,
+                                                      BibWorkflowEngineLog,
+                                                      BibWorkflowObjectLog)
+        from invenio.ext.sqlalchemy import db
+
+        workflows = Workflow.get(Workflow.module_name == "unit_tests").all()
+        for workflow in workflows:
+            BibWorkflowObject.query.filter(
+                BibWorkflowObject.id_workflow == workflow.uuid
+            ).delete()
+
+            objects = BibWorkflowObjectLog.query.filter(
+                BibWorkflowObject.id_workflow == workflow.uuid
+            ).all()
+            for obj in objects:
+                db.session.delete(obj)
+            db.session.delete(workflow)
+
+            objects = BibWorkflowObjectLog.query.filter(
+                BibWorkflowObject.id_workflow == workflow.uuid
+            ).all()
+            for obj in objects:
+                BibWorkflowObjectLog.delete(id=obj.id)
+            BibWorkflowEngineLog.delete(uuid=workflow.uuid)
+            # Deleting dumy object created in tests
+        db.session.query(BibWorkflowObject).filter(
+            BibWorkflowObject.id_workflow.in_([11, 123, 253])
+        ).delete(synchronize_session='fetch')
+        Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
+        db.session.commit()
 
 class BibWorkflowObjectIdContainer(object):
     """
@@ -99,39 +127,10 @@ def get_workflow_definition(name):
     else:
         return WorkflowMissing.workflow
 
-#FIXME: Dead code ? Useless ? Still in study please wait before removing except if you have reliabily conclude
-#FIXME: that it is 100% dead and useless code
-
-# def determineDataType(data):
-#     # If data is a dictionary and contains type key,
-#     # we can directly derive the data_type
-#     if isinstance(data, dict):
-#         if 'type' in data:
-#             data_type = data['type']
-#         else:
-#             data_type = 'dict'
-#     else:
-#
-#         # If data is not a dictionary, we try to guess MIME type
-#         # by using magic library
-#         try:
-#             from magic import Magic
-#
-#             mime_checker = Magic(mime=True)
-#             data_type = mime_checker.from_buffer(data)  # noqa
-#         except:
-#             from invenio.ext.logging import register_exception
-#
-#             register_exception(stream="warning", prefix=
-#             "BibWorkflowObject.determineDataType:" +
-#             " Impossible to resolve data type.")
-#             data_type = ""
-#     return data_type
 
 ## TODO special thanks to http://code.activestate.com/recipes/440514-dictproperty-properties-for-dictionary-attributes/
 class dictproperty(object):
     class _proxy(object):
-
         def __init__(self, obj, fget, fset, fdel):
             self._obj = obj
             self._fget = fget
@@ -139,22 +138,13 @@ class dictproperty(object):
             self._fdel = fdel
 
         def __getitem__(self, key):
-            try:
-                return self._fget(self._obj, key)
-            except TypeError:
-                print("can't read item")
+            return self._fget(self._obj, key)
 
         def __setitem__(self, key, value):
-            try:
-                self._fset(self._obj, key, value)
-            except TypeError:
-                print("can't set item %s: %s" % (str(key), str(value),))
+            self._fset(self._obj, key, value)
 
         def __delitem__(self, key):
-            try:
-                self._fdel(self._obj, key)
-            except TypeError:
-                print("can't delete item")
+            self._fdel(self._obj, key)
 
     def __init__(self, fget=None, fset=None, fdel=None, doc=None):
         self._fget = fget

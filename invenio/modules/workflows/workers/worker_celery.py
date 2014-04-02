@@ -15,8 +15,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
-
 from six import iteritems
 
 from invenio.celery import celery
@@ -79,11 +77,11 @@ class worker_celery(object):
         Helper function to get celery task
         decorators to worker_celery
 
-        @param workflow_name: name of the workflow to be run
-        @type workflow_name: string
+        :param workflow_name: name of the workflow to be run
+        :type workflow_name: str
 
-        @param data: list of objects for the workflow
-        @type data: list
+        :param data: list of objects for the workflow
+        :type data: list
         """
         return CeleryResult(celery_run.delay(workflow_name, data, **kwargs))
 
@@ -92,8 +90,8 @@ class worker_celery(object):
         Helper function to get celery task
         decorators to worker_celery
 
-        @param wid: uuid of the workflow to be run
-        @type wid: string
+        :param wid: uuid of the workflow to be run
+        :type wid: str
         """
         return CeleryResult(celery_restart.delay(wid, **kwargs))
 
@@ -102,11 +100,11 @@ class worker_celery(object):
         Helper function to get celery task
         decorators to worker_celery
 
-        @param oid: uuid of the object to be started
-        @type oid: string
+        :param oid: uuid of the object to be started
+        :type oid: str
 
-        @param restart_point: sets the start point
-        @type restart_point: string
+        :param restart_point: sets the start point
+        :type restart_point: str
         """
         return CeleryResult(celery_continue.delay(oid, restart_point, **kwargs))
 

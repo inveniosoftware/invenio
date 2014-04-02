@@ -20,9 +20,12 @@
 import os
 import tempfile
 from six.moves import cPickle
+from invenio.modules.workflows.utils import session_manager
 import base64
 import logging
-from six import string_types, iteritems
+from six import (string_types,
+                 iteritems,
+                 )
 
 from datetime import datetime
 from sqlalchemy import desc
@@ -30,9 +33,12 @@ from sqlalchemy.orm.exc import NoResultFound
 from invenio.ext.sqlalchemy import db
 from invenio.base.globals import cfg
 
-from .utils import redis_create_search_entry, WorkflowsTaskResult
+from .utils import (redis_create_search_entry,
+                    WorkflowsTaskResult,
+                    )
 from .logger import (get_logger,
-                     BibWorkflowLogHandler)
+                     BibWorkflowLogHandler,
+                     )
 
 
 class ObjectVersion(object):
@@ -60,22 +66,6 @@ def get_default_extra_data():
                           "redis_search": {},
                           "source": ""}
     return base64.b64encode(cPickle.dumps(extra_data_default))
-
-
-def session_manager(orig_func):
-    """Decorator to wrap function with the session."""
-
-    def new_func(self, *a, **k):
-        """Wrappend function to manage DB session."""
-        try:
-            resp = orig_func(self, *a, **k)
-            db.session.commit()
-            return resp
-        except:
-            db.session.rollback()
-            raise
-
-    return new_func
 
 
 class Workflow(db.Model):
@@ -309,6 +299,7 @@ class BibWorkflowObject(db.Model):
     def set_extra_data(self, value):
         """
         Main method to update data saved to the object.
+        :param value: value that you want to replace extra_data
         """
         self._extra_data = base64.b64encode(cPickle.dumps(value))
 
