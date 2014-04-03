@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,9 +17,38 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+    invenio.modules.documents.api
+    -----------------------------
+
+    Documents API
+
+    Following example shows how to handle documents metadata::
+
+        >>> from flask import g
+        >>> from invenio.base.factory import create_app
+        >>> app = create_app()
+        >>> ctx = app.test_request_context()
+        >>> ctx.push()
+        >>> from invenio.modules.documents import api
+        >>> from invenio.modules.jsonalchemy.jsonext.engines import memory
+        >>> g.documents_storage_engine = memory.MemoryStorage()
+        >>> d = api.Document.create({'title': 'Title 1'})
+        >>> d['title']
+        'Title 1'
+        >>> d['creator']
+        0
+        >>> d['title'] = 'New Title 1'
+        >>> d = d.update()
+        >>> api.Document.get_document(d['_id'])['title']
+        'New Title 1'
+        >>> ctx.pop()
+"""
+
 import fs
 import six
 
+from datetime import datetime
 from flask import g
 from fs.opener import opener
 from werkzeug.local import LocalProxy
@@ -36,17 +65,12 @@ from . import signals, errors
 def get_storage_engine():
     if not hasattr(g, "documents_storage_engine"):
         g.documents_storage_engine = MongoDBStorage(
-            "Document",
-            host=cfg["DOCUMENTS_MONGODB_HOST"],
-            port=cfg["DOCUMENTS_MONGODB_PORT"],
-            database=cfg["CFG_DATABASE_NAME"])
+            "Document", **cfg.get("DOCUMENTS_MONGODB", {}))
     return g.documents_storage_engine
 
 
 class Document(SmartJson):
-    """
-    Document
-    """
+    """Document"""
     storage_engine = LocalProxy(get_storage_engine)
 
     @classmethod
@@ -61,10 +85,42 @@ class Document(SmartJson):
 
     @classmethod
     def get_document(cls, uuid, include_deleted=False):
-        """
-        Returns document instance identified by UUID.
+        """Returns document instance identified by UUID.
+
+        Find existing document::
+
+            >>> from flask import g
+            >>> from invenio.base.factory import create_app
+            >>> app = create_app()
+            >>> ctx = app.test_request_context()
+            >>> ctx.push()
+            >>> from invenio.modules.documents import api
+            >>> from invenio.modules.jsonalchemy.jsonext.engines import memory
+            >>> g.documents_storage_engine = memory.MemoryStorage()
+            >>> d = api.Document.create({'title': 'Title 1'})
+            >>> e = api.Document.get_document(d['_id'])
+
+        If you try to find deleted document you will get an exception::
+
+            >>> e.delete()
+            >>> api.Document.get_document(d['_id'])
+            Traceback (most recent call last):
+             ...
+            DeletedDocument
+
+        and also if you try to find not existing document::
+
+            >>> import uuid
+            >>> api.Document.get_document(str(uuid.uuid4()))
+            Traceback (most recent call last):
+             ...
+            DocumentNotFound
+            >>> ctx.pop()
+
 
         :returns: a :class:`Document` instance.
+        :raises: :class:`~.invenio.modules.documents.errors.DocumentNotFound`
+            or :class:`~invenio.modules.documents.errors.DeletedDocument`
         """
         try:
             document = cls(cls.storage_engine.get_one(uuid))
@@ -83,46 +139,42 @@ class Document(SmartJson):
 
     def update(self):
         """Update document object."""
+        #FIXME This should be probably done in model dump.
+        self['modification_date'] = datetime.now()
         return self._save()
 
-    def setcontents(self, source, name=None, chunk_size=65536):
-        """
-        A convenience method to create a new file from a string or file-like
+    def setcontents(self, source, name, chunk_size=65536):
+        """A convenience method to create a new file from a string or file-like
         object.
 
-        NOTE: All paths has to be absolute or specified in full URI format.
+        :note: All paths has to be absolute or specified in full URI format.
 
         :param data: .
         :param name: File URI or filename generator taking `self` as argument.
         """
 
-        if isinstance(source, six.text_type):
+        if isinstance(source, six.string_types):
             self['source'] = source
             f = opener.open(source, 'rb')
         else:
             f = source
-
-        if name is None:
-            name = fs.path.basename(source)
 
         if callable(name):
             name = name(self)
         else:
             name = fs.path.abspath(name)
 
-        signals.document_before_content_set.send(self, name)
+        signals.document_before_content_set.send(self, name=name)
 
         data = f.read()
         _fs, filename = opener.parse(name)
         _fs.setcontents(filename, data, chunk_size)
         _fs.close()
 
-        signals.document_after_content_set.send(self, name)
+        signals.document_after_content_set.send(self, name=name)
 
-        try:
+        if hasattr(f, 'close'):
             f.close()
-        except:
-            pass
 
         self['uri'] = name
         self._save()
@@ -133,16 +185,15 @@ class Document(SmartJson):
         return _fs.open(filename, mode=mode, **kwargs)
 
     def delete(self, force=False):
-        """
-        Deletes the document.
+        """Deletes the instance of document.
 
-        :param force: If it is True than the document is deleted including
+        :param force: If it is True then the document is deleted including
             attached files and metadata.
         """
 
         self['deleted'] = True
 
-        if force:
+        if force and self.get('uri') is not None:
             signals.document_before_file_delete.send(self)
             fs, filename = opener.parse(self['uri'])
             fs.remove(filename)

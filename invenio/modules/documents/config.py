@@ -18,35 +18,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-    invenio.modules.documents.signal
+    invenio.modules.documents.config
     --------------------------------
 
-    Defines signals used in document API.
+    Defines configuration options for documents.
 """
+from invenio.base import config
 
-from blinker import Namespace
-_signals = Namespace()
-
-document_created = _signals.signal(
-    'document_created')
-"""
-This signal is sent right after the document is created.
-"""
-
-document_before_content_set = _signals.signal(
-    'document-before-content-set')
-"""
-This signal is send right before data are written to the document.
-"""
-
-document_after_content_set = _signals.signal(
-    'document-after-content-set')
-"""
-This signal is send right after data are written to the document.
-"""
-
-document_before_file_delete = _signals.signal(
-    'document-before-file-delete')
-"""
-This signal is send right before data are deleted from filesystem.
-"""
+DOCUMENTS_MONGODB = {
+    'host': "localhost",
+    'port': 27017,
+    'database': config.CFG_DATABASE_NAME,
+}
