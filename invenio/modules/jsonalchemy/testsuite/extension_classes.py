@@ -17,10 +17,19 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+
 class Class1(object):
     def class1(self):
         return 'class1'
 
+
 class Class2(object):
     def class2(self):
         return 'class2'
+
+
+def class3(*args):
+    class Class3(object):
+        def class3(self):
+            return args
+    return Class3
