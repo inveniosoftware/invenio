@@ -2813,7 +2813,7 @@ class Template:
                         <TD><span class="span_float_left"><TEXTAREA NAME=Abstract ROWS=3 COLS=30></textarea><FONT SIZE=2>(not displayed)</FONT></span></TD></TR>
                         <tr><TD> <span class="span_float_right"><font size="1">SPAM Robots have been sending us submissions via this form, in order to prevent this we ask that you confirm that you are a real person by answering this question, which should be
                         easy for you, and hard for a SPAM robot. Cutting down on the extraneous submissions we get means that we can handle real requests faster.</font></span></td><td><span class="span_float_left">
-                        <script type="text/javascript" src="http://www.slac.stanford.edu/spires/hepnames/spbeat.js">
+                        <script type="text/javascript" src="https://www.slac.stanford.edu/spires/hepnames/spbeat.js">
                         </SCRIPT><br /><STRONG> How many people in image</STRONG>  <SELECT NAME=beatspam ID=beatspam> <OPTION VALUE=""> </OPTION>
                         <option value="1"> one person</option>
                         <option value="2"> two people</option><option value="3"> three people</option>
