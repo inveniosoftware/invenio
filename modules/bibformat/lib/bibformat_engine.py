@@ -399,8 +399,8 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                                              user_info=user_info)
         out += out_
 
-        if of.lower() == 'xm':
-            out = filter_hidden_fields(out, user_info)
+        if of.lower() in ('xm', 'xoaimarc'):
+            out = filter_hidden_fields(out, user_info, force_filtering=of.lower()=='xoaimarc')
 
         # We have spent time computing this format
         # We want to save this effort if the format is cached
@@ -2215,11 +2215,11 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
     for line in recxml.splitlines(True):
         #check if this block needs to be omitted
         for htag in filter_tags:
-            if line.count('datafield tag="'+str(htag)+'"'):
+            if 'datafield tag="'+str(htag)+'"' in line:
                 omit = True
         if not omit:
             out += line
-        if omit and line.count('</datafield>'):
+        if omit and ('</datafield>' in line or '</marc:datafield>' in line):
             omit = False
     return out
 

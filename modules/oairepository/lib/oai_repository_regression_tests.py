@@ -106,6 +106,20 @@ class OAIRepositoryWebPagesAvailabilityTest(InvenioTestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
+
+class TestHiddenFields(InvenioTestCase):
+    """Test GetRecord with hidden fields"""
+
+    def test_hidden_fields(self):
+        """oairepository - not exposing hidden fields"""
+        req = StringIO()
+        # List available records, get datestamps and play with them
+        oai_repository_server.oai_list_records_or_identifiers(req, {'verb': 'GetRecord', 'metadataPrefix': 'marcxml', 'identifier': 'oai:atlantis.cern.ch:12'})
+        result = req.getvalue()
+        self.failIf("<error" in result, "Errors found in result: %s" % result)
+        self.failIf('<marc:datafield tag="595" ind1=" " ind2=" " >' in result, "Hidden field 595 found in result: %s" % result)
+
+
 class TestSelectiveHarvesting(InvenioTestCase):
     """Test set, from and until parameters used to do selective harvesting."""
 
@@ -218,7 +232,8 @@ Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_m
 TEST_SUITE = make_test_suite(OAIRepositoryTouchSetTest,
                              OAIRepositoryWebPagesAvailabilityTest,
                              TestSelectiveHarvesting,
-                             TestPerformance)
+                             TestPerformance,
+                             TestHiddenFields)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
