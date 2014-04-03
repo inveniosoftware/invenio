@@ -30,8 +30,10 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 Field_parser = lazy_import('invenio.modules.jsonalchemy.parser:FieldParser')
 Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
-guess_legacy_field_names = lazy_import('invenio.modules.jsonalchemy.parser:guess_legacy_field_names')
-get_producer_rules = lazy_import('invenio.modules.jsonalchemy.parser:get_producer_rules')
+guess_legacy_field_names = lazy_import(
+    'invenio.modules.jsonalchemy.parser:guess_legacy_field_names')
+get_producer_rules = lazy_import(
+    'invenio.modules.jsonalchemy.parser:get_producer_rules')
 
 TEST_PACKAGE = 'invenio.modules.jsonalchemy.testsuite'
 
@@ -46,7 +48,6 @@ function_proxy = lambda: ModuleAutoDiscoverySubRegistry(
     'functions', registry_namespace=test_registry)
 
 
-
 class TestReader(InvenioTestCase):
 
     @classmethod
@@ -57,9 +58,12 @@ class TestReader(InvenioTestCase):
         Model_parser._model_definitions = {}
 
     def setUp(self):
-        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
-        self.app.extensions['registry']['testsuite.models'] = model_definitions()
-        self.app.extensions['registry']['testsuite.functions'] = function_proxy()
+        self.app.extensions['registry'][
+            'testsuite.fields'] = field_definitions()
+        self.app.extensions['registry'][
+            'testsuite.models'] = model_definitions()
+        self.app.extensions['registry'][
+            'testsuite.functions'] = function_proxy()
 
     def tearDown(self):
         del self.app.extensions['registry']['testsuite.fields']
@@ -72,9 +76,13 @@ class TestReader(InvenioTestCase):
         from invenio.modules.jsonalchemy.reader import Reader
         from invenio.modules.jsonalchemy.wrappers import SmartJson
 
-        self.assertRaises(ReaderException, Reader.translate, blob=None, json_class=None)
-        self.assertRaises(ReaderException, Reader.translate, blob={}, json_class=dict)
-        self.assertRaises(NotImplementedError, Reader.add, json=SmartJson(master_format='json'), fields='foo')
+        self.assertRaises(
+            ReaderException, Reader.translate, blob=None, json_class=None)
+        self.assertRaises(
+            ReaderException, Reader.translate, blob={}, json_class=dict)
+        self.assertRaises(NotImplementedError, Reader.add, json=SmartJson(
+            master_format='json'), fields='foo')
+
 
 class TestJSONReader(InvenioTestCase):
 
@@ -86,9 +94,12 @@ class TestJSONReader(InvenioTestCase):
         Model_parser._model_definitions = {}
 
     def setUp(self):
-        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
-        self.app.extensions['registry']['testsuite.models'] = model_definitions()
-        self.app.extensions['registry']['testsuite.functions'] = function_proxy()
+        self.app.extensions['registry'][
+            'testsuite.fields'] = field_definitions()
+        self.app.extensions['registry'][
+            'testsuite.models'] = model_definitions()
+        self.app.extensions['registry'][
+            'testsuite.functions'] = function_proxy()
         Field_parser.reparse('testsuite')
         Model_parser.reparse('testsuite')
 
@@ -111,7 +122,8 @@ class TestJSONReader(InvenioTestCase):
                 'number_of_authors': 1,
                 'title': {'title': 'ALEPH experiment: Candidate of Higgs boson production'}}
 
-        json = Reader.translate(blob, SmartJson, master_format='json', namespace='testsuite')
+        json = Reader.translate(
+            blob, SmartJson, master_format='json', namespace='testsuite')
         self.assertIsNotNone(json)
         self.assertTrue(all([key in json for key in blob.keys()]))
         self.assertTrue('__meta_metadata__' in json)
@@ -124,23 +136,26 @@ class TestJSONReader(InvenioTestCase):
 
         blob = {'abstract': {'summary': 'Candidate for the associated production of the Higgs boson and Z boson. Both, the Higgs and Z boson decay into 2 jets each. The green and the yellow jets belong to the Higgs boson. They represent the fragmentation of a bottom andanti-bottom quark. The red and the blue jets stem from the decay of the Z boson into a quark anti-quark pair. Left: View of the event along the beam axis. Bottom right: Zoom around the interaction point at the centre showing detailsof the fragmentation of the bottom and anti-bottom quarks. As expected for b quarks, in each jet the decay of a long-lived B meson is visible. Top right: "World map" showing the spatial distribution of the jets in the event.'},
                 'authors': [{'first_name': '',
-                'full_name': 'Photolab',
-                'last_name': 'Photolab'}],
+                             'full_name': 'Photolab',
+                             'last_name': 'Photolab'}],
                 'collection': {'primary': 'PICTURE'},
                 'keywords': [{'term': 'LEP'}]}
 
-        json = Reader.translate(blob, SmartJson, master_format='json', namespace='testsuite')
+        json = Reader.translate(
+            blob, SmartJson, master_format='json', namespace='testsuite')
         self.assertIsNotNone(json)
         self.assertTrue('abstract' in json)
         Reader.add(json, 'number_of_authors', blob)
         self.assertTrue('number_of_authors' in json)
         self.assertEquals(json.get('number_of_authors'), 1)
 
-        Reader.set(json, 'title', {'title': 'ALEPH experiment: Candidate of Higgs boson production'})
+        Reader.set(
+            json, 'title', {'title': 'ALEPH experiment: Candidate of Higgs boson production'})
         self.assertTrue('title' in json)
         self.assertTrue('title' in json['__meta_metadata__'])
         Reader.set(json, 'title')
-        self.assertEquals(json['title'], {'title': 'ALEPH experiment: Candidate of Higgs boson production'})
+        self.assertEquals(
+            json['title'], {'title': 'ALEPH experiment: Candidate of Higgs boson production'})
         Reader.set(json, 'title', {'title': 'New title'})
         self.assertEquals(json['title'], {'title': 'New title'})
 
@@ -161,9 +176,12 @@ class TestMarcReader(InvenioTestCase):
         Model_parser._model_definitions = {}
 
     def setUp(self):
-        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
-        self.app.extensions['registry']['testsuite.models'] = model_definitions()
-        self.app.extensions['registry']['testsuite.functions'] = function_proxy()
+        self.app.extensions['registry'][
+            'testsuite.fields'] = field_definitions()
+        self.app.extensions['registry'][
+            'testsuite.models'] = model_definitions()
+        self.app.extensions['registry'][
+            'testsuite.functions'] = function_proxy()
 
     def tearDown(self):
         del self.app.extensions['registry']['testsuite.fields']
@@ -175,7 +193,7 @@ class TestMarcReader(InvenioTestCase):
         from invenio.modules.jsonalchemy.reader import Reader
         from invenio.modules.jsonalchemy.wrappers import SmartJson
 
-        #First record from demobibcfg.xml
+        # First record from demobibcfg.xml
         xml = """
             <record>
                 <datafield tag="037" ind1=" " ind2=" ">
@@ -251,7 +269,8 @@ class TestMarcReader(InvenioTestCase):
                 </datafield>
             </record>
         """
-        reader = Reader(SmartJson(master_format='marc', schema='xml', namespace='testsuite'), blob=xml)
+        reader = Reader(
+            SmartJson(master_format='marc', schema='xml', namespace='testsuite'), blob=xml)
         reader._prepare_blob()
 
         self.assertTrue(reader.rec_tree)
@@ -597,24 +616,30 @@ class TestMarcReader(InvenioTestCase):
         blob = list(split_blob(xml, 'marc', schema='foo'))
         self.assertTrue(len(blob) == 0)
         blob = list(split_blob(xml, 'marc'))[0]
-        json = Reader.translate(blob, SmartJson, master_format='marc', namespace='testsuite')
+        json = Reader.translate(
+            blob, SmartJson, master_format='marc', namespace='testsuite')
         self.assertIsNotNone(json)
         self.assertTrue('__meta_metadata__' in json)
-        self.assertEquals(json['__meta_metadata__']['__additional_info__']['master_format'], 'marc')
+        self.assertEquals(
+            json['__meta_metadata__']['__additional_info__']['master_format'], 'marc')
         self.assertTrue('authors' in json)
         self.assertEquals(json['authors'][0]['full_name'], "Efstathiou, G P")
         self.assertEquals(len(json['authors']), 5)
         self.assertTrue('title' in json)
-        self.assertEquals(json['title']['title'], "Constraints on $\Omega_{\Lambda}$ and $\Omega_{m}$from Distant Type 1a Supernovae and Cosmic Microwave Background Anisotropies")
+        self.assertEquals(json['title'][
+                          'title'], "Constraints on $\Omega_{\Lambda}$ and $\Omega_{m}$from Distant Type 1a Supernovae and Cosmic Microwave Background Anisotropies")
         self.assertTrue('abstract' in json)
-        self.assertEquals(json['abstract']['summary'], "We perform a combined likelihood analysis of the latest cosmic microwave background anisotropy data and distant Type 1a Supernova data of Perlmutter etal (1998a). Our analysis is restricted tocosmological models where structure forms from adiabatic initial fluctuations characterised by a power-law spectrum with negligible tensor component. Marginalizing over other parameters, our bestfit solution gives Omega_m = 0.25 (+0.18, -0.12) and Omega_Lambda = 0.63 (+0.17, -0.23) (95 % confidence errors) for the cosmic densities contributed by matter and a cosmological constantrespectively. The results therefore strongly favour a nearly spatially flat Universe with a non-zero cosmological constant.")
+        self.assertEquals(json['abstract'][
+                          'summary'], "We perform a combined likelihood analysis of the latest cosmic microwave background anisotropy data and distant Type 1a Supernova data of Perlmutter etal (1998a). Our analysis is restricted tocosmological models where structure forms from adiabatic initial fluctuations characterised by a power-law spectrum with negligible tensor component. Marginalizing over other parameters, our bestfit solution gives Omega_m = 0.25 (+0.18, -0.12) and Omega_Lambda = 0.63 (+0.17, -0.23) (95 % confidence errors) for the cosmic densities contributed by matter and a cosmological constantrespectively. The results therefore strongly favour a nearly spatially flat Universe with a non-zero cosmological constant.")
         self.assertTrue('reference' in json)
         self.assertEquals(len(json['reference']), 36)
 
-        json = Reader.translate(blob, SmartJson, master_format='marc', namespace='testsuite', model='test_model')
+        json = Reader.translate(
+            blob, SmartJson, master_format='marc', namespace='testsuite', model='test_model')
         self.assertEquals(json.model_info.names, ['test_model', ])
         self.assertEquals(json.additional_info.namespace, 'testsuite')
         self.assertEquals(json.class2(), 'class2')
+        self.assertEquals(json.class3(), ('foo', ')', ','))
         self.assertTrue('foo' in json['title'])
         self.assertEquals(json['title.foo'], 'bar')
 
@@ -697,17 +722,20 @@ class TestMarcReader(InvenioTestCase):
             </datafield>
           </record>
           '''
-        json = Reader.translate(blob, SmartJson, master_format='marc', namespace='testsuite')
+        json = Reader.translate(
+            blob, SmartJson, master_format='marc', namespace='testsuite')
         self.assertIsNotNone(json)
         del json['title']
 
         Reader.add(json, 'title', blob)
         self.assertTrue('title' in json)
         self.assertTrue('title' in json['__meta_metadata__'])
-        self.assertEquals(json['title'], {'title': 'ALEPH experiment: Candidate of Higgs boson production'})
+        self.assertEquals(
+            json['title'], {'title': 'ALEPH experiment: Candidate of Higgs boson production'})
 
-    #FIXME
+    # FIXME
     from invenio.testsuite import nottest
+
     @nottest
     def test_update_json(self):
         """JSONAlchemy - set field"""
@@ -789,7 +817,8 @@ class TestMarcReader(InvenioTestCase):
             </datafield>
           </record>
           '''
-        json = Reader.translate(blob, SmartJson, master_format='marc', namespace='testsuite', model='test_model')
+        json = Reader.translate(
+            blob, SmartJson, master_format='marc', namespace='testsuite', model='test_model')
         self.assertIsNotNone(json)
 
         del json['title']
@@ -797,7 +826,8 @@ class TestMarcReader(InvenioTestCase):
         Reader.update(json, ('title',), blob)
         self.assertTrue('title' in json)
         self.assertTrue('title' in json['__meta_metadata__'])
-        self.assertEquals(json['title']['title'], 'ALEPH experiment: Candidate of Higgs boson production')
+        self.assertEquals(
+            json['title']['title'], 'ALEPH experiment: Candidate of Higgs boson production')
 
     def test_set_fields(self):
         """JSONAlchemy - set field"""
@@ -879,15 +909,17 @@ class TestMarcReader(InvenioTestCase):
             </datafield>
           </record>
           '''
-        json = Reader.translate(blob, SmartJson, master_format='marc', namespace='testsuite')
+        json = Reader.translate(
+            blob, SmartJson, master_format='marc', namespace='testsuite')
         self.assertIsNotNone(json)
         del json['title']
 
-        json['title'] = {'title': 'ALEPH experiment: Candidate of Higgs boson production'}
+        json['title'] = {
+            'title': 'ALEPH experiment: Candidate of Higgs boson production'}
         self.assertTrue('title' in json)
         self.assertTrue('title' in json['__meta_metadata__'])
-        self.assertEquals(json['title'], {'title': 'ALEPH experiment: Candidate of Higgs boson production'})
-
+        self.assertEquals(
+            json['title'], {'title': 'ALEPH experiment: Candidate of Higgs boson production'})
 
 
 TEST_SUITE = make_test_suite(TestReader, TestMarcReader, TestJSONReader)

@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from pyparsing import Keyword, Word, alphanums, delimitedList
+from pyparsing import Keyword, OneOrMore, quotedString, restOfLine, removeQuotes
 from werkzeug.utils import import_string
 
 from invenio.base.utils import try_to_eval
@@ -33,7 +33,8 @@ class ExtensionModelParser(ModelBaseExtensionParser):  # pylint: disable=W0232
         fields:
             ....
             extensions:
-                invenio.modules.records.api:RecordIter
+                'invenio.modules.records.api:RecordIter'
+                'invenio.modules.jsonalchemy.bases:Versinable'
 
     """
 
@@ -42,15 +43,15 @@ class ExtensionModelParser(ModelBaseExtensionParser):  # pylint: disable=W0232
     @classmethod
     def parse_element(cls, indent_stack):
         """Sets ``extensions`` attribute to the rule definition"""
-        import_str = Word(alphanums + '_' + '.' + ':')
+        import_line = quotedString.setParseAction(removeQuotes) + restOfLine
         return (Keyword('extensions:').suppress() +
-                indentedBlock(delimitedList(import_str), indent_stack)
+                indentedBlock(OneOrMore(import_line), indent_stack)
                 ).setResultsName('extensions')
 
     @classmethod
     def create_element(cls, rule, namespace):  # pylint: disable=W0613
         """Simply returns the list of extensions"""
-        return rule.extensions.asList()
+        return [e.strip() for e in rule.extensions.asList() if e]
 
     @classmethod
     def inherit_model(cls, current_value, base_value):
