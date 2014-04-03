@@ -19,16 +19,18 @@
 
 from __future__ import absolute_import
 
+import os
+
 from cerberus import Validator
+from fs.opener import opener
 from flask import request, current_app
 from flask.ext.login import current_user
-from flask.ext.restful import Resource, abort, marshal_with, fields, reqparse
-from flask.ext.restful.utils import unpack
+from flask.ext.restful import Resource, abort
 from functools import wraps
 from werkzeug.utils import secure_filename
 from werkzeug.http import parse_options_header
 
-from invenio.ext.restful import require_api_auth, error_codes, require_oauth_scopes, require_header
+from invenio.ext.restful import require_api_auth, error_codes, require_header
 
 from . import errors
 from .api import Document
@@ -53,9 +55,9 @@ def error_handler(f):
     def inner(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except errors.DocumentNotFound as e:
+        except errors.DocumentNotFound:
             abort(404, message="Document does not exists.", status=404)
-        #except Exception as e:
+        # except Exception as e:
         #    current_app.logger.error(e)
         #    if len(e.args) >= 1:
         #        abort(400, message=e.args[0], status=400)
@@ -83,6 +85,11 @@ def filter_errors(result):
 def check_content_length(value):
     """greater than 0"""
     return int(value) > 0
+
+
+def directory_name(document):
+    return os.path.join(current_app.instance_path, 'files',
+                        document['uuid'].replace('-', '/'))
 
 # =========
 # Mix-ins
@@ -116,19 +123,18 @@ class DocumentListResource(Resource):
         """
         abort(405)
 
-    #@require_header('Content-Length', check_content_length)
+    @require_header('Content-Length', check_content_length)
     def put(self, oauth):
         filename = parse_options_header(
             request.headers.get('Content-Disposition', ''))[1].get('filename')
 
         d = Document.create({'deleted': False})
-        from fs.opener import opener
-        opener.opendir(current_app.instance_path + '/files/' +
-            d['uuid'].replace('-', '/') + '/', create_dir=True)
+        opener.opendir(directory_name(d), create_dir=True)
         d.setcontents(
             request.stream,
-            name=lambda s: current_app.instance_path + '/files/' +
-            s['uuid'].replace('-', '/') + '/' + secure_filename(filename))
+            name=lambda s: os.path.join(directory_name(s),
+                                        secure_filename(filename))
+        )
         return d.dumps()
 
     def delete(self, oauth):
