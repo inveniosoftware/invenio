@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,7 +24,9 @@ Test unit for the miscutil/datastructures module.
 from invenio.utils.datastructures import LazyDict, LaziestDict, SmartDict
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
+
 class CallCounter(object):
+
     """Counts number of calls."""
 
     def __init__(self, populate):
@@ -37,6 +39,7 @@ class CallCounter(object):
 
 
 class TestLazyDictionaries(InvenioTestCase):
+
     """
     Lazy dictionaries TestSuite.
     """
@@ -62,8 +65,14 @@ class TestLazyDictionaries(InvenioTestCase):
         self.assertEqual(lazy_dict['foo'], 'bar')
         self.assertEqual(populate.counter, 2)
 
+        del lazy_dict['foo']
+        self.assertEqual(populate.counter, 2)
+        assert 'foo' not in lazy_dict
+
     def test_lazies_dictionary(self):
-        populate = CallCounter(lambda k: {'foo': 'bar', 1: 11, 'empty': None}[k])
+        populate = CallCounter(
+            lambda k: {'foo': 'bar', 1: 11, 'empty': None}[k]
+        )
 
         laziest_dict = LaziestDict(populate)
         self.assertEqual(populate.counter, 0)
@@ -92,6 +101,7 @@ class TestLazyDictionaries(InvenioTestCase):
 
 
 class TestSmartDict(InvenioTestCase):
+
     """
     Smart Dictionary TestSuite
     """
@@ -99,21 +109,21 @@ class TestSmartDict(InvenioTestCase):
     def test_smart_dict(self):
         d = SmartDict()
 
-        d['foo'] = {'a': 'world', 'b':'hello'}
-        d['a'] = [ {'b':1}, {'b':2}, {'b':3} ]
+        d['foo'] = {'a': 'world', 'b': 'hello'}
+        d['a'] = [{'b': 1}, {'b': 2}, {'b': 3}]
         self.assertEqual(d.keys(), ['a', 'foo'])
         self.assertTrue('foo.a' in d)
         del d['foo']
         self.assertEqual(d.keys(), ['a'])
-        self.assertEqual(d['a'], [{'b':1}, {'b':2}, {'b':3}])
-        self.assertEqual(d['a[0]'], {'b':1})
-        self.assertEqual(d['a.b'], [1,2,3])
-        self.assertEqual(d['a[1:]'], [{'b':2}, {'b':3}])
+        self.assertEqual(d['a'], [{'b': 1}, {'b': 2}, {'b': 3}])
+        self.assertEqual(d['a[0]'], {'b': 1})
+        self.assertEqual(d['a.b'], [1, 2, 3])
+        self.assertEqual(d['a[1:]'], [{'b': 2}, {'b': 3}])
 
-        d.set('a', {'b':4}, extend=True)
-        self.assertEqual(d['a'], [{'b':1}, {'b':2}, {'b':3}, {'b':4}])
-        d.set('a', [ {'b':1}, {'b':2}, {'b':3} ], extend=False)
-        self.assertEqual(d['a'], [{'b':1}, {'b':2}, {'b':3}])
+        d.set('a', {'b': 4}, extend=True)
+        self.assertEqual(d['a'], [{'b': 1}, {'b': 2}, {'b': 3}, {'b': 4}])
+        d.set('a', [{'b': 1}, {'b': 2}, {'b': 3}], extend=False)
+        self.assertEqual(d['a'], [{'b': 1}, {'b': 2}, {'b': 3}])
 
         self.assertEqual(d.get('does not exists'), None)
 
