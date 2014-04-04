@@ -23,6 +23,7 @@ Deposit Blueprint
 
 import json
 from functools import wraps
+import warnings
 
 from flask import current_app, Blueprint, \
     render_template, \
@@ -121,10 +122,7 @@ def index():
         context=ctx
     )
 
-    return render_template(
-        'deposit/index.html',
-        **ctx
-    )
+    return render_template('deposit/index.html', **ctx)
 
 
 @blueprint.route('/<depositions:deposition_type>')
@@ -358,6 +356,7 @@ def status(deposition_type=None, uuid=None, draft_id=None):
     """
     Get the status of a draft (uncompleted/completed)
     """
+    warnings.warn("View has been deprecated", DeprecationWarning)
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
     completed = deposition.get_draft(draft_id).is_completed()
     return jsonify({"status": 1 if completed else 0})
