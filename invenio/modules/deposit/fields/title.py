@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,18 +24,21 @@ __all__ = ['TitleField']
 
 
 def validate_title(form, field):
+    import warnings
+    warnings.warn("Validator has been deprecated", PendingDeprecationWarning)
+
     value = field.data or ''
-    # Empty string allowed (required validator may be defined on per-field basis)
     if value == "" or value.isspace():
         return
 
-    error_message = ''
     if len(value) <= 4:
         raise ValidationError("This field must have at least 4 characters")
 
 
 class TitleField(WebDepositField, TextField):
     def __init__(self, **kwargs):
+        import warnings
+        warnings.warn("Field has been deprecated", PendingDeprecationWarning)
         defaults = dict(
             icon='book',
             export_key='title.title',

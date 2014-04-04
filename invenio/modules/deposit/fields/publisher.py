@@ -25,6 +25,8 @@ __all__ = ['PublisherField']
 
 class PublisherField(WebDepositField, TextField):
     def __init__(self, **kwargs):
+        import warnings
+        warnings.warn("Field has been deprecated", PendingDeprecationWarning)
         defaults = dict(
             icon='certificate',
             widget_classes="form-control"
