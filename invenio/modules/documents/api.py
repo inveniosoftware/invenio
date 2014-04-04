@@ -50,33 +50,18 @@ import fs
 import six
 
 from datetime import datetime
-from flask import g
 from fs.opener import opener
-from werkzeug.utils import import_string
-from werkzeug.local import LocalProxy
 
-from invenio.base.globals import cfg
 from invenio.modules.jsonalchemy.wrappers import SmartJson
 from invenio.modules.jsonalchemy.reader import Reader
 
 from . import signals, errors
 
 
-def get_storage_engine():
-    if not hasattr(g, "documents_storage_engine"):
-        engine = cfg['DOCUMENTS_ENGINE']
-        if isinstance(engine, six.string_types):
-            engine = import_string(engine)
-
-        key = engine.__name__.upper()
-        kwargs = cfg.get('DOCUMENTS_{0}'.format(key), {})
-        g.documents_storage_engine = engine(**kwargs)
-    return g.documents_storage_engine
-
-
 class Document(SmartJson):
     """Document"""
-    storage_engine = LocalProxy(get_storage_engine)
+
+    __storagename__ = 'documents'
 
     @classmethod
     def create(cls, data, model='document_base', master_format='json',

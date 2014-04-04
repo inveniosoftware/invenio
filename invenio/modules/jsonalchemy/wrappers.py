@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,6 +24,10 @@
 import copy
 import six
 
+from flask import current_app
+from werkzeug.utils import import_string
+
+from invenio.utils.memoise import memoize
 from invenio.utils.datastructures import DotableDict, SmartDict
 
 from .parser import FieldParser, ModelParser
@@ -31,6 +35,36 @@ from .reader import Reader
 from .registry import contexts, producers
 
 
+class StorageEngine(type):
+    """Storage metaclass for parsing application config."""
+
+    @property
+    @memoize
+    def storage_engine(cls):
+        """Returns an instance of storage engine defined in application config.
+
+        It looks for key "ENGINE' prefixed by ``__storagename__.upper()`` for
+        example::
+
+            class Dummy(SmartJson):
+                __storagename__ = 'dummy'
+
+        will look for key "DUMMY_ENGINE" and
+        "DUMMY_`DUMMY_ENGINE.__name__.upper()`" should contain dictionary with
+        keyword arguments of the engine defined in "DUMMY_ENGINE".
+        """
+        storagename = cls.__storagename__.lower()
+        prefix = storagename.upper()
+        engine = current_app.config['{0}_ENGINE'.format(prefix)]
+        if isinstance(engine, six.string_types):
+            engine = import_string(engine)
+
+        key = engine.__name__.upper()
+        kwargs = current_app.config.get('{0}_{1}'.format(prefix, key), {})
+        return engine(**kwargs)
+
+
+@six.add_metaclass(StorageEngine)
 class SmartJson(SmartDict):
     """Base class for Json structures"""
 

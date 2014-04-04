@@ -17,8 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-ANNOTATIONS_MONGODB_HOST = "localhost"
-ANNOTATIONS_MONGODB_PORT = 27017
+from invenio.base import config
+
+ANNOTATIONS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.'
+                      'mongodb_pymongo:MongoDBStorage')
+
+
+ANNOTATIONS_MONGODBSTORAGE = {
+    'host': "localhost",
+    'port': 27017,
+    'database': config.CFG_DATABASE_NAME,
+}
 
 ANNOTATIONS_ATTACHMENTS = False
 
