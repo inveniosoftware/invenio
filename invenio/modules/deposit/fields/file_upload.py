@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,8 @@ __all__ = ['FileUploadField']
 
 class FileUploadField(WebDepositField, FileField):
     def __init__(self, **kwargs):
+        import warnings
+        warnings.warn("Field has been deprecated", PendingDeprecationWarning)
         defaults = dict(icon='upload', export_key=False)
         defaults.update(kwargs)
         super(FileUploadField, self).__init__(**defaults)

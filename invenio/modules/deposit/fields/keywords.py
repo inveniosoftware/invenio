@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,6 +26,8 @@ __all__ = ['KeywordsField']
 class KeywordsField(WebDepositField, TextField):
 
     def __init__(self, **kwargs):
+        import warnings
+        warnings.warn("Field has been deprecated", PendingDeprecationWarning)
         defaults = dict(
             icon='tags',
             widget_classes="form-control"

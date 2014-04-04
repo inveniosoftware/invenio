@@ -25,6 +25,8 @@ __all__ = ['JournalField']
 
 class JournalField(WebDepositField, TextField):
     def __init__(self, **kwargs):
+        import warnings
+        warnings.warn("Field has been deprecated", PendingDeprecationWarning)
         defaults = dict(
             icon='book',
             widget_classes="form-control",
