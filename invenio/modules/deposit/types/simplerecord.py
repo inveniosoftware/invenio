@@ -33,31 +33,32 @@ from invenio.modules.deposit.tasks import render_form, \
 
 class SimpleRecordDeposition(DepositionType):
     """
-    Simple record submission with main workflow
+    Simple record submission - no support for editing nor REST API.
     """
     workflow = [
         # Pre-fill draft with values passed in from request
         prefill_draft(draft_id='default'),
         # Render form and wait for user to submit
         render_form(draft_id='default'),
-        # Create the submission information package by merging data
-        # from all drafts.
+        # Create the submission information package by merging form data
+        # from all drafts (in this case only one draft exists).
         prepare_sip(),
-        # Process SIP
+        # Process metadata to match your JSONAlchemy record model. This will
+        # call process_sip_metadata() on your subclass.
         process_sip_metadata(),
-        # Reserve a new record id
+        # Reserve a new record id, so that we can provide proper feedback to
+        # user before the record has been uploaded.
         create_recid(),
-        # Generate MARC based on metadata dictionary
+        # Generate MARC based on metadata dictionary.
         finalize_record_sip(is_dump=False),
         # Seal the SIP and write MARCXML file and call bibupload on it
-        # Note: after upload_record_sip()
         upload_record_sip(),
     ]
 
     @classmethod
     def render_completed(cls, d):
         """
-        Render page when deposition was successfully completed
+        Page to render when deposition was successfully completed.
         """
         ctx = dict(
             deposition=d,

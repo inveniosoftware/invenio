@@ -16,10 +16,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import absolute_import, print_function
 
 from flask import current_app
 from flask.ext.registry import ImportPathRegistry, SingletonRegistry, \
-    RegistryProxy
+    RegistryProxy, RegistryError
+from invenio.modules.deposit.models import DepositionType
 from invenio.modules.workflows.loader import workflows
 
 
@@ -47,15 +49,40 @@ class DepositionTypeRegistry(ImportPathRegistry):
             import_path
         )
 
-        # Ensure DepositionType is actually a loaded workflow
-        # FIXME
-        #if obj.__name__ not in workflows or obj != workflows[obj.__name__]:
-        #    raise RuntimeError("Import path '%s' is not a loaded workflow.")
-
         if import_path == current_app.config['DEPOSIT_DEFAULT_TYPE']:
             deposit_default_type.register(obj)
 
         return obj
+
+    def register(self, import_path_or_type):
+        """
+        Allow registering both import paths or deposition types
+
+        Note, if you manually register a deposition type instad of using the
+        configuration variable you must also refresh your applications URL
+        map using .url_converters.refresh_url_map() method.
+        """
+        if isinstance(import_path_or_type, type) and \
+           issubclass(import_path_or_type, DepositionType):
+            if import_path_or_type.__name__ in workflows:
+                raise RegistryError("Workflow named %s already registered.")
+            # Super call with ImportPathRegistry instead of
+            # DepositionTypeRegistry on purpose.
+            super(ImportPathRegistry, self).register(import_path_or_type)
+            workflows[import_path_or_type.__name__] = import_path_or_type
+        else:
+            super(DepositionTypeRegistry, self).register(import_path_or_type)
+
+    def unregister(self, deposition_type):
+        """
+        Allow unregistering deposition types
+        """
+        if deposition_type.__name__ not in workflows:
+            raise RegistryError("Deposition type not registered")
+        # Super call with ImportPathRegistry instead of DepositionTypeRegistry
+        # on purpose.
+        super(ImportPathRegistry, self).unregister(deposition_type)
+        del workflows[deposition_type.__name__]
 
     def mapping(self):
         return dict([(x.__name__, x) for x in self])
