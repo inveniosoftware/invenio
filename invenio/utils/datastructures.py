@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -57,6 +57,11 @@ class LazyDict(object):
             self._evaluate_function()
         return self._cached_dict.__setitem__(key, value)
 
+    def __delitem__(self, key):
+        if self._cached_dict is None:
+            self._evaluate_function()
+        return self._cached_dict.__delitem__(key)
+
     def __getattr__(self, key):
         if self._cached_dict is None:
             self._evaluate_function()
@@ -101,7 +106,9 @@ class LaziestDict(LazyDict):
 
     def reader_discover(key):
         from werkzeug.utils import import_string
-        return import_string('invenio.jsonalchemy.jsonext.readers%sreader:reader' % (key))
+        return import_string(
+            'invenio.jsonalchemy.jsonext.readers%sreader:reader' % (key)
+        )
 
     laziest_dict = LaziestDict(reader_discover)
 
@@ -111,7 +118,8 @@ class LaziestDict(LazyDict):
 
     def __init__(self, function):
         """
-        @param function: it must accept one parameter (the key of the dictionary)
+        @param function: it must accept one parameter (the key of the
+            dictionary)
         and returns the element which will be store that key.
         """
         super(LaziestDict, self).__init__(function)
@@ -177,8 +185,8 @@ class SmartDict(object):
         As in C{dict.__getitem__} but using 'smart queries'
 
         NOTE: accessing one value in a normal way, meaning d['a'], is almost as
-              fast as accessing a regular dictionary. But using the special name
-              convention is a bit slower than using the regular access::
+              fast as accessing a regular dictionary. But using the special
+              name convention is a bit slower than using the regular access::
                 %timeit x = dd['a[0].b']
                 100000 loops, best of 3: 3.94 µs per loop
 
@@ -194,13 +202,15 @@ class SmartDict(object):
                 try:
                     return v[int(k)]
                 except ValueError:
-                    return v[slice(*map(lambda x: int(x.strip()) if x.strip() else None, k.split(':')))]
+                    return v[slice(*map(
+                        lambda x: int(x.strip()) if x.strip() else None,
+                        k.split(':')
+                    ))]
             else:
                 tmp = []
                 for inner_v in v:
                     tmp.append(getitem(k, inner_v))
                 return tmp
-
 
         #Check if we are using python regular keys
         try:
@@ -292,7 +302,7 @@ class SmartDict(object):
                 if chunk is None:
                     chunk = [None, ]
             chunk[key] = setitem(chunk[key])
-        else: # dict
+        else:  # dict
             if extend:
                 if chunk is None:
                     chunk = {}
@@ -306,7 +316,7 @@ class SmartDict(object):
                         chunk[key] = setitem(chunk[key])
                     else:
                         if not isinstance(chunk[key], list):
-                            chunk[key] = [chunk[key],]
+                            chunk[key] = [chunk[key], ]
                         chunk[key].append(None)
                         chunk[key][-1] = setitem(chunk[key][-1])
             else:
@@ -317,7 +327,6 @@ class SmartDict(object):
                 chunk[key] = setitem(chunk[key])
 
         return chunk
-
 
     def get(self, key, default=None):
         try:
