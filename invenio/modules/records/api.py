@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,11 +25,9 @@
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.utils import cached_property
 
-from invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy import SQLAlchemyStorage
 from invenio.modules.jsonalchemy.reader import Reader
 from invenio.modules.jsonalchemy.wrappers import SmartJson
 
-from .models import RecordMetadata as RecordMetadataModel
 from .models import Record as RecordModel
 
 
@@ -37,8 +35,6 @@ class Record(SmartJson):
     """
     Default/Base record class
     """
-
-    storage_engine = SQLAlchemyStorage(RecordMetadataModel)
 
     def __init__(self, json=None, **kwargs):
         if not json or '__meta_metadata__' not in json:
@@ -71,7 +67,8 @@ class Record(SmartJson):
         if record_sql_model is None or blob is None:
             return None
         additional_info = record_sql_model.additional_info \
-                if record_sql_model.additional_info else {'master_format': 'marc'}
+            if record_sql_model.additional_info \
+            else {'master_format': 'marc'}
         record = cls.create(blob, **additional_info)
         record._save()
         record_sql_model.additional_info = record.additional_info

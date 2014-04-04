@@ -17,6 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from .models import RecordMetadata as RecordMetadataModel
+
 
 RECORDS_BREADCRUMB_TITLE_KEY = 'title.title'
 """ Key used to extract the breadcrumb title from the record """
+
+RECORDS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy'
+                  ':SQLAlchemyStorage')
+
+RECORDS_SQLALCHEMYSTORAGE = {
+    'model': RecordMetadataModel,
+}

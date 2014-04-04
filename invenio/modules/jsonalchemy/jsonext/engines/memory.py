@@ -37,7 +37,7 @@ class MemoryStorage(Storage):
         """
         See also :meth:`~invenio.modules.jsonalchemy.storage:Storage.__init__`
         """
-        self._database = kwargs.get('database', {})
+        self._database = kwargs.get('database', dict())
 
     def save_one(self, data, id=None):
         """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.save_one`"""

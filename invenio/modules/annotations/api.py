@@ -17,24 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask import g
-from werkzeug.local import LocalProxy
-
 from invenio.base.globals import cfg
-from invenio.modules.jsonalchemy.jsonext.engines.mongodb_pymongo import \
-    MongoDBStorage
 from invenio.modules.jsonalchemy.reader import Reader
 from invenio.modules.jsonalchemy.wrappers import SmartJsonLD
-
-
-def get_storage_engine():
-    if not hasattr(g, "annotations_storage_engine"):
-        g.annotations_storage_engine = \
-            MongoDBStorage("Annotation",
-                           host=cfg["ANNOTATIONS_MONGODB_HOST"],
-                           port=cfg["ANNOTATIONS_MONGODB_PORT"],
-                           database=cfg["CFG_DATABASE_NAME"])
-    return g.annotations_storage_engine
 
 
 class QueryIterator():
@@ -62,7 +47,8 @@ class QueryIterator():
 
 
 class Annotation(SmartJsonLD):
-    storage_engine = LocalProxy(get_storage_engine)
+
+    __storagename__ = 'annotations'
 
     @classmethod
     def create(cls, data, model='annotation', store=True):
