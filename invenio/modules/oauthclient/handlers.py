@@ -116,10 +116,28 @@ def default_handler(resp, remote, *args, **kwargs):
     if resp is not None:
         if 'access_token' in resp:
             oauth2_token_setter(remote, resp)
-        else:
+        elif 'oauth_token' in resp and 'oauth_token_secret' in resp:
             oauth1_token_setter(remote, resp)
+        elif 'error' in resp:
+            # Only OAuth2 specifies how to send error messages
+            error_code = resp['error']
+            error_uri = resp.get('error_uri', None)
+            error_description = resp.get('error_description', None)
+            return oauth2_handle_error(
+                remote, resp, error_code, error_uri, error_description
+            )
     else:
         flash("You rejected the authentication request.")
+    return redirect('/')
+
+
+def oauth2_handle_error(remote, resp, error_code, error_uri,
+                        error_description):
+    """
+    Default handling of OAuth 2 errors when exchange of one time
+    code for an access token fails.
+    """
+    flash("Authorization with remote service failed.")
     return redirect('/')
 
 

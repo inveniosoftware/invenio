@@ -22,14 +22,17 @@ class RemoteAccountTestCase(InvenioTestCase):
         self.app.config['OAUTHCLIENT_REMOTE_APPS'] = dict(
             test=dict(
                 authorized_handler=self.handler,
-                params=params('testid')
+                params=params('testid'),
+                title='MyLinkedTestAccount',
             ),
             test_invalid=dict(
                 authorized_handler=self.handler_invalid,
-                params=params('test_invalidid')
+                params=params('test_invalidid'),
+                title='Test Invalid',
             ),
             full=dict(
-                params=params("fullid")
+                params=params("fullid"),
+                title='Full',
             ),
         )
         self.handled_resp = None
@@ -131,6 +134,15 @@ class RemoteAccountTestCase(InvenioTestCase):
                 )
             )
 
+    def test_no_remote_app(self):
+        self.assert404(self.client.get(
+            url_for("oauthclient.authorized", remote_app='invalid')
+        ))
+
+        self.assert404(self.client.get(
+            url_for("oauthclient.disconnect", remote_app='invalid')
+        ))
+
     @patch('invenio.ext.session.interface.SessionInterface.save_session')
     def test_token_getter_setter(self, save_session):
         from invenio.modules.oauthclient.models import RemoteToken
@@ -142,13 +154,22 @@ class RemoteAccountTestCase(InvenioTestCase):
         user.is_authenticated = MagicMock(return_value=True)
         with patch('flask.ext.login._get_user', return_value=user):
             with self.app.test_client() as c:
-                c.get(url_for("oauthclient.login", remote_app='full'))
+                # First call login to be redirected
+                res = c.get(url_for("oauthclient.login", remote_app='full'))
+                assert res.status_code == 302
+                assert res.location.startswith(
+                    oauth.remote_apps['full'].authorize_url
+                )
+                # Mock resposen class
                 self.mock_response(app='full')
 
+                # Imitate that the user authorized our request in the remote
+                # application.
                 c.get(url_for(
                     "oauthclient.authorized", remote_app='full', code='test',
                 ))
 
+                # Assert if every is as it should be.
                 assert session['oauth_token_full'] == ('test_access_token', '')
 
                 t = RemoteToken.get(1, "fullid")
@@ -172,6 +193,68 @@ class RemoteAccountTestCase(InvenioTestCase):
 
                 val = token_getter(oauth.remote_apps['full'])
                 assert val == ('new_access_token', '')
+
+                # Disconnect account
+                res = c.get(url_for(
+                    "oauthclient.disconnect", remote_app='full',
+                ))
+                assert res.status_code == 302
+                assert res.location.endswith(
+                    url_for('oauthclient_settings.index')
+                )
+                # Assert that remote account have been removed.
+                t = RemoteToken.get(1, "fullid")
+                assert t is None
+
+    @patch('invenio.ext.session.interface.SessionInterface.save_session')
+    def test_rejected(self, save_session):
+        from invenio.modules.oauthclient.client import oauth
+
+        user = MagicMock()
+        user.get_id = MagicMock(return_value=1)
+        user.is_authenticated = MagicMock(return_value=True)
+        with patch('flask.ext.login._get_user', return_value=user):
+            with self.app.test_client() as c:
+                # First call login to be redirected
+                res = c.get(url_for("oauthclient.login", remote_app='full'))
+                assert res.status_code == 302
+                assert res.location.startswith(
+                    oauth.remote_apps['full'].authorize_url
+                )
+
+                # Mock response to imitate an invalid response. Here, an
+                # example from GitHub when the code is expired.
+                self.mock_response(app='full', data=dict(
+                    error_uri='http://developer.github.com/v3/oauth/'
+                              '#bad-verification-code',
+                    error_description='The code passed is '
+                                      'incorrect or expired.',
+                    error='bad_verification_code',
+                ))
+
+                # Imitate that the user authorized our request in the remote
+                # application (however, the remote app will son reply with an
+                # error)
+                res = c.get(url_for(
+                    "oauthclient.authorized", remote_app='full', code='test',
+                ))
+                assert res.status_code == 302
+
+    def test_settings_view(self):
+        # Create a remove account (linked account)
+        from invenio.modules.oauthclient.models import RemoteAccount
+        RemoteAccount.create(1, 'testid', None)
+
+        self.assert401(self.client.get(url_for('oauthclient_settings.index')))
+        self.login("admin", "")
+
+        res = self.client.get(url_for('oauthclient_settings.index'))
+        self.assert200(res)
+        assert 'MyLinkedTestAccount' in res.data
+        assert url_for('oauthclient.disconnect', remote_app='test') in res.data
+        assert url_for('oauthclient.login', remote_app='full') in res.data
+        assert url_for('oauthclient.login', remote_app='test_invalid') in \
+            res.data
 
 
 TEST_SUITE = make_test_suite(RemoteAccountTestCase)
