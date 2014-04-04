@@ -25,7 +25,14 @@
 """
 from invenio.base import config
 
-DOCUMENTS_MONGODB = {
+DOCUMENTS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy'
+                    ':SQLAlchemyStorage')
+
+DOCUMENTS_SQLALCHEMYSTORAGE = {
+    'model': 'invenio.modules.documents.models:Document'
+}
+
+DOCUMENTS_MONGODBSTORAGE = {
     'host': "localhost",
     'port': 27017,
     'database': config.CFG_DATABASE_NAME,

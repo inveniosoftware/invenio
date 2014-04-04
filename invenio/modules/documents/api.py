@@ -32,7 +32,8 @@
         >>> ctx.push()
         >>> from invenio.modules.documents import api
         >>> from invenio.modules.jsonalchemy.jsonext.engines import memory
-        >>> g.documents_storage_engine = memory.MemoryStorage()
+        >>> app.config['DOCUMENTS_ENGINE'] = \
+        "invenio.modules.jsonalchemy.jsonext.engines.memory:MemoryStorage"
         >>> d = api.Document.create({'title': 'Title 1'})
         >>> d['title']
         'Title 1'
@@ -51,11 +52,10 @@ import six
 from datetime import datetime
 from flask import g
 from fs.opener import opener
+from werkzeug.utils import import_string
 from werkzeug.local import LocalProxy
 
 from invenio.base.globals import cfg
-from invenio.modules.jsonalchemy.jsonext.engines.mongodb_pymongo import \
-    MongoDBStorage
 from invenio.modules.jsonalchemy.wrappers import SmartJson
 from invenio.modules.jsonalchemy.reader import Reader
 
@@ -64,8 +64,13 @@ from . import signals, errors
 
 def get_storage_engine():
     if not hasattr(g, "documents_storage_engine"):
-        g.documents_storage_engine = MongoDBStorage(
-            "Document", **cfg.get("DOCUMENTS_MONGODB", {}))
+        engine = cfg['DOCUMENTS_ENGINE']
+        if isinstance(engine, six.string_types):
+            engine = import_string(engine)
+
+        key = engine.__name__.upper()
+        kwargs = cfg.get('DOCUMENTS_{0}'.format(key), {})
+        g.documents_storage_engine = engine(**kwargs)
     return g.documents_storage_engine
 
 
@@ -96,7 +101,8 @@ class Document(SmartJson):
             >>> ctx.push()
             >>> from invenio.modules.documents import api
             >>> from invenio.modules.jsonalchemy.jsonext.engines import memory
-            >>> g.documents_storage_engine = memory.MemoryStorage()
+            >>> app.config['DOCUMENTS_ENGINE'] = \
+            "invenio.modules.jsonalchemy.jsonext.engines.memory:MemoryStorage"
             >>> d = api.Document.create({'title': 'Title 1'})
             >>> e = api.Document.get_document(d['_id'])
 
