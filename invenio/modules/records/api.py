@@ -138,7 +138,7 @@ class Record(SmartJson):
         return filter(None, pids)
 
     def _save(self):
-        self.storage_engine.update_one(self.dumps())
+        self.__class__.storage_engine.update_one(self.dumps())
 
 # Functional interface
 create_record = Record.create

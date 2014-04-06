@@ -124,9 +124,11 @@ class Document(SmartJson):
 
     def _save(self):
         try:
-            return self.storage_engine.update_one(self.dumps(), id=self['_id'])
+            return self.__class__.storage_engine.update_one(self.dumps(),
+                                                            id=self['_id'])
         except:
-            return self.storage_engine.save_one(self.dumps(), id=self['_id'])
+            return self.__class__.storage_engine.save_one(self.dumps(),
+                                                          id=self['_id'])
 
     def update(self):
         """Update document object."""
