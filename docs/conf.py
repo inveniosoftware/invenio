@@ -18,12 +18,8 @@ try:
     import sphinx_rtd_theme
     _html_theme = "sphinx_rtd_theme"
     _html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-#try:
-#    import sphinx_bootstrap_theme
-#    _html_theme = 'bootstrap'
-#    _html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 except:
-    print('Please run: `pip install sphinx_bootstrap_theme sphinx_bootstrap_theme`', file=sys.stderr)
+    print('Please run: `pip install sphinx_rtd_theme`', file=sys.stderr)
     _html_theme = 'default'
     _html_theme_path = []
 

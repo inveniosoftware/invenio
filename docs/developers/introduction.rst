@@ -27,7 +27,6 @@ Before you start reading please
     # Install package in editable mode
     $ pip install -e git+http://invenio-software.org/repo/invenio.git
     # Follow the instructions in src/invenio/INSTALL file.
-    $ inveniomanage runserver &
     # Edit a file
     $ `$EDITOR` src/invenio/invenio/<module>/<file>.py
     # See that your server has been reloaded automatically.
