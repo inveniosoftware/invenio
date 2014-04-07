@@ -11,6 +11,9 @@ Developer's Guide
    extensions
    registries
    modules
+   howtomodule
+   howtomodulepart2
+   howtomodulepart3
    templates
    git-workflow
    kwalitee

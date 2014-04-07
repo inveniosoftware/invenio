@@ -22,7 +22,7 @@ Before you start reading please
 - *Agile Development* where each iteration should lead to working code
   in relatively short time while incremental step are small and easy to
   understand by other developers. When you start with development take
-  advantage of built-in tools provided by Python and undelying libraries::
+  advantage of built-in tools provided by Python and underlying libraries::
 
     # Install package in editable mode
     $ pip install -e git+http://invenio-software.org/repo/invenio.git
@@ -57,7 +57,7 @@ Modules
 -------
 
 Modules are application components that can be use within an application
-or across aplications.  They can contains `SQLAlchemy`_ models, `Flask`_
+or across applications.  They can contains `SQLAlchemy`_ models, `Flask`_
 views, `Jinja2`_ templates and other ref:`pluggable-objects`.
 
 Discovery of modules is done based on configuration parameter called
