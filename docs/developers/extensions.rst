@@ -14,7 +14,7 @@ extension running.
 .. _Flask Extension Registry: http://flask.pocoo.org/extensions/
 .. _Flask Extension Development: http://flask.pocoo.org/docs/extensiondev/
 
-Pluging an Existing Extension
+Plugging an Existing Extension
 -----------------------------
 
 Extensions are all located in a package called ``flask_something``
