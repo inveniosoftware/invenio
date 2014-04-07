@@ -157,19 +157,19 @@ def _fix_recid(recid, logger):
         if res2[0][1]:
             minfo = cPickle.loads(res2[0][1])
             # 2a migrating descriptions->version->format
-            new_value = cPickle.dumps(minfo['descriptions'])
+            new_value = cPickle.dumps(minfo.get('descriptions', {}))
             run_sql("INSERT INTO bibdocmoreinfo (id_bibdoc, namespace, data_key, data_value) VALUES (%s, %s, %s, %s)", (str(docid), "", "descriptions", new_value))
             # 2b migrating comments->version->format
-            new_value = cPickle.dumps(minfo['comments'])
+            new_value = cPickle.dumps(minfo.get('comments', {}))
             run_sql("INSERT INTO bibdocmoreinfo (id_bibdoc, namespace, data_key, data_value) VALUES (%s, %s, %s, %s)", (str(docid), "", "comments", new_value))
             # 2c migrating flags->flagname->version->format
-            new_value = cPickle.dumps(minfo['flags'])
+            new_value = cPickle.dumps(minfo.get('flags', {}))
             run_sql("INSERT INTO bibdocmoreinfo (id_bibdoc, namespace, data_key, data_value) VALUES (%s, %s, %s, %s)", (str(docid), "", "flags", new_value))
 
             # 3) Verify the correctness of moreinfo transformations
             try:
                 descriptions = cPickle.loads(run_sql("SELECT data_value FROM bibdocmoreinfo WHERE id_bibdoc=%s AND namespace=%s AND data_key=%s", (str(docid), '', 'descriptions'))[0][0])
-                for version in minfo['descriptions']:
+                for version in minfo.get('descriptions', {}):
                     for docformat in minfo['descriptions'][version]:
                         v1 = descriptions[version][docformat]
                         v2 = minfo['descriptions'][version][docformat]
@@ -181,7 +181,7 @@ def _fix_recid(recid, logger):
 
             try:
                 comments = cPickle.loads(run_sql("SELECT data_value FROM bibdocmoreinfo WHERE id_bibdoc=%s AND namespace=%s AND data_key=%s", (str(docid), '', 'comments'))[0][0])
-                for version in minfo['comments']:
+                for version in minfo.get('comments', {}):
                     for docformat in minfo['comments'][version]:
 
                         v1 = comments[version][docformat]
@@ -194,7 +194,7 @@ def _fix_recid(recid, logger):
 
             try:
                 flags = cPickle.loads(run_sql("SELECT data_value FROM bibdocmoreinfo WHERE id_bibdoc=%s AND namespace=%s AND data_key=%s", (str(docid), '', 'flags'))[0][0])
-                for flagname in minfo['flags']:
+                for flagname in minfo.get('flags', {}):
                     for version in minfo['flags'][flagname]:
                         for docformat in minfo['flags'][flagname][version]:
                             if minfo['flags'][flagname][version][docformat]:
