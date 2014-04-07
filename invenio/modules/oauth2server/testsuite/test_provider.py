@@ -1,9 +1,28 @@
-from __future__ import absolute_import
+# -*- coding: utf-8 -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import os
 import logging
+
+from flask import url_for
 
 from invenio.testsuite import FlaskSQLAlchemyTest
 from invenio.ext.sqlalchemy import db
@@ -23,6 +42,7 @@ class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
     def create_app(self):
         try:
             app = super(OAuth2ProviderTestCase, self).create_app()
+            app.debug = True
             app.config.update(dict(
                 OAUTH2_CACHE_TYPE='simple',
             ))
@@ -190,6 +210,12 @@ class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
         self.assert200(r)
         self.assertEqual(r.json, dict(ping='pong'))
 
+        # Authentication flow has now been completed, and the access
+        # token can be used to access protected resources.
+        r = self.client.get('/oauth2test/test-ping')
+        self.assert200(r)
+        self.assertEqual(r.json, dict(ping='pong'))
+
         r = self.client.get('/oauth2test/test-info')
         self.assert200(r)
         assert r.json.get('client') == 'dev'
@@ -248,3 +274,24 @@ class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
         # Access token is not valid for this scope.
         r = self.client.get('/oauth/info')
         self.assertStatus(r, 403)
+
+    def test_settings_index(self):
+        # Create a remove account (linked account)
+        self.assert401(self.client.get(url_for('oauth2server_settings.index')))
+        self.login("tester", "tester")
+
+        res = self.client.get(url_for('oauth2server_settings.index'))
+        self.assert200(res)
+
+        res = self.client.get(url_for('oauth2server_settings.client_new'))
+        self.assert200(res)
+
+        res = self.client.post(
+            url_for('oauth2server_settings.client_new'),
+            data=dict(
+                name='Test',
+                description='Test description',
+                website='http://invenio-software.org',
+            )
+        )
+        assert res.status_code == 302
