@@ -33,6 +33,7 @@ DOCUMENTS_SQLALCHEMYSTORAGE = {
 }
 
 DOCUMENTS_MONGODBSTORAGE = {
+    'model': 'Document',
     'host': "localhost",
     'port': 27017,
     'database': config.CFG_DATABASE_NAME,

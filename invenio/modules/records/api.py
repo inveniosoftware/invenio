@@ -35,6 +35,7 @@ class Record(SmartJson):
     """
     Default/Base record class
     """
+    __storagename__ = "records"
 
     def __init__(self, json=None, **kwargs):
         if not json or '__meta_metadata__' not in json:
