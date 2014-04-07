@@ -109,7 +109,6 @@ def authorized(remote_app=None):
     """
     if remote_app not in handlers:
         return abort(404)
-
     return handlers[remote_app]()
 
 

@@ -30,7 +30,7 @@ from .models import RemoteToken, RemoteAccount
 def oauth_authenticate(client_id, email=None, access_token=None,
                        require_existing_link=True, auto_register=False):
     """
-    Authenticate and authenticated oauth request
+    Authenticate an oauth authorized callback
     """
     if email is None and access_token is None:
         return False
