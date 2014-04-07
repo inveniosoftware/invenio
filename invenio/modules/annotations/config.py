@@ -24,6 +24,7 @@ ANNOTATIONS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.'
 
 
 ANNOTATIONS_MONGODBSTORAGE = {
+    'model': 'Annotation',
     'host': "localhost",
     'port': 27017,
     'database': config.CFG_DATABASE_NAME,
