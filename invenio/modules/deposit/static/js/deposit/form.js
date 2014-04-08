@@ -212,7 +212,10 @@ var DEPOSIT_FORM = (function( $ ){
           // if(!$('#state-' + name)){
           //     alert("Problem");
           // }
-          $('#state-' + name).html(
+          var $state_name = $("#state-" + name);
+          var $state_group_name = $("#state-group-" + name);
+
+          $state_name.html(
               tpl_field_message.render({
                   name: name,
                   state: state,
@@ -220,20 +223,23 @@ var DEPOSIT_FORM = (function( $ ){
               })
           );
 
+          var error_state = 'danger';
 
-          ['info','warning','error','success'].map(function(s){
-              $("#state-group-" + name).removeClass(s);
-              $("#state-" + name).removeClass('alert-'+s);
+          ['info', 'warning', 'error', 'success'].forEach(function(s){
+              $state_group_name.removeClass(s);
+              $state_name.removeClass('alert-'+s);
               if(s == state) {
+                  $state_group_name.addClass(state);
                   if(s == 'error') {
                       has_error = true;
+                      $state_name.addClass('alert-'+error_state);
                   }
-                  $("#state-group-" + name).addClass(state);
-                  $("#state-" + name).addClass('alert-'+state);
+                  else
+                      $state_name.addClass('alert-'+state);
               }
           });
 
-          $('#state-' + name).show('fast');
+          $state_name.show('fast');
           return has_error;
       } else {
           clear_error(name);
