@@ -48,7 +48,7 @@ from invenio.modules.pidstore.models import PersistentIdentifier
 # Helpers
 #
 def filter_empty_helper(keys=None):
-    """ Remove empty elements from a list"""
+    """Remove empty elements from a list."""
     def _inner(elem):
         if isinstance(elem, dict):
             for k, v in elem.items():
@@ -64,21 +64,18 @@ def filter_empty_helper(keys=None):
 # Workflow tasks
 #
 def is_api_request(obj, eng):
-    """ Check if request is an API request """
+    """Check if request is an API request."""
     return getattr(request, 'is_api_request', False)
 
 
 def has_submission(obj, eng):
-    """
-    """
+    """Check if deposition has submission."""
     d = Deposition(obj)
     return d.has_sip()
 
 
 def is_sip_uploaded(sip, record=None):
-    """
-    Check if a submission information package for a record has been uploaded
-    """
+    """Check if a submission information package for a record has been uploaded."""
     if not sip.is_sealed():
         return False
 
@@ -100,9 +97,7 @@ def is_sip_uploaded(sip, record=None):
 
 
 def authorize_user(action, **params):
-    """
-    Check if current user is authorized to perform the action.
-    """
+    """Check if current user is authorized to perform the action."""
     def _authorize_user(obj, dummy_eng):
         from invenio.modules.access.engine import acc_authorize_action
 
@@ -119,9 +114,7 @@ def authorize_user(action, **params):
 
 
 def prefill_draft(draft_id='_default', clear=True):
-    """
-    Fill draft values with values from pre-filled cache
-    """
+    """Fill draft values with values from pre-filled cache."""
     def _prefill_draft(obj, eng):
         if not getattr(request, 'is_api_request', False):
             draft_cache = DepositionDraftCacheManager.get()
@@ -133,8 +126,7 @@ def prefill_draft(draft_id='_default', clear=True):
 
 
 def render_form(draft_id='_default'):
-    """
-    Renders a form if the draft associated with it has not yet been completed.
+    """Render a form if the draft associated with it has not yet been completed.
 
     :param draft_id: The name of the draft to create. Must be specified if you
         put more than two ``render_form'''s in your deposition workflow.
@@ -192,9 +184,7 @@ def render_form(draft_id='_default'):
 
 def load_record(draft_id='_default', producer='json_for_form',
                 pre_process=None, post_process=None):
-    """
-    Load a record and map to draft data.
-    """
+    """Load a record and map to draft data."""
     def _load_record(obj, eng):
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=True)
@@ -261,9 +251,7 @@ def load_record(draft_id='_default', producer='json_for_form',
 
 
 def merge_changes(deposition, dest, a, b):
-    """
-    Find changes between two dictionaries A and B, and apply the changes
-    to a destination dictionary.
+    """Find changes between two dicts and apply them to a destination dict.
 
     This method is useful when A is a subset of the destination dictionary.
     """
@@ -277,8 +265,7 @@ def merge_changes(deposition, dest, a, b):
 def merge_record(draft_id='_default', pre_process_load=None,
                  post_process_load=None, process_export=None,
                  merge_func=merge_changes):
-    """
-    Merge recjson with a record
+    """Merge recjson with a record.
 
     This task will load the current record, diff the changes from the
     deposition against it, and apply the patch.
@@ -347,9 +334,7 @@ def merge_record(draft_id='_default', pre_process_load=None,
 
 
 def create_recid():
-    """
-    Create a new record id.
-    """
+    """Create a new record id."""
     def _create_recid(obj, dummy_eng):
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=False)
@@ -365,8 +350,7 @@ def create_recid():
 
 def mint_pid(pid_field='doi', pid_creator=None, pid_store_type='doi',
              existing_pid_checker=None):
-    """
-    Register a persistent identifier internally.
+    """Register a persistent identifier internally.
 
     :param pid_field: The recjson key for where to look for a pre-reserved pid.
         Defaults to 'pid'.
@@ -413,9 +397,7 @@ def mint_pid(pid_field='doi', pid_creator=None, pid_store_type='doi',
 
 
 def process_bibdocfile(process=None):
-    """
-    Process bibdocfiles with custom processor
-    """
+    """Process bibdocfiles with custom processor."""
     def _bibdocfile_update(obj, eng):
         if process:
             d = Deposition(obj)
@@ -429,9 +411,7 @@ def process_bibdocfile(process=None):
 
 
 def prepare_sip():
-    """
-    Prepare a submission information package
-    """
+    """Prepare a submission information package."""
     def _prepare_sip(obj, dummy_eng):
         d = Deposition(obj)
 
@@ -451,10 +431,7 @@ def prepare_sip():
 
 
 def process_sip_metadata(processor=None):
-    """
-    Process metadata in submission information package using a custom
-    processor.
-    """
+    """Process metadata in submission information package using a custom processor."""
     def _prepare_sip(obj, dummy_eng):
         d = Deposition(obj)
         metadata = d.get_latest_sip(sealed=False).metadata
@@ -469,9 +446,7 @@ def process_sip_metadata(processor=None):
 
 
 def finalize_record_sip(is_dump=True):
-    """
-    Finalizes the SIP by generating the MARC and storing it in the SIP.
-    """
+    """Finalize the SIP by generating the MARC and storing it in the SIP."""
     def _finalize_sip(obj, dummy_eng):
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=False)
@@ -482,9 +457,19 @@ def finalize_record_sip(is_dump=True):
     return _finalize_sip
 
 
+def hold_for_approval():
+    """Hold deposition on the Holding Pen for admin approval."""
+    def _hold_for_approval(obj, dummy_eng):
+        from invenio.modules.workflows.tasks.marcxml_tasks import approve_record
+        d = Deposition(obj)
+        if d.type.hold_for_upload:
+            approve_record(obj, dummy_eng)
+    return _hold_for_approval
+
+
 def upload_record_sip():
-    """
-    Generates the record from marc.
+    """Generate the record from marc.
+
     The function requires the marc to be generated,
     so the function export_marc_from_json must have been called successfully
     before

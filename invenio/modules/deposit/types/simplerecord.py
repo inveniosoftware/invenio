@@ -27,14 +27,15 @@ from invenio.modules.deposit.tasks import render_form, \
     prepare_sip, \
     finalize_record_sip, \
     upload_record_sip, \
-    prefill_draft,\
-    process_sip_metadata
+    prefill_draft, \
+    process_sip_metadata, \
+    hold_for_approval
 
 
 class SimpleRecordDeposition(DepositionType):
-    """
-    Simple record submission - no support for editing nor REST API.
-    """
+
+    """Simple record submission - no support for editing nor REST API."""
+
     workflow = [
         # Pre-fill draft with values passed in from request
         prefill_draft(draft_id='default'),
@@ -51,15 +52,17 @@ class SimpleRecordDeposition(DepositionType):
         create_recid(),
         # Generate MARC based on metadata dictionary.
         finalize_record_sip(is_dump=False),
+        # Hold the deposition for admin approval
+        hold_for_approval(),
         # Seal the SIP and write MARCXML file and call bibupload on it
         upload_record_sip(),
     ]
 
+    hold_for_upload = False
+
     @classmethod
     def render_completed(cls, d):
-        """
-        Page to render when deposition was successfully completed.
-        """
+        """Page to render when deposition was successfully completed."""
         ctx = dict(
             deposition=d,
             deposition_type=(
@@ -77,8 +80,5 @@ class SimpleRecordDeposition(DepositionType):
 
     @classmethod
     def process_sip_metadata(cls, deposition, metadata):
-        """
-        Implement this method in your subclass to process metadata prior to
-        MARC generation.
-        """
+        """Implement this method in your subclass to process metadata prior to MARC generation."""
         pass
