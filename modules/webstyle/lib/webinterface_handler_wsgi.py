@@ -577,11 +577,6 @@ def application(environ, start_response):
         for (callback, data) in req.get_cleanups():
             callback(data)
 
-        ## as suggested in
-        ## <http://www.python.org/doc/2.3.5/lib/module-gc.html>
-        gc.enable()
-        gc.collect()
-        del gc.garbage[:]
     return []
 
 def generate_error_page(req, admin_was_alerted=True, page_already_started=False):
