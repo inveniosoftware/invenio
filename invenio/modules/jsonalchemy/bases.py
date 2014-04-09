@@ -34,7 +34,7 @@ class Versionable(object):
         """
         Creates new revision of the object and saves link to the old one.
         """
-        self['old_version'] = self['_id']
+        self['older_version'] = self['_id']
         self['_id'] = str(__import__('uuid').uuid4())
         #self.set_default_value('_id')  # pylint: disable=E1101
         return super(Versionable, self).update()

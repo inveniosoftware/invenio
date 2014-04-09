@@ -39,7 +39,6 @@ class StorageEngine(type):
     """Storage metaclass for parsing application config."""
 
     @property
-    @memoize
     def storage_engine(cls):
         """Returns an instance of storage engine defined in application config.
 
@@ -54,6 +53,11 @@ class StorageEngine(type):
         keyword arguments of the engine defined in "DUMMY_ENGINE".
         """
         storagename = cls.__storagename__.lower()
+        return cls._engine(storagename)
+
+    @staticmethod
+    @memoize
+    def _engine(storagename):
         prefix = storagename.upper()
         engine = current_app.config['{0}_ENGINE'.format(prefix)]
         if isinstance(engine, six.string_types):

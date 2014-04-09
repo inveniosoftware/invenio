@@ -20,6 +20,6 @@
 
 def get_version_history(self):
     """Returns list of older version `_id`s."""
-    older = self.storage_engine.get_one(self['older_version'])
+    older = self.__class__.storage_engine.get_one(self['older_version'])
     return older.get('version_history', []) + \
         self['older_version'] and [self['older_version']] or []

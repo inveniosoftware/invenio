@@ -49,13 +49,16 @@ class ConnectParser(DecoratorAfterEvalBaseExtensionParser):
         return (Keyword("@connect").suppress() +
                 Literal('(').suppress() +
                 quotedString.setResultsName('field')
-                    .setParseAction(removeQuotes) +
+                .setParseAction(removeQuotes) +
                 Optional(Literal(',').suppress() +
                          SkipTo(')')).setResultsName('func') +
                 Literal(')').suppress()
-               ).setResultsName("connect")\
-               .setParseAction(lambda toks: {'connected_field': toks.field,
-                   'update_function': toks.func[0] if toks.func else None})
+                ).setResultsName("connect").setParseAction(
+                    lambda toks: {
+                        'connected_field': toks.field,
+                        'update_function': toks.func[0]
+                        if toks.func else None
+                    })
 
     @classmethod
     def create_element(cls, rule, field_def, content, namespace):
@@ -65,25 +68,34 @@ class ConnectParser(DecoratorAfterEvalBaseExtensionParser):
             content = (content, )
         else:
             content = content.asList()
-        #Conect to the other side
-        element = []
+        # Conect to the other side
         for connect in content:
             try:
-                connected_field = FieldParser.field_definitions(namespace)\
-                        [connect['connected_field']]
+                connected_field = FieldParser.field_definitions(
+                    namespace)[connect['connected_field']]
             except KeyError:
                 raise FieldParserException(
                     "Definition for '%(field)s' not found, maybe adding "
                     "@parse_first('%(field)s') could help" %
                     {'field': connect['connected_field']})
-            #Add it to all the rules (all master format, derived and calculated)
+            # Add it to all the rules (all master format, derived and
+            # calculated)
             for connected_rules in connected_field['rules'].values():
                 for connected_rule in connected_rules:
+                    # Add parse_first for connected field
+                    if 'parse_first' not in connected_rule['decorators'][
+                            'before']:
+                        connected_rule['decorators']['before'][
+                            'parse_first'] = []
+                    connected_rule['decorators']['before']['parse_first']\
+                        .append(rule.field['json_id'])
+                    # Connect fields
                     if 'connect' not in connected_rule['decorators']['after']:
                         connected_rule['decorators']['after']['connect'] = []
                     connected_rule['decorators']['after']['connect']\
                         .append({'connected_field': rule.field['json_id'],
-                                 'update_function': connect['update_function']})
+                                 'update_function': connect['update_function']
+                                 })
 
         return content
 
@@ -110,7 +122,8 @@ class ConnectParser(DecoratorAfterEvalBaseExtensionParser):
                                  exclude='connect')
             else:
                 try_to_eval(info['update_function'],
-                            functions(json.additional_info.namespace))\
-                           (json, field_name, info['connected_field'], action)
+                            functions(json.additional_info.namespace))(
+                                json, field_name, info['connected_field'],
+                                action)
 
 parser = ConnectParser
