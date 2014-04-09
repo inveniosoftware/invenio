@@ -798,9 +798,12 @@
       e.stopPropagation();
     });
 
-    $('form[name=search] button[name=action_browse]').on('click', function(e) {
-      $('form[name=search] button[name=action_search]').attr('name', 'action_browse');
-      $('.add_to_search-form button[name=action_search]').trigger('click');
+    // browse buttons
+    $('.add_to_search-form button[name=action_browse]').on('click', function(e) {
+      makeSearchQuery();
+      var $main_search_button = $('#searchform-input-group button[name=action_search]');
+      $main_search_button.attr('name', 'action_browse');
+      $main_search_button.trigger('click');
     });
 
     $('#add_to_search-button').on('click', function(e) {
