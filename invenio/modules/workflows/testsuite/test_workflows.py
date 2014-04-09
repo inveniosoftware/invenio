@@ -19,28 +19,22 @@
 
 """Unit tests for workflows views."""
 
+from __future__ import absolute_import
+
 import random
 import time
 import logging
 
 from invenio.testsuite import InvenioTestCase, make_test_suite, \
     run_test_suite
-from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
-from flask.ext.registry import (RegistryProxy,
-                                ImportPathRegistry)
+from ..registry import WorkflowsRegistry
+from flask.ext.registry import ImportPathRegistry
 
 
 TEST_PACKAGES = [
     'invenio.modules.*',
     'invenio.modules.workflows.testsuite',
 ]
-
-
-test_registry = RegistryProxy('test_registry', ImportPathRegistry,
-                              initial=TEST_PACKAGES)
-
-workflows_test_registry = lambda: ModuleAutoDiscoverySubRegistry(
-    'workflows', registry_namespace=test_registry)
 
 
 class WorkflowViewTest(InvenioTestCase):
@@ -61,13 +55,24 @@ class WorkflowViewTest(InvenioTestCase):
         self.assert401(response)
 
 
-class WorkflowTasksTestAPI(InvenioTestCase):
-    """ Test basic workflow API """
+class WorkflowTasksTestCase(InvenioTestCase):
+    def create_registries(self):
+        self.app.extensions['registry']['workflows.tests'] = \
+            ImportPathRegistry(initial=TEST_PACKAGES)
+        self.app.extensions['registry']['workflows'] = \
+            WorkflowsRegistry(
+                'workflows', app=self.app, registry_namespace='workflows.tests'
+            )
+        self.app.extensions['registry']['workflows.widgets'] = \
+            WorkflowsRegistry(
+                'widgets', app=self.app, registry_namespace='workflows.tests'
+            )
 
+
+class WorkflowTasksTestAPI(WorkflowTasksTestCase):
+    """ Test basic workflow API """
     def setUp(self):
-        if 'workflows' in self.app.extensions['registry']:
-            del self.app.extensions['registry']['workflows']
-        self.app.extensions['registry']['workflows'] = workflows_test_registry()
+        self.create_registries()
 
         self.test_data = {}
         self.id_workflows = []
@@ -138,7 +143,6 @@ distances from it.
         ).delete(synchronize_session='fetch')
         Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
         db.session.commit()
-        del self.app.extensions['registry']['workflows']
 
     def test_halt(self):
         from invenio.modules.workflows.registry import workflows
@@ -640,17 +644,12 @@ test purpose, this object will log several things"""
             self.assertEqual(final_object.get_data(), final_data)
 
 
-class TestWorkflowTasks(InvenioTestCase):
+class TestWorkflowTasks(WorkflowTasksTestCase):
     """
     Tests meant for testing the the generic tasks available.
     """
     def setUp(self):
-        if 'workflows' in self.app.extensions['registry']:
-            del self.app.extensions['registry']['workflows']
-        self.app.extensions['registry']['workflows'] = workflows_test_registry()
-
-    def tearDown(self):
-        del self.app.extensions['registry']['workflows']
+        self.create_registries()
 
     def test_logic_tasks(self):
         """
