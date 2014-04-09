@@ -1,6 +1,7 @@
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
 import re
 import redis
@@ -50,7 +51,9 @@ class BibWorkflowObjectIdContainer(object):
         from invenio.modules.workflows.models import BibWorkflowObject
 
         if self.id is not None:
-            return BibWorkflowObject.query.filter(BibWorkflowObject.id == self.id).one()
+            return BibWorkflowObject.query.filter(
+                BibWorkflowObject.id == self.id
+            ).one()
         else:
             return None
 
@@ -106,9 +109,11 @@ def determineDataType(data):
             mime_checker = Magic(mime=True)
             data_type = mime_checker.from_buffer(data)  # noqa
         except:
-            register_exception(stream="warning", prefix=
-                               "BibWorkflowObject.determineDataType:" +
-                               " Impossible to resolve data type.")
+            register_exception(
+                stream="warning",
+                prefix="BibWorkflowObject.determineDataType:"
+                       " Impossible to resolve data type."
+            )
             data_type = ""
     return data_type
 

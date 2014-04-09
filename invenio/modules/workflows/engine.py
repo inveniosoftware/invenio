@@ -16,8 +16,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import absolute_import
+
+import sys
+
 from six.moves import cPickle
-from six import iteritems
+from six import iteritems, reraise
 from uuid import uuid1 as new_uuid
 
 import base64
@@ -354,7 +358,7 @@ BibWorkflowEngine
                 except Exception as e:
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
-                    raise e
+                    reraise(*sys.exc_info())
             # We save the object once it is fully run through
             obj.save(version=ObjectVersion.FINAL)
             self.increase_counter_finished()
