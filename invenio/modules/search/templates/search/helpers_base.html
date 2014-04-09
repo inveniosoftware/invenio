@@ -257,7 +257,7 @@
     <div class="form-group">
       <div class="col-md-offset-2 col-md-10 col-sm-offset-3 col-sm-9">
         <div class="pull-left">
-          <button id="addtosearch" class="btn">
+          <button id="add_to_search-button" class="btn">
             <i class="glyphicon glyphicon-plus"></i> {{ _("Add to search") }}
           </button>
         </div>
@@ -637,14 +637,14 @@
 
     //--------------------
 
+    /**
+     * Allows to deactivate a radio buttons (like check-buttons)
+     * and make them behave as radio ones when the another one is clicked
+     *
+     * @method radio_checkbox_hybrid
+     * @param radioButtons jQuerySelector for all the buttons in a group
+     */
     var radio_checkbox_hybrid = function (radioButtons) {
-
-      /*
-        Allows to deactivate a toggle buttons (like checkbuttons)
-        and make them behave as radio ones when the another one is clicked
-
-        @param radioButtons jQuerySelector for all the buttons in a group
-      */
 
       radioButtons.click(function () {
         var buttons = $(this).siblings();
@@ -667,34 +667,49 @@
         {%- endfor -%}
         };
 
-    var addtosearch_callback = function(e) {
-      var op1 = $('#add_type-btn-group .active').children(':first').val(),
-          m1 = $('[name=m1]').val(),
+    /**
+     * Merges value from 'advanced' tab in 'Add to search' form
+     * with the current search query
+     *
+     * @method addAdvancedQuery
+     * @returns {String} search query after adding the form content
+     */
+    function getAdvancedQuery() {
+      var m1 = $('[name=m1]').val(),
           p1 = $('[name=p1]').val(),
           f = $('[name=f]').val(),
-          p = $('[name=p]'),
-          val = $.trim(p.val()),
-          op = (op1=='a' && val=="")?'':op1_fn[op1];
-      if (val !== "") {
-        val += ' ' + op;
+          p = $('[name=p]');
+      if (p1 === "") {
+        return '';
       }
-      if (p1 === "") { return false; }
       if (f !== "") {
         f +=':';
       }
-      p.val(val+m1_fn[m1](p1,f));
-      $('[name=p1]').val('');
-      e.stopPropagation();
-      return false;
+      return m1_fn[m1](p1,f);
     };
 
+    /**
+     * Removes query value from 'what?' field in 'advanced' tab
+     *
+     * @method cleanAdvancedQuery
+     */
+    function cleanAdvancedQueryForm() {
+      $('[name=p1]').val('');
+    }
 
-    function perform_easy_search() {
+    /**
+     * Creates search query from 'simple' tab in 'Add to search' form
+     *
+     * @method getSimpleQuery
+     * @returns {String} query from the form content
+     *
+     */
+    function getSimpleQuery() {
+        var query_str = '';
+
         // get values
         var p = $('[name=p]'),
-            val = $.trim(p.val()),
             op1 = $('#add_type-btn-group .active').children(':first').val(),
-            op = (op1=='a' && val=="")?'':op1_fn[op1],
             author = $('#author').val(),
             title = $('#title').val(),
             rn = $('#rn').val(),
@@ -707,9 +722,6 @@
             jvol = $('#journal-vol').val(),
             jpage = $('#journal-page').val();
 
-        if (val !== "") {
-          val += ' ' + op;
-        }
         // filter and build
         var query = [];
         if (author !== '') { query.push('author:' + author); }
@@ -721,22 +733,69 @@
         if (j !== '') { query.push('journal:' + j); }
         if (jvol !== '') { query.push('909C4v:' + jvol); }
         if (jpage !== '') { query.push('909C4c:' + jpage); }
-        //query = query.replace(/topcite (\d+)?\+/, 'topcite $1->99999');
-        //query = query.replace(' and ', ' ');
-        //query = query.replace(/ /g, '+');
-        // window.location = search_url;
+
         if (query.length > 0) {
-          p.val(val+query.join(' '+op1_fn[op1]));
+          query_str = query.join(' '+op1_fn[op1])
         }
+
+        return query_str;
     };
 
-    $('.add_to_search-form button[name=action_search]').on('click', function(e) {
-      if ($('.add_to_search-form .tab-buttons li.active a').attr('href') === '#simple-search') {
-        perform_easy_search();
+    var $main_search_field = $('[name=p]');
+
+    /**
+     * Adds query from 'advanced' tab to the search field
+     *
+     * @method addAdvancedQueryToSearch
+     */
+    function addAdvancedQueryToSearch() {
+      var current_query = $.trim($main_search_field.val());
+      var new_part = getAdvancedQuery();
+      cleanAdvancedQueryForm();
+      $main_search_field.val(mergeQuery(current_query, new_part));
+    }
+
+    /**
+     * Merges new part to old query using currently
+     * chosen logic function
+     *
+     * @method mergeQuery
+     * @param {String} old_query old query
+     * @param {String} new_part a string which user is going to merge
+     */
+    function mergeQuery(current_query, new_part) {
+      var op1 = $('#add_type-btn-group .active').children(':first').val();
+      var op = (op1=='a' && current_query=="")?'':op1_fn[op1];
+
+      if (current_query !== "" && new_part !== "") {
+        current_query += ' ' + op;
+      }
+
+      return current_query + new_part;
+    }
+
+    /**
+     * Updates query value in the search field
+     *
+     * @method makeSearchQuery
+     */
+    function makeSearchQuery() {
+      var active_tab = $('.add_to_search-form .tab-buttons li.active a').attr('href');
+
+      if (active_tab === '#simple-search') {
+        var current_query = $.trim($main_search_field.val());
+        var new_part = getSimpleQuery();
+        $main_search_field.val(mergeQuery(current_query, new_part));
       } else {
-        addtosearch_callback(e);
+        addAdvancedQueryToSearch();
         $('.add_to_search-form .appender').trigger('click');
       }
+    }
+
+    // search buttons
+    $('.add_to_search-form button[name=action_search]').on('click', function(e) {
+      makeSearchQuery();
+      e.stopPropagation();
     });
 
     $('form[name=search] button[name=action_browse]').on('click', function(e) {
@@ -744,13 +803,16 @@
       $('.add_to_search-form button[name=action_search]').trigger('click');
     });
 
-    $('#addtosearch').on('click', addtosearch_callback);
-    $('#advanced-search [name=p1]').keypress(function(event) {
+    $('#add_to_search-button').on('click', function(e) {
+      addAdvancedQueryToSearch();
+      return false;
+    });
+
+    $('.add_to_search-form #advanced-search [name=p1]').keypress(function(event) {
+      // on 'return' key
       if ( event.which == 13 ) {
-        if ($(this).val() !== '') {
-          event.preventDefault();
-          addtosearch_callback(event);
-        }
+        addAdvancedQueryToSearch();
+        return false;
       }
     });
 
