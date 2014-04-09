@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -58,7 +58,7 @@ def populate(packages=[], default_data=True, files=None,
         print('>>> Default data has been skiped (--no-data).')
         return
     if not packages:
-        packages = ['invenio_demosite']
+        packages = ['invenio_demosite.base']
 
     from werkzeug.utils import import_string
     from invenio.config import CFG_PREFIX
@@ -111,7 +111,7 @@ def create(packages=[]):
     from invenio.base.scripts.config import get_conf
 
     if not packages:
-        packages = ['invenio_demosite']
+        packages = ['invenio_demosite.base']
 
     print(">>> Going to create demo site...")
     db.session.execute("TRUNCATE schTASK")
