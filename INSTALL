@@ -2,40 +2,38 @@ Invenio INSTALLATION
 ====================
 
 About
-----
+-----
 
-This document specifies how to quickly install Invenio v2.0.0 for
-the first time.  See RELEASE-NOTES if you are upgrading
-from a previous Invenio release.
+This document specifies how to quickly install Invenio v2.0.0 for the first
+time. See RELEASE-NOTES if you are upgrading from a previous Invenio release.
 
 Prerequisites
 -------------
 
-Here is the software you need to have around before you
-start installing Invenio for development.
+Here is the software you need to have around before you start installing
+Invenio for development.
 
-Unix-like operating system.  The main development and
-production platforms for Invenio at CERN are GNU/Linux
-distributions Debian, Gentoo, Scientific Linux (aka RHEL),
-Ubuntu, but we also develop on Mac OS X.  Basically any Unix
-system supporting the software listed below should do.
+Unix-like operating system.  The main development and production platforms for
+Invenio at CERN are GNU/Linux distributions Debian, Gentoo, Scientific Linux
+(aka RHEL), Ubuntu, but we also develop on Mac OS X.  Basically any Unix system
+supporting the software listed below should do.
 
-If you are using Ubuntu 13.10 or later, then you can install
-most of the below-mentioned prerequisites and recommendations
-by running::
+If you are using Ubuntu 13.10 or later, then you can install most of the
+below-mentioned prerequisites and recommendations by running:::
 
-    sudo apt-get update
-    sudo apt-get install virtualenvwrapper mysql-server \
-        redis-server libmysqlclient-dev libxml2-dev libxslt-dev \
-        python-software-properties g++ make python-dev
-    sudo add-apt-repository ppa:chris-lea/node.js
-    sudo apt-get install nodejs
-    sudo npm install -g bower grunt-cli
+    $ sudo apt-get update
+    $ sudo apt-get install mysql-client mysql-server redis-server \
+                           libmysqlclient-dev libxml2-dev libxslt-dev \
+                           libjpeg-dev libfreetype6-dev libtiff5-dev \
+                           python-software-properties g++ make python-dev \
+                           npm git
+    $ sudo ln -s /usr/bin/nodejs /usr/bin/node
+    $ sudo pip install -U virtualenvwrapper
+    $ sudo npm install -g bower grunt-cli
 
 NOTE: The recommended Python version is 2.7.5+
 
-For futher tutorial you will need to check that you have
-``git-new-workdir``.::
+For futher tutorial you will need to check that you have ``git-new-workdir``.::
 
     which git-new-workdir || { \
         wget https://raw.github.com/git/git/master/contrib/workdir/git-new-workdir \
@@ -48,76 +46,77 @@ Quick instructions for the impatient Invenio admin
 --------------------------------------------------
 
 a. Installation
----------------
+~~~~~~~~~~~~~~~
 
-You can run following commands in your shell::
+Run the following commands in your shell::
 
-    cd $HOME/src/
-    export BRANCH=pu
-    git clone https://github.com/jirikuncar/invenio.git
-    mkvirtualenv invenio --no-site-packages
-    workon invenio
-    cdvirtualenv
-    mkdir src; cd src
-    git-new-workdir ~/src/invenio/ invenio $BRANCH
-    cd invenio
-    pip install --upgrade pip
-    pip install -e . --process-dependency-links --allow-all-external
-    pybabel compile -fd invenio/base/translations/
-    npm install
-    bower install
-    grunt
+    $ cd $HOME/src/
+    $ export BRANCH=pu
+    $ git clone https://github.com/jirikuncar/invenio.git
+    $ mkvirtualenv invenio
+    (invenio)$ cdvirtualenv
+    (invenio)$ mkdir src; cd src
+    (invenio)$ git-new-workdir ~/src/invenio/ invenio $BRANCH
+    (invenio)$ cd invenio
+    (invenio)$ pip install --upgrade pip
+    (invenio)$ pip install -e . --process-dependency-links --allow-all-external
+    (invenio)$ pybabel compile -fd invenio/base/translations/
+    (invenio)$ npm install
+    (invenio)$ bower install
+    (invenio)$ grunt
 
 
 b. Configuration
-----------------
+~~~~~~~~~~~~~~~~
 
-Generate secret key for your installation::
+Generate the secret key for your installation.::
 
-    inveniomanage config create secret-key
+    (invenio)$ inveniomanage config create secret-key
 
-If you are planning to develop localy in multiple environments
-please run following::
+If you are planning to develop localy in multiple environments please run
+following::
 
-    inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail
-    inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`
-    inveniomanage config set CFG_DATABASE_NAME $BRANCH
-    inveniomanage config set CFG_DATABASE_USER $BRANCH
+    (invenio)$ inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail
+    (invenio)$ inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`
+    (invenio)$ inveniomanage config set CFG_DATABASE_NAME $BRANCH
+    (invenio)$ inveniomanage config set CFG_DATABASE_USER $BRANCH
+    (invenio)$ inveniomanage config set CFG_SITE_URL http://0.0.0.0:4000
 
-Invenio comes with default demo site configuration examples that
-you can use for quick start::
+Invenio comes with default demo site configuration examples that you can use
+for quick start.::
 
-    cd $HOME/src/
-    git clone https://github.com/inveniosoftware/invenio-demosite.git
-    cdvirtualenv src
-    git-new-workdir ~/src/invenio-demosite/ invenio-demosite $BRANCH
-    cd invenio-demosite
-    pip install -e . --process-dependency-links --allow-all-external
+    (invenio)$ cd $HOME/src/
+    (invenio)$ git clone https://github.com/inveniosoftware/invenio-demosite.git
+    (invenio)$ cdvirtualenv src
+    (invenio)$ git-new-workdir ~/src/invenio-demosite/ invenio-demosite $BRANCH
+    (invenio)$ cd invenio-demosite
+    (invenio)$ pip install -e .
+    (invenio)$ inveniomanage config set PACKAGES "['invenio_demosite', 'invenio.modules.*']"
 
 
 c. Development
---------------
+~~~~~~~~~~~~~~
 
 Once you have everything installed you can create database
 and populate it with demo records.::
 
-    inveniomanage database init --user=root --password=password --yes-i-know
-    inveniomanage database create
-    inveniomanage demosite create
+    (invenio)$ inveniomanage database init --user=root --password=password --yes-i-know
+    (invenio)$ inveniomanage database create
+    (invenio)$ inveniomanage demosite create
 
-Now you should be able to run the development server. We provide
-``Procfile`` that you can run with ``honcho``.::
+Now you should be able to run the development server. We provide ``Procfile``
+that you can run with ``honcho``.::
 
-    cdvirtualenv src/invenio
-    pip install honcho
-    honcho start
+    (invenio)$ cdvirtualenv src/invenio
+    (invenio)$ pip install honcho
+    (invenio)$ honcho start
 
-When you have your server running it is possible to upload demo records::
+When you have your server running, it is possible to upload demo records.::
 
-    inveniomanage demosite populate
+    (invenio)$ inveniomanage demosite populate
 
-Optionally, if you are using Bash shell completion, then
-you may want to register python argcomplete for inveniomanage::
+Optionally, if you are using Bash shell completion, then you may want to
+register python argcomplete for inveniomanage.::
 
     eval "$(register-python-argcomplete inveniomanage)"
 
@@ -126,3 +125,5 @@ Good luck, and thanks for choosing Invenio.
        - Invenio Development Team
          <info@invenio-software.org>
          <http://invenio-software.org/>
+
+.. vim: set ft=rst:

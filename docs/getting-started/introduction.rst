@@ -30,14 +30,14 @@ What do I need?
 .. sidebar:: Version Requirements
     :subtitle: Invenio version 2.0 runs on
 
-    - Python ❨2.6, 2.7, *3.3 comming soon* ❩
+    - Python ❨2.6, 2.7, *3.3 coming soon* ❩
 
     This is the last version to support Python 2.6,
     and from the next version Python 2.7 or newer is required.
     The last version to support Python 2.4 was Invenio series 1.2.
 
 *Invenio* requires a relational database backend to store information.
-The MySQL or PostgreSQL (*comming soon*) are required for basic
+The MySQL or PostgreSQL (*coming soon*) are required for basic
 functionality, but there's also support for a MongoDB of other
 experimental NoSQL solutions, including using SQLite for local
 development.

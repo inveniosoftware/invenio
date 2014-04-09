@@ -20,7 +20,7 @@ Before you start reading please
   development (refactoring).
 
 - *Agile Development* where each iteration should lead to working code
-  in relatively short time while incremental step are small and easy to
+  in relatively short time while incremental steps are small and easy to
   understand by other developers. When you start with development take
   advantage of built-in tools provided by Python and underlying libraries::
 
@@ -32,7 +32,7 @@ Before you start reading please
     # See that your server has been reloaded automatically.
 
   When you are done with editing do not forget to run our tests to make
-  sure that all other modules are working fine (`python setup.py test`).
+  sure that all other modules are working fine (``python setup.py test``).
 
 Extensions
 ----------
