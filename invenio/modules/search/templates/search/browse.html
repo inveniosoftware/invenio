@@ -20,8 +20,8 @@
 {{ records }}
 {%- else -%}
 {% from "_formhelpers.html" import render_filter_form with context %}
-{% from "search/helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form, search_form_javascript, record_brief_links with context %}
-{% extends "page.html" %}
+{% from "search/helpers.html" import collection_tree, portalbox_sidebar, search_also,  record_brief_links with context %}
+{% extends "search/searchbar_frame.html" %}
 {# set title = collection.name_ln if collection.id > 1 else None #}
 {% set title = None %}
 
@@ -36,12 +36,7 @@
   {{ portalboxes.te }}
 {% endblock %}
 {% block header %}
-  {{ super() }} 
-  {% js url_for('search.static', filename='js/search/typeahead.js') %}
-  {% js url_for('search.static', filename='js/search/facet.js') %}
-  {% js url_for('static', filename='js/bootstrap-select.js') %}
-  {% js "js/jquery.hotkeys.js" %}
-  {% js url_for('search.static', filename='js/search/hotkeys.js') %}
+  {{ super() }}
   {% if records|length > 0 %}
   {%- set args = request.args.copy().to_dict() -%}
   {%- set jrec = (pagination.page-2)*pagination.per_page+1 if pagination.has_prev else 1 -%}
@@ -58,7 +53,7 @@
 {% endblock %}
 
 
-{% block body %}
+{% block inner_content %}
 
 <style>
 .modal-backdrop {
@@ -71,9 +66,6 @@ body {
 }
 
 </style>
-
-
-{{ search_form(collection, easy_search_form) }}
 
 
 {% if not records|length %}
@@ -127,11 +119,7 @@ body {
   </div>
 </div>
 {%- endif -%}
-{% endblock body %}
-
-{% block javascript %}
-{{ search_form_javascript(collection) }}
-{% endblock %}
+{% endblock inner_content %}
 
 {%- endif -%}
 
