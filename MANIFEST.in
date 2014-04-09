@@ -13,15 +13,17 @@ recursive-include invenio/base/translations *.mo *.po *.pot
 recursive-include invenio/modules/*/static *
 recursive-include invenio/modules/*/templates *
 recursive-include invenio/modules/*/testsuite *
-recursive-include invenio/modules/*/recordext/* *
+recursive-include invenio/modules/*/format_elements *
+recursive-include invenio/modules/*/format_templates *
+recursive-include invenio/modules/*/output_formats *
 recursive-include invenio/modules/*/converterext *
 recursive-include invenio/modules/*/documentext *
 recursive-include invenio/modules/*/editorext *
 recursive-include invenio/modules/*/exportext *
-recursive-include invenio/modules/*/format_elements *
-recursive-include invenio/modules/*/format_templates *
-recursive-include invenio/modules/*/output_formats *
+recursive-include invenio/modules/*/jsonext *
 recursive-include invenio/modules/*/rankext *
+recursive-include invenio/modules/*/recordext/* *
+
 
 recursive-include invenio/modules/authorids/name_authority_files *
 recursive-include invenio/modules/encoder/scripts *
