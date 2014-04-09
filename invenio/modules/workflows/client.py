@@ -110,6 +110,8 @@ def continue_execution(wfe, workflow_object, restart_point="restart_task",
     if HaltProcessing is raised.
     """
     pos = workflow_object.get_current_task()
+    if not pos:
+        pos = [0]
 
     wfe._objects = [workflow_object]
 

@@ -38,7 +38,8 @@ from invenio.ext.restful import UTCISODateTime
 from invenio.base.helpers import unicodifier
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.workflows.models import BibWorkflowObject, Workflow, ObjectVersion
+from invenio.modules.workflows.models import BibWorkflowObject, Workflow, \
+    ObjectVersion
 from invenio.modules.workflows.engine import BibWorkflowEngine, WorkflowStatus
 from invenio.modules.workflows.api import continue_oid
 
