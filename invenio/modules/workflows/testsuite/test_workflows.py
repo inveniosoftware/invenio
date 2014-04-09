@@ -31,7 +31,7 @@ from flask.ext.registry import (RegistryProxy,
 
 
 TEST_PACKAGES = [
-    'invenio.modules.workflows.testsuite.workflows',
+    'invenio.modules.*',
     'invenio.modules.workflows.testsuite',
 ]
 
@@ -65,10 +65,9 @@ class WorkflowTasksTestAPI(InvenioTestCase):
     """ Test basic workflow API """
 
     def setUp(self):
-        from invenio.modules.workflows.registry import workflows_registry
-        list(workflows_registry)  # Need to init the proxy
-        for m in workflows_test_registry():
-            self.app.extensions['registry']['workflows'].register(m)
+        if 'workflows' in self.app.extensions['registry']:
+            del self.app.extensions['registry']['workflows']
+        self.app.extensions['registry']['workflows'] = workflows_test_registry()
 
         self.test_data = {}
         self.id_workflows = []
@@ -646,10 +645,9 @@ class TestWorkflowTasks(InvenioTestCase):
     Tests meant for testing the the generic tasks available.
     """
     def setUp(self):
-        from invenio.modules.workflows.registry import workflows_registry
-        list(workflows_registry)  # Need to init the proxy
-        for m in workflows_test_registry():
-            self.app.extensions['registry']['workflows'].register(m)
+        if 'workflows' in self.app.extensions['registry']:
+            del self.app.extensions['registry']['workflows']
+        self.app.extensions['registry']['workflows'] = workflows_test_registry()
 
     def tearDown(self):
         del self.app.extensions['registry']['workflows']
