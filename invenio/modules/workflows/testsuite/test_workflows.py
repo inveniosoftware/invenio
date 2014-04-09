@@ -313,10 +313,10 @@ distances from it.
         initial_object = BibWorkflowObject.query.get(test_object.id_parent)
         all_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid
-        )
+        ).order_by(BibWorkflowObject.id).all()
 
         # There should only be 2 objects (initial, final)
-        self.assertEqual(all_objects.count(), 2)
+        self.assertEqual(len(all_objects), 2)
         self.assertEqual(test_object.id_parent, initial_object.id)
         self.assertEqual(initial_object.version, ObjectVersion.INITIAL)
         self.assertEqual(initial_object.get_data(), initial_data)
@@ -348,10 +348,10 @@ distances from it.
             BibWorkflowObject.id_parent == initial_object.id).first()
         all_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid
-        )
+        ).order_by(BibWorkflowObject.id).all()
 
         # There should only be 2 objects (initial, final)
-        self.assertEqual(all_objects.count(), 2)
+        self.assertEqual(len(all_objects), 2)
         self.assertEqual(test_object.id_parent, initial_object.id)
         self.assertEqual(initial_object.version, ObjectVersion.INITIAL)
         self.assertEqual(initial_object.get_data(), initial_data)
@@ -375,17 +375,19 @@ distances from it.
         objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid,
             BibWorkflowObject.id_parent == None  # noqa E711
-        )
+        ).order_by(BibWorkflowObject.id).all()
 
         # Let's check that we found anything.
         # There should only be three objects
-        self.assertEqual(objects.count(), 2)
+        self.assertEqual(len(objects), 2)
 
         all_objects = BibWorkflowObject.query.filter(
-            BibWorkflowObject.id_workflow == workflow.uuid)
-        self.assertEqual(all_objects.count(), 4)
+            BibWorkflowObject.id_workflow == workflow.uuid
+        ).order_by(BibWorkflowObject.id).all()
 
-        for obj in objects.all():
+        self.assertEqual(len(all_objects), 4)
+
+        for obj in objects:
             # The child object should have the final or halted version
             self.assertTrue(obj.child_objects[0].version in (ObjectVersion.FINAL,
                                                              ObjectVersion.HALTED))
@@ -408,15 +410,16 @@ distances from it.
         objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid,
             BibWorkflowObject.id_parent == None  # noqa E711
-        )
+        ).order_by(BibWorkflowObject.id).all()
 
         self._check_workflow_execution(objects,
                                        initial_data, None)
 
         all_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid
-        )
-        self.assertEqual(all_objects.count(), 2)
+        ).order_by(BibWorkflowObject.id).all()
+
+        self.assertEqual(len(all_objects), 2)
 
         self.assertEqual(workflow.status, WorkflowStatus.HALTED)
 
@@ -553,7 +556,8 @@ test purpose, this object will log several things"""
 
         obj_halted = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == init_workflow.uuid,
-            BibWorkflowObject.version == ObjectVersion.HALTED).first()
+            BibWorkflowObject.version == ObjectVersion.HALTED
+        ).first()
 
         self.assertTrue(obj_halted)
         self.assertEqual(obj_halted.get_data(), 1)
@@ -597,17 +601,18 @@ test purpose, this object will log several things"""
 
         init_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == init_workflow.uuid
-        )
-        self.assertEqual(init_objects.count(), 2)
+        ).order_by(BibWorkflowObject.id).all()
+        self.assertEqual(len(init_objects), 2)
 
         restarted_workflow = start_by_wid(wid=init_workflow.uuid,
                                           module_name="unit_tests")
 
         restarted_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == restarted_workflow.uuid
-        )
+        ).order_by(BibWorkflowObject.id).all()
+
         # This time we should only have one more initial object
-        self.assertEqual(restarted_objects.count(), 3)
+        self.assertEqual(len(restarted_objects), 3)
 
         # First and last object will be INITIAL
         self.assertEqual(restarted_objects[0].version,
@@ -626,7 +631,7 @@ test purpose, this object will log several things"""
         from invenio.modules.workflows.models import ObjectVersion
 
         # Let's check that we found anything. There should only be one object
-        self.assertEqual(objects.count(), 1)
+        self.assertEqual(len(objects), 1)
         parent_object = objects[0]
 
         # The object should be the inital version
