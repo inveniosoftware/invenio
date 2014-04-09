@@ -47,7 +47,7 @@
          |
         <a href="{{ url_for('.search', p="refersto:recid:%d" % recid) }}">
            <i class="glyphicon glyphicon-share"></i>
-          {{ _("%i citations") % num_citations if num_citations > 1 else _("1 citation") }}
+          {{ "%i" % num_citations + _(" citations") if num_citations > 1 else _("1 citation") }}
         </a>
         {%- endif -%}
       {%- endif -%}
