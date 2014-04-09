@@ -449,8 +449,8 @@ class DepositionType(object):
         if wo.version == ObjectVersion.FINAL and \
            wo.workflow.status == WorkflowStatus.COMPLETED:
 
-            wo.version = ObjectVersion.RUNNING
-            wo.workflow.status = WorkflowStatus.RUNNING
+            wo.version = ObjectVersion.INITIAL
+            wo.workflow.status = WorkflowStatus.NEW
 
             # Clear deposition drafts
             deposition.drafts = {}
@@ -925,10 +925,9 @@ class Deposition(object):
                 id_user=user_id,
                 module_name="webdeposit"
             )
-            self.workflow_object = BibWorkflowObject(
+            self.workflow_object = BibWorkflowObject.create_object(
                 id_workflow=self.engine.uuid,
                 id_user=user_id,
-                version=ObjectVersion.RUNNING,
             )
             self.workflow_object.set_data({})
         else:
@@ -1067,10 +1066,8 @@ class Deposition(object):
         """
         self.update()
         if self.engine:
-            self.engine.save(status=WorkflowStatus.RUNNING)
-        self.workflow_object.save(
-            version=self.workflow_object.version or ObjectVersion.RUNNING
-        )
+            self.engine.save()
+        self.workflow_object.save()
 
     def delete(self):
         """
