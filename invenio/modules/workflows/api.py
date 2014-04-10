@@ -278,6 +278,7 @@ def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
     result = WORKER().continue_worker(oid, start_point, **kwargs)
     return result
 
+
 def resume_objects_in_workflow(id_workflow, start_point="continue_next",
                                **kwargs):
     """
