@@ -633,6 +633,31 @@ test purpose, this object will log several things"""
         self.assertEqual(restarted_objects[0].get_data(),
                          restarted_objects[2].get_data())
 
+    def test_object_workflow_api(self):
+        """ Test the object bound workflow start/continue functions"""
+        from invenio.modules.workflows.models import (BibWorkflowObject,
+                                                      ObjectVersion)
+        from invenio.modules.workflows.engine import WorkflowStatus
+
+        obj = BibWorkflowObject.create_object(id_user=1234)
+        obj.set_data(10)
+        obj.save()
+
+        engine = obj.start_workflow("test_workflow",
+                                    module_name="unit_tests")
+
+        self.assertEqual(engine.status, WorkflowStatus.HALTED)
+        self.assertEqual(obj.version, ObjectVersion.HALTED)
+
+        # Now we amend data again
+        obj.set_data(49)
+        engine = obj.continue_workflow(start_point="restart_task",
+                                       module_name="unit_tests")
+
+        self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
+        self.assertEqual(obj.get_data(), 49 + 18)
+        self.assertEqual(obj.version, ObjectVersion.FINAL)
+
     def _check_workflow_execution(self, objects, initial_data, final_data):
         from invenio.modules.workflows.models import ObjectVersion
 

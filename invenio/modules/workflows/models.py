@@ -374,6 +374,39 @@ class BibWorkflowObject(db.Model):
         extra_data["_message"] = ""
         self.set_extra_data(extra_data)
 
+    def start_workflow(self, workflow_name, **kwargs):
+        """Run the workflow specified on the object.
+
+        Will start a new workflow execution for the object using
+        workflows.api.
+
+        :param workflow_name: name of workflow to run
+        :type str
+        """
+        from .api import start
+        self.save()
+        return start(workflow_name, data=[self], **kwargs)
+
+    def continue_workflow(self, start_point="continue_next", **kwargs):
+        """Run the workflow specified on the object.
+
+        Will continue a previous execution for the object using
+        workflows.api.
+
+        :param start_point: where should the workflow start from? One of:
+           * restart_prev: will restart from the previous task
+           * continue_next: will continue to the next task
+           * restart_task: will restart the current task
+        :type str
+        """
+        from .api import continue_oid
+        from .errors import WorkflowAPIError
+        self.save()
+        if not self.id_workflow:
+            raise WorkflowAPIError("No workflow associated with object: %r"
+                                   % (repr(self),))
+        return continue_oid(self.id, start_point, **kwargs)
+
     def change_status(self, message):
         self.status = message
 
