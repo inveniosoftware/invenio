@@ -151,9 +151,9 @@ def _task_run_core():
         bibtask.task_update_progress('Updating personid...')
         run_rabbit(record_ids, all_records)
         bibtask.task_update_progress('PersonID update finished!')
-        # bibtask.task_update_progress('Updating affiliations...')
-        # process_affiliations(record_ids, all_records)
-        # bibtask.task_update_progress('Affiliations update finished!')
+        bibtask.task_update_progress('Updating affiliations...')
+        process_affiliations(record_ids, all_records)
+        bibtask.task_update_progress('Affiliations update finished!')
 
     if bibtask.task_get_option("disambiguate"):
         bibtask.task_update_progress('Performing full disambiguation...')
