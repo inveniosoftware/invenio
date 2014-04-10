@@ -667,6 +667,25 @@
         {%- endfor -%}
         };
 
+    // the visible search field
+    var $search_query_field = $('form[name=search] input[name=p]');
+
+    // all fields containg search query, there are some hidden ones too
+    var $all_search_query_fields = $('[name=p]');
+
+    /**
+     * Sets value of the main search field. Should be used
+     * instead of jQuery's val() to update typeahead's
+     * internal query.
+     *
+     * @method setSearchFieldValue
+     * @param {String} val value to be set
+     */
+    function setSearchFieldValue(val) {
+      $search_query_field.data('search_typeahead').setFieldValue(val);
+      $all_search_query_fields.val(val);
+    }
+
     /**
      * Merges value from 'advanced' tab in 'Add to search' form
      * with the current search query
@@ -741,18 +760,16 @@
         return query_str;
     };
 
-    var $main_search_field = $('[name=p]');
-
     /**
      * Adds query from 'advanced' tab to the search field
      *
      * @method addAdvancedQueryToSearch
      */
     function addAdvancedQueryToSearch() {
-      var current_query = $.trim($main_search_field.val());
+      var current_query = $.trim($search_query_field.val());
       var new_part = getAdvancedQuery();
       cleanAdvancedQueryForm();
-      $main_search_field.val(mergeQuery(current_query, new_part));
+      setSearchFieldValue(mergeQuery(current_query, new_part));
     }
 
     /**
@@ -783,9 +800,9 @@
       var active_tab = $('.add_to_search-form .tab-buttons li.active a').attr('href');
 
       if (active_tab === '#simple-search') {
-        var current_query = $.trim($main_search_field.val());
+        var current_query = $.trim($search_query_field.val());
         var new_part = getSimpleQuery();
-        $main_search_field.val(mergeQuery(current_query, new_part));
+        setSearchFieldValue(mergeQuery(current_query, new_part));
       } else {
         addAdvancedQueryToSearch();
         $('.add_to_search-form .appender').trigger('click');
