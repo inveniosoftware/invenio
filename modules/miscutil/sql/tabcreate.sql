@@ -4731,7 +4731,8 @@ CREATE TABLE IF NOT EXISTS `aidAFFILIATIONS` (
   `affiliation` VARCHAR( 255 ) NOT NULL,
   `last_recid` MEDIUMINT( 8 ) UNSIGNED NOT NULL,
   `last_occurence` datetime NOT NULL,
- PRIMARY KEY (`personid`)
+ PRIMARY KEY (`personid`, `affiliation`),
+ INDEX `last_recid` (`last_recid`)
 ) ENGINE=MyISAM;
 
 -- refextract tables:
@@ -5056,5 +5057,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_12_format_code_v
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_13_tag_recjsonvalue',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_11_28_bibauthorid_search_engine_column_changes',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_01_new_aidAFFILIATIONS',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_10_aidAFFILIATIONS_change_pk',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_23_bibauthorid_rabbit_matchable_name_column', NOW());
 -- end of file
