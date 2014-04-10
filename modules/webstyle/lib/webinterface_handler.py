@@ -356,7 +356,8 @@ def create_handler(root):
                     profile_dump.append(strstream.getvalue())
             profile_dump = '\n'.join(profile_dump)
             profile_dump += '\nYou can use profile=%s or profile=memory' % existing_sorts
-            req.write("\n<pre>%s</pre>" % profile_dump)
+            if req.content_type == 'text/html':
+                req.write("\n<pre>%s</pre>" % profile_dump)
             return ret
         elif 'debug' in args and args['debug']:
             #remote_debugger.start(["3"]) # example starting debugger on demand
