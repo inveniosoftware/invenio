@@ -25,6 +25,8 @@ the affiliations for each author appearing in a paper. This is used later in:
 * Rabbit to use the affiliation to assign papers in a fast way.
 """
 
+import json
+
 from itertools import islice
 from datetime import datetime
 from itertools import chain
@@ -99,7 +101,7 @@ def get_personids(recid):
                                WHERE bibrec = %s and bibref_table = '700'""", [recid])
     pids = {}
     for personid, name in chain(pids_100_rows, pids_700_rows):
-        pids[name] = personid
+        pids[name.decode('utf-8')] = personid
     return pids
 
 
@@ -108,20 +110,17 @@ def get_creation_date(recid):
 
 
 def update_aff(pid, aff_info):
-    run_sql("""UPDATE aidAFFILIATIONS
-               SET affiliation = %s, last_recid = %s, last_occurence = %s
-               WHERE personid = %s""", (aff_info['aff'],
-                                        aff_info['last_recid'],
-                                        aff_info['last_occurence'].strftime("%Y-%m-%d %H:%M:%S"),
-                                        pid))
+    run_sql("DELETE FROM aidAFFILIATIONS WHERE personid = %s", [pid])
+    insert_aff(pid, aff_info)
 
 
 def insert_aff(pid, aff_info):
-    run_sql("""INSERT INTO aidAFFILIATIONS (personid, affiliation, last_recid, last_occurence)
-               VALUES (%s, %s, %s, %s)""", (pid,
-                                            aff_info['aff'],
-                                            aff_info['last_recid'],
-                                            aff_info['last_occurence'].strftime("%Y-%m-%d %H:%M:%S")))
+    for affiliation in set(aff_info['aff']):
+        run_sql("""INSERT IGNORE INTO aidAFFILIATIONS (personid, affiliation, last_recid, last_occurence)
+                   VALUES (%s, %s, %s, %s)""", (pid,
+                                                affiliation,
+                                                aff_info['last_recid'],
+                                                aff_info['last_occurence'].strftime("%Y-%m-%d %H:%M:%S")))
 
 
 def process_chunk(recids):
@@ -157,7 +156,7 @@ def process_chunk(recids):
                 pid = pids[field_author]
                 record_date = get_creation_date(recid)
                 if pid not in aff or aff[pid]['last_occurence'] <= record_date:
-                    aff[pid] = {'aff': field_aff[0],
+                    aff[pid] = {'aff': field_aff,
                                 'last_recid': recid,
                                 'last_occurence': record_date}
 
@@ -184,9 +183,16 @@ def get_current_aff(pids):
 
     cur_aff = {}
     for personid, affiliation, last_recid, last_occurence in aff_rows:
-        cur_aff[personid] = {'aff': affiliation,
-                             'last_recid': last_recid,
-                             'last_occurence': last_occurence}
+        if personid in cur_aff:
+            cur_el = cur_aff[personid]
+            cur_el['aff'].append(affiliation)
+            if cur_el['last_occurence'] <= last_occurence:
+                cur_el['last_recid'] = last_recid
+                cur_el['last_occurence'] = last_occurence
+        else:
+            cur_aff[personid] = {'aff': [affiliation],
+                                 'last_recid': last_recid,
+                                 'last_occurence': last_occurence}
     return cur_aff
 
 
