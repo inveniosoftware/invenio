@@ -68,6 +68,11 @@ class WorkflowTasksTestCase(InvenioTestCase):
                 'widgets', app=self.app, registry_namespace='workflows.tests'
             )
 
+    def cleanup_registries(self):
+        del self.app.extensions['registry']['workflows.tests']
+        del self.app.extensions['registry']['workflows']
+        del self.app.extensions['registry']['workflows.widgets']
+
 
 class WorkflowTasksTestAPI(WorkflowTasksTestCase):
     """ Test basic workflow API """
@@ -143,6 +148,7 @@ distances from it.
         ).delete(synchronize_session='fetch')
         Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
         db.session.commit()
+        self.cleanup_registries()
 
     def test_halt(self):
         from invenio.modules.workflows.registry import workflows
@@ -655,6 +661,9 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
     """
     def setUp(self):
         self.create_registries()
+
+    def tearDown(self):
+        self.cleanup_registries()
 
     def test_logic_tasks(self):
         """
