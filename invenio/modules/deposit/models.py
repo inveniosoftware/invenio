@@ -40,8 +40,7 @@ from invenio.base.helpers import unicodifier
 from invenio.ext.sqlalchemy import db
 from invenio.modules.workflows.models import BibWorkflowObject, Workflow, \
     ObjectVersion
-from invenio.modules.workflows.engine import BibWorkflowEngine, WorkflowStatus
-from invenio.modules.workflows.api import continue_oid
+from invenio.modules.workflows.engine import WorkflowStatus
 
 from .form import CFG_FIELD_FLAGS, DataExporter
 from .signals import file_uploaded
@@ -437,10 +436,16 @@ class DepositionType(object):
         Usually not invoked directly, but instead indirectly through
         Deposition.run_workflow().
         """
-        return continue_oid(
-            deposition.id,
-            start_point="restart_task",
-        )
+        if deposition.workflow_object.workflow is None:
+            return deposition.workflow_object.start_workflow(
+                workflow_name=cls.get_identifier(),
+                id_user=deposition.workflow_object.id_user,
+                module_name="webdeposit"
+            )
+        else:
+            return deposition.workflow_object.continue_workflow(
+                start_point="restart_task",
+            )
 
     @classmethod
     def reinitialize_workflow(cls, deposition):
@@ -921,19 +926,13 @@ class Deposition(object):
             self.title = ''
             self.sips = []
 
-            self.engine = BibWorkflowEngine(
-                name=self.type.get_identifier(),
-                id_user=user_id,
-                module_name="webdeposit"
-            )
             self.workflow_object = BibWorkflowObject.create_object(
-                id_workflow=self.engine.uuid,
                 id_user=user_id,
             )
             self.workflow_object.set_data({})
         else:
             self.__setstate__(workflow_object.get_data())
-            self.engine = None
+        self.engine = None
 
     #
     # Properties proxies to BibWorkflowObject
@@ -1066,8 +1065,6 @@ class Deposition(object):
         and saves it.
         """
         self.update()
-        if self.engine:
-            self.engine.save()
         self.workflow_object.save()
 
     def delete(self):
@@ -1101,14 +1098,16 @@ class Deposition(object):
         If you made modifications to the deposition you must save if before
         running the workflow, using the save() method.
         """
-        current_status = self.workflow_object.workflow.status
-        if current_status == WorkflowStatus.COMPLETED:
-            return self.type.api_final(self) if headless \
-                else self.type.render_final(self)
+        if self.workflow_object.workflow is not None:
+            current_status = self.workflow_object.workflow.status
+            if current_status == WorkflowStatus.COMPLETED:
+                return self.type.api_final(self) if headless \
+                    else self.type.render_final(self)
 
         self.update()
-        status = self.type.run_workflow(self).status
+        self.engine = self.type.run_workflow(self)
         self.reload()
+        status = self.engine.status
 
         if status == WorkflowStatus.ERROR:
             return self.type.api_error(self) if headless else \
