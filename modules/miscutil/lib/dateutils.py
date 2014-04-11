@@ -434,7 +434,7 @@ def guess_datetime(datetime_string):
         except ValueError:
             pass
     else:
-        for format in (None, '%x %X', '%X %x', '%Y-%M-%dT%h:%m:%sZ'):
+        for format in (None, '%x %X', '%X %x', '%Y-%M-%dT%h:%m:%sZ', "%Y-%m-%d", "%d %m %Y"):
             try:
                 return time.strptime(datetime_string, format)
             except ValueError:

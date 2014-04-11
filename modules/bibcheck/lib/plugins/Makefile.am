@@ -31,7 +31,8 @@ pylib_DATA = __init__.py \
     texkey.py \
     doi.py \
     crossref_checker.py \
-    url.py
+    url.py \
+    creation_date.py
 
 EXTRA_DIST = $(pylib_DATA)
 
