@@ -245,8 +245,7 @@ def task_parse_options(key, val, *_):
     """ Must be defined for bibtask to create a task """
 
     if key in ("--all", "-a"):
-        for rule_name in val.split(","):
-            reset_rule_last_run(rule_name)
+        task_set_option("reset_rules", set(val.split(",")))
     elif key in ("--enable-rules", "-e"):
         task_set_option("enabled_rules", set(val.split(",")))
     elif key in ("--id", "-i"):
@@ -272,10 +271,17 @@ def task_run_core():
 
     Returns True when run successfully. False otherwise.
     """
+    rules_to_reset = task_get_option("reset_rules")
+    if rules_to_reset:
+        write_message("Resetting the following rules: %s" % rules_to_reset)
+        for rule in rules_to_reset:
+            reset_rule_last_run(rule)
     plugins = load_plugins()
     rules = load_rules(plugins)
+    write_message("Loaded rules: %s" % rules, verbose=9)
     task_set_option('plugins', plugins)
     recids_for_rules = get_recids_for_rules(rules)
+    write_message("recids for rules: %s" % recids_for_rules, verbose=9)
 
     all_recids = intbitset([])
     single_rules = set()
