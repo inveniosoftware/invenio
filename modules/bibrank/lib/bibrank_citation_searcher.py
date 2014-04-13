@@ -41,9 +41,8 @@ class CitationDictsDataCacher(DataCacher):
             from invenio.bibrank_tag_based_indexer import fromDB
             redis = get_redis()
             serialized_weights = redis.get('citations_weights')
-            if serialized_weights:
-                weights = deserialize_via_marshal(serialized_weights)
-            else:
+            weights = deserialize_via_marshal(serialized_weights)
+            if not weights:
                 weights = fromDB('citation')
 
             alldicts['citations_weights'] = weights
