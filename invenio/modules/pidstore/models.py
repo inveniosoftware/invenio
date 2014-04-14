@@ -371,6 +371,9 @@ class PidLog(db.Model):
     message = db.Column(db.Text(), nullable=False)
     """ Log message """
 
+    # Relationship
+    pid = db.relationship("PersistentIdentifier", backref="logs")
+
 
 __all__ = ['PersistentIdentifier',
            'PidLog']
