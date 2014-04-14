@@ -436,7 +436,11 @@ class DepositionType(object):
         Usually not invoked directly, but instead indirectly through
         Deposition.run_workflow().
         """
-        if deposition.workflow_object.workflow is None:
+        if deposition.workflow_object.workflow is None or (
+                deposition.workflow_object.version == ObjectVersion.INITIAL
+                and
+                deposition.workflow_object.workflow.status ==
+                WorkflowStatus.NEW):
             return deposition.workflow_object.start_workflow(
                 workflow_name=cls.get_identifier(),
                 id_user=deposition.workflow_object.id_user,
