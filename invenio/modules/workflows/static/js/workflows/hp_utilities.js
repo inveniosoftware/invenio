@@ -20,10 +20,8 @@
 //Utility functions
 //***********************************
 var WORKFLOWS_HP_UTILITIES = function ( $, holdingpen ) {
-    var rowList = holdingpen.rowList;
-    var rowIndexList = holdingpen.rowIndexList;
+
     var tagList = holdingpen.tag.tagList;
-    var oTable = holdingpen.oTable;
     var version_showing = [holdingpen.context.version_showing];
 
     $.fn.exists = function () {
@@ -32,11 +30,10 @@ var WORKFLOWS_HP_UTILITIES = function ( $, holdingpen ) {
 
     var _requestNewObjects = function() {
         var version_showing = {};
-
-        version_showing["final"] = ($.inArray("Final", tagList) <= -1) ? false : true;
-        version_showing["halted"] = ($.inArray("Halted", tagList) <= -1) ? false : true;
-        version_showing["running"] = ($.inArray("Running", tagList) <= -1) ? false : true;
-
+        ($.inArray("Completed", holdingpen.tag.tagList()) <= -1) ? null:  version_showing["final"] = true;
+        ($.inArray("Halted", holdingpen.tag.tagList()) <= -1) ? null : version_showing["halted"] = true;
+        ($.inArray("Running", holdingpen.tag.tagList()) <= -1) ? null : version_showing["running"] = true;
+        ($.inArray("Initial", holdingpen.tag.tagList()) <= -1) ? null : version_showing["initial"] = true;
         $.ajax({
             type : "POST",
             url : holdingpen.context.holdingpen.url_load,
@@ -53,10 +50,10 @@ var WORKFLOWS_HP_UTILITIES = function ( $, holdingpen ) {
         if(version_showing){
             for(var i=0; i<version_showing.length; i++){
                 if(version_showing[i] == 1){
-                    if ($.inArray('Final', tagList) <= -1){
-                        tagList.push('Final');  
+                    if ($.inArray('Completed', tagList) <= -1){
+                        tagList.push('Completed');
                     } 
-                    $('#version-final').click();
+                    $('#version-completed').click();
                 }
                 else if(version_showing[i] == 2){
                     if ($.inArray('Halted', tagList) <= -1){
@@ -95,8 +92,8 @@ var WORKFLOWS_HP_UTILITIES = function ( $, holdingpen ) {
         },
 
         emptyLists: function (){
-            rowList = [];
-            rowIndexList = [];
+            holdingpen.rowList = [];
+            holdingpen.rowIndexList = [];
         },
     };
 

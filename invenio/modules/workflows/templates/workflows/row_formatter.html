@@ -35,9 +35,10 @@
 {{ pretty_date(object.created)}}
 </td>
 <td title="version">
-{% if object.version == 1 %}<span class="label label-success">Completed</span>
-{% elif object.version == 2 %}<span class="label label-warning">Halted</span>
-{% else %}<span class="label label-info">Running</span>
+{% if object.version == 1 %}<span class="label label-success">Done</span>
+{% elif object.version == 2 %}<span class="label label-danger">Need action</span>
+{% elif object.version == 3 %}<span class="label label-warning">In process</span>
+{% elif object.version == 0 %}<span class="label label-info">New</span>
 {% endif %}
 </td>
 <td title="type">
