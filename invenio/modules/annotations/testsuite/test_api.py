@@ -32,11 +32,18 @@ NOTEUTILS = lazy_import('invenio.modules.annotations.noteutils')
 COMMENT = lazy_import('invenio.modules.comments.models.CmtRECORDCOMMENT')
 
 
-class TestAnnotation(InvenioTestCase):
+class AnnotationTestCase(InvenioTestCase):
+
+    def setUp(self):
+        self.app.config['ANNOTATIONS_ENGINE'] = \
+            "invenio.modules.jsonalchemy.jsonext.engines.memory:MemoryStorage"
+
+
+class TestAnnotation(AnnotationTestCase):
+
     def test_initialization(self):
         u = USER(id=1)
-        a = API.Annotation.create({"who": u, "what": "lorem", "where": "/"},
-                                  store=False)
+        a = API.Annotation.create({"who": u, "what": "lorem", "where": "/"})
         self.assert_(len(a.validate()) == 0)
         self.assert_(type(a["when"]) == datetime)
         self.assert_(a["who"].get_id() == 1)
@@ -44,21 +51,19 @@ class TestAnnotation(InvenioTestCase):
         # invalid annotation
         a = API.Annotation.create({"who": u, "what": "lorem", "where": "/",
                                    "perm": {"public": True, "groups": []},
-                                   "uuid": "1m"},
-                                  store=False)
+                                   "uuid": "1m"})
         self.assert_(len(a.validate()) == 1)
 
     def test_jsonld(self):
         u = USER(id=1, nickname="johndoe")
         a = API.Annotation.create({"who": u, "what": "lorem", "where": "/",
-                                   "perm": {"public": True, "groups": []}},
-                                  store=False)
+                                   "perm": {"public": True, "groups": []}})
         ld = a.get_jsonld("oaf")
         self.assert_(ld["hasTarget"]["@id"] == CFG["CFG_SITE_URL"] + "/")
         self.assert_(ld["hasBody"]["chars"] == "lorem")
 
 
-class TestJSONLD(InvenioTestCase):
+class TestJSONLD(AnnotationTestCase):
 
     @nottest
     def test(self):
@@ -66,7 +71,7 @@ class TestJSONLD(InvenioTestCase):
         data = {"who": u, "what": "lorem",
                 "where": {"record": 1, "marker": "P.1_T.2a.2_L.100"},
                 "comment": 1}
-        a = API.add_annotation(model='annotation_note', store=False, **data)
+        a = API.add_annotation(model='annotation_note', **data)
 
         # JSONAlchemy issue with overwritting fields
         self.assert_(len(a.validate()) == 0)
@@ -77,7 +82,8 @@ class TestJSONLD(InvenioTestCase):
                           format="compacted")
 
         self.assert_(ld["http://www.w3.org/ns/oa#hasTarget"]
-                       ["http://www.w3.org/ns/oa#hasSelector"]["@type"] == "ST")
+                       ["http://www.w3.org/ns/oa#hasSelector"]
+                       ["@type"] == "ST")
         self.assert_(ld["http://www.w3.org/ns/oa#hasTarget"]
                        ["http://www.w3.org/ns/oa#hasSelector"]
                        ["http://www.w3.org/1999/02/22-rdf-syntax-ns#value"] ==

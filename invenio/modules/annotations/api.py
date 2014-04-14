@@ -51,14 +51,11 @@ class Annotation(SmartJsonLD):
     __storagename__ = 'annotations'
 
     @classmethod
-    def create(cls, data, model='annotation', store=True):
+    def create(cls, data, model='annotation'):
         dic = Reader.translate(data, cls, model=model, master_format='json',
                                namespace="annotationsext")
-        if store:
-            return cls.storage_engine.save_one(dic.dumps())
-        else:
-            # useful for testing, until we have a mock DB
-            return dic
+        cls.storage_engine.save_one(dic.dumps())
+        return dic
 
     @classmethod
     def search(cls, query):
@@ -122,8 +119,8 @@ def get_jsonld_multiple(annos, context="oaf", new_context={}, format="full"):
                          format=format) for a in annos]
 
 
-def add_annotation(model='annotation', store=True, **kwargs):
-    return Annotation.create(kwargs, model, store=store)
+def add_annotation(model='annotation', **kwargs):
+    return Annotation.create(kwargs, model)
 
 
 def get_annotations(which):
