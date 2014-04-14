@@ -280,10 +280,10 @@ def process_and_store(recids, config, chunk_size):
     # Compute new weights dictionary
     if modified:
         weights = compute_weights()
+        store_weights_cache(weights)
     else:
         weights = None
 
-    store_weights_cache(weights)
 
     return weights
 
