@@ -26,21 +26,26 @@ from invenio.ext.sqlalchemy import db
 from flask import current_app
 from werkzeug import cached_property
 
+
 class Record(db.Model):
     """Represents a record object inside the SQL database"""
 
     __tablename__ = 'bibrec'
 
-    id = db.Column(db.MediumInteger(8, unsigned=True), primary_key=True,
-            nullable=False, autoincrement=True)
-    creation_date = db.Column(db.DateTime, nullable=False,
-            server_default='1900-01-01 00:00:00',
-            index=True)
-    modification_date = db.Column(db.DateTime, nullable=False,
-            server_default='1900-01-01 00:00:00',
-            index=True)
-    master_format = db.Column(db.String(16), nullable=False,
-            server_default='marc')
+    id = db.Column(
+        db.MediumInteger(8, unsigned=True), primary_key=True,
+        nullable=False, autoincrement=True)
+    creation_date = db.Column(
+        db.DateTime, nullable=False,
+        server_default='1900-01-01 00:00:00',
+        index=True)
+    modification_date = db.Column(
+        db.DateTime, nullable=False,
+        server_default='1900-01-01 00:00:00',
+        index=True)
+    master_format = db.Column(
+        db.String(16), nullable=False,
+        server_default='marc')
     additional_info = db.Column(db.JSON)
 
     #FIXME: remove this from the model and add them to the record class, all?
@@ -103,10 +108,13 @@ class Record(db.Model):
     @cached_property
     def is_restricted(self):
         """Returns True is record is restricted."""
-        from invenio.legacy.search_engine import get_restricted_collections_for_recid
+        from invenio.legacy.search_engine import \
+            get_restricted_collections_for_recid
 
-        if get_restricted_collections_for_recid(self.id,
-                                                recreate_cache_if_needed=False):
+        if get_restricted_collections_for_recid(
+                self.id,
+                recreate_cache_if_needed=False
+                ):
             return True
         elif self.is_processed:
             return True
@@ -125,15 +133,17 @@ class RecordMetadata(db.Model):
 
     __tablename__ = 'record_json'
 
-    id = db.Column(db.MediumInteger(8, unsigned=True),
-            db.ForeignKey(Record.id),
-            primary_key=True,
-            nullable=False,
-            autoincrement=True)
+    id = db.Column(
+        db.MediumInteger(8, unsigned=True),
+        db.ForeignKey(Record.id),
+        primary_key=True,
+        nullable=False,
+        autoincrement=True
+    )
+
     json = db.Column(db.JSON, nullable=False)
 
     record = db.relationship(Record, backref='record_json')
 
 __all__ = ['Record',
-           'RecordMetadata',
-          ]
+           'RecordMetadata', ]
