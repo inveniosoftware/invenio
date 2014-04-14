@@ -75,11 +75,13 @@
                         {% endfor %}
 
                         {% if bwobject.version == 1 %}
-                            <span class="label label-success">Final</span>
+                            <span class="label label-success">Done</span>
                         {% elif bwobject.version == 2 %}
-                            <span class="label label-warning">Halted</span>
-                        {% else %}
-                            <span class="label label-info">Initial</span>
+                            <span class="label label-danger">Need action</span>
+                        {% elif bwobject.version == 0  %}
+                            <span class="label label-info">New</span>
+                        {% elif bwobject.version == 3  %}
+                            <span class="label label-warning">In process</span>
                         {% endif %}
                         <!-- {% endblock record_metadata_table %} -->
                     </tbody>

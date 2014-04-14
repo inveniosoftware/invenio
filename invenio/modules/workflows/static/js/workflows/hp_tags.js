@@ -21,60 +21,102 @@
 //***********************************
 var WORKFLOWS_HP_TAGS = function ( $, holdingpen ){
     var tagList = [];
-    var oTable = holdingpen.oTable;
+
+        $("#tags").tagsinput({
+            tagClass: function(item)
+            {
+                switch (item)
+                {
+                    case 'In process' : return 'label label-warning';
+                    case 'Need action' : return 'label label-danger';
+                    case 'Done': return 'label label-success';
+                    case 'New': return 'label label-info';
+                    default  : return 'badge badge-warning';
+                }
+            }
+        });
+
 
     var init = function () {
-
         $('.task-btn').on('click', function(){
             if($.inArray($(this)[0].name, tagList) <= -1){
                 var widget_name = $(this)[0].name;
-                $('#tagsinput').tagsinput('add', $(this)[0].name);
-                tagList.push($(this)[0].name);
+                $("#tags").tagsinput('add', $(this)[0].text);
                 WORKFLOWS_HP_UTILITIES.requestNewObjects();
             }
             else{
                 closeTag(widget_name);
-                oTable.fnFilter( '^$', 4, true, false );
-                oTable.fnDraw(false);
+                holdingpen.oTable.fnFilter( '^$', 4, true, false );
+                holdingpen.oTable.fnDraw(false);
             }
         });
 
 
         $('.version-selection').on('click', function(){
             if($.inArray($(this)[0].name, tagList) <= -1){
-                $('#tagsinput').tagsinput('add', $(this)[0].name);
-                tagList.push($(this)[0].name);
+                $('#tags').tagsinput('add', $(this)[0].text);
+
                 WORKFLOWS_HP_UTILITIES.requestNewObjects();
             }
         });
 
-        $("#tagsinput").on('itemRemoved', function(event) {
-            tagList.splice(tagList.indexOf(event.item), 1);
-            console.log('item removed : '+event.item);
-            oTable.fnFilter('');
+        $("#tags").on('itemRemoved', function(event) {
+            tagList =  $("#tags").val().split(',');
+            tagList = taglist_translation(tagList);
+            holdingpen.oTable.fnFilter('');
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
         });
 
-        $("#tagsinput").on('itemAdded', function(event){
-            console.log(tagList);
-            console.log(event.item);
-            if(event.item != 'Halted' && event.item != 'Final' && event.item != 'Running'){
-                oTable.fnFilter(event.item);
+        $("#tags").on('itemAdded', function(event){
+
+            tagList =  $("#tags").val().split(',');
+            tagList = taglist_translation(tagList);
+
+            if(event.item != 'Halted' && event.item != 'Completed' && event.item != 'Running'){
+                holdingpen.oTable.fnFilter(event.item, null, false, false, false);
+            }
+            else
+            {
+                WORKFLOWS_HP_UTILITIES.requestNewObjects();
             }
         });
+
+
     };
 
+    function taglist_translation(my_taglist)
+    {
+        for(var i = 0; i<=my_taglist.length; i ++)
+            {
+                if(my_taglist[i] == 'Done' )
+                {
+                    my_taglist[i] = 'Completed';
+                }
+                else if( my_taglist[i] == 'Need action')
+                {
+                    my_taglist[i] = 'Halted';
+                }
+                else if( my_taglist[i] == 'In process')
+                {
+                    my_taglist[i] = 'Running';
+                }
+                else if(my_taglist[i] == 'New')
+                {
+                    my_taglist[i] = 'Initial';
+                }
+            }
+            return my_taglist;
+    }
+
     var closeTag = function (tag_name){
-        console.log(tag_name);
         tagList.splice(tagList.indexOf(tag_name), 1);
-        $('#tagsinput').tagsinput('remove', tag_name);
-        console.log($("#tagsinput").tagsinput('items'));
+        $('#tags').tagsinput('remove', tag_name);
         WORKFLOWS_HP_UTILITIES.requestNewObjects();
     };
 
     return {
         init: init,
-        tagList: tagList,
+        tagList: function(){return tagList},
         closeTag: closeTag,
     };
 }($, WORKFLOWS_HOLDINGPEN);

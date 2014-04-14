@@ -23,6 +23,7 @@
     {{ super() }}
     {% css url_for('static', filename='css/dataTables.colVis.css') %}
     {% css url_for('static', filename='css/dataTables.bootstrap.css') %}
+    {% css url_for('static', filename='css/bootstrap-tagsinput.css') %}
 {% endblock header %}
 
 {% js url_for('static', filename='js/jquery.dataTables.min.js'), '30-datatables' %}
@@ -35,6 +36,7 @@
 {% js url_for('workflows.static', filename='js/workflows/hp_selection.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/hp_utilities.js'), '50-workflows' %}
 
+
 {% for file in widget_static %}
     {% js url_for('workflows.static', filename=file), '50-workflows' %}
 {% endfor %}
@@ -42,29 +44,29 @@
 {% block javascript %}
     {{ super() }}
 
-    <script type="text/javascript">
-        $(document).ready(function(){
-            var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
-            window.jQuery.ajax({
-                url: context_url,
-                success: function(data) {
-                    WORKFLOWS_HOLDINGPEN.init(data);
-                    WORKFLOWS_HOLDINGPEN.init_datatable(WORKFLOWS_HP_SELECTION);
-                    WORKFLOWS_HP_TAGS.init();
-                    WORKFLOWS_HP_UTILITIES.init();
-                    for (var i = data.widgets.length - 1; i >= 0; i--) {
-                        window[data.widgets[i]] = window[data.widgets[i]](window.jQuery, WORKFLOWS_HOLDINGPEN);
-                        window[data.widgets[i]].init(data);
-                    };
-                }
-            })            
+<script type="text/javascript">
+    $(document).ready(function(){
+        var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
+        window.jQuery.ajax({
+            url: context_url,
+            success: function(data) {
+                WORKFLOWS_HOLDINGPEN.init(data);
+                WORKFLOWS_HOLDINGPEN.init_datatable(WORKFLOWS_HP_SELECTION);
+                WORKFLOWS_HP_TAGS.init();
+                WORKFLOWS_HP_UTILITIES.init();
+                for (var i = data.widgets.length - 1; i >= 0; i--) {
+                    window[data.widgets[i]] = window[data.widgets[i]](window.jQuery, WORKFLOWS_HOLDINGPEN);
+                    window[data.widgets[i]].init(data);
+                };
+
+            }
         });
-    </script>
+    });
+</script>
 {% endblock javascript %}
 
 {% block hpbody %}
     <div id="alert-message"></div>
-
     <nav class="navbar navbar-default navbar-static-top" role="navigation">
       <!-- Brand and toggle get grouped for better mobile display -->
 
@@ -90,9 +92,10 @@
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">Status<b class="caret"></b></a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a id="version-halted" class="version-selection" name="Halted">Halted</a></li>
-                    <li><a id="version-final" class="version-selection" name="Final">Completed</a></li>
-                    <li><a id="version-running" class="version-selection" name="Running">Running</a></li>
+                    <li><a id="version-halted" class="version-selection" name="Halted">Need action</a></li>
+                    <li><a id="version-completed" class="version-selection" name="Completed">Done</a></li>
+                    <li><a id="version-running" class="version-selection" name="Running">In process</a></li>
+                    <li><a id="version-initial" class="version-selection" name="Initial">New</a></li>
                 </ul>
             </li>
         </ul>
@@ -101,8 +104,9 @@
       </div>
     </nav>
 
-    <input id="tagsinput" type="text" data-role="tagsinput" placeholder="Add new tag"/>
-    </br>
+
+    <input class="tags" id="tags" type="text" placeholder="Add tags"/>
+    <br>
 
     <div class="container">
         <div class="row">

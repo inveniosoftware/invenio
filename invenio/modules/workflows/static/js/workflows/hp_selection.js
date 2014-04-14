@@ -23,12 +23,9 @@
 var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
     var oTable = {};
     var oSettings = {};
-    var rowList = holdingpen.rowList;
-    var rowIndexList = holdingpen.rowIndexList;
     var hoveredRow = -1;
 
     function init(_oTable, _oSettings){
-        console.log(1);
         oTable = _oTable;
         oSettings = _oSettings;
     }
@@ -40,38 +37,53 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
 
         var current_row = null;
         for (var i=fromPos; i<=toPos; i++){
-            j = i%10;
+            j = i % holdingpen.oSettings._iDisplayLength;
             current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
-            console.log(current_row);
-            if($.inArray(current_row.row_id, rowList) <= -1){
-                if (selectCellByTitle(current_row, 'Actions').innerText != 'N/A'){
-                    rowIndexList.push(i);
-                    rowList.push(current_row.row_id);
+            if($.inArray(current_row.row_id, holdingpen.rowList) <= -1){
+                    holdingpen.rowIndexList.push(i);
+                    holdingpen.rowList.push(current_row.row_id);
                     current_row.style.background = "#ffa";
                     current_row.cells[0].firstChild.checked = true;
-                }
             }
         }
     }
 
     function selectCellByTitle (row, title){
         for(var i=0; i<holdingpen.oSettings.aoHeader[0].length; i++){
-            var trimmed_title = $.trim(holdingpen.oSettings.aoHeader[0][i].cell.innerText);
+            var text_to_process = holdingpen.oSettings.aoHeader[0][i].cell.textContent || holdingpen.oSettings.aoHeader[0][i].cell.innerText;
+            var trimmed_title = $.trim(text_to_process);
             if(trimmed_title === title){
                 return $(row).children()[i - 1];
             }
         }
     }
 
-    function deselectAllFromPage (){
+    function selectCellByTitle_content(row, title){
+        var A = selectCellByTitle(row, title);
+        A = A.innerText || A.textContent;
+        return A;
+    }
+
+    function deselectAllFromPage (event){
         var fromPos = holdingpen.oSettings._iDisplayStart;
         var toPos = holdingpen.oSettings._iDisplayLength-1 + fromPos;
+        var j;
 
-        for (i=fromPos; i<=toPos; i++){
-            j = i % 10;
-            if($.inArray(i, rowIndexList) > -1){
-                current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
-                selectRow(current_row, event, holdingpen.oSettings);
+        var current_row = null;
+        for (var i=fromPos; i<=toPos; i++){
+            j = i % holdingpen.oSettings._iDisplayLength;
+            current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
+            if($.inArray(current_row.row_id, holdingpen.rowList) > -1){
+                holdingpen.rowList.splice(holdingpen.rowList.indexOf(current_row.row_id), 1);
+                holdingpen.rowIndexList.splice( holdingpen.rowIndexList.indexOf(current_row._DT_RowIndex+holdingpen.oSettings._iDisplayStart), 1);
+                current_row.style.background = "white";
+                widget_name = selectCellByTitle_content(current_row, 'Actions')
+                if (widget_name != 'N/A'){
+                    if(widget_name === 'Approve Record'){
+                        holdingpen.recordsToApprove.splice(holdingpen.recordsToApprove.indexOf(current_row.row_id), 1);
+                    }
+                }
+                current_row.checkbox.checked = false;
             }
         }
     }
@@ -80,46 +92,57 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
         selectedRow = row;
         var widget_name;
         if( e.shiftKey === true ){
-            selectRange(row);
+
+            this.selectRange(row);
         }
         else{
             if(selectCellByTitle(row, 'Actions').childNodes[0].id === 'submitButtonMini'){
                 widget_name = 'Approve Record';
             }
-            if($.inArray(row.row_id, rowList) <= -1){
+            if($.inArray(row.row_id, holdingpen.rowList) <= -1){
                 // Select row
-                rowList.push(row.row_id);
-                rowIndexList.push(row._DT_RowIndex+oSettings._iDisplayStart);
+                holdingpen.rowList.push(row.row_id);
+                holdingpen.rowIndexList.push(row._DT_RowIndex+oSettings._iDisplayStart);
                 row.style.background = "#ffa";
-
-                if (selectCellByTitle(row, 'Actions').innerText != 'N/A'){                    
+                if (selectCellByTitle_content(row, 'Actions') != 'N/A'){
                     if(widget_name === 'Approve Record'){
                         holdingpen.recordsToApprove.push(row.row_id);
-                        console.log(holdingpen.recordsToApprove);
                     }
                 }   
                 row.checkbox.checked = true;
             }   
             else{
+                $('#select-all')[0].checked = false;
                 // De-Select
-                rowList.splice(rowList.indexOf(row.row_id), 1);
-                rowIndexList.splice(rowIndexList.indexOf(row._DT_RowIndex+oSettings._iDisplayStart), 1);
+                holdingpen.rowList.splice(holdingpen.rowList.indexOf(row.row_id), 1);
+                holdingpen.rowIndexList.splice( holdingpen.rowIndexList.indexOf(row._DT_RowIndex+holdingpen.oSettings._iDisplayStart), 1);
                 row.style.background = "white";
-                
+                if (selectCellByTitle_content(row, 'Actions') != 'N/A'){
                 if(widget_name === 'Approve Record'){
                     holdingpen.recordsToApprove.splice(holdingpen.recordsToApprove.indexOf(row.row_id), 1);
+                }
                 }
                 row.checkbox.checked = false;
             }
         }
         window['approval_widget'].checkRecordsToApprove();
     }
-
-     function deselectAll (){
+    function  removeSelection() {
+            if (window.getSelection) {  // all browsers, except IE before version 9
+                var selection = window.getSelection ();
+                selection.removeAllRanges ();
+            }
+            else {
+                if (document.selection.createRange) {        // Internet Explorer
+                    var range = document.selection.createRange ();
+                    document.selection.empty ();
+                }
+            }
+        }
+    function deselectAll (){
         holdingpen.rowList = [];
         holdingpen.rowIndexList = [];
-        console.log(this.oTable);
-        oTable.fnDraw(false);
+        holdingpen.oTable.fnDraw(false);
         window.getSelection().removeAllRanges();
     } 
 
@@ -128,7 +151,6 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
     }
 
     function unhoverRow (row) {
-        console.log(row.row_id);
         if($.inArray(row.row_id, holdingpen.rowList) > -1){
             row.style.background = "#ffa";
         }
@@ -137,31 +159,32 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
         }
     }
 
-    $("#select-all").on("click", function(){
+    $("#select-all").on("click", function(event){
         if($(this)[0].checked == true){
             selectAll();
         }
         else{
-            deselectAllFromPage();
+            deselectAllFromPage(event.originalEvent);
         }
     });
 
     window.addEventListener("keydown", function(e){
         var currentRowIndex;
         var current_row;
-        if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        if([37, 38, 39, 40].indexOf(e.keyCode) > -1) {
             e.preventDefault();
         }
         if (e.keyCode == 40) {
             if (e.shiftKey === true){
-                currentRowIndex = rowIndexList[rowIndexList.length-1];
+                currentRowIndex =  holdingpen.rowIndexList[ holdingpen.rowIndexList.length-1];
                 if (currentRowIndex < 9){
                     row_index = currentRowIndex + 1;
                     current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[row_index]].nTr;
-                    if($.inArray(current_row.row_id, rowList) <= -1){
+                    if($.inArray(current_row.row_id, holdingpen.rowList) <= -1){
                         holdingpen.rowIndexList.push(row_index);
                         holdingpen.rowList.push(current_row.row_id);
                         current_row.style.background = "#ffa";
+                        current_row.checkbox.checked = true;
                     }
                 }
             }
@@ -185,6 +208,7 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
                         holdingpen.rowIndexList.push(rowToAdd);
                         holdingpen.rowList.push(current_row.row_id);
                         current_row.style.background = "#ffa";
+                        current_row.checkbox.checked = true;
                     }
                 }
             }
@@ -197,14 +221,14 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
             }
         }
         else if (e.keyCode == 37){
-            oTable.fnPageChange('previous');
+            holdingpen.oTable.fnPageChange('previous');
         }
         else if( e.keyCode == 39){
-            oTable.fnPageChange('next');
+            holdingpen.oTable.fnPageChange('next');
         }
         else if (e.keyCode == 65 && e.ctrlKey === true){
-            selectAll();
-            removeSelection();
+            $("#select-all").click();
+            e.preventDefault();
         }
         else if (e.keyCode == 13 && hoveredRow != -1){
             selectCellByTitle(holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[hoveredRow]].nTr, 'Details').click();
@@ -222,9 +246,10 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
     $(document).keyup(function(e){
         if (e.keyCode == 27) {  // esc           
             deselectAll();
-            console.log($('#select-all'));
         }
     });
+
+
 
     return{
         init: init,
@@ -232,32 +257,21 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
         deselectAll: deselectAll,
         hoverRow: hoverRow,
         unhoverRow: unhoverRow,
-
-        removeSelection: function () {
-            if (window.getSelection) {  // all browsers, except IE before version 9
-                var selection = window.getSelection ();
-                selection.removeAllRanges ();
-            }
-            else {
-                if (document.selection.createRange) {        // Internet Explorer
-                    var range = document.selection.createRange ();
-                    document.selection.empty ();
-                }
-            }
-        },
+        removeSelection : removeSelection,
 
         selectRange: function (row){
-            var toPos = oTable.fnGetPosition(row) + holdingpen.oSettings._iDisplayStart;
+            var toPos = holdingpen.oTable.fnGetPosition(row) + holdingpen.oSettings._iDisplayStart;
             var fromPos = holdingpen.rowIndexList[holdingpen.rowIndexList.length-1];
             var i;
             var current_row = null;
 
-            if (toPos > fromPos){
-                for (i=fromPos; i<=toPos; i++){
-                    j = i % 10;
-                    if($.inArray(i, rowIndexList) <= -1){
-                        current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
-                        if (selectCellByTitle(current_row, 'Actions').innerText != 'N/A'){
+            if((fromPos != undefined)&&(toPos != undefined)&&(row.checkbox.checked))
+            {
+                if (toPos > fromPos){
+                    for(i=fromPos+1; i<=toPos; i++){
+                        j = i % holdingpen.oSettings._iDisplayLength ;
+                        if($.inArray(i, holdingpen.rowIndexList) <= -1){
+                            current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
                             holdingpen.rowIndexList.push(i);
                             holdingpen.rowList.push(current_row.row_id);
                             current_row.style.background = "#ffa";
@@ -265,22 +279,41 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
                         }
                     }
                 }
-            }
-            else{
-                for (i=fromPos; i>=toPos; i--){
-                    j = i % 10;
-                    if($.inArray(i, holdingpen.rowIndexList) <= -1){
-                        current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
-                        if (selectCellByTitle(current_row, 'Actions').innerText != 'N/A'){
+                else{
+                    for (i=fromPos-1; i>=toPos; i--){
+                        j = i % holdingpen.oSettings._iDisplayLength ;
+                        if($.inArray(i, holdingpen.rowIndexList) <= -1){
+                            current_row = holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[j]].nTr;
                             holdingpen.rowIndexList.push(i);
                             holdingpen.rowList.push(current_row.row_id);
                             current_row.style.background = "#ffa";
-                            current_row.checkbox.checked = false;
+                            current_row.checkbox.checked = true;
                         }
                     }
                 }
-            }
-            document.getSelection().removeAllRanges();
+                document.getSelection().removeAllRanges();
+          }
+          else
+          {
+              if($.inArray(holdingpen.oTable.fnGetPosition(row), holdingpen.rowIndexList) <= -1)
+              {
+                holdingpen.rowIndexList.push(holdingpen.oTable.fnGetPosition(row));
+                holdingpen.rowList.push(row.row_id);
+                row.style.background = "#ffa";
+                row.checkbox.checked = true;
+              }
+              else
+              {
+                $('#select-all')[0].checked = false;
+                holdingpen.rowList.splice(holdingpen.rowList.indexOf(row.row_id), 1);
+                holdingpen.rowIndexList.splice( holdingpen.rowIndexList.indexOf(row._DT_RowIndex+holdingpen.oSettings._iDisplayStart), 1);
+                row.style.background = "white";
+                row.checkbox.checked = false;
+              }
+
+
+
+          }
         },
 
         rememberSelected: function (row, id) {
@@ -292,7 +325,9 @@ var WORKFLOWS_HP_SELECTION = function ( $, holdingpen ){
 
         getCellIndex: function (row, title){
             for(var i=0; i<holdingpen.oSettings.aoHeader[0].length; i++){
-                var trimmed_title = $.trim(holdingpen.oSettings.aoHeader[0][i].cell.innerText);
+                var temp_cell =  holdingpen.oSettings.aoHeader[0][i].cell;
+                var temp_cell_value = temp_cell.innerText || temp_cell.textContent;;
+                var trimmed_title = $.trim(temp_cell_value);
                 if(trimmed_title === title){
                     return i;
                 }

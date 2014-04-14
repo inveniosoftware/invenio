@@ -27,7 +27,6 @@
     Note: Currently work-in-progress.
 """
 
-
 import re
 
 from six import iteritems, text_type
@@ -106,6 +105,7 @@ def batch_widget(bwolist):
     Renders widget accepting single or multiple records.
     """
     from ..utils import parse_bwids
+
     bwolist = parse_bwids(bwolist)
 
     try:
@@ -146,9 +146,8 @@ def batch_widget(bwolist):
 
 @blueprint.route('/load_table', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'version_showing': (text_type, "default")})
 @templated('workflows/hp_maintable.html')
-def load_table(version_showing):
+def load_table():
     """
     Function used for the passing of JSON data to the DataTable
     1] First checks for what record version to show
@@ -156,25 +155,22 @@ def load_table(version_showing):
     3] then if the user searched for something
     and finally it builds the JSON to send.
     """
-    VERSION_SHOWING = []
-    req = request.get_json()
+    version_showing = []
+    req = request.json
+    s_search = request.args.get('sSearch', None)
 
-    if req:
-        if req.get('final', None):
-            VERSION_SHOWING.append(ObjectVersion.FINAL)
-        if req.get('halted', None):
-            VERSION_SHOWING.append(ObjectVersion.HALTED)
-        if req.get('running', None):
-            VERSION_SHOWING.append(ObjectVersion.RUNNING)
-        current_app.config['VERSION_SHOWING'] = VERSION_SHOWING
-    else:
-        try:
-            VERSION_SHOWING = current_app.config['VERSION_SHOWING']
-        except:
-            VERSION_SHOWING = [ObjectVersion.HALTED]
-
-    # sSearch will be used for searching later
-    a_search = request.args.get('sSearch', None)
+    if req is not None:
+        if "final" in req:
+            version_showing.append(ObjectVersion.FINAL)
+        if "halted" in req:
+            version_showing.append(ObjectVersion.HALTED)
+        if "running" in req:
+            version_showing.append(ObjectVersion.RUNNING)
+        if "initial" in req:
+            version_showing.append(ObjectVersion.INITIAL)
+        current_app.config['VERSION_SHOWING'] = version_showing
+    elif "VERSION_SHOWING" in current_app.config:
+        version_showing = current_app.config.get('VERSION_SHOWING', [])
 
     try:
         i_sortcol_0 = request.args.get('iSortCol_0')
@@ -189,13 +185,13 @@ def load_table(version_showing):
         i_display_length = current_app.config.get('iDisplayLength', 10)
         sEcho = current_app.config.get('sEcho', 0) + 1
 
-    bwolist = get_holdingpen_objects(sSearch=a_search,
-                                     version_showing=VERSION_SHOWING)
+    bwolist = get_holdingpen_objects(ssearch=s_search,
+                                     version_showing=version_showing)
 
     if 'iSortCol_0' in current_app.config:
         i_sortcol_0 = int(i_sortcol_0)
         if i_sortcol_0 != current_app.config['iSortCol_0'] \
-           or s_sortdir_0 != current_app.config['sSortDir_0']:
+        or s_sortdir_0 != current_app.config['sSortDir_0']:
             bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
 
     current_app.config['iDisplayStart'] = i_display_start
@@ -212,14 +208,14 @@ def load_table(version_showing):
         table_data['iTotalRecords'] = len(bwolist)
         table_data['iTotalDisplayRecords'] = len(bwolist)
     except:
-        bwolist = get_holdingpen_objects(version_showing=VERSION_SHOWING)
+        bwolist = get_holdingpen_objects(version_showing=version_showing)
         table_data['iTotalRecords'] = len(bwolist)
         table_data['iTotalDisplayRecords'] = len(bwolist)
 
     # This will be simplified once Redis is utilized.
     records_showing = 0
 
-    for bwo in bwolist[i_display_start:i_display_start+i_display_length]:
+    for bwo in bwolist[i_display_start:i_display_start + i_display_length]:
         widget_name = bwo.get_widget()
         widget = widgets.get(widget_name, None)
 
@@ -366,6 +362,7 @@ def delete_from_db(objectid):
 @wash_arguments({'bwolist': (text_type, "")})
 def delete_multi(bwolist):
     from ..utils import parse_bwids
+
     bwolist = parse_bwids(bwolist)
     for objectid in bwolist:
         delete_from_db(objectid)
@@ -552,45 +549,45 @@ def get_widget_list(object_list):
     return widget_dict
 
 
-def get_holdingpen_objects(iSortCol_0=None,
-                           sSortDir_0=None,
-                           sSearch=None,
+def get_holdingpen_objects(isortcol_0=None,
+                           ssortdir_0=None,
+                           ssearch=None,
                            version_showing=(ObjectVersion.HALTED,)):
     """
     Looks for related BibWorkflowObject's for display in Holding Pen.
 
     Uses DataTable naming for filtering/sorting. Work in progress.
     """
-    if iSortCol_0:
-        iSortCol_0 = int(iSortCol_0)
+    if isortcol_0:
+        isortcol_0 = int(isortcol_0)
 
     bwobject_list = BibWorkflowObject.query.filter(
         BibWorkflowObject.id_parent != 0 and
         not version_showing or BibWorkflowObject.version.in_(version_showing)
     ).all()
 
-    if sSearch and len(sSearch) < 2:
+    if ssearch and len(ssearch) < 2:
         bwobject_list_tmp = []
         for bwo in bwobject_list:
             extra_data = bwo.get_extra_data()
-            if bwo.id_parent == sSearch:
+            if bwo.id_parent == ssearch:
                 bwobject_list_tmp.append(bwo)
-            elif bwo.id_user == sSearch:
+            elif bwo.id_user == ssearch:
                 bwobject_list_tmp.append(bwo)
-            elif bwo.id_workflow == sSearch:
+            elif bwo.id_workflow == ssearch:
                 bwobject_list_tmp.append(bwo)
-            elif extra_data['_last_task_name'] == sSearch:
+            elif extra_data['_last_task_name'] == ssearch:
                 bwobject_list_tmp.append(bwo)
             else:
                 widget_name = bwo.get_widget()
                 if widget_name:
                     widget = widgets[widget_name]
-                    if sSearch in widget.__title__ or sSearch in widget_name:
+                    if ssearch in widget.__title__ or ssearch in widget_name:
                         bwobject_list_tmp.append(bwo)
         bwobject_list = bwobject_list_tmp
 
-    if iSortCol_0 == -6:
-        if sSortDir_0 == 'desc':
+    if isortcol_0 == -6:
+        if ssortdir_0 == 'desc':
             bwobject_list.reverse()
 
     return bwobject_list
