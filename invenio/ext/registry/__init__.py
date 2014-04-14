@@ -130,23 +130,34 @@ class DictModuleAutoDiscoverySubRegistry(ModuleAutoDiscoverySubRegistry):
     def items(self):
         """
         Get list of key/value pairs.
-
-        :param item: Object to register
         """
         return self._registry.items()
 
     def keys(self):
         """
         Get list of keys.
-
-        :param item: Object to register
         """
         return self._registry.keys()
 
     def values(self):
         """
-        Get list of keys.
-
-        :param item: Object to register
+        Get list of values.
         """
         return self._registry.values()
+
+    def iteritems(self):
+        """
+        Get iterator over list of key/value pairs.
+        """
+        return self._registry.iteritems()
+
+    def get(self, key, default=None):
+        """
+        Get value of key.
+
+        :param key: key to fetch
+        :param default: default if key not found (optional)
+
+        :return: value of given key in dict
+        """
+        return self._registry.get(key, default)
