@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -413,8 +413,6 @@ def to_url(val, scheme):
     val = normalize_pid(val, scheme)
     if scheme == 'doi':
         return "http://dx.doi.org/%s" % val
-    elif scheme == 'handle':
-        return "http://hdl.handle.net/%s" % val
     elif scheme == 'handle':
         return "http://hdl.handle.net/%s" % val
     elif scheme == 'arxiv':

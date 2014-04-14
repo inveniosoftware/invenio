@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -51,6 +51,7 @@ identifiers = [
     ('http://hdl.handle.net/10013/epic.10033', ['handle', 'url'],
         '10013/epic.10033'),
     ('978-3-905673-82-1', ['isbn'], ''),
+    ('0-9752298-0-X', ['isbn'], ''),
     ('0077-5606', ['issn'], ''),
     ('urn:lsid:ubio.org:namebank:11815', ['lsid', 'urn'], ''),
     ('0A9 2002 12B4A105 7', ['istc'], ''),
@@ -96,6 +97,8 @@ class PersistentIdentifierUtilities(InvenioTestCase):
                 normalized_value or i
             )
 
+        assert pidutils.normalize_pid(None, 'handle') is None
+
     def test_tourl(self):
         for i, expected_schemes, normalized_value in identifiers:
             pidutils.to_url(
@@ -114,6 +117,18 @@ class PersistentIdentifierUtilities(InvenioTestCase):
                 pidutils.detect_identifier_schemes(nonsense_pid),
                 []
             )
+
+    def test_compund_ean(self):
+        assert pidutils.is_ean('4006381333931')
+        assert pidutils.is_ean('73513537')
+
+    def test_compund_isbn(self):
+        assert pidutils.is_isbn('978-3-905673-82-1')
+        assert pidutils.is_isbn13('978-3-905673-82-1')
+        assert not pidutils.is_isbn10('978-3-905673-82-1')
+        assert pidutils.is_isbn('0-9752298-0-X')
+        assert not pidutils.is_isbn13('0-9752298-0-X')
+        assert pidutils.is_isbn10('0-9752298-0-X')
 
 
 TEST_SUITE = make_test_suite(PersistentIdentifierUtilities)
