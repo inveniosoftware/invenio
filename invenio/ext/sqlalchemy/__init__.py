@@ -39,7 +39,6 @@ from .types import MarshalBinary, PickleBinary, GUID
 from .utils import get_model_type
 
 
-
 def _include_sqlalchemy(obj, engine=None):
     #for module in sqlalchemy, sqlalchemy.orm:
     #    for key in module.__all__:
@@ -52,7 +51,10 @@ def _include_sqlalchemy(obj, engine=None):
     else:
         from sqlalchemy import types as engine_types
 
-    setattr(obj, 'JSON', JSONType)
+    # Length is provided to JSONType to ensure MySQL uses LONGTEXT instead
+    # of TEXT which only provides for 64kb storage compared to 4gb for
+    # LONGTEXT.
+    setattr(obj, 'JSON', JSONType(length=2**32-2))
     setattr(obj, 'Char', engine_types.CHAR)
     try:
         setattr(obj, 'TinyText', engine_types.TINYTEXT)
@@ -81,7 +83,7 @@ def _include_sqlalchemy(obj, engine=None):
     setattr(obj, 'UUID', GUID)
 
     if engine == 'mysql':
-        from .engines import mysql as dummy_mysql
+        from .engines import mysql as dummy_mysql  # noqa
     #    module = invenio.sqlalchemyutils_mysql
     #    for key in module.__dict__:
     #        setattr(obj, key,
