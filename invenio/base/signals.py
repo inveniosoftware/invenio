@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,13 @@ This module defines Invenio-wide signals
 
 from blinker import Namespace
 _signals = Namespace()
+
+# Custom Flask signals
+before_handle_user_exception = _signals.signal(
+    'before-handle-user-exception')
+"""
+This signal is sent right before user exception handler is called.
+"""
 
 # WebSearch signals
 websearch_before_search = _signals.signal(
