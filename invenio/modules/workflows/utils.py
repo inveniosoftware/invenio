@@ -21,14 +21,10 @@ from __future__ import print_function, absolute_import
 
 import re
 import redis
-import traceback
 
 from six import iteritems
 
 from invenio.ext.logging import register_exception
-
-from .errors import WorkflowDefinitionError
-
 
 REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
 
@@ -83,12 +79,10 @@ def get_workflow_definition(name):
     """ Tries to load the given workflow from the system. """
     from .registry import workflows
 
-    try:
-        return workflows[name]
-    except Exception as e:
-        raise WorkflowDefinitionError("Error with workflow '%s': %s\n%s" %
-                                      (name, str(e), traceback.format_exc()),
-                                      workflow_name=name)
+    if name in workflows:
+        return getattr(workflows[name], "workflow", None)
+    else:
+        return None
 
 
 def determineDataType(data):

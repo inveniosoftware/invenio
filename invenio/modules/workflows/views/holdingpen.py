@@ -521,7 +521,7 @@ def extract_data(bwobject):
         Workflow.query.filter(Workflow.uuid == bwobject.id_workflow).first()
 
     extracted_data['workflow_func'] = \
-        get_workflow_definition(extracted_data['w_metadata'].name).workflow
+        get_workflow_definition(extracted_data['w_metadata'].name)
 
     return extracted_data
 
