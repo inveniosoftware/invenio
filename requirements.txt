@@ -36,7 +36,7 @@ fixture==1.5
 redis==2.8.0
 unittest2==0.5.1
 webassets==0.7
-git+https://github.com/david-e/flask-admin@bootstrap3#egg=Flask-Admin-1.0.7
+git+https://github.com/mrjoes/flask-admin#egg=Flask-Admin-1.0.7
 Flask-Assets==0.7
 Flask-Babel==0.9
 Flask-Cache==0.12

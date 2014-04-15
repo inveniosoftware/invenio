@@ -18,7 +18,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-pages models.
+    invenio.modules.pages.models
+    ----------------------------
+
+    Contains page model.
 """
 
 from invenio.ext.sqlalchemy import db
@@ -32,9 +35,9 @@ class Page(db.Model):
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                    primary_key=True,
                    autoincrement=True)
-    url = db.Column(db.String(100), server_default='', unique=True)
-    title = db.Column(db.String(200), server_default='')
-    content = db.Column(db.TEXT, server_default='', nullable=True)
+    url = db.Column(db.String(100), unique=True, nullable=False)
+    title = db.Column(db.String(200), nullable=True)
+    content = db.Column(db.TEXT(length=2**32-2), nullable=True)
     # Default is pages/templates/default.html
     template_name = db.Column(db.String(70), nullable=True)
 
