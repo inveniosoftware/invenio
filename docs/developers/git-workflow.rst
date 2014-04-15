@@ -11,7 +11,8 @@ Introduction
 
 Our collaboration model is basically a pull-on-demand model similar to
 the one used for the Linux kernel.  You may want to read a chapter in the
-`Mercurial book on this collaboration model <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
+`Mercurial book on this collaboration model
+<http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
 
 In the recipes below you will encounter several personas with
 different roles:
@@ -27,7 +28,9 @@ Setting up things
 S1. Setting up your Git identity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-How to set up your Git identity::
+How to set up your Git identity.
+
+.. code-block:: console
 
     $ vim ~/.gitconfig
     $ cat ~/.gitconfig
@@ -47,18 +50,22 @@ coherent over time.
 S2. Setting up your private repo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is how to set up your private repo (on your laptop)::
+This is how to set up your private repo (on your laptop).
 
+.. code-block:: console
     $ cd ~/src
     $ git clone http://invenio-software.org/repo/invenio.git
 
 
-=== S3. Backuping your private repo (only developers at CERN)===
+S3. Backuping your private repo (only developers at CERN)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is how to mirror your private repo to CERN AFS space::
+This is how to mirror your private repo to CERN AFS space.
+
+.. code-block:: console
 
     $ rsync -rlptDvz -e ssh --delete ~/src/invenio/ \
-    johndoe@lxplus.cern.ch:private/src/invenio
+        johndoe@lxplus.cern.ch:private/src/invenio
 
 
 You should mirror your private repo and your working files from your
@@ -74,7 +81,9 @@ other machines, notably CDSDEV.
 S4. Setting up your public repo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is how to set up your public repo (on your AFS public space)::
+This is how to set up your public repo (on your AFS public space).
+
+.. code-block:: console
 
     $ ssh johndoe@lxplus.cern.ch # LXPLUS (SLC5) now has git
     johndoe@lxplus> mkdir /afs/cern.ch/user/j/johndoe/public/repo
@@ -87,14 +96,18 @@ This is how to set up your public repo (on your AFS public space)::
 
 
 You can now push your private master branch (from your laptop) to your
-public repo (on AFS)::
+public repo (on AFS).
+
+.. code-block:: console
 
     $ cd ~/src/invenio
     $ git push ssh://johndoe@lxplus.cern.ch/~/public/repo/invenio-johndoe.git master
 
 
 You can define a shortcut called ``johndoe-public`` for your public repo
-in order to ease future push commands::
+in order to ease future push commands.
+
+.. code-block:: console
 
     $ git remote add johndoe-public \
         ssh://johndoe@lxplus.cern.ch/~/public/repo/invenio-johndoe.git
@@ -108,7 +121,9 @@ In order to be able to push to your public repo from outside of CERN
 to a specific machine such as cdswaredev that has ssh port hidden
 behind the firewall, you should configure your ssh client to connect
 to cdswaredev via lxplus proxy gateway, using netcat to forward
-traffic to cdswaredev::
+traffic to cdswaredev.
+
+.. code-block:: console
 
     $ cat ~/.ssh/config
     Host lxplus.cern.ch
@@ -132,19 +147,26 @@ S7. Using remote repository locally
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you prefer, you can mount the remote afs filesystem in the local drive,  and work
-as normal. To accomplish that you need sshfs package installed::
+as normal. To accomplish that you need sshfs package installed.
 
-    mkdir ~/afsrepo
-    sshfs -o workaround=rename <username>@lxplus.cern.ch:/afs/cern.ch/user/r/<username>/public/repo ~/afsrepo/
-    git push ~/afsrepo/invenio.git/ master
+.. code-block:: console
+
+    $ mkdir ~/afsrepo
+    $ sshfs -o workaround=rename <username>@lxplus.cern.ch:/afs/cern.ch/user/r/<username>/public/repo \
+        ~/afsrepo/
+    $ git push ~/afsrepo/invenio.git/ master
 
 
-To unmount the repository::
+To unmount the repository.
+
+.. code-block:: console
 
     fusermount -u ~/afsrepo
 
 
 You can create aliases or edit /etc/fstab to help you mount the public repository.
+
+.. code-block:: text
 
     sshfs#<USERNAME>@lxplus.cern.ch:/afs/cern.ch/user/<LETTER>/<USERNAME>/public/repo fuse user,noauto 0 0
 
@@ -163,7 +185,8 @@ In summary, the new patchlevel releases (X.Y.Z) happen from the
 ``master`` branch, and new major feature releases (X) happen after they
 mature in the ``next`` branch.  A more detailed description follows.
 
-**maint**
+``maint``
+~~~~~~~~~
 
 This is the maintenance branch for the latest stable release.  There
 can be several maintenance branches for every release series
@@ -183,7 +206,8 @@ the corresponding ``maint-X.Y`` branch updates, and (3) rolling back the
 ``etc`` folder with their customizations.  This upgrade process will be
 automatized in the future via special ``inveniocfg`` options.
 
-**master**
+``master``
+~~~~~~~~~~
 
 The ``master`` branch is where the new features are being developed and
 where the new feature releases are being made from.  The code in
@@ -199,7 +223,8 @@ are not covered by usual ``inveniocfg`` update statements, so people
 should be prepared to study the differences and update DB schemata and
 config files themselves.
 
-**next**
+``next``
+~~~~~~~~
 
 If a new feature is well implemented, tested and considered stable, it
 goes directly into the ``master`` branch described previously.  If it is
@@ -216,19 +241,28 @@ Usually, ``master`` contains all of ``maint``, and ``next`` contains all of
 ``master``.  This is assured by periodical upward merges
 (maint-to-master, master-to-next, etc).
 
-== Working on new features - overview ==
+Working on new features - overview
+----------------------------------
 
 Here is a schema summarizing how John Doe would work on new features
 and fixes, and how Joe Bloggs would integrate them.
 
-[[Image(invenio-git-workflow.png, 859px)]]
+.. image:: /_static/invenio-git-workflow.png
+   :width: 859
+   :alt: invenio git workflow with features.
+
 
 The most important thing to recall is that *any topic branch*, be it a
-bugfix or a new feature, *should be started off by the developer from the lowest maint branch it applies to*,
+bugfix or a new feature, *should be started off by the developer from the
+lowest maint branch it applies to*,
 since it will then be merged upwards to all the other branches as part
 of the integration process.
 
-[[Image(invenio-git-branches.png, 348px)]]
+.. image:: /_static/invenio-git-branches.png
+   :width: 348px
+   :alt: git tree with maint and master read only branches as well as two
+         features or bugfix branches.
+
 
 Example: if there is an important bug in v0.99.1 that John is going to
 fix, then John should create a topic branch from the tip of
@@ -239,7 +273,8 @@ as needed, e.g. via periodical ``maint->master`` merges.
 
 Backporting fixes from ``master`` to ``maint`` should remain exceptional.
 
-== Working on new features - details ==
+Working on new features - details
+---------------------------------
 
 W1. Cloning the repo
 ~~~~~~~~~~~~~~~~~~~~
@@ -258,7 +293,9 @@ older releases, publishing some features while retaining features not
 yet ready for public eyes, etc.
 
 In our workflow example above, we created several branches to tackle
-several different tasks::
+several different tasks.
+
+.. code-block:: console
 
     $ git checkout master
     $ git branch new-feature-a
@@ -280,7 +317,9 @@ appear in the central repo logs in case of non-trivial merges.
 W3. Working on new-feature-b
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You now have some time to work on feature B, so::
+You now have some time to work on feature B, so.
+
+.. code-block:: console
 
     $ git checkout new-feature-b
     [ edit, test, edit, test, commit ]
@@ -302,13 +341,15 @@ If you want to switch branches, then you have to commit all the
 stuff you are currently editing, which may not be what you want.  In
 that case you can **stash** your commits into a temporary git stash,
 switch to a branch, do what you want, and when you come back, replay
-the changes from the stash.  Here is an example::
+the changes from the stash.  Here is an example.
+
+.. code-block:: console
 
     $ git stash # put local edits to the stash
     $ git stash list # list what you have there
     stash@`informe 0 <report/0>`_: WIP on foo.py: 2340b5a... WebFoo: new support for baz
     $ git checkout refactor-c # work on the refactor-c branch a bit
-    `... <...>`_
+     ... <...>
     $ git checkout new-feature-b  # come back to the new-feature-b branch
     $ git stash apply # replay stuff from stash
     $ git diff # verify
@@ -335,27 +376,35 @@ W6. Rebasing against latest git/master
 At this step the new-feature-b code is working both for Atlantis
 and for CDS contexts.  You should now check official repo for any
 updates to catch any changes that may have been committed to
-origin/master in the meantime::
+origin/master in the meantime.
+
+.. code-block:: console
 
     $ git checkout master
     $ git pull
 
 
-You can then **rebase** your new-feature-b branch again recent master::
+You can then **rebase** your new-feature-b branch again recent master.
+
+.. code-block:: console
 
     $ git checkout new-feature-b
     $ git rebase master
 
 
 In case of conflicts during the rebase, say in file foo.py, you should
-resolve them::
+resolve them.
+
+.. code-block:: console
 
     $ vim foo.py
     $ git add foo.py
     $ git rebase --continue
 
 
-or you can stop the rebase for good::
+or you can stop the rebase for good.
+
+.. code-block:: console
 
     $ git rebase --abort
 
@@ -382,7 +431,9 @@ that the test cases are working well, and please check once more the
 basic code kwalitee, as mentioned in the section R3 below.
 
 If the test cases work and the code kwalitee is acceptable, then push
-your branch into your public repo like this::
+your branch into your public repo like this.
+
+.. code-block:: console
 
     $ git push johndoe-public new-feature-b
 
@@ -391,7 +442,9 @@ Then alert Joe Bloggs with a request to review and integrate the
 branch, indicating ``git branch johndoe/new-feature-b`` in the email
 Subject header so that the emails will be threaded properly and given
 special treatment in the haystack of Joe's usual email conversation.
-Please also add any special observations for merge.  Example::
+Please also add any special observations for merge.  Example.
+
+.. code-block:: console
 
     From: john.doe@cern.ch
     To: joe.bloggs@cern.ch
@@ -411,7 +464,9 @@ W7.b Sending patches by email
 +++++++++++++++++++++++++++++
 
 If some occasional code contributors do not have a public repo, they
-can generate and **send patches by email** to Joe.  Say like this::
+can generate and **send patches by email** to Joe.  Say like this.
+
+.. code-block:: console
 
     $ git checkout master
     $ git pull
@@ -468,7 +523,9 @@ generate some comments; after the round one is over, 2) testing of the
 patch can generate other comments.
 
 If the changes to be done are rather small, then Joe usually does it
-himself::
+himself.
+
+.. code-block:: console
 
     $ git log master..johndoe/new-feature-b # even when master is well ahead in future
     $ git diff master...johndoe/new-feature-b
@@ -493,7 +550,9 @@ W8.b Reviewing and committing patches
 +++++++++++++++++++++++++++++++++++++
 
 For patches received by email, similar review procedure takes
-place.  To integrate such a patch::
+place. To integrate such a patch.
+
+.. code-block:: console
 
     $ less ~/0001-Foo.patch
     $ emacs ~/0001-Foo.patch # for small edits
@@ -501,7 +560,9 @@ place.  To integrate such a patch::
     $ git commit --amend # to change commit message
 
 
-or, for bigger patches that may require more integration work::
+or, for bigger patches that may require more integration work.
+
+.. code-block:: console
 
     $ less ~/0001-Foo.patch
     $ git am -3 ~/0001-Foo.patch
@@ -523,21 +584,23 @@ W8.c Reviewing and cherry-picking commits
 
 Instead of integrating branches in full, Joe may want to **cherry-pick**
 some particular commits, or squash branches to keep nice project
-history.  An example::
+history.  An example.
 
-    # see log of a branch:
+.. code-block:: console
+
+    $ # see log of a branch:
     $ git log erika/cool-stuff
     # pick one particular commit: (e.g. some other author in Erika's branch)
     $ git cherry-pick 027e1524cd1b823a620620d4b60dd570596fd641
-    # edit its log message:
+    $ # edit its log message:
     $ git commit --amend
-    # squash other commits together while merging: (e.g. other author in Erika's branch)
+    $ # squash other commits together while merging: (e.g. other author in Erika's branch)
     $ git diff 027e1524cd1b823a620620d4b60dd570596fd641 394d1a2a8488cbd0554f12b627ce478c8d1ee65c > ~/z.patch
     $ git apply --check z.patch
     $ git apply ~/z.patch --check # test whether patch applies
     $ emacs ~/z.patch # edit some lines away, retest until applies
     $ git apply --reject z.patch # alternatively, apply only good junks, study rejects later
-    # commit changes as Erika:
+    $ # commit changes as Erika:
     $ git commit -a --author='Erika Mustermann <erika.mustermann@cern.ch>'
 
 
@@ -547,7 +610,9 @@ W9. Checking integrated branch
 Once all the integration-related iterations are over, and your
 new-feature-b code was integrated into the Invenio master branch,
 then you fetch it to **check** if it was well integrated, and you delete
-your new-feature-b branch since you don't need it anymore::
+your new-feature-b branch since you don't need it anymore.
+
+.. code-block:: console
 
     $ git checkout master
     $ git pull
@@ -562,7 +627,9 @@ W10. Deleting integrated branch
 +++++++++++++++++++++++++++++++
 
 Once new-feature-b is fully okay, you **delete** this branch in your
-public repo::
+public repo.
+
+.. code-block:: console
 
     $ git push johndoe-public :new-feature-b
 
@@ -577,8 +644,9 @@ Before a topical branch is sent for review and integration, the commit
 history of the branch should be checked and eventually polished.  Here
 is an example.
 
-Consider a topical branch with history like this::
+Consider a topical branch with history like this.
 
+.. code-block:: text
 
     commit1 WebFoo: new xyzzy facility
     commit2 WebFoo: fixed typo
@@ -599,8 +667,9 @@ properly, they would only be making `git bisect` harder in the future.
 
 Ideally, the individual commits should be in an always-working state,
 and they should be presented in logical groups.  For example the above
-branch is better to be squashed as follows::
+branch is better to be squashed as follows.
 
+.. code-block:: text
 
     commit1 WebFoo: new xyzzy facility
      + commit2 WebFoo: fixed typo
@@ -632,29 +701,24 @@ clean ups:
 
 
 * Is the facility fully working now as expected?  If yes, keep the
-   commit.
-
+  commit.
 
 * Is this facility or some related one broken in one of the aspects?
-   If yes, amend and squash.
-
+  If yes, amend and squash.
 
 * Is this commit an improvement over an already-working facility?  If
-   yes, keep the commit.
-
+  yes, keep the commit.
 
 * Is this commit intermediary?  Is it worth keeping?  Is there a
-   chance that somebody might want to start off a new branch at this
-   point in some day?  Does this commit helps some future developer to
-   better understand the branch history?  If not, squash.
-
+  chance that somebody might want to start off a new branch at this
+  point in some day?  Does this commit helps some future developer to
+  better understand the branch history?  If not, squash.
 
 * Is the primary author of this commit different?  If yes, keep the
-   commit.  Or squash but use `Co-authored-by` commit log directive.
-
+  commit.  Or squash but use `Co-authored-by` commit log directive.
 
 * Is the same commit addressing more than one logically separate problem?
-   If yes, split.
+  If yes, split.
 
 Having clean branch history helps in providing sensibly working atomic
 updates, helps in understanding commits and code, eases eventual
@@ -670,20 +734,22 @@ R2a. Commit message format
 Invenio git commit log messages are usually formatted in the following
 way:
 
-* commit message headline providing short summary (maximum 50 chars) 
-  formatted in the style of `ModuleName: short description`. (using mostly 
+* commit message headline providing short summary (maximum 50 chars)
+  formatted in the style of ``ModuleName: short description``. (using mostly
   nouns, no verbs);
 
 * empty line;
 
-* commit message body with detailed description of what this patch 
-  does, formatted as a bulletted list, with one empty line between 
+* commit message body with detailed description of what this patch
+  does, formatted as a bulletted list, with one empty line between
   items (using present tense).
 
-Here is an example: changeset:71df9665bf5fcdd020b67e4cbcedfaddfd6cadaa::
+Here is an example: https://github.com/inveniosoftware/invenio/commit/71df9665bf5fcdd020b67e4cbcedfaddfd6cadaa.
+
+.. code-block:: text
 
     WebSearch: field-filtered MARCXML API output
-    
+
     * Implements field-filtered MARCXML output in Python and Web APIs.
       This was working for the TextMARC output, not for MARCXML output.
       This commit fixes the problem.  Usage: `/record/123?of=xm&ot=100,700`
@@ -692,17 +758,19 @@ Here is an example: changeset:71df9665bf5fcdd020b67e4cbcedfaddfd6cadaa::
     * Adds new tests for trying to access hidden fields via the
       filtered-field API technique.
 
-Note that if you use `vim` or `emacs git-modes` to write your commit
+Note that if you use ``vim`` or ``emacs git-modes`` to write your commit
 messages, you will be alerted about the excessive headline length
-(more than 50 characters) via colour syntax highlighting. To use `vim`
-for example as your commit message editor, add `export EDITOR=vim` to
-your `.bashrc`, `bash_profile` or variants.
+(more than 50 characters) via colour syntax highlighting. To use ``vim``
+for example as your commit message editor, add ``export EDITOR=vim`` to
+your ``.bashrc``, ``bash_profile`` or variants.
 
 The short commit logs are easily readable on narrow mobile devices,
 are helpful to quickly localise features, and ease any possible
 hunting for bugs via git bisecting later should the troubles arise.
 
-Here is an example listing last 15 commits on the master branch::
+Here is an example listing last 15 commits on the master branch.
+
+.. code-block:: console
 
     $ git log -n 15 maint-1.1..master --pretty=oneline | grep -v 'Merge b'
     c7cd1f184188207b55903e00e78e5b1acbff33c3 BibFormat: author links for mobile app
@@ -719,8 +787,10 @@ Here is an example listing last 15 commits on the master branch::
 
 
 See also commit message practices used in the git world, such as
-`here <http://spheredev.org/wiki/Git_for_the_lazy#Writing_good_commit_messages>`_ and
-`here <http://www.tpope.net/node/106>`_.
+`Git for the lazy: Writing good commit messages
+<http://spheredev.org/wiki/Git_for_the_lazy#Writing_good_commit_messages>`_ and
+`A Note About Git Commit Messages
+<http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_.
 
 R2b. Commit message QA/review directives
 ++++++++++++++++++++++++++++++++++++++++
@@ -729,8 +799,9 @@ The authors can use the following commit signature directives in order
 to highlight the quality of the patch at hand before requesting its
 review and merge.
 
-Example:  changeset:e4a1804b7bbdf61f2b7fe8698684c16aced3f58a::
+Example:  https://github.com/inveniosoftware/invenio/commit/e4a1804b7bbdf61f2b7fe8698684c16aced3f58a
 
+.. code-block:: text
 
     BibField: creation date addition and keyword fix
 
@@ -746,28 +817,41 @@ Example:  changeset:e4a1804b7bbdf61f2b7fe8698684c16aced3f58a::
 
 Here is the list of QA directives that the author may use:
 
-  Reported-by::
-    Acknowledges the user who originally reported the bug that this commit fixes.
+  ``Reported-by``
+    Acknowledges the user who originally reported the bug that this commit
+    fixes.
 
-  Signed-off-by::
-    The author says, in essence: "I have carefully implemented the feature without any leftover to-be-fixed places, I have run all code kwalitee checks and all relevant unit and functional tests, and everything is good.  To the best of my knowledge, this commit is good to go into the fast merge track".
+  ``Signed-off-by``
+    The author says, in essence: "I have carefully implemented the feature
+    without any leftover to-be-fixed places, I have run all code kwalitee
+    checks and all relevant unit and functional tests, and everything is good.
+    To the best of my knowledge, this commit is good to go into the fast merge
+    track".
 
-  Co-authored-by::
-    Used when more persons than the current author were involved in creating the code.  This usually happens in peer programming.
+  ``Co-authored-by``
+    Used when more persons than the current author were involved in creating
+    the code. This usually happens in peer programming.
 
-  Improved-by::
-    Acknowledges the person who improved the current code significantly after the original committer left, say.  This differs from review in that the author provides much more improvements than in a usual review.
+  ``Improved-by``
+    Acknowledges the person who improved the current code significantly after
+    the original committer left, say. This differs from review in that the
+    author provides much more improvements than in a usual review.
 
 The reviewers then usually add one of the following tags:
 
-  Acked-by::
-    The reviewer says, in essence: "I have seen this commit from a distance while walking in the corridor, it looks useful, but I have not had time to deal with it further".  Rarely used.
+  ``Acked-by``
+    The reviewer says, in essence: "I have seen this commit from a distance
+    while walking in the corridor, it looks useful, but I have not had time to
+    deal with it further". Rarely used.
 
-  Tested-by::
-    The reviewer says, in essence: "In addition, I have paged through the code, tested its kwalitee, tested the desired functionality that this commit implements, and all is well."
+  ``Tested-by``
+    The reviewer says, in essence: "In addition, I have paged through the code,
+    tested its kwalitee, tested the desired functionality that this commit
+    implements, and all is well."
 
-  Reviewed-by::
-    The reviewer says, in essence: "In addition, I have read every line of the source code in detail."
+  ``Reviewed-by``
+    The reviewer says, in essence: "In addition, I have read every line of the
+    source code in detail."
 
 Note that a similar system is used in the git world, e.g. Linux kernel
 `https://www.kernel.org/doc/Documentation/SubmittingPatches <https://www.kernel.org/doc/Documentation/SubmittingPatches>`_ or Git
@@ -775,42 +859,6 @@ itself
 `http://git.kernel.org/cgit/git/git.git/plain/Documentation/SubmittingPatches <http://git.kernel.org/cgit/git/git.git/plain/Documentation/SubmittingPatches>`_.
 While we use some tags in similar context, some other tags we use
 slightly differently.
-
-R2c. Commit message ticket directives
-+++++++++++++++++++++++++++++++++++++
-
-If the commit addresses a certain problem or implements a certain
-feature that has been previously ticketised in the Invenio ticket
-tracking system, then the commit should contain a ticket directive.
-
-Example: changeset:b18ee3fd919c1a06b143761f4611c02f4ac91cab::
-
-    BibField: Python-2.4 compatibility fix
-
-    * Fixes Python-2.4 compatibility problem.  (closes `ticket 1533 <ticket/1533>`_)
-
-    * Also standardizes the use of double quotes arrounf XML atributes.
-
-    Signed-off-by: Esteban J. G. Gabancho <esteban.gabancho@cern.ch>
-    Reviewed-by: Tibor Simko <tibor.simko@cern.ch>
-
-
-The `(closes `ticket 1533 <ticket/1533>`_)` directive will cause the Trac ticket 1533 to be
-automatically closed when the patch will be pushed to the official
-repository by the Lead Developer.  There is no need to manipulate the
-ticket status on Trac manually.  (There should never be such a need.)
-
-Here is the list of all available ticket directives the authors may
-use in the commit messages:
-
-  `(closes `ticket 123 <ticket/123>`_)`::
-     This commit fully closes ticket 123.
-
-  `(addresses `ticket 123 <ticket/123>`_)`::
-     This commit addresses, but not fully closes yet, ticket 123.
-
-  `(references `ticket 123 <ticket/123>`_)`::
-     This commit references ticket 123.
 
 R3. Remarks on the coding
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -827,7 +875,9 @@ Here is a small sample of often-made coding remarks:
 
 Ideally you should make sure they are not present in your public
 branches before asking for merge into the git/master.  You can do a
-**code kwalitee** check yourself by running::
+**code kwalitee** check yourself by running.
+
+.. code-block:: console
 
     $ cd src/invenio/modules/bibedit/lib
     ... hack on bibrecord_engine.py and friends
