@@ -41,14 +41,4 @@ class Page(db.Model):
     # Default is pages/templates/default.html
     template_name = db.Column(db.String(70), nullable=True)
 
-
-def rebuild_cache(mapper, connection, target):
-    from invenio.modules.pages.views import rebuild_pages_cache
-    rebuild_pages_cache()
-
-
-event.listen(Page, 'after_delete', rebuild_cache)
-event.listen(Page, 'after_insert', rebuild_cache)
-event.listen(Page, 'after_update', rebuild_cache)
-
 __all__ = ['Page']

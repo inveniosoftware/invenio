@@ -16,16 +16,46 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import six
+
+from flask import Blueprint, request, render_template, current_app
+from sqlalchemy import event
+from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import NotFound
 
 from invenio.base.globals import cfg
+from invenio.base.signals import before_handle_user_exception
+# from invenio.ext.cache import cache
 from invenio.modules.pages.models import Page
-from invenio.ext.cache import cache
-
-from sqlalchemy.orm.exc import NoResultFound
-from flask import Blueprint, request, render_template, got_request_exception
 
 blueprint = Blueprint('pages', __name__, url_prefix='/',
                       template_folder='templates')
+
+
+@blueprint.before_app_first_request
+def register():
+    """Register all pages before the first application request."""
+    try:
+        _add_url_rule([page.url for page in Page.query.all()])
+    except:
+        current_app.logger.warn('Pages were not loaded.')
+
+
+@blueprint.errorhandler(NoResultFound)
+def no_result_found(_dummy):
+    """Renders 404 page when no page has been found."""
+    return render_template('404.html'), 404
+
+
+@blueprint.errorhandler(404)
+def errorhandler(exception):
+    """Tries to render the page otherwise continues to app error handler."""
+    try:
+        return view()
+    except NoResultFound:
+        # FIXME reraise?
+        # raise exception
+        pass
 
 
 def view():
@@ -39,32 +69,50 @@ def view():
         page
             `pages.pages` object
     """
-    try:
-        page = Page.query.filter_by(url=request.path).one()
-    except NoResultFound:
-        return render_template('404.html'), 404
-
-    return render_page(page)
+    return render_page(request.path)
 
 
-def render_page(page):
+# @cache.memoize for guests?
+def render_page(path):
     """
     Internal interface to the page view.
     """
+    page = Page.query.filter_by(url=request.path).one()
     return render_template([page.template_name, cfg['PAGES_DEFAULT_TEMPLATE']],
                            page=page)
 
 
-def handle_404(sender, exception, **extra):
-    sender.logger.info('Got exception during processing: %s', exception)
+def page_orm_handler(mapper, connection, target):
+    _add_url_rule(target.url)
+
+# event.listen(Page, 'after_delete', rebuild_cache)
+event.listen(Page, 'after_insert', page_orm_handler)
+event.listen(Page, 'after_update', page_orm_handler)
 
 
-def setup_app(app):
-    with app.app_context():
-        for page in Page.query.all():
-            app.add_url_rule(page.url, 'pages.view', view)
+def handle_not_found(exception, **extra):
+    """Custom blueprint exception handler."""
 
-    #FIXME investigate signals otherwise add new into base/wrappers.py
-    got_request_exception.connect(handle_404, app)
+    if not isinstance(exception, NotFound):
+        return
 
-    return app
+    page = Page.query.filter_by(url=request.path).first()
+    if page is not None:
+        _add_url_rule(page.url)
+        # Modify request to call our errorhandler.
+        request.url_rule.endpoint = blueprint.name + '.view'
+
+before_handle_user_exception.connect(handle_not_found)
+
+
+def _add_url_rule(url_or_urls):
+    """Registers url rule to application url map."""
+    current_app.logger.info(url_or_urls)
+    old = current_app._got_first_request
+    # This is bit of cheating to overcome @flask.app.setupmethod decorator.
+    current_app._got_first_request = False
+    if isinstance(url_or_urls, six.string_types):
+        url_or_urls = [url_or_urls]
+    map(lambda url: current_app.add_url_rule(url, 'pages.view', view),
+        url_or_urls)
+    current_app._got_first_request = old

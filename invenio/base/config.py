@@ -51,7 +51,6 @@ EXTENSIONS = [
     'flask.ext.menu:Menu',
     'flask.ext.breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
-    'invenio.modules.pages.views',
 ]
 
 PACKAGES = [
