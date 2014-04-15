@@ -32,9 +32,7 @@
   {% js url_for('static', filename='js/bootstrap-select.js') %}
 {#  {% js "js/jquery.hotkeys.js" %}#}
 {#  {% js url_for('search.static', filename='js/search/hotkeys.js') %}#}
-{% endblock %}
 
-{% block css %}
   {%- css url_for('static', filename='css/typeahead.js-bootstrap.css'), '50-search' -%}
   {%- css url_for('static', filename='css/search/searchbar.css'), '50-search' -%}
 {% endblock %}
