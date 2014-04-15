@@ -89,6 +89,8 @@ from werkzeug.exceptions import NotFound
 from werkzeug.local import LocalProxy
 from invenio.utils.datastructures import LazyDict
 
+from .signals import before_handle_user_exception
+
 
 def _decorate_url_adapter_build(wrapped):
     """Changes behavior of :func:`flask.url_for` for http and https scheme."""
@@ -174,6 +176,10 @@ class Flask(FlaskBase):  # pylint: disable=R0904
         if filename not in STATIC_MAP:
             raise NotFound
         return send_file(STATIC_MAP[filename])
+
+    def handle_user_exception(self, e):
+        before_handle_user_exception.send(e)
+        return super(Flask, self).handle_user_exception(e)
 
 
 def lazy_import(name):
