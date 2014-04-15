@@ -62,7 +62,7 @@ REG_TD = re.compile("<td title=\"(.+?)\">(.+?)</td>", re.DOTALL)
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/index', methods=['GET', 'POST'])
 @login_required
-@register_menu(blueprint, 'main.admin.holdingpen', _('Holdingpen'))
+@register_menu(blueprint, 'personalize.holdingpen', _('Your Pending Actions'))
 @register_breadcrumb(blueprint, '.', _('Holdingpen'))
 @templated('workflows/hp_index.html')
 def index():
@@ -70,8 +70,8 @@ def index():
     Displays main interface of Holdingpen.
     Acts as a hub for catalogers (may be removed)
     """
-    bwolist = get_holdingpen_objects()
-
+    # FIXME: Add user filtering
+    bwolist = get_holdingpen_objects(version_showing=[ObjectVersion.HALTED])
     widget_list = get_widget_list(bwolist)
 
     return dict(tasks=widget_list)
@@ -537,15 +537,27 @@ def edit_record(form):
 
 def get_widget_list(object_list):
     """
-    Returns a dicts of widget names mapped to
+    Returns a dict of widget names mapped to
     the number of halted objects associated with that widget.
     """
     widget_dict = {}
+    found_widgets = []
+
+    # First get a list of all to count up later
     for bwo in object_list:
-        widget = bwo.get_widget()
-        if widget is not None and bwo.version == ObjectVersion.HALTED:
-            widget_count = widget_dict.setdefault(widget, 0)
-            widget_count += 1
+        widget_name = bwo.get_widget()
+        if widget_name is not None:
+            found_widgets.append(widget_name)
+
+    # Get "real" widget name only once per widget
+    for widget_name in set(found_widgets):
+        if widget_name not in widgets:
+            # Perhaps some old widget? Use stored name.
+            widget_nicename = widget_name
+        else:
+            widget = widgets[widget_name]
+            widget_nicename = getattr(widget, "__title__", widget_name)
+        widget_dict[widget_nicename] = found_widgets.count(widget_name)
     return widget_dict
 
 
@@ -562,8 +574,7 @@ def get_holdingpen_objects(isortcol_0=None,
         isortcol_0 = int(isortcol_0)
 
     bwobject_list = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id_parent != 0 and
-        not version_showing or BibWorkflowObject.version.in_(version_showing)
+        BibWorkflowObject.version.in_(version_showing)
     ).all()
 
     if ssearch and len(ssearch) < 2:

@@ -17,23 +17,32 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 {% extends "workflows/hp_base.html" %}
+{% set title = _("Your Pending Actions") %}
 {% block hpbody %}
 
-	<h1>HoldingPen Overview</h1>
-		<div class="container">
-			<div class="col-md-3">
-				<h4>Main Table</h4>
-				<div><a href="{{url_for('holdingpen.maintable')}}"><button class="btn btn-primary" type="button">Show Table</button></a></div>
-			</div>
-			<div class="col-md-3">
-				<h4>Pending Tasks</h4>
-				{% for task, object_count in tasks.items() %}
-					<div class="task-btns"><a href="{{url_for('holdingpen.maintable')}}"><button class="btn btn-warning" type="button">{{task}}: {{object_count}}</button></a></br></div>
-				{% endfor %}
-			</div>
-			<div class="col-md-3">
-				<h4>Assigned to me</h4>
-				<div><a href="{{url_for('holdingpen.maintable')}}"><button class="btn btn-primary" type="button">Show Records</button></a></div>
-			</div>
-		</div>
+
+<div class="row">
+<div class="col-md-12">
+	<p>Here is a list of actions remaining to be resolved grouped by type of action (work in progress).</p>
+</div>
+</div>
+
+<div class="row">
+<div class="col-md-6 col-sm-12">
+	<ul class="list-group">
+	  {% for task, object_count in tasks.items() %}
+		  <a href="{{ url_for('holdingpen.maintable')|safe }}" class="list-group-item">
+		    <span class="badge">{{object_count}}</span>
+		    {{task}}
+		  </a>
+	  {% endfor %}
+	</ul>
+</div>
+</div>
+
+<div class="row">
+<div class="col-md-12">
+	<a href="{{ url_for('holdingpen.maintable')|safe }}" class="btn btn-primary btn-lg pull-right" role="button">Go to Holding Pen</a>
+</div>
+</div>
 {% endblock %}
