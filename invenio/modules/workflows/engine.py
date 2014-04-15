@@ -38,11 +38,11 @@ from .models import (Workflow,
                      BibWorkflowObject,
                      BibWorkflowEngineLog,
                      ObjectVersion)
-from .utils import (dictproperty,
-                    get_workflow_definition)
+from .utils import dictproperty
 from .logger import (get_logger,
                      BibWorkflowLogHandler)
-from .errors import WorkflowHalt
+from .errors import (WorkflowHalt,
+                     WorkflowDefinitionError)
 
 DEBUG = CFG_DEVEL_SITE > 0
 
@@ -445,8 +445,13 @@ BibWorkflowEngine
 
         :param workflow_name:
         """
-        workflow = get_workflow_definition(workflow_name)
-        self.workflow_definition = workflow
+        from .registry import workflows
+        if workflow_name not in workflows:
+            # No workflow with that name exists
+            raise WorkflowDefinitionError("Workflow '%s' does not exist"
+                                          % (workflow_name,),
+                                          workflow_name=workflow_name)
+        self.workflow_definition = workflows[workflow_name]
         self.setWorkflow(self.workflow_definition.workflow)
 
     def set_extra_data_params(self, **kwargs):

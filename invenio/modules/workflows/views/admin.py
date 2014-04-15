@@ -85,8 +85,7 @@ def details(objectid):
         Workflow.uuid == bwobject.id_workflow
     ).first()
 
-    # Workflow class: workflow.workflow is the workflow list
-    workflow = get_workflow_definition(workflow_object.name)
+    workflow_tasks = get_workflow_definition(workflow_object.name)
     formatted_data = bwobject.get_formatted_data(of)
     if isinstance(formatted_data, dict):
         formatted_data = pformat(formatted_data)
@@ -101,7 +100,7 @@ def details(objectid):
     return dict(entry=bwobject,
                 log=engine_log,
                 data_preview=data,
-                workflow_func=workflow.workflow)
+                workflow_tasks=workflow_tasks)
 
 
 @blueprint.route('/workflow_details/<id_workflow>',
@@ -114,11 +113,10 @@ def workflow_details(id_workflow):
         Workflow.uuid == id_workflow
     ).first()
 
-    # Workflow class: workflow.workflow is the workflow list
-    workflow = get_workflow_definition(workflow_object.name)
+    workflow_tasks = get_workflow_definition(workflow_object.name)
     return dict(workflow_metadata=workflow_object,
                 log="",
-                workflow_func=workflow.workflow)
+                workflow_tasks=workflow_tasks)
 
 
 @blueprint.route('/workflows', methods=['GET', 'POST'])

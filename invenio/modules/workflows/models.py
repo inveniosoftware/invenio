@@ -341,9 +341,8 @@ class BibWorkflowObject(db.Model):
         self.extra_data["_tasks_results"].append(res_obj)
 
     def add_widget(self, widget, message):
-        """
-        Assign a widget to this object for an action to be taken
-        in holdingpen. The widget is reffered to by a string with
+        """Assign a widget to this object for an action to be taken
+        in holding-pen. The widget is referred to by a string with
         the filename minus extension. Ex: approval_widget.
 
         A message is also needed to tell the user the action
@@ -355,10 +354,10 @@ class BibWorkflowObject(db.Model):
         self.set_extra_data(extra_data)
 
     def get_widget(self):
-        """
-        Retrive the currently assigned widget, if any.
-        """
+        """Retrieve the currently assigned widget, if any.
 
+        :return: name of widget assigned as string, or None
+        """
         try:
             return self.get_extra_data()["_widget"]
         except KeyError:
@@ -366,9 +365,7 @@ class BibWorkflowObject(db.Model):
             return None
 
     def remove_widget(self):
-        """
-        Removes the currently assigned widget.
-        """
+        """Removes the currently assigned widget."""
         extra_data = self.get_extra_data()
         extra_data["_widget"] = None
         extra_data["_message"] = ""
