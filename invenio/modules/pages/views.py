@@ -16,19 +16,19 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+
+from invenio.base.globals import cfg
 from invenio.modules.pages.models import Page
-from invenio.modules.pages.errors import PageNotFound
 from invenio.ext.cache import cache
 
 from sqlalchemy.orm.exc import NoResultFound
-from flask import Blueprint, request, render_template
+from flask import Blueprint, request, render_template, got_request_exception
 
-blueprint = Blueprint('pages', __name__, url_prefix='/', template_folder='templates')
+blueprint = Blueprint('pages', __name__, url_prefix='/',
+                      template_folder='templates')
 
-DEFAULT_TEMPLATE = 'pages/default.html'
 
-
-def page(request, url):
+def view():
     """
     Public interface to the page view.
 
@@ -39,45 +39,32 @@ def page(request, url):
         page
             `pages.pages` object
     """
-    if not url.startswith('/'):
-        url = '/' + url
-
     try:
-        f = Page.query.filter_by(url=url).one()
+        page = Page.query.filter_by(url=request.path).one()
     except NoResultFound:
         return render_template('404.html'), 404
 
-    return render_page(request, f)
+    return render_page(page)
 
 
-def render_page(request, f):
+def render_page(page):
     """
-    Internal interface to the flat page view.
+    Internal interface to the page view.
     """
-    if f.template_name:
-        return render_template(f.template_name, page=f)
-    else:
-        return render_template(DEFAULT_TEMPLATE, page=f)
+    return render_template([page.template_name, cfg['PAGES_DEFAULT_TEMPLATE']],
+                           page=page)
 
 
-@blueprint.app_errorhandler(404)
-def errorhandler(error):
-    # Is there a flat page for this url?
-    pages_map = cache.get("pages-url-map")
-    if not pages_map:
-        # cache maybe expired, or there are no pages yet
-        rebuild_pages_cache()
-        pages_map = cache.get("pages-url-map")
-    if pages_map:
-        req_path = request.path
-        if req_path in pages_map:
-            try:
-                return page(request, req_path)
-            except PageNotFound:
-                pass
-    return render_template('404.html'), 404
+def handle_404(sender, exception, **extra):
+    sender.logger.info('Got exception during processing: %s', exception)
 
 
-def rebuild_pages_cache():
-    urls = [page.url for page in Page.query.all()]
-    cache.set("pages-url-map", dict.fromkeys(urls), timeout=84000)
+def setup_app(app):
+    with app.app_context():
+        for page in Page.query.all():
+            app.add_url_rule(page.url, 'pages.view', view)
+
+    #FIXME investigate signals otherwise add new into base/wrappers.py
+    got_request_exception.connect(handle_404, app)
+
+    return app

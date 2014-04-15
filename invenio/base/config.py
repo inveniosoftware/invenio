@@ -51,6 +51,7 @@ EXTENSIONS = [
     'flask.ext.menu:Menu',
     'flask.ext.breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
+    'invenio.modules.pages.views',
 ]
 
 PACKAGES = [
@@ -59,7 +60,8 @@ PACKAGES = [
 
 PACKAGES_EXCLUDE = [
     'invenio.modules.annotations',
-    'invenio.modules.communities'
+    'invenio.modules.communities',
+    'invenio.modules.pages',
 ]
 
 CFG_PREFIX = distutils.sysconfig.get_config_var("prefix")
