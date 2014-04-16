@@ -19,8 +19,10 @@
 
 """Utilities for interaction with SVN repositories"""
 
+import errno
+
 from os import chdir
-from subprocess import call
+from subprocess import check_call as call
 from invenio.base.globals import cfg
 import tarfile
 from tempfile import mkdtemp
@@ -74,4 +76,10 @@ def harvest_repo(root_url, archive_path, tag=None, archive_mode='w:gz'):
     tar.add(clone_path, arcname=root_url.split('/').pop())
     tar.close()
 
-    rmtree(clone_path)
+    try:
+        rmtree(clone_path)
+    except OSError as e:
+        # Reraise unless ENOENT: No such file or directory
+        # (ok if directory has already been deleted)
+        if e.errno != errno.ENOENT:
+            raise
