@@ -17,30 +17,54 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-CFG_PROVIDER_LIST = ['invenio.modules.pidstore.providers.datacite:DataCite',
-                      'invenio.modules.pidstore.providers.local_doi:LocalDOI',
-                     ]
+PIDSTORE_PROVIDERS = [
+    'invenio.modules.pidstore.providers.datacite:DataCite',
+    'invenio.modules.pidstore.providers.local_doi:LocalDOI',
+]
 
-CFG_OBJECT_TYPES = ['rec', ]
+PIDSTORE_OBJECT_TYPES = ['rec', ]
+"""
+Definition of supported object types
+"""
 
-CFG_STATUS_NEW = 'N'
+PIDSTORE_DATACITE_OUTPUTFORMAT = 'dcite'
+"""
+Output format used to generate the DataCite
+"""
+
+PIDSTORE_DATACITE_RECORD_DOI_FIELD = 'doi'
+"""
+Field name in record model (JSONAlchemy)
+"""
+
+PIDSTORE_DATACITE_SITE_URL = None
+"""
+Site URL to use when minting records. Defaults to CFG_SITE_URL.
+"""
+
+
+#
+# Internal configuration values. Normally you will not need to edit
+# any of the configuration values below.
+#
+PIDSTORE_STATUS_NEW = 'N'
 """
 The pid has *not* yet been registered with the service provider.
 """
 
-CFG_STATUS_REGISTERED = 'R'
+PIDSTORE_STATUS_REGISTERED = 'R'
 """
 The pid has been registered with the service provider.
 """
 
-CFG_STATUS_DELETED = 'D'
+PIDSTORE_STATUS_DELETED = 'D'
 """
-The pid has been deleted with the service proivider. This should
+The pid has been deleted/inactivated with the service proivider. This should
 very rarely happen, and must be kept track of, as the PID should not be
 reused for something else.
 """
 
-CFG_STATUS_RESERVED = 'K'
+PIDSTORE_STATUS_RESERVED = 'K'
 """
 The pid has been reserved in the service provider but not yet fully
 registered.

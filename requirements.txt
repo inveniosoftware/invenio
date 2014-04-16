@@ -69,3 +69,4 @@ SQLAlchemy-Utils==0.23.1
 wtforms-alchemy==0.12.1
 mock==1.0.1
 setuptools>=2.0
+httpretty==0.8.0
