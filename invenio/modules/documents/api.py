@@ -159,10 +159,11 @@ class Document(SmartJson):
 
         signals.document_before_content_set.send(self, name=name)
 
-        data = f.read()
-        _fs, filename = opener.parse(name)
-        _fs.setcontents(filename, data, chunk_size)
-        _fs.close()
+        if self.get('source', '') != name:
+            data = f.read()
+            _fs, filename = opener.parse(name)
+            _fs.setcontents(filename, data, chunk_size)
+            _fs.close()
 
         signals.document_after_content_set.send(self, name=name)
 
