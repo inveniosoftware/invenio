@@ -19,7 +19,9 @@
 
 """Utilities for interaction with Git repositories"""
 
-from subprocess import call
+import errno
+
+from subprocess import check_call as call
 from invenio.base.globals import cfg
 from os import chdir
 from tempfile import mkdtemp
@@ -68,11 +70,16 @@ def harvest_repo(root_url, archive_path, tag=None, archive_format='tar.gz'):
     chdir(clone_path)
 
     if tag:
-        call([git, 'checkout', tag])
-        call([git, 'archive', '--format=' + archive_format, tag, '-o',
-              archive_path])
+        call([git, 'archive', '--format=' + archive_format, '-o',
+              archive_path, tag])
     else:
-        call([git, 'archive', '--format=' + archive_format, 'HEAD', '-o',
-              archive_path])
+        call([git, 'archive', '--format=' + archive_format, '-o',
+              archive_path, 'HEAD'])
 
-    rmtree(clone_path)
+    try:
+        rmtree(clone_path)
+    except OSError as e:
+        # Reraise unless ENOENT: No such file or directory
+        # (ok if directory has already been deleted)
+        if e.errno != errno.ENOENT:
+            raise

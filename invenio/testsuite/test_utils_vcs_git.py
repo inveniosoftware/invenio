@@ -44,10 +44,17 @@ class GitHarvestTest(InvenioTestCase):
         self.which_git = get_which_git()
 
         self.path = path.join(mkdtemp(dir=cfg['CFG_TMPDIR']), '')
-        self.archive_path = path.join(self.path, 'test.tar.gz')
+        self.archive_dir = path.join(mkdtemp(dir=cfg['CFG_TMPDIR']), '')
+        self.archive_path = path.join(self.archive_dir, 'test.tar.gz')
 
         call([self.which_git, 'init', self.path])
         chdir(self.path)
+
+        # Setup git user config.
+        call([self.which_git, 'config', 'user.name', 'Invenio Software'])
+        call([self.which_git, 'config', 'user.email',
+              'info@invenio-software.org'])
+
         call(['touch', self.path + 'test.txt'])
         call([self.which_git, 'add', self.path + 'test.txt'])
         call([self.which_git, 'commit', '-m', 'Initial Commit'])

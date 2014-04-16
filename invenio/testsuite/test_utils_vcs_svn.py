@@ -47,7 +47,8 @@ class SVNHarvestTest(InvenioTestCase):
         self.svntest = mkdtemp(dir=cfg['CFG_TMPDIR'])
         self.repo = path.join(self.svntest, 'temprepo', '')
         self.src = path.join(self.svntest, 'tempsrc', '')
-        self.archive_path = path.join(self.svntest, 'test.tar.gz')
+        self.archive_dir = path.join(mkdtemp(dir=cfg['CFG_TMPDIR']), '')
+        self.archive_path = path.join(self.archive_dir, 'test.tar.gz')
 
         chdir(self.svntest)
         call([which('svnadmin'), '--fs-type', 'fsfs', 'create', self.repo])
