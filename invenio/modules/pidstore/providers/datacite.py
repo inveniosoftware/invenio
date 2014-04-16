@@ -24,10 +24,15 @@
     DataCite PID provider
 """
 
-from invenio.base.globals import cfg
-from invenio.utils.datacite import DataCite as DataCiteUtil, HttpError, DataCiteError
+from __future__ import absolute_import
 
-from invenio.modules.pidstore.provider import PidProvider
+from invenio.base.globals import cfg
+from invenio.utils.datacite import DataCite as DataCiteUtil, HttpError, \
+    DataCiteError, DataCiteGoneError, DataCiteNoContentError, \
+    DataCiteNotFoundError
+
+from ..provider import PidProvider
+
 
 class DataCite(PidProvider):
     """
@@ -112,7 +117,10 @@ class DataCite(PidProvider):
             return False
         else:
             if pid.is_deleted():
-                pid.log("UPDATE", "Successfully updated and possibly registered in DataCite")
+                pid.log(
+                    "UPDATE",
+                    "Successfully updated and possibly registered in DataCite"
+                )
             else:
                 pid.log("UPDATE", "Successfully updated in DataCite")
         return True
@@ -129,6 +137,54 @@ class DataCite(PidProvider):
             return False
         else:
             pid.log("DELETE", "Successfully deleted in DataCite")
+        return True
+
+    def sync_status(self, pid, *args, **kwargs):
+        """ Synchronize DOI status DataCite MDS """
+        status = None
+
+        try:
+            self.api.doi_get(pid.pid_value)
+            status = cfg['PIDSTORE_STATUS_REGISTERED']
+        except DataCiteGoneError:
+            status = cfg['PIDSTORE_STATUS_DELETED']
+        except DataCiteNoContentError:
+            status = cfg['PIDSTORE_STATUS_REGISTERED']
+        except DataCiteNotFoundError:
+            pass
+        except DataCiteError as e:
+            pid.log("SYNC", "Failed with %s" % e.__class__.__name__)
+            return False
+        except HttpError as e:
+            pid.log("SYNC", "Failed with HttpError - %s" % unicode(e))
+            return False
+
+        if status is None:
+            try:
+                self.api.metadata_get(pid.pid_value)
+                status = cfg['PIDSTORE_STATUS_RESERVED']
+            except DataCiteGoneError:
+                status = cfg['PIDSTORE_STATUS_DELETED']
+            except DataCiteNoContentError:
+                status = cfg['PIDSTORE_STATUS_REGISTERED']
+            except DataCiteNotFoundError:
+                pass
+            except DataCiteError as e:
+                pid.log("SYNC", "Failed with %s" % e.__class__.__name__)
+                return False
+            except HttpError as e:
+                pid.log("SYNC", "Failed with HttpError - %s" % unicode(e))
+                return False
+
+        if status is None:
+            status = cfg['PIDSTORE_STATUS_NEW']
+
+        if pid.status != status:
+            pid.log(
+                "SYNC", "Fixed status from %s to %s." % (pid.status, status)
+            )
+            pid.status = status
+
         return True
 
     @classmethod

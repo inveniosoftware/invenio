@@ -69,7 +69,7 @@ class PidProvider(object):
 
     def __load_providers():
         registry = dict()
-        for provider_str in cfg['CFG_PROVIDER_LIST']:
+        for provider_str in cfg['PIDSTORE_PROVIDERS']:
             provider = import_string(provider_str)
             if not issubclass(provider, PidProvider):
                 raise TypeError("Argument not an instance of PidProvider.")
@@ -90,7 +90,9 @@ class PidProvider(object):
     """ Registry of possible providers """
 
     pid_type = None
-    """ Must be overwritten in subcleass and specified as a string (max len 6) """
+    """
+    Must be overwritten in subcleass and specified as a string (max len 6)
+    """
 
     @staticmethod
     def create(pid_type, pid_str, pid_provider, *args, **kwargs):
@@ -127,6 +129,12 @@ class PidProvider(object):
     def delete(self, pid, *args, **kwargs):
         """ Delete a persistent identifier """
         raise NotImplementedError
+
+    def sync_status(self, pid, *args, **kwargs):
+        """
+        Synchronize persistent identifier status with remote service provider.
+        """
+        return True
 
     @classmethod
     def is_provider_for_pid(cls, pid_str):
