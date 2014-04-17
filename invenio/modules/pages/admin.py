@@ -16,9 +16,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from jinja2 import TemplateNotFound
+from flask import current_app
+from wtforms.validators import ValidationError
+
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
 from invenio.modules.pages.models import Page
+
+
+def template_exists(form, field):
+    """ Form validation: check that selected template exists """
+    template_name = "pages/" + field.data
+    try:
+        current_app.jinja_env.get_template(template_name)
+    except TemplateNotFound:
+        raise ValidationError("Template selected does not exist")
 
 
 class PagesAdmin(ModelView):
@@ -30,11 +43,26 @@ class PagesAdmin(ModelView):
     edit_template = 'pages/edit.html'
 
     column_list = (
-        'url', 'title'
+        'url', 'title', 'last_modified',
     )
     column_searchable_list = ('url',)
 
     page_size = 100
+
+    form_args = dict(
+        template_name=dict(
+            validators=[template_exists]
+        ))
+
+    #FIXME if we want to prevent users from modifying the dates
+    # form_widget_args = {
+    #     'created': {
+    #         'type': "hidden"
+    #     },
+    #     'last_modified': {
+    #         'type': "hidden"
+    #     },
+    # }
 
     def __init__(self, model, session, **kwargs):
         super(PagesAdmin, self).__init__(

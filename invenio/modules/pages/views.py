@@ -24,6 +24,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import NotFound
 
 from invenio.base.globals import cfg
+from invenio.ext.sqlalchemy import db
 from invenio.base.signals import before_handle_user_exception
 # from invenio.ext.cache import cache
 from invenio.modules.pages.models import Page
@@ -77,15 +78,25 @@ def render_page(path):
     """
     Internal interface to the page view.
     """
-    page = Page.query.filter_by(url=request.path).one()
+    page = Page.query.filter(db.or_(Page.url == request.path,
+                                    Page.url == request.path + "/")).first()
     return render_template([page.template_name, cfg['PAGES_DEFAULT_TEMPLATE']],
                            page=page)
+
+
+def before_url_insert(mapper, connection, target):
+    if not target.url.startswith("/"):
+        target.url = "/" + target.url
+    if not target.url.endswith("/") and cfg["PAGES_APPEND_SLASH"]:
+        target.url = target.url + "/"
 
 
 def page_orm_handler(mapper, connection, target):
     _add_url_rule(target.url)
 
+
 # event.listen(Page, 'after_delete', rebuild_cache)
+event.listen(Page, 'before_insert', before_url_insert)
 event.listen(Page, 'after_insert', page_orm_handler)
 event.listen(Page, 'after_update', page_orm_handler)
 
@@ -96,7 +107,8 @@ def handle_not_found(exception, **extra):
     if not isinstance(exception, NotFound):
         return
 
-    page = Page.query.filter_by(url=request.path).first()
+    page = Page.query.filter(db.or_(Page.url == request.path,
+                                    Page.url == request.path + "/")).first()
     if page is not None:
         _add_url_rule(page.url)
         # Modify request to call our errorhandler.

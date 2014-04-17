@@ -18,3 +18,4 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 PAGES_DEFAULT_TEMPLATE = 'pages/default.html'
+PAGES_APPEND_SLASH = True

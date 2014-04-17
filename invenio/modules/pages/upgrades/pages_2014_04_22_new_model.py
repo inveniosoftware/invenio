@@ -21,7 +21,7 @@ from invenio.ext.sqlalchemy import db
 from invenio.modules.upgrader.api import op
 from sqlalchemy.dialects import mysql
 
-# depends_on = ['CHANGE_ME']
+depends_on = []
 
 
 def info():
@@ -35,8 +35,10 @@ def do_upgrade():
         db.Column('id', mysql.INTEGER(display_width=15), nullable=False),
         db.Column('url', db.String(length=100), nullable=False),
         db.Column('title', db.String(length=200), nullable=True),
-        db.Column('content', db.TEXT(length=2**32-2), nullable=True),
+        db.Column('content', db.TEXT(length=4294967294), nullable=True),
         db.Column('template_name', db.String(length=70), nullable=True),
+        db.Column('created', db.DateTime(), nullable=False),
+        db.Column('last_modified', db.DateTime(), nullable=False),
         db.PrimaryKeyConstraint('id'),
         db.UniqueConstraint('url'),
         mysql_charset='utf8',
