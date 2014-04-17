@@ -564,6 +564,14 @@ def add_recid_elements(splitted_citations):
                 break
 
 
+def arxiv_urls_to_report_numbers(citation_elements):
+    arxiv_url_prefix = 'http://arxiv.org/abs/'
+    for el in citation_elements:
+        if el['type'] == 'URL' and el['url_string'].startswith(arxiv_url_prefix):
+            el['type'] = 'REPORTNUMBER'
+            el['report_num'] = el['url_string'].replace(arxiv_url_prefix, 'arXiv:')
+
+
 ## End of elements transformations
 
 
@@ -616,6 +624,7 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
     format_hep(citation_elements)
     remove_b_for_nucl_phys(citation_elements)
     mangle_volume(citation_elements)
+    arxiv_urls_to_report_numbers(citation_elements)
     associate_recids(citation_elements)
 
     # Split the reference in multiple ones if needed
