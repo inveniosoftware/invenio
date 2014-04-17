@@ -25,7 +25,7 @@
 """
 
 from invenio.ext.sqlalchemy import db
-from sqlalchemy import event
+from datetime import datetime
 
 
 class Page(db.Model):
@@ -40,5 +40,8 @@ class Page(db.Model):
     content = db.Column(db.TEXT(length=2**32-2), nullable=True)
     # Default is pages/templates/default.html
     template_name = db.Column(db.String(70), nullable=True)
+    created = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    last_modified = db.Column(db.DateTime(), nullable=False,
+                              default=datetime.now, onupdate=datetime.now)
 
 __all__ = ['Page']
