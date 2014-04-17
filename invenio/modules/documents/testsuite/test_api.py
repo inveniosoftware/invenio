@@ -53,7 +53,12 @@ class TestDocumentsApi(InvenioTestCase):
         self.assertEqual(d['title'], 'Document 1')
 
         d['title'] = 'New Document 1 Title'
-        d.update()
+        e = d.update()
+
+        # Make sure that new version has new id
+        self.assertTrue(e['_id'] != d['_id'])
+
+        d = e
 
         self.assertEqual(d['creation_date'], creation_date)
         self.assertTrue(d['modification_date'] > modification_date)
