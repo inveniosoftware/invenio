@@ -1270,7 +1270,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
 def perform_modifyapikeydata(req, userID, keyID='', status='' , callback='yes', confirm=0):
     """modify REST API keys of an account"""
 
-    from invenio.modules.apikeys.model import WebAPIKey
+    from invenio.modules.apikeys.models import WebAPIKey
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
