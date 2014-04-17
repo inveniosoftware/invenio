@@ -114,7 +114,8 @@ class Document(SmartJson):
             or :class:`~invenio.modules.documents.errors.DeletedDocument`
         """
         try:
-            document = cls(cls.storage_engine.get_one(uuid))
+            document = cls(cls.storage_engine.get_one(uuid),
+                           process_model_info=True)
         except:
             raise errors.DocumentNotFound
 
@@ -124,17 +125,17 @@ class Document(SmartJson):
 
     def _save(self):
         try:
-            return self.__class__.storage_engine.update_one(self.dumps(),
-                                                            id=self['_id'])
+            self.__class__.storage_engine.update_one(self.dumps(),
+                                                     id=self['_id'])
         except:
-            return self.__class__.storage_engine.save_one(self.dumps(),
-                                                          id=self['_id'])
+            self.__class__.storage_engine.save_one(self.dumps(),
+                                                   id=self['_id'])
 
     def update(self):
         """Update document object."""
-        #FIXME This should be probably done in model dump.
         self['modification_date'] = datetime.now()
-        return self._save()
+        self._save()
+        return self
 
     def setcontents(self, source, name, chunk_size=65536):
         """A convenience method to create a new file from a string or file-like
