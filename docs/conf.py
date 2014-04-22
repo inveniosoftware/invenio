@@ -265,9 +265,9 @@ texinfo_documents = [
 # See <http://sphinx-doc.org/ext/intersphinx.html>
 intersphinx_mapping = {
     'python': ('https://docs.python.org/2.7/', None),
-    'flask_registry': ('http://flask-registry.readthedocs.org/en/latest/', None),
-    'flask_menu': ('http://flask-menu.readthedocs.org/en/latest/', None),
-    'flask_breadcrumbs': ('http://flask-breadcrumbs.readthedocs.org/en/latest/', None),
+#    'flask_registry': ('http://flask-registry.readthedocs.org/en/latest/', None),
+#    'flask_menu': ('http://flask-menu.readthedocs.org/en/latest/', None),
+#    'flask_breadcrumbs': ('http://flask-breadcrumbs.readthedocs.org/en/latest/', None),
     'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
     'flask': ('http://flask.pocoo.org/docs/', None),
 }
