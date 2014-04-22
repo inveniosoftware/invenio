@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,22 +19,21 @@
 
 
 """
-Invenio upgrader
-================
+Usage (via ``inveniomanage``):
 
-Usage (via inveniomanage)::
+.. code-block:: console
 
-  inveniomanage upgrade create recipe -p invenio.modules.search
-  inveniomanage upgrade create release -r invenio -p invenio.base
-  inveniomanage upgrade show applied
-  inveniomanage upgrade show pending
-  inveniomanage upgrade check
-  inveniomanage upgrade run
+    $ inveniomanage upgrade create recipe -p invenio.modules.search
+    $ inveniomanage upgrade create release -r invenio -p invenio.base
+    $ inveniomanage upgrade show applied
+    $ inveniomanage upgrade show pending
+    $ inveniomanage upgrade check
+    $ inveniomanage upgrade run
 
 Recommendations for writing upgrades
 ------------------------------------
 
- * An upgrade must be self-contained. DO NOT IMPORT ANYTHING from Invenio
+ * An upgrade must be self-contained. **DO NOT IMPORT ANYTHING** from Invenio
    unless absolutely necessary. Reasons: 1) If a it depends on other Invenio
    modules, then their API must be very stable and backwards-compatible.
    Otherwise when an upgrade is applied two years later, the Invenio function
@@ -44,30 +43,30 @@ Recommendations for writing upgrades
    instead.
  * All upgrades must depend on a previous upgrade (except for your first
    upgrade).
- * For every software release, make a '<repository>_release_<x>_<y>_<z>.py'
+ * For every software release, make a ``<repository>_release_<x>_<y>_<z>.py``
    that depends on all upgrades between the previous release and the new, so
    future upgrades can depend on this upgrade. The command
-   'inveniomanage upgrade create release' can help you with this.
+   ``inveniomanage upgrade create release`` can help you with this.
  * Upgrades may query for user input, but must be able to run in unattended
-   mode when --yes-i-know option is being used, thus good defaults/guessing
+   mode when ``--yes-i-know option`` is being used, thus good defaults/guessing
    should be used.
 
 Upgrade modules
 ---------------
 Upgrades are implemented as normal Python modules. They must implement the
-methods do_upgrade() and info() and contain a list variable 'depends_on'.
-Optionally they may implement the methods estimate(), pre_upgrade(),
-post_upgrade().
+methods ``do_upgrade()`` and ``info()`` and contain a list variable
+``depends_on``. Optionally they may implement the methods ``estimate()``,
+``pre_upgrade()``, ``post_upgrade()``.
 
 The upgrade engine will search for upgrades in all packages listed in
-``current_app.config['PACKAGES']''.
+``current_app.config['PACKAGES']``.
 
 Upgrade dependency graph
 ------------------------
 The upgrades form a *dependency graph* that must be without cycles (i.e.
 a DAG). The upgrade engine supports having several independent graphs (normally
 one per module). The graphs are defined using via a filename prefix using the
-pattern (<module name>_<date>_<name>.py).
+pattern (``<module name>_<date>_<name>.py``).
 
 The upgrade engine will run upgrades in topological order (i.e upgrades
 will be run respecting the dependency graph). The engine will detect cycles in
