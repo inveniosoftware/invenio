@@ -11,5 +11,4 @@ Getting Started
     demo
     features
     first-steps
-    next-steps
-    resources
+    common-concepts

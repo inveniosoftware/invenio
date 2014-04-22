@@ -36,7 +36,7 @@ Demo Sites
 Production Sites
 ----------------
 
-.. image:: _static/CDS20120611.png
+.. image:: /_static/CDS20120611.png
    :width: 200 px
    :align: right
 
@@ -51,7 +51,7 @@ Production Sites
    the performance and scalability of Invenio.
 
 
-.. image:: _static/Inspire20120611.png
+.. image:: /_static/Inspire20120611.png
    :width: 200 px
    :align: right
 

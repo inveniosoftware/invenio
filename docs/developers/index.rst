@@ -10,6 +10,7 @@ Developer's Guide
    introduction
    extensions
    registries
+   models
    modules
    howtomodule
    howtomodulepart2
