@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Utils for extracting notes from comments and manipulating them."""
+"""Utils for extracting notes from comments and manipulating them.
+
+.. py:data:: MARKERS
+
+   the note markers; references have a special type of location, e.g.
+   "[Ellis98]"
+"""
 
 import re
 
@@ -33,7 +39,6 @@ from invenio.modules.accounts.models import User
 LOCATION = r'[\w\.]+(?:[\,][\w\.]+)*'
 
 
-# the note markers; references have a special type of location, e.g. "[Ellis98]"
 MARKERS = {
     'P': {'longname': _('Page'), 'regex': r'[P]\.' + LOCATION},
     'F': {'longname': _('Figure'), 'regex': r'[F]\.' + LOCATION},
@@ -47,7 +52,6 @@ MARKERS = {
           'regex': r'[R]\.' +
                    r'[\[][\w]+[\]](?:[\,][\[][\w]+[\]])*'}
 }
-
 
 # description of the notes' markup, to be used in GUI
 # FIXME: move to Jinja2 template
@@ -90,19 +94,20 @@ TEXT = r'(.+)'
 def extract_notes_from_comment(comment, bodyOnly=False):
     """Extracts notes from a comment.
 
-    Notes are one-line blocks of text preceded by MARKERS and locations (page
-    numbers, figure names etc.).
+    Notes are one-line blocks of text preceded by :py:data:`MARKERS` and
+    locations (page numbers, figure names etc.).
 
-    Args:
-        comment: the comment to parse
-    Returns:
-        the list of parsed notes in the following JSON form:
+    :param comment: the comment to parse
+    :return: the list of parsed notes in the following JSON form below (
+        if the ``body`` is a JSON, it means that the note has a child).
+
+        .. code-block:: json
+
             {
-             'marker': String,
-             'location': String,
-             'body': JSON|String
+                "marker": String,
+                "location": String,
+                "body": JSON|String
             }
-        if the 'body' is a JSON it means that the note has a child
     """
     if bodyOnly:
         text = comment
@@ -134,10 +139,8 @@ def get_original_comment(note):
     """Fetches the original comment of the note; in case of hierarchic notes, it
     goes up to the parent.
 
-    Args:
-        note: the note
-    Returns:
-        the comment in which the note appeared
+    :param note: the note
+    :return: the comment in which the note appeared
     """
     from invenio.modules.comments.models import CmtRECORDCOMMENT
     from sqlalchemy.orm.exc import NoResultFound
@@ -153,10 +156,8 @@ def get_original_comment(note):
 def get_note_title(location):
     """Convert a note/ marker combination to a human readable string.
 
-    Args:
-        location: the note/ marker combination
-    Returns:
-        the human-readable location
+    :param location: the note/ marker combination
+    :return: the human-readable location
     """
     location = location.split('.')
     # certain marker types might not require a location, hence else ''
