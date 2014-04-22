@@ -22,7 +22,7 @@
 Community Model - a layer around Invenio's collections
 and portalboxes for easier allowing end-users to create their own collections.
 
-    from invenio.modules.communities.model import Community
+    from invenio.modules.communities.models import Community
     from invenio.ext.sqlalchemy import db
 
     u = Community.query.get('test5')
@@ -219,7 +219,7 @@ class Community(db.Model):
         usercomm = []
         for c in colls:
             try:
-            # We are only interested in subfield 'a'
+                # We are only interested in subfield 'a'
                 code, val = c[0][0]
                 if code == 'a' and val.startswith(prefix):
                     val = val[len(prefix):]
