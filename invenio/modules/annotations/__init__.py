@@ -27,9 +27,11 @@
 
     To enable Web page annotations, add the following to your templates:
 
-    .. code-block:: html
+    .. code-block:: jinja
 
-        {%- from "annotations/macros.html" import annotations_toolbar, annotations_js, annotations_css -%}
+        {%- from "annotations/macros.html" import annotations_toolbar,
+                                                  annotations_js,
+                                                  annotations_css -%}
 
         {%- block global_css -%}
           {{ super() }}
