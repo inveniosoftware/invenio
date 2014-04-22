@@ -1,19 +1,21 @@
-# This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
-#
-# Invenio is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 2 of the
-# License, or (at your option) any later version.
-#
-# Invenio is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# -*- coding: utf-8 -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from __future__ import print_function
 
@@ -131,9 +133,9 @@ def make_test_suite(*test_cases):
                                for case in test_cases])
 
 from invenio.base.factory import create_app
+# pyparsing needed to import here before flask.ext.testing in order to avoid
+# pyparsing troubles due to twill
 import pyparsing  # pylint: disable=W0611
-                  # pyparsinf needed to import here before flask.ext.testing
-                  # in order to avoid pyparsing troubles due to twill
 from flask.ext.testing import TestCase
 
 
@@ -425,7 +427,7 @@ def test_web_page_content(url,
         except mechanize.HTTPError as msg:
             if msg.code != 401:
                 raise msg
-            error_messages.append('ERROR: Page %s (login %s) not accessible. %s' % \
+            error_messages.append('ERROR: Page %s (login %s) not accessible. %s' %
                                   (url, username, msg))
         url_body = browser.response().read()
 
@@ -440,9 +442,10 @@ def test_web_page_content(url,
             try:
                 url_body.index(cur_expected_text)
             except ValueError:
-                raise InvenioTestUtilsBrowserException, \
-                    'ERROR: Page %s (login %s) does not contain %s, but contains %s' % \
+                raise InvenioTestUtilsBrowserException(
+                    'ERROR: Page %s (login %s) does not contain %s, but contains %s',
                     (url, username, cur_expected_text, url_body)
+                )
 
         # now test for UNEXPECTED_TEXT:
         # first normalize unexpected_text
@@ -457,9 +460,10 @@ def test_web_page_content(url,
         for cur_unexpected_text in unexpected_texts:
             try:
                 url_body.index(cur_unexpected_text)
-                raise InvenioTestUtilsBrowserException, \
-                    'ERROR: Page %s (login %s) contains %s.' % \
+                raise InvenioTestUtilsBrowserException(
+                    'ERROR: Page %s (login %s) contains %s.' %
                     (url, username, cur_unexpected_text)
+                )
             except ValueError:
                 pass
 
@@ -467,12 +471,12 @@ def test_web_page_content(url,
         if expected_link_target or expected_link_label:
             # first normalize expected_link_target and expected_link_label
             if isinstance(expected_link_target, str) or \
-                expected_link_target is None:
+               expected_link_target is None:
                 expected_link_targets = [expected_link_target]
             else:
                 expected_link_targets = expected_link_target
             if isinstance(expected_link_label, str) or \
-                expected_link_label is None:
+               expected_link_label is None:
                 expected_link_labels = [expected_link_label]
             else:
                 expected_link_labels = expected_link_label
@@ -488,10 +492,11 @@ def test_web_page_content(url,
                     browser.find_link(url=cur_expected_link_target,
                                       text=cur_expected_link_label)
                 except mechanize.LinkNotFoundError:
-                    raise InvenioTestUtilsBrowserException, \
-                        'ERROR: Page %s (login %s) does not contain link to %s entitled %s.' % \
+                    raise InvenioTestUtilsBrowserException(
+                        'ERROR: Page %s (login %s) does not contain link to %s entitled %s.' %
                         (url, username, cur_expected_link_target,
-                        cur_expected_link_label)
+                         cur_expected_link_label)
+                    )
 
         # now test for validation if required
         if require_validate_p:
@@ -503,8 +508,7 @@ def test_web_page_content(url,
                 from invenio.config import CFG_LOGDIR
                 open('%s/w3c-markup-validator.log' %
                      CFG_LOGDIR, 'a').write(error_text)
-                raise InvenioTestUtilsBrowserException, error_text
-
+                raise InvenioTestUtilsBrowserException(error_text)
 
     except InvenioTestUtilsBrowserException as msg:
         error_messages.append(
@@ -524,7 +528,7 @@ def test_web_page_content(url,
         pass
 
     if CFG_TESTUTILS_VERBOSE >= 9:
-        print("%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \
+        print("%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." %
               (time.strftime("%Y-%m-%d %H:%M:%S -->", time.localtime()),
                url, username, expected_text,
                ",".join(error_messages)))
@@ -578,6 +582,7 @@ def build_and_run_js_unit_test_suite():
     Called by 'inveniocfg --run-js-unit-tests'.
     """
     from invenio.config import CFG_PREFIX, CFG_WEBDIR, CFG_JSTESTDRIVER_PORT
+
     def _server_init(server_process):
         """
         Init JsTestDriver server and check if it succedeed
@@ -623,11 +628,16 @@ def build_and_run_js_unit_test_suite():
         return errors_found
 
     print("Going to start JsTestDriver server...")
-    server_process = subprocess.Popen(["java", "-jar",
-                                       "%s/JsTestDriver.jar" % (
-                                       CFG_PREFIX + "/lib/java/js-test-driver"), "--runnerMode", "INFO",
-                                       "--port", "%d" % CFG_JSTESTDRIVER_PORT],
-                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    server_process = subprocess.Popen([
+        "java",
+        "-jar",
+        "%s/JsTestDriver.jar" % (CFG_PREFIX + "/lib/java/js-test-driver"),
+        "--runnerMode", "INFO",
+        "--port",
+        "%d" % CFG_JSTESTDRIVER_PORT],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT
+    )
 
     try:
         from invenio.config import CFG_SITE_URL
@@ -635,8 +645,8 @@ def build_and_run_js_unit_test_suite():
             # There was an error initialising server
             return 1
 
-        print("Now you can capture the browsers where you would " \
-              "like to run the tests by opening the following url:\n" \
+        print("Now you can capture the browsers where you would "
+              "like to run the tests by opening the following url:\n"
               "%s:%d/capture \n" % (CFG_SITE_URL, CFG_JSTESTDRIVER_PORT))
 
         print("Press enter when you are ready to run tests")
@@ -887,7 +897,7 @@ class InvenioWebTestCase(InvenioTestCase):
         @type go_to_login_page: bool
         """
         if go_to_login_page:
-            if not "You can use your nickname or your email address to login." in self.browser.page_source:
+            if "You can use your nickname or your email address to login." not in self.browser.page_source:
                 if "You are no longer recognized by our system" in self.browser.page_source:
                     self.find_element_by_link_text_with_timeout("login here")
                     self.browser.find_element_by_link_text(
@@ -1169,12 +1179,14 @@ def build_and_run_flask_test_suite():
 
 from invenio.base.utils import import_submodules_from_packages
 
+
 def iter_suites():
     """Yields all testsuites."""
     app = create_app()
-    packages = ['invenio'] + app.config.get('PACKAGES', [])
+    packages = ['invenio', 'invenio.celery'] + app.config.get('PACKAGES', [])
 
-    for module in import_submodules_from_packages('testsuite', packages=packages):
+    for module in import_submodules_from_packages('testsuite',
+                                                  packages=packages):
         if not module.__name__.split('.')[-1].startswith('test_'):
             continue
         if hasattr(module, 'TEST_SUITE'):
