@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,17 +31,15 @@ from celery.loaders.base import BaseLoader
 
 from . import registry
 
-from invenio.base.factory import with_app_context
-
 
 class InvenioLoader(BaseLoader):
     """
     The Invenio Celery loader - modeled after the Django Celery loader.
     """
     def __init__(self, *args, **kwargs):
+        self.flask_app = kwargs.pop('flask_app', None)
         super(InvenioLoader, self).__init__(*args, **kwargs)
         self._install_signal_handlers()
-        self.flask_app = None
         self.db = None
 
     def _install_signal_handlers(self):
@@ -83,26 +81,29 @@ class InvenioLoader(BaseLoader):
         Called before a task is run - pushes a new Flask request context
         for the task.
         """
-        app = self.flask_app
-        if not app:
-            from flask import current_app
-            app = current_app
-        task.request.flask_ctx = app.test_request_context()
-        task.request.flask_ctx.push()
-        app.try_trigger_before_first_request_functions()
-        app.preprocess_request()
+        if task.app == self.app:
+            app = self.flask_app
+            if not app:
+                from flask import current_app
+                app = current_app
+            task.request.flask_ctx = app.test_request_context()
+            task.request.flask_ctx.push()
+            app.try_trigger_before_first_request_functions()
+            app.preprocess_request()
 
     def on_task_postrun(self, task=None, **dummy_kwargs):
         """
         Called after a task is run - pops the pushed Flask request context
         for the task.
         """
-        app = self.flask_app
-        if not app:
-            from flask import current_app
-            app = current_app
-        app.process_response(app.response_class())
-        task.request.flask_ctx.pop()
+        if task.app == self.app:
+            app = self.flask_app
+            if not app:
+                from flask import current_app
+                app = current_app
+            app.process_response(app.response_class())
+            task.request.flask_ctx.pop()
+            task.request.flask_ctx = None
 
     def on_process_cleanup(self):
         """Does everything necessary for Invenio to work in a long-living,
