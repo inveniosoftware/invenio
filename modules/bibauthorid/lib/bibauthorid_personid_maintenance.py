@@ -23,21 +23,21 @@ aidPersonID maintenance algorithms.
 from invenio.bibauthorid_name_utils import split_name_parts
 from invenio.bibauthorid_name_utils import create_normalized_name
 from invenio.bibauthorid_backinterface import get_name_by_bibref
-from invenio.bibauthorid_backinterface import back_up_author_paper_associations                       #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import compare_personid_tables              #emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import back_up_author_paper_associations  # emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import compare_personid_tables  # emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_backinterface import group_personid
-from invenio.bibauthorid_backinterface import check_author_paper_associations                #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import repair_author_paper_associations                      #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import duplicated_tortoise_results_exist                        #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import merger_errors_exist                         #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import restore_author_paper_associations                    #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import get_all_author_paper_associations             #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import get_clusters                     #emitting #pylint: disable-msg=W0611
-from invenio.bibauthorid_backinterface import get_papers_affected_since as get_recids_affected_since #emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import check_author_paper_associations  # emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import repair_author_paper_associations  # emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import duplicated_tortoise_results_exist  # emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import merger_errors_exist  # emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import restore_author_paper_associations  # emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import get_all_author_paper_associations  # emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import get_clusters  # emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_backinterface import get_papers_affected_since as get_recids_affected_since  # emitting #pylint: disable-msg=W0611
 
 
 def convert_personid():
-    from invenio.dbquery import run_sql # oh come on, the whole function will be removed soon
+    from invenio.dbquery import run_sql  # oh come on, the whole function will be removed soon
     from itertools import repeat
     chunk = 1000
 
@@ -52,8 +52,7 @@ def convert_personid():
                 " `name`, "
                 " `flag`, "
                 " `lcul`) "
-                "VALUES " + " , ".join(repeat("(%s, %s, %s, %s, %s, %s, %s)", len(args) / 7))
-                , tuple(args))
+                "VALUES " + " , ".join(repeat("(%s, %s, %s, %s, %s, %s, %s)", len(args) / 7)), tuple(args))
 
     def flush_data(args):
         run_sql("INSERT INTO `aidPERSONIDDATA` "
@@ -62,8 +61,7 @@ def convert_personid():
                 " `data`, "
                 " `opt1`, "
                 " `opt2`) "
-                "VALUES " + " , ".join(repeat("(%s, %s, %s, %s, %s)", len(args) / 5))
-               , tuple(args))
+                "VALUES " + " , ".join(repeat("(%s, %s, %s, %s, %s)", len(args) / 5)), tuple(args))
 
     paper_args = []
     data_args = []

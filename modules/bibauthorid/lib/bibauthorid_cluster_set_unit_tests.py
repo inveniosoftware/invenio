@@ -27,10 +27,11 @@ from itertools import chain
 from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 from invenio.bibauthorid_cluster_set import ClusterSet
 
-class TestCluster(InvenioTestCase):
+
+class Test_cluster(InvenioTestCase):
 
     def setUp(self):
-        self.clusters = [ClusterSet.Cluster(range(i*10,i*10+10)) for i in range(3)]
+        self.clusters = [ClusterSet.Cluster(range(i * 10, i * 10 + 10)) for i in range(3)]
 
     def test_quarrel_hate(self):
         c1 = self.clusters[0]
@@ -43,21 +44,23 @@ class TestCluster(InvenioTestCase):
         self.assertTrue(c1.hates(c2))
         self.assertTrue(c2.hates(c1))
 
-class TestClusterSet(InvenioTestCase):
+
+class Test_cluster_set(InvenioTestCase):
 
     def setUp(self):
-        self.clusters = [ClusterSet.Cluster(range(i*10,i*10+5)) for i in range(10)]
+        self.clusters = [ClusterSet.Cluster(range(i * 10, i * 10 + 5)) for i in range(10)]
 
-    def test_udate_all_bibs(self):
+    def test_update_all_bibs(self):
         c = ClusterSet()
         c.clusters = self.clusters
         c.update_bibs()
 
         self.assertTrue(c.num_all_bibs == 50)
-        self.assertTrue( sorted(list((c.all_bibs()))) ==
-                         list(chain.from_iterable(range(i*10,i*10+5) for i in range(10))))
+        self.assertTrue(sorted(list((c.all_bibs()))) ==
+                        list(chain.from_iterable(range(i * 10, i * 10 + 5) for i in range(10))))
 
-TEST_SUITE = make_test_suite(TestCluster, TestClusterSet)
 
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE, warn_user=True)
+TEST_SUITE = make_test_suite(Test_cluster, Test_cluster_set)
+
+if __name__ == '__main__':
+    run_test_suite(TEST_SUITE)

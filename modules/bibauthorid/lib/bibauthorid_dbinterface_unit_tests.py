@@ -27,7 +27,8 @@ from itertools import chain
 from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 from invenio.bibauthorid_cluster_set import ClusterSet
 
-class TestDummy(InvenioTestCase):
+
+class Test_(InvenioTestCase):
 
     def setUp(self):
         pass
@@ -35,7 +36,8 @@ class TestDummy(InvenioTestCase):
     def test_one(self):
         pass
 
-TEST_SUITE = make_test_suite(TestDummy)
 
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE, warn_user=True)
+TEST_SUITE = make_test_suite(Test_)
+
+if __name__ == '__main__':
+    run_test_suite(TEST_SUITE)

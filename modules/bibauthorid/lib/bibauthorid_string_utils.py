@@ -23,31 +23,6 @@ bibauthorid_string_utils
 '''
 
 
-def string_partition(s, sep, direc='l'):
-    '''
-    Partition a string by the first occurrence of the separator.
-    Mimics the string.partition function, which is not available in Python2.4
-
-    @param s: string to be partitioned
-    @type s: string
-    @param sep: separator to partition by
-    @type sep: string
-    @param dir: direction (left 'l' or right 'r') to search the separator from
-    @type dir: string
-
-    @return: tuple of (left or sep, sep, right of sep)
-    @rtype: tuple
-    '''
-    if direc == 'r':
-        i = s.rfind(sep)
-    else:
-        i = s.find(sep)
-    if i < 0:
-        return (s, '', '')
-    else:
-        return (s[0:i], s[i:i + 1], s[i + 1:])
-
-
 def unpackbib(bibrecref):
     """
     Creates a tuple (700, 123, 456) from a bibrecref string("100:123,456").
@@ -58,5 +33,3 @@ def unpackbib(bibrecref):
     table, tail = bibrecref.split(":")
     bibref, bibrec = tail.split(",")
     return (int(table), int(bibref), int(bibrec))
-
-

@@ -23,6 +23,7 @@
     This file has examples how to use the backend of BibAuthorID.
 '''
 
+
 def initial_disambiguation():
     from invenio.bibauthorid_tortoise import tortoise_from_scratch
     from invenio.bibauthorid_personid_maintenance import duplicated_tortoise_results_exist
@@ -37,8 +38,8 @@ def safe_disambiguation_iteration():
     from invenio.bibauthorid_tortoise import tortoise
     from invenio.bibauthorid_rabbit import rabbit
     from invenio.bibauthorid_personid_maintenance import check_author_paper_associations \
-                                                 , duplicated_tortoise_results_exist \
-                                                 , repair_author_paper_associations
+        , duplicated_tortoise_results_exist \
+        , repair_author_paper_associations
     if not check_author_paper_associations():
         rabbit([])
         repair_author_paper_associations()
@@ -53,11 +54,11 @@ def safe_merger():
     from invenio.bibauthorid_merge import merge_static
     from invenio.bibauthorid_rabbit import rabbit
     from invenio.bibauthorid_personid_maintenance import check_author_paper_associations \
-                                                 , duplicated_tortoise_results_exist \
-                                                 , merger_errors_exist \
-                                                 , repair_author_paper_associations \
-                                                 , back_up_author_paper_associations \
-                                                 , compare_personids
+        , duplicated_tortoise_results_exist \
+        , merger_errors_exist \
+        , repair_author_paper_associations \
+        , back_up_author_paper_associations \
+        , compare_personids
 
     assert duplicated_tortoise_results_exist()
     if not check_author_paper_associations():
@@ -77,8 +78,8 @@ def test_accuracy():
     from invenio.bibauthorid_tortoise import tortoise
     from invenio.bibauthorid_rabbit import rabbit
     from invenio.bibauthorid_personid_maintenance import check_author_paper_associations \
-                                                 , duplicated_tortoise_results_exist \
-                                                 , repair_author_paper_associations
+        , duplicated_tortoise_results_exist \
+        , repair_author_paper_associations
     from invenio.bibauthorid_merge import matched_claims
 
     if not check_author_paper_associations():
@@ -91,4 +92,3 @@ def test_accuracy():
     assert duplicated_tortoise_results_exist()
 
     return matched_claims()
-

@@ -26,9 +26,9 @@
 from itertools import groupby
 from operator import itemgetter
 
-#Well this is bad, BUT otherwise there must 100+ lines
-#of the form from dbinterface import ...  # emitting
-from invenio.bibauthorid_dbinterface import * # pylint:  disable-msg=W0614
+# Well this is bad, BUT otherwise there must 100+ lines
+# of the form from dbinterface import ...  # emitting
+from invenio.bibauthorid_dbinterface import *  # pylint:  disable-msg=W0614
 
 import invenio.bibauthorid_dbinterface as dbinter
 
@@ -64,16 +64,18 @@ def compare_personid_tables(personIDold_papers, personIDold_data,
         fp.write("\n")
 
     def write_paper(row, header):
-        fp.write("%s[PAPER] %s, signature %s %d %d, flag: %d, lcul: %d\n" % (header, row[3], row[0], row[1], row[2], row[4], row[5]))
+        fp.write(
+            "%s[PAPER] %s, signature %s %d %d, flag: %d, lcul: %d\n" %
+            (header, row[3], row[0], row[1], row[2], row[4], row[5]))
 
     def write_data(row, header):
         tag = "[%s]" % row[0].upper()
         fp.write("%s%s %s, opt: (%s %s %s)\n" % (header, tag, row[1], row[2], row[3], row[4]))
 
     all_pids = (frozenset(personIDold_data.keys())
-               | frozenset(personIDnew_data.keys())
-               | frozenset(personIDold_papers.keys())
-               | frozenset(personIDnew_papers.keys()))
+                | frozenset(personIDnew_data.keys())
+                | frozenset(personIDold_papers.keys())
+                | frozenset(personIDnew_papers.keys()))
 
     for pid in all_pids:
         data_old = frozenset(personIDold_data.get(pid, frozenset()))
@@ -103,6 +105,7 @@ def compare_personid_tables(personIDold_papers, personIDold_data,
 
             write_end_personid()
 
+
 def compare_personid_tables_easy(suffix='_copy', filename='/tmp/pid_comparison'):
     f = open(filename, 'w')
     oldPap, oldDat = group_personid('aidPERSONIDPAPERS' + suffix, 'aidPERSONIDDATA' + suffix)
@@ -110,8 +113,9 @@ def compare_personid_tables_easy(suffix='_copy', filename='/tmp/pid_comparison')
     compare_personid_tables(oldPap, oldDat, pap, dat, f)
     f.close()
 
+
 def filter_bibrecs_outside(all_papers):
-    all_bibrecs = get_all_papers()
+    all_bibrecs = get_all_bibrecs_from_aidpersonidpapers()
 
     to_remove = list(frozenset(all_bibrecs) - frozenset(all_papers))
     chunk = 1000
@@ -119,4 +123,3 @@ def filter_bibrecs_outside(all_papers):
 
     for sep in separated:
         remove_papers(sep)
-

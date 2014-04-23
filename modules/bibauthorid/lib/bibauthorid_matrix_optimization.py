@@ -19,6 +19,7 @@
 
 from operator import itemgetter
 
+
 def maximized_mapping(matrix):
     '''
     Finds nearly maximized sum mapping from a matrix.
@@ -33,9 +34,14 @@ def maximized_mapping(matrix):
     if not matrix or not matrix[0]:
         return []
 
-    sorts = sorted([(i, j, v) for i, row in enumerate(matrix) for j, v in enumerate(row)]
-                   , key=itemgetter(2)
-                   , reverse=True)
+    sorts = sorted(
+        [(i,
+          j,
+          v) for i,
+         row in enumerate(matrix) for j,
+         v in enumerate(row)],
+        key=itemgetter(2),
+        reverse=True)
     freei = set(range(len(matrix)))
     freej = set(range(len(matrix[0])))
     res = []
@@ -46,6 +52,5 @@ def maximized_mapping(matrix):
             freej.remove(j)
             if not freei or not freej:
                 return res
-    assert False # you shouldn't be here
+    assert False  # you shouldn't be here
     return res
-

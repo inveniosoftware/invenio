@@ -27,12 +27,14 @@ from itertools import chain
 from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 from invenio.bibauthorid_cluster_set import ClusterSet
 
-class TestProbabilityMatrix(InvenioTestCase):
+
+class Test_probability_matrix(InvenioTestCase):
 
     def setUp(self):
         pass
 
-TEST_SUITE = make_test_suite()
 
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE, warn_user=True)
+TEST_SUITE = make_test_suite(Test_probability_matrix)
+
+if __name__ == '__main__':
+    run_test_suite(TEST_SUITE)

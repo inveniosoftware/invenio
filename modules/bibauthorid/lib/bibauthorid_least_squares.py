@@ -19,8 +19,10 @@
 
 import operator
 from itertools import izip, starmap, repeat
-#python2.4 compatibility
+# python2.4 compatibility
 from invenio.bibauthorid_general_utils import bai_all as all
+from functools import reduce
+
 
 def approximate(xs, ys, power):
     assert len(xs) == len(ys)
@@ -31,7 +33,8 @@ def approximate(xs, ys, power):
     xs = map(float, xs)
     ys = map(float, ys)
 
-    xs = reduce(lambda x, y: x + [list(starmap(operator.mul, izip(x[-1], y)))], repeat(xs, variables - 1), [[1] * len(xs)])
+    xs = reduce(lambda x, y: x + [list(starmap(operator.mul, izip(x[-1], y)))], repeat(
+        xs, variables - 1), [[1] * len(xs)])
     assert len(xs) == variables
 
     s = map(sum, xs)
@@ -83,6 +86,7 @@ def approximate(xs, ys, power):
 
 def to_function(poly):
     power = len(poly) - 1
+
     def func(x):
         arr = [1.]
         for _ in xrange(power):

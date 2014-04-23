@@ -1,0 +1,74 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="row">
+
+    <!-- left -->
+    <div class="col-md-6">
+        <!-- arxiv -->
+        <div id="arxiv" class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>arXiv</span>
+            </div>
+            <div class="bai-box-content">{{ arxiv }}</div>
+        </div>
+
+        <!-- autoassign -->
+        {% if autoclaim_successful_recids or autoclaim_unsuccesful_recids %}
+        <div id="autoassign" class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Automatically Assigned Papers</span>
+            </div>
+	    <div class="bai-box-content">{% include "autoclaim_box.html" %}</div>
+        </div>
+        {% endif %}
+
+        <!-- merge -->
+        <div id="merge" class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Merge Profiles</span>
+            </div>
+            <div class="bai-box-content">{{ merge }}</div>
+        </div>
+
+        {% if user_level == "admin" %}
+        <!-- External IDs -->
+        <div id="orcid" class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>External IDs</span>
+            </div>
+            <div class="bai-box-content">{{ external_ids_box_html }}</div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- right -->
+    <div class="col-md-6">
+        <!-- orcid -->
+        <div id="orcid" class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>ORCiD</span>
+            </div>
+            <div class="bai-box-content">{{ orcid }}</div>
+        </div>
+
+	<!-- hepnames -->
+        <div id="hepdata" class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>HepNames</span>
+            </div>
+            <div class="bai-box-content">{{ hepnames }}</div>
+        </div>
+
+        <!-- contact -->
+        <div id="contact" class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Contact</span>
+            </div>
+            <div class="bai-box-content">{{ contact }}</div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
