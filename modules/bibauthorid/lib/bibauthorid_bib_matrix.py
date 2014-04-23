@@ -3,10 +3,12 @@ import os
 import shutil
 from cPickle import dump, load, UnpicklingError
 from invenio.bibauthorid_dbinterface import get_db_time
+from invenio.bibauthorid_logutils import Logger
 import h5py
 
 
 class Bib_matrix(object):
+
     '''
     Contains the sparse matrix and encapsulates it.
     '''
@@ -37,6 +39,8 @@ class Bib_matrix(object):
         self._matrix = None
         self.creation_time = get_db_time()
 
+        self.logger = Logger("bib_matrix")
+
     def _initialize_matrix(self):
         self.open_h5py_file()
         self._matrix = self._f.create_dataset("array", (self._size, 2), 'f')
@@ -64,8 +68,7 @@ class Bib_matrix(object):
         except TypeError:
             self._initialize_matrix()
             ret = self._matrix[entry]
-        return Bib_matrix.special_numbers.get(ret[0], ret)
-
+        return Bib_matrix.special_numbers.get(ret[0], tuple(ret))
 
     def getitem_numeric(self, bibs):
         return self._matrix[self._resolve_entry(bibs)]
@@ -100,9 +103,9 @@ class Bib_matrix(object):
 
         try:
             self._f = h5py.File(path)
-        except IOError, e:
-            #If the file is corrupted h5py fails with IOErorr.
-            #Give it a second try with an empty file before raising.
+        except IOError as e:
+            # If the file is corrupted h5py fails with IOErorr.
+            # Give it a second try with an empty file before raising.
             if create_empty_on_failure:
                 os.remove(path)
                 self._f = h5py.File(path)
@@ -120,9 +123,9 @@ class Bib_matrix(object):
         try:
             with open(self.get_map_path(), 'r') as fp:
                 bibmap_v = load(fp)
-            rec_v, self.creation_time, self._bibmap = bibmap_v # pylint: disable=W0612
+            rec_v, self.creation_time, self._bibmap = bibmap_v  # pylint: disable=W0612
 #                if (rec_v != Bib_matrix.current_comparison_version or
-#                    # you can use negative version to recalculate
+# you can use negative version to recalculate
 #                    Bib_matrix.current_comparison_version < 0):
 #                    self._bibmap = dict()
             self._use_temporary_file = False
@@ -131,8 +134,8 @@ class Bib_matrix(object):
             self.open_h5py_file(create_empty_on_failure=False)
             self._matrix = self._f['array']
 
-        except (IOError, UnpicklingError, KeyError, OSError), e:
-            print 'Bib_matrix: error occurred while loading bibmap, cleaning... ', str(type(e)), str(e)
+        except (IOError, UnpicklingError, KeyError, OSError) as e:
+            self.logger.log('Bib_matrix: error occurred while loading bibmap, cleaning... ', str(type(e)), str(e))
             self._bibmap = dict()
             self._matrix = None
 
@@ -160,14 +163,14 @@ class Bib_matrix(object):
         if not os.path.isdir(files_dir):
             try:
                 os.mkdir(files_dir)
-            except OSError, e:
+            except OSError as e:
                 if e.errno == 17 or 'file exists' in str(e.strerror).lower():
                     pass
                 else:
                     raise e
 
     def store(self):
-        #save only if we are not completey empty:
+        # save only if we are not completey empty:
         if self._bibmap:
             self._prepare_destination_directory()
             bibmap_v = (Bib_matrix.current_comparison_version, self.creation_time, self._bibmap)
@@ -186,7 +189,7 @@ class Bib_matrix(object):
                     finalpath = self.get_matrix_path()
                     try:
                         os.rename(curpath, finalpath)
-                    except OSError, e:
+                    except OSError as e:
                         raise e
 
     def duplicate_existing(self, name, newname):

@@ -1,29 +1,31 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 '''
 bibauthorid_general_utils
     Bibauthorid utilities used by many parts of the framework
 '''
 
 from invenio import bibauthorid_config as bconfig
+from invenio.config import CFG_BASE_URL
 from datetime import datetime
 import sys
+import os
 from math import floor
 from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 try:
@@ -35,18 +37,14 @@ from urllib2 import HTTPError
 from collections import deque
 
 import multiprocessing as mp
+from multiprocessing import Queue
+from Queue import Empty
+
 import time
 import re
-
-PRINT_TS = bconfig.DEBUG_TIMESTAMPS
-PRINT_TS_US = bconfig.DEBUG_TIMESTAMPS_UPDATE_STATUS and PRINT_TS
-NEWLINE = bconfig.DEBUG_UPDATE_STATUS_THREAD_SAFE
-
-FO = bconfig.DEBUG_LOG_TO_PIDFILE
-
-TERMINATOR = '\r'
-if NEWLINE or FO:
-    TERMINATOR = '\n'
+import random
+from collections import Hashable
+from functools import partial
 
 import os
 PID = os.getpid
@@ -64,8 +62,86 @@ orcid_regex = re.compile(r"((?:https?://)?(?:www.)?orcid.org/)?((?:\d{4}-){3}\d{
 inspire_regex = re.compile(r"(INSPIRE-)(\d+)$", re.IGNORECASE)
 
 arxiv_new_regex = re.compile(r"(arXiv:)?(\d{4})\.(\d{4,6})(v\d+)?$", re.IGNORECASE)
-arxiv_old_regex = re.compile(r"(arXiv:)?((?:[a-zA-Z]|[a-zA-Z]-[a-zA-Z])+)(\.[a-zA-Z]{2})?/(\d{7})(v\d+)?$", re.IGNORECASE)
+arxiv_old_regex = re.compile(
+    r"(arXiv:)?((?:[a-zA-Z]|[a-zA-Z]-[a-zA-Z])+)(\.[a-zA-Z]{2})?/(\d{7})(v\d+)?$",
+    re.IGNORECASE)
 doi_regex = re.compile(r"((?:https?://)?(?:dx.)?doi.org/)?(10\.(\d+)(/|\.)\S.*)$", re.IGNORECASE)
+
+
+class memoized(object):
+
+    '''Decorator. Caches a function's return value each time it is called.
+    If called later with the same arguments, the cached value is returned
+    (not reevaluated).
+    Keeps at most cache_limit elements. Deletes half of caches in case of overflow.
+    '''
+
+    def __init__(self, func, cache_limit=1000000):
+
+        self.func = func
+        self.cache = {}
+
+        if cache_limit:
+            self.cache_limit = cache_limit
+        else:
+            cache_limit = False
+
+    def __call__(self, *args, **kwargs):
+        if kwargs:
+            return self.func(*args, **kwargs)
+        try:
+            key = hash(args)
+        except TypeError:
+            return self.func(*args)
+        if key in self.cache:
+            return self.cache[key]
+        else:
+            value = self.func(*args)
+            self.cache[key] = value
+            if self.cache_limit and len(self.cache) > self.cache_limit:
+                keys = self.cache.keys()
+                random.shuffle(keys)
+                to_delete = keys[0:self.cache_limit / 2]
+                map(self.cache.pop, to_delete)
+            return value
+
+    def __repr__(self):
+        '''Return the function's docstring.'''
+        return self.func.__doc__
+
+    def __get__(self, obj, objtype):
+        '''Support instance methods.'''
+        return partial(self.__call__, obj)
+
+
+def get_doi_url(doi):
+    """
+    Provides a HTTP DX DOI resolvable url given a DOI.
+
+    @param doi: DOI string
+    @return: Resolvable DOI URL
+    """
+    return "http://dx.doi.org/%s" % doi
+
+
+def get_arxiv_url(arxiv):
+    """
+    Provides a HTTP arXiv resolvable url given an arXiv ID.
+
+    @param arxiv: arXiv string
+    @return: Resolvable arXiv URL
+    """
+    return "http://http://arxiv.org/abs/%s" % arxiv
+
+
+def get_inspire_record_url(recid):
+    """
+    Provides a resolvable url given an inspire recid.
+
+    @param recid: internal record id
+    @return: Resolvable inspire record URL
+    """
+    return "%s/record/%s" % (CFG_BASE_URL, recid)
 
 
 def get_orcid_from_string(identifier, uri=False):
@@ -214,6 +290,7 @@ def is_doi(identifier):
     result = doi_regex.match(identifier.strip())
     return result is not None
 
+
 def get_doi(identifier):
     """
     Extracts doi from a given ID that matches the format of a DOI.
@@ -313,35 +390,112 @@ def get_title_of_arxiv_pubid(arxiv_pubid):
     return arxiv_pubid
 
 
-def schedule_workers(function, args, max_processes=mp.cpu_count()):
-    processes = dict( (x,None) for x in range(max_processes) )
+def proc_f(function, results_q, return_result, args, kwargs):
+    identity = os.getpid()
+    retdict = {'id': identity, 'exception': None, 'result': None}
+    try:
+        retval = function(*args, **kwargs)
+        if return_result:
+            retdict['result'] = retval
+    except Exception as e:
+        retdict['exception'] = e
+    finally:
+        results_q.put(retdict)
+
+
+def schedule_workers(
+    function,
+    args,
+    max_processes=mp.cpu_count(),
+    with_kwargs=False,
+    return_results=False,
+        raise_exceptions=True):
+    '''
+    This function should be used as a scheduler for multithreaded jobs.
+    It is necessary to specify whether there are keyword arguments used (with_kwargs flag).
+
+
+    @param function: function to call for each worker.
+    @type function: func
+
+    @param args: list of tuples where each tuple contains positional arguments.
+    @type args: list or list tuple (if with_kwargs)
+
+    @param max_processess:
+        the maximum number of processes to spawn. By default,
+        the number of cores.
+    @type max_processes: int
+
+    @param with_kwargs:
+        Indicates whether kwargs are present. args must contain
+        a list of 2-tuples where the first component represents
+        positional args and the second represents kwargs.
+    @type with_kwargs: bool
+
+    #param rise_exceptions:
+        If a process raises an exception, terminate everything and raise
+    '''
+    results_q = Queue()
+    results = list()
+
+    processes = dict()
 
     jobs = list(args)
+    # jobs gets popped from the right....
     jobs.reverse()
 
     while jobs:
-        for p, proc in processes.iteritems():
-            if not proc or not proc.is_alive():
-                if proc:
-                    proc.join()
-                    proc.terminate()
-                new_proc = mp.Process(target=function, args=(jobs.pop(),))
+        if with_kwargs:
+            args, kwargs = jobs.pop()
+        else:
+            args = jobs.pop()
+            kwargs = dict()
+
+        assigned = False
+        while not assigned:
+            if len(processes) <= max_processes:
+                new_proc = mp.Process(target=proc_f, args=(function, results_q, return_results, args, kwargs))
                 new_proc.start()
-                processes[p] = new_proc
-        time.sleep(1)
-    for p, proc in processes.iteritems():
-        if not proc or not proc.is_alive():
-            if proc:
-                proc.join()
-                proc.terminate()
+                processes[new_proc.pid] = new_proc
+                assigned = True
+                break
+            else:
+                retval = results_q.get()
+                if retval['exception']:
+                    if raise_exceptions:
+                        for pid, proc in processes.iteritems():
+                            proc.terminate()
+                        raise retval['exception']
+                else:
+                    results.append(retval['result'])
+                processes[retval['id']].join()
+                processes[retval['id']].terminate()
+                del processes[retval['id']]
+
+    while len(processes) > 0:
+        retval = results_q.get()
+        if retval['exception']:
+            if raise_exceptions:
+                raise retval['exception']
+        else:
+            results.append(retval['result'])
+        processes[retval['id']].join()
+        processes[retval['id']].terminate()
+        del processes[retval['id']]
+
+    return results
 
 
+def swmap(f, args):
+    return schedule_workers(f, args, return_results=True)
 
 
 class defaultdict(dict):
+
     '''
     Implementation of defaultdict to supply missing collections library in python <= 2.4
     '''
+
     def __init__(self, default_factory, *args, **kwargs):
         super(defaultdict, self).__init__(*args, **kwargs)
         self.default_factory = default_factory
@@ -361,25 +515,7 @@ class defaultdict(dict):
             return self.__missing__(key)
 
 
-def override_stdout_config(fileout=False, stdout=True):
-    global FO
-    assert fileout^stdout
-    if fileout:
-        FO = True
-    if stdout:
-        FO = False
-
-def set_stdout():
-    if FO:
-        try:
-            sys.stdout = pidfiles[PID()]
-        except KeyError:
-            pidfiles[PID()]  =    open('/tmp/bibauthorid_log_pid_'+str(PID()),'w')
-            sys.stdout = pidfiles[PID()]
-            print 'REDIRECTING TO PIDFILE '
-
-
-#python2.4 compatibility layer.
+# python2.4 compatibility layer.
 try:
     any([True])
 except:
@@ -399,70 +535,17 @@ except:
                 return False
         return True
 bai_all = all
-#end of python2.4 compatibility. Please remove this horror as soon as all systems will have
-#been ported to python2.6+
+# end of python2.4 compatibility. Please remove this horror as soon as all systems will have
+# been ported to python2.6+
 
-
-def __print_func(*args):
-    set_stdout()
-    if PRINT_TS:
-        print datetime.now(),
-    for arg in args:
-        print arg,
-    print ""
-    sys.stdout.flush()
-
-def __dummy_print(*args):
-    pass
-
-def __create_conditional_print(cond):
-    if cond:
-        return __print_func
-    else:
-        return __dummy_print
-
-bibauthor_print = __create_conditional_print(bconfig.DEBUG_OUTPUT)
-name_comparison_print = __create_conditional_print(bconfig.DEBUG_NAME_COMPARISON_OUTPUT)
-metadata_comparison_print = __create_conditional_print(bconfig.DEBUG_METADATA_COMPARISON_OUTPUT)
-wedge_print = __create_conditional_print(bconfig.DEBUG_WEDGE_OUTPUT)
-
-
-if bconfig.DEBUG_OUTPUT:
-
-    status_len = 18
-    comment_len = 40
-
-    def padd(stry, l):
-        return stry[:l].ljust(l)
-
-    def update_status(percent, comment="", print_ts=False):
-        set_stdout()
-        filled = max(0,int(floor(percent * status_len)))
-        bar = "[%s%s] " % ("#" * filled, "-" * (status_len - filled))
-        percent = ("%.2f%% done" % (percent * 100))
-        progress = padd(bar + percent, status_len+2)
-        comment = padd(comment, comment_len)
-        if print_ts or PRINT_TS_US:
-            print  datetime.now(),
-        print 'pid:',PID(),
-        print progress, comment, TERMINATOR,
-        sys.stdout.flush()
-
-    def update_status_final(comment=""):
-        set_stdout()
-        update_status(1., comment, print_ts=PRINT_TS)
-        print ""
-        sys.stdout.flush()
-
-else:
-    def update_status(percent, comment=""):
-        pass
-
-    def update_status_final(comment=""):
-        pass
 
 def print_tortoise_memory_log(summary, fp):
-    stry = "PID:\t%s\tPEAK:\t%s,%s\tEST:\t%s\tBIBS:\t%s\n" % (summary['pid'], summary['peak1'], summary['peak2'], summary['est'], summary['bibs'])
+    stry = "PID:\t%s\tPEAK:\t%s,%s\tEST:\t%s\tBIBS:\t%s\n" % (
+        summary['pid'],
+        summary['peak1'],
+        summary['peak2'],
+        summary['est'],
+        summary['bibs'])
     fp.write(stry)
 
 
@@ -473,22 +556,27 @@ def parse_tortoise_memory_log(memfile_path):
 
     def line_2_dict(line):
         line = line.split('\t')
-        ret = {  'mem1' : int(line[3].split(",")[0]),
-                 'mem2' : int(line[3].split(",")[1]),
-                 'est'  : float(line[5]),
-                 'bibs' : int(line[7])
-                 }
+        ret = {'mem1': int(line[3].split(",")[0]),
+                 'mem2': int(line[3].split(",")[1]),
+                 'est': float(line[5]),
+                 'bibs': int(line[7])
+               }
         return ret
 
     return map(line_2_dict, lines)
 
 
 eps = 1e-6
+
+
 def is_eq(v1, v2):
     return v1 + eps > v2 and v2 + eps > v1
 
-#Sort files in place
+# Sort files in place
+
+
 class FileSort(object):
+
     def __init__(self, inFile, outFile=None, splitSize=20):
         """ split size (in MB) """
         self._inFile = inFile
@@ -502,7 +590,6 @@ class FileSort(object):
 
         self.reverse = False
 
-
     def setKeyExtractMethod(self, keyExtractMethod=None):
         """ key extract from line for sort method:
             def f(line):
@@ -514,7 +601,7 @@ class FileSort(object):
             self._getKey = keyExtractMethod
 
     def sort(self, reverse=False):
-        self.reverse=reverse
+        self.reverse = reverse
         files = self._splitFile()
 
         if files is None:
@@ -528,19 +615,16 @@ class FileSort(object):
         self._mergeFiles(files)
         self._deleteFiles(files)
 
-
     def _sortFile(self, fileName, outFile=None):
         lines = open(fileName).readlines()
         get_key = self._getKey
-        data = [(get_key(line), line) for line in lines if line!='']
+        data = [(get_key(line), line) for line in lines if line != '']
         data.sort(reverse=self.reverse)
         lines = [line[1] for line in data]
         if outFile is not None:
             open(outFile, 'w').write(''.join(lines))
         else:
             open(fileName, 'w').write(''.join(lines))
-
-
 
     def _splitFile(self):
         totalSize = os.path.getsize(self._inFile)
@@ -550,7 +634,7 @@ class FileSort(object):
 
         fileNames = []
 
-        fn,e = os.path.splitext(self._inFile)
+        fn, e = os.path.splitext(self._inFile)
         f = open(self._inFile)
         try:
             i = size = 0
@@ -562,15 +646,14 @@ class FileSort(object):
                     i += 1
                     tmpFile = fn + '.%03d' % i
                     fileNames.append(tmpFile)
-                    open(tmpFile,'w').write(''.join(lines))
+                    open(tmpFile, 'w').write(''.join(lines))
                     del lines[:]
                     size = 0
 
-
             if size > 0:
-                tmpFile = fn + '.%03d' % (i+1)
+                tmpFile = fn + '.%03d' % (i + 1)
                 fileNames.append(tmpFile)
-                open(tmpFile,'w').write(''.join(lines))
+                open(tmpFile, 'w').write(''.join(lines))
 
             return fileNames
         finally:
@@ -587,14 +670,14 @@ class FileSort(object):
             keys.append(self._getKey(l))
 
         buff = []
-        buffSize = self._splitSize/2
+        buffSize = self._splitSize / 2
         append = buff.append
-        output = open(self._outFile,'w')
+        output = open(self._outFile, 'w')
         try:
             key = min(keys)
             index = keys.index(key)
             get_key = self._getKey
-            while 1:
+            while True:
                 while key == min(keys):
                     append(lines[index])
                     if len(buff) > buffSize:
@@ -612,13 +695,13 @@ class FileSort(object):
                     keys[index] = key
                     lines[index] = line
 
-                if len(files)==0:
+                if len(files) == 0:
                     break
                 # key != min(keys), see for new index (file)
                 key = min(keys)
                 index = keys.index(key)
 
-            if len(buff)>0:
+            if len(buff) > 0:
                 output.write(''.join(buff))
         finally:
             output.close()
@@ -628,7 +711,6 @@ class FileSort(object):
             os.remove(fn)
 
 
-
 def sortFileInPlace(inFileName, outFileName=None, getKeyMethod=None, reverse=False):
     fs = FileSort(inFileName, outFileName)
     if getKeyMethod is not None:
@@ -636,3 +718,41 @@ def sortFileInPlace(inFileName, outFileName=None, getKeyMethod=None, reverse=Fal
 
     fs.sort(reverse=reverse)
     fs = None
+
+
+import inspect
+
+
+def lineno():
+    a = inspect.getframeinfo(inspect.getouterframes(inspect.currentframe())[2][0])
+    return (a.filename, a.lineno)
+
+
+def caller():
+    a = inspect.stack()[3]
+    return (a[1], a[2])
+
+
+def monitored(func):
+
+    with open('/tmp/logfile', 'w') as logfile:
+        logfile.write('')
+
+    def wrap(*args, **keywords):
+        with open('/tmp/logfile', 'a') as logfile:
+            start_time = time.time()
+            r = func(*args, **keywords)
+            end_time = time.time()
+            file_name, line = lineno()
+            file_name = file_name.split('/')[-1]
+            call_name, call_line = caller()
+            call_name = call_name.split('/')[-1]
+            logfile.write(
+                file_name + '\t' + str(
+                    line) + '\t' + str(
+                        end_time - start_time) + '\t' + str(
+                            call_name) + '\t' + str(
+                    call_line) + '\n')
+            return r
+
+    return wrap

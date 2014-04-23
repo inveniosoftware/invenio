@@ -49,7 +49,7 @@ import invenio.template
 bibauthorid_templates = invenio.template.load('bibauthorid')
 websearch_templates = invenio.template.load('websearch')
 
-from webauthorprofile_config import CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
+from invenio.webauthorprofile_config import CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_STATS, CFG_SITE_NAME, CFG_SITE_URL, \
      CFG_INSPIRE_SITE, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_BIBINDEX_CHARS_PUNCTUATION, CFG_WEBSEARCH_WILDCARD_LIMIT, \
@@ -57,7 +57,7 @@ from webauthorprofile_config import CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
      CFG_WEBAUTHORPROFILE_GENERATED_TIMESTAMP_BOTTOM_POSITION
 
 # maximum number of collaborating authors etc shown in GUI
-from webauthorprofile_config import CFG_WEBAUTHORPROFILE_MAX_COLLAB_LIST, \
+from invenio.webauthorprofile_config import CFG_WEBAUTHORPROFILE_MAX_COLLAB_LIST, \
     CFG_WEBAUTHORPROFILE_MAX_KEYWORD_LIST, CFG_WEBAUTHORPROFILE_MAX_FIELDCODE_LIST, \
     CFG_WEBAUTHORPROFILE_MAX_AFF_LIST, CFG_WEBAUTHORPROFILE_MAX_COAUTHOR_LIST
 
@@ -498,9 +498,8 @@ class Template:
         affiliations_box = self.tmpl_print_searchresultbox('affiliations', line1, line2)
         return affiliations_box
 
-    def tmpl_coauthor_box(self, bibauthorid_data, authors, ln, add_box=True, loading=False):
+    def tmpl_coauthor_box(self, bibauthorid_data, authors, ln, loading=False):
         _ = gettext_set_language(ln)
-        header = "<strong>" + _("Frequent co-authors (excluding collaborations)") + "</strong>"
         content = ""
         if not loading:
             if bibauthorid_data["cid"]:
@@ -532,46 +531,15 @@ class Template:
         if not content:
             content = _("No Frequent Co-authors")
 
-        if add_box:
-            coauthor_box = self.tmpl_print_searchresultbox('coauthors', header, content)
-            return coauthor_box
-        else:
-            return content
+        return content
 
-    def tmpl_citations_box(self, summarize_records, pubs, ln, add_box=True, loading=False):
+    def tmpl_graph_box(self, pubs_per_year, ln, loading=False):
+        """ Creates a graph image (if it doesn't exist) with publication history over the years for
+            the specific author and returns the image tag in HTML.
+        """
+
         _ = gettext_set_language(ln)
-        if CFG_INSPIRE_SITE:
-            addition = ' (from papers in INSPIRE)'
-        else:
-            addition = ''
-        line1 = "<strong>" + _("Citations%s" % addition) + "</strong>"
-        if not loading:
-            summarize_records, rec_query = summarize_records
-            for i in summarize_records[0].keys():
-                summarize_records[0][i] = intbitset(summarize_records[0][i])
-
-            str_buffer = StringIO()
-            render_citation_summary(str_buffer, ln, intbitset(pubs),
-                                    stats=summarize_records,
-                                    searchpattern=rec_query,
-                                    searchfield="")
-            str_buffer.write(websearch_templates.tmpl_citesummary_footer())
-            line2 = str_buffer.getvalue()
-            line2 = '<span style="white-space: nowrap;">' + line2 + "</span>"
-        else:
-            line2 = self.loading_html()
-        if add_box:
-            citations_box = self.tmpl_print_searchresultbox('citations', line1, line2)
-            return citations_box
-        else:
-            return line2
-
-    def tmpl_graph_box(self, pubs_per_year, ln, add_box=True, loading=False):
-        """ Creates graph images (if not already existent) with publication history over the years for
-            the specific author and returns HTML code refering to those images. """
-        _ = gettext_set_language(ln)
-        html_head = _("<strong> Publications per year </strong>")
-        html_graph_code = _("No Publication Graph")
+        graph_html = _("No Publication Graph")
         if not loading:
             if pubs_per_year:
                 graph_data = []
@@ -584,243 +552,10 @@ class Template:
                         graph_data.append((year, 0))
 
                 graph_file_name = '%s' % (md5(str(graph_data)).hexdigest())
-                temp_graph_code = get_graph_code(graph_file_name, graph_data)
-                if temp_graph_code:
-                    html_graph_code = temp_graph_code
+                graph = get_graph_code(graph_file_name, graph_data)
+                if graph:
+                    graph_html = graph
         else:
-            html_graph_code = self.loading_html()
-        if add_box:
-            graph_box = self.tmpl_print_searchresultbox('pubs_graph', html_head, html_graph_code)
-            return graph_box
-        else:
-            return html_graph_code
+            graph_html = self.loading_html()
 
-    def tmpl_pubs_list(self, internal_pubs, external_pubs, datasets_pubs, ln, add_box=True, loading=False):
-        """ Internal and external publications list """
-        _ = gettext_set_language(ln)
-
-        html_head = _("<strong> Publications list </strong>")
-        html_pubs_list = ['<div style="border:2px;height:300px;overflow:scroll;overflow-y:auto;overflow-x:hidden;">']
-
-        if internal_pubs:
-            html_pubs_list.append( '<strong> Publications in INSPIRE: </strong> <br> <ol style="padding-left:20px">')
-            internal_pubs_list = sorted([(recid, title) for recid, title in internal_pubs.iteritems()], key=lambda x: x[0], reverse=True)
-            for recid, title in internal_pubs_list:
-                html_pubs_list.append( '<li> <a href="%s/record/%s"> <b> ' % (CFG_SITE_URL, recid) + title + '</b> </a></li>\n')
-            html_pubs_list.append('</ol><br>\n')
-
-        if external_pubs and 'arxiv' in external_pubs and external_pubs['arxiv']:
-            html_pubs_list.append('<br> <strong> Publication in arXiv but not in INSPIRE: </strong> <br> <ol style="padding-left:20px">')
-            for arxiv_pubid, title in external_pubs['arxiv'].iteritems():
-                referer = "http://arxiv.org/abs/%s" % arxiv_pubid
-                html_pubs_list.append('<li> <a href="%s" target="_blank"> <b> ' % referer + title + '</b> </a> </li>\n')
-            html_pubs_list.append('</ol><br>\n')
-
-        if external_pubs and 'doi' in external_pubs and external_pubs['doi']:
-            html_pubs_list.append('<br> <strong> Publications with a DOI and not in INSPIRE: </strong> <br> <ol style="padding-left:20px">')
-            for doi, title in external_pubs['doi'].iteritems():
-                html_pubs_list.append('<li> <a href="http://dx.doi.org/%s" target="_blank"> <b> ' % doi + title + '</b> </a> </li>\n')
-            html_pubs_list.append('</ol><br>\n')
-
-        if datasets_pubs:
-            html_pubs_list.append( '<strong> Datasets in INSPIRE: </strong> <br> <ol style="padding-left:20px">')
-            datasets_pubs_list = sorted([(recid, title) for recid, title in datasets_pubs.iteritems()], key=lambda x: x[0], reverse=True)
-            for recid, title in datasets_pubs_list:
-                html_pubs_list.append( '<li> <a href="%s/record/%s"> <b> ' % (CFG_SITE_URL, recid) + title + '</b> </a></li>\n')
-            html_pubs_list.append('</ol><br>\n')
-
-        html_pubs_list += '</div>'
-        html_pubs_list = ''.join(html_pubs_list)
-
-        if not internal_pubs and not external_pubs:
-            html_pubs_list = _("No publications available")
-
-        if loading:
-            html_pubs_list = self.loading_html()
-
-        if add_box:
-            pubs_list_box = self.tmpl_print_searchresultbox('pubs_list', html_head, html_pubs_list)
-            return pubs_list_box
-        else:
-            return html_pubs_list
-
-    def tmpl_numpaperstitle(self, bibauthorid_data, pubs):
-        if bibauthorid_data["cid"]:
-            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
-        else:
-            baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
-
-        pubs_to_papers_link = create_html_link(websearch_templates.build_search_url(p=baid_query), {}, str(len(pubs)))
-
-        return  '(%s papers)' % pubs_to_papers_link
-
-
-    def tmpl_authornametitle(self, authorname, bibauthorid_data, pubs, person_link, ln, loading=False):
-        _ = gettext_set_language(ln)
-
-        if loading:
-            html_header = '<span id="authornametitle">' + self.loading_html() + '</span>'
-        else:
-            display_name = authorname
-            if not display_name:
-                if bibauthorid_data["cid"]:
-                    display_name = bibauthorid_data["cid"]
-                else:
-                    display_name = bibauthorid_data["pid"]
-
-            if bibauthorid_data["cid"]:
-                baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["cid"])
-            else:
-                baid_query = 'exactauthor:%s' % wrap_author_name_in_quotes_if_needed(bibauthorid_data["pid"])
-
-            pubs_to_papers_link = create_html_link(websearch_templates.build_search_url(p=baid_query), {}, str(len(pubs)))
-
-            addition = ''
-            if CFG_INSPIRE_SITE:
-                addition = ' relevant to High Energy Physics'
-
-            headernumpapers = ''
-            if pubs:
-                headernumpapers = '(%s papers%s)' % (pubs_to_papers_link, addition)
-
-            html_header = ('<h1><span id="authornametitle">%s</span> <span id="numpaperstitle" style="font-size:50%%;">%s</span></h1>'
-                          % (display_name, headernumpapers))
-
-            if person_link or person_link == 'None':
-                menu = invenio.bibauthorid_templates.Template.tmpl_profile_navigation_bar(get_person_info_by_pid(bibauthorid_data['pid']), ln, "View Profile")
-                html_header += "<div id=\"authorid_wrapper\">%s</div>" % menu
-
-        return html_header
-
-    def tmpl_author_page(self, ln, person_link,oldest_cache_date,
-                        recompute_allowed):
-        '''
-        '''
-        _ = gettext_set_language(ln)
-
-        html = list()
-
-        # html_header = self.tmpl_authornametitle(None, None, None, None, ln, loading=True)
-        # html.append(html_header)
-
-        html_name_variants = self.tmpl_author_name_variants_box(None, None, ln, loading=True)
-        html_combined_papers = self.tmpl_papers_with_self_papers_box(None, None, None, None, ln, loading=True)
-        html_keywords = self.tmpl_keyword_box(None, None, ln, loading=True)
-        html_fieldcodes = self.tmpl_fieldcode_box(None, None, ln, loading=True)
-        html_affiliations = self.tmpl_affiliations_box(None, ln, loading=True)
-        html_coauthors = self.tmpl_coauthor_box(None, None, ln, loading=True)
-
-        if CFG_INSPIRE_SITE:
-            html_hepnames = bibauthorid_templates.tmpl_hepnames_box(None, ln, loading=True)
-            html_pubs = self.tmpl_pubs_list(None, None, None, ln, loading=True)
-        else:
-            html_hepnames = ''
-            html_pubs = ''
-        html_citations = self.tmpl_citations_box(None, None, ln, loading=True)
-        html_graph = self.tmpl_graph_box(None, ln, loading=True)
-        html_collabs = self.tmpl_collab_box(None, None, ln, loading=True)
-
-        g = self._grid
-
-        page = g(1,3)(
-        g(2,1)(
-            g(1,1,False,5)(html_pubs),
-            g(2,2)(
-                g(1,1,False,5)(html_combined_papers),
-                g(1,1,False,5)(html_graph),
-                g(1,1,False,5)(html_fieldcodes),
-                g(1,1,False,5)(html_keywords)
-            )
-        ),
-        g(1,1,False,5)(html_citations),
-        g(2,1)(
-            g(1,1,False,5)(html_hepnames),
-            g(2,2)(
-                g(1,1,False,5)(html_name_variants),
-                g(1,1,False,5)(html_affiliations),
-                g(1,1,False,5)(html_coauthors),
-                g(1,1,False,5)(html_collabs)
-            )
-        ),
-        )
-
-        html.append(page)
-
-        rec_date = 'now'
-        if oldest_cache_date:
-            rec_date = str(oldest_cache_date)
-
-        cache_reload_link = ''
-        if recompute_allowed:
-            cache_reload_link = """
-                <form method="post">
-                    <input type="submit" value="%s" />
-                    <input type="hidden" name="recompute" value="1" />
-                </form>""" % _("Recompute Now!")
-        html_generated_timestamp = "<div align='right' font-size:'50%%'> Generated: %s. %s</div>" % (rec_date, cache_reload_link)
-
-        if CFG_WEBAUTHORPROFILE_GENERATED_TIMESTAMP_BOTTOM_POSITION:
-            html.append(html_generated_timestamp)
-        else:
-            html.insert(0, html_generated_timestamp)
-
-        return ' '.join(html)
-
-
-    def tmpl_open_table(self, width_pcnt=False, cell_padding=False, height_pcnt=False):
-        options = []
-
-        if height_pcnt:
-            options.append('height="%s"' % height_pcnt)
-
-        if width_pcnt:
-            options.append('width="%s"' % width_pcnt)
-        else:
-            options.append('width="100%"')
-
-        if cell_padding:
-            options.append('cellpadding="%s"' % cell_padding)
-        else:
-            options.append('cellpadding="0"')
-
-        return '<table border=0 %s >' % ' '.join(options)
-
-    def tmpl_close_table(self):
-        return "</table>"
-
-    def tmpl_open_row(self):
-        return "<tr>"
-    def tmpl_close_row(self):
-        return "</tr>"
-
-    def tmpl_open_col(self, width=False):
-        if width:
-            return '<td valign="top" width="%s">' % width
-        else:
-            return "<td valign='top'>"
-
-    def tmpl_close_col(self):
-        return "</td>"
-
-    def _grid(self, rows, cols, table_width=False, cell_padding=False, force_equal_columns=True):
-        tmpl = self
-        columns_width = False
-        if force_equal_columns:
-            columns_width = 100/cols
-
-        def cont(*boxes):
-            out = []
-            h = out.append
-            idx = 0
-            h(tmpl.tmpl_open_table(width_pcnt=table_width, cell_padding=cell_padding))
-            for _ in range(rows):
-                h(tmpl.tmpl_open_row())
-                for _ in range(cols):
-                    h(tmpl.tmpl_open_col(width=columns_width))
-                    h(boxes[idx])
-                    idx += 1
-                    h(tmpl.tmpl_close_col())
-                h(tmpl.tmpl_close_row())
-            h(tmpl.tmpl_close_table())
-            return '\n'.join(out)
-        return cont
+        return graph_html

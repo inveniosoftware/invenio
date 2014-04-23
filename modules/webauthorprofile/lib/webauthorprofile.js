@@ -18,29 +18,11 @@
  */
 
 $(document).ready(function() {
-    $("a[rel=lightbox]").lightBox();
 
-    $('[class^=more-]').hide();
-
-    $('[class^=lmore]').each(function() {
-        $(this).click(function () {
-            var link_class = $(this).prop("className");
-            var content = $("." + "more-" + link_class);
-            if (content.hasClass("hidden")) {
-                content.removeClass("hidden").slideDown();
-                $(this).html("<img src='/img/aid_minus_16.png' alt='hide information' width='11' height='11'> less");
-            }
-            else {
-              content.addClass("hidden").slideUp();
-              $(this).html("<img src='/img/aid_plus_16.png' alt='toggle additional information.' width='11' height='11'> more");
-            }
-        return false;
-        });
-    });
     //call name variants
     data = { 'personId': gPID };
     funcs = ['create_authorpage_name_variants', 'create_authorpage_combined_papers', 'create_authorpage_keywords', 'create_authorpage_fieldcodes', 'create_authorpage_affiliations',
-                 'create_authorpage_coauthors', 'create_authorpage_pubs', 'create_authorpage_authors_pubs', 'create_authorpage_citations', 'create_authorpage_pubs_graph',
+                 'create_authorpage_coauthors', 'create_authorpage_citations', 'create_authorpage_pubs_graph',
                  'create_authorpage_hepdata', 'create_authorpage_collaborations', 'create_authorpage_pubs_list'];
     funcsLength = funcs.length;
     var count = Math.min( gNumOfWorkers, funcs.length);
@@ -100,6 +82,7 @@ function add_box_content(id, html_content) {
     });
     if (id == "pubs_list") {
         MathJax.Hub.Queue(["Typeset", MathJax.Hub, $box.get(0)]);
+        $(".pub-tabs a:first").tab('show');
     }
 }
 

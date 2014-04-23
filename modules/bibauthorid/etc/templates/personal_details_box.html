@@ -1,0 +1,141 @@
+{% macro multi_value_row(name, values, url=False, url_trim_length=30) %}
+	<tr>
+		<th>{{ name }}</th>
+		<td>
+			{% for value in values -%}
+			{{ value|urlize(url_trim_length, true) if url else value }}<br>
+			{% endfor %}
+		</td>
+	</tr>
+{% endmacro %}
+
+{% macro institution_history(institutions, reverse_chrono=False, limit=0) %}
+	{% if reverse_chrono %}
+		{% set items = institutions[::-1] %}
+	{% else %}
+		{% set items = institutions %}
+	{% endif %}
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr>
+				<th>Period</th>
+				<th>Rank</th>
+				<th>Institution</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for institution in (items[:limit] if limit > 0 else items) %}
+			<tr{{ ' class="warning"' if institution.rank == "PHD" }}>
+				{% if institution.start and institution.end %}
+				<td>{{ institution.start }}&nbsp;&ndash;&nbsp;{{ institution.end }}</td>
+				{% else %}
+				<td>{{ "%s" % institution.start or institution.end }}</td>
+				{% endif %}
+				<td>{{ institution.rank }}</td>
+				<td>{{ institution.name }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endmacro %}
+
+{% if not record %}
+<div class="bai-details-selection" data-cname="{{ cname }}">
+	<p>There is no{{ " unique" if choices else "" }} HepNames record associated with this profile.</p>
+	{% if choice_list %}<p><strong>Which one looks right?</strong></p>{% endif %}
+
+	<div class="list-group">
+		{% for item in choice_list %}
+		<a href="{{ '%s%s' % (profile_link, item.author_profile) if item.author_profile else '#' }}" class="list-group-item" data-heprecord="{{ item.record_id }}">
+			<h4 class="list-group-item-heading">
+				{{ item.display_name }}
+			</h4>
+			<div class="list-group-item-text clearfix">
+				{{ (item.institution_history|last).name if item.institution_history else 'Institution not known.' }}
+				{% if item.author_profile %}
+				<div class="pull-right bai-quick-view">
+					<span class="bai-quick-view-spot">
+						<small>Go to {{ item.author_profile }}&nbsp<span class="glyphicon glyphicon-arrow-right"></span></small>
+					</span>
+					<div class="hidden bai-quick-view-src">
+					    <p class="text-center">This HepNames record has already been taken.</p>
+					</div>
+				</div>
+				{% else %}
+				<div class="pull-right bai-quick-view">
+					<span class="bai-quick-view-spot">
+						<small>Quick View &nbsp<span class="glyphicon glyphicon-eye-open"></span></small>
+					</span>
+					<div class="hidden bai-quick-view-src">
+					    {% if item.fields or item.experiments %}
+					    <table class="table">
+                            {{ multi_value_row("Fields", item.fields) if item.fields }}
+                            {{ multi_value_row("Experiments", item.experiments) if item.experiments }}
+			            </table>
+			            {% endif %}
+					    {{ institution_history(item.institution_history, reverse_chrono=True, limit=3) }}
+					</div>
+				</div>
+				{% endif %}
+			</div>
+		</a>
+		{% endfor %}
+		<a href="{{ new_record_link }}" class="list-group-item">
+			<h4 class="list-group-item-heading">Create One</h4>
+			<p class="list-group-item-text">I am able to provide INSPIRE with some details.</p>
+		</a>
+	</div>
+</div>
+{% else %}
+<div class="clearfix">
+	<table class="table table-condensed table-hover">
+	<tbody>
+		<tr>
+		    <th class="no-border">Name</th>
+		    <td class="no-border">{{ record.display_name }}</td>
+	    </tr>
+        {% if record.institution_history -%}
+		<tr>
+		    <th>Current Institution</th>
+		    <td>{{ (record.institution_history|last).name }}</td>
+	    </tr>
+        {% endif %}
+
+		{% if record.emails -%}
+		<tr>
+		    <th>E-mail{{'s' if record.emails|length > 1}}</th>
+		    <td>
+		    {% for email in record.emails -%}
+		    {{ email }}<br>
+		    {% endfor %}
+		    </td>
+	        </tr>
+        {% endif %}
+		{{ multi_value_row("Links", record.urls, url=True) if record.urls }}
+        {{ multi_value_row("Fields", record.fields) if record.fields }}
+		{{ multi_value_row("Experiments", record.experiments) if record.experiments }}
+		{% if record.identifiers %}
+		<tr>
+		    <th>Identifiers</th>
+		    <td>
+            {% for id in record.identifiers|sort(attribute='priority') %}
+	            {% if id.link %}
+	            {{ '%s: <a href="%s">%s</a><br>' % (id.label, id.link, id.value) }}
+	            {% else %}
+	            {{ "%s: %s<br>" % (id.label, id.value) }}
+	            {% endif %}
+			{% endfor %}
+		    </td>
+		</tr>
+		{% endif %}
+	</tbody>
+	</table>
+	{{ institution_history(record.institution_history) }}
+	<div class="bai-details-button pull-right">
+		{% if link_to_record %}
+		<a href="{{ hepnames_link }}{{ record.record_id }}"type="button" class="btn btn-danger">HepNames Record</a>
+		{% endif %}
+		<a href="{{ update_link }}{{ record.record_id }}"type="button" class="btn btn-default">Update Details</a>
+	</div>
+</div>
+{% endif %}

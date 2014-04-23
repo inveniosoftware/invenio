@@ -1,115 +1,107 @@
-# -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-from itertools import cycle, imap, chain, izip
 from operator import itemgetter
-
-
-from invenio.bibtask import task_sleep_now_if_required, write_message, task_update_progress
-
+from itertools import cycle, imap, chain, izip
+from invenio.bibauthorid_name_utils import compare_names as comp_names, \
+    create_matchable_name
 from invenio import bibauthorid_config as bconfig
-
-from invenio.bibauthorid_comparison import cached_sym
-from invenio.bibauthorid_name_utils import compare_names as comp_names
-from invenio.bibauthorid_name_utils import split_name_parts
-from invenio.bibauthorid_name_utils import create_normalized_name
-from invenio.bibauthorid_general_utils import update_status \
-                                    , update_status_final
+from invenio.bibauthorid_backinterface import get_authors_by_name, \
+    add_signature, get_signatures_of_paper, \
+    remove_signatures, modify_signature, filter_bibrecs_outside, get_deleted_papers, \
+    create_new_author_by_signature as new_person_from_signature, get_all_valid_bibrecs, \
+    remove_papers, get_author_refs_of_paper,\
+    get_coauthor_refs_of_paper, get_name_by_bibref,  \
+    get_author_by_external_id, update_canonical_names_of_authors, \
+    update_external_ids_of_authors, remove_empty_authors
 from invenio.bibauthorid_matrix_optimization import maximized_mapping
-from invenio.bibauthorid_backinterface import get_all_valid_papers
-from invenio.bibauthorid_backinterface import filter_bibrecs_outside
-from invenio.bibauthorid_backinterface import get_deleted_papers
-from invenio.bibauthorid_backinterface import remove_papers
-from invenio.bibauthorid_backinterface import get_author_refs_of_paper
-from invenio.bibauthorid_backinterface import get_coauthor_refs_of_paper
-from invenio.bibauthorid_backinterface import get_signatures_of_paper
-from invenio.bibauthorid_backinterface import modify_signature
-from invenio.bibauthorid_backinterface import remove_signatures
-from invenio.bibauthorid_backinterface import get_authors_by_name as _find_pids_by_exact_name
-from invenio.bibauthorid_backinterface import create_new_author_by_signature as _new_person_from_signature
-from invenio.bibauthorid_backinterface import add_signature as _add_signature
-from invenio.bibauthorid_backinterface import update_canonical_names_of_authors
-from invenio.bibauthorid_backinterface import update_external_ids_of_authors
-from invenio.bibauthorid_backinterface import get_name_by_bibref
-from invenio.bibauthorid_backinterface import populate_partial_marc_caches
-from invenio.bibauthorid_backinterface import destroy_partial_marc_caches
-from invenio.bibauthorid_backinterface import get_inspire_id_of_signature
-from invenio.bibauthorid_backinterface import get_author_by_external_id
-from invenio.bibauthorid_backinterface import get_name_to_authors_mapping
-from invenio.bibauthorid_backinterface import get_free_author_id
-from invenio.bibauthorid_backinterface import remove_empty_authors
-USE_EXT_IDS = bconfig.RABBIT_USE_EXTERNAL_IDS
-USE_INSPIREID = bconfig.RABBIT_USE_EXTERNAL_ID_INSPIREID
+from invenio.bibauthorid_dbinterface import populate_partial_marc_caches
+from invenio.bibauthorid_dbinterface import destroy_partial_marc_caches
+from invenio.bibauthorid_general_utils import memoized
 
+from invenio.bibtask import task_update_progress
 from datetime import datetime
+from invenio.dbquery import run_sql
+from invenio.bibauthorid_logutils import Logger
+
+
 now = datetime.now
 
-def rabbit(bibrecs, check_invalid_papers=False, personids_to_update_extids=None, verbose=False):
-    '''
-    @param bibrecs: an iterable full of bibrecs
-    @type bibrecs: an iterable of ints
-    @return: none
-    '''
-    logfile = open('/tmp/RABBITLOG-%s' % str(now()).replace(" ", "_"), 'w')
-    logfile.write("RABBIT %s running on %s \n" % (str(now()), str(bibrecs)))
+USE_EXT_IDS = bconfig.RABBIT_USE_EXTERNAL_IDS
+EXT_IDS_TO_USE = bconfig.RABBIT_EXTERNAL_IDS_TO_USE
+if USE_EXT_IDS:
+    external_id_getters = list()
+    if 'InspireID' in EXT_IDS_TO_USE:
+        from invenio.bibauthorid_backinterface import get_inspire_id_of_signature
+        external_id_getters.append(get_inspire_id_of_signature)
+    if 'OrcidID' in EXT_IDS_TO_USE:
+        from invenio.bibauthorid_backinterface import get_orcid_id_of_signature
+        external_id_getters.append(get_orcid_id_of_signature)
 
-    def logwrite(msg, is_error):
-        verb = 9
-        if is_error or verbose:
-            verb = 1
-        write_message(msg, verbose=verb)
 
-    if bconfig.RABBIT_USE_CACHED_PID:
-        PID_NAMES_CACHE = get_name_to_authors_mapping()
+M_NAME_PIDS_CACHE = None
 
-        def find_pids_by_exact_names_cache(name):
-            try:
-                return zip(PID_NAMES_CACHE[name])
-            except KeyError:
-                return []
+# The first element of this list is the master function
+M_NAME_FUNCTIONS = [create_matchable_name]
 
-        def add_signature_using_names_cache(sig, name, pid):
-            try:
-                PID_NAMES_CACHE[name].add(pid)
-            except KeyError:
-                PID_NAMES_CACHE[name] = set([pid])
-            _add_signature(sig, name, pid)
 
-        def new_person_from_signature_using_names_cache(sig, name):
-            pid = get_free_author_id()
-            add_signature_using_names_cache(sig, name, pid)
-            return pid
+def populate_mnames_pids_cache():
+    global M_NAME_PIDS_CACHE
+    mnames_pids = run_sql("select distinct(m_name), personid from aidPERSONIDPAPERS")
+    M_NAME_PIDS_CACHE = dict(mnames_pids)
 
-        add_signature = add_signature_using_names_cache
-        new_person_from_signature = new_person_from_signature_using_names_cache
-        find_pids_by_exact_name = find_pids_by_exact_names_cache
+
+def destroy_mnames_pids_cache():
+    global M_NAME_PIDS_CACHE
+    M_NAME_PIDS_CACHE = None
+
+
+def rabbit(bibrecs=None, check_invalid_papers=False,
+           personids_to_update_extids=None, verbose=False):
+
+    logger = Logger("Rabbit")
+
+    if verbose:
+        logger.verbose = True
+
+    if not bibrecs:
+        logger.log("Running on all records")
     else:
-        add_signature = _add_signature
-        new_person_from_signature = _new_person_from_signature
-        find_pids_by_exact_name = _find_pids_by_exact_name
+        logger.log("Running on %s " % (str(bibrecs)))
 
-    compare_names = cached_sym(lambda x: x)(comp_names)
-    # fast assign threshold
-    threshold = 0.80
+    populate_mnames_pids_cache()
+
+    global M_NAME_PIDS_CACHE
+
+    memoized_compare_names = memoized(comp_names)
+    compare_names = lambda x, y: memoized_compare_names(*sorted((x, y)))
+
+    def find_pids_by_matchable_name_with_cache(matchable_name):
+        try:
+            matched_pids = [M_NAME_PIDS_CACHE[matchable_name]]
+        except KeyError:
+            matched_pids = get_authors_by_name(matchable_name,
+                                               use_matchable_name=True)
+            if matched_pids:
+                M_NAME_PIDS_CACHE[matchable_name] = matched_pids[0]
+        return matched_pids
+
+    if USE_EXT_IDS:
+
+        def get_matched_pids_by_external_ids(sig, rec, pids_having_rec):
+            '''
+            This function returns all the matched pids after iterating
+            through all available external IDs of the system.
+            '''
+            for get_external_id_of_signature in external_id_getters:
+                external_id = get_external_id_of_signature(sig + (rec,))
+                if external_id:
+                    matched_pids = list(get_author_by_external_id(external_id[0]))
+                    if matched_pids and int(matched_pids[0][0]) in pids_having_rec:
+                        matched_pids = list()
+                    return matched_pids
+
+    threshold = 0.8
 
     if not bibrecs or check_invalid_papers:
-        all_bibrecs = get_all_valid_papers()
+        all_bibrecs = get_all_valid_bibrecs()
 
         if not bibrecs:
             bibrecs = all_bibrecs
@@ -117,114 +109,137 @@ def rabbit(bibrecs, check_invalid_papers=False, personids_to_update_extids=None,
         if check_invalid_papers:
             filter_bibrecs_outside(all_bibrecs)
 
-    if (bconfig.RABBIT_USE_CACHED_GET_GROUPED_RECORDS and
-        len(bibrecs) > bconfig.RABBIT_USE_CACHED_GET_GROUPED_RECORDS_THRESHOLD):
-        populate_partial_marc_caches()
-        SWAPPED_GET_GROUPED_RECORDS = True
-    else:
-        SWAPPED_GET_GROUPED_RECORDS = False
-
     updated_pids = set()
     deleted = frozenset(p[0] for p in get_deleted_papers())
 
     for idx, rec in enumerate(bibrecs):
 
-        logwrite("\nConsidering %s" % str(rec), False)
+        logger.log("Considering %s" % str(rec))
 
-        if idx%200 == 0:
-            task_sleep_now_if_required(True)
-
-            update_status(float(idx) / len(bibrecs), "%d/%d current: %d" % (idx, len(bibrecs), rec))
+        if idx % 100 == 0:
             task_update_progress("%d/%d current: %d" % (idx, len(bibrecs), rec))
 
+        if idx % 1000 == 0:
+            destroy_partial_marc_caches()
+            populate_partial_marc_caches(bibrecs[idx: idx + 1000])
+
+            logger.log(float(idx) / len(bibrecs), "%d/%d" % (idx, len(bibrecs)))
+
         if rec in deleted:
-            logwrite(" - Record was deleted, removing from pid and continuing with next record", True)
             remove_papers([rec])
             continue
 
+        author_refs = get_author_refs_of_paper(rec)
+        coauthor_refs = get_coauthor_refs_of_paper(rec)
 
-        markrefs = frozenset(chain(izip(cycle([100]), imap(itemgetter(0), get_author_refs_of_paper(rec))),
-                                   izip(cycle([700]), imap(itemgetter(0), get_coauthor_refs_of_paper(rec)))))
+        markrefs = frozenset(chain(izip(cycle([100]), imap(itemgetter(0),
+                                                           author_refs)),
+                                   izip(cycle([700]), imap(itemgetter(0),
+                                                           coauthor_refs))))
 
-        personid_rows = [map(int, row[:3]) + [row[4]] for row in get_signatures_of_paper(rec)]
-        personidrefs_names = dict(((row[1], row[2]), row[3]) for row in personid_rows)
+        personid_rows = [map(int, row[:3]) + [row[4]]
+                         for row in get_signatures_of_paper(rec)]
+        personidrefs_names = dict(((row[1], row[2]), row[3])
+                                  for row in personid_rows)
 
         personidrefs = frozenset(personidrefs_names.keys())
         new_signatures = list(markrefs - personidrefs)
         old_signatures = list(personidrefs - markrefs)
 
-        new_signatures_names = dict((new, create_normalized_name(split_name_parts(get_name_by_bibref(new))))
+        new_signatures_names = dict((new, get_name_by_bibref(new))
                                     for new in new_signatures)
 
         # matrix |new_signatures| X |old_signatures|
-        matrix = [[compare_names(new_signatures_names[new], personidrefs_names[old])
-                  for old in old_signatures] for new in new_signatures]
+        matrix = [[compare_names(new_signatures_names[new],
+                                 personidrefs_names[old])
+                   for old in old_signatures] for new in new_signatures]
 
-        logwrite(" - Old signatures: %s" % str(old_signatures), bool(old_signatures))
-        logwrite(" - New signatures: %s" % str(new_signatures), bool(new_signatures))
-        logwrite(" - Matrix: %s" % str(matrix), bool(matrix))
+        logger.log(" - Deleted signatures: %s" % str(old_signatures))
+        logger.log(" - Added signatures: %s" % str(new_signatures))
+        logger.log(" - Matrix: %s" % str(matrix))
 
-        # [(new_signatures, old_signatures)]
+        #[new_signatures, old_signatures]
         best_match = [(new_signatures[new], old_signatures[old])
-                      for new, old, score in maximized_mapping(matrix) if score > threshold]
+                      for new, old, score in maximized_mapping(matrix)
+                      if score > threshold]
 
-        logwrite(" - Best match: %s " % str(best_match), bool(best_match))
+        logger.log(" - Best match: %s " % str(best_match))
 
         for new, old in best_match:
-            logwrite(" - - Moving signature: %s on %s to %s as %s" % (old, rec, new, new_signatures_names[new]), True)
+            logger.log("  -  -  Moving signature: %s on %s to %s as %s" %
+                      (old, rec, new, new_signatures_names[new]))
             modify_signature(old, rec, new, new_signatures_names[new])
 
         remove_signatures(tuple(list(old) + [rec]) for old in old_signatures)
+        not_matched = frozenset(new_signatures) - frozenset(map(itemgetter(0),
+                                                                best_match))
 
-        not_matched = frozenset(new_signatures) - frozenset(map(itemgetter(0), best_match))
+        remaining_personid_rows = ([x for x in personid_rows
+                                    if x[1:3] in old_signatures])
 
-        pids_having_rec = set([int(row[0]) for row in get_signatures_of_paper(rec)])
-        logwrite(" - Not matched: %s" % str(not_matched), bool(not_matched))
+        pids_having_rec = set([int(row[0]) for row in remaining_personid_rows])
+        logger.log(" - Not matched: %s" % str(not_matched))
 
         if not_matched:
             used_pids = set(r[0] for r in personid_rows)
 
         for sig in not_matched:
             name = new_signatures_names[sig]
+            matchable_name = create_matchable_name(name)
             matched_pids = list()
             if USE_EXT_IDS:
-                if USE_INSPIREID:
-                    inspire_id = get_inspire_id_of_signature(sig + (rec,))
-                    if inspire_id:
-                        matched_pids = list(get_author_by_external_id(inspire_id[0]))
-                        if matched_pids and int(matched_pids[0][0]) in pids_having_rec:
-                            matched_pids = list()
+                matched_pids = get_matched_pids_by_external_ids(sig, rec, pids_having_rec)
+
                 if matched_pids:
-                    add_signature(list(sig) + [rec], name, matched_pids[0][0])
+                    add_signature(list(sig) + [rec], name,
+                                  matched_pids[0][0], m_name=matchable_name)
+                    M_NAME_PIDS_CACHE[matchable_name] = matched_pids[0][0]
                     updated_pids.add(matched_pids[0][0])
                     pids_having_rec.add(matched_pids[0][0])
                     continue
 
-            matched_pids = find_pids_by_exact_name(name)
-            matched_pids = [p for p in matched_pids if int(p[0]) not in used_pids]
+            matched_pids = find_pids_by_matchable_name_with_cache(matchable_name)
+            if not matched_pids:
+                for matching_function in M_NAME_FUNCTIONS[1:]:
+                    matchable_name = matching_function(name)
+                    matched_pids = find_pids_by_matchable_name_with_cache(matchable_name)
+                    if matched_pids:
+                        break
 
-            if not matched_pids or int(matched_pids[0][0]) in pids_having_rec:
-                new_pid = new_person_from_signature(list(sig) + [rec], name)
+            matched_pids = [p for p in matched_pids if int(p) not in used_pids]
+
+            if not matched_pids or int(matched_pids[0]) in pids_having_rec:
+                new_pid = new_person_from_signature(list(sig) + [rec],
+                                                    name, matchable_name)
+                M_NAME_PIDS_CACHE[matchable_name] = new_pid
                 used_pids.add(new_pid)
                 updated_pids.add(new_pid)
-
             else:
-                add_signature(list(sig) + [rec], name, matched_pids[0][0])
-                used_pids.add(matched_pids[0][0])
-                updated_pids.add(matched_pids[0][0])
-                pids_having_rec.add(matched_pids[0][0])
+                add_signature(list(sig) + [rec], name,
+                              matched_pids[0], m_name=matchable_name)
+                M_NAME_PIDS_CACHE[matchable_name] = matched_pids[0]
+                used_pids.add(matched_pids[0])
+                updated_pids.add(matched_pids[0])
+                pids_having_rec.add(matched_pids[0])
 
-        logwrite('Finished with %s' % str(rec), False)
+        logger.log('Finished with %s' % str(rec))
 
-    update_status_final()
+    logger.update_status_final()
+
+    destroy_partial_marc_caches()
 
     if personids_to_update_extids:
-        updated_pids |= personids_to_update_extids
-    if updated_pids: # an empty set will update all canonical_names
+        updated_pids |= set(personids_to_update_extids)
+    if updated_pids:  # an empty set will update all canonical_names
         update_canonical_names_of_authors(updated_pids)
-        update_external_ids_of_authors(updated_pids, limit_to_claimed_papers=bconfig.LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS)
+        update_external_ids_of_authors(updated_pids,
+                                       limit_to_claimed_papers=bconfig.LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS,
+                                       force_cache_tables=True)
 
-    if SWAPPED_GET_GROUPED_RECORDS:
-        destroy_partial_marc_caches()
+    destroy_partial_marc_caches()
+    destroy_mnames_pids_cache()
 
     remove_empty_authors()
+    
+    task_update_progress("Done!")
+
