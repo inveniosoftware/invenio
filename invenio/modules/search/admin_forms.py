@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,23 +19,17 @@
 
 """WebMessage Forms"""
 
-from string import strip
-from datetime import datetime
-from invenio.ext.sqlalchemy import db
 from invenio.base.i18n import _
 from invenio.modules.search.models import get_pbx_pos
-from flask.ext.wtf import Form
-from invenio.utils.forms import InvenioBaseForm, FilterForm, DateTimePickerWidget, FilterTextField
-from wtforms import DateTimeField, BooleanField, TextField, TextAreaField, \
-                    PasswordField, validators, HiddenField, FieldList, SelectField
+from invenio.utils.forms import InvenioBaseForm
+from wtforms import TextField, HiddenField, SelectField
 
-
-# from invenio.base.i18n import language_list_long
 
 class CollectionForm(InvenioBaseForm):
     id = HiddenField()
     name = TextField(_('Name'))
     dbquery = TextField(_('Query'))
+
 
 def TranslationsForm(language_list_long, values):
 
@@ -43,12 +37,13 @@ def TranslationsForm(language_list_long, values):
         collection_id = HiddenField()
 
     for (lang, lang_long) in language_list_long:
-        setattr( _TranslationsForm, lang,  TextField(_(unicode(lang_long,"utf-8")), default = \
-            values.get(lang, '')))
+        setattr(_TranslationsForm, lang,
+                TextField(_(lang_long),
+                          default=values.get(lang, '')))
 
-    return  _TranslationsForm
+    return _TranslationsForm
 
 
 class PortalBoxForm(InvenioBaseForm):
     id = HiddenField()
-    postion = SelectField(u'Select Position', get_pbx_pos() )
+    postion = SelectField(u'Select Position', get_pbx_pos())
