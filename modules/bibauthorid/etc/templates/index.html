@@ -1,0 +1,90 @@
+{% if bootstrap %}<div class="hidden" id="jsbootstrap">{{ bootstrap|e }}</div>{% endif %}
+
+<div class="ow-overlay ow-closed"></div>
+<div class="bsw">
+
+<div id="ticket-modal" class="modal">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content"></div>
+
+    </div>
+</div>
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-xs-12">{% if debug %}{% include 'debug_block.html' %}{% endif %}</div>
+    </div>
+
+
+    <div class="row">
+    <!-- Person Name and Profile Search -->
+        <div class="col-md-8">
+            <div id="person_name">
+                <h1 class="authornametitle">{{ title }}</h1>
+            </div>
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div id="profile_search">
+                <form class="form-search" method="get" action="{{ search_form_url }}">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Profile Name" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button" onclick="document.getElementsByClassName('form-search')[0].submit()">
+                                <span class="glyphicon glyphicon-search"></span>&nbsp Search
+                            </button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="col-md-10">
+            <div id="person_menu">
+                {% if menu %}{% include 'profile_menu.html' %}{% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-2 clearfix">
+            {% if last_computed %}
+            {% if possible_to_recompute %}
+            <button class="btn btn-default btn-sm pull-right" id="recomputeProfile" type="button">
+                <span class="glyphicon glyphicon-refresh"></span>&nbsp {{ last_computed }}
+            </button>
+            {% else %}
+            <button class="btn btn-default btn-sm pull-right" id="recomputeProfile-disabled" type="button" disabled>
+                <span class="glyphicon glyphicon-time"></span>&nbsp {{ last_computed }}
+            </button>
+	    {% endif %}
+	    {% endif %}
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-12" id="bai_ticket"></div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="bai_content">
+                {% block content %}{% endblock %}
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</div>

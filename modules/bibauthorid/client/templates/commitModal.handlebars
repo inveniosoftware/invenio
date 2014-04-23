@@ -1,0 +1,79 @@
+<div class="modal-header">
+    <h2 class="modal-title">{{ title }}</h2>
+</div>
+
+<div class="modal-body">
+
+    <span class="confirm-text">
+        <p>{{#guest}}Please provide your details to submit your suggestions.<br>{{/guest}}
+            If you have any comments, please fill in the comments box below.
+        </p>
+    </span>
+
+    <form class="form-horizontal" role="form" novalidate="novalidate">
+        {{#guest}}
+
+        <div class="form-group">
+
+            <div class="col-sm-3"><label class="control-label" for="firstName">First Name</label></div>
+
+            <div class="col-sm-9">
+                <input class="form-control" data-parsley-required="true" data-parsley-trigger="change keyup focusin focusout"
+                       data-parsley-required-message="This field is required." data-parsley-minlength="2"
+                       data-parsley-minlength-message="Your input is too short." type="text"
+                       id="firstName" placeholder="First Name" value="{{ userDetails.first_name }}"/>
+            </div>
+
+        </div>
+        <div class="form-group">
+            <div class="col-sm-3"><label class="control-label" for="lastName">Last Name</label></div>
+
+            <div class="col-sm-9">
+                <input class="form-control" data-parsley-required="true" data-parsley-trigger="change keyup focusin focusout"
+                       data-parsley-required-message="This field is required." data-parsley-minlength="2"
+                       data-parsley-minlength-message="Your input is too short." type="text"
+                       id="lastName" placeholder="Last Name" value="{{ userDetails.last_name }}"/>
+            </div>
+
+        </div>
+        <div class="form-group">
+            <div class="col-sm-3"><label class="control-label" for="email">Email</label></div>
+
+            <div class="col-sm-9">
+                <input class="form-control" data-parsley-required="true" data-parsley-trigger="change keyup focusin focusout"
+                       data-parsley-required-message="This field is required." data-parsley-minlength="1"
+                       data-parsley-type-message="Please enter a valid email address." type="email"
+                       id="email" placeholder="Email" value="{{ userDetails.email }}" />
+            </div>
+
+        </div>
+        {{/guest}}
+
+        <div class="form-group">
+            <div class="col-sm-3">
+                <label class="control-label" for="comments">
+                    Comments
+                </label>
+            </div>
+
+            <div class="col-sm-9">
+                <textarea
+                          class="form-control" data-parsley-trigger="change keyup focusin focusout"
+                          data-parsley-minlength="1" data-parsley-maxlength="10000"
+                          rows="4" id="comments" placeholder="Comments">
+
+                    {{ userDetails.comments }}
+
+                </textarea>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+
+<div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn btn-default back">Go Back</a>
+    <a href="#" class="btn btn-primary continue">Continue</a>
+</div>

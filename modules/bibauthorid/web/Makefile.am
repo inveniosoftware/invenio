@@ -18,44 +18,28 @@
 
 imgdir=$(localstatedir)/www/img
 
-img_DATA = bibauthorid.css bootstrap.min.css glyphicons-halflings.png glyphicons-halflings-white.png \
-	   bibauthorid-help-full-image001.png \
-	   bibauthorid-help-full-image003.png \
-	   bibauthorid-help-full-image005.png \
-	   bibauthorid-help-full-image007.png \
-	   bibauthorid-help-full-image009.png \
-	   bibauthorid-help-full-image011.png \
-	   bibauthorid-help-full-image013.png \
-	   bibauthorid-help-full-image015.png \
-	   bibauthorid-help-full-image017.png \
-	   bibauthorid-help-full-image019.png \
-	   bibauthorid-help-full-image021.png \
-	   bibauthorid-help-full-image023.png \
-	   bibauthorid-help-full-image025.png \
-	   bibauthorid-help-full-image027.png \
-	   bibauthorid-help-full-image028.png \
-	   bibauthorid-help-full-image029.png \
-	   bibauthorid-help-full-image031.png \
-	   bibauthorid-help-full-image033.png \
-	   bibauthorid-help.html \
-	   bibauthorid-help-small-image001.png \
-	   bibauthorid-help-small-image003.png \
-	   bibauthorid-help-small-image005.png \
-	   bibauthorid-help-small-image007.png \
-	   bibauthorid-help-small-image009.png \
-	   bibauthorid-help-small-image011.png \
-	   bibauthorid-help-small-image013.png \
-	   bibauthorid-help-small-image015.png \
-	   bibauthorid-help-small-image017.png \
-	   bibauthorid-help-small-image019.png \
-	   bibauthorid-help-small-image021.png \
-	   bibauthorid-help-small-image023.png \
-	   bibauthorid-help-small-image025.png \
-	   bibauthorid-help-small-image027.png \
-	   bibauthorid-help-small-image028.png \
-	   bibauthorid-help-small-image029.png \
-	   bibauthorid-help-small-image031.png \
-	   bibauthorid-help-small-image033.png 
+img_DATA = glyphicons-halflings.png glyphicons-halflings-white.png \
+	   001.png \
+	   002.png \
+	   003.png \
+	   004.png \
+	   005.png \
+	   006.png \
+	   007.png \
+	   008.png \
+	   009.png \
+	   010.png \
+	   011.png \
+	   012.png \
+	   013.png \
+	   014.png \
+	   015.png \
+	   016.png \
+	   017.png \
+	   018.png \
+           019.png
+
+
 
 EXTRA_DIST = $(img_DATA)
 

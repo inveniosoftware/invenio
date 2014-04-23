@@ -164,7 +164,7 @@ install-jquery-plugins:
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js -O jquery.MultiFile.pack.js && \
 	wget http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip -O jquery.tablesorter.zip && \
 	wget http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip -O uploadify.zip && \
-	wget http://www.datatables.net/download/build/jquery.dataTables.min.js -O jquery.dataTables.min.js && \
+	wget http://cdn.datatables.net/1.9.0/js/jquery.dataTables.min.js  -O jquery.dataTables.min.js && \
 	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip -O jquery.bookmark.package-1.4.0.zip && \
 	unzip -u jquery.tablesorter.zip -d tablesorter && \
 	wget http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip -O jquery.fileTree-1.01.zip && \

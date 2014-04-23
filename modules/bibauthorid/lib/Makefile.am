@@ -52,13 +52,23 @@ pylib_DATA = \
 	bibauthorid_bib_matrix_unit_tests.py \
 	bibauthorid_cluster_set_unit_tests.py \
 	bibauthorid_dbinterface_unit_tests.py \
-	bibauthorid_affiliations.py \
-	bibauthorid_affiliations_regression_tests.py \
-	bibauthorid_prob_matrix_unit_tests.py
+    bibauthorid_affiliations.py \
+    bibauthorid_affiliations_regression_tests.py \
+	bibauthorid_prob_matrix_unit_tests.py \
+	bibauthorid_webutils.py \
+	bibauthorid_logutils.py \
+	bibauthorid_testutils.py
 
 jsdir=$(localstatedir)/www/js
 
-js_DATA = bibauthorid.js bootstrap.min.js underscore-min.js backbone.js handlebars.js hepname_update.js
+js_DATA =	bibauthorid.js \
+			bootstrap.min.js \
+			underscore-min.js \
+			backbone.js \
+			handlebars.js \
+			hepname_update.js \
+			author-handlebars-templates.js \
+			json3.min.js
 
 EXTRA_DIST = $(pylib_DATA) \
              $(js_DATA)

@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
 Bibauthorid Daemon
@@ -23,6 +23,7 @@ Bibauthorid Daemon
 """
 
 import sys
+import os
 from invenio import bibauthorid_config as bconfig
 from invenio import bibtask
 
@@ -32,17 +33,15 @@ from invenio.bibauthorid_backinterface import insert_user_log
 from invenio.bibauthorid_backinterface import get_db_time
 from invenio.bibauthorid_backinterface import get_authors_of_claimed_paper
 from invenio.bibauthorid_backinterface import get_claimed_papers_from_papers
-from invenio.bibauthorid_backinterface import get_all_valid_papers
 from invenio.bibauthorid_affiliations import process_affiliations
+from invenio.bibauthorid_backinterface import get_all_valid_bibrecs
 
-#python 2.4 compatibility
-from invenio.bibauthorid_general_utils import bai_any as any
 
 def bibauthorid_daemon():
     """Constructs the Bibauthorid bibtask."""
     bibtask.task_init(authorization_action='runbibclassify',
-        authorization_msg="Bibauthorid Task Submission",
-        description="""
+                      authorization_msg="Bibauthorid Task Submission",
+                      description="""
 Purpose:
   Disambiguate Authors and find their identities.
 Examples:
@@ -51,7 +50,7 @@ Examples:
   - Disambiguate all records on a fresh installation
       $ bibauthorid -u admin --disambiguate --from-scratch
 """,
-        help_specific_usage="""
+                      help_specific_usage="""
   bibauthorid [COMMAND] [OPTIONS]
 
   COMMAND
@@ -89,22 +88,38 @@ Examples:
       --from-scratch        Ignores the current information in the personid
                             tables and disambiguates everything from scratch.
 
+      --last-names          Performs disambiguation only for specific last names.
+                            This is useful for testing or to fix a broken last name cluster.
+                            Moreover,the threshold for the wedge algorithm may optionally be specified
+                            explicitly per cluster (or keep the value of WEDGE_THRESHOLD in bibauthorid_config).
+
+                            For example: --last-names=surname1,surname2:0.5,surname3:0.3,surname4
+
+      Option for last-names
+        (default)                 Runs in multi-threaded mode.
+
+        --single-threaded         Single-threaded mode. Useful when handling a limited number of names
+                                  and for testing. The flag is only valid when some last names are specified.
+
     There are no options for the merger.
 """,
-        version="Invenio Bibauthorid v%s" % bconfig.VERSION,
-        specific_params=("i:",
-            [
-             "record-ids=",
-             "disambiguate",
-             "merge",
-             "update-search-index",
-             "all-records",
-             "update-personid",
-             "from-scratch"
-            ]),
-        task_submit_elaborate_specific_parameter_fnc=_task_submit_elaborate_specific_parameter,
-        task_submit_check_options_fnc=_task_submit_check_options,
-        task_run_fnc=_task_run_core)
+                      version="Invenio Bibauthorid v%s" % bconfig.VERSION,
+                      specific_params=("i:",
+                                       [
+                                       "record-ids=",
+                                       "disambiguate",
+                                       "merge",
+                                       "update-search-index",
+                                       "all-records",
+                                       "update-personid",
+                                       "from-scratch",
+                                       "last-names=",
+                                       "st",
+                                       "single-threaded"
+                                       ]),
+                      task_submit_elaborate_specific_parameter_fnc=_task_submit_elaborate_specific_parameter,
+                      task_submit_check_options_fnc=_task_submit_check_options,
+                      task_run_fnc=_task_run_core)
 
 
 def _task_submit_elaborate_specific_parameter(key, value, opts, args):
@@ -120,7 +135,7 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ("--record-ids", '-i'):
         if value.count("="):
             value = value[1:]
-        value = value.split(",")
+        value = [token.strip() for token in value.split(',')]
         bibtask.task_set_option("record_ids", value)
     elif key in ("--all-records",):
         bibtask.task_set_option("all_records", True)
@@ -132,6 +147,13 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
         bibtask.task_set_option("update_search_index", True)
     elif key in ("--from-scratch",):
         bibtask.task_set_option("from_scratch", True)
+    elif key in ("--last-names",):
+        if value.count("="):
+            value = value[1:]
+        value = [token.strip() for token in value.split(',')]
+        bibtask.task_set_option("last-names", value)
+    elif key in ("--single-threaded",):
+        bibtask.task_set_option("single-threaded", True)
     else:
         return False
 
@@ -156,9 +178,21 @@ def _task_run_core():
         bibtask.task_update_progress('Affiliations update finished!')
 
     if bibtask.task_get_option("disambiguate"):
-        bibtask.task_update_progress('Performing full disambiguation...')
-        run_tortoise(bool(bibtask.task_get_option("from_scratch")))
-        bibtask.task_update_progress('Full disambiguation finished!')
+        last_names = bibtask.task_get_option('last-names')
+        from_scratch = bool(bibtask.task_get_option("from_scratch"))
+        single_threaded = bool(bibtask.task_get_option("single-threaded"))
+        if single_threaded and not last_names:
+            bibtask.write_message("""--single-threaded will not be considered
+                                     as there are no last names specified.""")
+        if last_names:
+            last_names_thresholds = _group_last_names(last_names)
+            bibtask.task_update_progress('Performing disambiguation on specific last names.')
+            run_tortoise(from_scratch, last_names_thresholds, single_threaded)
+            bibtask.task_update_progress('Disambiguation on specific last names finished!')
+        else:
+            bibtask.task_update_progress('Performing full disambiguation...')
+            run_tortoise(from_scratch)
+            bibtask.task_update_progress('Full disambiguation finished!')
 
     if bibtask.task_get_option("merge"):
         bibtask.task_update_progress('Merging results...')
@@ -171,6 +205,28 @@ def _task_run_core():
         bibtask.task_update_progress('Indexing finished!')
 
     return 1
+
+
+def _group_last_names(last_names_from_daemon):
+    last_names_thresholds = list()
+
+    for last_name in last_names_from_daemon:
+        cl_args = [n.strip() for n in last_name.split(':', 1)]
+        last_names_thresholds.append(cl_args)
+
+    final_names = dict()
+    for i, cl_args in enumerate(last_names_thresholds):
+        if len(cl_args) > 1:
+            name = cl_args[0]
+            threshold = float(cl_args[1])
+            if threshold > 1 or threshold <= 0.0:
+                raise ValueError("Wrong values for threshold")
+
+            final_names[name] = threshold
+        else:
+            name = cl_args[0]
+            final_names[name] = None
+    return final_names
 
 
 def _task_submit_check_options():
@@ -186,18 +242,19 @@ def _task_submit_check_options():
     all_records = bibtask.task_get_option("all_records")
     from_scratch = bibtask.task_get_option("from_scratch")
 
-    commands =( bool(update_personid) + bool(disambiguate) +
-                bool(merge) + bool(update_search_index) )
+    commands = (bool(update_personid) + bool(disambiguate) +
+                bool(merge) + bool(update_search_index))
 
     if commands == 0:
-        bibtask.write_message("ERROR: At least one command should be specified!"
-                              , stream=sys.stdout, verbose=0)
+        bibtask.write_message(
+            "ERROR: At least one command should be specified!",
+            stream=sys.stdout,
+            verbose=0)
         return False
 
     if commands > 1:
         bibtask.write_message("ERROR: The options --update-personid, --disambiguate "
-                              "and --merge are mutually exclusive."
-                              , stream=sys.stdout, verbose=0)
+                              "and --merge are mutually exclusive.", stream=sys.stdout, verbose=0)
         return False
 
     assert commands == 1
@@ -206,15 +263,13 @@ def _task_submit_check_options():
         if any((from_scratch,)):
             bibtask.write_message("ERROR: The only options which can be specified "
                                   "with --update-personid are --record-ids and "
-                                  "--all-records"
-                                  , stream=sys.stdout, verbose=0)
+                                  "--all-records", stream=sys.stdout, verbose=0)
             return False
 
         options = bool(record_ids) + bool(all_records)
         if options > 1:
             bibtask.write_message("ERROR: conflicting options: --record-ids and "
-                                  "--all-records are mutually exclusive."
-                                  , stream=sys.stdout, verbose=0)
+                                  "--all-records are mutually exclusive.", stream=sys.stdout, verbose=0)
             return False
 
         if record_ids:
@@ -227,18 +282,17 @@ def _task_submit_check_options():
     if disambiguate:
         if any((record_ids, all_records)):
             bibtask.write_message("ERROR: The only option which can be specified "
-                                  "with --disambiguate is from-scratch"
-                                  , stream=sys.stdout, verbose=0)
+                                  "with --disambiguate is from-scratch", stream=sys.stdout, verbose=0)
             return False
 
     if merge:
         if any((record_ids, all_records, from_scratch)):
             bibtask.write_message("ERROR: There are no options which can be "
-                                  "specified along with --merge"
-                                  , stream=sys.stdout, verbose=0)
+                                  "specified along with --merge", stream=sys.stdout, verbose=0)
             return False
 
     return True
+
 
 def _get_personids_to_update_extids(papers=None):
     '''
@@ -254,7 +308,7 @@ def _get_personids_to_update_extids(papers=None):
         daemon_last_time_run = last_log[0][2]
         modified_bibrecs = get_modified_papers_since(daemon_last_time_run)
     else:
-        modified_bibrecs = get_all_valid_papers()
+        modified_bibrecs = get_all_valid_bibrecs()
     if papers:
         modified_bibrecs &= set(papers)
     if not modified_bibrecs:
@@ -265,6 +319,7 @@ def _get_personids_to_update_extids(papers=None):
     for bibrec in modified_bibrecs:
         personids_to_update_extids |= set(get_authors_of_claimed_paper(bibrec))
     return personids_to_update_extids
+
 
 def rabbit_with_log(papers, check_invalid_papers, log_comment, partial=False):
     from invenio.bibauthorid_rabbit import rabbit
@@ -286,7 +341,7 @@ def run_rabbit(paperslist, all_records=False):
         last_log = get_user_logs(userinfo='daemon', action='PID_UPDATE', only_most_recent=True)
 
         if len(last_log) >= 1:
-            #select only the most recent papers
+            # select only the most recent papers
             recently_modified = get_modified_papers_since(since=last_log[0][2])
             if not recently_modified:
                 bibtask.write_message("update_personID_table_from_paper: "
@@ -296,17 +351,44 @@ def run_rabbit(paperslist, all_records=False):
                 bibtask.write_message("update_personID_table_from_paper: Running on: " +
                                       str(recently_modified), stream=sys.stdout, verbose=0)
                 rabbit_with_log(recently_modified, True, 'bibauthorid_daemon, run_personid_fast_assign_papers on '
-                                                 + str([paperslist, all_records, recently_modified]))
+                                + str([paperslist, all_records, recently_modified]))
         else:
             rabbit_with_log(None, True, 'bibauthorid_daemon, update_personid on all papers')
     else:
-        rabbit_with_log(paperslist, True, 'bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist), partial=True)
+        rabbit_with_log(
+            paperslist,
+            True,
+            'bibauthorid_daemon, personid_fast_assign_papers on ' + str(paperslist),
+            partial=True)
 
 
-def run_tortoise(from_scratch):
-    from invenio.bibauthorid_tortoise import tortoise, tortoise_from_scratch
+def run_tortoise(from_scratch, last_names_thresholds=None,
+                 single_threaded=False):
 
-    if from_scratch:
+    _prepare_tortoise_cache()
+
+    from invenio.bibauthorid_tortoise import tortoise, \
+        tortoise_from_scratch, tortoise_last_name, tortoise_last_names
+
+    if single_threaded and last_names_thresholds:
+        for last_name, threshold in last_names_thresholds.items():
+            tortoise_last_name(last_name, wedge_threshold=threshold,
+                               from_mark=from_scratch)
+    elif last_names_thresholds:
+        names_with_args = list()
+        for last_name, threshold in last_names_thresholds.items():
+            kwargs = dict()
+            if from_scratch:
+                kwargs['from_mark'] = from_scratch
+            else:
+                kwargs['pure'] = from_scratch
+            if threshold:
+                args = (last_name, threshold)
+            else:
+                args = (last_name,)
+            names_with_args.append((args, kwargs))
+        tortoise_last_names(names_with_args)
+    elif from_scratch:
         tortoise_from_scratch()
     else:
         start_time = get_db_time()
@@ -319,13 +401,19 @@ def run_tortoise(from_scratch):
             modified = []
         tortoise(modified)
 
-    insert_user_log(tortoise_db_name, '-1', '', '', '', timestamp=start_time)
+        insert_user_log(tortoise_db_name, '-1', '', '', '', timestamp=start_time)
+
+
+def _prepare_tortoise_cache():
+    if not os.path.isdir(bconfig.TORTOISE_FILES_PATH):
+        os.makedirs(bconfig.TORTOISE_FILES_PATH)
 
 
 def run_merge():
     from invenio.bibauthorid_merge import merge_dynamic
     merge_dynamic()
 
+
 def update_index():
-    from bibauthorid_search_engine import create_bibauthorid_indexer
+    from invenio.bibauthorid_search_engine import create_bibauthorid_indexer
     create_bibauthorid_indexer()
