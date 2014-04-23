@@ -29,7 +29,7 @@ from invenio.bibauthority_engine import \
     get_low_level_recIDs_from_control_no, \
     get_dependent_records_for_control_no
 
-from invenio.viafutils import get_wikipedia_link
+from invenio.viafutils import get_wikipedia_link,get_wiki_link_from_record
 
 __revision__ = "$Id$"
 
@@ -50,27 +50,34 @@ def format_element(bfo):
     links_formatted = []
     for control_no in control_nos:
         from urllib import quote
-        image_pattern = "<a href='%(external_article)s'><img %(style)s src='/img/%(image)s'/>%(text)s</a>"
+        image_pattern = "<a href='%(external_article)s'><img class='author_usefull_link' src='/img/%(image)s'/>%(text)s</a>"
 
         if (control_no.find("|(VIAF)") != -1):
             viaf_id = control_no.split("|(VIAF)")[1]
-            link_to_wikipedia = get_wikipedia_link(viaf_id)
-            # Wikipedia link with wiki icon
-            image_element = image_pattern % { "style": style, "text": "Wikipedia link", "image": "wikipedia.png", "external_article": link_to_wikipedia}
+            link_to_wikipedia = get_wiki_link_from_record(bfo)
+            if not link_to_wikipedia:
+                link_to_wikipedia = get_wikipedia_link(viaf_id)
+            ## Wikipedia link with wiki icon
+            if link_to_wikipedia:
+                image_element = image_pattern % { "text": "Wikipedia link", "image": "wikipedia.png", "external_article": link_to_wikipedia}
+                links_formatted.append(image_element)
+            ## VIAF link
+            image_element = image_pattern \
+                    % { "text" : "VIAF cluster link","image": "viaf.png", "external_article": str("http://viaf.org/viaf/"+viaf_id) }
             links_formatted.append(image_element)
-            # VIAF link
-            text_element = "<a href='%(external_article)s' %(style)s>%(text)s</a>" \
-                    % {"style" : "style='width:auto;height:20px;font-size:17px'", "text" : "VIAF cluster link", "external_article": str("http://viaf.org/viaf/"+viaf_id) }
-            links_formatted.append(text_element)
+            ## Library of congress link
         if (control_no.find("|(DLC)") != -1):
             dlc_id = control_no.split("|(DLC)")[1].replace(" ","")
             link_to_lccn = "http://lccn.loc.gov/"+ dlc_id
-            image_element = image_pattern % { "style" : style, "text": "Library of Congress link", "image": "library_of_congress.png", "external_article" : link_to_lccn }
+            image_element = image_pattern % { "text": "Library of Congress link", "image": "library_of_congress.png", "external_article" : link_to_lccn }
             links_formatted.append(image_element)
 
 
+
+
+
     if links_formatted is not None:
-        title = "<strong>" + _("Useful link(s)") + "</strong>"
+        title = "<strong>" + _("Useful links") + "</strong>"
         if links_formatted:
             content = "<ul><li>" + "</li><li> ".join(links_formatted) + "</li></ul>"
         else:

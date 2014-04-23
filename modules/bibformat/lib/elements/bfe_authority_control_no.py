@@ -66,9 +66,6 @@ def format_element(bfo):
             if count > 1:
                 # joining control_nos might be more helpful for the user
                 # than joining recIDs... or maybe not...
-#                p_val = '"' + '" or "'.join(control_nos) + '"' # more understandable for the user
-
-                #p_val = "recid:" + ' or recid:'.join([str(recID) for recID in recIDs]) # more efficient
                 parameters = []
                 for ctrl_number_field_numbers in CFG_BIBAUTHORITY_RECORD_AUTHOR_CONTROL_NUMBER_FIELDS:
                     parameters.append(ctrl_number_field_numbers + ":" + control_no)
@@ -91,7 +88,6 @@ def format_element(bfo):
         #assemble the html and append to list
         html_str = control_no + " (" + count_string + ")"
 
-        #"?p=" + "recid:" + 'or recid:'.join([str(_id) for _id in my_recIDs]) + \
         # check if there are more than one authority record with the same
         # control number. If so, warn the user about this inconsistency.
         # TODO: hide this warning from unauthorized users

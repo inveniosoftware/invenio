@@ -45,19 +45,14 @@ def format_element(bfo):
     from invenio.messages import gettext_set_language
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
-    control_nos = [d['a'] for d in bfo.fields('035__')]
-    control_nos = filter(None, control_nos) # fastest way to remove empty ""s
+
+    control_nos = [d['a'] for d in bfo.fields('035__') if d['a']]
     previous_recIDs = []
     parameters = []
     count = None
     publications_formatted = []
+    ## for every control number that this author has, find all the connected records for each one
     for control_no in control_nos:
-#        recIDs = []
-#        types = guess_authority_types(bfo.recID)
-#        # control_no example: AUTHOR:(CERN)aaa0005"
-#        control_nos = [(type + CFG_BIBAUTHORITY_PREFIX_SEP + control_no) for type in types]
-#        for control_no in control_nos:
-#            recIDs.extend(list(search_pattern(p='"' + control_no + '"')))
         for ctrl_number_field_numbers in CFG_BIBAUTHORITY_RECORD_AUTHOR_CONTROL_NUMBER_FIELDS:
             parameters.append(ctrl_number_field_numbers + ":" + control_no.replace(" ",""))
         recIDs = [x for x in get_dependent_records_for_control_no(control_no) if x not in previous_recIDs]
@@ -69,18 +64,8 @@ def format_element(bfo):
             prefix_pattern = "<a href='" + CFG_SITE_URL + "%s" + "'>"
             postfix = "</a>"
             url_str = ''
-            # we have multiple dependent records
-            if count > CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT:
-                #titles = get_fieldvalues(recIDs[:CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT],"245__a")
-                for i in xrange(CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT):
-                    title = get_fieldvalues(recIDs[i],"245__a")
-                    if title:
-                        url_str = "/record/"+ str(recIDs[i])
-                        prefix = prefix_pattern % url_str
-                        publications_formatted.append(prefix + title[0] + postfix)
-            else:
-                #titles = get_fieldvalues(recIDs,"245__a")
-                for i in xrange(len(recIDs)):
+            # print as many of the author's publications as the CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT allows
+            for i in range(count if count<CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT else CFG_BIBAUTHORITY_PUBLICATION_VIEW_LIMIT):
                     title = get_fieldvalues(recIDs[i],"245__a")
                     if title:
                         url_str = "/record/"+ str(recIDs[i])

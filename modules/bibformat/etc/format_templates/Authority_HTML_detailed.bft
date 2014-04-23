@@ -2,7 +2,7 @@
 <description>Detailed Authority HTML format.</description>
 
 <h1><BFE_FIELD tag="100__a"/></h1>
-
+<style>.inside{margin-left: 10px;}</style>
 <div>
 
 <BFE_AUTHORITY_AUTHOR detail="yes"/>
