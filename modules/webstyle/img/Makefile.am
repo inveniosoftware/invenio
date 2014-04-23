@@ -317,6 +317,7 @@ img_DATA = add-small.png \
            openid_icon_48.png \
            twitter_icon_24.png \
            twitter_icon_48.png \
+	   viaf.png \
            verisign_icon_24.png \
            verisign_icon_48.png \
 	   wikipedia.png \

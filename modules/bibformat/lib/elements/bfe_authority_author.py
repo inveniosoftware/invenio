@@ -18,7 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """BibFormat element - Prints author data from an Authority Record.
 """
-
+from invenio.config import CFG_SITE_URL, CFG_SITE_NAME
+from urllib import quote
 import re
 
 __revision__ = "$Id$"
@@ -49,14 +50,15 @@ def format_element(bfo, detail='no'):
     if len(main_dicts):
         main_dict = main_dicts[0]
         main = stringify_dict(main_dict)
-        out += "<p style='margin-top:0px;margin-bottom:0px'>" + "<strong>" + _("Main %s name") % _("author") + "</strong>" + ": " + main + "</p>"
+        ## out += "<p style='margin-top:0px;margin-bottom:0px'>" + "<strong>" + _("Main %s name") % _("author") + "</strong>" + ": " + main + "</p>"
+        out += "<a style='margin-top:0px;margin-bottom:0px'  href='" +"/record/"+ str(bfo.recID) +"?ln=" + bfo.lang + "' >" + main + "</a>"
     # detail
     if detail.lower() == "yes":
         sees = [stringify_dict(see_dict) for see_dict in bfo.fields('400%%')]
         sees = filter(None, sees) # fastest way to remove empty ""s
         sees = [re.sub(",{2,}",",", x) for x in sees] # prevent ",,"
         if len(sees):
-            out += "<p>" + "<strong>" + _("Variant(s)") + "</strong>" + ": <ul><li>" + "</li><li>".join(sees) + "</li></ul></p>"
+            out += "<p>" + "<strong>" + _("Name variant(s)") + "</strong>" + ": <ul><li>" + "</li><li>".join(sees) + "</li></ul></p>"
         see_alsos = [stringify_dict(see_also_dict) for see_also_dict in bfo.fields('500%%')]
         see_alsos = filter(None, see_alsos) # fastest way to remove empty ""s
         see_alsos = [re.sub(",{2,}",",", x) for x in see_alsos] # prevent ",,"

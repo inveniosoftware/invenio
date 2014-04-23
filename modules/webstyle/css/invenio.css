@@ -4008,4 +4008,13 @@ img.login_button_big {
 img.login_button_small {
     border-radius: 2px;
 }
+
+.author_usefull_link {
+width:auto;
+height:20px;
+margin-right:10px;
+}
+
+
+
 /* end of invenio.css */
