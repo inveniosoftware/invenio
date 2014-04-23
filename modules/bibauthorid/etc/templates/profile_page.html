@@ -1,0 +1,278 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="row" id="profile-page" data-box-pid="{{ person_id }}">
+
+    <div class="col-md-5 col-lg-3">
+    <!-- HepNames -->
+
+        <div class="visible-lg well well-sm col-section-title">
+        <!-- Section Title -->
+            <strong><small>Personal Information</small></strong>
+        </div>
+
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Personal Details <small>(HepNames)</small></span>
+            </div>
+            <div class="bai-box-content" id="hepdata" data-box-source="hepnames"></div>
+        </div>
+
+        <div class="visible-lg">
+         <!-- Name Variants, Affiliations, Collaborations -->
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title">
+                    <span>Name Variants</span>
+                </div>
+                <div class="bai-box-content" id="name_variants" data-box-source="name-variants"></div>
+            </div>
+
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title">
+                    <span>Affiliations</span>
+                </div>
+                <div class="bai-box-content" id="affiliations" data-box-source="affiliations"></div>
+            </div>
+
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title"><span>Collaborations</span>
+                </div>
+                <div class="bai-box-content" id="collaborations" data-box-source="collaborations"></div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="col-md-7 col-lg-5">
+    <!-- Publications List -->
+
+        <div class="visible-lg well well-sm col-section-title">
+        <!-- Section Title -->
+            <strong><small>Publications and Output</small></strong>
+        </div>
+
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <ul class="pub-tabs">
+                    <li><a href="#internal-pubs" data-toggle="tab">Publications</a>
+                    </li>
+                    <li><a href="#datasets" data-toggle="tab">Datasets</a>
+                    </li>
+                    <li><a href="#external-pubs" data-toggle="tab">External</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="bai-box-content" id="pubs_list" data-box-source="publications-list">{% include 'publications_box.html' %}</div>
+        </div>
+
+
+        <div class="row visible-lg">
+            <!-- Subject Categories, Keywords, Co-Authors, Papers -->
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="well well-small inspire-well">
+                            <div class="bai-box-title"><span>Co-Authors</span>
+                            </div>
+                            <div class="bai-box-content" id="coauthors" data-box-source="co-authors"></div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="well well-small inspire-well">
+                            <div class="bai-box-title"><span>Papers</span>
+                            </div>
+                            <div class="bai-box-content" id="combined_papers" data-box-source="papers-summary"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="well well-small inspire-well">
+                            <div class="bai-box-title"><span>Subject Categories</span>
+                            </div>
+                            <div class="bai-box-content" id="fieldcodes" data-box-source="subject-categories"></div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="well well-small inspire-well">
+                            <div class="bai-box-title"><span>Frequent Keywords</span>
+                            </div>
+                            <div class="bai-box-content" id="keywords" data-box-source="keywords"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="clearfix visible-md"></div>
+
+
+    <div class="col-md-5 col-lg-4">
+    <!-- Citations Summary -->
+
+        <div class="visible-lg well well-sm col-section-title">
+        <!-- Section Title -->
+            <strong><small>Stats</small></strong>
+        </div>
+
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Citations Summary</span>
+            </div>
+            <div class="bai-box-content" id="citations" data-box-source="citations-summary">
+                {% if papers_num and citeable and published %}
+                {% include 'citations_summary.html'%}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Publications Graph -->
+        <div class="row visible-lg">
+            <div class="col-md-12">
+                <div class="well well-small inspire-well">
+
+                    <div class="bai-box-title"><span>Publication Graph</span></div>
+                    <div class="bai-box-content" id="pubs_graph" data-box-source="publications-graph"></div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="visible-md">
+         <!-- Name Variants, Affiliations, Collaborations -->
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title">
+                    <span>Name Variants</span>
+                </div>
+                <div class="bai-box-content" id="name_variants" data-box-source="name-variants"></div>
+            </div>
+
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title">
+                    <span>Affiliations</span>
+                </div>
+                <div class="bai-box-content" id="affiliations" data-box-source="affiliations"></div>
+            </div>
+
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title"><span>Collaborations</span>
+                </div>
+                <div class="bai-box-content" id="collaborations" data-box-source="collaborations"></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="col-md-7 col-lg-offset-8 col-lg-4">
+        <!-- Publications Graph -->
+        <div class="row hidden-lg">
+            <div class="col-md-12">
+                <div class="well well-small inspire-well">
+
+                    <div class="bai-box-title"><span>Publication Graph</span></div>
+                    <div class="bai-box-content" id="pubs_graph" data-box-source="publications-graph"></div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Subject Categories, Keywords, Co-Authors, Papers -->
+        <div class="row hidden-lg">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="well well-small inspire-well">
+                            <div class="bai-box-title"><span>Co-Authors</span>
+                            </div>
+                            <div class="bai-box-content" id="coauthors" data-box-source="co-authors"></div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="well well-small inspire-well">
+                            <div class="bai-box-title"><span>Papers</span>
+                            </div>
+                            <div class="bai-box-content" id="combined_papers" data-box-source="papers-summary"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="well well-small inspire-well">
+                            <div class="bai-box-title"><span>Subject Categories</span>
+                            </div>
+                            <div class="bai-box-content" id="fieldcodes" data-box-source="subject-categories"></div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="well well-small inspire-well">
+                            <div class="bai-box-title"><span>Frequent Keywords</span>
+                            </div>
+                            <div class="bai-box-content" id="keywords" data-box-source="keywords"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <div class="col-md-5 visible-sm">
+    <!-- Name Variants, Affiliations, Collaborations -->
+
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Name Variants</span>
+            </div>
+            <div class="bai-box-content" id="name_variants" data-box-source="name-variants"></div>
+        </div>
+
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Affiliations</span>
+            </div>
+            <div class="bai-box-content" id="affiliations" data-box-source="affiliations"></div>
+        </div>
+
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title"><span>Collaborations</span>
+            </div>
+            <div class="bai-box-content" id="collaborations" data-box-source="collaborations"></div>
+        </div>
+
+    </div>
+
+
+</div>
+{% endblock %}

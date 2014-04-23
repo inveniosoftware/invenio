@@ -1,0 +1,48 @@
+<div id="autoclaim">
+     <br></br>
+
+     {% if autoclaim_unsuccessful_recids %}
+     <span id="autoClaimUnSuccessMessage">
+	  The following publications need your review before they can be assigned to your profile:
+     </span>
+     <br></br>
+     <div style="border:2px;height:100px;overflow:scroll;overflow-y:auto;overflow-x:auto;">
+          <br></br>
+          <strong>Publication title</strong>
+          <ol type="1" id="noNumbers" style="list-style-type:none">
+          <br></br>
+	  {% for title, url, rec in autoclaim_unsuccessful_recids %}
+	  <li>{{ loop.index }}. <a href="{{ url }}">{{ '%s%s' % (base_url, url) if not title or title == '' else title }}</a></li>
+	  {% endfor %}
+          </ol>
+          <br></br>
+     </div>
+     <br></br>
+     <span class="bsw">
+          <a class="btn btn-default" href="{{ review_autoclaim_link }}" rel="nofollow">Review assigning</a>
+     </span>
+     <br></br>
+     <br></br>
+     {% endif %}
+
+
+     {% if autoclaim_successful_recids %}
+     <span id="autoClaimSuccessMessage">
+	  The following publications have been successfully assigned to your profile:
+     </span>
+     <br></br>
+     <div style="border:2px;height:300px;overflow:scroll;overflow-y:auto;overflow-x:auto;">
+	  <br></br>
+           <strong>Publication title</strong>
+	   <ol type="1" style="padding-left:20px;list-style-type:none">
+           <br></br>
+	   {% for title, url, rec in autoclaim_successful_recids %}
+	   <li>{{ loop.index }}. <a href="{{ url }}"><b>{{ '%s%s' % (base_url, url) if not title or title == '' else title }}</b></a></li>
+	   {% endfor %}
+           </ol>
+           <br></br>
+     </div>	  
+     {% endif %}
+
+</div>
+

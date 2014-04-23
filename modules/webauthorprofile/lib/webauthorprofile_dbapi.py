@@ -90,8 +90,7 @@ def expire_cache_element(name, key):
 
 def expire_all_cache_for_person(person_id):
     """ Expires all caches for person n.canonical.1 """
-    run_sql("update wapCACHE set object_status=%s where "
-            "object_key=%s", ('Expired', 'pid:' + str(person_id)))
+    run_sql("DELETE FROM wapCACHE WHERE object_key=%s", ('pid:' + str(person_id),))
 
 def get_expired_person_ids(expire_delay_days=CFG_WEBAUTHORPROFILE_CACHE_EXPIRED_DELAY_BIBSCHED):
     """ Returns pids with expired caches. """

@@ -1,0 +1,43 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+
+      <div class="row clearfix">
+
+          {{#action}}
+          <div class="col-xs-2">
+              <h2><span class="label {{ classes }}">{{ action }}</span></h2>
+          </div>
+          {{/action}}
+
+
+          <div class="col-xs-{{#action}}8{{/action}}{{^action}}12{{/action}}">
+              <a href="{{ rec_link }}" target="_blank">{{rec_title}}</a>
+
+              <br>For profile <a href="{{ profile_link }}">{{ profile }}</a>
+
+              {{#editable}}, known by:
+
+                  <select>
+                      {{#bibrefs}}
+                      <option value="{{ bibref }}">{{ sig }}</option>
+                      {{/bibrefs}}
+                      <option class="nobibref" value="">I don't know</option>
+                  </select>
+
+              {{/editable}}
+
+          </div>
+
+          <div class="col-xs-2">
+
+              <div class="op-buttons">
+                  <button class="btn btn-default btn-small op-btn removeOp pull-right" type="button">
+                      <span class="glyphicon glyphicon-trash"></span>&nbspDiscard
+                  </button>
+              </div>
+
+          </div>
+      </div>
+
+  </div>
+</div>

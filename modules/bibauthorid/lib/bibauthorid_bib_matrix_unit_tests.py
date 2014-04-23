@@ -28,7 +28,8 @@ from invenio.testutils import InvenioTestCase, make_test_suite, \
 from invenio.bibauthorid_cluster_set import ClusterSet
 from invenio.bibauthorid_bib_matrix import Bib_matrix
 
-class TestBibMatrix(InvenioTestCase):
+
+class Test_Bib_matrix(InvenioTestCase):
 
     def setUp(self):
         """
@@ -36,7 +37,7 @@ class TestBibMatrix(InvenioTestCase):
         """
         self.bm = Bib_matrix('testname', storage_dir_override='/tmp/')
         self.css = ClusterSet()
-        self.css.clusters = [ClusterSet.Cluster(range(i*10,i*10+10)) for i in range(10)]
+        self.css.clusters = [ClusterSet.Cluster(range(i * 10, i * 10 + 10)) for i in range(10)]
         self.css.update_bibs()
         self.bmcs0 = Bib_matrix('testname2', self.css, storage_dir_override='/tmp/')
 
@@ -50,36 +51,36 @@ class TestBibMatrix(InvenioTestCase):
         '''
         for j in range(100):
             for k in range(100):
-                self.assertTrue( self.bmcs0._resolve_entry((j,k))==self.bmcs0._resolve_entry((k,j)) )
+                self.assertTrue(self.bmcs0._resolve_entry((j, k)) == self.bmcs0._resolve_entry((k, j)))
 
     def test_resolve_entry_unicity(self):
         '''
         resolve_entry should produce unuque indexes for any couple of values
         '''
         ntests = 30
-        testvalues = set((i,j) for i in range(ntests) for j in range(ntests))
+        testvalues = set((i, j) for i in range(ntests) for j in range(ntests))
         for k in range(ntests):
             for z in range(ntests):
-                tvalues = testvalues - set([(k,z)]) - set([(z,k)])
-                val = self.bmcs0._resolve_entry((k,z))
+                tvalues = testvalues - set([(k, z)]) - set([(z, k)])
+                val = self.bmcs0._resolve_entry((k, z))
                 allvalues = set(self.bmcs0._resolve_entry(v) for v in tvalues)
-                self.assertFalse( val in allvalues , str(val)+' is in, from '+str((k,z)))
+                self.assertFalse(val in allvalues, str(val) + ' is in, from ' + str((k, z)))
 
     def test_matrix_content(self):
         '''
         The matrix should be simmetric, and values should be preserved
         '''
         for i in range(100):
-            for j in range(i+1):
-                self.bmcs0[i,j] = (i,j)
+            for j in range(i + 1):
+                self.bmcs0[i, j] = (i, j)
 
         for i in range(100):
-            for j in range(i+1,100):
-                val = self.bmcs0[i,j]
+            for j in range(i + 1, 100):
+                val = self.bmcs0[i, j]
                 if i < j:
-                    k,z = j,i
+                    k, z = j, i
                 else:
-                    k,z = i,j
+                    k, z = i, j
                 self.assertTrue(val[0] == k)
                 self.assertTrue(val[1] == z)
 
@@ -87,10 +88,10 @@ class TestBibMatrix(InvenioTestCase):
         """
         All elements should be None
         """
-        for i in range(9,10):
-            for j in range(i*10,i*10+10):
-                for k in range(i*10,i*10+10):
-                        self.assertTrue(self.bmcs0[(j,k)] == None)
+        for i in range(9, 10):
+            for j in range(i * 10, i * 10 + 10):
+                for k in range(i * 10, i * 10 + 10):
+                        self.assertTrue(self.bmcs0[(j, k)] is None)
 
     @nottest
     def FIXME_1678_test_save_matrix(self):
@@ -102,37 +103,38 @@ class TestBibMatrix(InvenioTestCase):
         self.assertTrue(loaded.load())
         bmcs0 = self.bmcs0
         for i in range(100):
-            for  j in range(100):
-                self.assertTrue(bmcs0[i,j] == loaded[i,j])
+            for j in range(100):
+                self.assertTrue(bmcs0[i, j] == loaded[i, j])
 
     def test_duplicate_existing(self):
         self.bmcs0.store()
-        self.bm.duplicate_existing('testname2','testnameduplicate')
+        self.bm.duplicate_existing('testname2', 'testnameduplicate')
         self.assertTrue(self.bmcs0.load())
         self.assertTrue(self.bm.load())
         bmcs0 = self.bmcs0
         bm = self.bm
         for i in range(100):
-            for  j in range(100):
-                self.assertTrue(bmcs0[i,j] == bm[i,j])
+            for j in range(100):
+                self.assertTrue(bmcs0[i, j] == bm[i, j])
 
     def test_special_items(self):
-        self.bmcs0[0,0] = '+'
-        self.bmcs0[0,1] = '-'
-        self.bmcs0[0,2] = None
-        self.assertTrue(self.bmcs0[0,0] == '+')
-        self.assertTrue(self.bmcs0[0,1] == '-')
-        self.assertTrue(self.bmcs0[0,2] is None)
+        self.bmcs0[0, 0] = '+'
+        self.bmcs0[0, 1] = '-'
+        self.bmcs0[0, 2] = None
+        self.assertTrue(self.bmcs0[0, 0] == '+')
+        self.assertTrue(self.bmcs0[0, 1] == '-')
+        self.assertTrue(self.bmcs0[0, 2] is None)
 
     def test_getitem_numeric(self):
-        self.bmcs0[0,0] = '+'
-        self.bmcs0[0,1] = '-'
-        self.bmcs0[0,2] = None
-        self.assertTrue(self.bmcs0.getitem_numeric([0,0])[0] == -2)
-        self.assertTrue(self.bmcs0.getitem_numeric([0,1])[0] == -1)
-        self.assertTrue(self.bmcs0.getitem_numeric([0,2])[0] == -3)
+        self.bmcs0[0, 0] = '+'
+        self.bmcs0[0, 1] = '-'
+        self.bmcs0[0, 2] = None
+        self.assertTrue(self.bmcs0.getitem_numeric([0, 0])[0] == -2)
+        self.assertTrue(self.bmcs0.getitem_numeric([0, 1])[0] == -1)
+        self.assertTrue(self.bmcs0.getitem_numeric([0, 2])[0] == -3)
 
-TEST_SUITE = make_test_suite(TestBibMatrix)
 
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE, warn_user=True)
+TEST_SUITE = make_test_suite(Test_Bib_matrix)
+
+if __name__ == '__main__':
+    run_test_suite(TEST_SUITE)

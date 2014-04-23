@@ -1,0 +1,156 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+
+		<p>The author profile pages display an automatically generated summary of each one of the HEP authors on INSPIRE.</p>
+        <p>You can keep your own profile (as well as other's) up to date, correct errors and include new information by using the management
+		capacities that the author profile provides you.</p>
+
+        <p>Below, you can find a detailed description of all the options that can help you managing author information on INSPIRE.</p>
+
+        <ul style="list-style: none">
+
+           <li><a href="#personal">Personal details</a>
+            </li><li><a href="#manage">Manage your profile</a>
+            </li><li><a href="#choose">Choose profile</a>
+            </li><li><a href="#orcid">Connect external IDs (ORCiD, etc.) to your profile</a>
+            </li><li><a href="#merge">Merge profiles</a>
+            </li><li><a href="#publications">Manage publications</a>
+	        </li><li><a href="#contact">Contact</a>
+        </ul>
+
+
+ <h2><a name="personal">Personal details</a></h2>
+
+
+        <p>The new profile page provides personal information about the author, a complete scientific output list (publications, data, etc.) 
+			and stats about his/her work.  </p>
+
+		<p>The first details you can manage are those included in the "Personal details" section. Two situations can happen:</p>
+		
+		<ul>
+			
+			<li>Profile not connected with personal details: In this situation, you will be provided with a list of matches. You will be 
+				able to select the most accurate or create a new one.
+
+				<br /><br /><img src="{{ base_url }}/img/001.png" alt="profile not connected"/><br /><br />
+
+			<li>Profile connected with personal details: If your profile is already connected with a set of personal details, you can 
+				manage the information displayed by clicking "Update details". The changes will be processed manually by our staff and will
+				not appear immediately.
+				
+				<br /><br /><img src="{{ base_url }}/img/002.png" alt="profile connected"/><br /><br />
+
+        <h2><a name="manage">Manage your profile</a></h2>
+
+		<p>Further details can be updated or extended from the "Manage profile" section. You can access it using the navigation menu on top:</p>
+		
+		<br /><img src="{{ base_url }}/img/003.png" alt="navigation menu" /><br /><br /><br />
+
+        <p>The first thing you can do is login with your arXiv account. Login is strongly recommended but not necessary. You can still continue as a guest. That means you can manage your profile but your edits will not be visible right away. It will take some time for your changes to appear as they will be managed manually by one of our administrators.</p>
+
+		<br /><img src="{{ base_url }}/img/004.png" alt="arXiv login 1" /><br /><br /><br />
+		
+        <p>Clicking on the "Login into INSPIRE through arXiv" button will redirect you to the arXiv website. There you can use your arXiv username and password (or create a new account). </p>
+
+		<br /><img src="{{ base_url }}/img/005.png" alt="arXiv login 2" /><br /><br /><br />
+
+        <p>You will be redirected back to INSPIRE automatically after logging in.</p>
+
+		<br /><br />
+
+        <h2><a name="choose">Choose profile</a></h2>
+
+        <p>The first time you login through arXiv, INSPIRE will show you the profile(s) that match your arXiv publication list.</p>
+
+		<br /><img src="{{ base_url }}/img/006.png" alt="select matching profile" /><br /><br /><br />
+
+        <p>Please, choose the best match. If none of them matches your publication list wholly, select the closest match and add the missing publications in a later step.</p>
+
+		<br /><br />
+
+        <h2><a name="orcid">Connect external IDs (ORCiD, etc.) to your profile</a></h2>
+
+        <p>It is recommended that you add an ORCiD to your profile.</p>
+
+        <p>ORCiD (Open Researcher and Contributor ID) is a unique researcher identifier that distinguishes you from other researchers. It holds a record of all your research activities. You can add your ORCiD to all your works to make sure they are associated with you.  For more information you can visit <a href="http://www.orcid.org/" target="_blank">http://www.orcid.org</a></p>
+
+        <p>The process is similar to the arXiv login. You will be directed to ORCiD.org to login or register a new account. After that, you will be redirected back to your author management page. INSPIRE will now get updated with the publications you have on your ORCiD profile.</p>
+
+		<br /><img src="{{ base_url }}/img/007.png" alt="orcid 1" /><br />
+
+		<br /><img src="{{ base_url }}/img/008.png" alt="orcid 2" /><br /><br /><br />
+
+        <p>If the publications received from ORCiD exist in the INSPIRE database, they will be assigned to your publication list. The rest will appear as part of the "External" publication list. You will only have to login through ORCiD once. Future updates on ORCiD will be included on INSPIRE automatically. </p>
+
+		<br /><img src="{{ base_url }}/img/009.png" alt="external publications" /><br /><br /><br />
+
+        <h2><a name="merge">Merge profiles</a></h2>
+
+        <p>If you notice that publications of an author are split over two or more profiles, you can merge them in one profile using the "Merge Profile" tool.</p>
+
+
+		<br /><img src="{{ base_url }}/img/010.png" alt="merge box" /><br /><br /><br />
+		
+        <p>It will lead you to a list of automatically suggested additional profiles to merge. </p>
+
+		<br /><img src="{{ base_url }}/img/011.png" alt="merge interface" /><br /><br /><br />
+		
+        <p>If the profile you are looking for is not on the list, you can use the search box to find it.</p>
+
+		<br /><img src="{{ base_url }}/img/012.png" alt="search and merge" /><br /><br /><br />
+
+        <p>You can add as many profiles as necessary by clicking on "Add to merge list". Decide which one you want to make the primary profile. Once you have a complete set of profiles that you want to merge, press the "Merge profiles" button. </p>
+
+		<br /><img src="{{ base_url }}/img/013.png" alt="merging" /><br /><br /><br />
+		
+        <p>Your actions will need to be confirmed by our staff before they take effect, even if you are logged in via arXiv. </p>
+
+        <p>Consider that once the action is confirmed, all the information (including publications, IDs and citations) will be assigned to the profile you choose as primary profile (by default, the one you started the process from is set as primary profile). After merging, only the primary profile will remain in the system and all the others will be automatically deleted.</p>
+
+		<br /><br />
+
+        <h2><a name="publications">Manage publications</a></h2>
+
+        <p>Having your publication list up to date is important as this is what makes your statistics, such as number of citations, appear correctly. For reviewing or correcting your publication list, click on "Manage publications" in the navigation bar.</p>
+
+		<br /><img src="{{ base_url }}/img/014.png" alt="menu publications" /><br /><br /><br />
+
+        <p> For each publication you can:</p>
+
+        <ul>
+            <li>Confirm that this is your paper
+            </li><li>Remove it from your publication list if it is not authored by you
+            </li><li>Assign it to somebody else
+        </li></ul>
+
+        <p>You can select multiple publications and complete one action for all of them by clicking on the corresponding buttons on the top of the page.</p>
+
+		<br /><img src="{{ base_url }}/img/015.png" alt="top menu manage publications" /><br /><br /><br />
+
+        <p>You can also decide for each publication separately using the buttons on the side.</p>
+
+		<br /><img src="{{ base_url }}/img/016.png" alt="right menu manage publicatons" /><br /><br /><br />
+
+        <p>If your publication list is incomplete, you can also search for your missing papers in the INSPIRE database through the search box at the bottom of the page.</p>
+
+        <br /><img src="{{ base_url }}/img/017.png" alt="bottom search" /><br /><br /><br />
+
+        <p>You will get a list of search results on INSPIRE. To add a paper from this list to your publication list, click on the green "Attribute this paper" link.</p>
+
+        <br /><img src="{{ base_url }}/img/018.png" alt="assign paper" /><br /><br /><br />
+
+        <p>In a next step, you will be able to select the appropriate author for the publication (either you or a different author). </p>
+
+        <br /><img src="{{ base_url }}/img/019.png" alt="assign paper 2" /><br /><br /><br />
+
+        <h2><a name="contact">Contact us</a></h2>
+
+
+        <p>If you have any other question or need help, please contact us at <a href="mailto:feedback@inspirehep.net">feedback@inspirehep.net</a></p>
+
+
+    </div>
+</div>
+{% endblock %}

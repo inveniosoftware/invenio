@@ -1,6 +1,6 @@
 panagiotis;panos
 jan;johannes
-jorg;joerg;j�rg
+jorg;joerg;jörg
 chip;raymond
 jianhui;jian
 tim;timothy
@@ -30,7 +30,7 @@ agentul;marius
 daxi;daxian
 andrei;andree
 maciek;ignacy
-francois;fran�ois
+francois;françois
 dave;david
 vojtech;vojtich
 bao;baoloc
@@ -82,7 +82,7 @@ fernando;baltasar
 frank;teng
 yan;yanlin
 charles;stuart
-lähteenmäk;anne
+lÃ¤hteenmÃ¤k;anne
 hrant;grant
 alessandra;maria
 jim;allaby
@@ -185,7 +185,7 @@ evgeny;evgueni
 gudlaugur;guolaugur
 jin;jinhyuk
 constance;connie
-valentí;valenti
+valentÃ­;valenti
 junsuhk;jun
 leonardo;leonard
 joseph;ioseph
@@ -211,7 +211,7 @@ gunter;guenter
 jack;jacobo
 sjing;jing
 mingxiong;ming
-remi;rémi
+remi;rÃ©mi
 jozef;josef
 dobrin;dobin
 bernard;ben
@@ -229,7 +229,7 @@ grigory;grigori
 rakotonirina;christian
 hui;huishi
 jin;jinhao
-german;germán
+german;germÃ¡n
 iouri;yury;yuri
 aleksandre;alexandre;alexander
 cheng;chengfu
@@ -240,7 +240,7 @@ evgeni;evgueni
 vakhtang;vato
 slawomir;slawek
 jing;jinghan
-jürgen;jurgen;juergen
+jÃ¼rgen;jurgen;juergen
 hongsu;hong
 samson;ilia
 dan;dani
@@ -270,7 +270,7 @@ jong;jonghee
 paula;maria
 alex;alexander
 fredrick;fred
-muge;müge"
+muge;mÃ¼ge"
 adrianus;arie;adrianes
 zhengguo;zheng
 tie;tiesheng
@@ -341,7 +341,7 @@ ilektra;electra
 jozso;jozsef
 yichun;yi
 paolo;de
-j�rgen;jurgen;juergen
+jürgen;jurgen;juergen
 alexandru;alexander
 william;will
 dimitrios;dimos
@@ -385,7 +385,7 @@ ivan;heredia
 hermann;peter
 yevgen;evgenij
 jaison;jai
-micha�l;mikael;michael
+michaël;mikael;michael
 alexei;alexey
 donald;jack
 sabato;stefano
@@ -404,7 +404,7 @@ djordje;dorde
 concha;maria
 mikhail;misha
 julian;jay
-jürgen;jurgen
+jÃ¼rgen;jurgen
 leroy;christine
 christophe;colas
 katerina;ekaterina
@@ -463,7 +463,7 @@ wyatt;kay
 shamibrata;shami
 melinda;lindy
 brano;branislav
-jorg;jörg;joerg
+jorg;jÃ¶rg;joerg
 matt;charles
 numan;mustafa
 jacob;jaap
@@ -480,7 +480,7 @@ retha;magaretha
 reinder;rene
 george;georg
 weimin;wei
-céline;celine
+cÃ©line;celine
 youngshin;young
 reginald;reg
 peter;piotr
@@ -550,11 +550,11 @@ bart;leonard
 herman;shiu
 xinjie;xin
 peining;pei
-rafal;rafa�~b
+rafal;rafaÅ~b
 mirzayusuf;mirzayousuf;yousuf
 mike;micheal
 sungeun;sung
-gabor;gábor
+gabor;gÃ¡bor
 valery;valeri
 terrence;terrance;terry
 rick;richard
@@ -576,7 +576,7 @@ nikolay;nickolay
 shan;sheldon
 abner;abi
 ludvig;ludwig
-andre;andr�
+andre;andré
 seungwon;seung
 huaxing;hua
 eduardo;eddie
@@ -614,7 +614,7 @@ topher;christopher
 xiaomei;xiao
 yulia;julia
 mimmo;domenico
-jo�o;joao
+joão;joao
 paul;franklin
 jun;junseong
 desmond;des
@@ -657,7 +657,7 @@ jun;jundong
 zhong;zhongxin
 dharam;dharm
 gensheng;gen
-gösta;gosta
+gÃ¶sta;gosta
 patrick;rick
 hong;hongshi
 sergei;sergey;serguei
@@ -680,7 +680,7 @@ yuan;yuanning
 yury;iouri
 muhammad;jamil
 frank;franciscus
-jose;josé
+jose;josÃ©
 fedor;feodor
 byung;byungil
 minghui;ming
@@ -700,7 +700,7 @@ dimitrios;dimitris
 ai;aihong
 daniel;bram
 sergei;sergey
-renee;ren�e
+renee;renée
 chia;chiayu
 xin;xingang
 shinichi;shin'ichi
@@ -735,7 +735,7 @@ lucie;luc
 eva;evelina
 andrew;howard
 scott;gary
-régis;regis
+rÃ©gis;regis
 ihn;ihnjea
 eunsin;eun
 gene;eugene
@@ -755,7 +755,7 @@ marjorie;marj
 antonino;antonio
 louis;jamie
 jose;chilo
-andre;andré
+andre;andrÃ©
 kenichi;ken'ichi
 nikolai;nikolay
 leonard;lenny

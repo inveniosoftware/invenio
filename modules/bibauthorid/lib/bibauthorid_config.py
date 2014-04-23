@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
 bibauthorid_config
@@ -23,6 +23,8 @@ bibauthorid_config
     by different parts of the framework. Note, however, that it's best to
     declare any configuration options for the modules within themselves.
 """
+
+# To refactor: Local variables should also start with CFG.
 
 try:
     from invenio.access_control_config import SUPERADMINROLE
@@ -36,11 +38,11 @@ try:
         CFG_BIBAUTHORID_MAX_PROCESSES, \
         CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY, \
         CFG_BIBAUTHORID_ENABLED, \
-        CFG_BIBAUTHORID_ON_AUTHORPAGES, \
         CFG_BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, \
         CFG_INSPIRE_SITE, \
         CFG_ADS_SITE, \
-        CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS
+        CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS, \
+        CFG_SITE_NAME
 
 except ImportError:
     GLOBAL_CONFIG = False
@@ -61,7 +63,7 @@ CLAIMPAPER_CHANGE_OTHERS_DATA = 'claimpaper_change_others_data'
 CLAIMPAPER_CLAIM_OWN_PAPERS = 'claimpaper_claim_own_papers'
 CLAIMPAPER_CLAIM_OTHERS_PAPERS = 'claimpaper_claim_others_papers'
 
-#Number of persons in a search result for which the first five papers will be shown
+# Number of persons in a search result for which the first five papers will be shown
 PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT = 10
 
 CMPROLESLCUL = {'guest': 0,
@@ -74,6 +76,10 @@ PERSONS_PER_PAGE = 5
 # Max amount of recent papers shown to the user
 MAX_NUM_SHOW_PAPERS = 5
 
+# BibAuthorId functionalities should always be enabled for Inspire.
+if CFG_INSPIRE_SITE:
+    CFG_BIBAUTHORID_ENABLED = True
+
 # Globally enable AuthorID Interfaces.
 #     If False: No guest, user or operator will have access to the system.
 if GLOBAL_CONFIG:
@@ -83,7 +89,7 @@ else:
 
 # Enable AuthorID information on the author pages.
 if GLOBAL_CONFIG:
-    AID_ON_AUTHORPAGES = CFG_BIBAUTHORID_ON_AUTHORPAGES
+    AID_ON_AUTHORPAGES = CFG_BIBAUTHORID_ENABLED
 else:
     AID_ON_AUTHORPAGES = True
 
@@ -95,10 +101,7 @@ if GLOBAL_CONFIG and CFG_ADS_SITE:
 elif CFG_INSPIRE_SITE:
     LIMIT_TO_COLLECTIONS = ['HEP']
 else:
-    LIMIT_TO_COLLECTIONS = []
-
-# Exclude documents that are visible in a collection mentioned here:
-EXCLUDE_COLLECTIONS = ["HEPDATA","Data", "HEPNAMES", "INST", "Deleted", "DELETED", "deleted"]
+    LIMIT_TO_COLLECTIONS = list()
 
 # User info keys for externally claimed records
 # e.g. for arXiv SSO: ["external_arxivids"]
@@ -126,38 +129,39 @@ else:
 WEDGE_THRESHOLD = 0.70
 
 
-#Rabbit use or ignore external ids
+# Rabbit use or ignore external ids
 RABBIT_USE_EXTERNAL_IDS = True
 
-#Collect and use in rabbit external ids INSPIREID
+# Collect and use in rabbit external ids INSPIREID
 COLLECT_EXTERNAL_ID_INSPIREID = CFG_INSPIRE_SITE
-RABBIT_USE_EXTERNAL_ID_INSPIREID = CFG_INSPIRE_SITE
+if CFG_INSPIRE_SITE:
+    RABBIT_EXTERNAL_IDS_TO_USE = ['InspireID', 'OrcidID']
+else:
+    RABBIT_EXTERNAL_IDS_TO_USE = list()
 
-#Force rabbit to cache entire marc tables instead of querying db if dealing with more
-#then threshold papers
+# Threshold to the determine whether a person' records will be cached during the query.
+EXT_ID_CACHE_THRESHOLD = 50
+
+# Force rabbit to cache entire marc tables instead of querying db if dealing with more
+# then threshold papers
 RABBIT_USE_CACHED_GET_GROUPED_RECORDS = True
 RABBIT_USE_CACHED_GET_GROUPED_RECORDS_THRESHOLD = 5000
 
 
-#Cache the personid table for performing exact name searches?
+# Cache the personid table for performing exact name searches?
 RABBIT_USE_CACHED_PID = True
 
-#Collect (external ids from and store them as person attributes) _only_ from manually claimed papers?
-#If false, collects even from non claimed papers.
+# Collect (external ids from and store them as person attributes) _only_ from manually claimed papers?
+# If false, collects even from non claimed papers.
 LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS = True
 
 
 # BibAuthorID debugging options
 
-# This flag triggers most of the output.
+# This flag triggers the basic output.
 DEBUG_OUTPUT = False
-# Print timestamps
-DEBUG_TIMESTAMPS = True
 
-# Print timestamps even in update_status
-DEBUG_TIMESTAMPS_UPDATE_STATUS = True
-
-DEBUG_UPDATE_STATUS_THREAD_SAFE = True
+DEBUG_UPDATE_STATUS_THREAD_SAFE = False
 DEBUG_LOG_TO_PIDFILE = False
 
 # The following options trigger the output for parts of
@@ -165,8 +169,7 @@ DEBUG_LOG_TO_PIDFILE = False
 DEBUG_NAME_COMPARISON_OUTPUT = False
 DEBUG_METADATA_COMPARISON_OUTPUT = False
 DEBUG_WEDGE_OUTPUT = False
-DEBUG_WEDGE_PRINT_FINAL_CLUSTER_COMPATIBILITIES = False
-DEBUG_PROCESS_PEAK_MEMORY = True
+DEBUG_PROCESS_PEAK_MEMORY = False
 
 # Keep in mind that you might use an assert instead of this option.
 # Use DEBUG_CHECKS to guard heavy computations in order to make
@@ -175,7 +178,7 @@ DEBUG_CHECKS = False
 
 TORTOISE_FILES_PATH = '/opt/tortoise_cache/'
 
-## force skip ui arxiv stub page (specific for inspire)
+# force skip ui arxiv stub page (specific for inspire)
 BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
 
 if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
@@ -183,13 +186,12 @@ if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
 else:
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
 
-## URL for the remote INSPIRE login that shall be shown on (arXiv stub page.)
+# URL for the remote INSPIRE login that shall be shown on (arXiv stub page.)
 BIBAUTHORID_CFG_INSPIRE_LOGIN = ""
 
 if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
     BIBAUTHORID_CFG_INSPIRE_LOGIN = 'https://arxiv.org/inspire_login'
-
-# Shall we send from locally defined eMail address or from the users one
+# Shall we send from local:ly defined eMail address or from the users one
 # when we send out a ticket? Default is True -> send with user's email
 TICKET_SENDING_FROM_USER_EMAIL = True
 
@@ -200,9 +202,21 @@ SURNAMES_SEPARATOR_CHARACTER_LIST = ",;"
 # create new profile required
 CREATE_NEW_PERSON = -3
 
-#Dict which lists which external identifiers  can be stored on a person profile page, and maps them
-#with their representation in aidPERSONIDDATA
+# Dict which lists which external identifiers  can be stored on a person profile page, and maps them
+# with their representation in aidPERSONIDDATA
 PERSONID_EXTERNAL_IDENTIFIER_MAP = {'Inspire': 'INSPIREID', 'Orcid': 'ORCID'}
+
+# HepNames whitelist of identifiers displayed on user profiles.
+# Identifiers should be in lowercase and the value represents the priority.
+# Priority values are ordered: smallest first and largest last.
+# {} signifies that all identifiers should be displayed.
+# e.g. { "arxiv": 1 } signals arxiv identifiers with highest priority.
+PROFILE_IDENTIFIER_WHITELIST = {}
+
+# Used to define URL mappings for identifiers in lowercase
+# Identifiers will be placed where {} is found in the mapping.
+# e.g. { "orcid": "https://orcid.org/{}"}
+PROFILE_IDENTIFIER_URL_MAPPING = {}
 
 NON_EMPTY_PERSON_TAGS = ['canonical_name']
 
@@ -210,14 +224,24 @@ QGRAM_LEN = 2
 MATCHING_QGRAMS_PERCENTAGE = 0.8
 MAX_T_OCCURANCE_RESULT_LIST_CARDINALITY = 35
 MIN_T_OCCURANCE_RESULT_LIST_CARDINALITY = 10
-NAME_SCORE_COEFFICIENT = 0.5
 
 # List that contains the existing remote systems that a user can logged in via them in Inspire
 CFG_BIBAUTHORID_EXISTING_REMOTE_LOGIN_SYSTEMS = ['arXiv', 'orcid']
 
-if GLOBAL_CONFIG and not set(CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS ) <= set(CFG_BIBAUTHORID_EXISTING_REMOTE_LOGIN_SYSTEMS):
-    raise Exception("Wrong configuration!!! CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS must be a subset of %s"%str(CFG_BIBAUTHORID_EXISTING_REMOTE_LOGIN_SYSTEMS))
+if GLOBAL_CONFIG and not set(CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS) <= set(CFG_BIBAUTHORID_EXISTING_REMOTE_LOGIN_SYSTEMS):
+    raise Exception(
+        "Wrong configuration!!! CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS must be a subset of %s" %
+        str(CFG_BIBAUTHORID_EXISTING_REMOTE_LOGIN_SYSTEMS))
 
-CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIERS = {'arxivid': '037', 'doi': 'doi' }
-CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_LINKS = {'arXiv': 'invalid', 'invalid': 'invalid' }
-CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIER_TYPES = {'arXiv': 'arxivid', 'orcid': 'doi' }
+CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIERS = {'arxivid': '037', 'doi': 'doi'}
+CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_LINKS = {'arXiv': 'invalid', 'invalid': 'invalid'}
+CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIER_TYPES = {'arXiv': 'arxivid', 'orcid': 'doi'}
+
+# For Inspire,the value of CFG_SITE_NAME is extensively used for a different purpose.
+# This keeps the configuration neutral of implementations.
+BIBAUTHORID_CFG_SITE_NAME = ""
+
+if GLOBAL_CONFIG and CFG_INSPIRE_SITE:
+    BIBAUTHORID_CFG_SITE_NAME = "INSPIRE"
+else:
+    BIBAUTHORID_CFG_SITE_NAME = CFG_SITE_NAME

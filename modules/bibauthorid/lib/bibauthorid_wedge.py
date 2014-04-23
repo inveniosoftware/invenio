@@ -1,35 +1,32 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011, 2012, 2013 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio import bibauthorid_config as bconfig
 from itertools import izip, starmap
 from operator import mul
 from multiprocessing import Process
-from invenio.bibauthorid_general_utils import update_status \
-                                    , update_status_final \
-                                    , bibauthor_print \
-                                    , wedge_print \
-                                    , sortFileInPlace
+from invenio.bibauthorid_general_utils import sortFileInPlace
+from invenio.bibauthorid_logutils import Logger
 
 from invenio.bibauthorid_prob_matrix import ProbabilityMatrix, Bib_matrix
 import numpy
-#mport cPickle as SER
+# mport cPickle as SER
 import msgpack as SER
 
 import gzip as filehandler
@@ -49,11 +46,17 @@ edge_cut_prob = ''
 wedge_thrsh = ''
 h5file = None
 
-import os
-PID = lambda : str(os.getpid())
 
-import pyximport; pyximport.install()
-from bibauthorid_meld_edges import meld_edges
+logger = Logger("wedge")
+logger.verbose=bconfig.DEBUG_WEDGE_OUTPUT
+
+import os
+PID = lambda: str(os.getpid())
+
+import pyximport
+pyximport.install()
+from invenio.bibauthorid_meld_edges import meld_edges
+
 
 def wedge(cluster_set, report_cluster_status=False, force_wedge_thrsh=False):
     # The lower bound of the edges being processed by the wedge algorithm.
@@ -71,33 +74,28 @@ def wedge(cluster_set, report_cluster_status=False, force_wedge_thrsh=False):
     matr.load()
 
     global h5file
-    h5filepath = bconfig.TORTOISE_FILES_PATH+'wedge_cache_'+str(PID())
+    h5filepath = bconfig.TORTOISE_FILES_PATH + 'wedge_cache_' + str(PID())
     h5file = h5py.File(h5filepath)
 
     convert_cluster_set(cluster_set, matr)
-    del matr # be sure that this is the last reference!
+    del matr  # be sure that this is the last reference!
 
     do_wedge(cluster_set)
 
     report = []
-    if bconfig.DEBUG_WEDGE_PRINT_FINAL_CLUSTER_COMPATIBILITIES or report_cluster_status:
+    if report_cluster_status:
         msg = []
         for cl1 in cluster_set.clusters:
             for cl2 in cluster_set.clusters:
                 if cl2 > cl1:
                     id1 = cluster_set.clusters.index(cl1)
                     id2 = cluster_set.clusters.index(cl2)
-                    c12 = _compare_to(cl1,cl2)
-                    c21 = _compare_to(cl2,cl1)
-                    report.append((id1,id2,c12+c21))
-                    msg.append( ' %s vs %s : %s + %s = %s -- %s' %  (id1, id2, c12, c21, c12+c21, cl1.hates(cl2)))
+                    c12 = _compare_to(cl1, cl2)
+                    c21 = _compare_to(cl2, cl1)
+                    report.append((id1, id2, c12 + c21))
+                    msg.append(' %s vs %s : %s + %s = %s -- %s' % (id1, id2, c12, c21, c12 + c21, cl1.hates(cl2)))
         msg = 'Wedge final clusters for %s: \n' % str(wedge_thrsh) + '\n'.join(msg)
-        if not bconfig.DEBUG_WEDGE_OUTPUT and bconfig.DEBUG_WEDGE_PRINT_FINAL_CLUSTER_COMPATIBILITIES:
-            print
-            print msg
-            print
-        wedge_print(msg)
-
+        logger.log(msg)
 
     restore_cluster_set(cluster_set)
 
@@ -106,9 +104,10 @@ def wedge(cluster_set, report_cluster_status=False, force_wedge_thrsh=False):
         assert cluster_set._debug_duplicated_recs()
 
     if report_cluster_status:
-        destfile = '/tmp/baistats/cluster_status_report_pid_%s_lastname_%s_thrsh_%s' % (str(PID()),str(cluster_set.last_name),str(wedge_thrsh))
+        destfile = '/tmp/baistats/cluster_status_report_pid_%s_lastname_%s_thrsh_%s' % (
+            str(PID()), str(cluster_set.last_name), str(wedge_thrsh))
         f = filehandler.open(destfile, 'w')
-        SER.dump([wedge_thrsh,cluster_set.last_name,report,cluster_set.num_all_bibs],f)
+        SER.dump([wedge_thrsh, cluster_set.last_name, report, cluster_set.num_all_bibs], f)
         f.close()
     gc.collect()
 
@@ -120,7 +119,7 @@ def _decide(cl1, cl2):
     score1 = _compare_to(cl1, cl2)
     score2 = _compare_to(cl2, cl1)
     s = score1 + score2
-    wedge_print("Wedge: _decide (%f+%f) = %f cmp to %f" % (score1,score2,s,wedge_thrsh))
+    logger.log("Wedge: _decide (%f+%f) = %f cmp to %f" % (score1, score2, s, wedge_thrsh))
     return s > wedge_thrsh, s
 
 
@@ -128,18 +127,18 @@ def _compare_to(cl1, cl2):
     cl1_out_edges = h5file[str(id(cl1))]
     pointers = [cl1_out_edges[v] for v in cl2.bibs]
 
-    assert pointers, PID()+"Wedge: no edges between clusters!"
+    assert pointers, PID() + "Wedge: no edges between clusters!"
     vals, probs = zip(*pointers)
 
-    wedge_print("Wedge: _compare_to: vals = %s, probs = %s" % (str(vals), str(probs)))
+    logger.log("Wedge: _compare_to: vals = %s, probs = %s" % (str(vals), str(probs)))
 
     if SP_QUARREL in vals:
         ret = 0.
-        wedge_print('Wedge: _compare_to: - edge present, returning 0')
+        logger.log('Wedge: _compare_to: - edge present, returning 0')
 
     elif SP_CONFIRM in vals:
         ret = 0.5
-        wedge_print('Wedge: _compare_to: + edge present, returning 0.5')
+        logger.log('Wedge: _compare_to: + edge present, returning 0.5')
 
     else:
 
@@ -147,7 +146,7 @@ def _compare_to(cl1, cl2):
         if avg > eps:
             nvals = [(val / avg) ** prob for val, prob in pointers]
         else:
-            wedge_print("Wedge: _compare_to: vals too low to compare, skipping")
+            logger.log("Wedge: _compare_to: vals too low to compare, skipping")
             return 0
 
         coeff = _gini(nvals)
@@ -156,9 +155,10 @@ def _compare_to(cl1, cl2):
 
         ret = (coeff * weight) / 2.
 
-        assert ret <= 0.5, PID()+'COMPARE_TO big value returned ret %s coeff %s weight %s nvals %s vals %s prob %s' % (ret, coeff, weight, nvals, vals, probs)
+        assert ret <= 0.5, PID() + 'COMPARE_TO big value returned ret %s coeff %s weight %s nvals %s vals %s prob %s' % (
+            ret, coeff, weight, nvals, vals, probs)
 
-        wedge_print("Wedge: _compare_to: coeff = %f, weight = %f, retval = %f" % (coeff, weight, ret))
+        logger.log("Wedge: _compare_to: coeff = %f, weight = %f, retval = %f" % (coeff, weight, ret))
 
     return ret
 
@@ -182,7 +182,7 @@ def _edge_sorting(edge):
 
 
 def _pack_vals(v):
-    return str(v[0])+';'+str(v[1])+';'+str(v[2][0])+';'+str(v[2][1])+'\n'
+    return str(v[0]) + ';' + str(v[1]) + ';' + str(v[2][0]) + ';' + str(v[2][1]) + '\n'
 
 
 def _unpack_vals(s):
@@ -199,26 +199,26 @@ def do_wedge(cluster_set, deep_debug=False):
 
     bib_map = create_bib_2_cluster_dict(cluster_set)
     original_process_id = PID()
-    #remember to close the files!
-    #plus_edges_fp, len_plus, minus_edges_fp, len_minus, edges_fp, len_edges = group_sort_edges(cluster_set)
+    # remember to close the files!
+    # plus_edges_fp, len_plus, minus_edges_fp, len_minus, edges_fp, len_edges = group_sort_edges(cluster_set)
 
-    p = Process(target=group_sort_edges, args=(cluster_set,original_process_id))
+    p = Process(target=group_sort_edges, args=(cluster_set, original_process_id))
     p.start()
     p.join()
 
-    plus_edges_fp = open(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_p_'+str(original_process_id),'r')
-    minus_edges_fp = open(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_m_'+str(original_process_id),'r')
-    edges_fp = open(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_e_'+str(original_process_id),'r')
-    data_fp = open(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_data_'+str(original_process_id),'r')
+    plus_edges_fp = open(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_p_' + str(original_process_id), 'r')
+    minus_edges_fp = open(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_m_' + str(original_process_id), 'r')
+    edges_fp = open(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_e_' + str(original_process_id), 'r')
+    data_fp = open(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_data_' + str(original_process_id), 'r')
 
-    len_plus,len_minus,len_edges = cPickle.load(data_fp)
+    len_plus, len_minus, len_edges = cPickle.load(data_fp)
     data_fp.close()
 
     interval = 1000
     for i, s in enumerate(plus_edges_fp):
         bib1, bib2, unused = _unpack_vals(s)
         if (i % interval) == 0:
-            update_status(float(i) / len_plus, "Agglomerating obvious clusters...")
+            logger.update_status(float(i) / len_plus, "Agglomerating obvious clusters...")
         cl1 = bib_map[bib1]
         cl2 = bib_map[bib2]
         if cl1 != cl2 and not cl1.hates(cl2):
@@ -226,65 +226,69 @@ def do_wedge(cluster_set, deep_debug=False):
             cluster_set.clusters.remove(cl2)
             for v in cl2.bibs:
                 bib_map[v] = cl1
-    update_status_final("Agglomerating obvious clusters done.")
+    logger.update_status_final("Agglomerating obvious clusters done.")
 
     interval = 1000
     for i, s in enumerate(minus_edges_fp):
         bib1, bib2, unused = _unpack_vals(s)
         if (i % interval) == 0:
-            update_status(float(i) / len_minus, "Dividing obvious clusters...")
+            logger.update_status(float(i) / len_minus, "Dividing obvious clusters...")
         cl1 = bib_map[bib1]
         cl2 = bib_map[bib2]
         if cl1 != cl2 and not cl1.hates(cl2):
             cl1.quarrel(cl2)
-    update_status_final("Dividing obvious clusters done.")
+    logger.update_status_final("Dividing obvious clusters done.")
 
     interval = 50000
-    wedge_print("Wedge: New wedge, %d edges." % len_edges)
+    logger.log("Wedge: New wedge, %d edges." % len_edges)
     current = -1
-    for  s in edges_fp:
+    for s in edges_fp:
         v1, v2, unused = _unpack_vals(s)
         current += 1
         if (current % interval) == 0:
-            update_status(float(current) / len_edges, "Wedge...")
+            logger.update_status(float(current) / len_edges, "Wedge...")
 
-        assert unused != '+' and unused != '-', PID()+"Signed edge after filter!"
+        assert unused != '+' and unused != '-', PID() + "Signed edge after filter!"
         cl1 = bib_map[v1]
         cl2 = bib_map[v2]
-        #try using object ids instead of index to boost performances
-        #idcl1 = cluster_set.clusters.index(cl1)
-        #idcl2 = cluster_set.clusters.index(cl2)
+        # try using object ids instead of index to boost performances
+        # idcl1 = cluster_set.clusters.index(cl1)
+        # idcl2 = cluster_set.clusters.index(cl2)
         idcl1 = id(cl1)
         idcl2 = id(cl2)
 
-        #keep the ids low!
+        # keep the ids low!
         if idcl1 > idcl2:
             idcl1, idcl2 = idcl2, idcl1
             cl1, cl2 = cl2, cl1
 
-        wedge_print("Wedge: popped new edge: Verts = (%s,%s) from (%s, %s) Value = (%f, %f)" % (idcl1, idcl2, v1, v2, unused[0], unused[1]))
+        logger.log(
+            "Wedge: popped new edge: Verts = (%s,%s) from (%s, %s) Value = (%f, %f)" %
+            (idcl1, idcl2, v1, v2, unused[0], unused[1]))
 
         if cl1 != cl2 and not cl1.hates(cl2):
             if deep_debug:
-                export_to_dot(cluster_set, "/tmp/%s%d.dot" % (cluster_set.last_name, current), bib_map, (v1, v2, unused))
+                export_to_dot(
+                    cluster_set, "/tmp/%s%d.dot" %
+                    (cluster_set.last_name, current), bib_map, (v1, v2, unused))
 
             decision, value = _decide(cl1, cl2)
             if decision:
-                wedge_print("Wedge: Joined %s to %s with %s"% (idcl1, idcl2, value))
+                logger.log("Wedge: Joined %s to %s with %s" % (idcl1, idcl2, value))
                 join(cl1, cl2)
                 cluster_set.clusters.remove(cl2)
                 for v in cl2.bibs:
                     bib_map[v] = cl1
             else:
-                wedge_print("Wedge: Quarreled %s from %s with %s " %  (idcl1, idcl2, value))
+                logger.log("Wedge: Quarreled %s from %s with %s " % (idcl1, idcl2, value))
                 cl1.quarrel(cl2)
         elif cl1 == cl2:
-            wedge_print("Wedge: Clusters already joined! (%s,%s)" % (idcl1, idcl2))
+            logger.log("Wedge: Clusters already joined! (%s,%s)" % (idcl1, idcl2))
         else:
-            wedge_print("Wedge: Clusters hate each other! (%s,%s)" % (idcl1, idcl2))
+            logger.log("Wedge: Clusters hate each other! (%s,%s)" % (idcl1, idcl2))
 
-    update_status_final("Wedge done.")
-    bibauthor_print("")
+    logger.update_status_final("Wedge done.")
+    logger.log("")
 
     if deep_debug:
         export_to_dot(cluster_set, "/tmp/%sfinal.dot" % cluster_set.last_name, bib_map)
@@ -295,10 +299,10 @@ def do_wedge(cluster_set, deep_debug=False):
     data_fp.close()
 
     try:
-        os.remove(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_p_'+str(original_process_id))
-        os.remove(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_m_'+str(original_process_id))
-        os.remove(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_e_'+str(original_process_id))
-        os.remove(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_data_'+str(original_process_id))
+        os.remove(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_p_' + str(original_process_id))
+        os.remove(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_m_' + str(original_process_id))
+        os.remove(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_e_' + str(original_process_id))
+        os.remove(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_data_' + str(original_process_id))
     except:
         pass
 
@@ -310,7 +314,7 @@ def convert_cluster_set(cs, prob_matr):
     @param type: cluster set
     @return: a mapping from a number to a bibrefrec.
     '''
-    #gc.disable()
+    # gc.disable()
 
     # step 1:
     #    + Assign a number to each bibrefrec.
@@ -323,8 +327,8 @@ def convert_cluster_set(cs, prob_matr):
         end = len(result_mapping)
         clus.bibs = range(start, end)
 
-    assert len(result_mapping) == len(set(result_mapping)), PID()+"Cluster set conversion failed"
-    assert len(result_mapping) == cs.num_all_bibs, PID()+"Cluster set conversion failed"
+    assert len(result_mapping) == len(set(result_mapping)), PID() + "Cluster set conversion failed"
+    assert len(result_mapping) == cs.num_all_bibs, PID() + "Cluster set conversion failed"
 
     cs.new2old = result_mapping
 
@@ -332,11 +336,11 @@ def convert_cluster_set(cs, prob_matr):
     #    + Using the prob matrix create a vector values to all other bibs.
     #    + Meld those vectors into one for each cluster.
 
-    special_symbols = Bib_matrix.special_symbols #locality optimization
+    special_symbols = Bib_matrix.special_symbols  # locality optimization
     pb_getitem_numeric = prob_matr.getitem_numeric
 
     interval = 100
-    gc.set_threshold(100,100,100)
+    gc.set_threshold(100, 100, 100)
     current = -1
     real_pointer = None
     try:
@@ -344,15 +348,15 @@ def convert_cluster_set(cs, prob_matr):
             gc.collect()
             current += 1
             if (current % interval) == 0:
-                update_status(float(current) / len(cs.clusters), "Converting the cluster set...")
+                logger.update_status(float(current) / len(cs.clusters), "Converting the cluster set...")
 
-            assert len(c1.bibs) > 0, PID()+"Empty cluster send to wedge"
+            assert len(c1.bibs) > 0, PID() + "Empty cluster send to wedge"
             pointers = list()
 
             for v1 in c1.bibs:
                 pointer = list()
                 index = list()
-                rm = result_mapping[v1] #locality optimization
+                rm = result_mapping[v1]  # locality optimization
                 for c2 in cs.clusters:
                     if c1 != c2 and not c1.hates(c2):
                         pointer += [pb_getitem_numeric((rm, result_mapping[v2])) for v2 in c2.bibs]
@@ -371,7 +375,7 @@ def convert_cluster_set(cs, prob_matr):
             else:
                 h5file.create_dataset(str(id(c1)), (len(cs.clusters), 2), 'f')
 
-    except Exception, e:
+    except Exception as e:
         raise Exception("""Error happened in convert_cluster_set with
                         v1: %s,
                         real_pointer: %s,
@@ -382,13 +386,13 @@ def convert_cluster_set(cs, prob_matr):
                         len(pointer): %s,
                         len(pointers):  %s,
                         original_exception: %s
-                        """%(str(v1),str(real_pointer),str(pointer), str(pointers),
-                             str(result_mapping), str(index),
-                             str(len(real_pointer)), str(len(pointer)),
-                             str(len(pointers)), str(e)) )
+                        """ % (str(v1), str(real_pointer), str(pointer), str(pointers),
+                               str(result_mapping), str(index),
+                        str(len(real_pointer)), str(len(pointer)),
+                        str(len(pointers)), str(e)))
 
-    update_status_final("Converting the cluster set done.")
-    #gc.enable()
+    logger.update_status_final("Converting the cluster set done.")
+    # gc.enable()
 
 
 def restore_cluster_set(cs):
@@ -411,32 +415,32 @@ def create_bib_2_cluster_dict(cs):
 
 
 def group_sort_edges(cs, original_process_id):
-    bibauthor_print("group_sort_edges spowned by %s" % original_process_id)
+    logger.log("group_sort_edges spowned by %s" % original_process_id)
 
-    plus_fp = open(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_p_'+str(original_process_id),'w')
-    minus_fp = open(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_m_'+str(original_process_id),'w')
-    pairs_fp = open(bconfig.TORTOISE_FILES_PATH+'/wedge_temp_edges_cache_e_'+str(original_process_id),'w')
-    data_fp = open(bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_data_'+str(original_process_id),'w')
+    plus_fp = open(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_p_' + str(original_process_id), 'w')
+    minus_fp = open(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_m_' + str(original_process_id), 'w')
+    pairs_fp = open(bconfig.TORTOISE_FILES_PATH + '/wedge_temp_edges_cache_e_' + str(original_process_id), 'w')
+    data_fp = open(bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_data_' + str(original_process_id), 'w')
 
     plus_count = 0
     minus_count = 0
     pairs_count = 0
 
-    default_val = [0.,0.]
-    #gc.disable()
+    default_val = [0., 0.]
+    # gc.disable()
     interval = 1000
     current = -1
     for cl1 in cs.clusters:
         current += 1
         if (current % interval) == 0:
-            update_status(float(current) / len(cs.clusters), "Grouping all edges...")
+            logger.update_status(float(current) / len(cs.clusters), "Grouping all edges...")
 
         bib1 = tuple(cl1.bibs)[0]
         pointers = h5file[str(id(cl1))]
         for bib2 in xrange(len(h5file[str(id(cl1))])):
             val = pointers[bib2]
-            #if val[0] not in Bib_matrix.special_numbers:
-            #optimization: special numbers are assumed to be negative
+            # if val[0] not in Bib_matrix.special_numbers:
+            # optimization: special numbers are assumed to be negative
             if val[0] >= 0:
 
                 if val[0] > edge_cut_prob:
@@ -453,24 +457,25 @@ def group_sort_edges(cs, original_process_id):
             else:
                 assert val[0] == Bib_matrix.special_symbols[None], "Invalid Edge"
 
-    update_status_final("Finished with the edge grouping.")
+    logger.update_status_final("Finished with the edge grouping.")
 
     plus_fp.close()
     minus_fp.close()
     pairs_fp.close()
 
-    bibauthor_print("Positive edges: %d, Negative edges: %d, Value edges: %d."
-                     % (plus_count, minus_count, pairs_count))
-    #gc.enable()
-    bibauthor_print("Sorting in-file value edges.")
-    sortFileInPlace(bconfig.TORTOISE_FILES_PATH+'/wedge_temp_edges_cache_e_'+str(original_process_id),
-                    bconfig.TORTOISE_FILES_PATH+'/wedge_edges_cache_e_'+str(original_process_id),
+    logger.log("Positive edges: %d, Negative edges: %d, Value edges: %d."
+               % (plus_count, minus_count, pairs_count))
+    # gc.enable()
+    logger.log("Sorting in-file value edges.")
+    sortFileInPlace(bconfig.TORTOISE_FILES_PATH + '/wedge_temp_edges_cache_e_' + str(original_process_id),
+                    bconfig.TORTOISE_FILES_PATH + '/wedge_edges_cache_e_' + str(original_process_id),
                     lambda x: _edge_sorting(_unpack_vals(x)), reverse=True)
 
-    os.remove(bconfig.TORTOISE_FILES_PATH+'/wedge_temp_edges_cache_e_'+str(original_process_id))
+    os.remove(bconfig.TORTOISE_FILES_PATH + '/wedge_temp_edges_cache_e_' + str(original_process_id))
 
-    bibauthor_print("Dumping egdes data to file...")
+    logger.log("Dumping egdes data to file...")
     cPickle.dump((plus_count, minus_count, pairs_count), data_fp)
+    logger.log("Grouping and sorting of edges is done!")
     data_fp.close()
 
 
@@ -481,11 +486,11 @@ def join(cl1, cl2):
     cl1_out_edges = h5file[str(id(cl1))]
     cl2_out_edges = h5file[str(id(cl2))]
     cl1_out_edges[:] = meld_edges((cl1_out_edges, len(cl1.bibs)),
-                               (cl2_out_edges, len(cl2.bibs)))[0]
+                                  (cl2_out_edges, len(cl2.bibs)))[0]
     cl1.bibs += cl2.bibs
 
-    assert not cl1.hates(cl1), PID()+"Joining hateful clusters"
-    assert not cl2.hates(cl2), PID()+"Joining hateful clusters2"
+    assert not cl1.hates(cl1), PID() + "Joining hateful clusters"
+    assert not cl2.hates(cl2), PID() + "Joining hateful clusters2"
 
     cl1.hate |= cl2.hate
     for cl in cl2.hate:
@@ -511,6 +516,6 @@ def export_to_dot(cs, fname, graph_info, extra_edge=None):
         fptr.write("    %s [color=blue];\n" % " -- ".join(str(x) for x in clus.bibs))
 
         fptr.write("".join("    %d -- %d [color=red]\n" % (b1, b2)
-                      for b1 in clus.bibs for h in clus.hate for b2 in h.bibs))
+                           for b1 in clus.bibs for h in clus.hate for b2 in h.bibs))
 
     fptr.write("}")

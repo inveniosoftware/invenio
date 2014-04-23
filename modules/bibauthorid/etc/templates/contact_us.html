@@ -1,0 +1,37 @@
+{% extends "generic_wrapper.html" %}
+
+{% block content %}
+<div style="display: block; width: 600px; text-align: left;">
+	<div style="width:100%; minheight: 500px;">
+		<div  style="background-color: #F1F1FA; display: table; border-radius: 10px; padding: 20px; color: #3366CC; font: Helvetica 12pt;border: 1px solid black; margin: 0px auto;">
+
+			<div align="center">
+				<p style="font-size: 20px; font-weight: bold;"> Get help!</p>
+				<p style="font-size: 14px; font-weight: bold;"> Write here on any issue, suggestions or technical request.</p>
+			</div>
+
+			<form action="/author/claim/action" method="POST">
+				<fieldset style="border: 0; display: inline-block;">
+					<p>
+						<label for="Name">Name: </label>
+						<input style="float: right; border-radius: 4px;" required="True" name="Name" value="{{ name_prefill }}" type="text"  size="40">
+					</p>
+
+					<p>
+						<label for="E-mail">E-mail: </label>
+						<input style="float: right; border-radius: 4px;" name="E-mail" value="{{ email_prefill }}" type="email" size="40">
+					</p>
+
+					<input type="hidden" name="last_page_visited" value="{{ last_page_visited }}" />
+					<p>Comment:</p>
+					<p>
+						<textarea style="max-width:500px; min-width:500px; min-height:300px; border-radius: 4px;" name="Comment" cols="60" rows="5" required="True" id="Comment"></textarea>
+					</p>
+				</fieldset>
+
+				<button class="aid_btn_blue" style="display: block; margin: 0 auto;" type="submit" name="send_message">Submit</button>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -113,8 +113,11 @@ def _get_access_token_from_orcid(scope, extra_params=None, response_format='json
     res = None
     # response.raise_for_status()
     if code == requests.codes.ok:
-        res = json.loads(response.content)['access_token']
-
+        try:
+            res = json.loads(response.content)['access_token']
+        except ValueError:
+            #TODO: don't fail silently but gently report an error somehow
+            return None
     return res
 
 
