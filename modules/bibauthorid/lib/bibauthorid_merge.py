@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011, 2012 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from operator import itemgetter
 from itertools import groupby, chain, imap, izip
 
-from invenio.bibauthorid_general_utils import update_status \
-                                    , update_status_final
+from invenio.bibauthorid_logutils import Logger
 from invenio.bibauthorid_matrix_optimization import maximized_mapping
 from invenio.bibauthorid_backinterface import update_canonical_names_of_authors
 from invenio.bibauthorid_backinterface import get_cluster_names
@@ -37,6 +36,9 @@ from invenio.bibauthorid_backinterface import get_ordered_author_and_status_of_s
 from invenio.bibauthorid_backinterface import remove_empty_authors
 from invenio.bibauthorid_backinterface import get_paper_to_author_and_status_mapping
 
+logger = Logger("merge")
+
+
 def merge_static_classy():
     '''
         This function merges aidPERSONIDPAPERS with aidRESULTS.
@@ -48,10 +50,11 @@ def merge_static_classy():
                before it can replace it.
     '''
     class Sig(object):
+
         def __init__(self, bibrefrec, pid_flag):
-            self.rejected = dict(filter(lambda p:                p[1] <= -2, pid_flag))
-            self.assigned = filter(lambda p:-2 < p[1] and p[1] < 2, pid_flag)
-            self.claimed = filter(lambda p:  2 <= p[1], pid_flag)
+            self.rejected = dict(filter(lambda p: p[1] <= -2, pid_flag))
+            self.assigned = filter(lambda p: -2 < p[1] and p[1] < 2, pid_flag)
+            self.claimed = filter(lambda p: 2 <= p[1], pid_flag)
             self.bibrefrec = bibrefrec
 
             assert self.invariant()
@@ -84,6 +87,7 @@ def merge_static_classy():
             move_signature(self.bibrefrec, pid)
 
     class Cluster(object):
+
         def __init__(self, pid, sigs):
             self.pid = pid
 
@@ -105,12 +109,13 @@ def merge_static_classy():
     free_pids = backinterface_get_free_pids()
 
     for idx, last in enumerate(last_names):
-        update_status(float(idx) / len(last_names), "Merging, %d/%d current: %s" % (idx, len(last_names), last))
+        logger.update_status(float(idx) / len(last_names), "Merging, %d/%d current: %s" % (idx, len(last_names), last))
 
         results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_clusters_by_surname(last))
 
         # [(last name number, [bibrefrecs])]
-        results = [(k, map(itemgetter(1), d)) for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
+        results = [(k, map(itemgetter(1), d))
+                   for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
 
         # List of dictionaries.
         # [{new_pid -> N}]
@@ -168,11 +173,12 @@ def merge_static_classy():
                 else:
                     assert not sig.isrejected(pid)
 
-    update_status_final("Merging done.")
+    logger.update_status_final("Merging done.")
 
-    update_status_final()
+    logger.update_status_final()
     remove_empty_authors()
     update_canonical_names_of_authors()
+
 
 def merge_static():
     '''
@@ -201,39 +207,36 @@ def merge_static():
         """
         paps = current_mapping[sig]
         rejected = filter(lambda p: p[1] <= -2, paps)
-        assigned = filter(lambda p:-2 < p[1] and p[1] < 2, paps)
+        assigned = filter(lambda p: -2 < p[1] and p[1] < 2, paps)
         claimed = filter(lambda p: 2 <= p[1] and p[0] == target_pid, paps)
 
-        if claimed or not assigned or assigned[0] == target_pid:
+        if claimed or not assigned or assigned[0] == target_pid or rejected:
             return
 
         assert len(assigned) == 1
 
-        if rejected:
-            newpid = free_pids.next()
-            move_sig_and_update_mapping(sig, assigned[0], (newpid, assigned[0][1]))
+        conflicts = get_signatures_of_paper_and_author(sig, target_pid)
+        if not conflicts:
+            move_sig_and_update_mapping(sig, assigned[0], (target_pid, assigned[0][1]))
         else:
-            conflicts = get_signatures_of_paper_and_author(sig, target_pid)
-            if not conflicts:
-                move_sig_and_update_mapping(sig, assigned[0], (target_pid, assigned[0][1]))
+            assert len(conflicts) == 1
+            if conflicts[0][3] == 2:
+                newpid = free_pids.next()
+                move_sig_and_update_mapping(sig, assigned[0], (newpid, assigned[0][1]))
             else:
-                assert len(conflicts) == 1
-                if conflicts[0][3] == 2:
-                    newpid = free_pids.next()
-                    move_sig_and_update_mapping(sig, assigned[0], (newpid, assigned[0][1]))
-                else:
-                    newpid = free_pids.next()
-                    csig = tuple(conflicts[0][:3])
-                    move_sig_and_update_mapping(csig, (target_pid, conflicts[0][3]), (newpid, conflicts[0][3]))
-                    move_sig_and_update_mapping(sig, assigned[0], (target_pid, assigned[0][1]))
+                newpid = free_pids.next()
+                csig = tuple(conflicts[0][:3])
+                move_sig_and_update_mapping(csig, (target_pid, conflicts[0][3]), (newpid, conflicts[0][3]))
+                move_sig_and_update_mapping(sig, assigned[0], (target_pid, assigned[0][1]))
 
     for idx, last in enumerate(last_names):
-        update_status(float(idx) / len(last_names), "%d/%d current: %s" % (idx, len(last_names), last))
+        logger.update_status(float(idx) / len(last_names), "%d/%d current: %s" % (idx, len(last_names), last))
 
         results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_clusters_by_surname(last))
 
         # [(last name number, [bibrefrecs])]
-        results = [(k, map(itemgetter(1), d)) for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
+        results = [(k, map(itemgetter(1), d))
+                   for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
 
         # List of dictionaries.
         # [{new_pid -> N}]
@@ -270,9 +273,10 @@ def merge_static():
                     if not pid in map(itemgetter(0), filter(lambda x: x[1] > -2, current_mapping[sig])):
                         try_move_signature(sig, pid)
 
-    update_status_final()
+    logger.update_status_final()
     remove_empty_authors()
     update_canonical_names_of_authors()
+
 
 def merge_dynamic():
     '''
@@ -295,35 +299,38 @@ def merge_dynamic():
         """
         paps = get_ordered_author_and_status_of_signature(sig)
         rejected = filter(lambda p: p[1] <= -2, paps)
-        assigned = filter(lambda p:-2 < p[1] and p[1] < 2, paps)
+        assigned = filter(lambda p: -2 < p[1] and p[1] < 2, paps)
         claimed = filter(lambda p: 2 <= p[1] and p[0] == target_pid, paps)
-
-        if claimed or not assigned or assigned[0] == target_pid:
+        
+        logger.log(paps, rejected, assigned, claimed, sig, target_pid)        
+        
+        if claimed or not assigned or assigned[0][0] == target_pid or int(target_pid) in [int(x[0]) for x in rejected]:
+            logger.log("I return", claimed, assigned)
             return
 
         assert len(assigned) == 1
+        
 
-        if int(target_pid) in [int(x[0]) for x in rejected]:
-            move_signature(sig, free_pids.next())
+
+        conflicts = get_signatures_of_paper_and_author(sig, target_pid)
+        if not conflicts:
+            move_signature(sig, target_pid)
         else:
-            conflicts = get_signatures_of_paper_and_author(sig, target_pid)
-            if not conflicts:
-                move_signature(sig, target_pid)
+            assert len(conflicts) == 1
+            if conflicts[0][3] == 2:
+                move_signature(sig, free_pids.next())
             else:
-                assert len(conflicts) == 1
-                if conflicts[0][3] == 2:
-                    move_signature(sig, free_pids.next())
-                else:
-                    move_signature(conflicts[0][:3], free_pids.next())
-                    move_signature(sig, target_pid)
+                move_signature(conflicts[0][:3], free_pids.next())
+                move_signature(sig, target_pid)
 
     for idx, last in enumerate(last_names):
-        update_status(float(idx) / len(last_names), "%d/%d current: %s" % (idx, len(last_names), last))
+        logger.update_status(float(idx) / len(last_names), "%d/%d current: %s" % (idx, len(last_names), last))
 
         results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_clusters_by_surname(last))
 
         # [(last name number, [bibrefrecs])]
-        results = [(k, map(itemgetter(1), d)) for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
+        results = [(k, map(itemgetter(1), d))
+                   for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
 
         # List of dictionaries.
         # [{new_pid -> N}]
@@ -345,20 +352,23 @@ def merge_dynamic():
 
         # We cast it to list in order to ensure the order persistence.
         old_pids = list(old_pids)
-        #best_match = cluster,pid_idx,n
+        # best_match = cluster,pid_idx,n
         best_match = maximized_mapping([[row.get(old, 0) for old in old_pids] for row in matr])
 
-        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, score in best_match if score > 0]
-        not_matched_clusters = frozenset(xrange(len(results))) - frozenset(imap(itemgetter(0), [x for x in best_match if x[2] > 0]))
+        matched_clusters = [(results[new_idx][1], old_pids[old_idx])
+                            for new_idx, old_idx, score in best_match if score > 0]
+        not_matched_clusters = frozenset(xrange(len(results))) - frozenset(
+            imap(itemgetter(0), [x for x in best_match if x[2] > 0]))
         not_matched_clusters = izip((results[i][1] for i in not_matched_clusters), free_pids)
-
+        
         for sigs, pid in chain(matched_clusters, not_matched_clusters):
             for sig in sigs:
                 try_move_signature(sig, pid)
 
-    update_status_final()
+    logger.update_status_final()
     remove_empty_authors()
     update_canonical_names_of_authors()
+
 
 def matched_claims(inspect=None):
     '''
@@ -374,12 +384,13 @@ def matched_claims(inspect=None):
             continue
 
         results_dict = dict(((row[1], row[2], row[3]), int(row[0].split(".")[1]))
-                        for row in get_clusters_by_surname(lname))
+                            for row in get_clusters_by_surname(lname))
 
         results_clusters = max(results_dict.values()) + 1
         assert frozenset(results_dict.values()) == frozenset(range(results_clusters))
 
-        pids = frozenset(x[0] for x in chain.from_iterable(get_author_info_of_confirmed_paper(r) for r in results_dict.keys()))
+        pids = frozenset(x[0]
+                         for x in chain.from_iterable(get_author_info_of_confirmed_paper(r) for r in results_dict.keys()))
 
         matr = ((results_dict[x] for x in get_claimed_papers_of_author(pid) if x in results_dict) for pid in pids)
         matr = (dict((k, len(list(d))) for k, d in groupby(sorted(row))) for row in matr)
@@ -389,4 +400,3 @@ def matched_claims(inspect=None):
         r_total += sum(sum(row) for row in matr)
 
     return r_match, r_total
-

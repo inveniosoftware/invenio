@@ -1202,6 +1202,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /fonts/ %(webdir)s/fonts/
         Alias /flash/ %(webdir)s/flash/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
@@ -1268,6 +1269,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /fonts/ %(webdir)s/fonts/
         Alias /flash/ %(webdir)s/flash/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/

@@ -42,7 +42,7 @@ except ImportError:
 from invenio.webauthorprofile_config import serialize, deserialize
 from invenio.webauthorprofile_config import CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
     CFG_WEBAUTHORPROFILE_CACHE_EXPIRED_DELAY_LIVE, \
-    CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID, CFG_WEBAUTHORPROFILE_USE_ALLOWED_FIELDCODES, \
+    CFG_WEBAUTHORPROFILE_USE_ALLOWED_FIELDCODES, \
     CFG_WEBAUTHORPROFILE_ALLOWED_FIELDCODES, CFG_WEBAUTHORPROFILE_KEYWORD_TAG, \
     CFG_WEBAUTHORPROFILE_FKEYWORD_TAG, CFG_WEBAUTHORPROFILE_COLLABORATION_TAG, \
     CFG_WEBAUTHORPROFILE_FIELDCODE_TAG
@@ -50,10 +50,11 @@ from invenio.bibauthorid_webauthorprofileinterface import get_papers_by_person_i
     get_names_of_author, create_normalized_name, \
     get_person_redirect_link, is_valid_canonical_id, split_name_parts, \
     gathered_names_by_personid, get_canonical_name_of_author, get_coauthors_of_author, \
-    get_names_count_of_author, get_existing_authors, get_confirmed_papers_of_author, \
+    get_names_to_records_of_author, get_existing_authors, get_confirmed_papers_of_author, \
     get_title_of_paper, get_orcid_id_of_author, get_arxiv_papers_of_author, \
-    get_hepnames, remove_empty_authors
+    get_hepnames, remove_empty_authors, get_papers_of_author, get_pid_to_canonical_name_map
 from invenio.bibauthorid_general_utils import get_title_of_doi, get_title_of_arxiv_pubid
+from invenio.bibauthorid_config import CFG_BIBAUTHORID_ENABLED
 from invenio.webauthorprofile_dbapi import get_cached_element, precache_element, cache_element, \
     expire_all_cache_for_person, get_expired_person_ids, get_cache_oldest_date
 from invenio.search_engine_summarizer import summarize_records
@@ -172,9 +173,8 @@ def get_institute_pubs(person_id):
     namesdict, status = get_person_names_dicts(person_id)
     if not status:
         return [None, False]
-    names_list = namesdict['db_names_dict'].keys()
     return retrieve_update_cache('institute_pub_dict', 'pid:' + str(person_id), _get_institute_pubs,
-                                 names_list, person_id)
+                                 namesdict, person_id)
 
 def get_pubs_per_year(person_id):
     '''
@@ -363,7 +363,7 @@ def _get_datasets(person_id):
     data_recs = set()
 
     for rec in recs:
-        data_recs_tmp = perform_request_search(p="%s" % str(rec), f='786', m1='w', cc='Data', rg=0)
+        data_recs_tmp = perform_request_search(p="%s" % str(rec), f='786__w', cc='Data', rg=0)
         data_recs.update(set(data_recs_tmp))
 
     datasets_pubs = dict()
@@ -479,12 +479,14 @@ def _compute_cache_for_person(person_id):
 
 def precompute_cache_for_person(person_ids=None, all_persons=False, only_expired=False):
     pids = set()
+
     if all_persons:
         pids = get_existing_authors(with_papers_only=True)
     elif only_expired:
         pids = set(get_expired_person_ids())
+
     if person_ids:
-        pids |= person_ids
+        pids |= set(person_ids)
 
     empty_pids = remove_empty_authors(remove=False)
     pids = pids - empty_pids
@@ -520,8 +522,8 @@ def _get_pubs_bai(person_id):
     Person's publication list.
     @param person_id: int person id
     '''
-    full_pubs = get_papers_by_person_id(person_id, -1)
-    pubs = [int(row[0]) for row in full_pubs]
+    pubs = get_papers_of_author(person_id)
+    pubs = [int(row[0]) for row in pubs]
     return pubs
 
 def _get_self_pubs_bai(person_id):
@@ -544,14 +546,16 @@ def _get_institute_pubs_bai(names_list, person_id):
     recids = perform_request_search(rg=0, p='author:%s' % str(cid))
     return _get_institute_pubs_dict(recids, names_list)
 
-def _get_institute_pubs_dict(recids, names_list):
+def _get_institute_pubs_dict(recids, namesdict):
+    names_list = namesdict['db_names_dict'].keys()
+    names_to_records = namesdict['names_to_records']
     a = format_records(recids, 'WAPAFF')
     a = [deserialize(p) for p in a.strip().split('!---THEDELIMITER---!') if p]
     affdict = {}
     for rec, affs in a:
         keys = affs.keys()
         for name in names_list:
-            if name in keys and affs[name]:
+            if name in keys and affs[name] and name in names_to_records and rec in names_to_records[name]:
                 for aff in affs[name]:
                     try:
                         affdict[aff].add(rec)
@@ -608,7 +612,9 @@ def _get_person_names_dicts_bai(person_id):
     names_dict = {}
     db_names_dict = {}
 
-    for aname, acount in get_names_count_of_author(person_id):
+    names_to_records = get_names_to_records_of_author(person_id)
+    for aname, records in names_to_records.items():
+        acount = len(records)
         names_dict[aname] = acount
         norm_name = create_normalized_name(split_name_parts(aname))
 
@@ -622,7 +628,7 @@ def _get_person_names_dicts_bai(person_id):
             db_names_dict[aname] = acount
 
     return {'longest': longest_name, 'names_dict': names_dict,
-            'db_names_dict': db_names_dict}
+            'db_names_dict': db_names_dict, 'names_to_records':names_to_records}
 
 
 def _get_total_downloads_bai(pubs):
@@ -709,8 +715,14 @@ def _get_coauthors_bai(collabs, person_id):
     personids = get_coauthors_of_author(person_id, exclude_recs)
 
     coauthors = []
+
+    cname_map = get_pid_to_canonical_name_map()
+
     for p in personids:
-        cn = canonical_name(p[0])
+        try:
+            cn = cname_map[p[0]]
+        except KeyError:
+            cn = str(p[0])
         #ln is used only for exact search in case canonical name is not available. Never happens
         # with bibauthorid, let's print there the canonical name.
         #ln = max_key(gathered_names_by_personid(p[0]), key=len)
@@ -801,7 +813,8 @@ def _get_person_names_dicts_fallback(person_id):
             person_id = formatted[s:s + len(person_id)]
         except (IndexError, ValueError):
             pass
-    return {'longest':person_id, 'names_dict':{person_id:pcount}, 'db_names_dict':{person_id:pcount}}
+    return {'longest':person_id, 'names_dict':{person_id:pcount}, 'db_names_dict':{person_id:pcount},
+            'names_to_records': {person_id:p}}
 
 def _get_total_downloads_fallback(pubs):
     '''
@@ -897,7 +910,7 @@ def  _get_rec_query_fallback(bibauthorid_data, authorname, db_names_dict, person
     return rec_query
 
 
-if CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID:
+if CFG_BIBAUTHORID_ENABLED:
     _get_pubs = _get_pubs_bai
     _get_self_pubs = _get_self_pubs_bai
     _get_institute_pubs = _get_institute_pubs_bai

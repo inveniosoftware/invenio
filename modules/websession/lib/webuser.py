@@ -60,8 +60,9 @@ from invenio.config import \
      CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
-     CFG_BIBAUTHORID_ENABLED, \
      CFG_SITE_RECORD
+
+from bibauthorid_config import CFG_BIBAUTHORID_ENABLED
 
 try:
     from invenio.session import get_session
@@ -1272,16 +1273,14 @@ def collect_user_info(req, login_time=False, refresh=False):
         user_info['group'] = []
         user_info['guest'] = str(isGuestUser(uid))
 
-        if user_info['guest'] == '1' and CFG_INSPIRE_SITE:
+        if user_info['guest'] == '1' and CFG_BIBAUTHORID_ENABLED:
             usepaperattribution = False
             viewclaimlink = False
 
-            if (CFG_BIBAUTHORID_ENABLED
-                and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
+            if (acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
                 usepaperattribution = True
 
-#            if (CFG_BIBAUTHORID_ENABLED
-#                and usepaperattribution
+#            if (usepaperattribution
 #                and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionlinkviewers"))):
 #                viewclaimlink = True
             if is_req:
@@ -1294,8 +1293,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             else:
                 viewlink = False
 
-            if (CFG_BIBAUTHORID_ENABLED
-                and usepaperattribution
+            if (usepaperattribution
                 and viewlink):
                 viewclaimlink = True
 

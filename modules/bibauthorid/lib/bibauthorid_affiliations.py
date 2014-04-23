@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2014 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Affiliation related functions
 
@@ -34,8 +34,7 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import write_message, task_update_progress as bibtask_update_progress, task_sleep_now_if_required
 from invenio.docextract_task import fetch_last_updated, store_last_updated
 from invenio.docextract_record import get_record
-from unidecode import unidecode
-
+from invenio.textutils import translate_to_ascii
 
 CHUNK_SIZE = 10000
 
@@ -196,7 +195,9 @@ def store_aff(cur_aff, aff):
     for pid, aff_info in aff.iteritems():
         cur_aff_info = cur_aff.get(pid, None)
         if aff_info != cur_aff_info:
-            # write_message('Affiliation changed for %s, new info %s @ %s in %s' % (pid, aff_info['aff'], aff_info['last_occurence'].strftime("%Y-%m-%d %H:%M:%S"), aff_info['last_recid']))
+            # write_message('Affiliation changed for %s, new info %s @ %s in %s' %
+            # (pid, aff_info['aff'], aff_info['last_occurence'].strftime("%Y-%m-%d
+            # %H:%M:%S"), aff_info['last_recid']))
             if cur_aff_info:
                 update_aff(pid, aff_info)
             else:

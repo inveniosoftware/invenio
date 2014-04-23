@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011, 2012 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 '''
     bibauthorid_frontinterface
     This file aims to filter and modify the interface given by
@@ -29,6 +29,9 @@ from invenio.bibauthorid_name_utils import soft_compare_names
 from invenio.bibauthorid_name_utils import create_normalized_name  # emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_search_engine import find_personids_by_name
 import invenio.bibauthorid_dbinterface as dbinter
+from invenio.bibauthorid_name_utils import generate_last_name_cluster_str as get_surname
+from invenio.bibauthorid_name_utils import clean_string
+from invenio.textutils import translate_to_ascii
 from cgi import escape
 
 # Well this is bad, BUT otherwise there must 100+ lines
@@ -54,6 +57,7 @@ def set_person_data(person_id, tag, value, user_level=None):
     if value not in old_data:
         dbinter.add_author_data(person_id, tag, value, opt2=user_level)
 
+
 def get_persons_data(person_id_list, tag=None):
     '''
     @param person_id_list:
@@ -70,6 +74,7 @@ def get_persons_data(person_id_list, tag=None):
         persons_data[person_id] = res
 
     return persons_data
+
 
 def del_person_data(tag, person_id=None, value=None):
     dbinter.remove_author_data(tag, person_id, value)
@@ -120,7 +125,7 @@ def get_person_papers_to_be_manually_reviewed(pid):
     '''
     res = get_persons_data([pid], 'paper_needs_bibref_manual_confirm')
     if res[pid]:
-        return [res[pid][0][1],res[0][0]]
+        return [res[pid][0][1], res[0][0]]
     return list()
 
 
@@ -158,9 +163,10 @@ def assign_person_to_uid(uid, pid):
     else:
         current_uid = get_persons_data([pid], 'uid')
         if len(current_uid[pid]) == 0:
-            dbinter.add_userid_to_author(pid,  str(uid))
+            dbinter.add_userid_to_author(pid, str(uid))
             return pid, True
         return -1, False
+
 
 def get_processed_external_recids(pid):
     '''
@@ -180,9 +186,11 @@ def get_processed_external_recids(pid):
 def get_all_personids_recs(pid, claimed_only=False):
     return dbinter.get_papers_of_author(pid, claimed_only)
 
+
 def mark_internal_id_as_old(person_id, uid):
-    remove_author_data('uid', pid=person_id, value = uid)
-    add_author_data(person_id, 'uid-old', value = uid)
+    remove_author_data('uid', pid=person_id, value=uid)
+    add_author_data(person_id, 'uid-old', value=uid)
+
 
 def fallback_find_personids_by_name_string(target):
     '''
@@ -197,28 +205,37 @@ def fallback_find_personids_by_name_string(target):
     @return: pid list of lists
     [pid,[[name string, occur count, compatibility]]]
     '''
-    splitted_name = split_name_parts(target)
-    family = splitted_name[0]
+    family = get_surname(target)
+    ascii_family = get_surname(translate_to_ascii(target)[0])
+    clean_family = get_surname(clean_string(target))
 
-    levels = (# target + '%', #this introduces a weird problem: different results for mele, salvatore and salvatore mele
-              family + ',%',
-              family[:-2] + '%',
-              '%' + family + ',%',
-              '%' + family[1:-1] + '%')
+    #SANITY: avoid empty queries
+    if not family:
+        return list()
+
+    levels = (  # target + '%', #this introduces a weird problem: different results for mele, salvatore and salvatore mele
+        family + '%',
+        '%' + family + ',%',
+        '%' + family[1:-1] + '%')
 
     if len(family) <= 4:
         levels = [levels[0], levels[2]]
 
-    for lev in levels:
-        names = dbinter.get_authors_by_name_regexp(lev)
-        if names:
-            print "%s" % lev
-            break
+    names = list(set().union(*map(get_authors_by_name_regexp,(family + ',%',
+                                                              ascii_family + ',%',
+                                                              clean_family + ',%'))))
+
+    if not names:
+        for lev in levels:
+            names = dbinter.get_authors_by_name_regexp(lev)
+            if names:
+                break
 
     is_canonical = False
     if not names:
         names = dbinter.get_authors_by_canonical_name_regexp(target)
         is_canonical = True
+
 
     names = groupby(sorted(names))
     names = [(key[0], key[1], len(list(data)), soft_compare_names(target, key[1])) for key, data in names]
@@ -241,66 +258,43 @@ def person_search_engine_query(query_string):
     @return:
     @rtype:
     '''
-    personid_names_list = list()
-
-    search_engine_status = dbinter.search_engine_is_operating()
-
-    personids_list = list()
-    if search_engine_status:
-        personids_list = find_personids_by_name(query_string)
-        personid_names_list = [(i, []) for i in personids_list]
 
     if canonical_name_type.match(query_string):
         canonical_name_matches = list(get_authors_by_canonical_name_regexp(query_string))
 
         if canonical_name_matches:
-            canonical_name_matches = [i for i in canonical_name_matches if int(i[0]) not in personids_list]
-            personid_names_list = canonical_name_matches + personid_names_list
+            canonical_name_matches = [i for i in canonical_name_matches]
+            return canonical_name_matches
 
     if '@' in query_string:
         uid = dbinter.get_user_id_by_email(query_string)
         if uid is not None:
             pid = dbinter.get_author_by_uid(uid)
-            if pid and pid not in personids_list:
-                personid_names_list = [(pid, [])] + personid_names_list
+            if pid:
+                return [(pid, [])]
 
-    if personid_names_list:
-        return personid_names_list
+    try:
+        pids = list()
+        n = int(query_string)
+        pid = dbinter.get_author_by_uid(n)
+        if pid:
+            pids.append((pid, []))
+        if dbinter.author_exists(n):
+            pids.append((n, []))
+        return pids
+
+    except ValueError:
+        pass
+
+    search_engine_status = dbinter.search_engine_is_operating()
+
+    if search_engine_status:
+        personids_list = find_personids_by_name(query_string, trust_is_operating=True)
+        personid_list = [(i, []) for i in personids_list]
+        if personid_list:
+            return personid_list
 
     return fallback_find_personids_by_name_string(query_string)
-
-
-def find_personIDs_by_name_string(query_string):
-    return person_search_engine_query(query_string)
-
-def find_top5_personid_for_new_arxiv_user(bibrecs, name):
-
-    top5_list = []
-
-    pidlist = get_author_to_papers_mapping(bibrecs, limit_by_name=name)
-
-    for p in pidlist:
-        if not get_uid_of_author(p[0]):
-            top5_list.append(p[0])
-            if len(top5_list) > 4:
-                break
-
-    escaped_name = ""
-
-    if name:
-        escaped_name = escape(name, quote=True)
-    else:
-        return top5_list
-
-    pidlist = find_personIDs_by_name_string(escaped_name)
-
-    for p in pidlist:
-        if not get_uid_of_author(p[0]) and not p[0] in top5_list:
-            top5_list.append(p[0])
-            if len(top5_list) > 4:
-                break
-
-    return top5_list
 
 
 def check_personids_availability(picked_profile, uid):

@@ -1,0 +1,29 @@
+{% if no_cache %}
+<!-- Meta -->
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+<META HTTP-EQUIV="Pragma-directive" CONTENT="no-cache">
+<META HTTP-EQUIV="Cache-Directive" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+{% endif %}<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% if scripts %}
+<!-- Scripts -->
+{% for item in scripts %}<script type="text/javascript" src="{{ scripts_dir }}/{{ item }}"></script>
+{% endfor %}{% endif %}
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$','$']],
+        processEscapes: true},
+        showProcessingMessages: false,
+        messageStyle: "none"
+        });
+</script>
+<script src="/MathJax/MathJax.js?config=TeX-AMS_HTML" type="text/javascript">
+</script>
+
+{% if stylesheets %}
+<!-- Stylesheets -->
+{% for item in stylesheets %}<link rel="stylesheet" type="text/css" href="{{ item }}" />
+{% endfor %}{% endif %}

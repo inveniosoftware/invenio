@@ -1005,7 +1005,7 @@ def get_database_last_updated_timestamp():
     database_tables_timestamps.append(get_table_update_time('bibrec'))
     ## In INSPIRE bibfmt is on innodb and there is not such configuration
     bibfmt_last_update = run_sql("SELECT max(last_updated) FROM bibfmt")
-    if bibfmt_last_update and bibfmt_last_update[0][0]:
+    if bibfmt_last_update and bibfmt_last_update[0][0] is not None:
         database_tables_timestamps.append(str(bibfmt_last_update[0][0]))
     try:
         database_tables_timestamps.append(get_table_update_time('idxWORD%'))

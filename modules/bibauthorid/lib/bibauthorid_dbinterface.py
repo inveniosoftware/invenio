@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011, 2012, 2013 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 '''
     Filename: bibauthorid_dbinterface.py
@@ -26,7 +26,7 @@
 '''
 
 from invenio.config import CFG_SITE_URL, \
-                CFG_BIBAUTHORID_SEARCH_ENGINE_MAX_DATACHUNK_PER_INSERT_DB_QUERY
+    CFG_BIBAUTHORID_SEARCH_ENGINE_MAX_DATACHUNK_PER_INSERT_DB_QUERY
 import invenio.bibauthorid_config as bconfig
 
 import gc
@@ -34,16 +34,14 @@ import datetime
 from itertools import groupby, count, ifilter, chain, imap, repeat
 from operator import itemgetter
 
-from invenio.search_engine import perform_request_search
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL
 
 from invenio.bibauthorid_name_utils import split_name_parts
 from invenio.bibauthorid_name_utils import create_canonical_name
 from invenio.bibauthorid_name_utils import create_normalized_name
-from invenio.bibauthorid_general_utils import bibauthor_print
-from invenio.bibauthorid_general_utils import update_status \
-                                    , update_status_final
+
 from invenio.dbquery import run_sql
 from invenio import bibtask
 
@@ -58,28 +56,31 @@ except ImportError:
 from invenio.dbquery import run_sql
 from invenio.htmlutils import X
 from invenio.search_engine import perform_request_search, get_record
-from invenio.bibrecord import record_get_field_value, record_get_field_instances
+from invenio.bibrecord import record_get_field_value, \
+    record_get_field_instances
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibauthorid_name_utils import split_name_parts, \
-                                create_canonical_name, create_normalized_name
-from invenio.bibauthorid_general_utils import bibauthor_print, update_status, \
-                                update_status_final
-# python2.4 compatibility
-from invenio.bibauthorid_general_utils import bai_all as all
+    create_canonical_name, create_matchable_name
+from invenio.bibauthorid_general_utils import memoized
+from invenio.bibauthorid_general_utils import monitored
+from invenio.bibauthorid_logutils import Logger
+import time
 
+
+# run_sql = monitored(run_sql)
+
+logger = Logger("db_interface")
 
 MARC_100_700_CACHE = None
 
 
-##########################################################################################
-###                                                                                    ###
-###                             aidPERSONIDPAPERS table                                ###
-###                                                                                    ###
-##########################################################################################
-
+#
+#
+# aidPERSONIDPAPERS table                                ###
+#
+#
 # ********** setters **********#
-
-def add_signature(sig, name, pid, flag=0, user_level=0):
+def add_signature(sig, name, pid, flag=0, user_level=0, m_name=None):
     '''
     Adds the given signature to the specified author.
 
@@ -95,13 +96,15 @@ def add_signature(sig, name, pid, flag=0, user_level=0):
     @type user_level: int
     '''
     if not name:
-        name = get_name_by_bibref(sig)
-        name = create_normalized_name(split_name_parts(name))
+        name = get_name_by_bibref(sig[0:2])
 
-    run_sql("""insert into aidPERSONIDPAPERS
-               (personid, bibref_table, bibref_value, bibrec, name, flag, lcul)
-               values (%s, %s, %s, %s, %s, %s, %s)""",
-               (pid, str(sig[0]), sig[1], sig[2], name, flag, user_level) )
+    if not m_name:
+        m_name = create_matchable_name(name)
+
+    run_sql('insert into aidPERSONIDPAPERS'
+            '(personid, bibref_table, bibref_value, bibrec, name, m_name, flag, lcul) '
+            'values (%s, %s, %s, %s, %s, %s, %s, %s)',
+            (pid, str(sig[0]), sig[1], sig[2], name, m_name, flag, user_level))
 
 
 def move_signature(sig, pid, force_claimed=False, set_unclaimed=False):
@@ -117,17 +120,17 @@ def move_signature(sig, pid, force_claimed=False, set_unclaimed=False):
     @param set_unclaimed: set signature as unclaimed
     @type set_unclaimed: bool
     '''
-    query = """update aidPERSONIDPAPERS
-               set personid=%s"""
+    query = ('update aidPERSONIDPAPERS '
+             'set personid=%s ')
     if set_unclaimed:
-        query += ", flag=0"
-    query += """ where bibref_table like %s
-                 and bibref_value=%s
-                 and bibrec=%s"""
+        query += ", flag=0 "
+    query += ('where bibref_table like %s '
+              'and bibref_value=%s '
+              'and bibrec=%s ')
     if not force_claimed:
         query += " and (flag <> 2 and flag <> -2)"
 
-    run_sql(query, (pid, sig[0], sig[1], sig[2]) )
+    run_sql(query, (pid, sig[0], sig[1], sig[2]))
 
 
 def modify_signature(old_ref, rec, new_ref, new_name):
@@ -143,16 +146,21 @@ def modify_signature(old_ref, rec, new_ref, new_name):
     @param new_name: new name to be assigned for the author
     @type new_name: str
     '''
-    run_sql("""update aidPERSONIDPAPERS
-               set bibref_table=%s, bibref_value=%s, name=%s
-               where bibref_table=%s
-               and bibref_value=%s
-               and bibrec=%s""",
-               (str(new_ref[0]), new_ref[1], new_name,
-                str(old_ref[0]), old_ref[1], rec) )
+    if not new_name:
+        new_name = get_name_by_bibref(new_ref)
+
+    m_name = create_matchable_name(new_name)
+
+    run_sql('update aidPERSONIDPAPERS '
+            'set bibref_table=%s, bibref_value=%s, name=%s, m_name=%s '
+            'where bibref_table like %s '
+            'and bibref_value=%s '
+            'and bibrec=%s',
+            (str(new_ref[0]), new_ref[1], new_name, m_name,
+             str(old_ref[0]), old_ref[1], rec))
 
 
-def remove_signatures(sigs):   ### remove_sigs
+def remove_signatures(sigs):  # remove_sigs
     '''
     Deletes the given signatures.
 
@@ -163,7 +171,7 @@ def remove_signatures(sigs):   ### remove_sigs
         _delete_from_aidpersonidpapers_where(table=sig[0], ref=sig[1], rec=sig[2])
 
 
-def remove_papers(recs):   ### remove_all_bibrecs
+def remove_papers(recs):  # remove_all_bibrecs
     '''
     Deletes all data about the given papers from all authors.
 
@@ -172,9 +180,8 @@ def remove_papers(recs):   ### remove_all_bibrecs
     '''
     if recs:
         recs_sqlstr = _get_sqlstr_from_set(recs)
-        run_sql("""delete from aidPERSONIDPAPERS
-                   where bibrec in %s"""
-                   % recs_sqlstr )
+        run_sql('delete from aidPERSONIDPAPERS '
+                'where bibrec in %s' % recs_sqlstr)
 
 
 def transfer_papers_to_author(papers_data, new_pid):
@@ -187,16 +194,16 @@ def transfer_papers_to_author(papers_data, new_pid):
     @type new_pid: int
     '''
     for pid, table, ref, rec, flag in papers_data:
-        run_sql("""update aidPERSONIDPAPERS
-                   set personid=%s, flag=%s
-                   where personid=%s
-                   and bibref_table=%s
-                   and bibref_value=%s
-                   and bibrec=%s""",
-                   (new_pid, flag, pid, table, ref, rec) )
+        run_sql('update aidPERSONIDPAPERS '
+                'set personid=%s, flag=%s '
+                'where personid=%s '
+                'and bibref_table like %s '
+                'and bibref_value=%s '
+                'and bibrec=%s',
+                (new_pid, flag, pid, table, ref, rec))
 
 
-def confirm_papers_to_author(pid, sigs_str, user_level=0):   ### confirm_papers_to_person
+def confirm_papers_to_author(pid, sigs_str, user_level=0):  # confirm_papers_to_person
     '''
     Confirms the relationship between the given author and the specified papers
     (from user input).
@@ -219,11 +226,11 @@ def confirm_papers_to_author(pid, sigs_str, user_level=0):   ### confirm_papers_
         table, ref, rec = sig
 
         # the paper should be present, either assigned or rejected
-        papers = run_sql("""select bibref_table, bibref_value, bibrec, personid, flag
-                            from aidPERSONIDPAPERS
-                            where bibrec=%s
-                            and flag >= -2""",
-                            (rec,) )
+        papers = run_sql('select bibref_table, bibref_value, bibrec, personid, flag '
+                         'from aidPERSONIDPAPERS '
+                         'where bibrec=%s '
+                         'and flag >= -2',
+                         (rec,))
 
         # select bibref_table, bibref_value, bibrec
         # from aidPERSONIDPAPERS
@@ -262,9 +269,9 @@ def confirm_papers_to_author(pid, sigs_str, user_level=0):   ### confirm_papers_
         # hence it happens that papers are claimed when they no longer exist in the system.
         # For the sake of mental sanity, instead of crashing from now on we just ignore such cases.
         if not (author_not_rejected_papers or author_rejected_papers or diff_author_not_rejected_papers) or not sig_exists:
-            statuses.append({ 'success':False, 'operation':'confirm' })
+            statuses.append({'success': False, 'operation': 'confirm'})
             continue
-        statuses.append({ 'success':True, 'operation':'confirm' })
+        statuses.append({'success': True, 'operation': 'confirm'})
 
         # It should not happen that a paper is assigned more than once to the same person.
         # But sometimes it happens in rare unfortunate cases of bad concurrency circumstances,
@@ -272,7 +279,8 @@ def confirm_papers_to_author(pid, sigs_str, user_level=0):   ### confirm_papers_
         # Once a better solution for dealing with concurrency is found, the following asserts
         # shall be reenabled to allow better control on what happens.
         # assert len(author_not_rejected_papers) < 2, "This paper should not be assigned to this person more then once! %s" % author_not_rejected_papers
-        # assert len(diff_author_not_rejected_papers) < 2, "There should not be more than one copy of this paper! %s" % diff_author_not_rejected_papers
+        # assert len(diff_author_not_rejected_papers) < 2, "There should not be
+        # more than one copy of this paper! %s" % diff_author_not_rejected_papers
 
         # If the bibrec is present with a different bibref, the existing one must be moved somewhere
         # else before we can claim the incoming one.
@@ -287,18 +295,18 @@ def confirm_papers_to_author(pid, sigs_str, user_level=0):   ### confirm_papers_
         # from now on.
         remove_signatures([sig])
         add_signature(sig, None, pid)
-        run_sql("""update aidPERSONIDPAPERS
-                   set personid=%s, flag=%s, lcul=%s
-                   where bibref_table=%s
-                   and bibref_value=%s
-                   and bibrec=%s""",
-                   (pid, '2', user_level, table, ref, rec) )
+        run_sql('update aidPERSONIDPAPERS '
+                'set personid=%s, flag=%s, lcul=%s '
+                'where bibref_table like %s '
+                'and bibref_value=%s '
+                'and bibrec=%s',
+                (pid, '2', user_level, table, ref, rec))
     update_canonical_names_of_authors(pids_to_update)
 
     return statuses
 
 
-def reject_papers_from_author(pid, sigs_str, user_level=0):   ### reject_papers_from_person
+def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_from_person
     '''
     Confirms the negative relationship between the given author and the
     specified papers (from user input).
@@ -327,9 +335,9 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):   ### reject_papers_
         # For the sake of mental sanity (see commentis in confirm_papers_to_author) just ignore if this paper does not longer exist.
         # assert sig_exists, 'The signature should exist'
         if not sig_exists:
-            statuses.append({ 'success':False, 'operation':'reject' })
+            statuses.append({'success': False, 'operation': 'reject'})
             continue
-        statuses.append({ 'success':True, 'operation':'reject' })
+        statuses.append({'success': True, 'operation': 'reject'})
 
         # If the record is already assigned to a different person the rejection is meaningless.
         # If not, we assign the paper to someone else (it doesn't matter who because eventually
@@ -345,7 +353,7 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):   ### reject_papers_
     return statuses
 
 
-def reset_papers_of_author(pid, sigs_str):   ### reset_papers_flag
+def reset_papers_of_author(pid, sigs_str):  # reset_papers_flag
     '''
     Redefines the relationship of the given author and the specified papers as
     neutral (neither claimed nor rejected).
@@ -364,7 +372,13 @@ def reset_papers_of_author(pid, sigs_str):   ### reset_papers_flag
         sig = _split_signature_string(s)
         table, ref, rec = sig
 
-        papers = _select_from_aidpersonidpapers_where(select=['bibref_table', 'bibref_value', 'bibrec', 'flag'], pid=pid, rec=rec)
+        papers = _select_from_aidpersonidpapers_where(
+            select=['bibref_table',
+                    'bibref_value',
+                    'bibrec',
+                    'flag'],
+            pid=pid,
+            rec=rec)
 
         assert len(papers) < 2
 
@@ -387,21 +401,20 @@ def reset_papers_of_author(pid, sigs_str):   ### reset_papers_flag
         # For the sake of mental sanity (see comments in confirm_papers_to_author) just ignore if this paper does not longer exist.
         # assert sig_exists, 'The signature should exist'
         if author_rejected_papers or not sig_exists:
-            statuses.append({ 'success':False, 'operation':'reset' })
+            statuses.append({'success': False, 'operation': 'reset'})
             continue
-        statuses.append({ 'success':True, 'operation':'reset' })
+        statuses.append({'success': True, 'operation': 'reset'})
 
-        run_sql("""delete from aidPERSONIDPAPERS
-                   where bibref_table like %s
-                   and bibref_value=%s
-                   and bibrec=%s""",
-                   (sig) )
+        run_sql('delete from aidPERSONIDPAPERS '
+                'where bibref_table like %s '
+                'and bibref_value=%s '
+                'and bibrec=%s', sig)
         add_signature(sig, None, pid)
 
     return statuses
 
 
-def duplicated_conirmed_papers_exist(printer, repair=False):   ### check_duplicated_papers
+def duplicated_conirmed_papers_exist(printer, repair=False):  # check_duplicated_papers
     '''
     It examines if there are records of confirmed papers in aidPERSONIDPAPERS
     table which are in an impaired state (duplicated) and repairs them if
@@ -419,10 +432,9 @@ def duplicated_conirmed_papers_exist(printer, repair=False):   ### check_duplica
     author_confirmed_papers = dict()
     to_reassign = list()
 
-    confirmed_papers = run_sql("""select personid, bibrec
-                                  from aidPERSONIDPAPERS
-                                  where flag <> %s""",
-                                  (-2,) )
+    confirmed_papers = run_sql('select personid, bibrec '
+                               'from aidPERSONIDPAPERS '
+                               'where flag <> %s', (-2,))
 
     for pid, rec in confirmed_papers:
         author_confirmed_papers.setdefault(pid, []).append(rec)
@@ -433,31 +445,29 @@ def duplicated_conirmed_papers_exist(printer, repair=False):   ### check_duplica
             duplicated_conirmed_papers_found = True
 
             duplicates = sorted(recs)
-            duplicates = set([rec for i, rec in enumerate(duplicates[:-1]) if rec == duplicates[i+1]])
+            duplicates = set([rec for i, rec in enumerate(duplicates[:-1]) if rec == duplicates[i + 1]])
             printer("Person %d has duplicated papers: %s" % (pid, duplicates))
 
             if repair:
                 for duprec in duplicates:
                     printer("Repairing duplicated bibrec %s" % str(duprec))
-                    claimed_from_involved = run_sql("""select personid, bibref_table, bibref_value, bibrec, flag
-                                                       from aidPERSONIDPAPERS
-                                                       where personid=%s
-                                                       and bibrec=%s
-                                                       and flag >= 2""",
-                                                       (pid, duprec) )
+                    claimed_from_involved = run_sql('select personid, bibref_table, bibref_value, bibrec, flag '
+                                                    'from aidPERSONIDPAPERS '
+                                                    'where personid=%s '
+                                                    'and bibrec=%s '
+                                                    'and flag >= 2', (pid, duprec))
                     if len(claimed_from_involved) != 1:
                         to_reassign.append(duprec)
                         _delete_from_aidpersonidpapers_where(rec=duprec, pid=pid)
                     else:
-                        run_sql("""delete from aidPERSONIDPAPERS
-                                   where personid=%s
-                                   and bibrec=%s
-                                   and flag < 2""",
-                                   (pid, duprec) )
+                        run_sql('delete from aidPERSONIDPAPERS '
+                                'where personid=%s '
+                                'and bibrec=%s '
+                                'and flag < 2', (pid, duprec))
 
     if repair and to_reassign:
         printer("Reassigning deleted bibrecs %s" % str(to_reassign))
-        from bibauthorid_rabbit import rabbit
+        from invenio.bibauthorid_rabbit import rabbit
         rabbit(to_reassign)
 
     return duplicated_conirmed_papers_found
@@ -481,10 +491,9 @@ def duplicated_confirmed_signatures_exist(printer, repair=False):   # check_dupl
     paper_confirmed_bibrefs = dict()
     to_reassign = list()
 
-    confirmed_sigs = run_sql("""select bibref_table, bibref_value, bibrec
-                                from aidPERSONIDPAPERS
-                                where flag > %s""",
-                                (-2,) )
+    confirmed_sigs = run_sql('select bibref_table, bibref_value, bibrec '
+                             'from aidPERSONIDPAPERS '
+                             'where flag > %s', (-2,))
 
     for table, ref, rec in confirmed_sigs:
         paper_confirmed_bibrefs.setdefault(rec, []).append((table, ref))
@@ -495,34 +504,41 @@ def duplicated_confirmed_signatures_exist(printer, repair=False):   # check_dupl
             duplicated_confirmed_signatures_found = True
 
             duplicates = sorted(bibrefs)
-            duplicates = set([bibref for i, bibref in enumerate(duplicates[:-1]) if bibref == duplicates[i+1]])
+            duplicates = set([bibref for i, bibref in enumerate(duplicates[:-1]) if bibref == duplicates[i + 1]])
             printer("Paper %d has duplicated signatures: %s" % (rec, duplicates))
 
             if repair:
                 for table, ref in duplicates:
                     printer("Repairing duplicated signature %s" % str((table, ref)))
-                    claimed = _select_from_aidpersonidpapers_where(select=['personid', 'bibref_table', 'bibref_value', 'bibrec'], table=table, ref=ref, rec=rec, flag=2)
+                    claimed = _select_from_aidpersonidpapers_where(
+                        select=['personid',
+                                'bibref_table',
+                                'bibref_value',
+                                'bibrec'],
+                        table=table,
+                        ref=ref,
+                        rec=rec,
+                        flag=2)
 
                     if len(claimed) != 1:
                         to_reassign.append(rec)
                         _delete_from_aidpersonidpapers_where(table=table, ref=ref, rec=rec)
                     else:
-                        run_sql("""delete from aidPERSONIDPAPERS
-                                   where bibref_table=%s
-                                   and bibref_value=%s
-                                   and bibrec=%s
-                                   and flag < 2""",
-                                   (table, ref, rec) )
+                        run_sql('delete from aidPERSONIDPAPERS '
+                                'where bibref_table like %s '
+                                'and bibref_value=%s '
+                                'and bibrec=%s '
+                                'and flag < 2', (table, ref, rec))
 
     if repair and to_reassign:
         printer("Reassigning deleted bibrecs %s" % str(to_reassign))
-        from bibauthorid_rabbit import rabbit
+        from invenio.bibauthorid_rabbit import rabbit
         rabbit(to_reassign)
 
     return duplicated_confirmed_signatures_found
 
 
-def wrong_names_exist(printer, repair=False):   ### check_wrong_names
+def wrong_names_exist(printer, repair=False):  # check_wrong_names
     '''
     It examines if there are records in aidPERSONIDPAPERS table which carry a
     wrong name and repairs them if specified.
@@ -543,25 +559,28 @@ def wrong_names_exist(printer, repair=False):   ### check_wrong_names
         printer("%d corrupted names in aidPERSONIDPAPERS." % wrong_names_count)
         for wrong_name in wrong_names:
             if wrong_name[2]:
-                printer("Outdated name, ('%s')  '%s'(%s:%d)." % (wrong_name[3], wrong_name[2], wrong_name[0], wrong_name[1]))
+                printer(
+                    "Outdated name, ('%s' instead of '%s' (%s:%d))." %
+                    (wrong_name[3], wrong_name[2], wrong_name[0], wrong_name[1]))
             else:
-                printer("Invalid id(%s:%d)." % (wrong_name[0], wrong_name[1]))
+                printer("Invalid id (%s:%d)." % (wrong_name[0], wrong_name[1]))
 
             if repair:
                 printer("Fixing wrong name: %s" % str(wrong_name))
                 if wrong_name[2]:
-                    run_sql("""update aidPERSONIDPAPERS
-                               set name=%s
-                               where bibref_table=%s
-                               and bibref_value=%s""",
-                               (wrong_name[2], wrong_name[0], wrong_name[1]) )
+                    m_name = create_matchable_name(wrong_name[2])
+                    run_sql('update aidPERSONIDPAPERS '
+                            'set name=%s, m_name=%s, '
+                            'where bibref_table like %s '
+                            'and bibref_value=%s',
+                            (wrong_name[2], m_name, wrong_name[0], wrong_name[1]))
                 else:
                     _delete_from_aidpersonidpapers_where(table=wrong_name[0], ref=wrong_name[1])
 
     return wrong_names_found
 
 
-def impaired_rejections_exist(printer, repair=False):   ### check_wrong_rejection
+def impaired_rejections_exist(printer, repair=False):  # check_wrong_rejection
     '''
     It examines if there are records of rejected papers in aidPERSONIDPAPERS
     table which are in an impaired state (not assigned or both confirmed and
@@ -579,24 +598,30 @@ def impaired_rejections_exist(printer, repair=False):   ### check_wrong_rejectio
     to_reassign = list()
     to_deal_with = list()
 
-    rejected_papers = set(_select_from_aidpersonidpapers_where(select=['bibref_table', 'bibref_value', 'bibrec'], flag=-2))
+    rejected_papers = set(_select_from_aidpersonidpapers_where(
+        select=['bibref_table', 'bibref_value', 'bibrec'], flag=-2))
 
-    confirmed_papers = set(run_sql("""select bibref_table, bibref_value, bibrec
-                                      from aidPERSONIDPAPERS
-                                      where flag > %s""",
-                                      (-2,) ))
+    confirmed_papers = set(run_sql('select bibref_table, bibref_value, bibrec '
+                                   'from aidPERSONIDPAPERS '
+                                   'where flag > %s', (-2,)))
     not_assigned_papers = rejected_papers - confirmed_papers
 
     for paper in not_assigned_papers:
         printer("Paper (%s:%s,%s) was rejected but never reassigned" % paper)
         to_reassign.append(paper)
 
-    rejected_papers = set(_select_from_aidpersonidpapers_where(select=['personid', 'bibref_table', 'bibref_value', 'bibrec'], flag=-2))
+    rejected_papers = set(
+        _select_from_aidpersonidpapers_where(
+            select=[
+                'personid',
+                'bibref_table',
+                'bibref_value',
+                'bibrec'],
+            flag=-2))
 
-    confirmed_papers = set(run_sql("""select personid, bibref_table, bibref_value, bibrec
-                                      from aidPERSONIDPAPERS
-                                      where flag > %s""",
-                                      (-2,) ))
+    confirmed_papers = set(run_sql('select personid, bibref_table, bibref_value, bibrec '
+                                   'from aidPERSONIDPAPERS '
+                                   'where flag > %s', (-2,)))
     # papers which are both confirmed and rejected for/from the same author
     both_confirmed_and_rejected_papers = rejected_papers & confirmed_papers
 
@@ -608,7 +633,7 @@ def impaired_rejections_exist(printer, repair=False):   ### check_wrong_rejectio
         impaired_rejections_found = True
 
     if repair and (to_reassign or to_deal_with):
-        from bibauthorid_rabbit import rabbit
+        from invenio.bibauthorid_rabbit import rabbit
 
         if to_reassign:
             # Rabbit is not designed to reassign signatures which are rejected but not assigned:
@@ -666,7 +691,7 @@ def _delete_from_aidpersonidpapers_where(pid=None, table=None, ref=None, rec=Non
         add_condition('personid=%s')
         add_arg(pid)
     if table is not None:
-        add_condition('bibref_table=%s')
+        add_condition("bibref_table like %s")
         add_arg(str(table))
     if ref is not None:
         add_condition('bibref_value=%s')
@@ -688,14 +713,15 @@ def _delete_from_aidpersonidpapers_where(pid=None, table=None, ref=None, rec=Non
         return
 
     conditions_str = " and ".join(conditions)
-    query = """delete from aidPERSONIDPAPERS
-               where %s""" % conditions_str
+    query = ('delete from aidPERSONIDPAPERS '
+             'where %s') % conditions_str
 
-    run_sql(query, tuple(args) )
+    run_sql(query, tuple(args))
 
 # ********** getters **********#
 
-def get_all_papers():   ### get_all_bibrecs
+
+def get_all_bibrecs_from_aidpersonidpapers():
     '''
     Gets all papers which are associated to some author.
 
@@ -719,7 +745,7 @@ def get_all_paper_data_of_author(pid):
     return _select_from_aidpersonidpapers_where(select=['personid', 'bibref_table', 'bibref_value', 'bibrec', 'flag'], pid=pid)
 
 
-def get_papers_of_author(pid, claimed_only=False, include_rejected=False):   ### get_all_paper_records
+def get_papers_of_author(pid, claimed_only=False, include_rejected=False):  # get_all_paper_records
     '''
     Gets all papers for the specific author. If 'claimed_only' flag is enabled
     it takes into account only claimed papers. Additionally if
@@ -736,18 +762,18 @@ def get_papers_of_author(pid, claimed_only=False, include_rejected=False):   ###
     @return: paper identifiers
     @rtype: set set((int),)
     '''
-    query = """select bibrec
-               from aidPERSONIDPAPERS
-               where personid=%s"""
+    query = ('select bibrec '
+             'from aidPERSONIDPAPERS '
+             'where personid=%s')
     if claimed_only and include_rejected:
         query += " and (flag=2 or flag=-2)"
     elif claimed_only:
         query += " and flag=2"
 
-    return set(run_sql(query, (pid,) ))
+    return set(run_sql(query, (pid,)))
 
 
-def get_confirmed_papers_of_authors(pids):   ### get_all_papers_of_pids
+def get_confirmed_papers_of_authors(pids):  # get_all_papers_of_pids
     '''
     Gets all records for the given authors.
 
@@ -760,16 +786,14 @@ def get_confirmed_papers_of_authors(pids):   ### get_all_papers_of_pids
     if not pids:
         return ()
     pids_sqlstr = _get_sqlstr_from_set(pids)
-    papers = run_sql("""select personid, bibref_table, bibref_value, bibrec, flag
-                        from aidPERSONIDPAPERS
-                        where personid in %s
-                        and flag > -2"""
-                        % pids_sqlstr )
+    papers = run_sql('select personid, bibref_table, bibref_value, bibrec, flag '
+                     'from aidPERSONIDPAPERS '
+                     'where personid in %s and flag > -2' % pids_sqlstr)
 
     return (p for p in papers)
 
 
-def get_confirmed_papers_of_author(pid):   ### get_person_bibrecs
+def get_confirmed_papers_of_author(pid):  # get_person_bibrecs
     '''
     Gets all papers which are associated (non-negatively) to the given author.
 
@@ -779,17 +803,15 @@ def get_confirmed_papers_of_author(pid):   ### get_person_bibrecs
     @return: paper identifiers
     @rtype: list [int,]
     '''
-    papers = run_sql("""select bibrec
-                        from aidPERSONIDPAPERS
-                        where personid=%s
-                        and flag > -2""",
-                        (str(pid),) )
+    papers = run_sql('select bibrec '
+                     'from aidPERSONIDPAPERS '
+                     'where personid=%s and flag > -2', (str(pid),))
     papers = list(set([p[0] for p in papers]))
 
     return papers
 
 
-def get_claimed_papers_of_author(pid):   ### get_claimed_papers
+def get_claimed_papers_of_author(pid):  # get_claimed_papers
     '''
     Gets all signatures for the manually claimed papers of the given author.
 
@@ -799,11 +821,9 @@ def get_claimed_papers_of_author(pid):   ### get_claimed_papers
     @return: signatures ((bibref_table, bibref_value, bibrec),)
     @rtype: tuple ((str, int, int),)
     '''
-    return run_sql("""select bibref_table, bibref_value, bibrec
-                      from aidPERSONIDPAPERS
-                      where personid=%s
-                      and flag > %s""",
-                      (pid, 1) )
+    return run_sql('select bibref_table, bibref_value, bibrec '
+                   'from aidPERSONIDPAPERS '
+                   'where personid=%s and flag > %s', (pid, 1))
 
 
 def get_claimed_papers_from_papers(recs):
@@ -817,15 +837,26 @@ def get_claimed_papers_from_papers(recs):
     @rtype: tuple ((int),)
     '''
     recs_sqlstr = _get_sqlstr_from_set(recs)
-    claimed_recs = set(run_sql("""select bibrec
-                                  from aidPERSONIDPAPERS
-                                  where bibrec in %s
-                                  and flag=2"""
-                                  % recs_sqlstr ))
+    claimed_recs = set(run_sql('select bibrec '
+                               'from aidPERSONIDPAPERS '
+                               'where bibrec in %s and flag=2' % recs_sqlstr))
     return claimed_recs
 
 
-def get_signatures_of_paper(rec):   ### get_signatures_from_rec
+def get_rec_to_signatures_mapping():
+    table = _select_from_aidpersonidpapers_where(
+        select=['personid',
+                'bibref_table',
+                'bibref_value',
+                'bibrec',
+                'name'])
+    cache = defaultdict(list)
+    for row in table:
+        cache[int(row[3])].append(row)
+    return cache
+
+
+def get_signatures_of_paper(rec):  # get_signatures_from_rec
     '''
     Gets all records with the given paper identifier.
 
@@ -838,7 +869,7 @@ def get_signatures_of_paper(rec):   ### get_signatures_from_rec
     return _select_from_aidpersonidpapers_where(select=['personid', 'bibref_table', 'bibref_value', 'bibrec', 'name'], rec=rec)
 
 
-def get_status_of_signature(sig_str):   ### get_bibref_modification_status
+def get_status_of_signature(sig_str):  # get_bibref_modification_status
     '''
     Gets the author-paper association status for the given signature.
 
@@ -862,7 +893,7 @@ def get_status_of_signature(sig_str):   ### get_bibref_modification_status
         return (False, 0)
 
 
-def get_author_and_status_of_signature(sig_str):   ### get_papers_status
+def get_author_and_status_of_signature(sig_str):  # get_papers_status
     '''
     Gets the authors and the author-paper association status (for each author)
     of the paper reffered in the given signature.
@@ -881,7 +912,7 @@ def get_author_and_status_of_signature(sig_str):   ### get_papers_status
     return [[sig] + list(i) for i in author_and_status]
 
 
-def get_ordered_author_and_status_of_signature(sig):   ### get_signature_info
+def get_ordered_author_and_status_of_signature(sig):  # get_signature_info
     '''
     Gets the author and the author-paper association status affiliated to the
     given signature.
@@ -892,16 +923,15 @@ def get_ordered_author_and_status_of_signature(sig):   ### get_signature_info
     @return: author identifier and author-paper association status
     @rtype: tuple ((int, int),)
     '''
-    return run_sql("""select personid, flag
-                      from aidPERSONIDPAPERS
-                      where bibref_table=%s
-                      and bibref_value=%s
-                      and bibrec=%s
-                      order by flag""",
-                      sig )
+    return run_sql('select personid, flag '
+                   'from aidPERSONIDPAPERS '
+                   'where bibref_table like %s '
+                   'and bibref_value=%s '
+                   'and bibrec=%s '
+                   'order by flag', sig)
 
 
-def get_author_and_status_of_confirmed_paper(sig):   ### personid_from_signature
+def get_author_and_status_of_confirmed_paper(sig):  # personid_from_signature
     '''
     Gets the confirmed author and author-paper association status affiliated to
     the given signature.
@@ -912,20 +942,19 @@ def get_author_and_status_of_confirmed_paper(sig):   ### personid_from_signature
     @return: author identifier and author-paper association status
     @rtype: tuple ((int, int),)
     '''
-    conf_author_and_status = run_sql("""select personid, flag
-                                        from aidPERSONIDPAPERS
-                                        where bibref_table=%s
-                                        and bibref_value=%s
-                                        and bibrec=%s
-                                        and flag > -2""",
-                                        sig )
+    conf_author_and_status = run_sql('select personid, flag '
+                                     'from aidPERSONIDPAPERS '
+                                     'where bibref_table like %s '
+                                     'and bibref_value=%s '
+                                     'and bibrec=%s '
+                                     'and flag > -2', sig)
 
     assert len(conf_author_and_status) < 2, "More that one author hold the same signature: %s" % conf_author_and_status
 
     return conf_author_and_status
 
 
-def get_author_info_of_confirmed_paper(sig):   ### personid_name_from_signature
+def get_author_info_of_confirmed_paper(sig):  # personid_name_from_signature
     '''
     Gets the confirmed author and author name affiliated to the given
     signature.
@@ -936,20 +965,19 @@ def get_author_info_of_confirmed_paper(sig):   ### personid_name_from_signature
     @return: author identifier and author name
     @rtype: tuple ((int, str),)
     '''
-    conf_author = run_sql("""select personid, name
-                             from aidPERSONIDPAPERS
-                             where bibref_table=%s
-                             and bibref_value=%s
-                             and bibrec=%s
-                             and flag > -2""",
-                             sig )
+    conf_author = run_sql('select personid, name '
+                          'from aidPERSONIDPAPERS '
+                          'where bibref_table like %s '
+                          'and bibref_value=%s '
+                          'and bibrec=%s '
+                          'and flag > -2', sig)
 
     assert len(conf_author) < 2, "More than one author hold the same signature: %s" % str(conf_author)
 
     return conf_author
 
 
-def get_authors_of_claimed_paper(rec):   ### get_personids_from_bibrec
+def get_authors_of_claimed_paper(rec):  # get_personids_from_bibrec
     '''
     Gets all the authors who are associated (non-negatively) with the given
     paper.
@@ -960,18 +988,27 @@ def get_authors_of_claimed_paper(rec):   ### get_personids_from_bibrec
     @return: author identifiers
     @rtype: set set(int,)
     '''
-    pids = run_sql("""select personid
-                      from aidPERSONIDPAPERS
-                      where bibrec=%s
-                      and flag > -2""",
-                      (rec,) )
+    pids = run_sql('select personid '
+                   'from aidPERSONIDPAPERS '
+                   'where bibrec=%s '
+                   'and flag > -2', (rec,))
     if not pids:
         return set()
 
     return set([pid[0] for pid in pids])
 
 
-def get_coauthors_of_author(pid, excluding_recs=None):   ### get_coauthor_pids
+def get_personid_signature_association_for_paper(rec):
+    data = run_sql("select personid, bibref_table, bibref_value from aidPERSONIDPAPERS where "
+                   "bibrec = %s and flag > -2", (rec,))
+    associations = defaultdict(list)
+    for i in data:
+        associations[str(i[1]) + ':' + str(i[2])] = int(i[0])
+
+    return associations
+
+
+def get_coauthors_of_author(pid, excluding_recs=None):  # get_coauthor_pids
     '''
     Gets the authors who are sharing papers with the given author excluding
     from the common papers the specified set.
@@ -983,18 +1020,20 @@ def get_coauthors_of_author(pid, excluding_recs=None):   ### get_coauthor_pids
     '''
     recs = get_confirmed_papers_of_author(pid)
     if excluding_recs:
-        recs = set(recs) - set(excluding_recs)
+	exclude_set = set(excluding_recs)
+        recs = set(recs) - exclude_set
+    else:
+	exclude_set = set()
 
     if not recs:
         return list()
     recs_sqlstr = _get_sqlstr_from_set(recs)
-    pids = run_sql("""select personid, bibrec
-                      from aidPERSONIDPAPERS
-                      where bibrec in %s
-                      and flag > -2"""
-                      % recs_sqlstr )
+    pids = run_sql('select personid, bibrec '
+                   'from aidPERSONIDPAPERS '
+                   'where bibrec in %s '
+                   'and flag > -2' % recs_sqlstr)
 
-    pids = set([(int(p), int(r)) for p, r in pids if int(p) != int(pid)])
+    pids = set([(int(p), int(r)) for p, r in pids if (int(p) != int(pid) and int(r) not in exclude_set)])
     pids = sorted([p for p, r in pids])
     pids = groupby(pids)
     pids = [(key, len(list(val))) for key, val in pids]
@@ -1003,7 +1042,7 @@ def get_coauthors_of_author(pid, excluding_recs=None):   ### get_coauthor_pids
     return pids
 
 
-def get_names_count_of_author(pid):   ### get_person_names_count
+def get_names_to_records_of_author(pid):  # get_person_names_count
     '''
     Returns the set of names and times each name appears from the records which
     are associated to the given author.
@@ -1014,20 +1053,23 @@ def get_names_count_of_author(pid):   ### get_person_names_count
     @return: set of names and times each name appears
     @rtype: set set((int, str),)
     '''
-    author_names = run_sql("""select name
-                              from aidPERSONIDPAPERS
-                              where personid=%s
-                              and flag > -2""",
-                              (pid,) )
-    author_names = [name[0] for name in author_names]
-    names_count = defaultdict(int)
-    for name in author_names:
-        names_count[name] += 1
+    author_names = run_sql('select name, bibrec '
+                           'from aidPERSONIDPAPERS '
+                           'where personid=%s '
+                           'and flag > -2', (pid,))
+    author_names = [(name[0], name[1]) for name in author_names]
+    names_count = defaultdict(set)
+    for name, bibrec in author_names:
+        names_count[name].add(bibrec)
 
-    return names_count.items()
+    return dict((x, list(y)) for x, y in names_count.items())
 
 
-def _get_external_ids_from_papers_of_author(pid, limit_to_claimed_papers=False):   ### collect_personID_external_ids_from_papers
+def get_names_count_of_author(pid):
+    return dict((x, len(y)) for x, y in get_names_to_records_of_author(pid).items()).items()
+
+
+def _get_external_ids_from_papers_of_author(pid, limit_to_claimed_papers=False, force_cache_tables=False):  # collect_personID_external_ids_from_papers
     '''
     Gets a mapping which associates an external system (e.g. Inspire) with the
     identifiers that the given author carries in that system (based on the
@@ -1049,11 +1091,16 @@ def _get_external_ids_from_papers_of_author(pid, limit_to_claimed_papers=False):
         if limit_to_claimed_papers:
             flag = 1
 
-        sigs = run_sql("""select bibref_table, bibref_value, bibrec
-                          from aidPERSONIDPAPERS
-                          where personid=%s
-                          and flag > %s""",
-                          (pid, flag) )
+        sigs = run_sql('select bibref_table, bibref_value, bibrec '
+                       'from aidPERSONIDPAPERS '
+                       'where personid=%s '
+                       'and flag > %s', (pid, flag))
+
+        records_to_cache = [x[2] for x in sigs]
+
+       # if len(records_to_cache) >= bconfig.EXT_ID_CACHE_THRESHOLD:
+        populate_partial_marc_caches(records_to_cache)
+
         inspire_ids = set()
         for sig in sigs:
             try:
@@ -1068,7 +1115,7 @@ def _get_external_ids_from_papers_of_author(pid, limit_to_claimed_papers=False):
     return external_ids
 
 
-def get_validated_request_tickets_for_author(pid, tid=None):   ### get_validated_request_ticket
+def get_validated_request_tickets_for_author(pid, tid=None):  # get_validated_request_ticket
     '''
     Gets the request tickets for the given author after it validates that their
     entries are correct. If an entry is incorrect it discards it.
@@ -1101,7 +1148,7 @@ def get_validated_request_tickets_for_author(pid, tid=None):   ### get_validated
     return request_tickets
 
 
-def get_authors_by_name_regexp(name_regexp):   ### get_all_personids_by_name
+def get_authors_by_name_regexp(name_regexp):  # get_all_personids_by_name
     '''
     Gets authors whose name matches the regular expression pattern.
 
@@ -1111,14 +1158,14 @@ def get_authors_by_name_regexp(name_regexp):   ### get_all_personids_by_name
     @return: authors whose name satisfies the regexp ((personid, name),)
     @rtype: tuple ((int, str),)
     '''
-    return run_sql("""select personid, name
-                      from aidPERSONIDPAPERS
-                      where name like %s
-                      and flag > -2""",
-                      (name_regexp,) )
+    return run_sql('select personid, name '
+                   'from aidPERSONIDPAPERS '
+                   'where name like %s '
+                   'and flag > -2 '
+                   'group by personid, name', (name_regexp,))
 
 
-def get_authors_by_name(name, limit_to_recid=False):   ### find_pids_by_exact_name
+def get_authors_by_name(name, limit_to_recid=False, use_matchable_name=False):  # find_pids_by_exact_name
     '''
     Gets all authors who have records with the specified name.
 
@@ -1128,16 +1175,23 @@ def get_authors_by_name(name, limit_to_recid=False):   ### find_pids_by_exact_na
     @return: author identifiers
     @rtype: set set((int),)
     '''
-    if limit_to_recid:
-        pids = run_sql("select personid from aidPERSONIDPAPERS where name=%s and bibrec=%s and flag>-2",
-                       (name, limit_to_recid))
-        return set(pids)
+    if use_matchable_name:
+        name_column = 'm_name'
     else:
-        pids = run_sql("select personid from aidPERSONIDPAPERS where name=%s and flag>-2",
-                       (name,))
-        return set(pids)
+        name_column = 'name'
 
-def get_paper_to_author_and_status_mapping():   ### get_bibrefrec_to_pid_flag_mapping
+    query_string_one = "select distinct(personid) from aidPERSONIDPAPERS where %s" % name_column
+    if limit_to_recid:
+        pids = run_sql("".join([query_string_one, "=%s and bibrec=%s and flag>-2"]),
+                      (name, limit_to_recid))
+        return [pid[0] for pid in pids]
+    else:
+        pids = run_sql("".join([query_string_one, "=%s and flag>-2"]),
+                      (name,))
+        return [pid[0] for pid in pids]
+
+
+def get_paper_to_author_and_status_mapping():  # get_bibrefrec_to_pid_flag_mapping
     '''
     Gets a mapping which associates signatures with author identifiers and the
     status of the author-paper association (of the paper that the signature is
@@ -1146,15 +1200,16 @@ def get_paper_to_author_and_status_mapping():   ### get_bibrefrec_to_pid_flag_ma
     @return: mapping
     @rtype: dict {(str, int, int): set((int, int),)}
     '''
-    mapping = dict()
-    sigs_authors = _select_from_aidpersonidpapers_where(select=['bibref_table', 'bibref_value', 'bibrec', 'personid', 'flag'])
+    mapping = defaultdict(list)
+    sigs_authors = _select_from_aidpersonidpapers_where(
+        select=['bibref_table', 'bibref_value', 'bibrec', 'personid', 'flag'])
 
     gc.disable()
 
     for i in sigs_authors:
         sig = (i[0], i[1], i[2])
         pid_flag = (i[3], i[4])
-        mapping[sig] = mapping.get(sig, []).append(pid_flag)
+        mapping[sig].append(pid_flag)
 
     gc.collect()
     gc.enable()
@@ -1162,7 +1217,7 @@ def get_paper_to_author_and_status_mapping():   ### get_bibrefrec_to_pid_flag_ma
     return mapping
 
 
-def get_author_to_papers_mapping(recs, limit_by_name=None):   ### get_personids_and_papers_from_bibrecs
+def get_author_to_papers_mapping(recs, limit_by_name=None):  # get_personids_and_papers_from_bibrecs
     '''
     It finds the authors of the given papers and returns a mapping which
     associates each author with the set of papers he has affiliation with.
@@ -1186,21 +1241,19 @@ def get_author_to_papers_mapping(recs, limit_by_name=None):   ### get_personids_
     surname = None
     if limit_by_name:
         try:
-            surname = split_name_parts(limit_by_name)[0]
+            surname = create_normalized_name(split_name_parts(limit_by_name)[0])
         except IndexError:
             pass
 
     if surname:
-        pids_papers = run_sql("""select personid, bibrec
-                                 from aidPERSONIDPAPERS
-                                 where bibrec in %s
-                                 and name like %s"""
-                                 % (recs_sqlstr, '"'+surname + '%' +'"') )
+        pids_papers = run_sql('select personid, bibrec '
+                              'from aidPERSONIDPAPERS '
+                              'where bibrec in %s '
+                              'and name like %s' % (recs_sqlstr, '"' + surname + '%' + '"'))
     else:
-        pids_papers = run_sql("""select personid, bibrec
-                                 from aidPERSONIDPAPERS
-                                 where bibrec in %s"""
-                                 % recs_sqlstr )
+        pids_papers = run_sql('select personid, bibrec '
+                              'from aidPERSONIDPAPERS '
+                              'where bibrec in %s' % recs_sqlstr)
 
     pids_papers = sorted(pids_papers, key=itemgetter(0))
     pids_papers = groupby(pids_papers, key=itemgetter(0))
@@ -1210,7 +1263,7 @@ def get_author_to_papers_mapping(recs, limit_by_name=None):   ### get_personids_
     return pids_papers
 
 
-def get_author_to_confirmed_names_mapping(since=None):   ### get_all_modified_names_from_personid
+def get_author_to_confirmed_names_mapping(since=None):  # get_all_modified_names_from_personid
     '''
     For all authors it gets the set of names from the papers each author is
     associated with. It excludes the names that come from rejected papers.
@@ -1226,23 +1279,22 @@ def get_author_to_confirmed_names_mapping(since=None):   ### get_all_modified_na
     args = list()
     add_arg = args.append
 
-    query = """select personid, name
-               from aidPERSONIDPAPERS
-               where flag > -2"""
+    query = ('select personid, name '
+             'from aidPERSONIDPAPERS '
+             'where flag > -2')
     if since:
         query += " and last_updated > %s"
         add_arg(since)
 
-    pids_names = run_sql(query, tuple(args) )
+    pids_names = run_sql(query, tuple(args))
 
     if since:
         pids = set([pid for pid, _ in pids_names])
         pids_sqlstr = _get_sqlstr_from_set(pids)
-        pids_names = run_sql("""select personid, name
-                                from aidPERSONIDPAPERS
-                                where personid in %s
-                                and flag > -2"""
-                                % pids_sqlstr )
+        pids_names = run_sql('select personid, name '
+                             'from aidPERSONIDPAPERS '
+                             'where personid in %s '
+                             'and flag > -2' % pids_sqlstr)
 
     res = dict()
     for pid, name in pids_names:
@@ -1253,6 +1305,7 @@ def get_author_to_confirmed_names_mapping(since=None):   ### get_all_modified_na
             res[pid] = [pid, set([name]), 1]
 
     return (tuple(res[pid]) for pid in res.keys())
+
 
 def get_all_modified_names_from_personid(since=None):
     if since:
@@ -1268,14 +1321,33 @@ def get_all_modified_names_from_personid(since=None):
 
     return ((name[0][0], set(n[1] for n in name), len(name))
             for name in (run_sql(
-            "SELECT personid, name "
-            "FROM aidPERSONIDPAPERS "
-            "WHERE personid = %s "
-            "AND flag > -2", p)
-        for p in all_pids))
+                         "SELECT personid, name "
+                         "FROM aidPERSONIDPAPERS "
+                         "WHERE personid = %s "
+                         "AND flag > -2", p)
+                         for p in all_pids))
 
 
-def get_name_to_authors_mapping():   ### get_name_string_to_pid_dictionary
+def get_author_to_name_and_occurrence_mapping():
+    '''
+    Gets a mapping which associates authors with the set of names they carry
+    and the number of times each name occurs in their papers.
+
+    @return: mapping
+    @rtype: dict {int: {str: int},}
+    '''
+    cl = lambda: defaultdict(int)
+    mapping = defaultdict(cl)
+    authors = run_sql('select personid, name '
+                      'from aidPERSONIDPAPERS '
+                      'where flag > -2')
+
+    for pid, name in authors:
+        mapping[pid][name] += 1
+    return mapping
+
+
+def get_name_to_authors_mapping():  # get_name_string_to_pid_dictionary
     '''
     Gets a mapping which associates names with the set of authors who carry
     each name.
@@ -1283,11 +1355,11 @@ def get_name_to_authors_mapping():   ### get_name_string_to_pid_dictionary
     @return: mapping
     @rtype: dict {str: set(int,)}
     '''
-    mapping = dict()
-    authors = set(_select_from_aidpersonidpapers_where(select=['personid', 'name']))
+    mapping = defaultdict(set)
+    authors = _select_from_aidpersonidpapers_where(select=['personid', 'name'])
 
     for pid, name in authors:
-        mapping.setdefault(name, set()).add(pid)
+        mapping[name].add(pid)
 
     return mapping
 
@@ -1300,18 +1372,18 @@ def get_confirmed_name_to_authors_mapping():
     @return: mapping
     @rtype: dict {str: set(int,)}
     '''
-    mapping = dict()
-    authors = run_sql("""select personid, name
-                         from aidPERSONIDPAPERS
-                         where flag > -2""")
+    mapping = defaultdict(set)
+    authors = run_sql('select personid, name '
+                      'from aidPERSONIDPAPERS '
+                      'where flag > -2')
 
     for pid, name in authors:
-        mapping.setdefault(name, set()).add(pid)
+        mapping[name].add(pid)
 
     return mapping
 
 
-def get_all_author_paper_associations(table_name='aidPERSONIDPAPERS'):   ### get_full_personid_papers
+def get_all_author_paper_associations(table_name='aidPERSONIDPAPERS'):  # get_full_personid_papers
     '''
     Gets all author-paper associations (from aidPERSONIDPAPERS table or any
     other table with the same structure).
@@ -1322,9 +1394,8 @@ def get_all_author_paper_associations(table_name='aidPERSONIDPAPERS'):   ### get
     @return: author-paper associations ((pid, bibref_table, bibref_value, bibrec, name, flag, lcul),)
     @rtype: tuple ((int, str, int, int, str, int, int),)
     '''
-    return run_sql("""select personid, bibref_table, bibref_value, bibrec, name, flag, lcul
-                      from %s"""
-                      % table_name )
+    return run_sql('select personid, bibref_table, bibref_value, bibrec, name, flag, lcul '
+                   'from %s' % table_name)
 
 
 def get_wrong_names():
@@ -1334,17 +1405,15 @@ def get_wrong_names():
     @return: wrong names (table, ref, correct_name)
     @rtype: generator ((str, int, str),)
     '''
-    bib100 = dict( ((name_id, create_normalized_name(split_name_parts(name_value))) \
-                    for name_id, name_value in get_bib10x()) )
-    bib700 = dict( ((name_id, create_normalized_name(split_name_parts(name_value))) \
-                    for name_id, name_value in get_bib70x()) )
+    bib100 = dict((name_id, name_value) for name_id, name_value in get_bib10x())
+    bib700 = dict((name_id, name_value) for name_id, name_value in get_bib70x())
 
     aidpersonidpapers100 = set(_select_from_aidpersonidpapers_where(select=['bibref_value', 'name'], table='100'))
     aidpersonidpapers700 = set(_select_from_aidpersonidpapers_where(select=['bibref_value', 'name'], table='700'))
 
-    wrong100 = set(('100', nid, bib100.get(nid, None), nvalue) for nid, nvalue in aidpersonidpapers100 \
+    wrong100 = set(('100', nid, bib100.get(nid, None), nvalue) for nid, nvalue in aidpersonidpapers100
                    if nvalue != bib100.get(nid, None))
-    wrong700 = set(('700', nid, bib700.get(nid, None), nvalue) for nid, nvalue in aidpersonidpapers700 \
+    wrong700 = set(('700', nid, bib700.get(nid, None), nvalue) for nid, nvalue in aidpersonidpapers700
                    if nvalue != bib700.get(nid, None))
 
     total = len(wrong100) + len(wrong700)
@@ -1352,7 +1421,7 @@ def get_wrong_names():
     return chain(wrong100, wrong700), total
 
 
-def get_signatures_of_paper_and_author(sig, pid):   ### find_conflicts
+def get_signatures_of_paper_and_author(sig, pid):  # find_conflicts
     '''
     Gets confirmed signatures for the given signature and author.
 
@@ -1364,15 +1433,14 @@ def get_signatures_of_paper_and_author(sig, pid):   ### find_conflicts
     @return: confirmed signatures
     @rtype: tuple ((bibref_table, bibref_value, bibrec, flag),)
     '''
-    return run_sql("""select bibref_table, bibref_value, bibrec, flag
-                      from aidPERSONIDPAPERS
-                      where personid=%s
-                      and bibrec=%s
-                      and flag <> -2""",
-                      (pid, sig[2]) )
+    return run_sql('select bibref_table, bibref_value, bibrec, flag '
+                   'from aidPERSONIDPAPERS '
+                   'where personid=%s '
+                   'and bibrec=%s '
+                   'and flag <> -2', (pid, sig[2]))
 
 
-def paper_affirmed_from_user_input(pid, sig_str):   ### person_bibref_is_touched_old
+def paper_affirmed_from_user_input(pid, sig_str):  # person_bibref_is_touched_old
     '''
     Examines if the given author and the specified signature association has
     been affirmed from user input.
@@ -1401,8 +1469,8 @@ def paper_affirmed_from_user_input(pid, sig_str):   ### person_bibref_is_touched
     return True
 
 
-def update_external_ids_of_authors(pids=None, overwrite=False, limit_to_claimed_papers=False,   ### update_personID_external_ids
-                                   force_cache_tables=False):
+def update_external_ids_of_authors(pids=None, overwrite=False, limit_to_claimed_papers=False,  # update_personID_external_ids
+                                   force_cache_tables=False):  # TODO turn to True
     '''
     Updates the external ids for the given authors. If no authors are specified
     it does the updating for all authors. The possesion of an external id is
@@ -1417,17 +1485,28 @@ def update_external_ids_of_authors(pids=None, overwrite=False, limit_to_claimed_
     @param force_cache_tables: use a caching mechanism for the calculation
     @type force_cache_tables: bool
     '''
-    if force_cache_tables:
-        populate_partial_marc_caches()
 
     if not pids:
         pids = set([i[0] for i in _select_from_aidpersonidpapers_where(select=['personid'])])
 
     for idx, pid in enumerate(pids):
-        update_status(float(idx) / float(len(pids)), "Updating external ids...")
+
+        logger.update_status(float(idx) / float(len(pids)), "Updating external ids...")
+
+        collected = _get_external_ids_from_papers_of_author(pid,
+                                                            limit_to_claimed_papers=limit_to_claimed_papers,
+                                                            force_cache_tables=True)
+
+        collected_ids_exist = False
+        for external_id in collected.values():
+            if external_id:
+                collected_ids_exist = True
+                break
+
+        if not collected_ids_exist and not overwrite:
+            continue
 
         present = get_external_ids_of_author(pid)
-        collected = _get_external_ids_from_papers_of_author(pid, limit_to_claimed_papers=limit_to_claimed_papers)
 
         if overwrite:
             for ext_system_id in present.keys():
@@ -1443,10 +1522,18 @@ def update_external_ids_of_authors(pids=None, overwrite=False, limit_to_claimed_
     if force_cache_tables:
         destroy_partial_marc_caches()
 
-    update_status_final("Updating external ids finished.")
+    logger.update_status_final("Updating external ids finished.")
 
 
-def _select_from_aidpersonidpapers_where(select=None, pid=None, table=None, ref=None, rec=None, name=None, flag=None, lcul=None):
+def _select_from_aidpersonidpapers_where(
+    select=None,
+    pid=None,
+    table=None,
+    ref=None,
+    rec=None,
+    name=None,
+    flag=None,
+        lcul=None):
     '''
     Selects the given fields from the records of aidPERSONIDPAPERS table
     with the specified attributes. If no parameters are given it returns all
@@ -1485,7 +1572,7 @@ def _select_from_aidpersonidpapers_where(select=None, pid=None, table=None, ref=
         add_condition('personid=%s')
         add_arg(pid)
     if table is not None:
-        add_condition('bibref_table=%s')
+        add_condition("bibref_table like %s")
         add_arg(str(table))
     if ref is not None:
         add_condition('bibref_value=%s')
@@ -1505,21 +1592,22 @@ def _select_from_aidpersonidpapers_where(select=None, pid=None, table=None, ref=
 
     select_fields_str = ", ".join(select)
     conditions_str = " and ".join(conditions)
-    query = """select %s
-               from aidPERSONIDPAPERS
-               where %s""" % (select_fields_str, conditions_str)
+    query = ('select %s '
+             'from aidPERSONIDPAPERS '
+             'where %s') % (select_fields_str, conditions_str)
 
-    return run_sql(query, tuple(args) )
+    return run_sql(query, tuple(args))
 
-##########################################################################################
-###                                                                                    ###
-###                             aidPERSONIDDATA table                                  ###
-###                                                                                    ###
-##########################################################################################
+#
+#
+# aidPERSONIDDATA table                                  ###
+#
+#
 
 # ********** setters **********#
 
-def add_author_data(pid, tag, value, opt1=None, opt2=None, opt3=None):   ### set_personid_row
+
+def add_author_data(pid, tag, value, opt1=None, opt2=None, opt3=None):  # set_personid_row
     '''
     Adds data under the specified tag for the given author.
 
@@ -1536,13 +1624,11 @@ def add_author_data(pid, tag, value, opt1=None, opt2=None, opt3=None):   ### set
     @param opt3: opt3
     @type opt3: str
     '''
-    run_sql("""insert into aidPERSONIDDATA
-               (`personid`, `tag`, `data`, `opt1`, `opt2`, `opt3`)
-               values (%s, %s, %s, %s, %s, %s)""",
-               (pid, tag, value, opt1, opt2, opt3) )
+    run_sql('insert into aidPERSONIDDATA (`personid`, `tag`, `data`, `opt1`, `opt2`, `opt3`) '
+            'values (%s, %s, %s, %s, %s, %s)', (pid, tag, value, opt1, opt2, opt3))
 
 
-def remove_author_data(tag, pid=None, value=None):   ### del_personid_row
+def remove_author_data(tag, pid=None, value=None):  # del_personid_row
     '''
     Deletes the data associated with the given tag. If 'pid' or 'value' are
     specified the deletion is respectively restrained.
@@ -1575,11 +1661,10 @@ def transfer_data_to_author(data, new_pid):
     @type new_pid: int
     '''
     for pid, tag in data:
-        run_sql("""update aidPERSONIDDATA
-                   set personid=%s
-                   where personid=%s
-                   and tag=%s""",
-                   (new_pid, pid, tag) )
+        run_sql('update aidPERSONIDDATA '
+                'set personid=%s '
+                'where personid=%s '
+                'and tag=%s', (new_pid, pid, tag))
 
 
 def add_orcid_id_to_author(pid, orcid_id):
@@ -1593,10 +1678,12 @@ def add_orcid_id_to_author(pid, orcid_id):
     '''
     _add_external_id_to_author(pid, 'ORCID', orcid_id)
 
+
 def webuser_merge_user(old_uid, new_uid):
     pid = run_sql("select personid from aidPERSONIDDATA where tag='uid' and data=%s", (old_uid,))
     if pid:
         add_userid_to_author(pid[0][0], new_uid)
+
 
 def add_userid_to_author(pid, uid):
     """
@@ -1605,11 +1692,16 @@ def add_userid_to_author(pid, uid):
     """
     run_sql("update aidPERSONIDDATA set tag='uid_old' where tag='uid' and personid=%s", (pid,))
 
-    pid_is_present = run_sql("select personid from aidPERSONIDDATA where tag='uid' and data=%s" , (uid,))
+    pid_is_present = run_sql("select personid from aidPERSONIDDATA where tag='uid' and data=%s", (uid,))
     if not pid_is_present:
         run_sql("insert into aidPERSONIDDATA (personid, tag, data) values (%s, 'uid', %s)", (pid, uid))
     else:
-        run_sql("update aidPERSONIDDATA set personid=%s where personid=%s and tag='uid' and data=%s", (pid, pid_is_present[0][0],uid))
+        run_sql(
+            "update aidPERSONIDDATA set personid=%s where personid=%s and tag='uid' and data=%s",
+            (pid,
+             pid_is_present[0][0],
+             uid))
+
 
 def add_arxiv_papers_to_author(arxiv_papers, pid):
     '''
@@ -1629,10 +1721,8 @@ def add_arxiv_papers_to_author(arxiv_papers, pid):
 
     arxiv_papers = serialize(arxiv_papers)
 
-    run_sql("""insert into aidPERSONIDDATA
-               (`personid`, `tag`, `datablob`)
-               values (%s, %s, %s)""",
-               (pid, 'arxiv_papers', arxiv_papers) )
+    run_sql('insert into aidPERSONIDDATA (`personid`, `tag`, `datablob`) '
+            'values (%s, %s, %s)', (pid, 'arxiv_papers', arxiv_papers))
 
 
 def remove_arxiv_papers_of_author(pid):
@@ -1642,13 +1732,11 @@ def remove_arxiv_papers_of_author(pid):
     @param pid: author identifier
     @type pid: int
     '''
-    run_sql("""delete from aidPERSONIDDATA
-               where tag=%s
-               and personid=%s""",
-               ('arxiv_papers', pid) )
+    run_sql('delete from aidPERSONIDDATA '
+            'where tag=%s and personid=%s', ('arxiv_papers', pid))
 
 
-def _add_external_id_to_author(pid, ext_sys, ext_id):   ### add_personID_external_id
+def _add_external_id_to_author(pid, ext_sys, ext_id):  # add_personID_external_id
     '''
     Adds the external identifier of the specified system to the given author.
 
@@ -1659,13 +1747,11 @@ def _add_external_id_to_author(pid, ext_sys, ext_id):   ### add_personID_externa
     @param ext_id: external identifier
     @type ext_id: str
     '''
-    run_sql("""insert into aidPERSONIDDATA
-               (personid, tag, data)
-               values (%s, %s, %s)""",
-               (pid, 'extid:%s' % ext_sys, ext_id) )
+    run_sql('insert into aidPERSONIDDATA (personid, tag, data) '
+            'values (%s, %s, %s)', (pid, 'extid:%s' % ext_sys, ext_id))
 
 
-def _remove_external_id_from_author(pid, ext_sys, ext_id=None):   ### remove_personID_external_id
+def _remove_external_id_from_author(pid, ext_sys, ext_id=None):  # remove_personID_external_id
     '''
     Removes all identifiers of the specified external system from the given
     author. If 'ext_id' is specified it removes the specific one.
@@ -1683,7 +1769,7 @@ def _remove_external_id_from_author(pid, ext_sys, ext_id=None):   ### remove_per
         _delete_from_aidpersoniddata_where(pid=pid, tag='extid:%s' % ext_sys, data=ext_id)
 
 
-def update_request_ticket_for_author(pid, ticket_dict, tid=None):   ### update_request_ticket
+def update_request_ticket_for_author(pid, ticket_dict, tid=None):  # update_request_ticket
     '''
     Creates/updates a request ticket for the given author with the specified
     ticket 'image'.
@@ -1728,10 +1814,10 @@ def update_request_ticket_for_author(pid, ticket_dict, tid=None):   ### update_r
     run_sql("""insert into aidPERSONIDDATA
                (personid, tag, datablob, opt1)
                values (%s, %s, %s, %s)""",
-               (pid, 'request_tickets', request_tickets, request_tickets_num) )
+           (pid, 'request_tickets', request_tickets, request_tickets_num))
 
 
-def remove_request_ticket_for_author(pid, tid=None):   ### delete_request_ticket
+def remove_request_ticket_for_author(pid, tid=None):  # delete_request_ticket
     '''
     Removes a request ticket from the given author. If ticket identifier is not
     specified it removes all the pending tickets for the given author.
@@ -1745,7 +1831,7 @@ def remove_request_ticket_for_author(pid, tid=None):   ### delete_request_ticket
         run_sql("""delete from aidPERSONIDDATA
                    where personid=%s
                    and tag=%s""",
-                   (pid, 'request_tickets') )
+               (pid, 'request_tickets'))
 
     if tid is None:
         remove_all_request_tickets_for_author(pid)
@@ -1771,10 +1857,10 @@ def remove_request_ticket_for_author(pid, tid=None):   ### delete_request_ticket
     run_sql("""insert into aidPERSONIDDATA
                (personid, tag, datablob, opt1)
                values (%s, %s, %s, %s)""",
-               (pid, 'request_tickets', request_tickets, request_tickets_num) )
+           (pid, 'request_tickets', request_tickets, request_tickets_num))
 
 
-def modify_canonical_name_of_authors(pids_newcnames=None):   ### change_personID_canonical_names
+def modify_canonical_name_of_authors(pids_newcnames=None):  # change_personID_canonical_names
     '''
     Updates the existing canonical name of the given authors.
 
@@ -1784,21 +1870,21 @@ def modify_canonical_name_of_authors(pids_newcnames=None):   ### change_personID
     for idx, pid_newcname in enumerate(pids_newcnames):
 
         pid, newcname = pid_newcname
-        update_status(float(idx) / float(len(pids_newcnames)), "Changing canonical names...")
+        logger.update_status(float(idx) / float(len(pids_newcnames)), "Changing canonical names...")
 
         # delete the existing canonical name of the current author and the
         # current holder of the new canonical name
         run_sql("""delete from aidPERSONIDDATA
                    where tag=%s
                    and (personid=%s or data=%s)""",
-                   ('canonical_name', pid, newcname) )
+               ('canonical_name', pid, newcname))
 
         run_sql("""insert into aidPERSONIDDATA
                    (personid, tag, data)
                    values (%s, %s, %s)""",
-                   (pid, 'canonical_name', newcname) )
+               (pid, 'canonical_name', newcname))
 
-    update_status_final("Changing canonical names finished.")
+    logger.update_status_final("Changing canonical names finished.")
 
 
 def _delete_from_aidpersoniddata_where(pid=None, tag=None, data=None, opt1=None, opt2=None, opt3=None):
@@ -1847,10 +1933,10 @@ def _delete_from_aidpersoniddata_where(pid=None, tag=None, data=None, opt1=None,
         return
 
     conditions_str = " and ".join(conditions)
-    query = """delete from aidPERSONIDDATA
-               where %s""" % conditions_str
+    query = ('delete from aidPERSONIDDATA '
+             'where %s') % conditions_str
 
-    run_sql(query, tuple(args) )
+    run_sql(query, tuple(args))
 
 
 # ********** getters **********#
@@ -1866,7 +1952,7 @@ def get_all_author_data_of_author(pid):
     return _select_from_aidpersoniddata_where(select=['personid', 'tag'], pid=pid)
 
 
-def get_author_data(pid, tag):   ### get_personid_row
+def get_author_data(pid, tag):  # get_personid_row
     '''
     Gets all the records associated to the specified author and tag.
 
@@ -1881,7 +1967,7 @@ def get_author_data(pid, tag):   ### get_personid_row
     return _select_from_aidpersoniddata_where(select=['data', 'opt1', 'opt2', 'opt3', 'tag'], pid=pid, tag=tag)
 
 
-def get_canonical_name_of_author(pid):   ### get_canonical_id_from_personid - get_canonical_names_by_pid
+def get_canonical_name_of_author(pid):  # get_canonical_id_from_personid - get_canonical_names_by_pid
     '''
     Gets the canonical name of the given author.
 
@@ -1894,7 +1980,15 @@ def get_canonical_name_of_author(pid):   ### get_canonical_id_from_personid - ge
     return _select_from_aidpersoniddata_where(select=['data'], pid=pid, tag='canonical_name')
 
 
-def get_uid_of_author(pid):   ### get_uid_from_personid
+def get_pid_to_canonical_name_map():
+    """
+    Generate a dictionary which maps person ids to canonical names
+    """
+    values = run_sql("select personid, data from aidPERSONIDDATA where tag='canonical_name'")
+    return dict(values)
+
+
+def get_uid_of_author(pid):  # get_uid_from_personid
     '''
     Gets the user identifier associated with the specified author otherwise
     None.
@@ -1913,7 +2007,7 @@ def get_uid_of_author(pid):   ### get_uid_from_personid
     return None
 
 
-def get_external_ids_of_author(pid):   ### get_personiID_external_ids
+def get_external_ids_of_author(pid):  # get_personiID_external_ids
     '''
     Gets a mapping which associates an external system (e.g. Inspire) with the
     identifiers that the given author carries in that system.
@@ -1928,7 +2022,7 @@ def get_external_ids_of_author(pid):   ### get_personiID_external_ids
                              from aidPERSONIDDATA
                              where personid=%s
                              and tag like %s""",
-                             (pid, 'extid:%%') )
+                         (pid, 'extid:%%'))
 
     ext_ids = defaultdict(list)
     for tag, ext_id in tags_extids:
@@ -1936,6 +2030,7 @@ def get_external_ids_of_author(pid):   ### get_personiID_external_ids
         ext_ids[ext_sys].append(ext_id)
 
     return ext_ids
+
 
 def get_internal_user_id_of_author(pid):
     """
@@ -1956,6 +2051,7 @@ def get_internal_user_id_of_author(pid):
 
     return ids, old_ids
 
+
 def get_arxiv_papers_of_author(pid):
     '''
     Gets the arxiv papers of the specified author. If no stored record is
@@ -1971,7 +2067,7 @@ def get_arxiv_papers_of_author(pid):
                               from aidPERSONIDDATA
                               where tag=%s
                               and personid=%s""",
-                              ('arxiv_papers', pid) )
+                          ('arxiv_papers', pid))
     if not arxiv_papers:
         return None
 
@@ -1980,7 +2076,7 @@ def get_arxiv_papers_of_author(pid):
     return arxiv_papers
 
 
-def get_request_tickets_for_author(pid, tid=None):   ### get_request_ticket
+def get_request_tickets_for_author(pid, tid=None):  # get_request_ticket
     '''
     Gets the request tickets for the given author. If ticket identifier is
     specified it returns only that one.
@@ -1998,7 +2094,7 @@ def get_request_tickets_for_author(pid, tid=None):   ### get_request_ticket
                                      from aidPERSONIDDATA
                                      where personid=%s
                                      and tag=%s""",
-                                     (pid, 'request_tickets') )
+                                 (pid, 'request_tickets'))
 
         request_tickets = list(deserialize(request_tickets[0][0]))
     except IndexError:
@@ -2010,9 +2106,10 @@ def get_request_tickets_for_author(pid, tid=None):   ### get_request_ticket
     for request_ticket in request_tickets:
         if request_ticket['tid'] == tid:
             return [request_ticket]
+    return list()
 
 
-def get_authors_by_canonical_name_regexp(cname_regexp):   ### get_personids_by_canonical_name
+def get_authors_by_canonical_name_regexp(cname_regexp):  # get_personids_by_canonical_name
     '''
     Gets authors whose canonical name matches the regular expression pattern.
 
@@ -2026,10 +2123,10 @@ def get_authors_by_canonical_name_regexp(cname_regexp):   ### get_personids_by_c
                       from aidPERSONIDDATA
                       where tag=%s
                       and data like %s""",
-                      ('canonical_name', cname_regexp) )
+                  ('canonical_name', cname_regexp))
 
 
-def get_author_by_canonical_name(cname):   ### get_person_id_from_canonical_id
+def get_author_by_canonical_name(cname):  # get_person_id_from_canonical_id
     '''
     Gets the author who carries the given canonical name.
 
@@ -2042,7 +2139,7 @@ def get_author_by_canonical_name(cname):   ### get_person_id_from_canonical_id
     return _select_from_aidpersoniddata_where(select=['personid'], tag='canonical_name', data=cname)
 
 
-def get_author_by_uid(uid):   ### get_personid_from_uid
+def get_author_by_uid(uid):  # get_personid_from_uid
     '''
     Gets the author associated with the specified user identifier otherwise it
     returns None.
@@ -2061,7 +2158,7 @@ def get_author_by_uid(uid):   ### get_personid_from_uid
     return int(pid[0][0])
 
 
-def get_author_by_external_id(ext_id, ext_sys=None):   ### get_person_with_extid
+def get_author_by_external_id(ext_id, ext_sys=None):  # get_person_with_extid
     '''
     Gets the authors who carry the given external identifier. If 'ext_sys' is
     specified, it constraints the search only for that external system.
@@ -2083,7 +2180,7 @@ def get_author_by_external_id(ext_id, ext_sys=None):   ### get_person_with_extid
     return set(pids)
 
 
-def get_authors_with_open_tickets():   ### get_persons_with_open_tickets_list
+def get_authors_with_open_tickets():  # get_persons_with_open_tickets_list
     '''
     Gets all the authors who have open tickets.
 
@@ -2093,10 +2190,10 @@ def get_authors_with_open_tickets():   ### get_persons_with_open_tickets_list
     return run_sql("""select personid, opt1
                       from aidPERSONIDDATA
                       where tag=%s""",
-                      ('request_tickets',) )
+                  ('request_tickets',))
 
 
-def get_author_data_associations(table_name="`aidPERSONIDDATA`"):   ### get_full_personid_data
+def get_author_data_associations(table_name="`aidPERSONIDDATA`"):  # get_full_personid_data
     '''
     Gets all author-data associations (from aidPERSONIDDATA table or any other
     table with the same structure).
@@ -2107,12 +2204,11 @@ def get_author_data_associations(table_name="`aidPERSONIDDATA`"):   ### get_full
     @return: author-data associations ((pid, tag, data, opt1, opt2, opt3),)
     @rtype: tuple ((int, str, str, int, int, str),)
     '''
-    return run_sql("""select personid, tag, data, opt1, opt2, opt3
-                      from %s"""
-                      % table_name )
+    return run_sql('select personid, tag, data, opt1, opt2, opt3 '
+                   'from %s' % table_name)
 
 
-def _get_inspire_id_of_author(pid):   ### get_inspire_ids_by_pids
+def _get_inspire_id_of_author(pid):  # get_inspire_ids_by_pids
     '''
     Gets the external identifier of Inspire system for the given author.
 
@@ -2125,7 +2221,7 @@ def _get_inspire_id_of_author(pid):   ### get_inspire_ids_by_pids
     return _select_from_aidpersoniddata_where(select=['data'], pid=pid, tag='extid:INSPIREID')
 
 
-def get_orcid_id_of_author(pid):   ### get_orcids_by_pids
+def get_orcid_id_of_author(pid):  # get_orcids_by_pids
     '''
     Gets the external identifier of ORCID system for the given author.
 
@@ -2138,7 +2234,7 @@ def get_orcid_id_of_author(pid):   ### get_orcids_by_pids
     return _select_from_aidpersoniddata_where(select=['data'], pid=pid, tag='extid:ORCID')
 
 
-def create_new_author_by_uid(uid=-1, uid_is_owner=False):   ### create_new_person
+def create_new_author_by_uid(uid=-1, uid_is_owner=False):  # create_new_person
     '''
     Creates a new author and associates him with the given user identifier. If
     the 'uid_is_owner' flag is enabled the author will hold the user identifier
@@ -2167,7 +2263,7 @@ def create_new_author_by_uid(uid=-1, uid_is_owner=False):   ### create_new_perso
     return pid
 
 
-def user_can_modify_data_of_author(uid, pid):   ### user_can_modify_data
+def user_can_modify_data_of_author(uid, pid):  # user_can_modify_data
     '''
     Examines if the specified user can modify data of the given author.
 
@@ -2246,17 +2342,18 @@ def _select_from_aidpersoniddata_where(select=None, pid=None, tag=None, data=Non
                from aidPERSONIDDATA
                where %s""" % (select_fields_str, conditions_str)
 
-    return run_sql(query, tuple(args) )
+    return run_sql(query, tuple(args))
 
-##########################################################################################
-###                                                                                    ###
-###                             both tables                                            ###
-###                                                                                    ###
-##########################################################################################
+#
+#
+# both tables                                            ###
+#
+#
 
 # ********** setters **********#
 
-def empty_authors_exist(printer, repair=False):   ### check_empty_personids
+
+def empty_authors_exist(printer, repair=False):  # check_empty_personids
     '''
     It examines if there are empty authors (that is authors with no papers or
     other defined data) and deletes them if specified.
@@ -2284,7 +2381,7 @@ def empty_authors_exist(printer, repair=False):   ### check_empty_personids
     return empty_authors_found
 
 
-def remove_empty_authors(remove=True):   ### delete_empty_persons
+def remove_empty_authors(remove=True):  # delete_empty_persons
     '''
     Gets all empty authors (that is authors with no papers or other defined
     data) and by default deletes all data associated with them, except if
@@ -2296,7 +2393,8 @@ def remove_empty_authors(remove=True):   ### delete_empty_persons
     @return: empty author identifiers set(pid,)
     @rtype: set set(int,)
     '''
-    pids_with_papers = set(pid[0] for pid in _select_from_aidpersonidpapers_where(select=['personid']))
+    pids = run_sql("select distinct(personid) from aidPERSONIDPAPERS")
+    pids_with_papers = set(pid[0] for pid in pids)
     pids_tags = _select_from_aidpersoniddata_where(select=['personid', 'tag'])
     pids_with_data = set(pid for pid, tag in pids_tags)
     not_empty_pids = set(pid for pid, tag in pids_tags if tag not in bconfig.NON_EMPTY_PERSON_TAGS)
@@ -2306,13 +2404,13 @@ def remove_empty_authors(remove=True):   ### delete_empty_persons
     if empty_pids and remove:
         run_sql("""delete from aidPERSONIDDATA
                    where personid in %s"""
-                   % _get_sqlstr_from_set(empty_pids) )
+                % _get_sqlstr_from_set(empty_pids))
 
     return empty_pids
 
 
 # bibauthorid_maintenance personid update private methods
-def update_canonical_names_of_authors(pids=None, overwrite=False, suggested='', overwrite_not_claimed_only=False):   ### update_personID_canonical_names
+def update_canonical_names_of_authors(pids=None, overwrite=False, suggested='', overwrite_not_claimed_only=False):  # update_personID_canonical_names
     '''
     Updates the canonical names for the given authors. If no authors are
     specified it does the updating for all authors. If 'overwrite' flag is
@@ -2333,11 +2431,12 @@ def update_canonical_names_of_authors(pids=None, overwrite=False, suggested='', 
         pids = set([pid[0] for pid in _select_from_aidpersonidpapers_where(select=['personid'])])
 
         if not overwrite:
-            pids_with_cname = set([x[0] for x in _select_from_aidpersoniddata_where(select=['personid'], tag='canonical_name')])
+            pids_with_cname = set([x[0]
+                                  for x in _select_from_aidpersoniddata_where(select=['personid'], tag='canonical_name')])
             pids = pids - pids_with_cname
 
     for i, pid in enumerate(pids):
-        update_status(float(i) / float(len(pids)), "Updating canonical_names...")
+        logger.update_status(float(i) / float(len(pids)), "Updating canonical_names...")
 
         if overwrite_not_claimed_only:
             has_claims = bool(_select_from_aidpersonidpapers_where(select=['*'], pid=pid, flag=2))
@@ -2363,7 +2462,7 @@ def update_canonical_names_of_authors(pids=None, overwrite=False, suggested='', 
             taken_cnames = run_sql("""select data from aidPERSONIDDATA
                                       where tag=%s
                                       and data like %s""",
-                                      ('canonical_name', canonical_name + '%') )
+                                  ('canonical_name', canonical_name + '%'))
             taken_cnames = set([cname[0].lower() for cname in taken_cnames])
 
             for i in count(1):
@@ -2375,13 +2474,13 @@ def update_canonical_names_of_authors(pids=None, overwrite=False, suggested='', 
             run_sql("""insert into aidPERSONIDDATA
                        (personid, tag, data)
                        values (%s, %s, %s)""",
-                       (pid, 'canonical_name', canonical_name))
-
-    update_status_final("Updating canonical_names finished.")
+                   (pid, 'canonical_name', canonical_name))
+    logger.update_status_final("Updating canonical_names finished.")
 
 # ********** getters **********#
 
-def get_free_author_ids():   ### get_free_pids
+
+def get_free_author_ids():  # get_free_pids
     '''
     Gets unused author identifiers (it fills the holes).
 
@@ -2389,13 +2488,13 @@ def get_free_author_ids():   ### get_free_pids
     @rtype: iterator (int, )
     '''
     all_pids = frozenset(pid[0] for pid in chain(
-                _select_from_aidpersonidpapers_where(select=['personid']),
-                _select_from_aidpersoniddata_where(select=['personid'])))
+        _select_from_aidpersonidpapers_where(select=['personid']),
+        _select_from_aidpersoniddata_where(select=['personid'])))
 
     return ifilter(lambda x: x not in all_pids, count(1))
 
 
-def get_free_author_id():   ### get_new_personid
+def get_free_author_id():  # get_new_personid
     '''
     Gets a free author identifier.
 
@@ -2416,7 +2515,7 @@ def get_free_author_id():   ### get_new_personid
     return free_pid
 
 
-def get_existing_authors(with_papers_only=False):   ### get_existing_personids
+def get_existing_authors(with_papers_only=False):  # get_existing_personids
     '''
     Gets existing authors (that is authors who are associated with a paper or
     withhold some other data). If 'with_papers_only' flag is enabled it gets
@@ -2443,7 +2542,7 @@ def get_existing_authors(with_papers_only=False):   ### get_existing_personids
     return pids_wih_data | pids_with_papers
 
 
-def get_data_of_papers(recs, with_alt_names=False, with_all_author_papers=False):   ### get_persons_from_recids
+def get_data_of_papers(recs, with_alt_names=False, with_all_author_papers=False):  # get_persons_from_recids
     '''
     Gets data for the specified papers. Helper for search engine indexing.
 
@@ -2473,7 +2572,7 @@ def get_data_of_papers(recs, with_alt_names=False, with_all_author_papers=False)
                           from aidPERSONIDPAPERS
                           where bibrec=%s
                           and flag > -2""",
-                          (rec,) )
+                      (rec,))
 
         pids = set(pid[0] for pid in pids)
         paper_authors[rec] = list(pids)
@@ -2498,14 +2597,14 @@ def get_data_of_papers(recs, with_alt_names=False, with_all_author_papers=False)
         assert len(cname) <= 1, "A person cannot have more than one canonical name"
 
         if len(cname) == 1:
-            pid_data = {'canonical_id' : cname[0][0]}
+            pid_data = {'canonical_id': cname[0][0]}
 
         if with_alt_names:
             names = run_sql("""select name
                                from aidPERSONIDPAPERS
                                where personid=%s
                                and flag > -2""",
-                               (pid,) )
+                           (pid,))
             names = set(name[0] for name in names)
 
             pid_data['alternative_names'] = list(names)
@@ -2515,7 +2614,7 @@ def get_data_of_papers(recs, with_alt_names=False, with_all_author_papers=False)
                               from aidPERSONIDPAPERS
                               where personid=%s
                               and flag > -2""",
-                              (pid,) )
+                          (pid,))
             recs = set(rec[0] for rec in recs)
 
             pid_data['person_records'] = list(recs)
@@ -2525,7 +2624,7 @@ def get_data_of_papers(recs, with_alt_names=False, with_all_author_papers=False)
     return (paper_authors, author_papers)
 
 
-def impaired_canonical_names_exist(printer, repair=False):   ### check_canonical_names
+def impaired_canonical_names_exist(printer, repair=False):  # check_canonical_names
     '''
     It examines if there are authors who carry less or more than one canonical
     name and repairs them if specified.
@@ -2586,12 +2685,12 @@ def user_can_modify_paper(uid, sig_str):
 
     pid_lcul = run_sql("""select personid, lcul
                           from aidPERSONIDPAPERS
-                          where bibref_table=%s
+                          where bibref_table like %s
                           and bibref_value=%s
                           and bibrec=%s
                           order by lcul
                           desc limit 0,1""",
-                          (table, ref, rec) )
+                      (table, ref, rec))
 
     if not pid_lcul:
         return ((acc_authorize_action(uid, bconfig.CLAIMPAPER_CLAIM_OWN_PAPERS)[0] == 0) or
@@ -2602,7 +2701,7 @@ def user_can_modify_paper(uid, sig_str):
                                from aidPERSONIDDATA
                                where tag=%s
                                and personid=%s""",
-                               ('uid', str(pid_lcul[0][0])))
+                           ('uid', str(pid_lcul[0][0])))
 
     req_acc = get_paper_access_right(bconfig.CLAIMPAPER_CLAIM_OWN_PAPERS)
     if uid_of_author:
@@ -2617,22 +2716,22 @@ def user_can_modify_paper(uid, sig_str):
     return (acc_authorize_action(uid, min_req_acc)[0] == 0) and (get_paper_access_right(min_req_acc) >= min_req_acc_n)
 
 
-##########################################################################################
-###                                                                                    ###
-###        aidPERSONIDDATA or/and aidPERSONIDPAPERS table + some other table           ###
-###                                                                                    ###
-##########################################################################################
+#
+#
+# aidPERSONIDDATA or/and aidPERSONIDPAPERS table + some other table           ###
+#
+#
 
 # ********** setters **********#
 
-def back_up_author_paper_associations():   ### copy_personids
+def back_up_author_paper_associations():  # copy_personids
     '''
     Copies/Backs-up the author-data and author-paper association tables
     (aidPERSONIDDATA, aidPERSONIDPAPERS) to the back-up tables
     (aidPERSONIDDATA_copy, aidPERSONIDPAPERS_copy) for later
     comparison/restoration.
     '''
-    run_sql("""drop table if exists `aidPERSONIDDATA_copy`""")
+    run_sql('drop table if exists `aidPERSONIDDATA_copy`')
     run_sql("""CREATE TABLE `aidPERSONIDDATA_copy` (
                `personid` BIGINT( 16 ) UNSIGNED NOT NULL ,
                `tag` VARCHAR( 64 ) NOT NULL ,
@@ -2652,13 +2751,14 @@ def back_up_author_paper_associations():   ### copy_personids
                select *
                from `aidPERSONIDDATA`""")
 
-    run_sql("""drop table if exists `aidPERSONIDPAPERS_copy`""")
+    run_sql('drop table if exists `aidPERSONIDPAPERS_copy`')
     run_sql("""CREATE TABLE IF NOT EXISTS `aidPERSONIDPAPERS_copy` (
                `personid` BIGINT( 16 ) UNSIGNED NOT NULL ,
                `bibref_table` ENUM(  '100',  '700' ) NOT NULL ,
                `bibref_value` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
                `bibrec` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
                `name` VARCHAR( 256 ) NOT NULL ,
+               `m_name` VARCHAR( 256 ) NOT NULL ,
                `flag` SMALLINT( 2 ) NOT NULL DEFAULT  '0' ,
                `lcul` SMALLINT( 2 ) NOT NULL DEFAULT  '0' ,
                `last_updated` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
@@ -2679,7 +2779,8 @@ def back_up_author_paper_associations():   ### copy_personids
 
 # ********** getters **********#
 
-def get_papers_affected_since(since):   ### personid_get_recids_affected_since
+
+def get_papers_affected_since(since):  # personid_get_recids_affected_since
     '''
     Gets the set of papers which were manually changed after the specified
     timestamp.
@@ -2693,23 +2794,23 @@ def get_papers_affected_since(since):   ### personid_get_recids_affected_since
     recs = set(_split_signature_string(sig[0])[2] for sig in run_sql("""select distinct value
                                                                        from aidUSERINPUTLOG
                                                                        where timestamp >= %s""",
-                                                                       (since,) ) if ',' in sig[0] and ':' in sig[0])
+              (since,)) if ',' in sig[0] and ':' in sig[0])
 
     pids = set(int(pid[0]) for pid in run_sql("""select distinct personid
                                                  from aidUSERINPUTLOG
                                                  where timestamp >= %s""",
-                                                 (since,) ) if pid[0] > 0)
+              (since,)) if pid[0] > 0)
 
     if pids:
         pids_sqlstr = _get_sqlstr_from_set(pids)
         recs |= set(rec[0] for rec in run_sql("""select bibrec from aidPERSONIDPAPERS
                                                  where personid in %s"""
-                                                 % pids_sqlstr ))
+                                              % pids_sqlstr))
 
     return list(recs)
 
 
-def get_papers_info_of_author(pid, flag,   ### get_person_papers
+def get_papers_info_of_author(pid, flag,  # get_person_papers
                               show_author_name=False,
                               show_title=False,
                               show_rt_status=False,
@@ -2756,12 +2857,10 @@ def get_papers_info_of_author(pid, flag,   ### get_person_papers
 
     select_fields_str = ", ".join(select)
 
-    records = run_sql("""select """ + select_fields_str + """
-                         from aidPERSONIDPAPERS
-                         where personid=%s
-                         and flag >= %s""",
-                         (pid, flag) )
-
+    records = run_sql('select %s ' % select_fields_str +
+                      'from aidPERSONIDPAPERS '
+                      'where personid=%s '
+                      'and flag >= %s', (pid, flag))
 
     def format_record(record):
         '''
@@ -2781,7 +2880,7 @@ def get_papers_info_of_author(pid, flag,   ### get_person_papers
         sig_str = "%s:%d,%d" % (table, ref, rec)
 
         record_info = {'data': sig_str,
-                       'flag': flag }
+                       'flag': flag}
 
         recstruct = get_record(rec)
 
@@ -2789,8 +2888,7 @@ def get_papers_info_of_author(pid, flag,   ### get_person_papers
             record_info['authorname'] = name
 
         if show_title:
-            record_info['title'] = (record_get_field_value(recstruct, '245', '','', 'a'),)
-
+            record_info['title'] = (record_get_field_value(recstruct, '245', '', '', 'a'),)
 
         if show_rt_status:
             record_info['rt_status'] = False
@@ -2807,19 +2905,18 @@ def get_papers_info_of_author(pid, flag,   ### get_person_papers
             record_info['affiliation'] = get_grouped_records((table, ref, rec), tag)[tag]
 
         if show_date:
-            record_info['date'] = (record_get_field_value(recstruct, '269', '', '','c'),)
+            record_info['date'] = (record_get_field_value(recstruct, '269', '', '', 'c'),)
 
         if show_experiment:
-            record_info['experiment'] = (record_get_field_value(recstruct, '693', '', '', 'e' ),)
+            record_info['experiment'] = (record_get_field_value(recstruct, '693', '', '', 'e'),)
 
         return record_info
-
 
     request_tickets = get_request_tickets_for_author(pid)
     return [format_record(record) for record in records]
 
 
-def get_names_of_author(pid, sort_by_count=True):   ### get_person_db_names_count
+def get_names_of_author(pid, sort_by_count=True):  # get_person_db_names_count
     '''
     Gets the names associated to the given author and sorts them (by default)
     in descending order of name count.
@@ -2836,7 +2933,7 @@ def get_names_of_author(pid, sort_by_count=True):   ### get_person_db_names_coun
                         from aidPERSONIDPAPERS
                         where personid=%s
                         and flag > -2""",
-                        (pid,) )
+                    (pid,))
 
     bibref_values100 = [value for table, value in bibref if table == '100']
     bibref_values700 = [value for table, value in bibref if table == '700']
@@ -2850,7 +2947,7 @@ def get_names_of_author(pid, sort_by_count=True):   ### get_person_db_names_coun
         ids_names100 = run_sql("""select id, value
                                   from bib10x
                                   where id in %s"""
-                                  % bibref_value100_sqlstr)
+                               % bibref_value100_sqlstr)
 
     ids_names700 = tuple()
     if bibref_values700:
@@ -2858,7 +2955,7 @@ def get_names_of_author(pid, sort_by_count=True):   ### get_person_db_names_coun
         ids_names700 = run_sql("""select id, value
                                   from bib70x
                                   where id in %s"""
-                                  % bibref_value700_sqlstr)
+                               % bibref_value700_sqlstr)
 
     names_count100 = [(name, bibref_values100_count[nid]) for nid, name in ids_names100]
     names_count700 = [(name, bibref_values700_count[nid]) for nid, name in ids_names700]
@@ -2871,7 +2968,7 @@ def get_names_of_author(pid, sort_by_count=True):   ### get_person_db_names_coun
     return names_count
 
 
-def merger_errors_exist():   ### check_merger
+def merger_errors_exist():  # check_merger
     '''
     It examines if the merger introduced any error to the author-paper
     asociations (e.g. loss of claims/signatures, creation of new
@@ -2897,9 +2994,9 @@ def merger_errors_exist():   ### check_merger
     for claims, message in errors:
         if claims:
             all_ok = False
-            bibauthor_print(message)
-            bibauthor_print("".join("    %s: personid %d %d:%d,%d\n" %
-                            (action[cl[4]], cl[0], int(cl[1]), cl[2], cl[3]) for cl in claims))
+            logger.log(message)
+            logger.log("".join("    %s: personid %d %d:%d,%d\n" %
+                      (action[cl[4]], cl[0], int(cl[1]), cl[2], cl[3]) for cl in claims))
 
     old_sigs = set(run_sql("""select bibref_table, bibref_value, bibrec
                               from aidPERSONIDPAPERS_copy"""))
@@ -2914,18 +3011,19 @@ def merger_errors_exist():   ### check_merger
     for sigs, message in errors:
         if sigs:
             all_ok = False
-            bibauthor_print(message)
-            bibauthor_print("".join("    %s:%d,%d\n" % sig for sig in sigs))
+            logger.log(message)
+            logger.log("".join("    %s:%d,%d\n" % sig for sig in sigs))
 
     return all_ok
 
-##########################################################################################
-###                                                                                    ###
-###                                 aidRESULTS table                                   ###
-###                                                                                    ###
-##########################################################################################
+#
+#
+# aidRESULTS table                                   ###
+#
+#
 
 # ********** setters **********#
+
 
 def save_cluster(named_cluster):
     '''
@@ -2940,10 +3038,10 @@ def save_cluster(named_cluster):
         run_sql("""insert into aidRESULTS
                    (personid, bibref_table, bibref_value, bibrec)
                    values (%s, %s, %s, %s)""",
-                   (name, str(table), ref, rec) )
+               (name, str(table), ref, rec))
 
 
-def remove_clusters_by_name(surname):   ### remove_result_cluster
+def remove_clusters_by_name(surname):  # remove_result_cluster
     '''
     Deletes all clusters which belong to authors who carry the specified
     surname.
@@ -2953,10 +3051,10 @@ def remove_clusters_by_name(surname):   ### remove_result_cluster
     '''
     run_sql("""delete from aidRESULTS
                where personid like '%s.%%'"""
-               % surname)
+            % surname)
 
 
-def empty_tortoise_results_table():   ### empty_results_table
+def empty_tortoise_results_table():  # empty_results_table
     '''
     Truncates the disambiguation algorithm results table.
     '''
@@ -2964,7 +3062,8 @@ def empty_tortoise_results_table():   ### empty_results_table
 
 # ********** getters **********#
 
-def get_clusters_by_surname(surname):   ### get_lastname_results
+
+def get_clusters_by_surname(surname):  # get_lastname_results
     '''
     Gets all the disambiguation algorithm result records associated to the
     specified author surname.
@@ -2978,10 +3077,10 @@ def get_clusters_by_surname(surname):   ### get_lastname_results
     return run_sql("""select personid, bibref_table, bibref_value, bibrec
                       from aidRESULTS
                       where personid like %s""",
-                      (surname + '.%',) )
+                  (surname + '.%',))
 
 
-def get_cluster_names():   ### get_existing_result_clusters
+def get_cluster_names():  # get_existing_result_clusters
     '''
     Gets all cluster names.
 
@@ -2992,7 +3091,7 @@ def get_cluster_names():   ### get_existing_result_clusters
                           from aidRESULTS"""))
 
 
-def duplicated_tortoise_results_exist():   ### check_results
+def duplicated_tortoise_results_exist():  # check_results
     '''
     It examines if there are duplicated records in the disambiguation algorithm
     results (e.g. same signature assigned to two different authors or same
@@ -3007,7 +3106,8 @@ def duplicated_tortoise_results_exist():   ### check_results
                                         from aidRESULTS""")
     keyfunc = lambda x: x[1:]
     disambiguation_results = sorted(disambiguation_results, key=keyfunc)
-    duplicated_results = [list(sig_holders) for _, sig_holders in groupby(disambiguation_results, key=keyfunc) if len(list(sig_holders)) > 1]
+    duplicated_results = [list(sig_holders)
+                          for _, sig_holders in groupby(disambiguation_results, key=keyfunc) if len(list(sig_holders)) > 1]
 
     for duplicates in duplicated_results:
         duplicated_tortoise_results_not_found = False
@@ -3020,7 +3120,8 @@ def duplicated_tortoise_results_exist():   ### check_results
     for name, _, _, rec in disambiguation_results:
         clusters[name] = clusters.get(name, []) + [rec]
 
-    faulty_clusters = dict((name, len(recs) - len(set(recs))) for name, recs in clusters.items() if not len(recs) == len(set(recs)))
+    faulty_clusters = dict((name, len(recs) - len(set(recs)))
+                           for name, recs in clusters.items() if not len(recs) == len(set(recs)))
 
     if faulty_clusters:
         duplicated_tortoise_results_not_found = False
@@ -3034,11 +3135,11 @@ def duplicated_tortoise_results_exist():   ### check_results
     return duplicated_tortoise_results_not_found
 
 
-##########################################################################################
-###                                                                                    ###
-###                           aidUSERINPUTLOG table                                    ###
-###                                                                                    ###
-##########################################################################################
+#
+#
+# aidUSERINPUTLOG table                                    ###
+#
+#
 
 # ********** setters **********#
 
@@ -3072,18 +3173,19 @@ def insert_user_log(userinfo, pid, action, tag, value, comment='', transactionid
         run_sql("""insert into aidUSERINPUTLOG
                    (transactionid, timestamp, userinfo, userid, personid, action, tag, value, comment)
                    values (%s, now(), %s, %s, %s, %s, %s, %s, %s)""",
-                   (transactionid, userinfo, userid, pid, action, tag, value, comment) )
+               (transactionid, userinfo, userid, pid, action, tag, value, comment))
     else:
         run_sql("""insert into aidUSERINPUTLOG
                    (transactionid, timestamp, userinfo, userid, personid, action, tag, value, comment)
                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                   (transactionid, timestamp, userinfo, userid, pid, action, tag, value, comment) )
+               (transactionid, timestamp, userinfo, userid, pid, action, tag, value, comment))
 
     return transactionid
 
 # ********** getters **********#
 
-def get_user_logs(transactionid=None, userid=None, userinfo=None, pid=None, action=None, tag=None, value=None, comment=None, only_most_recent=False):   ### get_user_log
+
+def get_user_logs(transactionid=None, userid=None, userinfo=None, pid=None, action=None, tag=None, value=None, comment=None, only_most_recent=False):  # get_user_log
     '''
     Gets the user log entries with the specified attributes. If no parameters
     are given it returns all log entries.
@@ -3148,14 +3250,14 @@ def get_user_logs(transactionid=None, userid=None, userinfo=None, pid=None, acti
     if only_most_recent:
         query += ' order by timestamp desc limit 0,1'
 
-    return run_sql(query, tuple(args) )
+    return run_sql(query, tuple(args))
 
 
-##########################################################################################
-###                                                                                    ###
-###                                   other table                                      ###
-###                                                                                    ###
-##########################################################################################
+#
+#
+# other table                                      ###
+#
+#
 
 # ********** setters **********#
 
@@ -3164,9 +3266,9 @@ def set_dense_index_ready():
     Sets the search engine dense index ready to use.
     '''
     run_sql("""insert into aidDENSEINDEX
-               (name_id, person_name, personids)
-               values (%s, %s, %s)""",
-               (-1, '', '') )
+               (flag)
+               values (%s)""",
+           (-1,))
 
 
 def set_inverted_lists_ready():
@@ -3176,11 +3278,12 @@ def set_inverted_lists_ready():
     run_sql("""insert into aidINVERTEDLISTS
                (qgram, inverted_list, list_cardinality)
                values (%s,%s,%s)""",
-               ('!'*bconfig.QGRAM_LEN, '', 0) )
+           ('!' * bconfig.QGRAM_LEN, '', 0))
 
 # ********** getters **********#
 
-def get_matching_bibrefs_for_paper(names, rec, always_match=False):   ### get_possible_bibrecref
+
+def get_matching_bibrefs_for_paper(names, rec, always_match=False):  # get_possible_bibrecref
     '''
     Gets the bibrefs which match any of the surnames of the specified names and
     are associated with the given paper. If 'always_match' flag is enabled it
@@ -3204,14 +3307,14 @@ def get_matching_bibrefs_for_paper(names, rec, always_match=False):   ### get_po
                                               where id_bibrec=%s) as dummy
                               where o.tag='100__a'
                               and o.id=dummy.iid""",
-                              (rec,) )
+                          (rec,))
     bib70x_names = run_sql("""select o.id, o.value
                               from bib70x o, (select i.id_bibxxx as iid
                                               from bibrec_bib70x i
                                               where id_bibrec=%s) as dummy
                               where o.tag='700__a'
                               and o.id = dummy.iid""",
-                              (rec,) )
+                          (rec,))
 
 #    bib10x_names = run_sql("""select id, value
 #                              from bib10x
@@ -3248,7 +3351,7 @@ def get_matching_bibrefs_for_paper(names, rec, always_match=False):   ### get_po
     return bibrefs
 
 
-def get_collaborations_for_paper(rec):   ### get_collaboration
+def get_collaborations_for_paper(rec):  # get_collaboration
     '''
     Gets the collaborations which the given paper is associated with.
 
@@ -3261,7 +3364,7 @@ def get_collaborations_for_paper(rec):   ### get_collaboration
     bibxxx_ids = run_sql("""select id_bibxxx
                             from bibrec_bib71x
                             where id_bibrec=%s""",
-                            (rec,) )
+                        (rec,))
 
     if not bibxxx_ids:
         return list()
@@ -3271,12 +3374,12 @@ def get_collaborations_for_paper(rec):   ### get_collaboration
                                 from bib71x
                                 where id in %s
                                 and tag like '%s'"""
-                                % (bibxxx_ids_sqlstr, "710__g") )
+                             % (bibxxx_ids_sqlstr, "710__g"))
 
     return [c[0] for c in collaborations]
 
 
-def get_keywords_for_paper(rec):   ### get_key_words
+def get_keywords_for_paper(rec):  # get_key_words
     '''
     Gets the keywords which the given paper is associated with.
 
@@ -3290,12 +3393,12 @@ def get_keywords_for_paper(rec):   ### get_key_words
         bibxxx_ids = run_sql("""select id_bibxxx
                                 from bibrec_bib65x
                                 where id_bibrec=%s""",
-                                (rec,) )
+                            (rec,))
     else:
         bibxxx_ids = run_sql("""select id_bibxxx
                                 from bibrec_bib69x
                                 where id_bibrec=%s""",
-                                (rec,) )
+                            (rec,))
 
     if not bibxxx_ids:
         return list()
@@ -3307,18 +3410,18 @@ def get_keywords_for_paper(rec):   ### get_key_words
                               from bib69x
                               where id in %s
                               and tag like '%s'"""
-                              % (bibxxx_ids_sqlstr, "6531_a") )
+                           % (bibxxx_ids_sqlstr, "6531_a"))
     else:
         keywords = run_sql("""select value
                               from bib69x
                               where id in %s
                               and tag like '%s'"""
-                              % (bibxxx_ids_sqlstr, "695__a") )
+                           % (bibxxx_ids_sqlstr, "695__a"))
 
     return [k[0] for k in keywords]
 
 
-def get_authors_of_paper(rec):   ### get_all_authors
+def get_authors_of_paper(rec):  # get_all_authors
     '''
     Gets the authors (including the coauthors) whom the given paper is
     associated with.
@@ -3332,7 +3435,7 @@ def get_authors_of_paper(rec):   ### get_all_authors
     bibxxx10_ids = run_sql("""select id_bibxxx
                               from bibrec_bib10x
                               where id_bibrec=%s""",
-                              (rec,) )
+                          (rec,))
     authors10 = tuple()
     if bibxxx10_ids:
         bibxxx10_ids_sqlstr = _get_sqlstr_from_set(bibxxx10_ids, lambda x: x[0])
@@ -3340,12 +3443,12 @@ def get_authors_of_paper(rec):   ### get_all_authors
                                from bib10x
                                where tag='%s'
                                and id in %s"""
-                               % ('100__a', bibxxx10_ids_sqlstr) )
+                            % ('100__a', bibxxx10_ids_sqlstr))
 
     bibxxx70_ids = run_sql("""select id_bibxxx
                               from bibrec_bib70x
                               where id_bibrec=%s""",
-                              (rec,) )
+                          (rec,))
     authors70 = tuple()
     if bibxxx70_ids:
         bibxxx70_ids_sqlstr = _get_sqlstr_from_set(bibxxx70_ids, lambda x: x[0])
@@ -3353,12 +3456,12 @@ def get_authors_of_paper(rec):   ### get_all_authors
                                from bib70x
                                where tag='%s'
                                and id in %s"""
-                               % ('700__a', bibxxx70_ids_sqlstr) )
+                            % ('700__a', bibxxx70_ids_sqlstr))
 
     return [a[0] for a in chain(authors10, authors70)]
 
 
-def get_title_of_paper(rec, recstruct=None):   ### get_title_from_rec
+def get_title_of_paper(rec, recstruct=None):  # get_title_from_rec
     '''
     Gets the title which the specified paper carries.
 
@@ -3369,12 +3472,16 @@ def get_title_of_paper(rec, recstruct=None):   ### get_title_from_rec
     @rtype: str
     '''
     if not recstruct:
-        recstruct = get_record(int(rec))
+        try:
+            title = get_fieldvalues([rec], '245__a')[0]
+            return title
+        except IndexError:
+            return ""
+    else:
+        return record_get_field_value(recstruct, '245', '', '', 'a')
 
-    return record_get_field_value(recstruct, '245', '','','a' )
 
-
-def _get_doi_for_paper(recid, recstruct=None):   ### get_doi_from_rec
+def _get_doi_for_paper(recid, recstruct=None):  # get_doi_from_rec
     '''
     Gets the doi which the specified paper is associated with.
 
@@ -3388,7 +3495,7 @@ def _get_doi_for_paper(recid, recstruct=None):   ### get_doi_from_rec
     if not recstruct:
         recstruct = get_record(recid)
 
-    inst = record_get_field_instances(recstruct, '024','%')
+    inst = record_get_field_instances(recstruct, '024', '%')
 
     dois = list()
     for couple in inst:
@@ -3401,8 +3508,7 @@ def _get_doi_for_paper(recid, recstruct=None):   ### get_doi_from_rec
     return dois
 
 
-
-def get_modified_papers_since(since):   ### get_recently_modified_record_ids
+def get_modified_papers_since(since):  # get_recently_modified_record_ids
     '''
     Gets the papers which have modification date more recent than the specified
     one.
@@ -3415,13 +3521,13 @@ def get_modified_papers_since(since):   ### get_recently_modified_record_ids
     '''
     modified_recs = run_sql("""select id from bibrec
                                where modification_date >= %s""",
-                               (since,) )
+                           (since,))
     modified_recs = frozenset(rec[0] for rec in modified_recs)
 
-    return modified_recs & frozenset(get_all_valid_papers())
+    return modified_recs & frozenset(get_all_valid_bibrecs())
 
 
-def get_modified_papers_before(recs, before):   ### filter_modified_record_ids
+def get_modified_papers_before(recs, before):  # filter_modified_record_ids
     '''
     Gets the papers which have modification date older than the specified one
     from the given set of papers.
@@ -3440,14 +3546,14 @@ def get_modified_papers_before(recs, before):   ### filter_modified_record_ids
     modified_recs = run_sql("""select id from bibrec
                                where id in %s
                                and modification_date < '%s'"""
-                               % (recs_sqlstr, before) )
+                            % (recs_sqlstr, before))
     modified_recs = [rec[0] for rec in modified_recs]
     modified_recs = [rec for rec in recs if rec[2] in modified_recs]
 
     return modified_recs
 
 
-def _get_author_refs_from_db_of_paper(rec):   ### _get_authors_from_paper_from_db
+def _get_author_refs_from_db_of_paper(rec):  # _get_authors_from_paper_from_db
     '''
     Gets all author refs for the specified paper.
 
@@ -3460,7 +3566,7 @@ def _get_author_refs_from_db_of_paper(rec):   ### _get_authors_from_paper_from_d
     ref_ids100 = run_sql("""select id_bibxxx
                             from bibrec_bib10x
                             where id_bibrec=%s""",
-                            (rec,) )
+                        (rec,))
     if not ref_ids100:
         return tuple()
 
@@ -3468,10 +3574,10 @@ def _get_author_refs_from_db_of_paper(rec):   ### _get_authors_from_paper_from_d
     return run_sql("""select id from bib10x
                       where tag='100__a'
                       and id in %s"""
-                      % ref_ids100_sqlstr )
+                   % ref_ids100_sqlstr)
 
 
-def _get_coauthor_refs_from_db_of_paper(rec):   ### _get_coauthors_from_paper_from_db
+def _get_coauthor_refs_from_db_of_paper(rec):  # _get_coauthors_from_paper_from_db
     '''
     @param rec: paper identifier
     @type rec: int
@@ -3482,7 +3588,7 @@ def _get_coauthor_refs_from_db_of_paper(rec):   ### _get_coauthors_from_paper_fr
     ref_ids700 = run_sql("""select id_bibxxx
                          from bibrec_bib70x
                          where id_bibrec=%s""",
-                         (rec,) )
+                         (rec,))
     if not ref_ids700:
         return tuple()
 
@@ -3491,7 +3597,7 @@ def _get_coauthor_refs_from_db_of_paper(rec):   ### _get_coauthors_from_paper_fr
                       from bib70x
                       where tag='700__a'
                       and id in %s"""
-                      % ref_ids700_sqlstr)
+                   % ref_ids700_sqlstr)
 
 
 def get_bib10x():
@@ -3504,7 +3610,7 @@ def get_bib10x():
     return run_sql("""select id, value
                       from bib10x
                       where tag like %s""",
-                      ("100__a",) )
+                  ("100__a",))
 
 
 def get_bib70x():
@@ -3517,7 +3623,7 @@ def get_bib70x():
     return run_sql("""select id, value
                       from bib70x
                       where tag like %s""",
-                      ("700__a",) )
+                  ("700__a",))
 
 
 def get_user_id_by_email(email):
@@ -3540,7 +3646,7 @@ def get_user_id_by_email(email):
     return uid
 
 
-def get_authors_data_from_indexable_name_ids(indexable_name_ids):   ### get_indexable_name_personids
+def get_name_variants_for_authors(authors):  # get_indexable_name_personids
     '''
     Gets the real author name and the author identifiers (which carry that
     name) associated to each of the specified indexable name identifiers.
@@ -3551,10 +3657,61 @@ def get_authors_data_from_indexable_name_ids(indexable_name_ids):   ### get_inde
     @return: real author name and the author identifiers which carry that name ((name, pids),)
     @rtype: tuple ((str, bytes),)
     '''
-    return run_sql("""select person_name, personids
+    name_variants = run_sql("""select id, personids
+                               from aidDENSEINDEX
+                               where id in %s
+                               and flag=1"""
+                            % _get_sqlstr_from_set(authors))
+    authors = list()
+    author_to_name_variants_mapping = dict()
+    for author, names in name_variants:
+        authors.append(author)
+        author_to_name_variants_mapping[author] = deserialize(names)
+
+    assert len(authors) == len(set(authors))
+    return author_to_name_variants_mapping
+
+
+def get_author_groups_from_string_ids(indexable_name_ids):  # get_indexable_name_personids
+    '''
+    Gets the real author name and the author identifiers (which carry that
+    name) associated to each of the specified indexable name identifiers.
+
+    @param name_ids: indexable name identifiers
+    @type name_ids: list [int,]
+
+    @return: real author name and the author identifiers which carry that name ((name, pids),)
+    @rtype: tuple ((str, bytes),)
+    '''
+    return run_sql("""select personids
                       from aidDENSEINDEX
-                      where name_id in %s"""
-                      % _get_sqlstr_from_set(indexable_name_ids) )
+                      where id in %s
+                      and flag=0"""
+                   % _get_sqlstr_from_set(indexable_name_ids))
+
+
+def get_indexed_strings(string_ids):  # get_indexable_name_personids
+    '''
+    Gets the real author name and the author identifiers (which carry that
+    name) associated to each of the specified indexable name identifiers.
+
+    @param name_ids: indexable name identifiers
+    @type name_ids: list [int,]
+
+    @return: real author name and the author identifiers which carry that name ((name, pids),)
+    @rtype: tuple ((str, bytes),)
+    '''
+    strings = run_sql("""select id, indexable_string, indexable_surname
+                         from aidDENSEINDEX
+                         where id in %s
+                         and flag=0"""
+                      % (_get_sqlstr_from_set(string_ids),))
+
+    strings_to_ids_mapping = dict()
+    for sid, string, surname in strings:
+        strings_to_ids_mapping[string] = {'sid': sid, 'surname': surname}
+
+    return strings_to_ids_mapping
 
 
 def _get_grouped_records_from_db(sig, *args):
@@ -3579,7 +3736,7 @@ def _get_grouped_records_from_db(sig, *args):
                           from %s
                           where id_bibrec=%s
                           and id_bibxxx=%s"""
-                          % (mapping_table, rec, ref) )
+                       % (mapping_table, rec, ref))
 
     if not group_id:
         # the mapping is not found
@@ -3594,7 +3751,7 @@ def _get_grouped_records_from_db(sig, *args):
                          from %s
                          where id_bibrec=%s
                          and field_number=%s"""
-                         % (mapping_table, rec, field_number) )
+                      % (mapping_table, rec, field_number))
 
     assert len(grouped) > 0, "There should be at most one grouped value per tag."
 
@@ -3606,7 +3763,7 @@ def _get_grouped_records_from_db(sig, *args):
                             from %s
                             where tag like '%%%s%%'
                             and id in %s"""
-                            % (target_table, tag, grouped_sqlstr) )
+                         % (target_table, tag, grouped_sqlstr))
         res[tag] = [value[0] for value in values]
 
     return res
@@ -3629,7 +3786,7 @@ def get_signatures_from_bibrefs(bibrefs):
         sig10x = run_sql("""select 100, id_bibxxx, id_bibrec
                             from bibrec_bib10x
                             where id_bibxxx in %s"""
-                            % bib10x_sqlstr )
+                         % bib10x_sqlstr)
 
     sig70x = tuple()
     bib70x = filter(lambda x: x[0] == 700, bibrefs)
@@ -3638,14 +3795,14 @@ def get_signatures_from_bibrefs(bibrefs):
         sig70x = run_sql("""select 700, id_bibxxx, id_bibrec
                             from bibrec_bib70x
                             where id_bibxxx in %s"""
-                            % bib70x_sqlstr )
+                         % bib70x_sqlstr)
 
-    valid_recs = set(get_all_valid_papers())
+    valid_recs = set(get_all_valid_bibrecs())
 
     return filter(lambda x: x[2] in valid_recs, chain(set(sig10x), set(sig70x)))
 
 
-def get_resolved_affiliation(ambiguous_aff):   ### resolve_affiliation
+def get_resolved_affiliation(ambiguous_aff):  # resolve_affiliation
     """
     This is a method available in the context of author disambiguation in ADS
     only. No other platform provides the table used by this function.
@@ -3664,7 +3821,7 @@ def get_resolved_affiliation(ambiguous_aff):   ### resolve_affiliation
     aff_id = run_sql("""select aff_id
                         from ads_affiliations
                         where affstring=%s""",
-                        (ambiguous_aff,) )
+                    (ambiguous_aff,))
 
     if not aff_id:
         return "None"
@@ -3672,7 +3829,7 @@ def get_resolved_affiliation(ambiguous_aff):   ### resolve_affiliation
     return aff_id[0][0]
 
 
-def _get_name_from_db_by_bibref(bibref):   ### _get_name_by_bibrecref_from_db
+def _get_name_from_db_by_bibref(bibref):  # _get_name_by_bibrecref_from_db
     '''
     Gets the author name which is associated with the given bibref.
 
@@ -3726,75 +3883,146 @@ def get_inverted_lists(qgrams):
     return run_sql("""select inverted_list, list_cardinality
                       from aidINVERTEDLISTS
                       where qgram in %s"""
-                      % _get_sqlstr_from_set(qgrams, f=lambda x: "'%s'" % x) )
+                   % _get_sqlstr_from_set(qgrams, f=lambda x: "'%s'" % x))
 
 
-def populate_partial_marc_caches():
+def populate_partial_marc_caches(selected_bibrecs=None, verbose=True):
     '''
     Populates marc caches.
     '''
     global MARC_100_700_CACHE
 
-    if MARC_100_700_CACHE:
-        return
-
-    def br_dictionarize(maptable):
+    def br_dictionarize(maptable, md):
         gc.disable()
-        md = defaultdict(dict)
         maxiters = len(set(map(itemgetter(0), maptable)))
         for i, v in enumerate(groupby(maptable, itemgetter(0))):
-            if i % 1000 == 0:
-                update_status(float(i) / maxiters, 'br_dictionarizing...')
-#            if i % 1000000 == 0:
-#                update_status(float(i) / maxiters, 'br_dictionarizing...GC')
-#                gc.collect()
+            if i % 10000 == 0:
+                logger.update_status(float(i) / maxiters, 'br_dictionarizing...')
             idx = defaultdict(list)
             fn = defaultdict(list)
             for _, k, z in v[1]:
                 idx[k].append(z)
                 fn[z].append(k)
-            md[v[0]]['id'] = idx
-            md[v[0]]['fn'] = fn
-        update_status_final('br_dictionarizing done')
+            md[v[0]] = {'id': dict(idx), 'fn': dict(fn)}
+        logger.update_status_final('br_dictionarizing done')
         gc.enable()
         return md
+
+    def bib_dictionarize_in_batches(bibtable, bd):
+        bd.update(((i[0], (i[1], i[2])) for i in bibtable))
+        return bd
 
     def bib_dictionarize(bibtable):
         return dict((i[0], (i[1], i[2])) for i in bibtable)
 
-    update_status(.0, 'Populating get_grouped_records_table_cache')
-    bibrec_bib10x = sorted(run_sql("""select id_bibrec, id_bibxxx, field_number
-                                      from bibrec_bib10x"""))
-    update_status(.125, 'Populating get_grouped_records_table_cache')
-    brd_b10x = br_dictionarize(bibrec_bib10x)
+    sl = 500
+
+    logger.update_status(.0, 'Populating cache, 10x')
+
+    if selected_bibrecs is None:
+        bibrecs = list(set(x[0] for x in run_sql("select distinct(id_bibrec) from bibrec_bib10x")))
+    else:
+        bibrecs = selected_bibrecs
+
+    # If there is nothing to cache, stop here
+    if not bibrecs:
+        return
+
+    if MARC_100_700_CACHE:
+        bibrecs = set(bibrecs) - MARC_100_700_CACHE['records']
+        # we add to the cache only the missing records. If nothing is missing, go away.
+        if not bibrecs:
+            return
+        MARC_100_700_CACHE['records'] |= set(bibrecs)
+    else:
+        MARC_100_700_CACHE = dict()
+        MARC_100_700_CACHE['records'] = set(bibrecs)
+
+    bibrecs = list(bibrecs)
+    # bibrecs.sort()
+    bibrecs = [bibrecs[x:x + sl] for x in range(0, len(bibrecs), sl)]
+
+    if 'brb100' in MARC_100_700_CACHE:
+        brd_b10x = MARC_100_700_CACHE['brb100']
+    else:
+        brd_b10x = dict()
+    for i, bunch in enumerate(bibrecs):
+        logger.update_status(float(i) / len(bibrecs), '10x population bunching...')
+        bibrec_bib10x = run_sql("select id_bibrec, id_bibxxx, field_number"
+                                " from bibrec_bib10x where id_bibrec in %s "
+                                % _get_sqlstr_from_set(bunch))
+        bibrec_bib10x = sorted(bibrec_bib10x, key=lambda x: x[0])
+        brd_b10x = br_dictionarize(bibrec_bib10x, brd_b10x)
     del bibrec_bib10x
 
-    update_status(.25, 'Populating get_grouped_records_table_cache')
-    bibrec_bib70x = sorted(run_sql("""select id_bibrec, id_bibxxx, field_number
-                                      from bibrec_bib70x"""))
-    update_status(.375, 'Populating get_grouped_records_table_cache')
-    brd_b70x = br_dictionarize(bibrec_bib70x)
+    logger.update_status(.25, 'Populating cache, 70x')
+
+    if not selected_bibrecs:
+        bibrecs = list(set(x[0] for x in run_sql("select distinct(id_bibrec) from bibrec_bib70x")))
+        bibrecs = [bibrecs[x:x + sl] for x in range(0, len(bibrecs), sl)]
+
+    if 'brb700' in MARC_100_700_CACHE:
+        brd_b70x = MARC_100_700_CACHE['brb700']
+    else:
+        brd_b70x = dict()
+    for i, bunch in enumerate(bibrecs):
+        logger.update_status(float(i) / len(bibrecs), '70x population bunching...')
+        bibrec_bib70x = run_sql("select id_bibrec, id_bibxxx, field_number"
+                                " from bibrec_bib70x where id_bibrec in %s "
+                                % _get_sqlstr_from_set(bunch))
+        bibrec_bib70x = sorted(bibrec_bib70x, key=lambda x: x[0])
+        brd_b70x = br_dictionarize(bibrec_bib70x, brd_b70x)
     del bibrec_bib70x
 
-    update_status(.5, 'Populating get_grouped_records_table_cache')
-    bib10x = (run_sql("""select id, tag, value
-                         from bib10x"""))
-    update_status(.625, 'Populating get_grouped_records_table_cache')
-    bibd_10x = bib_dictionarize(bib10x)
+    logger.update_status(.5, 'Populating get_grouped_records_table_cache')
+
+    if 'b100' in MARC_100_700_CACHE:
+        bibd_10x = MARC_100_700_CACHE['b100']
+    else:
+        bibd_10x = dict()
+
+    logger.update_status(.625, 'Populating get_grouped_records_table_cache')
+
+    if selected_bibrecs:
+        for i, bunch in enumerate(bibrecs):
+            bib10x = (run_sql("select id, tag, value"
+                              " from bib10x, bibrec_bib10x where id=id_bibxxx "
+                              " and id_bibrec in %s" % _get_sqlstr_from_set(bunch)))
+            bibd_10x = bib_dictionarize_in_batches(bib10x, bibd_10x)
+    else:
+        bib10x = (run_sql("select id, tag, value"
+                          " from bib10x"))
+        bibd_10x = bib_dictionarize(bib10x)
     del bib10x
 
-    update_status(.75, 'Populating get_grouped_records_table_cache')
-    bib70x = (run_sql("""select id, tag, value
-                         from bib70x"""))
-    update_status(.875, 'Populating get_grouped_records_table_cache')
-    bibd_70x = bib_dictionarize(bib70x)
+    if 'b700' in MARC_100_700_CACHE:
+        bibd_70x = MARC_100_700_CACHE['b700']
+    else:
+        bibd_70x = dict()
+
+    logger.update_status(.75, 'Populating get_grouped_records_table_cache')
+
+    if selected_bibrecs:
+        for i, bunch in enumerate(bibrecs):
+            bib70x = (run_sql("select id, tag, value"
+                              " from bib70x, bibrec_bib70x where id=id_bibxxx"
+                              " and id_bibrec in %s" % _get_sqlstr_from_set(bunch)))
+            bibd_70x = bib_dictionarize_in_batches(bib70x, bibd_70x)
+    else:
+        bib70x = (run_sql("select id, tag, value"
+                          " from bib70x"))
+        bibd_70x = bib_dictionarize(bib70x)
     del bib70x
 
-    update_status_final('Finished populating get_grouped_records_table_cache')
-    MARC_100_700_CACHE = {'brb100': brd_b10x, 'brb700': brd_b70x, 'b100': bibd_10x, 'b700': bibd_70x}
+    logger.update_status_final('Finished populating get_grouped_records_table_cache')
+
+    MARC_100_700_CACHE['brb100'] = brd_b10x
+    MARC_100_700_CACHE['brb700'] = brd_b70x
+    MARC_100_700_CACHE['b100'] = bibd_10x
+    MARC_100_700_CACHE['b700'] = bibd_70x
 
 
-def search_engine_is_operating():   ### check_search_engine_status
+def search_engine_is_operating():  # check_search_engine_status
     '''
     Examines if the bibauthorid search engine is operating.
 
@@ -3803,12 +4031,12 @@ def search_engine_is_operating():   ### check_search_engine_status
     '''
     dense_index_exists = bool(run_sql("""select *
                                          from aidDENSEINDEX
-                                         where name_id=%s""",
-                                         (-1,) ))
+                                         where flag=%s""",
+                             (-1,)))
     inverted_lists_exists = bool(run_sql("""select *
                                             from aidINVERTEDLISTS
                                             where qgram=%s""",
-                                            ('!'*bconfig.QGRAM_LEN,) ))
+                                ('!' * bconfig.QGRAM_LEN,)))
 
     if dense_index_exists and inverted_lists_exists:
         return True
@@ -3823,10 +4051,10 @@ def _truncate_table(table_name):
     @param table_name: name of the table to truncate
     @type table_name: str
     '''
-    run_sql("""truncate %s""" % table_name)
+    run_sql('truncate %s' % table_name)
 
 
-def flush_data_to_db(table_name, column_names, args):   ### flush_data
+def flush_data_to_db(table_name, column_names, args):  # flush_data
     '''
     Flushes the given data in the specified table with the specified columns.
 
@@ -3839,21 +4067,23 @@ def flush_data_to_db(table_name, column_names, args):   ### flush_data
     '''
     column_num = len(column_names)
 
-    assert len(args) % column_num == 0, 'Trying to flush data in table %s. Wrong number of arguments passed.' % table_name
+    assert len(
+        args) % column_num == 0, 'Trying to flush data in table %s. Wrong number of arguments passed.' % table_name
 
     values_sqlstr = "(%s)" % ", ".join(repeat("%s", column_num))
-    multiple_values_sqlstr = ", ".join(repeat(values_sqlstr, len(args)/column_num))
+    multiple_values_sqlstr = ", ".join(repeat(values_sqlstr, len(args) / column_num))
     insert_query = 'insert into %s (%s) values %s' % (table_name, ", ".join(column_names), multiple_values_sqlstr)
 
     run_sql(insert_query, args)
 
-##########################################################################################
-###                                                                                    ###
-###                                    no table                                        ###
-###                                                                                    ###
-##########################################################################################
+#
+#
+# no table                                        ###
+#
+#
 
-def create_new_author_by_signature(sig, name=None):   ### new_person_from_signature
+
+def create_new_author_by_signature(sig, name=None, m_name=None):  # new_person_from_signature
     '''
     Creates a new author and associates him with the given signature.
 
@@ -3867,12 +4097,12 @@ def create_new_author_by_signature(sig, name=None):   ### new_person_from_signat
     '''
     pid = get_free_author_id()
 
-    add_signature(sig, name, pid)
+    add_signature(sig, name, pid, m_name=m_name)
 
     return pid
 
 
-def check_author_paper_associations(output_file=None):   ### check_personid_papers
+def check_author_paper_associations(output_file=None):  # check_personid_papers
     '''
     It examines if there are records in aidPERSONIDPAPERS table which are in an
     impaired state. If 'output_file' is specified it writes the output in that
@@ -3888,7 +4118,7 @@ def check_author_paper_associations(output_file=None):   ### check_personid_pape
         fp = open(output_file, "w")
         printer = lambda x: fp.write(x + '\n')
     else:
-        printer = bibauthor_print
+        printer = logger.log
 
     checkers = (wrong_names_exist,
                 duplicated_conirmed_papers_exist,
@@ -3902,7 +4132,7 @@ def check_author_paper_associations(output_file=None):   ### check_personid_pape
     return not any([check(printer) for check in checkers])
 
 
-def repair_author_paper_associations(output_file=None):   ### repair_personid
+def repair_author_paper_associations(output_file=None):  # repair_personid
     '''
     It examines if there are records in aidPERSONIDPAPERS table which are in an
     impaired state and repairs them. If 'output_file' is specified it writes
@@ -3918,7 +4148,7 @@ def repair_author_paper_associations(output_file=None):   ### repair_personid
         fp = open(output_file, "w")
         printer = lambda x: fp.write(x + '\n')
     else:
-        printer = bibauthor_print
+        printer = logger.log
 
     checkers = (wrong_names_exist,
                 duplicated_conirmed_papers_exist,
@@ -3940,7 +4170,7 @@ def repair_author_paper_associations(output_file=None):   ### repair_personid
     return not any(last_check)
 
 
-def get_author_refs_of_paper(rec):   ### get_authors_from_paper
+def get_author_refs_of_paper(rec):  # get_authors_from_paper
     '''
     Gets all author refs for the specified paper.
 
@@ -3951,16 +4181,15 @@ def get_author_refs_of_paper(rec):   ### get_authors_from_paper
     @rtype: list [(str),]
     '''
     if MARC_100_700_CACHE:
-        if bconfig.DEBUG_CHECKS:
-            assert _get_author_refs_from_marc_caches_of_paper(rec) == _get_author_refs_from_db_of_paper(rec)
         return _get_author_refs_from_marc_caches_of_paper(rec)
     else:
         return _get_author_refs_from_db_of_paper(rec)
 
 
-def _get_author_refs_from_marc_caches_of_paper(rec):   ### _get_authors_from_paper_from_cache
+def _get_author_refs_from_marc_caches_of_paper(rec):  # _get_authors_from_paper_from_cache
     '''
     Gets all author refs for the specified paper (from marc caches).
+    If author refs are not found in marc caches, the database is queried.
 
     @param rec: paper identifier
     @type rec: int
@@ -3972,12 +4201,15 @@ def _get_author_refs_from_marc_caches_of_paper(rec):   ### _get_authors_from_pap
         ids = MARC_100_700_CACHE['brb100'][rec]['id'].keys()
         refs = [i for i in ids if '100__a' in MARC_100_700_CACHE['b100'][i][0]]
     except KeyError:
-        return list()
+        if rec in MARC_100_700_CACHE['records']:
+            refs = tuple()
+        else:
+            refs = _get_author_refs_from_db_of_paper(rec)
 
-    return zip(refs)
+    return tuple(zip(refs))
 
 
-def get_coauthor_refs_of_paper(paper):   ### get_coauthors_from_paper
+def get_coauthor_refs_of_paper(paper):  # get_coauthors_from_paper
     '''
     Gets all coauthor refs for the specified paper.
 
@@ -3988,14 +4220,12 @@ def get_coauthor_refs_of_paper(paper):   ### get_coauthors_from_paper
     @rtype: list [(str),]
     '''
     if MARC_100_700_CACHE:
-        if bconfig.DEBUG_CHECKS:
-            assert _get_coauthor_refs_from_marc_caches_of_paper(paper) == _get_coauthor_refs_from_db_of_paper(paper)
         return _get_coauthor_refs_from_marc_caches_of_paper(paper)
     else:
         return _get_coauthor_refs_from_db_of_paper(paper)
 
 
-def _get_coauthor_refs_from_marc_caches_of_paper(rec):   ### _get_coauthors_from_paper_from_cache
+def _get_coauthor_refs_from_marc_caches_of_paper(rec):  # _get_coauthors_from_paper_from_cache
     '''
     Gets all coauthor refs for the specified paper (from marc caches).
 
@@ -4009,9 +4239,11 @@ def _get_coauthor_refs_from_marc_caches_of_paper(rec):   ### _get_coauthors_from
         ids = MARC_100_700_CACHE['brb700'][rec]['id'].keys()
         refs = [i for i in ids if '700__a' in MARC_100_700_CACHE['b700'][i][0]]
     except KeyError:
-        return list()
-
-    return zip(refs)
+        if rec in MARC_100_700_CACHE['records']:
+            refs = tuple()
+        else:
+            refs = _get_coauthor_refs_from_db_of_paper(rec)
+    return tuple(zip(refs))
 
 
 def get_all_bibrefs_of_paper(rec):
@@ -4046,12 +4278,12 @@ def get_all_signatures_of_paper(rec):
         marc_tag = str(table) + '__a'
         sig = get_grouped_records((table, ref, rec), marc_tag)[marc_tag][0]
         bibref = str(table) + ':' + str(ref)
-        signatures.append({"bibref": bibref, "sig": sig});
+        signatures.append({"bibref": bibref, "sig": sig})
 
     return signatures
 
 
-def _get_name_by_bibref_from_cache(ref):   ### _get_name_by_bibrecref_from_cache
+def _get_name_by_bibref_from_cache(ref):  # _get_name_by_bibrecref_from_cache
     '''
     Finds the author name from cache based on the given bibref.
 
@@ -4069,18 +4301,13 @@ def _get_name_by_bibref_from_cache(ref):   ### _get_name_by_bibrecref_from_cache
     try:
         if tag in MARC_100_700_CACHE[table][refid][0]:
             name = MARC_100_700_CACHE[table][refid][1]
-    except (KeyError, IndexError), e:
-        # the gc did run and the table is not clean?
-        # we might want to allow empty response here
-        raise Exception(str(ref) + str(e))
-
-    if bconfig.DEBUG_CHECKS:
-        assert name == _get_name_from_db_by_bibref(ref)
+    except (KeyError):
+        name = _get_name_from_db_by_bibref(ref)
 
     return name
 
 
-def get_inspire_id_of_signature(sig):   ### get_inspire_id
+def get_inspire_id_of_signature(sig):  # get_inspire_id
     '''
     Gets the external identifier of Inspire system for the given signature.
 
@@ -4095,7 +4322,21 @@ def get_inspire_id_of_signature(sig):   ### get_inspire_id
     return get_grouped_records((str(table), ref, rec), str(table) + '__i').values()[0]
 
 
-def get_author_names_from_db(pid):   ### get_person_db_names_set
+def get_orcid_id_of_signature(sig):
+    '''
+    Gets the external identifier of Inspire system for the given signature.
+
+    @param sig: signature (bibref_table, bibref_value, bibrec)
+    type sig: tuple (int, int, int)
+
+    @return Orcid external identifier
+    @rtype: list [str]
+    '''
+
+    return None
+
+
+def get_author_names_from_db(pid):  # get_person_db_names_set
     '''
     Gets the set of names associated to the given author.
 
@@ -4113,21 +4354,17 @@ def get_author_names_from_db(pid):   ### get_person_db_names_set
     return zip(zip(*names)[0])
 
 
-def get_all_valid_papers():   ### get_all_valid_bibrecs
+def get_all_valid_bibrecs():
     '''
-    Gets all valid papers.
+    Gets all valid bibrecs.
 
     @return: paper identifiers
     @rtype: list [int,]
     '''
-    if not bconfig.LIMIT_TO_COLLECTIONS:
-        return perform_request_search(p="")
-    collection_restriction_pattern = " or ".join(["980__a:\"%s\"" % x for x in bconfig.LIMIT_TO_COLLECTIONS])
-
-    return perform_request_search(p="%s" % collection_restriction_pattern, rg=0)
+    return perform_request_search(c=bconfig.LIMIT_TO_COLLECTIONS, rg=0)
 
 
-def get_name_by_bibref(ref):   ### get_name_by_bibrecref
+def get_name_by_bibref(ref):  # get_name_by_bibrecref
     '''
     Finds the author name based on the given bibref.
 
@@ -4138,15 +4375,12 @@ def get_name_by_bibref(ref):   ### get_name_by_bibrecref
     @rtype: str
     '''
     if MARC_100_700_CACHE:
-        if bconfig.DEBUG_CHECKS:
-            assert _get_name_by_bibref_from_cache(ref) == _get_name_from_db_by_bibref(ref)
-
         return _get_name_by_bibref_from_cache(ref)
     else:
         return _get_name_from_db_by_bibref(ref)
 
 
-def get_last_rabbit_runtime():   ### fetch_bibauthorid_last_update
+def get_last_rabbit_runtime():  # fetch_bibauthorid_last_update
     '''
     Gets last runtime of rabbit.
 
@@ -4162,7 +4396,7 @@ def get_last_rabbit_runtime():   ### fetch_bibauthorid_last_update
     return last_update
 
 
-def get_db_time():   ### get_sql_time
+def get_db_time():  # get_sql_time
     '''
     Gets the time according to the database.
 
@@ -4178,7 +4412,6 @@ def destroy_partial_marc_caches():
     '''
     global MARC_100_700_CACHE
     MARC_100_700_CACHE = None
-    gc.collect()
 
 
 def _split_signature_string(sig_str):
@@ -4198,7 +4431,7 @@ def _split_signature_string(sig_str):
     return (table, ref, rec)
 
 
-def _get_sqlstr_from_set(items, f=lambda x: x):   ### list_2_SQL_str
+def _get_sqlstr_from_set(items, f=lambda x: x):  # list_2_SQL_str
     """
     Creates a string from a set after transforming each item
     with a function.
@@ -4215,7 +4448,7 @@ def _get_sqlstr_from_set(items, f=lambda x: x):   ### list_2_SQL_str
     return "(%s)" % ", ".join(strs)
 
 
-def get_paper_access_right(acc):   ### resolve_paper_access_right
+def get_paper_access_right(acc):  # resolve_paper_access_right
     '''
     Given an access right key, resolves to the corresponding access right
     value. If asked for a wrong/not present key falls back to the minimum
@@ -4227,9 +4460,9 @@ def get_paper_access_right(acc):   ### resolve_paper_access_right
     @return: access right value
     @rtype: str or int
     '''
-    access_dict = { bconfig.CLAIMPAPER_VIEW_PID_UNIVERSE: 0,
-                    bconfig.CLAIMPAPER_CLAIM_OWN_PAPERS: 25,
-                    bconfig.CLAIMPAPER_CLAIM_OTHERS_PAPERS: 50 }
+    access_dict = {bconfig.CLAIMPAPER_VIEW_PID_UNIVERSE: 0,
+                   bconfig.CLAIMPAPER_CLAIM_OWN_PAPERS: 25,
+                   bconfig.CLAIMPAPER_CLAIM_OTHERS_PAPERS: 50}
 
     if isinstance(acc, str):
         try:
@@ -4254,14 +4487,12 @@ def get_grouped_records(sig, *args):
     @type args: tuple (str,)
     '''
     if MARC_100_700_CACHE:
-        if bconfig.DEBUG_CHECKS:
-            assert _get_grouped_records_using_marc_caches(sig, *args) == _get_grouped_records_from_db(sig, *args)
         return _get_grouped_records_using_marc_caches(sig, *args)
     else:
         return _get_grouped_records_from_db(sig, *args)
 
 
-def _get_grouped_records_using_marc_caches(sig, *args):   ### _get_grouped_records_using_caches
+def _get_grouped_records_using_marc_caches(sig, *args):  # _get_grouped_records_using_caches
     '''
     Gets the records from marc caches which are grouped together with the paper
     specified in the given signature and carry a tag from 'args'.
@@ -4280,11 +4511,14 @@ def _get_grouped_records_using_marc_caches(sig, *args):   ### _get_grouped_recor
         c = MARC_100_700_CACHE['brb%s' % str(table)][rec]
         fn = c['id'][ref]
     except KeyError:
-        return dict((tag, list()) for tag in args)
+        if rec in MARC_100_700_CACHE['records']:
+            return dict()
+        else:
+            return _get_grouped_records_from_db(sig, *args)
 
-    if not fn or len(fn) > 1:
+    if not fn:  # or len(fn)>1
         # If len(fn) > 1 it's BAD: the same signature is at least twice on the same paper.
-        # To be on the safe side, let empty list to be the default.
+        # But after all, that's the mess we find in the database, so let's leave it there.
         return dict((tag, list()) for tag in args)
 
     ids = set(chain(*(c['fn'][i] for i in fn)))
@@ -4293,7 +4527,7 @@ def _get_grouped_records_using_marc_caches(sig, *args):   ### _get_grouped_recor
 
     for t in tuples:
         present = [tag for tag in args if tag in t[0]]
-        assert len(present) <= 1
+        # assert len(present) <= 1
 
         if present:
             tag = present[0]
@@ -4302,8 +4536,7 @@ def _get_grouped_records_using_marc_caches(sig, *args):   ### _get_grouped_recor
     for tag in args:
         if tag not in res.keys():
             res[tag] = list()
-
-    return res
+    return dict(res)
 
 
 def populate_table(table_name, column_names, values, empty_table_first=True):
@@ -4327,9 +4560,9 @@ def populate_table(table_name, column_names, values, empty_table_first=True):
 
     assert values_len % column_num == 0, 'Trying to populate table %s. Wrong number of arguments passed.' % table_name
 
-    for i in range(int(values_len/column_num)):
+    for i in range(int(values_len / column_num)):
         # it keeps the size for each tuple of values
-        values_tuple_size.append(sum([len(str(i)) for i in values[i*column_num:i*column_num+column_num]]))
+        values_tuple_size.append(sum([len(str(i)) for i in values[i * column_num:i * column_num + column_num]]))
 
     if empty_table_first:
         _truncate_table(table_name)
@@ -4337,7 +4570,7 @@ def populate_table(table_name, column_names, values, empty_table_first=True):
     populate_table_with_limit(table_name, column_names, values, values_tuple_size)
 
 
-def populate_table_with_limit(table_name, column_names, values, values_tuple_size, \
+def populate_table_with_limit(table_name, column_names, values, values_tuple_size,
                               max_insert_size=CFG_BIBAUTHORID_SEARCH_ENGINE_MAX_DATACHUNK_PER_INSERT_DB_QUERY):
     '''
     Populates the specified table which has the specified column names with the
@@ -4362,29 +4595,29 @@ def populate_table_with_limit(table_name, column_names, values, values_tuple_siz
     start = 0
 
     for i in range(len(values_tuple_size)):
-        if summ+values_tuple_size[i] <= max_insert_size:
+        if summ + values_tuple_size[i] <= max_insert_size:
             summ += values_tuple_size[i]
             continue
         summ = values_tuple_size[i]
-        flush_data_to_db(table_name, column_names, values[start:(i-1)*column_num])
-        start = (i-1)*column_num
+        flush_data_to_db(table_name, column_names, values[start:(i - 1) * column_num])
+        start = (i - 1) * column_num
 
     flush_data_to_db(table_name, column_names, values[start:])
 
-##########################################################################################
-###                                                                                    ###
-###                                 other staff                                        ###
-###                                                                                    ###
-##########################################################################################
+#
+#
+# other staff                                        ###
+#
+#
 
 
-##########################################################################################
-###                                                                                    ###
-###                          not used functions                                        ###
-###                                                                                    ###
-##########################################################################################
+#
+#
+# not used functions                                        ###
+#
+#
 
-def remove_not_claimed_papers_from_author(pid):   ### del_person_not_manually_claimed_papers
+def remove_not_claimed_papers_from_author(pid):  # del_person_not_manually_claimed_papers
     '''
     Deletes papers which have not been manually claimed or rejected
     from the given author.
@@ -4397,7 +4630,7 @@ def remove_not_claimed_papers_from_author(pid):   ### del_person_not_manually_cl
                and personid=%s""", (pid,) )
 
 
-def remove_all_signatures_from_authors(pids):   ### remove_personid_papers
+def remove_all_signatures_from_authors(pids):  # remove_personid_papers
     '''
     Deletes all signatures from the given authors.
 
@@ -4408,10 +4641,10 @@ def remove_all_signatures_from_authors(pids):   ### remove_personid_papers
         pids_sqlstr = _get_sqlstr_from_set(pids)
         run_sql("""delete from aidPERSONIDPAPERS
                    where personid in %s"""
-                   % pids_sqlstr )
+                % pids_sqlstr)
 
 
-def get_authors_by_surname(surname):   ### find_pids_by_name
+def get_authors_by_surname(surname):  # find_pids_by_name
     '''
     Gets all authors who carry records with the specified surname.
 
@@ -4424,11 +4657,11 @@ def get_authors_by_surname(surname):   ### find_pids_by_name
     return set(run_sql("""select personid, name
                           from aidPERSONIDPAPERS
                           where name like %s""",
-                          (surname + ',%',) ))
+              (surname + ',%',)))
 
 
 # could be useful to optimize rabbit. Still unused and untested, Watch out!
-def get_author_to_signatures_mapping():   ### get_bibrecref_to_pid_dictuonary
+def get_author_to_signatures_mapping():  # get_bibrecref_to_pid_dictuonary
     '''
     Gets a mapping which associates signatures with the set of authors who
     carry a record with that signature.
@@ -4445,7 +4678,7 @@ def get_author_to_signatures_mapping():   ### get_bibrecref_to_pid_dictuonary
     return mapping
 
 
-def get_author_data_associations_for_author(pid):   ### get_specific_personid_full_data
+def get_author_data_associations_for_author(pid):  # get_specific_personid_full_data
     '''
     Gets all author-data associations for the given author.
 
@@ -4458,7 +4691,7 @@ def get_author_data_associations_for_author(pid):   ### get_specific_personid_fu
     return _select_from_aidpersoniddata_where(select=['personid', 'tag', 'data', 'opt1', 'opt2', 'opt3'], pid=pid)
 
 
-def get_user_id_of_author(pid):   ### get_uids_by_pids
+def get_user_id_of_author(pid):  # get_uids_by_pids
     '''
     Gets the user identifier for the given author.
 
@@ -4471,7 +4704,7 @@ def get_user_id_of_author(pid):   ### get_uids_by_pids
     return _select_from_aidpersoniddata_where(select=['data'], pid=pid, tag='uid')
 
 
-def restore_author_paper_associations():   ### restore_personids
+def restore_author_paper_associations():  # restore_personids
     '''
     Restores the author-data and author-paper association tables
     (aidPERSONIDDATA, aidPERSONIDPAPERS) from the last saved copy of the
@@ -4510,16 +4743,16 @@ def check_claim_inspireid_contradiction():
         inspire_ids10x = run_sql("""select id_bibxxx, id_bibrec, field_number
                                     from bibrec_bib10x
                                     where id_bibxxx in %s"""
-                                    % inspire_ids10x_sqlstr)
+                                 % inspire_ids10x_sqlstr)
 
         inspire_ids10x = ((row[0], [(ref, rec) for ref, rec in run_sql(
-                                """select id_bibxxx, id_bibrec
+            """select id_bibxxx, id_bibrec
                                    from bibrec_bib10x
                                    where id_bibrec='%s'
                                    and field_number='%s'"""
-                                   % row[1:])
-                               if ref in refs10x])
-                      for row in inspire_ids10x)
+                                    % row[1:])
+                                    if ref in refs10x])
+                          for row in inspire_ids10x)
 
     inspire_ids70x = run_sql("""select id
                                 from bib70x
@@ -4533,16 +4766,16 @@ def check_claim_inspireid_contradiction():
         inspire_ids70x = run_sql("""select id_bibxxx, id_bibrec, field_number
                                     from bibrec_bib70x
                                     where id_bibxxx in %s"""
-                                    % inspire_ids70x_sqlstr)
+                                 % inspire_ids70x_sqlstr)
 
         inspire_ids70x = ((row[0], [(ref, rec) for ref, rec in run_sql(
-                                """select id_bibxxx, id_bibrec
+            """select id_bibxxx, id_bibrec
                                    from bibrec_bib70x
                                    where id_bibrec='%s'
                                    and field_number='%s'"""
-                                   % (row[1:]))
-                               if ref in refs70x])
-                      for row in inspire_ids70x)
+                                    % (row[1:]))
+                                    if ref in refs70x])
+                          for row in inspire_ids70x)
 
     # [(iids, [bibs])]
     inspired = list(chain(((iid, list(set(('100',) + bib for bib in bibs))) for iid, bibs in inspire_ids10x),
@@ -4551,17 +4784,17 @@ def check_claim_inspireid_contradiction():
     assert all(len(x[1]) == 1 for x in inspired)
 
     inspired = ((k, map(itemgetter(0), map(itemgetter(1), d)))
-                    for k, d in groupby(sorted(inspired, key=itemgetter(0)), key=itemgetter(0)))
+                for k, d in groupby(sorted(inspired, key=itemgetter(0)), key=itemgetter(0)))
 
     # [(inspireid, [bibs])]
     inspired = [([(run_sql("""select personid
                               from aidPERSONIDPAPERS
-                              where bibref_table=%s
+                              where bibref_table like %s
                               and bibref_value=%s
                               and bibrec=%s
                               and flag='2'""", bib), bib)
-                        for bib in cluster[1]], cluster[0])
-                    for cluster in inspired]
+                  for bib in cluster[1]], cluster[0])
+                for cluster in inspired]
 
     # [([([pid], bibs)], inspireid)]
     for cluster, iid in inspired:
@@ -4585,7 +4818,7 @@ def check_claim_inspireid_contradiction():
         # The last step is to check all non-claimed papers for being
         # claimed by the person on some different signature.
         problem = (_select_from_aidpersonidpapers_where(select=['bibref_table', 'bibref_value', 'bibrec'], pid=pid, rec=bib[2], flag=2)
-                       for bib in (bib for lpid, bib in cluster if not lpid))
+                   for bib in (bib for lpid, bib in cluster if not lpid))
         problem = list(chain.from_iterable(problem))
 
         if problem:
@@ -4596,7 +4829,7 @@ def check_claim_inspireid_contradiction():
             print
 
 
-def remove_clusters_except(excl_surnames):   ### remove_results_outside
+def remove_clusters_except(excl_surnames):  # remove_results_outside
     '''
     Deletes all disambiguation algorithm result records except records who are
     assoociated with the specified surnames.
@@ -4609,11 +4842,11 @@ def remove_clusters_except(excl_surnames):   ### remove_results_outside
                                                                       from aidRESULTS"""))
     for surname in surnames - excl_surnames:
         run_sql("""delete from aidRESULTS
-                   where personid like '%s'""",
-                   (surname + '.%%',) )
+                   where personid like %s""",
+               (surname + '.%%',))
 
 
-def get_clusters():   ### get_full_results
+def get_clusters():  # get_full_results
     '''
     Gets all disambiguation algorithm result records.
 
@@ -4624,7 +4857,7 @@ def get_clusters():   ### get_full_results
                       from aidRESULTS""")
 
 
-def get_existing_papers_and_refs(table, recs, refs):   ### get_bibrefrec_subset
+def get_existing_papers_and_refs(table, recs, refs):  # get_bibrefrec_subset
     '''
     From the specified papers and bibref values it gets the existing ones.
 
@@ -4641,7 +4874,7 @@ def get_existing_papers_and_refs(table, recs, refs):   ### get_bibrefrec_subset
     table = "bibrec_bib%sx" % str(table)[:-1]
     contents = run_sql("""select id_bibrec, id_bibxxx
                           from %s"""
-                          % table )
+                       % table)
     recs = set(recs)
     refs = set(refs)
 
@@ -4649,106 +4882,23 @@ def get_existing_papers_and_refs(table, recs, refs):   ### get_bibrefrec_subset
     return set(ifilter(lambda x: x[0] in recs and x[1] in refs, contents))
 
 
-def export_author(pid):   ### export_person
-    '''list of records table: personidpapers and personiddate check existing function for getting the records!!!
-       exports a structure of dictunaries of tuples of [...] if strings, like:
+#
+# BibRDF utilities. To be refactored and ported to bibauthorid_bibrdfinterface                      #
+#
 
-       {'name':('namestring',),
-        'repeatable_field':({'field1':('val1',)},{'field1':'val2'})}
-
-    @param pid: author identifier
-    @type pid: int
-
-    @return: author info
-    @rtype: defaultdict
-    '''
-    author_info = defaultdict(defaultdict)
-
-    full_names = get_author_names_from_db(pid)
-    if full_names:
-        splitted_names = [split_name_parts(n[0]) for n in full_names]
-        splitted_names = [x + [len(x[2])] for x in splitted_names]
-        max_first_names = max([x[4] for x in splitted_names])
-        full_name_candidates = filter(lambda x: x[4] == max_first_names, splitted_names)
-        full_name = create_normalized_name(full_name_candidates[0])
-
-        author_info['names']['full_name'] = (full_name,)
-        author_info['names']['surname'] = (full_name_candidates[0][0],)
-        if full_name_candidates[0][2]:
-            author_info['names']['first_names'] = (' '.join(full_name_candidates[0][2]),)
-        author_info['names']['name_variants'] = ('; '.join([create_normalized_name(x) for x in splitted_names]),)
-
-    bibrecs = get_confirmed_papers_of_author(pid)
-
-    recids_data = list()
-    for recid in bibrecs:
-        recid_dict = defaultdict(defaultdict)
-        recid_dict['INSPIRE-record-id'] = (str(recid),)
-        recid_dict['INSPIRE-record-url'] = ('%s/record/%s' % (CFG_SITE_URL, str(recid)),)
-        rec_doi = _get_doi_for_paper(recid)
-        if rec_doi:
-            recid_dict['DOI'] = (str(rec_doi),)
-        recids_data.append(recid_dict)
-
-    author_info['records']['record'] = tuple(recids_data)
-    author_info['identifiers']['INSPIRE_person_ID'] = (str(pid),)
+def get_all_personids_with_orcid():
+    pids = run_sql("select personid from aidPERSONIDDATA where tag='extid:ORCID'")
+    pids = set(x[0] for x in pids)
+    return pids
 
 
-    canonical_names = get_canonical_name_of_author(pid)
-    if canonical_names:
-        author_info['identifiers']['INSPIRE_canonical_name'] = (str(canonical_names[0][0]),)
-        author_info['profile_page']['INSPIRE_profile_page'] = ('%s/author/profile/%s' % (CFG_SITE_URL, canonical_names[0][0]),)
-    else:
-        author_info['profile_page']['INSPIRE_profile_page'] = ('%s/author/profile/%s' % (CFG_SITE_URL, str(pid)),)
-
-    orcids = get_orcid_id_of_author(pid)
-    if orcids:
-        author_info['identifiers']['ORCID'] = tuple(str(x[0]) for x in orcids)
-
-    inspire_ids = _get_inspire_id_of_author(pid)
-    if inspire_ids:
-        author_info['identifiers']['INSPIREID'] = tuple(str(x[0]) for x in inspire_ids)
-
-    return author_info
+def get_records_of_authors(personids_set):
+    authors = _get_sqlstr_from_set(personids_set)
+    recids = run_sql("select bibrec from aidPERSONIDPAPERS where personid in %s" % authors)
+    recids = set(x[0] for x in recids)
+    return recids
 
 
-def export_author_to_foaf(pid):   ### export_person_to_foaf
-    '''
-    Exports to foaf xml a dictionary of dictionaries or tuples of strings as retured by export_author
-
-    @param pid: author identifier
-    @type pid: int
-
-    @return:
-    @rtype:
-    '''
-    author_info = export_author(pid)
-
-    def export(val, indent=0):   ### export_to_foaf
-        '''
-        Exports to foaf xml a dictionary of dictionaries or tuples of strings as retured by export_author
-
-        @param val: author info
-        @type val: dict
-        @param indent:
-        @type indent: int
-
-        @return:
-        @rtype:
-        '''
-        if isinstance(val, dict):
-            contents = list()
-
-            for k, v in val.iteritems():
-                if isinstance(v, tuple):
-                    contents.append(''.join([ X[str(k)](indent=indent, body=export(c)) for c in v]))
-                else:
-                    contents.append(X[str(k)](indent=indent, body=export(v, indent=indent + 1)))
-
-            return ''.join(contents)
-        elif isinstance(val, str):
-            return str(X.escaper(val))
-        else:
-            raise Exception('HOW THE HELL DID WE GET HERE? %s' % str(val))
-
-    return X['person'](body=export(author_info, indent=1))
+def author_exists(personid):
+    return any((bool(run_sql("select * from aidPERSONIDDATA where personid=%s limit 1", (personid,))),
+                bool(run_sql("select * from aidPERSONIDPAPERS where personid=%s limit 1", (personid,)))))

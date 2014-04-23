@@ -8,9 +8,8 @@ http://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz
 numpy==1.7.0
 lxml==3.1.2
 mechanize==0.2.5
-python-Levenshtein==0.10.2
 PyStemmer==1.3.0
-https://py-editdist.googlecode.com/files/py-editdist-0.3.tar.gz
+Python-Levenshtein==0.11.2
 feedparser==5.1.3
 BeautifulSoup==3.2.1
 beautifulsoup4==4.1.3
@@ -29,3 +28,4 @@ redis==2.9.0
 nydus==0.10.6
 Cerberus==0.5
 HTMLParser==0.0.2
+h5py==2.2.1

@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011, 2012 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 '''
 Bibauthorid_webapi
 Point of access to the documents clustering facility.
@@ -24,16 +24,17 @@ Provides utilities to safely interact with stored data.
 import os
 from itertools import chain
 from copy import deepcopy
+from collections import defaultdict
 
 import invenio.bibauthorid_config as bconfig
 import invenio.bibauthorid_frontinterface as dbapi
 import invenio.bibauthorid_name_utils as nameapi
 import invenio.webauthorprofile_interface as webauthorapi
-from invenio.bibauthorid_general_utils import defaultdict
 
+from invenio.bibauthorid_config import PROFILE_IDENTIFIER_URL_MAPPING, PROFILE_IDENTIFIER_WHITELIST
 import invenio.search_engine as search_engine
 from invenio.bibformat import format_record
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import perform_request_search, get_record
 from cgi import escape
 from invenio.dateutils import strftime
 from time import time, gmtime, ctime
@@ -53,17 +54,15 @@ from invenio.mailutils import send_email
 from invenio.bibauthorid_name_utils import most_relevant_name
 from invenio.bibauthorid_general_utils import is_arxiv_id_or_doi
 from invenio.shellutils import retry_mkstemp
-from invenio.bibrecord import record_xml_output, record_add_field
+from invenio.bibrecord import record_xml_output, record_add_field, record_get_field_instances,\
+    record_get_field_value, record_get_field_values, record_has_field
 from invenio.bibtask import task_low_level_submission
-from invenio.bibauthorid_dbinterface import get_external_ids_of_author, add_arxiv_papers_to_author, get_arxiv_papers_of_author  #pylint: disable-msg=W0614
+from invenio.bibauthorid_dbinterface import get_external_ids_of_author, add_arxiv_papers_to_author, get_arxiv_papers_of_author  # pylint: disable-msg=W0614
 
 
-
-############################################
-#           DB Data Accessors              #
-############################################
-
-
+#
+# DB Data Accessors              #
+#
 def is_profile_available(pid):
     '''
     check if the profile with pid is not claimed to a user
@@ -80,6 +79,7 @@ def is_profile_available(pid):
         return True
     return False
 
+
 def get_bibrec_from_bibrefrec(bibrefrec):
 
     tmp_split_list = bibrefrec.split(':')
@@ -89,6 +89,7 @@ def get_bibrec_from_bibrefrec(bibrefrec):
     if len(tmp_split_list) == 1:
         return -1
     return int(tmp_split_list[1])
+
 
 def get_bibrefs_from_bibrecs(bibreclist):
     '''
@@ -102,6 +103,7 @@ def get_bibrefs_from_bibrecs(bibreclist):
     '''
     return [[bibrec, dbapi.get_matching_bibrefs_for_paper([''], bibrec, always_match=True)]
             for bibrec in bibreclist]
+
 
 def get_canonical_id_from_person_id(person_id):
     '''
@@ -125,6 +127,7 @@ def get_canonical_id_from_person_id(person_id):
 
     return canonical_name
 
+
 def get_external_ids_from_person_id(pid):
     '''
     Finds the person  external ids (doi, arxivids, ..) from personid (e.g. 1)
@@ -144,6 +147,7 @@ def get_external_ids_from_person_id(pid):
     external_ids = dbapi.get_external_ids_of_author(pid)
     return external_ids
 
+
 def get_internal_user_id_from_person_id(pid):
     '''
     Finds the person  external ids (doi, arxivids, ..) from personid (e.g. 1)
@@ -162,7 +166,8 @@ def get_internal_user_id_from_person_id(pid):
 
     return dbapi.get_internal_user_id_of_author(pid)
 
-def get_longest_name_from_pid(person_id= -1):
+
+def get_longest_name_from_pid(person_id=-1):
     '''
     Finds the longest name of a person to be representative for this person.
 
@@ -189,7 +194,7 @@ def get_longest_name_from_pid(person_id= -1):
         return "This person does not seem to have a name!"
 
 
-def get_most_frequent_name_from_pid(person_id= -1, allow_none=False):
+def get_most_frequent_name_from_pid(person_id=-1, allow_none=False):
     '''
     Finds the most frequent name of a person to be
     representative for this person.
@@ -213,7 +218,7 @@ def get_most_frequent_name_from_pid(person_id= -1, allow_none=False):
 
     try:
         nn = dbapi.get_names_count_of_author(person_id)
-        mf_name = sorted(nn, key=lambda k:k[1], reverse=True)[0][0]
+        mf_name = sorted(nn, key=lambda k: k[1], reverse=True)[0][0]
     except IndexError:
         pass
 
@@ -225,7 +230,8 @@ def get_most_frequent_name_from_pid(person_id= -1, allow_none=False):
         else:
             return "This person does not seem to have a name!"
 
-def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
+
+def get_papers_by_person_id(person_id=-1, rec_status=-2, ext_out=False):
     '''
     Returns all the papers written by the person
 
@@ -282,8 +288,8 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
             records.append([int(recid), bibref, flag, authorname,
                             authoraff, date, rt_status, exp])
 
-
     return records
+
 
 def get_papers_cluster(bibref):
     '''
@@ -302,6 +308,7 @@ def get_papers_cluster(bibref):
         papers = get_papers_by_person_id(person_id)
 
     return papers
+
 
 def get_paper_status(bibref):
     '''
@@ -323,6 +330,7 @@ def get_paper_status(bibref):
 
     return status
 
+
 def get_person_redirect_link(pid):
     '''
     Returns the canonical name of a pid if found, the pid itself otherwise
@@ -333,6 +341,7 @@ def get_person_redirect_link(pid):
         return str(cname[0][0])
     else:
         return str(pid)
+
 
 def get_person_id_from_canonical_id(canonical_id):
     '''
@@ -355,6 +364,7 @@ def get_person_id_from_canonical_id(canonical_id):
         pass
 
     return pid
+
 
 def get_person_id_from_paper(bibref=None):
     '''
@@ -379,6 +389,7 @@ def get_person_id_from_paper(bibref=None):
 
     return person_id
 
+
 def get_person_comments(person_id):
     '''
     Get all comments from a person
@@ -402,7 +413,8 @@ def get_person_comments(person_id):
 
     return comments
 
-def get_person_db_names_from_id(person_id= -1):
+
+def get_person_db_names_from_id(person_id=-1):
     '''
     Finds and returns the names associated with this person as stored in the
     meta data of the underlying data set along with the
@@ -414,13 +426,14 @@ def get_person_db_names_from_id(person_id= -1):
     @return: name and number of occurrences of the name
     @rtype: tuple of tuple
     '''
-    ##retrieve all rows for the person
+    # retrieve all rows for the person
     if (not person_id > -1) or (not isinstance(person_id, (int, long))):
         return []
 
     return dbapi.get_names_of_author(person_id)
 
-def get_person_names_from_id(person_id= -1):
+
+def get_person_names_from_id(person_id=-1):
     '''
     Finds and returns the names associated with this person along with the
     frequency of occurrence (i.e. the number of papers)
@@ -431,11 +444,12 @@ def get_person_names_from_id(person_id= -1):
     @return: name and number of occurrences of the name
     @rtype: tuple of tuple
     '''
-    ##retrieve all rows for the person
+    # retrieve all rows for the person
     if (not person_id > -1) or (not isinstance(person_id, (int, long))):
         return []
 
     return dbapi.get_names_count_of_author(person_id)
+
 
 def get_person_request_ticket(pid=-1, tid=None):
     '''
@@ -466,12 +480,14 @@ def get_person_request_ticket(pid=-1, tid=None):
 
     return request_tickets
 
+
 def get_persons_with_open_tickets_list():
     '''
     Finds all the persons with open tickets and returns pids and count of tickets
     @return: [[pid,ticket_count]]
     '''
     return dbapi.get_authors_with_open_tickets()
+
 
 def get_pid_from_uid(uid):
     '''
@@ -484,7 +500,9 @@ def get_pid_from_uid(uid):
     '''
     if isinstance(uid, tuple):
         uid = uid[0][0]
-        assert False, ("AAAAARGH problem in get_pid_from_uid webapi. Got uid as a tuple instead of int.Uid = %s" % str(uid))
+        assert False, (
+            "AAAAARGH problem in get_pid_from_uid webapi. Got uid as a tuple instead of int.Uid = %s" %
+            str(uid))
     pid = dbapi.get_author_by_uid(uid)
     if not pid:
         return -1
@@ -507,8 +525,9 @@ def get_possible_bibrefs_from_pid_bibrec(pid, bibreclist, always_match=False, ad
     lists = []
     for bibrec in bibreclist:
         lists.append([bibrec, dbapi.get_matching_bibrefs_for_paper([n[0] for n in pid_names], bibrec,
-                                                        always_match)])
+                                                                   always_match)])
     return lists
+
 
 def get_processed_external_recids(pid):
     '''
@@ -525,6 +544,7 @@ def get_processed_external_recids(pid):
 
     return list_str.split(";")
 
+
 def get_review_needing_records(pid):
     '''
     Returns list of records associated to pid which are in need of review
@@ -535,6 +555,7 @@ def get_review_needing_records(pid):
     db_data = dbapi.get_person_papers_to_be_manually_reviewed(pid)
 
     return [int(row[0][1]) for row in db_data if row[0][1]]
+
 
 def get_uid_from_personid(pid):
     '''
@@ -552,6 +573,7 @@ def get_uid_from_personid(pid):
 
     return result
 
+
 def get_user_level(uid):
     '''
     Finds and returns the aid-universe-internal numeric user level
@@ -565,7 +587,8 @@ def get_user_level(uid):
     actions = [row[1] for row in acc_find_user_role_actions({'uid': uid})]
     return max([dbapi.get_paper_access_right(acc) for acc in actions])
 
-def search_person_ids_by_name(namequery, limit_to_recid=None):
+
+def search_person_ids_by_name(namequery, limit_to_recid=None, exact_name_match=False):
     '''
     Prepares the search to search in the database
 
@@ -588,7 +611,7 @@ def search_person_ids_by_name(namequery, limit_to_recid=None):
     else:
         return list()
 
-    results = dbapi.find_personIDs_by_name_string(escaped_query)
+    results = dbapi.person_search_engine_query(escaped_query)
 
     if not limit_to_recid:
         return results
@@ -597,9 +620,9 @@ def search_person_ids_by_name(namequery, limit_to_recid=None):
         return filter(lambda x: x[0] in limit_to_persons, results)
 
 
-############################################
-#           DB Data Mutators               #
-############################################
+#
+# DB Data Mutators               #
+#
 
 def add_person_comment(person_id, message):
     '''
@@ -628,6 +651,7 @@ def add_person_comment(person_id, message):
 
     return dbmsg
 
+
 def add_person_external_id(person_id, ext_sys, ext_id, userinfo=''):
     '''
     Adds an external id for the person
@@ -648,7 +672,15 @@ def add_person_external_id(person_id, ext_sys, ext_id, userinfo=''):
     webauthorapi.expire_all_cache_for_personid(person_id)
 
     log_value = '%s %s %s' % (person_id, tag, ext_id)
-    dbapi.insert_user_log(userinfo, person_id, 'data_insertion', 'CMPUI_addexternalid', log_value, 'External id manually added.', userid=uid)
+    dbapi.insert_user_log(
+        userinfo,
+        person_id,
+        'data_insertion',
+        'CMPUI_addexternalid',
+        log_value,
+        'External id manually added.',
+        userid=uid)
+
 
 def set_person_uid(person_id, dest_uid, userinfo=''):
     '''
@@ -668,7 +700,15 @@ def set_person_uid(person_id, dest_uid, userinfo=''):
     dbapi.add_userid_to_author(person_id, int(dest_uid))
 
     log_value = '%s %s %s' % (person_id, 'uid', int(dest_uid))
-    dbapi.insert_user_log(userinfo, person_id, 'data_insertion', 'CMPUI_set_uid', log_value, 'UID manually set to person.', userid=uid)
+    dbapi.insert_user_log(
+        userinfo,
+        person_id,
+        'data_insertion',
+        'CMPUI_set_uid',
+        log_value,
+        'UID manually set to person.',
+        userid=uid)
+
 
 def add_review_needing_record(pid, bibrec_id):
     '''
@@ -679,6 +719,7 @@ def add_review_needing_record(pid, bibrec_id):
     pid = wash_integer_id(pid)
     bibrec_id = wash_integer_id(bibrec_id)
     dbapi.add_person_paper_needs_manual_review(pid, bibrec_id)
+
 
 def delete_person_external_ids(person_id, existing_ext_ids, userinfo=''):
     '''
@@ -704,7 +745,15 @@ def delete_person_external_ids(person_id, existing_ext_ids, userinfo=''):
         dbapi.del_person_data(tag, person_id, ext_id)
         deleted_ids.append((person_id, tag, ext_id))
 
-    dbapi.insert_user_log(userinfo, person_id, 'data_deletion', 'CMPUI_deleteextid', '', 'External ids manually deleted: ' + str(deleted_ids), userid=uid)
+    dbapi.insert_user_log(
+        userinfo,
+        person_id,
+        'data_deletion',
+        'CMPUI_deleteextid',
+        '',
+        'External ids manually deleted: ' + str(deleted_ids),
+        userid=uid)
+
 
 def del_review_needing_record(pid, bibrec_id):
     '''
@@ -715,6 +764,7 @@ def del_review_needing_record(pid, bibrec_id):
     pid = wash_integer_id(pid)
     bibrec_id = wash_integer_id(bibrec_id)
     dbapi.del_person_papers_needs_manual_review(pid, bibrec_id)
+
 
 def insert_log(userinfo, personid, action, tag, value, comment='', transactionid=0):
     '''
@@ -767,7 +817,8 @@ def insert_log(userinfo, personid, action, tag, value, comment='', transactionid
         uid = ''
 
     return dbapi.insert_user_log(userinfo, personid, action, tag,
-                       value, comment, transactionid, userid=uid)
+                                 value, comment, transactionid, userid=uid)
+
 
 def move_internal_id(person_id_of_owner, person_id_of_receiver):
     '''
@@ -787,6 +838,7 @@ def move_internal_id(person_id_of_owner, person_id_of_receiver):
     dbapi.add_author_data(person_id_of_receiver, 'uid', internal_id)
     return True
 
+
 def move_external_ids(person_id_of_owner, person_id_of_receiver):
     '''
     Assign existing external ids to another profile
@@ -797,6 +849,7 @@ def move_external_ids(person_id_of_owner, person_id_of_receiver):
     @type pid: int
     '''
     pass
+
 
 def set_processed_external_recids(pid, recid_list):
     '''
@@ -811,6 +864,7 @@ def set_processed_external_recids(pid, recid_list):
         recid_list_str = ";".join(recid_list)
 
     dbapi.set_processed_external_recids(pid, recid_list_str)
+
 
 def swap_person_canonical_name(person_id, desired_cname, userinfo=''):
     '''
@@ -840,12 +894,28 @@ def swap_person_canonical_name(person_id, desired_cname, userinfo=''):
         create_log_personid_with_desired_cname = True
     # both person_id and personid_with_desired_cname own a canonical name
     else:
-        dbapi.modify_canonical_name_of_authors([(person_id, desired_cname), (personid_with_desired_cname, current_cname)])
+        dbapi.modify_canonical_name_of_authors(
+            [(person_id, desired_cname), (personid_with_desired_cname, current_cname)])
         create_log_personid_with_desired_cname = True
 
-    dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.', userid=uid)
+    dbapi.insert_user_log(
+        userinfo,
+        person_id,
+        'data_update',
+        'CMPUI_changecanonicalname',
+        '',
+        'Canonical name manually updated.',
+        userid=uid)
     if create_log_personid_with_desired_cname:
-        dbapi.insert_user_log(userinfo, personid_with_desired_cname, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.', userid=uid)
+        dbapi.insert_user_log(
+            userinfo,
+            personid_with_desired_cname,
+            'data_update',
+            'CMPUI_changecanonicalname',
+            '',
+            'Canonical name manually updated.',
+            userid=uid)
+
 
 def update_person_canonical_name(person_id, canonical_name, userinfo=''):
     '''
@@ -858,11 +928,19 @@ def update_person_canonical_name(person_id, canonical_name, userinfo=''):
     else:
         uid = ''
     dbapi.update_canonical_names_of_authors([person_id], overwrite=True, suggested=canonical_name)
-    dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.', userid=uid)
+    dbapi.insert_user_log(
+        userinfo,
+        person_id,
+        'data_update',
+        'CMPUI_changecanonicalname',
+        '',
+        'Canonical name manually updated.',
+        userid=uid)
 
-############################################
-#           NOT TAGGED YET                 #
-############################################
+#
+# NOT TAGGED YET                 #
+#
+
 
 def wash_integer_id(param_id):
     '''
@@ -882,6 +960,7 @@ def wash_integer_id(param_id):
         return (-1)
 
     return pid
+
 
 def is_valid_bibref(bibref):
     '''
@@ -949,6 +1028,7 @@ def is_valid_canonical_id(cid):
         return True
     else:
         return False
+
 
 def author_has_papers(pid):
     '''
@@ -1050,7 +1130,7 @@ def person_bibref_is_touched_old(pid, bibref):
 
     return dbapi.paper_affirmed_from_user_input(pid, bibref)
 
-#def is_logged_in_through_arxiv(req):
+# def is_logged_in_through_arxiv(req):
 #    '''
 #    Checks if the user is logged in through the arXiv.
 #
@@ -1058,16 +1138,16 @@ def person_bibref_is_touched_old(pid, bibref):
 #    @type req: Apache request object
 #    '''
 #    session = get_session(req)
-#    #THOMAS: ask samK about this variables: probably it would be better to rename them in the session as arxiv_sso_blabla
-#    #THOMAS: ask samK if this is correct, what other way there is to discover is we are SSOed through arxiv?
-#    #user_info = collect_user_info(req)
-#    #isGuestUser(req)
-#    # TO DO THIS SHOULD BE CHANGED
+# THOMAS: ask samK about this variables: probably it would be better to rename them in the session as arxiv_sso_blabla
+# THOMAS: ask samK if this is correct, what other way there is to discover is we are SSOed through arxiv?
+# user_info = collect_user_info(req)
+# isGuestUser(req)
+# TO DO THIS SHOULD BE CHANGED
 #    if 'user_info' in session.keys() and 'email' in session['user_info'].keys() and session['user_info']['email']:
 #        return True
 #    return False
 #
-#def is_logged_in_through_orcid(req):
+# def is_logged_in_through_orcid(req):
 #    '''
 #    Checks if the user is logged in through the orcid.
 #
@@ -1114,6 +1194,166 @@ def get_user_role(req):
 
     return role
 
+
+def display_name_from_hepnames(record):
+    display_name = (record_get_field_value(record, '880', '', '', 'a') or
+                    record_get_field_value(record, '100', '', '', 'q') or
+                    record_get_field_value(record, '100', '', '', 'a'))
+
+    return display_name
+
+
+def main_hepnames_email(record):
+    email = (record_get_field_values(record, '371', '', '', 'm',
+                                     filter_subfield_code='z',
+                                     filter_subfield_value='Current|current|CURRENT',
+                                     filter_subfield_mode='r') or
+             record_get_field_value(record, '371', '', '', 'm'))
+
+    return email
+
+
+def emails_from_hepnames(record):
+    return record_get_field_values(record, '371', '', '', 'm')
+
+
+def map_subfields(sub_fields, mapping):
+    output = {}
+    for code, value in sub_fields:
+        if code in mapping:
+            output[mapping[code]] = value
+
+    return output
+
+
+def institution_history(record):
+
+    def extract_institution(sub_fields):
+        mapping = {
+            'a': 'name',
+            'r': 'rank',
+            's': 'start',
+            't': 'end'
+        }
+        institution = map_subfields(sub_fields, mapping)
+        if 'start' not in institution:
+            institution['start'] = ''
+        if 'name' not in institution:
+            institution = None
+
+        return institution or None
+
+    if (not record_has_field(record, '371')):
+        return None
+
+    field_instances = record_get_field_instances(record, '371', '', '')
+    institutions = [extract_institution(x[0]) for x in field_instances if extract_institution(x[0]) is not None]
+
+    institutions.sort(key=lambda x: x['start'])
+
+    return institutions
+
+
+def hepnames_ids(record):
+
+    def extract_identifier(sub_fields):
+        mapping = {
+            '9': 'type',
+            'a': 'value'
+        }
+        return map_subfields(sub_fields, mapping) or None
+
+    field_instances = record_get_field_instances(record, '035', '', '')
+    ids = [extract_identifier(x[0]) for x in field_instances if extract_identifier(x[0]) is not None]
+
+    return ids
+
+
+def author_profile_from_hepnames(identifiers):
+    test = lambda item: item['type'] == "BAI"
+    bai = filter(test, identifiers)
+
+    try:
+        return bai.pop()['value']
+    except (IndexError, KeyError):
+        return None
+
+
+def identifier_permitted_for_display(identifier):
+    return identifier['type'].lower() in PROFILE_IDENTIFIER_WHITELIST
+
+
+def link_identifier(identifier):
+    id_type = identifier['type'].lower()
+    value = identifier['value']
+    if id_type in PROFILE_IDENTIFIER_URL_MAPPING:
+        return PROFILE_IDENTIFIER_URL_MAPPING[id_type].format(value)
+    else:
+        return None
+
+def identifier_context_for(identifier):
+    id_type = identifier['type'].lower()
+    try:
+        priority = PROFILE_IDENTIFIER_WHITELIST[id_type.lower()]
+    except KeyError:
+        priority = 0
+
+    id_context = {
+        "priority": priority,
+        "label": identifier['type'],
+        "type": id_type,
+        "value": identifier['value']
+    }
+    link = link_identifier(identifier)
+    if link:
+        id_context['link'] = link
+
+    return id_context
+
+
+def permitted_identifier_context_for(identifier):
+    if identifier_permitted_for_display(identifier):
+        return identifier_context_for(identifier)
+    else:
+        return None
+
+
+def context_for_identifiers(identifiers):
+    if any(PROFILE_IDENTIFIER_WHITELIST):
+        identifier_context = permitted_identifier_context_for
+    else:
+        identifier_context = identifier_context_for
+
+    identifiers_with_context = []
+    if identifiers:
+        for identifier in identifiers:
+            context = identifier_context(identifier)
+            if context:
+                identifiers_with_context.append(context)
+    return identifiers_with_context
+
+
+def hepnames_context(record):
+    '''
+    Generates template a context using a HepNames record.
+    '''
+    identifiers = hepnames_ids(record)
+    context = {
+        'record_id': record_get_field_value(record, '001', '', '', ''),
+        'display_name': display_name_from_hepnames(record),
+        'urls': record_get_field_values(record, '856', '4', '', 'u'),
+        'fields': record_get_field_values(record, '650', '1', '7', 'a'),
+        'experiments': record_get_field_values(record, '693', '', '', 'e'),
+        'identifiers': context_for_identifiers(identifiers),
+        'author_profile': author_profile_from_hepnames(identifiers),
+        'emails': emails_from_hepnames(record),
+        'institution_history': institution_history(record)
+
+    }
+
+    return context
+
+
 def get_hepnames(person_id, bibauthorid_data=None):
     '''
     Returns hepnames data.
@@ -1130,7 +1370,6 @@ def get_hepnames(person_id, bibauthorid_data=None):
 
         return bibauthorid_data
 
-
     if bibauthorid_data is None:
         bibauthorid_data = get_bibauthorid_data(person_id)
 
@@ -1138,6 +1377,7 @@ def get_hepnames(person_id, bibauthorid_data=None):
     hepRecord = perform_request_search(rg=0, cc='HepNames', p=' %s ' % searchid)[:CFG_WEBAUTHORPROFILE_MAX_HEP_CHOICES]
 
     hepnames_data = {}
+
     hepnames_data['cid'] = bibauthorid_data['cid']
     hepnames_data['pid'] = person_id
 
@@ -1147,20 +1387,20 @@ def get_hepnames(person_id, bibauthorid_data=None):
         query = ' or '.join(['author:"%s"' % str(n) for n in dbnames])
         additional_records = perform_request_search(rg=0, cc='HepNames', p=query)[:CFG_WEBAUTHORPROFILE_MAX_HEP_CHOICES]
         hepRecord += additional_records
-        hepnames_data['HaveHep'] = False
-        hepnames_data['HaveChoices'] = bool(hepRecord)
+        hepnames_data['have_hep'] = False
+        hepnames_data['choice'] = bool(hepRecord)
         # limit possible choiches!
-        hepnames_data['HepChoices'] = [(format_record(x, 'hb'), x) for x in hepRecord ]
-        hepnames_data['heprecord'] = hepRecord
+        hepnames_data['choice_list'] = [hepnames_context(get_record(x)) for x in hepRecord]
         hepnames_data['bd'] = bibauthorid_data
     else:
         # show the heprecord we just found.
-        hepnames_data['HaveHep'] = True
-        hepnames_data['HaveChoices'] = False
-        hepnames_data['heprecord'] = format_record(hepRecord[0], 'hd')
+        hepnames_data['have_hep'] = True
+        hepnames_data['choice'] = False
+        hepnames_data['record'] = hepnames_context(get_record(hepRecord[0]))
         hepnames_data['bd'] = bibauthorid_data
 
     return hepnames_data
+
 
 def _update_ulevel(req, pinfo):
     if 'ulevel' not in pinfo:
@@ -1172,49 +1412,61 @@ def _update_ulevel(req, pinfo):
 
         pinfo['ulevel'] = ulevel
 
+
 def _update_uid(req, pinfo):
     if 'uid' not in pinfo:
         pinfo['uid'] = int(getUid(req))
+
 
 def _update_pid(req, pinfo):
     if 'pid' not in pinfo:
         pinfo['pid'] = int(get_pid_from_uid(getUid(req)))
 
+
 def _initialize_should_check_to_autoclaim(pinfo):
     if 'should_check_to_autoclaim' not in pinfo:
         pinfo['should_check_to_autoclaim'] = False
+
 
 def _initialize_login_info_message(pinfo):
     if 'login_info_message' not in pinfo:
         pinfo["login_info_message"] = None
 
+
 def _initialize_merge_info_message(pinfo):
     if 'merge_info_message' not in pinfo:
         pinfo["merge_info_message"] = None
+
 
 def _initialize_claimpaper_admin_last_viewed_pid(pinfo):
     if "claimpaper_admin_last_viewed_pid" not in pinfo:
         pinfo["claimpaper_admin_last_viewed_pid"] = -2
 
+
 def _initialize_ln(pinfo):
     if 'ln' not in pinfo:
         pinfo["ln"] = 'en'
+
 
 def _initialize_merge_primary_profile(pinfo):
     if 'merge_primary_profile' not in pinfo:
         pinfo["merge_primary_profile"] = None
 
+
 def _initialize_merge_profiles(pinfo):
     if 'merge_profiles' not in pinfo:
         pinfo["merge_profiles"] = list()
+
 
 def _initialize_orcid(pinfo):
     if 'orcid' not in pinfo:
         pinfo['orcid'] = {'imported_pubs': list(), 'import_pubs': False, 'has_orcid_id': False}
 
+
 def _initialize_arxiv_status(pinfo):
     if 'arxiv_status' not in pinfo:
         pinfo['arxiv_status'] = False
+
 
 def _initialize_autoclaim(pinfo):
     if not 'autoclaim' in pinfo:
@@ -1223,41 +1475,51 @@ def _initialize_autoclaim(pinfo):
         pinfo['autoclaim']['external_pubs_association'] = dict()
         pinfo['autoclaim']['res'] = None
 
+
 def _initialize_marked_visit(pinfo):
     if 'marked_visit' not in pinfo:
         pinfo['marked_visit'] = None
+
 
 def _initialize_visit_diary(pinfo):
     if 'visit_diary' not in pinfo:
         pinfo['visit_diary'] = defaultdict(list)
 
+
 def _initialize_diary_size_per_category(pinfo):
     if 'diary_size_per_category' not in pinfo:
         pinfo['diary_size_per_category'] = 5
+
 
 def _initialize_most_compatible_person(pinfo):
     if 'most_compatible_person' not in pinfo:
         pinfo['most_compatible_person'] = None
 
+
 def _initialize_profile_suggestion_info(pinfo):
     if 'profile_suggestion_info' not in pinfo:
         pinfo["profile_suggestion_info"] = None
+
 
 def _initialize_ticket(pinfo):
     if 'ticket' not in pinfo:
         pinfo["ticket"] = list()
 
+
 def _initialize_users_open_tickets_storage(pinfo):
     if 'users_open_tickets_storage' not in pinfo:
         pinfo["users_open_tickets_storage"] = list()
+
 
 def _initialize_claim_in_process(pinfo):
     if 'claim_in_process' not in pinfo:
         pinfo['claim_in_process'] = False
 
+
 def _initialize_incomplete_autoclaimed_tickets_storage(pinfo):
     if 'incomplete_autoclaimed_tickets_storage' not in pinfo:
         pinfo["incomplete_autoclaimed_tickets_storage"] = list()
+
 
 def _initialize_remote_login_system(pinfo):
     if 'remote_login_system' not in pinfo:
@@ -1265,6 +1527,7 @@ def _initialize_remote_login_system(pinfo):
         for system in CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS:
             if system not in pinfo["remote_login_system"]:
                 pinfo['remote_login_system'][system] = {'name': None, 'email': None}
+
 
 def session_bareinit(req):
     '''
@@ -1306,6 +1569,8 @@ def session_bareinit(req):
     session.dirty = True
 
 # all teh get_info methods should standardize the content:
+
+
 def get_arxiv_info(req, uinfo):
     session_bareinit(req)
     session = get_session(req)
@@ -1322,7 +1587,7 @@ def get_arxiv_info(req, uinfo):
 
     if surname:
         session['personinfo']['remote_login_system']['arXiv']['name'] = nameapi.create_normalized_name(
-                                          nameapi.split_name_parts(surname + ', ' + name))
+            nameapi.split_name_parts(surname + ', ' + name))
     else:
         session['personinfo']['remote_login_system']['arXiv']['name'] = ''
 
@@ -1335,9 +1600,12 @@ def get_arxiv_info(req, uinfo):
     # {the dictionary we define in _webinterface}
 
 # all teh get_info methods should standardize the content:
+
+
 def get_orcid_info(req, uinfo):
     return dict()
     # {the dictionary we define in _webinterface}
+
 
 def get_remote_login_systems_info(req, remote_logged_in_systems):
     '''
@@ -1359,6 +1627,7 @@ def get_remote_login_systems_info(req, remote_logged_in_systems):
 
     return user_remote_logged_in_systems_info
 
+
 def get_ids_from_arxiv(req):
     '''
     Collects the external ids that the user has in arXiv.
@@ -1376,6 +1645,7 @@ def get_ids_from_arxiv(req):
         current_external_ids = uinfo['external_arxivids'].split(';')
 
     return current_external_ids
+
 
 def get_ids_from_orcid(req):
     '''
@@ -1398,8 +1668,10 @@ def get_ids_from_orcid(req):
 
     return dois
 
+
 def get_external_ids_type(external_id):
     pass
+
 
 def get_external_ids_to_recids_association(req, external_ids):
     '''
@@ -1427,8 +1699,14 @@ def get_external_ids_to_recids_association(req, external_ids):
             recid = cached_ids_association[(id_type, external_id)]
             recids_from_external_system.append(recid)
         else:
-            # recid_list = perform_request_search(p=bconfig.CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIERS['arXiv'] + str(arxivid), of='id', rg=0)
-            recid_list = perform_request_search(p=external_id, f=bconfig.CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIERS[id_type], m1='e', cc='HEP')
+            # recid_list =
+            # perform_request_search(p=bconfig.CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIERS['arXiv']
+            # + str(arxivid), of='id', rg=0)
+            recid_list = perform_request_search(
+                p=external_id,
+                f=bconfig.CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIERS[id_type],
+                m1='e',
+                cc='HEP')
             if len(recid_list) == 1:
                 recid = recid_list[0]
                 recids_from_external_system.append(recid)
@@ -1436,6 +1714,7 @@ def get_external_ids_to_recids_association(req, external_ids):
     pinfo['autoclaim']['external_pubs_association'] = cached_ids_association
     session.dirty = True
     return recids_from_external_system
+
 
 def get_remote_login_systems_recids(req, remote_logged_in_systems):
     '''
@@ -1461,8 +1740,9 @@ def get_remote_login_systems_recids(req, remote_logged_in_systems):
         remote_login_systems_recids += system_recids
 
     # mocking
-    #remote_login_systems_recids = [14, 18, 8, 11]
+    # remote_login_systems_recids = [14, 18, 8, 11]
     return list(set(remote_login_systems_recids))
+
 
 def get_cached_id_association(req):
     '''
@@ -1480,6 +1760,7 @@ def get_cached_id_association(req):
 
     return pinfo['autoclaim']['external_pubs_association']
 
+
 def get_user_pid(uid):
     '''
     find user's pid by his uid
@@ -1496,6 +1777,7 @@ def get_user_pid(uid):
         return -1
 
     return pid
+
 
 def merge_is_allowed(primary_pid, pids_to_merge, is_admin):
     '''
@@ -1535,7 +1817,7 @@ def merge_is_allowed(primary_pid, pids_to_merge, is_admin):
     return True, None
 
 
-#def open_ticket_for_papers_of_merged_profiles(req, primary_profile, profiles):
+# def open_ticket_for_papers_of_merged_profiles(req, primary_profile, profiles):
 #    '''
 #    instead of actually merging the papers it opens a ticket for them to be merged
 #    '''
@@ -1550,7 +1832,7 @@ def merge_is_allowed(primary_pid, pids_to_merge, is_admin):
 #
 #    recs_to_merge = []
 #    for recid in records.keys():
-#        # if more than one with the same recid we append only the recid and we let the user to solve tha problem in ticket_review
+# if more than one with the same recid we append only the recid and we let the user to solve tha problem in ticket_review
 #        if len(records[recid]) > 1:
 #            recs_to_merge.append(recid)
 #        else:
@@ -1586,10 +1868,11 @@ def get_papers_of_merged_profiles(primary_profile, profiles):
             # keep only the claimed one
             if not paper[0] in records:
                 records[paper[0]] = paper
-            elif records[paper[0]] and records[paper[0]][2] == 0 and paper[2] == 2 :
+            elif records[paper[0]] and records[paper[0]][2] == 0 and paper[2] == 2:
                 records[paper[0]] = paper
 
     return [records[recid] for recid in records.keys()]
+
 
 def get_uid_for_merged_profiles(persons_data):
     '''
@@ -1606,6 +1889,7 @@ def get_uid_for_merged_profiles(persons_data):
             if data[-1] == 'uid':
                 return data
     return None
+
 
 def get_data_union_for_merged_profiles(persons_data, new_profile_bibrecrefs):
     '''
@@ -1637,7 +1921,7 @@ def get_data_union_for_merged_profiles(persons_data, new_profile_bibrecrefs):
                 if rt_old_counter != data[1]:
                     rt_old_counter = data[1]
                     rt_new_counter += 1
-                data = (data[0],rt_new_counter,data[2],data[3],data[4])
+                data = (data[0], rt_new_counter, data[2], data[3], data[4])
             new_profile_data.append(data)
     return list(set(new_profile_data))
 
@@ -1679,7 +1963,6 @@ def merge_profiles(primary_pid, pids_to_merge):
                 pass
             dbapi.update_request_ticket_for_author(primary_pid, request_ticket)
 
-
     merge_papers()
     merge_data()
 
@@ -1713,6 +1996,7 @@ def auto_claim_papers(req, pid, recids):
     # add autoclaimed tickets to the session
     add_tickets(req, pid, missing_bibrecs, 'assign')
 
+
 def get_name_variants_list_from_remote_systems_names(remote_login_systems_info):
     '''
     return the names that a user has in the external systems
@@ -1733,6 +2017,7 @@ def get_name_variants_list_from_remote_systems_names(remote_login_systems_info):
             pass
 
     return list(set(name_variants))
+
 
 def match_profile(req, recids, remote_login_systems_info):
     '''
@@ -1756,13 +2041,14 @@ def match_profile(req, recids, remote_login_systems_info):
     pinfo = session['personinfo']
     most_compatible_person = pinfo['most_compatible_person']
 
-    if most_compatible_person != None:
+    if most_compatible_person is not None:
         return most_compatible_person
 
     name_variants = get_name_variants_list_from_remote_systems_names(remote_login_systems_info)
     most_compatible_person = dbapi.find_most_compatible_person(recids, name_variants)
     pinfo['most_compatible_person'] = most_compatible_person
     return most_compatible_person
+
 
 def get_profile_suggestion_info(req, pid, recids_in_arXiv):
     '''
@@ -1785,7 +2071,7 @@ def get_profile_suggestion_info(req, pid, recids_in_arXiv):
     pinfo = session['personinfo']
     profile_suggestion_info = pinfo['profile_suggestion_info']
 
-    if profile_suggestion_info != None and pid == profile_suggestion_info['pid']:
+    if profile_suggestion_info is not None and pid == profile_suggestion_info['pid']:
         return profile_suggestion_info
 
     profile_suggestion_info = dict()
@@ -1796,8 +2082,9 @@ def get_profile_suggestion_info(req, pid, recids_in_arXiv):
 
     profile_suggestion_info['num_of_arXiv_papers'] = len(recids_in_arXiv)
     # find the number of papers that are both in recids and probable person's papers
-    profile_suggestion_info['num_of_recids_intersection'] = len(set(recids_in_arXiv) & set([bibrecref[0] for bibrecref in get_papers_by_person_id(pid)]))
-    if name != None:
+    profile_suggestion_info['num_of_recids_intersection'] = len(
+        set(recids_in_arXiv) & set([bibrecref[0] for bibrecref in get_papers_by_person_id(pid)]))
+    if name is not None:
         profile_suggestion_info['name_string'] = name
 
     if len(profile_suggestion_info['canonical_id']) > 0:
@@ -1810,6 +2097,7 @@ def get_profile_suggestion_info(req, pid, recids_in_arXiv):
     profile_suggestion_info['pid'] = pid
     pinfo['profile_suggestion_info'] = profile_suggestion_info
     return profile_suggestion_info
+
 
 def claim_profile(uid, pid):
     '''
@@ -1825,6 +2113,7 @@ def claim_profile(uid, pid):
     @rtype: int, boolean
     '''
     return dbapi.assign_person_to_uid(uid, pid)
+
 
 def external_user_can_perform_action(uid):
     '''
@@ -1855,6 +2144,7 @@ def external_user_can_perform_action(uid):
 
     return full_key
 
+
 def is_external_user(uid):
     '''
     Check for SSO user and if external claims will affect the
@@ -1883,6 +2173,7 @@ def is_external_user(uid):
             break
 
     return full_key
+
 
 def check_transaction_permissions(uid, bibref, pid, action):
     '''
@@ -2034,7 +2325,7 @@ def create_request_ticket(userinfo, ticket):
         try:
             tic[(op['pid'], cname)].append((op['action'], bibrefrec))
         except KeyError:
-            tic[(op['pid'], cname)] = [(op['action'], bibrefrec),]
+            tic[(op['pid'], cname)] = [(op['action'], bibrefrec), ]
 
         preposition = 'to' if op['action'] == 'assign' else 'from'
         m("    %s %s %s %s" % (op['action'].title(), bibrefrec, preposition, cname))
@@ -2067,7 +2358,8 @@ def create_request_ticket(userinfo, ticket):
 
     return True
 
-def create_request_message(userinfo, subj = None):
+
+def create_request_message(userinfo, subj=None):
     '''
     Creates a request message
     @param userinfo: dictionary of info about user
@@ -2092,6 +2384,7 @@ def create_request_message(userinfo, subj = None):
                CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
                subject=subj,
                content="\n".join(mailcontent))
+
 
 def send_user_commit_notification_email(userinfo, ticket):
     '''
@@ -2148,7 +2441,7 @@ def _resolve_maximum_acces_rights(uid):
     '''
 
     roles = {bconfig.CLAIMPAPER_ADMIN_ROLE: acc_get_role_id(bconfig.CLAIMPAPER_ADMIN_ROLE),
-            bconfig.CLAIMPAPER_USER_ROLE: acc_get_role_id(bconfig.CLAIMPAPER_USER_ROLE)}
+             bconfig.CLAIMPAPER_USER_ROLE: acc_get_role_id(bconfig.CLAIMPAPER_USER_ROLE)}
     uroles = acc_get_user_roles(uid)
 
     max_role = ['guest', 0]
@@ -2259,6 +2552,7 @@ def sign_assertion(robotname, assertion):
 
     return robot.sign(secr, assertion)
 
+
 def get_orcids_by_pid(pid):
     orcids = dbapi.get_orcid_id_of_author(pid)
 
@@ -2272,6 +2566,7 @@ def add_orcid_to_pid(pid, orcid):
     dbapi.add_orcid_id_to_author(pid, orcid)
     webauthorapi.expire_all_cache_for_personid(pid)
 
+
 def get_person_info_by_pid(pid):
     '''
     Collect person's info such as name variants, name and canonical_id
@@ -2284,14 +2579,15 @@ def get_person_info_by_pid(pid):
     '''
     person_info = dict()
     person_info['pid'] = pid
-    name_variants = [x for (x,y) in get_person_db_names_from_id(pid)]
+    name_variants = [x for (x, y) in get_person_db_names_from_id(pid)]
     person_info['name'] = most_relevant_name(name_variants)
     person_info['canonical_name'] = get_canonical_id_from_person_id(pid)
     return person_info
 
-############################################
-#           Ticket Functions               #
-############################################
+#
+# Ticket Functions               #
+#
+
 
 def add_tickets(req, pid, bibrefs, action):
     '''
@@ -2332,7 +2628,8 @@ def add_tickets(req, pid, bibrefs, action):
             if e['bibref'] == t['bibref'] and e['pid'] == t['pid']:
                 ticket.remove(e)
                 break
-            # if we are comparing two different bibrefrecs with the same recids we remove the current bibrefrec and we add their recid
+            # if we are comparing two different bibrefrecs with the same recids we
+            # remove the current bibrefrec and we add their recid
             elif e['pid'] == t['pid'] and tempticket_is_valid_bibref and ticket_is_valid_bibref and t['bibref'].split(',')[1] == e['bibref'].split(',')[1]:
                 ticket.remove(e)
                 ticket.append({'pid': pid, 'bibref': t['bibref'].split(',')[1], 'action': action})
@@ -2349,7 +2646,7 @@ def add_tickets(req, pid, bibrefs, action):
             ticket.append(t)
     session.dirty = True
 
-#def manage_tickets(req, autoclaim_show_review, autoclaim):
+# def manage_tickets(req, autoclaim_show_review, autoclaim):
 #    '''
 #    managing the tickets. This involves reviewing them, try to guess the correct one if a ticket is incomplete,
 #    give them to the user for a review, handle the results of that review, check if the permissions to commit a ticket are granted, commit the ticket if possible
@@ -2369,16 +2666,16 @@ def add_tickets(req, pid, bibrefs, action):
 #    ticket = pinfo["ticket"]
 #
 #    page_info = dict()
-#    # check if there is user review that needs to be handled
+# check if there is user review that needs to be handled
 #    reviews_to_handle = is_ticket_review_handling_required(req)
 #
 #    if not reviews_to_handle:
-#        # check if the tickets need review
+# check if the tickets need review
 #        is_required, incomplete_tickets = is_ticket_review_required(req)
 #
 #        if is_required:
-#            # if review is required and we are not in the workflow that builds the autoassigned papers box of the manage profile page
-#            # then it returns to the user for review
+# if review is required and we are not in the workflow that builds the autoassigned papers box of the manage profile page
+# then it returns to the user for review
 #            if not autoclaim or autoclaim_show_review:
 #                bibrefs_auto_assigned, bibrefs_to_confirm = ticket_review(req, incomplete_tickets)
 #                page_info['type'] = 'Submit Attribution'
@@ -2386,8 +2683,8 @@ def add_tickets(req, pid, bibrefs, action):
 #                page_info['body_params'] = [bibrefs_auto_assigned, bibrefs_to_confirm]
 #                return page_info
 #            else:
-#                # tries to guess the incomplete tickets, move the still incomplete to their storage, and user can review them by clicking the button
-#                # of the autoassigned papers box in the manage profile page
+# tries to guess the incomplete tickets, move the still incomplete to their storage, and user can review them by clicking the button
+# of the autoassigned papers box in the manage profile page
 #                guess_signature(req, incomplete_tickets)
 #                failed_to_autoclaim_tickets = []
 #                for t in list(ticket):
@@ -2407,7 +2704,7 @@ def add_tickets(req, pid, bibrefs, action):
 #    uid = getUid(req)
 #
 #    for t in ticket:
-#        # TODO be carefull if an admin connects through arxiv
+# TODO be carefull if an admin connects through arxiv
 #        t['status'] = check_transaction_permissions(uid,
 #                                                       t['bibref'],
 #                                                       t['pid'],
@@ -2476,6 +2773,7 @@ def confirm_valid_ticket(req):
 
     return mark_yours, mark_not_yours, mark_theirs, mark_not_theirs
 
+
 def guess_signature(req, incomplete_tickets):
     '''
     Tries to guess a bibrecref based on a recid and names of the person. It writes the fix directly in the session
@@ -2504,7 +2802,8 @@ def guess_signature(req, incomplete_tickets):
             tickets.remove(incomplete_ticket)
         else:
             pid = incomplete_ticket['pid']
-            possible_signatures_per_rec = get_possible_bibrefs_from_pid_bibrec(pid, [recid], additional_names=arxiv_name)
+            possible_signatures_per_rec = get_possible_bibrefs_from_pid_bibrec(
+                pid, [recid], additional_names=arxiv_name)
 
             for [rec, possible_signatures] in possible_signatures_per_rec:
                 # if there is only one bibreceref candidate for the given recid
@@ -2512,10 +2811,11 @@ def guess_signature(req, incomplete_tickets):
                     # fix the incomplete ticket with the retrieved bibrecref
                     for ticket in list(tickets):
                         if incomplete_ticket['bibref'] == ticket['bibref'] and incomplete_ticket['pid'] == ticket['pid']:
-                            ticket['bibref'] = possible_signatures[0][0]+','+str(rec)
+                            ticket['bibref'] = possible_signatures[0][0] + ',' + str(rec)
                             ticket.pop('incomplete', True)
                             break
     session.dirty = True
+
 
 def ticket_review(req, needs_review):
     '''
@@ -2535,7 +2835,6 @@ def ticket_review(req, needs_review):
         arxiv_name = [pinfo['arxiv_name']]
     else:
         arxiv_name = None
-
 
     bibrefs_auto_assigned = {}
     bibrefs_to_confirm = {}
@@ -2616,6 +2915,7 @@ def ticket_review(req, needs_review):
     session.dirty = True
     return bibrefs_auto_assigned, bibrefs_to_confirm
 
+
 def add_user_data_to_ticket(req):
     session = get_session(req)
     uid = getUid(req)
@@ -2630,21 +2930,21 @@ def add_user_data_to_ticket(req):
     user_email_sys = False
 
     if ("external_firstname" in userinfo
-          and userinfo["external_firstname"]):
+       and userinfo["external_firstname"]):
         user_first_name = userinfo["external_firstname"]
         user_first_name_sys = True
     elif "user_first_name" in pinfo and pinfo["user_first_name"]:
         user_first_name = pinfo["user_first_name"]
 
     if ("external_familyname" in userinfo
-          and userinfo["external_familyname"]):
+       and userinfo["external_familyname"]):
         user_last_name = userinfo["external_familyname"]
         user_last_name_sys = True
     elif "user_last_name" in pinfo and pinfo["user_last_name"]:
         user_last_name = pinfo["user_last_name"]
 
     if ("email" in userinfo
-          and not userinfo["email"] == "guest"):
+       and not userinfo["email"] == "guest"):
         user_email = userinfo["email"]
         user_email_sys = True
     elif "user_email" in pinfo and pinfo["user_email"]:
@@ -2665,8 +2965,8 @@ def add_user_data_to_ticket(req):
 
         pinfo["upid"] = upid
 
-
     session.dirty = True
+
 
 def can_commit_ticket(req):
     '''
@@ -2701,7 +3001,7 @@ def can_commit_ticket(req):
         return True
     return False
 
-#def clean_ticket(req):
+# def clean_ticket(req):
 #    '''
 #    Removes from a ticket the transactions with an execution_result flag
 #    '''
@@ -2726,9 +3026,10 @@ def is_ticket_review_handling_required(req):
 
     # if check is needed
     if ("bibref_check_required" in pinfo and pinfo["bibref_check_required"]
-                                and "bibref_check_reviewed_bibrefs" in pinfo):
+       and "bibref_check_reviewed_bibrefs" in pinfo):
         return True
     return False
+
 
 def handle_ticket_review_results(req, autoclaim):
     '''
@@ -2779,7 +3080,8 @@ def handle_ticket_review_results(req, autoclaim):
                               if ('incomplete' in row)]:
             ticket.remove(ticket_remove)
 
-    # delete also all bibrefs_auto_assigned, bibrefs_to_confirm and bibref_check_reviewed_bibrefs since the have been handled
+    # delete also all bibrefs_auto_assigned, bibrefs_to_confirm and
+    # bibref_check_reviewed_bibrefs since the have been handled
     if ("bibrefs_auto_assigned" in pinfo):
         del(pinfo["bibrefs_auto_assigned"])
 
@@ -2790,6 +3092,7 @@ def handle_ticket_review_results(req, autoclaim):
     # now there is no check required
     pinfo["bibref_check_required"] = False
     session.dirty = True
+
 
 def is_ticket_review_required(req):
     '''
@@ -2815,6 +3118,7 @@ def is_ticket_review_required(req):
         return (False, [])
     return (True, needs_review)
 
+
 def restore_users_open_tickets(req):
     '''
     restores any users open ticket, that is in storage , in session as autoclaiming has finished
@@ -2830,6 +3134,7 @@ def restore_users_open_tickets(req):
         ticket.append(t)
         temp_storage.remove(t)
     temp_storage = []
+
 
 def store_users_open_tickets(req):
     '''
@@ -2860,6 +3165,7 @@ def store_incomplete_autoclaim_tickets(req, failed_to_autoclaim_tickets):
         if incomplete_ticket not in temp_storage:
             temp_storage.append(incomplete_ticket)
 
+
 def restore_incomplete_autoclaim_tickets(req):
     '''
     restores any users open ticket, that is in storage , in session as autoclaiming has finished
@@ -2875,6 +3181,7 @@ def restore_incomplete_autoclaim_tickets(req):
         ticket.append(t)
         temp_storage.remove(t)
 
+
 def get_stored_incomplete_autoclaim_tickets(req):
     '''
     gets the records that its claim to the user profile was unsuccesfull
@@ -2885,6 +3192,7 @@ def get_stored_incomplete_autoclaim_tickets(req):
     session = get_session(req)
     temp_storage = session['personinfo']['incomplete_autoclaimed_tickets_storage']
     return temp_storage
+
 
 def add_cname_to_hepname_record(cname, recid, uid=None):
     """
@@ -2897,13 +3205,14 @@ def add_cname_to_hepname_record(cname, recid, uid=None):
                      ind1=CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4],
                      ind2=CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5],
                      subfields=[
-                        (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6], str(cname)),
-                        (CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6], 'BAI')])
+                     (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6], str(cname)),
+                     (CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6], 'BAI')])
     tmp_file_fd, tmp_file_name = retry_mkstemp(suffix='.xml', prefix="bibauthorid-%s" % recid)
     tmp_file = os.fdopen(tmp_file_fd, "w")
     tmp_file.write(record_xml_output(rec))
     tmp_file.close()
     task_low_level_submission('bibupload', get_nickname(uid) or "", "-a", tmp_file_name, "-P5", "-N", "bibauthorid")
+
 
 def connect_author_with_hepname(cname, hepname):
     subject = "HepNames record match: %s %s" % (cname, hepname)
@@ -2913,6 +3222,7 @@ def connect_author_with_hepname(cname, hepname):
                CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL,
                subject=subject,
                content=content)
+
 
 def connect_author_with_orcid(cname, orcid):
     subject = "ORCiD record match: %s %s" % (cname, orcid)
@@ -2924,9 +3234,9 @@ def connect_author_with_orcid(cname, orcid):
                content=content)
 
 
-############################################
-#      Exposed Ticket Functions            #
-############################################
+#
+# Exposed Ticket Functions            #
+#
 
 def construct_operation(operation_parts, pinfo, uid, should_have_bibref=False):
     pid = operation_parts['pid']
@@ -2961,7 +3271,7 @@ def construct_operation(operation_parts, pinfo, uid, should_have_bibref=False):
                  'bibref': bibref,
                  'has_bibref': bibref is not None,
                  'bibrefs': bibrefs,
-                 'has_all_metadata': False }
+                 'has_all_metadata': False}
 
     return operation
 
@@ -3071,9 +3381,10 @@ def clean_ticket(ticket):
         if 'execution_result' in op:
             ticket.remove(op)
 
-############################################
-#      Not Exposed Ticket Functions        #
-############################################
+#
+# Not Exposed Ticket Functions        #
+#
+
 
 def split_bibrefrec(bibrefrec):
     if is_valid_bibref(bibrefrec):
@@ -3153,13 +3464,18 @@ def _commit_ticket(ticket, userinfo, uid, ulevel):
         for op in ticket:
             op['execution_result'] = {'success': True, 'operation': 'ticketized'}
 
-
     def commit_ticket_user(ticket, userinfo, uid, modified_pids):
         ok_ops = list()
         for op in list(ticket):
             if op['status'] == 'granted':
                 bibrefrec = op['bibref'] + ',' + str(op['rec'])
-                op['execution_result'] = _execute_operation(op['action'], op['pid'], bibrefrec, uid, userinfo['uid-ip'], str(userinfo))
+                op['execution_result'] = _execute_operation(
+                    op['action'],
+                    op['pid'],
+                    bibrefrec,
+                    uid,
+                    userinfo['uid-ip'],
+                    str(userinfo))
                 # This is the only point which modifies a person,
                 # so this can trigger the deletion of a cached page.
                 modified_pids.add(op['pid'])
@@ -3177,15 +3493,19 @@ def _commit_ticket(ticket, userinfo, uid, ulevel):
 
         ticket += ok_ops
 
-
     def commit_ticket_admin(ticket, userinfo, uid, modified_pids):
         for op in ticket:
             bibrefrec = op['bibref'] + ',' + str(op['rec'])
-            op['execution_result'] = _execute_operation(op['action'], op['pid'], bibrefrec, uid, userinfo['uid-ip'], str(userinfo))
+            op['execution_result'] = _execute_operation(
+                op['action'],
+                op['pid'],
+                bibrefrec,
+                uid,
+                userinfo['uid-ip'],
+                str(userinfo))
             # This is the only point which modifies a person,
             # so this can trigger the deletion of a cached page.
             modified_pids.add(op['pid'])
-
 
     commit = {'guest': commit_ticket_guest,
               'user': commit_ticket_user,
@@ -3218,9 +3538,10 @@ def _execute_operation(action, pid, bibrefrec, uid, userinfo='', comment=''):
 
     return res
 
-############################################
-#  Exposed Autoclaim-relevant Functions    #
-############################################
+#
+# Exposed Autoclaim-relevant Functions    #
+#
+
 
 def get_login_info(uid, params):
     login_info = {'logged_in_to_remote_systems': list(),
@@ -3244,13 +3565,14 @@ def get_papers_from_remote_systems(remote_systems, params, external_pubs_associa
 
     return papers_from_remote_systems
 
-################################################
-#  Not Exposed Autoclaim-relevant Functions    #
-################################################
+#
+# Not Exposed Autoclaim-relevant Functions    #
+#
+
 
 def _is_logged_in_through_arxiv(user_info):
-    #TODO: ask Kaplun more accurate way to discover if we are SSOed through arxiv
-    #WARNING: this assumes that any user logged in and which have an email was logged in through arXiv
+    # TODO: ask Kaplun more accurate way to discover if we are SSOed through arxiv
+    # WARNING: this assumes that any user logged in and which have an email was logged in through arXiv
     if user_info and 'email' in user_info and user_info['email']:
         return True
 
@@ -3290,7 +3612,11 @@ def _get_current_system_related_papers(pubs, external_pubs_association):
             recid = external_pubs_association[(id_type, pub)]
             papers.add(recid)
         except KeyError:
-            recids = perform_request_search(p=pub, f=bconfig.CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIERS[id_type], m1='e', cc='HEP')
+            recids = perform_request_search(
+                p=pub,
+                f=bconfig.CFG_BIBAUTHORID_REMOTE_LOGIN_SYSTEMS_IDENTIFIERS[id_type],
+                m1='e',
+                cc='HEP')
             if len(recids) == 1:
                 recid = recids[0]
                 papers.add(recid)
@@ -3302,9 +3628,10 @@ def _get_current_system_related_papers(pubs, external_pubs_association):
 IS_LOGGED_IN_THROUGH = {'arXiv': _is_logged_in_through_arxiv, 'orcid': _is_logged_in_through_orcid}
 GET_PUBS_FROM_REMOTE_SYSTEM = {'arXiv': _get_pubs_from_arxiv, 'orcid': _get_pubs_from_orcid}
 
-############################################
-#         Visit diary Functions            #
-############################################
+#
+# Visit diary Functions            #
+#
+
 
 def history_log_visit(req, page, pid=None, params=None):
     """
@@ -3317,11 +3644,12 @@ def history_log_visit(req, page, pid=None, params=None):
     pinfo = session['personinfo']
     my_diary = pinfo['visit_diary']
 
-    my_diary[page].append({'page':page, 'pid':pid, 'params':params, 'timestamp':time()})
+    my_diary[page].append({'page': page, 'pid': pid, 'params': params, 'timestamp': time()})
 
-    if len(my_diary[page]) >  pinfo['diary_size_per_category']:
+    if len(my_diary[page]) > pinfo['diary_size_per_category']:
         my_diary[page].pop(0)
     session.dirty = True
+
 
 def _get_sorted_history(visit_diary, limit_to_page=None):
     history = list()
@@ -3337,6 +3665,7 @@ def _get_sorted_history(visit_diary, limit_to_page=None):
     history = sorted(history, key=lambda x: x['timestamp'], reverse=True)
 
     return history
+
 
 def history_get_last_visited_url(visit_diary, limit_to_page=None, just_page=False):
     '''
@@ -3361,14 +3690,15 @@ def history_get_last_visited_url(visit_diary, limit_to_page=None, just_page=Fals
     if just_page:
         return history['page']
 
-    link = [CFG_SITE_URL+'/author/', history['page']]
+    link = [CFG_SITE_URL + '/author/', history['page']]
 
     if history['pid']:
-        link.append('/'+str(get_canonical_id_from_person_id(history['pid'])))
+        link.append('/' + str(get_canonical_id_from_person_id(history['pid'])))
     if history['params']:
         link.append(history['params'])
 
     return ''.join(link)
+
 
 def history_get_last_visited_pid(visit_diary, limit_to_page=None):
     history = _get_sorted_history(visit_diary, limit_to_page)
@@ -3376,7 +3706,8 @@ def history_get_last_visited_pid(visit_diary, limit_to_page=None):
         if visit['pid']:
             return visit['pid']
 
-def set_marked_visit_link(req, page, pid = None, params = None):
+
+def set_marked_visit_link(req, page, pid=None, params=None):
     '''
     store a marked redirect link for redirect purpose.
 
@@ -3398,15 +3729,16 @@ def set_marked_visit_link(req, page, pid = None, params = None):
     if not page:
         pinfo['marked_visit'] = None
     else:
-        link = [CFG_SITE_URL+'/author/', page]
+        link = [CFG_SITE_URL + '/author/', page]
 
         if pid:
-            link.append('/'+str(get_canonical_id_from_person_id(pid)))
+            link.append('/' + str(get_canonical_id_from_person_id(pid)))
         if params:
             link.append(params)
 
         pinfo['marked_visit'] = ''.join(link)
     session.dirty = True
+
 
 def get_marked_visit_link(req):
     '''
@@ -3425,6 +3757,7 @@ def get_marked_visit_link(req):
 
     return pinfo['marked_visit']
 
+
 def reset_marked_visit_link(req):
     '''
     empty the marked redirect link.
@@ -3433,6 +3766,7 @@ def reset_marked_visit_link(req):
     @type req: Apache request object
     '''
     set_marked_visit_link(req, None)
+
 
 def get_fallback_redirect_link(req):
     '''
@@ -3453,4 +3787,4 @@ def get_fallback_redirect_link(req):
     return '%s/author/manage_profile/%s' % (CFG_SITE_URL, get_canonical_id_from_person_id(pid))
 
 REMOTE_LOGIN_SYSTEMS_FUNCTIONS = {'arXiv': get_arxiv_info, 'orcid': get_orcid_info}
-REMOTE_LOGIN_SYSTEMS_GET_RECIDS_FUNCTIONS = {'arXiv': get_ids_from_arxiv, 'orcid': get_ids_from_orcid }
+REMOTE_LOGIN_SYSTEMS_GET_RECIDS_FUNCTIONS = {'arXiv': get_ids_from_arxiv, 'orcid': get_ids_from_orcid}

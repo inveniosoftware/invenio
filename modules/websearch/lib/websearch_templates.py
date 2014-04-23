@@ -96,6 +96,45 @@ from invenio import hepdatadisplayutils
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
 
+
+def tmpl_citesummary_get_link(search_pattern_for_coll, searchfield, colldef):
+    link_url = CFG_BASE_URL + '/search?p='
+    if search_pattern_for_coll:
+        p = search_pattern_for_coll
+        if searchfield:
+            if " " in p:
+                p = searchfield + ':"' + p + '"'
+            else:
+                p = searchfield + ':' + p
+        link_url += quote(p)
+    if colldef:
+        link_url += '%20AND%20' + quote(colldef)
+
+    return link_url
+
+def tmpl_citesummary_get_link_for_rep_breakdown(search_pattern_for_coll, searchfield, colldef, keyword, low, high):
+    link_url = CFG_BASE_URL + '/search?p='
+    if search_pattern_for_coll:
+        p = search_pattern_for_coll
+        if searchfield:
+            if " " in p:
+                p = searchfield + ':"' + p + '"'
+            else:
+                p = searchfield + ':' + p
+            link_url += quote(p) + '%20AND%20'
+        if colldef:
+            link_url += quote(colldef) + '%20AND%20'
+        if low == 0 and high == 0:
+            link_url += quote('%s:0' % keyword)
+        else:
+            link_url += quote('%s:%i->%i' % (keyword, low, high))
+    return link_url
+
+
+
+
+
+
 class Template:
 
     # This dictionary maps Invenio language code to locale codes (ISO 639)
@@ -4711,22 +4750,13 @@ class Template:
         out += """<tr><td><strong>%(msg_recs)s</strong></td>""" % \
                {'msg_recs': _("Total number of papers analyzed:"), }
         for coll, colldef in collections:
-            link_url = CFG_BASE_URL + '/search?p='
-            if search_patterns[coll]:
-                p = search_patterns[coll]
-                if searchfield:
-                    if " " in p:
-                        p = searchfield + ':"' + p + '"'
-                    else:
-                        p = searchfield + ':' + p
-                link_url += quote(p)
-            if colldef:
-                link_url += '%20AND%20' + quote(colldef)
+            link_url = tmpl_citesummary_get_link(search_patterns[coll], searchfield, colldef)
             link_text = self.tmpl_nice_number(len(coll_recids[coll]), ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url,
                                                                    link_text)
         out += '</tr>'
         return out
+
 
     def tmpl_citesummary_overview(self, collections, d_total_cites,
                                   d_avg_cites, ln=CFG_SITE_LANG):
@@ -4799,21 +4829,8 @@ class Template:
                 keyword = 'citedexcludingselfcites'
             else:
                 keyword = 'cited'
-            link_url = CFG_BASE_URL + '/search?p='
-            if searchpatterns.get(coll, None):
-                p = searchpatterns.get(coll, None)
-                if searchfield:
-                    if " " in p:
-                        p = searchfield + ':"' + p + '"'
-                    else:
-                        p = searchfield + ':' + p
-                link_url += quote(p) + '%20AND%20'
-            if colldef:
-                link_url += quote(colldef) + '%20AND%20'
-            if low == 0 and high == 0:
-                link_url += quote('%s:0' % keyword)
-            else:
-                link_url += quote('%s:%i->%i' % (keyword, low, high))
+
+            link_url = tmpl_citesummary_get_link_for_rep_breakdown(searchpatterns.get(coll, None), searchfield, colldef, keyword, low, high)
             link_text = self.tmpl_nice_number(d_cites[coll], ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url,
                                                                    link_text)

@@ -4629,6 +4629,7 @@ CREATE TABLE IF NOT EXISTS `aidPERSONIDPAPERS` (
   `bibref_value` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
   `bibrec` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
   `name` VARCHAR( 256 ) NOT NULL ,
+  `m_name` VARCHAR( 256 ) NOT NULL,
   `flag` SMALLINT( 2 ) NOT NULL DEFAULT  '0' ,
   `lcul` SMALLINT( 2 ) NOT NULL DEFAULT  '0' ,
   `last_updated` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
@@ -4637,6 +4638,7 @@ CREATE TABLE IF NOT EXISTS `aidPERSONIDPAPERS` (
   INDEX `refvalue-b` (`bibref_value`) ,
   INDEX `rec-b` (`bibrec`) ,
   INDEX `name-b` (`name`) ,
+  INDEX `m_name-b` (`m_name`) ,
   INDEX `pn-b` (`personid`, `name`) ,
   INDEX `timestamp-b` (`last_updated`) ,
   INDEX `flag-b` (`flag`) ,
@@ -4708,17 +4710,20 @@ CREATE TABLE IF NOT EXISTS `aidCACHE` (
 -- tables for search engine
 
 CREATE TABLE IF NOT EXISTS `aidDENSEINDEX` (
- `name_id` INT( 10 ) NOT NULL,
- `person_name` VARCHAR( 256 ) NOT NULL,
- `personids` LONGBLOB NOT NULL,
- PRIMARY KEY (`name_id`)
+  `id` BIGINT( 16 ) NULL DEFAULT NULL,
+  `indexable_string` VARCHAR( 256 ) NULL DEFAULT NULL,
+  `personids` LONGBLOB NULL DEFAULT NULL,
+  `flag` SMALLINT( 2 ) NOT NULL,
+  `indexable_surname` VARCHAR( 256 ) NULL DEFAULT NULL,
+  PRIMARY KEY  (`id`, `flag`),
+  INDEX `nameid-b` (`id`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `aidINVERTEDLISTS` (
- `qgram` VARCHAR( 4 ) NOT NULL,
- `inverted_list` LONGBLOB NOT NULL,
- `list_cardinality` INT( 10 ) NOT NULL,
- PRIMARY KEY (`qgram`)
+  `qgram` VARCHAR( 4 ) NOT NULL,
+  `inverted_list` LONGBLOB NOT NULL,
+  `list_cardinality` INT( 10 ) NOT NULL,
+  PRIMARY KEY (`qgram`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `aidAFFILIATIONS` (
@@ -4991,6 +4996,7 @@ CREATE TABLE IF NOT EXISTS upgrade (
 -- maint-1.1 upgrade recipes:
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_1_0',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_tablesorter_location',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_WebAuthorProfile_bibformat_dependency_update',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_01_lower_user_email',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_21_aiduserinputlog_userid_check',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_hstRECORD_marcxml_longblob',NOW());
@@ -5011,6 +5017,9 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_01_oaiREPOSITORY
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_07_crcILLREQUEST_overdue_letter',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_12_bibrec_master_format',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_06_11_rnkDOWNLOADS_file_format',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_aidPERSONIDDATA_last_updated',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_bibauthorid_search_engine_tables',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_wapCACHE_object_value_longblob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_20_idxINDEX_synonym_kb',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_21_idxINDEX_stopwords',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_25_idxINDEX_html_markup',NOW());
@@ -5034,20 +5043,17 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_06_24_new_bibsched_
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_02_new_bibARXIVPDF',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_05_oaiHARVEST_arguments_blob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_13_new_bibEDITCACHE',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_16_aidPERSONIDDATA_datablob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_26_webauthorlist',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_11_bibHOLDINGPEN_longblob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_06_20_new_bibcheck_rules_table',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_WebAuthorProfile_bibformat_dependency_update',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_aidPERSONIDDATA_last_updated',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_bibauthorid_search_engine_tables',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_wapCACHE_object_value_longblob',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_16_aidPERSONIDDATA_datablob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_04_seqSTORE_larger_value',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_redis_sessions',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_24_seqSTORE_larger_value',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_queue_table_virtual_index',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_05_new_index_doi',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_03_13_new_index_filename',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_11_28_bibauthorid_search_engine_column_changes',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_01_new_aidAFFILIATIONS',NOW());
-
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_23_bibauthorid_rabbit_matchable_name_column', NOW());
 -- end of file

@@ -1,0 +1,69 @@
+<p>{{ papers_num|groupformat }} papers found, {{ citeable.num|groupformat }} of them citeable (published or arXiv)</p>
+<table class="table table-hover table-condensed">
+    <thead>
+        <tr>
+            <td></td>
+            <th>Citeable papers</th>
+            <th>Published only</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <th>Number of papers analyzed:</th>
+	    <td><a href="{{ citeable_papers_link }}">{{ citeable.num|groupformat }}</a></td>
+	    <td><a href="{{ published_only_papers_link }}">{{ published.num|groupformat }}</a></td>
+        </tr>
+
+        <tr>
+            <th>Number of citations:</th>
+            <td>{{ citeable.citations_num|groupformat }}</td>
+            <td>{{ published.citations_num|groupformat }}</td>
+        </tr>
+
+        <tr>
+            <th>Citations per paper (average):</th>
+            <td>{{ citeable.avg_cites|groupformat }}</td>
+            <td>{{ published.avg_cites|groupformat }}</td>
+        </tr>
+
+        <tr>
+            <th>h<sub>HEP</sub> index <a href="{{ hindex_fine_print_link }}">[?]</a></th>
+            <td>{{ citeable.h_index|groupformat }}</td>
+            <td>{{ published.h_index|groupformat }}</td>
+        </tr>
+
+    </tbody>
+
+</table>
+<span>Breakdown of papers by citations:</span>
+<table class="table table-hover table-condensed">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Citeable papers</th>
+            <th>Published only</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for key in breakdown_categories %}
+        <tr>
+            <td>{{ key }}</td>
+            {% if citeable.breakdown[key] == 0 %}
+        <td>{{ citeable.breakdown[key]|groupformat }}</td> 
+            {% else %}  
+	    <td><a href=" {{ citeable.breakdown_queries[key]  }} "> {{ citeable.breakdown[key]|groupformat }}</a></td>
+            {% endif %}
+
+            {% if published.breakdown[key] == 0 %}
+        <td>{{ published.breakdown[key]|groupformat }}</td>
+            {% else %}     
+	    <td><a href=" {{ published.breakdown_queries[key] }}"> {{ published.breakdown[key]|groupformat }}</a></td>
+            {% endif %}
+        </tr>{% endfor %}
+    </tbody>
+
+</table>
+<p class="text-center"><a href="{{ selfcite_link }}">Click here to view statistics without self-citations or RPP</a></p>
+<p><strong>Warning</strong>: The citations count should be interpreted with great care. <a href="{{ citation_fine_print_link }}">Read the fine print</a></p>
