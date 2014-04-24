@@ -63,8 +63,8 @@ Sphinx
 alembic==0.6.2
 git+https://github.com/lnielsen-cern/setuptools-bower.git#egg=setuptools-bower-0.1
 pytz
-#PyLD>=0.4.11
-git+https://github.com/adrianp/pyld.git@python2.6#egg=PyLD-0.4.11-dev
+#PyLD=0.5.0 + python 2.6 patches
+git+https://github.com/inveniosoftware/pyld.git@python2.6#egg=PyLD-26.0.5.0-dev
 SQLAlchemy-Utils==0.23.1
 wtforms-alchemy==0.12.1
 mock==1.0.1
