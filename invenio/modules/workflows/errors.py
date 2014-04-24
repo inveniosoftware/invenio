@@ -29,25 +29,25 @@ from workflow.engine import HaltProcessing
 class WorkflowHalt(HaltProcessing):
     """
     Raised when workflow should be halted.
-    Also contains the widget to be displayed.
+    Also contains the action to be displayed.
     """
 
-    def __init__(self, message, widget=None, **kwargs):
+    def __init__(self, message, action=None, **kwargs):
         HaltProcessing.__init__(self)
         self.message = message
-        self.widget = widget
+        self.action = action
         self.payload = kwargs
 
     def to_dict(self):
         rv = dict(self.payload or ())
         rv['message'] = self.message
-        rv['widget'] = self.widget
+        rv['action'] = self.action
         return rv
 
     def __str__(self):
         """String representation."""
-        return "WorkflowHalt(%s, widget: %s, payload: %r)" % \
-               (repr(self.message), repr(self.widget), repr(self.payload))
+        return "WorkflowHalt(%s, action: %s, payload: %r)" % \
+               (repr(self.message), repr(self.action), repr(self.payload))
 
 
 class WorkflowError(Exception):

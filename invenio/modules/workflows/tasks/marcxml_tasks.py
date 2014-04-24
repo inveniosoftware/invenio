@@ -65,22 +65,22 @@ add_metadata_to_extra_data.__title__ = "Metadata Extraction"
 
 def approve_record(obj, eng):
     """
-    Will add the approval widget to the record.
+    Will add the approval action to the record.
     The workflow need to be halted to use the
-    widget in the holdingpen.
+    action in the holdingpen.
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
     try:
-        eng.halt(widget="approval_widget",
+        eng.halt(action="approval",
                  msg='Record needs approval')
     except KeyError:
         # Log the error
-        obj.extra_data["_error_msg"] = 'Could not assign widget'
+        obj.extra_data["_error_msg"] = 'Could not assign action'
 
 
 approve_record.__title__ = "Record Approval"
-approve_record.__description__ = "This task assigns the approval widget to a record."
+approve_record.__description__ = "This task assigns the approval action to a record."
 
 
 def filtering_oai_pmh_identifier(obj, eng):
@@ -110,14 +110,14 @@ def filtering_oai_pmh_identifier(obj, eng):
 
 
 def inspire_filter_custom(fields, custom_accepted=(), custom_refused=(),
-                          custom_widgeted=(), widget=None):
+                          custom_widgeted=(), action=None):
     """
 
     :param fields:
     :param custom_accepted:
     :param custom_refused:
     :param custom_widgeted:
-    :param widget:
+    :param action:
     :return:
     """
 
@@ -147,8 +147,14 @@ def inspire_filter_custom(fields, custom_accepted=(), custom_refused=(),
                             eng.log.error("no " + field + " in " + one_custom)
                 custom_to_process_current = custom_to_process_next[:]
         if not custom_to_process_next:
-            eng.log.error("%s not found in the record. Human intervention needed", fields_to_process)
-            eng.halt(str(fields_to_process) + " not found in the record. Human intervention needed", widget=widget)
+            eng.log.error(
+                "%s not found in the record. Human intervention needed",
+                fields_to_process
+            )
+            eng.halt(
+                str(fields_to_process) + " not found in the record. Human intervention needed",
+                action=action
+            )
 
         for i in custom_widgeted:
             if i != '*':
@@ -185,18 +191,18 @@ def inspire_filter_custom(fields, custom_accepted=(), custom_refused=(),
                 # We don't know what we should do, in doubt query human... they are nice!
                 msg = ("Category out of task definition. "
                        "Human intervention needed")
-                eng.halt(msg, widget=widget)
+                eng.halt(msg, action=action)
         else:
             if sum_action == action_to_take[0]:
                 eng.halt("Category filtering needs human intervention",
-                         widget=widget)
+                         action=action)
             elif sum_action == action_to_take[1]:
                 return None
             elif sum_action == action_to_take[2]:
                 eng.stopProcessing()
             else:
                 eng.halt("Category filtering needs human intervention, rules are incoherent !!!",
-                         widget=widget)
+                         action=action)
 
     return _inspire_filter_custom
 
@@ -226,9 +232,9 @@ def inspire_filter_category(category_accepted_param=(), category_refused_param=(
         except KeyError:
             category_widgeted = category_widgeted_param
         try:
-            widget = obj.extra_data["_repository"]["arguments"]["filtering"]['widget']
+            action = obj.extra_data["_repository"]["arguments"]["filtering"]['widget']
         except KeyError:
-            widget = widget_param
+            action = widget_param
 
         category_to_process = []
         action_to_take = [0, 0, 0]
@@ -243,7 +249,7 @@ def inspire_filter_category(category_accepted_param=(), category_refused_param=(
         except KeyError:
             msg = "Category not found in the record. Human intervention needed"
             eng.log.error(msg)
-            eng.halt(msg, widget=widget)
+            eng.halt(msg, action=action)
 
         for i in category_widgeted:
             if i != '*':
@@ -278,18 +284,18 @@ def inspire_filter_category(category_accepted_param=(), category_refused_param=(
                 # We don't know what we should do, in doubt query human... they are nice!
                 msg = ("Category out of task definition. "
                        "Human intervention needed")
-                eng.halt(msg, widget=widget)
+                eng.halt(msg, action=action)
         else:
             if sum_action == action_to_take[0]:
                 eng.halt("Category filtering needs human intervention",
-                         widget=widget)
+                         action=action)
             elif sum_action == action_to_take[1]:
                 return None
             elif sum_action == action_to_take[2]:
                 eng.stopProcessing()
             else:
                 eng.halt("Category filtering needs human intervention, rules are incoherent !!!",
-                         widget=widget)
+                         action=action)
 
     return _inspire_filter_category
 

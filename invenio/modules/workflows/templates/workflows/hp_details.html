@@ -1,3 +1,22 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
 {% extends "workflows/hp_detailed_base.html" %}
 {% import 'workflows/utils.html' as utils %}
 
@@ -12,7 +31,7 @@
 
 {% block javascript %}
     {{ super() }}
-    
+
     <script type="text/javascript">
         $(document).ready(function(){
             var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
@@ -21,35 +40,35 @@
                 success: function(data) {
                     WORKFLOWS_HP_DETAILS.init(data, {{ bwobject.id }});
                 }
-            })            
+            })
         });
     </script>
 {% endblock javascript %}
 
 {% block hpbody %}
-    
+
     {% block navbar_right %}
         <ul class="nav navbar-nav pull-right">
             <li>
-                {% if bwobject.get_extra_data()['widget'] %}
-                <a href="{{ url_for('holdingpen.show_widget', objectid=bwobject.id) }}" ><i class="icon-wrenchwhite icon-wrench"></i>Action needed</a>
+                {% if bwobject.get_action() %}
+                <a href="{{ url_for('holdingpen.show_action', objectid=bwobject.id) }}" ><i class="icon-wrenchwhite icon-wrench"></i>Action needed</a>
                 {% else %}
-                
+
                 {% endif %}
             </li>
         </ul>
     {% endblock navbar_right %}
-    
+
     {% block hp_navbar %}
         {{ super() }}
     {% endblock hp_navbar %}
 
     <div class="container" style="padding-left:0px;">
         <div class="row">
-            <div class="col-md-3"> 
+            <div class="col-md-3">
                 <div class="well">
                     <form id="edit_form" class="form-horizontal" role="form" method="POST" name="">
-                        {% for field in edit_record_widget %}
+                        {% for field in edit_record_action %}
                             {{ utils.render_field(field) }}
                         {% endfor %}
                     </form>
@@ -62,9 +81,9 @@
             </div>
 
             <div class="col-md-9">
-               
-                {% if 'message' in bwobject.get_extra_data() and 
-                    bwobject.get_extra_data()['widget'] != None %}
+
+                {% if 'message' in bwobject.get_extra_data() and
+                    bwobject.get_action() != None %}
                     <div id="usermessage" class="alert alert-warning alert-dismissable">
                         {{bwobject.get_extra_data()['message']}}
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

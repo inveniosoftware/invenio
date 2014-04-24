@@ -36,13 +36,13 @@
 {% js url_for('workflows.static', filename='js/workflows/hp_selection.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/hp_utilities.js'), '50-workflows' %}
 
-
-{% for file in widget_static %}
+{% for file in action_static %}
     {% js url_for('workflows.static', filename=file), '50-workflows' %}
 {% endfor %}
 
 {% block javascript %}
     {{ super() }}
+
 
 <script type="text/javascript">
     $(document).ready(function(){
@@ -54,11 +54,10 @@
                 WORKFLOWS_HOLDINGPEN.init_datatable(WORKFLOWS_HP_SELECTION);
                 WORKFLOWS_HP_TAGS.init();
                 WORKFLOWS_HP_UTILITIES.init();
-                for (var i = data.widgets.length - 1; i >= 0; i--) {
-                    window[data.widgets[i]] = window[data.widgets[i]](window.jQuery, WORKFLOWS_HOLDINGPEN);
-                    window[data.widgets[i]].init(data);
+                for (var i = data.actions.length - 1; i >= 0; i--) {
+                    window[data.actions[i]] = window[data.actions[i]](window.jQuery, WORKFLOWS_HOLDINGPEN);
+                    window[data.actions[i]].init(data);
                 };
-
             }
         });
     });
@@ -80,7 +79,7 @@
                     <ul class="dropdown-menu">
                     {% if user_list %}
                         {% set i = 0 %}
-                        {% for task, object_count in widget_list.items() %}
+                        {% for task, object_count in action_list.items() %}
                             <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{task}}: {{object_count}}</a></li>
                             {% set i = i+1 %}
                         {% endfor %}

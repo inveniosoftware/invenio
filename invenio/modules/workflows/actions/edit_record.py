@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,10 +21,10 @@ from wtforms import TextField, Form, SubmitField, BooleanField
 from ..hp_field_widgets import bootstrap_submit
 from flask import render_template
 
-__all__ = ['edit_record_widget']
+__all__ = ['edit_record']
 
 
-class edit_record_widget(Form):
+class edit_record(Form):
     recid = TextField(label='Rec ID')
     core = BooleanField(label='Core')
     field_code = TextField(label='Field Code')
@@ -34,8 +34,11 @@ class edit_record_widget(Form):
     def render(self, *args, **kwargs):
         return render_template('workflows/hp_edit_record_widget.html')
 
+    def run(self):
+        pass
 
-edit_record_widget.__title__ = 'Edit Record'
-edit_record_widget.static = []
 
-widget = edit_record_widget()
+edit_record.__title__ = 'Edit Record'
+edit_record.static = []
+
+action = edit_record()

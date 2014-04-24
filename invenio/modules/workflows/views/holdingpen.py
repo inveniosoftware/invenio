@@ -44,7 +44,7 @@ from invenio.base.i18n import _
 from invenio.utils.date import pretty_date
 
 from ..models import BibWorkflowObject, Workflow, ObjectVersion
-from ..registry import widgets
+from ..registry import actions
 from ..utils import (get_workflow_definition,
                      sort_bwolist)
 from ..api import continue_oid_delayed, start
@@ -72,9 +72,9 @@ def index():
     """
     # FIXME: Add user filtering
     bwolist = get_holdingpen_objects(version_showing=[ObjectVersion.HALTED])
-    widget_list = get_widget_list(bwolist)
+    action_list = get_action_list(bwolist)
 
-    return dict(tasks=widget_list)
+    return dict(tasks=action_list)
 
 
 @blueprint.route('/maintable', methods=['GET', 'POST'])
@@ -86,23 +86,23 @@ def maintable():
     Displays main table interface of Holdingpen.
     """
     bwolist = get_holdingpen_objects()
-    widget_list = get_widget_list(bwolist)
-    widget_static = []
-    for name, widget in iteritems(widgets):
-        if getattr(widget, "static", None):
-            widget_static.extend(widget.static)
+    action_list = get_action_list(bwolist)
+    action_static = []
+    for name, action in iteritems(actions):
+        if getattr(action, "static", None):
+            action_static.extend(action.static)
 
     return dict(bwolist=bwolist,
-                widget_list=widget_list,
-                widget_static=widget_static)
+                action_list=action_list,
+                action_static=action_static)
 
 
-@blueprint.route('/batch_widget', methods=['GET', 'POST'])
+@blueprint.route('/batch_action', methods=['GET', 'POST'])
 @login_required
 @wash_arguments({'bwolist': (text_type, "")})
-def batch_widget(bwolist):
+def batch_action(bwolist):
     """
-    Renders widget accepting single or multiple records.
+    Renders action accepting single or multiple records.
     """
     from ..utils import parse_bwids
 
@@ -118,7 +118,7 @@ def batch_widget(bwolist):
     workflow_func_list = []
     w_metadata_list = []
     info_list = []
-    widgetlist = []
+    actionlist = []
     bwo_parent_list = []
     logtext_list = []
 
@@ -131,12 +131,12 @@ def batch_widget(bwolist):
         info_list.append(extracted_data['info'])
         w_metadata_list.append(extracted_data['w_metadata'])
         workflow_func_list.append(extracted_data['workflow_func'])
-        if bwobject.get_widget() not in widgetlist:
-            widgetlist.append(bwobject.get_widget())
+        if bwobject.get_action() not in actionlist:
+            actionlist.append(bwobject.get_action())
 
-    widget_form = widgets[widgetlist[0]]
+    action_form = actions[actionlist[0]]
 
-    result = widget_form().render(objlist, bwo_parent_list, info_list,
+    result = action_form().render(objlist, bwo_parent_list, info_list,
                                   logtext_list, w_metadata_list,
                                   workflow_func_list)
     url, parameters = result
@@ -191,7 +191,7 @@ def load_table():
     if 'iSortCol_0' in current_app.config:
         i_sortcol_0 = int(i_sortcol_0)
         if i_sortcol_0 != current_app.config['iSortCol_0'] \
-        or s_sortdir_0 != current_app.config['sSortDir_0']:
+           or s_sortdir_0 != current_app.config['sSortDir_0']:
             bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
 
     current_app.config['iDisplayStart'] = i_display_start
@@ -216,13 +216,13 @@ def load_table():
     records_showing = 0
 
     for bwo in bwolist[i_display_start:i_display_start + i_display_length]:
-        widget_name = bwo.get_widget()
-        widget = widgets.get(widget_name, None)
+        action_name = bwo.get_action()
+        action = actions.get(action_name, None)
 
-        # if widget != None and bwo.version in VERSION_SHOWING:
+        # if action != None and bwo.version in VERSION_SHOWING:
         records_showing += 1
 
-        mini_widget = getattr(widget, "mini_widget", None)
+        mini_action = getattr(action, "mini_action", None)
         record = bwo.get_data()
         if not isinstance(record, dict):
             record = {}
@@ -237,8 +237,8 @@ def load_table():
                               record=record,
                               extra_data=extra_data,
                               categories=categories,
-                              widget=widget,
-                              mini_widget=mini_widget,
+                              action=action,
+                              mini_action=mini_action,
                               pretty_date=pretty_date)
 
         d = {}
@@ -255,7 +255,7 @@ def load_table():
              d['version'],
              d['type'],
              d['details'],
-             d['widget']
+             d['action']
              ]
         )
 
@@ -292,10 +292,10 @@ def details(objectid):
     extracted_data = extract_data(bwobject)
 
     try:
-        edit_record_widget = widgets['edit_record_widget']()
+        edit_record_action = actions['edit_record_action']()
     except KeyError:
-        # Could not load edit_record_widget
-        edit_record_widget = []
+        # Could not load edit_record_action
+        edit_record_action = []
 
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
@@ -305,7 +305,7 @@ def details(objectid):
                            data_preview=formatted_data,
                            workflow_func=extracted_data['workflow_func'],
                            workflow=extracted_data['w_metadata'],
-                           edit_record_widget=edit_record_widget)
+                           edit_record_action=edit_record_action)
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])
@@ -370,20 +370,20 @@ def delete_multi(bwolist):
 
 
 @blueprint.route('/action/<objectid>', methods=['GET', 'POST'])
-@register_breadcrumb(blueprint, '.widget', _("Widget"))
+@register_breadcrumb(blueprint, '.action', _("action"))
 @login_required
-def show_widget(objectid):
+def show_action(objectid):
     """
-    Renders the widget assigned to a specific record
+    Renders the action assigned to a specific record
     """
     bwobject = BibWorkflowObject.query.filter(
         BibWorkflowObject.id == objectid).first_or_404()
 
-    widget = bwobject.get_widget()
-    # FIXME: add case here if no widget
-    widget_form = widgets[widget]
+    action = bwobject.get_action()
+    # FIXME: add case here if no action
+    action_form = actions[action]
     extracted_data = extract_data(bwobject)
-    result = widget_form().render([bwobject],
+    result = action_form().render([bwobject],
                                   [extracted_data['bwparent']],
                                   [extracted_data['info']],
                                   [extracted_data['logtext']],
@@ -397,14 +397,13 @@ def show_widget(objectid):
 @blueprint.route('/resolve', methods=['GET', 'POST'])
 @login_required
 @wash_arguments({'objectid': (text_type, '-1'),
-                 'widget': (text_type, 'default')})
-def resolve_widget(objectid, widget):
+                 'action': (text_type, 'default')})
+def resolve_action(objectid, action):
+    """Resolves the action taken. Calls the
+    run function of the specific action.
     """
-    Resolves the action taken in a widget.
-    Calls the run_widget function of the specific widget.
-    """
-    widget_form = widgets[widget]
-    widget_form().run_widget(objectid)
+    action_form = actions[action]
+    action_form().run(objectid)
     return "Done"
 
 
@@ -414,7 +413,7 @@ def resolve_widget(objectid, widget):
                  'form': (text_type, '')})
 def resolve_edit(objectid, form):
     """
-    Performs the changes to the record made in the edit record widget.
+    Performs the changes to the record made in the edit record action.
     """
     if request:
         edit_record(request.form)
@@ -469,8 +468,8 @@ def get_context():
     except KeyError:
         context['version_showing'] = ObjectVersion.HALTED
 
-    context['widgets'] = [name for name, widget in iteritems(widgets)
-                          if getattr(widget, "static", None)]
+    context['actions'] = [name for name, action in iteritems(actions)
+                          if getattr(action, "static", None)]
     return jsonify(context)
 
 
@@ -486,17 +485,16 @@ def get_info(bwobject):
     info['parent id'] = bwobject.id_parent
     info['workflow id'] = bwobject.id_workflow
     info['object id'] = bwobject.id
-    info['widget'] = bwobject.get_widget()
+    info['action'] = bwobject.get_action()
     return info
 
 
 def extract_data(bwobject):
     """
     Extracts metadata for BibWorkflowObject needed for rendering
-    the Record's details and widget page.
+    the Record's details and action page.
     """
     extracted_data = {}
-
     if bwobject.id_parent is not None:
         extracted_data['bwparent'] = \
             BibWorkflowObject.query.get(bwobject.id_parent)
@@ -513,52 +511,51 @@ def extract_data(bwobject):
 
     extracted_data['info'] = get_info(bwobject)
     try:
-        extracted_data['info']['widget'] = bwobject.get_widget()
+        extracted_data['info']['action'] = bwobject.get_action()
     except (KeyError, AttributeError):
         pass
 
     extracted_data['w_metadata'] = \
         Workflow.query.filter(Workflow.uuid == bwobject.id_workflow).first()
 
-    extracted_data['workflow_func'] = \
-        get_workflow_definition(extracted_data['w_metadata'].name)
-
+    workflow_def = get_workflow_definition(extracted_data['w_metadata'].name)
+    extracted_data['workflow_func'] = workflow_def
     return extracted_data
 
 
 def edit_record(form):
     """
-    Will call the edit record widget resolve function
+    Will call the edit record action resolve function
     """
     for key in form.iterkeys():
         # print '%s: %s' % (key, form[key])
         pass
 
 
-def get_widget_list(object_list):
+def get_action_list(object_list):
     """
-    Returns a dict of widget names mapped to
-    the number of halted objects associated with that widget.
+    Returns a dict of action names mapped to
+    the number of halted objects associated with that action.
     """
-    widget_dict = {}
-    found_widgets = []
+    action_dict = {}
+    found_actions = []
 
     # First get a list of all to count up later
     for bwo in object_list:
-        widget_name = bwo.get_widget()
-        if widget_name is not None:
-            found_widgets.append(widget_name)
+        action_name = bwo.get_action()
+        if action_name is not None:
+            found_actions.append(action_name)
 
-    # Get "real" widget name only once per widget
-    for widget_name in set(found_widgets):
-        if widget_name not in widgets:
-            # Perhaps some old widget? Use stored name.
-            widget_nicename = widget_name
+    # Get "real" action name only once per action
+    for action_name in set(found_actions):
+        if action_name not in actions:
+            # Perhaps some old action? Use stored name.
+            action_nicename = action_name
         else:
-            widget = widgets[widget_name]
-            widget_nicename = getattr(widget, "__title__", widget_name)
-        widget_dict[widget_nicename] = found_widgets.count(widget_name)
-    return widget_dict
+            action = actions[action_name]
+            action_nicename = getattr(action, "__title__", action_name)
+        action_dict[action_nicename] = found_actions.count(action_name)
+    return action_dict
 
 
 def get_holdingpen_objects(isortcol_0=None,
@@ -590,10 +587,10 @@ def get_holdingpen_objects(isortcol_0=None,
             elif extra_data['_last_task_name'] == ssearch:
                 bwobject_list_tmp.append(bwo)
             else:
-                widget_name = bwo.get_widget()
-                if widget_name:
-                    widget = widgets[widget_name]
-                    if ssearch in widget.__title__ or ssearch in widget_name:
+                action_name = bwo.get_action()
+                if action_name:
+                    action = actions[action_name]
+                    if ssearch in action.__title__ or ssearch in action_name:
                         bwobject_list_tmp.append(bwo)
         bwobject_list = bwobject_list_tmp
 

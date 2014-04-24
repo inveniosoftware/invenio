@@ -56,7 +56,7 @@ def get_default_extra_data():
                           "error_msg": "",
                           "_last_task_name": "",
                           "latest_object": -1,
-                          "_widget": None,
+                          "_action": None,
                           "redis_search": {},
                           "source": ""}
     return base64.b64encode(cPickle.dumps(extra_data_default))
@@ -340,35 +340,50 @@ class BibWorkflowObject(db.Model):
         res_obj = WorkflowsTaskResult(task_name, name, result)
         self.extra_data["_tasks_results"].append(res_obj)
 
-    def add_widget(self, widget, message):
-        """Assign a widget to this object for an action to be taken
-        in holding-pen. The widget is referred to by a string with
-        the filename minus extension. Ex: approval_widget.
+    def add_action(self, action, message):
+        """Assign an action to this object for an action to be taken
+        in holding-pen. The action is referred to by a string with
+        the filename minus extension. Ex: approval.
 
         A message is also needed to tell the user the action
         required.
+
+        :param action: name of the action to add (i.e. "approval")
+        :type action: string
+
+        :param message: message to show to the user
+        :type message: string
         """
         extra_data = self.get_extra_data()
-        extra_data["_widget"] = widget
+        extra_data["_action"] = action
         extra_data["_message"] = message
         self.set_extra_data(extra_data)
 
-    def get_widget(self):
-        """Retrieve the currently assigned widget, if any.
+    def get_action(self):
+        """Retrieve the currently assigned action, if any.
 
-        :return: name of widget assigned as string, or None
+        :return: name of action assigned as string, or None
         """
         try:
-            return self.get_extra_data()["_widget"]
+            return self.get_extra_data()["_action"]
         except KeyError:
-            # No widget
+            # No widget, try old _widget
+            extra_data = self.get_extra_data()
+            if "_widget" in extra_data:
+                # Migrate to new naming
+                extra_data["_action"] = extra_data['_widget']
+                del extra_data["_widget"]
+                self.set_extra_data(extra_data)
+                return extra_data["_action"]
             return None
 
-    def remove_widget(self):
-        """Removes the currently assigned widget."""
+    def remove_action(self):
+        """Removes the currently assigned action."""
         extra_data = self.get_extra_data()
-        extra_data["_widget"] = None
+        extra_data["_action"] = None
         extra_data["_message"] = ""
+        if "_widget" in extra_data:
+            del extra_data["_widget"]
         self.set_extra_data(extra_data)
 
     def start_workflow(self, workflow_name, **kwargs):
@@ -505,7 +520,9 @@ class BibWorkflowObject(db.Model):
                         pass
                 # Just return raw string
             return data
-            # Not any of the above types. How juicy!
+        if isinstance(data, set):
+            return list(data)
+        # Not any of the above types. How juicy!
         return data
 
     @session_manager

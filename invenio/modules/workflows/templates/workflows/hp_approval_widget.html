@@ -27,7 +27,7 @@
 {% js url_for('static', filename='js/prism.js'), '40-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/utilities.js'), '50-workflows' %}
 {% js url_for('workflows.static', filename='js/workflows/hp_details.js'), '50-workflows' %}
-{% js url_for('workflows.static', filename='js/workflows/widgets/approval.js'), '50-workflows' %}
+{% js url_for('workflows.static', filename='js/workflows/actions/approval.js'), '50-workflows' %}
 
 {%- block javascript %}
     {{ super() }}
@@ -44,7 +44,7 @@
 <div class="container" style="padding-left:0">
     <div id="goodbye-msg" class="col-md-12 text-center">
     </div>
-    
+
 {% for i in range(obj_number) %}
 {% set bwobject = bwobject_list[i] %}
 {% set bwparent = bwparent_list[i] %}
@@ -64,12 +64,12 @@
     {% block hp_navbar scoped%}
         {{ super() }}
     {% endblock hp_navbar %}
-    
+
     <div id="row_fluid{{i}}" class="row">
         <div class="col-md-3">
             <div id="decision-btns{{i}}" class="row decision-btns">
-                <form id="form{{i}}" class="theform" method="POST" name="{{ url_for('holdingpen.resolve_widget', object_id=bwobject.id, widget='approval_widget') }}">
-                    {% for field in widget %}
+                <form id="form{{i}}" class="theform" method="POST" name="{{ url_for('holdingpen.resolve_action', object_id=bwobject.id, action='approval') }}">
+                    {% for field in action %}
                         {{ field }}
                     {% endfor %}
                 </form>
@@ -79,7 +79,7 @@
             {% block hpbody_details scoped %}
             {{ super() }}
             {% endblock hpbody_details %}
-            
+
         </div>
 
         {% block hp_preview scoped %}
