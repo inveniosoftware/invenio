@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2013 CERN.
+## Copyright (C) 2013, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -35,7 +35,7 @@ def bootstrap_accept(field):
 
 def bootstrap_submit(field):
     """
-    Submit button for edit record widget
+    Submit button for edit record action
     """
     html = u'<input %s >' \
            % html_params(id="submitButton",

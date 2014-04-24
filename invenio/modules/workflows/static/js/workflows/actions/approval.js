@@ -17,7 +17,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var approval_widget = (function ($, holdingpen) {
+var approval = (function ($, holdingpen) {
     "use strict";
 
     var recordsToApprove = holdingpen.recordsToApprove;
@@ -28,8 +28,8 @@ var approval_widget = (function ($, holdingpen) {
     var url = {};
 
     var init = function (data){
-        url = {"resolve_widget": data.url_prefix + "/resolve",
-                    "delete_single": data.url_prefix + "/delete"};
+        url = {"resolve_action": data.url_prefix + "/resolve",
+               "delete_single": data.url_prefix + "/delete"};
 
         $(".message").hide();
         $("#batch-btn").popover();
@@ -113,7 +113,7 @@ var approval_widget = (function ($, holdingpen) {
         console.log("deleting");
         deleteRecords(recordsToApprove);
         recordsToApprove = [];
-        // TODO: 
+        // TODO:
         // the bug here will occur when there are records with other widgets
         // than approval.
         checkRecordsToApprove();
@@ -152,10 +152,10 @@ var approval_widget = (function ($, holdingpen) {
                 for(var i=0; i<recordsToApprove.length; i++){
                     jQuery.ajax({
                         type: "POST",
-                        url: url.resolve_widget,
+                        url: url.resolve_action,
                         data: {"objectid": recordsToApprove[i],
-                             "widget": "approval_widget",
-                             "decision": "Accept"},
+                               "action": "approval",
+                               "decision": "Accept"},
                         success: function(json){
                             recordsToApprove = [];
                             checkRecordsToApprove();
@@ -169,9 +169,9 @@ var approval_widget = (function ($, holdingpen) {
                     console.log(recordsToApprove[i]);
                     jQuery.ajax({
                         type: "POST",
-                        url: url.resolve_widget,
+                        url: url.resolve_action,
                         data: {"objectid": recordsToApprove[i],
-                               "widget": "approval_widget",
+                               "action": "approval",
                                "decision": "Reject"},
                         success: function(json){
                             recordsToApprove = [];
@@ -186,9 +186,9 @@ var approval_widget = (function ($, holdingpen) {
     var mini_approval = function (decision, event, objectid){
         jQuery.ajax({
             type: "POST",
-            url: url.resolve_widget,
+            url: url.resolve_action,
             data: {"objectid": objectid,
-                   "widget": "approval_widget",
+                   "action": "approval",
                    "decision": decision},
             success: function(json){
                 deselectAll();

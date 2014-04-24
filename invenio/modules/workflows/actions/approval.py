@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,14 +24,14 @@ from wtforms import SubmitField, Form
 from invenio.base.i18n import _
 
 
-__all__ = ['approval_widget']
+__all__ = ['approval']
 
 
-class approval_widget(Form):
+class approval(Form):
     reject = SubmitField(label=_('Reject'), widget=bootstrap_reject)
     accept = SubmitField(label=_('Accept'), widget=bootstrap_accept)
 
-    class mini_widget(Form):
+    class mini_action(Form):
         reject = SubmitField(label=_('Reject'), widget=bootstrap_reject_mini)
         accept = SubmitField(label=_('Accept'), widget=bootstrap_accept_mini)
 
@@ -39,14 +39,14 @@ class approval_widget(Form):
                logtext_list, w_metadata_list,
                workflow_func_list, *args, **kwargs):
         data_preview_list = []
-        # setting up approval widget
+        # setting up approval action
         for bwo in bwobject_list:
             data_preview_list.append(bwo.get_formatted_data())
 
         return ('workflows/hp_approval_widget.html',
                 {'bwobject_list': bwobject_list,
                  'bwparent_list': bwparent_list,
-                 'widget': approval_widget(),
+                 'action': approval(),
                  'data_preview_list': data_preview_list,
                  'obj_number': len(bwobject_list),
                  'info_list': info_list,
@@ -54,9 +54,9 @@ class approval_widget(Form):
                  'w_metadata_list': w_metadata_list,
                  'workflow_func_list': workflow_func_list})
 
-    def run_widget(self, objectid):
+    def run(self, objectid):
         """
-        Resolves the action taken in the approval widget
+        Resolves the action taken in the approval action
         """
         from flask import request, flash
         from ..api import continue_oid
@@ -65,7 +65,7 @@ class approval_widget(Form):
         bwobject = BibWorkflowObject.query.get(objectid)
 
         if request.form['decision'] == 'Accept':
-            bwobject.remove_widget()
+            bwobject.remove_action()
             continue_oid(objectid)
             flash('Record Accepted')
 
@@ -73,7 +73,7 @@ class approval_widget(Form):
             BibWorkflowObject.delete(objectid)
             flash('Record Rejected')
 
-approval_widget.__title__ = 'Approve Record'
-approval_widget.static = ["js/workflows/widgets/approval.js"]
+approval.__title__ = 'Approve Record'
+approval.static = ["js/workflows/actions/approval.js"]
 
-widget = approval_widget()
+action = approval()

@@ -20,16 +20,13 @@
 from invenio.base.i18n import _
 from ..hp_field_widgets import bootstrap_accept
 from wtforms import SubmitField, Form
-__all__ = ['bibmatch_widget']
+__all__ = ['matcher']
 
 
-class bibmatch_widget(Form):
+class matcher(Form):
     accept = SubmitField(label=_('Accept'), widget=bootstrap_accept)
 
     def render(self, bwobject_list, *args, **kwargs):
-        # FIXME: Currently not working
-
-        # setting up bibmatch widget
         bwobject = bwobject_list[0]
         results = bwobject.get_extra_data()['_tasks_results']
 
@@ -43,13 +40,16 @@ class bibmatch_widget(Form):
 
         return ('workflows/hp_bibmatch_widget.html',
                 {'bwobject': bwobject,
-                 'widget': bibmatch_widget(),
+                 'action': matcher(),
                  'match_preview': match_preview,
                  'matches': matches,
                  'data_preview': data_preview})
 
+    def run(self):
+        pass
 
-bibmatch_widget.__title__ = 'Bibmatch Widget'
-bibmatch_widget.static = []
 
-widget = bibmatch_widget()
+matcher.__title__ = 'Bibmatch Widget'
+matcher.static = []
+
+action = matcher()

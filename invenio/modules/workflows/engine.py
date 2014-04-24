@@ -406,10 +406,10 @@ BibWorkflowEngine
             return None
         return self._objects[obj_id]
 
-    def halt(self, msg, widget=None):
+    def halt(self, msg, action=None):
         """Halt the workflow (stop also any parent wfe)"""
         raise WorkflowHalt(message=msg,
-                           widget=widget,
+                           action=action,
                            id_workflow=self.uuid)
 
     def get_default_data_type(self):

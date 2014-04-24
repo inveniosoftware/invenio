@@ -45,19 +45,19 @@
 {{object.data_type}}
 </td>
 <td title="details">
-{% if widget == None %}
+{% if action == None %}
     <a href="{{url_for('holdingpen.details', objectid=object.id)}}">Details</a>
 {% else %}
-{% set widget_instance = widget() %}
-    <a href="{{url_for('holdingpen.show_widget', objectid=object.id)}}">Details</a>
+{% set action_instance = action() %}
+    <a href="{{url_for('holdingpen.show_action', objectid=object.id)}}">Details</a>
 {% endif %}
 </td>
-<td title="widget">
-{% if widget != None %}
-    {% set widget = widget() %}
-    {% if mini_widget != None %}
-        {% set mini_widget = mini_widget() %}
-        {% for field in mini_widget %}
+<td title="action">
+{% if action != None %}
+    {% set action = action() %}
+    {% if mini_action != None %}
+        {% set mini_action = mini_action() %}
+        {% for field in mini_action %}
             {{ field(objectid=object.id) }}
         {% endfor %}
     {% endif %}

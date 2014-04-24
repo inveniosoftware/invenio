@@ -25,13 +25,13 @@
 
 {%- block javascript %}
     {{ super() }}
-    {%- block widget_assets %}
+    {%- block action_assets %}
         {% js url_for('static', filename='js/google-code-prettify/run_prettify.js'), '50-workflows' %}
-    {%- endblock widget_assets %}
+    {%- endblock action_assets %}
 {%- endblock javascript %}
 
 {% block hpbody %}
-    <h1>Bibmatch Widget</h1>
+    <h1>Matcher results</h1>
 
     <div class="container">
         <div class="row">
@@ -58,7 +58,7 @@
                             </pre>
                         </div>
                         <div id="accept-btn-bibmatch">
-                            {{ widget.accept }}
+                            {{ action.accept }}
                         </div>
                         </br>
 

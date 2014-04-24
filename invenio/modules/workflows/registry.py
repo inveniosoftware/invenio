@@ -48,6 +48,6 @@ class WorkflowsRegistry(DictModuleAutoDiscoverySubRegistry):
 
 
 workflows = RegistryProxy('workflows', WorkflowsRegistry, 'workflows')
-widgets = RegistryProxy('workflows.widgets', WorkflowsRegistry, 'widgets')
+actions = RegistryProxy('workflows.actions', WorkflowsRegistry, 'actions')
 
-__all__ = ['widgets', 'workflows']
+__all__ = ['actions', 'workflows']

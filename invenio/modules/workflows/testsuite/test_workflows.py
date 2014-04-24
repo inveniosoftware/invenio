@@ -63,15 +63,15 @@ class WorkflowTasksTestCase(InvenioTestCase):
             WorkflowsRegistry(
                 'workflows', app=self.app, registry_namespace='workflows.tests'
             )
-        self.app.extensions['registry']['workflows.widgets'] = \
+        self.app.extensions['registry']['workflows.actions'] = \
             WorkflowsRegistry(
-                'widgets', app=self.app, registry_namespace='workflows.tests'
+                'actions', app=self.app, registry_namespace='workflows.tests'
             )
 
     def cleanup_registries(self):
         del self.app.extensions['registry']['workflows.tests']
         del self.app.extensions['registry']['workflows']
-        del self.app.extensions['registry']['workflows.widgets']
+        del self.app.extensions['registry']['workflows.actions']
 
 
 class WorkflowTasksTestAPI(WorkflowTasksTestCase):
@@ -165,7 +165,7 @@ distances from it.
         workflows['halttest'] = HaltTest
 
         data = [set(('somekey', 'somevalue'))]
-        eng = start('halttest', data)
+        eng = start('halttest', data, module_name="unit_tests")
         idx, obj = list(eng.getObjects())[0]
 
         assert obj.version == ObjectVersion.HALTED
@@ -191,7 +191,7 @@ distances from it.
         workflows['branchtest'] = BranchTest
 
         data = [set(('somekey', 'somevalue'))]
-        eng = start('branchtest', data)
+        eng = start('branchtest', data, module_name="unit_tests")
         idx, obj = list(eng.getObjects())[0]
 
         assert obj.version == ObjectVersion.HALTED
@@ -401,7 +401,7 @@ distances from it.
             self.assertTrue(obj.child_objects[0].get_data() in final_data)
 
     def test_workflow_marcxml(self):
-        """Tests runnning a record ingestion workflow with a widget step"""
+        """Tests runnning a record ingestion workflow with a action step"""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
         from invenio.modules.workflows.engine import WorkflowStatus
@@ -434,7 +434,7 @@ distances from it.
             BibWorkflowObject.version == ObjectVersion.HALTED
         ).one()
 
-        self.assertEqual(current.get_widget(), "approval_widget")
+        self.assertEqual(current.get_action(), "approval")
 
     def test_workflow_for_halted_object(self):
         """Test workflow with continuing a halted object"""

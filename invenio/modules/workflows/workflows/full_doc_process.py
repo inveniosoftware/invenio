@@ -38,20 +38,24 @@ from invenio.config import CFG_PREFIX
 
 class full_doc_process(object):
     object_type = "record"
-    workflow = [convert_record_with_repository("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield,
-                workflow_if(quick_match_record, True),
-                [
-                    plot_extract(["latex"]),
-                    fulltext_download,
-                    inspire_filter_custom(fields=["report_number", "arxiv_category"], custom_accepted=["*"],
-                                          custom_refused="gr-qc", widget="approval_widget"),
-                    bibclassify(taxonomy=CFG_PREFIX + "/etc/bibclassify/HEP.rdf",
-                                output_mode="dict", match_mode="partial"),
-                    refextract, author_list,
-                    upload_step,
-                ],
-                workflow_else,
-                [
-                    log_info("Record already into database"),
-                ],
-                ]
+    workflow = [
+        convert_record_with_repository("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield,
+        workflow_if(quick_match_record, True),
+        [
+            plot_extract(["latex"]),
+            fulltext_download,
+            inspire_filter_custom(fields=["report_number", "arxiv_category"],
+                                  custom_accepted=["*"],
+                                  custom_refused="gr-qc",
+                                  action="approval"),
+            bibclassify(taxonomy=CFG_PREFIX + "/etc/bibclassify/HEP.rdf",
+                        output_mode="dict",
+                        match_mode="partial"),
+            refextract, author_list,
+            upload_step,
+        ],
+        workflow_else,
+        [
+            log_info("Record already into database"),
+        ],
+    ]
