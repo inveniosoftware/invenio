@@ -32,7 +32,7 @@ module.exports = {
                ,'jquery-tokeninput/styles/token-input-facebook.css'
                ,'jquery-tokeninput/styles/token-input.css'
                ,'jquery.bookmark/jquery.bookmark.css'
-               ,'datatables-colvis/media/css/ColVis.css'
+               ,'datatables-colvis/css/dataTables.colVis.css'
                ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.css'
                ,'prism/prism.css'
                ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.css'],
@@ -60,7 +60,6 @@ module.exports = {
         src: ['jquery.bookmark/bookmarks.png'
                ,'uploadify/uploadify*'
                ,'!uploadify/uploadify.php'
-               ,'datatables-colvis/media/images/button.png'
                ,'DataTables-Plugins/integration/bootstrap/3/images/*.png'],
         dest: '<%= globalConfig.installation_path %>/img/'
     },
@@ -81,7 +80,7 @@ module.exports = {
              ,'jquery.hotkeys/jquery.hotkeys.js'
              ,'uploadify/jquery.uploadify.min.js'
              ,'json2/json2.js'
-             ,'datatables-colvis/media/js/ColVis.js'
+             ,'datatables-colvis/js/dataTables.colVis.js'
              ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js'
              ,'prism/prism.js'
              ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js'

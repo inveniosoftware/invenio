@@ -21,12 +21,12 @@
 
 {% block header%}
     {{ super() }}
-    {% css url_for('static', filename='css/ColVis.css') %}
+    {% css url_for('static', filename='css/dataTables.colVis.css') %}
     {% css url_for('static', filename='css/dataTables.bootstrap.css') %}
 {% endblock header %}
 
 {% js url_for('static', filename='js/jquery.dataTables.min.js'), '30-datatables' %}
-{% js url_for('static', filename='js/ColVis.js'), '30-datatables' %}
+{% js url_for('static', filename='js/dataTables.colVis.js'), '30-datatables' %}
 {% js url_for('static', filename='js/bootstrap.js'), '30-datatables' %}
 {% js url_for('static', filename='js/dataTables.bootstrap.js'), '30-datatables' %}
 {% js url_for('static', filename='js/bootstrap-tagsinput.min.js'), '30-datatables' %}
