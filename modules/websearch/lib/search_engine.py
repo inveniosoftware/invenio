@@ -4590,7 +4590,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
                     # load content
                     if tab == 'usage':
-                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
@@ -4683,47 +4683,9 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
-                        from invenio.bibclassify_webinterface import \
-                            record_get_keywords, write_keywords_body, \
-                            generate_keywords
-                        from invenio.webinterface_handler import wash_urlargd
-                        form = req.form
-                        argd = wash_urlargd(form, {
-                            'generate': (str, 'no'),
-                            'sort': (str, 'occurrences'),
-                            'type': (str, 'tagcloud'),
-                            'numbering': (str, 'off'),
-                            })
-                        recid = recIDs[irec]
-
-                        req.write(webstyle_templates.detailed_record_container_top(recid,
-                                                                                   tabs,
-                                                                                   ln))
-                        content = websearch_templates.tmpl_record_plots(recID=recid,
-                                                                        ln=ln)
-                        req.write(content)
-                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
-                                                                                      tabs,
-                                                                                      ln))
-
-                        req.write(webstyle_templates.detailed_record_container_top(recid,
-                            tabs, ln, citationnum=citedbynum, referencenum=references))
-
-                        if argd['generate'] == 'yes':
-                            # The user asked to generate the keywords.
-                            keywords = generate_keywords(req, recid, argd)
-                        else:
-                            # Get the keywords contained in the MARC.
-                            keywords = record_get_keywords(recid, argd)
-
-                        if argd['sort'] == 'related' and not keywords:
-                            req.write('You may want to run BibIndex.')
-
-                        # Output the keywords or the generate button.
-                        write_keywords_body(keywords, req, recid, argd)
-
-                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
-                            tabs, ln))
+                        from invenio.bibclassify_webinterface import main_page
+                        main_page(req, recid, tabs, ln,
+                                  webstyle_templates)
                     elif tab == 'plots':
                         req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,

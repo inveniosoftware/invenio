@@ -4927,11 +4927,14 @@ class WebSearchCustomCollectionBoxesName(InvenioTestCase):
 
 class WebSearchDetailedRecordTabsTest(InvenioTestCase):
     def test_detailed_record(self):
+        """websearch - check detailed record main tab"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/record/81',
-                                               expected_text='Decapitating Tadpoles'))
+                                               expected_text='Decapitating Tadpoles',
+                                               unexpected_text='The server encountered an error'))
 
     def test_detailed_record_references_tab(self):
+        """websearch - check detailed record references tab"""
         expected_refs = [
             'References (37)',
             'W. Fischler and L. Susskind, "Dilaton Tadpoles, String Condensates And Scale In-variance,"',
@@ -4942,6 +4945,7 @@ class WebSearchDetailedRecordTabsTest(InvenioTestCase):
                                                expected_text=expected_refs))
 
     def test_detailed_record_citations_tab(self):
+        """websearch - check detailed record citations tab"""
         expected_cites = [
             'Filtering Gravity: Modification at Large Distances?',
         ]
@@ -4949,6 +4953,46 @@ class WebSearchDetailedRecordTabsTest(InvenioTestCase):
                          test_web_page_content(CFG_SITE_URL + '/record/81/citations',
                                                expected_text=expected_cites,
                                                unexpected_text='The server encountered an error'))
+
+    def test_detailed_record_keywords_tab(self):
+        """websearch - check detailed record keywords tab"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/keywords',
+                                                   expected_text='Keywords',
+                                                   unexpected_text='The server encountered an error'))
+
+    def test_detailed_record_comments_tab(self):
+        """websearch - check detailed record comments tab"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/comments',
+                                                   expected_text='Comments',
+                                                   unexpected_text='The server encountered an error'))
+
+    def test_detailed_record_usage_tab(self):
+        """websearch - check detailed record usage tab"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/usage',
+                                                   expected_text='Usage statistics',
+                                                   unexpected_text='The server encountered an error'))
+
+    def test_detailed_record_files_tab(self):
+        """websearch - check detailed record files tab"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/files',
+                                                   expected_text='Files',
+                                                   unexpected_text='The server encountered an error'))
+
+    def test_detailed_record_plots_tab(self):
+        """websearch - check detailed record plots tab"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/linkbacks',
+                                                   expected_text='Plots',
+                                                   unexpected_text='The server encountered an error'))
+    def test_detailed_record_holdings_tab(self):
+        """websearch - check detailed record holdings tab"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/linkbacks',
+                                                   expected_text='Holdings',
+                                                   unexpected_text='The server encountered an error'))
+    def test_detailed_record_linkback_tab(self):
+        """websearch - check detailed record linkback tab"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/linkbacks',
+                                                   expected_text='Linkbacks',
+                                                   unexpected_text='The server encountered an error'))
 
 
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
