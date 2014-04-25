@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.modules.formatter.api import get_tag_from_name
-from invenio.ext.logging import raise_exception
+from invenio.ext.logging import register_exception
 from invenio.modules.ranker.registry import configuration
 
 
@@ -24,7 +24,10 @@ CFG_BIBRANK_WRD_CFG_PATH = configuration.get('wrd.cfg', '')
 
 
 def alert_admin(name):
-    raise_exception(ValueError, 'No marc tag for %s defined' % name, alert_admin=True)
+    try:
+        raise ValueError('No marc tag for %s defined' % name)
+    except Exception:
+        return register_exception(alert_admin=True)
 
 
 # abstract:
@@ -57,7 +60,7 @@ else:
 # keyword:
 marc_tag_keyword = get_tag_from_name('keyword')
 if marc_tag_keyword:
-    CFG_MARC_KEYWORD= marc_tag_keyword
+    CFG_MARC_KEYWORD = marc_tag_keyword
 else:
     CFG_MARC_KEYWORD = '6531_a'
     alert_admin('keyword')

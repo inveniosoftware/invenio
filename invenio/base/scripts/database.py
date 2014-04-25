@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,9 +34,11 @@ manager = Manager(usage="Perform database operations")
 # Shortcuts for manager options to keep code DRY.
 option_yes_i_know = manager.option('--yes-i-know', action='store_true',
                                    dest='yes_i_know', help='use with care!')
-option_default_data = manager.option('--no-data', action='store_false',
-                                     dest='default_data',
-                                     help='do not populate tables with default data')
+option_default_data = manager.option(
+    '--no-data', action='store_false',
+    dest='default_data',
+    help='do not populate tables with default data'
+)
 
 
 @manager.option('-u', '--user', dest='user', default="root")
@@ -48,7 +50,10 @@ def init(user='root', password='', yes_i_know=False):
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 
     ## Step 0: confirm deletion
-    wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy your database tables! Run first `inveniomanage database drop`."""))
+    wait_for_user(wrap_text_in_a_box(
+        "WARNING: You are going to destroy your database tables! Run first"
+        " `inveniomanage database drop`."
+    ))
 
     ## Step 1: drop database and recreate it
     if db.engine.name == 'mysql':
@@ -83,6 +88,7 @@ def init(user='root', password='', yes_i_know=False):
                 sys.exit(1)
         print('>>> Database has been installed.')
 
+
 @option_yes_i_know
 def drop(yes_i_know=False):
     """Drops database tables"""
@@ -98,7 +104,9 @@ def drop(yes_i_know=False):
     from invenio.legacy.bibdocfile.api import _make_base_dir
 
     ## Step 0: confirm deletion
-    wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy your database tables and related data on filesystem!"""))
+    wait_for_user(wrap_text_in_a_box(
+        "WARNING: You are going to destroy your database tables and related "
+        "data on filesystem!"))
 
     ## Step 1: test database connection
     test_db_connection()
@@ -142,7 +150,7 @@ def drop(yes_i_know=False):
     for i, table in enumerate(tables):
         try:
             print_progress(1.0 * i / N, prefix=prefix,
-                            suffix=str(datetime.timedelta(seconds=e()[0])))
+                           suffix=str(datetime.timedelta(seconds=e()[0])))
             table.drop(bind=db.engine)
             dropped += 1
         except:
@@ -169,9 +177,9 @@ def create(default_data=True):
     try:
         test_db_connection()
     except Exception as e:
-        from invenio.ext.logging import get_tracestack
+        from invenio.ext.logging.wrappers import get_traceback
         print('Cannot connect with the db:', e.message)
-        print(get_tracestack())
+        print(get_traceback())
         return
 
     list(models)
@@ -199,7 +207,7 @@ def create(default_data=True):
     for i, table in enumerate(tables):
         try:
             print_progress(1.0 * i / N, prefix=prefix,
-                            suffix=str(datetime.timedelta(seconds=e()[0])))
+                           suffix=str(datetime.timedelta(seconds=e()[0])))
             table.create(bind=db.engine)
             created += 1
         except:
@@ -221,7 +229,7 @@ def diff():
     """Diff database against SQLAlchemy models"""
 
     try:
-        from migrate.versioning import schemadiff
+        from migrate.versioning import schemadiff  # noqa
     except ImportError:
         print(">>> Required package sqlalchemy-migrate is not installed. "
               "Please install with:")
@@ -263,9 +271,17 @@ def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
 
     dbfixture = SQLAlchemyFixture(env=models, engine=db.metadata.bind,
                                   session=db.session)
-    data = dbfixture.data(*[f for (n, f) in iteritems(fixtures) if n in models])
+    data = dbfixture.data(
+        *[f for (n, f) in iteritems(fixtures) if n in models]
+    )
     if len(models) != len(fixtures):
-        print(">>> ERROR: There are", len(models), "tables and", len(fixtures), "fixtures.")
+        print(
+            ">>> ERROR: There are",
+            len(models),
+            "tables and",
+            len(fixtures),
+            "fixtures."
+        )
         print(">>>", set(fixture_names) ^ set(models.keys()))
     else:
         print(">>> There are", len(models), "tables to be loaded.")
