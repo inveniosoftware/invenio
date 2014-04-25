@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,6 +28,7 @@ import os
 import sys
 import time
 import re
+import datetime
 import marshal
 import getopt
 from itertools import chain
@@ -56,7 +57,7 @@ from invenio.config import \
      CFG_BIBSCHED_MAX_ARCHIVED_ROWS_DISPLAY
 from invenio.legacy.dbquery import run_sql, real_escape_string
 from invenio.utils.text import wrap_text_in_a_box
-from invenio.ext.logging import register_exception, register_emergency
+from invenio.ext.logging import register_exception
 from invenio.utils.shell import run_shell_command
 
 CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING',
@@ -70,6 +71,59 @@ SHIFT_RE = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 
 class RecoverableError(StandardError):
     pass
+
+
+def register_emergency(msg, recipients=None):
+    """Launch an emergency. This means to send email messages to each
+    address in 'recipients'. By default recipients will be obtained via
+    get_emergency_recipients() which loads settings from
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES
+    """
+    from invenio.base.globals import cfg
+    from invenio.ext.email import send_email
+    if not recipients:
+        recipients = get_emergency_recipients()
+    recipients = set(recipients)
+    recipients.add(cfg['CFG_SITE_ADMIN_EMAIL'])
+    for address_str in recipients:
+        send_email(
+            cfg['CFG_SITE_SUPPORT_EMAIL'],
+            address_str,
+            "Emergency notification",
+            msg
+        )
+
+
+def get_emergency_recipients(recipient_cfg=None):
+    """
+    Parse a list of appropriate emergency email recipients from
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, or from a provided dictionary
+    comprised of 'time constraint' => 'comma separated list of addresses'
+
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES format example:
+
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES = {
+       'Sunday 22:00-06:00': '0041761111111@email2sms.foo.com',
+       '06:00-18:00': 'team-in-europe@foo.com,0041762222222@email2sms.foo.com',
+       '18:00-06:00': 'team-in-usa@foo.com',
+       '*': 'john.doe.phone@foo.com'}
+    """
+    from invenio.base.globals import cfg
+    from invenio.utils.date import parse_runtime_limit
+
+    if recipient_cfg is None:
+        recipient_cfg = cfg['CFG_SITE_EMERGENCY_EMAIL_ADDRESSES']
+
+    recipients = set()
+    for time_condition, address_str in recipient_cfg.items():
+        if time_condition and time_condition is not '*':
+            (current_range, future_range) = parse_runtime_limit(time_condition)
+            if not current_range[0] \
+               <= datetime.datetime.now() <= current_range[1]:
+                continue
+
+        recipients.update([address_str])
+    return list(recipients)
 
 
 def get_pager():

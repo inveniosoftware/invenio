@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ class TestGetEmergencyRecipients(InvenioTestCase):
 
     def test_get_emergency_recipients(self):
         """errorlib - test return of proper set of recipients"""
-        from invenio.ext.logging import get_emergency_recipients
+        from invenio.legacy.bibsched.cli import get_emergency_recipients
 
         now = datetime.datetime.today()
         tomorrow = now + datetime.timedelta(days=1)
@@ -37,19 +37,19 @@ class TestGetEmergencyRecipients(InvenioTestCase):
         later = now.replace(hour=(now.hour + 1) % 24)
         earlier = now.replace(hour=(now.hour - 1) % 24)
         constraint_now = "%s %s-%s" % (
-                                    now.strftime("%a"),
-                                    earlier.strftime("%H:00"),
-                                    later.strftime("%H:00"),
-                                    )
+            now.strftime("%a"),
+            earlier.strftime("%H:00"),
+            later.strftime("%H:00"),
+        )
         constraint_tomorrow = "%s %s-%s" % (
-                                    tomorrow.strftime("%a"),
-                                    earlier.strftime("%H:00"),
-                                    later.strftime("%H:00"),
-                                    )
+            tomorrow.strftime("%a"),
+            earlier.strftime("%H:00"),
+            later.strftime("%H:00"),
+        )
         constraint_time = "%s-%s" % (
-                                    earlier.strftime("%H:00"),
-                                    later.strftime("%H:00"),
-                                    )
+            earlier.strftime("%H:00"),
+            later.strftime("%H:00"),
+        )
         minute = (now.minute - 3) % 60
         # hour and earlier can change when minute is modified
         if minute > now.minute:
@@ -58,21 +58,21 @@ class TestGetEmergencyRecipients(InvenioTestCase):
         else:
             hour = now.hour
         constraint_near_miss = "%s-%s" % (
-                                    earlier.strftime("%H:00"),
-                                    now.replace(minute=minute, hour=hour) \
-                                        .strftime("%H:%M")
-                                    )
+            earlier.strftime("%H:00"),
+            now.replace(minute=minute, hour=hour)
+            .strftime("%H:%M")
+        )
         constraint_day = "%s" % now.strftime("%A")
         constraint_diff_day = "%s" % diff_day.strftime("%A")
         test_config = {
-                       constraint_now:      'now@example.com',
-                       constraint_tomorrow: 'tomorrow@example.com',
-                       constraint_time:     'time@example.com',
-                       constraint_day:      'day@example.com,day@foobar.com',
-                       constraint_diff_day: 'diff_day@example.com',
-                       constraint_near_miss:'near_miss@example.com',
-                       '*':                 'fallback@example.com',
-                       }
+            constraint_now:      'now@example.com',
+            constraint_tomorrow: 'tomorrow@example.com',
+            constraint_time:     'time@example.com',
+            constraint_day:      'day@example.com,day@foobar.com',
+            constraint_diff_day: 'diff_day@example.com',
+            constraint_near_miss: 'near_miss@example.com',
+            '*':                 'fallback@example.com',
+        }
         result = get_emergency_recipients(recipient_cfg=test_config)
         expected = ['now@example.com', 'time@example.com',
                     'day@example.com,day@foobar.com', 'fallback@example.com']
