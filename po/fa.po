@@ -22,13 +22,13 @@ msgstr ""
 "PO-Revision-Date: 2014-04-12 06:30+0330\n"
 "Last-Translator: Mehdi Zahedi <mehdizahedin@gmail.com>\n"
 "Language-Team: FA <info@invenio-software.org>\n"
+"Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 "X-Generator: Poedit 1.6.4\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Language: fa_IR\n"
 
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
@@ -2204,7 +2204,7 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:409
 #, python-format
-msgid "&lt;b&gt;%s documents&lt;/b&gt; have been found."
+msgid "<b>%s documents</b> have been found."
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:411
@@ -4119,19 +4119,20 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:166
 #: modules/webcomment/lib/webcomment.py:210
-msgid "Bad page number --&gt; showing first page."
+msgid "Bad page number --> showing first page."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:174
-msgid "Bad number of results per page --&gt; showing 10 results per page."
-msgstr ""
+#, fuzzy
+msgid "Bad number of results per page --> showing 10 results per page."
+msgstr "تعداد نتایج جستجو در هر صفحه"
 
 #: modules/webcomment/lib/webcomment.py:183
-msgid "Bad display order --&gt; showing most helpful first."
+msgid "Bad display order --> showing most helpful first."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:192
-msgid "Bad display order --&gt; showing oldest first."
+msgid "Bad display order --> showing oldest first."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:229
@@ -4228,7 +4229,7 @@ msgid "Failed to insert your comment to the database. Please try again."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1719
-msgid "Unknown action --&gt; showing you the default add comment form."
+msgid "Unknown action --> showing you the default add comment form."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1841
@@ -4259,13 +4260,13 @@ msgstr "یک نظر بنویسید"
 #: modules/webcomment/lib/webcomment_templates.py:94
 #, python-format
 msgid ""
-"&lt;div class=\"webcomment_comment_round_header\"&gt;%(x_nb)i Comments for "
-"round \"%(x_name)s\""
+"<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments for round "
+"\"%(x_name)s\""
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:96
 #, python-format
-msgid "&lt;div class=\"webcomment_comment_round_header\"&gt;%(x_nb)i Comments"
+msgid "<div class=\"webcomment_comment_round_header\">%(x_nb)i Comments"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:124
@@ -4346,8 +4347,8 @@ msgstr "این مدرک را درجه بندی کنید"
 
 #: modules/webcomment/lib/webcomment_templates.py:333
 msgid ""
-"&lt;div class=\"webcomment_review_first_introduction\"&gt;Be the first to "
-"review this document.&lt;/div&gt;"
+"<div class=\"webcomment_review_first_introduction\">Be the first to review "
+"this document.</div>"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:368
@@ -4891,22 +4892,22 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:2138
 #, python-format
-msgid "To post another comment, go to &lt;%(x_url)s&gt; instead."
+msgid "To post another comment, go to <%(x_url)s> instead."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:2143
 #, python-format
-msgid "To specifically reply to this comment, go to &lt;%(x_url)s&gt;"
+msgid "To specifically reply to this comment, go to <%(x_url)s>"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:2148
 #, python-format
-msgid "To unsubscribe from this discussion, go to &lt;%(x_url)s&gt;"
+msgid "To unsubscribe from this discussion, go to <%(x_url)s>"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:2152
 #, python-format
-msgid "For any question, please use &lt;%(CFG_SITE_SUPPORT_EMAIL)s&gt;"
+msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:2219
@@ -7543,14 +7544,13 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_managedocfiles.py:562
 #, python-format
 msgid ""
-"The uploaded file is too small (&lt;%i o) and has therefore not been "
-"considered"
+"The uploaded file is too small (<%i o) and has therefore not been considered"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:567
 #, python-format
 msgid ""
-"The uploaded file is too big (&gt;%i o) and has therefore not been considered"
+"The uploaded file is too big (>%i o) and has therefore not been considered"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:574
@@ -7755,9 +7755,9 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_engine.py:1055
 msgid ""
 "A serious function-error has been encountered. Adminstrators have been "
-"alerted. &lt;br /&gt;&lt;em&gt;Please not that this might be due to wrong "
-"characters inserted into the form&lt;/em&gt; (e.g. by copy and pasting some "
-"text from a PDF file)."
+"alerted. <br /><em>Please not that this might be due to wrong characters "
+"inserted into the form</em> (e.g. by copy and pasting some text from a PDF "
+"file)."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:1384
@@ -8957,7 +8957,7 @@ msgid ""
 "Hi,\n"
 "\n"
 "Have a look at the following article:\n"
-"&lt;%(url)s&gt;"
+"<%(url)s>"
 msgstr ""
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:260
@@ -12352,7 +12352,7 @@ msgstr "رد شده!"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:679
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:779
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:955
-msgid "No, this paper is &lt;i&gt;not&lt;/i&gt; by this person"
+msgid "No, this paper is <i>not</i> by this person"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:680
@@ -12427,13 +12427,13 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:687
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:787
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:963
-msgid "But it's &lt;i&gt;not&lt;/i&gt; this person's paper."
+msgid "But it's <i>not</i> this person's paper."
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:691
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:791
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:967
-msgid "But it &lt;i&gt;is&lt;/i&gt; this person's paper."
+msgid "But it <i>is</i> this person's paper."
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:694
@@ -12542,8 +12542,8 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2109
 msgid ""
-"&lt;p&gt;We're sorry. An error occurred while handling your request. Please "
-"find more information below:&lt;/p&gt;"
+"<p>We're sorry. An error occurred while handling your request. Please find "
+"more information below:</p>"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2187
@@ -12878,8 +12878,7 @@ msgid "Mark as _not_ their documents"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1376
-msgid ""
-"  * You can come back to this page later. Nothing will be lost. &lt;br /&gt;"
+msgid "  * You can come back to this page later. Nothing will be lost. <br />"
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1377
