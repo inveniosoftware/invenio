@@ -110,7 +110,6 @@ def try_to_eval(string, context={}, **general_context):
     imports = []
     general_context.update(context)
     simple = False
-
     while True:
         try:
             res = eval(string, globals().update(general_context), locals())  # kwalitee: disable=eval
@@ -119,7 +118,6 @@ def try_to_eval(string, context={}, **general_context):
             try:
                 from werkzeug.utils import import_string
                 if "." in string:
-
                     part = string.split('.')[0]
                     import_string(part)
                     for i in string.split('.')[1:]:
