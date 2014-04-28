@@ -96,8 +96,8 @@ def produce(self, fields=None):
 
     Produces a list of dictionaries will all the possible marc tags as keys.
 
-    :param fields: list of tags to include in the output, if None or
-        empty list all available tags will be included.
+    :param fields: list of fields to include in the output, if None or
+                empty list all available tags will be included.
     """
     from invenio.base.utils import try_to_eval
 
