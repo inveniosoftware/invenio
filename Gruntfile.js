@@ -21,10 +21,11 @@
 
 
 module.exports = function (grunt) {
-    var globalConfig = {
-        bower_path: 'bower_components',
-        installation_path: '../../var/invenio.base-instance/static' // default path
-    };
+    var prefix = process.env.VIRTUAL_ENV || '../..'
+      , globalConfig = {
+            bower_path: 'bower_components',
+            installation_path: prefix + '/var/invenio.base-instance/static'
+        };
 
     // target for custom path
     if (grunt.option('path')) {
