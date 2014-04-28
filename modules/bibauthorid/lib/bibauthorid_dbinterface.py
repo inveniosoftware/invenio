@@ -2692,12 +2692,12 @@ def get_papers_affected_since(since):   ### personid_get_recids_affected_since
     '''
     recs = set(_split_signature_string(sig[0])[2] for sig in run_sql("""select distinct value
                                                                        from aidUSERINPUTLOG
-                                                                       where timestamp > %s""",
+                                                                       where timestamp >= %s""",
                                                                        (since,) ) if ',' in sig[0] and ':' in sig[0])
 
     pids = set(int(pid[0]) for pid in run_sql("""select distinct personid
                                                  from aidUSERINPUTLOG
-                                                 where timestamp > %s""",
+                                                 where timestamp >= %s""",
                                                  (since,) ) if pid[0] > 0)
 
     if pids:
