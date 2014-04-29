@@ -138,7 +138,6 @@ for quick start.
     (invenio)$ git-new-workdir ~/src/invenio-demosite/ invenio-demosite $BRANCH
     (invenio)$ cd invenio-demosite
     (invenio)$ pip install -e .
-    (invenio)$ inveniomanage config set PACKAGES "['invenio_demosite', 'invenio.modules.*']"
 
 
 c. Development
