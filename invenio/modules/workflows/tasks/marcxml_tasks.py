@@ -686,7 +686,7 @@ def fulltext_download(obj, eng):
     bibtask.task_sleep_now_if_required()
     if "pdf" not in obj.extra_data["_result"]:
         extract_path = plotextractor_getter.make_single_directory(
-            cfg['CFG_TMPSHAREDDIR'], eng.uuid)
+            cfg['CFG_TMPSHAREDDIR'], str(eng.uuid))
         tarball, pdf = plotextractor_getter.harvest_single(
             obj.data["system_number_external"]["value"],
             extract_path, ["pdf"])
@@ -710,9 +710,10 @@ def fulltext_download(obj, eng):
                             "    </datafield>"
                            ) % {'url': obj.extra_data["_result"]["pdf"],
                                 'doctype': doctype}
-            updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n' \
+            updated_xml = '<?xml version="1.0"?>\n' \
                           '<collection>\n<record>\n' + fulltext_xml + \
                           '</record>\n</collection>'
+
             new_dict_representation = convert_marcxml_to_bibfield(updated_xml)
             try:
                 if isinstance(new_dict_representation["fft"], list):
@@ -910,6 +911,7 @@ def plot_extract(plotextractor_types):
                     # contents live
                     # Read and grab MARCXML from plotextractor run
                     new_dict = convert_marcxml_to_bibfield(marc_xml)
+
                     try:
                         if isinstance(new_dict["fft"], list):
                             for element in new_dict["fft"]:
