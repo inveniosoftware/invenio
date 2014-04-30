@@ -502,8 +502,9 @@ class Reader(object):  # pylint: disable=R0921
                 if ext is not None:
                     info['after'][name] = ext
             except KeyError as e:
-                # Only raise if the error is different the KeyError 'decorators'
-                if not e.message == 'decorators':
+                # Only raise if the error is different the KeyError
+                # 'decorators'
+                if not e.args[0] == 'decorators':
                     raise e
 
         # Field extensions
@@ -514,7 +515,8 @@ class Reader(object):  # pylint: disable=R0921
                 if ext is not None:
                     info['ext'][name] = ext
             except NotImplementedError:
-                # Maybe your extension doesn't have anything to add to the field
+                # Maybe your extension doesn't have anything to add to the
+                # field
                 pass
 
         return info
