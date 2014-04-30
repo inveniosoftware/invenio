@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,7 +31,6 @@ import re
 from flask import has_app_context, current_app
 from werkzeug.utils import import_string, find_modules
 from functools import partial
-from itertools import chain
 
 
 def register_extensions(app):
@@ -56,7 +56,9 @@ def import_module_from_packages(name, app=None, packages=None, silent=False):
         if app is None and has_app_context():
             app = current_app
         if app is None:
-            raise Exception('Working outside application context or provide app')
+            raise Exception(
+                'Working outside application context or provide app'
+            )
         #FIXME
         packages = app.config.get('PACKAGES', [])
 
@@ -118,7 +120,8 @@ autodiscover_format_elements = partial(
 autodiscover_widgets = partial(import_module_from_packages, 'widgets')
 
 
-def autodiscover_non_python_files(file_name, package_name, app=None, packages=None):
+def autodiscover_non_python_files(file_name, package_name, app=None,
+                                  packages=None):
     """
     Helper function to autodiscover non python files that are included inside
     the package. (see MANIFEST.in)
@@ -188,12 +191,96 @@ def try_to_eval(string, context={}, **general_context):
                 pass
 
             import_name = str(err).split("'")[1]
-            if not import_name in imports:
+            if import_name not in imports:
                 if import_name in context:
                     globals()[import_name] = context[import_name]
                 else:
                     globals()[import_name] = __import__(import_name)
                     imports.append(import_name)
                 continue
-            raise ImportError("Can't import the needed module to evaluate %s" (string, ))
+            raise ImportError(
+                "Can't import the needed module to evaluate %s" (string, )
+            )
         return res
+
+
+#
+# Python 2.6 implementation of logging.captureWarnings introduced in Python 2.7
+# Copy/pasted from logging/__init__.py. Can be removed as soon as dependency on
+# Python 2.6 is removed.
+import logging
+import warnings
+import sys
+
+
+class NullHandler(logging.Handler):
+    """
+    This handler does nothing. It's intended to be used to avoid the
+    "No handlers could be found for logger XXX" one-off warning. This is
+    important for library code, which may contain code to log events. If a user
+    of the library does not configure logging, the one-off warning might be
+    produced; to avoid this, the library developer simply needs to instantiate
+    a NullHandler and add it to the top-level logger of the library module or
+    package.
+    """
+    def handle(self, record):
+        pass
+
+    def emit(self, record):
+        pass
+
+    def createLock(self):
+        self.lock = None
+
+
+_warnings_showwarning = None
+
+
+def _showwarning(message, category, filename, lineno, file=None, line=None):
+    """
+    Implementation of showwarnings which redirects to logging, which will first
+    check to see if the file parameter is None. If a file is specified, it will
+    delegate to the original warnings implementation of showwarning. Otherwise,
+    it will call warnings.formatwarning and will log the resulting string to a
+    warnings logger named "py.warnings" with level logging.WARNING.
+    """
+    if sys.hexversion >= 0x2070000:
+        raise RuntimeError("_showwarning() should not be used on Python 2.7+")
+
+    if file is not None:
+        if _warnings_showwarning is not None:
+            _warnings_showwarning(message, category, filename, lineno, file,
+                                  line)
+    else:
+        s = warnings.formatwarning(message, category, filename, lineno, line)
+        logger = logging.getLogger("py.warnings")
+        if not logger.handlers:
+            logger.addHandler(NullHandler())
+        logger.warning("%s", s)
+
+
+def _captureWarnings(capture):
+    """
+    If capture is true, redirect all warnings to the logging package.
+    If capture is False, ensure that warnings are not redirected to logging
+    but to their original destinations.
+    """
+    if sys.hexversion >= 0x2070000:
+        raise RuntimeError(
+            "_captureWarnings() should not be used on Python 2.7+"
+        )
+
+    global _warnings_showwarning
+    if capture:
+        if _warnings_showwarning is None:
+            _warnings_showwarning = warnings.showwarning
+            warnings.showwarning = _showwarning
+    else:
+        if _warnings_showwarning is not None:
+            warnings.showwarning = _warnings_showwarning
+            _warnings_showwarning = None
+
+if sys.hexversion >= 0x2070000:
+    captureWarnings = logging.captureWarnings
+else:
+    captureWarnings = _captureWarnings

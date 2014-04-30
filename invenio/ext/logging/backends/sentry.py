@@ -27,6 +27,7 @@ SENTRY_DSN = "https://...:...@app.getsentry.com/..."
 SENTRY_INCLUDE_PATHS = [..]  # List all modules you want version information
                              # for.
 LOGGING_SENTRY_LEVEL = 'ERROR' # log level (maps to logging.ERROR)
+LOGGING_SENTRY_INCLUDE_WARNINGS = True # Include deprecation warnings
 
 Note, Sentry also supports logging JavaScript errors. This is however not yet
 supported.
@@ -37,7 +38,9 @@ import pkg_resources
 
 from werkzeug.local import LocalProxy
 from flask import current_app
+from raven.handlers.logging import SentryHandler
 from raven.contrib.flask import Sentry
+
 import invenio
 
 
@@ -49,6 +52,14 @@ def sentry_include_paths():
         pass
 
 
+def setup_warnings(sentry):
+    """
+    Add sentry to warnings logger
+    """
+    warnings = logging.getLogger('py.warnings')
+    warnings.addHandler(SentryHandler(sentry.client, level=logging.WARNING))
+
+
 def setup_app(app):
     """
     Setup Sentry extension
@@ -58,6 +69,8 @@ def setup_app(app):
     app.config.setdefault('SENTRY_USER_ATTRS', ['info', ])
     # Defaults to only reporting errors and warnings.
     app.config.setdefault('LOGGING_SENTRY_LEVEL', 'WARNING')
+    # Sent warnings to Sentry?
+    app.config.setdefault('LOGGING_SENTRY_INCLUDE_WARNINGS', True)
 
     if app.config['SENTRY_DSN']:
         # Detect Invenio requirements and add to Sentry include paths so
@@ -86,6 +99,10 @@ def setup_app(app):
 
         # Add extra tags information to sentry.
         s.client.extra_context({'version': invenio.__version__})
+
+        # Capture warnings from warnings module
+        if app.config['LOGGING_SENTRY_INCLUDE_WARNINGS']:
+            setup_warnings(s)
 
         # Werkzeug only adds a stream handler if there's no other handlers
         # defined, so when Sentry adds a log handler no output is

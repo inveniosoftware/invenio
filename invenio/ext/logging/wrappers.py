@@ -274,13 +274,13 @@ def register_exception(stream='error',
     :return: 1 if successfully wrote to stream, 0 if not
     """
     if stream == 'error':
-        logger = current_app.logger.exception
+        logger = current_app.logger.error
     elif stream == 'warning':
         logger = current_app.logger.warning
     elif stream == 'info':
-        logger = current_app.logger.exception
+        logger = current_app.logger.info
     elif stream == 'debug':
-        logger = current_app.logger.exception
+        logger = current_app.logger.debug
     elif stream == 'critical':
         logger = current_app.logger.critical
     else:
@@ -311,8 +311,7 @@ def register_exception(stream='error',
         )
         return 1
     except Exception as err:
-        print("Error in registering exception to '%s': '%s'" % (
-            cfg['CFG_LOGDIR'] + '/invenio.' + stream, err), file=sys.stderr)
+        print("Error in registering exception '%s'" % err, file=sys.stderr)
         return 0
 
 
@@ -336,30 +335,3 @@ def _truncate_dynamic_string(val, maxlength=500):
     if len(out) > maxlength:
         out = out[:maxlength] + ' [...]'
     return out
-
-
-def wrap_warn():
-    import warnings
-    from functools import wraps
-
-    def wrapper(showwarning):
-        @wraps(showwarning)
-        def new_showwarning(message=None, category=None, filename=None,
-                            lineno=None, file=None, line=None):
-
-            fmt = "* %(time)s -> WARNING: %(category)s: %(message)s " \
-                  "(%(file)s:%(line)s)\n"
-
-            current_app.logger.warning(
-                fmt % {
-                    'time': time.strftime("%Y-%m-%d %H:%M:%S"),
-                    'category': category,
-                    'message': message,
-                    'file': filename,
-                    'line': lineno
-                } + "** Traceback details\n" + str(traceback.format_stack())
-                  + "\n"
-            )
-        return new_showwarning
-
-    warnings.showwarning = wrapper(warnings.showwarning)
