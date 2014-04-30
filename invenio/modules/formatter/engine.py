@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -48,9 +48,9 @@ import traceback
 import zlib
 import cgi
 import types
-from flask import has_app_context
+from flask import has_app_context, current_app
 from operator import itemgetter
-from six import iteritems
+from six import iteritems, reraise
 from werkzeug.utils import cached_property
 
 from invenio.base.globals import cfg
@@ -770,20 +770,27 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
             output_text = apply(function, (), params)
         except Exception as e:
             name = format_element['attrs']['name']
-            try:
-                raise InvenioBibFormatError(_(
-                    'Error when evaluating format element %(format_element)s with parameters %(parameters)s.',
-                    format_element=name, parameters=str(params)))
-            except InvenioBibFormatError as exc:
-                register_exception(req=bfo.req)
-                errors.append(exc.message)
 
-            if verbose >= 5:
+            # Log exception
+            message = _(
+                "Error when evaluating format element %(format_element)s with"
+                " parameters %(parameters)s.",
+                format_element=name,
+                parameters=str(params)
+            )
+            current_app.logger.exception(
+                message
+            )
+            errors.append(message)
+
+            # In debug mode - include traceback in output
+            if current_app.debug:
                 tb = sys.exc_info()[2]
-
-                stack = traceback.format_exception(Exception, e, tb, limit=None)
-                output_text = '<b><span style="color: rgb(255, 0, 0);">'+ \
-                              str(exc.message) + "".join(stack) +'</span></b> '
+                stack = traceback.format_exception(
+                    Exception, e, tb, limit=None
+                )
+                output_text = '<span class="well"><pre style="color:red;">' \
+                    '%s\n\n%s</pre></span>' % (message, "".join(stack))
 
         # None can be returned when evaluating function
         if output_text is None:
