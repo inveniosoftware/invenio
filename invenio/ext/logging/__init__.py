@@ -33,49 +33,111 @@ application:
 >>> from invenio.base.factory import create_app
 >>> app = create_app()
 
-Handling errors
+Logging errors
 ^^^^^^^^^^^^^^^
+The preferred way to log errors is by using the Flask application logger:
 
->>> from invenio.ext.logging import register_exception
+>>> from flask import current_app
 >>> with app.app_context():
         try:
             raise Exception("This is an exception")
         except Exception as e:
-            register_exception()
+            current_app.logger.exception("My message")
 
+``logger.exception()`` will automatically include the exception stacktrace in
+the log record, which each log handler may decide to include or not.
 
-Logging
-^^^^^^^
-Please use the logger defined on the Flask application (``current_app.logger``)
-to log any message.
+You may also manually include exception information in the logger using the
+``exc_info`` keyword argument:
 
->>> from flask import current_app
+>>> import sys
 >>> with app.app_context():
-...     current_app.logger.debug("My message")
-...     current_app.logger.info("My message")
-...     current_app.logger.warning("My message")
-...     current_app.logger.error("My message")
+        try:
+            raise Exception("This is an exception")
+        except Exception as e:
+            current_app.logger.critical("My message", exc_info=sys.exc_info())
 
-You may also add extra data, which a log handler such as Sentry may decide to
-include in the logged message:
 
+Naturally, other log levels may also be used:
+
+>>> app.logger.info("This is an info message")
+>>> app.logger.warning("This is a warning message")
+>>> app.logger.debug("This is a debug message")
+
+Legacy handling of errors
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Invenio 1.x used a method ``register_exception`` to log errors. This method may
+still be used, but may be deprecated in the future:
+
+>>> from invenio.ext.logging import register_exception
 >>> with app.app_context():
-...     current_app.logger.error("My message", extra={'key': 'value'})
+...     try:
+...         raise Exception("This is an exception")
+...     except Exception as e:
+...         register_exception()
 
 
-In case you do not have access to the current application, you may
-*exceptionally* use the standard Python logging
-(https://docs.python.org/2/library/logging.html). In case you do so, please
-allow configurable logging handlers, so that an administrator can decide where
-log records should be sent to.
+The method ``register_exception`` is in fact just a small wrapper around the
+application logger.
 
-In all cases, avoid creating log files manually and writing to them. It
-prevents configuring e.g. sending emails or logging to sentry instead of
-writing to files.
+Error handling do's and don'ts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*Always use ``except Exception:`` over ``except:``*, unless you explicitly want
+to catch the following built-in exceptions (``SystemExit``,
+ ``KeyboardInterrupt``, ``GeneratorExit``).
+
+See https://docs.python.org/2/library/exceptions.html#exception-hierarchy
+
+*Reraise instead raise*. To gracefully handle errors, you may often catch
+exceptions to perform some cleanup or e.g. convert a low-level library
+exception into a more high-level application exception. This may however often
+discard the initial exception and its traceback, making it hard to track
+down the root cause. To preserve the traceback, you may reraise the caught
+exception:
+
+>>> import six
+>>> with app.app_context():
+...     try:
+...         try:
+...             0 / 0
+...         except ZeroDivisionError as e:
+...             # Do clean-up
+...             six.reraise(*sys.exc_info())
+...     except Exception as e:
+...         current_app.logger.exception("Something bad happened")
+
+If you like to convert the exception, it can be done like this:
+
+>>> import six
+>>> class AppError(Exception):
+...     pass
+>>> with app.app_context():
+...     try:
+...         try:
+...             0 / 0
+...         except ZeroDivisionError as e:
+...             six.reraise(MyAppError, "Custom message", sys.exc_info()[2])
+...     except AppError as e:
+...         current_app.logger.exception("Something bad happened")
+
+Warnings
+^^^^^^^^
+Warnings are useful to alert developers and system administrators about
+possible problems, e.g. usage of obsolete modules, deprecated APIs etc.
+
+Issue a deprecation warning (not silent):
+
+>>> import warnings
+>>> warnings.warn("Message to developer", DeprecationWarning)
+
+Issue a pending deprecation warning (silent by default):
+
+>>> warnings.warn("Message to developer", PendingDeprecationWarning)
 
 Log handlers
 ^^^^^^^^^^^^
-Log messages written to  the Flask application logger can be handled by many
+Log messages written to the Flask application logger can be handled by many
 different backends, which is configurable by the an administrator. By default
 Invenio ships with following log handlers:
 
@@ -85,19 +147,24 @@ Invenio ships with following log handlers:
 * ``invenio.ext.logging.backends.sentry`` - Logging to Sentry service (see
   https://pypi.python.org/pypi/sentry and https://getsentry.com/)
 
-Please see documentation in each backend for further configuration options.
+Please see documentation in each backend for further configuration options as
+well as the Python logging documentation for how to create handlers, formatters
+and filters: https://docs.python.org/2/library/logging.html
 """
 
-from .wrappers import register_exception, wrap_warn, get_pretty_traceback
+from __future__ import absolute_import
+
+import logging
+from .wrappers import register_exception, get_pretty_traceback
 
 
 def setup_app(app):
-    """
-    Nothing to setup. All is currently done in the specific backends.
-    """
-    pass
-
+    # Output deprecation warnings in debug mode
+    if app.debug:
+        logger = logging.getLogger('py.warnings')
+        logger.addHandler(logging.StreamHandler())
+        logger.setLevel(logging.WARNING)
 
 __all__ = [
-    'register_exception', 'wrap_warn', 'get_pretty_traceback'
+    'register_exception', 'get_pretty_traceback'
 ]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -410,8 +410,8 @@ def task_init(
     if task_name not in CFG_BIBTASK_VALID_TASKS or os.path.realpath(os.path.join(CFG_BINDIR, task_name)) != os.path.realpath(sys.argv[0]):
         raise OSError("%s is not in the allowed modules" % sys.argv[0])
 
-    from invenio.ext.logging import wrap_warn
-    wrap_warn()
+    from invenio.base.factory import configure_warnings
+    configure_warnings()
 
     if type(argv) is dict:
         # FIXME: REMOVE AFTER MAJOR RELEASE 1.0

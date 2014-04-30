@@ -33,6 +33,7 @@ from werkzeug.local import LocalProxy
 #from invenio.ext.logging import register_exception
 from .helpers import with_app_context, unicodifier
 from .wrappers import Flask
+from .utils import captureWarnings
 from flask.ext.registry import Registry, ExtensionRegistry, \
     PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
 
@@ -49,7 +50,6 @@ def cleanup_legacy_configuration(app):
     app.config.update(unicodifier(dict(app.config)))
     ## ... and map certain common parameters
     app.config['CFG_LANGUAGE_LIST_LONG'] = LocalProxy(language_list_long)
-
 
 
 def register_legacy_blueprints(app):
@@ -94,6 +94,21 @@ def load_site_config(app):
         app.config.from_object(ep.module_name)
 
 
+def configure_warnings():
+    """
+    Configure warnings by routing warnings to the logging system, as well as
+    unhiding DeprecationWarning.
+    """
+    if not sys.warnoptions:
+        # Route warnings through python logging
+        captureWarnings(True)
+
+        # DeprecationWarning is by default hidden, hence we force the
+        # "default" behavior on deprecation warnings which is not to hide
+        # errors.
+        warnings.simplefilter("default", DeprecationWarning)
+
+
 def create_app(instance_path=None, **kwargs_config):
     """
     Prepare Invenio application based on Flask.
@@ -102,6 +117,8 @@ def create_app(instance_path=None, **kwargs_config):
     the old WSGI legacy application and the old Python legacy
     scripts (URLs to *.py files).
     """
+    configure_warnings()
+
     # Flask application name
     app_name = '.'.join(__name__.split('.')[0:2])
 
@@ -191,15 +208,8 @@ def create_app(instance_path=None, **kwargs_config):
 
 def create_wsgi_app(*args, **kwargs):
     """
+    Create WSGI application
     """
-    # wrap warnings (usually from sql queries) to log the traceback
-    # of their origin for debugging
-    try:
-        from invenio.ext.logging import wrap_warn
-        wrap_warn()
-    except:
-        pass
-
     app = create_app(*args, **kwargs)
 
     ## Start remote debugger if appropriate:
