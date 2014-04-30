@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,8 @@ from urllib import quote
 from invenio.base.globals import cfg
 
 
-def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
+def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ',
+                   link='yes'):
     """
     Display keywords of the record.
 
@@ -43,11 +44,12 @@ def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='y
 
     if len(keywords) > 0:
         if link == 'yes':
-            keywords = ['<a href="' + CFG_SITE_URL + '/search?f=keyword&amp;p='+ \
-                        quote('"' + keyword + '"') + \
-                        '&amp;ln='+ bfo.lang+ \
-                        '">' + cgi.escape(keyword) + '</a>'
-                        for keyword in keywords]
+            keywords = [
+                '<a href="' + CFG_SITE_URL + '/search?f=keyword&amp;p=' +
+                quote('"' + keyword + '"') +
+                '&amp;ln=' + str(bfo.lang) +
+                '">' + cgi.escape(keyword) + '</a>'
+                for keyword in keywords]
         else:
             keywords = [cgi.escape(keyword)
                         for keyword in keywords]
@@ -55,6 +57,7 @@ def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='y
         keywords = [keyword_prefix + keyword + keyword_suffix
                     for keyword in keywords]
         return separator.join(keywords)
+
 
 def escape_values(bfo):
     """
