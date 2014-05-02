@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,10 +24,10 @@ CFG_CLOUD_UTILS_ROWS_PER_PAGE = 10
 
 CFG_SERVICE_PRETTY_NAME = {'dropbox': "Dropbox",
                            'google_drive': "Google Drive",
-                           'skydrive': "SkyDrive",
+                           'onedrive': "OneDrive",
                            }
 
-CFG_CLOUD_UTILS_ENABLED_SERVICES = ['dropbox', 'google_drive', 'skydrive']
+CFG_CLOUD_UTILS_ENABLED_SERVICES = ['dropbox', 'google_drive', 'onedrive']
 
 # Dropbox configuration
 CFG_DROPBOX_KEY = ""
@@ -45,8 +45,8 @@ CFG_GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file"
 CFG_GOOGLE_DRIVE_ROOT = "invenio"
 
 
-# SkyDrive configuration
-CFG_SKYDRIVE_CLIENT_ID = ""
-CFG_SKYDRIVE_CLIENT_SECRET = ""
-CFG_SKYDRIVE_SCOPE = ["wl.skydrive_update", "wl.offline_access"]
-CFG_SKYDRIVE_ROOT = "invenio"
+# OneDrive configuration
+CFG_ONEDRIVE_CLIENT_ID = ""
+CFG_ONEDRIVE_CLIENT_SECRET = ""
+CFG_ONEDRIVE_SCOPE = ["wl.skydrive", "wl.skydrive_update", "wl.offline_access"]
+CFG_ONEDRIVE_ROOT = "invenio"
