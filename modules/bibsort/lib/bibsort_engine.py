@@ -198,6 +198,9 @@ def get_data_for_definition_rnk(method_name, rnk_name):
 def get_data_for_definition_bibrec(column_name, recids_copy):
     '''Having a column_name and a list of recids, it returns a dictionary
     mapping each recids with its correspondig value from the column'''
+    if column_name == 'id':
+        ## short-cut for recids:
+        return dict(map(lambda x: (x,x), recids_copy))
     dict_column = {}
     for recid in recids_copy:
         creation_date = run_sql('SELECT %s from bibrec WHERE id = %%s' %column_name, (recid, ))[0][0]

@@ -3827,7 +3827,8 @@ class Template:
     def tmpl_detailed_record_metadata(self, recID, ln, format,
                                       content,
                                       creationdate=None,
-                                      modificationdate=None):
+                                      modificationdate=None,
+                                      ingestiondate=None):
         """Returns the main detailed page of a record
 
         Parameters:
@@ -3843,6 +3844,8 @@ class Template:
           - 'creationdate' *string* - The creation date of the printed record
 
           - 'modificationdate' *string* - The last modification date of the printed record
+
+          - 'ingestiondate' *string* - The ingestion date of the printed record
         """
         _ = gettext_set_language(ln)
 
