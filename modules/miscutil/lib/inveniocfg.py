@@ -887,11 +887,13 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/webcoll 5" % CFG_PREFIX,
                 "%s/bin/bibrank -u admin" % CFG_PREFIX,
                 "%s/bin/bibrank 6" % CFG_PREFIX,
+                "%s/bin/bibcheck -u admin -e earliest_date -c example_rules.cfg" % CFG_PREFIX,
+                "%s/bin/bibcheck 7" % CFG_PREFIX,
                 "%s/bin/bibsort -u admin -R" % CFG_PREFIX,
-                "%s/bin/bibsort 7" % CFG_PREFIX,
+                "%s/bin/bibsort 8" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
-                "%s/bin/oairepositoryupdater 8" % CFG_PREFIX,
-                "%s/bin/bibupload 9" % CFG_PREFIX,]:
+                "%s/bin/oairepositoryupdater 9" % CFG_PREFIX,
+                "%s/bin/bibupload 10" % CFG_PREFIX,]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)

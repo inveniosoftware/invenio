@@ -3867,6 +3867,14 @@ def get_modification_date(recID, fmt="%Y-%m-%d"):
         out = res[0][0]
     return out
 
+def get_earliest_date(recID, fmt="%Y-%m-%d"):
+    "Returns the earliest date for the record 'recID'."
+    out = ""
+    res = run_sql("SELECT DATE_FORMAT(earliest_date,%s) FROM bibrec WHERE id=%s", (fmt, recID), 1)
+    if res:
+        out = res[0][0]
+    return out
+
 def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb_found=-1, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS,
                       aas=0, ln=CFG_SITE_LANG, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
@@ -4808,9 +4816,11 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
                         creationdate = None
                         modificationdate = None
+                        earliestdate = None
                         if record_exists(recid) == 1:
                             creationdate = get_creation_date(recid)
                             modificationdate = get_modification_date(recid)
+                            earliestdate = get_earliest_date(recid)
 
                         content = print_record(recid, format, ot, ln,
                                                search_pattern=search_pattern,
@@ -4822,6 +4832,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             format=format,
                             creationdate=creationdate,
                             modificationdate=modificationdate,
+                            earliestdate=earliestdate,
                             content=content)
                         # display of the next-hit/previous-hit/back-to-search links
                         # on the detailed record pages
@@ -4834,6 +4845,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       ln,
                                                                                       creationdate=creationdate,
                                                                                       modificationdate=modificationdate,
+                                                                                      earliestdate=earliestdate,
                                                                                       show_short_rec_p=False))
 
                         if len(tabs) > 0:
