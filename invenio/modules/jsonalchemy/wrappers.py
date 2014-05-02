@@ -33,6 +33,7 @@ from invenio.utils.datastructures import DotableDict, SmartDict
 from .parser import FieldParser, ModelParser
 from .reader import Reader
 from .registry import contexts, producers
+from .errors import ReaderException
 
 
 class StorageEngine(type):
@@ -394,7 +395,16 @@ class SmartJson(SmartDict):
         """
         # FIXME: it might be a bit overkilling
         from invenio.legacy.bibrecord import create_record
-        return create_record(self.legacy_export_as_marc())[0]
+        record, status_code, errors = create_record(
+            self.legacy_export_as_marc()
+        )
+        if status_code == 0:
+            # There was an error
+            if isinstance(errors, list):
+                errors = "\n".join(errors)
+            raise ReaderException("There was an error while parsing MARCXML: %s"
+                                  % (errors,))
+        return record
 
 
 class SmartJsonLD(SmartJson):

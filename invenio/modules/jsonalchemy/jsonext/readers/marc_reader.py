@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,6 +29,8 @@ from werkzeug.utils import import_string
 from invenio.base.globals import cfg
 
 from invenio.modules.jsonalchemy.reader import Reader
+from invenio.modules.jsonalchemy.errors import ReaderException
+
 
 class MarcReader(Reader):
     """Marc reader"""
@@ -99,8 +101,14 @@ class MarcReader(Reader):
                 value = current_value
             d[key] = value
         self.rec_tree = SaveDict()
-        tmp = create_record(self._blob)[0]
-        for key, values in iteritems(tmp):
+        record, status_code, errors = create_record(self._blob)
+        if status_code == 0:
+            if isinstance(errors, list):
+                errors = "\n".join(errors)
+            # There was an error
+            raise ReaderException("There was an error while parsing MARCXML: %s"
+                                  % (errors,))
+        for key, values in iteritems(record):
             if key < '010' and key.isdigit():
                 self.rec_tree[key] = [value[3] for value in values]
             else:
