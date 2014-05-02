@@ -39,9 +39,9 @@ class RunSqlReturnListOfDictionaries(InvenioTestCase):
         """dbquery - select date format column query"""
         import time
         year = time.localtime().tm_year
-        res = dbquery.run_sql("SELECT DATE_FORMAT(creation_date, '%Y') FROM bibrec WHERE id<3", with_dict=True)
-        self.assertEqual(res, ([{"DATE_FORMAT(creation_date, '%Y')": str(year)},
-                                {"DATE_FORMAT(creation_date, '%Y')": str(year)}]))
+        res = dbquery.run_sql("SELECT DATE_FORMAT(ingestion_date, '%Y') FROM bibrec WHERE id<3", with_dict=True)
+        self.assertEqual(res, ([{"DATE_FORMAT(ingestion_date, '%Y')": str(year)},
+                                {"DATE_FORMAT(ingestion_date, '%Y')": str(year)}]))
 
     def test_select_sum_columns_query(self):
         """dbquery - select sum columns query"""

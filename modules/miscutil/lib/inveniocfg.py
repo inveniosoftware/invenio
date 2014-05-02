@@ -900,13 +900,15 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/bibreformat 6" % CFG_PREFIX,
                 "%s/bin/bibrank -u admin" % CFG_PREFIX,
                 "%s/bin/bibrank 7" % CFG_PREFIX,
+                "%s/bin/bibcheck -u admin -e creation_date -c example_rules.cfg" % CFG_PREFIX,
+                "%s/bin/bibcheck 8" % CFG_PREFIX,
                 "%s/bin/bibsort -u admin -R" % CFG_PREFIX,
-                "%s/bin/bibsort 8" % CFG_PREFIX,
+                "%s/bin/bibsort 9" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
-                "%s/bin/oairepositoryupdater 9" % CFG_PREFIX,
-                "%s/bin/bibupload 10" % CFG_PREFIX,
+                "%s/bin/oairepositoryupdater 10" % CFG_PREFIX,
+                "%s/bin/bibupload 11" % CFG_PREFIX,
                 "%s/bin/bibauthorid -u admin --update-personid" % CFG_PREFIX,
-                "%s/bin/bibauthorid 11" % CFG_PREFIX]:
+                "%s/bin/bibauthorid 12" % CFG_PREFIX]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
