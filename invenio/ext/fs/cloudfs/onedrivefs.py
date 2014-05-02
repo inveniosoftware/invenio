@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-    SkyDrive file system
+    OneDrive file system
     --------------------
 
     Known issues:
@@ -27,7 +27,7 @@
       the file on cloud is overwrite twice...
 """
 
-from skydrive import api_v5
+from onedrive import api_v5
 import six
 import os
 import time
@@ -94,7 +94,7 @@ class CacheItem(object):
         self.timestamp = time.time()
 
 
-class SkyDriveCache(UserDict):
+class OneDriveCache(UserDict):
     def __init__(self, client):
         self._client = client
         UserDict.__init__(self)
@@ -113,9 +113,9 @@ class SkyDriveCache(UserDict):
         return value
 
 
-class SkyDriveClient(api_v5.SkyDriveAPI):
+class OneDriveClient(api_v5.OneDriveAPI):
     def __init__(self, credentials):
-        self.cache = SkyDriveCache(self)
+        self.cache = OneDriveCache(self)
         self.auth_access_token = credentials.get("access_token", None)
         self.auth_refresh_token = credentials.get("refresh_token", None)
         self.auth_redirect_uri = credentials.get("redirect_uri", None)
@@ -128,7 +128,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
         item = self.cache.get(path)
         if not item or item.metadata is None or item.expired:
             try:
-                metadata = super(SkyDriveClient, self).info(path)
+                metadata = super(OneDriveClient, self).info(path)
             except api_v5.ProtocolError as e:
                 if e.code == 404:
                     raise ResourceNotFoundError(path)
@@ -159,11 +159,11 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
             update = True
         if update:
             try:
-                metadata = super(SkyDriveClient, self).info(path)
+                metadata = super(OneDriveClient, self).info(path)
                 if metadata["type"] != "folder" and not ("folder" in path):
                     raise ResourceInvalidError(path)
                 children = []
-                contents = super(SkyDriveClient, self).listdir(path)
+                contents = super(OneDriveClient, self).listdir(path)
                 for child in contents:
                     children.append(child['id'])
                     self.cache[child['id']] = CacheItem(child, parent=path)
@@ -175,7 +175,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
                     raise OperationFailedError(opname='metadata', path=path,
                                                msg=str(e))
                 # We have an item from cache (perhaps expired), but it's
-                # hash is still valid (as far as SkyDrive is concerned),
+                # hash is still valid (as far as OneDrive is concerned),
                 # so just renew it and keep using it.
                 item.renew()
             except:
@@ -187,7 +187,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
     def file_create_folder(self, parent_id, title):
         "Add newly created directory to cache."
         try:
-            metadata = super(SkyDriveClient, self).mkdir(title, parent_id)
+            metadata = super(OneDriveClient, self).mkdir(title, parent_id)
         except api_v5.ProtocolError as e:
             if e.code == 405:
                     raise ResourceInvalidError(parent_id)
@@ -204,7 +204,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
 
     def file_copy(self, src, dst):
         try:
-            metadata = super(SkyDriveClient, self).copy(src, dst, False)
+            metadata = super(OneDriveClient, self).copy(src, dst, False)
         except api_v5.ProtocolError as e:
             if e.code == 404:
                 raise ResourceNotFoundError(
@@ -219,7 +219,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
 
     def file_move(self, src, dst):
         try:
-            metadata = super(SkyDriveClient, self).copy(src, dst, True)
+            metadata = super(OneDriveClient, self).copy(src, dst, True)
         except api_v5.ProtocolError as e:
             if e.code == 404:
                 raise ResourceNotFoundError(
@@ -236,7 +236,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
 
     def file_delete(self, path):
         try:
-            super(SkyDriveClient, self).delete(path)
+            super(OneDriveClient, self).delete(path)
         except api_v5.ProtocolError as e:
             if e.code == 404:
                 raise ResourceNotFoundError(path)
@@ -249,7 +249,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
 
     def put_file(self, parent_id, title, content, overwrite=False):
         try:
-            metadata = super(SkyDriveClient, self).put(
+            metadata = super(OneDriveClient, self).put(
                 (title, content), parent_id, overwrite=overwrite)
         except api_v5.ProtocolError as e:
             if e.code == 404:
@@ -268,7 +268,7 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
 
         if not self.cache.get(path, None):
             try:
-                metadata = super(SkyDriveClient, self).info(path)
+                metadata = super(OneDriveClient, self).info(path)
             except api_v5.ProtocolError as e:
                 if e.code == 404:
                     raise ResourceNotFoundError("Source file doesn't exist")
@@ -284,11 +284,11 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
             item = self.cache[path]
             metadata = item.metadata
 
-        return super(SkyDriveClient, self).get(path)
+        return super(OneDriveClient, self).get(path)
 
     def update_file(self, file_id, new_file_info):
         try:
-            metadata = super(SkyDriveClient, self).info_update(
+            metadata = super(OneDriveClient, self).info_update(
                 file_id, new_file_info)
         except api_v5.ProtocolError as e:
             if e.resp.status == 404:
@@ -304,11 +304,11 @@ class SkyDriveClient(api_v5.SkyDriveAPI):
         return metadata['id']
 
 
-class SkyDriveFS(FS):
+class OneDriveFS(FS):
     """
         Sky drive file system
     """
-    __name__ = "SkyDrive"
+    __name__ = "OneDrive"
 
     _meta = {'thread_safe': True,
              'virtual': False,
@@ -332,23 +332,23 @@ class SkyDriveFS(FS):
             self._root = "me/skydrive"
 
         if self._credentials is None:
-            if "SKYDRIVE_ACCESS_TOKEN" not in os.environ:
+            if "ONEDRIVE_ACCESS_TOKEN" not in os.environ:
                 raise CreateFailedError(
-                    "SKYDRIVE_ACCESS_TOKEN is not set in os.environ")
+                    "ONEDRIVE_ACCESS_TOKEN is not set in os.environ")
             else:
                 self._credentials['access_token'] = os.environ.get(
-                    'SKYDRIVE_ACCESS_TOKEN')
+                    'ONEDRIVE_ACCESS_TOKEN')
                 self._credentials['refresh_token'] = os.environ.get(
-                    'SKYDRIVE_REFRESH_TOKEN', None)
+                    'ONEDRIVE_REFRESH_TOKEN', None)
                 self._credentials['redirect_uri'] = os.environ.get(
-                    'SKYDRIVE_REDIRECT_URI', None)
+                    'ONEDRIVE_REDIRECT_URI', None)
                 self._credentials['client_id'] = os.environ.get(
-                    'SKYDRIVE_CLIENT_ID', None)
+                    'ONEDRIVE_CLIENT_ID', None)
                 self._credentials['client_secret'] = os.environ.get(
-                    'SKYDRIVE_CLIENT_SECRET', None)
+                    'ONEDRIVE_CLIENT_SECRET', None)
 
-        self.client = SkyDriveClient(self._credentials)
-        super(SkyDriveFS, self).__init__(thread_synchronize=thread_synchronize)
+        self.client = OneDriveClient(self._credentials)
+        super(OneDriveFS, self).__init__(thread_synchronize=thread_synchronize)
 
     def __repr__(self):
         args = (self.__class__.__name__, self._root)
@@ -485,7 +485,7 @@ class SkyDriveFS(FS):
         """
         @param src: Id of the file to be copied
         @param dst: Id of the folder in which to copy the file
-        @param overwrite: This is never true for SkyDrive
+        @param overwrite: This is never true for OneDrive
         @return: Id of the copied file
         """
         return self.client.file_copy(src, dst)
@@ -493,7 +493,7 @@ class SkyDriveFS(FS):
     def copydir(self, src, dst, overwrite=False, ignore_errors=False,
                 chunk_size=16384):
         """
-        NOTE: SkyDrive doesn't support copy of folders. And to implement it
+        NOTE: OneDrive doesn't support copy of folders. And to implement it
               over copy method will be very inefficient
         """
         raise NotImplemented("If implemented method will be very inefficient")
@@ -546,7 +546,7 @@ class SkyDriveFS(FS):
                 - /new_folder_name to create a new folder in root directory
                 - /new_folder1/new_folder2... to recursively create a new folder in root
         @param recursive: allows recursive creation of directories
-        @param allow_recreate: for SkyDrive this param is always False, it will
+        @param allow_recreate: for OneDrive this param is always False, it will
             never recreate a directory
         """
         parts = path.split("/")
@@ -591,7 +591,7 @@ class SkyDriveFS(FS):
     def movedir(self, src, dst, overwrite=False, ignore_errors=False,
                 chunk_size=16384):
         """
-        @attention: skydrive API doesn't allow to move folders
+        @attention: onedrive API doesn't allow to move folders
         """
         raise UnsupportedError("move a directory")
 
@@ -692,7 +692,7 @@ class SkyDriveFS(FS):
         """
         path = self._normpath(path)
 
-        # Fix for skydrive, because if you don't write the path in the way they
+        # Fix for onedrive, because if you don't write the path in the way they
         # want. It will raise an exception with the error code 400.
         # That error means nothing because it's raised in many situations.
         if not self.exists(path):
@@ -738,7 +738,7 @@ class SkyDriveFS(FS):
         user = self.client.info("me")
         info = {}
         quota = self.client.get_quota()
-        info['cloud_storage_url'] = "https://skydrive.live.com/"
+        info['cloud_storage_url'] = "https://onedrive.live.com/"
         info['user_name'] = user['first_name'].capitalize() + \
             " " + user['last_name'].capitalize()
         info['quota'] = 100 * (float(quota[1] - quota[0]) / float(quota[1]))
@@ -751,7 +751,7 @@ class SkyDriveFS(FS):
         """
 
         if path in ("/skydrive/camera_roll", "/skydrive/my_documents",
-                    "/skydrive/my_photos, /skydrive/public_documents",
+                    "/skydrive/my_photos", "/skydrive/public_documents",
                     "me/skydrive"):
             return path
         elif path == self._root:
