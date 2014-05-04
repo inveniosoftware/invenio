@@ -957,6 +957,9 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
     elif of == "intbitset":
         req.content_type = "application/octet-stream"
         req.send_http_header()
+    elif of == "recjson":
+        req.content_type = "application/json"
+        req.send_http_header()
     elif of == "id":
         pass # nothing to do, we shall only return list of recIDs
     elif content_type == 'text/html':
@@ -4483,6 +4486,17 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                 req.write(x)
                 if x:
                     req.write('\n')
+        elif format.startswith('recjson'):
+            # we are doing recjson output:
+            req.write('[')
+            for idx, recid in enumerate(recIDs):
+                if idx > 0:
+                    req.write(',')
+                req.write(print_record(recid, format, ot, ln,
+                                       search_pattern=search_pattern,
+                                       user_info=user_info, verbose=verbose,
+                                       sf=sf, so=so, sp=sp, rm=rm))
+            req.write(']')
         elif format == 'excel':
             create_excel(recIDs=recIDs, req=req, ot=ot, user_info=user_info)
         else:
@@ -4860,6 +4874,15 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     """
     if format == 'recstruct':
         return get_record(recID)
+
+    if format.startswith('recjson'):
+        import json
+        from invenio.bibfield import get_record as get_recjson
+        if ot:
+            ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
+            return json.dumps(dict(get_recjson(recID, fields=ot)))
+        else:
+            return json.dumps(get_recjson(recID).dumps())
 
     _ = gettext_set_language(ln)
 
@@ -5559,6 +5582,8 @@ def prs_wash_arguments_colls(kwargs=None, of=None, req=None, cc=None, c=None, sc
             return []
         elif of == "intbitset":
             return intbitset()
+        elif of == "recjson":
+            return []
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5738,6 +5763,8 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
             return []
         elif of == "intbitset":
             return intbitset()
+        elif of == "recjson":
+            return []
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5813,6 +5840,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
             return []
         if of == "intbitset":
             return intbitset()
+        elif of == "recjson":
+            return []
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5865,6 +5894,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                     return []
                 elif of == "intbitset":
                     return intbitset()
+                elif of == "recjson":
+                    return []
                 elif of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
@@ -5894,6 +5925,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
             return []
         elif of == "intbitset":
             return intbitset()
+        elif of == "recjson":
+            return []
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5927,6 +5960,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
                     return []
                 elif of == "intbitset":
                     return intbitset()
+                elif of == "recjson":
+                    return []
                 elif of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
