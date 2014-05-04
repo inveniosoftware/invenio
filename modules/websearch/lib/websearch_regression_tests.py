@@ -2822,6 +2822,27 @@ Zaffaroni, A
 </collection>"""))
 
 
+class WebSearchSearchEngineJSONAPITest(InvenioTestCase):
+    """Check typical search engine JSON API calls on the demo data."""
+
+    def test_search_engine_json_api_for_failed_query(self):
+        """websearch - search engine JSON API for failed query"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=aoeuidhtns&of=recjson',
+                                               expected_text=""))
+
+    def test_search_engine_json_api_for_ellis_query(self):
+        """websearch - search engine JSON API for Ellis"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=recjson&ot=recid',
+                                               expected_text='[{"recid": 47},{"recid": 18},{"recid": 17},{"recid": 16},{"recid": 15},{"recid": 14},{"recid": 13},{"recid": 12},{"recid": 11},{"recid": 10}]'))
+
+    def test_search_engine_json_api_for_ellis_query_paginated(self):
+        """websearch - search engine JSON API for Ellis, output fields and pagination"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=recjson&ot=recid,title&jrec=4&rg=2',
+                                               expected_text='[{"recid": 16, "title": {"title": "Cosmological perturbations in Kaluza-Klein models"}},{"recid": 15, "title": {"title": "Cosmic equation of state, Gravitational Lensing Statistics and Merging of Galaxies"}}]'))
+
 
 class WebSearchRecordWebAPITest(InvenioTestCase):
     """Check typical /record Web API calls on the demo data."""
@@ -3245,6 +3266,40 @@ class WebSearchRecordWebAPITest(InvenioTestCase):
 Porrati, Massimo
 Zaffaroni, A
 """))
+
+
+class WebSearchRecordJSONAPITest(InvenioTestCase):
+    """Check typical /record JSON API calls on the demo data."""
+
+    def test_record_json_api_for_failed_field(self):
+        """websearch - search engine JSON API for failed field"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/81?of=recjson&ot=aoeuidhtns',
+                                               expected_text='[{"aoeuidhtns": null}]'))
+
+    def test_record_json_api_for_field(self):
+        """websearch - search engine JSON API for existing field"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/81?of=recjson&ot=authors',
+                                               expected_text='[{"authors": [{"affiliation": "Stanford University", "first_name": "A", "last_name": "Adams", "full_name": "Adams, A"}, {"first_name": "J", "last_name": "McGreevy", "full_name": "McGreevy, J"}, {"first_name": "E", "last_name": "Silverstein", "full_name": "Silverstein, E"}]}]'))
+
+    def test_record_json_api_for_field_subfield(self):
+        """websearch - search engine JSON API for existing field.subfield"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/81?of=recjson&ot=authors.last_name',
+                                               expected_text='[{"authors": {"last_name": ["Adams", "McGreevy", "Silverstein"]}}]'))
+
+    def test_record_json_api_for_derived_field(self):
+        """websearch - search engine JSON API for derived field"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/81?of=recjson&ot=number_of_authors',
+                                               expected_text='[{"number_of_authors": 3}]'))
+
+    def test_record_json_api_for_virtual_field(self):
+        """websearch - search engine JSON API for virtual field"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/81?of=recjson&ot=recid,number_of_citations',
+                                               expected_text='[{"recid": 81, "number_of_citations": 4}]'))
 
 
 class WebSearchRestrictedCollectionTest(InvenioTestCase):
@@ -5007,7 +5062,9 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchAuthorQueryTest,
                              WebSearchSearchEnginePythonAPITest,
                              WebSearchSearchEngineWebAPITest,
+                             WebSearchSearchEngineJSONAPITest,
                              WebSearchRecordWebAPITest,
+                             WebSearchRecordJSONAPITest,
                              WebSearchRestrictedCollectionTest,
                              WebSearchRestrictedCollectionHandlingTest,
                              WebSearchRestrictedPicturesTest,
@@ -5046,7 +5103,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchCJKTokenizedSearchTest,
                              WebSearchItemCountQueryTest,
                              WebSearchCustomCollectionBoxesName,
-                             WebSearchDetailedRecordTabsTest)
+                             WebSearchDetailedRecordTabsTest,)
 
 
 if __name__ == "__main__":
