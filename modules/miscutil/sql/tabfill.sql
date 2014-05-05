@@ -68,6 +68,7 @@ INSERT INTO field VALUES (45,'note','note');
 INSERT INTO field VALUES (46,'address','address');
 INSERT INTO field VALUES (47,'data source','datasource');
 INSERT INTO field VALUES (50,'journal page','journalpage');
+INSERT INTO field VALUES (51,'date ingested','dateingested');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
