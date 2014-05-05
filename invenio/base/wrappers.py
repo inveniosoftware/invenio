@@ -21,7 +21,7 @@
     invenio.base.wrappers
     ---------------------
 
-    Implements the Flask application wrapper.
+    Implement the Flask application wrapper.
 
     The function :func:`~flask.url_for` in standard :class:`~flask.Flask`
     application changes only protocol for secure sites from 'http' to 'https'.
@@ -79,6 +79,11 @@
          ...
         NotFound: 404: Not Found
         >>> ctx.pop()
+
+
+    .. py:data:: STATIC_MAP
+
+       Map of static resources and their absolute path.
 """
 import os
 

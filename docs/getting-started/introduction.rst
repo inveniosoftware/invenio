@@ -50,4 +50,6 @@ new to Invenio 2.0 coming from previous versions then you should read our
 getting started tutorials:
 
 - :ref:`first-steps`
-- :ref:`next-steps`
+
+..
+    - :ref:`next-steps`
