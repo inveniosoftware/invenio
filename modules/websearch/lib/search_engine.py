@@ -2425,6 +2425,8 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
         hitset = search_unit_in_bibrec(p, p, 'c')
     elif f == 'datemodified':
         hitset = search_unit_in_bibrec(p, p, 'm')
+    elif f == 'earliestdate':
+        hitset = search_unit_in_bibrec(p, p, 'e')
     elif f == 'refersto':
         # we are doing search by the citation count
         hitset = search_unit_refersto(p)
@@ -2895,6 +2897,8 @@ def search_unit_in_bibrec(datetext1, datetext2, search_type='c'):
     hitset = intbitset()
     if search_type and search_type.startswith("m"):
         search_type = "modification_date"
+    elif search_type and search_type.startswith("e"):
+        search_type = "earliest_date"
     else:
         search_type = "creation_date" # by default we are searching for creation dates
 
@@ -3276,7 +3280,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         nearest_terms = []
         if index_id:
             nearest_terms = get_nearest_terms_in_idxphrase(p, index_id, n, n)
-        if f == 'datecreated' or f == 'datemodified':
+        if f in ('datecreated', 'datemodified', 'earliestdate'):
             nearest_terms = get_nearest_terms_in_bibrec(p, f, n, n)
         if not nearest_terms:
             nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
@@ -3291,7 +3295,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         else:
             if index_id:
                 hits = get_nbhits_in_idxphrases(term, f)
-            elif f == 'datecreated' or f == 'datemodified':
+            elif f in ('datecreated', 'datemodified', 'earliestdate'):
                 hits = get_nbhits_in_bibrec(term, f)
             else:
                 hits = get_nbhits_in_bibxxx(term, f)
@@ -3472,13 +3476,15 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
 
 def get_nearest_terms_in_bibrec(p, f, n_below, n_above):
     """Return list of nearest terms and counts from bibrec table.
-    p is usually a date, and f either datecreated or datemodified.
+    p is usually a date, and f either datecreated or datemodified or earliestdate.
 
     Note: below/above count is very approximative, not really respected.
     """
     col = 'creation_date'
     if f == 'datemodified':
         col = 'modification_date'
+    elif f == 'earliestdate':
+        col = 'earliest_date'
     res_above = run_sql("""SELECT DATE_FORMAT(%s,'%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s')
                              FROM bibrec WHERE %s < %%s
                             ORDER BY %s DESC LIMIT %%s""" % (col, col, col),
@@ -3498,10 +3504,12 @@ def get_nearest_terms_in_bibrec(p, f, n_below, n_above):
 
 def get_nbhits_in_bibrec(term, f):
     """Return number of hits in bibrec table.  term is usually a date,
-    and f is either 'datecreated' or 'datemodified'."""
+    and f is either 'datecreated' or 'datemodified' or 'earliestdate'."""
     col = 'creation_date'
     if f == 'datemodified':
         col = 'modification_date'
+    elif f == 'earliestdate':
+        col = 'earliest_date'
     res = run_sql("SELECT COUNT(*) FROM bibrec WHERE %s LIKE %%s" % (col,),
                   (term + '%',))
     return res[0][0]

@@ -425,6 +425,7 @@ class SpiresToInvenioSyntaxConverter:
     # Constants defining fields
     _DATE_ADDED_FIELD = 'datecreated:'
     _DATE_UPDATED_FIELD = 'datemodified:'
+    _EARLIEST_DATE_FIELD = 'earliestdate:'
     _DATE_FIELD = 'year:'
 
     _A_TAG = 'author:'
@@ -481,6 +482,9 @@ class SpiresToInvenioSyntaxConverter:
         'date-updated': _DATE_UPDATED_FIELD,
         'dupd': _DATE_UPDATED_FIELD,
         'du': _DATE_UPDATED_FIELD,
+        'de': _EARLIEST_DATE_FIELD,
+        'dear': _EARLIEST_DATE_FIELD,
+        'earliest-date': _EARLIEST_DATE_FIELD,
         # first author
         'fa' : 'firstauthor:',
         'first-author' : 'firstauthor:',
@@ -717,13 +721,13 @@ class SpiresToInvenioSyntaxConverter:
                 (?=\ and\ not\ |\ and\ |\ or\ |\ not\ |$)''')
 
         # regular expression matching date after pattern
-        self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated|de|dear|earliest-date)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression matching date after pattern
-        self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated|de|dear|earliest-date)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # match date searches which have been keyword-substituted
-        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._EARLIEST_DATE_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # for finding (and changing) a variety of different SPIRES search keywords
         self._re_spires_find_keyword = re.compile('^(f|fin|find)\s+', re.IGNORECASE)

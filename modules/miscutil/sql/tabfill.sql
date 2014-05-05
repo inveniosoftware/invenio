@@ -63,6 +63,7 @@ INSERT INTO field VALUES (40,'refers to excluding self cites','referstoexcluding
 INSERT INTO field VALUES (41,'cited by excluding self cites','citedbyexcludingselfcites');
 INSERT INTO field VALUES (42,'cataloguer nickname','cataloguer');
 INSERT INTO field VALUES (43,'file name','filename');
+INSERT INTO field VALUES (44,'earliest date','earliestdate');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
