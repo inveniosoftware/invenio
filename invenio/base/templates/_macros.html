@@ -33,14 +33,14 @@
   {%- for bundle in get_js_bundle(iterate=True) -%}
     {%- assets bundle -%}
       <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-    {%- endassets -%}
+    {% endassets -%}
   {%- endfor -%}
 {%- endmacro -%}
 
 {%- macro css_bundle() -%}
   {%- for bundle in get_css_bundle(iterate=True) -%}
     {%- assets bundle -%}
-      <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
-    {%- endassets -%}
+      <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"/>
+    {% endassets -%}
   {%- endfor -%}
 {%- endmacro -%}

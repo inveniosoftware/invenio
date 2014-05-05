@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,34 +19,91 @@
     invenio.ext.assets
     ------------------
 
-    This module provides additional extensions and functions for
-    `flask.ext.assets` module.
+    Additional extensions and functions for the `flask.ext.assets` module.
 """
 
 import os
+import six
+from webassets.bundle import is_url
 from flask import current_app
-from flask.ext.assets import Environment, Bundle
+from flask.ext.assets import Environment, Bundle, FlaskResolver
 from .extensions import CollectionExtension
+
+from invenio.base.wrappers import STATIC_MAP
+
+
+__all__ = ('CollectionExtension', 'setup_app')
+
+
+class InvenioResolver(FlaskResolver):
+
+    """Custom resource resolver for webassets."""
+
+    def resolve_source(self, item):
+        """Return the absolute path of the resource.
+
+        .. seealso:: :py:function:`webassets.env.Resolver:resolve_source`
+        """
+        if not isinstance(item, six.string_types) or is_url(item):
+            return item
+        if item.startswith(self.env.url):
+            item = item[len(self.env.url):]
+        return self.search_for_source(item)
+
+    def resolve_source_to_url(self, filepath, item):
+        """Return the url of the resource.
+
+        Displaying them as is in debug mode as the webserver knows where to
+        search for them.
+
+        .. seealso:: :py:function:`webassets.env.Resolver:resolve_source_to_url`
+        """
+        if self.env.debug:
+            return item
+        return super(InvenioResolver, self).resolve_source_to_url(filepath,
+                                                                  item)
+
+    def search_for_source(self, item):
+        """Return absolute path of the resource.
+
+        It uses the :py:data:`invenio.base.wrappers.STATIC_MAP` to identify
+        which items are within a module static directory or are coming from
+        the instance static directory.
+
+        :param item: resource filename
+        :return: absolute path
+        .. seealso:: :py:function:`webassets.env.Resolver:search_for_source`
+        """
+        abspath = STATIC_MAP.get(item)
+        if abspath and not os.path.exists(abspath):
+            abspath = None
+
+        if not abspath:
+            try:
+                abspath = super(InvenioResolver, self).search_env_directory(item)
+            except:
+                # If a file is missing in production (non-debug mode), we want
+                # to not break and will use /dev/null instead. The exception
+                # is caught and logged.
+                if not current_app.debug:
+                    error = "Missing asset file: {0}".format(item)
+                    current_app.logger.exception(error)
+                    abspath = "/dev/null"
+                else:
+                    raise
+
+        return abspath
+
+Environment.resolver_class = InvenioResolver
 
 
 def setup_app(app):
-    """Initializes Assets extension."""
-
-    # Let's create assets environment.
+    """Initialize Assets extension."""
     assets = Environment(app)
-    assets.debug = 'assets-debug' in app.config.get('CFG_DEVEL_TOOLS', [])
-    assets.directory = app.config.get('CFG_WEBDIR', '')
+    assets.url = app.static_url_path + "/"
+    assets.directory = app.static_folder
 
     def _jinja2_new_bundle(tag, collection, name=None):
-        if not assets.debug:
-            files = [f for f in collection if os.path.isfile(
-                     os.path.join(assets.directory, f))]
-            if len(files) != len(collection):
-                ## Turn on debuging to generate 404 request on missing files.
-                assets.debug = True
-                current_app.logger.error('Missing files: ' + ','.join(
-                    set(collection) - set(files)))
-
         if len(collection):
             return Bundle(output="%s/%s-%s.%s" %
                           (tag, 'invenio' if name is None else name,

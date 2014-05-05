@@ -24,12 +24,11 @@
     Configuration of *Flask-Collect* extension.
 """
 
-from flask import safe_join
 from flask.ext.collect import Collect
 
 collect = Collect()
 
 
 def setup_app(app):
-    app.config['COLLECT_STATIC_ROOT'] = safe_join(app.instance_path, 'static')
+    app.config['COLLECT_STATIC_ROOT'] = app.static_folder
     collect.init_app(app)

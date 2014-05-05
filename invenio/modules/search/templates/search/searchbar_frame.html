@@ -23,18 +23,18 @@
 
 {% block header %}
   {{ super() }}
-  {% js 'js/jquery-caret.js' %}
-  {%- js 'js/typeahead.js', '10-invenio' -%}
-  {% js url_for('search.static', filename='js/search/search_parser.js') %}
-  {% js url_for('search.static', filename='js/search/typeahead.js') %}
-  {% js url_for('search.static', filename='js/search/default_typeahead_configuration.js') %}
-  {% js url_for('search.static', filename='js/search/facet.js') %}
-  {% js url_for('static', filename='js/bootstrap-select.js') %}
-{#  {% js "js/jquery.hotkeys.js" %}#}
+  {%- js url_for('static', filename='js/jquery-caret.js') -%}
+  {%- js url_for('static', filename='js/typeahead.js'), '10-invenio' -%}
+  {%- js url_for('search.static', filename='js/search/search_parser.js') -%}
+  {%- js url_for('search.static', filename='js/search/typeahead.js') -%}
+  {%- js url_for('search.static', filename='js/search/default_typeahead_configuration.js') -%}
+  {%- js url_for('search.static', filename='js/search/facet.js') -%}
+  {%- js url_for('static', filename='js/bootstrap-select.js') -%}
+{#  {% js url_for('static', 'js/jquery.hotkeys.js') %}#}
 {#  {% js url_for('search.static', filename='js/search/hotkeys.js') %}#}
 
   {%- css url_for('static', filename='css/typeahead.js-bootstrap.css'), '50-search' -%}
-  {%- css url_for('static', filename='css/search/searchbar.css'), '50-search' -%}
+  {%- css url_for('search.static', filename='css/search/searchbar.css'), '50-search' -%}
 {% endblock %}
 
 {% block body %}

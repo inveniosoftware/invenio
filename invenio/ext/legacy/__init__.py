@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.wrappers import BaseResponse
 
 from flask import request, g, current_app, render_template, abort, \
-    safe_join, send_from_directory
+    send_from_directory
 
 from .request_class import LegacyRequest
 
@@ -98,14 +98,13 @@ def setup_app(app):
             is_mp_legacy_publisher_path, mp_legacy_publisher, \
             application as legacy_application
         possible_module, possible_handler = is_mp_legacy_publisher_path(
-                                            request.environ['PATH_INFO'])
+            request.environ['PATH_INFO'])
         if possible_module is not None:
             legacy_publisher = lambda req: \
                 mp_legacy_publisher(req, possible_module, possible_handler)
             return legacy_application(request.environ, g.start_response,
                                       handler=legacy_publisher)
         return render_template('404.html'), 404
-
 
     @app.endpoint('static')
     def static_handler_with_legacy_publisher(*args, **kwargs):
@@ -123,7 +122,7 @@ def setup_app(app):
                 static_file_response = app.send_static_file(*args, **kwargs)
             except NotFound:
                 static_file_response = send_from_directory(
-                    safe_join(app.instance_path, 'static'), kwargs['filename'])
+                    app.static_folder, kwargs['filename'])
             return static_file_response
 
     try:

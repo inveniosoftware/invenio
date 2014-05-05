@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,17 +29,17 @@
 #}
 
 {# Global CSS files #}
-{%- css 'css/bootstrap.css', '00-invenio' -%}
-{%- css 'css/bootstrap-responsive.min.css', '00-invenio' -%}
-{%- css 'css/token-input.css', '00-invenio' -%}
-{%- css 'css/token-input-facebook.css', '00-invenio' -%}
+{%- css url_for('static', filename='css/bootstrap.css'), '00-invenio' -%}
+{%- css url_for('static', filename='css/bootstrap-responsive.min.css'), '00-invenio' -%}
+{%- css url_for('static', filename='css/token-input.css'), '00-invenio' -%}
+{%- css url_for('static', filename='css/token-input-facebook.css'), '00-invenio' -%}
 
 {# Global Javascript files #}
-{%- js 'js/jquery.min.js', '00-invenio' -%}
-{%- js 'js/bootstrap.js', '00-invenio' -%}
-{%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
-{%- js 'js/invenio.js', '00-invenio' -%}
-<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+{%- js url_for('static', filename='js/jquery.min.js'), '00-invenio' -%}
+{%- js url_for('static', filename='js/bootstrap.js'), '00-invenio' -%}
+{%- js url_for('static', filename='js/jquery.tokeninput.js'), '00-invenio' -%}
+{%- js url_for('static', filename='js/invenio.js'), '00-invenio' -%}
+<script src="//code.jquery.com/jquery-migrate-1.2.1.js"></script>
 
 
 

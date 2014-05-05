@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,25 +21,25 @@
 
 {# Global CSS #}
 {%- block global_css %}
-  {%- css 'css/bootstrap.css', '00-invenio' -%}
-  {%- css 'css/font-awesome.min.css', '00-invenio' -%}
-  {%- css 'css/token-input.css', '00-invenio' -%}
-  {%- css 'css/token-input-facebook.css', '00-invenio' -%}
-  {%- css url_for('static', filename='css/base.css'), '00-invenio' -%}
+  {%- css url_for('static', filename='css/bootstrap.css'), '00-invenio' -%}
+  {%- css url_for('static', filename='css/font-awesome.min.css'), '00-invenio' -%}
+  {%- css url_for('static', filename='css/token-input.css'), '00-invenio' -%}
+  {%- css url_for('static', filename='css/token-input-facebook.css'), '00-invenio' -%}
+  {%- css url_for('base.static', filename='css/base.css'), '00-invenio' -%}
   {%- css url_for('webtag.static', filename='css/tags/popover.css'), '00-invenio' -%}
   {%- if config.CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' %}
-    {%- css 'css/'+config.CFG_WEBSTYLE_TEMPLATE_SKIN+'.css', '00-invenio' -%}
+    {%- css url_for('static', filename='css/'+config.CFG_WEBSTYLE_TEMPLATE_SKIN+'.css'), '00-invenio' -%}
   {%- endif %}
 {%- endblock global_css -%}
 {# Global Javascript files #}
 {%- block global_javascript -%}
-  {%- js 'js/jquery.min.js', '00-invenio' -%}
-  {%- js 'js/jquery.jeditable.mini.js', '10-invenio' -%}
-  {%- js 'js/bootstrap.js', '10-invenio' -%}
-  {%- js 'js/jquery.tokeninput.js', '10-invenio' -%}
-  {%- js 'js/hogan.js', '10-invenio' -%}
-  {%- js 'js/translate.js', '10-invenio' -%}
-  {%- js 'js/invenio.js', '90-invenio' -%}
+  {%- js url_for('static', filename='js/jquery.min.js'), '00-invenio' -%}
+  {%- js url_for('static', filename='js/jquery.jeditable.mini.js'), '10-invenio' -%}
+  {%- js url_for('static', filename='js/bootstrap.js'), '10-invenio' -%}
+  {%- js url_for('static', filename='js/jquery.tokeninput.js'), '10-invenio' -%}
+  {%- js url_for('static', filename='js/hogan.js'), '10-invenio' -%}
+  {%- js url_for('base.static', filename='js/translate.js'), '10-invenio' -%}
+  {%- js url_for('base.static', filename='js/invenio.js'), '90-invenio' -%}
 {%- endblock global_javascript %}
 {%- block page -%}
 {%- if not no_pageheader -%}
