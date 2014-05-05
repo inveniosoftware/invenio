@@ -17,10 +17,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-invenio.base.factory
---------------------
+    invenio.base.factory
+    --------------------
 
-Implements application factory.
+    Implement application factory.
 """
 
 import warnings
@@ -38,7 +38,7 @@ from flask.ext.registry import Registry, ExtensionRegistry, \
     PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
 
 
-__all__ = ['create_app', 'with_app_context']
+__all__ = ('create_app', 'with_app_context')
 
 
 def cleanup_legacy_configuration(app):
@@ -115,7 +115,7 @@ def create_app(instance_path=None, **kwargs_config):
 
     Invenio consists of a new Flask application with legacy support for
     the old WSGI legacy application and the old Python legacy
-    scripts (URLs to *.py files).
+    scripts (URLs to ``*.py`` files).
     """
     configure_warnings()
 

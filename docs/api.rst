@@ -14,6 +14,7 @@ Extensions
 .. toctree::
    :maxdepth: 1
 
+   ext/assets
    ext/sqlalchemy
 
 Modules
