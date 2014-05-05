@@ -425,6 +425,7 @@ class SpiresToInvenioSyntaxConverter:
     # Constants defining fields
     _DATE_ADDED_FIELD = 'datecreated:'
     _DATE_UPDATED_FIELD = 'datemodified:'
+    _DATE_INGESTED_FIELD = 'dateingested:'
     _DATE_FIELD = 'year:'
 
     _A_TAG = 'author:'
@@ -481,6 +482,9 @@ class SpiresToInvenioSyntaxConverter:
         'date-updated': _DATE_UPDATED_FIELD,
         'dupd': _DATE_UPDATED_FIELD,
         'du': _DATE_UPDATED_FIELD,
+        'di': _DATE_INGESTED_FIELD,
+        'ding': _DATE_INGESTED_FIELD,
+        'date-ingested': _DATE_INGESTED_FIELD,
         # first author
         'fa' : 'firstauthor:',
         'first-author' : 'firstauthor:',
@@ -716,10 +720,10 @@ class SpiresToInvenioSyntaxConverter:
                 (?=\ and\ not\ |\ and\ |\ or\ |\ not\ |$)''')
 
         # regular expression matching date after pattern
-        self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated|di|ding|date-ingested)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression matching date after pattern
-        self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated|di|ding|date-ingested)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression matching date greater-or-equal pattern
         self._re_date_greater_equal_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(>=)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
@@ -728,7 +732,7 @@ class SpiresToInvenioSyntaxConverter:
         self._re_date_less_equal_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(<=)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # match date searches which have been keyword-substituted
-        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |\)|$)', re.IGNORECASE)
+        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_INGESTED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |\)|$)', re.IGNORECASE)
 
         # for finding (and changing) a variety of different SPIRES search keywords
         self._re_spires_find_keyword = re.compile('^(f|fin|find)\s+', re.IGNORECASE)
