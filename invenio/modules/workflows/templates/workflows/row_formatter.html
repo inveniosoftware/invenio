@@ -27,8 +27,8 @@
     <p>{{i}}<p>
 {% endfor %}
 </td>
-<td title="source">
-{{ extra_data.get('source', "No source") }}
+<td title="identifiers">
+{{ ", ".join(identifiers) or "No identifiers" }}
 </td>
 <td title="category">
 {{ ", ".join(categories) or "No category" }}

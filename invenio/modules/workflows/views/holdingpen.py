@@ -28,7 +28,6 @@
 """
 
 import re
-from mock import _Call
 
 from six import iteritems, text_type
 
@@ -244,25 +243,13 @@ def load_table():
             except:
                 record = {}
 
+        categories = get_subject_categories(record)
+        title = get_title(record)
+        identifiers = get_identifiers(record)
+
         extra_data = bwo.get_extra_data()
-        category_list = record.get('subject_term', [])
-        if isinstance(category_list, dict):
-            category_list = [category_list]
-        categories = ["%s (%s)" % (subject['term'], subject['scheme'])
-                      for subject in category_list]
-
-        extracted_title = []
-        if "title" in record:
-            if isinstance(record["title"], str):
-                extracted_title = [record["title"]]
-            else:
-                for a_title in record["title"]:
-                    extracted_title.append(record["title"][a_title])
-        else:
-            extracted_title = ["No title"]
-
         row = render_template('workflows/row_formatter.html',
-                              title=extracted_title,
+                              title=title,
                               object=bwo,
                               record=record,
                               extra_data=extra_data,
@@ -270,7 +257,8 @@ def load_table():
                               action=action,
                               mini_action=mini_action,
                               action_message=action_message,
-                              pretty_date=pretty_date)
+                              pretty_date=pretty_date,
+                              identifiers=identifiers)
 
         d = {}
         for key, value in REG_TD.findall(row):
@@ -280,7 +268,7 @@ def load_table():
             [d['id'],
              d['checkbox'],
              d['title'],
-             d['source'],
+             d['identifiers'],
              d['category'],
              d['pretty_date'],
              d['version'],
@@ -607,3 +595,58 @@ def get_holdingpen_objects(isortcol_0=None,
             bwobject_list.reverse()
 
     return bwobject_list
+
+
+def get_subject_categories(record):
+    """
+    Get the subject categories.
+    """
+    if 'subject' in record:
+        lookup = ["subject", "term"]
+    elif "subject_term":
+        lookup = ["subject_term", "term"]
+    else:
+        lookup = None
+
+    if lookup is None:
+        categories = []
+    else:
+        primary, secondary = lookup
+        category_list = record.get(primary, [])
+        if isinstance(category_list, dict):
+            category_list = [category_list]
+        categories = ["%s (%s)" % (subject[secondary], subject['source'])
+                      for subject in category_list]
+    return categories
+
+
+def get_title(record):
+    """
+    Get the title.
+    """
+    extracted_title = []
+    if "title" in record:
+        if isinstance(record["title"], str):
+            extracted_title = [record["title"]]
+        else:
+            for a_title in record["title"]:
+                extracted_title.append(record["title"][a_title])
+    else:
+        extracted_title = ["No title"]
+    return extracted_title
+
+
+def get_identifiers(record):
+    """
+    Get record identifiers.
+    """
+    return [record.get("system_control_number", {}).get("value", 'No ids')]
+    def fun(d):
+        if 'pid' in d:
+            yield d['pid']
+        for k in d:
+            if isinstance(d[k], list):
+                for i in d[k]:
+                    for j in fun(i):
+                        yield j
+    return [pid for pid in fun(record)]
