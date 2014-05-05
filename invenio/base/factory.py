@@ -145,6 +145,7 @@ def create_app(instance_path=None, **kwargs_config):
         ## by the webserver from CFG_WEBDIR. In order to generate independent
         ## url for static files use func:`url_for('static', filename='test')`.
         static_url_path='',
+        static_folder=os.path.join(instance_path, 'static'),
         template_folder='templates',
         instance_relative_config=True,
         instance_path=instance_path,

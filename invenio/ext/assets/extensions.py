@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@
     invenio.ext.assets.extensions
     -----------------------------
 
-    This module contains custom `Jinja2` extensions.
+    Custom `Jinja2` extensions.
 """
 
 from operator import itemgetter
@@ -36,22 +36,24 @@ def prepare_tag_bundle(cls, tag):
     order.
 
     Here is an example that shows the final order when template
-    inheritance is used::
+    inheritance is used.
 
-        example.html
-        ------------
-        {%\ extends 'page.html' %}
-        {%\ css 'template2.css' %}
-        {%\ css 'template3.css' %}
+    .. code-block:: html
 
-        page.html
-        ---------
-        {%\ css 'template1.css' %}
-        {{ get_css_bundle() }}
+       <!-- example.html -->
+       {%\ extends 'page.html' %}
+       {%\ css 'template2.css' %}
+       {%\ css 'template3.css' %}
 
-        Output:
-        -------
-        [template1.css, template2.css, template3.css]
+       <!-- page.html -->
+       {%\ css 'template1.css' %}
+       {{ get_css_bundle() }}
+
+    Output:
+
+    .. code-block:: python
+
+       [template1.css, template2.css, template3.css]
 
     """
     def get_bundle(key=None, iterate=False):
@@ -59,7 +61,7 @@ def prepare_tag_bundle(cls, tag):
         def _get_data_by_key(data_, key_):
             return map(itemgetter(1), filter(lambda (k, v): k == key_, data_))
 
-        data = getattr(cls.environment, ENV_PREFIX+tag)
+        data = getattr(cls.environment, ENV_PREFIX + tag)
 
         if iterate:
             bundles = sorted(set(map(itemgetter(0), data)))
@@ -92,58 +94,67 @@ class CollectionExtension(Extension):
     The ``new_bundle`` method is used to create bundle from
     list of file names collected using `css` and `js` tags.
 
-    Example: simple case
+    **Example:** simple case
 
-        {% css 'css/invenio.css' %}
-        {% js 'js/jquery.js' %}
-        {% js 'js/invenio.js' %}
+    .. code-block:: jinja
+
+        {% css url_for('static', filename='css/invenio.css') %}
+        {% js url_for('static', filename='js/jquery.js') %}
+        {% js url_for('static', filename='js/invenio.js') %}
         ...
         {% assets get_css_bundle() %}
-           <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
+           <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
         {% endassets %}
         {% assets get_js_bundle() %}
            In template, use {{ ASSETS_URL }} for printing file URL.
         {% endassets %}
 
-    Example: named bundles
+    **Example:** named bundles
 
-        record.html:
+    .. code-block:: jinja
+
+        <!-- record.html -->
         {% extend 'page.html' %}
-        {% css 'css/may-vary.css' %}
-        # default bundle name can be changed in application factory
-        # app.jinja_env.extend(default_bundle_name='90-default')
-        {% css 'css/record.css', '10-record' %}
-        {% css 'css/form.css', '10-record' %}
+        {% css url_for('static', filename='css/may-vary.css') %}
+        {#
+         # default bundle name can be changed in application factory
+         # app.jinja_env.extend(default_bundle_name='90-default')
+         #}
+        {% css url_for('static', filename='css/record.css'), '10-record' %}
+        {% css url_for('static', filename='css/form.css'), '10-record' %}
 
-        page.html:
-        {% css 'css/bootstrap.css', '00-base' %}
-        {% css 'css/invenio.css', '00-base' %}
+        <!-- page.html -->
+        {% css url_for('static', filename='css/bootstrap.css'), '00-base' %}
+        {% css url_for('static', filename='css/invenio.css'), '00-base' %}
         ...
         {% for bundle in get_css_bundle(iterate=True) %}
           {% assets bundle %}
-            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
+            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
           {% endassets %}
         {% endfor %}
 
-        Output:
-            <link rel="stylesheet" type="text/css" href="/css/00-base.css"></link>
-            <link rel="stylesheet" type="text/css" href="/css/10-record.css"></link>
-            <link rel="stylesheet" type="text/css" href="/css/90-default.css"></link>
+    Output:
 
-     Note:
-       If you decide not to use assets bundle but directly print
-       stylesheet and script html tags, you MUST define:
-       ```
+    .. code-block:: html
+
+       <link rel="stylesheet" type="text/css" href="/css/00-base.css">
+       <link rel="stylesheet" type="text/css" href="/css/10-record.css">
+       <link rel="stylesheet" type="text/css" href="/css/90-default.css">
+
+    **Note:** If you decide not to use assets bundle but directly print
+    stylesheet and script html tags, you MUST define:
+
+    .. code-block:: python
+
        _app.jinja_env.extend(
            use_bundle = False,
            collection_templates = {
-               'css': '<link rel="stylesheet" type="text/css" href="/%s"></link>',
+               'css': '<link rel="stylesheet" type="text/css" href="/%s">',
                'js': '<script type="text/javascript" src="/%s"></script>'
            })
-       ```
-       Both callable and string with '%s' are allowed in
-       ``collection_templates``.
 
+    Both callable and string with ``%s`` are allowed in
+    ``collection_templates``.
     """
     tags = set(['css', 'js'])
 
@@ -165,23 +176,23 @@ class CollectionExtension(Extension):
         Empty list of used scripts.
         """
         if key is None:
-            setattr(self.environment, ENV_PREFIX+tag, [])
+            setattr(self.environment, ENV_PREFIX + tag, [])
         else:
             data = filter(lambda (k, v): k != key,
-                          getattr(self.environment, ENV_PREFIX+tag))
-            setattr(self.environment, ENV_PREFIX+tag, data)
+                          getattr(self.environment, ENV_PREFIX + tag))
+            setattr(self.environment, ENV_PREFIX + tag, data)
 
     def _update(self, tag, value, key, caller=None):
         """
         Update list of used scripts.
         """
         try:
-            values = getattr(self.environment, ENV_PREFIX+tag)
+            values = getattr(self.environment, ENV_PREFIX + tag)
             values.append((key, value))
         except:
             values = [(key, value)]
 
-        setattr(self.environment, ENV_PREFIX+tag, values)
+        setattr(self.environment, ENV_PREFIX + tag, values)
         return ''
 
     def parse(self, parser):
@@ -221,7 +232,9 @@ class CollectionExtension(Extension):
                 node = self.environment.collection_templates[tag](value)
             else:
                 node = self.environment.collection_templates[tag] % value
-            return nodes.Output([nodes.MarkSafeIfAutoescape(nodes.Const(node))])
+            return nodes.Output([
+                nodes.MarkSafeIfAutoescape(nodes.Const(node))
+            ])
 
         # Call :meth:`_update` to collect names of used scripts.
         return nodes.CallBlock(self.call_method('_update', args=args,
