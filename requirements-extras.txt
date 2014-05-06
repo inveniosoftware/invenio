@@ -16,3 +16,4 @@ cython
 nose
 nosexcover
 flake8
+raven
