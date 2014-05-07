@@ -723,7 +723,7 @@ class SpiresToInvenioSyntaxConverter:
         self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # match date searches which have been keyword-substituted
-        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |\)|$)', re.IGNORECASE)
 
         # for finding (and changing) a variety of different SPIRES search keywords
         self._re_spires_find_keyword = re.compile('^(f|fin|find)\s+', re.IGNORECASE)
@@ -810,17 +810,17 @@ class SpiresToInvenioSyntaxConverter:
 
         # this dictionary is used when generating match patterns for months
         self._months = {'jan':'01', 'january':'01',
-                         'feb':'02', 'february':'02',
-                         'mar':'03', 'march':'03',
-                         'apr':'04', 'april':'04',
-                         'may':'05', 'may':'05',
-                         'jun':'06', 'june':'06',
-                         'jul':'07', 'july':'07',
-                         'aug':'08', 'august':'08',
-                         'sep':'09', 'september':'09',
-                         'oct':'10', 'october':'10',
-                         'nov':'11', 'november':'11',
-                         'dec':'12', 'december':'12'}
+                        'feb':'02', 'february':'02',
+                        'mar':'03', 'march':'03',
+                        'apr':'04', 'april':'04',
+                        'may':'05', 'may':'05',
+                        'jun':'06', 'june':'06',
+                        'jul':'07', 'july':'07',
+                        'aug':'08', 'august':'08',
+                        'sep':'09', 'september':'09',
+                        'oct':'10', 'october':'10',
+                        'nov':'11', 'november':'11',
+                        'dec':'12', 'december':'12'}
         # this dictionary is used to transform name of the month
         # to a number used in the date format. By this reason it
         # contains also the numbers itself to simplify the conversion
@@ -1017,7 +1017,10 @@ class SpiresToInvenioSyntaxConverter:
 
         def create_replacement_pattern(match):
             """method used for replacement with regular expression"""
-            return match.group('searchop') + ' ' + match.group('search_content') + '->9999'
+            return '(' \
+            + match.group('searchop') + ' ' + match.group('search_content')+ '->9999' \
+            + ' AND NOT ' + match.group('searchop') + ' ' + match.group('search_content') \
+            + ')'
 
         query = self._re_date_after_match.sub(create_replacement_pattern, query)
 
@@ -1026,9 +1029,12 @@ class SpiresToInvenioSyntaxConverter:
     def _convert_spires_date_before_to_invenio_span_query(self, query):
         """Converts date before SPIRES search term into invenio span query"""
 
-        # method used for replacement with regular expression
         def create_replacement_pattern(match):
-            return match.group('searchop') + ' ' + '0->' + match.group('search_content')
+            """method used for replacement with regular expression"""
+            return ' (' \
+            + match.group('searchop') + ' 0->' + match.group('search_content') \
+            + ' AND NOT ' + match.group('searchop') + ' ' + match.group('search_content') \
+            + ')'
 
         query = self._re_date_before_match.sub(create_replacement_pattern, query)
 
