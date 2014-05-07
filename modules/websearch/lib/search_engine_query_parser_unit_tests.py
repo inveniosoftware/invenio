@@ -731,13 +731,13 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
         def test_date_by_lt_yr(self):
             """SPIRES search syntax - searching by date < year"""
             spi_search = "find date < 2002"
-            inv_search = 'year:0->2002'
+            inv_search = 'year:0->2001'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_gt_yr(self):
             """SPIRES search syntax - searching by date > year"""
             spi_search = "find date > 1980"
-            inv_search = 'year:1980->9999'
+            inv_search = 'year:1981->9999'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_yr_mo(self):
@@ -765,15 +765,27 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_lt_yr_mo(self):
-            """SPIRES search syntax - searching by date < 1978-10-21"""
-            spi_search = "find date < 1978-10-21"
-            inv_search = 'year:0->1978-10-21'
+            """SPIRES search syntax - searching by date < 1978-10"""
+            spi_search = "find date < 1978-10"
+            inv_search = 'year:0->1978-09'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_gt_yr_mo(self):
+            """SPIRES search syntax - searching by date > 1978-10"""
+            spi_search = "find date > 1978-10"
+            inv_search = 'year:1978-11->9999'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_lt_yr_mo_da(self):
+            """SPIRES search syntax - searching by date < 1978-10-21"""
+            spi_search = "find date < 1978-10-21"
+            inv_search = 'year:0->1978-10-20'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_gt_yr_mo_da(self):
             """SPIRES search syntax - searching by date > 1978-10-21"""
             spi_search = "find date > 1978-10-21"
-            inv_search = 'year:1978-10-21->9999'
+            inv_search = 'year:1978-10-22->9999'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_before_1900(self):
