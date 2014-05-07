@@ -35,7 +35,8 @@
     "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",
     "font-awesome": "*",
     "bootstrap-tagsinput": "*",
-    "jquery.caret": "https://github.com/acdvorak/jquery.caret.git"
+    "jquery.caret": "https://github.com/acdvorak/jquery.caret.git",
+    "jquery-migrate": "http://code.jquery.com/jquery-migrate-1.2.1.js"
   },
   "resolutions": {
     "jquery": "2.1.0"
