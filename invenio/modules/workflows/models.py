@@ -94,6 +94,8 @@ class Workflow(db.Model):
     counter_finished = db.Column(db.Integer, default=0, nullable=False)
     module_name = db.Column(db.String(64), nullable=False)
 
+    child_logs = db.relationship("BibWorkflowEngineLog")
+
     def __repr__(self):
         """ Represent a workflow object."""
         return "<Workflow(name: %s, module: %s, cre: %s, mod: %s," \
@@ -634,12 +636,12 @@ class BibWorkflowObjectLog(db.Model):
 
     def __repr__(self):
         """Represent a log message."""
-        return "BibWorkflowObjectLog(%s)" % (", ".join(
+        return "BibWorkflowObjectLog(%s)" % (", ".join([
             "log_type='%s'" % self.log_type,
             "created='%s'" % self.created,
             "message='%s'" % self.message,
-            "id_object='%'" % self.id_object)
-        )
+            "id_object='%s'" % self.id_object,
+        ]))
 
     @classmethod
     def get(cls, *criteria, **filters):
@@ -675,7 +677,9 @@ class BibWorkflowEngineLog(db.Model):
 
     __tablename__ = "bwlWORKFLOWLOGGING"
     id = db.Column(db.Integer, primary_key=True)
-    id_object = db.Column(db.String(255), nullable=False)
+    id_object = db.Column(db.String(255),
+                          db.ForeignKey('bwlWORKFLOW.uuid'),
+                          nullable=False)
     log_type = db.Column(db.Integer, default=0, nullable=False)
     created = db.Column(db.DateTime, default=datetime.now)
     message = db.Column(db.TEXT, default="", nullable=False)
@@ -690,12 +694,12 @@ class BibWorkflowEngineLog(db.Model):
 
     def __repr__(self):
         """Represent a log message."""
-        return "BibWorkflowEngineLog(%s)" % (", ".join(
+        return "BibWorkflowEngineLog(%s)" % (", ".join([
             "log_type='%s'" % self.log_type,
             "created='%s'" % self.created,
             "message='%s'" % self.message,
-            "id_object='%'" % self.id_object)
-        )
+            "id_object='%s'" % self.id_object
+        ]))
 
     @classmethod
     def get(cls, *criteria, **filters):
