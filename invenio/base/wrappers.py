@@ -144,13 +144,6 @@ def get_static_map():
                     'Filename "%s" already exists: "%s" (%s)',
                     path, out[filename], app.name)
 
-    # There are files into base/static which must be part of the STATIC_MAP
-    # as well. static_folder is pointing to the generated assets.
-    old = current_app.static_folder
-    current_app.static_folder = os.path.join(current_app.root_path, 'static')
-    os.path.walk(current_app.static_folder, generator, current_app)
-    current_app.static_folder = old
-
     for blueprint in current_app.blueprints.values():
         if not blueprint.has_static_folder:
             continue
