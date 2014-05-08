@@ -83,7 +83,6 @@ def import_submodules_from_packages(name, app=None, packages=None,
 
 autodiscover_user_settings = partial(import_module_from_packages,
                                      'user_settings')
-autodiscover_facets = partial(import_submodules_from_packages, 'facets')
 autodiscover_managers = partial(import_module_from_packages, 'manage')
 autodiscover_redirect_methods = partial(import_submodules_from_packages,
                                         'redirect_methods')
