@@ -190,7 +190,7 @@ class SmartJson(SmartDict):
             pass
         main_key = SmartDict.main_key_pattern.sub('', key)
         if main_key == '__meta_metadata__':
-            return self._dict[key]
+            return super(SmartJson, self).__getitem__(key)
         elif main_key in self._dict:
             if main_key not in self.meta_metadata:
                 Reader.set(self, main_key)
