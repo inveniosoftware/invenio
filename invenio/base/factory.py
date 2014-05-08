@@ -34,6 +34,7 @@ from werkzeug.local import LocalProxy
 from .helpers import with_app_context, unicodifier
 from .wrappers import Flask
 from .utils import captureWarnings
+from flask import Blueprint
 from flask.ext.registry import Registry, ExtensionRegistry, \
     PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
 
@@ -192,7 +193,7 @@ def create_app(instance_path=None, **kwargs_config):
     # takes precedence)
     ConfigurationRegistry(app)
 
-    # Leagcy conf cleanup
+    # Legacy conf cleanup
     cleanup_legacy_configuration(app)
 
     # ======================
@@ -201,6 +202,9 @@ def create_app(instance_path=None, **kwargs_config):
     app.extensions['registry']['blueprints'] = BlueprintAutoDiscoveryRegistry(
         app=app
     )
+
+    # Register base blueprint for the static files
+    app.register_blueprint(Blueprint("base", __name__, static_folder="static"))
 
     register_legacy_blueprints(app)
 
