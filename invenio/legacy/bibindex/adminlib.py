@@ -45,8 +45,9 @@ from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     get_index_name_from_index_id, \
     get_all_index_names_and_column_values, \
     is_index_virtual
+from invenio.utils.datastructures import LazyDict
 
-_TOKENIZERS = load_tokenizers()
+_TOKENIZERS = LazyDict(load_tokenizers)
 
 websearch_templates = invenio.legacy.template.load('websearch')
 
