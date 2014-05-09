@@ -235,57 +235,35 @@ def empty_redis():
 
 
 def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
-    if iSortCol_0 == 0:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.id, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.id, reverse=False)
-    elif iSortCol_0 == 1:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.id_user, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.id_user, reverse=False)
-    elif iSortCol_0 == 2:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.id_user, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.id_user, reverse=False)
-    elif iSortCol_0 == 3:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.id_user, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.id_user, reverse=False)
-    elif iSortCol_0 == 4:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.id_workflow, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.id_workflow, reverse=False)
-    elif iSortCol_0 == 5:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.id_user, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.id_user, reverse=False)
-    elif iSortCol_0 == 6:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.created, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.created, reverse=False)
-    elif iSortCol_0 == 7:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.version, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.version, reverse=False)
-    elif iSortCol_0 == 8:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.version, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.version, reverse=False)
-    elif iSortCol_0 == 9:
-        if sSortDir_0 == 'desc':
-            bwolist.sort(key=lambda x: x.version, reverse=True)
-        else:
-            bwolist.sort(key=lambda x: x.version, reverse=False)
+    from invenio.modules.workflows.views.holdingpen import (get_title,
+                                                            get_identifiers,
+                                                            get_subject_categories
 
+    )
+    should_we_reverse = False
+    if sSortDir_0 == 'desc':
+        should_we_reverse = True
+
+    if iSortCol_0 == 0:
+        bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
+    elif iSortCol_0 == 1:
+        bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
+    elif iSortCol_0 == 2:
+        bwolist.sort(key=lambda x: get_title(x.get_data()), reverse=should_we_reverse)
+    elif iSortCol_0 == 3:
+        bwolist.sort(key=lambda x: get_identifiers(x.get_data()), reverse=should_we_reverse)
+    elif iSortCol_0 == 4:
+        bwolist.sort(key=lambda x: get_subject_categories(x.get_data()), reverse=should_we_reverse)
+    elif iSortCol_0 == 5:
+        bwolist.sort(key=lambda x: x.created, reverse=should_we_reverse)
+    elif iSortCol_0 == 6:
+        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
+    elif iSortCol_0 == 7:
+        bwolist.sort(key=lambda x: x.data_type, reverse=should_we_reverse)
+    elif iSortCol_0 == 8:
+        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
+    elif iSortCol_0 == 9:
+        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
     return bwolist
 
 

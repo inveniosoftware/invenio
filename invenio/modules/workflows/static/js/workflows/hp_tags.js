@@ -21,6 +21,7 @@
 //***********************************
 var WORKFLOWS_HP_TAGS = function ( $, holdingpen ){
     var tagList = [];
+    var tagListToSearch = [];
 
         $("#tags").tagsinput({
             tagClass: function(item)
@@ -55,7 +56,6 @@ var WORKFLOWS_HP_TAGS = function ( $, holdingpen ){
         $('.version-selection').on('click', function(){
             if($.inArray($(this)[0].name, tagList) <= -1){
                 $('#tags').tagsinput('add', $(this)[0].text);
-
                 WORKFLOWS_HP_UTILITIES.requestNewObjects();
             }
         });
@@ -63,7 +63,13 @@ var WORKFLOWS_HP_TAGS = function ( $, holdingpen ){
         $("#tags").on('itemRemoved', function(event) {
             tagList =  $("#tags").val().split(',');
             tagList = taglist_translation(tagList);
-            holdingpen.oTable.fnFilter('');
+            if(event.item != 'Done' && event.item != 'In process' && event.item != 'Need action' && event.item != 'New'){
+                if(tagListToSearch.indexOf(event.item) > -1 )
+                {
+                    tagListToSearch.splice(tagListToSearch.indexOf(event.item), 1);
+                }
+            }
+            holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
         });
 
@@ -72,13 +78,16 @@ var WORKFLOWS_HP_TAGS = function ( $, holdingpen ){
             tagList =  $("#tags").val().split(',');
             tagList = taglist_translation(tagList);
 
-            if(event.item != 'Halted' && event.item != 'Completed' && event.item != 'Running'){
-                holdingpen.oTable.fnFilter(event.item, null, false, false, false);
+            if(event.item != 'Done' && event.item != 'In process' && event.item != 'Need action' && event.item != 'New'){
+                if(tagListToSearch.indexOf(event.item) == -1 )
+                {
+                    tagListToSearch.push(event.item);
+                    holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
+                    WORKFLOWS_HP_UTILITIES.requestNewObjects();
+                }
             }
-            else
-            {
-                WORKFLOWS_HP_UTILITIES.requestNewObjects();
-            }
+            holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
+            WORKFLOWS_HP_UTILITIES.requestNewObjects();
         });
 
 

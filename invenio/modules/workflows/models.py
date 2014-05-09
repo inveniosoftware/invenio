@@ -226,7 +226,6 @@ class Workflow(db.Model):
             self.status = status
         db.session.add(self)
 
-
 class BibWorkflowObject(db.Model):
     # db table definition
     __tablename__ = "bwlOBJECT"
@@ -591,7 +590,8 @@ class BibWorkflowObject(db.Model):
         obj.copy(old_obj)
 
         # Overwrite some changes
-        obj.id_parent = old_obj.id
+
+        # obj.id_parent = old_obj.id
         obj.version = version
         for key, value in iteritems(kwargs):
             setattr(obj, key, value)
