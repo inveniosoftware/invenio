@@ -17,9 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Addtional registries for Flask-Registry
-"""
+"""Addtional registries for Flask-Registry."""
 
 from werkzeug.utils import import_string, find_modules
 from flask.ext.registry import ModuleAutoDiscoveryRegistry
@@ -29,6 +27,11 @@ from flask.ext.registry import RegistryError
 class ModuleAutoDiscoverySubRegistry(ModuleAutoDiscoveryRegistry):
     def _discover_module(self, pkg):
         import_str = pkg + '.' + self.module_name
+
+        blacklist = self.app.config.get(
+            '%s_%s_EXCLUDE' % (self.cfg_var_prefix, self.module_name.upper()),
+            []
+        )
 
         try:
             import_string(import_str, silent=self.silent)
@@ -40,6 +43,8 @@ class ModuleAutoDiscoverySubRegistry(ModuleAutoDiscoveryRegistry):
             return
 
         for m in find_modules(import_str):
+            if m in blacklist:  # Exclude specific package
+                continue
             try:
                 module = import_string(m, silent=self.silent)
                 if module is not None:
