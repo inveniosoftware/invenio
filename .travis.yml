@@ -54,7 +54,7 @@ install:
   - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
   - "inveniomanage config set PACKAGES_EXCLUDE []"  # test all packages
   - "inveniomanage config set CFG_TMPDIR /tmp"  # test all packages
-  - "grunt"
+  - "travis_retry grunt"
 
 before_script:
   - "inveniomanage apache create-config"
