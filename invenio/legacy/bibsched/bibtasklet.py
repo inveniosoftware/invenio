@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,74 +17,54 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
-
 """Invenio Bibliographic Tasklet BibTask.
 
 This is a particular BibTask that execute tasklets, which can be any
-function dropped into /opt/cds-invenio/lib/python/invenio/bibsched_tasklets/.
+function dropped into ``<package>.tasklets`` where ``<package>`` is defined
+in ``PACKAGES``.
 """
 
-__revision__ = "$Id$"
+from __future__ import print_function
 
 import sys
-from werkzeug.utils import find_modules, import_string
-from flask import current_app
-from six import iteritems
-from invenio.legacy.bibsched.bibtask import task_init, write_message, task_set_option, \
-    task_get_option, task_update_progress
+
+from invenio.version import __version__
+from invenio.legacy.bibsched.bibtask import (
+    task_init, write_message, task_set_option, task_get_option,
+    task_update_progress)
 from invenio.utils.autodiscovery.helpers import get_callable_documentation
 from invenio.utils.autodiscovery.checkers import check_arguments_compatibility
-#from invenio.base.utils import import_module_from_packages
-from invenio.utils.datastructures import LazyDict
+from invenio.modules.scheduler.registry import tasklets
 
 
-def _load_tasklets():
-    """
-    Load all the bibsched tasklets into the global variable _TASKLETS.
-    """
-    tasklets = {}
-    packages = current_app.config.get('CFG_BIBSCHED_TASKLET_PACKAGES', [])
-    for pkg_import_str in packages:
-        module = import_string(pkg_import_str)
-        for tasklet in find_modules(module.__name__):
-            try:
-                func = import_string(tasklet + ':' + tasklet.split('.')[-1])
-                tasklets[tasklet.split('.')[-1]] = func
-            except:
-                print('Fail', tasklet)
-
-    return tasklets
-
-
-_TASKLETS = LazyDict(_load_tasklets)
+_TASKLETS = tasklets
 
 
 def cli_list_tasklets():
-    """
-    Print the list of available tasklets and broken tasklets.
-    """
+    """Print the list of available tasklets and broken tasklets."""
     print("""Available tasklets:""")
     for tasklet in _TASKLETS.values():
         print(get_callable_documentation(tasklet))
 
-    print("""Broken tasklets:""")
-    for tasklet_name, error in iteritems(_TASKLETS.get_broken_plugins()):
-        print("%s: %s" % (tasklet_name, error))
     sys.exit(0)
 
 
 def task_submit_elaborate_specific_parameter(key, value,
-        dummy_opts, dummy_args):
-    """ Given the string key it checks it's meaning, eventually using the
-    value. Usually it fills some key in the options dict.
-    It must return True if it has elaborated the key, False, if it doesn't
-    know that key.
-    eg:
-    if key in ('-n', '--number'):
-        task_set_option('number', value)
-        return True
-    return False
+                                             dummy_opts, dummy_args):
+    """Check meaning of given string key.
+
+    Eventually use the value for check. Usually it fills some key in the
+    options dict. It must return True if it has elaborated the key, False,
+    if it doesn't know that key.
+
+    Example:
+
+    .. code-block:: python
+
+        if key in ('-n', '--number'):
+            task_set_option('number', value)
+            return True
+        return False
     """
     if key in ('-T', '--tasklet'):
         task_set_option('tasklet', value)
@@ -94,8 +74,9 @@ def task_submit_elaborate_specific_parameter(key, value,
         try:
             key, value = value.split('=', 1)
         except NameError:
-            print('ERROR: an argument must be in the form ' \
-                'param=value, not "%s"' % value, file=sys.stderr)
+            print('ERROR: an argument must be in the form '
+                  'param=value, not "%s"' % (value, ),
+                  file=sys.stderr)
             return False
         arguments[key] = value
         task_set_option('arguments', arguments)
@@ -107,51 +88,46 @@ def task_submit_elaborate_specific_parameter(key, value,
 
 
 def task_submit_check_options():
-    """
-    Check if a tasklet has been specified, and if the parameters are good
-    """
+    """Check if a tasklet has been specified and the parameters are good."""
     tasklet = task_get_option('tasklet', None)
     arguments = task_get_option('arguments', {})
     if not tasklet:
         print('ERROR: no tasklet specified', file=sys.stderr)
         return False
     elif tasklet not in _TASKLETS:
-        print('ERROR: "%s" is not a valid tasklet. Use ' \
-            '--list-tasklets to obtain a list of the working tasklets.' % \
-                tasklet, file=sys.stderr)
+        print('ERROR: "%s" is not a valid tasklet. Use '
+              '--list-tasklets to obtain a list of the working tasklets.' %
+              tasklet, file=sys.stderr)
         return False
     else:
         try:
             check_arguments_compatibility(_TASKLETS[tasklet], arguments)
         except ValueError as err:
-            print('ERROR: wrong arguments (%s) specified for ' \
-                'tasklet "%s": %s' % (arguments, tasklet, err), file=sys.stderr)
+            print('ERROR: wrong arguments (%s) specified for '
+                  'tasklet "%s": %s' % (
+                      arguments, tasklet, err), file=sys.stderr)
             return False
     return True
 
 
 def task_run_core():
-    """
-    Run the specific tasklet.
-    """
+    """Run the specific tasklet."""
     tasklet = task_get_option('tasklet')
     arguments = task_get_option('arguments', {})
-    write_message('Starting tasklet "%s" (with arguments %s)' %
-        (tasklet, arguments))
+    write_message('Starting tasklet "%s" (with arguments %s)' % (
+        tasklet, arguments))
     task_update_progress('%s started' % tasklet)
     ret = _TASKLETS[tasklet](**arguments)
     task_update_progress('%s finished' % tasklet)
-    write_message('Finished tasklet "%s" (with arguments %s)' %
-        (tasklet, arguments))
+    write_message('Finished tasklet "%s" (with arguments %s)' % (
+        tasklet, arguments))
     if ret is not None:
         return ret
     return True
 
 
 def main():
-    """
-    Main body of bibtasklet.
-    """
+    """Main body of bibtasklet."""
     task_init(
         authorization_action='runbibtaslet',
         authorization_msg="BibTaskLet Task Submission",
@@ -161,10 +137,10 @@ def main():
                             param=value, e.g. --argument foo=bar
   -l, --list-tasklets   List the existing tasklets
 """,
-        version=__revision__,
-        specific_params=("T:a:l",
-            ["tasklet=", "argument=", "list-tasklets"]),
-        task_submit_elaborate_specific_parameter_fnc=
-            task_submit_elaborate_specific_parameter,
+        version=__version__,
+        specific_params=("T:a:l", ["tasklet=", "argument=", "list-tasklets"]),
+        task_submit_elaborate_specific_parameter_fnc=(
+            task_submit_elaborate_specific_parameter
+        ),
         task_run_fnc=task_run_core,
         task_submit_check_options_fnc=task_submit_check_options)
