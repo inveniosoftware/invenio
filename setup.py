@@ -60,6 +60,7 @@ dependency_links = [
 install_requires = [
     "alembic>=0.6.6",
     "Babel>=1.3",
+    "bagit>=1.5.1",
     "BeautifulSoup>=3.2.1",
     "BeautifulSoup4>=4.3.2",
     "celery>=3.1.8",

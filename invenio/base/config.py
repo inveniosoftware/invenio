@@ -63,6 +63,7 @@ PACKAGES = [
 ]
 
 PACKAGES_EXCLUDE = [
+    'invenio.modules.archiver',
     'invenio.modules.annotations',
     'invenio.modules.communities',
     'invenio.modules.pages',
