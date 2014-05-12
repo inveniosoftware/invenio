@@ -31,10 +31,10 @@ import re
 
 from six import iteritems, text_type
 
-from flask import (render_template, Blueprint,
-                   request, current_app,
+from flask import (render_template,
+                   Blueprint, request,
                    jsonify, url_for,
-                   flash)
+                   flash, session)
 from flask.ext.login import login_required
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.menu import register_menu
@@ -168,9 +168,9 @@ def load_table():
             version_showing.append(ObjectVersion.RUNNING)
         if "initial" in req:
             version_showing.append(ObjectVersion.INITIAL)
-        current_app.config['VERSION_SHOWING'] = version_showing
-    elif "VERSION_SHOWING" in current_app.config:
-        version_showing = current_app.config.get('VERSION_SHOWING', [])
+        session['workflows_version_showing'] = version_showing
+    elif 'workflows_version_showing' in session:
+        version_showing = session.get('workflows_version_showing', [])
 
     try:
         i_sortcol_0 = request.args.get('iSortCol_0')
@@ -179,26 +179,26 @@ def load_table():
         i_display_length = int(request.args.get('iDisplayLength'))
         sEcho = int(request.args.get('sEcho')) + 1
     except:
-        i_sortcol_0 = current_app.config.get('iSortCol_0', 0)
-        s_sortdir_0 = current_app.config.get('sSortDir_0', None)
-        i_display_start = current_app.config.get('iDisplayStart', 0)
-        i_display_length = current_app.config.get('iDisplayLength', 10)
-        sEcho = current_app.config.get('sEcho', 0) + 1
+        i_sortcol_0 = session.get('iSortCol_0', 0)
+        s_sortdir_0 = session.get('sSortDir_0', None)
+        i_display_start = session.get('iDisplayStart', 0)
+        i_display_length = session.get('iDisplayLength', 10)
+        sEcho = session.get('sEcho', 0) + 1
 
     bwolist = get_holdingpen_objects(ssearch=s_search,
                                      version_showing=version_showing)
 
-    if 'iSortCol_0' in current_app.config:
+    if 'iSortCol_0' in session:
         i_sortcol_0 = int(i_sortcol_0)
-        if i_sortcol_0 != current_app.config['iSortCol_0'] \
-           or s_sortdir_0 != current_app.config['sSortDir_0']:
+        if i_sortcol_0 != session['iSortCol_0'] \
+           or s_sortdir_0 != session['sSortDir_0']:
             bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
 
-    current_app.config['iDisplayStart'] = i_display_start
-    current_app.config['iDisplayLength'] = i_display_length
-    current_app.config['iSortCol_0'] = i_sortcol_0
-    current_app.config['sSortDir_0'] = s_sortdir_0
-    current_app.config['sEcho'] = sEcho
+    session['iDisplayStart'] = i_display_start
+    session['iDisplayLength'] = i_display_length
+    session['iSortCol_0'] = i_sortcol_0
+    session['sSortDir_0'] = s_sortdir_0
+    session['sEcho'] = sEcho
 
     table_data = {
         "aaData": []
@@ -219,7 +219,6 @@ def load_table():
         action_name = bwo.get_action()
         action = actions.get(action_name, None)
 
-        # if action != None and bwo.version in VERSION_SHOWING:
         records_showing += 1
 
         mini_action = getattr(action, "mini_action", None)
@@ -272,7 +271,7 @@ def get_version_showing():
     Returns current version showing, saved in current_app.config
     """
     try:
-        return current_app.config['VERSION_SHOWING']
+        return session['workflows_version_showing']
     except KeyError:
         return None
 
@@ -464,7 +463,7 @@ def get_context():
         "url_resolve_edit": url_for('holdingpen.resolve_edit')
     }
     try:
-        context['version_showing'] = current_app.config['VERSION_SHOWING']
+        context['version_showing'] = session['workflows_version_showing']
     except KeyError:
         context['version_showing'] = ObjectVersion.HALTED
 
