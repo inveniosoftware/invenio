@@ -36,9 +36,6 @@ install:
   - "sudo add-apt-repository -y ppa:chris-lea/node.js"
   - "sudo apt-get update"
   - "sudo apt-get install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion nodejs --fix-missing"
-  - "sudo su -c \"npm install -g bower grunt-cli\""
-  - "npm install"
-  - "bower install"
   - "sudo a2enmod actions"
   - "sudo a2enmod version"
   - "sudo a2enmod rewrite"
@@ -54,6 +51,11 @@ install:
   - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
   - "inveniomanage config set PACKAGES_EXCLUDE []"  # test all packages
   - "inveniomanage config set CFG_TMPDIR /tmp"  # test all packages
+  - "sudo su -c \"npm install -g bower grunt-cli\""
+  - "npm install"
+  - "inveniomanage config set CLEANCSS_BIN `find $PWD/node_modules -iname \"cleancss\" | grep \"\\.bin\" | head -1`"
+  - "inveniomanage config set LESS_BIN `find $PWD/node_modules -iname \"lessc\" | grep \"\\.bin\" | head -1`"
+  - "bower install"
   - "travis_retry grunt"
   - "inveniomanage collect"
 

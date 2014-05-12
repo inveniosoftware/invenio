@@ -87,11 +87,24 @@ def setup_app(app):
     assets.url = app.static_url_path + "/"
     assets.directory = app.static_folder
 
-    def _jinja2_new_bundle(tag, collection, name=None):
+    def _jinja2_new_bundle(tag, collection, name=None, filters=None):
         if len(collection):
-            return Bundle(output="%s/%s-%s.%s" %
-                          (tag, 'invenio' if name is None else name,
-                           hash('|'.join(collection)), tag), *collection)
+            name = "invenio" if name is None else name
+            sig = hash(",".join(collection) + "|" + str(filters))
+            kwargs = {
+                "output": "{0}/{1}-{2}.{0}".format(tag, name, sig),
+                "filters": filters,
+                "extra": {"rel": "stylesheet"}
+            }
+
+            # If LESS_RUN_IN_DEBUG is set to False, then the filters are
+            # removed and each less file will be parsed by the less JavaScript
+            # library.
+            if assets.debug and not app.config.get("LESS_RUN_IN_DEBUG", True):
+                kwargs["extra"]["rel"] = "stylesheet/less"
+                kwargs["filters"] = None
+
+            return Bundle(*collection, **kwargs)
 
     app.jinja_env.extend(new_bundle=_jinja2_new_bundle,
                          default_bundle_name='90-invenio')

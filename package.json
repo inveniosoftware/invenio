@@ -7,6 +7,7 @@
     "grunt-contrib-cssmin": "*",
     "grunt-contrib-clean": "*",
     "grunt-contrib-uglify": "*",
+    "grunt-contrib-less": "*",
     "load-grunt-config": "*",
     "grunt-newer": "*",
     "grunt-concurrent": "*"
