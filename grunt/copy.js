@@ -27,9 +27,7 @@ module.exports = {
         expand: true,
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>',
-        src: ['bootstrap/dist/css/bootstrap*'
-               ,'font-awesome/css/font-awesome.*'
-               ,'jquery-tokeninput/styles/token-input-facebook.css'
+        src: ['jquery-tokeninput/styles/token-input-facebook.css'
                ,'jquery-tokeninput/styles/token-input.css'
                ,'jquery.bookmark/jquery.bookmark.css'
                ,'datatables-colvis/css/dataTables.colVis.css'
@@ -37,6 +35,20 @@ module.exports = {
                ,'prism/prism.css'
                ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.css'],
         dest: '<%= globalConfig.installation_path %>/css/'
+    },
+    less_bootstrap: {
+        expand: true,
+        flatten: true,
+        cwd: '<%= globalConfig.bower_path %>',
+        src: ['bootstrap/less/*.less'],
+        dest: '<%= globalConfig.installation_path %>/less/bootstrap'
+    },
+    less_fontawesome: {
+        expand: true,
+        flatten: true,
+        cwd: '<%= globalConfig.bower_path %>',
+        src: ['font-awesome/less/*.less'],
+        dest: '<%= globalConfig.installation_path %>/less/font-awesome'
     },
     jquery_css: {
         expand: true,
@@ -279,6 +291,15 @@ module.exports = {
                 src = 'jquery-migrate.js'
             }
             return dest + src;
+        }
+    },
+    lesscss: {
+        expand: true,
+        cwd: '<%= globalConfig.bower_path %>/less/dist',
+        src: ['less-1.7.0.*'],
+        dest: '<%= globalConfig.installation_path %>/js/',
+        rename: function(dest, src) {
+            return dest + src.replace(/-\d\.\d\.\d/, '');
         }
     }
 };

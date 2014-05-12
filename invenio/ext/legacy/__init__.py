@@ -79,8 +79,9 @@ def setup_app(app):
             if not isinstance(response, BaseResponse):
                 response = current_app.make_response(str(response))
             return response
-        except HTTPException:
-            pass
+        except HTTPException as e:
+            current_app.logger.exception(request.path)
+            error = e
         if error.code == 404:
             return render_template('404.html'), 404
         return str(error), error.code
