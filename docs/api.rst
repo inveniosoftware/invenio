@@ -33,6 +33,7 @@ Modules
    modules/jsonalchemy
    modules/tags
    modules/upgrader
+   modules/uploader
    modules/workflows
 
 
