@@ -69,7 +69,9 @@ from invenio.config import (
     CFG_VERSION,
     CFG_BIBSCHED_FLUSH_LOGS,
     CFG_SITE_NAME,
-    CFG_SITE_URL
+    CFG_SITE_URL,
+    CFG_BIBSCHED_TASK_IS_NOT_A_DAEMON,
+    CFG_BIBSCHED_VALID_PROCESSES_NO_AUTH_NEEDED
 )
 from invenio.errorlib import register_exception
 
@@ -95,10 +97,6 @@ _TASK_PARAMS = dict(CFG_BIBTASK_DEFAULT_GLOBAL_TASK_SETTINGS)
 
 # Global _OPTIONS dictionary.
 _OPTIONS = {}
-
-# Which tasks don't need to ask the user for authorization?
-CFG_VALID_PROCESSES_NO_AUTH_NEEDED = ("bibupload", )
-CFG_TASK_IS_NOT_A_DEAMON = ("bibupload", )
 
 
 class RecoverableError(StandardError):
@@ -691,7 +689,7 @@ def _task_build_params(task_name,
             elif opt[0] in ("-v", "--verbose"):
                 params["verbose"] = int(opt[1])
             elif opt[0] in ("-s", "--sleeptime"):
-                if task_name not in CFG_TASK_IS_NOT_A_DEAMON:
+                if task_name not in CFG_BIBSCHED_TASK_IS_NOT_A_DAEMON:
                     get_datetime(opt[1]) # see if it is a valid shift
                     params["sleeptime"] = opt[1]
             elif opt[0] in ("-t", "--runtime"):
@@ -907,8 +905,12 @@ def authenticate(user, authorization_action, authorization_msg=""):
     Return user name upon authorization success,
     do system exit upon authorization failure.
     """
+
+    # if the process name (webcoll, bibupload etc..) is marked in config, ignore password
+    if os.path.basename(sys.argv[0]) in CFG_BIBSCHED_VALID_PROCESSES_NO_AUTH_NEEDED:
+        return user
     # With SSO it's impossible to check for pwd
-    if CFG_EXTERNAL_AUTH_USING_SSO or os.path.basename(sys.argv[0]) in CFG_VALID_PROCESSES_NO_AUTH_NEEDED:
+    if CFG_EXTERNAL_AUTH_USING_SSO:
         return user
     if authorization_msg:
         print authorization_msg
