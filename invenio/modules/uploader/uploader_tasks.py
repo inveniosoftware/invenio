@@ -24,6 +24,9 @@
     Those are the main/common tasks that the uploader will use, they are used
     inside the workflows defined in
     :py:mod:`~invenio.modules.uploader.worflows`.
+
+    See
+    `Simple worflows for Python <https://pypi.python.org/pypi/workflow/1.0>`_
 """
 
 from invenio.base.globals import cfg
