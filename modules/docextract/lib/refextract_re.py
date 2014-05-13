@@ -637,6 +637,11 @@ re_doi = (re.compile(ur"""
     [\w\-_:;\(\)/<>])                       # any character excluding a full stop
     """, re.VERBOSE))
 
+## Pattern used to locate HDL (handle identifiers)
+re_hdl = re.compile(ur"""([hH][dD][lL]:
+                          |https?://hdl\.handle\.net/)
+                         (?P<hdl_id>\S+/\S+)""", re.UNICODE|re.VERBOSE)
+
 
 def _create_regex_pattern_add_optional_spaces_to_word_characters(word):
     """Add the regex special characters (\s*) to allow optional spaces between

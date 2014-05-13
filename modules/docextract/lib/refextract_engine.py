@@ -61,7 +61,8 @@ from invenio.refextract_re import (get_reference_line_numeration_marker_patterns
                                    re_roman_numbers,
                                    re_recognised_numeration_for_title_plus_series,
                                    remove_year,
-                                   re_year_in_misc_txt)
+                                   re_year_in_misc_txt,
+                                   re_hdl)
 
 
 description = """
@@ -572,6 +573,38 @@ def arxiv_urls_to_report_numbers(citation_elements):
             el['report_num'] = el['url_string'].replace(arxiv_url_prefix, 'arXiv:')
 
 
+def look_for_hdl(citation_elements):
+    """Looks for handle identifiers in the misc txt of the citation elements
+
+       When finding an hdl, creates a new HDL element.
+       @param citation_elements: (list) elements to process
+    """
+    for el in list(citation_elements):
+        matched_hdl = re_hdl.finditer(el['misc_txt'])
+        for match in reversed(list(matched_hdl)):
+            hdl_el = {'type': 'HDL',
+                      'hdl_id': match.group('hdl_id'),
+                      'misc_txt': el['misc_txt'][match.end():]}
+            el['misc_txt'] = el['misc_txt'][0:match.start()]
+            citation_elements.insert(citation_elements.index(el)+1, hdl_el)
+
+
+def look_for_hdl_urls(citation_elements):
+    """Looks for handle identifiers that have already been identified as urls
+
+       When finding an hdl, creates a new HDL element.
+       @param citation_elements: (list) elements to process
+    """
+    for el in citation_elements:
+        if el['type'] == 'URL':
+            match = re_hdl.match(el['url_string'])
+            if match:
+                el['type'] = 'HDL'
+                el['hdl_id'] = match.group('hdl_id')
+                del el['url_desc']
+                del el['url_string']
+
+
 ## End of elements transformations
 
 
@@ -625,6 +658,8 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
     remove_b_for_nucl_phys(citation_elements)
     mangle_volume(citation_elements)
     arxiv_urls_to_report_numbers(citation_elements)
+    look_for_hdl(citation_elements)
+    look_for_hdl_urls(citation_elements)
     associate_recids(citation_elements)
 
     # Split the reference in multiple ones if needed
