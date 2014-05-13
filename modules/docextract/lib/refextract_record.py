@@ -106,14 +106,14 @@ def build_references(citations):
 
     Transform the reference elements into marc xml
     """
-        # Now, run the method which will take as input:
-        # 1. A list of lists of dictionaries, where each dictionary is a piece
-        # of citation information corresponding to a tag in the citation.
-        # 2. The line marker for this entire citation line (mulitple citation
-        # 'finds' inside a single citation will use the same marker value)
-        # The resulting xml line will be a properly marked up form of the
-        # citation. It will take into account authors to try and split up
-        # references which should be read as two SEPARATE ones.
+    # Now, run the method which will take as input:
+    # 1. A list of lists of dictionaries, where each dictionary is a piece
+    # of citation information corresponding to a tag in the citation.
+    # 2. The line marker for this entire citation line (mulitple citation
+    # 'finds' inside a single citation will use the same marker value)
+    # The resulting xml line will be a properly marked up form of the
+    # citation. It will take into account authors to try and split up
+    # references which should be read as two SEPARATE ones.
     return [c for citation_elements in citations
               for elements in citation_elements['elements']
               for c in build_reference_fields(elements,
@@ -155,15 +155,15 @@ def build_reference_fields(citation_elements, line_marker, inspire_format=None):
     if inspire_format is None:
         inspire_format = CFG_INSPIRE_SITE
 
-    ## Begin the datafield element
+    # Begin the datafield element
     current_field = create_reference_field(line_marker)
 
     reference_fields = [current_field]
 
     for element in citation_elements:
-        ## Before going onto checking 'what' the next element is, handle misc text and semi-colons
-        ## Multiple misc text subfields will be compressed later
-        ## This will also be the only part of the code that deals with MISC tag_typed elements
+        # Before going onto checking 'what' the next element is, handle misc text and semi-colons
+        # Multiple misc text subfields will be compressed later
+        # This will also be the only part of the code that deals with MISC tag_typed elements
         misc_txt = element['misc_txt']
         if misc_txt.strip("., [](){}"):
             misc_txt = misc_txt.lstrip('])} ,.').rstrip('[({ ,.')
@@ -190,7 +190,10 @@ def build_reference_fields(citation_elements, line_marker, inspire_format=None):
 
         # DOI
         elif element['type'] == "DOI":
-            add_subfield(current_field, 'doi', element['doi_string'])
+            add_subfield(current_field, 'doi', 'doi:' + element['doi_string'])
+        # HDL
+        elif element['type'] == "HDL":
+            add_subfield(current_field, 'hdl', 'hdl:' + element['hdl_id'])
 
         # AUTHOR
         elif element['type'] == "AUTH":
