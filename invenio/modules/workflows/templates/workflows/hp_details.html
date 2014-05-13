@@ -66,6 +66,7 @@
     <div class="container" style="padding-left:0px;">
         <div class="row">
             <div class="col-md-3">
+                {% if edit_record_action %}
                 <div class="well">
                     <form id="edit_form" class="form-horizontal" role="form" method="POST" name="">
                         {% for field in edit_record_action %}
@@ -73,7 +74,7 @@
                         {% endfor %}
                     </form>
                 </div>
-
+                {% endif %}
                 {% block hpbody_details %}
                     {{ super() }}
                 {% endblock hpbody_details %}

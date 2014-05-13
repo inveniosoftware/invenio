@@ -71,8 +71,10 @@
         {{ super() }}
     {% endblock hp_navbar %}
             <div class="col-md-3">
+
             {% block hpbody_details scoped %}
-            <div id="decision-btns{{i}}" class="row decision-btns well" >
+
+            <div id="decision-btns{{i}}" class=" decision-btns well" >
                 <p>{{message}}</p>
                 <form id="form{{i}}" class="theform" method="POST" name="{{ url_for('holdingpen.resolve_action', object_id=bwobject.id, action='' )}}">
                     {% for field in action %}
@@ -80,6 +82,7 @@
                     {% endfor %}
                 </form>
             </div>
+
             {{ super() }}
             {% endblock hpbody_details %}
             </div>

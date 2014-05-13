@@ -20,7 +20,9 @@
 
 {% block hpbody_details %}
         <div class="well">
-            <div class="muted">Workflow: <b>{{workflow.name}}</b></div>
+            <div class="muted">  <b>Workflow:</b></div>
+
+            <p data-toggle="tooltip" data-placement="top" title="{{ workflow.name }}">{{ workflow.name|truncate(25, True) }}</p>
             <span type="button" class="pull-right" style="cursor:pointer" data-toggle="collapse" data-target="#workflow-definition"><span class="caret"></span></span>
             <div id="workflow-definition" class="collapse">
                 <table class="table table-striped">
@@ -73,7 +75,6 @@
                             <b>{{ key }}</b> = {{ value }}
                             <hr>
                         {% endfor %}
-
                         {% if bwobject.version == 1 %}
                             <span class="label label-success">Done</span>
                         {% elif bwobject.version == 2 %}
@@ -88,6 +89,39 @@
                 </table>
             </div>
         </div>
+
+        {% if hbwobject %}
+        <div class="well">
+            <div class="muted"><b>History</b>
+                <span type="button" class="pull-right" style="cursor:pointer" data-toggle="collapse" data-target="#History"><span class="caret"></span></span>
+            </div>
+            </br>
+            <div id="History" class="collapse">
+                <table class="table table-striped">
+                    <tbody>
+                    {% for object in hbwobject %}
+                        {% if  object["id"] == bwobject.id %}
+                           <a href="#"> current </a> -
+                           {% else %}
+                           <a href="{{ url_for('holdingpen.details', objectid=object['id']) }}" >{{object["id"]}}</a> -
+                        {% endif %}
+                        {% if object["version"] == 1 %}
+                            <span class="label label-success">Done</span>
+                        {% elif  object["version"] == 2 %}
+                            <span class="label label-danger">Need action</span>
+                        {% elif  object["version"] == 0  %}
+                            <span class="label label-info">New</span>
+                        {% elif  object["version"] == 3  %}
+                            <span class="label label-warning">In process</span>
+                        {% endif %}
+                     {{object["date"]}}
+                    <hr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
 {% endblock %}
 
 {% block hp_navbar %}
@@ -143,7 +177,7 @@
                     name="hd">HTML</button>
             <button class="preview btn btn-xs btn-primary"
                     data-id="{{ bwobject.id }}"
-                    name="xm">MARCXML</button>
+                    name="xm">RAW</button>
             <button class="preview btn btn-xs btn-primary"
                     data-id="{{ bwobject.id }}"
                     name="tm">MARC</button>

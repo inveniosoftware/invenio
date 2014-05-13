@@ -16,15 +16,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-    invenio.modules.workflows.views.holdingpen
-    ------------------------------------------
+Holding Pen
 
-    Holding Pen is an overlay over all objects (BibWorkflowObject) that
-    have run through a workflow (BibWorkflowEngine). This area is targeted
-    to catalogers and super users for inspecting ingestion workflows and
-    submissions/depositions.
+Holding Pen is an overlay over all objects (BibWorkflowObject) that
+have run through a workflow (BibWorkflowEngine). This area is targeted
+to catalogers and super users for inspecting ingestion workflows and
+submissions/depositions.
 
-    Note: Currently work-in-progress.
+Note: Currently work-in-progress.
 """
 
 import re
@@ -302,9 +301,21 @@ def details(objectid):
     """Display info about the object."""
     of = "hd"
     bwobject = BibWorkflowObject.query.get(objectid)
-
+    from sqlalchemy import or_
     formatted_data = bwobject.get_formatted_data(of)
+
     extracted_data = extract_data(bwobject)
+    if bwobject.id_parent:
+        hbwobject_db_request = BibWorkflowObject.query.filter(or_(BibWorkflowObject.id_parent == bwobject.id_parent, BibWorkflowObject.id == bwobject.id, BibWorkflowObject.id == bwobject.id_parent)).all()
+    else:
+        hbwobject_db_request = BibWorkflowObject.query.filter(or_(BibWorkflowObject.id_parent == bwobject.id, BibWorkflowObject.id == bwobject.id)).all()
+    hbwobject = []
+
+    for hbobject in hbwobject_db_request:
+        hbwobject.append({"id": hbobject.id, "version": hbobject.version, "date": pretty_date(hbobject.created), "true_date": hbobject.created})
+
+    hbwobject.sort(key=lambda x: x["id"])
+
     try:
         edit_record_action = actions['edit_record_action']()
     except KeyError:
@@ -313,6 +324,7 @@ def details(objectid):
 
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
+                           hbwobject=hbwobject,
                            bwparent=extracted_data['bwparent'],
                            info=extracted_data['info'],
                            log=extracted_data['logtext'],
@@ -396,7 +408,20 @@ def show_action(objectid):
                                   [extracted_data['workflow_func']])
     url, parameters = result
     #### message
+    from sqlalchemy import or_
+    if bwobject.id_parent:
+        hbwobject_db_request = BibWorkflowObject.query.filter(or_(BibWorkflowObject.id_parent == bwobject.id_parent, BibWorkflowObject.id == bwobject.id, BibWorkflowObject.id == bwobject.id_parent)).all()
+    else:
+        hbwobject_db_request = BibWorkflowObject.query.filter(or_(BibWorkflowObject.id_parent == bwobject.id, BibWorkflowObject.id == bwobject.id)).all()
+    hbwobject = []
+
+    for hbobject in hbwobject_db_request:
+        hbwobject.append({"id": hbobject.id, "version": hbobject.version, "date": pretty_date(hbobject.created), "true_date": hbobject.created})
+
+    hbwobject.sort(key=lambda x: x["id"])
+
     parameters["message"] = bwobject.get_action_message()
+    parameters["hbwobject"] = hbwobject
     return render_template("workflows/hp_approval_widget.html", **parameters)
 
 
