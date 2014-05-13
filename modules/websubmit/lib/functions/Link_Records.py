@@ -280,7 +280,7 @@ def get_recid_and_reportnumber(recid=None, reportnumber=None, keep_original_repo
             ## Not found as primary
             recids = search_pattern(p='reportnumber:"%s"' % reportnumber)
         if len(recids) > 1:
-            raise ValueError('More than one record matches the reportnumber "%s": %s' % (reportnumber, ', '.join(recids)))
+            raise ValueError('More than one record matches the reportnumber "%s": %s' % (reportnumber, ', '.join([str(i) for i in recids])))
         elif len(recids) == 1:
             recid = list(recids)[0]
             if keep_original_reportnumber:
