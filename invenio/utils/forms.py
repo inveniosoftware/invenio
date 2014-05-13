@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,7 +30,7 @@ are taken from `flask-admin` extension.
 import datetime
 import time
 
-from flask import session
+from flask import session, current_app
 from wtforms.form import Form as WTForm
 from wtforms.widgets import TextInput, HTMLString, html_params
 from wtforms.fields import Field, StringField, HiddenField, FileField
@@ -198,10 +198,18 @@ class InvenioBaseForm(Form, SessionSecureForm):
     TIME_LIMIT = 1200.0
 
     def __init__(self, *args, **kwargs):
-        super(InvenioBaseForm, self).__init__(*args, csrf_context=session, **kwargs)
+        super(InvenioBaseForm, self).__init__(
+            *args, csrf_context=session, **kwargs
+        )
 
     def add_fields(self, name, field):
         self.__setattr__(name, field)
+
+    def validate_csrf_token(self, field):
+        # Disable CRSF proection during testing
+        if current_app.testing:
+            return
+        super(InvenioBaseForm, self).validate_csrf_token(field)
 
 
 class FilterForm(InvenioBaseForm):
