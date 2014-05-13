@@ -128,6 +128,8 @@ class TestJSONReader(InvenioTestCase):
         self.assertTrue(all([key in json for key in blob.keys()]))
         self.assertTrue('__meta_metadata__' in json)
         self.assertTrue('modification_date' in json)
+        self.assertEquals(json['default_values_test'],
+                          {'field2': False, 'field3': False, 'field1': False})
 
     def test_json_reader_add_and_set_fields(self):
         """JSONAlchemy - add and set fields"""
