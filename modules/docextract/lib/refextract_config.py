@@ -53,6 +53,7 @@ CFG_REFEXTRACT_FIELDS = {
     'misc': 'm',
     'linemarker': 'o',
     'doi': 'a',
+    'hdl': 'a',
     'reportnumber': 'r',
     'journal': 's',
     'url': 'u',
@@ -71,7 +72,7 @@ CFG_REFEXTRACT_IND1_REFERENCE            = "C"    # ref field ind1
 CFG_REFEXTRACT_IND2_REFERENCE            = "5"    # ref field ind2
 
 ## refextract statistics fields:
-CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS     = "999C6" # ref-stats tag
+CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS = "999C6"  # ref-stats tag
 
 CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS   = "a"   # ref-stats subfield
 CFG_REFEXTRACT_SUBFIELD_EXTRACTION_TIME    = "t"   # ref-stats time subfield
