@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-##
+{#
 ## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
@@ -16,12 +15,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
 
-from __future__ import absolute_import
-from .client import blueprint as client_blueprint
-from .settings import blueprint as settings_blueprint
+{%- extends "page.html" %}
 
-blueprints = [
-    client_blueprint,
-    settings_blueprint,
-]
+{% block body %}
+Rejected
+{% endblock %}

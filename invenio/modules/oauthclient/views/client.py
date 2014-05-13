@@ -17,20 +17,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-OAuth client blueprint
-"""
+""" OAuth client blueprint. """
 
 from __future__ import absolute_import
 
 from flask import Blueprint, abort, current_app, url_for, request
 
+from flask.ext.login import user_logged_out
+
 from invenio.base.globals import cfg
 from invenio.ext.sslify import ssl_required
 
-from ..client import oauth, handlers, disconnect_handlers
-from ..handlers import default_handler, make_token_getter, make_handler, \
-    disconnect_handler
+from ..client import oauth, handlers, disconnect_handlers, signup_handlers
+from ..handlers import authorized_default_handler, make_token_getter, \
+    make_handler, disconnect_handler, oauth_logout_handler
 
 
 blueprint = Blueprint(
@@ -44,12 +44,13 @@ blueprint = Blueprint(
 
 @blueprint.before_app_first_request
 def setup_app():
-    """
-    Setup OAuth clients
-    """
-    oauth.init_app(current_app)
+    """ Setup OAuth clients. """
+    # Connect signal to remove access tokens on logout
+    user_logged_out.connect(oauth_logout_handler)
 
     # Add remote applications
+    oauth.init_app(current_app)
+
     for remote_app, conf in cfg['OAUTHCLIENT_REMOTE_APPS'].items():
         # Prevent double creation problems
         if remote_app not in oauth.remote_apps:
@@ -67,7 +68,7 @@ def setup_app():
         handlers.register(
             remote_app,
             remote.authorized_handler(make_handler(
-                conf.get('authorized_handler', default_handler),
+                conf.get('authorized_handler', authorized_default_handler),
                 remote,
             ))
         )
@@ -81,13 +82,41 @@ def setup_app():
             )
         )
 
+        # Register sign-up handlers
+        def dummy_handler(remote, *args, **kargs):
+            pass
+
+        signup_handler = conf.get('signup_handler', dict())
+        account_info_handler = make_handler(
+            signup_handler.get('info', dummy_handler),
+            remote,
+            with_response=False
+        )
+        account_setup_handler = make_handler(
+            signup_handler.get('setup', dummy_handler),
+            remote,
+            with_response=False
+        )
+        account_view_handler = make_handler(
+            signup_handler.get('view', dummy_handler),
+            remote,
+            with_response=False
+        )
+
+        signup_handlers.register(
+            remote_app,
+            dict(
+                info=account_info_handler,
+                setup=account_setup_handler,
+                view=account_view_handler,
+            )
+        )
+
 
 @blueprint.route('/login/<remote_app>/')
 @ssl_required
 def login(remote_app):
-    """
-    Send user to remote application for authentication
-    """
+    """ Send user to remote application for authentication. """
     if remote_app not in oauth.remote_apps:
         return abort(404)
 
@@ -104,20 +133,28 @@ def login(remote_app):
 @blueprint.route('/authorized/<remote_app>/')
 @ssl_required
 def authorized(remote_app=None):
-    """
-    Authorized handler callback
-    """
+    """ Authorized handler callback. """
     if remote_app not in handlers:
         return abort(404)
     return handlers[remote_app]()
 
 
+@blueprint.route('/signup/<remote_app>/', methods=['GET', 'POST'])
+@ssl_required
+def signup(remote_app):
+    """ Extra signup step. """
+    if remote_app not in signup_handlers:
+        return abort(404)
+    res = signup_handlers[remote_app]['view']()
+    return abort(404) if res is None else res
+
+
 @blueprint.route('/disconnect/<remote_app>/')
 @ssl_required
 def disconnect(remote_app):
-    """
-    Disconnect user from remote application. Removes application as well as
-    associated information.
+    """ Disconnect user from remote application.
+
+    Removes application as well as associated information.
     """
     if remote_app not in disconnect_handlers:
         return abort(404)

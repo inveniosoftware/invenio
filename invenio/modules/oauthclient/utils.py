@@ -22,58 +22,61 @@ from flask.ext.login import current_user, logout_user, login_user
 from invenio.ext.login import authenticate, UserInfo
 from invenio.ext.sqlalchemy import db
 from invenio.ext.script import generate_secret_key
-
+from invenio.modules.accounts.models import User
 
 from .models import RemoteToken, RemoteAccount
 
 
-def oauth_authenticate(client_id, email=None, access_token=None,
-                       require_existing_link=True, auto_register=False):
+def oauth_get_user(client_id, account_info=None, access_token=None):
     """
-    Authenticate an oauth authorized callback
-    """
-    if email is None and access_token is None:
-        return False
+    Retrieve user exists for the given request.
 
-    # Authenticate via the access token
+    Uses either the access token or extracted account information to trieve the
+    user object.
+    """
     if access_token:
         token = RemoteToken.get_by_token(client_id, access_token)
-
         if token:
-            u = UserInfo(token.remote_account.user_id)
-            if login_user(u):
-                return True
+            return UserInfo(token.remote_account.user_id)
 
-    if email:
-        if authenticate(email):
-            if not require_existing_link:
-                return True
+    if account_info and account_info.get('email'):
+        u = User.query.filter_by(email=account_info['email']).first()
+        if u:
+            return UserInfo(u.id)
+    return None
 
-            # Pre-existing link required so check
-            account = RemoteAccount.get(current_user.get_id(), client_id)
-            if account:
-                return True
 
-            # Account doesn't exists, and thus the user haven't linked
-            # the accounts
-            logout_user()
-            return None
-        elif auto_register:
-            from invenio.modules.accounts.models import User
-            if not User.query.filter_by(email=email).first():
-                # Email doesn't exists so we can proceed to register user.
-                u = User(
-                    nickname="",
-                    email=email,
-                    password=generate_secret_key(),
-                    note='1',  # Activated
-                )
-
-                try:
-                    db.session.add(u)
-                    db.session.commit()
-                    login_user(UserInfo(u.id))
-                    return True
-                except Exception:
-                    pass
+def oauth_authenticate(client_id, userinfo, require_existing_link=False):
+    """ Authenticate an oauth authorized callback. """
+    # Authenticate via the access token (access token used to get user_id)
+    if userinfo and authenticate(userinfo['email']):
+        if require_existing_link:
+            account = RemoteAccount.get(userinfo.get_id(), client_id)
+            if account is None:
+                logout_user()
+                return False
+        return True
     return False
+
+
+def oauth_register(account_info):
+    """ Register user if possible. """
+    from invenio.modules.accounts.models import User
+    if account_info and account_info.get('email'):
+        if not User.query.filter_by(email=account_info['email']).first():
+            # Email does not already exists. so we can proceed to register
+            # user.
+            u = User(
+                nickname=account_info.get('nickname', ''),
+                email=account_info['email'],
+                password=generate_secret_key(),
+                note='1',  # Activated - assumes email is validated
+            )
+
+            try:
+                db.session.add(u)
+                db.session.commit()
+                return UserInfo(u.id)
+            except Exception:
+                pass
+    return None

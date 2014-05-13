@@ -21,18 +21,22 @@ from flask_oauthlib.client import OAuth
 from flask.ext.registry import DictRegistry, RegistryProxy
 
 oauth = OAuth()
-"""
-Flask-OAuthlib extension
-"""
+"""Flask-OAuthlib extension."""
 
 handlers = RegistryProxy('oauthclientext.handlers', DictRegistry)
-"""
-Registry of handlers for authorized handler callbacks
-"""
+"""Registry of handlers for authorized handler callbacks."""
 
 disconnect_handlers = RegistryProxy(
     'oauthclientext.disconnecthandlers', DictRegistry
 )
-"""
-Registry of handlers for authorized handler callbacks
-"""
+"""Registry of handlers for authorized handler callbacks."""
+
+signup_handlers = RegistryProxy(
+    'oauthclientext.signuphandlers', DictRegistry
+)
+"""Registry of handlers for signup handlers."""
+
+account_handlers = RegistryProxy(
+    'oauthclientext.accounthandlers', DictRegistry
+)
+"""Registry of handlers for initializing an account."""
