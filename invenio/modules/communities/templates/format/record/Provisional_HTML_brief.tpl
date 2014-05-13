@@ -1,3 +1,22 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
 {% from "communities/helpers.html" import curation_buttons with context %}
 {% js url_for('communities.static', filename='js/communities/custom.js'), 'provisional-custom' %}
 
@@ -99,7 +118,7 @@
 {% endmacro %}
 
 {% macro record_info() %}
-  {{ bfe_primary_report_number(bfo, prefix='<i class="glyphicon glyphicon-qrcode"></i> ') }}
+  {{ record.get('primary_report_number')|prefix('<i class="glyphicon glyphicon-qrcode"></i> ') }}
   {{ bfe_additional_report_numbers(bfo, prefix='<i class="glyphicon glyphicon-qrcode"></i> ',
                                    separator=' <i class="glyphicon glyphicon-qrcode"></i> ') }}
 
