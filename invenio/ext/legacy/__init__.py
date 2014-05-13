@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Tools for working with legacy application."""
+
 import warnings
 
 ## Import the remote debugger as a first thing, if allowed
@@ -25,16 +27,17 @@ import warnings
 #except:
 #    remote_debugger = None
 
-from werkzeug.exceptions import HTTPException, NotFound
+from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import BaseResponse
 
-from flask import request, g, current_app, render_template, abort, \
-    send_from_directory
+from flask import (request, g, current_app, render_template, abort,
+                   send_from_directory)
 
 from .request_class import LegacyRequest
 
 
 def setup_app(app):
+    """Setup up the app."""
     ## Legacy config support
     USE_X_SENDFILE = app.config.get('CFG_BIBDOCFILE_USE_XSENDFILE')
     DEBUG = app.config.get('CFG_DEVEL_SITE', 0) > 0
@@ -77,12 +80,7 @@ def setup_app(app):
                 response = current_app.make_response(str(response))
             return response
         except HTTPException:
-            from flask import current_app
-            # FIXME: check if request.path is static
-            try:
-                return current_app.send_static_file(request.path)
-            except NotFound as e:
-                current_app.logger.error(str(e) + " " + request.path)
+            pass
         if error.code == 404:
             return render_template('404.html'), 404
         return str(error), error.code
@@ -91,9 +89,7 @@ def setup_app(app):
     @app.route('/admin/<module>/<action>.py/<path:arguments>',
                methods=['GET', 'POST', 'PUT'])
     def web_admin(module, action, arguments=None):
-        """
-        Adds support for legacy mod publisher.
-        """
+        """Add support for legacy mod publisher."""
         from invenio.legacy.wsgi import \
             is_mp_legacy_publisher_path, mp_legacy_publisher, \
             application as legacy_application
@@ -108,9 +104,7 @@ def setup_app(app):
 
     @app.endpoint('static')
     def static_handler_with_legacy_publisher(*args, **kwargs):
-        """
-        Serves static files from instance path.
-        """
+        """Serve static files from instance path."""
         # Static file serving for devserver
         # ---------------------------------
         # Apache normally serve all static files, but if we are using the
@@ -118,12 +112,7 @@ def setup_app(app):
         if not app.config.get('CFG_FLASK_SERVE_STATIC_FILES'):
             abort(404)
         else:
-            try:
-                static_file_response = app.send_static_file(*args, **kwargs)
-            except NotFound:
-                static_file_response = send_from_directory(
-                    app.static_folder, kwargs['filename'])
-            return static_file_response
+            return send_from_directory(app.static_folder, kwargs["filename"])
 
     try:
         # pylint: disable=E0611

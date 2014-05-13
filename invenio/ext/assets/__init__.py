@@ -15,21 +15,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-    invenio.ext.assets
-    ------------------
 
-    Additional extensions and functions for the `flask.ext.assets` module.
-"""
+"""Additional extensions and functions for the `flask.ext.assets` module."""
 
-import os
 import six
 from webassets.bundle import is_url
 from flask import current_app
 from flask.ext.assets import Environment, Bundle, FlaskResolver
 from .extensions import CollectionExtension
-
-from invenio.base.wrappers import STATIC_MAP
 
 
 __all__ = ('CollectionExtension', 'setup_app')
@@ -66,31 +59,22 @@ class InvenioResolver(FlaskResolver):
     def search_for_source(self, item):
         """Return absolute path of the resource.
 
-        It uses the :py:data:`invenio.base.wrappers.STATIC_MAP` to identify
-        which items are within a module static directory or are coming from
-        the instance static directory.
-
         :param item: resource filename
         :return: absolute path
         .. seealso:: :py:function:`webassets.env.Resolver:search_for_source`
         """
-        abspath = STATIC_MAP.get(item)
-        if abspath and not os.path.exists(abspath):
-            abspath = None
-
-        if not abspath:
-            try:
-                abspath = super(InvenioResolver, self).search_env_directory(item)
-            except:
-                # If a file is missing in production (non-debug mode), we want
-                # to not break and will use /dev/null instead. The exception
-                # is caught and logged.
-                if not current_app.debug:
-                    error = "Missing asset file: {0}".format(item)
-                    current_app.logger.exception(error)
-                    abspath = "/dev/null"
-                else:
-                    raise
+        try:
+            abspath = super(InvenioResolver, self).search_env_directory(item)
+        except:
+            # If a file is missing in production (non-debug mode), we want
+            # to not break and will use /dev/null instead. The exception
+            # is caught and logged.
+            if not current_app.debug:
+                error = "Missing asset file: {0}".format(item)
+                current_app.logger.exception(error)
+                abspath = "/dev/null"
+            else:
+                raise
 
         return abspath
 
