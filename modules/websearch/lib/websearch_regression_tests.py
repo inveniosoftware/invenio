@@ -1977,11 +1977,16 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
 
 </collection>""")
 
-
     def test_search_engine_python_api_long_author_with_quotes(self):
         """websearch - search engine Python API for p=author:"Abbot, R B"'""" \
         """this test was written along with a bug report, needs fixing."""
         self.assertEqual([16], perform_request_search(p='author:"Abbott, R B"'))
+
+    def test_search_engine_python_api_search_refersto_year_2000(self):
+        """websearch - search engine Python API for failed query"""
+        self.assertEqual([92],
+                         perform_request_search(p='refersto:year:2000'))
+
 
 class WebSearchSearchEngineWebAPITest(InvenioTestCase):
     """Check typical search engine Web API calls on the demo data."""
