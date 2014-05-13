@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,13 +28,22 @@ def get_self_cited_by(recid):
     return intbitset(run_sql(sql, [recid]))
 
 
-def get_self_cited_by_list(recids):
-    in_sql = ','.join('%s' for dummy in recids)
+def get_self_cited_by_list(recids, record_limit=None):
+    if not recids:
+        return []
+
+    # We don't want to overwrite the input parameter
+    if record_limit is not None:
+        limited_recids = recids[:record_limit]
+    else:
+        limited_recids = recids
+
+    in_sql = ','.join('%s' for dummy in limited_recids)
     sql = "SELECT citee, citer FROM rnkSELFCITEDICT WHERE citee IN (%s)"
     cites = {}
-    for citee, citer in run_sql(sql % in_sql, recids):
+    for citee, citer in run_sql(sql % in_sql, limited_recids):
         cites.setdefault(citee, set()).add(citer)
-    return [(recid, cites.get(recid, set())) for recid in recids]
+    return [(recid, cites.get(recid, set())) for recid in limited_recids]
 
 
 def get_self_refers_to(recid):
@@ -42,10 +51,19 @@ def get_self_refers_to(recid):
     return intbitset(run_sql(sql, [recid]))
 
 
-def get_self_refers_to_list(recids):
-    in_sql = ','.join('%s' for dummy in recids)
+def get_self_refers_to_list(recids, record_limit=None):
+    if not recids:
+        return []
+
+    # We don't want to overwrite the input parameter
+    if record_limit is not None:
+        limited_recids = recids[:record_limit]
+    else:
+        limited_recids = recids
+
+    in_sql = ','.join('%s' for dummy in limited_recids)
     sql = "SELECT citer, citee FROM rnkSELFCITEDICT WHERE citer IN (%s)"
     refs = {}
-    for citer, citee in run_sql(sql % in_sql, recids):
+    for citer, citee in run_sql(sql % in_sql, limited_recids):
         refs.setdefault(citer, set()).add(citee)
-    return [(recid, refs.get(recid, set())) for recid in recids]
+    return [(recid, refs.get(recid, set())) for recid in limited_recids]
