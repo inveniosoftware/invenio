@@ -17,30 +17,71 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+    invenio.modules.uploader.workflows.insert
+    -----------------------------------------
+
+    Default workflows for insert records using the uploader.
+
+
+    :py:data:`insert`
+    :py:data:`undo`
+"""
+
 from workflow.patterns import IF
 
 from invenio.modules.uploader.errors import UploaderWorkflowException
-from invenio.modules.uploader.tasks import raise_, validate, update_pidstore,\
-    retrieve_record_id_from_pids, reserve_record_id, save_record, \
-    save_master_format
+from invenio.modules.uploader.uploader_tasks import raise_, \
+    validate, \
+    update_pidstore,\
+    retrieve_record_id_from_pids, \
+    reserve_record_id, save_record, \
+    save_master_format, \
+    create_records_for_workflow, \
+    return_recordids_only
 
-insert = [
-    retrieve_record_id_from_pids(step=0),
-    IF(
-        lambda obj, eng: obj[1].get('recid') and
-        not eng.getVar('options').get('force', False),
-        [
-            raise_(UploaderWorkflowException(step=1,
-                msg="Record identifier found the input, you should use the"
-                    " option 'replace', 'correct' or 'append' mode instead.\n "
-                    "The option '--force' could also be used. (-h for help)"))
-         ]
-       ),
-    reserve_record_id(step=2),
-    validate(step=3),
-    save_record(step=4),
-    update_pidstore(step=5),
-    save_master_format(step=6),
-]
+insert = dict(
+    pre_tasks=[
+        create_records_for_workflow,
+    ],
+    tasks=[
+        retrieve_record_id_from_pids(step=0),
+        IF(
+            lambda obj, eng: obj[1].get('recid') and
+            not eng.getVar('options').get('force', False),
+            [
+                raise_(UploaderWorkflowException(
+                    step=1,
+                    msg="Record identifier found the input, you should use the"
+                        " option 'replace', 'correct' or 'append' mode "
+                        "instead.\n The option '--force' could also be used. "
+                        "(-h for help)")
+                       )
+            ]
+        ),
+        reserve_record_id(step=2),
+        validate(step=3),
+        save_record(step=4),
+        update_pidstore(step=5),
+        save_master_format(step=6),
+    ],
+    post_tasks=[
+        return_recordids_only,
+    ]
+)
+"""
+Defaul insert workflow.
 
-undo = []
+TBC.
+"""
+
+undo = dict(
+    pre_tasks=[],
+    tasks=[],
+    post_tasks=[]
+)
+"""
+Default undo steps for the insert workflow.
+
+TBC.
+"""
