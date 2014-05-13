@@ -115,7 +115,7 @@
 {% endmacro %}
 
 {% macro record_info() %}
-  {{ bfe_primary_report_number(bfo, prefix='<i class="glyphicon glyphicon-qrcode"></i> ') }}
+  {{ record.get('primary_report_number')|prefix('<i class="glyphicon glyphicon-qrcode"></i> ') }}
   {{ bfe_additional_report_numbers(bfo, prefix='<i class="glyphicon glyphicon-qrcode"></i> ',
                                    separator=' <i class="glyphicon glyphicon-qrcode"></i> ') }}
 
