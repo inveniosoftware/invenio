@@ -36,6 +36,7 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import write_message, task_update_progress as bibtask_update_progress, task_sleep_now_if_required
 from invenio.docextract_task import fetch_last_updated, store_last_updated
 from invenio.docextract_record import get_record
+from unidecode import unidecode
 
 
 CHUNK_SIZE = 10000
@@ -150,7 +151,7 @@ def process_chunk(recids):
         for field in chain(record['100'], record['700']):
             if not field['a']:
                 continue
-            field_author = field['a'][0]
+            field_author = unidecode(field['a'][0])
             field_aff = field['u']
             if field_aff:
                 pid = pids[field_author]
