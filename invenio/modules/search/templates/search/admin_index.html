@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,12 +26,9 @@
 
 {% block header %}
   {{ super() }}
-  {% js "js/jquery-ui.min.js" %}
-{% endblock header %}
+  {%- js url_for("static", filename="js/jqueryui/jquery-ui.js") -%}
 
-{% block body %}
-
-<style>
+<style type="text/css">
     /* This minimal height is important to be able to attach
      * an item to any list of collection tree.
      */
@@ -54,7 +51,9 @@
     }
 
 </style>
+{% endblock header %}
 
+{% block body %}
 <div class="subnav">
     <ul class="nav nav-pills" >
         <li class="dropdown">
@@ -87,7 +86,7 @@
   </div>
 
   <div class="col-md-4 collection">
-	  <h4>{{ _("Focus on") }}</h4>
+    <h4>{{ _("Focus on") }}</h4>
     {{ collection_tree(collection, '_collection_children_v', class="nav nav-list sortable
     connectedSortable") }}
   </div>

@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,8 +21,8 @@
 {% set personalize_selected = True %}
 {% block header %}
   {{ super() }}
-  {% js "js/jquery.tokeninput.js" %}
-  {% css "css/token-input.css" %}
+  {%- js url_for("static", filename="js/jquery.tokeninput.js") -%}
+  {%- css url_for("static", filename="css/token-input.css") -%}
 {% endblock %}
 {% block javascript %}
 <script type="text/javascript">

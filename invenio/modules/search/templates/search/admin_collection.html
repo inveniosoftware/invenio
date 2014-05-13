@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,9 +28,8 @@
 {% set personalize_selected = True %}
 
 {% block header %}
-{{ super() }}
-{% js "js/jquery/jquery-1.7.2.min.js" %}
-{% js "js/jquery/jquery-ui-1.8.21.custom.min.js" %}
+  {{ super() }}
+  {%- js url_for("static", filename="js/jqueryui/jquery-ui.custom.min.js") -%}
 {% endblock header %}
 
 {% block body %}
@@ -42,7 +41,7 @@
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="tab1">
-            <form method="POST" action="{{ url_for('.update', id = collection.id) }}" >
+            <form method="POST" action="{{ url_for('.update', id = collection.id) }}">
                 {{ form.csrf_token }}
                 {{ form.id }}
                 {{ render_field(form.name) }}
@@ -53,15 +52,12 @@
         </div>
         {% if collection %}
         <div class="tab-pane" id="tab2">
-
             {{ collection_translations(collection) }}
-    
         </div>
         <div class="tab-pane" id="tab3">
             {{ portalboxes_admin(collection) }}
           </div>
-          {% endif %}
-    
+        {% endif %}
     </div>
 </div>
 
