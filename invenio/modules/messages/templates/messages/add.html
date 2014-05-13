@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,9 +21,9 @@
 {% set title = _("Write a message") %}
 {% block header %}
   {{ super() }}
-  {% css "img/jquery-ui/themes/redmond/jquery-ui.css" %}
-  {% js "js/jquery-ui.min.js" %}
-  {% js "js/jquery-ui-timepicker-addon.js" %}
+  {%- css url_for("static", filename="js/jquery-ui/jquery-ui.css") -%}
+  {%- js url_for("static", filename="js/jquery-ui.js") -%}
+  {%- js url_for("static", filename="js/jquery-ui-timepicker-addon.js") -%}
 {% endblock header %}
 {% block javascript %}
     <script type="text/javascript">

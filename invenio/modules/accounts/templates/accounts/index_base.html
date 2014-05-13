@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -35,53 +35,10 @@
 </div>
 {% endblock %}
 
-{% block body %}
-
-{% css "img/jquery-ui/themes/redmond/jquery-ui.css" %}
-{% js "js/jquery-ui.min.js" %}
-
-<div class="container">
-  <div class="row">
-   <div class="col-md-12">
-    <ul id="widgets" class="list-unstyled">
-      <li id="leftColumn" class="widgetColumn col-md-4">
-        <ul id="widgetsLeft" class="connectedWidgets list-unstyled">
-          {%- for p in plugins[0] -%}
-            {{display_widget(p)}}
-          {%- endfor -%}
-        </ul>
-      </li>
-      <li id="middleColumn" class="widgetColumn col-md-4">
-        <ul id="widgetsMiddle" class="connectedWidgets list-unstyled">
-          {%- for p in plugins[1] -%}
-            {{display_widget(p)}}
-          {%- endfor -%}
-        </ul>
-      </li>
-      <li id="rightColumn" class="widgetColumn col-md-4">
-        <ul id="widgetsRight" class="connectedWidgets list-unstyled">
-          {%- for p in plugins[2] -%}
-            {{display_widget(p)}}
-          {%- endfor -%}
-        </ul>
-      </li>
-    </ul>
-    </div>
-  </div>
-
-  <hr/>
-
-  <div class="row">
-    <div class="col-md-12" id="closed-list-bar">
-      <h5>{{ _('Closed Widgets') }} <small>{{ _('can be re-opened by clicking on folloing button(s)') }}</small></h5>
-      <ul id="closed-list">
-      {%- for p in closed_plugins -%}
-        <li id="{{ p.name}}" class="btn display-widget">{{p.title}} <i class="glyphicon glyphicon-plus"></i></li>
-      {%- endfor -%}
-      </ul>
-    </div>
-  </div>
-</div>
+{% block header %}
+  {{ super() }}
+  {%- css url_for("static", filename="js/jqueryui/jquery-ui.css") -%}
+  {%- js url_for("static", filename="js/jqueryui/jquery-ui.js") -%}
 
 <style>
 #widgets li .thumbnail {
@@ -128,7 +85,51 @@
   margin-right: 10px;
 }
 </style>
+{% endblock %}
 
+{% block body %}
+<div class="container">
+  <div class="row">
+   <div class="col-md-12">
+    <ul id="widgets" class="list-unstyled">
+      <li id="leftColumn" class="widgetColumn col-md-4">
+        <ul id="widgetsLeft" class="connectedWidgets list-unstyled">
+          {%- for p in plugins[0] -%}
+            {{display_widget(p)}}
+          {%- endfor -%}
+        </ul>
+      </li>
+      <li id="middleColumn" class="widgetColumn col-md-4">
+        <ul id="widgetsMiddle" class="connectedWidgets list-unstyled">
+          {%- for p in plugins[1] -%}
+            {{display_widget(p)}}
+          {%- endfor -%}
+        </ul>
+      </li>
+      <li id="rightColumn" class="widgetColumn col-md-4">
+        <ul id="widgetsRight" class="connectedWidgets list-unstyled">
+          {%- for p in plugins[2] -%}
+            {{display_widget(p)}}
+          {%- endfor -%}
+        </ul>
+      </li>
+    </ul>
+    </div>
+  </div>
+
+  <hr/>
+
+  <div class="row">
+    <div class="col-md-12" id="closed-list-bar">
+      <h5>{{ _('Closed Widgets') }} <small>{{ _('can be re-opened by clicking on folloing button(s)') }}</small></h5>
+      <ul id="closed-list">
+      {%- for p in closed_plugins -%}
+        <li id="{{ p.name}}" class="btn display-widget">{{p.title}} <i class="glyphicon glyphicon-plus"></i></li>
+      {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block javascript %}
