@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf8 -*-
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
@@ -17,14 +17,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Configuration of *Flask-Collect* extension."""
-
-from flask.ext.collect import Collect
-
-collect = Collect()
-
-
-def setup_app(app):
-    """Set the application up with the corresct static root."""
-    app.config['COLLECT_STATIC_ROOT'] = app.static_folder
-    collect.init_app(app)
+"""Custom *Flask-Collect* storages."""
