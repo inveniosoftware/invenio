@@ -21,6 +21,13 @@
     invenio.modules.jsonalchemy.reader
     ----------------------------------
 
+    Default/Base reader, it provides the common functionality to use the
+    readers. Typically this class should be used as a factory to create the
+    concrete reader depending of the master format of the input.
+
+        >>> from invenio.modules.jsonalchemy.reader import Reader
+        >>> from invenio.modules.readers.api import Record
+        >>> record = Reader.translate(blob, 'marc', Record, model=['picture'])
 """
 import datetime
 import six
@@ -37,16 +44,8 @@ def split_blob(blob, master_format, **kwargs):
 
 
 class Reader(object):  # pylint: disable=R0921
-    """
-    Default/Base reader, it provides the common functionality to use the
-    readers. Typically this class should be used as a factory to create the
-    concrete reader depending of the master format of the input.
 
-    >>> from invenio.modules.jsonalchemy.reader import Reader
-    >>> from invenio.modules.readers.api import Record
-    >>> record = Reader.translate(blob, 'marc', Record, model=['picture'])
-
-    """
+    """Base reader."""
 
     def __new__(cls, json, blob=None, **kwargs):  # pylint: disable=W0613
         try:
@@ -164,6 +163,7 @@ class Reader(object):  # pylint: disable=R0921
                                                )['fields'].get(field, field)
 
             reader._set_default_value(json_id, field)
+            reader._evaluate_after_decorators(field)
 
     @classmethod
     def update(cls, json, fields, blob=None, update_db=False):
@@ -299,18 +299,9 @@ class Reader(object):  # pylint: disable=R0921
         self._apply_rules(json_id, field_name, rule)
         self._apply_virtual_rules(json_id, field_name, rule)
 
-        if field_name not in self._json._dict_bson:
-            self._set_default_value(json_id, field_name)
-        else:
-            self._set_default_type(json_id, field_name)
-            for ext, args in \
-                    six.iteritems(self._json.meta_metadata[field_name]['after']):
-                FieldParser.decorator_after_extensions()[ext]\
-                    .evaluate(self._json, field_name, 'set', args)
-            for ext, args in \
-                    six.iteritems(self._json.meta_metadata[field_name]['ext']):
-                FieldParser.field_extensions()[ext]\
-                    .evaluate(self._json, field_name, 'set', args)
+        self._set_default_value(json_id, field_name)
+        self._set_default_type(json_id, field_name)
+        self._evaluate_after_decorators(field_name)
         return field_name in self._json
 
     def _apply_rules(self, json_id, field_name, rule):
@@ -387,10 +378,22 @@ class Reader(object):  # pylint: disable=R0921
                 self._json.additional_info.namespace)[json_id]
             .get('schema', {}).get(json_id, {}))
         if value is not None:
-            info = self._find_field_metadata(json_id, field_name,
-                                             self._json.get(field_name))
-            self._json['__meta_metadata__'][field_name] = info
-            self._json[field_name] = value
+            if field_name not in self._json._dict_bson:
+                info = self._find_field_metadata(json_id, field_name,
+                                                 self._json.get(field_name))
+                self._json['__meta_metadata__'][field_name] = info
+                self._json.__setitem__(field_name, value, extend=False,
+                                       exclude=['decorators', 'extensions'])
+            else:
+                old_value = self._json.__getitem__(
+                    field_name, exclude=['decorators', 'extensions'])
+                self._json.__setitem__(field_name, value, extend=False,
+                                       exclude=['decorators', 'extensions'])
+                try:
+                    self._json._dict_bson[field_name].update(old_value)
+                except AttributeError:
+                    self._json.__setitem__(field_name, old_value, extend=False,
+                                           exclude=['decorators', 'extensions'])
 
     def _set_default_type(self, json_id, field_name):
         """Finds the default type inside the schema, if `force` is used"""
@@ -549,3 +552,16 @@ class Reader(object):  # pylint: disable=R0921
                               self._json.additional_info.namespace, content):
                 return False
         return True
+
+    def _evaluate_after_decorators(self, field_name):
+        """Evaluates all the after decorators"""
+        if field_name not in self._json._dict_bson:
+            return
+        for ext, args in \
+                six.iteritems(self._json.meta_metadata[field_name]['after']):
+            FieldParser.decorator_after_extensions()[ext]\
+                .evaluate(self._json, field_name, 'set', args)
+        for ext, args in \
+                six.iteritems(self._json.meta_metadata[field_name]['ext']):
+            FieldParser.field_extensions()[ext]\
+                .evaluate(self._json, field_name, 'set', args)
