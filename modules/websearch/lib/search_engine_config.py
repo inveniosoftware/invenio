@@ -60,3 +60,19 @@ class InvenioWebSearchWildcardLimitError(Exception):
     def __init__(self, res):
         """Initialization."""
         self.res = res
+
+class InvenioWebSearchReferstoLimitError(Exception):
+    """
+    Exception raised when CFG_WEBSEARCH_MAX_RECORDS_REFERSTO limit is reached.
+    """
+    def __init__(self, res):
+        """Initialization."""
+        self.res = res
+
+class InvenioWebSearchCitedbyLimitError(Exception):
+    """
+    Exception raised when CFG_WEBSEARCH_MAX_RECORDS_CITEDBY limit is reached.
+    """
+    def __init__(self, res):
+        """Initialization."""
+        self.res = res

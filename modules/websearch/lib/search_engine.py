@@ -87,11 +87,15 @@ from invenio.config import \
      CFG_XAPIAN_ENABLED, \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_BASE_URL, \
-     CFG_WEBSEARCH_BLACKLISTED_FORMATS
+     CFG_WEBSEARCH_BLACKLISTED_FORMATS, \
+     CFG_WEBSEARCH_MAX_RECORDS_REFERSTO, \
+     CFG_WEBSEARCH_MAX_RECORDS_CITEDBY
 
 from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
      InvenioWebSearchWildcardLimitError, \
+     InvenioWebSearchReferstoLimitError, \
+     InvenioWebSearchCitedbyLimitError, \
      CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
      CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH
 from invenio.search_engine_utils import (get_fieldvalues,
@@ -2111,6 +2115,15 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             basic_search_unit_hitset = excp.res
             if of.startswith("h"):
                 write_warning(_("Search term too generic, displaying only partial results..."), req=req)
+        except InvenioWebSearchReferstoLimitError, excp:
+            basic_search_unit_hitset = excp.res
+            if of.startswith("h"):
+                write_warning(_("Search term after reference operator too generic, displaying only partial results..."), req=req)
+        except InvenioWebSearchCitedbyLimitError, excp:
+            basic_search_unit_hitset = excp.res
+            if of.startswith("h"):
+                write_warning(_("Search term after citedby operator too generic, displaying only partial results..."), req=req)
+
         # FIXME: print warning if we use native full-text indexing
         if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h') and not CFG_SOLR_URL:
             write_warning(_("No phrase index available for fulltext yet, looking for word combination..."), req=req)
@@ -2898,7 +2911,11 @@ def search_unit_refersto(query):
     """
     if query:
         ahitset = search_pattern(p=query)
-        return get_refersto_hitset(ahitset)
+        res = get_refersto_hitset(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_REFERSTO)
+
+        if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_REFERSTO:
+            raise InvenioWebSearchReferstoLimitError(res)
+        return res
     else:
         return intbitset([])
 
@@ -2910,11 +2927,14 @@ def search_unit_refersto_excluding_selfcites(query):
     if query:
         ahitset = search_pattern(p=query)
         citers = intbitset()
-        citations = get_cited_by_list(ahitset)
-        selfcitations = get_self_cited_by_list(ahitset)
+        citations = get_cited_by_list(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_REFERSTO)
+        selfcitations = get_self_cited_by_list(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_REFERSTO)
         for cites, selfcites in zip(citations, selfcitations):
             # cites is in the form [(citee, citers), ...]
             citers += cites[1] - selfcites[1]
+
+        if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_REFERSTO:
+            raise InvenioWebSearchReferstoLimitError(citers)
         return citers
     else:
         return intbitset([])
@@ -2961,7 +2981,11 @@ def search_unit_citedby(query):
     if query:
         ahitset = search_pattern(p=query)
         if ahitset:
-            return get_citedby_hitset(ahitset)
+            res = get_citedby_hitset(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_CITEDBY)
+
+            if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_CITEDBY:
+                raise InvenioWebSearchCitedbyLimitError(res)
+            return res
         else:
             return intbitset([])
     else:
@@ -2975,11 +2999,14 @@ def search_unit_citedby_excluding_selfcites(query):
     if query:
         ahitset = search_pattern(p=query)
         citees = intbitset()
-        references = get_refers_to_list(ahitset)
-        selfreferences = get_self_refers_to_list(ahitset)
+        references = get_refers_to_list(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_CITEDBY)
+        selfreferences = get_self_refers_to_list(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_CITEDBY)
         for refs, selfrefs in zip(references, selfreferences):
             # refs is in the form [(citer, citees), ...]
             citees += refs[1] - selfrefs[1]
+
+        if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_CITEDBY:
+            raise InvenioWebSearchCitedbyLimitError(citees)
         return citees
     else:
         return intbitset([])
