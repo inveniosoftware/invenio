@@ -49,7 +49,6 @@ from invenio.config import \
      CFG_WEBSEARCH_RSS_TTL, \
      CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
-     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBDIR, \
      CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
@@ -87,7 +86,8 @@ from invenio.search_engine import check_user_can_view_record, \
      restricted_collection_cache, \
      get_coll_normalised_name, \
      EM_REPOSITORY
-from invenio.websearch_webcoll import perform_display_collection
+from invenio.websearch_webcoll import perform_display_collection, \
+    CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
 from invenio.search_engine_utils import get_fieldvalues, \
      get_fieldvalues_alephseq_like
 from invenio.access_control_engine import acc_authorize_action
@@ -779,7 +779,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         if argd.has_key('as'):
             argd['aas'] = argd['as']
             del argd['as']
-        if argd.get('aas', CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE) not in (0, 1):
+        if argd.get('aas', CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE) not in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES:
             argd['aas'] = CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
 
         # If we specify no collection, then we don't need to redirect

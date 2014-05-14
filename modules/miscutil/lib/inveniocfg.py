@@ -226,7 +226,6 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS',
                        'CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS',
                        'CFG_BIBUPLOAD_DELETE_FORMATS',
-                       'CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES',
                        'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST',
                        'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
@@ -249,12 +248,8 @@ You may want to customise your invenio-local.conf configuration accordingly."""
         for elem in option_value[1:-1].split(","):
             if elem:
                 elem = elem.strip()
-                if option_name in ['CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES']:
-                    # 3d1) integer values
-                    out += "%i, " % int(elem)
-                else:
-                    # 3d2) string values
-                    out += "'%s', " % elem
+                # string values
+                out += "'%s', " % elem
         out += "]"
         option_value = out
 
@@ -376,11 +371,6 @@ def cli_cmd_update_config_py(conf):
                 line_out = convert_conf_option(option, conf.get(section, option))
                 if line_out:
                     fdesc.write(line_out + "\n")
-    ## FIXME: special treatment for experimental variables
-    ## CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES and CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
-    ## (not offering them in invenio.conf since they will be refactored)
-    fdesc.write("CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE = 0\n")
-    fdesc.write("CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES = [0, 1,]\n")
     ## generate postamble:
     fdesc.write("")
     fdesc.write("# END OF GENERATED FILE")

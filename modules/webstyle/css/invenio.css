@@ -575,7 +575,7 @@ a.footer:hover {
    color: #000;
    background: #fff;
    padding: 1px;
-   margin: 5px 0px 5px 0px;
+   /*margin: 5px 0px 5px 0px;*/
    border-collapse: collapse;
    /*border-top: 1px solid #36c;*/
 }
@@ -3295,6 +3295,29 @@ div.bibcircbottom {
     width: 50%;
 }
 
+
+/* add-to-search */
+
+#advbox{
+    padding-bottom: 20px;
+    white-space: nowrap;
+}
+
+a#advbox-toggle{
+    text-decoration: none;
+    color: #3366CC;
+}
+
+#advbox-toggle-button{
+    background-color: #DDDDDD;
+    border-radius: 3px 3px 3px 3px;
+    color: #3366CC;
+    font-weight: 400;
+    padding: 1px 6px;
+    text-decoration: none;
+}
+
+/*End - add-to-search*/
 
 /* Rollover menus */
 

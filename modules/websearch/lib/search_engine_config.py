@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -45,6 +45,11 @@ CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH = False
 ## page. All the rest of the collections will be hidden by a
 ## "See more collections" link.
 CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT = 10
+
+# CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES -- all the enabled search
+# interfaces (0=simple, 1=advanced, 2=add-to-search):
+CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES = [0,1,2]
+
 
 class InvenioWebSearchUnknownCollectionError(Exception):
     """Exception for bad collection."""
