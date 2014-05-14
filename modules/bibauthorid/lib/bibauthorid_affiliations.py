@@ -151,10 +151,14 @@ def process_chunk(recids):
         for field in chain(record['100'], record['700']):
             if not field['a']:
                 continue
-            field_author = unidecode(field['a'][0])
+            field_author = field['a'][0]
             field_aff = field['u']
             if field_aff:
-                pid = pids[field_author]
+                try:
+                    pid = pids[field_author]
+                except KeyError:
+                    # Name stored by an older version of bibauthorid
+                    pid = pids[unidecode(field_author)]
                 record_date = get_creation_date(recid)
                 if pid not in aff or aff[pid]['last_occurence'] <= record_date:
                     aff[pid] = {'aff': field_aff,
