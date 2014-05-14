@@ -1,4 +1,4 @@
-include requirements*.txt ABOUT-NLS AUTHORS ChangeLog COPYING INSTALL NEWS README RELEASE-NOTES THANKS TODO UNINSTALL bower.json Gruntfile.js mapping.cfg package.json Procfile setup.cfg
+include requirements*.txt ABOUT-NLS AUTHORS ChangeLog COPYING INSTALL NEWS README RELEASE-NOTES THANKS TODO UNINSTALL bower.json Gruntfile.js mapping.cfg package.json Procfile* setup.cfg
 include invenio/invenio.wsgi
 
 recursive-include docs *

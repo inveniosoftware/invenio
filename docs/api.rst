@@ -15,6 +15,7 @@ Extensions
    :maxdepth: 1
 
    ext/assets
+   ext/elasticsearch
    ext/sqlalchemy
 
 Modules
