@@ -88,6 +88,7 @@ def detach_slave(connection=None):
     """Detach the slave."""
     if connection is None:
         connection = get_connection_for_dump_on_slave()
+    connection.ping(1)
     run_sql("STOP SLAVE SQL_THREAD", connection=connection)
     check_slave_is_down(connection)
 
@@ -95,6 +96,7 @@ def attach_slave(connection=None):
     """Attach the slave."""
     if connection is None:
         connection = get_connection_for_dump_on_slave()
+    connection.ping(1)
     run_sql("START SLAVE", connection=connection)
     check_slave_is_up(connection)
 
