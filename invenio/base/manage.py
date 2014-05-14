@@ -22,20 +22,10 @@
 from __future__ import print_function
 
 from flask import current_app
-from flask.ext.registry import RegistryProxy, ModuleAutoDiscoveryRegistry
-
-from invenio.ext.script import Manager, change_command_name, register_manager
 from invenio.base.factory import create_app
+from invenio.ext.script import Manager, change_command_name, register_manager
 
-app = create_app()
-manager = Manager(app, with_default_commands=False)
-managers = RegistryProxy('managers', ModuleAutoDiscoveryRegistry, 'manage')
-register_manager(manager)
-
-with app.app_context():
-    for script in managers:
-        manager.add_command(script.__name__.split('.')[-2],
-                            getattr(script, 'manager'))
+manager = Manager(create_app(), with_default_commands=False)
 
 
 @manager.shell
@@ -70,8 +60,7 @@ def check_for_software_updates():
 @manager.command
 @change_command_name
 def detect_system_details():
-    """
-    Detect and print system details such as Apache/Python/MySQL versions.
+    """Detect and print system details such as Apache/Python/MySQL versions.
 
     It is useful for debugging problems on various OS.
     """
@@ -110,6 +99,7 @@ def detect_system_details():
 
 def main():
     """Run manager."""
+    register_manager(manager)
     manager.run()
 
 if __name__ == "__main__":
