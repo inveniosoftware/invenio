@@ -85,8 +85,14 @@
                 {% if 'message' in bwobject.get_extra_data() and
                     bwobject.get_action() != None %}
                     <div id="usermessage" class="alert alert-warning alert-dismissable">
-                        {{bwobject.get_extra_data()['message']}}
+                        {{bwobject.get_extra_data()['_message']}}
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    </div>
+                {% endif %}
+                {% if bwobject.version == 1 %}
+                    <div id="successmessage" class="alert alert-success">
+                        Record ran workflow successfully.
+                        <a class="close" data-dismiss="alert">×</a>
                     </div>
                 {% endif %}
 
@@ -94,12 +100,7 @@
                     {{ super() }}
                 {% endblock %}
 
-                {% if bwobject.version == 1 %}
-                    <div id="successmessage" class="alert alert-success">
-                        Record ran workflow successfully.
-                        <a class="close" data-dismiss="alert">×</a>
-                    </div>
-                {% endif %}
+
             </div>
         </div>
     </div>

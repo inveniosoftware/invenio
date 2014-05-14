@@ -39,14 +39,19 @@ from .errors import WorkflowWorkerError
 
 
 class WorkerBackend(object):
+
     """
-    WorkerBackend is a class representing the worker
-    it will automatically get the worker thanks to the configuration
+    WorkerBackend is a class representing the worker.
+
+    It will automatically get the worker thanks to the configuration
     when called.
     """
+
     @cached_property
     def worker(self):
         """
+        Represents the worker.
+
         This cached property is the one which is returning the worker
         to use.
 
@@ -71,8 +76,7 @@ WORKER = WorkerBackend()
 
 def start(workflow_name, data, **kwargs):
     """
-    Starts a workflow by given name for specified data *immediately*
-    in the current process.
+    Start a workflow by given name for specified data *immediately*.
 
     The name of the workflow to start is considered unique and it is
     equal to the name of a file containing the workflow definition.
@@ -102,8 +106,9 @@ def start(workflow_name, data, **kwargs):
 
 def start_delayed(workflow_name, data, **kwargs):
     """
-    Starts a *delayed* workflow by using one of the defined workers
-    available. For example, enqueue the execution of the workflow in
+    Start a *delayed* workflow by using one of the defined workers.
+
+    For example, enqueue the execution of the workflow in
     a task queue such as Celery (http://celeryproject.org).
 
     Otherwise, see documentation of start().
@@ -137,8 +142,9 @@ def start_delayed(workflow_name, data, **kwargs):
 
 def start_by_wid(wid, **kwargs):
     """
-    Will re-start given workflow, by workflow uuid (wid),
-    from the beginning with the original data given.
+    Will re-start given workflow, by workflow uuid (wid).
+
+    It is restarted from the beginning with the original data given.
 
     Special custom keyword arguments can be given to the workflow engine
     in order to pass certain variables to the tasks in the workflow execution,
@@ -156,8 +162,9 @@ def start_by_wid(wid, **kwargs):
 
 def start_by_wid_delayed(wid, **kwargs):
     """
-    Will re-start given workflow, by workflow uuid (wid),
-    from the beginning with the original data given.
+    Will re-start given workflow, by workflow uuid (wid).
+
+    It is restarted from the beginning with the original data given.
 
     Starts the workflow *delayed* by using one of the defined workers
     available. For example, enqueueing the execution of the workflow in
@@ -177,8 +184,7 @@ def start_by_wid_delayed(wid, **kwargs):
 
 def start_by_oids(workflow_name, oids, **kwargs):
     """
-    Will start given workflow, by name, using the given
-    list of BibWorkflowObject ids (oids) from beginning.
+    Start given workflow, by name, with the given list of BibWorkflowObject ids.
 
     Special custom keyword arguments can be given to the workflow engine
     in order to pass certain variables to the tasks in the workflow execution,
@@ -206,8 +212,7 @@ def start_by_oids(workflow_name, oids, **kwargs):
 
 def start_by_oids_delayed(workflow_name, oids, **kwargs):
     """
-    Will start given workflow, by name, using the given
-    list of BibWorkflowObject ids (oids) from beginning.
+    Start given workflow, by name,with the given list of BibWorkflowObject.
 
     Special custom keyword arguments can be given to the workflow engine
     in order to pass certain variables to the tasks in the workflow execution,
@@ -236,6 +241,7 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
 def continue_oid(oid, start_point="continue_next", **kwargs):
     """
     Continue workflow asociated with object given by object id (oid).
+
     It can start from previous, current or next task.
 
     Special custom keyword arguments can be given to the workflow engine
@@ -265,6 +271,7 @@ def continue_oid(oid, start_point="continue_next", **kwargs):
 def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
     """
     Continue workflow associated with object given by object id (oid).
+
     It can start from previous, current or next task.
 
     Special custom keyword arguments can be given to the workflow engine

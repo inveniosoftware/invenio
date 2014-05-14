@@ -21,9 +21,11 @@ import logging
 
 def get_logger(logger_name, db_handler_obj, level=10, **kwargs):
     """
-    Will initialize and return a Python logger object with
-    handlers to output logs in sys.stderr as well as the
-    datebase.
+    Initialize and return a Python logger object.
+
+
+    You can specifiy the handlers to output logs in sys.stderr as well as the
+    datebase or anything you want.
     """
     logging.basicConfig(level=level)
 
@@ -56,11 +58,11 @@ def get_logger(logger_name, db_handler_obj, level=10, **kwargs):
 
 
 class BibWorkflowLogHandler(logging.Handler, object):
-    """
-    Implements a handler for logging to database
-    """
+
+    """Implements a handler for logging to database."""
 
     def __init__(self, model, id_name):
+        
         super(BibWorkflowLogHandler, self).__init__()
 
         self.model = model
@@ -77,7 +79,10 @@ class BibWorkflowLogHandler(logging.Handler, object):
 
 
 class BibWorkflowLogAdapter(logging.LoggerAdapter):
+
     """
+    BibWorkflowLogAdapter class.
+
     This example adapter expects the passed in dict-like object to have a
     'obj' key, whose value in brackets is used during logging.
     """

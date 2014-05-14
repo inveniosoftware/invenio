@@ -78,7 +78,10 @@ var WORKFLOWS_HOLDINGPEN = (function ( $ ){
                     nRow.row_id = id;
                     nRow.checkbox = nRow.cells[0].firstChild;
                     nRow.addEventListener("click", function(e) {
-                        datatable.selectRow(nRow, e, oTable.fnSettings());
+                        if((e.target.localName == "td")||(e.target.localName == "input"))
+                        {
+                            datatable.selectRow(nRow, e, oTable.fnSettings());
+                        }
                     });
                 },
                 "fnDrawCallback": function(){

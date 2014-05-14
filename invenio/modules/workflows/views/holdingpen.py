@@ -28,13 +28,14 @@
 """
 
 import re
+from mock import _Call
 
 from six import iteritems, text_type
 
 from flask import (render_template,
                    Blueprint, request,
                    jsonify, url_for,
-                   flash, session)
+                   flash, session, current_app)
 from flask.ext.login import login_required
 from flask.ext.breadcrumbs import (default_breadcrumb_root,
                                    register_breadcrumb,
@@ -92,11 +93,22 @@ def maintable():
     for name, action in iteritems(actions):
         if getattr(action, "static", None):
             action_static.extend(action.static)
+    my_tags = current_app.config.get('VERSION_SHOWING', [])
+    tags_to_print = ""
+    for tag in my_tags:
+        if tag == ObjectVersion.FINAL:
+            tags_to_print += "Done,"
+        if tag == ObjectVersion.HALTED:
+            tags_to_print += "Need action,"
+        if tag == ObjectVersion.RUNNING:
+            tags_to_print += "In process,"
+        if tag == ObjectVersion.INITIAL:
+            tags_to_print += "New,"
 
     return dict(bwolist=bwolist,
                 action_list=action_list,
-                action_static=action_static)
-
+                action_static=action_static,
+                tags=tags_to_print)
 
 @blueprint.route('/batch_action', methods=['GET', 'POST'])
 @login_required
@@ -207,7 +219,7 @@ def load_table():
     try:
         table_data['iTotalRecords'] = len(bwolist)
         table_data['iTotalDisplayRecords'] = len(bwolist)
-    except:
+    except TypeError:
         bwolist = get_holdingpen_objects(version_showing=version_showing)
         table_data['iTotalRecords'] = len(bwolist)
         table_data['iTotalDisplayRecords'] = len(bwolist)
@@ -217,27 +229,47 @@ def load_table():
 
     for bwo in bwolist[i_display_start:i_display_start + i_display_length]:
         action_name = bwo.get_action()
+        action_message = bwo.get_action_message()
+        if not action_message:
+            action_message = ""
         action = actions.get(action_name, None)
 
         records_showing += 1
 
         mini_action = getattr(action, "mini_action", None)
         record = bwo.get_data()
-        if not isinstance(record, dict):
-            record = {}
+        if not hasattr(record, "get"):
+            try:
+                record = dict(record)
+            except:
+                record = {}
+
         extra_data = bwo.get_extra_data()
         category_list = record.get('subject_term', [])
         if isinstance(category_list, dict):
             category_list = [category_list]
         categories = ["%s (%s)" % (subject['term'], subject['scheme'])
                       for subject in category_list]
+
+        extracted_title = []
+        if "title" in record:
+            if isinstance(record["title"], str):
+                extracted_title = [record["title"]]
+            else:
+                for a_title in record["title"]:
+                    extracted_title.append(record["title"][a_title])
+        else:
+            extracted_title = ["No title"]
+
         row = render_template('workflows/row_formatter.html',
+                              title=extracted_title,
                               object=bwo,
                               record=record,
                               extra_data=extra_data,
                               categories=categories,
                               action=action,
                               mini_action=mini_action,
+                              action_message=action_message,
                               pretty_date=pretty_date)
 
         d = {}
@@ -284,7 +316,6 @@ def details(objectid):
 
     formatted_data = bwobject.get_formatted_data(of)
     extracted_data = extract_data(bwobject)
-
     try:
         edit_record_action = actions['edit_record_action']()
     except KeyError:
@@ -375,8 +406,9 @@ def show_action(objectid):
                                   [extracted_data['w_metadata']],
                                   [extracted_data['workflow_func']])
     url, parameters = result
-
-    return render_template(url, **parameters)
+    #### message
+    parameters["message"] = bwobject.get_action_message()
+    return render_template("workflows/hp_approval_widget.html", **parameters)
 
 
 @blueprint.route('/resolve', methods=['GET', 'POST'])

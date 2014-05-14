@@ -23,7 +23,9 @@
 <input type="checkbox" class="hp-check">
 </td>
 <td title="title">
-{{ record.get('title', {}) }}
+{% for i in title %}
+    <p>{{i}}<p>
+{% endfor %}
 </td>
 <td title="source">
 {{ extra_data.get('source', "No source") }}
