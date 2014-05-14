@@ -51,7 +51,7 @@ git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy-1.99
 git+https://github.com/inveniosoftware/flask-menu.git#egg=Flask-Menu-0.1
 git+https://github.com/inveniosoftware/flask-breadcrumbs.git#egg=Flask-Breadcrumbs-0.1
 git+https://github.com/inveniosoftware/flask-registry.git#egg=Flask-Registry-0.1
-Flask-Script==0.6.6
+Flask-Script>=2.0.3
 #Flask-Testing==0.4
 https://github.com/jarus/flask-testing/zipball/master#egg=Flask-Testing-0.4.1
 Flask-WTF==0.9.3
