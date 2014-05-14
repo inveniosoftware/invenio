@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -449,9 +449,9 @@ def cli_cmd_update_bibconvert_tpl(conf):
     from conf file.  Note: this edits tpl files in situ, taking a
     backup first.  Use only when you know what you are doing.
     """
-    from invenio.legacy.bibconvert.manager import main
+    from invenio.modules.converter.manage import main
 
-    warn('inveniocfg --update-bibconvert-tpl is deprecated. Using instead: inveniomanage bibconvert update')
+    warn('inveniocfg --update-bibconvert-tpl is deprecated. Using instead: inveniomanage converter update')
 
     sys_argv = sys.argv
     sys.argv = 'bibconvert_manager.py update'.split()

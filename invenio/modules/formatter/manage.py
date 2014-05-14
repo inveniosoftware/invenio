@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,16 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Perform template migration operations.
+
+Migrate output formats and output templates found in
+``CFG_BIBFORMAT_OUTPUTS_PATH`` and ``CFG_BIBFORMAT_TEMPLATES_PATH``
+respectively. It creates backup of each output format with name
+``<FORMAT>_legacy.bfo`` and generates new Jinja2 templates in
+``CFG_BIBFORMAT_JINJA_TEMPLATE_PATH``.
+"""
+
 from __future__ import print_function
-
-"""
-Invenio template migration engine.
-
-Migrates output formats and output templates found in
-CFG_BIBFORMAT_OUTPUTS_PATH and CFG_BIBFORMAT_TEMPLATES_PATH respectively.
-It creates backup of each output format with name `<FORMAT>_legacy.bfo` and
-generates new Jinja2 templates in CFG_BIBFORMAT_JINJA_TEMPLATE_PATH.
-"""
 
 import os
 import re
@@ -36,7 +37,7 @@ from six import iteritems
 
 from invenio.ext.script import Manager
 
-manager = Manager(usage="Perform migration operations")
+manager = Manager(usage="Perform template migration operations.")
 
 
 @manager.option('--rewrite-existing-templates',
@@ -46,11 +47,11 @@ manager = Manager(usage="Perform migration operations")
                 dest='only_template_re', default=None,
                 help="only templates matching regular expression")
 @manager.option('--verbose', dest='verbose')
-def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
-    """Converts bft templates to Jinja2 templates."""
-
-    ## Import all invenio modules inside to avoid side-efects ouside
-    ## Flask application context.
+def bft2tpl(rewrite_existing_templates=False, only_template_re=None,
+            verbose=0):
+    """Convert *bft* templates to Jinja2 *tpl* templates."""
+    # Import all invenio modules inside to avoid side-efects ouside
+    # Flask application context.
     from invenio.modules.formatter.config import CFG_BIBFORMAT_OUTPUTS_PATH, \
         CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, \
         CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
@@ -115,30 +116,28 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
             print('\n'.join(error))
 
         # Substitute special tags in the format by our own text.
-        # Special tags have the form <BFE_format_element_name [param="value"]* />
+        # Special tags have the form
+        # <BFE_format_element_name [param="value"]* />
         format = pattern_tag.sub(insert_element_code, format_template)
         return format
 
     def translate(match):
-        """
-        Translate matching values
-        """
+        """Translate matching values."""
         word = match.group("word")
         translated_word = '{{ _("' + word + '") }}'
         return translated_word
 
     def filter_languages(format_template):
-
+        """Filter languages in format template."""
         def search_lang_tag(match):
-            """
-            Searches for the <lang>...</lang> tag.
-            """
+            """Searche for the <lang>...</lang> tag."""
             ln_tags = {}
 
             def clean_language_tag(match):
-                """
-                Return tag text content if tag language of match is output
-                language. Called by substitution in 'filter_languages(...)'
+                """Return tag text content.
+
+                It contains if statement block to match output language.
+                It is called by substitution in 'filter_languages(...)'.
 
                 @param match: a match object corresponding to the special tag
                               that must be interpreted
@@ -154,7 +153,7 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
             cleaned_lang_tag = ln_pattern.sub(clean_language_tag,
                                               lang_tag_content)
             # FIXME no traslation for current language
-            #if len(ln_tags) > 0:
+            # if len(ln_tags) > 0:
             #    cleaned_lang_tag += '{% if not g.ln in ["' + \
             #        '", "'.join(ln_tags.keys()) + '"] %}' + \
             #        ln_tags.get(CFG_SITE_LANG, '') + '{% endif %}'
@@ -166,7 +165,8 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
         return filtered_format_template
 
     skip_templates = lambda (name, key): name[-3:] != 'xsl'
-    format_templates = filter(skip_templates, iteritems(get_format_templates(True)))
+    format_templates = filter(skip_templates,
+                              iteritems(get_format_templates(True)))
 
     print('>>> Going to migrate %d format template(s) ...' % (
         len(format_templates), ))
@@ -205,14 +205,15 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
 
     skip_legacy = lambda (name, key): name[-11:] != '_legacy.' + \
         CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
-    output_formats = filter(skip_legacy,
-                            iteritems(get_output_formats(with_attributes=True)))
+    output_formats = filter(
+        skip_legacy, iteritems(get_output_formats(with_attributes=True)))
     print('>>> Going to migrate %d output format(s) ...' % (
         len(output_formats)))
 
     for name, output_format in output_formats:
-        if not any(map(lambda rule: rule['template'][-3:] == CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION,
-                   output_format['rules'])):
+        if not any(map(lambda rule: rule['template'][-3:] ==
+                       CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION,
+                       output_format['rules'])):
             print('    [!]', name, 'does not contain any', end=' ')
             print(CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, 'template', end=' ')
             if only_template is not None:
@@ -250,16 +251,16 @@ def expunge(output_format="HB"):
     output_format = output_format.upper()
     print(">>> Cleaning %s cache..." % (output_format, ))
     # Prepare where expression.
-    filter_format = Bibfmt.format == output_format \
-            if ',' not in output_format else \
-            Bibfmt.format.in_(map(lambda x: x.strip(),
-                                  output_format.split(',')))
-
+    filter_format = (
+        Bibfmt.format == output_format if ',' not in output_format else
+        Bibfmt.format.in_(map(lambda x: x.strip(), output_format.split(',')))
+    )
     Bibfmt.query.filter(filter_format).delete(synchronize_session=False)
     db.session.commit()
 
 
 def main():
+    """Run manager."""
     from invenio.base.factory import create_app
     app = create_app()
     manager.app = app

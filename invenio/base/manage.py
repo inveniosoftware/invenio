@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,42 +17,44 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Invenio manager implementation using *Flask-Script*."""
+
 from __future__ import print_function
 
-
 from flask import current_app
-from invenio.ext.script import Manager, change_command_name, \
-    generate_secret_key, register_manager
-from invenio.base.factory import create_app
-from invenio.base.utils import autodiscover_managers
+from flask.ext.registry import RegistryProxy, ModuleAutoDiscoveryRegistry
 
+from invenio.ext.script import Manager, change_command_name, register_manager
+from invenio.base.factory import create_app
 
 app = create_app()
 manager = Manager(app, with_default_commands=False)
+managers = RegistryProxy('managers', ModuleAutoDiscoveryRegistry, 'manage')
 register_manager(manager)
 
-#FIXME find better way of adding managers depending on application config.
-for script in autodiscover_managers(app):
-    manager.add_command(script.__name__.split('.')[-2],
-                        getattr(script, 'manager'))
+with app.app_context():
+    for script in managers:
+        manager.add_command(script.__name__.split('.')[-2],
+                            getattr(script, 'manager'))
 
 
 @manager.shell
 def make_shell_context():
     """Extend shell context."""
-    #from invenio.ext.sqlalchemy import db
-    return dict(current_app=current_app)#, db=db)
+    from invenio.ext.sqlalchemy import db
+    return dict(current_app=current_app, db=db)
 
 
 @manager.command
 def version():
-    """ Get running version of Invenio """
+    """Get running version of Invenio."""
     return current_app.config.get('CFG_VERSION')
 
 
 @manager.command
 @change_command_name
 def check_for_software_updates():
+    """Check software updates."""
     from flask import get_flashed_messages
     from invenio.ext.script import check_for_software_updates
     print(">>> Going to check software updates ...")
@@ -69,8 +71,9 @@ def check_for_software_updates():
 @change_command_name
 def detect_system_details():
     """
-    Detect and print system details such as Apache/Python/MySQL
-    versions etc. (useful for debugging problems on various OS)
+    Detect and print system details such as Apache/Python/MySQL versions.
+
+    It is useful for debugging problems on various OS.
     """
     import sys
     import socket
@@ -80,8 +83,8 @@ def detect_system_details():
     print("* Python version: " + sys.version.replace("\n", " "))
 
     try:
-        from invenio.base.scripts.apache import version as detect_apache_version
-        print("* Apache version: " + detect_apache_version(
+        from invenio.base.scripts.apache import version as apache_version
+        print("* Apache version: " + apache_version(
             separator=";\n                  "))
     except ImportError:
         print('* Apache manager could not be imported.', file=sys.stderr)
@@ -92,8 +95,8 @@ def detect_system_details():
             version as detect_database_driver_version, \
             driver as detect_database_driver_name
 
-        print("* " + detect_database_driver_name() + " version: " + \
-            detect_database_driver_version())
+        print("* " + detect_database_driver_name() + " version: " +
+              detect_database_driver_version())
         try:
             out = mysql_info(separator="\n", line_format="    - %s: %s")
             print("* MySQL version:\n", out)
@@ -106,6 +109,7 @@ def detect_system_details():
 
 
 def main():
+    """Run manager."""
     manager.run()
 
 if __name__ == "__main__":

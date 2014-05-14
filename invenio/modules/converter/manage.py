@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,39 +17,38 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Perform converter operations."""
+
 from __future__ import print_function
 
 from invenio.ext.script import Manager
 
-from .registry import templates
-
-manager = Manager(usage="Perform BibConvert operations")
+manager = Manager(usage=__doc__)
 
 
 @manager.command
 def update():
-    """Updates BibConvert templates.
+    """Update converter templates.
 
     Update bibconvert/config/*.tpl files looking for 856
     http://.../CFG_SITE_RECORD lines, replacing URL with CFG_SITE_URL taken
     from conf file.  Note: this edits tpl files in situ, taking a
     backup first.  Use only when you know what you are doing.
     """
-    print(">>> Going to update bibconvert templates...")
-    import os
+    print(">>> Going to update converter templates...")
     import re
     import shutil
     from invenio.config import CFG_SITE_RECORD, CFG_SITE_URL
-    ## location where bibconvert/config/*.tpl are:
-    ## find all *.tpl files:
-    for tplfilename in templates.itervalues():
-        if tplfilename.endswith(".tpl"):
-            ## change tpl file:
-            tplfile = tpldir + os.sep + tplfilename
+    from invenio.legacy.bibconvert.registry import templates
+
+    for tplfile in templates.itervalues():
+        if tplfile.endswith(".tpl"):
+            # change tpl file:
             shutil.copy(tplfile, tplfile + '.OLD')
             out = ''
             for line in open(tplfile, 'r').readlines():
-                match = re.search(r'^(.*)http://.*?/%s/(.*)$' % CFG_SITE_RECORD, line)
+                match = re.search(
+                    r'^(.*)http://.*?/%s/(.*)$' % CFG_SITE_RECORD, line)
                 if match:
                     out += "%s%s/%s/%s\n" % (match.group(1),
                                              CFG_SITE_URL,
@@ -60,10 +59,11 @@ def update():
             fdesc = open(tplfile, 'w')
             fdesc.write(out)
             fdesc.close()
-    print(">>> bibconvert templates updated successfully.")
+    print(">>> converter: templates updated successfully.")
 
 
 def main():
+    """Run manager."""
     from invenio.base.factory import create_app
     app = create_app()
     manager.app = app
