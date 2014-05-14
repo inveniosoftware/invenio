@@ -3,5 +3,5 @@
 First Steps with Invenio
 ========================
 
-.. include:: ../../INSTALL
+.. include:: ../../INSTALL.rst
    :start-after: ====================

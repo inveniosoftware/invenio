@@ -15,8 +15,8 @@ Invenio for development.
 
 Unix-like operating system.  The main development and production platforms for
 Invenio at CERN are GNU/Linux distributions Debian, Gentoo, Scientific Linux
-(RHEL-based), Ubuntu, but we also develop on Mac OS X.  Basically any Unix system
-supporting the software listed below should do.
+(RHEL-based), Ubuntu, but we also develop on Mac OS X.  Basically any Unix
+system supporting the software listed below should do.
 
 If you are using Ubuntu 13.10 or later, then you can install Invenio by
 following this tutorial. **Note:** the recommended Python version is 2.7.5+
@@ -100,11 +100,42 @@ Let's install Invenio in the environment just created.
     (invenio)$ mkdir src; cd src
     (invenio)$ git-new-workdir $HOME/src/invenio/ invenio $BRANCH
     (invenio)$ cd invenio
+
+Installing the Python dependencies.
+
+.. code-block:: console
+
     (invenio)$ pip install -e . --process-dependency-links --allow-all-external
+
+Some modules may require specific dependencies listed in the
+``requirements-[dev,img,mongo,...].txt`` files. Pick the ones you need.
+E.g. to add images support, we can do as follow:
+
+.. code-block:: console
+
+    (invenio)$ pip install -r requirements-img.txt
+
+Compiling the translations.
+
+.. code-block:: console
+
     (invenio)$ pybabel compile -fd invenio/base/translations/
+
+Installing the npm dependencies and the external JavaScript and CSS libraries.
+
+.. code-block:: console
+
     (invenio)$ npm install
     (invenio)$ bower install
+
+``grunt`` and ``inveniomanage collect`` will create the static folder with all
+the required assets (JavaScript, CSS and images) from each module static folder
+and bower.
+
+.. code-block:: console
+
     (invenio)$ grunt
+    (invenio)$ inveniomanage collect
 
 
 b. Configuration
@@ -143,8 +174,8 @@ for quick start.
 c. Development
 ~~~~~~~~~~~~~~
 
-Once you have everything installed you can create database
-and populate it with demo records.
+Once you have everything installed you can create database and populate it
+with demo records.
 
 .. code-block:: console
 
@@ -208,5 +239,3 @@ Good luck, and thanks for choosing Invenio.
        - Invenio Development Team
          <info@invenio-software.org>
          <http://invenio-software.org/>
-
-.. vim: set ft=rst:
