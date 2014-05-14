@@ -771,7 +771,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         if argd.has_key('as'):
             argd['aas'] = argd['as']
             del argd['as']
-        if argd.get('aas', CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE) not in (0, 1):
+        if argd.get('aas', CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE) not in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES:
             argd['aas'] = CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
 
         # If we specify no collection, then we don't need to redirect

@@ -733,7 +733,7 @@ class Template:
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         asearchurl = self.build_search_interface_url(c=collection_id,
-                                                     aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
+                                                     aas=CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES[1],
                                                      ln=ln)
 
         # Build example of queries for this collection
@@ -882,7 +882,7 @@ class Template:
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         asearchurl = self.build_search_interface_url(c=collection_id,
-                                                     aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
+                                                     aas=CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES[1],
                                                      ln=ln)
         # print commentary start:
         out += '''
@@ -979,7 +979,7 @@ class Template:
         header = _("Search %s records for") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         header += ':'
-        ssearchurl = self.build_search_interface_url(c=collection_id, aas=min(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES), ln=ln)
+        ssearchurl = self.build_search_interface_url(c=collection_id, ln=ln)
 
         out += '''
         <table class="searchbox advancedsearch">
@@ -1122,6 +1122,150 @@ class Template:
                     'formatoptions' : formatoptions
                   }
         return out
+
+
+    def tmpl_searchfor_addtosearch(self, ln, collection_id, record_count, searchwithin):
+        """
+        Add-To-Search Interface
+        Creates the Search box and the Add-to-Search advance search
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = '''
+        <!--create_searchfor_addtosearch()-->
+        '''
+
+        argd = drop_default_urlargd({'ln': ln, 'cc': collection_id, 'sc': CFG_WEBSEARCH_SPLIT_BY_COLLECTION},
+                                    self.search_results_default_urlargd)
+
+        # Only add non-default hidden values
+        for field, value in argd.items():
+            out += self.tmpl_input_hidden(field, value)
+
+        header = _("Search %s records for:") % \
+                 self.tmpl_nbrecs_info(record_count, "", "")
+
+        adv_search_link = create_html_link(self.build_search_interface_url(c=collection_id, aas=1, ln=ln),
+                                           {}, _("Advanced Search"))
+
+        out += self.create_addtosearch_box(ln,
+                                    p='', # no pattern in the collection page
+                                    p1='', # no advanced search pattern in the collection page
+                                    searchwithin=searchwithin,
+                                    header=header,
+                                    adv_search_link=adv_search_link)
+        return out
+
+
+    def create_addtosearch_box(self, ln, p, p1, searchwithin, header, adv_search_link):
+        """
+        Creates the Search  and the Add-to-Search box.
+
+        Parameters:
+
+        ln - language
+        p - search pattern (for prefilling the search box)
+        p1 - search pattern in advanced search box
+        searchwithin - HTML code for the first row of options (any field, specific fields ...)
+        header - what to appear on top of the search box
+
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = '''<script>
+        $(document).ready(function() {
+        '''
+        out += '''
+            $('a#advbox-toggle').click(function() {
+                $('#advbox').slideToggle();
+                var sign = $('a#advbox-toggle-button').text();
+                $('a#advbox-toggle-button').text(sign == "+" ? "−" : "+");
+                return false;
+            });
+            $('a#advbox-toggle-button').click(function() {
+                 $('#advbox').slideToggle();
+                 var sign = $(this).text();
+                 $(this).text(sign == "+" ? "−" : "+");
+                 return false;
+             });
+             $('select[name=f1]').change(function(){
+                 if ($(this).val() == 'author' && $('select[name=m1]').val() == 'a'){
+                     $('select[name=m1]').val('e');
+                 }
+             });
+
+
+        });
+        </script>'''
+        out += '''
+        <table class="searchbox simplesearch">
+        '''
+        if header:
+            out += '''
+            <thead>
+                <tr align="left">
+                    <th colspan="3" class="searchboxheader">%(header)s</th>
+                </tr>
+            </thead>
+            ''' %{'header' : header}
+        out += '''
+        <tbody>
+        <tr valign="center">
+            <td class="searchboxbody"><input type="text" name="p" size="%(sizepattern)d" value="%(p)s" class="simplesearchfield"/></td>
+            <td class="searchboxbody"><input class="formbutton" type="submit" name="action_search" value="%(search)s" /></td>
+            <td class="searchboxbody" align="left" style="font-size:80%%; line-height:1.5em;">
+                <a href="%(siteurl)s/help/search-tips%(langlink)s">%(search_tips)s</a><br/>
+                %(adv_search_link)s
+            </td>
+        </tr>
+        <tr valign="baseline">
+            <td class="searchboxbody" align="right">
+                <small><a href="#" id="advbox-toggle">%(add_to_search)s</a>
+                       <a href="#" id="advbox-toggle-button"/>%(toggle_button)s</a></small>
+            </td>
+        </tr>
+         </tbody></table>
+        ''' % {
+            'sizepattern' : CFG_WEBSEARCH_LIGHTSEARCH_PATTERN_BOX_WIDTH,
+            'p' : cgi.escape(p, 1),
+            'search' : _("Search"),
+            'siteurl' : CFG_SITE_URL,
+            'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+            'search_tips': _("Search Tips"),
+            'adv_search_link': adv_search_link,
+            'add_to_search': _("Add to Search"),
+            'toggle_button': p1 and "-" or "+"
+        }
+        out += '''
+        <table class="searchbox simplesearch">
+        <tr><td>
+        <div id="advbox" class="searchboxbody" %(display)s>
+            %(andornot1)s
+            %(matchbox1)s
+            <input type="text" name="p1" size="%(sizepattern)d" class="advancedsearchfield"/>
+            %(searchwithin1)s
+            <input class="formbutton" type="submit" name="action_asearch" value="%(add_to_search)s"/>
+        </div>
+        </td></tr>
+        </table>
+        ''' %{
+            'display': not p1 and 'style="display:none"' or '',
+            'andornot1' : self.tmpl_andornot_box(
+                              name = 'op1',
+                              value = '',
+                              ln = ln
+                            ),
+            'matchbox1' : self.tmpl_matchtype_box('m1', '', ln=ln),
+            'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
+            'searchwithin1' : searchwithin,
+            'add_to_search' : _("Add to Search")
+            }
+        return out
+
 
     def tmpl_matchtype_box(self, name='m', value='', ln='en'):
         """Returns HTML code for the 'match type' selection box.
@@ -2015,7 +2159,20 @@ class Template:
         if action == 'browse':
             leadingtext = _("Browse")
 
-        if aas == 1:
+        if aas == 2:
+            # Add-to-Search interface
+            searchwithin = self.tmpl_searchwithin_select(
+                                  ln = ln,
+                                  fieldname = 'f1',
+                                  selected = '',
+                                  values = self._add_mark_to_field(value=f1, fields=fieldslist, ln=ln)
+                                )
+            adv_search_link = create_html_link(self.build_search_url(rm=rm, aas=1, cc=cc, jrec=jrec, ln=ln, rg=rg),
+                                               {}, _("Advanced Search"))
+
+            out += self.create_addtosearch_box(ln, p, p1, searchwithin, '', adv_search_link)
+
+        elif aas == 1:
             # print Advanced Search form:
 
             # define search box elements:
@@ -2144,7 +2301,7 @@ class Template:
               'advanced_search': create_html_link(self.build_search_url(p1=p,
                                                                         f1=f,
                                                                         rm=rm,
-                                                                        aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
+                                                                        aas=CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES[1],
                                                                         cc=cc,
                                                                         jrec=jrec,
                                                                         ln=ln,
@@ -2202,7 +2359,7 @@ class Template:
               'advanced_search': create_html_link(self.build_search_url(p1=p,
                                                                         f1=f,
                                                                         rm=rm,
-                                                                        aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
+                                                                        aas=CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES[1],
                                                                         cc=cc,
                                                                         jrec=jrec,
                                                                         ln=ln,
@@ -4890,3 +5047,12 @@ class Template:
                 out += '<format name="%s" type="%s" />\n' % (xml_escape(format_name), xml_escape(format_type))
         out += "</formats>"
         return out
+
+    def restore_search_args_to_default(self, arg_list):
+        """Returns a dictionary with the default values for a list of arguments"""
+        default_args = {}
+        for item in arg_list:
+            default_values = self.search_results_default_urlargd.get(item, ())
+            if default_values:
+                default_args[item] = default_values[1]
+        return default_args

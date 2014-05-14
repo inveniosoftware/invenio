@@ -1070,6 +1070,52 @@ def page_end(req, of="hb", ln=CFG_SITE_LANG, em=""):
             req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req))
     return
 
+def create_add_to_search_pattern(p, p1, f1, m1, op1):
+    """Create the search pattern """
+    if not p1:
+        return p
+    init_search_pattern = p
+    # operation: AND, OR, AND NOT
+    if op1 == 'a' and p: # we don't want '+' at the begining of the query
+        op =  ' +'
+    elif op1 == 'o':
+        op = ' |'
+    elif op1 == 'n':
+        op = ' -'
+    else:
+        op = ''
+
+    # field
+    field = ''
+    if f1:
+        field = f1 + ':'
+
+    # type of search
+    pattern = p1
+    start = '('
+    end = ')'
+    if m1 == 'e':
+        start = end = '"'
+    elif m1 == 'p':
+        start = end = "'"
+    elif m1 == 'r':
+        start = end = '/'
+    else: # m1 == 'o' or m1 =='a'
+        words = p1.strip().split(' ')
+        if len(words) == 1:
+            start = end = ''
+            pattern = field + words[0]
+        elif m1 == 'o':
+            pattern = ' |'.join([field + word for word in words])
+        else:
+            pattern = ' '.join([field + word for word in words])
+        #avoid having field:(word1 word2) since this is not currently correctly working
+        return init_search_pattern + op + start + pattern + end
+    if not pattern:
+        return ''
+    #avoid having field:(word1 word2) since this is not currently correctly working
+    return init_search_pattern + op + field + start + pattern + end
+
 def create_page_title_search_pattern_info(p, p1, p2, p3):
     """Create the search pattern bit for the page <title> web page
     HTML header.  Basically combine p and (p1,p2,p3) together so that
@@ -5662,6 +5708,13 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
 
     _ = gettext_set_language(ln)
 
+    if aas == 2: #add-to-search interface
+        p = create_add_to_search_pattern(p, p1, f1, m1, op1)
+        default_addtosearch_args = websearch_templates.restore_search_args_to_default(['p1', 'f1', 'm1', 'op1'])
+        if req:
+            req.argd.update(default_addtosearch_args)
+            req.argd['p'] = p
+
     kwargs = {'req': req, 'cc': cc, 'c': c, 'p': p, 'f': f, 'rg': rg, 'sf': sf,
               'so': so, 'sp': sp, 'rm': rm, 'of': of, 'ot': ot, 'aas': aas,
               'p1': p1, 'f1': f1, 'm1': m1, 'op1': op1, 'p2': p2, 'f2': f2,
@@ -6559,14 +6612,20 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
 
     t1 = os.times()[4]
     results_in_any_collection = intbitset()
-    if aas == 1 or (p1 or p2 or p3):
-        ## 3A - advanced search
+    if aas == 2 and not (p2 or p3):
+        ## 3A add-to-search
+        output = prs_simple_search(results_in_any_collection, kwargs=kwargs, **kwargs)
+        if output is not None:
+            return output
+
+    elif aas == 1 or (p1 or p2 or p3):
+        ## 3B - advanced search
         output = prs_advanced_search(results_in_any_collection, kwargs=kwargs, **kwargs)
         if output is not None:
             return output
 
     else:
-        ## 3B - simple search
+        ## 3C - simple search
         output = prs_simple_search(results_in_any_collection, kwargs=kwargs, **kwargs)
         if output is not None:
             return output
