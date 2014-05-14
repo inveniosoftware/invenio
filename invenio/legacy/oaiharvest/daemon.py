@@ -17,8 +17,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
-
 """
 OAI Harvest daemon - harvest records from OAI repositories.
 
@@ -27,13 +25,13 @@ harvesting. Otherwise starts a BibSched task for periodical harvesting
 of repositories defined in the OAI Harvest admin interface
 """
 
-__revision__ = "$Id$"
+from __future__ import print_function
 
 import sys
 import getopt
 import getpass
 import time
-import urlparse
+from six.moves import urllib
 
 from sqlalchemy import orm
 from invenio.config import (CFG_OAI_FAILED_HARVESTING_STOP_QUEUE,
@@ -118,20 +116,25 @@ def task_run_core():
         elif isinstance(repository, list):
 
             for name_repository in repository:
-                name_workflow = OaiHARVEST.get(OaiHARVEST.name == name_repository).one().workflows
+                name_workflow = OaiHARVEST.get(
+                    OaiHARVEST.name == name_repository).one().workflows
                 if name_workflow not in list_of_repository_per_workflow:
-                    list_of_repository_per_workflow[name_workflow] = [name_repository]
+                    list_of_repository_per_workflow[name_workflow] = [
+                        name_repository]
                 else:
-                    list_of_repository_per_workflow[name_workflow].append(name_repository)
+                    list_of_repository_per_workflow[name_workflow].append(
+                        name_repository)
 
         else:
-            workflow_found = OaiHARVEST.get(OaiHARVEST.name == repository).one().workflows
+            workflow_found = OaiHARVEST.get(
+                OaiHARVEST.name == repository).one().workflows
             list_of_repository_per_workflow[workflow_found] = repository
     try:
         if list_of_repository_per_workflow:
             for workflow_to_launch in list_of_repository_per_workflow:
                 options = task_get_option(None)
-                options["repository"] = list_of_repository_per_workflow[workflow_to_launch]
+                options["repository"] = list_of_repository_per_workflow[
+                    workflow_to_launch]
                 workflow = start(workflow_to_launch,
                                  data=[""],
                                  stop_on_error=True,
@@ -157,7 +160,7 @@ def task_run_core():
         workflow_id_preservation = e.id_workflow
         workflowlog = BibWorkflowEngineLog.query.filter(
             BibWorkflowEngineLog.id_object == e.id_workflow
-        ).filter(BibWorkflowEngineLog.log_type > 40).all()
+        ).filter(BibWorkflowEngineLog.log_type >= 40).all()
 
         for log in workflowlog:
             write_message(log.message)
@@ -166,22 +169,20 @@ def task_run_core():
             write_message("\n\n____________Workflow " + i + " log output____________")
             workflowlog = BibWorkflowEngineLog.query.filter(
                 BibWorkflowEngineLog.id_object == i
-            ).filter(BibWorkflowEngineLog.log_type > 40).all()
+            ).filter(BibWorkflowEngineLog.log_type >= 40).all()
             for log in workflowlog:
                 write_message(log.message)
 
-        write_message("ERRORS HAPPENED")
         write_message("____________Object log output____________")
 
         objectlog = BibWorkflowObjectLog.query.filter(
             BibWorkflowObjectLog.id_object == e.id_object
-        ).filter(BibWorkflowEngineLog.log_type > 40).all()
+        ).filter(BibWorkflowEngineLog.log_type >= 40).all()
 
         for log in objectlog:
             write_message(log.message)
 
         execution_time = round(time.time() - start_time, 2)
-
         write_message("Execution time :" + str(execution_time))
 
     # Generate reports
@@ -193,8 +194,10 @@ def task_run_core():
 
     if ticket_queue or notification_email:
 
-        subject, text = generate_harvest_report(workflow_main,
-                                                current_task_id=task_get_task_param("task_id"))
+        subject, text = generate_harvest_report(
+            workflow_main,
+            current_task_id=task_get_task_param("task_id")
+        )
         # Create ticket for finished harvest?
         if ticket_queue:
             ticketid = create_ticket(ticket_queue, subject=subject, text=text)
@@ -353,7 +356,7 @@ def main():
                                     "user=",
                                     "password=",
                                     "workflow=",
-                                    ])
+                                   ])
 
         # So everything went smoothly: start harvesting in manual mode
         if len([opt for opt, opt_value in opts
@@ -407,7 +410,7 @@ def main():
                 if not base_url.lower().startswith('http'):
                     base_url = 'http://' + base_url
                 (addressing_scheme, network_location, path, dummy1,
-                 dummy2, dummy3) = urlparse.urlparse(base_url)
+                 dummy2, dummy3) = urllib.parse(base_url)
                 secure = (addressing_scheme == "https")
 
                 if (cert_file and not key_file) or \
@@ -420,7 +423,8 @@ def main():
                     usage(1, "You must specify a username")
                 elif user and not password:
                     if not secure:
-                        sys.stderr.write("*WARNING* Your password will be sent in clear!\n")
+                        sys.stderr.write(
+                            "*WARNING* Your password will be sent in clear!\n")
                     try:
                         password = getpass.getpass()
                     except KeyboardInterrupt as error:
@@ -434,7 +438,8 @@ def main():
                                key_file)
 
                 sys.stderr.write("Harvesting completed at: %s\n\n" %
-                                 time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
+                                 time.strftime("%Y-%m-%d %H:%M:%S --> ",
+                                               time.localtime()))
                 return
             else:
                 usage(1, "You must specify the URL to harvest")
@@ -443,7 +448,8 @@ def main():
             # harvesting. But first check if URL parameter is given:
             # if it is, then warn directly now
 
-            if len([opt for opt, opt_value in opts if opt in ['-i', '--identifier']]) == 0 \
+            if len([opt for opt, opt_value in opts if
+                    opt in ['-i', '--identifier']]) == 0 \
                 and len(args) > 1 or \
                     (len(args) == 1 and not args[0].isdigit()):
                 usage(1, "You must specify the --verb parameter")
@@ -474,8 +480,10 @@ def main():
         else:
             position = sys.argv.index("--repository")
         repositories = sys.argv[position + 1].split(",")
-        if len(repositories) > 1 and ("-i" in sys.argv or "--identifier" in sys.argv):
-            usage(1, "It is impossible to harvest an identifier from several repositories.")
+        if len(repositories) > 1 and (
+                    "-i" in sys.argv or "--identifier" in sys.argv):
+            usage(1,
+                  "It is impossible to harvest an identifier from several repositories.")
 
     if num_of_critical_parameterb == 1:
 
@@ -490,11 +498,14 @@ def main():
 
         for name_repository in repositories:
             try:
-                oaiharvest_instance = OaiHARVEST.get(OaiHARVEST.name == name_repository).one()
+                oaiharvest_instance = OaiHARVEST.get(
+                    OaiHARVEST.name == name_repository).one()
                 if oaiharvest_instance.workflows not in registry_workflows:
-                    usage(1, "The repository %s doesn't have a valid workflow specified." % name_repository)
+                    usage(1,
+                          "The repository %s doesn't have a valid workflow specified." % name_repository)
             except orm.exc.NoResultFound:
-                usage(1, "The repository %s doesn't exist in our database." % name_repository)
+                usage(1,
+                      "The repository %s doesn't exist in our database." % name_repository)
 
     elif num_of_critical_parameter == 1 and num_of_critical_parameterb == 1:
 
@@ -502,7 +513,8 @@ def main():
             try:
                 OaiHARVEST.get(OaiHARVEST.name == name_repository).one()
             except orm.exc.NoResultFound:
-                usage(1, "The repository %s doesn't exist in our database." % name_repository)
+                usage(1,
+                      "The repository %s doesn't exist in our database." % name_repository)
 
         print("A workflow has been specified, overriding the repository one.")
 
@@ -564,10 +576,10 @@ Automatic (periodical) harvesting mode:
                                   '  --workflow       specify the workflow to execute.\n'
                                   '  --create-ticket-in   Provide desired ticketing queue to create a ticket in it on upload and/or finished harvest.\n'
                                   '                       Requires a configured ticketing system (BibCatalog).\n',
-              version=__revision__,
               specific_params=(
                   "r:i:d:W",
-                  ["repository=", "identifier=", "dates=", "workflow=", "notify-email-to=", "create-ticket-in="]),
+                  ["repository=", "identifier=", "dates=", "workflow=",
+                   "notify-email-to=", "create-ticket-in="]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               task_run_fnc=task_run_core)
 
