@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,18 +18,23 @@
 
 """ Implements a workflow for testing """
 
-from invenio.modules.workflows.tasks.workflows_tasks import (start_workflow,
-                                                             wait_for_a_workflow_to_complete,
-                                                             get_list_of_workflows_to_wait,
-                                                             write_something_generic,
-                                                             log_info,
-                                                             workflows_reviews,
-                                                             get_nb_workflow_created,
-                                                             num_workflow_running_greater,
-                                                             get_nb_workflow_running,
-                                                             wait_for_workflows_to_complete)
+from invenio.modules.workflows.tasks. \
+    workflows_tasks import (start_workflow,
+                            wait_for_a_workflow_to_complete,
+                            get_list_of_workflows_to_wait,
+                            write_something_generic,
+                            log_info,
+                            workflows_reviews,
+                            get_nb_workflow_created,
+                            num_workflow_running_greater,
+                            get_nb_workflow_running,
+                            wait_for_workflows_to_complete,
+                            )
 
-from invenio.modules.workflows.tasks.logic_tasks import simple_for, end_for, workflow_if, workflow_else
+from invenio.modules.workflows.tasks.logic_tasks import (simple_for,
+                                                         end_for, workflow_if,
+                                                         workflow_else,
+                                                         )
 from invenio.modules.workflows.tasks.marcxml_tasks import set_obj_extra_data_key
 
 
@@ -49,7 +54,9 @@ class test_workflow_workflows(object):
 
         simple_for(0, 20, 1),
         [
-            write_something_generic(["We are waiting for ", get_list_of_workflows_to_wait], [log_info]),
+            write_something_generic(
+                ["We are waiting for ", get_list_of_workflows_to_wait],
+                [log_info]),
             wait_for_a_workflow_to_complete(0.1),
         ],
         end_for,
@@ -66,9 +73,10 @@ class test_workflow_workflows(object):
                 wait_for_a_workflow_to_complete(0.1),
                 start_workflow("test_workflow", 22),
             ],
-            set_obj_extra_data_key("nbworkflowrunning", get_nb_workflow_running),
+            set_obj_extra_data_key("nbworkflowrunning",
+                                   get_nb_workflow_running),
         ],
         end_for,
         wait_for_workflows_to_complete,
-        workflows_reviews(False, False),
+        workflows_reviews(False, False)
     ]

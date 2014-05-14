@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from .client import run_workflow, continue_execution
-from .engine import BibWorkflowEngine
+from .engine import BibWorkflowEngine, WorkflowStatus
 from .models import BibWorkflowObject, Workflow, ObjectVersion
 from .errors import WorkflowObjectVersionError
 
@@ -48,8 +48,10 @@ def restart_worker(wid, **kwargs):
     Restarts workflow with given id (wid) and given data. If data are not
     specified then it will load all initial data for workflow.
 
-    Data can be specified as list of objects
-    or single id of WfeObject/BibWorkflowObjects.
+    The workflow will restart from scratch.
+
+    Data can be specified as list of objects or single id of
+    BibWorkflowObjects.
 
     :param wid: workflow id (uuid) of the workflow to be restarted
     :param kwargs: This parameter allow to pass some
@@ -73,20 +75,12 @@ def restart_worker(wid, **kwargs):
             running_object.save()
             data.append(running_object)
 
-    from invenio.modules.workflows.engine import WorkflowStatus
-
-
     workflow = Workflow.query.get(wid)
-    new_workflow = Workflow()
-    new_workflow.uuid = workflow.uuid
-    new_workflow.name = workflow.name
-    Workflow.delete(wid)
-    new_workflow.module_name = workflow.module_name or "Unknown"
-    new_workflow.save(WorkflowStatus.NEW)
     engine = BibWorkflowEngine(workflow.name,
-                               workflow_object=new_workflow,
+                               workflow_object=workflow,
                                **kwargs)
-    engine.save()
+    engine.reset_extra_data()
+    engine.save(WorkflowStatus.NEW)
     objects = get_workflow_object_instances(data, engine)
     run_workflow(wfe=engine, data=objects, **kwargs)
     return engine

@@ -38,8 +38,11 @@ class worker_redis(object):
         :param data: list of objects for the workflow
         :type data: list
         """
-        return RedisResult(job(queue='default', connection=redis_conn)(run_worker). \
-            delay(workflow_name, data, **kwargs))
+        return RedisResult(
+            job(queue='default', connection=redis_conn)(run_worker).delay(
+                workflow_name, data, **kwargs
+            )
+        )
 
     def restart_worker(self, wid, **kwargs):
         """
@@ -49,8 +52,11 @@ class worker_redis(object):
         :param wid: uuid of the workflow to be run
         :type wid: string
         """
-        return RedisResult(job(queue='default', connection=redis_conn)(restart_worker). \
-            delay(wid, **kwargs))
+        return RedisResult(
+            job(queue='default', connection=redis_conn)(restart_worker).delay(
+                wid, **kwargs
+            )
+        )
 
     def continue_worker(self, oid, restart_point, **kwargs):
         """
@@ -63,9 +69,11 @@ class worker_redis(object):
         :param restart_point: sets the start point
         :type restart_point: string
         """
-        return RedisResult(job(queue='default', connection=redis_conn)(continue_worker). \
-            delay(oid, restart_point, **kwargs))
-
+        return RedisResult(
+            job(queue='default', connection=redis_conn)(continue_worker).delay(
+                oid, restart_point, **kwargs
+            )
+        )
 
 
 class RedisResult(AsynchronousResultWrapper):

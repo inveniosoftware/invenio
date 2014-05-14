@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,17 +18,12 @@
 
 """ Implements a workflow for testing """
 
-from invenio.modules.workflows.tasks.sample_tasks import (
-    add_data,
-    halt_if_data_less_than,
-    reduce_data_by_one
-)
+from ...tasks.sample_tasks import (halt_whatever,
+                                   )
 
 
-class test_workflow(object):
+class test_workflow_dummy(object):
     """
     A test workflow for the testsuite.
     """
-    workflow = [halt_if_data_less_than(20),
-                add_data(20),
-                reduce_data_by_one(2)]
+    workflow = [halt_whatever]

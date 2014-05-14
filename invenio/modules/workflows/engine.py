@@ -18,13 +18,13 @@
 
 from __future__ import absolute_import
 
+import traceback
 import sys
-
-from six.moves import cPickle
-from six import iteritems, reraise
 from uuid import uuid1 as new_uuid
-
 import base64
+
+from six import iteritems, reraise
+from six.moves import cPickle
 
 from workflow.engine import (GenericWorkflowEngine,
                              ContinueNextToken,
@@ -34,7 +34,8 @@ from workflow.engine import (GenericWorkflowEngine,
                              JumpTokenForward,
                              WorkflowError,
                              )
-from invenio.config import CFG_DEVEL_SITE
+
+from .errors import WorkflowError as WorkflowErrorClient, WorkflowDefinitionError
 from .models import (Workflow,
                      BibWorkflowObject,
                      BibWorkflowEngineLog,
@@ -48,6 +49,7 @@ from .logger import (get_logger,
                      )
 from .errors import WorkflowHalt
 
+from invenio.config import CFG_DEVEL_SITE
 
 DEBUG = CFG_DEVEL_SITE > 0
 
@@ -120,6 +122,11 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         :param value:
         """
         self.db_obj._extra_data = base64.b64encode(cPickle.dumps(value))
+
+    def reset_extra_data(self):
+        """Reset extra data to defaults."""
+        from .models import get_default_extra_data
+        self.db_obj._extra_data = get_default_extra_data()
 
     def extra_data_get(self, key):
         if key not in self.db_obj.get_extra_data():
@@ -353,17 +360,29 @@ BibWorkflowEngine
                         msg = 'Processing was halted at step: %s' % (i,)
                         self.log.info(msg)
                         obj.log.info(msg)
+
                     # Re-raise the exception,
                     # this is the only case when a WFE can be completely
                     # stopped
                     if type(e) == WorkflowHalt:
-                        raise e
+                        reraise(*sys.exc_info())
                     else:
                         raise WorkflowHalt(e)
                 except Exception as e:
+                    # unless instructed otherwise.
+                    msg = "Error: %r\n%s" % (e, traceback.format_exc())
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
-                    reraise(*sys.exc_info())
+                    # Changing counter should be moved to wfe object
+                    # together with default exception handling
+                    if isinstance(e, WorkflowErrorClient):
+                        reraise(*sys.exc_info())
+                    else:
+                        raise WorkflowErrorClient(
+                            message=msg,
+                            id_workflow=self.uuid,
+                            id_object=self.getCurrObjId(),
+                        )
             # We save the object once it is fully run through
             obj.save(version=ObjectVersion.FINAL)
             self.increase_counter_finished()
@@ -384,7 +403,6 @@ BibWorkflowEngine
             obj.set_data(obj.data)
             obj.extra_data["_task_counter"] = self._i[1]
             obj.set_extra_data(obj.extra_data)
-
 
     def get_current_taskname(self):
         """

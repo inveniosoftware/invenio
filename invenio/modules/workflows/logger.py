@@ -19,8 +19,7 @@
 import logging
 
 
-def get_logger(logger_name, db_handler_obj,
-               level=10, **kwargs):
+def get_logger(logger_name, db_handler_obj, level=10, **kwargs):
     """
     Will initialize and return a Python logger object with
     handlers to output logs in sys.stderr as well as the

@@ -18,9 +18,8 @@
 
 from ..tasks.marcxml_tasks import (convert_record_with_repository,
                                    convert_record_to_bibfield,
-                                   upload_step,
+                                   upload_step, approve_record,
                                    quick_match_record,
-                                   approve_record
                                    )
 
 from ..tasks.workflows_tasks import (log_info)
@@ -34,7 +33,8 @@ from invenio.config import CFG_PREFIX
 class full_doc_process(object):
     object_type = "record"
     workflow = [
-        convert_record_with_repository("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield,
+        convert_record_with_repository("oaiarxiv2marcxml.xsl"),
+        convert_record_to_bibfield,
         workflow_if(quick_match_record, True),
         [
             approve_record,

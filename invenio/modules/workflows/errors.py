@@ -54,11 +54,14 @@ class WorkflowError(Exception):
     """Raised when workflow experiences an error."""
 
     def __init__(self, message, id_workflow, id_object, payload=[]):
+        if isinstance(message, unicode):
+            message = message.encode('utf-8', 'ignore')
         self.message = message
         self.id_workflow = id_workflow
         self.id_object = id_object
         self.payload = payload
-        Exception.__init__(self, message, message, id_object, payload)  # <-- REQUIRED
+        # Needed for passing an exception through message queue
+        Exception.__init__(self, message, message, id_object, payload)
 
     def to_dict(self):
         rv = list(self.payload or [])
@@ -69,8 +72,14 @@ class WorkflowError(Exception):
 
     def __str__(self):
         """String representation."""
-        return "WorkflowError(%s, id_workflow: %s, id_object: %s, payload: %r)" % \
-               (self.message, str(self.id_workflow), str(self.id_object), repr(self.payload))
+        return "WorkflowError(%s," \
+               " id_workflow: %s," \
+               " id_object: %s," \
+               " payload: %r)" % \
+               (str(self.message),
+                str(self.id_workflow),
+                str(self.id_object),
+                repr(self.payload))
 
 
 class WorkflowDefinitionError(Exception):
@@ -78,6 +87,8 @@ class WorkflowDefinitionError(Exception):
 
     def __init__(self, message, workflow_name, **kwargs):
         Exception.__init__(self)
+        if isinstance(message, unicode):
+            message = message.encode('utf-8', 'ignore')
         self.message = message
         self.workflow_name = workflow_name
         self.payload = kwargs
@@ -90,8 +101,11 @@ class WorkflowDefinitionError(Exception):
 
     def __str__(self):
         """String representation."""
-        return "WorkflowDefinitionError(%s, workflow_name: %s, payload: %r)" % \
-               (repr(self.message), self.workflow_name, repr(self.payload) or "None")
+        return "WorkflowDefinitionError(%s, workflow_name: %s," \
+               " payload: %r)" % \
+               (str(self.message),
+                self.workflow_name,
+                repr(self.payload) or "None")
 
 
 class WorkflowWorkerError(Exception):
@@ -111,8 +125,12 @@ class WorkflowWorkerError(Exception):
 
     def __str__(self):
         """String representation."""
-        return "WorkflowWorkerError(%s, worker_name: %s, payload: %r)" % \
-               (repr(self.message), self.worker_name, repr(self.payload) or "None")
+        return "WorkflowWorkerError(%s," \
+               " worker_name: %s," \
+               " payload: %r)" % \
+               (repr(self.message),
+                self.worker_name,
+                repr(self.payload) or "None")
 
 
 class WorkflowObjectVersionError(Exception):
@@ -132,8 +150,12 @@ class WorkflowObjectVersionError(Exception):
 
     def __str__(self):
         """String representation."""
-        return "WorkflowObjectVersionError(%s, obj_version: %s, id_object: %s)" % \
-               (self.message, str(self.obj_version), str(self.id_object))
+        return "WorkflowObjectVersionError(%s," \
+               " obj_version: %s," \
+               " id_object: %s)" % \
+               (self.message,
+                str(self.obj_version),
+                str(self.id_object))
 
 
 class WorkflowAPIError(Exception):

@@ -20,8 +20,12 @@ from six import iteritems
 from invenio.celery import celery
 
 from invenio.base.helpers import with_app_context
-from invenio.modules.workflows.worker_result import AsynchronousResultWrapper, uui_to_workflow
+from invenio.modules.workflows.worker_result import (AsynchronousResultWrapper,
+                                                     uuid_to_workflow,
+                                                     )
+
 from invenio.modules.workflows.utils import session_manager
+from invenio.modules.workflows.errors import WorkflowWorkerError
 
 
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.run_worker')
@@ -33,16 +37,17 @@ def celery_run(workflow_name, data, **kwargs):
     from ..worker_engine import run_worker
     from ..utils import BibWorkflowObjectIdContainer
 
+    # Let's see if we have a list of data
     if isinstance(data, list):
+        # For each data item check if dict and then
+        # see if the dict contains a BibWorkflowObjectId container
+        # generated dict.
         for i in range(0, len(data)):
             if isinstance(data[i], dict):
                 if str(BibWorkflowObjectIdContainer().__class__) in data[i]:
                     data[i] = BibWorkflowObjectIdContainer().from_dict(data[i]).get_object()
-                    stack = data[i].get_extra_data().items()
-                    while stack:
-                        k, v = stack.pop()
-                        if isinstance(v, dict):
-                            stack.extend(iteritems(v))
+    else:
+        raise WorkflowWorkerError("Data is not a list: %r" % (data,))
 
     return run_worker(workflow_name, data, **kwargs).uuid
 
@@ -54,9 +59,7 @@ def celery_restart(wid, **kwargs):
     Restarts the workflow with Celery
     """
     from ..worker_engine import restart_worker
-
-    result = restart_worker(wid, **kwargs).uuid
-    return result
+    return restart_worker(wid, **kwargs).uuid
 
 
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.continue_worker')
@@ -67,8 +70,8 @@ def celery_continue(oid, restart_point, **kwargs):
     """
     from ..worker_engine import continue_worker
 
+    # We need to return the uuid because
     return continue_worker(oid, restart_point, **kwargs).uuid
-
 
 
 class worker_celery(object):
@@ -111,8 +114,14 @@ class worker_celery(object):
 
 class CeleryResult(AsynchronousResultWrapper):
     """
+    This represents a wrapped async Celery result presenting
+    a normalized interface to the task enqueued in Celery.
 
-    :param asynchronousresult:
+    Since BibWorkflowEngine cannot be serialized, we need this wrapper
+    to transform the results (BibWorkflowEngine) back and forth between
+    client and queue.
+
+    :param asynchronousresult: the result from Celery
     """
 
     def __init__(self, asynchronousresult):
@@ -124,7 +133,19 @@ class CeleryResult(AsynchronousResultWrapper):
 
     @session_manager
     def get(self, postprocess=None):
+        """
+        Returns the result of async result that ran in Celery.
+
+        WorkflowEngine cannot be serialized, so we often need to
+        postprocess the result from the celery process across
+        to the client.
+
+        :param postprocess: function to postprocess the result
+        :type postprocess: callable function
+
+        :return: the postprocess result (i.e. BibWorkflowEngine)
+        """
         if postprocess is None:
-            return uui_to_workflow(self.asyncresult.get())
+            return self.asyncresult.get()
         else:
             return postprocess(self.asyncresult.get())

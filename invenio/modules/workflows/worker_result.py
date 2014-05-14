@@ -1,6 +1,6 @@
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,8 +21,17 @@ from abc import abstractmethod, ABCMeta
 
 class AsynchronousResultWrapper(object):
     """
+    This class is an abstract class. When you inherit it you should
+    absolutely implement all the functions.
 
-    :param asynchronousresult:
+    This class is here for two reason, get and unified interface for all
+    the worker and so allow to switch from one to another seemslessly,
+    and also add feature to functions.
+
+    For example the get method now allow a post processing
+    on the result.
+
+    :param asynchronousresult: the async result that you want to wrap.
     """
     __metaclass__ = ABCMeta
 
@@ -38,7 +47,7 @@ class AsynchronousResultWrapper(object):
         return
 
 
-def uui_to_workflow(uuid):
+def uuid_to_workflow(uuid):
     from invenio.modules.workflows.models import Workflow
 
     return Workflow.query.filter(Workflow.uuid == uuid).first()

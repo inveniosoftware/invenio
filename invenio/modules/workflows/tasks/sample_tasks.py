@@ -24,16 +24,39 @@ import time
 
 def add_data(data_param):
     """ Task using closure to allow parameters """
+
     def _add_data(obj, eng):
         """ Adds data to obj.data """
         #due to python 2 way of managing closure
         data = data_param
         obj.data += data
+
     return _add_data
+
+
+def generate_error(obj, eng):
+    """ Generate a ZeroDevisionError """
+    call_a()
+
+
+def call_a():
+    """ Used in order to test deep stack trace output """
+    call_b()
+
+
+def call_b():
+    """ Used in order to test deep stack trace output """
+    call_c()
+
+
+def call_c():
+    """ Used in order to test deep stack trace output """
+    raise ZeroDivisionError
 
 
 def halt_if_data_less_than(threshold):
     """ Static task with no parameters """
+
     def _halt_if_data_less_than(obj, eng):
         """
         Halts workflow execution for this object
@@ -41,14 +64,17 @@ def halt_if_data_less_than(threshold):
         """
         if obj.data < threshold:
             eng.halt("Value of data is too small.")
+
     return _halt_if_data_less_than
 
 
 def set_data(data):
     """ Task using closure to allow parameters """
+
     def _set_data(obj, eng):
         """ Sets obj.data to given data """
         obj.data = data
+
     return _set_data
 
 
@@ -108,12 +134,14 @@ def subtract(value):
     return _subtract
 
 
+def halt_whatever(obj, eng):
+    eng.halt("halt!", None)
+
+
 def task_reduce_and_halt(obj, eng):
     eng.log.info("value" + str(obj.data))
     if obj.data > 0:
-        eng.log.error(obj.data)
         obj.data -= 1
-        eng.log.error(obj.data)
         obj.save()
         eng.halt("test halt")
     else:

@@ -18,18 +18,20 @@
 
 """ Implements a workflow for testing """
 
-from invenio.modules.workflows.tasks.logic_tasks import (end_for,
-                                                         foreach,
-                                                         simple_for,
-                                                         workflow_else,
-                                                         workflow_if,
-                                                         compare_logic)
-from invenio.modules.workflows.tasks.sample_tasks import add_data
+from ...tasks.logic_tasks import (end_for,
+                                  foreach,
+                                  simple_for,
+                                  workflow_else,
+                                  workflow_if,
+                                  compare_logic,
+                                  )
+from ...tasks.sample_tasks import add_data
 
-from invenio.modules.workflows.tasks.workflows_tasks import interrupt_workflow
+from ...tasks.workflows_tasks import interrupt_workflow
 
-from invenio.modules.workflows.tasks.marcxml_tasks import (get_data,
-                                                           set_obj_extra_data_key)
+from ...tasks.marcxml_tasks import (get_data,
+                                    set_obj_extra_data_key,
+                                    )
 
 
 class test_workflow_logic(object):

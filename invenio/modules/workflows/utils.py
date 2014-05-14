@@ -41,39 +41,56 @@ def session_manager(orig_func):
     return new_func
 
 
-def tearDown(self):
-        """ Clean up created objects """
-        from invenio.modules.workflows.models import (BibWorkflowObject,
-                                                      Workflow,
-                                                      BibWorkflowEngineLog,
-                                                      BibWorkflowObjectLog)
-        from invenio.ext.sqlalchemy import db
+def convert_marcxml_to_bibfield(marcxml):
+    """
 
-        workflows = Workflow.get(Workflow.module_name == "unit_tests").all()
-        for workflow in workflows:
-            BibWorkflowObject.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).delete()
+    :param marcxml:
+    :return:
+    """
+    from invenio.modules.jsonalchemy.reader import Reader
+    from invenio.modules.jsonalchemy.wrappers import SmartJson
+    if isinstance(marcxml, unicode):
+        marcxml = marcxml.encode(errors='ignore')
+    return Reader.translate(marcxml,
+                            SmartJson,
+                            master_format='marc',
+                            namespace='recordext')
 
-            objects = BibWorkflowObjectLog.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).all()
-            for obj in objects:
-                db.session.delete(obj)
-            db.session.delete(workflow)
 
-            objects = BibWorkflowObjectLog.query.filter(
-                BibWorkflowObject.id_workflow == workflow.uuid
-            ).all()
-            for obj in objects:
-                BibWorkflowObjectLog.delete(id=obj.id)
-            BibWorkflowEngineLog.delete(uuid=workflow.uuid)
-            # Deleting dumy object created in tests
-        db.session.query(BibWorkflowObject).filter(
-            BibWorkflowObject.id_workflow.in_([11, 123, 253])
-        ).delete(synchronize_session='fetch')
-        Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
-        db.session.commit()
+def test_teardown(self):
+    """ Clean up created objects """
+    from invenio.modules.workflows.models import (BibWorkflowObject,
+                                                  Workflow,
+                                                  BibWorkflowEngineLog,
+                                                  BibWorkflowObjectLog)
+    from invenio.ext.sqlalchemy import db
+
+    workflows = Workflow.get(Workflow.module_name == "unit_tests").all()
+    for workflow in workflows:
+        BibWorkflowObject.query.filter(
+            BibWorkflowObject.id_workflow == workflow.uuid
+        ).delete()
+
+        objects = BibWorkflowObjectLog.query.filter(
+            BibWorkflowObject.id_workflow == workflow.uuid
+        ).all()
+        for obj in objects:
+            db.session.delete(obj)
+        db.session.delete(workflow)
+
+        objects = BibWorkflowObjectLog.query.filter(
+            BibWorkflowObject.id_workflow == workflow.uuid
+        ).all()
+        for obj in objects:
+            BibWorkflowObjectLog.delete(id=obj.id)
+        BibWorkflowEngineLog.delete(uuid=workflow.uuid)
+        # Deleting dumy object created in tests
+    db.session.query(BibWorkflowObject).filter(
+        BibWorkflowObject.id_workflow.in_([11, 123, 253])
+    ).delete(synchronize_session='fetch')
+    Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
+    db.session.commit()
+
 
 class BibWorkflowObjectIdContainer(object):
     """
@@ -90,12 +107,10 @@ class BibWorkflowObjectIdContainer(object):
             self.id = None
 
     def get_object(self):
-        from invenio.modules.workflows.models import BibWorkflowObject
+        from ..workflows.models import BibWorkflowObject as bwlObject
 
         if self.id is not None:
-            return BibWorkflowObject.query.filter(
-                BibWorkflowObject.id == self.id
-            ).one()
+            return bwlObject.query.filter(bwlObject.id == self.id).one()
         else:
             return None
 
@@ -128,7 +143,6 @@ def get_workflow_definition(name):
         return WorkflowMissing.workflow
 
 
-## TODO special thanks to http://code.activestate.com/recipes/440514-dictproperty-properties-for-dictionary-attributes/
 class dictproperty(object):
     class _proxy(object):
         def __init__(self, obj, fget, fset, fdel):
@@ -227,23 +241,20 @@ def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
         else:
             bwolist.sort(key=lambda x: x.id, reverse=False)
     elif iSortCol_0 == 1:
-        pass
-        # if sSortDir_0 == 'desc':
-        #     bwolist.sort(key=lambda x: x.id_user, reverse=True)
-        # else:
-        #     bwolist.sort(key=lambda x: x.id_user, reverse=False)
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.id_user, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.id_user, reverse=False)
     elif iSortCol_0 == 2:
-        pass
-        # if sSortDir_0 == 'desc':
-        #     bwolist.sort(key=lambda x: x.id_user, reverse=True)
-        # else:
-        #     bwolist.sort(key=lambda x: x.id_user, reverse=False)
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.id_user, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.id_user, reverse=False)
     elif iSortCol_0 == 3:
-        pass
-        # if sSortDir_0 == 'desc':
-        #     bwolist.sort(key=lambda x: x.id_user, reverse=True)
-        # else:
-        #     bwolist.sort(key=lambda x: x.id_user, reverse=False)
+        if sSortDir_0 == 'desc':
+            bwolist.sort(key=lambda x: x.id_user, reverse=True)
+        else:
+            bwolist.sort(key=lambda x: x.id_user, reverse=False)
     elif iSortCol_0 == 4:
         if sSortDir_0 == 'desc':
             bwolist.sort(key=lambda x: x.id_workflow, reverse=True)
