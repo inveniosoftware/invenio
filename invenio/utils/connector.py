@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,10 +16,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
 Tools to connect to distant Invenio servers using Invenio APIs.
 
-from __future__ import print_function
 
 Example of use:
 
@@ -38,17 +38,25 @@ FIXME:
 - implement cache expiration
 - exceptions handling
 - parsing of <!-- Search-Engine-Total-Number-Of-Results: N -->
-- better checking of input parameters (especially InvenioConnector.__init__ "url")
-- improve behaviour when running locally (perform_request_search *requiring* "req" object)
+- better checking of input parameters
+- improve behaviour when running locally
+    (perform_request_search *requiring* "req" object)
 """
+
+from __future__ import print_function
+
 import urllib
 import urllib2
+import requests
 import xml.sax
 import re
 import tempfile
 import os
 import time
 import sys
+
+from requests.exceptions import (ConnectionError, InvalidSchema, InvalidURL,
+                                 MissingSchema, RequestException)
 
 MECHANIZE_CLIENTFORM_VERSION_CHANGE = (0, 2, 0)
 try:
@@ -159,6 +167,8 @@ class InvenioConnector(object):
             raise InvenioConnectorServerError("You do not seem to have Invenio installed and no remote URL is given")
         else:
             self.server_url = url
+        self._validate_server_url()
+
         self.local = LOCAL_SITE_URLS and self.server_url in LOCAL_SITE_URLS
         self.cached_queries = {}
         self.cached_records = {}
@@ -401,6 +411,31 @@ class InvenioConnector(object):
         parser.setContentHandler(handler)
         parser.parse(results)
         return handler.records
+
+    def _validate_server_url(self):
+        """Validates self.server_url"""
+        try:
+            request = requests.head(self.server_url)
+            if request.status_code >= 400:
+                raise InvenioConnectorServerError(
+                    "Unexpected status code '%d' accessing URL: %s"
+                    % (request.status_code, self.server_url))
+        except (InvalidSchema, MissingSchema) as err:
+            raise InvenioConnectorServerError(
+                "Bad schema, expecting http:// or https://:\n %s" % (err,))
+        except ConnectionError as err:
+            raise InvenioConnectorServerError(
+                "Couldn't establish connection to '%s':\n %s"
+                % (self.server_url, err))
+        except InvalidURL as err:
+            raise InvenioConnectorServerError(
+                "Invalid URL '%s':\n %s"
+                % (self.server_url, err))
+        except RequestException as err:
+            raise InvenioConnectorServerError(
+                "Unknown error connecting to '%s':\n %s"
+                % (self.server_url, err))
+
 
 class Record(dict):
     """
