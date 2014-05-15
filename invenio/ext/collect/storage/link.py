@@ -38,14 +38,18 @@ class Storage(BaseStorage):
         Create the directory tree but will symlink all the files.
         """
         self.log("Collect static from blueprints")
+        skipped, total = 0, 0
         for bp, f, o in self:
             destination = os.path.join(self.collect.static_root, o)
             destination_dir = os.path.dirname(destination)
             if not os.path.exists(destination_dir):
                 os.makedirs(destination_dir)
 
-            if os.path.exists(destination):
-                self.log("{0} is already present!".format(o))
-            else:
+            if not os.path.exists(destination):
                 os.symlink(f, destination)
                 self.log("{0}:{1} symbolink link created".format(bp.name, o))
+            else:
+                skipped += 1
+            total += 1
+        self.log("{0} of {1} files already present".format(skipped, total))
+        self.log("Done collecting.")

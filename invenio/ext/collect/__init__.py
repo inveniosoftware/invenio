@@ -27,4 +27,6 @@ collect = Collect()
 def setup_app(app):
     """Set the application up with the corresct static root."""
     app.config['COLLECT_STATIC_ROOT'] = app.static_folder
+    # unsetting the static_folder so it's not picked up by collect.
+    app.static_folder = None
     collect.init_app(app)
