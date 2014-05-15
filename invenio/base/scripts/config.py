@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,16 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Command line script to manage configuration operations."""
+
 from __future__ import print_function
 
-import errno
+import ast
 import imp
 import sys
-import types
+import errno
 
 from pprint import pformat
 from flask import current_app
-from six import iteritems, StringIO
 from invenio.ext.script import Manager, change_command_name, \
     generate_secret_key
 
@@ -39,6 +40,7 @@ manager = Manager(usage="Perform configuration operations")
 
 
 def default_keys():
+    """Yield list of default configuration keys."""
     yield 'SECRET_KEY'
     for k in current_app.config.keys():
         if k.startswith('CFG_DATABASE'):
@@ -46,6 +48,7 @@ def default_keys():
 
 
 def get_instance_config_object(filename='invenio.cfg', silent=True):
+    """Get the configuration object from the given filename."""
     d = imp.new_module('config')
     d.__file__ = filename
     try:
@@ -59,6 +62,7 @@ def get_instance_config_object(filename='invenio.cfg', silent=True):
 
 
 def get_conf():
+    """Prepare configuration."""
     try:
         from invenio.config import CFG_ETCDIR
     except:
@@ -74,9 +78,11 @@ def get_conf():
 @manager.command
 def get(name):
     """
-    Return value of VARNAME read from CONF files.  Useful for
-    third-party programs to access values of conf options such as
+    Return value of VARNAME read from CONF files.
+
+    Useful for third-party programs to access values of conf options such as
     CFG_PREFIX.  Return None if VARNAME is not found.
+
     """
     try:
         varvalue = current_app.config.get(name.upper(), None)
@@ -102,13 +108,9 @@ def set_(name, value, filename='invenio.cfg'):
         sys.exit(1)
 
     try:
-        type_ = type(current_app.config.get(name, value))
-        if type_ in [types.DictType, types.ListType]:
-            value = eval(value)
-        else:
-            value = type_(value)
-    except:
-        print('>>> Using default type ...')
+        value = ast.literal_eval(value)
+    except (SyntaxError, ValueError):
+        pass
 
     with current_app.open_instance_resource(filename, 'a') as config_file:
         print(name, '=', pformat(value), file=config_file)
@@ -117,43 +119,39 @@ set_.__name__ = 'set'
 manager.command(set_)
 
 
-@manager.command
-def list():
-    """
-    Print a list of all conf options and values from CONF.
-    """
-    for key, value in iteritems(current_app.config):
+def list_():
+    """Print a list of all conf options and values from CONF."""
+    for key, value in current_app.config.items():
         print(key, '=', pformat(value))
+
+list_.__name__ = 'list'
+manager.command(list_)
 
 
 @manager.command
 def update(filename='invenio.cfg', silent=True):
-    """
-    Update new config.py from conf options, keeping previous
-    config.py in a backup copy.
+    """Update new config.py from conf options.
+
+    The previous config.py is kept in a backup copy.
     """
     d = get_instance_config_object(filename, silent)
-
     new_config = StringIO()
-    for key in set(d.__dict__.keys()) | set(default_keys()):
+    keys = set(d.__dict__.keys()) | set(default_keys())
+    keys = list(keys)
+    keys.sort()
+    for key in keys:
         if key != key.upper():
             continue
         value = d.__dict__.get(key, current_app.config[key])
         type_ = type(value)
         prmt = key + ' (' + type_.__name__ + ') [' + pformat(value) + ']: '
-        while True:
-            new_value = raw_input(prmt)
-            try:
-                if type_ in [types.DictType, types.ListType]:
-                    new_value = eval(new_value) if new_value else value
-                elif isinstance(None, type_):
-                    new_value = new_value if new_value != '' else None
-                else:
-                    new_value = type_(new_value or value)
-                break
-            except Exception as e:
-                print(e)
-                pass
+
+        new_value = raw_input(prmt)
+        try:
+            new_value = ast.literal_eval(new_value)
+        except (SyntaxError, ValueError):
+            pass
+
         print('>>>', key, '=', pformat(new_value))
         print(key, '=', pformat(new_value), file=new_config)
 
@@ -169,7 +167,9 @@ manager.add_command("create", config_create)
 @change_command_name
 def secret_key(key=None, filename='invenio.cfg', silent=True):
     """Generate and append SECRET_KEY to invenio.cfg.
-    Useful for the installation process."""
+
+    Useful for the installation process.
+    """
     print(">>> Going to generate random SECRET_KEY...")
     try:
         d = get_instance_config_object(filename)
@@ -181,7 +181,8 @@ def secret_key(key=None, filename='invenio.cfg', silent=True):
         sys.exit(1)
     from invenio.base.config import SECRET_KEY
     if current_app.config.get('SECRET_KEY') != SECRET_KEY:
-        print("WARNING: custom config package already contains SECRET_KEY.", file=sys.stderr)
+        print("WARNING: custom config package already contains SECRET_KEY.",
+              file=sys.stderr)
         print(">>> No need to generate secret key.")
     else:
         if key is None:
@@ -192,9 +193,11 @@ def secret_key(key=None, filename='invenio.cfg', silent=True):
 
 
 def main():
+    """Run the command line manager."""
     from invenio.base.factory import create_app
     manager.app = create_app()
     manager.run()
+
 
 if __name__ == '__main__':
     main()

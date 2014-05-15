@@ -160,7 +160,7 @@ class InvenioFixture(object):
         return dictate
 
 
-class InvenioTestCase(TestCase, unittest.TestCase):
+class InvenioTestCase(TestCase):
 
     """Base test case for invenio."""
 
@@ -1238,7 +1238,8 @@ from invenio.base.utils import import_submodules_from_packages
 def iter_suites():
     """Yield all testsuites."""
     app = create_app()
-    packages = ['invenio', 'invenio.celery'] + app.config.get('PACKAGES', [])
+    packages = ['invenio', 'invenio.base', 'invenio.celery']
+    packages += app.config.get('PACKAGES', [])
 
     for module in import_submodules_from_packages('testsuite',
                                                   packages=packages):
