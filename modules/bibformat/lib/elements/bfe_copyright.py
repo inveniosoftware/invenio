@@ -3,7 +3,7 @@
 ## $Id$
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012, 2013 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -36,7 +36,8 @@ CFG_CERN_LICENSE_URL = 'http://copyright.cern.ch/'
 
 def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", instances_separator=", ",
                    link_to_licenses='yes', auto_link_to_CERN_license='no', remove_link_to_CERN_license='yes',
-                   show_licenses='yes', show_material="yes", license_to_url_kb='LICENSE2URL'):
+                   show_licenses='yes', show_material="yes", 
+                   show_sponsor="yes", license_to_url_kb='LICENSE2URL'):
     """
     Print copyright information
 
@@ -121,6 +122,7 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
             # Check to which bibdoc ID this license applies
             bibdoc_id = 0
             material = None
+            sponsor_info = license_info.get('f', '')
             if license_info.has_key('8'):
                 try:
                     bibdoc_id = int(license_info['8'])
@@ -155,13 +157,13 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
             elif material and not copyrights_and_licenses_list.has_key(material):
                 copyrights_and_licenses_list[material] = {'copyright':[], 'license': []}
             if not (material and bibdoc_id == 0):
-                copyrights_and_licenses_list[bibdoc_id]['license'].append([label, license_body, url])
+                copyrights_and_licenses_list[bibdoc_id]['license'].append([label, license_body, url, sponsor_info])
             elif copyrights_and_licenses_list.has_key(material):
-                copyrights_and_licenses_list[material]['license'].append([label, license_body, url])
+                copyrights_and_licenses_list[material]['license'].append([label, license_body, url, sponsor_info])
 
         # We also need to add the auto CERN licenses to specified BibDocs
         for bibdoc_id in add_CERN_license_link_to_bibdocs:
-            copyrights_and_licenses_list[bibdoc_id]['license'].append(['', '', CFG_CERN_LICENSE_URL])
+            copyrights_and_licenses_list[bibdoc_id]['license'].append(['', '', CFG_CERN_LICENSE_URL, ''])
 
         for linkage, copyright_and_license in copyrights_and_licenses_list.iteritems():
             copyrights = copyright_and_license['copyright']
@@ -169,7 +171,7 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
             if len(copyrights) == 1 and len(licenses) == 1:
                 # Great that is one particular case we can maybe handle
                 copyright_label, copyright_holder = copyrights[0]
-                license_label, license_body, license_url = licenses[0]
+                license_label, license_body, license_url, dummy = licenses[0]
                 if not license_label or copyright_holder in ("&copy; " + license_label, license_label):
                     # Cool, we can squash things
                     if remove_link_to_CERN_license.lower() == 'yes' and \
@@ -206,7 +208,10 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
                 else:
                     prefix_license = 'Licenses: '
 
-            for license_label, license_body, license_url in licenses:
+            sponsor_tmp = []
+            for license_label, license_body, license_url, sponsor_info in licenses:
+                if sponsor_info:
+                    sponsor_tmp.append(sponsor_info)
                 if not license_label and license_url and link_to_licenses.lower() == 'yes':
                     license_tmp.append(create_html_link(license_url, {}, 'License'))
                     prefix_license = '' # no longer needed
@@ -215,11 +220,22 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
                 elif license_label:
                     license_tmp.append(license_label)
 
+            if sponsor_tmp and show_sponsor == "yes" and 'SCOAP3' in sponsor_tmp:
+                sponsored_by = 'sponsored by <a href="http://scoap3.org">SCOAP&#179;</a>'
+            else:
+                sponsored_by = ''
+
             if show_licenses.lower() != 'yes':
                 # All that work for nothing!
                 license_tmp = []
             if copyright_tmp and license_tmp:
-                out.add('%s (%s%s)' % (copyright_tmp, prefix_license, licenses_separator.join(license_tmp)))
+                out.add('%s (%s%s)%s' % \
+                         (copyright_tmp, \
+                          prefix_license, \
+                          licenses_separator.join(license_tmp), \
+                          sponsored_by and ', %s' % sponsored_by or '' \
+                         )\
+                       )
             else:
                 out.add(copyright_tmp+licenses_separator.join(license_tmp))
 
@@ -717,8 +733,60 @@ def test():
     assert(format_element(bfo26, remove_link_to_CERN_license="no")  == 'Publication: &copy; 2012 FOO (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>), Preprint: <a href="http://copyright.cern.ch/">&copy; 2011 CERN</a>')
 
 
-    print "All tests run ok"
+    xml27 = '''
+<record>
+    <datafield tag="540" ind1=" " ind2=" ">
+       <subfield code="f">SCOAP3</subfield>
+       <subfield code="a">CC-BY-3.0</subfield>
+       <subfield code="3">Publication</subfield>
+    </datafield>
+    <datafield tag="540" ind1=" " ind2=" ">
+       <subfield code="a">CERN</subfield>
+       <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+       <subfield code="d">CERN</subfield>
+       <subfield code="g">2011</subfield>
+       <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+       <subfield code="d">ESA</subfield>
+       <subfield code="g">2014</subfield>
+      <subfield code="3">Publication</subfield>
+    </datafield>
+</record>'''
 
+    bfo27 = BibFormatObject(0, xml_record=xml27)
+    assert(format_element(bfo27, remove_link_to_CERN_license="yes")  == 'Preprint: &copy; 2011 CERN, Publication: &copy; 2014 ESA (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>), sponsored by <a href="http://scoap3.org">SCOAP&#179;</a>')
+
+
+    xml28 = '''
+<record>
+    <datafield tag="540" ind1=" " ind2=" ">
+       <subfield code="f">SCOAP3</subfield>
+       <subfield code="a">CC-BY-3.0</subfield>
+       <subfield code="3">Publication</subfield>
+    </datafield>
+    <datafield tag="540" ind1=" " ind2=" ">
+       <subfield code="a">CERN</subfield>
+       <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+       <subfield code="d">CERN</subfield>
+       <subfield code="g">2011</subfield>
+       <subfield code="3">Preprint</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+       <subfield code="d">ESA</subfield>
+       <subfield code="g">2014</subfield>
+      <subfield code="3">Publication</subfield>
+    </datafield>
+</record>'''
+
+    bfo28 = BibFormatObject(0, xml_record=xml28)
+    assert(format_element(bfo28, remove_link_to_CERN_license="yes", show_sponsor="no")  == 'Preprint: &copy; 2011 CERN, Publication: &copy; 2014 ESA (License: <a href="http://creativecommons.org/licenses/by/3.0/">CC-BY-3.0</a>)')
+
+    print "All tests run ok"
 
 if __name__ == "__main__":
     test()
