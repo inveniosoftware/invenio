@@ -1822,15 +1822,23 @@ def get_coll_ancestors(coll):
 
 def get_coll_sons(coll, coll_type='r', public_only=1):
     """Return a list of sons (first-level descendants) of type 'coll_type' for collection 'coll'.
+       If coll_type = '*', both regular and virtual collections will be returned.
        If public_only, then return only non-restricted son collections.
     """
     coll_sons = []
+    if coll_type == '*':
+        coll_type_query = " IN ('r', 'v')"
+        query_params = (coll, )
+    else:
+        coll_type_query = "=%s"
+        query_params = (coll_type, coll)
+
     query = "SELECT c.name FROM collection AS c "\
             "LEFT JOIN collection_collection AS cc ON c.id=cc.id_son "\
             "LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad "\
-            "WHERE cc.type=%s AND ccc.name=%s"
+            "WHERE cc.type%s AND ccc.name=%%s" % coll_type_query
     query += " ORDER BY cc.score DESC"
-    res = run_sql(query, (coll_type, coll))
+    res = run_sql(query, query_params)
     for name in res:
         if not public_only or not collection_restricted_p(name[0]):
             coll_sons.append(name[0])
@@ -1842,25 +1850,33 @@ class CollectionAllChildrenDataCacher(DataCacher):
 
         def cache_filler():
 
-            def get_all_children(coll, coll_type='r', public_only=1):
-                """Return a list of all children of type 'type' for collection 'coll'.
+            def get_all_children(coll, coll_type='r', public_only=1, d_internal_coll_sons=None):
+                """Return a list of all children of type 'coll_type' for collection 'coll'.
                    If public_only, then return only non-restricted child collections.
-                   If type='*', then return both regular and virtual collections.
+                   If coll_type='*', then return both regular and virtual collections.
+                   d_internal_coll_sons is an internal dictionary used in recursion for
+                   minimizing the number of database calls and should not be used outside
+                   this scope.
                 """
+                if not d_internal_coll_sons:
+                    d_internal_coll_sons = {}
+
                 children = []
-                if coll_type == '*':
-                    sons = get_coll_sons(coll, 'r', public_only) + get_coll_sons(coll, 'v', public_only)
-                else:
-                    sons = get_coll_sons(coll, coll_type, public_only)
-                for child in sons:
+
+                if coll not in d_internal_coll_sons:
+                    d_internal_coll_sons[coll] = get_coll_sons(coll, coll_type, public_only)
+
+                for child in d_internal_coll_sons[coll]:
                     children.append(child)
-                    children.extend(get_all_children(child, coll_type, public_only))
-                return children
+                    children.extend(get_all_children(child, coll_type, public_only, d_internal_coll_sons)[0])
+
+                return children, d_internal_coll_sons
 
             ret = {}
+            d_internal_coll_sons = None
             collections = collection_reclist_cache.cache.keys()
             for collection in collections:
-                ret[collection] = get_all_children(collection, '*', public_only=0)
+                ret[collection], d_internal_coll_sons = get_all_children(collection, '*', public_only=0, d_internal_coll_sons=d_internal_coll_sons)
             return ret
 
         def timestamp_verifier():
