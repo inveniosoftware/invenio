@@ -4567,6 +4567,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
             elif format.startswith("hd"):
                 # HTML detailed format:
+                referer = user_info.get('referer', '')
                 for recid in recIDs:
                     if record_exists(recid) == -1:
                         write_warning(_("The record has been deleted."), req=req)
@@ -4574,7 +4575,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         if merged_recid:
                             write_warning(_("The record %d replaces it." % merged_recid), req=req)
                         continue
-                    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recid)),
+                    unordered_tabs = get_detailed_page_tabs(get_colID(guess_collection_of_a_record(recid, referer, False)),
                                                             recid, ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
                     ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
