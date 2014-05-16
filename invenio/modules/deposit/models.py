@@ -812,15 +812,16 @@ class DepositionDraft(FactoryMixin):
             (name, value) for name, value in post_processed_data.items()
             if validated_data[name] != value
         )
+
         # Determine changed flags
         changed_flags = dict(
             (name, flags) for name, flags in post_processed_flags.items()
-            if validated_flags[name] != flags
+            if validated_flags.get(name, []) != flags
         )
         # Determine changed messages
         changed_msgs = dict(
             (name, messages) for name, messages in post_processed_msgs.items()
-            if validated_msgs[name] != messages or process_field_names is None
+            if validated_msgs.get(name, []) != messages or process_field_names is None
             or name in process_field_names
         )
 
