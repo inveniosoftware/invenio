@@ -35,7 +35,6 @@ from flask.ext.login import login_required
 from flask.ext.breadcrumbs import register_breadcrumb
 from flask.ext.menu import register_menu
 from invenio.base.i18n import _
-from invenio.ext.sslify import ssl_required
 from .holdingpen import get_holdingpen_objects, get_action_list
 
 blueprint = Blueprint(
@@ -48,7 +47,6 @@ blueprint = Blueprint(
 
 
 @blueprint.route("/", methods=['GET', 'POST'])
-@ssl_required
 @login_required
 @register_menu(
     blueprint, 'settings.workflows',

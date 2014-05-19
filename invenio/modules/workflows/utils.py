@@ -279,9 +279,7 @@ def parse_bwids(bwolist):
 
 
 def dummy_function(obj, eng):
-    """
-    Workflow function not found for workflow.
-    """
+    """Workflow function not found for workflow."""
     pass
 
 

@@ -370,6 +370,9 @@ class BibWorkflowObject(db.Model):
             # No widget, try old _widget
             extra_data = self.get_extra_data()
             if "_widget" in extra_data:
+                import warnings
+                warnings.warn("Widget's are now stored in '_action'",
+                              DeprecationWarning)
                 # Migrate to new naming
                 extra_data["_action"] = extra_data['_widget']
                 del extra_data["_widget"]
