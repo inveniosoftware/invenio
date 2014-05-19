@@ -14,19 +14,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 021111307, USA.
+"""Workflows task to communicate with bibsched.
+
+The Bibsched logic is separate from other tasks, the goal is to allow
+to run a workflow in another way than with Bibsched.
+"""
 
 
 def task_update_progress(msg):
-    """
-    This function should be call to print in the field progress of bibsched
+    """Function call to print in the field progress of bibsched.
 
     :param msg: message to print in the field progress of bibsched
     :type msg: str
     :return:the nested function for the workflow engine
     """
-
     def _task_update_progress(obj, eng):
-        """Updates progress information in the BibSched task table."""
+        """Update progress information in the BibSched task table."""
         from invenio.legacy.bibsched.bibtask import task_update_progress as task_update_progress_nested
 
         task_update_progress_nested(msg)
@@ -35,16 +38,14 @@ def task_update_progress(msg):
 
 
 def task_update_status(msg):
-    """
-    This function should be call to print in the field status of bibsched
+    """Function call to print in the field status of bibsched.
 
     :param msg: message to print in the field status of bibsched
     :type msg: str
     :return:the nested function for the workflow engine
     """
-
     def _task_update_status(obj, eng):
-        """Updates status information in the BibSched task table."""
+        """Update status information in the BibSched task table."""
         from invenio.legacy.bibsched.bibtask import task_update_status as task_update_status_nested
 
         task_update_status_nested(msg)

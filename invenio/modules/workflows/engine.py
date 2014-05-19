@@ -15,6 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""The workflow engine class and its attached classes."""
 
 from __future__ import absolute_import
 
@@ -22,46 +23,35 @@ import traceback
 import sys
 from uuid import uuid1 as new_uuid
 import base64
-
 from six import iteritems, reraise
 from six.moves import cPickle
-
-from workflow.engine import (GenericWorkflowEngine,
-                             ContinueNextToken,
-                             HaltProcessing,
-                             StopProcessing,
-                             JumpTokenBack,
-                             JumpTokenForward,
-                             WorkflowError,
-                             )
-
+from workflow.engine import (GenericWorkflowEngine, ContinueNextToken,
+                             HaltProcessing, StopProcessing, JumpTokenBack,
+                             JumpTokenForward, WorkflowError)
 from .errors import WorkflowError as WorkflowErrorClient, WorkflowDefinitionError
-from .models import (Workflow,
-                     BibWorkflowObject,
-                     BibWorkflowEngineLog,
-                     ObjectVersion,
-                     )
-from .utils import (dictproperty,
-                    get_workflow_definition,
-                    )
-from .logger import (get_logger,
-                     BibWorkflowLogHandler,
-                     )
+from .models import (Workflow, BibWorkflowObject, BibWorkflowEngineLog,
+                     ObjectVersion)
+from .utils import dictproperty
+from .logger import get_logger, BibWorkflowLogHandler
 from .errors import WorkflowHalt
-
 from invenio.config import CFG_DEVEL_SITE
-
 DEBUG = CFG_DEVEL_SITE > 0
 
 
 class WorkflowStatus(object):
+
+    """The different possible value for Workflow Status."""
+
     NEW, RUNNING, HALTED, ERROR, COMPLETED = range(5)
 
 
 class BibWorkflowEngine(GenericWorkflowEngine):
+
     """
-    Subclass of GenericWorkflowEngine representing a workflow in
-    the workflows module.
+    Subclass of GenericWorkflowEngine representing a workflow.
+
+    Subclass of GenericWorkflowEngine representing a workflow
+    in the workflows module.
 
     Adds a SQLAlchemy database model to save workflow states and
     workflow data.
@@ -69,19 +59,23 @@ class BibWorkflowEngine(GenericWorkflowEngine):
     Overrides key functions in GenericWorkflowEngine to implement
     logging and certain workarounds for storing data before/after
     task calls (This part will be revisited in the future).
-
-    :param name:
-    :param uuid:
-    :param curr_obj:
-    :param workflow_object:
-    :param id_user:
-    :param module_name:
-    :param kwargs:
     """
 
     def __init__(self, name=None, uuid=None, curr_obj=0,
                  workflow_object=None, id_user=0, module_name="Unknown",
                  **kwargs):
+        """
+        Init function to init a new BibWorkflowEngine object.
+
+        This will create a new BibWorkflowEngine object. This engine
+        is needed to run a workflow and control the workflow, like steps,
+        processing and control object manipulation inside this workflow.
+
+        You can pass several parameter to the init function to personalize
+        your engine but most of the time you shouldn't create yourself a
+        BibWorkflowEngine but you should instead use the API which will
+        create it for you.
+        """
         super(BibWorkflowEngine, self).__init__()
 
         self.db_obj = None
@@ -111,16 +105,11 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         self.set_extra_data_params(**kwargs)
 
     def get_extra_data(self):
-        """
-        Main method to retrieve data saved to the object.
-        """
+        """Main method to retrieve data saved to the object."""
         return cPickle.loads(base64.b64decode(self.db_obj._extra_data))
 
     def set_extra_data(self, value):
-        """
-        Main method to update data saved to the object.
-        :param value:
-        """
+        """Main method to update data saved to the object."""
         self.db_obj._extra_data = base64.b64encode(cPickle.dumps(value))
 
     def reset_extra_data(self):
@@ -129,11 +118,13 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         self.db_obj._extra_data = get_default_extra_data()
 
     def extra_data_get(self, key):
+        """Get a key value in extra data."""
         if key not in self.db_obj.get_extra_data():
             raise KeyError("%s not in extra_data" % (key,))
         return self.db_obj.get_extra_data()[key]
 
     def extra_data_set(self, key, value):
+        """Add a key value pair in extra_data."""
         tmp = self.db_obj.get_extra_data()
         tmp[key] = value
         self.db_obj.set_extra_data(tmp)
@@ -145,29 +136,36 @@ class BibWorkflowEngine(GenericWorkflowEngine):
 
     @property
     def counter_object(self):
+        """Return the number of object."""
         return self.db_obj.counter_object
 
     @property
     def uuid(self):
+        """Return the uuid."""
         return self.db_obj.uuid
 
     @property
     def id_user(self):
+        """Return the user id."""
         return self.db_obj.id_user
 
     @property
     def module_name(self):
+        """Return the module name."""
         return self.db_obj.module_name
 
     @property
     def name(self):
+        """Return the name."""
         return self.db_obj.name
 
     @property
     def status(self):
+        """Return the status."""
         return self.db_obj.status
 
     def __getstate__(self):
+        """Pickling needed functions."""
         if not self._picklable_safe:
             raise cPickle.PickleError("The instance of the workflow engine "
                                       "cannot be serialized, "
@@ -180,6 +178,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         return state
 
     def __setstate__(self, state):
+        """Unpickling needed functions."""
         if len(self._objects) < self._i[0]:
             raise cPickle.PickleError("The workflow instance "
                                       "inconsistent state, "
@@ -193,9 +192,11 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         self.__dict__ = state
 
     def __repr__(self):
+        """Allow to represent the BibWorkflowEngine."""
         return "<BibWorkflow_engine(%s)>" % (self.db_obj.name,)
 
     def __str__(self, log=False):
+        """Allow to print the BibWorkflowEngine."""
         return """-------------------------------
 BibWorkflowEngine
 -------------------------------
@@ -205,15 +206,14 @@ BibWorkflowEngine
 
     @staticmethod
     def before_processing(objects, self):
-        """
-        Executed before processing the workflow.
-        """
+        """Executed before processing the workflow."""
         self.save(status=WorkflowStatus.RUNNING)
         self.set_counter_initial(len(objects))
         GenericWorkflowEngine.before_processing(objects, self)
 
     @staticmethod
     def after_processing(objects, self):
+        """Action after process to update status."""
         self._i = [-1, [0]]
         if self.has_completed():
             self.save(WorkflowStatus.COMPLETED)
@@ -221,10 +221,7 @@ BibWorkflowEngine
             self.save(WorkflowStatus.HALTED)
 
     def has_completed(self):
-        """
-        Returns True of workflow is fully completed meaning
-        that all associated objects are in FINAL state.
-        """
+        """Return True if workflow is fully completed."""
         number_of_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == self.uuid,
             BibWorkflowObject.version.in_([ObjectVersion.HALTED,
@@ -233,25 +230,26 @@ BibWorkflowEngine
         return number_of_objects == 0
 
     def save(self, status=None):
-        """
-        Save the workflow instance to database.
-        """
+        """Save the workflow instance to database."""
         # This workflow continues a previous execution.
         if status == WorkflowStatus.HALTED:
             self.db_obj.current_object = 0
         self.db_obj.save(status)
 
     def process(self, objects):
-        """
+        """Process objects.
 
-        :param objects:
+        :param objects: objects to process.
         """
         super(BibWorkflowEngine, self).process(objects)
 
     def restart(self, obj, task):
-        """Restart the workflow engine after it was deserialized
-        :param task:
-        :param obj:
+        """Restart the workflow engine after it was deserialized.
+
+        :param task: can be prev for previous task or current for the current
+        task or next for the next task.
+        :param obj: the object which shoulld be restarted. Can be like for task
+        prev, current or next.
         """
         self.log.debug("Restarting workflow from %s object and %s task" %
                        (str(obj), str(task),))
@@ -286,27 +284,28 @@ BibWorkflowEngine
 
     @staticmethod
     def processing_factory(objects, self):
-        """Default processing factory extended with saving objects
-        before succesful processing.
+        """Default processing factory.
 
-        Default processing factory, will process objects in order
+        An extended  version of the default processing factory
+        with saving objectsbefore succesful processing.
 
-        :param objects: list of objects (passed in by self.process())
+        Default processing factory, will process objects in order.
+
+        :param objects: list of objects (passed in by self.process()).
 
         :keyword cls: engine object itself, because this method may
             be implemented by the standalone function, we pass the
-            self also as a cls argument
+            self also as a cls argument.
 
         As the WFE proceeds, it increments the internal counter, the
         first position is the number of the element. This pointer increases
-        before the object is taken
+        before the object is taken.
 
         2nd pos is reserved for the array that points to the task position.
         The number there points to the task that is currently executed;
         when error happens, it will be there unchanged. The pointer is
         updated after the task finished running.
         """
-
         self.before_processing(objects, self)
 
         i = self._i
@@ -390,7 +389,7 @@ BibWorkflowEngine
         self.after_processing(objects, self)
 
     def execute_callback(self, callback, obj):
-        """Executes the callback - override this method to implement logging"""
+        """Execute the callback - override this method to implement logging."""
         obj.data = obj.get_data()
         obj.extra_data = obj.get_extra_data()
         obj.extra_data["_last_task_name"] = self.get_current_taskname()
@@ -405,10 +404,7 @@ BibWorkflowEngine
             obj.set_extra_data(obj.extra_data)
 
     def get_current_taskname(self):
-        """
-        Will attempt to return name of current task/step.
-        Otherwise returns None.
-        """
+        """Will attempt to return name of current task/step."""
         callback_list = self.getCallbacks()
         if callback_list:
             for i in self.getCurrTaskId():
@@ -421,34 +417,29 @@ BibWorkflowEngine
             return callback_list.func_name
 
     def get_current_object(self):
-        """
-        Returns the currently active BibWorkflowObject or
-        None if no object is active.
-        """
+        """Return the currently active BibWorkflowObject."""
         obj_id = self.getCurrObjId()
         if obj_id < 0:
             return None
         return self._objects[obj_id]
 
     def halt(self, msg, action=None):
-        """Halt the workflow (stop also any parent wfe)"""
+        """Halt the workflow (stop also any parent wfe."""
         raise WorkflowHalt(message=msg,
                            action=action,
                            id_workflow=self.uuid)
 
     def get_default_data_type(self):
-        """
-        Returns default data type from workflow
-        definition.
-        """
+        """Return default data type from workflow definition."""
         return getattr(self.workflow_definition,
                        "object_type",
                        "")
 
     def set_counter_initial(self, obj_count):
-        """
+        """Initiate the counters of object states.
 
-        :param obj_count:
+        :param obj_count: Number of objects to process.
+        :type obj_count int.
         """
         self.db_obj.counter_initial = obj_count
         self.db_obj.counter_halted = 0
@@ -456,18 +447,25 @@ BibWorkflowEngine
         self.db_obj.counter_finished = 0
 
     def increase_counter_halted(self):
+        """Indicate we halted the processing of one object."""
         self.db_obj.counter_halted += 1
 
     def increase_counter_error(self):
+        """Indicate we crashed the processing of one object."""
         self.db_obj.counter_error += 1
 
     def increase_counter_finished(self):
+        """Indicate we finished the processing of one object."""
         self.db_obj.counter_finished += 1
 
     def set_workflow_by_name(self, workflow_name):
-        """
+        """Configure the workflow to run by the name of this one.
 
-        :param workflow_name:
+        Allows the modification of the workflow that the engine will run
+        by looking in the registry the name passed in parameter.
+
+        :param workflow_name: name of the workflow.
+        :type workflow_name: str.
         """
         from .registry import workflows
         if workflow_name not in workflows:
@@ -479,9 +477,12 @@ BibWorkflowEngine
         self.setWorkflow(self.workflow_definition.workflow)
 
     def set_extra_data_params(self, **kwargs):
-        """
+        """Add keys/value in extra_data.
 
-        :param kwargs:
+        Allows the addition of value in the extra_data dictionnary,
+        all the data must be passed as "key=value".
+
+        :param kwargs: pair key/value dictionnary comprehensive.
         """
         tmp = self.get_extra_data()
         if not tmp:

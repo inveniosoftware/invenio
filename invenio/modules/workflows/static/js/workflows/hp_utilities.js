@@ -19,16 +19,16 @@
 
 //Utility functions
 //***********************************
-var WORKFLOWS_HP_UTILITIES = function ( $, holdingpen ) {
+var WORKFLOWS_HP_UTILITIES = function ($, holdingpen) {
 
-    var tagList = holdingpen.tag.tagList;
-    var version_showing = [holdingpen.context.version_showing];
+    var tagList = holdingpen.tag.tagList,
+        version_showing = [holdingpen.context.version_showing];
 
     $.fn.exists = function () {
         return this.length !== 0;
     };
 
-    var _requestNewObjects = function() {
+    var _requestNewObjects = function () {
         var version_showing = {};
         ($.inArray("Completed", holdingpen.tag.tagList()) <= -1) ? null:  version_showing["final"] = true;
         ($.inArray("Halted", holdingpen.tag.tagList()) <= -1) ? null : version_showing["halted"] = true;
@@ -46,23 +46,22 @@ var WORKFLOWS_HP_UTILITIES = function ( $, holdingpen ) {
         });
     };
 
-    var _init = function() {
-        if(version_showing){
-            for(var i=0; i<version_showing.length; i++){
-                if(version_showing[i] == 1){
-                    if ($.inArray('Completed', tagList) <= -1){
+    var _init = function () {
+        var i;
+        if (version_showing) {
+            for (i = 0; i < version_showing.length; i++) {
+                if (version_showing[i] === 1) {
+                    if ($.inArray('Completed', tagList) <= -1) {
                         tagList.push('Completed');
-                    } 
+                    }
                     $('#version-completed').click();
-                }
-                else if(version_showing[i] == 2){
-                    if ($.inArray('Halted', tagList) <= -1){
-                        tagList.push('Halted');  
-                    } 
-                    $('#version-halted').click();  
-                }
-                else if(version_showing[i] == 3){
-                    if ($.inArray("Running", tagList) <= -1){
+                } else if (version_showing[i] === 2) {
+                    if ($.inArray('Halted', tagList) <= -1) {
+                        tagList.push('Halted');
+                    }
+                    $('#version-halted').click();
+                } else if (version_showing[i] === 3) {
+                    if ($.inArray("Running", tagList) <= -1) {
                         tagList.push("Running");
                     }
                     $("#version-running").click();
@@ -75,23 +74,24 @@ var WORKFLOWS_HP_UTILITIES = function ( $, holdingpen ) {
         init: _init,
         requestNewObjects: _requestNewObjects,
 
-        fnGetSelected: function ( oTableLocal ){
-            var aReturn = [];
-            var aTrs = oTableLocal.fnGetNodes();
-            
-            for ( var i=0 ; i<aTrs.length ; i++ ){
-                if ($(aTrs[i]).hasClass("row_selected")){
-                    aReturn.push( aTrs[i] );
+        fnGetSelected: function (oTableLocal) {
+            var aReturn = [],
+                aTrs = oTableLocal.fnGetNodes(),
+                i;
+
+            for (i = 0; i < aTrs.length; i++) {
+                if ($(aTrs[i]).hasClass("row_selected")) {
+                    aReturn.push(aTrs[i]);
                 }
             }
             return aReturn;
         },
 
         isInt: function (n) {
-           return typeof n === "number" && n % 1 === 0;
+            return typeof n === "number" && n % 1 === 0;
         },
 
-        emptyLists: function (){
+        emptyLists: function () {
             holdingpen.rowList = [];
             holdingpen.rowIndexList = [];
         },

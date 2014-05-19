@@ -19,72 +19,68 @@
 
 // Tags functions
 //***********************************
-var WORKFLOWS_HP_TAGS = function ( $, holdingpen ){
-    var tagList = [];
-    var tagListToSearch = [];
+var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
+    var tagList = [],
+        tagListToSearch = [];
 
-        $("#tags").tagsinput({
-            tagClass: function(item)
-            {
-                switch (item)
-                {
-                    case 'In process' : return 'label label-warning';
-                    case 'Need action' : return 'label label-danger';
-                    case 'Done': return 'label label-success';
-                    case 'New': return 'label label-info';
-                    default  : return 'badge badge-warning';
-                }
+    $("#tags").tagsinput({
+        tagClass: function (item) {
+            switch (item) {
+            case 'In process':
+                return 'label label-warning';
+            case 'Need action':
+                return 'label label-danger';
+            case 'Done':
+                return 'label label-success';
+            case 'New':
+                return 'label label-info';
+            default:
+                return 'badge badge-warning';
             }
-        });
+        }
+    });
 
 
     var init = function () {
-        $('.task-btn').on('click', function(){
-            if($.inArray($(this)[0].name, tagList) <= -1){
+        $('.task-btn').on('click', function () {
+            if ($.inArray($(this)[0].name, tagList) <= -1) {
                 var widget_name = $(this)[0].name;
                 $("#tags").tagsinput('add', $(this)[0].text);
                 WORKFLOWS_HP_UTILITIES.requestNewObjects();
-            }
-            else{
+            } else {
                 closeTag(widget_name);
-                holdingpen.oTable.fnFilter( '^$', 4, true, false );
+                holdingpen.oTable.fnFilter('^$', 4, true, false);
                 holdingpen.oTable.fnDraw(false);
             }
         });
 
 
-        $('.version-selection').on('click', function(){
-            if($.inArray($(this)[0].name, tagList) <= -1){
+        $('.version-selection').on('click', function () {
+            if ($.inArray($(this)[0].name, tagList) <= -1) {
                 $('#tags').tagsinput('add', $(this)[0].text);
                 WORKFLOWS_HP_UTILITIES.requestNewObjects();
             }
         });
 
-        $("#tags").on('itemRemoved', function(event) {
-            tagList =  $("#tags").val().split(',');
+        $("#tags").on('itemRemoved', function (event) {
+            tagList = $("#tags").val().split(',');
             tagList = taglist_translation(tagList);
-            if(event.item != 'Done' && event.item != 'In process' && event.item != 'Need action' && event.item != 'New'){
-                if(tagListToSearch.indexOf(event.item) > -1 )
-                {
-                    tagListToSearch.splice(tagListToSearch.indexOf(event.item), 1);
-                }
+            if (tagListToSearch.indexOf(event.item) >= 0 && ["Done", "In process", "Need action", "New"].indexOf(event.item) < 0) {
+                tagListToSearch.splice(tagListToSearch.indexOf(event.item), 1);
             }
             holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
         });
 
-        $("#tags").on('itemAdded', function(event){
+        $("#tags").on('itemAdded', function (event) {
 
             tagList =  $("#tags").val().split(',');
             tagList = taglist_translation(tagList);
 
-            if(event.item != 'Done' && event.item != 'In process' && event.item != 'Need action' && event.item != 'New'){
-                if(tagListToSearch.indexOf(event.item) == -1 )
-                {
-                    tagListToSearch.push(event.item);
-                    holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
-                    WORKFLOWS_HP_UTILITIES.requestNewObjects();
-                }
+            if (tagListToSearch.indexOf(event.item) >= 0 && ["Done", "In process", "Need action", "New"].indexOf(event.item) < 0) {
+                tagListToSearch.push(event.item);
+                holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
+                WORKFLOWS_HP_UTILITIES.requestNewObjects();
             }
             holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
@@ -93,31 +89,23 @@ var WORKFLOWS_HP_TAGS = function ( $, holdingpen ){
 
     };
 
-    function taglist_translation(my_taglist)
-    {
-        for(var i = 0; i<=my_taglist.length; i ++)
-            {
-                if(my_taglist[i] == 'Done' )
-                {
-                    my_taglist[i] = 'Completed';
-                }
-                else if( my_taglist[i] == 'Need action')
-                {
-                    my_taglist[i] = 'Halted';
-                }
-                else if( my_taglist[i] == 'In process')
-                {
-                    my_taglist[i] = 'Running';
-                }
-                else if(my_taglist[i] == 'New')
-                {
-                    my_taglist[i] = 'Initial';
-                }
+    function taglist_translation(my_taglist) {
+        var i;
+        for (i = 0; i <= my_taglist.length; i++) {
+            if (my_taglist[i] === 'Done') {
+                my_taglist[i] = 'Completed';
+            } else if (my_taglist[i] === 'Need action') {
+                my_taglist[i] = 'Halted';
+            } else if (my_taglist[i] === 'In process') {
+                my_taglist[i] = 'Running';
+            } else if (my_taglist[i] === 'New') {
+                my_taglist[i] = 'Initial';
             }
-            return my_taglist;
+        }
+        return my_taglist;
     }
 
-    var closeTag = function (tag_name){
+    var closeTag = function (tag_name) {
         tagList.splice(tagList.indexOf(tag_name), 1);
         $('#tags').tagsinput('remove', tag_name);
         WORKFLOWS_HP_UTILITIES.requestNewObjects();
@@ -125,7 +113,7 @@ var WORKFLOWS_HP_TAGS = function ( $, holdingpen ){
 
     return {
         init: init,
-        tagList: function(){return tagList},
+        tagList: function () { return tagList;},
         closeTag: closeTag,
     };
 }($, WORKFLOWS_HOLDINGPEN);

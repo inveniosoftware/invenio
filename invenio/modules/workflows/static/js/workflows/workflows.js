@@ -17,11 +17,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var WORKFLOWS_APP = (function($) {
+var WORKFLOWS_APP = (function ($) {
 
     var workflows_app = {};
 
-    workflows_app.init_workflow = function(url_run_workflow) {
+    workflows_app.init_workflow = function (url_run_workflow) {
 
         $("#example_my_workflow").popover({
             trigger: 'hover',
@@ -29,11 +29,11 @@ var WORKFLOWS_APP = (function($) {
             content: "Workflow has been started."
         });
 
-        $("input[type=submit]").bind('click', function(){
+        $("input[type=submit]").bind('click', function () {
             w_name = $(this).attr('name');
             jQuery.ajax({
                 url: url_run_workflow + "?workflow_name=" + w_name,
-                success: function(json){
+                success: function (json) {
                         bootstrap_alert.warning('Workflow has been started');
                 }
             })
@@ -42,10 +42,10 @@ var WORKFLOWS_APP = (function($) {
         workflows_app.bind_alerts();
     };
 
-    workflows_app.activate_button = function(){
+    workflows_app.activate_button = function () {
         $("input[type=submit]").removeAttr("disabled");
     };
 
     return workflows_app;
 
-}(window.jQuery);
+})(window.jQuery);

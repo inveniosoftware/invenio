@@ -18,18 +18,16 @@
 
 """ Implements a workflow for testing """
 
-from ...tasks.workflows_tasks import (start_workflow,
-                                      workflows_reviews,
-                                      wait_for_workflows_to_complete,
-                                      )
+from ...tasks.workflows_tasks import (start_workflow, workflows_reviews,
+                                      wait_for_workflows_to_complete)
 
 from invenio.modules.workflows.tasks.logic_tasks import simple_for, end_for
 
 
 class test_workflow_workflows_errors_C(object):
-    """
-    Test workflow for unit-tests.
-    """
+
+    """Test workflow for unit-tests."""
+    
     workflow = [
         simple_for(0, 5, 1, "X"),
         [

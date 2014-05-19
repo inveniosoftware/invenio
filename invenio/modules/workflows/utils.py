@@ -18,9 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import redis
-
+import traceback
 from six import iteritems
-
 from .errors import WorkflowDefinitionError
 
 
@@ -59,8 +58,7 @@ def convert_marcxml_to_bibfield(marcxml):
 
 def test_teardown(self):
     """ Clean up created objects """
-    from invenio.modules.workflows.models import (BibWorkflowObject,
-                                                  Workflow,
+    from invenio.modules.workflows.models import (BibWorkflowObject, Workflow,
                                                   BibWorkflowEngineLog,
                                                   BibWorkflowObjectLog)
     from invenio.ext.sqlalchemy import db

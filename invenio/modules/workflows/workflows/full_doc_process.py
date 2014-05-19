@@ -16,17 +16,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111 1307, USA.
 
+""" Generic record process in harvesting."""
+
 from ..tasks.marcxml_tasks import (convert_record_with_repository,
                                    convert_record_to_bibfield,
-                                   upload_step, approve_record,
-                                   quick_match_record,
-                                   )
-
-from ..tasks.workflows_tasks import (log_info)
-
-from ..tasks.logic_tasks import (workflow_if,
-                                 workflow_else
-                                 )
+                                   quick_match_record, upload_step,
+                                   approve_record)
+from ..tasks.workflows_tasks import log_info
+from ..tasks.logic_tasks import workflow_if, workflow_else
 from invenio.config import CFG_PREFIX
 
 

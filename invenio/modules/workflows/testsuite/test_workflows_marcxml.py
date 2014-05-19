@@ -17,25 +17,28 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Test for marcxml tasks."""
 
-from invenio.testsuite import (make_test_suite,
-                               run_test_suite,
-                               )
+from invenio.testsuite import make_test_suite, run_test_suite
 from .test_workflows import WorkflowTasksTestCase
 
 
 class WorkflowMarcXML(WorkflowTasksTestCase):
 
+    """Class to test the marcxml tasks."""
+
     def setUp(self):
+        """Setup tests."""
         self.create_registries()
 
     def tearDown(self):
-        """ Clean up created objects """
+        """ Clean up created objects."""
         from invenio.modules.workflows.utils import test_teardown
         test_teardown(self)
         self.cleanup_registries()
 
     def test_filtering(self):
+        """ Test filtering functionnality."""
         from ..tasks.marcxml_tasks import filtering_oai_pmh_identifier
         from invenio.modules.workflows.api import start
         from invenio.modules.workflows.models import BibWorkflowObject
@@ -74,6 +77,7 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
                          False)
 
     def test_init_harvesting(self):
+        """Test harvesting."""
         from ..tasks.marcxml_tasks import init_harvesting
         from invenio.modules.workflows.api import start
         from invenio.modules.workflows.models import BibWorkflowObject

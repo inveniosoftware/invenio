@@ -68,7 +68,7 @@ def restart_worker(wid, **kwargs):
         # Then we reset their children to the same state as initial
         for initial_object in initials:
             running_object = BibWorkflowObject.query.filter(
-                BibWorkflowObject.id_parent == initial_object.id
+                BibWorkflowObject.id == initial_object.id_parent
             ).one()
             running_object.copy(initial_object)
             running_object.id_parent = initial_object.id

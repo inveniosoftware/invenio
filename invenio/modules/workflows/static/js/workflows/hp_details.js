@@ -17,41 +17,41 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var WORKFLOWS_HP_DETAILS = (function( $ ){
-    var context = {};
-    var format = "hd";
-    var bwoid;
+var WORKFLOWS_HP_DETAILS = (function ($) {
+    var context = {},
+        format = "hd",
+        bwoid;
 
     function data_preview(url_preview, bwoid, format) {
         $.ajax({
             url: url_preview,
             data: {'objectid': bwoid,
                    'of': format},
-            success: function(json){
-                if(format === "xm" || format === "marcxml"){
-                    if( json.data === ""){
+            success: function (json) {
+                if (format === "xm" || format === "marcxml") {
+                    if (json.data === "") {
                         json.data = "Preview not available";
                     }
-                    $('div[id="object_preview_container'+bwoid+'"]').empty();
-                    $('div[id="object_preview_container'+bwoid+'"]').append("<pre><code id='object_preview' class='language-markup'></code></pre>");
+                    $('div[id="object_preview_container' + bwoid + '"]').empty();
+                    $('div[id="object_preview_container' + bwoid + '"]').append("<pre><code id='object_preview' class='language-markup'></code></pre>");
                     $('code[id="object_preview"]').append(json.data);
                     Prism.highlightElement($('code[id="object_preview"]')[0]);
                 } else {
-                    if( json.data === ""){
+                    if (json.data === "") {
                         json.data = "Preview not available";
                     }
-                    $('div[id="object_preview_container'+bwoid+'"]').empty();
-                    $('div[id="object_preview_container'+bwoid+'"]').append(json.data);
+                    $('div[id="object_preview_container' + bwoid + '"]').empty();
+                    $('div[id="object_preview_container' + bwoid + '"]').append(json.data);
                 }
             }
         });
     }
 
-    return{
+    return {
         bwoid: bwoid,
         data_preview: data_preview,
         init: function (context, bwoid) {
-            if ( window.addEventListener ) {
+            if (window.addEventListener) {
                 $("div.btn-group[name='data_version']").bind('click', function(event){
                     version = event.target.name;
                 });
@@ -62,54 +62,53 @@ var WORKFLOWS_HP_DETAILS = (function( $ ){
                               bwoid,
                               format);
 
-            $('button.preview').click(function() {
+            $('button.preview').click(function () {
                 var format = $(this).attr('name');
                 data_preview(context.holdingpen.url_preview, bwoid, format);
-                $('button.preview').each(function() {
+                $('button.preview').each(function () {
                     $(this).removeClass('active');
                 });
                 $(this).addClass('active');
             });
 
-            $('#restart_button').on('click', function() {
+            $('#restart_button').on('click', function () {
                 $.ajax({
                     url: context.holdingpen.url_restart_record,
                     data: {'objectid': this.bwoid},
-                    success: function(json){
+                    success: function (json) {
                         WORKFLOWS_UTILITIES.bootstrap_alert('Object restarted', 'info');
                     }
                 });
             });
 
-            $('#restart_button_prev').on('click', function() {
+            $('#restart_button_prev').on('click', function () {
                 $.ajax({
                     url: context.holdingpen.url_restart_record_prev,
                     data: {'objectid': this.bwoid},
-                    success: function(json){
+                    success: function (json) {
                         WORKFLOWS_UTILITIES.bootstrap_alert('Object restarted from previous task', 'info');
                     }
                 });
             });
 
-            $('#continue_button').on('click', function() {
+            $('#continue_button').on('click', function () {
                 $.ajax({
                     url: context.holdingpen.url_continue,
                     data: {'objectid': this.bwoid},
-                    success: function(json){
+                    success: function (json) {
                         WORKFLOWS_UTILITIES.bootstrap_alert('Object continued from next task', 'info');
                     }
                 });
             });
 
-            $('#edit_form').on('submit', function(event){
+            $('#edit_form').on('submit', function (event) {
                 event.preventDefault();
                 var form_data = {};
-                $("#edit_form input").each(function() {
-                    if($(this)[0].name != 'submitButton'){
-                        if($(this)[0].name == 'core'){
+                $("#edit_form input").each(function () {
+                    if ($(this)[0].name !== 'submitButton') {
+                        if ($(this)[0].name === 'core') {
                             form_data[$(this)[0].name] = $(this)[0].checked;
-                        }
-                        else{
+                        } else {
                             form_data[$(this)[0].name] = $(this)[0].value;
                         }
                     }
@@ -120,11 +119,11 @@ var WORKFLOWS_HP_DETAILS = (function( $ ){
                     url: context.holdingpen.url_resolve_edit,
                     data: {'objectid': this.bwoid,
                            'data': form_data},
-                    success: function(json){
+                    success: function (json) {
                         WORKFLOWS_UTILITIES.bootstrap_alert('Record successfully edited', 'info');
                     }
                 });
             });
         }
     };
-})( window.jQuery );
+})(window.jQuery);

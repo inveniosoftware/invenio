@@ -29,15 +29,10 @@ Note: Currently work-in-progress.
 import re
 
 from six import iteritems, text_type
-
-from flask import (render_template,
-                   Blueprint, request,
-                   jsonify, url_for,
-                   flash, session, current_app)
+from flask import (render_template, Blueprint, request, current_app, jsonify,
+                   url_for, flash, session)
 from flask.ext.login import login_required
-from flask.ext.breadcrumbs import (default_breadcrumb_root,
-                                   register_breadcrumb,
-)
+from flask.ext.breadcrumbs import default_breadcrumb_root,register_breadcrumb
 from flask.ext.menu import register_menu
 
 from invenio.base.decorators import templated, wash_arguments
@@ -46,9 +41,7 @@ from invenio.utils.date import pretty_date
 
 from ..models import BibWorkflowObject, Workflow, ObjectVersion
 from ..registry import actions
-from ..utils import (get_workflow_definition,
-                     sort_bwolist,
-)
+from ..utils import get_workflow_definition, sort_bwolist
 from ..api import continue_oid_delayed, start
 
 
@@ -70,6 +63,7 @@ REG_TD = re.compile("<td title=\"(.+?)\">(.+?)</td>", re.DOTALL)
 def index():
     """
     Displays main interface of Holdingpen.
+
     Acts as a hub for catalogers (may be removed)
     """
     # FIXME: Add user filtering
@@ -303,7 +297,6 @@ def details(objectid):
     bwobject = BibWorkflowObject.query.get(objectid)
     from sqlalchemy import or_
     formatted_data = bwobject.get_formatted_data(of)
-
     extracted_data = extract_data(bwobject)
     if bwobject.id_parent:
         hbwobject_db_request = BibWorkflowObject.query.filter(or_(BibWorkflowObject.id_parent == bwobject.id_parent, BibWorkflowObject.id == bwobject.id, BibWorkflowObject.id == bwobject.id_parent)).all()
@@ -430,7 +423,7 @@ def show_action(objectid):
 @wash_arguments({'objectid': (text_type, '-1'),
                  'action': (text_type, 'default')})
 def resolve_action(objectid, action):
-    """Resolves the action taken.
+    """Resolve the action taken.
 
     Will call the run() function of the specific action.
     """
@@ -444,7 +437,7 @@ def resolve_action(objectid, action):
 @wash_arguments({'objectid': (text_type, '0'),
                  'form': (text_type, '')})
 def resolve_edit(objectid, form):
-    """Performs the changes to the record."""
+    """Perform the changes to the record."""
     if request:
         edit_record(request.form)
     return 'Record Edited'
@@ -500,7 +493,7 @@ def get_context():
 
 
 def get_info(bwobject):
-    """Parse the hpobject and extract info to a dictionary"""
+    """Parses the hpobject and extracts its info to a dictionary."""
     info = {}
     if bwobject.get_extra_data()['owner'] != {}:
         info['owner'] = bwobject.get_extra_data()['owner']

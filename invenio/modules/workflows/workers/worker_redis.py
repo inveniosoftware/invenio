@@ -18,9 +18,7 @@
 from redis import Redis
 from rq.decorators import job
 from invenio.modules.workflows.worker_result import AsynchronousResultWrapper
-from ..worker_engine import (run_worker,
-                             restart_worker,
-                             continue_worker)
+from ..worker_engine import run_worker, restart_worker, continue_worker
 
 #FIXME: add configuration variables
 redis_conn = Redis()

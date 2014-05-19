@@ -36,9 +36,11 @@ TEST_PACKAGES = [
 
 
 class WorkflowViewTest(InvenioTestCase):
+
     """ Test search view functions. """
 
     def test_main_admin_availability(self):
+        """Test if admin view is avaiable."""
         from flask import url_for
 
         response = self.client.get(url_for('workflows.index'))
@@ -46,6 +48,7 @@ class WorkflowViewTest(InvenioTestCase):
         self.assert401(response)
 
     def test_workflow_list_availability(self):
+        """Test if workflow list view is avaiable."""
         from flask import url_for
 
         response = self.client.get(url_for('workflows.show_workflows'))
@@ -54,7 +57,11 @@ class WorkflowViewTest(InvenioTestCase):
 
 
 class WorkflowTasksTestCase(InvenioTestCase):
+
+    """ Workflow class for testing."""
+
     def create_registries(self):
+        """Create registries for testing."""
         self.app.extensions['registry']['workflows.tests'] = \
             ImportPathRegistry(initial=TEST_PACKAGES)
         self.app.extensions['registry']['workflows'] = \
@@ -67,14 +74,18 @@ class WorkflowTasksTestCase(InvenioTestCase):
             )
 
     def cleanup_registries(self):
+        """Clean registries for testing."""
         del self.app.extensions['registry']['workflows.tests']
         del self.app.extensions['registry']['workflows']
         del self.app.extensions['registry']['workflows.actions']
 
 
 class WorkflowTasksTestAPI(WorkflowTasksTestCase):
-    """ Test basic workflow API """
+
+    """ Test basic workflow API."""
+
     def setUp(self):
+        """Setup tests."""
         self.create_registries()
         self.test_data = {}
         self.id_workflows = []
@@ -114,12 +125,13 @@ distances from it.
 """
 
     def tearDown(self):
-        """ Clean up created objects """
+        """ Clean up created objects."""
         from invenio.modules.workflows.utils import test_teardown
         test_teardown(self)
         self.cleanup_registries()
 
     def test_halt(self):
+        """Test halt task."""
         from invenio.modules.workflows.registry import workflows
         from invenio.modules.workflows.api import start
         from invenio.modules.workflows.engine import WorkflowStatus
@@ -143,6 +155,7 @@ distances from it.
             id_object=obj.id, log_type=logging.ERROR).count(), 0)
 
     def test_halt_in_branch(self):
+        """Test halt task when in conditionnal branch."""
         from workflow.patterns import IF_ELSE
         from invenio.modules.workflows.registry import workflows
         from invenio.modules.workflows.api import start
@@ -171,8 +184,9 @@ distances from it.
 
     def test_object_creation_complete(self):
         """
-        Test status of object before/after workflow when
-        created before calling API, with "high" test-data that will
+        Test status of object before/after workflow.
+
+        When created before calling API, with "high" test-data that will
         make the workflow complete.
         """
         from invenio.modules.workflows.models import (BibWorkflowObject,
@@ -192,14 +206,14 @@ distances from it.
                        module_name="unit_tests")
 
         self.assertEqual(test_object.get_data(), 38)
-        self.assertNotEqual(test_object.id_parent, None)
+        self.assertEqual(test_object.id_parent, None)
         self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
         self.assertEqual(test_object.version, ObjectVersion.FINAL)
 
     def test_object_creation_halt(self):
-        """
-        Test status of object before/after workflow when
-        created before calling API, with "low" test-data that will
+        """Test status of object before/after workflow.
+
+        When created before calling API, with "low" test-data that will
         make the workflow halt.
         """
         from invenio.modules.workflows.models import (BibWorkflowObject,
@@ -223,10 +237,7 @@ distances from it.
         self.assertEqual(engine.status, WorkflowStatus.HALTED)
 
     def test_workflow_engine_instantiation(self):
-        """
-        Checking the proper instantiation of the Workflow model
-        and BibWorkflowEngine object.
-        """
+        """Check the proper init of the Workflow and BibWorkflowEngine."""
         from invenio.modules.workflows.models import Workflow
         from invenio.modules.workflows.engine import BibWorkflowEngine
         from uuid import uuid1 as new_uuid
@@ -238,10 +249,7 @@ distances from it.
         self.assertEqual(test_workflow.name, test_workflow_engine.name)
 
     def test_workflow_restarts(self):
-        """
-        Checks if all is well when restarting a workflow an arbitrary
-        number of times.
-        """
+        """Check if all is well when restarting a workflow several times."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
         from invenio.modules.workflows.api import start, continue_oid
@@ -266,10 +274,7 @@ distances from it.
         self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
 
     def test_workflow_object_creation(self):
-        """
-        Tests to see if the right snapshots or object versions
-        are created when passing existing objects.
-        """
+        """Test to see if the right snapshots or object versions are created."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
         from invenio.modules.workflows.api import start
@@ -286,24 +291,21 @@ distances from it.
                          module_name="unit_tests")
 
         # Get parent object of the workflow we just ran
-        initial_object = BibWorkflowObject.query.get(test_object.id_parent)
+        initial_object = BibWorkflowObject.query.filter(BibWorkflowObject.id_parent == test_object.id).one()
         all_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid
         ).order_by(BibWorkflowObject.id).all()
 
         # There should only be 2 objects (initial, final)
         self.assertEqual(len(all_objects), 2)
-        self.assertEqual(test_object.id_parent, initial_object.id)
+        self.assertEqual(test_object.id, initial_object.id_parent)
         self.assertEqual(initial_object.version, ObjectVersion.INITIAL)
         self.assertEqual(initial_object.get_data(), initial_data)
         self.assertEqual(test_object.get_data(), final_data)
         self.assertEqual(test_object.version, ObjectVersion.FINAL)
 
     def test_workflow_object_creation_simple(self):
-        """
-        Tests to see if the right snapshots or object versions
-        are created with simple data.
-        """
+        """Test to see if the right snapshots or object versions are created."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
         from invenio.modules.workflows.api import start
@@ -329,13 +331,13 @@ distances from it.
         # There should only be 2 objects (initial, final)
         self.assertEqual(len(all_objects), 2)
         self.assertEqual(test_object.id_parent, initial_object.id)
-        self.assertEqual(initial_object.version, ObjectVersion.INITIAL)
-        self.assertEqual(initial_object.get_data(), initial_data)
-        self.assertEqual(test_object.get_data(), final_data)
-        self.assertEqual(test_object.version, ObjectVersion.FINAL)
+        self.assertEqual(initial_object.version, ObjectVersion.FINAL)
+        self.assertEqual(initial_object.get_data(), final_data)
+        self.assertEqual(test_object.get_data(), initial_data)
+        self.assertEqual(test_object.version, ObjectVersion.INITIAL)
 
     def test_workflow_complex_run(self):
-        """Tests running workflow with several data objects"""
+        """Test running workflow with several data objects."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
         from invenio.modules.workflows.api import start
@@ -365,13 +367,14 @@ distances from it.
 
         for obj in objects:
             # The child object should have the final or halted version
-            self.assertTrue(obj.child_objects[0].version in (ObjectVersion.FINAL,
+            self.assertTrue(obj.child_objects[0].version in (ObjectVersion.INITIAL,
                                                              ObjectVersion.HALTED))
             # Making sure the final data is correct
-            self.assertTrue(obj.child_objects[0].get_data() in final_data)
+            self.assertTrue(obj.get_data() in final_data)
+            self.assertTrue(obj.child_objects[0].get_data() in self.test_data)
 
     def test_workflow_marcxml(self):
-        """Tests runnning a record ingestion workflow with a action step"""
+        """Test runnning a record ingestion workflow with a action step."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
         from invenio.modules.workflows.engine import WorkflowStatus
@@ -407,7 +410,7 @@ distances from it.
         self.assertEqual(current.get_action(), "approval")
 
     def test_workflow_for_halted_object(self):
-        """Test workflow with continuing a halted object"""
+        """Test workflow with continuing a halted object."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
         from invenio.modules.workflows.api import start, continue_oid
@@ -430,7 +433,7 @@ distances from it.
         self.assertEqual(current.version, ObjectVersion.FINAL)
 
     def test_workflow_for_finished_object(self):
-        """Test starting workflow with finished object given"""
+        """Test starting workflow with finished object given."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
         from invenio.modules.workflows.api import start
@@ -459,8 +462,7 @@ distances from it.
         self.assertEqual(previous.get_data(), 56)
 
     def test_logging_for_workflow_objects_without_workflow(self):
-        """This test run a virtual object out of a workflow for
-test purpose, this object will log several things"""
+        """Test run a virtual object out of a workflow for test purpose."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       BibWorkflowObjectLog,
                                                       ObjectVersion)
@@ -495,9 +497,7 @@ test purpose, this object will log several things"""
         self.assertEqual(messages_found, 2)
 
     def test_workflow_for_running_object(self):
-        """
-        Test starting workflow with running object given and watch it fail.
-        """
+        """Test workflow with running object given and watch it fail."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
         from invenio.modules.workflows.api import start_by_oids
@@ -534,14 +534,10 @@ test purpose, this object will log several things"""
         obj_running.delete(obj_running)
 
     def test_continue_execution_for_object(self):
-        """
-        Tests continuing execution of workflow for object
-        given object from prev, current and next task.
-        """
+        """Test continuing execution of workflow for object given."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
-        from invenio.modules.workflows.api import (start,
-                                                   continue_oid)
+        from invenio.modules.workflows.api import start, continue_oid
 
         initial_data = 1
 
@@ -583,11 +579,10 @@ test purpose, this object will log several things"""
         self.assertEqual(obj_halted.version, ObjectVersion.FINAL)
 
     def test_restart_workflow(self):
-        """Tests restarting workflow for given workflow id"""
+        """Test restarting workflow for given workflow id."""
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       ObjectVersion)
-        from invenio.modules.workflows.api import (start,
-                                                   start_by_wid)
+        from invenio.modules.workflows.api import start, start_by_wid
 
         initial_data = 1
 
@@ -611,19 +606,22 @@ test purpose, this object will log several things"""
         self.assertEqual(len(restarted_objects), 3)
 
         # First and last object will be INITIAL
-        self.assertEqual(restarted_objects[0].version,
-                         ObjectVersion.INITIAL)
+        self.assertEqual(restarted_objects[1].version, ObjectVersion.INITIAL)
 
-        self.assertEqual(restarted_objects[0].version,
+        self.assertEqual(restarted_objects[1].version,
                          restarted_objects[2].version)
 
         self.assertEqual(restarted_objects[1].id_parent,
-                         restarted_objects[2].id)
+                         restarted_objects[0].id)
+
+        self.assertEqual(restarted_objects[2].id_parent,
+                         restarted_objects[0].id)
 
         self.assertEqual(restarted_objects[0].get_data(),
                          restarted_objects[2].get_data())
 
     def _check_workflow_execution(self, objects, initial_data):
+        """Test correct workflow execution."""
         from invenio.modules.workflows.models import ObjectVersion
 
         # Let's check that we found anything. There should only be one object
@@ -631,10 +629,11 @@ test purpose, this object will log several things"""
         parent_object = objects[0]
 
         # The object should be the inital version
-        self.assertEqual(parent_object.version, ObjectVersion.INITIAL)
+
+        self.assertEqual(parent_object.version, ObjectVersion.HALTED)
 
         # The object should have the inital data
-        self.assertEqual(parent_object.get_data(), initial_data)
+        self.assertEqual(objects[0].child_objects[0].get_data(), initial_data)
 
         # Fetch final object which should exist
         final_object = objects[0].child_objects[0]
@@ -642,21 +641,21 @@ test purpose, this object will log several things"""
 
 
 class TestWorkflowTasks(WorkflowTasksTestCase):
-    """
-    Tests meant for testing the the generic tasks available.
-    """
+
+    """Test meant for testing the the generic tasks available."""
+
     def setUp(self):
+        """Setup tests."""
         self.create_registries()
 
     def tearDown(self):
+        """Clean up tests."""
         from invenio.modules.workflows.utils import test_teardown
         self.cleanup_registries()
         test_teardown(self)
 
     def test_logic_tasks(self):
-        """
-        Tests that the logic tasks work correctly.
-        """
+        """Test that the logic tasks work correctly."""
         from invenio.modules.workflows.models import BibWorkflowObject
         from invenio.modules.workflows.api import start, continue_oid, start_by_wid
 
@@ -695,9 +694,7 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
         self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
 
     def test_workflow_without_workflow_object_saved(self):
-        """
-        Tests that the logic tasks work correctly.
-        """
+        """Test that the logic tasks work correctly."""
         from invenio.modules.workflows.models import BibWorkflowObject
         from invenio.modules.workflows.api import start, start_by_wid
 
@@ -711,8 +708,7 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
         start_by_wid(workflow.uuid)
         test_object.delete(test_object.id)
 
-TEST_SUITE = make_test_suite(WorkflowViewTest,
-                             WorkflowTasksTestAPI,
+TEST_SUITE = make_test_suite(WorkflowViewTest, WorkflowTasksTestAPI,
                              TestWorkflowTasks)
 
 if __name__ == "__main__":

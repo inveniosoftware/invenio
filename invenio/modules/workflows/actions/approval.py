@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Approval action."""
+
 from ..hp_field_widgets import (bootstrap_accept, bootstrap_accept_mini,
                                 bootstrap_reject, bootstrap_reject_mini)
 
@@ -28,16 +30,23 @@ __all__ = ['approval']
 
 
 class approval(Form):
+
+    """Class representing the approval action."""
+
     reject = SubmitField(label=_('Reject'), widget=bootstrap_reject)
     accept = SubmitField(label=_('Accept'), widget=bootstrap_accept)
 
     class mini_action(Form):
+
+        """Class representing the minimal form of the approval action."""
+
         reject = SubmitField(label=_('Reject'), widget=bootstrap_reject_mini)
         accept = SubmitField(label=_('Accept'), widget=bootstrap_accept_mini)
 
     def render(self, bwobject_list, bwparent_list, info_list,
                logtext_list, w_metadata_list,
                workflow_func_list, *args, **kwargs):
+        """Method to render the action."""
         data_preview_list = []
         # setting up approval action
         for bwo in bwobject_list:
@@ -55,9 +64,7 @@ class approval(Form):
                  'workflow_func_list': workflow_func_list})
 
     def run(self, objectid):
-        """
-        Resolves the action taken in the approval action
-        """
+        """Resolve the action taken in the approval action."""
         from flask import request, flash
         from ..api import continue_oid
         from ..models import BibWorkflowObject

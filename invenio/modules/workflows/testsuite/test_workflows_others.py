@@ -18,23 +18,28 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.testsuite import (make_test_suite,
-                               run_test_suite,
-                               )
+""" Test for workflow not fitting in other categories."""
+
+from invenio.testsuite import make_test_suite, run_test_suite
 from .test_workflows import WorkflowTasksTestCase
 
 
 class WorkflowOthers(WorkflowTasksTestCase):
+
+    """Class to test the other tasks and workflows."""
+
     def setUp(self):
+        """Setup tests."""
         self.create_registries()
 
     def tearDown(self):
-        """ Clean up created objects """
+        """ Clean up created objects."""
         from invenio.modules.workflows.utils import test_teardown
         test_teardown(self)
         self.cleanup_registries()
 
     def test_result_abstraction(self):
+        """Test abastraction layer for celery worker."""
         from ..utils import BibWorkflowObjectIdContainer
         from ..models import BibWorkflowObject
         from ..worker_result import AsynchronousResultWrapper
@@ -55,16 +60,18 @@ class WorkflowOthers(WorkflowTasksTestCase):
             self.assertEqual(isinstance(e, TypeError), True)
 
     def test_acces_to_undefineworkflow(self):
+        """Test of access to undefined workflow."""
         from invenio.modules.workflows.api import start
-        from invenio.modules.workflows.errors import WorkflowDefinitionError
-
         try:
             start("@thisisnotatrueworkflow@", ["my_false_data"],
                   random_kay_args="value")
         except Exception as e:
+            print e
+            from invenio.modules.workflows.errors import WorkflowDefinitionError
             self.assertEqual(isinstance(e, WorkflowDefinitionError), True)
 
     def test_workflows_exceptions(self):
+        """Test for workflows exception."""
         from invenio.modules.workflows.errors import WorkflowError
         from invenio.modules.workflows.api import start
 

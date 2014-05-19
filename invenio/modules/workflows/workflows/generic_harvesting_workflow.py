@@ -18,24 +18,17 @@
 
 """Implements an example of a typical ingestion workflow for MARCXML records"""
 
-from ..tasks.marcxml_tasks import (get_repositories_list,
-                                   init_harvesting,
-                                   harvest_records,
-                                   get_records_from_file,
-                                   get_obj_extra_data_key,
-                                   filtering_oai_pmh_identifier,
-                                   update_last_update)
+from ..tasks.marcxml_tasks import (get_repositories_list, harvest_records,
+                                   get_records_from_file, update_last_update,
+                                   get_obj_extra_data_key, init_harvesting,
+                                   filtering_oai_pmh_identifier)
 
-from ..tasks.workflows_tasks import (start_workflow,
-                                     workflows_reviews,
+from ..tasks.workflows_tasks import (start_workflow, workflows_reviews,
                                      get_nb_workflow_created,
                                      num_workflow_running_greater,
                                      wait_for_a_workflow_to_complete)
 
-from ..tasks.logic_tasks import (foreach,
-                                 end_for,
-                                 workflow_if,
-                                 workflow_else,
+from ..tasks.logic_tasks import (foreach, end_for, workflow_if, workflow_else,
                                  simple_for)
 
 

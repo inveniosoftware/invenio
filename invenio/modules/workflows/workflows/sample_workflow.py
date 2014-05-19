@@ -16,9 +16,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from ..tasks.sample_tasks import (add_data,
-                                  )
-
+from ..tasks.sample_tasks import add_data
 from ..tasks.logic_tasks import execute_if
 from ..tasks.marcxml_tasks import approve_record
 

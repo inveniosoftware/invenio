@@ -15,18 +15,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""Collection of tasks used for tests."""
 
-"""
-Collection of tasks used for tests.
-"""
 import time
 
 
 def add_data(data_param):
-    """ Task using closure to allow parameters """
-
+    """Add data_param to obj.data."""
     def _add_data(obj, eng):
-        """ Adds data to obj.data """
         #due to python 2 way of managing closure
         data = data_param
         obj.data += data
@@ -35,33 +31,32 @@ def add_data(data_param):
 
 
 def generate_error(obj, eng):
-    """ Generate a ZeroDevisionError """
+    """Generate a ZeroDevisionError."""
     call_a()
 
 
 def call_a():
-    """ Used in order to test deep stack trace output """
+    """Used in order to test deep stack trace output."""
     call_b()
 
 
 def call_b():
-    """ Used in order to test deep stack trace output """
+    """Used in order to test deep stack trace output."""
     call_c()
 
 
 def call_c():
-    """ Used in order to test deep stack trace output """
+    """Used in order to test deep stack trace output."""
     raise ZeroDivisionError
 
 
 def halt_if_data_less_than(threshold):
-    """ Static task with no parameters """
+    """Static task to halt if data is lesser than threshold.
 
+    Halt workflow execution for this object if its value is less than given
+    threshold.
+    """
     def _halt_if_data_less_than(obj, eng):
-        """
-        Halts workflow execution for this object
-        if its value is less than given threshold.
-        """
         if obj.data < threshold:
             eng.halt("Value of data is too small.")
 
@@ -69,16 +64,15 @@ def halt_if_data_less_than(threshold):
 
 
 def set_data(data):
-    """ Task using closure to allow parameters """
-
+    """Task using closure to allow parameters and change data."""
     def _set_data(obj, eng):
-        """ Sets obj.data to given data """
         obj.data = data
 
     return _set_data
 
 
 def reduce_data_by_one(times):
+    """Task to substract one to data."""
     def _reduce_data_by_one(obj, eng):
         a = times
         while a > 0:
@@ -90,8 +84,9 @@ def reduce_data_by_one(times):
 
 
 def add_metadata():
+    """Task to add metadata."""
     def _add_metadata(obj, eng):
-        if (obj['content_type'] == 'book'):
+        if obj['content_type'] == 'book':
             obj.add_field("meta1", "elefant")
         else:
             obj.add_field("meta1", "hippo")
@@ -100,13 +95,14 @@ def add_metadata():
 
 
 def task_b(obj, eng):
-    """Function task_b docstring"""
+    """Function task_b docstring."""
     if obj.data < 20:
         eng.log.info("data < 20")
         obj.add_task_result("task_b", {'a': 12, 'b': 13, 'c': 14})
 
 
 def sleep_task(t):
+    """Task to wait t seconds."""
     def _sleep_task(dummy_obj, eng):
         time.sleep(t)
 
@@ -114,31 +110,33 @@ def sleep_task(t):
 
 
 def lower_than_20(obj, eng):
-    """Function checks if variable is lower than 20"""
+    """Function checks if variable is lower than 20."""
     if obj.data < 20:
         eng.halt("Value of filed: a in object is lower than 20.")
 
 
 def halt_if_higher_than_20(obj, eng):
-    """Function checks if variable is higher than 20"""
+    """Function checks if variable is higher than 20."""
     eng.log.info("value" + str(obj.data))
     if obj.data > 20:
         eng.halt("Value of filed: a in object is higher than 20.")
 
 
 def subtract(value):
+    """Function subtract value from variable."""
     def _subtract(obj, dummy_eng):
-        """Function subtract value from variable"""
         obj.data -= value
 
     return _subtract
 
 
 def halt_whatever(obj, eng):
+    """Task to stop processing in halted status."""
     eng.halt("halt!", None)
 
 
 def task_reduce_and_halt(obj, eng):
+    """Task to substract one to data and stop."""
     eng.log.info("value" + str(obj.data))
     if obj.data > 0:
         obj.data -= 1

@@ -17,30 +17,20 @@
 
 """Implements an example of a typical ingestion workflow for MARCXML records"""
 
-from ..tasks.marcxml_tasks import (get_repositories_list,
-                                   init_harvesting,
-                                   harvest_records,
-                                   get_obj_extra_data_key,
-                                   get_records_from_file,
-                                   update_last_update,
-                                   filtering_oai_pmh_identifier
-                                   )
+from ..tasks.marcxml_tasks import (get_repositories_list, harvest_records,
+                                   init_harvesting,get_records_from_file,
+                                   get_obj_extra_data_key,  update_last_update,
+                                   filtering_oai_pmh_identifier)
 
-from ..tasks.workflows_tasks import (start_workflow,
+from ..tasks.workflows_tasks import (start_workflow,  workflows_reviews,
                                      wait_for_a_workflow_to_complete,
-                                     workflows_reviews,
                                      get_nb_workflow_created,
                                      get_workflows_progress,
                                      write_something_generic,
-                                     num_workflow_running_greater
-                                     )
+                                     num_workflow_running_greater)
 
-from ..tasks.logic_tasks import (foreach,
-                                 end_for,
-                                 simple_for,
-                                 workflow_if,
-                                 workflow_else
-                                 )
+from ..tasks.logic_tasks import (foreach, end_for, simple_for, workflow_if,
+                                 workflow_else)
 
 from invenio.legacy.bibsched.bibtask import task_update_progress, write_message
 
@@ -80,7 +70,8 @@ class generic_harvesting_workflow_with_bibsched(object):
                         [
                             write_something_generic(["Max Simultaneous Workflow"
                                                      ", Wait for one to finish"]
-                                ,[task_update_progress,
+                                                    ,
+                                                    [task_update_progress,
                                   write_message]),
                             wait_for_a_workflow_to_complete(0.05),
                             start_workflow("full_doc_process", None),

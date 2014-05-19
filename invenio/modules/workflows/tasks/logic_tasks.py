@@ -15,20 +15,24 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""Set of workflow logic tasks."""
 
-"""
-Set of workflow logic tasks.
-"""
+from six import callable
 
 
 def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"):
-    """
+    """Simple for each without memory of previous state.
 
-    :param get_list_function:
-    :param savename:
-    :param cache_data:
-    :param order:
-    :return:
+    :param get_list_function: function returning the list on which we should
+    iterate.
+    :param savename: name of variable to save the current loop state in the
+    extra_data in case you want to reuse the value somewhere in a task.
+    :param cache_data: can be True or False in case of True, the list will be
+    cached in memory instead of being recomputed everytime. In case of caching
+    the list is no more dynamic.
+    :param order: because we should iterate over a list you can choose in which
+    order you want to iterate over your list from start to end(ASC) or from end
+    to start (DSC).
     """
     if order not in ["ASC", "DSC"]:
         order = "ASC"
@@ -92,14 +96,14 @@ def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"
 
 
 def simple_for(inita, enda, incrementa, variable_name=None):
-    """
+    """Simple for going from inita to enda by step of incrementa.
+
     :param inita: the starting value
     :param enda: the ending value
     :param incrementa: the increment of the value for each iteration
     :param variable_name: if needed the name in extra_data where we want to store
     the value
     """
-
     def _simple_for(obj, eng):
 
         init = inita
@@ -143,11 +147,7 @@ def simple_for(inita, enda, incrementa, variable_name=None):
 
 
 def end_for(obj, eng):
-    """
-
-    :param obj:
-    :param eng:
-    """
+    """Workflow task indicating the end of a for(each) loop."""
     coordonatex = len(eng.getCurrTaskId()) - 1
     coordonatey = eng.getCurrTaskId()[coordonatex]
     new_vector = eng.getCurrTaskId()
@@ -156,13 +156,7 @@ def end_for(obj, eng):
 
 
 def execute_if(fun, *args):
-    """
-
-    :param fun:
-    :param args:
-    :return:
-    """
-
+    """Simple conditional execution task."""
     def _execute_if(obj, eng):
         for rule in args:
             res = rule(obj, eng)
@@ -174,13 +168,11 @@ def execute_if(fun, *args):
 
 
 def workflow_if(cond, neg=False):
-    """
+    """Simple if statement.
 
-    :param cond:
-    :param neg:
-    :return:
+    The goal of this function is to allow the creation of if else statement
+    without the use of lambda and get a safer way.
     """
-
     def _workflow_if(obj, eng):
         conda = cond
         while callable(conda):
@@ -208,10 +200,10 @@ def workflow_if(cond, neg=False):
 
 
 def workflow_else(obj, eng):
-    """
+    """Simple else statement.
 
-    :param obj:
-    :param eng:
+    The goal of this function is to allow the creation of if else statement
+    without the use of lambda and get a safer way.
     """
     coordonatex = len(eng.getCurrTaskId()) - 1
     coordonatey = eng.getCurrTaskId()[coordonatex]
@@ -228,7 +220,7 @@ def workflow_else(obj, eng):
 
 
 def compare_logic(a, b, op):
-    """
+    """Task that can be used in if or something else to compare two values.
 
     :param a: value A to compare
     :param b: value B to compare

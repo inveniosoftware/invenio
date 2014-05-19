@@ -17,14 +17,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var WORKFLOWS_UTILITIES = (function($) {
+var WORKFLOWS_UTILITIES = (function ($) {
 
     return {
         bootstrap_alert: function (message, category) {
             $("#alert-message").html(
-                '<div class="alert alert-' + category + ' alert-dismissable">' + 
+                '<div class="alert alert-' + category + ' alert-dismissable">' +
                 '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
-                '<span>'+ message +'</span></div>'
+                '<span>' + message + '</span></div>'
             );
         }
     };

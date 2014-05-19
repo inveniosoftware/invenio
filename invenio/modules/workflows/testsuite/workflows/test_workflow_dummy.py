@@ -16,14 +16,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Implements a workflow for testing """
+""" Implements a workflow for testing. """
 
-from ...tasks.sample_tasks import (halt_whatever,
-                                   )
+from ...tasks.sample_tasks import halt_whatever
 
 
 class test_workflow_dummy(object):
-    """
-    A test workflow for the testsuite.
-    """
+
+    """A test workflow for the testsuite."""
+
     workflow = [halt_whatever]

@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+""" Logging part of workflows module."""
+
 import logging
 
 
@@ -62,13 +64,14 @@ class BibWorkflowLogHandler(logging.Handler, object):
     """Implements a handler for logging to database."""
 
     def __init__(self, model, id_name):
-        
+        """Instanciate a BibWorkflowLogHandler object."""
         super(BibWorkflowLogHandler, self).__init__()
 
         self.model = model
         self.id_name = id_name
 
     def emit(self, record):
+        """ Create the log object in database."""
         from invenio.ext.sqlalchemy import db
 
         log_obj = self.model(id_object=getattr(record.obj, self.id_name),
@@ -88,5 +91,6 @@ class BibWorkflowLogAdapter(logging.LoggerAdapter):
     """
 
     def process(self, msg, kwargs):
+        """ Save kwargs in extra."""
         kwargs['extra'] = self.extra
         return msg, kwargs

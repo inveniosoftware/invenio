@@ -16,19 +16,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Implements a workflow for testing """
+""" Implements a workflow for testing."""
 
-from invenio.modules.workflows.tasks.sample_tasks import (
-    add_data,
-    halt_if_data_less_than,
-    reduce_data_by_one
-)
+from ...tasks.sample_tasks import (add_data, halt_if_data_less_than,
+                                   reduce_data_by_one)
 
 
 class test_workflow(object):
-    """
-    A test workflow for the testsuite.
-    """
+
+    """A test workflow for the testsuite."""
+
     workflow = [halt_if_data_less_than(20),
                 add_data(20),
                 reduce_data_by_one(2)]

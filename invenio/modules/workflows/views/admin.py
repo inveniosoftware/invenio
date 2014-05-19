@@ -35,9 +35,8 @@ from invenio.base.decorators import wash_arguments, templated
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 
 from ..api import start_delayed
-from ..utils import (get_workflow_definition,
-                     get_redis_keys as utils_get_redis_keys,
-                     filter_holdingpen_results)
+from ..utils import (get_workflow_definition, filter_holdingpen_results,
+                     get_redis_keys as utils_get_redis_keys)
 
 from ..models import Workflow, BibWorkflowObject, BibWorkflowEngineLog
 from ..registry import workflows

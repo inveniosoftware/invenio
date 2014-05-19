@@ -18,10 +18,8 @@
 
 """Implements an example of a typical ingestion workflow for MARCXML records"""
 
-from invenio.modules.workflows.tasks. \
-    marcxml_tasks import (approve_record,
-                          convert_record,
-                          add_metadata_to_extra_data)
+from ...workflows.tasks.marcxml_tasks import (approve_record, convert_record,
+                                              add_metadata_to_extra_data)
 
 
 class marcxml_workflow(object):

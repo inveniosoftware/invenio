@@ -16,23 +16,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-    invenio.modules.workflows.api
-    -----------------------------
+Main API for the workflows.
 
-    This is the main API for the workflows module.
-
-    If you want to run a workflow using the workflows module,
-    this is the high level API you will want to use.
+If you want to run a workflow using the workflows module,
+this is the high level API you will want to use.
 """
 
-
-from werkzeug.utils import (import_string,
-                            cached_property,
-                            )
-
+from werkzeug.utils import import_string, cached_property
 from invenio.base.globals import cfg
 from invenio.base.config import CFG_BIBWORKFLOW_WORKER
-
 from .utils import BibWorkflowObjectIdContainer
 from .models import BibWorkflowObject
 from .errors import WorkflowWorkerError
@@ -50,7 +42,7 @@ class WorkerBackend(object):
     @cached_property
     def worker(self):
         """
-        Represents the worker.
+        Represent the worker.
 
         This cached property is the one which is returning the worker
         to use.
@@ -66,6 +58,7 @@ class WorkerBackend(object):
             register_exception(alert_admin=True)
 
     def __call__(self, *args, **kwargs):
+        """Action on call."""
         if not self.worker:
             raise WorkflowWorkerError('No worker configured')
         return self.worker(*args, **kwargs)
@@ -198,7 +191,6 @@ def start_by_oids(workflow_name, oids, **kwargs):
 
     :return: BibWorkflowEngine that ran the workflow.
     """
-
     if not oids:
         # oids is not defined!
         from .errors import WorkflowAPIError
@@ -230,7 +222,6 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
 
     :return: BibWorkflowEngine that ran the workflow.
     """
-
     objects = BibWorkflowObject.query.filter(
         BibWorkflowObject.id.in_(list(oids))
     ).all()

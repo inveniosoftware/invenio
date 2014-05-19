@@ -15,6 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""Set of function for harvesting."""
 
 import os
 import random
@@ -23,13 +24,11 @@ import glob
 import re
 import traceback
 
+from six import callable
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-
 from invenio.base.globals import cfg
 from invenio.base.wrappers import lazy_import
-
-from invenio.utils.shell import (run_shell_command,
-                                 Timeout)
+from invenio.utils.shell import run_shell_command, Timeout
 from invenio.utils.plotextractor.converter import untar
 from invenio.modules.workflows.utils import convert_marcxml_to_bibfield
 
@@ -46,9 +45,8 @@ REGEXP_AUTHLIST = re.compile(
 
 
 def add_metadata_to_extra_data(obj, eng):
-    """
-    Creates bibrecord from object data and
-    populates extra_data with metadata
+    """Create bibrecord from object data and populates extra_data with metadata.
+
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
@@ -65,8 +63,8 @@ def add_metadata_to_extra_data(obj, eng):
 
 
 def approve_record(obj, eng):
-    """
-    Will add the approval action to the record.
+    """Will add the approval widget to the record.
+
     The workflow need to be halted to use the
     action in the holdingpen.
     :param obj: Bibworkflow Object to process
@@ -81,8 +79,7 @@ def approve_record(obj, eng):
 
 
 def filtering_oai_pmh_identifier(obj, eng):
-    """
-    Get the OAI-PMH identifier in the OAI request.
+    """Get the OAI-PMH identifier in the OAI request.
 
     :param obj: BibworkflowObject being processed
     :param eng: BibWorkflowEngine processing the object
@@ -112,7 +109,8 @@ def filtering_oai_pmh_identifier(obj, eng):
 
 def inspire_filter_custom(fields, custom_accepted=(), custom_refused=(),
                           custom_widgeted=(), action=None):
-    """
+    """Allow you to filter for any type of key.
+
     This function allow you to filter for any type of key in a dictionnary stored
     in object data.
 
@@ -129,9 +127,7 @@ def inspire_filter_custom(fields, custom_accepted=(), custom_refused=(),
     :param widget: widget triggered if a value in custom_widgeted is found.
     :return: function to be intepreted by the workflow engine
     """
-
     def _inspire_filter_custom(obj, eng):
-
         custom_to_process_current = []
         custom_to_process_next = []
         action_to_take = [0, 0, 0]
@@ -162,9 +158,10 @@ def inspire_filter_custom(fields, custom_accepted=(), custom_refused=(),
             eng.log.error(
                 "%s not found in the record. Human intervention needed",
                 fields_to_process)
-            eng.halt(str(
-                fields_to_process) + " not found in the record. Human intervention needed",
+            eng.halt(str(fields_to_process) +
+                     " not found in the record. Human intervention needed",
                      action=action)
+
         for i in custom_widgeted:
             if i != '*':
                 i = re.compile('^' + re.escape(i) + '.*')
@@ -222,16 +219,8 @@ def inspire_filter_custom(fields, custom_accepted=(), custom_refused=(),
 
 def inspire_filter_category(category_accepted_param=(),
                             category_refused_param=(),
-                            category_widgeted_param=(), widget_param=None):
-    """
-
-    :param category_accepted_param:
-    :param category_refused_param:
-    :param category_widgeted_param:
-    :param widget_param:
-    :return:
-    """
-
+                            category_widgeted_param=(), action_param=None):
+    """Allow filtering over category of the record."""
     def _inspire_filter_category(obj, eng):
         try:
             category_accepted = \
@@ -254,7 +243,7 @@ def inspire_filter_category(category_accepted_param=(),
         try:
             action = obj.extra_data["_repository"]["arguments"]["filtering"]['action']
         except KeyError:
-            action = widget_param
+            action = action_param
 
         category_to_process = []
         action_to_take = [0, 0, 0]
@@ -301,7 +290,8 @@ def inspire_filter_category(category_accepted_param=(),
             elif '*' in category_refused:
                 eng.stopProcessing()
             else:
-                # We don't know what we should do, in doubt query human... they are nice!
+                # We don't know what we should do, in doubt query human...
+                # they are nice!
                 msg = ("Category out of task definition. "
                        "Human intervention needed")
                 eng.halt(msg, action=action)
@@ -318,14 +308,12 @@ def inspire_filter_category(category_accepted_param=(),
             else:
                 eng.halt(
                     "Category filtering needs human intervention, rules are incoherent !!!",
-                     action=action)
+                    action=action)
     return _inspire_filter_category
 
 
 def convert_record_to_bibfield(obj, eng):
-    """
-    Convert a record in data log.error into a 'dictionary'
-    thanks to BibField
+    """Convert a record in data into a 'dictionary' thanks to BibField.
 
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
@@ -335,7 +323,8 @@ def convert_record_to_bibfield(obj, eng):
 
 
 def init_harvesting(obj, eng):
-    """
+    """Get all the options from previous state.
+
     This function gets all the option linked to the task and stores them into the
     object to be used later.
 
@@ -353,7 +342,8 @@ def init_harvesting(obj, eng):
 
 
 def get_repositories_list(repositories=()):
-    """
+    """Get repository list in options.
+
     Here we are retrieving the oaiharvest configuration for the task.
     It will allows in the future to do all the correct operations.
     :param repositories:
@@ -388,9 +378,10 @@ def get_repositories_list(repositories=()):
 
 
 def harvest_records(obj, eng):
-    """
-    Run the harvesting task.  The row argument is the oaiharvest task
-    queue row, containing if, arguments, etc.
+    """Run the harvesting task.
+
+    The row argument is the oaiharvest task queue row, containing if, arguments,
+    etc.
     Return 1 in case of success and 0 in case of failure.
     :param obj: BibworkflowObject being
     :param eng: BibWorkflowEngine processing the object
@@ -454,11 +445,7 @@ def harvest_records(obj, eng):
 
 
 def get_records_from_file(path=None):
-    """
-
-    :param path:
-    :return:
-    """
+    """Allow to retrieve the records from a file."""
     from invenio.legacy.oaiharvest.utils import record_extraction_from_file
 
     def _get_records_from_file(obj, eng):
@@ -485,9 +472,10 @@ def get_records_from_file(path=None):
 
 
 def get_eng_uuid_harvested(obj, eng):
-    """
+    """Allow to retrieve the uuid of the eng.
+
     Simple function which allows to retrieve the uuid of the eng in the workflow
-    for printing by example
+    for printing by example.
 
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
@@ -497,13 +485,7 @@ def get_eng_uuid_harvested(obj, eng):
 
 
 def get_files_list(path, parameter):
-    """
-
-    :param path:
-    :param parameter:
-    :return:
-    """
-
+    """Function returning the list of file in a directory."""
     def _get_files_list(obj, eng):
         if callable(parameter):
             unknown = parameter
@@ -521,37 +503,23 @@ def get_files_list(path, parameter):
 
 
 def set_obj_extra_data_key(key, value):
-    """
-
-    :param value:
-    :param key:
-    """
-
+    """Task setting the value of an object extra data key."""
     def _set_obj_extra_data_key(obj, eng):
-        import six
-
         my_value = value
         my_key = key
-        if six.callable(my_value):
-            while six.callable(my_value):
+        if callable(my_value):
+            while callable(my_value):
                 my_value = my_value(obj, eng)
-
-        if six.callable(my_key):
-            while six.callable(my_key):
+        if callable(my_key):
+            while callable(my_key):
                 my_key = my_key(obj, eng)
-
         obj.extra_data[str(my_key)] = my_value
 
     return _set_obj_extra_data_key
 
 
 def get_obj_extra_data_key(name):
-    """
-
-    :param name:
-    :return:
-    """
-
+    """Task returning the value of an object extra data key."""
     def _get_obj_extra_data_key(obj, eng):
         return obj.extra_data[name]
 
@@ -559,12 +527,7 @@ def get_obj_extra_data_key(name):
 
 
 def get_eng_extra_data_key(name):
-    """
-
-    :param name:
-    :return:
-    """
-
+    """Task returning the value of an engine extra data key."""
     def _get_eng_extra_data_key(obj, eng):
         return eng.extra_data[name]
 
@@ -572,26 +535,18 @@ def get_eng_extra_data_key(name):
 
 
 def get_data(obj, eng):
-    """
-
-    :param obj:
-    :param eng:
-    :return:
-    """
+    """Task returning data of the object."""
     return obj.data
 
 
 def convert_record(stylesheet="oaidc2marcxml.xsl"):
-    """
+    """Will convert the object data, if XML, using the given stylesheet.
 
     :param stylesheet:
     :return: :raise workflows_error.WorkflowError:
     """
-
     def _convert_record(obj, eng):
-        """
-        Will convert the object data, if XML, using the given stylesheet
-        """
+
         from invenio.legacy.bibconvert.xslt_engine import convert
 
         eng.log.info("Starting conversion using %s stylesheet" %
@@ -611,7 +566,8 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
 
 
 def convert_record_with_repository(stylesheet="oaidc2marcxml.xsl"):
-    """
+    """Convert a marc record to another one thanks to the stylesheet.
+
     This function converts a record to a marcxml representation by using a
     style sheet which should be in parameter or which sould have been stored
     into extra data of the object.
@@ -624,12 +580,7 @@ def convert_record_with_repository(stylesheet="oaidc2marcxml.xsl"):
     to convert a oai record to a marcxml one
     :type stylesheet: str
     """
-
     def _convert_record(obj, eng):
-        """
-        Will convert the object data, if XML, using the stylesheet
-        in the OAIrepository stored in the object extra_data.
-        """
         eng.log.info("my type: %s" % (obj.data_type,))
         try:
             if not obj.extra_data["_repository"]["arguments"]['c_stylesheet']:
@@ -648,11 +599,7 @@ def convert_record_with_repository(stylesheet="oaidc2marcxml.xsl"):
 
 
 def update_last_update(repository_list):
-    """
-
-    :param repository_list:
-    :return:
-    """
+    """Perform the update of the update date."""
     from invenio.legacy.oaiharvest.dblayer import update_lastrun
 
     def _update_last_update(obj, eng):
@@ -674,9 +621,7 @@ def update_last_update(repository_list):
 
 
 def fulltext_download(obj, eng):
-    """
-    Performs the fulltext download step.
-    Only for arXiv
+    """Perform the fulltext download step.
 
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
@@ -708,8 +653,8 @@ def fulltext_download(obj, eng):
                             "    <subfield code=\"a\">%(url)s</subfield>\n"
                             "    <subfield code=\"t\">%(doctype)s</subfield>\n"
                             "    </datafield>"
-                           ) % {'url': obj.extra_data["_result"]["pdf"],
-                                'doctype': doctype}
+                            ) % {'url': obj.extra_data["_result"]["pdf"],
+                                 'doctype': doctype}
             updated_xml = '<?xml version="1.0"?>\n' \
                           '<collection>\n<record>\n' + fulltext_xml + \
                           '</record>\n</collection>'
@@ -731,15 +676,15 @@ def fulltext_download(obj, eng):
 
 
 def quick_match_record(obj, eng):
-    """
-    Retrieve the record Id from a record by using tag 001 or SYSNO or OAI ID or DOI
-    tag. opt_mod is the desired mode.
+    """Retrieve the record Id from a record.
+
+    Retrieve the record Id from a record by using tag 001 or SYSNO or OAI ID or
+    DOI tag. opt_mod is the desired mode.
 
     001 fields even in the insert mode
 
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
-
     """
     from invenio.legacy.bibupload.engine import (find_record_from_recid,
                                                  find_record_from_sysno,
@@ -789,12 +734,7 @@ def quick_match_record(obj, eng):
 
 
 def upload_record(mode="ir"):
-    """
-
-    :param mode:
-    :return:
-    """
-
+    """Perform the upload step."""
     def _upload_record(obj, eng):
         eng.log_info("Saving data to temporary file for upload")
         filename = obj.save_to_file()
@@ -806,7 +746,7 @@ def upload_record(mode="ir"):
 
 
 def plot_extract(plotextractor_types):
-    """
+    """Perform the plotextraction step.
 
     :param plotextractor_types:
     :return: :raise workflows_error.WorkflowError:
@@ -815,15 +755,12 @@ def plot_extract(plotextractor_types):
                                                           create_contextfiles,
                                                           prepare_image_data,
                                                           remove_dups)
-    from invenio.utils.plotextractor.cli import (get_defaults,
-                                                 extract_captions,
+    from invenio.utils.plotextractor.cli import (get_defaults, extract_captions,
                                                  extract_context)
     from invenio.utils.plotextractor.converter import convert_images
 
     def _plot_extract(obj, eng):
-        """
-        Performs the plotextraction step.
-        """
+        """Perform the plotextraction step."""
         # Download tarball for each harvested/converted record,
         # then run plotextrator.
         # Update converted xml files with generated xml or add it for upload
@@ -832,7 +769,7 @@ def plot_extract(plotextractor_types):
             obj.extra_data["_result"] = {}
 
         if 'p_extraction-source' not in obj.extra_data["_repository"][
-            "arguments"]:
+           "arguments"]:
             p_extraction_source = plotextractor_types
         else:
             p_extraction_source = obj.extra_data["_repository"]["arguments"][
@@ -931,8 +868,7 @@ def plot_extract(plotextractor_types):
 
 
 def refextract(obj, eng):
-    """
-    Performs the reference extraction step.
+    """Perform the reference extraction step.
 
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
@@ -984,9 +920,7 @@ def refextract(obj, eng):
 
 
 def author_list(obj, eng):
-    """
-    Performs the special authorlist extraction step
-    (Mostly INSPIRE/CERN related).
+    """Perform the special authorlist extraction step.
 
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
@@ -1011,9 +945,7 @@ def author_list(obj, eng):
         if tarball is None:
             raise workflows_error.WorkflowError(str(
                 "Error harvesting tarball from id: %s %s" % (
-                    identifiers, extract_path)),
-                                                eng.uuid,
-                                                id_object=obj.id)
+                    identifiers, extract_path)), eng.uuid, id_object=obj.id)
         obj.extra_data["_result"]["tarball"] = tarball
 
     sub_dir, dummy = get_defaults(obj.extra_data["_result"]["tarball"],
@@ -1050,9 +982,8 @@ def author_list(obj, eng):
         translate_fieldvalues_from_latex(authorlist_record, '100', code='a')
         translate_fieldvalues_from_latex(authorlist_record, '700', code='a')
 
-        updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' + record_xml_output(
-            authorlist_record) \
-                      + '</collection>'
+        updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' \
+                      + record_xml_output(authorlist_record) + '</collection>'
         if not None == updated_xml:
             # We store the path to the directory  the tarball contents live
             # Read and grab MARCXML from plotextractor run
@@ -1144,21 +1075,7 @@ def bibclassify(taxonomy, rebuild_cache=False, no_cache=False,
                 output_limit=20, spires=False, match_mode='full',
                 with_author_keywords=False,
                 extract_acronyms=False, only_core_tags=False):
-    """
-
-    :param taxonomy:
-    :param rebuild_cache:
-    :param no_cache:
-    :param output_mode:
-    :param output_limit:
-    :param spires:
-    :param match_mode:
-    :param with_author_keywords:
-    :param extract_acronyms:
-    :param only_core_tags:
-    :return:
-    """
-
+    """Extract keywords and core ones."""
     def _bibclassify(obj, eng):
         import os.path
 

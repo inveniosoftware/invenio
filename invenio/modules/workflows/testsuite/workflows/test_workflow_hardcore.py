@@ -16,17 +16,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Implements a workflow for testing """
+""" Implements a workflow for testing."""
 
-from ...tasks.sample_tasks import (task_reduce_and_halt,
-                                   sleep_task,
-                                   )
+from ...tasks.sample_tasks import task_reduce_and_halt, sleep_task
 
 
 class test_workflow_hardcore(object):
-    """
-    Test workflow for unit-tests.
-    """
+
+    """Test workflow for unit-tests."""
+
     workflow = [
         sleep_task(0.001),
         task_reduce_and_halt,

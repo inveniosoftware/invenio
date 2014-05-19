@@ -36,17 +36,13 @@ from six.moves import urllib
 from sqlalchemy import orm
 from invenio.config import (CFG_OAI_FAILED_HARVESTING_STOP_QUEUE,
                             CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN,
-                            CFG_SITE_SUPPORT_EMAIL,
-                            )
+                            CFG_SITE_SUPPORT_EMAIL)
 
 from invenio.modules.oaiharvester.models import OaiHARVEST
 
 from invenio.legacy.bibsched.bibtask import (task_get_task_param,
-                                             task_get_option,
-                                             task_set_option,
-                                             write_message,
-                                             task_init,
-                                             )
+                                             task_get_option, task_set_option,
+                                             write_message, task_init)
 
 from invenio.legacy.oaiharvest.config import InvenioOAIHarvestWarning
 
@@ -57,16 +53,13 @@ from invenio.base.factory import with_app_context
 
 from invenio.legacy.oaiharvest.utils import (compare_timestamps_with_tolerance,
                                              generate_harvest_report,
-                                             create_ticket,
-                                             )
+                                             create_ticket)
 
 from invenio.legacy.webuser import email_valid_p
 from invenio.ext.email import send_email
 
-from invenio.modules.workflows.models import (BibWorkflowEngineLog,
-                                              BibWorkflowObjectLog,
-                                              Workflow,
-                                              )
+from invenio.modules.workflows.models import (BibWorkflowEngineLog, Workflow,
+                                              BibWorkflowObjectLog)
 from invenio.modules.workflows.registry import workflows as registry_workflows
 from invenio.modules.workflows.api import start
 from invenio.modules.workflows.errors import WorkflowError
@@ -83,7 +76,6 @@ def task_run_core():
 
     :return: :raise InvenioOAIHarvestWarning:
     """
-
     workflow_id_preservation = 0
     workflow = None
     start_time = time.time()
@@ -240,9 +232,7 @@ def task_run_core():
 
 
 def get_dates(dates):
-    """ A method to validate and process the dates input by the user
-    :param dates:
-        at the command line """
+    """ A method to validate and process the dates input by the user."""
     twodates = []
     if dates:
         datestring = dates.split(":")
@@ -282,8 +272,7 @@ def get_dates(dates):
 
 
 def get_repository_names(repositories):
-    """ A method to validate and process the repository names input by the
-        user at the command line """
+    """ A method to validate the repository names input by the user."""
     repository_names = []
     if repositories:
         names = repositories.split(",")
@@ -302,6 +291,7 @@ def get_repository_names(repositories):
 
 
 def get_identifier_names(identifier):
+    """ Return processed identifier list."""
     if identifier:
         # Let's see if the user had a comma-separated list of OAI ids.
         stripped_idents = []
@@ -320,10 +310,7 @@ def get_identifier_names(identifier):
 
 
 def usage(exitcode=0, msg=""):
-    """Print out info. Only used when run in 'manual' harvesting mode
-    :param msg:
-    :param exitcode:
-    """
+    """Print out info. Only used when run in 'manual' harvesting mode."""
     sys.stderr.write("*Manual single-shot harvesting mode*\n")
     if msg:
         sys.stderr.write(msg + "\n")
@@ -332,7 +319,7 @@ def usage(exitcode=0, msg=""):
 
 @with_app_context()
 def main():
-    """Starts the tool.
+    """Start the tool.
 
     If the command line arguments are those of the 'manual' mode, then
     starts a manual one-time harvesting. Else trigger a BibSched task
@@ -356,7 +343,7 @@ def main():
                                     "user=",
                                     "password=",
                                     "workflow=",
-                                   ])
+                                    ])
 
         # So everything went smoothly: start harvesting in manual mode
         if len([opt for opt, opt_value in opts
@@ -480,10 +467,11 @@ def main():
         else:
             position = sys.argv.index("--repository")
         repositories = sys.argv[position + 1].split(",")
-        if len(repositories) > 1 and (
-                    "-i" in sys.argv or "--identifier" in sys.argv):
+        if len(repositories) > 1 and \
+                ("-i" in sys.argv or "--identifier" in sys.argv):
             usage(1,
-                  "It is impossible to harvest an identifier from several repositories.")
+                  "It is impossible to harvest an identifier from several "
+                  "repositories.")
 
     if num_of_critical_parameterb == 1:
 

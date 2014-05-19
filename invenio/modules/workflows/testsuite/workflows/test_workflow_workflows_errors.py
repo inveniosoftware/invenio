@@ -16,24 +16,21 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Implements a workflow for testing """
+""" Implements a workflow for testing."""
 
-from ...tasks.workflows_tasks import (start_workflow,
+from ...tasks.workflows_tasks import (start_workflow, workflows_reviews,
                                       wait_for_a_workflow_to_complete,
                                       get_list_of_workflows_to_wait,
-                                      write_something_generic,
-                                      log_info,
-                                      workflows_reviews,
-                                      get_nb_workflow_created,
-                                      )
+                                      write_something_generic, log_info,
+                                      get_nb_workflow_created)
 
 from invenio.modules.workflows.tasks.logic_tasks import simple_for, end_for
 
 
 class test_workflow_workflows_errors(object):
-    """
-    Test workflow for unit-tests.
-    """
+
+    """Test workflow for unit-tests."""
+
     workflow = [
         simple_for(0, 5, 1, "X"),
         [
