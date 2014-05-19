@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -140,12 +140,20 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         if recid:
             user_is_owner = is_user_owner_of_record(user_info, recid)
 
+        try:
+            categ_fd = file(os.path.join(curdir, 'combo%s' %argd['doctype']))
+            categ = categ_fd.read()
+            categ_fd.close()
+        except IOError:
+            categ = '*'
+
         # Is user authorized to perform this action?
         (auth_code, auth_message) = acc_authorize_action(uid, "submit",
                                                          authorized_if_no_roles=not isGuestUser(uid),
                                                          verbose=0,
                                                          doctype=argd['doctype'],
-                                                         act=action)
+                                                         act=action,
+                                                         categ=categ)
         if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0 and not user_is_owner:
             # User cannot submit
             raise apache.SERVER_RETURN(apache.HTTP_UNAUTHORIZED)
