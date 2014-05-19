@@ -357,7 +357,7 @@ class Community(db.Model):
         if not pretend:
             bibupload_record(
                 record=rec, file_prefix='community', mode='-c',
-                opts=['-n', '-P5'], alias="community",
+                opts=['-n'], alias="community",
             )
         return rec
 
@@ -368,7 +368,7 @@ class Community(db.Model):
         from invenio.legacy.bibupload.utils import bibupload_record
         bibupload_record(
             collection=coll, file_prefix='community', mode='-c',
-            opts=['-n', '-P5'], alias="community",
+            opts=['-n'], alias="community",
         )
         return True
 
