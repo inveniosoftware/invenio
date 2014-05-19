@@ -29,5 +29,5 @@ from .settings import blueprint as settings_blueprint
 blueprints = [
     holdingpen_blueprint,
     admin_blueprint,
-    settings_blueprint
+    settings_blueprint,
 ]

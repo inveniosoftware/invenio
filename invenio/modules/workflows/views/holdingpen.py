@@ -82,9 +82,7 @@ def index():
 @login_required
 @templated('workflows/hp_maintable.html')
 def maintable():
-    """
-    Displays main table interface of Holdingpen.
-    """
+    """Display main table interface of Holdingpen."""
     bwolist = get_holdingpen_objects()
     action_list = get_action_list(bwolist)
     action_static = []
@@ -101,9 +99,7 @@ def maintable():
 @login_required
 @wash_arguments({'bwolist': (text_type, "")})
 def batch_action(bwolist):
-    """
-    Renders action accepting single or multiple records.
-    """
+    """Render action accepting single or multiple records."""
     from ..utils import parse_bwids
 
     bwolist = parse_bwids(bwolist)
@@ -148,7 +144,8 @@ def batch_action(bwolist):
 @login_required
 @templated('workflows/hp_maintable.html')
 def load_table():
-    """
+    """Get JSON data for the Holdingpen table.
+
     Function used for the passing of JSON data to the DataTable
     1] First checks for what record version to show
     2] then sorting direction,
@@ -267,9 +264,7 @@ def load_table():
 @blueprint.route('/get_version_showing', methods=['GET', 'POST'])
 @login_required
 def get_version_showing():
-    """
-    Returns current version showing, saved in current_app.config
-    """
+    """Return current version showing, from flask session."""
     try:
         return session['workflows_version_showing']
     except KeyError:
@@ -280,10 +275,7 @@ def get_version_showing():
 @register_breadcrumb(blueprint, '.details', _("Record Details"))
 @login_required
 def details(objectid):
-    """
-    Displays info about the object, and presents the data
-    of all available versions of the object. (Initial, Error, Final)
-    """
+    """Display info about the object."""
     of = "hd"
     bwobject = BibWorkflowObject.query.get(objectid)
 
@@ -311,9 +303,7 @@ def details(objectid):
 @login_required
 @wash_arguments({'objectid': (int, 0)})
 def restart_record(objectid, start_point='continue_next'):
-    """
-    Restarts the initial object in its workflow
-    """
+    """Restart the initial object in its workflow."""
     bwobject = BibWorkflowObject.query.get(objectid)
 
     workflow = Workflow.query.filter(
@@ -327,9 +317,7 @@ def restart_record(objectid, start_point='continue_next'):
 @login_required
 @wash_arguments({'objectid': (int, 0)})
 def continue_record(objectid):
-    """
-    Restarts the initial object in its workflow
-    """
+    """Continue workflow for current object."""
     continue_oid_delayed(oid=objectid, start_point='continue_next')
     return 'Record continued workflow'
 
@@ -338,9 +326,7 @@ def continue_record(objectid):
 @login_required
 @wash_arguments({'objectid': (int, 0)})
 def restart_record_prev(objectid):
-    """
-    Restarts the initial object in its workflow from the current task
-    """
+    """Restart the last task for current object."""
     continue_oid_delayed(oid=objectid, start_point="restart_task")
     return 'Record restarted current task'
 
@@ -349,9 +335,7 @@ def restart_record_prev(objectid):
 @login_required
 @wash_arguments({'objectid': (int, 0)})
 def delete_from_db(objectid):
-    """
-    Deletes all available versions of the object from the db
-    """
+    """Delete the object from the db."""
     BibWorkflowObject.delete(objectid)
     return 'Record Deleted'
 
@@ -360,6 +344,7 @@ def delete_from_db(objectid):
 @login_required
 @wash_arguments({'bwolist': (text_type, "")})
 def delete_multi(bwolist):
+    """Delete list of objects from the db"""
     from ..utils import parse_bwids
 
     bwolist = parse_bwids(bwolist)
@@ -369,12 +354,10 @@ def delete_multi(bwolist):
 
 
 @blueprint.route('/action/<objectid>', methods=['GET', 'POST'])
-@register_breadcrumb(blueprint, '.action', _("action"))
+@register_breadcrumb(blueprint, '.action', _("Action"))
 @login_required
 def show_action(objectid):
-    """
-    Renders the action assigned to a specific record
-    """
+    """Render the action assigned to a specific record."""
     bwobject = BibWorkflowObject.query.filter(
         BibWorkflowObject.id == objectid).first_or_404()
 
@@ -398,8 +381,9 @@ def show_action(objectid):
 @wash_arguments({'objectid': (text_type, '-1'),
                  'action': (text_type, 'default')})
 def resolve_action(objectid, action):
-    """Resolves the action taken. Calls the
-    run function of the specific action.
+    """Resolves the action taken.
+
+    Will call the run() function of the specific action.
     """
     action_form = actions[action]
     action_form().run(objectid)
@@ -411,9 +395,7 @@ def resolve_action(objectid, action):
 @wash_arguments({'objectid': (text_type, '0'),
                  'form': (text_type, '')})
 def resolve_edit(objectid, form):
-    """
-    Performs the changes to the record made in the edit record action.
-    """
+    """Performs the changes to the record."""
     if request:
         edit_record(request.form)
     return 'Record Edited'
@@ -424,9 +406,7 @@ def resolve_edit(objectid, form):
 @wash_arguments({'objectid': (text_type, '0'),
                  'of': (text_type, None)})
 def entry_data_preview(objectid, of):
-    """
-    Presents the data in a human readble form or in xml code
-    """
+    """Present the data in a human readble form or in xml code."""
     from flask import Markup
     from pprint import pformat
 
@@ -449,9 +429,7 @@ def entry_data_preview(objectid, of):
 @blueprint.route('/get_context', methods=['GET', 'POST'])
 @login_required
 def get_context():
-    """
-    Returns a JSON structure with URL maps for Holding Pen.
-    """
+    """Return the a JSON structure with URL maps and actions."""
     context = {}
     context['url_prefix'] = blueprint.url_prefix
     context['holdingpen'] = {
@@ -473,9 +451,7 @@ def get_context():
 
 
 def get_info(bwobject):
-    """
-    Parses the hpobject and extracts its info to a dictionary
-    """
+    """Parse the hpobject and extract info to a dictionary"""
     info = {}
     if bwobject.get_extra_data()['owner'] != {}:
         info['owner'] = bwobject.get_extra_data()['owner']
@@ -489,9 +465,10 @@ def get_info(bwobject):
 
 
 def extract_data(bwobject):
-    """
-    Extracts metadata for BibWorkflowObject needed for rendering
-    the Record's details and action page.
+    """Extracts needed metadata from BibWorkflowObject.
+
+    Used for rendering the Record's holdingpen table row and
+    details and action page.
     """
     extracted_data = {}
     if bwobject.id_parent is not None:
@@ -523,18 +500,17 @@ def extract_data(bwobject):
 
 
 def edit_record(form):
-    """
-    Will call the edit record action resolve function
-    """
+    """Call the edit record action."""
     for key in form.iterkeys():
         # print '%s: %s' % (key, form[key])
         pass
 
 
 def get_action_list(object_list):
-    """
-    Returns a dict of action names mapped to
-    the number of halted objects associated with that action.
+    """Return a dict of action names mapped to halted objects.
+
+    Get a dictionary mapping from action name to number of Pending
+    actions (i.e. halted objects). Used in the holdingpen.index page.
     """
     action_dict = {}
     found_actions = []
@@ -561,8 +537,7 @@ def get_holdingpen_objects(isortcol_0=None,
                            ssortdir_0=None,
                            ssearch=None,
                            version_showing=(ObjectVersion.HALTED,)):
-    """
-    Looks for related BibWorkflowObject's for display in Holding Pen.
+    """Get BibWorkflowObject's for display in Holding Pen.
 
     Uses DataTable naming for filtering/sorting. Work in progress.
     """
