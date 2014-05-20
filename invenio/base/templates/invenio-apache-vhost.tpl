@@ -67,6 +67,7 @@ WSGIPythonHome {{pythonhome}}
     {%- block directory_web %}
         DocumentRoot {{ config.COLLECT_STATIC_ROOT }}
         <Directory {{ config.COLLECT_STATIC_ROOT }}>
+           DirectorySlash Off
            Options FollowSymLinks MultiViews
            AllowOverride None
            <IfVersion >= 2.4>
@@ -85,16 +86,17 @@ WSGIPythonHome {{pythonhome}}
         CustomLog {{ config.CFG_LOGDIR }}/apache{{ log_suffix }}.log combined_with_timing
     {%- endblock logging -%}
     {%- block aliases %}
-        DirectoryIndex index.en.html index.html
-        # Auto-generated aliasses
-        {% for alias in aliases -%}
-        Alias {{ alias }} {{ config.COLLECT_STATIC_ROOT+alias }}
-        {% endfor %}
+        #FIXME DirectoryIndex index.en.html index.html
         AliasMatch /sitemap-(.*) {{ config.CFG_WEBDIR }}/sitemap-$1
     {%- endblock aliases -%}
     {%- block wsgi %}
-        WSGIScriptAlias / {{ config.CFG_WSGIDIR }}/invenio.wsgi
+        WSGIScriptAlias /wsgi {{ config.CFG_WSGIDIR }}/invenio.wsgi
         WSGIPassAuthorization On
+
+        RewriteEngine on
+        RewriteCond {{ config.COLLECT_STATIC_ROOT }}%{REQUEST_FILENAME} !-f
+        RewriteCond {{ config.COLLECT_STATIC_ROOT }}%{REQUEST_FILENAME} !-d
+        RewriteRule ^(.*)$ /wsgi$1 [PT,L]
     {% endblock wsgi -%}
     {%- block xsendfile_directive %}
         {{ '#' if not config.CFG_BIBDOCFILE_USE_XSENDFILE }}XSendFile On

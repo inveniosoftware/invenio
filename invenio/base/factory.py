@@ -28,9 +28,9 @@ import sys
 import os
 
 from pkg_resources import iter_entry_points
+from six.moves.urllib.parse import urlparse
 from werkzeug.local import LocalProxy
 
-#from invenio.ext.logging import register_exception
 from .helpers import with_app_context, unicodifier
 from .wrappers import Flask
 from .utils import captureWarnings
@@ -248,5 +248,24 @@ def create_wsgi_app(*args, **kwargs):
     if app.debug:
         from werkzeug.debug import DebuggedApplication
         app = DebuggedApplication(app, evalex=True)
+
+    class WSGIScriptAliasFix(object):
+
+        """WSGI ScriptAlias fix."""
+
+        def __init__(self, app, script_name):
+            """Initialize wsgi app wrapper."""
+            self.app = app
+            self.script_name = script_name
+
+        def __call__(self, environ, start_response):
+            """Parse path from ``REQUEST_URI`` to fix ``PATH_INFO``."""
+            path_info = urlparse(environ.get('REQUEST_URI')).path
+            assert self.script_name == environ['SCRIPT_NAME']
+            environ['SCRIPT_NAME'] = ''
+            environ['PATH_INFO'] = path_info
+            return self.app(environ, start_response)
+
+    app.wsgi_app = WSGIScriptAliasFix(app.wsgi_app, '/wsgi')
 
     return app
