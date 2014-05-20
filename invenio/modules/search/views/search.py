@@ -126,6 +126,7 @@ def response_formated_records(recids, collection, of, **kwargs):
     return response
 
 
+@blueprint.route('/index.html', methods=['GET', 'POST'])
 @blueprint.route('/index.py', methods=['GET', 'POST'])
 @blueprint.route('/', methods=['GET', 'POST'])
 @templated('search/index.html')
