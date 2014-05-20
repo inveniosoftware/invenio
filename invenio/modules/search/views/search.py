@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,7 +25,8 @@ import functools
 import cStringIO
 from math import ceil
 from flask import make_response, g, request, flash, jsonify, \
-    redirect, url_for, current_app, abort, session, Blueprint
+    redirect, url_for, current_app, abort, session, Blueprint, \
+    render_template
 from flask.ext.login import current_user
 from six import iteritems
 from werkzeug.local import LocalProxy
@@ -38,7 +39,7 @@ from ..forms import EasySearchForm
 from ..models import Collection
 from ..washers import wash_search_urlargd
 from flask.ext.menu import register_menu
-from invenio.base.signals import websearch_before_browse, websearch_before_search
+from invenio.base.signals import websearch_before_browse
 from invenio.modules.indexer import models as BibIndex
 from invenio.modules.formatter import format_record
 from invenio.base.i18n import _
@@ -48,6 +49,7 @@ from flask.ext.breadcrumbs import \
 from invenio.ext.template.context_processor import \
     register_template_context_processor
 from invenio.utils.pagination import Pagination
+from invenio.utils.text import slugify
 
 blueprint = Blueprint('search', __name__, url_prefix="",
                       template_folder='../templates',
@@ -93,7 +95,7 @@ def check_collection(method=None, name_getter=collection_name_from_request,
         name = name_getter()
         if name:
             g.collection = collection = Collection.query.filter(
-                Collection.name==name).first_or_404()
+                Collection.name == name).first_or_404()
         elif default_collection:
             g.collection = collection = Collection.query.get_or_404(1)
         else:
@@ -152,8 +154,12 @@ def index():
 
 
 @blueprint.route('/collection/<name>', methods=['GET', 'POST'])
-@templated('search/collection.html')
 def collection(name):
+    """
+    Renders the collection page either with a collection specific template
+    (aka collection_{collection_name}.html) or with the default collection
+    template (collection.html)
+    """
     collection = Collection.query.filter(Collection.name == name).first_or_404()
 
     @register_template_context_processor
@@ -163,7 +169,11 @@ def collection(name):
             format_record=format_record,
             easy_search_form=EasySearchForm(csrf_enabled=False),
             breadcrumbs=current_breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:])
-    return dict(collection=collection)
+
+    return render_template(['search/collection_{0}.html'.format(slugify(name,
+                                                                        '_')),
+                            'search/collection.html'],
+                           collection=collection)
 
 
 class SearchUrlargs(object):
@@ -217,8 +227,8 @@ class SearchUrlargs(object):
 
 def _create_neareset_term_box(argd_orig):
     try:
-        p = argd_orig.pop('p', '')#.encode('utf-8')
-        f = argd_orig.pop('f', '')#.encode('utf-8')
+        p = argd_orig.pop('p', '')
+        f = argd_orig.pop('f', '')
         if 'rg' in argd_orig and not 'rg' in request.values:
             del argd_orig['rg']
         if f == '' and ':' in p:
@@ -295,7 +305,6 @@ def browse(collection, p, f, of, so, rm, rg, jrec):
         argd['f'] = f
         argd['p'] = p
 
-
     websearch_before_browse.send(collection, **argd)
 
     records = map(lambda (r, h): (r.decode('utf-8'), h),
@@ -327,7 +336,7 @@ websearch_before_browse.connect(receivers.websearch_before_browse_handler)
 def rss(collection, p, jrec, so, rm):
     from invenio.legacy.search_engine import perform_request_search
     of = 'xr'
-    argd = argd_orig = wash_search_urlargd(request.args)
+    argd =  wash_search_urlargd(request.args)
     argd['of'] = 'id'
 
     # update search arguments with the search user preferences
