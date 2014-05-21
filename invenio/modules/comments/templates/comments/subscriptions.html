@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,63 +16,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "page.html" %}
-{% set title = _("Your comment subscriptions") %}
-{% set personalize_selected = True %}
-
-{% block body %}
-<script type="text/javascript">
-$(document).ready(function() {
-  $('#toggle').change(function() {
-    var toggle = $('#toggle').attr("checked")
-    $("input[name=recid]").attr("checked", function(i, val) {
-      return ! $(this).attr("checked");
-    });
-  });
-});
-</script>
-
-<form name="message" action="{{ url_for('.unsubscribe') }}" method="post">
-<table class="table table-striped table-bordered table-condensed">
-  <thead>
-    <tr>
-      <th><input type="checkbox" id="toggle" /></th>
-      <th>{{ _("Record") }}</th>
-      <th>{{ _("Subscription date") }}</th>
-      <th>{{ _("Action") }}</th>
-    </tr>
-  </thead>
-  <tfoot>
-    <tr>
-      <td colspan="4">
-        <input type="submit" id="delete-selected" name="delete" value="{{ _("Delete Selected") }}" class="btn btn-danger" />
-      </td>
-    </tr>
-  </tfoot>
-  <tbody>
-    {% if not subscriptions %}
-        <tr class="mailboxrecord" style="height: 100px;">
-        <td colspan="4" style="text-align: center;">
-            <b>{{ _("No subscriptions") }}</b>
-        </td>
-        </tr>
-    {% else %}
-        {% for s in subscriptions %}
-            <tr>
-                <td>
-                    <input type="checkbox" name="recid" value="{{ s.id_bibrec }}" />
-                </td>
-                <td>
-                  <a href="{{ url_for('comments.comments', recid=s.id_bibrec) }}">
-                  {{ get_record(s.id_bibrec).get('title.title', '#%d'|format(s.id_bibrec))|safe }}
-                  </a>
-                </td>
-                <td>{{ s.creation_time }}</td>
-                <td><a href="{{url_for('.unsubscribe', recid=s.id_bibrec) }}">{{ _("Delete") }}</a></td>
-            </tr>
-        {% endfor %}
-    {% endif %}
-  </tbody>
-</table>
-</form>
-{% endblock %}
+{%- extends "comments/subscriptions_base.html" -%}
