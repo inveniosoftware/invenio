@@ -17,13 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.ext.sso
-    ---------------
-
-    This module provides initialization and configuration for `flask.ext.sso`
-    module.
-"""
+"""Initialize and configure *Flask-SSO* extension."""
 
 import re
 
@@ -68,7 +62,7 @@ CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE = (
 #: Default attribute map
 SSO_ATTRIBUTE_MAP = {
     'ADFS_AUTHLEVEL': (False, 'authlevel'),
-    'ADFS_GROUP': (True, 'groups'),
+    'ADFS_GROUP': (True, 'group'),
     'ADFS_LOGIN': (True, 'nickname'),
     'ADFS_ROLE': (False, 'role'),
     'ADFS_EMAIL': (True, 'email'),
@@ -81,7 +75,6 @@ sso = SSO()
 
 def setup_app(app):
     """Setup SSO extension."""
-
     app.config['CFG_EXTERNAL_AUTH_USING_SSO'] = True
     app.config.setdefault('SSO_ATTRIBUTE_MAP', SSO_ATTRIBUTE_MAP)
     sso.init_app(app)
@@ -106,16 +99,17 @@ def setup_app(app):
 
     @sso.login_handler
     def login_callback(user_info):
-        """
+        """Login user base on SSO context (create one if necessary).
+
         Function should not raise an exception if `user_info` is not valid
         or `User` was not found in database.
         """
         from invenio.modules.accounts.models import User
-        from invenio.ext.login import (authenticate, login_user,
-                                       login_redirect, current_user)
+        from invenio.ext.login import (authenticate, login_redirect,
+                                       current_user)
         from invenio.ext.sqlalchemy import db
 
-        user_info['groups'] = fetch_groups(user_info['groups']).values()
+        user_info['group'] = fetch_groups(user_info['group']).values()
         user_info['external'] = fetch_external(user_info.get('external'))
         try:
             auth = authenticate(user_info['email'], login_method='SSO')
@@ -127,11 +121,13 @@ def setup_app(app):
                 user.settings = {'login_method': 'SSO'}
                 db.session.add(user)
                 db.session.commit()
-                login_user(User.query.filter_by(
-                    email=user_info['email']).one().id)
-            elif auth:
-                groups = current_user.get('group', [])
-                current_user.info['groups'] = groups + user_info['groups']
+                auth = authenticate(user_info['email'], login_method='SSO')
+                if auth is None:
+                    return redirect('/')
+
+            current_user.info['group'] = current_user.get('group', []) + \
+                user_info['group']
+            current_user.save()
         except:
             flash('Problem with login (%s)' % (str(user_info)), 'error')
             return redirect('/')
