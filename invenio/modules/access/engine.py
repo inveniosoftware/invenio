@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -50,6 +50,9 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, batch_a
     Returns (0, msg) when the authorization is granted, (1, msg) when it's not.
     """
     from invenio.ext.login import UserInfo
+    from werkzeug.local import LocalProxy
+    if isinstance(req, LocalProxy):
+        req = req._get_current_object()
     if isinstance(req, UserInfo):
         user_info = req
         uid = user_info.get_id()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1212,12 +1212,13 @@ def collect_user_info(req, login_time=False, refresh=False):
     is saved into req._user_info (for caching purpouses)
     setApacheUser & setUid will properly reset it.
     """
+    from flask.ext.login import current_user
+    from invenio.ext.login import UserInfo
 
-    if type(req) in [long, int] or req is None:
-        from invenio.ext.login import UserInfo
+    if (type(req) in [long, int] and current_user.get_id() != req) \
+            or req is None:
         return UserInfo(req)
 
-    from flask.ext.login import current_user
     return current_user._get_current_object()
 
     ##
