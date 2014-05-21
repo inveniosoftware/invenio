@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,4 +17,19 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{%- extends "search/helpers_base.html" -%}
+{# Collect the nav links, forms, and other content for toggling #}
+<form action="{{ url_for('search.search') }}" method="get" role="search" id="searchform">
+{%- block search_form_ctrls -%}
+  <input type="hidden" name="ln" value="{{g.ln}}">
+  {%- if collection.id > 1 %}
+  <input type="hidden" name="cc" value="{{collection.name}}">
+  {%- endif %}
+  <div class="nav navbar-nav navbar-left navbar-form">
+    <div class="input-group" id="searchform-input-group">
+      {% include "search/form/tips.html" %}
+      {% include "search/form/controls.html" %}
+    </div>
+  </div>
+{%- endblock -%}
+  {% include "search/form/dropdown.html" %}
+</form>
