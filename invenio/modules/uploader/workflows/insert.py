@@ -31,14 +31,16 @@
 from workflow.patterns import IF
 
 from invenio.modules.uploader.errors import UploaderWorkflowException
-from invenio.modules.uploader.uploader_tasks import raise_, \
-    validate, \
-    update_pidstore,\
-    retrieve_record_id_from_pids, \
-    reserve_record_id, save_record, \
-    save_master_format, \
+from invenio.modules.uploader.uploader_tasks import \
     create_records_for_workflow, \
-    return_recordids_only
+    manage_attached_documents, \
+    raise_, \
+    reserve_record_id, save_record, \
+    retrieve_record_id_from_pids, \
+    return_recordids_only, \
+    save_master_format, \
+    update_pidstore,\
+    validate
 
 insert = dict(
     pre_tasks=[
@@ -61,9 +63,10 @@ insert = dict(
         ),
         reserve_record_id(step=2),
         validate(step=3),
-        save_record(step=4),
-        update_pidstore(step=5),
-        save_master_format(step=6),
+        manage_attached_documents(step=4),
+        save_record(step=5),
+        update_pidstore(step=6),
+        save_master_format(step=7),
     ],
     post_tasks=[
         return_recordids_only,

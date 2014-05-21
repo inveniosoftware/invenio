@@ -38,7 +38,7 @@ install_requires = [
     "Babel==1.3",
     "BeautifulSoup==3.2.1",
     "BeautifulSoup4==4.3.2",
-    "celery==3.0.17",
+    "celery==3.1.12",
     "Cerberus==0.7",
     "dictdiffer==0.0.3",
     "feedparser==5.1.3",
