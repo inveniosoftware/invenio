@@ -96,5 +96,5 @@ class generic_harvesting_workflow_with_bibsched(object):
         end_for,
         write_something_generic("Finishing", [task_update_progress, write_message]),
         workflows_reviews(stop_if_error=True),
-        update_last_update(get_repositories_list([repository]))
+        update_last_update(get_repositories_list())
     ]
