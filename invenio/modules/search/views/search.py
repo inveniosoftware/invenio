@@ -171,7 +171,8 @@ def collection(name):
             easy_search_form=EasySearchForm(csrf_enabled=False),
             breadcrumbs=current_breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:])
 
-    return render_template(['search/collection_{0}.html'.format(slugify(name,
+    return render_template(['search/collection_{0}.html'.format(collection.id),
+                            'search/collection_{0}.html'.format(slugify(name,
                                                                         '_')),
                             'search/collection.html'],
                            collection=collection)
