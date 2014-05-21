@@ -16,14 +16,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-mod_wsgi Invenio application loader.
-"""
+"""mod_wsgi Invenio application loader."""
+
+import sys
+from invenio.base.factory import create_wsgi_app
 
 ## You can't write to stdout in mod_wsgi, but some of our
 ## dependecies do this! (e.g. 4Suite)
-import sys
 sys.stdout = sys.stderr
 
-from invenio.base.factory import create_wsgi_app
+
 application = create_wsgi_app()
