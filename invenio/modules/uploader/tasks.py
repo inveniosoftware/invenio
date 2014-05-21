@@ -74,9 +74,8 @@ def run_workflow(records, name, **kwargs):
 
     workflow = import_string(cfg['UPLOADER_WORKFLOWS'][name])
     _run_pre_post_tasks(workflow['pre_tasks'])
-    tasks = workflow['tasks']
     wfe = WorkflowEngine()
-    wfe.setWorkflow(tasks)
+    wfe.setWorkflow(workflow['tasks'])
     wfe.setVar('options', kwargs)
     wfe.process(records)
     _run_pre_post_tasks(workflow['post_tasks'])
@@ -98,4 +97,4 @@ def run_workflow(records, name, **kwargs):
 #           % (uuid, exc, result.traceback))
 #     return None
 
-
+__all__ = ['translate', 'run_workflow']

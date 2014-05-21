@@ -25,19 +25,20 @@
     inside the workflows defined in
     :py:mod:`~invenio.modules.uploader.worflows`.
 
-    See
+    See:
     `Simple worflows for Python <https://pypi.python.org/pypi/workflow/1.0>`_
 """
+import os
 
 from invenio.base.globals import cfg
 from invenio.modules.pidstore.models import PersistentIdentifier
-from invenio.modules.records.api import Record
 
 from .errors import UploaderWorkflowException
 
 ###########################################################
 ##############          Pre tasks         #################
 ###########################################################
+
 
 def create_records_for_workflow(records, **kwargs):
     """@todo: Docstring for create_records_for_workflow.
@@ -47,12 +48,14 @@ def create_records_for_workflow(records, **kwargs):
     :returns: @todo
 
     """
+    from invenio.modules.records.api import Record
     for i, obj in enumerate(records):
         records[i] = (obj[0], Record(json=obj[1]))
 
 ###########################################################
 ##############          Post tasks        #################
 ###########################################################
+
 
 def return_recordids_only(records, **kwargs):
     """@todo: Docstring for return_recordids_only.
@@ -244,3 +247,49 @@ def update_pidstore(step):
                      'register them in the DB')
 
     return _update_pidstore
+
+
+def manage_attached_documents(step):
+    """@todo: Docstring for manage_attached_documents.
+
+    :step: @todo
+    :returns: @todo
+
+    """
+    from invenio.modules.documents import api
+    from invenio.modules.documents.tasks import set_document_contents
+    from invenio.modules.records.utils import name_generator
+
+    def _manage_attached_documents(obj, eng):
+        record = obj[1]
+        eng.log.info('Look documents to manage')
+        if 'files_to_upload' in record:
+            eng.log.info('Documents to upload found')
+            record['_files'] = []
+            files_to_upload = record.get('files_to_upload', [])
+
+            for file_to_upload in files_to_upload:
+                document = api.Document.create({
+                    'title': os.path.basename(file_to_upload['path']),
+                    'description': '',
+                })
+                eng.log.info('Document %s created', (document['_id'],))
+
+                record['_files'].append(
+                    (os.path.basename(file_to_upload['path']), document['_id'])
+                )
+
+                set_document_contents.delay(
+                    document['_id'],
+                    file_to_upload['path'],
+                    name_generator(document)
+                )
+
+            eng.log.info('Finish creating documents, delete temporary key')
+            del record['files_to_upload']
+
+        if 'files_to_link' in record:
+            eng.log.info('Documents to link found')
+            del record['files_to_link']
+
+    return _manage_attached_documents

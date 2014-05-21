@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@
 from functools import wraps
 from six import iteritems
 from flask import g, render_template, request, flash, redirect, url_for, \
-    current_app, abort, Blueprint
+    current_app, abort, Blueprint, send_file
 from flask.ext.login import current_user
 
 from invenio.base.decorators import wash_arguments
@@ -32,6 +32,7 @@ from invenio.ext.template.context_processor import \
     register_template_context_processor
 from invenio.modules.search.models import Collection
 from invenio.modules.search.signals import record_viewed
+from invenio.modules.records.api import get_record
 from invenio.modules.records.models import Record as Bibrec
 from invenio.base.i18n import _
 from invenio.base.signals import pre_template_render
@@ -77,7 +78,6 @@ def request_record(f):
             flash(auth_msg, 'error')
             abort(apache.HTTP_UNAUTHORIZED)
 
-        from invenio.modules.records.api import get_record
         from invenio.legacy.search_engine import record_exists, get_merged_recid
         # check if the current record has been deleted
         # and has been merged, case in which the deleted record
@@ -193,6 +193,20 @@ def files(recid):
                 yield file.get_url()
 
     return render_template('records/files.html', files=list(get_files()))
+
+
+@blueprint.route('/<int:recid>/files/<path:filename>', methods=['GET'])
+@request_record
+def file(recid, filename):
+    from invenio.modules.documents import api
+    record = get_record(recid)
+    duuid = [uuid for (k, uuid) in record['_files'] if k == filename]
+    if len(duuid) != 1:
+        #TODO log
+        abort(404)
+    document = api.Document.get_document(duuid[0])
+    #TODO document.can_access(current_user)
+    return send_file(document['uri'])
 
 
 @blueprint.route('/<int:recid>/citations', methods=['GET', 'POST'])
