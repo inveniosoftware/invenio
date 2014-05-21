@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,4 +17,20 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{%- extends "search/helpers_base.html" -%}
+{%- from "search/helpers.html" import search_box with context -%}
+
+{%- block search_form_dropbox_boxes -%}
+<div class="nav navbar-nav navbar-row">
+  <div id="navbar-bottom" class="collapse">
+    <div class="row navbar-row-container">
+      <div class="col-md-12">
+        {# This is done using document.write to hide it from non-JS users #}
+        <script type="text/javascript">
+          var box = {{ search_box(collection, easy_search_form)|tojson|safe }};
+          document.write(box);
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endblock -%}

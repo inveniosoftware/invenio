@@ -21,6 +21,25 @@
   font-size: 14px;
 }
 
+/* ----------------------- */
+
+.nav.nav-pill-gray > .active > a,
+.nav.nav-pill-gray > li > a:hover {
+  background: none;
+  text-decoration: underline;
+  color: inherit;
+}
+
+/* line below the tab bar */
+
+._tab-form-group {
+  border-bottom: 1px solid #e7e7e7;
+}
+
+._tab-form-group .nav-tabs {
+  border-bottom: none;
+}
+
 /* -------------- */
 
 /*
