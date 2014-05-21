@@ -42,6 +42,47 @@ from flask.ext.registry import Registry, ExtensionRegistry, \
 __all__ = ('create_app', 'with_app_context')
 
 
+class WSGIScriptAliasFix(object):
+
+    """WSGI ScriptAlias fix middleware.
+
+    It relies on the fact that the ``WSGI_SCRIPT_ALIAS`` environment variable
+    exists in the Apache configuration and identifies the virtual path to
+    the invenio application.
+
+    This setup will first look for the present of a file on disk. If the file
+    exists, it will serve it otherwise it calls the WSGI application.
+
+    If no ``WSGI_SCRIPT_ALIAS`` is defined, it does not alter anything.
+
+    .. code-block:: apacheconf
+
+       SetEnv WSGI_SCRIPT_ALIAS /wsgi
+       WSGIScriptAlias /wsgi /opt/invenio/invenio/invenio.wsgi
+
+       RewriteEngine on
+       RewriteCond %{REQUEST_FILENAME} !-f
+       RewriteRule ^(.*)$ /wsgi$1 [PT,L]
+
+    .. seealso::
+
+       `modwsgi Configuration Guidelines
+       <https://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines>`_
+    """
+
+    def __init__(self, app):
+        """Initialize wsgi app wrapper."""
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        """Parse path from ``REQUEST_URI`` to fix ``PATH_INFO``."""
+        if environ.get('WSGI_SCRIPT_ALIAS') == environ['SCRIPT_NAME']:
+            path_info = urlparse(environ.get('REQUEST_URI')).path
+            environ['SCRIPT_NAME'] = ''
+            environ['PATH_INFO'] = path_info
+        return self.app(environ, start_response)
+
+
 def cleanup_legacy_configuration(app):
     """
     Cleanup legacy issue in configuration
@@ -247,25 +288,7 @@ def create_wsgi_app(*args, **kwargs):
 
     if app.debug:
         from werkzeug.debug import DebuggedApplication
-        app = DebuggedApplication(app, evalex=True)
+        app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 
-    class WSGIScriptAliasFix(object):
-
-        """WSGI ScriptAlias fix."""
-
-        def __init__(self, app, script_name):
-            """Initialize wsgi app wrapper."""
-            self.app = app
-            self.script_name = script_name
-
-        def __call__(self, environ, start_response):
-            """Parse path from ``REQUEST_URI`` to fix ``PATH_INFO``."""
-            path_info = urlparse(environ.get('REQUEST_URI')).path
-            assert self.script_name == environ['SCRIPT_NAME']
-            environ['SCRIPT_NAME'] = ''
-            environ['PATH_INFO'] = path_info
-            return self.app(environ, start_response)
-
-    app.wsgi_app = WSGIScriptAliasFix(app.wsgi_app, '/wsgi')
-
+    app.wsgi_app = WSGIScriptAliasFix(app.wsgi_app)
     return app
