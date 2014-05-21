@@ -46,12 +46,11 @@ from invenio.legacy.bibsched.bibtask import task_update_progress, write_message
 
 
 class generic_harvesting_workflow_with_bibsched(object):
-    repository = 'arXivb'
     workflow = [
         write_something_generic("Initialisation", [task_update_progress, write_message]),
         init_harvesting,
         write_something_generic("Starting", [task_update_progress, write_message]),
-        foreach(get_repositories_list([repository]), "_repository"),
+        foreach(get_repositories_list(), "_repository"),
         [
             write_something_generic("Harvesting", [task_update_progress, write_message]),
             harvest_records,
