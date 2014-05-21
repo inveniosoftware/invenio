@@ -17,15 +17,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111 1307, USA.
 
 from ..tasks.marcxml_tasks import (convert_record_with_repository,
-                                   plot_extract,
                                    convert_record_to_bibfield,
-                                   fulltext_download,
-                                   refextract,
-                                   author_list,
                                    upload_step,
                                    quick_match_record,
-                                   inspire_filter_custom,
-                                   bibclassify
+                                   approve_record
                                    )
 
 from ..tasks.workflows_tasks import (log_info)
@@ -42,16 +37,7 @@ class full_doc_process(object):
         convert_record_with_repository("oaiarxiv2marcxml.xsl"), convert_record_to_bibfield,
         workflow_if(quick_match_record, True),
         [
-            plot_extract(["latex"]),
-            fulltext_download,
-            inspire_filter_custom(fields=["report_number", "arxiv_category"],
-                                  custom_accepted=["*"],
-                                  custom_refused="gr-qc",
-                                  action="approval"),
-            bibclassify(taxonomy=CFG_PREFIX + "/etc/bibclassify/HEP.rdf",
-                        output_mode="dict",
-                        match_mode="partial"),
-            refextract, author_list,
+            approve_record,
             upload_step,
         ],
         workflow_else,

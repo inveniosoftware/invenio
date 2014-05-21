@@ -40,11 +40,10 @@ from ..tasks.logic_tasks import (foreach,
 
 
 class generic_harvesting_workflow(object):
-
     object_type = "harvest"
     workflow = [
         init_harvesting,
-        foreach(get_repositories_list(['arxivb']), "repository"),
+        foreach(get_repositories_list(), "repository"),
         [
             harvest_records,
             foreach(get_obj_extra_data_key("harvested_files_list")),
