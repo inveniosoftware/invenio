@@ -31,7 +31,8 @@ git+https://github.com/inveniosoftware/intbitset#egg=intbitset-2.0
 Jinja2==2.7.2
 SQLAlchemy==0.8.3
 Flask==0.10.1
-WTForms>=1.0.5
+# Flask-WTF 0.9.5 doesn't support WTForms 2.0 as of yet.
+WTForms>=1.0.5,<2.0
 fixture==1.5
 redis==2.8.0
 unittest2==0.5.1
@@ -54,7 +55,7 @@ git+https://github.com/inveniosoftware/flask-registry.git#egg=Flask-Registry-0.1
 Flask-Script>=2.0.3
 #Flask-Testing==0.4
 https://github.com/jarus/flask-testing/zipball/master#egg=Flask-Testing-0.4.1
-Flask-WTF==0.9.3
+Flask-WTF==0.9.5
 Cerberus==0.5
 #Flask-Collect>=0.2.2
 git+https://github.com/greut/Flask-Collect.git@setup-py-fix#egg=Flask-Collect-0.2.3-dev
@@ -65,7 +66,7 @@ pytz
 #PyLD=0.5.0 + python 2.6 patches
 git+https://github.com/inveniosoftware/pyld.git@python2.6#egg=PyLD-26.0.5.0-dev
 SQLAlchemy-Utils==0.23.1
-wtforms-alchemy==0.12.1
+wtforms-alchemy==0.12.4
 mock==1.0.1
 setuptools>=2.0
 httpretty==0.8.0
