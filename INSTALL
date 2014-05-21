@@ -375,7 +375,7 @@ Contents
           Verify GnuPG cryptographic signature.  Note that you may
           first have to import my public key into your keyring, if you
           haven't done that already:
-            $ gpg --keyserver wwwkeys.eu.pgp.net --recv-keys 0xBA5A2B67
+            $ gpg --keyserver pool.sks-keyservers.net --recv-key 0xBA5A2B67
           The output of the gpg --verify command should then read:
             Good signature from "Tibor Simko <tibor@simko.info>"
           You can safely ignore any trusted signature certification

@@ -137,6 +137,7 @@ class Template:
             out += """
                     <table>
                     """
+
             for key_info in keys_info:
                 out += """
                         <tr><td>%(key_description)s</td>
