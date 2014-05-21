@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,28 +16,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- extends "comments/base.html" -%}
-{%- import "annotations/notes_fragment.html" as nf -%}
-{%- from "previewer/pdf_base.html" import pdf_pane with context -%}
-
-{%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
-  {%- css url_for('previewer.static', filename='css/previewer/pdf_viewer.css'), '20-previews' -%}
-{%- endif -%}
-
-{%- js url_for('annotations.static', filename='js/annotations/notes_popover.js'), '10-comments' -%}
-{%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
-  {%- js url_for('previews.static', filename='js/previewer/pdf_viewer.js'), '110-annos' -%}
-  {%- js url_for('annotations.static', filename='js/annotations/pdf_notes_helpers.js'), '110-annos' -%}
-{%- endif -%}
-
-
-{%- block custom -%}
-  <div>
-    {%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
-      {{ pdf_pane() }}
-    {%- endif -%}
-    <div id="notes-wrapper" {{ 'class=col-md-6' if config.ANNOTATIONS_PREVIEW_ENABLED }}>
-        {{ nf.show_notes(current_user, recid, notes, note_is_collapsed, wash_html_id, get_note_title, get_original_comment) }}
-    </div>
-  </div>
-{%- endblock custom -%}
+{%- extends "annotations/notes_base.html" -%}
