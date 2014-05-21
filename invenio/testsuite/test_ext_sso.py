@@ -21,6 +21,8 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
+"""Test *Flask-SSO* integration."""
+
 from __future__ import absolute_import
 
 import sys
@@ -43,12 +45,12 @@ except ImportError:
 
 
 class TestSSO(InvenioTestCase):
-    """
-    Tests of extension creation
-    """
+
+    """Test extension itegration."""
 
     @unittest.skipUnless(has_sso, 'Flask-SSO is not installed')
     def test_login_handler(self):
+        """Test login handler."""
         self.app = setup_app(self.app)
 
         @contextmanager
@@ -66,22 +68,24 @@ class TestSSO(InvenioTestCase):
                 with self.app.test_client() as c:
                     c.get(self.app.config['SSO_LOGIN_URL'])
                     current_user['email'] == expected_data['email']
-                    current_user['groups'] == expected_data['groups']
+                    current_user['group'] == expected_data['group']
 
         data = {
-            'ADFS_GROUP': 'CERN Registered;project-invenio-devel;cern-personnel',
+            'ADFS_GROUP': ('CERN Registered;'
+                           'project-invenio-devel;'
+                           'cern-personnel'),
             'ADFS_LOGIN': 'admin',
             'ADFS_EMAIL': self.app.config['CFG_SITE_ADMIN_EMAIL'],
         }
         expected_data = {
             'email': self.app.config['CFG_SITE_ADMIN_EMAIL'],
-            'groups': [
+            'group': [
                 'project-invenio-devel (Group)', 'CERN Registered (Group)',
                 'cern-personnel (Group)'
             ],
         }
 
-        #FIXME mock user table
+        # FIXME mock user table
         from invenio.ext.sqlalchemy import db
         from invenio.modules.accounts.models import User
         admin = User.query.get(1)
