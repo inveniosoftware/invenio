@@ -16,4 +16,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- extends "messages/confirm_delete_base.html" -%}
+you have a new message from {{ message.user_from.nickname }}:
+
+----------
+Subject: {{ message.subject }}
+
+{{ message.body }}
+
+---------
+
+You can reply: {{ request.url_root }}{{ url_for('.write', msg_reply_id=message.id) }}
+
