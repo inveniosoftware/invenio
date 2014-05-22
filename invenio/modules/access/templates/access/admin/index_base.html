@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,4 +16,21 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- extends "access/admin_rolearea_base.html" -%}
+
+{% extends "page.html" %}
+{% set title = _("WebAccess Admin") %}
+{% block title %}
+<div class="page-header">
+  <h1>{{ title }} <small>{{ _('selection for WebAccess Admin') }}</small></h1>
+</div>
+{% endblock title %}
+
+{% block body %}
+<dl>
+{%- for a in actions -%}
+  <dt><a href="{{ a.url }}">{{ a.title }}</a></dt>
+  <dd>{{ a.description }}</dd>
+{%- endfor -%}
+</dl>
+{% endblock body %}
+
