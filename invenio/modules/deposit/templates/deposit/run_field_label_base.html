@@ -16,4 +16,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- extends "deposit/widget_plupload_base.html" -%}
+{% if thisfield.label.text %}
+    <label class="control-label col-md-3 {{' required' if thisfield.flags.required}}{{ ' error' if thisfield.errors }}" for="{{thisfield.label.field_id}}">
+        {%- if thisfield.icon %}
+            <span class=""><i class="{{ thisfield.icon }}"></i></span>
+        {%- endif %}
+        {{ thisfield.label.text }}
+    </label>
+{% endif %}

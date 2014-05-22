@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,49 +16,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-
-<div class="well">
-    <h2>My uploads</h2>
-    {% if not my_depositions %}
-    <p class="text-muted">You currently have no uploads.</p>
-    {% else %}
-    {% for dep in my_depositions if not dep.has_sip() %}
-    {%- set deposition_type = None if dep.type.is_default() else dep.type.get_identifier() -%}
-    {%- if loop.first %}
-    <h4>Unsubmitted</h4>
-    <table class="table table-striped">
-    {%- endif %}
-    <tr>
-        <td><a href="{{ url_for('webdeposit.run', deposition_type=deposition_type, uuid=dep.id) }}">{% if dep.title %}
-                  {{ dep.title }}
-              {% else %}
-                  {{ _('Untitled') }}
-              {% endif %}</a></td><td>{{ dep.modified|invenio_pretty_date }}</td><td><a href="{{ url_for('webdeposit.delete', deposition_type=deposition_type, uuid=dep.id) }}" class="rmlink" rel="tooltip" title="Delete upload"><i class="glyphicon glyphicon-trash"></i></a></td>
-    </tr>
-    {%- if loop.last %}
-    </table>
-    {%- endif %}
-    {% else %}
-
-    {% endfor %}
-
-    {% for dep in my_depositions if dep.has_sip() %}
-    {%- set deposition_type = None if dep.type.is_default() else dep.type.get_identifier() -%}
-    {%- if loop.first %}
-    <h4>Submitted</h4>
-    <table class="table table-striped">
-    {% endif %}
-    <tr>
-        <td><a href="{{ url_for('webdeposit.run', deposition_type=deposition_type, uuid=dep.id) }}">{% if dep.title %}
-                  {{ dep.title }}
-              {% else %}
-                  {{ _('Untitled') }}
-              {% endif %}</a></td><td>{{ dep.modified|invenio_pretty_date }}</td><td></td>
-    </tr>
-    {%- if loop.last %}
-    </table>
-    {%- endif %}
-    {%- endfor %}
-    {%- endif %}
-</div>
-
+{%- extends "deposit/myview_base.html" -%}
