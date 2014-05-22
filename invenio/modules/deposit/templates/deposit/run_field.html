@@ -1,20 +1,19 @@
-{%- if thisfield == '-' %}
-<hr />
-{%- else %}
-{%- set field_class = thisfield.widget_classes if thisfield.widget_classes is not none else field_class %}
-{%- set field_size = ("col-md-9 col-md-offset-3" if not thisfield.label.text else "col-md-9") if field_size is none else field_size -%}
-<div class="{{container_class}} {{ "error" if thisfield.errors }}" id="state-group-{{ thisfield.name }}"{% if thisfield.flags.hidden %} style="display:none;"{% endif %}>
-    {{ field_label(thisfield) }}
-    <div id="field-{{ thisfield.name }}" class="{{field_size}}">
-        {{ thisfield(class_= field_class + " " + thisfield.short_name) }}
-        {%- if thisfield.description %}
-            <p class="text-muted field-desc"><small>{{thisfield.description|urlize}}</small></p>
-        {%- endif %}
-        <div class="alert help-block alert-danger" id="state-{{ thisfield.name }}" style="margin-top: 5px;{% if thisfield.errors %} display:block;{% else%} display: none;{% endif %}">
-            {%- for error in thisfield.errors %}
-                <div>{{ error }}</div>
-            {%- endfor %}
-        </div>
-    </div>
-</div>
-{%- endif %}
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- extends "deposit/run_field_base.html" -%}
