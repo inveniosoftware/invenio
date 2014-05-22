@@ -16,4 +16,21 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- extends "oauth2server/errors_base.html" -%}
+
+{% extends "page.html" %}
+
+{% block body %}
+  <p>Client: {{ client.client_id }}</p>
+  <p>User: {{ current_user.nickname }}</p>
+  <form action="/oauth/authorize" method="post">
+    <p>Allow access?</p>
+    <input type="hidden" name="client_id" value="{{ client.client_id }}">
+    <input type="hidden" name="scope" value="{{ scopes|join(' ') }}">
+    <input type="hidden" name="response_type" value="{{ response_type }}">
+    {% if state %}
+    <input type="hidden" name="state" value="{{ state }}">
+    {% endif %}
+    <input type="submit" name="confirm" value="yes">
+    <input type="submit" name="confirm" value="no">
+  </form>
+{% endblock %}
