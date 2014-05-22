@@ -1,0 +1,115 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% from "_formhelpers.html" import render_field with context %}
+{% extends "page.html" %}
+{% set title = _("Write a message") %}
+{% block header %}
+  {{ super() }}
+  {%- css url_for("static", filename="js/jquery-ui/jquery-ui.css") -%}
+  {%- js url_for("static", filename="js/jquery-ui.js") -%}
+  {%- js url_for("static", filename="js/jquery-ui-timepicker-addon.js") -%}
+{% endblock header %}
+{% block javascript %}
+    <script type="text/javascript">
+    $(document).ready(function(){
+        function split( val ) {
+            return val.split(/,\s*/);
+        }
+        function extractLast( term ) {
+          return split(term).pop();
+        }
+        var selectLast = function( event, ui ) {
+            var terms = split(this.value);
+            terms.pop();
+            terms.push(ui.item.value);
+            terms.push("");
+            this.value = terms.join(", ");
+            return false;
+        }
+
+        $("#sent_to_user_nicks").autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                $.ajax({
+                    url: "{{ url_for('webgroup.search')|safe }}",
+                    data: {
+                        query: "users",
+                        term: extractLast(request.term)
+                    },
+                    focus: function() {
+                        return false;
+                    },
+                    success: function(data, textStatus, jqXHR){
+                        response(data["nicknames"]);
+                    }
+                })},
+            select: selectLast });
+        $("#sent_to_group_names").autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                $.ajax({
+                    url: "{{ url_for('webgroup.search')|safe }}",
+                    data: {
+                        query: "groups",
+                        term: extractLast(request.term)
+                    },
+                    focus: function() {
+                        return false;
+                    },
+                    success: function(data, textStatus, jqXHR){
+                        response(data["groups"]);
+                    }
+                });
+            },
+            select: selectLast
+        });
+
+        $('input.datepicker').datepicker({
+          dateFormat: 'yy-mm-dd'
+        });
+
+        $('input.datetimepicker').datetimepicker({
+          showSecond: true,
+          dateFormat: 'yy-mm-dd',
+          timeFormat: 'hh:mm:ss'
+        });
+
+        $('input.timepicker').timepicker({
+          timeFormat: 'hh:mm:ss',
+          showSecond: true
+        });
+
+    });
+    </script>
+{% endblock javascript %}
+{% block body %}
+<form name="write_message" action="{{ url_for('.add') }}" method="post" class="form-horizontal">
+    {{ form.csrf_token }}
+    {{ render_field(form.sent_to_user_nicks, label_size=2, field_size=10) }}
+    {{ render_field(form.sent_to_group_names, label_size=2, field_size=10) }}
+    {{ render_field(form.subject, label_size=2, field_size=10) }}
+    {{ render_field(form.body, label_size=2, field_size=10) }}
+    {{ render_field(form.received_date, label_size=2, field_size=10) }}
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" name="send_button" value="{{ _("Send") }}" class="btn btn-primary"/>
+        </div>
+    </div>
+</form>
+{% endblock %}
