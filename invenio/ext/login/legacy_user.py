@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,9 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    Legacy UserInfo object.
-"""
+"""Provide support for legacy UserInfo object."""
 
 from flask import session, request, has_request_context, current_app
 from flask.ext.login import UserMixin
@@ -67,9 +65,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
     """
 
     def __init__(self, uid=None, force=False):
-        """
-        Keeps information about user.
-        """
+        """Retreave information about user."""
         def on_update(self):
             """ Changes own status when the user info is modified. """
             self.modified = True
@@ -86,25 +82,23 @@ class UserInfo(CombinedMultiDict, UserMixin):
             data = self._create_guest()
 
         self.info = CallbackDict(data, on_update)
-        #FIXME remove req after everybody start using flask request.
+        # FIXME remove req after everybody start using flask request.
         CombinedMultiDict.__init__(self, [self.req, self.info, acc,
                                           dict(CFG_USER_DEFAULT_INFO)])
         self.save()
 
     def get_key(self):
-        """ Generates key for caching user information. """
+        """Generates key for caching user information."""
         key = 'current_user::' + str(self.uid)
         return key
 
     def get_acc_key(self):
-        """ Generates key for caching autorizations. """
+        """Generates key for caching autorizations."""
         remote_ip = str(request.remote_addr) if has_request_context() else '0'
         return 'current_user::' + str(self.uid) + '::' + remote_ip
 
     def save(self):
-        """
-        Saves modified data pernamently for logged users.
-        """
+        """Save modified data pernamently for logged users."""
         if not self.is_guest and self.modified:
             timeout = current_app.config.get(
                 'CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT', 0)*3600
@@ -112,9 +106,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
                       timeout=timeout)
 
     def reload(self):
-        """
-        Reloads user login information and saves them.
-        """
+        """Reload user login information and saves them."""
         data = self._login(self.uid, force=True)
         acc = self._precache(data, force=True)
         self.info.update(data)
@@ -126,11 +118,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
         self.req = self._get_request_info()
 
     def _get_request_info(self):
-        """
-        Get request information.
-        """
-
-        #FIXME: we should support IPV6 too. (hint for FireRole)
+        """Get request information."""
+        # FIXME: we should support IPV6 too. (hint for FireRole)
         data = {}
         if has_request_context():
             data['remote_ip'] = request.remote_addr or ''
@@ -138,16 +127,17 @@ class UserInfo(CombinedMultiDict, UserMixin):
             data['referer'] = request.referrer
             data['uri'] = request.environ['PATH_INFO'] or ''
             data['agent'] = request.headers.get('User-Agent', 'N/A')
-            #data['session'] = session.sid
         return data
 
     def _create_guest(self):
         data = {'settings': {}}
 
-        if current_app.config.get('CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS', False):
+        if current_app.config.get(
+                'CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS', False):
             from invenio.ext.sqlalchemy import db
             from invenio.modules.accounts.models import User
-            note = '1' if current_app.config.get('CFG_ACCESS_CONTROL_LEVEL_GUESTS', 0) == 0 else '0'
+            note = '1' if current_app.config.get(
+                'CFG_ACCESS_CONTROL_LEVEL_GUESTS', 0) == 0 else '0'
             u = User(email='', note=note, password='guest')
             db.session.add(u)
             db.session.commit()
@@ -159,8 +149,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         return data
 
     def _login(self, uid, force=False):
-        """
-        Get account information about currently logged user from database.
+        """Get account information about currently logged user from database.
 
         Should raise an exception when session.uid is not valid User.id.
         """
@@ -177,8 +166,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
             data['nickname'] = user.nickname or ''
             data['email'] = user.email or ''
             data['note'] = user.note or ''
-            data['groups'] = map(lambda x: x.usergroup.name,
-                                 user.usergroups or [])
+            data['group'] = map(lambda x: x.usergroup.name,
+                                user.usergroups or [])
             data.update(user.settings or {})
             data['settings'] = user.settings or {}
             data['guest'] = str(int(user.guest))  # '1' or '0'
@@ -189,8 +178,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         return data
 
     def _precache(self, info, force=False):
-        """
-        Calculate prermitions for user actions.
+        """Calculate prermitions for user actions.
 
         FIXME: compatibility layer only !!!
         """
@@ -203,7 +191,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         if not force and acc_key is not None and acc is not None:
             return acc
 
-        #FIXME: acc_authorize_action should use flask request directly
+        # FIXME: acc_authorize_action should use flask request directly
         user_info = info
         user_info.update(self.req)
 
@@ -212,7 +200,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
         from invenio.modules.access.engine import acc_authorize_action
         from invenio.modules.access.control import acc_get_role_id, \
             acc_is_user_in_role
-        from invenio.legacy.search_engine import get_permitted_restricted_collections
+        from invenio.legacy.search_engine import \
+            get_permitted_restricted_collections
 
         data = {}
         data['precached_permitted_restricted_collections'] = \
@@ -256,7 +245,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
         except (KeyError, TypeError):
             pass
 
-        if (current_app.config.get('CFG_BIBAUTHORID_ENABLED') and usepaperattribution and viewlink):
+        if (current_app.config.get('CFG_BIBAUTHORID_ENABLED')
+                and usepaperattribution and viewlink):
             viewclaimlink = True
 
 #       if (CFG_BIBAUTHORID_ENABLED

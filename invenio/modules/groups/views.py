@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,45 +17,124 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebGroup Flask Blueprint"""
+"""Groups Flask Blueprint."""
 
-from flask import Blueprint, render_template, request, jsonify
+from flask import (Blueprint, render_template, request, jsonify, flash,
+                   url_for, redirect, abort)
 from flask.ext.login import current_user, login_required
+from flask.ext.menu import register_menu
 from invenio.base.decorators import wash_arguments
 from invenio.base.i18n import _
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
 
+from .forms import JoinUsergroupForm, UsergroupForm
+
 blueprint = Blueprint('webgroup', __name__, url_prefix="/yourgroups",
                       template_folder='templates', static_folder='static')
 
-default_breadcrumb_root(blueprint, '.webaccount.webgroup')
-
-def filter_by_user_status(uid, user_status, login_method='INTERNAL'):
-    return db.and_(UserUsergroup.id_user == uid,
-                   UserUsergroup.user_status == user_status,
-                   Usergroup.login_method == login_method)
+default_breadcrumb_root(blueprint, '.settings.groups')
 
 
 @blueprint.route('/')
-@blueprint.route('/index', methods=['GET', 'POST'])
-@register_breadcrumb(blueprint, '.', _('Your Groups'))
+@blueprint.route('/index')
+@register_menu(
+    blueprint, 'settings.groups',
+    _('%(icon)s Groups', icon='<i class="fa fa-group fa-fw"></i>'),
+    order=0,
+    active_when=lambda: request.endpoint.startswith("webgroup.")
+)
+@register_breadcrumb(blueprint, '.', _('Groups'))
 @login_required
 def index():
+    """List all user groups."""
     uid = current_user.get_id()
-    mg = Usergroup.query.join(Usergroup.users).\
-        filter(UserUsergroup.id_user==uid).all()
-        #filter_by_user_status(uid,
-        #CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])).\
-        #all()
+    current_user.reload()
+    mg = UserUsergroup.query.join(UserUsergroup.usergroup).filter(
+        UserUsergroup.id_user == uid).all()
+    member_groups = dict(map(lambda ug: (ug.usergroup.name, ug), mg))
 
-    return render_template('groups/index.html', member_groups=map(dict, mg))
+    return render_template(
+        'groups/index.html',
+        member_groups=member_groups,
+        form=JoinUsergroupForm(),
+    )
+
+
+@blueprint.route('/new', methods=['GET', 'POST'])
+@register_breadcrumb(blueprint, '.new', _('New Group'))
+@login_required
+def new():
+    """Create new user group."""
+    form = UsergroupForm(request.form)
+
+    if form.validate_on_submit():
+        ug = Usergroup()
+        form.populate_obj(ug)
+        ug.join(status=UserUsergroup.USER_STATUS['ADMIN'])
+        db.session.add(ug)
+        db.session.commit()
+        current_user.reload()
+        return redirect(url_for(".index"))
+
+    return render_template(
+        "groups/new.html",
+        form=form,
+    )
+
+
+@blueprint.route('/leave/<int:id_usergroup>')
+@login_required
+def leave(id_usergroup):
+    """Leave user group.
+
+    :param id_usergroup: Identifier of user group.
+    """
+    group = Usergroup.query.get(id_usergroup)
+    if group is None:
+        return abort(400)
+    group.leave()
+    db.session.merge(group)
+    db.session.commit()
+    current_user.reload()
+    flash(_('You left a group %(name)s.', name=group.name), 'success')
+    return redirect(url_for('.index'))
+
+
+@blueprint.route('/join', methods=['GET', 'POST'])
+@blueprint.route('/join/<int:id_usergroup>', methods=['GET', 'POST'])
+@login_required
+@wash_arguments({"id_usergroup": (int, 0)})
+def join(id_usergroup, status=None):
+    """Join group."""
+    group = Usergroup.query.get(id_usergroup)
+    if group is None:
+        return abort(400)
+    group.join()
+    db.session.merge(group)
+    db.session.commit()
+    current_user.reload()
+    flash(_('You join a group %(name)s.', name=group.name), 'success')
+    return redirect(url_for('.index'))
+
+
+@blueprint.route('/manage/<int:id_usergroup>', methods=['GET', 'POST'])
+def manage(id_usergroup):
+    """Manage user group."""
+    raise NotImplemented()
+
+
+@blueprint.route('/members/<int:id_usergroup>', methods=['GET', 'POST'])
+def members(id_usergroup):
+    """List user group members."""
+    raise NotImplemented()
 
 
 @blueprint.route("/search", methods=['GET', 'POST'])
 @wash_arguments({"query": (unicode, ""), "term": (unicode, "")})
 def search(query, term):
+    """Search user groups."""
     if query == 'users' and len(term) >= 3:
         res = db.session.query(User.nickname).filter(
             User.nickname.like("%s%%" % term)).limit(10).all()
@@ -71,51 +150,7 @@ def search(query, term):
 @blueprint.route("/tokenize", methods=['GET', 'POST'])
 @wash_arguments({"q": (unicode, "")})
 def tokenize(q):
+    """FIXME."""
     res = Usergroup.query.filter(
         Usergroup.name.like("%s%%" % q)).limit(10).all()
     return jsonify(data=map(dict, res))
-
-
-@blueprint.route("/join", methods=['GET', 'POST'])
-@blueprint.route("/leave", methods=['GET', 'POST'])
-@wash_arguments({"id": (int, 0)})
-def _manipulate_group(id):
-    uid = current_user.get_id()
-    try:
-        user = User.query.filter(User.id == uid).one()
-        group = Usergroup.query.filter(Usergroup.id == id).one()
-        if request.path.find("/join") > 0:
-            user.usergroups.append(UserUsergroup(usergroup=group))
-            db.session.add(user)
-        else:
-            [db.session.delete(ug) for ug in user.usergroups
-                            if ug.id_usergroup == id]
-            #UserUsergroup.query.filter(and_(
-            #    UserUsergroup.id_user==uid,
-            #    UserUsergroup.id_userusergroup==id_usergroup)).delete()
-        db.session.commit()
-        return jsonify(result=dict({'status':True}))
-    except:
-        db.session.rollback()
-        return jsonify(result=dict({'status':False}))
-
-
-
-#@blueprint.route("/add", methods=['GET', 'POST'])
-#@login_required
-#def add():
-#    uid = current_user.get_id()
-#    form = AddMsgMESSAGEForm(request.form)
-#    if form.validate_on_submit():
-#        m = MsgMESSAGE()
-#        form.populate_obj(m)
-#        try:
-#            db.session.add(m)
-#            db.session.commit()
-#            flash(_('Message was sent'), "info")
-#            return redirect(url_for('.display'))
-#        except:
-#            db.session.rollback()
-#
-#    return render_template('webgroup_add.html', form=form)
-#

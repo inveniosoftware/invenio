@@ -16,69 +16,68 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "page.html" %}
-{% set title = _("Your Groups") %}
-{% set personalize_selected = True %}
-{% block header %}
-  {{ super() }}
-  {%- js url_for("static", filename="js/jquery.tokeninput.js") -%}
-  {%- css url_for("static", filename="css/token-input.css") -%}
-{% endblock %}
-{% block javascript %}
-<script type="text/javascript">
-    $(document).ready(function() {
-      $("#add-group").tokenInput("{{ url_for(".tokenize") }}", {
-        onAdd: function (item) {
-          var request = $.ajax({
-            url: "{{ url_for(".join") }}",
-            type: "POST",
-            data: {id : item.id},
-            dataType: "html"
-          });
 
-          request.done(function() {
-              alert("{{ _("Joined group") }} " + item.name);
-          });
+{%- import "accounts/settings/helpers.html" as helpers with context %}
+{%- from "_formhelpers.html" import render_field with context %}
+{%- extends "accounts/settings/index_base.html" -%}
 
-          request.fail(function(jqXHR, textStatus) {
-              alert("{{ _("Request failed:") }} " + textStatus );
-          });
-        },
-        onDelete: function (item) {
-           var request = $.ajax({
-            url: "{{ url_for(".leave") }}",
-            type: "POST",
-            data: {id : item.id},
-            dataType: "html"
-          });
-
-          request.done(function() {
-            alert("{{ _("Left group") }} " + item.name);
-          });
-
-          request.fail(function(jqXHR, textStatus) {
-              alert("{{ _("Request failed:") }} " + textStatus );
-          });
-        },
-        prePopulate: {{ member_groups|tojson|safe }},
-        jsonContainer: "data",
-        preventDuplicates: true,
-        tokenFormatter: function(item) {
-          return '<li>' + item.name + ' <small style="color: #333;">' + item.description + '</small></li>'
-        },
-        onReady: function() {
-          $("ul li input").change(function() {
-            $("#create-group").val($(this).val());
-          });
-        }
-      });
-    });
-</script>
-{% endblock javascript %}
-{% block body %}
-<h3>{{ _("You are a member of the following groups:") }}</h3>
-<input id="create-group" name="name" /><button onclick="alert($('#create-group').val());">Add</button>
-<div>
-  <input id="add-group" name="id_usergroup" type="text" placeholder="{{ _("Join group") }}" value="" />
-</div>
+{% block settings_body %}
+{{helpers.panel_start(
+    'Groups',
+    icon='fa fa-group fa-fw',
+    btn=_('New group'),
+    btn_icon='fa fa-plus',
+    btn_href=url_for('webgroup.new'),
+    with_body=False)}}
+  <div class="panel-body">
+    <p>{{ _("You are a member of the following groups:") }}</p>
+  </div>
+  <ul class="list-group">
+  {% for group in current_user.group %}
+    {%- set is_external = group not in member_groups -%}
+    <li class="list-group-item">
+      <div class="pull-right">
+      {% if not is_external %}
+        {% set user_status = member_groups.get(group).user_status %}
+        {% if user_status == 'A' %}
+        <a class="btn btn-xs btn-default"
+           href="{{ url_for('webgroup.members',
+             id_usergroup=member_groups.get(group).id_usergroup) }}">
+          <i class="fa fa-users"></i> {{ _('Members') }}
+        </a>
+        <a class="btn btn-xs btn-default"
+           href="{{ url_for('webgroup.manage',
+             id_usergroup=member_groups.get(group).id_usergroup) }}">
+          <i class="fa fa-wrench"></i> {{ _('Manage') }}
+        </a>
+        {% endif %}
+        <a class="btn btn-xs btn-danger"
+           href="{{ url_for('webgroup.leave',
+             id_usergroup=member_groups.get(group).id_usergroup) }}">
+          <i class="fa fa-chain-broken"></i> {{ _('Leave') }}
+        </a>
+      {% endif %}
+      </div>
+      <h4 class="list-group-item-heading">{{ group }}</h4>
+      <p class="list-group-item-text">
+        {{ member_groups.get(group).usergroup.description
+           if not is_external else 'External' }}
+      </p>
+    </li>
+  {% endfor %}
+  </ul>
+  <div class="panel-footer">
+    <form class="form-inline" action="{{ url_for('webgroup.join') }}"
+          method="post" role="form">
+      <div class="form-group">
+        {%- for field in form %}
+          {{ render_field(field, with_label=False) }}
+        {%- endfor %}
+        <button type="submit" class="btn btn-default">
+          <i class="fa fa-chain"></i> {{ _('Join group') }}
+        </button>
+      </div>
+    </form>
+  </div>
+{{helpers.panel_end(with_body=False)}}
 {% endblock %}
