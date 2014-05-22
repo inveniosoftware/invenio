@@ -1,11 +1,19 @@
-A new upload requests to be added to your community ({{community.title.decode('utf8')}}):
-
-URL: {{config.CFG_SITE_URL}}/record/{{record.recid}}
-Submitter: {{record.owner.username}} ({{record.owner.email.decode('utf8')}})
-Title: {{record.title.decode('utf8')}}
-Description: {{record.description.decode('utf8')|striptags}}
-
-Please go to above URL and either accept or reject the upload for inclusion in your community collection.
-
-A full list of pending requests is available at:
-{{config.CFG_SITE_URL}}{{community.community_provisional_url}}
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- extends "communities/new_upload_email_base.html" -%}

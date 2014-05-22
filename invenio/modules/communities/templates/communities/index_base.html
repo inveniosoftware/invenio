@@ -1,0 +1,128 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "page.html" %}
+
+{% block title %}{% endblock %}
+
+{% block javascript %}
+{{super()}}
+{% endblock %}
+
+{% block body %}
+<div class="row" id="file_container">
+  <div class="col-sm-12 col-md-12">
+    <h1><i class="icon-group"></i> Community Collections</h1>
+    <p class="text-muted">Communities created and curated by {{config.CFG_SITE_NAME}} users</p>
+  </div>
+
+  <div class="col-sm-8 col-md-8">
+    {%- set args = request.args.copy().to_dict() -%}
+
+    <div class="form-group">
+      <div class="btn-group">
+        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+          <i class="glyphicon glyphicon-th"></i> {{ _('Sort by') }}
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          {%- for opt in ['title', 'ranking'] -%}
+            {%- set new_args = args.copy() -%}
+            {%- do new_args.update({'so': opt}) -%}
+            <li><a
+               href="{{ url_for('communities.index', **new_args) }}"
+               class="active">
+              <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if args.get('so', 'ranking')==opt }}"></i>
+              {{ opt }}
+            </a></li>
+          {%- endfor -%}
+          <!-- dropdown menu links -->
+        </ul>
+      </div>
+
+      <form action="." method="GET" id="search_form" class="form-horizontal" role="form" style="display:inline-block;">
+        <div class="controls col-md-9">
+          {{ form.p(class_="form-control col-md-5 " + form.p.short_name) }}
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="icon-ok  icon-white"></i> {{ _("Search") }}</button>
+      </form>
+    </div>
+
+    {%- for row in communities|batch(2) %}
+    <div class="row">
+        {%- for obj in row %}
+          {% if obj %}
+            <div class="col-sm-12 col-md-6">
+              <div class="well">
+                <ul class="pager pull-right" style="margin-top: 10px">
+                  <li><a href="{{obj.community_url}}" class="btn btn-info">View</a></li>
+                  {% if obj.id_user == current_user.id %}
+                    <li><a href="{{obj.community_provisional_url}}" class="btn btn-info">Curate</a></li>
+                  {% endif %}
+                </ul>
+                <h4>{{obj.title}}</h4><br />
+                <p>{{obj.description|striptags|truncate}}</p>
+                <small class="text-muted">Curated by: {{obj.owner.nickname}}</small>
+              </div>
+            </div>
+          {% endif %}
+        {%- endfor %}
+    </div>
+    {%- endfor %}
+
+    <ul class="pagination">
+      <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
+        {%- set new_args = args.copy() -%}
+        {%- do new_args.update({'page': 1}) -%}
+        <a title="first" href="{{ url_for('communities.index', **new_args) }}">«</a>
+      </li>
+      <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
+        {%- do args.update({'page': pagination.page-1 }) -%}
+        <a title="prev" href="{{ url_for('communities.index', **args) }}">&lsaquo;</a>
+      </li>
+      {%- for page_p in pagination.iter_pages() %}
+        {%- if page_p -%}
+          {%- set new_args = args.copy() -%}
+          {%- do new_args.update({'page': page_p}) -%}
+          <li{{ ' class="active"'|safe if page_p == pagination.page }}>
+          <a href="{{ url_for('communities.index', **new_args) }}">{{ page_p }}</a>
+        </li>
+        {%- else -%}
+          <li class="disabled"><a href="#">...</a></li>
+        {%- endif -%}
+      {%- endfor -%}
+      <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
+        {%- set new_args = args.copy() -%}
+        {%- do new_args.update({'page': pagination.page+1}) -%}
+        <a href="{{ url_for('communities.index', **new_args) }}">&rsaquo;</a>
+      </li>
+      <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
+        {%- set new_args = args.copy() -%}
+        {%- do new_args.update({'page': pagination.pages }) -%}
+        <a title="last" href="{{ url_for('communities.index', **new_args) }}">»</a>
+      </li>
+    </ul>
+
+  </div>
+
+  <div class="col-sm-4 col-md-4">
+    {% include "communities/mycommunities.html" %}
+  </div>
+</div>
+{% endblock %}
