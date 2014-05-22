@@ -2,12 +2,16 @@ body {
 	padding-top: 70px;
 }
 
-footer a, footer a:hover {
+#footer a, #footer a:hover {
   color: #666;
 }
-footer, footer p {
+#footer, #footer p {
   font-size: 11px;
   color: #333;
+}
+
+#footer .langs {
+  text-align: right;
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -16,7 +20,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 /* Lastly, apply responsive CSS fixes as necessary */
 @media (max-width: 767px) {
-  footer {
+  #footer {
     margin-left: -20px;
     margin-right: -20px;
     padding-left: 20px;
@@ -103,5 +107,4 @@ body {
 /* Set the fixed height of the footer here */
 #footer {
   height: 150px;
-  background-color: #f5f5f5;
 }
