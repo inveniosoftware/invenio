@@ -2220,16 +2220,15 @@ I think you might be interested in joining the group "%(x_name)s".
 You can join by clicking here: %(x_url)s.
 
 Best regards.
-""") % {'x_name': group_name,
+""", **{'x_name': group_name,
         'x_url': create_html_link("%s/yourgroups/join" % CFG_SITE_URL, { 'grpID' : grpID,
                                                                 'join_button' : "1",
                                                                 },
-                         link_label=group_name, escape_urlargd=True, escape_linkattrd=True)}})
+                         link_label=group_name, escape_urlargd=True, escape_linkattrd=True)})})
 
         link_open = '<a href="%s">' % escape_html(write_a_message_url)
-        invite_text = _("If you want to invite new members to join your group, please use the %(x_url_open)sweb message%(x_url_close)s system.") % \
-            {'x_url_open': link_open,
-             'x_url_close': '</a>'}
+        invite_text = _("If you want to invite new members to join your group, please use the %(x_url_open)sweb message%(x_url_close)s system.",
+            **{'x_url_open': link_open, 'x_url_close': '</a>'})
         action = CFG_SITE_URL + '/yourgroups/members?ln=' + ln
         out %= {'title':_('Group: %(x_name)s', x_name=escape_html(group_name)),
                 'member_text' : member_text,
