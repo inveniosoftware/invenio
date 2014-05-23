@@ -252,6 +252,8 @@ This message would have been sent to the following recipients:
                 server.ehlo()
             if CFG_MISCUTIL_SMTP_USER and CFG_MISCUTIL_SMTP_PASS:
                 server.login(CFG_MISCUTIL_SMTP_USER, CFG_MISCUTIL_SMTP_PASS)
+            if isinstance(toaddr, basestring):
+                toaddr = [toaddr]
             server.sendmail(fromaddr, toaddr + bccaddr, body)
             server.quit()
             sent = True
