@@ -54,9 +54,12 @@ def AclFactory(obj=''):
         """
 
         def is_authorized(self, user_info=None, action='viewrestr'):
-            """
-            Check if the user is authorized to access a document protected with
-            the given restrictions.
+            """Check if the user is authorized to perform the action with the
+            given restrictions.
+
+            This method is able to run *pre* and *post* hooks to extend its
+            functionality,
+            e.g. :class:`~invenio.modules.records.bases:DocumentsHooks`
 
             :param user_info: an instance of
                 :class:`~invenio.ext.login.legacy_user.UserInfo`
@@ -76,6 +79,15 @@ def AclFactory(obj=''):
                 return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
             is_authorized = (0, CFG_WEBACCESS_WARNING_MSGS[0])
+
+            try:
+                is_authorized = self.acl_pre_authorized_hook(
+                    user_info, action, is_authorized)
+            except AttributeError:
+                pass
+
+            if is_authorized[0] != 0:
+                return is_authorized
 
             for auth_type, auth_value in six.iteritems(restriction):
                 if auth_type == 'status':
@@ -107,6 +119,12 @@ def AclFactory(obj=''):
 
                 if is_authorized[0] != 0:
                     break
+
+            try:
+                is_authorized = self.acl_post_authorized_hook(
+                    user_info, action, is_authorized)
+            except AttributeError:
+                pass
 
             return is_authorized
 

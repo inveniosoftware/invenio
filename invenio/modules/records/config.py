@@ -29,3 +29,13 @@ RECORDS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy'
 RECORDS_SQLALCHEMYSTORAGE = {
     'model': RecordMetadataModel,
 }
+
+RECORD_DOCUMENT_NAME_GENERATOR = ('invenio.modules.records.utils:'
+                                  'default_name_generator')
+
+RECORD_DOCUMENT_VIEWRESTR_POLICY = 'ANY'
+"""When a document belongs to more than one record, and this policy is set to
+`ALL` the user must be authorized to view all the records to continue checking
+the access rights of the document. If the policy is set to `ANY` (default),
+then the user needs to be authorized to view at least one record in order to
+continue checking the document specific access rights."""

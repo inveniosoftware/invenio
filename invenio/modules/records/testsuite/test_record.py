@@ -20,14 +20,17 @@
 import os
 import pkg_resources
 
+from mock import patch
 from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
+
 from invenio.base.wrappers import lazy_import
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 from invenio.testsuite import make_test_suite, run_test_suite, \
     InvenioTestCase, nottest
 
 Record = lazy_import('invenio.modules.records.api:Record')
+Document = lazy_import('invenio.modules.documents.api:Document')
 
 Field_parser = lazy_import('invenio.modules.jsonalchemy.parser:FieldParser')
 Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
@@ -496,7 +499,55 @@ class TestMarcRecordCreation(InvenioTestCase):
         )
 
 
-TEST_SUITE = make_test_suite(TestRecord, TestMarcRecordCreation)
+class TestRecordDocuments(InvenioTestCase):
+
+    """Test record doccuments behaviour."""
+
+    def setUp(self):
+        self.app.config['DOCUMENTS_ENGINE'] = \
+            "invenio.modules.jsonalchemy.jsonext.engines.memory:MemoryStorage"
+
+    @patch('invenio.legacy.search_engine.check_user_can_view_record')
+    def test_restricted_record_non_restricted_document(
+            self, check_user_can_view_record_patch):
+        """Record - Restrcited access to record documents."""
+        d = Document.create({'title': 'Document 1',
+                             'description': 'Testing 1',
+                             'restriction': {'email': 'user@invenio.org'},
+                             'recids': [1,2,3],
+                             },
+                            model='record_document_base')
+        user_info = {'email': 'user@invenio.org',
+                     'uid': -1}
+        self.app.config['RECORD_DOCUMENT_VIEWRESTR_POLICY'] = 'ANY'
+        check_user_can_view_record_patch.return_value = (0, '')
+        self.assertEquals(d.is_authorized(user_info)[0], 0)
+
+        check_user_can_view_record_patch.return_value = (1, '')
+        self.assertEquals(d.is_authorized(user_info)[0], 1)
+
+        check_user_can_view_record_patch.side_effect = \
+                lambda user_info, recid: (recid%2, '')
+
+        # At least one record must be authorized
+        self.assertEquals(d.is_authorized(user_info)[0], 0)
+
+        # All records must be authorized
+        self.app.config['RECORD_DOCUMENT_VIEWRESTR_POLICY'] = 'ALL'
+        self.assertEquals(d.is_authorized(user_info)[0], 1)
+
+        check_user_can_view_record_patch.side_effect = None
+        check_user_can_view_record_patch.return_value = (0, '')
+
+        self.assertEquals(d.is_authorized(user_info)[0], 0)
+
+
+
+
+
+TEST_SUITE = make_test_suite(TestRecord,
+                             TestMarcRecordCreation,
+                             TestRecordDocuments)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)
