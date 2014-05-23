@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,9 +30,10 @@ from invenio.utils import persistentid as pidutils
 
 
 def replace_field_data(field_name, getter=None):
-    """
-    Returns a processor, which will replace the given field names value with
-    the value from the field where the processor is installed.
+    """Return a processor.
+
+    This will replace the given field names value with the value from the field
+    where the processor is installed.
     """
     def _inner(form, field, submit=False, fields=None):
         getattr(form, field_name).data = getter(field) if getter else \
@@ -41,9 +42,7 @@ def replace_field_data(field_name, getter=None):
 
 
 def set_flag(flag_name):
-    """
-    Returns a processor, which will set a given flag on a field.
-    """
+    """ Return processor which will set a given flag on a field."""
     def _inner(form, field, submit=False, fields=None):
         setattr(field.flags, flag_name, True)
     return _inner
@@ -53,9 +52,9 @@ def set_flag(flag_name):
 # PID processors
 #
 class PidSchemeDetection(object):
-    """
-    Detect the persistent identifier scheme and store it in another field.
-    """
+
+    """Detect persistent identifier scheme and store it in another field."""
+
     def __init__(self, set_field=None):
         self.set_field = set_field
 
@@ -69,9 +68,9 @@ class PidSchemeDetection(object):
 
 
 class PidNormalize(object):
-    """
-    Normalize a persistent identifier
-    """
+
+    """Normalize a persistent identifier."""
+
     def __init__(self, scheme_field=None):
         self.scheme_field = scheme_field
 
@@ -86,18 +85,18 @@ class PidNormalize(object):
 #
 
 def datacite_dict_mapper(datacite, form, mapping):
-    """
-    Helper function to map DataCite metadata to form fields based on a mapping
-    """
+    """Map DataCite metadata to form fields based on a mapping."""
     for func_name, field_name in mapping.items():
         setattr(form, field_name, getattr(datacite, func_name)())
 
 
 class DataCiteLookup(object):
+
+    """Lookup DOI metadata in DataCite.
+
+    But only if DOI is not locally administered.
     """
-    Lookup DOI metadata in DataCite but only if DOI is not locally
-    administered.
-    """
+
     def __init__(self, display_info=False, mapping=None,
                  mapping_func=None, exclude_prefix='10.5072'):
         self.display_info = display_info
