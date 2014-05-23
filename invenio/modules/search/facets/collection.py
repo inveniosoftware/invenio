@@ -21,4 +21,4 @@
 
 from ..facet_builders import CollectionFacetBuilder
 
-facet = CollectionFacetBuilder('collection', order=1)
+facet = CollectionFacetBuilder('collection')

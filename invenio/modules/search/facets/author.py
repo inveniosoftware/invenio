@@ -21,4 +21,4 @@
 
 from ..facet_builders import FacetBuilder
 
-facet = FacetBuilder('author', order=2)
+facet = FacetBuilder('author')

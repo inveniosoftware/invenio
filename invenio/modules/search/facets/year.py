@@ -21,4 +21,4 @@
 
 from ..facet_builders import FacetBuilder
 
-facet = FacetBuilder('year', order=3)
+facet = FacetBuilder('year')

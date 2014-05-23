@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -203,6 +203,8 @@ class Collection(db.Model):
     formatoptions = property(formatoptions)
 
     _examples_example = association_proxy('_examples', 'example')
+
+    facets = db.relationship('FacetCollection', backref='collection')
 
     @property
     #@cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
@@ -830,6 +832,21 @@ class CollectionFieldFieldvalue(db.Model):
                 lazy='joined')
 
 
+class FacetCollection(db.Model):
+
+    """Facet configuration for collection."""
+
+    __tablename__ = 'facet_collection'
+
+    id = db.Column(db.Integer, primary_key=True)
+    id_collection = db.Column(db.Integer, db.ForeignKey(Collection.id))
+    order = db.Column(db.Integer)
+    facet_name = db.Column(db.String(80))
+
+    def __repr__(self):
+        return ('FacetCollection <id: {0.id}, id_collection: {0.id_collection},'
+                ' order: {0.order}, facet_name: {0.facet_name}>'.format(self))
+
 __all__ = ['Collection',
            'Collectionname',
            'Collectiondetailedrecordpagetabs',
@@ -848,4 +865,5 @@ __all__ = ['Collection',
            'FieldTag',
            'WebQuery',
            'UserQuery',
-           'CollectionFieldFieldvalue']
+           'CollectionFieldFieldvalue',
+           'FacetCollection']

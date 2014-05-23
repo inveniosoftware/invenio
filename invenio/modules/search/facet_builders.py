@@ -22,20 +22,15 @@
 from operator import itemgetter
 from itertools import groupby
 from six import iteritems
-from werkzeug.utils import cached_property
 from flask import g, url_for, request
 from flask.ext.login import current_user
 
 from .cache import search_results_cache, \
     get_search_results_cache_key_from_qid
 from .models import Collection
-from .registry import facets
 
 from invenio.base.globals import cfg
-try:
-    from intbitset import intbitset
-except:
-    from intbitset import intbitset
+from intbitset import intbitset
 
 
 def get_current_user_records_that_can_be_displayed(qid):
@@ -103,42 +98,6 @@ def faceted_results_filter(recids, filter_data, facets):
     return output
 
 
-def _facet_plugin_checker(plugin_code):
-    """Handy function to check facet plugin."""
-    if 'facet' in dir(plugin_code):
-        candidate = getattr(plugin_code, 'facet')
-        if isinstance(candidate, FacetBuilder):
-            return candidate
-
-
-class FacetLoader(object):
-
-    """Facet loader helper class."""
-
-    @cached_property
-    def plugins(self):
-        """Loaded facet plugins."""
-        return filter(None, map(_facet_plugin_checker, facets))
-
-    @cached_property
-    def elements(self):
-        """Dict with `FacetBuilder` instances accesible by facet name."""
-        return dict((f.name, f) for f in self.plugins)
-
-    def __getitem__(self, key):
-        """Return element value."""
-        return self.elements[key]
-
-    @cached_property
-    def sorted_list(self):
-        """List of sorted facets by their order property."""
-        return sorted(self.elements.values(), key=lambda x: x.order)
-
-    def config(self, *args, **kwargs):
-        """Return facet config for all loaded plugins."""
-        return map(lambda x: x.get_conf(*args, **kwargs), self.sorted_list)
-
-
 class FacetBuilder(object):
 
     """Facet builder helper class.
@@ -147,10 +106,9 @@ class FacetBuilder(object):
     `get_most_popular_field_values`.
     """
 
-    def __init__(self, name, order=0):
+    def __init__(self, name):
         """Initialize facet builder."""
         self.name = name
-        self.order = order
 
     def get_title(self, **kwargs):
         """Return facet title."""

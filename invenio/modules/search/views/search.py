@@ -55,7 +55,7 @@ from werkzeug.local import LocalProxy
 from .. import receivers
 from ..cache import get_search_query_id, get_collection_name_from_cache
 from ..facet_builders import get_current_user_records_that_can_be_displayed, \
-    faceted_results_filter, FacetLoader
+    faceted_results_filter
 from ..forms import EasySearchForm
 from ..models import Collection
 from ..washers import wash_search_urlargd
@@ -71,6 +71,7 @@ from invenio.ext.template.context_processor import \
     register_template_context_processor
 from invenio.utils.pagination import Pagination
 from invenio.utils.text import slugify
+from invenio.modules.search.registry import facets
 
 blueprint = Blueprint('search', __name__, url_prefix="",
                       template_folder='../templates',
@@ -91,8 +92,6 @@ def _collection_of():
 collection_of = LocalProxy(_collection_of)
 
 """Collection output format."""
-
-FACETS = FacetLoader()
 
 
 def collection_name_from_request():
@@ -471,7 +470,7 @@ def search(collection, p, of, so, rm):
         session["websearch-last-query-hits"] = last_query_hits
 
     ctx = dict(
-        facets=FACETS.config(collection=collection, qid=qid),
+        facets=facets.get_facets_config(collection, qid),
         records=len(get_current_user_records_that_can_be_displayed(qid)),
         qid=qid, rg=rg,
         create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
@@ -492,7 +491,7 @@ def facet(name, qid):
     :return: jsonified facet list sorted by number of records
     """
     try:
-        out = FACETS[name].get_facets_for_query(
+        out = facets[name].get_facets_for_query(
             qid, limit=request.args.get('limit', 20))
     except KeyError:
         abort(406)
@@ -533,7 +532,7 @@ def results(qid, p, of, so, rm):
     def make_results(collection):
         recids = faceted_results_filter(recIDsHitSet,
                                         filter_data,
-                                        FACETS.elements)
+                                        facets)
         recids = sort_and_rank_records(recids, so=so, rm=rm, p=p)
 
         return response_formated_records(
