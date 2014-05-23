@@ -59,8 +59,10 @@ class DictModuleAutoDiscoverySubRegistry(ModuleAutoDiscoverySubRegistry):
     """
     ModuleAutoDiscoverySubRegistry that behaves like a dictionary.
 
-    You should either provide the ``keygetter`` keyword argument or subclass
-    and override the ``keygetter()`` method.
+    You should either provide a function to the ``keygetter`` keyword argument
+    or subclass and override the ``keygetter()`` method for determining the
+    key of values in the dictionary. Likewise provide ``valuegetter`` in the
+    same way to determine the registered value.
     """
     def __init__(self, *args, **kwargs):
         self._registry = {}
@@ -71,7 +73,7 @@ class DictModuleAutoDiscoverySubRegistry(ModuleAutoDiscoverySubRegistry):
             *args, **kwargs
         )
 
-    def keygetter(self, key, value):
+    def keygetter(self, key, original_value, new_value):
         """
         Method used to compute the key for a value being registered.
 
@@ -79,10 +81,11 @@ class DictModuleAutoDiscoverySubRegistry(ModuleAutoDiscoverySubRegistry):
         and override this method to customize the behaviour.
 
         :param key: Key if provided by the user. Defaults to None.
-        :param value: Value being registered.
+        :param original_value: Unmodified value being registered.
+        :param new_value: Modified value being registered.
         """
         if self._keygetter:
-            return self._keygetter(key, value)
+            return self._keygetter(key, original_value, new_value)
         raise RegistryError("Please provide a key or keygetter function.")
 
     def valuegetter(self, value):
@@ -97,14 +100,14 @@ class DictModuleAutoDiscoverySubRegistry(ModuleAutoDiscoverySubRegistry):
         :param value: Value being registered.
         :param key: Key, if provided by the user.
         """
-        value = self.valuegetter(value)
-        key = self.keygetter(key, value)
+        new_value = self.valuegetter(value)
+        key = self.keygetter(key, value, new_value)
 
         if key in self._registry:
             raise RegistryError("Key %s already registered." % key)
 
-        if value:
-            self._registry[key] = value
+        if new_value:
+            self._registry[key] = new_value
 
     def unregister(self, key):  # pylint: disable=W0221
         """
