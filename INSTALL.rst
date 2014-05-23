@@ -41,6 +41,7 @@ to it as ``$MYSQL_ROOT``.
 are troublesome so we recommend you to install them from Chris Lea's PPA.
 
 .. code-block:: console
+
     $ sudo add-apt-repository ppa:chris-lea/node.js
     $ sudo apt-get update
     $ sudo apt-get install nodejs

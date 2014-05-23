@@ -29,35 +29,36 @@ http://www.example.org, https://secure.example.org) following
 
 Configuration:
 
-===================== ====================================================
-`CFG_SITE_URL`        specify URL under which your installation will be
-                      visible.  For example, use "http://your.site.com".
-                      Do not leave trailing slash.
-`CFG_SITE_SECURE_URL` specify secure URL under which your installation
-                      secure pages such as login or registration will be
-                      visible.  For example, use "https://your.site.com".
-                      Do not leave trailing slash. If you don't plan on
-                      using HTTPS, then you may leave this empty.
-===================== ====================================================
++-----------------------+-----------------------------------------------------+
+| `CFG_SITE_URL`        | specify URL under which your installation will be   |
+|                       | visible.  For example, use "http://your.site.com".  |
+|                       | Do not leave trailing slash.                        |
++-----------------------+-----------------------------------------------------+
+| `CFG_SITE_SECURE_URL` | specify secure URL under which your installation    |
+|                       | secure pages such as login or registration will be  |
+|                       | visible.  For example, use "https://your.site.com". |
+|                       | Do not leave trailing slash. If you don't plan on   |
+|                       | using HTTPS, then you may leave this empty.         |
++-----------------------+-----------------------------------------------------+
 
+Following example shows how to make http and https url scheme look the
+same.
 
+.. doctest::
 
-Following example shows how to make http and https url scheme loos the
-same::
-
->>> from flask import url_for
->>> from invenio.base.factory import create_app
->>> app = create_app()
->>> app.config['CFG_SITE_URL'] = 'http://localhost:4000'
->>> app.config['CFG_SITE_SECURE_URL'] = 'http://localhost:4000'
->>> ctx = app.test_request_context()
->>> ctx.push()
->>> url_for('search.search')
-'/search'
->>> url_for('search.search', _external=True)
-'http://localhost:4000/search'
->>> url_for('search.search', _external=True, _scheme='https')
-'http://localhost:4000/search'
+    >>> from flask import url_for
+    >>> from invenio.base.factory import create_app
+    >>> app = create_app()
+    >>> app.config['CFG_SITE_URL'] = 'http://localhost:4000'
+    >>> app.config['CFG_SITE_SECURE_URL'] = 'http://localhost:4000'
+    >>> ctx = app.test_request_context()
+    >>> ctx.push()
+    >>> url_for('search.search')
+    '/search'
+    >>> url_for('search.search', _external=True)
+    'http://localhost:4000/search'
+    >>> url_for('search.search', _external=True, _scheme='https')
+    'http://localhost:4000/search'
 
 """
 

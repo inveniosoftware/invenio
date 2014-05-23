@@ -23,14 +23,14 @@ Modules
 .. toctree::
    :maxdepth: 1
 
-   modules/apikeys
    modules/annotations
+   modules/apikeys
    modules/documents
    modules/formatter
    modules/jsonalchemy
    modules/tags
-   modules/workflows
    modules/upgrader
+   modules/workflows
 
 Legacy
 ------

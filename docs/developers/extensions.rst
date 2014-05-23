@@ -15,7 +15,7 @@ extension running.
 .. _Flask Extension Development: http://flask.pocoo.org/docs/extensiondev/
 
 Plugging an Existing Extension
------------------------------
+------------------------------
 
 Extensions are all located in a package called ``flask_something``
 where "something" is the name of the extension you want to bridge.

@@ -1,4 +1,4 @@
-.. _getting-started:
+.. _developers-guide:
 
 =================
 Developer's Guide

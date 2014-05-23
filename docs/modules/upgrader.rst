@@ -7,11 +7,5 @@ Upgrader
 Models
 ------
 
-.. automodule:: invenio.modules.tags.models
-   :members:
-
-Views
------
-
-.. automodule:: invenio.modules.tags.views
+.. automodule:: invenio.modules.upgrader.models
    :members:

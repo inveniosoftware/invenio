@@ -53,6 +53,7 @@ S2. Setting up your private repo
 This is how to set up your private repo (on your laptop).
 
 .. code-block:: console
+
     $ cd ~/src
     $ git clone http://invenio-software.org/repo/invenio.git
 
