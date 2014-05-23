@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -38,12 +38,14 @@ import re
 
 
 class Serializable(object):
-    """Class which can present its fields as dict for json serialization"""
+
+    """Class which can present its fields as dict for JSON serialization."""
+
     # Set of fields which are to be serialized
     __public__ = set([])
 
     def _serialize_field(self, value):
-        """ Converts value of a field to format suitable for json """
+        """Convert value of a field to format suitable for json."""
         if type(value) in (datetime, date):
             return value.isoformat()
 
@@ -60,8 +62,10 @@ class Serializable(object):
             return value
 
     def serializable_fields(self, fields=None):
-        """Returns model's fields (__public__) or
-           intersection(fields, __public__) for jsonify"""
+        """Return model's fields for jsonify.
+
+        Only __public__ or fields + __public__.
+        """
         data = {}
         keys = self._sa_instance_state.attrs.items()
 
@@ -84,7 +88,9 @@ class Serializable(object):
 # TAG
 #
 class WtgTAG(db.Model, Serializable):
-    """ Represents a Tag """
+
+    """A Tag."""
+
     __tablename__ = 'wtgTAG'
     __public__ = set(['id', 'name', 'id_owner'])
 
@@ -132,8 +138,8 @@ class WtgTAG(db.Model, Serializable):
 
     # Access rights of owner
     user_access_rights = db.Column(db.Integer(2, unsigned=True),
-                            nullable=False,
-                            default=ACCESS_OWNER_DEFAULT)
+                                   nullable=False,
+                                   default=ACCESS_OWNER_DEFAULT)
 
     # Group
     # equal to 0 for private tags
@@ -150,8 +156,8 @@ class WtgTAG(db.Model, Serializable):
 
     # Access rights of everyone
     public_access_rights = db.Column(db.Integer(2, unsigned=True),
-                            nullable=False,
-                            default=ACCESS_LEVELS['Nothing'])
+                                     nullable=False,
+                                     default=ACCESS_LEVELS['Nothing'])
 
     # Visibility in document description
     show_in_description = db.Column(db.Boolean,
@@ -178,20 +184,21 @@ class WtgTAG(db.Model, Serializable):
     #Calculated fields
     @db.hybrid_property
     def record_count(self):
+        """TODO."""
         return self.records_association_query.count()
 
     @record_count.expression
     def record_count(cls):
-        return db.select([db.func.count(WtgTAGRecord.id_bibrec)]).\
-               where(WtgTAGRecord.id_tag == cls.id).\
-               label('record_count')
-
+        """TODO."""
+        return db.select([db.func.count(WtgTAGRecord.id_bibrec)]) \
+                 .where(WtgTAGRecord.id_tag == cls.id) \
+                 .label('record_count')
 
     @db.validates('user_access_rights')
     @db.validates('group_access_rights')
     @db.validates('public_access_rights')
     def validate_user_access_rights(self, key, value):
-        """ Check if the value is among defined levels """
+        """Check if the value is among defined levels."""
         assert value in WtgTAG.ACCESS_NAMES
         return value
 
@@ -200,7 +207,8 @@ class WtgTAG(db.Model, Serializable):
 # TAG - RECORD
 #
 class WtgTAGRecord(db.Model, Serializable):
-    """ Represents a connection between Tag and Record """
+
+    """Connection between Tag and Record."""
 
     __tablename__ = 'wtgTAG_bibrec'
     __public__ = set(['id_tag', 'id_bibrec', 'date_added'])
@@ -245,8 +253,8 @@ class WtgTAGRecord(db.Model, Serializable):
                                                       cascade='all',
                                                       lazy='dynamic'))
 
-    # Constructor
     def __init__(self, bibrec=None, **kwargs):
+        """TODO."""
         super(WtgTAGRecord, self).__init__(**kwargs)
 
         self.bibrec = bibrec
@@ -255,20 +263,25 @@ class WtgTAGRecord(db.Model, Serializable):
 # Compiling once should improve regexp speed
 class ReplacementList(object):
 
+    """TODO."""
+
     def __init__(self, config_name):
+        """TODO."""
         self.config_name = config_name
 
     @cached_property
     def replacements(self):
+        """TODO."""
         return cfg.get(self.config_name, [])
 
     @cached_property
     def compiled(self):
+        """TODO."""
         return [(re.compile(exp), repl)
                 for (exp, repl) in self.replacements]
 
     def apply(self, text):
-        """Applies a list of regular expression replacements to a string.
+        """Apply a list of regular expression replacements to a string.
 
         :param replacements: list of pairs (compiled_expression, replacement)
         """
@@ -286,33 +299,37 @@ COMPILED_REPLACEMENTS_BLOCKING = \
 
 
 def wash_tag_silent(tag_name):
-    """
+    r"""
     Whitespace and character cleanup.
 
-    :param tag_name: Single tag.
+    :param tag_name: Single tag
     :return: Tag Unicode string with all whitespace characters replaced with
-    Unicode single space (' '), no whitespace at the start and end of the tags,
-    no duplicate whitespace, and only characters valid in XML 1.0.
-    Also applies list of replacements from CFG_WEBTAG_REPLACEMENTS_SILENT.
+        Unicode single space (' '), no whitespace at the start and end of the
+        tags, no duplicate whitespace, and only characters valid in XML 1.0.
+        Also applies list of replacements from CFG_WEBTAG_REPLACEMENTS_SILENT.
 
     Examples:
-    >>> print(_tag_cleanup('Well formatted string: Should not be changed'))
-    Well formatted string: Should not be changed
-    >>> print(_tag_cleanup('double  space  characters'))
-    double space characters
-    >>> print(_tag_cleanup('All\\tthe\\ndifferent\\x0bwhitespace\\x0cin\\rone go'))
-    All the different whitespace in one go
-    >>> print(_tag_cleanup(' Preceding whitespace'))
-    Preceding whitespace
-    >>> print(_tag_cleanup('Trailing whitespace '))
-    Trailing whitespace
-    >>> print(_tag_cleanup('  Preceding and trailing double whitespace  '))
-    Preceding and trailing double whitespace
-    >>> _tag_cleanup(unichr(CFG_WEBTAG_LAST_MYSQL_CHARACTER))
-    u''
-    >>> from string import whitespace
-    >>> _tag_cleanup(whitespace)
-    ''
+
+    .. code-block:: pycon
+
+        >>> print(_tag_cleanup('Well formatted string: Should not be changed'))
+        Well formatted string: Should not be changed
+        >>> print(_tag_cleanup('double  space  characters'))
+        double space characters
+        >>> print(_tag_cleanup('All\tthe\ndifferent\x0bwhitespace\x0cin\rone '
+                               'go'))
+        All the different whitespace in one go
+        >>> print(_tag_cleanup(' Preceding whitespace'))
+        Preceding whitespace
+        >>> print(_tag_cleanup('Trailing whitespace '))
+        Trailing whitespace
+        >>> print(_tag_cleanup('  Preceding and trailing double whitespace  '))
+        Preceding and trailing double whitespace
+        >>> _tag_cleanup(unichr(CFG_WEBTAG_LAST_MYSQL_CHARACTER))
+        u''
+        >>> from string import whitespace
+        >>> _tag_cleanup(whitespace)
+        ''
     """
     if tag_name is None:
         return None
@@ -331,18 +348,16 @@ def wash_tag_silent(tag_name):
 
 
 def wash_tag_blocking(tag_name):
-    """ Applies list of replacements from CFG_WEBTAG_REPLACEMENTS_BLOCKING """
-
+    """Apply list of replacements from CFG_WEBTAG_REPLACEMENTS_BLOCKING."""
     if tag_name is None:
         return None
 
-     # replacements
+    # replacements
     tag_name = COMPILED_REPLACEMENTS_BLOCKING.apply(tag_name)
 
     return tag_name
 
 
 def wash_tag(tag_name):
-    """ Applies all washing procedures in order """
-
+    """Apply all washing procedures in order."""
     return wash_tag_blocking(wash_tag_silent(tag_name))

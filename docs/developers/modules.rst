@@ -3,9 +3,10 @@
 Modules
 =======
 
-Modules are application components that can be use within an application
-or across aplications.  They can contains `SQLAlchemy`_ models, `Flask`_
-views, `Jinja2`_ templates and other ref:`pluggable-objects`.
+Modules are application components that can be use within an application or
+across aplications.  They can contains :ref:`SQLAlchemy <sqlalchemy:overview>`
+models, :ref:`Flask view <flask:tutorial>`, :py:class:`Jinja2 templates
+<jinja:jinja2.Template>` and other :ref:`pluggable-objects`.
 
 Discovery of modules is done based on configuration parameter called
 ``PACKAGES``, where expansion character `*` is supported at the end of

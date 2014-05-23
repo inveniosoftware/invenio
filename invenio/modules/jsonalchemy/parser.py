@@ -18,15 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-    invenio.modules.jsonalchemy.parser
-    ---------------------------------
+Fields and models configuration loader.
 
-    Fields and models configuration loader.
+This module uses `pyparsing <http://pyparsing.wikispaces.com/>` to read
+from thedifferent configuration files the field and model definitions.
 
-    This module uses `pyparsing <http://pyparsing.wikispaces.com/>` to read
-    from thedifferent configuration files the field and model definitions.
-
-    Extensions to both parsers could be added inside jsonext.parsers
+Extensions to both parsers could be added inside jsonext.parsers
 """
 import os
 import six
@@ -56,6 +53,8 @@ PYTHON_ALLOWED_EXPR = (DICT_DEF ^ LIST_DEF ^ DICT_ACCESS ^
 
 def indentedBlock(expr, indent_stack, indent=True):
     """
+    Define space-delimited indentation blocks.
+
     Helper method for defining space-delimited indentation blocks, such as
     those used to define block statements in Python source code.
 
@@ -64,7 +63,7 @@ def indentedBlock(expr, indent_stack, indent=True):
     """
     #TODO: update this to use indentStact from new versions of pyparsing
     def check_sub_indent(string, location, tokens):
-        """Helper functions to check indentation"""
+        """Check the indentation."""
         cur_col = col(location, string)
         if cur_col > indent_stack[-1]:
             indent_stack.append(cur_col)
@@ -72,7 +71,7 @@ def indentedBlock(expr, indent_stack, indent=True):
             raise ParseException(string, location, "not a subentry")
 
     def check_unindent(string, location, tokens):
-        """Helper function to check 'undentation'"""
+        """Check the 'undentation'."""
         if location >= len(string):
             return
         cur_col = col(location, string)
@@ -80,7 +79,7 @@ def indentedBlock(expr, indent_stack, indent=True):
             raise ParseException(string, location, "not an unindent")
 
     def do_unindent():
-        """Helper function to unindent"""
+        """Unindent."""
         indent_stack.pop()
 
     indent = lineEnd.suppress() + empty + empty.copy()\
@@ -93,9 +92,11 @@ def indentedBlock(expr, indent_stack, indent=True):
 
 def _create_field_parser():
     """
-    Creates a parser that can handle field definitions
+    Create a parser that can handle field definitions.
 
     BFN like grammar::
+
+        TODO
 
     """
     indent_stack = [1]
@@ -184,19 +185,20 @@ def _create_field_parser():
 
 def _create_model_parser():
     """
-    Creates a parser that can handle model definitions.
+    Create a parser that can handle model definitions.
 
     BFN like grammar::
 
+        TODO
 
     Note: Unlike the field configuration files where you can specify more than
     one field inside each file for the models only one definition is
     allowed by file.
     """
     def build_dict_for_fields(tokens):
-        """
-        Build the dictionary wih the field definitions:
-            {'field_name': 'json_identifier'}
+        """Build the dictionary wih the field definitions.
+
+        E.g. ``{'field_name': 'json_identifier'}``
         """
         dict_ = dict()
         for token in tokens:
@@ -228,7 +230,8 @@ def _create_model_parser():
 
 
 class FieldParser(object):
-    """Field definitions parser"""
+
+    """Field definitions parser."""
 
     _field_definitions = {}
     """Dictionary containing all the rules needed to create and validate json
@@ -248,13 +251,14 @@ class FieldParser(object):
     """Decorator after only parser extensions"""
 
     def __init__(self, namespace):
+        """Initialize."""
         #Autodiscover cfg files
         self.files = list(fields_definitions(namespace))
         self.__namespace = namespace
 
     @classmethod
     def field_extensions(cls):
-        """From the parser registry gets only the field parser extensions"""
+        """Get the field parser extensions from the parser registry."""
         if cls._field_extensions is None:
             cls._field_extensions = dict(
                 (module.parser.__parsername__, module.parser)
@@ -265,7 +269,7 @@ class FieldParser(object):
 
     @classmethod
     def decorator_before_extensions(cls):
-        """From the parser registry gets only the field parser extensions"""
+        """TODO."""
         if cls._decorator_before_extensions is None:
             cls._decorator_before_extensions = dict(
                 (module.parser.__parsername__, module.parser)
@@ -276,7 +280,7 @@ class FieldParser(object):
 
     @classmethod
     def decorator_on_extensions(cls):
-        """From the parser registry gets only the field parser extensions"""
+        """TODO."""
         if cls._decorator_on_extensions is None:
             cls._decorator_on_extensions = dict(
                 (module.parser.__parsername__, module.parser)
@@ -287,7 +291,7 @@ class FieldParser(object):
 
     @classmethod
     def decorator_after_extensions(cls):
-        """From the parser registry gets only the field parser extensions"""
+        """TODO."""
         if cls._decorator_after_extensions is None:
             cls._decorator_after_extensions = dict(
                 (module.parser.__parsername__, module.parser)
@@ -299,7 +303,8 @@ class FieldParser(object):
     @classmethod
     def field_definitions(cls, namespace):
         """
-        From a given namespace gets all the field definitions from it.
+        Get all the field definitions from a given namespace.
+
         If the namespace does not exist, it tries to create it first
         """
         if namespace not in cls._field_definitions:
@@ -309,7 +314,10 @@ class FieldParser(object):
     @classmethod
     def field_definition_model_based(cls, field_name, model_name, namespace):
         """
-        Based on a model name (and namespace) it gets the real field definition.
+        Get the real field definition based on the model name.
+
+        Based on a model name (and namespace) it gets the real field
+        definition.
         """
         new_model = ModelParser.resolve_models(model_name, namespace)
         json_id = field_name
@@ -322,7 +330,8 @@ class FieldParser(object):
     @classmethod
     def legacy_field_matchings(cls, namespace):
         """
-        Gets all the legacy mappings for a given namespace.
+        Get all the legacy mappings for a given namespace.
+
         If the namespace does not exist, it tries to create it first
 
         :see: guess_legacy_field_names()
@@ -334,7 +343,9 @@ class FieldParser(object):
     @classmethod
     def reparse(cls, namespace):
         """
-        Invalidates the cached version of all the fields inside the given
+        Reparse all the fields.
+
+        Invalidate the cached version of all the fields inside the given
         namespace and parse them again.
         """
         cls._field_definitions[namespace] = {}
@@ -343,6 +354,8 @@ class FieldParser(object):
 
     def _create(self):
         """
+        Create the fields and legacy fields definitions from configuration.
+
         Fills up _field_definitions and _legacy_field_matchings dictionary with
         the rules defined inside the configuration files.
 
@@ -384,8 +397,11 @@ class FieldParser(object):
 
     def _create_rule(self, rule):
         """
-        Creates the field and legacy definitions.
-        The result looks like this::
+        Create the field and legacy definitions.
+
+        The result looks like this.
+
+        .. code-block:: json
 
             {key: { override: True/False,
                     extend: True/False,
@@ -401,7 +417,9 @@ class FieldParser(object):
                    }
             }
 
-        Each of the rule (rule1, rule2, etc.) has the same content::
+        Each of the rule (rule1, rule2, etc.) has the same content.
+
+        .. code-block:: json
 
             {'source_format' : source_format/calculated/derived,
              'source_tag'    : source_tag/None,
@@ -464,8 +482,10 @@ class FieldParser(object):
 
     def __resolve_parser_extensions(self, rule):
         """
-        For each of the extension available it tries to apply it in the incoming
-        rule
+        Apply the incoming rule for each extension.
+
+        For each of the extension available it tries to apply it in the
+        incoming rule
         """
         json_id = rule.field['json_id']
         for name, parser in six.iteritems(self.__class__.field_extensions()):
@@ -475,7 +495,7 @@ class FieldParser(object):
                                                            self.__namespace)
 
     def __create_decorators_content(self, rule, field_def):
-        """Extracts from the rule all the possible decorators"""
+        """Extract from the rule all the possible decorators."""
         decorators = {'before': {}, 'on': {}, 'after': {}}
 
         for name, parser in six.iteritems(self.__class__.decorator_before_extensions()):
@@ -502,21 +522,23 @@ class FieldParser(object):
 
 
 class ModelParser(object):
-    """Record model parser"""
+
+    """Record model parser."""
 
     _model_definitions = {}
-    """Contains all the model definitions order by namespace"""
+    """Contain all the model definitions order by namespace."""
 
     _parser_extensions = None
-    """Model only parser extensions"""
+    """Model only parser extensions."""
 
     def __init__(self, namespace):
+        """Initialize the model parser with the given namespace."""
         self.files = list(models_definitions(namespace))
         self.__namespace = namespace
 
     @classmethod
     def parser_extensions(cls):
-        """From the parser registry gets only the model parser extensions"""
+        """Get only the model parser extensions from the parser registry."""
         if cls._parser_extensions is None:
             cls._parser_extensions = \
                 dict((module.parser.__parsername__, module.parser)
@@ -527,8 +549,9 @@ class ModelParser(object):
     @classmethod
     def model_definitions(cls, namespace):
         """
-        From a given namespace gets all the model definitions from it.
-        If the namespace does not exist, it tries to create it first
+        Get all the model definitions given a namespace.
+
+        If the namespace does not exist, it tries to create it first.
         """
         if namespace not in cls._model_definitions:
             cls.reparse(namespace)
@@ -537,14 +560,15 @@ class ModelParser(object):
     @classmethod
     def resolve_models(cls, model_list, namespace):
         """
+        Resolve all the field conflicts.
+
         From a given list of model definitions resolves all the field conflicts
         and returns a new model definition containing all the information from
         the model list.
         The field definitions are resolved from left-to-right.
 
         :param model_list: It could be also a string, in which case the model
-        definition is returned as it is.
-
+            definition is returned as it is.
         :return: Dictionary containing the union of the model definitions.
         """
         if model_list == '__default__':
@@ -591,21 +615,25 @@ class ModelParser(object):
     @classmethod
     def reparse(cls, namespace):
         """
-        Invalidates the cached version of all the models inside the given
-        namespace and parse it again.
+        Invalidate the cached version of all the models.
+
+        It does it inside the given namespace and parse it again.
         """
         cls._model_definitions[namespace] = {}
         cls(namespace)._create()
 
     def _create(self):
         """
-        Fills up _model_definitions dictionary with what is written inside the
-        *.cfg  model descriptions
+        Fill up _model_definitions dictionary.
+
+        It uses what is written inside the `*.cfg`  model descriptions
 
         It also resolve inheritance at creation time and name matching for the
         field names present inside the model file
 
-        The result looks like this::
+        The result looks like this:
+
+        .. code-block:: json
 
             {'model': {'fields': {'name_for_fieldfield1': json_id1,
                                   'name_for_field2': json_id2,
@@ -661,7 +689,7 @@ class ModelParser(object):
         self.__resolve_inheritance()
 
     def __resolve_inheritance(self):
-        """Resolves the inheritance"""
+        """Resolve the inheritance."""
         def resolve_ext_inheritance(ext_name, model_definition):
             for inherit_from in model_definition['bases']:
                 base_model = self.__class__.model_definitions(
@@ -698,10 +726,7 @@ class ModelParser(object):
                     name, model_definition)
 
     def __resolve_parser_extensions(self, model_name, model_def):
-        """
-        For each of the extension available it tries to apply it in the incoming
-        rule
-        """
+        """Apply the incoming rule for each available extension."""
         for name, parser in six.iteritems(self.__class__.parser_extensions()):
             if name in model_def:
                 self.__class__._model_definitions[self.__namespace][
@@ -711,11 +736,16 @@ class ModelParser(object):
 
 def guess_legacy_field_names(fields, master_format, namespace):
     """
+    Find the equivalent JSON field for the legacy field(s).
+
     Using the legacy rules written in the config file (@legacy) tries to find
     the equivalent json field for one or more legacy fields.
 
-    >>> guess_legacy_fields(('100__a', '245'), 'marc', 'recordext')
-    {'100__a':['authors[0].full_name'], '245':['title']}
+    .. doctest::
+
+        >>> guess_legacy_fields(('100__a', '245'), 'marc', 'recordext')
+        {'100__a':['authors[0].full_name'], '245':['title']}
+
     """
     res = {}
     if isinstance(fields, six.string_types):
@@ -731,23 +761,27 @@ def guess_legacy_field_names(fields, master_format, namespace):
 
 def get_producer_rules(field, code, namespace, model=['__default__']):  # pylint: disable=W0102
     """
+    Get all the producer rules related with the field and code.
+
     From the field definitions gets all the producer rules related with the
     field and the code (using also the namespace).
 
     For each producer rule the first element are the 'preconditions' to apply
     the rules and the second one are the actual rules.
 
-    >>> get_producer_rules('_first_author', 'json_for_marc', 'recordext')
-    [((),
-      {'100__a': 'full_name',
-       '100__e': 'relator_name',
-       '100__h': 'CCID',
-       '100__i': 'INSPIRE_number',
-       '100__u': 'affiliation'})]
-    >>> get_producer_rules('title', 'json_for_marc', 'recordext')
-    [[((), {'245__a': 'title', '245__b': 'subtitle', '245__k': 'form'})]
-    """
+    .. doctest::
 
+        >>> get_producer_rules('_first_author', 'json_for_marc', 'recordext')
+        [((),
+          {'100__a': 'full_name',
+           '100__e': 'relator_name',
+           '100__h': 'CCID',
+           '100__i': 'INSPIRE_number',
+           '100__u': 'affiliation'})]
+        >>> get_producer_rules('title', 'json_for_marc', 'recordext')
+        [[((), {'245__a': 'title', '245__b': 'subtitle', '245__k': 'form'})]
+
+    """
     try:
         return FieldParser.field_definition_model_based(field, model, namespace)\
             .get('producer', {}).get(code, [])
@@ -756,9 +790,11 @@ def get_producer_rules(field, code, namespace, model=['__default__']):  # pylint
 
 
 class BaseExtensionParser(type):  # pylint: disable=R0921
-    """Metaclass for the configuration file extensions"""
+
+    """Metaclass for the configuration file extensions."""
 
     def __new__(mcs, name, bases, dict_):
+        """TODO."""
         if not dict_.get('__parsername__'):
             dict_['__parsername__'] = name.lower().replace('parser', '')
 
@@ -767,6 +803,8 @@ class BaseExtensionParser(type):  # pylint: disable=R0921
     @classmethod
     def parse_element(mcs, indent_stack):
         """
+        Parse the element.
+
         Using pyparsing defines a piece of the grammar to parse the
         extension from configuration file
 
@@ -777,6 +815,8 @@ class BaseExtensionParser(type):  # pylint: disable=R0921
     @classmethod
     def create_element(mcs, *args, **kwargs):
         """
+        Create the element.
+
         Once the extension is parsed defines the actions that have to be taken
         to store inside the field_definitions the information needed or useful.
         """
@@ -785,6 +825,8 @@ class BaseExtensionParser(type):  # pylint: disable=R0921
     @classmethod
     def add_info_to_field(mcs, *args, **kwargs):
         """
+        Define with information goes into the meta-metadata dictionary.
+
         Defines which information goes inside the ``__meta_metadata__``
         dictionary and how.
         """
@@ -793,6 +835,8 @@ class BaseExtensionParser(type):  # pylint: disable=R0921
     @classmethod
     def evaluate(mcs, *args, **kwargs):
         """
+        Evaluate the field.
+
         Once the extension information is added to the field, whenever it gets
         accessed or modify this method is call for each of the extension set
         in the metadata of this field.
@@ -801,11 +845,14 @@ class BaseExtensionParser(type):  # pylint: disable=R0921
 
 
 class FieldBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pylint: disable=W0223,W0232,R0903,R0921
+
     """Base class for field parser extensions."""
 
     @classmethod
     def add_info_to_field(cls, json_id, info):
         """
+        Create the content of ``extension_name``.
+
         Should create the content of ``__meta_metadata__.json.extension_name``
         """
         raise NotImplementedError()
@@ -813,6 +860,8 @@ class FieldBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pyli
     @classmethod
     def evaluate(cls, json, field_name, action, args):
         """
+        Evaluate the field.
+
         Depending on the extension perform the actions that it defines using
         the current value as parameter. (It could cause side effects on the
         current json)
@@ -821,11 +870,14 @@ class FieldBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pyli
 
 
 class ModelBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pylint: disable=W0223,W0232,R0903,R0921
+
     """Base class for model parser extensions."""
 
     @classmethod
     def inherit_model(cls, current_value, base_value):
         """
+        Inherit the model from other.
+
         When a model inherits from other (or several) it should resolve the
         inheritance taking the current value and the base value from the
         extension.
@@ -835,6 +887,8 @@ class ModelBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pyli
     @classmethod
     def extend_model(cls, current_value, new_value):
         """
+        Extend the model.
+
         When a json object is using several models this method should provide
         the logic to extend the content of the extensions.
 
@@ -845,6 +899,8 @@ class ModelBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pyli
     @classmethod
     def add_info_to_field(cls, info):
         """
+        Define with information goes into the model dictionary.
+
         Defines which information goes inside the
         ``__meta_metadata__.__model__``  dictionary and how.
 
@@ -854,6 +910,8 @@ class ModelBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pyli
     @classmethod
     def evaluate(cls, obj, args):
         """
+        Get and modify the current object.
+
         Gets the current object (typically a SmartJson object) and modifies it
         accordingly with the extension nature.
         """
@@ -861,56 +919,71 @@ class ModelBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pyli
 
 
 class DecoratorBaseExtensionParser(six.with_metaclass(BaseExtensionParser)):  # pylint: disable=W0223,W0232,R0903
-    """ Base class for decorator parser extension"""
+
+    """Base class for decorator parser extension."""
+
     pass
 
 
 class DecoratorBeforeEvalBaseExtensionParser(DecoratorBaseExtensionParser):  # pylint: disable=W0223,W0232,R0903,R0921
+
     """
-    Base class for decorator parser extensions, this ones will be evaluated
-    *before* any operation on the value.
+    Base class for decorator parser extensions.
+
+    This ones will be evaluated *before* any operation on the value.
     """
 
     @classmethod
     def evaluate(cls, reader, args):
-        """Evaluates ``args`` and returns a boolean depending on them"""
+        """Evaluate ``args`` and returns a boolean depending on them."""
         raise NotImplementedError()
 
 
 class DecoratorOnEvalBaseExtensionParser(DecoratorBaseExtensionParser):  # pylint: disable=W0223,W0232,R0903,R0921
+
     """
-    Base class for decorator parser extensions, this ones will be evaluated
-    *while* the rule gets evaluated with the input value. (Therefore they have
-    access to ``value``)
-    This decorators are only useful for ``creator`` definitions.
+    Base class for decorator parser extensions.
+
+    this ones will be evaluated *while* the rule gets evaluated with the input
+    value. (Therefore they have access to ``value``) This decorators are only
+    useful for ``creator`` definitions.
     """
 
     @classmethod
     def evaluate(cls, value, namespace, args):
         """
-        Evaluates ``args`` with the master value from the input and returns a
-        boolean depending on them.
+        Evaluate ``args`` with the master value from the input.
+
+        :returns: a boolean depending on them.
         """
         raise NotImplementedError()
 
 
 class DecoratorAfterEvalBaseExtensionParser(DecoratorBaseExtensionParser):  # pylint: disable=W0223,W0232,R0903,R0921
+
     """
-    Base class for decorator parser extensions, this one will be evaluated
-    *after* the rule gets evaluated anb before setting the value to the json.
+    Base class for decorator parser extensions.
+
+    This one will be evaluated *after* the rule gets evaluated and before
+    setting the value to the json.
     """
 
     @classmethod
     def add_info_to_field(cls, json_id, info, args):
         """
+        Add a field to the JSON so it can be evaluated.
+
         When adding a new field to the json, if its definition uses the current
-        decorator it adds the needed content in a way that ``evaluate`` can use.
+        decorator it adds the needed content in a way that ``evaluate`` can
+        use.
         """
         raise NotImplementedError()
 
     @classmethod
     def evaluate(cls, json, field_name, action, args):
         """
+        Evaluate the actions depending on the decoratior.
+
         Depending on the decorator performs the actions that it defines using
         the current value as parameter. (It could cause side effects on the
         current json).

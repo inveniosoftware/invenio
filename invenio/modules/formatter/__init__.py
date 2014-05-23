@@ -16,9 +16,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-from __future__ import print_function
-
 """
 Format records using chosen format.
 
@@ -33,10 +30,12 @@ functions. This is also where special formatting functions of multiple
 records (that the engine does not handle, as it works on a single
 record basis) should be defined, with name C{def create_*}.
 
-@see: bibformat_utils.py
-"""
+.. seealso::
 
-__revision__ = "$Id$"
+    bibformat_utils.py
+
+"""
+from __future__ import print_function
 
 import getopt
 import sys
@@ -46,9 +45,9 @@ import six
 from flask import current_app
 from invenio.base.globals import cfg
 
+
 # Functions to format a single record
 ##
-
 def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False):
     """
@@ -70,26 +69,31 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
     is the same object as the one returned by
     'webuser.collect_user_info(req)'
 
-    @param recID: the ID of record to format.
-    @type recID: int
-    @param of: an output format code (or short identifier for the output format)
-    @type of: string
-    @param ln: the language to use to format the record
-    @type ln: string
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
-                                                       5: errors,
-                                                       7: errors and warnings, stop if error in format elements
-                                                       9: errors and warnings, stop if error (debug mode ))
-    @type verbose: int
-    @param search_pattern: list of strings representing the user request in web interface
-    @type search_pattern: list(string)
-    @param xml_record: an xml string represention of the record to format
-    @type xml_record: string or None
-    @param user_info: the information of the user who will view the formatted page (if applicable)
-    @param on_the_fly: if False, try to return an already preformatted version of the record in the database
-    @type on_the_fly: boolean
-    @return: formatted record
-    @rtype: string
+    :param recID: the ID of record to format.
+    :type recID: int
+    :param of: an output format code (or short identifier for the output
+               format)
+    :type of: string
+    :param ln: the language to use to format the record
+    :type ln: string
+    :param verbose: the level of verbosity from 0 to 9.
+                    - O: silent
+                    - 5: errors
+                    - 7: errors and warnings, stop if error in format elements
+                    - 9: errors and warnings, stop if error (debug mode)
+    :type verbose: int
+    :param search_pattern: list of strings representing the user request in web
+                           interface
+    :type search_pattern: list(string)
+    :param xml_record: an xml string represention of the record to format
+    :type xml_record: string or None
+    :param user_info: the information of the user who will view the formatted
+                      page (if applicable)
+    :param on_the_fly: if False, try to return an already preformatted version
+                       of the record in the database
+    :type on_the_fly: boolean
+    :return: formatted record
+    :rtype: string
     """
     ln = ln or cfg['CFG_SITE_LANG']
     from invenio.legacy.search_engine import record_exists
@@ -105,14 +109,15 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
     if cfg['CFG_BIBFORMAT_USE_OLD_BIBFORMAT'] and cfg['CFG_PATH_PHP']:
         from . import engine as bibformat_engine
-        return bibformat_engine.call_old_bibformat(recID, of=of, on_the_fly=on_the_fly)
+        return bibformat_engine.call_old_bibformat(recID, of=of,
+                                                   on_the_fly=on_the_fly)
     ############################# END ##################################
     if not on_the_fly and \
-       (ln == cfg['CFG_SITE_LANG'] or \
-        of.lower() == 'xm' or \
-        cfg['CFG_BIBFORMAT_USE_OLD_BIBFORMAT'] or \
-        (of.lower() in cfg['CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS'])) and \
-        record_exists(recID) != -1:
+       (ln == cfg['CFG_SITE_LANG'] or
+        of.lower() == 'xm' or
+        cfg['CFG_BIBFORMAT_USE_OLD_BIBFORMAT'] or
+        (of.lower() in cfg['CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS'])) \
+       and record_exists(recID) != -1:
         # Try to fetch preformatted record. Only possible for records
         # formatted in CFG_SITE_LANG language (other are never
         # stored), or of='xm' which does not depend on language.
@@ -133,7 +138,8 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
             if of.lower() == 'xm':
                 res = filter_hidden_fields(res, user_info)
             # try to replace language links in pre-cached res, if applicable:
-            if ln != cfg['CFG_SITE_LANG'] and of.lower() in cfg['CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS']:
+            if ln != cfg['CFG_SITE_LANG'] and of.lower() in \
+                    cfg['CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS']:
                 # The following statements try to quickly replace any
                 # language arguments in URL links.  Not an exact
                 # science, but should work most of the time for most
@@ -141,15 +147,15 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                 # We don't have time to parse output much here.
                 res = res.replace('?ln=' + cfg['CFG_SITE_LANG'], '?ln=' + ln)
                 res = res.replace('&ln=' + cfg['CFG_SITE_LANG'], '&ln=' + ln)
-                res = res.replace('&amp;ln=' + cfg['CFG_SITE_LANG'], '&amp;ln=' + ln)
+                res = res.replace('&amp;ln=' + cfg['CFG_SITE_LANG'],
+                                  '&amp;ln=' + ln)
             out += res
             return out
         else:
             if verbose == 9:
-                out += """\n<br/><span class="quicknote">
-                No preformatted output found for record %s.
-                </span>"""% recID
-
+                out += """\n<br/><span class="quicknote">""" \
+                       """No preformatted output found for record %s.""" \
+                       """</span>""" % recID
 
     # Live formatting of records in all other cases
     if verbose == 9:
@@ -173,8 +179,8 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
         if current_app.debug:
             six.reraise(*sys.exc_info())
         from invenio.ext.logging import register_exception
-        register_exception(prefix="An error occured while formatting record %i in %s" % \
-                           (recID, of),
+        register_exception(prefix="An error occured while formatting record "
+                                  "%i in %s" % (recID, of),
                            alert_admin=True)
         #Failsafe execution mode
         import invenio.legacy.template
@@ -185,24 +191,24 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
             </span>""" % (recID, str(e))
         if of.lower() == 'hd':
             if verbose == 9:
-                out += """\n<br/><span class="quicknote">
-                Formatting record %i with websearch_templates.tmpl_print_record_detailed.
-                </span><br/>""" % recID
+                out += """\n<br/><span class="quicknote">Formatting record""" \
+                       """ %i with """ \
+                       """websearch_templates.tmpl_print_record_detailed.""" \
+                       """</span><br/>""" % recID
                 return out + websearch_templates.tmpl_print_record_detailed(
-                    ln = ln,
-                    recID = recID,
-                    )
+                    ln=ln,
+                    recID=recID)
         if verbose == 9:
-            out += """\n<br/><span class="quicknote">
-            Formatting record %i with websearch_templates.tmpl_print_record_brief.
-            </span><br/>""" % recID
+            out += """\n<br/><span class="quicknote">Formatting record %i """ \
+                   """with websearch_templates.tmpl_print_record_brief.""" \
+                   """</span><br/>""" % recID
         return out + websearch_templates.tmpl_print_record_brief(ln=ln,
-                                                                 recID=recID,
-                                                                 )
+                                                                 recID=recID)
+
 
 def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     """
-    Returns an XML string of the record given by recID.
+    Return an XML string of the record given by recID.
 
     The function builds the XML directly from the database,
     without using the standard formatting process.
@@ -215,13 +221,15 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 
     If record does not exist, returns empty string.
 
-    @param recID: the id of the record to retrieve
-    @param format: the format to use
-    @param decompress: the library to use to decompress cache from DB
-    @return: the xml string of the record
+    :param recID: the id of the record to retrieve
+    :param format: the format to use
+    :param decompress: the library to use to decompress cache from DB
+    :return: the xml string of the record
     """
     from . import utils as bibformat_utils
-    return bibformat_utils.record_get_xml(recID=recID, format=format, decompress=decompress)
+    return bibformat_utils.record_get_xml(recID=recID, format=format,
+                                          decompress=decompress)
+
 
 # Helper functions to do complex formatting of multiple records
 #
@@ -229,79 +237,89 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 # formatting of multiple records, but add a create_* method
 # that relies on format_records to do the formatting.
 ##
-
 def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
                    xml_records=None, user_info=None, record_prefix=None,
                    record_separator=None, record_suffix=None, prologue="",
                    epilogue="", req=None, on_the_fly=False):
     """
-    Format records given by a list of record IDs or a list of records
-    as xml.  Adds a prefix before each record, a suffix after each
-    record, plus a separator between records.
+    Format records given by a list of record IDs or a list of records as xml.
 
-    Also add optional prologue and epilogue to the complete formatted
-    list.
+    Add a prefix before each record, a suffix after each record, plus a
+    separator between records.
 
-    You can either specify a list of record IDs to format, or a list
-    of xml records, but not both (if both are specified recIDs is
-    ignored).
+    Also add optional prologue and epilogue to the complete formatted list.
 
-    'record_separator' is a function that returns a string as
-    separator between records.  The function must take an integer as
-    unique parameter, which is the index in recIDs (or xml_records) of
-    the record that has just been formatted. For example separator(i)
-    must return the separator between recID[i] and recID[i+1].
-    Alternatively separator can be a single string, which will be used
-    to separate all formatted records.  The same applies to
+    You can either specify a list of record IDs to format, or a list of xml
+    records, but not both (if both are specified recIDs is ignored).
+
+    'record_separator' is a function that returns a string as separator between
+    records.  The function must take an integer as unique parameter, which is
+    the index in recIDs (or xml_records) of the record that has just been
+    formatted. For example separator(i) must return the separator between
+    recID[i] and recID[i+1]. Alternatively separator can be a single string,
+    which will be used to separate all formatted records.  The same applies to
     'record_prefix' and 'record_suffix'.
 
-    'req' is an optional parameter on which the result of the function
-    are printed lively (prints records after records) if it is given.
-    Note that you should set 'req' content-type by yourself, and send
-    http header before calling this function as it will not do it.
+    'req' is an optional parameter on which the result of the function are
+    printed lively (prints records after records) if it is given. Note that you
+    should set 'req' content-type by yourself, and send http header before
+    calling this function as it will not do it.
 
-    This function takes the same parameters as 'format_record' except for:
-    @param recIDs: a list of record IDs
-    @type recIDs: list(int)
-    @param of: an output format code (or short identifier for the output format)
-    @type of: string
-    @param ln: the language to use to format the record
-    @type ln: string
-    @param verbose: the level of verbosity from 0 to 9 (0: silent,
-                                                        5: errors,
-                                                        7: errors and warnings, stop if error in format elements
-                                                        9: errors and warnings, stop if error (debug mode ))
-    @type verbose: int
-    @param search_pattern: list of strings representing the user request in web interface
-    @type search_pattern: list(string)
-    @param user_info: the information of the user who will view the formatted page (if applicable)
-    @param xml_records: a list of xml string representions of the records to format
-    @type xml_records: list(string)
-    @param record_prefix: a string printed before B{each} formatted records (n times)
-    @type record_prefix: string
-    @param record_suffix: a string printed after B{each} formatted records (n times)
-    @type record_suffix: string
-    @param prologue: a string printed at the beginning of the complete formatted records (1x)
-    @type prologue: string
-    @param epilogue: a string printed at the end of the complete formatted output (1x)
-    @type epilogue: string
-    @param record_separator: either a string or a function that returns string to join formatted records
-    @param record_separator: string or function
-    @param req: an optional request object where to print records
-    @param on_the_fly: if False, try to return an already preformatted version of the record in the database
-    @type on_the_fly: boolean
-    @rtype: string
+    This function takes the same parameters as :meth:`format_record` except
+    for:
+
+    :param recIDs: a list of record IDs
+    :type recIDs: list(int)
+    :param of: an output format code (or short identifier for the output
+               format)
+    :type of: string
+    :param ln: the language to use to format the record
+    :type ln: string
+    :param verbose: the level of verbosity from 0 to 9.
+                    - 0: silent
+                    - 5: errors
+                    - 7: errors and warnings, stop if error in format elements
+                    - 9: errors and warnings, stop if error (debug mode)
+    :type verbose: int
+    :param search_pattern: list of strings representing the user request in web
+                           interface
+    :type search_pattern: list(string)
+    :param user_info: the information of the user who will view the formatted
+                      page (if applicable)
+    :param xml_records: a list of xml string representions of the records to
+                        format
+    :type xml_records: list(string)
+    :param record_prefix: a string printed before B{each} formatted records (n
+                          times)
+    :type record_prefix: string
+    :param record_suffix: a string printed after B{each} formatted records (n
+                          times)
+    :type record_suffix: string
+    :param prologue: a string printed at the beginning of the complete
+                     formatted records (1x)
+    :type prologue: string
+    :param epilogue: a string printed at the end of the complete formatted
+                     output (1x)
+    :type epilogue: string
+    :param record_separator: either a string or a function that returns string
+                             to join formatted records
+    :param record_separator: string or function
+    :param req: an optional request object where to print records
+    :param on_the_fly: if False, try to return an already preformatted version
+                       of the record in the database
+    :type on_the_fly: boolean
+    :rtype: string
     """
     if req is not None:
         req.write(prologue)
 
     formatted_records = ''
 
-    #Fill one of the lists with Nones
+    # Fill one of the lists with Nones
     if xml_records is not None:
-        recIDs = map(lambda x:None, xml_records)
+        recIDs = map(lambda x: None, xml_records)
     else:
-        xml_records = map(lambda x:None, recIDs)
+        xml_records = map(lambda x: None, recIDs)
 
     total_rec = len(recIDs)
     last_iteration = False
@@ -309,7 +327,7 @@ def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
         if i == total_rec - 1:
             last_iteration = True
 
-        #Print prefix
+        # Print prefix
         if record_prefix is not None:
             if isinstance(record_prefix, str):
                 formatted_records += record_prefix
@@ -321,16 +339,16 @@ def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
                 if req is not None:
                     req.write(string_prefix)
 
-        #Print formatted record
+        # Print formatted record
         ln = ln or cfg['CFG_SITE_LANG']
-        formatted_record = format_record(recIDs[i], of, ln, verbose, \
-                                         search_pattern, xml_records[i],\
+        formatted_record = format_record(recIDs[i], of, ln, verbose,
+                                         search_pattern, xml_records[i],
                                          user_info, on_the_fly)
         formatted_records += formatted_record
         if req is not None:
             req.write(formatted_record)
 
-        #Print suffix
+        # Print suffix
         if record_suffix is not None:
             if isinstance(record_suffix, str):
                 formatted_records += record_suffix
@@ -342,7 +360,7 @@ def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
                 if req is not None:
                     req.write(string_suffix)
 
-        #Print separator if needed
+        # Print separator if needed
         if record_separator is not None and not last_iteration:
             if isinstance(record_separator, str):
                 formatted_records += record_separator
@@ -359,9 +377,12 @@ def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
 
     return prologue + formatted_records + epilogue
 
-def create_excel(recIDs, req=None, ln=None, ot=None, ot_sep="; ", user_info=None):
+
+def create_excel(recIDs, req=None, ln=None, ot=None, ot_sep="; ",
+                 user_info=None):
     """
-    Returns an Excel readable format containing the given recIDs.
+    Return an Excel readable format containing the given recIDs.
+
     If 'req' is given, also prints the output in 'req' while individual
     records are being formatted.
 
@@ -374,13 +395,15 @@ def create_excel(recIDs, req=None, ln=None, ot=None, ot_sep="; ", user_info=None
     output is produced on the basis of the fields that 'ot' defines
     (see search_engine.perform_request_search(..) 'ot' param).
 
-    @param req: the request object
-    @param recIDs: a list of record IDs
-    @param ln: language
-    @param ot: a list of fields that should be included in the excel output as columns(see perform_request_search 'ot' param)
-    @param ot_sep: a separator used to separate values for the same record, in the same columns, if any
-    @param user_info: the user_info dictionary
-    @return: a string in Excel format
+    :param req: the request object
+    :param recIDs: a list of record IDs
+    :param ln: language
+    :param ot: a list of fields that should be included in the excel output as
+               columns(see perform_request_search 'ot' param)
+    :param ot_sep: a separator used to separate values for the same record, in
+                   the same columns, if any
+    :param user_info: the user_info dictionary
+    :return: a string in Excel format
     """
     from . import utils as bibformat_utils
     # Prepare the column headers to display in the Excel file
@@ -396,14 +419,20 @@ def create_excel(recIDs, req=None, ln=None, ot=None, ot_sep="; ", user_info=None
                            'Notes']
 
     # Prepare Content
-    column_headers = '</b></td><td style="border-color:black; border-style:solid; border-width:thin; background-color:black;color:white"><b>'.join(column_headers_list) + ''
-    column_headers = '<table style="border-collapse: collapse;">\n'+ '<td style="border-color:black; border-style:solid; border-width:thin; background-color:black;color:white"><b>' + column_headers + '</b></td>'
+    column_headers = '</b></td><td style="border-color:black; ' \
+                     'border-style:solid; border-width:thin; ' \
+                     'background-color:black;color:white"><b>' \
+                     .join(column_headers_list) + ''
+    column_headers = '<table style="border-collapse: collapse;">\n' \
+                     '<td style="border-color:black; border-style:solid; ' \
+                     'border-width:thin; background-color:black;color:white">'\
+                     '<b>' + column_headers + '</b></td>'
     footer = '</table>'
 
     # Apply content_type and print column headers
     if req is not None:
         req.content_type = get_output_format_content_type('excel')
-        req.headers_out["Content-Disposition"] = "inline; filename=%s" % 'results.xls'
+        req.headers_out["Content-Disposition"] = "inline; filename=results.xls"
         req.send_http_header()
 
     if ot is not None and len(ot) > 0:
@@ -412,29 +441,35 @@ def create_excel(recIDs, req=None, ln=None, ot=None, ot_sep="; ", user_info=None
         # output. If a field has multiple values, then they are joined
         # into the same cell.
         out = "<table>"
-        if req: req.write("<table>")
+        if req:
+            req.write("<table>")
         for recID in recIDs:
             row = '<tr>'
-            row += '<td><a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recID)i">%(recID)i</a></td>' % \
+            row += '<td><a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/' \
+                   '%(recID)i">%(recID)i</a></td>' % \
                    {'recID': recID, 'CFG_SITE_RECORD': cfg['CFG_SITE_RECORD'],
                     'CFG_SITE_URL': cfg['CFG_SITE_URL']}
             for field in ot:
-                row += '<td>' + \
-                       ot_sep.join(bibformat_utils.get_all_fieldvalues(recID, field)) + \
-                       '</td>'
+                row += '<td>%s</td>' % \
+                       ot_sep.join(bibformat_utils.get_all_fieldvalues(
+                           recID, field))
             row += '</tr>'
             out += row
-            if req: req.write(row)
+            if req:
+                req.write(row)
         out += '</table>'
-        if req: req.write('</table>')
+        if req:
+            req.write('</table>')
         return out
 
-    #Format the records
+    # Format the records
+    prologue = '<meta http-equiv="Content-Type" content="text/html; ' \
+               'charset=utf-8"><table>'
     excel_formatted_records = format_records(recIDs, 'excel',
                                              ln=ln or cfg['CFG_SITE_LANG'],
                                              record_separator='\n',
-                                             prologue = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><table>',
-                                             epilogue = footer,
+                                             prologue=prologue,
+                                             epilogue=footer,
                                              req=req,
                                              user_info=user_info)
 
@@ -444,9 +479,7 @@ def create_excel(recIDs, req=None, ln=None, ot=None, ot_sep="; ", user_info=None
 # Utility functions
 ##
 def make_filter_line(hide_tag):
-    """
-    Generate a line used for filtering MARCXML
-    """
+    """Generate a line used for filtering MARCXML."""
     hide_tag = str(hide_tag)
     tag = hide_tag[:3]
     ind1 = hide_tag[3:4]
@@ -467,15 +500,17 @@ def make_filter_line(hide_tag):
 def filter_hidden_fields(recxml, user_info=None, filter_tags=None,
                          force_filtering=False):
     """
-    Filter out tags specified by filter_tags from MARCXML. If the user
-    is allowed to run bibedit, then filter nothing, unless
+    Filter out tags specified by filter_tags from MARCXML.
+
+    If the user is allowed to run bibedit, then filter nothing, unless
     force_filtering is set to True.
 
-    @param recxml: marcxml presentation of the record
-    @param user_info: user information; if None, then assume invoked via CLI with all rights
-    @param filter_tags: list of MARC tags to be filtered
-    @param force_filtering: do we force filtering regardless of user rights?
-    @return: recxml without the hidden fields
+    :param recxml: marcxml presentation of the record
+    :param user_info: user information; if None, then assume invoked via CLI
+                      with all rights :param filter_tags: list of MARC tags to
+                      be filtered :param force_filtering: do we force filtering
+                      regardless of user rights?
+    :return: recxml without the hidden fields
     """
     filter_tags = filter_tags or cfg['CFG_BIBFORMAT_HIDDEN_TAGS']
     if force_filtering:
@@ -505,14 +540,18 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=None,
 
     return out
 
+
 def get_output_format_content_type(of, default_content_type="text/html"):
     """
-    Returns the content type (for example 'text/html' or 'application/ms-excel') \
-    of the given output format.
+    Return the content type of the given output format.
 
-    @param of: the code of output format for which we want to get the content type
-    @param default_content_type: default content-type when content-type was not set up
-    @return: the content-type to use for this output format
+    For example `text/html` or `application/ms-excel`.
+
+    :param of: the code of output format for which we want to get the content
+               type
+    :param default_content_type: default content-type when content-type was not
+                                 set up
+    :return: the content-type to use for this output format
     """
     from . import api
     content_type = api.get_output_format_content_type(of)
@@ -525,9 +564,7 @@ def get_output_format_content_type(of, default_content_type="text/html"):
 
 def print_records(recIDs, of='hb', ln=None, verbose=0,
                   search_pattern='', on_the_fly=False, **ctx):
-    """
-    Returns records using Jinja template.
-    """
+    """Return records using Jinja template."""
     import time
     from math import ceil
     from flask import request
@@ -536,7 +573,8 @@ def print_records(recIDs, of='hb', ln=None, verbose=0,
     from invenio.modules.formatter.engine import format_record
     from invenio.modules.search.models import Format
     from invenio.utils.pagination import Pagination
-    from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
+    from invenio.modules.formatter.engine import \
+        TEMPLATE_CONTEXT_FUNCTIONS_CACHE
 
     of = of.lower()
     jrec = request.values.get('jrec', ctx.get('jrec', 1), type=int)
@@ -566,11 +604,11 @@ def print_records(recIDs, of='hb', ln=None, verbose=0,
 
 def usage(exitcode=1, msg=""):
     """
-    Prints usage info.
+    Print usage info.
 
-    @param exitcode: exit code to use (eg. 1 for error, 0 for okay)
-    @param msg: message to print
-    @return: exit the process
+    :param exitcode: exit code to use (eg. 1 for error, 0 for okay)
+    :param msg: message to print
+    :return: exit the process
     """
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
@@ -584,31 +622,34 @@ def usage(exitcode=1, msg=""):
       $ bibformat -i 10 -o HB -v 9
 
     Required:
-     -i, --id=ID[ID2,ID3:ID5]  ID (or range of IDs) of the record(s) to be formatted.
+     -i, --id=ID[ID2,ID3:ID5]  ID (or range of IDs) of the record(s) to be
+                               formatted.
 
     Options:
-     -o, --output=CODE          short code of the output format used for formatting (default HB).
-     -l, --lang=LN              language used for formatting.
-     -y, --onthefly             on-the-fly formatting, avoiding caches created by BibReformat.
+     -o, --output=CODE         short code of the output format used for
+                               formatting (default HB).
+     -l, --lang=LN             language used for formatting.
+     -y, --onthefly            on-the-fly formatting, avoiding caches created
+                               by BibReformat.
 
     General options:
-     -h, --help                 print this help and exit
-     -v, --verbose=LEVEL        verbose level (from 0 to 9, default 0)
-     -V  --version              print the script version
+     -h, --help                print this help and exit
+     -v, --verbose=LEVEL       verbose level (from 0 to 9, default 0)
      """)
     sys.exit(exitcode)
 
+
 def main():
     """
-    Main entry point for biformat via command line
+    Main entry point for biformat via command line.
 
-    @return: formatted record(s) as specified by options, or help/errors
+    :return: formatted record(s) as specified by options, or help/errors
+
     """
-
-    options = {} # will hold command-line options
+    options = {}  # will hold command-line options
     options["verbose"] = 0
     options["onthefly"] = False
-    options["lang"] = CFG_SITE_LANG
+    options["lang"] = cfg['CFG_SITE_LANG']
     options["output"] = "HB"
     options["recID"] = None
 
@@ -629,13 +670,10 @@ def main():
         for opt in opts:
             if opt[0] in ["-h", "--help"]:
                 usage(0)
-            elif opt[0] in ["-V", "--version"]:
-                print(__revision__)
-                sys.exit(0)
             elif opt[0] in ["-v", "--verbose"]:
-                options["verbose"]  = int(opt[1])
+                options["verbose"] = int(opt[1])
             elif opt[0] in ["-y", "--onthefly"]:
-                options["onthefly"]    = True
+                options["onthefly"] = True
             elif opt[0] in ["-l", "--lang"]:
                 options["lang"] = opt[1]
             elif opt[0] in ["-i", "--id"]:
@@ -649,9 +687,9 @@ def main():
                         recIDs.append(int(recID))
                 options["recID"] = recIDs
             elif opt[0] in ["-o", "--output"]:
-                options["output"]  = opt[1]
+                options["output"] = opt[1]
 
-        if options["recID"] == None:
+        if options["recID"] is None:
             usage(1, "-i argument is needed")
     except StandardError as e:
         usage(e)
