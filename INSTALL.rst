@@ -159,6 +159,15 @@ the following commands.
     (invenio)$ inveniomanage config set CFG_DATABASE_USER $BRANCH
     (invenio)$ inveniomanage config set CFG_SITE_URL http://0.0.0.0:4000
 
+Assets in non-development mode may be combined and minified using various
+filters (see :ref:`ext_assets`). We need to set the path to the binaries if
+they are not in the environment ``$PATH`` already.
+
+.. code-block:: console
+
+    (invenio)$ inveniomanage config set LESS_BIN `find $PWD/node_modules -iname lessc | head -1`
+    (invenio)$ inveniomanage config set CLEANCSS_BIN `find $PWD/node_modules -iname cleancss | head -1`
+
 Invenio comes with default demo site configuration examples that you can use
 for quick start.
 

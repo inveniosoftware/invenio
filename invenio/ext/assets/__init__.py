@@ -83,9 +83,26 @@ Environment.resolver_class = InvenioResolver
 
 def setup_app(app):
     """Initialize Assets extension."""
+    app.config.setdefault("LESS_RUN_IN_DEBUG", False)
     assets = Environment(app)
     assets.url = app.static_url_path + "/"
     assets.directory = app.static_folder
+
+    commands = (("LESS_BIN", "lessc"),
+                ("CLEANCSS_BIN", "cleancss"))
+    import subprocess
+    for key, cmd in commands:
+        try:
+            command = app.config.get(key, cmd)
+            subprocess.call([command, "--version"],
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+        except OSError:
+            app.logger.error("Executable `{0}` was not found. You can specify "
+                             "it via {1}."
+                             .format(cmd, key))
+            app.config["ASSETS_DEBUG"] = True
+            assets.debug = True
 
     def _jinja2_new_bundle(tag, collection, name=None, filters=None):
         if len(collection):

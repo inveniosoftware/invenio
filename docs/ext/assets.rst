@@ -1,3 +1,5 @@
+.. _ext_assets:
+
 Assets
 ======
 
