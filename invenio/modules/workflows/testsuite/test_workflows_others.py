@@ -31,12 +31,17 @@ class WorkflowOthers(WorkflowTasksTestCase):
     def setUp(self):
         """Setup tests."""
         self.create_registries()
+        self.objects_to_delete = []
 
     def tearDown(self):
         """ Clean up created objects."""
         from invenio.modules.workflows.utils import test_teardown
+        from ..models import BibWorkflowObject
+
         test_teardown(self)
         self.cleanup_registries()
+        for obj in self.objects_to_delete:
+            BibWorkflowObject.delete(obj.id)
 
     def test_result_abstraction(self):
         """Test abastraction layer for celery worker."""
@@ -53,7 +58,7 @@ class WorkflowOthers(WorkflowTasksTestCase):
         self.assertEqual(bwoic2.get_object().id, test_object.id)
         result = bwoic2.to_dict()
         self.assertEqual(bwoic2.from_dict(result).id, test_object.id)
-        test_object.delete(test_object.id)
+        self.objects_to_delete.append(test_object)
         try:
             AsynchronousResultWrapper(None)
         except Exception as e:
@@ -76,7 +81,8 @@ class WorkflowOthers(WorkflowTasksTestCase):
         from invenio.modules.workflows.api import start
 
         try:
-            start("test_workflow_error", [2])
+            start("test_workflow_error", [2],
+                  module_name="unit_tests")
         except Exception as e:
             self.assertEqual(isinstance(e, WorkflowError), True)
             self.assertEqual("ZeroDivisionError" in e.message, True)

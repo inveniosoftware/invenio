@@ -58,7 +58,8 @@ def convert_marcxml_to_bibfield(marcxml):
 
 def test_teardown(self):
     """ Clean up created objects """
-    from invenio.modules.workflows.models import (BibWorkflowObject, Workflow,
+    from invenio.modules.workflows.models import (BibWorkflowObject,
+                                                  Workflow,
                                                   BibWorkflowEngineLog,
                                                   BibWorkflowObjectLog)
     from invenio.ext.sqlalchemy import db
@@ -82,10 +83,8 @@ def test_teardown(self):
         for obj in objects:
             BibWorkflowObjectLog.delete(id=obj.id)
         BibWorkflowEngineLog.delete(uuid=workflow.uuid)
-        # Deleting dumy object created in tests
-    db.session.query(BibWorkflowObject).filter(
-        BibWorkflowObject.id_workflow.in_([11, 123, 253])
-    ).delete(synchronize_session='fetch')
+
+    # Deleting dummy object created in tests
     Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
     db.session.commit()
 

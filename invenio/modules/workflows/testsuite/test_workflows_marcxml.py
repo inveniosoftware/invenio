@@ -30,12 +30,17 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
     def setUp(self):
         """Setup tests."""
         self.create_registries()
+        self.objects_to_delete = []
 
     def tearDown(self):
         """ Clean up created objects."""
         from invenio.modules.workflows.utils import test_teardown
+        from invenio.modules.workflows.models import BibWorkflowObject
+
         test_teardown(self)
         self.cleanup_registries()
+        for obj in self.objects_to_delete:
+            BibWorkflowObject.delete(obj.id)
 
     def test_filtering(self):
         """ Test filtering functionnality."""
@@ -52,7 +57,9 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
         my_test_obj_b.set_data(["<record><test></test><identifier>identifier2"
                                 "</identifier></record>"])
         my_test_obj_b.save()
-        engine = start("test_workflow_dummy", my_test_obj)
+        engine = start("test_workflow_dummy",
+                       my_test_obj,
+                       module_name="unit_tests")
 
         my_test_obj.data = my_test_obj.get_data()
         my_test_obj_b.data = my_test_obj_b.get_data()
@@ -75,6 +82,8 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
         engine.extra_data = engine.get_extra_data()
         self.assertEqual(filtering_oai_pmh_identifier(my_test_obj, engine),
                          False)
+        self.objects_to_delete.append(my_test_obj_b)
+        self.objects_to_delete.append(my_test_obj)
 
     def test_init_harvesting(self):
         """Test harvesting."""
@@ -85,13 +94,16 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
         my_test_obj = BibWorkflowObject()
         my_test_obj.set_data([2])
         my_test_obj.save()
-        engine = start("test_workflow_dummy", my_test_obj)
+        engine = start("test_workflow_dummy",
+                       my_test_obj,
+                       module_name="unit_tests")
         my_test_obj.data = my_test_obj.get_data()
         my_test_obj.extra_data = my_test_obj.get_extra_data()
         engine.set_extra_data_params(options={'test': True})
         engine.extra_data = engine.get_extra_data()
         init_harvesting(my_test_obj, engine)
         self.assertEqual(engine.get_extra_data()["options"]["test"], True)
+        self.objects_to_delete.append(my_test_obj)
 
 TEST_SUITE = make_test_suite(WorkflowMarcXML)
 
