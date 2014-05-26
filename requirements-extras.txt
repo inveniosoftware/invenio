@@ -16,4 +16,4 @@ cython
 nose
 nosexcover
 flake8
-raven
+raven==4.2.1
