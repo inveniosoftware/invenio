@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,14 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.merger.views
-    ----------------------------
-
-    Merger interface.
-"""
+"""Merger interface."""
 
 from flask import Blueprint
-≡jedi=0, ≡                    (name, import_name, static_folder = None, *static_url_path = None*, template_folder = None, url_prefix = None, subdomain = None, url_defaults = None) ≡jedi≡
 blueprint = Blueprint('merger', __name__, url_prefix='/',
                       template_folder='templates', static_folder='static')
