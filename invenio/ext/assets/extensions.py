@@ -86,7 +86,7 @@ def prepare_tag_bundle(cls, tag):
                 bundles = sorted(set(map(itemgetter(0), data)))
                 for bundle in bundles:
                     c, f = get_data_by_key(data, bundle)
-                    collection.append(**c)
+                    collection += c
                     if not filters:
                         filters = f
 
