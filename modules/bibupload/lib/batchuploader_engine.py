@@ -547,7 +547,10 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
 
     permitted_dbcollids = _get_client_authorized_collections(client_ip)
     if '*' in permitted_dbcollids:
-        return True
+        if not webupload:
+            return True
+        else:
+            return (0, " ")
 
     filename_tag980_values = _detect_980_values_from_marcxml_file(recs)
     for filename_tag980_value in filename_tag980_values:
