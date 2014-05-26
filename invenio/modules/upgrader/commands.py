@@ -64,30 +64,30 @@ def info():
 
 
 def do_upgrade():
-    \"\"\" Implement your upgrades here  \"\"\"
+    \"\"\"Implement your upgrades here.\"\"\"
 %(operations)s
 
 
 def estimate():
-    \"\"\"  Estimate running time of upgrade in seconds (optional). \"\"\"
+    \"\"\"Estimate running time of upgrade in seconds (optional).\"\"\"
     return 1
 
 
 def pre_upgrade():
-    \"\"\"  Run pre-upgrade checks (optional). \"\"\"
+    \"\"\"Run pre-upgrade checks (optional).\"\"\"
     # Example of raising errors:
     # raise RuntimeError("Description of error 1", "Description of error 2")
 
 
 def post_upgrade():
-    \"\"\"  Run post-upgrade checks (optional). \"\"\"
+    \"\"\"Run post-upgrade checks (optional).\"\"\"
     # Example of issuing warnings:
     # warnings.warn("A continuable error occurred")
 """
 
 
 def cmd_upgrade_check(upgrader=None):
-    """ Command for running pre-upgrade checks """
+    """Command for running pre-upgrade checks."""
     if not upgrader:
         upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
@@ -121,7 +121,7 @@ def cmd_upgrade_check(upgrader=None):
 
 
 def cmd_upgrade(upgrader=None):
-    """ Command for applying upgrades """
+    """Command for applying upgrades."""
     from invenio.config import CFG_LOGDIR
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 
@@ -182,7 +182,7 @@ def cmd_upgrade(upgrader=None):
 
 
 def cmd_upgrade_show_pending(upgrader=None):
-    """ Command for showing upgrades ready to be applied """
+    """Command for showing upgrades ready to be applied."""
     if not upgrader:
         upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
@@ -209,7 +209,7 @@ def cmd_upgrade_show_pending(upgrader=None):
 
 
 def cmd_upgrade_show_applied(upgrader=None):
-    """ Command for showing all upgrades already applied. """
+    """Command for showing all upgrades already applied."""
     if not upgrader:
         upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
@@ -233,9 +233,7 @@ def cmd_upgrade_show_applied(upgrader=None):
 
 def cmd_upgrade_create_release_recipe(pkg_path, repository=None,
                                       output_path=None, upgrader=None):
-    """
-    Create a new release upgrade recipe (for developers).
-    """
+    """Create a new release upgrade recipe (for developers)."""
     if not upgrader:
         upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
@@ -267,9 +265,7 @@ def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
                                        depends_on=None, release=False,
                                        upgrader=None, output_path=None,
                                        auto=False, overwrite=False, name=None):
-    """
-    Create a new upgrade recipe (for developers).
-    """
+    """Create a new upgrade recipe (for developers)."""
     if not upgrader:
         upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
@@ -335,6 +331,7 @@ def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
 # Helper functions
 #
 def _write_template(upgrade_file, depends_on, repository, auto=False):
+    """Write template to upgrade file."""
     if auto:
         # Ensure all models are loaded
         from invenio.ext.sqlalchemy import models
@@ -357,9 +354,9 @@ def _write_template(upgrade_file, depends_on, repository, auto=False):
 
 
 def _upgrade_recipe_find_path(import_str, create=True):
-    """
-    Determine repository name and path for new upgrade, based on package
-    import path.
+    """Determine repository name and path for new upgrade.
+
+    It is based on package import path.
     """
     try:
         # Import package
