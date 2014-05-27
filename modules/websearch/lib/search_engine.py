@@ -6184,13 +6184,18 @@ def prs_apply_search_limits(results_final, kwargs=None, req=None, of=None, cc=No
         if verbose and of.startswith("h"):
             write_warning("Search stage 5: applying time etc limits, from %s until %s..." % (datetext1, datetext2), req=req)
         try:
-            results_final = intersect_results_with_hitset(req,
-                                                          results_final,
-                                                          search_unit_in_bibrec(datetext1, datetext2, dt),
-                                                          ap,
-                                                          aptext= _("No match within your time limits, "
-                                                                    "discarding this condition..."),
-                                                          of=of)
+            results_temp = intersect_results_with_hitset(
+                req,
+                results_final,
+                search_unit_in_bibrec(datetext1, datetext2, dt),
+                ap,
+                aptext= _("No match within your time limits, "
+                          "discarding this condition..."),
+                of=of)
+            if results_temp:
+                results_final.update(results_temp)
+            else:
+                results_final.clear()
         except:
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
@@ -6213,13 +6218,18 @@ def prs_apply_search_limits(results_final, kwargs=None, req=None, of=None, cc=No
         if verbose and of.startswith("h"):
             write_warning("Search stage 5: applying search pattern limit %s..." % cgi.escape(pl), req=req)
         try:
-            results_final = intersect_results_with_hitset(req,
-                                                          results_final,
-                                                          search_pattern_parenthesised(req, pl, ap=0, ln=ln, wl=wl),
-                                                          ap,
-                                                          aptext=_("No match within your search limits, "
-                                                                   "discarding this condition..."),
-                                                          of=of)
+            results_temp = intersect_results_with_hitset(
+                req,
+                results_final,
+                search_pattern_parenthesised(req, pl, ap=0, ln=ln, wl=wl),
+                ap,
+                aptext=_("No match within your search limits, "
+                         "discarding this condition..."),
+                of=of)
+            if results_temp:
+                results_final.update(results_temp)
+            else:
+                results_final.clear()
         except:
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
