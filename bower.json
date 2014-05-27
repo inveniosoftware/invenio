@@ -6,6 +6,8 @@
     "less": "1.7.0",
     "jquery": "2.1.0",
     "font-awesome": "~4.0.3",
+    "requirejs": "latest",
+    "almond": "latest",
     "ckeditor": "latest"
   },
   "devDependencies": {
