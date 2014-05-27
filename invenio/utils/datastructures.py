@@ -15,27 +15,29 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-Invenio special data structures
-"""
 
+"""Invenio special data structures."""
+
+from collections import MutableMapping
 from six import iteritems
 
 
 class LazyDict(object):
+
     """
     Lazy dictionary that evaluates its content when it is first accessed.
 
-    Example of use:
+    Example of use::
 
-    def my_dict():
-        from werkzeug.utils import import_string
-        return {'foo': import_string('foo')}
+        def my_dict():
+            from werkzeug.utils import import_string
+            return {'foo': import_string('foo')}
 
-    lazy_dict = LazyDict(my_dict)
-    # at this point the internal dictionary is empty
-    lazy_dict['foo']
+        lazy_dict = LazyDict(my_dict)
+        # at this point the internal dictionary is empty
+        lazy_dict['foo']
     """
+
     def __init__(self, function=dict):
         """
         :param function: it must return a dictionary like structure
@@ -98,44 +100,43 @@ class LazyDict(object):
 
 
 class LaziestDict(LazyDict):
+
     """
     Even lazier dictionary (maybe the laziest), it doesn't have content
     and when a key is accessed it tries to evaluate only this key.
 
-    Example of use:
+    Example of use::
 
-    def reader_discover(key):
-        from werkzeug.utils import import_string
-        return import_string(
-            'invenio.jsonalchemy.jsonext.readers%sreader:reader' % (key)
-        )
+        def reader_discover(key):
+            from werkzeug.utils import import_string
+            return import_string(
+                'invenio.jsonalchemy.jsonext.readers%sreader:reader' % (key)
+            )
 
-    laziest_dict = LaziestDict(reader_discover)
+        laziest_dict = LaziestDict(reader_discover)
 
-    laziest_dict['json']
-    # It will give you the JsonReader class
+        laziest_dict['json']
+        # It will give you the JsonReader class
     """
 
     def __init__(self, function):
         """
-        @param function: it must accept one parameter (the key of the
+        :param function: it must accept one parameter (the key of the
             dictionary)
         and returns the element which will be store that key.
         """
         super(LaziestDict, self).__init__(function)
 
     def _evaluate_function(self):
-        """
-        It doesn't know how to create the full dictionary, in case
-        is really needed an empty dictionary is created.
-        """
+        """It doesn't know how to create the full dictionary, in case
+        is really needed an empty dictionary is created."""
         if self._cached_dict is None:
             self._cached_dict = {}
 
     def __getitem__(self, key):
         if self._cached_dict is None:
             self._evaluate_function()
-        if not key in self._cached_dict:
+        if key not in self._cached_dict:
             try:
                 self._cached_dict.__setitem__(key, self._function(key))
             except:
@@ -145,7 +146,7 @@ class LaziestDict(LazyDict):
     def __contains__(self, key):
         if self._cached_dict is None:
             self._evaluate_function()
-        if not key in self._cached_dict:
+        if key not in self._cached_dict:
             try:
                 self.__getitem__(key)
             except:
@@ -178,13 +179,12 @@ class SmartDict(object):
     main_key_pattern = re.compile('\..*|\[.*')
 
     def __init__(self, d=None):
-        self._dict = d if not d is None else dict()
+        self._dict = d if d is not None else dict()
 
     def __getitem__(self, key):
-        """
-        As in C{dict.__getitem__} but using 'smart queries'
+        """As in `dict.__getitem__` but using 'smart queries'.
 
-        NOTE: accessing one value in a normal way, meaning d['a'], is almost as
+        Note: accessing one value in a normal way, meaning d['a'], is almost as
               fast as accessing a regular dictionary. But using the special
               name convention is a bit slower than using the regular access::
                 %timeit x = dd['a[0].b']
@@ -198,7 +198,7 @@ class SmartDict(object):
                 return v[k]
             elif ']' in k:
                 k = k[:-1].replace('n', '-1')
-                #Work around for list indexes and slices
+                # Work around for list indexes and slices
                 try:
                     return v[int(k)]
                 except ValueError:
@@ -212,7 +212,7 @@ class SmartDict(object):
                     tmp.append(getitem(k, inner_v))
                 return tmp
 
-        #Check if we are using python regular keys
+        # Check if we are using python regular keys
         try:
             return self._dict[key]
         except KeyError:
@@ -225,7 +225,6 @@ class SmartDict(object):
         return value
 
     def __setitem__(self, key, value, extend=False, **kwargs):
-        #TODO: Check repeatable fields
         if '.' not in key and ']' not in key and not extend:
             self._dict[key] = value
         else:
@@ -278,8 +277,7 @@ class SmartDict(object):
         return repr(self._dict)
 
     def __setitem(self, chunk, key, keys, value, extend=False):
-        """ Helper function to fill up the dictionary"""
-
+        """Helper function to fill up the dictionary"""
         def setitem(chunk):
             if keys:
                 return self.__setitem(chunk, keys[0], keys[1:], value, extend)
@@ -308,7 +306,7 @@ class SmartDict(object):
                     chunk = {}
                     chunk[key] = None
                     chunk[key] = setitem(chunk[key])
-                elif not key in chunk:
+                elif key not in chunk:
                     chunk[key] = None
                     chunk[key] = setitem(chunk[key])
                 else:
@@ -340,8 +338,11 @@ class SmartDict(object):
     def update(self, E, **F):
         self._dict.update(E, **F)
 
+MutableMapping.register(SmartDict)
+
 
 class DotableDict(dict):
+
     """
     DotableDict to make nested python dictionaries (json-like objects)
     accessable using dot notation.
@@ -350,6 +351,7 @@ class DotableDict(dict):
     >>> dotable.a
     ...  [{'b': 3, 'c': 5}]
     """
+
     #TODO: allow dotable.a[0].b
     def __getattr__(self, key):
         return self[key]
