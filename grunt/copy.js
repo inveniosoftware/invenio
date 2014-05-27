@@ -32,7 +32,7 @@ module.exports = {
                ,'jquery.bookmark/jquery.bookmark.css'
                ,'datatables-colvis/css/dataTables.colVis.css'
                ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.css'
-               ,'prism/prism.css'
+               ,'prism/themes/prism.css'
                ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.css'],
         dest: '<%= globalConfig.installation_path %>/css/'
     },
