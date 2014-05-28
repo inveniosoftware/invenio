@@ -42,16 +42,23 @@ from unidecode import unidecode
 CHUNK_SIZE = 10000
 
 
+class RecomputeException(Exception):
+    pass
+
 def recompute_affiliation(pid):
     author_recids = run_sql("""SELECT bibrec, name FROM aidPERSONIDPAPERS
                                WHERE personid = %s ORDER BY bibrec DESC""", [pid])
     for recid, name in author_recids:
         record = get_record(recid)
         for field in chain(record['100'], record['700']):
-            if field['a'][0] == name and field['u']:
-                return {'aff': field['u'][0],
-                        'last_recid': recid,
-                        'last_occurence': get_creation_date(recid)}
+            try:
+                if field['a'][0] == name and field['u']:
+                    return {'aff': field['u'][0],
+                            'last_recid': recid,
+                            'last_occurence': get_creation_date(recid)}
+            except IndexError, e:
+                print 'WARNING: problem in recomputing affiliations for pid ', pid
+                raise RecomputeException(str(e))
 
 
 def process_affiliations(record_ids=None, all_records=False):
@@ -137,7 +144,10 @@ def process_chunk(recids):
         if pids:
             missing_pids -= intbitset(pids.values())
         for pid in missing_pids:
-            recomputed_aff_info = recompute_affiliation(pid)
+            try:
+                recomputed_aff_info = recompute_affiliation(pid)
+            except RecomputeException:
+                continue
             if recomputed_aff_info:
                 if pid not in aff or aff[pid]['last_occurence'] <= recomputed_aff_info['last_occurence']:
                     aff[pid] = recomputed_aff_info
