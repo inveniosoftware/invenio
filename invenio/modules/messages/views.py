@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2013 CERN.
+## Copyright (C) 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,15 +21,16 @@
 
 from datetime import datetime
 from flask import render_template, request, flash, redirect, url_for, Blueprint
+from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.login import current_user, login_required
+from flask.ext.menu import register_menu
 from sqlalchemy.sql import operators
 
 from invenio.base.decorators import (wash_arguments, templated, sorted_by,
                                      filtered_by)
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
-from flask.ext.menu import register_menu
+from invenio.ext.template import render_template_to_string
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 
@@ -48,13 +49,7 @@ class MessagesMenu(object):
                 UserMsgMESSAGE.id_user_to == uid,
                 UserMsgMESSAGE.status == cfg['CFG_WEBMESSAGE_STATUS_CODE']['NEW']
             )).scalar()
-
-        out = '<div data-menu="click" data-menu-source="' + url_for('webmessage.menu') + '">'
-        out += '<i class="fa fa-envelope"></i>'
-        if unread:
-            out += ' <span class="badge badge-important">%d</span>' % unread
-        out += "</div>"
-        return out
+        return render_template_to_string("messages/menu_item.html", unread=unread)
 
 not_guest = lambda: not current_user.is_guest
 
