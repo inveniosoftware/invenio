@@ -24,6 +24,7 @@
     See http://cerberus.readthedocs.org/en/latest
 """
 import datetime
+import collections
 import re
 import six
 
@@ -69,12 +70,12 @@ class Validator(ValidatorBase):
             self.schema = schema
         elif self.schema is None:
             raise SchemaError(errors.ERROR_SCHEMA_MISSING)
-        if not isinstance(self.schema, dict):
+        if not isinstance(self.schema, collections.Mapping):
             raise SchemaError(errors.ERROR_SCHEMA_FORMAT % str(self.schema))
 
         if document is None:
             raise ValidationError(errors.ERROR_DOCUMENT_MISSING)
-        if not hasattr(document, 'get'):
+        if not isinstance(document, collections.Mapping):
             raise ValidationError(errors.ERROR_DOCUMENT_FORMAT % str(document))
         self.document = document
 
