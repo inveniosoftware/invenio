@@ -16,26 +16,35 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- block webdeposit_assets %}
-  {% js 'js/jqueryui/jquery-ui.js', '01-jquery-ui' %}
-  {% js 'js/jqueryui/jquery.ui.core.js', '01-jquery-ui' %}
-  {% js 'js/jqueryui/jquery.ui.widget.js', '01-jquery-ui' %}
-  {% js 'js/jqueryui/jquery.ui.mouse.js', '01-jquery-ui' %}
-  {% js 'js/jqueryui/jquery.ui.sortable.js', '01-jquery-ui' %}
-  {% js 'plupload/plupload.full.min.js', '50-webdeposit' %}
-  {% js url_for('webdeposit.static', filename='js/deposit/form.js'), '50-webdeposit' %}
-  {% js 'js/hogan.js', '40-webdeposit-hogan' %}
-  {% js url_for('webdeposit.static', filename='js/deposit/templates.js'), '50-webdeposit' %}
-  {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
-  {% js 'js/ckeditor/invenio-ckeditor-config.js', '50-ckeditor' %}
-  {%- js 'js/typeahead.js', '10-invenio' -%}
-  {%- css url_for('static', filename='css/typeahead.js-bootstrap.css'), '50-webdeposit' -%}
-  {%- css url_for('static', filename='css/deposit/form.css'), '51-webdeposit' -%}
-  {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css', '01-jquery-ui' %}
-  {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css', '01-jquery-ui' %}
-{%- endblock webdeposit_assets %}
 
-{% extends "page.html" %}
+{%- extends "page.html" -%}
+
+{%- block global_css %}
+  {{ super() }}
+  {% block deposit_css %}
+    {%- css url_for('static', filename='css/typeahead.js-bootstrap.css'), '51-webdeposit' -%}
+    {%- css url_for('static', filename='css/deposit/form.css'), '51-webdeposit' -%}
+    {%- css url_for('static', filename='img/jquery-ui/themes/base/jquery.ui.theme.css'), '01-jquery-ui' -%}
+    {%- css url_for('static', filename='img/jquery-ui/themes/base/jquery.ui.datepicker.css'), '01-jquery-ui' -%}
+  {% endblock deposit_css %}
+{%- endblock global_css %}
+
+{%- block global_javascript %}
+  {{ super() }}
+  {% block deposit_js %}
+    {%- js url_for('static', filename='js/jqueryui/jquery-ui.js'), '01-jquery-ui' -%}
+    {%- js url_for('static', filename='js/jqueryui/jquery.ui.core.js'), '01-jquery-ui' -%}
+    {%- js url_for('static', filename='js/jqueryui/jquery.ui.widget.js'), '01-jquery-ui' -%}
+    {%- js url_for('static', filename='js/jqueryui/jquery.ui.mouse.js'), '01-jquery-ui' -%}
+    {%- js url_for('static', filename='js/jqueryui/jquery.ui.sortable.js'), '01-jquery-ui' -%}
+    {%- js url_for('static', filename='plupload/plupload.full.min.js'), '51-webdeposit' -%}
+    {%- js url_for('webdeposit.static', filename='js/deposit/form.js'), '51-webdeposit' -%}
+    {%- js url_for('webdeposit.static', filename='js/deposit/templates.js'), '51-webdeposit' -%}
+    {%- js url_for('static', filename='ckeditor/ckeditor.js'), '50-ckeditor' -%}
+    {%- js url_for('static', filename='js/ckeditor/invenio-ckeditor-config.js'), '50-ckeditor' -%}
+    {%- js url_for('static', filename='js/typeahead.js'), '10-invenio' -%}
+  {% endblock deposit_js %}
+{%- endblock global_javascript %}
 
 {% macro form_action_bar(margin="") -%}{% block form_action_bar scoped %}
     {% include "deposit/run_action_bar.html" %}
