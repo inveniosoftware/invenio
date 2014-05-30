@@ -46,6 +46,7 @@ def format_element(bfo):
 
     control_nos = [d['a'] for d in bfo.fields('035__') if d['a'] is not None]
     control_nos = filter(None, control_nos) # fastest way to remove empty ""s
+
     style = "style='width:auto;height:20px;margin-right:10px'"
     links_formatted = []
     for control_no in control_nos:
@@ -76,7 +77,7 @@ def format_element(bfo):
 
 
 
-    if links_formatted is not None:
+    if links_formatted:
         title = "<strong>" + _("Useful links") + "</strong>"
         if links_formatted:
             content = "<ul><li>" + "</li><li> ".join(links_formatted) + "</li></ul>"

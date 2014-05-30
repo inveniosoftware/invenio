@@ -24,7 +24,8 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_NAME
 from invenio.bibauthority_config import \
     CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME, \
     CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD, \
-    CFG_BIBAUTHORITY_RECORD_AUTHOR_CONTROL_NUMBER_FIELDS
+    CFG_BIBAUTHORITY_RECORD_AUTHOR_CONTROL_NUMBER_FIELDS as control_number_fields, \
+    CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_IDENTIFIER as authority_identifier
 from invenio.bibauthority_engine import \
     get_low_level_recIDs_from_control_no, \
     get_dependent_records_for_control_no
@@ -42,17 +43,17 @@ def format_element(bfo):
     from invenio.messages import gettext_set_language
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
-    control_nos = [d['a'] for d in bfo.fields('035__')]
-    control_nos = filter(None, control_nos) # fastest way to remove empty ""s
+    control_nos = [d['a'] for d in bfo.fields('035__') if d.get('a')]
+    control_nos.extend([d['a'] for d in bfo.fields('970__') if d.get('a')])
 
+    authority_type = [d.get('a') for d in bfo.fields('980__') if d.get('a') and d.get('a')!=authority_identifier]
+    if authority_type and type(authority_type) is list:
+        authority_type = authority_type[0]
+
+    related_control_number_fields = ['510','970']
+    related_control_number_fields.extend(control_number_fields.get(authority_type,[]))
     control_nos_formatted = []
     for control_no in control_nos:
-#        recIDs = []
-#        types = guess_authority_types(bfo.recID)
-#        # control_no example: AUTHOR:(CERN)aaa0005"
-#        control_nos = [(type + CFG_BIBAUTHORITY_PREFIX_SEP + control_no) for type in types]
-#        for control_no in control_nos:
-#            recIDs.extend(list(search_pattern(p='"' + control_no + '"')))
         recIDs = get_dependent_records_for_control_no(control_no)
         count = len(recIDs)
         count_string = str(count) + " dependent records"
@@ -67,8 +68,8 @@ def format_element(bfo):
                 # joining control_nos might be more helpful for the user
                 # than joining recIDs... or maybe not...
                 parameters = []
-                for ctrl_number_field_numbers in CFG_BIBAUTHORITY_RECORD_AUTHOR_CONTROL_NUMBER_FIELDS:
-                    parameters.append(ctrl_number_field_numbers + ":" + control_no)
+                for control_number_field in related_control_number_fields:
+                    parameters.append(control_number_field + ":" + control_no )
                 p_val = quote(" or ".join(parameters))
                 # include "&c=" parameter for bibliographic records
                 # and one "&c=" parameter for authority records

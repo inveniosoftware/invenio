@@ -24,7 +24,7 @@ import re
 
 __revision__ = "$Id$"
 
-def format_element(bfo, detail='no'):
+def format_element(bfo, main_name='yes', detail='no'):
     """ Prints the data of an author authority record in HTML. By default prints
     brief version.
 
@@ -47,7 +47,7 @@ def format_element(bfo, detail='no'):
         return _str or ''
     # brief
     main_dicts = bfo.fields('100%%')
-    if len(main_dicts):
+    if len(main_dicts) and main_name=='yes':
         main_dict = main_dicts[0]
         main = stringify_dict(main_dict)
         ## out += "<p style='margin-top:0px;margin-bottom:0px'>" + "<strong>" + _("Main %s name") % _("author") + "</strong>" + ": " + main + "</p>"
