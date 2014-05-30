@@ -168,7 +168,11 @@ def process_chunk(recids):
                     pid = pids[field_author]
                 except KeyError:
                     # Name stored by an older version of bibauthorid
-                    pid = pids[unidecode(field_author)]
+                    try:
+                        pid = pids[unidecode(field_author)]
+                    except KeyError:
+                        # There is some corruption somewhere...
+                        continue
                 record_date = get_creation_date(recid)
                 if pid not in aff or aff[pid]['last_occurence'] <= record_date:
                     aff[pid] = {'aff': field_aff,
