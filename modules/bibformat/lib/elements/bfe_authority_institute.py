@@ -33,7 +33,7 @@ from invenio.search_engine import \
     perform_request_search, \
     get_record
 
-def format_element(bfo, detail='no'):
+def format_element(bfo, main_name='yes', detail='no'):
     """ Prints the data of an institute authority record in HTML. By default prints
     brief version.
 
@@ -47,7 +47,7 @@ def format_element(bfo, detail='no'):
     out = ""
     # brief
     main_dicts = bfo.fields('110%%')
-    if len(main_dicts):
+    if len(main_dicts) and main_name=='yes':
         main = main_dicts[0].get('a') or ""
         ##out += "<p style='margin-top:0px;margin-bottom:0px>" + "<strong>" + _("Main %s name") % _("institute") + "</strong>" + ": " + main + "</p>"
         out += "<a style='margin-top:0px;margin-bottom:0px'  href='" +"/record/"+ str(bfo.recID) +"?ln=" + bfo.lang + "' >" + main + "</a>"
