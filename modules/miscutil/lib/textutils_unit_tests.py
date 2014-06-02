@@ -455,6 +455,7 @@ class TestStripping(InvenioTestCase):
             self.assertEqual(translate_to_ascii(None), None)
             self.assertEqual(translate_to_ascii([]), [])
             self.assertEqual(translate_to_ascii([None]), [None])
+            self.assertEqual(translate_to_ascii("√"), [""])
     else:
         pass
 
