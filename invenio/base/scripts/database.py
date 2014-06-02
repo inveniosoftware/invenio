@@ -254,13 +254,27 @@ def uri():
     print(current_app.config['SQLALCHEMY_DATABASE_URI'])
 
 
-def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
+def import_all_from_module(module):
+    """Import all objects/classes from a module.
+
+    :param module: the module from which the import should be done
+    """
+    classes_str = [x for x in dir(module) if not x.startswith('__')]
+
+    for c in classes_str:
+        yield getattr(module, c)
+
+
+def load_fixtures(packages=[],
+                  fixture_classes=[],
+                  truncate_tables_first=False):
     """Load fixtures.
 
-    Loads classes found in 'packages' to the database. Names of the fixture
-    classes should end with 'Data' suffix.
+    Combines classes found in 'packages' and 'fixture_classes' and loads them to
+    the database. Fixture class names should end with 'Data'.
 
     :param packages: packages with fixture classes to load
+    :param fixture_classes: fixture classes to load
     :param truncate_tables_first: if True truncates tables before loading
         the fixtures
     """
@@ -271,18 +285,28 @@ def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
     def is_fixture(class_name):
         return class_name.endswith('Data')
 
-    fixture_modules = list(
-        import_module_from_packages('fixtures', packages=packages)
-    )
-    fixtures = dict((f, getattr(ff, f)) for ff in fixture_modules
-                    for f in dir(ff) if is_fixture(f))
+    if not packages and not fixture_classes:
+        raise Exception("Set at least one parameter 'packages'" +
+                        " or 'fixture_classes'.")
+
+    fixtures = {}
+
+    for cls in fixture_classes:
+        fixtures.update({cls.__name__: cls})
+
+    if packages:
+        fixture_modules = list(
+            import_module_from_packages('fixtures', packages=packages)
+        )
+        fixtures.update(dict((f, getattr(ff, f)) for ff in fixture_modules
+                        for f in dir(ff) if is_fixture(f)))
+
     model_modules = list(models)
     fixture_names = fixtures.keys()
 
     not_matched_fixtures = fixture_names
     models = {}
     for module in model_modules:
-
         for model_name in dir(module):
             fixture_name = model_name + 'Data'
             if fixture_name not in fixture_names:
@@ -315,8 +339,6 @@ def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
     if truncate_tables_first:
         print(">>> Going to truncate following tables:",
               map(lambda t: t.__tablename__, models.values()))
-        db.session.execute("TRUNCATE %s" % ('collectionname', ))
-        db.session.execute("TRUNCATE %s" % ('collection_externalcollection', ))
         for m in models.values():
             db.session.execute("TRUNCATE %s" % (m.__tablename__, ))
         db.session.commit()
@@ -327,7 +349,8 @@ def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
 @option_default_data
 @manager.option('--truncate', action='store_true',
                 dest='truncate_tables_first', help='use with care!')
-def populate(default_data=True, truncate_tables_first=False):
+def populate(default_data=True, packages=['invenio.modules.*'],
+             truncate_tables_first=False):
     """Populate database with default data."""
     from invenio.config import CFG_PREFIX
     from invenio.base.scripts.config import get_conf
@@ -338,7 +361,18 @@ def populate(default_data=True, truncate_tables_first=False):
 
     print(">>> Going to fill tables...")
 
-    load_fixtures(truncate_tables_first=truncate_tables_first)
+    # FIXME: hardcoded tables to truncate,
+    # FIXME: should be truncated basing on the fixtures to load
+    if truncate_tables_first:
+        from invenio.ext.sqlalchemy import db
+        print(">>> Going to truncate following tables: collectionname, " +
+              "collection_externalcollection")
+        db.session.execute("TRUNCATE %s" % ('collectionname', ))
+        db.session.execute("TRUNCATE %s" % ('collection_externalcollection', ))
+        db.session.commit()
+
+    load_fixtures(packages,
+                  truncate_tables_first=truncate_tables_first)
 
     conf = get_conf()
 
