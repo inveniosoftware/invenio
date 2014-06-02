@@ -511,23 +511,3 @@ def autocomplete(deposition_type=None, uuid=None, draft_id=None,
     )
     resp.mimetype = "application/json"
     return resp
-
-
-@blueprint.route('/search_arxiv/', methods=['GET'])
-@login_required
-def search_arxiv():
-    """Search for given ArXiv ID."""
-    arxiv = request.args.get('arxiv')
-
-    from invenio.utils.arxiv import get_json_for_arxiv
-    from invenio.modules.records.utils import get_unique_record_json
-    from invenio.utils.washers import remove_underscore_keys
-
-    # queries the database
-    result = get_unique_record_json(arxiv)
-    result['query'] = remove_underscore_keys(result['query'])
-    if result['query']['status'] == 'notfound':
-        # queries arxiv
-        result = get_json_for_arxiv(arxiv)
-
-    return jsonify(result)
