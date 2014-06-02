@@ -584,7 +584,13 @@ def translate_to_ascii(values):
         else:
             encoded_text, encoding = guess_minimum_encoding(value)
             unicode_text = unicode(encoded_text.decode(encoding))
-            ascii_text = unidecode(unicode_text).encode('ascii')
+            decoded_text = ""
+            for unicode_char in unicode_text:
+                decoded_char = unidecode(unicode_char)
+                # Skip unrecognized characters
+                if decoded_char != "[?]":
+                    decoded_text += decoded_char
+            ascii_text = decoded_text.encode('ascii')
         values[index] = ascii_text
     return values
 
