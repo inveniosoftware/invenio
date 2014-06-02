@@ -268,14 +268,32 @@ def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
     from invenio.ext.sqlalchemy import db, models
     from fixture import SQLAlchemyFixture
 
-    fixture_modules = list(import_module_from_packages('fixtures',
-                                                       packages=packages))
+    fixture_modules = list(
+        import_module_from_packages('fixtures', packages=packages)
+    )
+    fixtures = dict(
+        (fixture_name, getattr(module, fixture_name))
+        for module in fixture_modules
+        for fixture_name in dir(module)
+        if fixture_name.endswith('Data')
+    )
     model_modules = list(models)
-    fixtures = dict((f, getattr(ff, f)) for ff in fixture_modules
-                    for f in dir(ff) if f[-4:] == 'Data')
     fixture_names = fixtures.keys()
-    models = dict((m+'Data', getattr(mm, m)) for mm in model_modules
-                  for m in dir(mm) if m+'Data' in fixture_names)
+
+    not_matched_fixtures = fixture_names
+    models = {}
+    for module in model_modules:
+        for model_name in dir(module):
+            fixture_name = model_name + 'Data'
+            if fixture_name not in fixture_names:
+                continue
+            models[fixture_name] = getattr(module, model_name)
+            not_matched_fixtures.remove(fixture_name)
+
+    # check if for all the fixtures there is a corresponding model
+    if not_matched_fixtures:
+        raise Exception('Cannot match models for the following fixture ' +
+                        'classes: %s' % repr(not_matched_fixtures))
 
     dbfixture = SQLAlchemyFixture(env=models, engine=db.metadata.bind,
                                   session=db.session)
