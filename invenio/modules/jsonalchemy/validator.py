@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,11 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.jsonalchemy.validator
-    -------------------------------------
+"""Cerberus validator.
 
-    See http://cerberus.readthedocs.org/en/latest
+See (Cerberus documentation)[http://cerberus.readthedocs.org/en/latest]
 """
 import datetime
 import collections
@@ -34,19 +32,19 @@ from cerberus import errors
 
 
 class Validator(ValidatorBase):
-    """
 
-    """
+    """Cerberus validator."""
 
     def __init__(self, schema=None, transparent_schema_rules=True,
                  ignore_none_values=False, allow_unknown=True):
+        """Same as in Cerberus."""
         super(Validator, self).__init__(schema, transparent_schema_rules,
                                         ignore_none_values, allow_unknown)
 
     #FIXME: refactor spaghetti code
     @staticmethod
     def force_type(document, field, type_):
-        """Tries to force `field` contentn to `type`"""
+        """Force `field` content to `type`."""
         if type_ == 'list' and not isinstance(document[field], (list, tuple)):
             document[field] = [document[field], ]
         elif type_ == 'string' and not isinstance(document[field],
@@ -121,8 +119,7 @@ class Validator(ValidatorBase):
         return len(self._errors) == 0
 
     def _validate_type_objectid(self, field, value):
-        """
-        Enables validation for `objectid` schema attribute.
+        """Enable validation for `objectid` schema attribute.
 
         :param field: field name.
         :param value: field value.
@@ -131,8 +128,7 @@ class Validator(ValidatorBase):
             self._error(field, errors.ERROR_BAD_TYPE % 'ObjectId')
 
     def _validate_type_uuid(self, field, value):
-        """
-        Enables validation for `uuid.uuid4()` schema attribute.
+        """Enable validation for `uuid.uuid4()` schema attribute.
 
         :param field: field name.
         :param value: field value.

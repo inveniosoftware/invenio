@@ -161,7 +161,7 @@ class TestParser(InvenioTestCase):
         value = {'a': 'a', 'b': 'b', 'k': 'k'}  # noqa
         self.assertEquals(
             eval(Field_parser.field_definitions('testsuite')
-                 ['title']['rules']['marc'][0]['function']),
+                 ['title']['rules']['marc'][1]['function']),
             {'form': 'k', 'subtitle': 'b', 'title': 'a'})
         # Check extras
         self.assertTrue(

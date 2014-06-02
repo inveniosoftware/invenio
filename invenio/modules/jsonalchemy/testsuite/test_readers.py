@@ -645,6 +645,44 @@ class TestMarcReader(InvenioTestCase):
         self.assertTrue('foo' in json['title'])
         self.assertEquals(json['title.foo'], 'bar')
 
+    def test_translate_several_tag_different_indicator(self):
+        """JSONAlchemy - translate several tag with different indicator."""
+        from invenio.modules.jsonalchemy.reader import Reader
+        from invenio.modules.jsonalchemy.wrappers import SmartJson
+        blob = '''
+            <record>
+            <datafield tag="245" ind1=" " ind2=" ">
+              <subfield code="a">Title in 245__</subfield>
+            </datafield>
+            <datafield tag="245" ind1=" " ind2="2">
+              <subfield code="a">Title in 245_2</subfield>
+            </datafield>
+            <datafield tag="245" ind1="1" ind2=" ">
+              <subfield code="a">Title in 2451_</subfield>
+            </datafield>
+            </record>
+        '''
+        json = Reader.translate(
+            blob, SmartJson, master_format='marc', namespace='testsuite')
+        self.assertIsNotNone(json)
+        self.assertTrue('title' in json)
+        self.assertEquals(json['title']['title'], 'Title in 2451_')
+        self.assertEquals(json.meta_metadata.title['function'], ['2451_', ])
+
+        blob = '''
+            <record>
+            <datafield tag="245" ind1="2" ind2="2">
+              <subfield code="a">Title in 24522</subfield>
+            </datafield>
+            </record>
+        '''
+        json = Reader.translate(
+            blob, SmartJson, master_format='marc', namespace='testsuite')
+        self.assertIsNotNone(json)
+        self.assertTrue('title' in json)
+        self.assertEquals(json['title']['title'], 'Title in 24522')
+        self.assertEquals(json.meta_metadata.title['function'], ['24522', ])
+
     def test_add_fields(self):
         """JSONAlchemy - add field"""
         from invenio.modules.jsonalchemy.reader import Reader
@@ -922,6 +960,100 @@ class TestMarcReader(InvenioTestCase):
         self.assertTrue('title' in json['__meta_metadata__'])
         self.assertEquals(
             json['title'], {'title': 'ALEPH experiment: Candidate of Higgs boson production'})
+
+    def test_export_as_marc(self):
+        """JSONAlchemy - export as marc."""
+        from invenio.modules.jsonalchemy.parser import FieldParser
+        from invenio.modules.jsonalchemy.reader import Reader
+        from invenio.modules.jsonalchemy.wrappers import SmartJson
+
+        blob = '''
+            <record>
+              <controlfield tag="001">8</controlfield>
+              <datafield tag="100" ind1=" " ind2=" ">
+                <subfield code="a">Efstathiou, G P</subfield>
+                <subfield code="u">Cambridge University</subfield>
+              </datafield>
+              <datafield tag="245" ind1="1" ind2="2">
+                <subfield code="a">Title</subfield>
+                <subfield code="b">SubTitle</subfield>
+              </datafield>
+              <datafield tag="700" ind1=" " ind2=" ">
+               <subfield code="a">Lasenby, A N</subfield>
+              </datafield>
+              <datafield tag="980" ind1=" " ind2=" ">
+                <subfield code="a">Articles</subfield>
+              </datafield>
+            </record>
+        '''
+
+        partial_result = [
+            {'24512a': 'Title'},
+            {'980__a': 'test_me_Articles'},
+            {'980__a': 'Articles'},
+            {'100__u': 'Cambridge University', '100__a': 'Efstathiou, G P'},
+            {'700__a': 'Lasenby, A N'},
+        ]
+        json = Reader.translate(
+            blob, SmartJson, master_format='marc', namespace='testsuite')
+        self.assertIsNotNone(json)
+
+        json_for_marc = json.produce('json_for_marc')
+        for d in partial_result:
+            self.assertTrue(d in json_for_marc)
+
+        FieldParser.field_definitions('testsuite')['title']['producer'][
+            'json_for_marc'].append(
+            (('245__'),
+             {'245__a': 'title', '245__b': 'subtitle', '245__k': 'form'}))
+        FieldParser.field_definitions('testsuite')['title']['producer'][
+            'json_for_marc'].append(
+            (('245[^_][^_]'),
+             {'245__a': 'title', '245__b': 'subtitle', '245__k': 'form'}))
+
+        json_for_marc = json.produce('json_for_marc')
+        for d in partial_result:
+            self.assertTrue(d in json_for_marc)
+
+        blob = '''
+            <record>
+              <controlfield tag="001">8</controlfield>
+              <datafield tag="100" ind1=" " ind2=" ">
+                <subfield code="a">Efstathiou, G P</subfield>
+                <subfield code="u">Cambridge University</subfield>
+              </datafield>
+              <datafield tag="245" ind1="3" ind2="4">
+                <subfield code="a">Title</subfield>
+                <subfield code="b">SubTitle</subfield>
+              </datafield>
+              <datafield tag="700" ind1=" " ind2=" ">
+               <subfield code="a">Lasenby, A N</subfield>
+              </datafield>
+              <datafield tag="980" ind1=" " ind2=" ">
+                <subfield code="a">Articles</subfield>
+              </datafield>
+            </record>
+        '''
+
+        partial_result = [
+            {'245__a': 'Title', '245__b': 'SubTitle'},
+            {'980__a': 'test_me_Articles'},
+            {'980__a': 'Articles'},
+            {'100__u': 'Cambridge University', '100__a': 'Efstathiou, G P'},
+            {'700__a': 'Lasenby, A N'},
+        ]
+
+        json = Reader.translate(
+            blob, SmartJson, master_format='marc', namespace='testsuite')
+        self.assertIsNotNone(json)
+
+        # To avoid duplicates we remove rules that overlap
+        del FieldParser.field_definitions('testsuite')['title']['producer'][
+            'json_for_marc'][0]
+
+        json_for_marc = json.produce('json_for_marc')
+        for d in partial_result:
+            self.assertTrue(d in json_for_marc)
 
 
 TEST_SUITE = make_test_suite(TestReader, TestMarcReader, TestJSONReader)
