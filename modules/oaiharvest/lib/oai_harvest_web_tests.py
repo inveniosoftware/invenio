@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,9 +20,9 @@
 """OaiHarvest module web tests."""
 
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.testutils import make_test_suite, \
-                              run_test_suite, \
-                              InvenioWebTestCase
+from invenio.testutils import (make_test_suite,
+                               run_test_suite,
+                               InvenioWebTestCase)
 
 
 class InvenioOaiHarvestWebTest(InvenioWebTestCase):
@@ -50,8 +50,8 @@ class InvenioOaiHarvestWebTest(InvenioWebTestCase):
         self.browser.find_element_by_id(id="post_input_c0").click()
         self.find_element_by_xpath_with_timeout("//input[@value='Add OAI Source']", timeout=60)
         self.browser.find_element_by_xpath("//input[@value='Add OAI Source']").click()
-        self.page_source_test(expected_text="The field 'cfg-file' is an required argument when choosing 'convert (c)' post-process.")
-        self.fill_textbox(textbox_name="c_cfg-file", text="oaimarc2marcxml.xsl")
+        self.page_source_test(expected_text="The field 'stylesheet' is an required argument when choosing 'convert (c)' post-process.")
+        self.fill_textbox(textbox_name="c_stylesheet", text="oaimarc2marcxml.xsl")
         self.find_element_by_xpath_with_timeout("//input[@value='Add OAI Source']")
         self.browser.find_element_by_xpath("//input[@value='Add OAI Source']").click()
         self.find_element_by_link_text_with_timeout("Go back to the OAI sources overview")
