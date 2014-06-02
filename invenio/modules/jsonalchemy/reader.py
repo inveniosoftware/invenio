@@ -17,17 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.jsonalchemy.reader
-    ----------------------------------
+"""Default JSONAlchemy reader.
 
-    Default/Base reader, it provides the common functionality to use the
-    readers. Typically this class should be used as a factory to create the
-    concrete reader depending of the master format of the input.
+It provides the common functionality to use by the readers.
+Typically this class should be used as a factory to create the concrete
+reader depending of the master format of the input.
 
-        >>> from invenio.modules.jsonalchemy.reader import Reader
-        >>> from invenio.modules.readers.api import Record
-        >>> record = Reader.translate(blob, 'marc', Record, model=['picture'])
+    >>> from invenio.modules.jsonalchemy.reader import Reader
+    >>> from invenio.modules.readers.api import Record
+    >>> record = Reader.translate(blob, 'marc', Record, model=['picture'])
 """
 import datetime
 import six
@@ -120,8 +118,9 @@ class Reader(object):  # pylint: disable=R0921
             model_fields = ModelParser.resolve_models(
                 json.model_info.names,
                 json.additional_info.namespace).get('fields')
-            fields = dict((field_name, model_fields.get(field_name, field_name))
-                          for field_name in fields)
+            fields = dict(
+                (field_name, model_fields.get(field_name, field_name))
+                for field_name in fields)
 
         for json_id, field_name in six.iteritems(fields):
             reader._unpack_rule(json_id, field_name)
@@ -137,8 +136,8 @@ class Reader(object):  # pylint: disable=R0921
         :param json: Any ``SmartJson`` object
         :param field: Name of the new field to be added
         :param value: New value for the field (if not ``None``)
-        :param set_default_value: If set to ``True`` looks for the default value
-            if any and sets it.
+        :param set_default_value: If set to ``True`` looks for the default
+            value if any and sets it.
         """
         reader = None
         json_id = None
@@ -173,10 +172,10 @@ class Reader(object):  # pylint: disable=R0921
         :param json: Any ``SmartJson`` object
         :param blob: incoming blob (like MARC), if ``None``, ``json.get_blob``
             will be used to retrieve it if needed.
-        :param fields: List of fields to be updated, if ``None`` all fields will
-            be updated.
-        :param save: If set to ``True`` a 'soft save' will be performed with the
-            changes.
+        :param fields: List of fields to be updated, if ``None`` all fields
+            will be updated.
+        :param save: If set to ``True`` a 'soft save' will be performed with
+            the changes.
         """
         reader = cls(json=json, blob=blob if blob else json.get_blob())
         reader._update(fields)
@@ -218,8 +217,8 @@ class Reader(object):  # pylint: disable=R0921
             self._json['__meta_metadata__']['__model_info__']['names'] = \
                 self._guess_model_from_input()
 
-        model = ModelParser.resolve_models(self._json.model_info.names,
-                                           self._json.additional_info.namespace)
+        model = ModelParser.resolve_models(
+            self._json.model_info.names, self._json.additional_info.namespace)
 
         for key, value in six.iteritems(model):
             if key in ('fields', 'bases'):
@@ -237,8 +236,8 @@ class Reader(object):  # pylint: disable=R0921
 
     def _prepare_blob(self, *args, **kwargs):
         """
-        Responsible of doing any kind of transformation over the blob before the
-        translation begins.
+        Responsible of doing any kind of transformation over the blob before
+        the translation begins.
         It should create a common structure that all the methods, specially
         ``_get_elements_from_blob`` understand.
         """
@@ -305,7 +304,13 @@ class Reader(object):  # pylint: disable=R0921
         return field_name in self._json
 
     def _apply_rules(self, json_id, field_name, rule):
-        """Tries to apply a 'creator' rule"""
+        """Try to apply a 'creator' rule.
+
+        :param json_id: Name os the json field in the configuration file.
+        :param field_name: Final name of the field, taken from the model
+            definiti, if any, otherwise is equal to the `json_id`
+        :param rule: Current rule for the `json_id`
+        """
         for field_def in rule['rules'].get(
                 self._json.additional_info.master_format, []):
             if not self._evaluate_before_decorators(field_def):
@@ -336,7 +341,13 @@ class Reader(object):  # pylint: disable=R0921
                             % (field_name, element, str(e)),)
 
     def _apply_virtual_rules(self, json_id, field_name, rule):
-        """Tries to apply either a 'derived' or 'calculated' rule"""
+        """Try to apply either a 'derived' or 'calculated' rule.
+
+        :param json_id: Name os the json field in the configuration file.
+        :param field_name: Final name of the field, taken from the model
+            definiti, if any, otherwise is equal to the `json_id`
+        :param rule: Current rule for the `json_id`
+        """
         field_defs = []
         field_defs.append(('calculated', rule['rules'].get('calculated', [])))
         field_defs.append(('derived', rule['rules'].get('derived', [])))
@@ -353,8 +364,9 @@ class Reader(object):  # pylint: disable=R0921
                     info = self._find_field_metadata(json_id, field_name,
                                                      field_type, field_def)
                     self._json['__meta_metadata__'][field_name] = info
-                    self._json.__setitem__(field_name, value, extend=False,
-                                           exclude=['decorators', 'extensions'])
+                    self._json.__setitem__(
+                        field_name, value, extend=False,
+                        exclude=['decorators', 'extensions'])
                 except Exception as e:
                     self._json.errors.append(
                         "Rule Error - Unable to apply rule for virtual "
@@ -392,15 +404,16 @@ class Reader(object):  # pylint: disable=R0921
                 try:
                     self._json._dict_bson[field_name].update(old_value)
                 except AttributeError:
-                    self._json.__setitem__(field_name, old_value, extend=False,
-                                           exclude=['decorators', 'extensions'])
+                    self._json.__setitem__(
+                        field_name, old_value, extend=False,
+                        exclude=['decorators', 'extensions'])
 
     def _set_default_type(self, json_id, field_name):
-        """Finds the default type inside the schema, if `force` is used"""
+        """Finds the default type inside the schema, if `force` is used."""
         from .validator import Validator
 
         def set_default_type(field, schema):
-            """Helper function to allow subfield default values"""
+            """Helper function to allow subfield default values."""
             if 'type' in schema and schema.get('force', False):
                 Validator.force_type(self._json._dict_bson, field_name,
                                      schema['type'])
@@ -417,7 +430,7 @@ class Reader(object):  # pylint: disable=R0921
         set_default_type(field_name, schema)
 
     def _remove_none_values(self, obj):
-        """Handy closure to remove recursively None values from obj"""
+        """Handy method to remove recursively None values from obj."""
         if isinstance(obj, dict):
             for key in list(obj.keys()):
                 if obj[key] is None:
@@ -443,10 +456,10 @@ class Reader(object):  # pylint: disable=R0921
         needed meta-metadata, inlcuding field extensions and after decorators.
 
         If the information regarding the field definition is no present, the
-        first one available will be used: first ``creator`` rules for the master
-        format of the json, then ``derived`` and finally ``calculated``. For
-        each of them if more than one definition is present the first one will
-        be used.
+        first one available will be used: first ``creator`` rules for the
+        master format of the json, then ``derived`` and finally ``calculated``.
+        For each of them if more than one definition is present the first one
+        will be used.
 
         If no rule is found the field info will be tag as ``UNKNOWN``
 
@@ -537,7 +550,7 @@ class Reader(object):  # pylint: disable=R0921
         raise NotImplementedError('Missing implementation on this version')
 
     def _evaluate_before_decorators(self, field_def):
-        """Evaluates all the before decorators (they must return a boolean)"""
+        """Evaluates all the before decorators (they must return a boolean)."""
         for name, content in six.iteritems(field_def['decorators']['before']):
             if not FieldParser.decorator_before_extensions()[name]\
                     .evaluate(self, content):
@@ -545,7 +558,7 @@ class Reader(object):  # pylint: disable=R0921
         return True
 
     def _evaluate_on_decorators(self, field_def, master_value):
-        """Evaluates all the on decorators (they must return a boolean"""
+        """Evaluates all the on decorators (they must return a boolean."""
         for name, content in six.iteritems(field_def['decorators']['on']):
             if not FieldParser.decorator_on_extensions()[name]\
                     .evaluate(master_value,
@@ -554,7 +567,7 @@ class Reader(object):  # pylint: disable=R0921
         return True
 
     def _evaluate_after_decorators(self, field_name):
-        """Evaluates all the after decorators"""
+        """Evaluates all the after decorators."""
         if field_name not in self._json._dict_bson:
             return
         for ext, args in \

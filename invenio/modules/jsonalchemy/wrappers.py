@@ -17,10 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.jsonalchemy.wrapper
-    -----------------------------------
-"""
+"""JSONAlchemy wrappers."""
+
 import copy
 import six
 
@@ -33,15 +31,15 @@ from invenio.utils.datastructures import DotableDict, SmartDict
 from .parser import FieldParser, ModelParser
 from .reader import Reader
 from .registry import contexts, producers
-from .errors import ReaderException
 
 
 class StorageEngine(type):
+
     """Storage metaclass for parsing application config."""
 
     @property
     def storage_engine(cls):
-        """Returns an instance of storage engine defined in application config.
+        """Return an instance of storage engine defined in application config.
 
         It looks for key "ENGINE' prefixed by ``__storagename__.upper()`` for
         example::
@@ -71,12 +69,48 @@ class StorageEngine(type):
 
 @six.add_metaclass(StorageEngine)
 class SmartJson(SmartDict):
-    """Base class for Json structures"""
+
+    """Base class for Json structures."""
 
     def __init__(self, json=None, set_default_values=False,
                  process_model_info=False, **kwargs):
-        """
-        #TODO: explain what can go in **kwargs and for what
+        """If no JSON, a new structure will be created.
+
+        Typically the JSON structure needs a few mandatory fields and subfields
+        that are created here, the final JSON should look like this::
+
+            {
+                '__meta_metadata': {
+                    '__additional_info__': {...},
+                    '__model_info__': {'model_names': [...], ....},
+                    '__aliases__': {...},
+                    '__errors__': [...],
+                    '__continuable_errors__': []
+              }
+            }
+
+        The content of `__additional_info__` is, usually, the content of
+        kwargs.
+
+        This object maintains two different dictionaries, one with the pure
+        JSON representation, `_dict` and a second one with the BSON
+        representation of the former. This behavior helps whenever dealing with
+        JSON databases as MongoDB or PostgreSQL.
+
+        The content of the BSON dictionary is typically the same as in the JSON
+        one, only if the `json` section is described in the definition of the
+        field the content might change, a good example of this behavior are the
+        date fields.
+        See :class:`~.jsonext.parsers.json_extra_parser:JsonExtraParser`.
+
+        :param json: JSON to build the dictionary.
+        :param set_defaul_values: If `True` default values will be set.
+        :param process_model_info: If `True` all model info will be parsed.
+        :param kwargs: Everything that would be useful inside
+            `__additional_info__`. Although it could be used also for:
+            * `model=['model1', 'model2']`, in this case this key will be
+            deleted from `kwargs` and used as model names inside
+            `__model_info__`.
         """
         super(SmartJson, self).__init__(json)
         self._dict_bson = SmartDict()
@@ -103,31 +137,56 @@ class SmartJson(SmartDict):
 
     @property
     def additional_info(self):
+        """Shortcut to `__meta_metadata__.__additional_info__`."""
         return DotableDict(self['__meta_metadata__']['__additional_info__'])
 
     @property
     def errors(self):
+        """Shortcut to `__meta_metadata__.__errors__`."""
         return self._dict['__meta_metadata__']['__errors__']
 
     @property
     def continuable_errors(self):
+        """Shortcut to `__meta_metadata__.__continuable_errors__`."""
         return self._dict['__meta_metadata__']['__continuable_errors__']
 
     @property
     def meta_metadata(self):
+        """Shortcut to `__meta_metadata__`."""
         return DotableDict(self._dict['__meta_metadata__'])
 
     @property
     def model_info(self):
+        """Shortcut to `__meta_metadata__.__model_info__`."""
         return DotableDict(self._dict['__meta_metadata__']['__model_info__'])
 
     def __getitem__(self, key, reset=False, **kwargs):
+        """Like in `dict.__getitem__`.
+
+        First it tries to load the value from the value from the BSON object,
+        if it fails, or reset is set to `True`, looks into the JSON object for
+        the `key`, applies all the extensions and decorators and return the
+        value that is stored in the BSON object as a cached version.
+
+        If the key is not found inside the dictionary, it tries before raising
+        `KeyError` to figure out if it is dealing with an alias.
+
+        :param key:
+        :param reset: If the key corresponds to a field calculated on the fly
+            the value will be calculated again.
+        :param kwargs: Typically used to set:
+            * `action`, Whether we are performing a `set` or a `get`.
+            *`exclude`, from the list of extensions and decorators excludes the
+            ones that are not required.
+
+        :return: Like in `dict.__getitem__`
+        """
         try:
             value = self._dict_bson[key]
             if value and not reset:
                 return value
         except KeyError:
-            #We will try to find the key inside the json dict and load it
+            # Try to find the key inside the json dict and load it
             pass
         main_key = SmartDict.main_key_pattern.sub('', key)
         if main_key == '__meta_metadata__':
@@ -163,6 +222,27 @@ class SmartJson(SmartDict):
                 + rest_of_key]
 
     def __setitem__(self, key, value, extend=False, **kwargs):
+        """Like in `dict.__setitem__`.
+
+        There are two possible scenarios, i) the key is already present in the
+        dictionary (also its metadata), therefore a simple set in the first
+        step, ii) or the key is not inside the dictionary, in this case the
+        metadata for the field is fetched before performing the rest of the
+        actions.
+
+        Like in `__getitem__` after setting the value to the BSON dictionary
+        the decorators and the extensions are evaluated and, if needed, the
+        JSON representation of `value` is set into the JSON dictionary.
+
+        :param key:
+        :param value:
+        :param extend: If `False` it behaves as `ditc.__setitem__`, if `True`
+            creates a list with the previous content and append `value` to it.
+        :param kwargs:Typically used to set:
+            * `action`, Whether we are performing a `set` or a `get`.
+            *`exclude`, from the list of extensions and decorators excludes the
+            ones that are not required.
+        """
         main_key = SmartDict.main_key_pattern.sub('', key)
         # If we have meta_metadata for the main key go ahead
         if main_key in self.meta_metadata:
@@ -189,12 +269,18 @@ class SmartJson(SmartDict):
                     .evaluate(self, main_key, action, args)
 
     def __str__(self):
+        """Representation of the object **without** the meta_metadata."""
         return self.dumps(without_meta_metadata=True).__str__()
 
     def __repr__(self):
+        """Full string representation of the JSON object."""
         return self._dict.__repr__()
 
     def __delitem__(self, key):
+        """Delete on key from the dictionary and its meta_metadata.
+
+        Note: It only works with default python keys
+        """
         self._dict.__delitem__(key)
         del self._dict['__meta_metadata__'][key]
         try:
@@ -203,12 +289,14 @@ class SmartJson(SmartDict):
             pass
 
     def get(self, key, default=None, reset=False, **kwargs):
+        """Like in `dict.get`."""
         try:
             return self.__getitem__(key, reset, **kwargs)
         except (KeyError, IndexError):
             return default
 
     def items(self, without_meta_metadata=False):
+        """Like in `dict.items`."""
         for key in self.keys():
             if key == '__meta_metadata__' and without_meta_metadata:
                 continue
@@ -216,13 +304,15 @@ class SmartJson(SmartDict):
     iteritems = items
 
     def keys(self, without_meta_metadata=False):
+        """Like in `dict.keys`."""
         for key in super(SmartJson, self).keys():
             if key == '__meta_metadata__' and without_meta_metadata:
                 continue
             yield key
 
     def get_blob(self, *args, **kwargs):
-        """
+        """To be override in the specific class.
+
         Should look for the original version of the file where the json came
         from.
         """
@@ -230,15 +320,14 @@ class SmartJson(SmartDict):
 
     def dumps(self, without_meta_metadata=False, with_calculated_fields=False,
               clean=False):
-        """
-        Creates the JSON friendly representation of the current object.
+        """Create the JSON friendly representation of the current object.
 
         :param without_meta_metadata: by default ``False``, if set to ``True``
             all the ``__meta_metadata__`` will be removed from the output.
         :param wit_calculated_fields: by default the calculated fields are not
             dump, if they are needed in the output set it to ``True``
-        :param clean: if set to ``True`` all the keys stating with ``_`` will be
-            removed from the ouput
+        :param clean: if set to ``True`` all the keys stating with ``_`` will
+            be removed from the ouput
 
         :return: JSON friendly object
         """
@@ -258,15 +347,14 @@ class SmartJson(SmartDict):
 
     def loads(self, without_meta_metadata=False, with_calculated_fields=True,
               clean=False):
-        """
-        Creates the BSON representation of the current object.
+        """Create the BSON representation of the current object.
 
         :param without_meta_metadata: if set to ``True`` all the
             ``__meta_metadata__`` will be removed from the output.
         :param wit_calculated_fields: by default the calculated fields are in
             the output, if they are not needed set it to ``False``
-        :param clean: if set to ``True`` all the keys stating with ``_`` will be
-            removed from the ouput
+        :param clean: if set to ``True`` all the keys stating with ``_`` will
+            be removed from the ouput
 
         :return: JSON friendly object
 
@@ -289,26 +377,33 @@ class SmartJson(SmartDict):
         return dict_
 
     def produce(self, producer_code, fields=None):
-        """
-        Depending on the ``producer_code`` it creates a different flavor of JSON
+        """Create a different flavor of `JSON` depending on `procuder_code`.
 
         :param producer_code: One of the possible producers listed in the
-            ``producer`` section inside de field definitions
+            `producer` section inside the field definitions.
         :param fields: List of fields that should be present in the output, if
-            ``None`` all fields from ``self`` will be used.
+            `None` all fields from `self` will be used.
 
         :return: It depends on each producer, see producer folder inside
-            jsonext, typically ``dict``.
+            `jsonext`, typically `dict`.
         """
         return producers[producer_code](self, fields=fields)
 
     def set_default_values(self, fields=None):
-        # TODO
+        """Set default value for the fields using the schema definition.
+
+        :param fields: List of fields to set the default value, if `None` all.
+
+        """
         raise NotImplementedError('Missing implementation in this version')
 
     def validate(self, validator=None):
-        """
+        """Validate using current JSON content using Cerberus.
 
+        See: (Cerberus)[http://cerberus.readthedocs.org/en/latest].
+
+        :param validator: Validator to be used, if `None`
+            :class:`~.validator:Validator`
         """
         if validator is None:
             from .validator import Validator as validator
@@ -317,8 +412,9 @@ class SmartJson(SmartDict):
             self.model_info.names,
             self.additional_info.namespace).get('fields', {})
         for field in self.keys():
-            if not field == '__meta_metadata__' and field not in model_fields \
-                    and self.meta_metadata[field]['json_id'] not in model_fields:
+            if not field == '__meta_metadata__' and \
+                    field not in model_fields and \
+                    self.meta_metadata[field]['json_id'] not in model_fields:
                 model_fields[field] = self.meta_metadata[field]['json_id']
         for json_id in model_fields.keys():
             try:
@@ -333,10 +429,7 @@ class SmartJson(SmartDict):
     # Legacy methods, try not to use them as they are already deprecated
 
     def legacy_export_as_marc(self):
-        """
-        It creates a valid marcxml using the legacy rules defined in the config
-        file
-        """
+        """Create the MARCXML representation using the producer rules."""
         from collections import Iterable
 
         def encode_for_marcxml(value):
@@ -389,9 +482,10 @@ class SmartJson(SmartDict):
         return export
 
     def legacy_create_recstruct(self):
-        """
-        It creates the recstruct representation using the legacy rules defined
-        in the configuration file
+        """Create the `recstruct` representation.
+
+        It uses the producer rules and
+        :func:`~invenio.legacy.bibrecord.create_record`.
         """
         # FIXME: it might be a bit overkilling
         from invenio.legacy.bibrecord import create_record
@@ -402,29 +496,30 @@ class SmartJson(SmartDict):
             # There was an error
             if isinstance(errors, list):
                 errors = "\n".join(errors)
-            raise ReaderException("There was an error while parsing MARCXML: %s"
-                                  % (errors,))
+            raise ReaderException(
+                "There was an error while parsing MARCXML: %s" % (errors,))
         return record
 
 
 class SmartJsonLD(SmartJson):
-    """Utility class for JSON-LD serialization"""
+
+    """Utility class for JSON-LD serialization."""
 
     def translate(self, context_name, context):
-        """
-        Translates object to fit given JSON-LD context. Should not inject
-        context as this will be done at publication time.
+        """Translate object to fit given JSON-LD context.
 
+        Should not inject context as this will be done at publication time.
         """
         raise NotImplementedError('Translation not required')
 
     def get_context(self, context):
-        """
-        Returns the context definition identified by the parameter. If the
-        context is not found in the current namespace, the received parameter is
-        returned as is, the assumption being that a IRI was passed.
+        """Return the context definition identified by the parameter.
 
-        :param: context identifier
+        If the context is not found in the current namespace, the received
+        parameter is returned as is, the assumption being that a IRI was
+        passed.
+
+        :param context: context identifier
         """
         try:
             return contexts(self.additional_info.namespace)[context]
@@ -432,21 +527,18 @@ class SmartJsonLD(SmartJson):
             return context
 
     def get_jsonld(self, context, new_context={}, format="full"):
-        """
-        Returns the JSON-LD serialization.
+        """Return the JSON-LD serialization.
 
         :param: context the context to use for raw publishing; each SmartJsonLD
-                        instance is expected to have a default context
-                        associated.
+            instance is expected to have a default context associated.
         :param: new_context the context to use for formatted publishing,
-                            usually supplied by the client; used by the
-                            'compacted', 'framed', and 'normalized' formats.
+            usually supplied by the client; used by the 'compacted', 'framed',
+            and 'normalized' formats.
         :param: format the publishing format; can be 'full', 'inline',
-                       'compacted', 'expanded', 'flattened', 'framed' or
-                       'normalized'. Note that 'full' and 'inline' are synonims,
-                       referring to the document form which includes the
-                       context; for more information see:
-                       http://www.w3.org/TR/json-ld/
+            'compacted', 'expanded', 'flattened', 'framed' or 'normalized'.
+            Note that 'full' and 'inline' are synonims, referring to the
+            document form which includes the context; for more information see:
+            [http://www.w3.org/TR/json-ld/]
         """
         from pyld import jsonld
 
