@@ -400,20 +400,8 @@ def wash_for_utf8(text, correct=True):
     if isinstance(text, unicode):
         return text.encode('utf-8')
 
-    ret = []
-    while True:
-        try:
-            text.decode("utf-8")
-        except UnicodeDecodeError, e:
-            if correct:
-                ret.append(text[:e.start])
-                text = text[e.end:]
-            else:
-                raise e
-        else:
-            break
-    ret.append(text)
-    return ''.join(ret)
+    errors = "ignore" if correct else "strict"
+    return text.decode("utf-8", errors).encode("utf-8", errors)
 
 def nice_size(size):
     """
