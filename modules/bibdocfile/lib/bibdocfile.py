@@ -236,6 +236,10 @@ def _generate_extensions():
                 _mimes.suffix_map.keys() + \
                 _mimes.types_map[1].keys() + \
                 CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS
+    # remove purely numerical extensions which usually are part of
+    # the basename and not an extension, e.g. fig.6.ps.gz
+    _tmp_extensions = [ext for ext in _tmp_extensions \
+                       if not ext.strip('.').isdigit()]
     extensions = []
     for ext in _tmp_extensions:
         if ext.startswith('.'):
