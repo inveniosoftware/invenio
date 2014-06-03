@@ -267,12 +267,14 @@ def manage_attached_documents(step):
             eng.log.info('Documents to upload found')
             record['_files'] = []
             files_to_upload = record.get('files_to_upload', [])
+            model = record.pop('model')
 
             for file_to_upload in files_to_upload:
                 document = api.Document.create({
                     'title': os.path.basename(file_to_upload['path']),
-                    'description': '',
-                })
+                    'description': filed_to_upload.get('description', ''),
+                    'recids': [record.get('recid', -1), ]
+                }, model=model)
                 eng.log.info('Document %s created', (document['_id'],))
 
                 record['_files'].append(
