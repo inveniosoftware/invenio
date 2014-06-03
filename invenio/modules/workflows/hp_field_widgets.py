@@ -56,7 +56,7 @@ def bootstrap_accept_mini(field, **kwargs):
                          name="submitButton",
                          type="submit",
                          value=field.label.text,
-                         onclick="mini_approval('Accept', event, %s);" % (objectid,),)
+                         onclick="approval.mini_approval('Accept', event, %s);" % (objectid,),)
     return HTMLString(u''.join(html))
 
 
@@ -84,5 +84,5 @@ def bootstrap_reject_mini(field, **kwargs):
                          name="submitButton",
                          type="submit",
                          value=field.label.text,
-                         onclick="mini_approval('Reject', event, %s);" % (objectid,),)
+                         onclick="approval.mini_approval('Reject', event, %s);" % (objectid,),)
     return HTMLString(u''.join(html))

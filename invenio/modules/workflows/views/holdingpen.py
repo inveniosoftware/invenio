@@ -32,7 +32,7 @@ from six import iteritems, text_type
 from flask import (render_template, Blueprint, request, current_app, jsonify,
                    url_for, flash, session)
 from flask.ext.login import login_required
-from flask.ext.breadcrumbs import default_breadcrumb_root,register_breadcrumb
+from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.menu import register_menu
 
 from invenio.base.decorators import templated, wash_arguments
@@ -102,6 +102,7 @@ def maintable():
                 action_static=action_static,
                 tags=tags_to_print)
 
+
 @blueprint.route('/batch_action', methods=['GET', 'POST'])
 @login_required
 @wash_arguments({'bwolist': (text_type, "")})
@@ -159,123 +160,143 @@ def load_table():
     3] then if the user searched for something
     and finally it builds the JSON to send.
     """
-    version_showing = []
-    req = request.json
-
-    if req is not None:
-        if "final" in req:
-            version_showing.append(ObjectVersion.FINAL)
-        if "halted" in req:
-            version_showing.append(ObjectVersion.HALTED)
-        if "running" in req:
-            version_showing.append(ObjectVersion.RUNNING)
-        if "initial" in req:
-            version_showing.append(ObjectVersion.INITIAL)
-        session['workflows_version_showing'] = version_showing
-    elif 'workflows_version_showing' in session:
-        version_showing = session.get('workflows_version_showing', [])
-
-    i_sortcol_0 = request.args.get('iSortCol_0')
-    if i_sortcol_0 == 0:
-        i_sortcol_0 = session.get('iSortCol_0', 0)
-    s_sortdir_0 = request.args.get('sSortDir_0')
-    if not s_sortdir_0:
-        s_sortdir_0 = session.get('sSortDir_0', None)
-    i_display_start = int(request.args.get('iDisplayStart'))
-    i_display_length = int(request.args.get('iDisplayLength'))
-
-    if i_display_length == 0:
-        i_display_length = current_app.config.get('iDisplayLength', 10)
-    sEcho = int(request.args.get('sEcho')) + 1
-    if sEcho == 0:
-        sEcho = session.get('sEcho', 0) + 1
-    s_search = request.args.get('sSearch', None)
-    bwolist = get_holdingpen_objects(ssearch=s_search,
-                                     version_showing=version_showing)
-
-    if 'iSortCol_0' in session:
-        i_sortcol_0 = int(i_sortcol_0)
-        if i_sortcol_0 != session['iSortCol_0'] \
-           or s_sortdir_0 != session['sSortDir_0']:
-            bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
-
-    session['iDisplayStart'] = i_display_start
-    session['iDisplayLength'] = i_display_length
-    session['iSortCol_0'] = i_sortcol_0
-    session['sSortDir_0'] = s_sortdir_0
-    session['sEcho'] = sEcho
-
-    table_data = {
-        "aaData": []
-    }
-
     try:
+        version_showing = []
+        req = None
+        req_search = []
+        if request.json:
+            if "version" in request.json:
+                req = request.json["version"]
+            if "tags" in request.json:
+                req_search = request.json["tags"]
+                session["tags"] = req_search
+        if req is not None:
+            if "final" in req:
+                version_showing.append(ObjectVersion.FINAL)
+            if "halted" in req:
+                version_showing.append(ObjectVersion.HALTED)
+            if "running" in req:
+                version_showing.append(ObjectVersion.RUNNING)
+            if "initial" in req:
+                version_showing.append(ObjectVersion.INITIAL)
+            session['workflows_version_showing'] = version_showing
+        elif 'workflows_version_showing' in session:
+            version_showing = session.get('workflows_version_showing', [])
+
+        try:
+            i_sortcol_0 = request.args.get('iSortCol_0')
+            s_sortdir_0 = request.args.get('sSortDir_0')
+            i_display_start = int(request.args.get('iDisplayStart'))
+            i_display_length = int(request.args.get('iDisplayLength'))
+            sEcho = int(request.args.get('sEcho')) + 1
+        except:
+            i_sortcol_0 = session.get('iSortCol_0', 0)
+            s_sortdir_0 = session.get('sSortDir_0', None)
+            i_display_start = session.get('iDisplayLength', 10)
+            i_display_length = session.get('iDisplayLength', 0)
+            sEcho = session.get('sEcho', 0) + 1
+
+        s_search = request.args.get('sSearch', None)
+        if s_search:
+            if req_search:
+                s_search = s_search.split(',') + req_search
+            else:
+                s_search = s_search.split(',') + session["tags"]
+        else:
+            if req_search:
+                s_search = req_search
+            elif "tags" in session:
+                s_search = session["tags"]
+            else:
+                s_search = []
+
+        print version_showing
+        print s_search
+
+        bwolist = get_holdingpen_objects(ssearch=s_search,
+                                         version_showing=version_showing)
+        print len(bwolist)
+        if 'iSortCol_0' in session:
+            i_sortcol_0 = int(i_sortcol_0)
+            if i_sortcol_0 != session['iSortCol_0'] \
+                or s_sortdir_0 != session['sSortDir_0']:
+                bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
+        session['iDisplayStart'] = i_display_start
+        session['iDisplayLength'] = i_display_length
+        session['iSortCol_0'] = i_sortcol_0
+        session['sSortDir_0'] = s_sortdir_0
+        session['sEcho'] = sEcho
+
+        table_data = {
+            "aaData": []
+        }
+        try:
+            table_data['iTotalRecords'] = len(bwolist)
+            table_data['iTotalDisplayRecords'] = len(bwolist)
+        except TypeError:
+            bwolist = get_holdingpen_objects(version_showing=version_showing)
+            table_data['iTotalRecords'] = len(bwolist)
+            table_data['iTotalDisplayRecords'] = len(bwolist)
+
+        # This will be simplified once Redis is utilized.
+        records_showing = 0
+        for bwo in bwolist[i_display_start:i_display_start + i_display_length]:
+            action_name = bwo.get_action()
+            action_message = bwo.get_action_message()
+            if not action_message:
+                action_message = ""
+            action = actions.get(action_name, None)
+
+            records_showing += 1
+
+            mini_action = getattr(action, "mini_action", None)
+            record = bwo.get_data()
+            if not hasattr(record, "get"):
+                try:
+                    record = dict(record)
+                except:
+                    record = {}
+
+            categories = get_subject_categories(record)
+            title = get_title(record)
+            identifiers = get_identifiers(record)
+
+            extra_data = bwo.get_extra_data()
+            row = render_template('workflows/row_formatter.html',
+                                  title=title,
+                                  object=bwo,
+                                  record=record,
+                                  extra_data=extra_data,
+                                  categories=categories,
+                                  action=action,
+                                  mini_action=mini_action,
+                                  action_message=action_message,
+                                  pretty_date=pretty_date,
+                                  identifiers=identifiers)
+            d = {}
+            for key, value in REG_TD.findall(row):
+                d[key] = value.strip()
+
+            table_data['aaData'].append(
+                [d['id'],
+                 d['checkbox'],
+                 d['title'],
+                 d['identifiers'],
+                 d['category'],
+                 d['pretty_date'],
+                 d['version'],
+                 d['type'],
+                 d['details'],
+                 d['action']
+                ]
+            )
+        table_data['sEcho'] = sEcho
         table_data['iTotalRecords'] = len(bwolist)
         table_data['iTotalDisplayRecords'] = len(bwolist)
-    except TypeError:
-        bwolist = get_holdingpen_objects(version_showing=version_showing)
-        table_data['iTotalRecords'] = len(bwolist)
-        table_data['iTotalDisplayRecords'] = len(bwolist)
-
-    # This will be simplified once Redis is utilized.
-    records_showing = 0
-
-    for bwo in bwolist[i_display_start:i_display_start + i_display_length]:
-        action_name = bwo.get_action()
-        action_message = bwo.get_action_message()
-        if not action_message:
-            action_message = ""
-        action = actions.get(action_name, None)
-
-        records_showing += 1
-
-        mini_action = getattr(action, "mini_action", None)
-        record = bwo.get_data()
-        if not hasattr(record, "get"):
-            try:
-                record = dict(record)
-            except:
-                record = {}
-
-        categories = get_subject_categories(record)
-        title = get_title(record)
-        identifiers = get_identifiers(record)
-
-        extra_data = bwo.get_extra_data()
-        row = render_template('workflows/row_formatter.html',
-                              title=title,
-                              object=bwo,
-                              record=record,
-                              extra_data=extra_data,
-                              categories=categories,
-                              action=action,
-                              mini_action=mini_action,
-                              action_message=action_message,
-                              pretty_date=pretty_date,
-                              identifiers=identifiers)
-
-        d = {}
-        for key, value in REG_TD.findall(row):
-            d[key] = value.strip()
-
-        table_data['aaData'].append(
-            [d['id'],
-             d['checkbox'],
-             d['title'],
-             d['identifiers'],
-             d['category'],
-             d['pretty_date'],
-             d['version'],
-             d['type'],
-             d['details'],
-             d['action']
-             ]
-        )
-
-    table_data['sEcho'] = sEcho
-    table_data['iTotalRecords'] = len(bwolist)
-    table_data['iTotalDisplayRecords'] = len(bwolist)
-    return jsonify(table_data)
+        print session
+        return jsonify(table_data)
+    except Exception as e:
+        print(e)
 
 
 @blueprint.route('/get_version_showing', methods=['GET', 'POST'])
@@ -296,16 +317,24 @@ def details(objectid):
     of = "hd"
     bwobject = BibWorkflowObject.query.get(objectid)
     from sqlalchemy import or_
+
     formatted_data = bwobject.get_formatted_data(of)
     extracted_data = extract_data(bwobject)
     if bwobject.id_parent:
-        hbwobject_db_request = BibWorkflowObject.query.filter(or_(BibWorkflowObject.id_parent == bwobject.id_parent, BibWorkflowObject.id == bwobject.id, BibWorkflowObject.id == bwobject.id_parent)).all()
+        hbwobject_db_request = BibWorkflowObject.query.filter(
+            or_(BibWorkflowObject.id_parent == bwobject.id_parent,
+                BibWorkflowObject.id == bwobject.id,
+                BibWorkflowObject.id == bwobject.id_parent)).all()
     else:
-        hbwobject_db_request = BibWorkflowObject.query.filter(or_(BibWorkflowObject.id_parent == bwobject.id, BibWorkflowObject.id == bwobject.id)).all()
+        hbwobject_db_request = BibWorkflowObject.query.filter(
+            or_(BibWorkflowObject.id_parent == bwobject.id,
+                BibWorkflowObject.id == bwobject.id)).all()
     hbwobject = []
 
     for hbobject in hbwobject_db_request:
-        hbwobject.append({"id": hbobject.id, "version": hbobject.version, "date": pretty_date(hbobject.created), "true_date": hbobject.created})
+        hbwobject.append({"id": hbobject.id, "version": hbobject.version,
+                          "date": pretty_date(hbobject.created),
+                          "true_date": hbobject.created})
 
     hbwobject.sort(key=lambda x: x["id"])
 
@@ -400,22 +429,31 @@ def show_action(objectid):
                                   [extracted_data['w_metadata']],
                                   [extracted_data['workflow_func']])
     url, parameters = result
+
     #### message
     from sqlalchemy import or_
+
     if bwobject.id_parent:
-        hbwobject_db_request = BibWorkflowObject.query.filter(or_(BibWorkflowObject.id_parent == bwobject.id_parent, BibWorkflowObject.id == bwobject.id, BibWorkflowObject.id == bwobject.id_parent)).all()
+        hbwobject_db_request = BibWorkflowObject.query.filter(
+            or_(BibWorkflowObject.id_parent == bwobject.id_parent,
+                BibWorkflowObject.id == bwobject.id,
+                BibWorkflowObject.id == bwobject.id_parent)).all()
     else:
-        hbwobject_db_request = BibWorkflowObject.query.filter(or_(BibWorkflowObject.id_parent == bwobject.id, BibWorkflowObject.id == bwobject.id)).all()
+        hbwobject_db_request = BibWorkflowObject.query.filter(
+            or_(BibWorkflowObject.id_parent == bwobject.id,
+                BibWorkflowObject.id == bwobject.id)).all()
     hbwobject = []
 
     for hbobject in hbwobject_db_request:
-        hbwobject.append({"id": hbobject.id, "version": hbobject.version, "date": pretty_date(hbobject.created), "true_date": hbobject.created})
+        hbwobject.append({"id": hbobject.id, "version": hbobject.version,
+                          "date": pretty_date(hbobject.created),
+                          "true_date": hbobject.created})
 
     hbwobject.sort(key=lambda x: x["id"])
 
     parameters["message"] = bwobject.get_action_message()
     parameters["hbwobject"] = hbwobject
-    return render_template("workflows/hp_approval_widget.html", **parameters)
+    return render_template(url, **parameters)
 
 
 @blueprint.route('/resolve', methods=['GET', 'POST'])
@@ -586,14 +624,13 @@ def get_holdingpen_objects(isortcol_0=None,
         isortcol_0 = int(isortcol_0)
 
     bwobject_list = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id_parent==None
-        ).filter(not version_showing or BibWorkflowObject.version.in_(version_showing)).all()
-
-    if ssearch and len(ssearch) > 2:
+        BibWorkflowObject.id_parent == None
+    ).filter(not version_showing or BibWorkflowObject.version.in_(
+        version_showing)).all()
+    if ssearch:
         bwobject_list_tmp = []
         for bwo in bwobject_list:
             extra_data = bwo.get_extra_data()
-
             if hasattr(bwo.get_data(), "get"):
                 data = bwo.get_data()
             else:
@@ -623,13 +660,14 @@ def get_holdingpen_objects(isortcol_0=None,
                                                checking_functions[function](
                                                        **dict(
                                                                (
-                                                                       checking_functions[
-                                                                           function].func_code.co_varnames[
-                                                                           i],
-                                                               all_parameters[
                                                                    checking_functions[
                                                                        function].func_code.co_varnames[
-                                                                       i]]) for
+                                                                       i],
+                                                                   all_parameters[
+                                                                       checking_functions[
+                                                                           function].func_code.co_varnames[
+                                                                           i]])
+                                                               for
                                                                i in
                                                                range(0,
                                                                      checking_functions[
@@ -642,7 +680,6 @@ def get_holdingpen_objects(isortcol_0=None,
             if to_add:
                 bwobject_list_tmp.append(bwo)
         bwobject_list = bwobject_list_tmp
-
     if isortcol_0 == -6:
         if ssortdir_0 == 'desc':
             bwobject_list.reverse()

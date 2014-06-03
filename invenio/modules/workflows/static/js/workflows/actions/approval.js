@@ -184,6 +184,7 @@ var approval = (function ($, holdingpen) {
     };
 
     var mini_approval = function (decision, event, objectid) {
+        console.log("omg");
         jQuery.ajax({
             type: "POST",
             url: url.resolve_action,
@@ -196,7 +197,7 @@ var approval = (function ($, holdingpen) {
                 checkRecordsToApprove();
             }
         });
-        oTable.fnDraw(false);
+        holdingpen.oTable.fnDraw(false);
     };
 
     var deleteRecords = function (bwolist) {

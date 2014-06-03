@@ -29,15 +29,33 @@ var WORKFLOWS_HP_UTILITIES = function ($, holdingpen) {
     };
 
     var _requestNewObjects = function () {
-        var version_showing = {};
-        ($.inArray("Completed", holdingpen.tag.tagList()) <= -1) ? null:  version_showing["final"] = true;
-        ($.inArray("Halted", holdingpen.tag.tagList()) <= -1) ? null : version_showing["halted"] = true;
-        ($.inArray("Running", holdingpen.tag.tagList()) <= -1) ? null : version_showing["running"] = true;
-        ($.inArray("Initial", holdingpen.tag.tagList()) <= -1) ? null : version_showing["initial"] = true;
+        var version_showing = [],
+            i,
+            search_tags = [];
+
+        for(i = 0 ; i< holdingpen.tag.tagList().length; i++)
+        {
+            console.log(holdingpen.tag.tagList()[i])
+            if ("Completed" == holdingpen.tag.tagList()[i]) {
+                version_showing.push("final");
+            } else if ("Halted" == holdingpen.tag.tagList()[i]) {
+                version_showing.push("halted")
+            } else if ("Running" ==  holdingpen.tag.tagList()[i]) {
+                version_showing.push("running")
+            } else if ("Initial" ==  holdingpen.tag.tagList()[i]){
+                version_showing.push("initial");
+            } else {
+                search_tags.push(holdingpen.tag.tagList()[i]);
+            }
+
+        }
+        console.log(version_showing)
+        console.log(search_tags)
+        my_data = JSON.stringify({'version':version_showing, 'tags':search_tags});
         $.ajax({
             type : "POST",
             url : holdingpen.context.holdingpen.url_load,
-            data: JSON.stringify(version_showing),
+            data: my_data,
             contentType: "application/json;charset=UTF-8",
             traditional: true,
             success: function(result) {

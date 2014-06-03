@@ -20,8 +20,8 @@
 // Tags functions
 //***********************************
 var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
-    var tagList = [],
-        tagListToSearch = [];
+    "use strict";
+    var tagList = [];
 
     $("#tags").tagsinput({
         tagClass: function (item) {
@@ -65,28 +65,14 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
         $("#tags").on('itemRemoved', function (event) {
             tagList = $("#tags").val().split(',');
             tagList = taglist_translation(tagList);
-            if (tagListToSearch.indexOf(event.item) >= 0 && ["Done", "In process", "Need action", "New"].indexOf(event.item) < 0) {
-                tagListToSearch.splice(tagListToSearch.indexOf(event.item), 1);
-            }
-            holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
         });
 
         $("#tags").on('itemAdded', function (event) {
-
             tagList =  $("#tags").val().split(',');
             tagList = taglist_translation(tagList);
-
-            if (tagListToSearch.indexOf(event.item) >= 0 && ["Done", "In process", "Need action", "New"].indexOf(event.item) < 0) {
-                tagListToSearch.push(event.item);
-                holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
-                WORKFLOWS_HP_UTILITIES.requestNewObjects();
-            }
-            holdingpen.oTable.fnFilter(tagListToSearch, null, false, false, false);
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
         });
-
-
     };
 
     function taglist_translation(my_taglist) {
@@ -113,8 +99,8 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
 
     return {
         init: init,
-        tagList: function () { return tagList;},
-        closeTag: closeTag,
+        tagList: function () { return tagList; },
+        closeTag: closeTag
     };
 }($, WORKFLOWS_HOLDINGPEN);
 //***********************************

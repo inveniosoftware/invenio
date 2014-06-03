@@ -81,7 +81,7 @@
                         {% set i = 0 %}
                         {% for task, object_count in action_list.items() %}
                             <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{task}}: {{object_count}}</a></li>
-                            {% set i = i+1 %}
+                            {% set i = i + 1 %}
                         {% endfor %}
                     {% else %}
                             <li><a class="task-btn">No actions left</a></li>

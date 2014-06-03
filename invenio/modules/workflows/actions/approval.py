@@ -43,9 +43,8 @@ class approval(Form):
         reject = SubmitField(label=_('Reject'), widget=bootstrap_reject_mini)
         accept = SubmitField(label=_('Accept'), widget=bootstrap_accept_mini)
 
-    def render(self, bwobject_list, bwparent_list, info_list,
-               logtext_list, w_metadata_list,
-               workflow_func_list, *args, **kwargs):
+    def render(self, bwobject_list, bwparent_list, info_list, logtext_list,
+               w_metadata_list, workflow_func_list, *args, **kwargs):
         """Method to render the action."""
         data_preview_list = []
         # setting up approval action
