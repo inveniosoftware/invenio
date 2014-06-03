@@ -323,7 +323,20 @@ def format_element(bfo, width="50"):
                                name_width,
                                value_width)
 
-    out +="\n}"
+    #Print doi
+    fields = bfo.fields("0247_")
+    for field in fields:
+        if field.get('2', 'DOI') == 'DOI' and 'a' in field:
+            out += format_bibtex_field("doi",
+                                       "{%s}" % field['a'],
+                                       name_width,
+                                       value_width)
+            out += format_bibtex_field("url",
+                                       "{http://dx.doi.org/%s}" % field['a'],
+                                       name_width,
+                                       value_width)
+
+    out += "\n}"
 
     return out
 
