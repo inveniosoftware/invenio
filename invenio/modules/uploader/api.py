@@ -18,17 +18,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-    invenio.modules.uploader.api
-    ----------------------------
+Uploader API.
 
-    Uploader API.
+Following example shows how to use this API for an easy use case::
 
-    Following example shows how to use this API for an easy use case::
-
-        >>> from invenio.modules.uploader.api import run
-        >>> blob = open('./testsuite/data/demo_record_marc_data.xml').read()
-        >>> reader_info = dict(schema='xml')
-        >>> run('insert', blob, master_format='marc', reader_info=reader_info)
+    >>> from invenio.modules.uploader.api import run
+    >>> blob = open('./testsuite/data/demo_record_marc_data.xml').read()
+    >>> reader_info = dict(schema='xml')
+    >>> run('insert', blob, master_format='marc', reader_info=reader_info)
 
 """
 
@@ -42,15 +39,24 @@ from invenio.modules.jsonalchemy.reader import split_blob
 from . import signals
 from .tasks import translate, run_workflow
 
+
 def run(name, input_file, master_format='marc', reader_info={}, **kwargs):
     """Entry point to run any of the modes of the uploader.
 
-    :name: @todo
-    :input_file: @todo
-    :master_format: @todo
-    :reader_info: @todo
-    :kwargs: @todo force, pretend, sync
-    :returns: @todo
+    :param name: Upload mode, see `~.config.UPLOADER_WORKFLOWS` for more info.
+    :type name: str
+    :input_file: Input master format, typically the content of an XML file.
+    :type input_file: str
+    :param master_format: Input file format, for example `marc`
+    :type master_format: str
+    :param reader_info: Any kind of information relevan to the reader, like for
+        example char encoding or special characters.
+    :type reader_info: dict
+    :param kwargs:
+        * force:
+        * pretend:
+        * sync: False by default, if set to True the hole process will be
+          teated synchronously
     """
     signals.uploader_started.send(mode=name,
                                   blob=input_file,

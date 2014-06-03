@@ -39,9 +39,7 @@
         def return_recids_only(records, **kwargs):
             records = [obj[1].get('recid') for obj in records]
 
-
-    This functions must have always the same parameters (like the one above) and
-    those parameters have the value that
+    This functions must have always the same parameters (like the one above)
+    and those parameters have the value that
     :func:`~invenio.modules.uploader.tasks.run_workflow` gets.
 """
-

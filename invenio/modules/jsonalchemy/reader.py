@@ -395,6 +395,7 @@ class Reader(object):  # pylint: disable=R0921
 
     def _set_default_value(self, json_id, field_name):
         """Finds the default value inside the schema, if any"""
+        #FIXME check how to update default values for items in a list!
         def set_default_value(field, schema):
             """Helper function to allow subfield default values"""
             if 'default' in schema:

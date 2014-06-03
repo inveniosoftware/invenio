@@ -18,15 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-    invenio.modules.uploader.uploader_tasks
-    ---------------------------------------
+Uploader workflow tasks.
 
-    Those are the main/common tasks that the uploader will use, they are used
-    inside the workflows defined in
-    :py:mod:`~invenio.modules.uploader.worflows`.
+Those are the main/common tasks that the uploader will use, they are used
+inside the workflows defined in :py:mod:`~invenio.modules.uploader.workflows`.
 
-    See:
-    `Simple worflows for Python <https://pypi.python.org/pypi/workflow/1.0>`_
+See: `Simple workflows for Python <https://pypi.python.org/pypi/workflow/1.0>`_
 """
 import os
 
@@ -41,12 +38,10 @@ from .errors import UploaderWorkflowException
 
 
 def create_records_for_workflow(records, **kwargs):
-    """@todo: Docstring for create_records_for_workflow.
+    """Create the record object from the json.
 
-    :records: @todo
-    :kwargs: @todo
-    :returns: @todo
-
+    :param records: List of records to be process.
+    :kwargs:
     """
     from invenio.modules.records.api import Record
     for i, obj in enumerate(records):
@@ -58,12 +53,10 @@ def create_records_for_workflow(records, **kwargs):
 
 
 def return_recordids_only(records, **kwargs):
-    """@todo: Docstring for return_recordids_only.
+    """Retrieve from the records only the record ID to return them.
 
-    :records: @todo
-    :kwargs: @todo
-    :returns: @todo
-
+    :param records: Processed list of records
+    :parma kwargs:
     """
     for i, obj in enumerate(records):
         records[i] = obj[1].get('recid')
@@ -75,22 +68,21 @@ def return_recordids_only(records, **kwargs):
 
 
 def raise_(ex):
-    """
-    Helper task to raise an exception.
-    """
+    """Helper task to raise an exception."""
     def _raise_(obj, eng):
         raise ex
     return _raise_
 
 
 def validate(step):
-    """
+    """Validate the record.
+
     Validate the record using the `validate` method present in each record and
-    the validation mode, either from the command line `options` or from
+    the validation mode, either from the command line options or from
     `UPLOADER_VALIDATION_MODE`.
 
-    The for the validation the `schema` information from the field definition
-    is used, see `invenio.modules.jsonalchemy.jsonext.parsers.schema_parser`
+    For the validation the `schema` information from the field definition
+    is used, see `invenio.modules.jsonalchemy.jsonext.parsers.schema_parser`.
     """
     def _validate(obj, eng):
         record = obj[1]
@@ -105,7 +97,7 @@ def validate(step):
         eng.log.info('Validation errors: %s' % (str(validator_errors), ))
         if mode.lower() == 'strict' and validator_errors:
             raise UploaderWorkflowException(
-                step, msg="One or more validation errors have occurred, please "
+                step, msg="One or more validation errors have occurred, please"
                           " check them or change the 'validation_mode' to "
                           "'permissive'.\n%s" % (str(validator_errors), ))
         eng.log.info('Finish validating the current record')
@@ -113,11 +105,9 @@ def validate(step):
 
 
 def retrieve_record_id_from_pids(step):
-    """
-    Retrieve the record identifier from a record by using all the persistent
-    identifiers present in the record.
+    """Retrieve the record identifier from a record using its PIDS.
 
-    If any PID matches with the any in DB then, the record id found is set to
+    If any PID matches with any in the DB then the record id found is set to
     the current `record`
     """
     def _retrieve_record_id_from_pids(obj, eng):
@@ -142,8 +132,8 @@ def retrieve_record_id_from_pids(step):
                     matching_recids.add(pid.object_value)
             if len(matching_recids) > 1:
                 raise UploaderWorkflowException(
-                    step, msg="Multiple records found in the database, %s that "
-                              "match '%s'" % (repr(matching_recids), pid_name))
+                    step, msg="Found multiple match in the database, %s "
+                              "for '%s'" % (repr(matching_recids), pid_name))
             elif matching_recids:
                 record['recid'] = matching_recids.pop()
                 eng.log.info(
@@ -154,10 +144,7 @@ def retrieve_record_id_from_pids(step):
 
 
 def reserve_record_id(step):
-    """
-    Reserve a new record id for the current object and add it to
-    `record['recid']`.
-    """
+    """Reserve a new record id for the current object and set it inside."""
     # TODO: manage exceptions in a better way
     def _reserve_record_id(obj, eng):
         record = obj[1]
@@ -175,9 +162,7 @@ def reserve_record_id(step):
 
 
 def save_record(step):
-    """
-    Save the record to the DB using the `_save` method from it.
-    """
+    """Save the record to the DB using the `_save` method from it."""
     def _save(obj, eng):
         record = obj[1]
         eng.log.info('Saving record to DB')
@@ -194,12 +179,7 @@ def save_record(step):
 
 
 def save_master_format(step):
-    """@todo: Docstring for save_master_format.
-
-    :step: @todo
-    :returns: @todo
-
-    """
+    """Put the master format info the `bfmt` DB table."""
     def _save_master_format(obj, eng):
         from invenio.base.helpers import utf8ifier
         from invenio.modules.formatter.models import Bibfmt
@@ -218,10 +198,7 @@ def save_master_format(step):
 
 
 def update_pidstore(step):
-    """
-    Save each PID present in the record to the `PersistentIdentifier` data
-    storage.
-    """
+    """Save each PID present in the record to the PID storage."""
     # TODO: manage exceptions
     def _update_pidstore(obj, eng):
         record = obj[1]
@@ -241,7 +218,7 @@ def update_pidstore(step):
                     pid = PersistentIdentifier.create(
                         pid_value.get('type'), pid_value.get('value'),
                         pid_value.get('provider'))
-                if not pid.has_object('rec', record['recid']):
+                if not pid.has_object('rec', recod['recid']):
                     pid.assign('rec', record['recid'])
         eng.log.info('Finish looking for PIDs inside the current record and '
                      'register them in the DB')
@@ -250,12 +227,7 @@ def update_pidstore(step):
 
 
 def manage_attached_documents(step):
-    """@todo: Docstring for manage_attached_documents.
-
-    :step: @todo
-    :returns: @todo
-
-    """
+    """Attach and treat all the documents embeded in the input filex."""
     from invenio.modules.documents import api
     from invenio.modules.documents.tasks import set_document_contents
     from invenio.modules.records.utils import name_generator
@@ -267,23 +239,23 @@ def manage_attached_documents(step):
             eng.log.info('Documents to upload found')
             record['_files'] = []
             files_to_upload = record.get('files_to_upload', [])
-            model = record.pop('model')
 
             for file_to_upload in files_to_upload:
-                document = api.Document.create({
-                    'title': os.path.basename(file_to_upload['path']),
-                    'description': filed_to_upload.get('description', ''),
-                    'recids': [record.get('recid', -1), ]
-                }, model=model)
+                model = file_to_upload.pop('model', 'record_document_base')
+
+                if 'recids' not in file_to_upload:
+                    file_to_upload['recids'] = list()
+                if record.get('recid', -1) not in file_to_upload['recids']:
+                    file_to_upload['recids'].append(record.get('recid', -1), )
+
+                document = api.Document.create(file_to_upload, model=model)
                 eng.log.info('Document %s created', (document['_id'],))
 
-                record['_files'].append(
-                    (os.path.basename(file_to_upload['path']), document['_id'])
-                )
+                record['_files'].append((document['title'], document['_id']))
 
                 set_document_contents.delay(
                     document['_id'],
-                    file_to_upload['path'],
+                    document['source'],
                     name_generator(document)
                 )
 

@@ -18,10 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-    invenio.modules.uploader.tasks
-    ------------------------------
-
-    Uploader celery tasks.
+Uploader celery tasks.
 """
 
 import six
@@ -37,29 +34,32 @@ from . import signals
 
 
 @celery.task
-def translate(blob, master_format, kwargs={}):
+def translate(blob, master_format, kwargs=None):
     """Translate from the `master_format` to `JSON`.
 
-    :blob: String contain the input file.
-    :master_format: Format of the blob, it will used to decide which reader to
-        use.
-    :kwargs: Arguments to be used by the reader.
-        See :class:`invenio.modules.jsonalchemy.reader:Reader`
+    :param blob: String contain the input file.
+    :param master_format: Format of the blob, it will used to decide which
+        reader to use.
+    :param kwargs: Arguments to be used by the reader.
+        See :class:`invenio.modules.jsonalchemy.reader.Reader`
+
     :returns: The blob and the `JSON` representation of the input file created
         by the reader.
 
     """
     return (blob,
-            Reader.translate(blob, Record, master_format, **kwargs).dumps())
+            Reader.translate(blob, Record, master_format,
+                             **(kwargs or dict())).dumps())
 
 
 @celery.task
 def run_workflow(records, name, **kwargs):
     """Run the uploader workflow itself.
 
-    :records: List of tuples `(blob, json_record)` from :func:`translate`.
-    :name: Name of the workflow to be run.
-    :kwargs: Additional arguments to be used by the tasks of the workflow.
+    :param records: List of tuples `(blob, json_record)` from :func:`translate`
+    :param name: Name of the workflow to be run.
+    :parma kwargs: Additional arguments to be used by the tasks of the workflow
+
     :returns: Typically the list of record Ids that has been process, although
         this value could be modify by the `post_tasks`.
 
