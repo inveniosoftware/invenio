@@ -49,7 +49,7 @@ function_proxy = lambda: ModuleAutoDiscoverySubRegistry(
 
 
 class TestRecord(InvenioTestCase):
-    """Record - demo file parsing test"""
+    """Record - demo file parsing test."""
 
     @classmethod
     def setUpClass(cls):
@@ -71,7 +71,7 @@ class TestRecord(InvenioTestCase):
 
     @nottest
     def test_records_created(self):
-        """Record - demo file how many records are created """
+        """Record - demo file how many records are created."""
         xmltext = pkg_resources.resource_string(
             'invenio.testsuite',
             os.path.join('data', 'demo_record_marc_data.xml'))
@@ -79,7 +79,7 @@ class TestRecord(InvenioTestCase):
         self.assertEqual(141, len(recs))
 
     def test_accented_unicode_letterst_test(self):
-        """Record - accented Unicode letters"""
+        """Record - accented Unicode letters."""
         xml = '''<record>
           <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
@@ -97,7 +97,7 @@ class TestRecord(InvenioTestCase):
         self.assertEquals(rec['title.title'], 'Пушкин')
 
     def test_create_empty_record(self):
-        """Record - Create empty record"""
+        """Record - Create empty record."""
         rec = Record(master_format='marc', namespace='testsuite')
         self.assertTrue('__meta_metadata__' in rec)
         self.assertEquals(list(rec.keys()), ['__meta_metadata__'])
@@ -108,7 +108,7 @@ class TestRecord(InvenioTestCase):
         self.assertEquals(len(rec['title']), 2)
 
     def test_validate(self):
-        """Record - Validate record"""
+        """Record - Validate record."""
         rec = Record(master_format='marc', namespace='testsuite')
         self.assertTrue('__meta_metadata__' in rec)
         self.assertTrue('recid' in rec.validate())
@@ -117,8 +117,81 @@ class TestRecord(InvenioTestCase):
         self.assertEquals(rec.validate()['recid'], 'must be of integer type')
 
 
+class TestLegacyExport(InvenioTestCase):
+    """Record - Legacy methods test."""
+
+    def setUp(self):
+        """Initialize stuff"""
+        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
+        self.app.extensions['registry']['testsuite.models'] = model_definitions()
+        self.app.extensions['registry']['testsuite.functions'] = function_proxy()
+
+    def tearDown(self):
+        del self.app.extensions['registry']['testsuite.fields']
+        del self.app.extensions['registry']['testsuite.models']
+        del self.app.extensions['registry']['testsuite.functions']
+
+    def test_legacy_export_marcxml(self):
+        """Record - legacy export marxml."""
+        # FIXME: use a better way to compare
+        from invenio.legacy.bibrecord import create_record, records_identical
+        blob = '''
+            <record>
+              <controlfield tag="001">8</controlfield>
+              <datafield tag="100" ind1=" " ind2=" ">
+                <subfield code="a">Efstathiou, G P</subfield>
+                <subfield code="u">Cambridge University</subfield>
+              </datafield>
+              <datafield tag="245" ind1=" " ind2=" ">
+                <subfield code="a">Title</subfield>
+                <subfield code="b">SubTitle</subfield>
+              </datafield>
+              <datafield tag="700" ind1=" " ind2=" ">
+               <subfield code="a">Lasenby, A N</subfield>
+              </datafield>
+              <datafield tag="980" ind1=" " ind2=" ">
+                <subfield code="a">Articles</subfield>
+              </datafield>
+            </record>
+        '''
+        rec = Record.create(blob, master_format='marc', namespace='testsuite')
+        recstruct, _, _ = create_record(blob)
+        json_recstruct, _, _ = create_record(rec.legacy_export_as_marc())
+        self.assertTrue(records_identical(json_recstruct, recstruct,
+                                          ignore_subfield_order=True))
+
+    def test_legacy_create_recstruct(self):
+        """Record - create recstruct."""
+        from invenio.legacy.bibrecord import create_record, records_identical
+
+        blob = '''
+            <record>
+              <controlfield tag="001">8</controlfield>
+              <datafield tag="100" ind1=" " ind2=" ">
+                <subfield code="a">Efstathiou, G P</subfield>
+                <subfield code="u">Cambridge University</subfield>
+              </datafield>
+              <datafield tag="245" ind1=" " ind2=" ">
+                <subfield code="a">Title</subfield>
+                <subfield code="b">SubTitle</subfield>
+              </datafield>
+              <datafield tag="700" ind1=" " ind2=" ">
+               <subfield code="a">Lasenby, A N</subfield>
+              </datafield>
+              <datafield tag="980" ind1=" " ind2=" ">
+                <subfield code="a">Articles</subfield>
+              </datafield>
+            </record>
+        '''
+        rec = Record.create(blob, master_format='marc', namespace='testsuite')
+        json_recstruct = rec.legacy_create_recstruct()
+        recstruct, _, _ = create_record(blob)
+        self.assertTrue(records_identical(json_recstruct, recstruct,
+                                          ignore_subfield_order=True))
+
+
 class TestMarcRecordCreation(InvenioTestCase):
-    """Records from marc"""
+    """Records from marc."""
 
     @classmethod
     def setUpClass(cls):

@@ -17,24 +17,24 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.records.api
-    ---------------------------
+"""Record API."""
 
-"""
+import six
+
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.utils import cached_property
 
 from invenio.modules.jsonalchemy.reader import Reader
 from invenio.modules.jsonalchemy.wrappers import SmartJson
+from invenio.modules.jsonalchemy.errors import ReaderException
 
 from .models import Record as RecordModel
 
 
 class Record(SmartJson):
-    """
-    Default/Base record class
-    """
+
+    """Default/Base record class."""
+
     __storagename__ = "records"
 
     def __init__(self, json=None, **kwargs):
@@ -46,14 +46,20 @@ class Record(SmartJson):
 
     @classmethod
     def create(cls, blob, master_format, **kwargs):
+        """Create a new record from the blob using the right reader."""
         return Reader.translate(blob, Record, master_format, **kwargs)
 
     @classmethod
     def create_many(cls, blobs, master_format, **kwargs):
-        pass
+        """Create many new record from the blob using the right reader."""
+        raise NotImplementedError()
 
     @classmethod
     def get_record(cls, recid, reset_cache=False):
+        """Get one record from the DB.
+
+        :param reset_cache: If set to `True` it creates the JSON again.
+        """
         if not reset_cache:
             try:
                 json = cls.storage_engine.get_one(recid)
@@ -80,6 +86,7 @@ class Record(SmartJson):
 
     @classmethod
     def get_blob(cls, recid):
+        """Get the blob from where the record was created."""
         #FIXME: start using bibarchive or bibingest for this
         from invenio.modules.formatter.models import Bibfmt
         from zlib import decompress
@@ -91,6 +98,7 @@ class Record(SmartJson):
 
     @property
     def blob(self):
+        """Get the blob from where the record was created."""
         #FIXME: start using bibarchive or bibingest for this
         from invenio.modules.formatter.models import Bibfmt
         from zlib import decompress
@@ -102,16 +110,18 @@ class Record(SmartJson):
 
     @cached_property
     def persistent_identifiers(self):
-        """
-        Return an ordered list containing tuples with the name of the ``PID``
-        and its value. The value will be always a list containing dictionaries
-        with this keys at least: ``field_name`` (same as the name of the
-        ``PID``) wit the value itself, ``type`` and ``provider`` (the last two
-        could be empty)
+        """Create an ordered list with the name of the `PID` and its value.
+
+        The value will be always a list containing dictionaries with this keys
+        at least: `field_name` (same as the name of the `PID`) wit the value
+        itself, `type` and `provider` (the last two could be empty)
         """
         class PIDList(list):
-            """Helper class to build the ordered list of PIDs"""
+
+            """Helper class to build the ordered list of PIDs."""
+
             def insert(self, index, tuple_):
+                """Ordered list insertion."""
                 value = (tuple_[0], self._massage_pid_value(tuple_))
                 try:
                     self[index] = value
@@ -121,7 +131,7 @@ class Record(SmartJson):
                     self[index] = value
 
             def _massage_pid_value(self, tuple_):
-                """Builds a list of dictionaries containing the PID info"""
+                """Build a list of dictionaries containing the PID info."""
                 if isinstance(tuple_[1], dict):
                     return [tuple_[1]]
                 if isinstance(tuple_[1], (list, tuple)):
@@ -140,6 +150,80 @@ class Record(SmartJson):
 
     def _save(self):
         self.__class__.storage_engine.update_one(self.dumps())
+
+    # Legacy methods, try not to use them as they are already deprecated
+
+    def legacy_export_as_marc(self):
+        """Create the MARCXML representation using the producer rules."""
+        from collections import Iterable
+
+        def encode_for_marcxml(value):
+            from invenio.utils.text import encode_for_xml
+            if isinstance(value, unicode):
+                value = value.encode('utf8')
+            return encode_for_xml(str(value))
+
+        export = '<record>'
+        marc_dicts = self.produce('json_for_marc')
+        for marc_dict in marc_dicts:
+            content = ''
+            tag = ''
+            ind1 = ''
+            ind2 = ''
+            for key, value in six.iteritems(marc_dict):
+                if isinstance(value, six.string_types) or \
+                        not isinstance(value, Iterable):
+                    value = [value]
+                for v in value:
+                    if v is None:
+                        continue
+                    if key.startswith('00') and len(key) == 3:
+                        # Control Field (No indicators no subfields)
+                        export += '<controlfield tag="%s">%s</controlfield>\n'\
+                            % (key, encode_for_marcxml(v))
+                    elif len(key) == 6:
+                        if not (tag == key[:3]
+                                and ind1 == key[3].replace('_', '')
+                                and ind2 == key[4].replace('_', '')):
+                            tag = key[:3]
+                            ind1 = key[3].replace('_', '')
+                            ind2 = key[4].replace('_', '')
+                            if content:
+                                export += '<datafield tag="%s" ind1="%s"'\
+                                    'ind2="%s">%s</datafield>\n' \
+                                    % (tag, ind1, ind2, content)
+                                content = ''
+                        content += '<subfield code="%s">%s</subfield>'\
+                            % (key[5], encode_for_marcxml(v))
+                    else:
+                        pass
+
+            if content:
+                export += \
+                    '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>\n'\
+                    % (tag, ind1, ind2, content)
+
+        export += '</record>'
+        return export
+
+    def legacy_create_recstruct(self):
+        """Create the `recstruct` representation.
+
+        It uses the producer rules and
+        :func:`~invenio.legacy.bibrecord.create_record`.
+        """
+        # FIXME: it might be a bit overkilling
+        from invenio.legacy.bibrecord import create_record
+        record, status_code, errors = create_record(
+            self.legacy_export_as_marc()
+        )
+        if status_code == 0:
+            # There was an error
+            if isinstance(errors, list):
+                errors = "\n".join(errors)
+            raise ReaderException(
+                "There was an error while parsing MARCXML: %s" % (errors,))
+        return record
 
 # Functional interface
 create_record = Record.create
