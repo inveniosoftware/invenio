@@ -25,6 +25,24 @@ Arxiv extension is initialized like this:
 >>> from invenio.ext.arxiv import Arxiv
 >>> app = Flask("myapp")
 >>> ext = Arxiv(app=app)
+
+Configuration Settings
+----------------------
+The details of the ArXiv URL and enpoint can be customized in the application
+settings.
+
+================= ============================================================
+`ARXIV_API_URL`   The URL of ArXiV query API.
+                  **Default:** `https://export.arxiv.org/api/query`
+`ARXIV_ENDPOINT`  The name of Flask endpoint for new application route.
+                  If the value is `False` (or `None`) the url rule is not
+                  registered.  **Default:** `_arxiv.search`
+`ARXIV_URL_RULE`  The URL for `ARXIV_ENPOINT` (i.e.
+                  `url_for(current_app.config['ARXIV_ENDPOINT'])` is equal to
+                  `current_app.config['ARXIV_ENDPOINT']`).
+                  **Default:** `/arxiv/search`
+================= ============================================================
+
 """
 
 from __future__ import absolute_import
@@ -76,10 +94,10 @@ class Arxiv(object):
             raise RuntimeError("Flask application already initialized")
         app.extensions["arxiv"] = self
 
-        # FIXME make decorators configurable
-        app.add_url_rule(app.config["ARXIV_URL_RULE"],
-                         app.config["ARXIV_ENDPOINT"],
-                         login_required(self.search))
+        if app.config["ARXIV_ENDPOINT"]:
+            app.add_url_rule(app.config["ARXIV_URL_RULE"],
+                             app.config["ARXIV_ENDPOINT"],
+                             login_required(self.search))
 
     def get_response(self, arxiv_id, max_results=1):
         """Get ArXiv response from the ``ARXIV_API_URL`` page."""

@@ -15,6 +15,7 @@ Extensions
    :maxdepth: 1
 
    ext/assets
+   ext/arxiv
    ext/elasticsearch
    ext/sqlalchemy
 
