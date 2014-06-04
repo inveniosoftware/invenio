@@ -58,6 +58,10 @@ sys.path.append(os.path.abspath('_themes'))
 #sys.path.append(os.path.abspath('.'))
 sys.path.append(os.path.abspath('../invenio'))
 
+def setup(app):
+    """Custom application tweaks."""
+    app.add_stylesheet("theme_overrides.css")
+
 # -- General configuration ----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
