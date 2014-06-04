@@ -36,6 +36,21 @@ def kb_autocomplete(name, mapper=None):
     return inner
 
 
+def kb_dynamic_autocomplete(name, mapper=None):
+    """
+    Create a autocomplete function from dynamic knowledge base
+
+    @param name: Name of knowledge base
+    @param mapper: Function that will map an knowledge base entry to
+                   autocomplete entry.
+    """
+    def inner(dummy_form, dummy_field, term, limit=50):
+        from invenio.modules.knowledge.api import get_kbd_values
+        result = get_kbd_values(name, searchwith=term)[:limit]
+        return map(mapper, result) if mapper is not None else result
+    return inner
+
+
 def sherpa_romeo_publishers(dummy_form, dummy_field, term, limit=50):
     if term:
         sherpa_romeo = SherpaRomeoSearch()
