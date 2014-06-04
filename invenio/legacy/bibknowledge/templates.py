@@ -245,7 +245,7 @@ class Template:
                          will be created.")+"<br/>"
         pleaseconf += _("If the expression is empty, a list of all values \
                          in 270__a will be created.")+"<br/>"
-        pleaseconf += _("If the expression contains '%', like '270__a:*%*', \
+        pleaseconf += _("If the expression contains '%%', like '270__a:*%%*', \
                          it will be replaced by a search string when the \
                          knowledge base is used.")+"<br/><br/>"
         pleaseconf += _("You can enter a collection name if the expression \
@@ -257,7 +257,7 @@ class Template:
                          will be created.")+"<br/><br/>"
         pleaseconf += _("Example 2: Return the institute's name (100__a) when the \
                          user gives its postal code (270__a): \
-                         Set field to 100__a, expression to 270__a:*%*.")+"<br/><br/>"
+                         Set field to 100__a, expression to 270__a:*%%*.")+"<br/><br/>"
         #create a pretty select box
         selectbox = "<select name=\"collection\"><option value=\""+ _("Any collection") +"\">"+_("Any collection")+"</option>"
         for mycoll in collections:
