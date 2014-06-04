@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,6 +32,20 @@ def kb_autocomplete(name, mapper=None):
     def inner(dummy_form, dummy_field, term, limit=50):
         from invenio.modules.knowledge.api import get_kb_mappings
         result = get_kb_mappings(name, '', term)[:limit]
+        return map(mapper, result) if mapper is not None else result
+    return inner
+
+
+def kb_dynamic_autocomplete(name, mapper=None):
+    """Create an autocomplete function from dynamic knowledge base.
+
+    :param name: Name of knowledge base
+    :param mapper: Function that will map an knowledge base entry to
+                   autocomplete entry.
+    """
+    def inner(dummy_form, dummy_field, term, limit=50):
+        from invenio.modules.knowledge.api import get_kbd_values
+        result = get_kbd_values(name, searchwith=term)[:limit]
         return map(mapper, result) if mapper is not None else result
     return inner
 
