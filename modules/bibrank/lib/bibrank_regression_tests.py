@@ -85,7 +85,7 @@ class BibRankWordSimilarityRankingTest(InvenioTestCase):
         """bibrank - 'Similar records' link"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A77&rm=wrd&of=id',
-                                               expected_text="[96, 95, 85, 77]"))
+                                               expected_text="[77, 85, 95, 96]"))
 
 class BibRankCitationRankingTest(InvenioTestCase):
     """Check BibRank citation ranking tools."""
