@@ -27,6 +27,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
+msgid "Configure BibSort"
+msgstr "Παραμετροποίηση BibSort"
+
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
 #: modules/websearch/doc/search-guide.webdoc:493
@@ -1776,6 +1779,9 @@ msgstr "Έχουν εντοπιστεί τα παρακάτω σφάλματα"
 msgid "BibFormat Admin"
 msgstr "Διαχείριση BibFormat"
 
+msgid "This is where you can edit the formatting styles available for the records. "
+msgstr "Εδώ μπορείτε να επεξεργαστείτε τα στυλ μορφοποίησης που διατίθενται για τις εγγραφές."
+
 #: modules/bibformat/lib/bibformatadminlib.py:357
 #: modules/bibformat/lib/bibformatadminlib.py:396
 #: modules/bibformat/lib/bibformatadminlib.py:398
@@ -2131,6 +2137,12 @@ msgstr "Όλα τα πεδία με %(x_fmt_open)s*%(x_fmt_close)s είναι υ
 #: modules/bibupload/lib/batchuploader_templates.py:391
 msgid "Upload priority"
 msgstr "Προτεραιότητα μεταφόρτωσης"
+
+msgid "Skip upload simulation"
+msgstr "Παράκαμψη προσομοίωσης ανεβάσματος"
+
+msgid "Email logs to"
+msgstr "Στείλε τα logs στο e-mail"
 
 #: modules/bibupload/lib/batchuploader_templates.py:214
 #, python-format
