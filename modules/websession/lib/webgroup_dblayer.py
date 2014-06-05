@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -360,7 +360,7 @@ def add_moderator_member(grpID, member_id, user_status):
     return res
 
 def delete_moderator_member(grpID, member_id, user_status):
-    """Delete moderator :Change user status,
+    """Delete moderator:
     moderator member becomes normal member"""
     date = convert_datestruct_to_datetext(localtime())
     res = run_sql("""UPDATE user_usergroup
