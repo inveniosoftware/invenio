@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2011-12-19 22:12+0100\n"
-"PO-Revision-Date: 2012-03-01 16:53+0100\n"
+"PO-Revision-Date: 2014-06-05 20:36+0200\n"
 "Last-Translator: Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>\n"
 "Language-Team: EL <info@invenio-software.org>\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: \n"
 "Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 1.5.4\n"
 
 msgid "Configure BibSort"
 msgstr "Παραμετροποίηση BibSort"
@@ -1464,6 +1465,9 @@ msgstr "Μενού"
 msgid "Close Editor"
 msgstr "Έξοδος από Επεξεργασία Προτύπων"
 
+msgid "BibFormat Admin Guide"
+msgstr "BidFormat Οδηγός για διαχειριστές"
+
 #: modules/bibformat/lib/bibformat_templates.py:318
 #: modules/bibformat/lib/bibformat_templates.py:431
 #: modules/bibformat/lib/bibformat_templates.py:583
@@ -1926,6 +1930,9 @@ msgstr "Δεν είναι δυνατή η δημιουργία μορφής εξ
 
 #: modules/bibformat/web/admin/bibformatadmin.py:513
 #: modules/bibformat/web/admin/bibformatadmin.py:587
+msgid "Documentation about BibFormat administration"
+msgstr "Εγχειρίδιο για την διαχείριση του BidFormat"
+
 #: modules/bibformat/web/admin/bibformatadmin.py:1023
 msgid "Restricted Format Template"
 msgstr "Πρότυπο Περιορισμένης Μορφής"
@@ -2691,6 +2698,18 @@ msgstr "Παραμετροποίηση WebSearch"
 #: modules/websession/lib/websession_templates.py:1121
 msgid "Configure WebSubmit"
 msgstr "Παραμετροποίηση WebSubmit"
+
+msgid "Configure WebLinkback"
+msgstr "Παραμετροποίηση WebLinkback"
+
+msgid "Run Author List Manager"
+msgstr "Εκτέλεση Διαχειριστή Λίστας Συγγραφέων"
+
+msgid "Run Info Space Manager"
+msgstr "Εκτέλεση Διαχειριστή Info Space "
+
+msgid "Configure BibSort"
+msgstr "Παραμετροποίηση BibSort"
 
 #: modules/webaccess/lib/access_control_config.py:315
 #: modules/websession/lib/websession_templates.py:1117
@@ -10188,7 +10207,7 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:160
 msgid "Ordered books"
-msgstr ""
+msgstr "Παραγγελμένα βιβλία."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:160
 msgid "Others"
@@ -10202,9 +10221,8 @@ msgid "Libraries"
 msgstr "Βιβλιοθήκη/ες"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:162
-#, fuzzy
 msgid "Add new library"
-msgstr "Προσθήκη νέου αρχείου"
+msgstr "Προσθήκη νέας βιβλιοθήκης"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:163
 #, fuzzy
@@ -10386,12 +10404,12 @@ msgstr "Το αίτημά σας έχει αποσταλεί στην αξιολ
 #: modules/bibcirculation/lib/bibcirculation_templates.py:473
 #: modules/bibcirculation/lib/bibcirculation_templates.py:481
 msgid "It is not possible to validate your request. "
-msgstr ""
+msgstr "Δεν είναι δυνατόν να επαληθεύσουμε το αίτημά σας."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:474
 #: modules/bibcirculation/lib/bibcirculation_templates.py:482
 msgid "Your office address is not available. "
-msgstr ""
+msgstr "Η διεύθυνση του γραφείου σας δεν είναι διαθέσιμη."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:475
 #: modules/bibcirculation/lib/bibcirculation_templates.py:483
@@ -10422,7 +10440,7 @@ msgstr "Αναζήτηση βιβλιοθήκης με"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:543
 msgid "Register new borrower."
-msgstr ""
+msgstr "Εγγραφή νέου δανειστή"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:569
 msgid "Borrower(s)"
@@ -11320,7 +11338,7 @@ msgstr "Αρ. τεκμηρίων"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3948
 msgid "Duplicated library?"
-msgstr ""
+msgstr "Αντιγραφή βιβλιοθήκης?"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4042
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4265
@@ -11635,7 +11653,6 @@ msgstr "Λεπτομέρειες νέου αντιγράφου"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7816
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8394
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8484
-#, fuzzy
 msgid "Expected arrival date"
 msgstr "Ημερομηνία άφιξης"
 
