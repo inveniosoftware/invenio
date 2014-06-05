@@ -1756,7 +1756,7 @@ class BibDoc(object):
 
     @staticmethod
     def create_instance(docid=None, recid=None, docname=None,
-                        doctype='Fulltext', a_type = 'Main', human_readable=False):
+                        doctype='Fulltext', a_type = '', human_readable=False):
         """
         Parameters of an attachement to the record:
         a_type, recid, docname
@@ -1781,6 +1781,9 @@ class BibDoc(object):
         for dummy, plugin in get_plugins().iteritems():
             if plugin['supports'](doctype, extensions):
                 used_plugin = plugin
+
+        if not a_type:
+            a_type = doctype or 'Main'
 
         if not docid:
             rec_links = []
