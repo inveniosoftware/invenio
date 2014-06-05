@@ -101,7 +101,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose, 
         voutput += "Total time used: %s<br />" % (str(time.time() - startCreate))
         rank_method_stat(rank_method_code, reclist, lwords)
 
-    return (reclist[:len(reclist)], methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
+    return (reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
 def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_termcount, verbose, quick=None):
     """Calculating the relevance of the documents based on the input, calculates only one word
@@ -162,7 +162,7 @@ def sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit
             reclist.append((recid, score))
 
     #sort scores
-    reclist.sort(lambda x, y: cmp(x[1], y[1]))
+    reclist.sort(lambda x, y: cmp(x[1], y[1]), reverse=True)
 
     if verbose > 0:
         voutput += "Number of records sorted: %s<br />" % len(reclist)
