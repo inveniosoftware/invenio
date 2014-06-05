@@ -380,7 +380,6 @@ def upload_url(deposition_type=None, uuid=None):
     )
 
 
-#@blueprint.route('/%s/<int:uuid>/file/' % deptypes, methods=['POST'])
 @blueprint.route('/<int:uuid>/file/', methods=['POST'])
 @login_required
 @deposition_error_handler()
