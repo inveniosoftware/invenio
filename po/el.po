@@ -804,6 +804,21 @@ msgstr "Αναζήτηση"
 msgid "Citation Metrics"
 msgstr "Στατιστικά Παραπομπών"
 
+msgid "Configure WebLinkback"
+msgstr "Παραμετροποίηση WebLinkback"
+
+msgid "WebLinkback Admin"
+msgstr "Διαχειριστής WebLinkback"
+
+msgid "Pending Linkbacks"
+msgstr "Εκκρεμή Linkback"
+
+msgid "Pending linkbacks"
+msgstr "Εκκρεμή linkback"
+
+msgid "There are no pending linkbacks."
+msgstr "Δεν υπάρχουν εκκρεμή linkbacks."
+
 #: modules/websearch/doc/search-tips.webdoc:35
 #: modules/websearch/doc/search-tips.webdoc:66
 #: modules/websearch/doc/search-tips.webdoc:104
