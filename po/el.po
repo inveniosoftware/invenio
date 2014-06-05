@@ -13513,6 +13513,41 @@ msgstr ""
 msgid "Correct my publication lists!"
 msgstr "Διορθώστε την λίστα δημοσιεύσεών μου!"
 
+msgid "BibRank Admin Interface"
+msgstr "Διεπαφή Διαχειριστή BibRank"
+
+msgid "Overview of rank methods [?]"
+msgstr "Επισκόπηση μεθόδων ταξινόμησης [?]"
+
+msgid "Add new rank method"
+msgstr "Προσθήκη νέας μεθόδου ταξινόμησης"
+
+msgid "Code"
+msgstr "Κώδικας"
+
+msgid "Translations"
+msgstr "Μεταφράσεις"
+
+msgid "Collections"
+msgstr "Συλλογές"
+
+msgid "Rank method"
+msgstr "Μέθοδος Ταξινόμησης"
+
+msgid "Modify"
+msgstr "Τροποποίηση"
+
+msgid "Show Details"
+msgstr "Εμφάνιση Λεπτομερειών"
+
+msgid "Delete"
+msgstr "Διαγραφή"
+
+
+msgid "Step 1 - Create new rank method   [?]"
+msgstr "Βήμα 1 - Δημιουργία νέας μεθόδου ταξινόμησης"
+
+
 #~ msgid "This book is sent to you ..."
 #~ msgstr "Το βιβλίο έχει αποσταλλεί σε εσάς ..."
 
