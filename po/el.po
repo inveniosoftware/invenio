@@ -2677,6 +2677,18 @@ msgstr "Παραμετροποίηση WebSearch"
 msgid "Configure WebSubmit"
 msgstr "Παραμετροποίηση WebSubmit"
 
+msgid "Configure WebLinkback"
+msgstr "Παραμετροποίηση WebLinkback"
+
+msgid "Run Author List Manager"
+msgstr "Εκτέλεση Διαχειριστή Λίστας Συγγραφέων"
+
+msgid "Run Info Space Manager"
+msgstr "Εκτέλεση Διαχειριστή Info Space "
+
+msgid "Configure BibSort"
+msgstr "Παραμετροποίηση BibSort"
+
 #: modules/webaccess/lib/access_control_config.py:315
 #: modules/websession/lib/websession_templates.py:1117
 msgid "Configure WebJournal"
