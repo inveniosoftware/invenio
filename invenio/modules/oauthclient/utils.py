@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from flask.ext.login import current_user, logout_user, login_user
+from flask.ext.login import logout_user
 from invenio.ext.login import authenticate, UserInfo
 from invenio.ext.sqlalchemy import db
 from invenio.ext.script import generate_secret_key
