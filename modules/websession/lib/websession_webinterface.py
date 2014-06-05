@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1810,20 +1810,20 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                           ln=argd['ln'])
         elif argd['add_member']:
             body = webgroup.perform_request_add_member(uid=uid,
-                                                          grpID=argd['grpID'],
-                                                          user_id=argd['pending_member_id'],
-                                                          ln=argd['ln'])
+                                                       grpID=argd['grpID'],
+                                                       user_id=argd['pending_member_id'],
+                                                       ln=argd['ln'])
         elif argd['remove_moderator']:
             body = webgroup.perform_request_remove_moderator(uid=uid,
-                                                       grpID=argd['grpID'],
-                                                       member_id=argd['moderator_member_id'],
-                                                       ln=argd['ln'])
+                                                             grpID=argd['grpID'],
+                                                             member_id=argd['moderator_member_id'],
+                                                             ln=argd['ln'])
 
 	elif argd['add_moderator']:
             body = webgroup.perform_request_add_moderator(uid=uid,
-                                                       grpID=argd['grpID'],
-                                                       user_id=argd['member_id'],
-                                                       ln=argd['ln'])
+                                                          grpID=argd['grpID'],
+                                                          user_id=argd['member_id'],
+                                                          ln=argd['ln'])
 
         else:
             body= webgroup.perform_request_manage_member(uid=uid,

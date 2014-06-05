@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,9 +23,9 @@ import sys
 
 from invenio.config import CFG_SITE_LANG
 from invenio.messages import gettext_set_language
-from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
+from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY, \
       CFG_WEBSESSION_USERGROUP_STATUS, \
-      CFG_WEBSESSION_GROUP_JOIN_POLICY, \
+      CFG_WEBSESSION_INFO_MESSAGES, \
       InvenioWebSessionError, \
       InvenioWebSessionWarning
 from invenio.webuser import nickname_valid_p, get_user_info
@@ -61,12 +61,12 @@ def perform_request_groups_display(uid, infos=[], warnings = [], \
     body_moderator = display_moderator_groups(uid, ln)
 
     body = websession_templates.tmpl_display_all_groups(infos=infos,
-        admin_group_html=body_admin,
-        member_group_html=body_member,
-        moderator_group_html=body_moderator,
-        external_group_html=body_external,
-        warnings=warnings,
-        ln=ln)
+                                                        admin_group_html=body_admin,
+                                                        member_group_html=body_member,
+                                                        moderator_group_html=body_moderator,
+                                                        external_group_html=body_external,
+                                                        warnings=warnings,
+                                                        ln=ln)
     return body
 
 def display_admin_groups(uid, ln=CFG_SITE_LANG):
@@ -113,6 +113,7 @@ def display_external_groups(uid, ln=CFG_SITE_LANG):
         body = None
     return body
 
+
 def display_moderator_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is moderator of.
     @param uid: user id
@@ -121,11 +122,10 @@ def display_moderator_groups(uid, ln=CFG_SITE_LANG):
     body : html groups representation the user is moderator of
     """
     body = ""
-    records = db.get_groups_by_user_status(uid,
-        user_status=CFG_WEBSESSION_USERGROUP_STATUS["MODERATOR"] )
-    body = websession_templates.tmpl_display_moderator_groups(groups=records,
-                                                           ln=ln)
+    records = db.get_groups_by_user_status(uid, user_status=CFG_WEBSESSION_USERGROUP_STATUS["MODERATOR"])
+    body = websession_templates.tmpl_display_moderator_groups(groups=records, ln=ln)
     return body
+
 
 def perform_request_input_create_group(group_name,
                                        group_description,
@@ -588,22 +588,19 @@ def perform_request_manage_member(uid,
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
-    members = db.get_users_by_status(grpID,
-        CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
-    pending_members = db.get_users_by_status(grpID,
-        CFG_WEBSESSION_USERGROUP_STATUS["PENDING"])
-    moderator_members = db.get_users_by_status(grpID,
-        CFG_WEBSESSION_USERGROUP_STATUS["MODERATOR"])
+    members = db.get_users_by_status(grpID, CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
+    pending_members = db.get_users_by_status(grpID, CFG_WEBSESSION_USERGROUP_STATUS["PENDING"])
+    moderator_members = db.get_users_by_status(grpID, CFG_WEBSESSION_USERGROUP_STATUS["MODERATOR"])
 
     body = websession_templates.tmpl_display_manage_member(grpID=grpID,
-        group_name=group_infos[0][1],
-        user_status=user_status[0][0],
-        members=members,
-        pending_members=pending_members,
-        moderator_members=moderator_members,
-        warnings=warnings,
-        infos=infos,
-        ln=ln)
+                                                           group_name=group_infos[0][1],
+                                                           user_status=user_status[0][0],
+                                                           members=members,
+                                                           pending_members=pending_members,
+                                                           moderator_members=moderator_members,
+                                                           warnings=warnings,
+                                                           infos=infos,
+                                                           ln=ln)
     return body
 
 def perform_request_remove_member(uid, grpID, member_id, ln=CFG_SITE_LANG):
@@ -782,6 +779,7 @@ def perform_request_reject_member(uid,
     return body
 
 def perform_request_add_moderator(uid, grpID, user_id, ln=CFG_SITE_LANG):
+
     """Add waiting member to a group.
     @param uid: user ID
     @param grpID: ID of the group
@@ -789,6 +787,7 @@ def perform_request_add_moderator(uid, grpID, user_id, ln=CFG_SITE_LANG):
     @param ln: language
     @return: body with warnings
     """
+
     body = ''
     warnings = []
     infos = []
@@ -827,17 +826,15 @@ def perform_request_add_moderator(uid, grpID, user_id, ln=CFG_SITE_LANG):
                                                  ln=ln)
         else:
             db.add_moderator_member(grpID,
-                user_id,
-                CFG_WEBSESSION_USERGROUP_STATUS["MODERATOR"])
+                                    user_id,
+                                    CFG_WEBSESSION_USERGROUP_STATUS["MODERATOR"])
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["MODERATOR_ADDED"])
             group_infos = db.get_group_infos(grpID)
             group_name = group_infos[0][1]
             user = get_user_info(user_id, ln)[2]
-            msg_subjet, msg_body = websession_templates.tmpl_moderator_msg(
-                group_name=group_name,ln=ln)
-            (body, dummy, dummy) = perform_request_send(
-                uid, msg_to_user=user, msg_to_group="", msg_subject=msg_subjet,
-                msg_body=msg_body, ln=ln)
+            msg_subjet, msg_body = websession_templates.tmpl_moderator_msg(group_name=group_name, ln=ln)
+            (body, dummy, dummy) = perform_request_send(uid, msg_to_user=user, msg_to_group="", msg_subject=msg_subjet,
+                                                        msg_body=msg_body, ln=ln)
             body = perform_request_manage_member(uid,
                                                  grpID,
                                                  infos=infos,
@@ -847,6 +844,7 @@ def perform_request_add_moderator(uid, grpID, user_id, ln=CFG_SITE_LANG):
 
 
 def perform_request_remove_moderator(uid, grpID, member_id, ln=CFG_SITE_LANG):
+
     """Remove moderator from a group.
     @param uid: user ID
     @param grpID: ID of the group
@@ -877,7 +875,7 @@ def perform_request_remove_moderator(uid, grpID, member_id, ln=CFG_SITE_LANG):
                                              warnings=warnings,
                                              ln=ln)
     else:
-        db.delete_moderator_member(grpID, member_id,CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
+        db.delete_moderator_member(grpID, member_id, CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
         infos.append(CFG_WEBSESSION_INFO_MESSAGES["MODERATOR_DELETED"])
         body = perform_request_manage_member(uid,
                                              grpID,

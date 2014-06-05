@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,7 +44,9 @@ from invenio.urlutils import make_canonical_urlargd, create_url, create_html_lin
 from invenio.htmlutils import escape_html, nmtoken_from_string
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY, \
-      CFG_WEBSESSION_USERGROUP_STATUS
+                                      CFG_WEBSESSION_USERGROUP_STATUS
+
+
 class Template:
     def tmpl_back_form(self, ln, message, url, link):
         """
@@ -1878,11 +1880,8 @@ class Template:
         <img src="%(siteurl)s/img/%(img)s" alt="%(text)s" style="border:0" width="25"
         height="25" /><br /><small>%(text)s</small>
         </a>"""
-
-
         out = self.tmpl_group_table_title(img="/img/group_admin.png",
-                                          text=_("You are a moderator of the following groups:") )
-
+                                          text=_("You are a moderator of the following groups:"))
         out += """
 <table class="mailbox">
   <thead class="mailboxheader">
@@ -1899,24 +1898,23 @@ class Template:
       <td></td>
     </tr>
   </tfoot>
-  <tbody class="mailboxbody">""" %(_("Group"), _("Description"))
+  <tbody class="mailboxbody">""" % (_("Group"), _("Description"))
         if len(groups) == 0:
             out += """
     <tr class="mailboxrecord" style="height: 100px;">
       <td colspan="3" style="text-align: center;">
         <small>%s</small>
       </td>
-    </tr>""" %(_("You are not a moderator of any groups."),)
+    </tr>""" % _("You are not a moderator of any groups.")
         for group_data in groups:
             (grpID, name, description) = group_data
-            members_link = img_link % {'siteurl' : CFG_SITE_URL,
-                                       'grpID' : grpID,
+            members_link = img_link % {'siteurl': CFG_SITE_URL,
+                                       'grpID': grpID,
                                        'ln': ln,
-                                       'img':"webbasket_usergroup.png",
-                                       'text':_("Edit %s members") % '',
-                                       'action':"members"
+                                       'img': "webbasket_usergroup.png",
+                                       'text': _("Edit %s members") % '',
+                                       'action': "members"
                                        }
-             
             out += """
     <tr class="mailboxrecord">
       <td>%s</td>
@@ -1933,7 +1931,6 @@ class Template:
 </table>
  """
         return out
-
 
     def tmpl_display_input_group_info(self,
                                       group_name,
@@ -2315,12 +2312,11 @@ class Template:
             <td style="padding: 0 5 10 5;">
             <input type="submit" name="remove_member" value="%s" class="nonsubmitbutton"/>
             </td>""" %  (member_list,_("Remove member"))
-            if user_status == CFG_WEBSESSION_USERGROUP_STATUS['ADMIN'] :
+            if user_status == CFG_WEBSESSION_USERGROUP_STATUS['ADMIN']:
                 member_text += """<td style="padding: 0 5 10 5;">
                 <input type="submit" name="add_moderator" value="%s" class="nonsubmitbutton"/>
                 </td>""" % _("Add as moderator")
-            
-        else :
+        else:
             member_text = """<td style="padding: 0 5 10 5;" colspan="2">%s</td>""" % _("No members.")
         if pending_members :
             pending_list =   self.__create_select_menu("pending_member_id", pending_members, _("Please select:"))
@@ -2332,7 +2328,7 @@ class Template:
             <td style="padding: 0 5 10 5;">
             <input type="submit" name="reject_member" value="%s" class="nonsubmitbutton"/>
             </td>""" %  (pending_list,_("Accept member"), _("Reject member"))
-        else :
+        else:
             pending_text = """<td style="padding: 0 5 10 5;" colspan="2">%s</td>""" % _("No members awaiting approval.")
         moderator_text = ""        
         if user_status == CFG_WEBSESSION_USERGROUP_STATUS['ADMIN']:
@@ -2357,7 +2353,7 @@ class Template:
       <tr>
         <td colspan="2">
           <table>
-            <tr>""" % (CFG_SITE_URL,self.tmpl_group_table_title(text= _("Current moderators")))
+            <tr>""" % (CFG_SITE_URL, self.tmpl_group_table_title(text=_("Current moderators")))
             if moderator_members :
                 moderator_list = self.__create_select_menu("moderator_member_id", moderator_members, _("Please select:"))  
                 moderator_text += """            
@@ -2365,7 +2361,7 @@ class Template:
                 <td style="padding: 0 5 10 5;">
                 <input type="submit" name="remove_moderator" value="%s" class="nonsubmitbutton"/>
                </td>""" % (moderator_list,_("Remove moderator"))
-            else :
+            else:
                 moderator_text += """<td style="padding: 0 5 10 5;" colspan="2">%s</td>""" % _("No moderators.")
             moderator_text += """</tr>
           </table>
@@ -2378,7 +2374,6 @@ class Template:
         header1 = self.tmpl_group_table_title(text=_("Current members"))
         header2 = self.tmpl_group_table_title(text=_("Members awaiting approval"))
         header3 = _("Invite new members")
-        
         write_a_message_url = create_url(
             "%s/yourmessages/write" % CFG_SITE_URL,
             {
@@ -2733,8 +2728,8 @@ Best regards.
         return subject, body
 
     def tmpl_moderator_msg(self,
-                        group_name,
-                        ln=CFG_SITE_LANG):
+                           group_name,
+                           ln=CFG_SITE_LANG):
         """
         return message content when new moderator is added
         - 'group_name' *string* - name of the group
@@ -2743,13 +2738,13 @@ Best regards.
         _ = gettext_set_language(ln)
         subject = _("Group %s: You has been added as moderator") % (group_name)
         body = _("Your are choosen as a moderator for the group %s .") % (group_name)
-        
         url = CFG_SITE_URL + "/yourgroups/display?ln=" + ln
         body += '<br />'
         body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">',
                                                                                               'x_url_close': '</a>'}
         body += '<br />'
         return subject, body
+
 
     def tmpl_group_info(self, nb_admin_groups=0, nb_member_groups=0, nb_total_groups=0, ln=CFG_SITE_LANG):
         """

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,10 +30,10 @@ CFG_WEBSESSION_GROUP_JOIN_POLICY = {'VISIBLEOPEN': 'VO',
                                     'VISIBLEEXTERNAL' : 'VE'
                                     }
 
-CFG_WEBSESSION_USERGROUP_STATUS = {'ADMIN':  'A',
-                                   'MEMBER':'M',
-                                   'PENDING':'P',
-                                   'MODERATOR':'O'
+CFG_WEBSESSION_USERGROUP_STATUS = {'ADMIN': 'A',
+                                   'MEMBER': 'M',
+                                   'PENDING': 'P',
+                                   'MODERATOR': 'O'
                                    }
 
 CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": 'You have successfully created a new group.',
@@ -47,8 +47,8 @@ CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": 'You have successfully created 
                                 "LEAVE_GROUP": 'You have successfully left a group.',
                                 "MODERATOR_ADDED": 'You have successfully added a moderator.',
                                 "MODERATOR_DELETED": 'You have successfully remove a moderator. This user is still a member of group.'
+                                }
 
-}
 
 # Choose the providers which will be dislayed bigger (48x48) on login page.
 # The order of the list decides the order of the login buttons.
@@ -78,25 +78,33 @@ CFG_EXTERNAL_LOGIN_FORM_LABELS = {
 }
 
 CFG_WEBSESSION_COOKIE_NAME = "INVENIOSESSION"
-CFG_WEBSESSION_ONE_DAY = 86400 #: how many seconds are there in one day
-CFG_WEBSESSION_CLEANUP_CHANCE = 10000 #: cleanups have 1 in CLEANUP_CHANCE chance
+CFG_WEBSESSION_ONE_DAY = 86400  #: how many seconds are there in one day
+CFG_WEBSESSION_CLEANUP_CHANCE = 10000  #: cleanups have 1 in CLEANUP_CHANCE chance
 
 # Exceptions: errors
+
+
 class InvenioWebSessionError(Exception):
+
     """A generic error for WebSession."""
     def __init__(self, message):
         """Initialisation."""
         self.message = message
+
     def __str__(self):
         """String representation."""
         return repr(self.message)
 
 # Exceptions: warnings
+
+
 class InvenioWebSessionWarning(Exception):
+
     """A generic warning for WebSession."""
     def __init__(self, message):
         """Initialisation."""
         self.message = message
+
     def __str__(self):
         """String representation."""
         return repr(self.message)
