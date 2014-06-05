@@ -215,4 +215,8 @@ def word_similarity_solr(pattern, hitset, params, verbose, explicit_field, ranke
     if verbose > 0:
         voutput += "Not ranked: %s<br/>" % not_ranked
 
+    # Similar-to-recid requires reverse order
+    if search_units[0][2] == 'recid':
+        ranked_result.reverse()
+
     return (ranked_result, params["prefix"], params["postfix"], voutput)
