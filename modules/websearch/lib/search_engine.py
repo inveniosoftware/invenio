@@ -1775,8 +1775,6 @@ def is_hosted_collection(coll):
     Returns True if it is, False if it's not or if the result is empty or if the query failed"""
 
     res = run_sql("SELECT dbquery FROM collection WHERE name=%s", (coll, ))
-    if not res[0][0]:
-        return False
     try:
         return res[0][0].startswith("hostedcollection:")
     except IndexError:
