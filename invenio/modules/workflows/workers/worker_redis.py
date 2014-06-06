@@ -81,7 +81,10 @@ class RedisResult(AsynchronousResultWrapper):
 
     @property
     def status(self):
-        raise NotImplementedError
+        return self.asyncresult.get_status()
 
     def get(self, postprocess=None):
-        raise NotImplementedError
+        if postprocess is None:
+            return self.asyncresult.result
+        else:
+            return postprocess(self.asyncresult.result)
