@@ -234,7 +234,7 @@ var WORKFLOWS_HP_SELECTION = function ($, holdingpen) {
             $("#select-all").click();
             e.preventDefault();
         } else if (e.keyCode === 13 && hoveredRow !== -1) {
-            selectCellByTitle(holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[hoveredRow]].nTr, 'Details').click();
+            selectCellByTitle(holdingpen.oSettings.aoData[holdingpen.oSettings.aiDisplay[hoveredRow]].nTr, 'Title').click();
         } else if (e.keyCode === 46) {
             if (holdingpen.rowList.length >= 1) {
                 rowList_out = JSON.stringify(holdingpen.rowList);

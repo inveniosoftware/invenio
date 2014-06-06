@@ -232,7 +232,7 @@ def task_run_core():
 
 
 def get_dates(dates):
-    """ A method to validate and process the dates input by the user."""
+    """Validate and process the dates input by the user."""
     twodates = []
     if dates:
         datestring = dates.split(":")

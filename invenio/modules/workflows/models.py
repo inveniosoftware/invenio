@@ -44,7 +44,8 @@ class ObjectVersion(object):
     FINAL = 1
     HALTED = 2
     RUNNING = 3
-
+    MAPPING = {0: "New,", 1: "Done,", 2: "Need action,",
+                             3: "In process,"}
 
 def get_default_data():
     """Return the base64 representation of the data default value."""
@@ -540,9 +541,13 @@ class BibWorkflowObject(db.Model):
             self.set_extra_data(extra_data)
 
         if version is not None:
+            if version != self.version:
+                self.modified = datetime.now()
             self.version = version
             if version in (ObjectVersion.FINAL, ObjectVersion.HALTED):
                 redis_create_search_entry(self)
+
+
 
         if id_workflow is not None:
             self.id_workflow = id_workflow
@@ -593,6 +598,8 @@ class BibWorkflowObject(db.Model):
         # Overwrite some changes
 
         obj.version = version
+        obj.created = datetime.now()
+        obj.modified = datetime.now()
         for key, value in iteritems(kwargs):
             setattr(obj, key, value)
         db.session.add(obj)

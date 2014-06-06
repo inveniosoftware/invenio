@@ -57,6 +57,7 @@ var WORKFLOWS_HOLDINGPEN = (function ($) {
         init_datatable: function (datatable) {
             oSettings = {
                 "sDom": "lf<'clear'>rtip",
+                "bFilter": false,
                 "bJQueryUI": true,
                 "bProcessing": true,
                 "bServerSide": true,

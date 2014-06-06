@@ -17,8 +17,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from abc import abstractmethod, ABCMeta
+from six import add_metaclass
 
-
+@add_metaclass(ABCMeta)
 class AsynchronousResultWrapper(object):
     """
     This class is an abstract class. When you inherit it you should
@@ -33,21 +34,22 @@ class AsynchronousResultWrapper(object):
 
     :param asynchronousresult: the async result that you want to wrap.
     """
-    __metaclass__ = ABCMeta
-
     def __init__(self, asynchronousresult):
         self.asyncresult = asynchronousresult
 
     @abstractmethod
     def get(self, postprocess=None):
+        """Return the value of the process."""
         return
 
     @abstractmethod
     def status(self):
+        """Return the current status of the tasks."""
         return
 
 
 def uuid_to_workflow(uuid):
+    """Return the workflow associate to a specify uuid."""
     from invenio.modules.workflows.models import Workflow
 
     return Workflow.query.filter(Workflow.uuid == uuid).first()

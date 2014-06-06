@@ -74,6 +74,8 @@ def restart_worker(wid, **kwargs):
             running_object.id_parent = initial_object.id
             running_object.save()
             data.append(running_object)
+    else:
+        data = kwargs["data"]
 
     workflow = Workflow.query.get(wid)
     engine = BibWorkflowEngine(workflow.name,
@@ -108,6 +110,7 @@ def continue_worker(oid, restart_point="continue_next",
                                workflow_object=workflow,
                                **kwargs)
     engine.save()
+    generate_snapshot(workflow_object, engine)
     continue_execution(engine, workflow_object, restart_point,
                        task_offset, **kwargs)
     return engine
@@ -135,8 +138,8 @@ def get_workflow_object_instances(data, engine):
     for data_object in data:
         if isinstance(data_object, BibWorkflowObject):
             if data_object.id:
-                data_object.log.debug("Existing workflow object found for " +
-                                      "this object. Saving a snapshot.")
+                data_object.log.critical("Existing workflow object found for " +
+                                         "this object. Saving a snapshot.")
                 workflow_objects.append(
                     generate_snapshot(data_object, engine)
                 )

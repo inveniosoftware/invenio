@@ -31,9 +31,7 @@ from invenio.modules.workflows.errors import WorkflowWorkerError
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.run_worker')
 @with_app_context()
 def celery_run(workflow_name, data, **kwargs):
-    """
-    Runs the workflow with Celery
-    """
+    """Run the workflow with Celery."""
     from ..worker_engine import run_worker
     from ..utils import BibWorkflowObjectIdContainer
 
@@ -55,9 +53,7 @@ def celery_run(workflow_name, data, **kwargs):
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.restart_worker')
 @with_app_context()
 def celery_restart(wid, **kwargs):
-    """
-    Restarts the workflow with Celery
-    """
+    """Restart the workflow with Celery."""
     from ..worker_engine import restart_worker
     return restart_worker(wid, **kwargs).uuid
 
@@ -65,9 +61,7 @@ def celery_restart(wid, **kwargs):
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.continue_worker')
 @with_app_context()
 def celery_continue(oid, restart_point, **kwargs):
-    """
-    Restarts the workflow with Celery
-    """
+    """Restart the workflow with Celery."""
     from ..worker_engine import continue_worker
 
     # We need to return the uuid because
@@ -77,8 +71,7 @@ def celery_continue(oid, restart_point, **kwargs):
 class worker_celery(object):
     def run_worker(self, workflow_name, data, **kwargs):
         """
-        Helper function to get celery task
-        decorators to worker_celery
+        Helper function to get celery task decorators to worker_celery.
 
         :param workflow_name: name of the workflow to be run
         :type workflow_name: str
@@ -90,8 +83,7 @@ class worker_celery(object):
 
     def restart_worker(self, wid, **kwargs):
         """
-        Helper function to get celery task
-        decorators to worker_celery
+        Helper function to get celery task decorators to worker_celery.
 
         :param wid: uuid of the workflow to be run
         :type wid: str
@@ -100,8 +92,7 @@ class worker_celery(object):
 
     def continue_worker(self, oid, restart_point, **kwargs):
         """
-        Helper function to get celery task
-        decorators to worker_celery
+        Helper function to get celery task decorators to worker_celery.
 
         :param oid: uuid of the object to be started
         :type oid: str
@@ -113,10 +104,11 @@ class worker_celery(object):
 
 
 class CeleryResult(AsynchronousResultWrapper):
-    """
-    This represents a wrapped async Celery result presenting
-    a normalized interface to the task enqueued in Celery.
 
+    """
+    Represent a wrapped async Celery result.
+
+    It is presenting a normalized interface to the task enqueued in Celery.
     Since BibWorkflowEngine cannot be serialized, we need this wrapper
     to transform the results (BibWorkflowEngine) back and forth between
     client and queue.
@@ -124,17 +116,15 @@ class CeleryResult(AsynchronousResultWrapper):
     :param asynchronousresult: the result from Celery
     """
 
-    def __init__(self, asynchronousresult):
-        super(CeleryResult, self).__init__(asynchronousresult)
-
     @property
     def status(self):
+        """Return the status."""
         return self.asyncresult.status
 
     @session_manager
     def get(self, postprocess=None):
         """
-        Returns the result of async result that ran in Celery.
+        Return the result of async result that ran in Celery.
 
         WorkflowEngine cannot be serialized, so we often need to
         postprocess the result from the celery process across

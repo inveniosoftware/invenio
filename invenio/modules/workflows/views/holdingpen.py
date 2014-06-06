@@ -27,6 +27,7 @@ Note: Currently work-in-progress.
 """
 
 import re
+import collections
 
 from six import iteritems, text_type
 from flask import (render_template, Blueprint, request, current_app, jsonify,
@@ -42,7 +43,7 @@ from invenio.utils.date import pretty_date
 from ..models import BibWorkflowObject, Workflow, ObjectVersion
 from ..registry import actions
 from ..utils import get_workflow_definition, sort_bwolist
-from ..api import continue_oid_delayed, start
+from ..api import continue_oid_delayed, start_delayed
 
 
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
@@ -88,14 +89,7 @@ def maintable():
     my_tags = current_app.config.get('VERSION_SHOWING', [])
     tags_to_print = ""
     for tag in my_tags:
-        if tag == ObjectVersion.FINAL:
-            tags_to_print += "Done,"
-        if tag == ObjectVersion.HALTED:
-            tags_to_print += "Need action,"
-        if tag == ObjectVersion.RUNNING:
-            tags_to_print += "In process,"
-        if tag == ObjectVersion.INITIAL:
-            tags_to_print += "New,"
+            tags_to_print += ObjectVersion.MAPPING[tag]
 
     return dict(bwolist=bwolist,
                 action_list=action_list,
@@ -160,143 +154,135 @@ def load_table():
     3] then if the user searched for something
     and finally it builds the JSON to send.
     """
+
+    version_showing = []
+    req = None
+    req_search = []
+    if request.json:
+        if "version" in request.json:
+            req = request.json["version"]
+        if "tags" in request.json:
+            req_search = request.json["tags"]
+            session["tags"] = req_search
+    if req is not None:
+        if "final" in req:
+            version_showing.append(ObjectVersion.FINAL)
+        if "halted" in req:
+            version_showing.append(ObjectVersion.HALTED)
+        if "running" in req:
+            version_showing.append(ObjectVersion.RUNNING)
+        if "initial" in req:
+            version_showing.append(ObjectVersion.INITIAL)
+        session['workflows_version_showing'] = version_showing
+    elif 'workflows_version_showing' in session:
+        version_showing = session.get('workflows_version_showing', [])
+
     try:
-        version_showing = []
-        req = None
-        req_search = []
-        if request.json:
-            if "version" in request.json:
-                req = request.json["version"]
-            if "tags" in request.json:
-                req_search = request.json["tags"]
-                session["tags"] = req_search
-        if req is not None:
-            if "final" in req:
-                version_showing.append(ObjectVersion.FINAL)
-            if "halted" in req:
-                version_showing.append(ObjectVersion.HALTED)
-            if "running" in req:
-                version_showing.append(ObjectVersion.RUNNING)
-            if "initial" in req:
-                version_showing.append(ObjectVersion.INITIAL)
-            session['workflows_version_showing'] = version_showing
-        elif 'workflows_version_showing' in session:
-            version_showing = session.get('workflows_version_showing', [])
+        i_sortcol_0 = request.args.get('iSortCol_0')
+        s_sortdir_0 = request.args.get('sSortDir_0')
+        i_display_start = int(request.args.get('iDisplayStart'))
+        i_display_length = int(request.args.get('iDisplayLength'))
+        sEcho = int(request.args.get('sEcho')) + 1
+    except:
+        i_sortcol_0 = session.get('iSortCol_0', 0)
+        s_sortdir_0 = session.get('sSortDir_0', None)
+        i_display_start = session.get('iDisplayLength', 10)
+        i_display_length = session.get('iDisplayLength', 0)
+        sEcho = session.get('sEcho', 0) + 1
 
-        try:
-            i_sortcol_0 = request.args.get('iSortCol_0')
-            s_sortdir_0 = request.args.get('sSortDir_0')
-            i_display_start = int(request.args.get('iDisplayStart'))
-            i_display_length = int(request.args.get('iDisplayLength'))
-            sEcho = int(request.args.get('sEcho')) + 1
-        except:
-            i_sortcol_0 = session.get('iSortCol_0', 0)
-            s_sortdir_0 = session.get('sSortDir_0', None)
-            i_display_start = session.get('iDisplayLength', 10)
-            i_display_length = session.get('iDisplayLength', 0)
-            sEcho = session.get('sEcho', 0) + 1
-
-        s_search = request.args.get('sSearch', None)
-        if s_search:
-            if req_search:
-                s_search = s_search.split(',') + req_search
-            else:
-                s_search = s_search.split(',') + session["tags"]
+    s_search = request.args.get('sSearch', None)
+    if s_search:
+        if req_search:
+            s_search = s_search.split(',') + req_search
         else:
-            if req_search:
-                s_search = req_search
-            elif "tags" in session:
-                s_search = session["tags"]
-            else:
-                s_search = []
+            s_search = s_search.split(',') + session["tags"]
+    else:
+        if req_search:
+            s_search = req_search
+        elif "tags" in session:
+            s_search = session["tags"]
+        else:
+            s_search = []
 
-        print version_showing
-        print s_search
+    bwolist = get_holdingpen_objects(ssearch=s_search,
+                                     version_showing=version_showing)
+    if 'iSortCol_0' in session:
+        i_sortcol_0 = int(i_sortcol_0)
+        if i_sortcol_0 != session['iSortCol_0'] \
+            or s_sortdir_0 != session['sSortDir_0']:
+            bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
+    session['iDisplayStart'] = i_display_start
+    session['iDisplayLength'] = i_display_length
+    session['iSortCol_0'] = i_sortcol_0
+    session['sSortDir_0'] = s_sortdir_0
+    session['sEcho'] = sEcho
 
-        bwolist = get_holdingpen_objects(ssearch=s_search,
-                                         version_showing=version_showing)
-        print len(bwolist)
-        if 'iSortCol_0' in session:
-            i_sortcol_0 = int(i_sortcol_0)
-            if i_sortcol_0 != session['iSortCol_0'] \
-                or s_sortdir_0 != session['sSortDir_0']:
-                bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
-        session['iDisplayStart'] = i_display_start
-        session['iDisplayLength'] = i_display_length
-        session['iSortCol_0'] = i_sortcol_0
-        session['sSortDir_0'] = s_sortdir_0
-        session['sEcho'] = sEcho
-
-        table_data = {
-            "aaData": []
-        }
-        try:
-            table_data['iTotalRecords'] = len(bwolist)
-            table_data['iTotalDisplayRecords'] = len(bwolist)
-        except TypeError:
-            bwolist = get_holdingpen_objects(version_showing=version_showing)
-            table_data['iTotalRecords'] = len(bwolist)
-            table_data['iTotalDisplayRecords'] = len(bwolist)
-
-        # This will be simplified once Redis is utilized.
-        records_showing = 0
-        for bwo in bwolist[i_display_start:i_display_start + i_display_length]:
-            action_name = bwo.get_action()
-            action_message = bwo.get_action_message()
-            if not action_message:
-                action_message = ""
-            action = actions.get(action_name, None)
-
-            records_showing += 1
-
-            mini_action = getattr(action, "mini_action", None)
-            record = bwo.get_data()
-            if not hasattr(record, "get"):
-                try:
-                    record = dict(record)
-                except:
-                    record = {}
-
-            categories = get_subject_categories(record)
-            title = get_title(record)
-            identifiers = get_identifiers(record)
-
-            extra_data = bwo.get_extra_data()
-            row = render_template('workflows/row_formatter.html',
-                                  title=title,
-                                  object=bwo,
-                                  record=record,
-                                  extra_data=extra_data,
-                                  categories=categories,
-                                  action=action,
-                                  mini_action=mini_action,
-                                  action_message=action_message,
-                                  pretty_date=pretty_date,
-                                  identifiers=identifiers)
-            d = {}
-            for key, value in REG_TD.findall(row):
-                d[key] = value.strip()
-
-            table_data['aaData'].append(
-                [d['id'],
-                 d['checkbox'],
-                 d['title'],
-                 d['identifiers'],
-                 d['category'],
-                 d['pretty_date'],
-                 d['version'],
-                 d['type'],
-                 d['details'],
-                 d['action']
-                ]
-            )
-        table_data['sEcho'] = sEcho
+    table_data = {
+        "aaData": []
+    }
+    try:
         table_data['iTotalRecords'] = len(bwolist)
         table_data['iTotalDisplayRecords'] = len(bwolist)
-        print session
-        return jsonify(table_data)
-    except Exception as e:
-        print(e)
+    except TypeError:
+        bwolist = get_holdingpen_objects(version_showing=version_showing)
+        table_data['iTotalRecords'] = len(bwolist)
+        table_data['iTotalDisplayRecords'] = len(bwolist)
+
+    # This will be simplified once Redis is utilized.
+    records_showing = 0
+    for bwo in bwolist[i_display_start:i_display_start + i_display_length]:
+        action_name = bwo.get_action()
+        action_message = bwo.get_action_message()
+        if not action_message:
+            action_message = ""
+        action = actions.get(action_name, None)
+
+        records_showing += 1
+
+        mini_action = getattr(action, "mini_action", None)
+        record = bwo.get_data()
+        if not hasattr(record, "get"):
+            try:
+                record = dict(record)
+            except:
+                record = {}
+
+        categories = get_subject_categories(record)
+        title = get_title(record)
+        identifiers = get_identifiers(record)
+
+        extra_data = bwo.get_extra_data()
+        row = render_template('workflows/row_formatter.html',
+                              title=title,
+                              object=bwo,
+                              record=record,
+                              extra_data=extra_data,
+                              categories=categories,
+                              action=action,
+                              mini_action=mini_action,
+                              action_message=action_message,
+                              pretty_date=pretty_date,
+                              identifiers=identifiers)
+        d = {}
+        for key, value in REG_TD.findall(row):
+            d[key] = value.strip()
+
+        table_data['aaData'].append(
+            [d['id'],
+             d['checkbox'],
+             d['title'],
+             d['identifiers'],
+             d['category'],
+             d['pretty_date'],
+             d['version'],
+             d['type'],
+             d['action']
+            ]
+        )
+    table_data['sEcho'] = sEcho
+    table_data['iTotalRecords'] = len(bwolist)
+    table_data['iTotalDisplayRecords'] = len(bwolist)
+    return jsonify(table_data)
 
 
 @blueprint.route('/get_version_showing', methods=['GET', 'POST'])
@@ -323,20 +309,29 @@ def details(objectid):
     if bwobject.id_parent:
         hbwobject_db_request = BibWorkflowObject.query.filter(
             or_(BibWorkflowObject.id_parent == bwobject.id_parent,
-                BibWorkflowObject.id == bwobject.id,
-                BibWorkflowObject.id == bwobject.id_parent)).all()
+                BibWorkflowObject.id == bwobject.id_parent,
+                BibWorkflowObject.id == bwobject.id)).all()
+
     else:
         hbwobject_db_request = BibWorkflowObject.query.filter(
             or_(BibWorkflowObject.id_parent == bwobject.id,
                 BibWorkflowObject.id == bwobject.id)).all()
-    hbwobject = []
+
+    hbwobject = {ObjectVersion.FINAL: [], ObjectVersion.HALTED: [],
+                 ObjectVersion.INITIAL: [], ObjectVersion.RUNNING: []}
 
     for hbobject in hbwobject_db_request:
-        hbwobject.append({"id": hbobject.id, "version": hbobject.version,
-                          "date": pretty_date(hbobject.created),
-                          "true_date": hbobject.created})
+        hbwobject[hbobject.version].append({"id": hbobject.id,
+                                            "version": hbobject.version,
+                                            "date": pretty_date(hbobject.created),
+                                            "true_date": hbobject.modified})
 
-    hbwobject.sort(key=lambda x: x["id"])
+    for list_of_object in hbwobject:
+        hbwobject[list_of_object].sort(key=lambda x: x["true_date"], reverse=True)
+
+    hbwobject_final = hbwobject[ObjectVersion.INITIAL] + \
+                      hbwobject[ObjectVersion.HALTED] + \
+                      hbwobject[ObjectVersion.FINAL]
 
     try:
         edit_record_action = actions['edit_record_action']()
@@ -346,7 +341,7 @@ def details(objectid):
 
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
-                           hbwobject=hbwobject,
+                           hbwobject=hbwobject_final,
                            bwparent=extracted_data['bwparent'],
                            info=extracted_data['info'],
                            log=extracted_data['logtext'],
@@ -366,7 +361,7 @@ def restart_record(objectid, start_point='continue_next'):
     workflow = Workflow.query.filter(
         Workflow.uuid == bwobject.id_workflow).first()
 
-    start(workflow.name, [bwobject.get_data()])
+    start_delayed(workflow.name, [bwobject.get_data()])
     return 'Record Restarted'
 
 
@@ -436,23 +431,32 @@ def show_action(objectid):
     if bwobject.id_parent:
         hbwobject_db_request = BibWorkflowObject.query.filter(
             or_(BibWorkflowObject.id_parent == bwobject.id_parent,
-                BibWorkflowObject.id == bwobject.id,
-                BibWorkflowObject.id == bwobject.id_parent)).all()
+                BibWorkflowObject.id == bwobject.id_parent,
+                BibWorkflowObject.id == bwobject.id)).all()
+
     else:
         hbwobject_db_request = BibWorkflowObject.query.filter(
             or_(BibWorkflowObject.id_parent == bwobject.id,
                 BibWorkflowObject.id == bwobject.id)).all()
-    hbwobject = []
+
+    hbwobject = {ObjectVersion.FINAL: [], ObjectVersion.HALTED: [],
+                 ObjectVersion.INITIAL: [], ObjectVersion.RUNNING: []}
 
     for hbobject in hbwobject_db_request:
-        hbwobject.append({"id": hbobject.id, "version": hbobject.version,
-                          "date": pretty_date(hbobject.created),
-                          "true_date": hbobject.created})
+        hbwobject[hbobject.version].append({"id": hbobject.id,
+                                            "version": hbobject.version,
+                                            "date": pretty_date(hbobject.created),
+                                            "true_date": hbobject.modified})
 
-    hbwobject.sort(key=lambda x: x["id"])
+    for list_of_object in hbwobject:
+        hbwobject[list_of_object].sort(key=lambda x: x["true_date"], reverse=True)
+
+    hbwobject_final = hbwobject[ObjectVersion.INITIAL] + \
+                      hbwobject[ObjectVersion.HALTED] + \
+                      hbwobject[ObjectVersion.FINAL]
 
     parameters["message"] = bwobject.get_action_message()
-    parameters["hbwobject"] = hbwobject
+    parameters["hbwobject"] = hbwobject_final
     return render_template(url, **parameters)
 
 
@@ -631,9 +635,8 @@ def get_holdingpen_objects(isortcol_0=None,
         bwobject_list_tmp = []
         for bwo in bwobject_list:
             extra_data = bwo.get_extra_data()
-            if hasattr(bwo.get_data(), "get"):
-                data = bwo.get_data()
-            else:
+            data = bwo.get_data()
+            if not isinstance(data, collections.Mapping):
                 data = {}
 
             all_parameters = {"record": data, "extra_data": extra_data,
@@ -649,29 +652,16 @@ def get_holdingpen_objects(isortcol_0=None,
                                   "identifiers": get_identifiers,
                                   "created": get_pretty_date,
                                   "type": get_type
-
-            }
+                                  }
 
             confirm = 0
             to_add = True
             for term in ssearch:
                 for function in checking_functions:
-                    if check_ssearch_over_data(term,
-                                               checking_functions[function](
-                                                       **dict(
-                                                               (
-                                                                   checking_functions[
-                                                                       function].func_code.co_varnames[
-                                                                       i],
-                                                                   all_parameters[
-                                                                       checking_functions[
-                                                                           function].func_code.co_varnames[
-                                                                           i]])
-                                                               for
-                                                               i in
-                                                               range(0,
-                                                                     checking_functions[
-                                                                         function].func_code.co_argcount)))):
+                    if check_ssearch_over_data(term, checking_functions[function](
+                                               **dict((checking_functions[function].func_code.co_varnames[i],
+                                                       all_parameters[checking_functions[function].func_code.co_varnames[i]])
+                                               for i in range(0, checking_functions[function].func_code.co_argcount)))):
                         confirm += 1
                 if confirm == 0:
                     to_add = False
@@ -688,6 +678,13 @@ def get_holdingpen_objects(isortcol_0=None,
 
 
 def check_ssearch_over_data(ssearch, data):
+    """
+    Check if the data match with one of the search tag in data.
+
+    :param ssearch: list of tags used for filtering.
+    :param data: data to check.
+    :return: True if present False otherwise.
+    """
     if not isinstance(ssearch, list):
         if "," in ssearch:
             ssearch = ssearch.split(",")
@@ -707,9 +704,7 @@ def check_ssearch_over_data(ssearch, data):
 
 
 def get_subject_categories(record):
-    """
-    Get the subject categories.
-    """
+    """Get the subject categories."""
     if hasattr(record, "get"):
         if 'subject' in record:
             lookup = ["subject", "term"]
@@ -747,14 +742,12 @@ def get_pretty_date(bwo):
 
 
 def get_type(bwo):
+    """Get the type of the Object."""
     return bwo.data_type
 
 
 def get_title(record):
-    """
-    Get the title.
-    """
-
+    """Get the title."""
     extracted_title = []
 
     if hasattr(record, "get") and "title" in record:
@@ -769,9 +762,7 @@ def get_title(record):
 
 
 def get_identifiers(record):
-    """
-    Get record identifiers.
-    """
+    """Get record identifiers."""
     #FIXME: after solving the bibfield problem use the oaiidentifier
     if hasattr(record, "get"):
         return [record.get("system_control_number", {}).get("value", 'No ids')]

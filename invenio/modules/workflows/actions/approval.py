@@ -65,14 +65,14 @@ class approval(Form):
     def run(self, objectid):
         """Resolve the action taken in the approval action."""
         from flask import request, flash
-        from ..api import continue_oid
+        from ..api import continue_oid_delayed
         from ..models import BibWorkflowObject
 
         bwobject = BibWorkflowObject.query.get(objectid)
 
         if request.form['decision'] == 'Accept':
             bwobject.remove_action()
-            continue_oid(objectid)
+            continue_oid_delayed(objectid)
             flash('Record Accepted')
 
         elif request.form['decision'] == 'Reject':
