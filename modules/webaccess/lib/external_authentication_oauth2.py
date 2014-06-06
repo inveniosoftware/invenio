@@ -246,12 +246,25 @@ class ExternalOAuth2(ExternalAuth):
 
         profile = requests.get(CFG_OAUTH2_CONFIGURATIONS['orcid']['request_url'].format(id=req.g['oauth2_orcid']), headers={'Accept': 'application/orcid+json', 'Authorization': 'Bearer %s' % req.g['oauth2_access_token']})
         orcid_record = req.g['orcid_record'] = json_unicode_to_utf8(profile.json())['orcid-profile']
-        id = orcid_record['orcid']['value']
-        emails = orcid_record['orcid-bio'].get('contact-details', {}).get('email', [])
+        try:
+            orcidid = orcid_record['orcid-identifier']['path']
+        except (TypeError, KeyError) as e:
+            import cPickle, os, datetime
+            from invenio.config import CFG_TMPSHAREDDIR
+            ts = str(datetime.datetime.today()).replace(' ', ':')
+            fname = os.path.join(CFG_TMPSHAREDDIR,
+                                 'orcid_dictionary_problem_%s.cPickle' % str(ts))
+            f = open(fname, 'w')
+            cPickle.dump((e, profile, orcid_record), f)
+            f.close()
+            raise Exception("Something is wrong with the dictionary we got from ORCID."
+                            "Dumped to temporary file %s" % fname)
+
+        emails = orcid_record['orcid-bio'].get('contact-details', dict()).get('email', list())
         if emails:
-            return emails[0], id
+            return emails[0], orcidid
         else:
-            return None, id
+            return None, orcidid
 
     @staticmethod
     def get_limited_access_data_from_orcid(orcid_id, access_token):
