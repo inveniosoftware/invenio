@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -144,7 +144,7 @@ from invenio.legacy.search_engine.query_parser import SearchQueryParenthesisedPa
 from invenio.utils import apache
 from invenio.legacy.miscutil.solrutils_bibindex_searcher import solr_get_bitset
 from invenio.legacy.miscutil.xapianutils_bibindex_searcher import xapian_get_bitset
-
+from invenio.modules.search import services
 
 try:
     import invenio.legacy.template
@@ -199,7 +199,8 @@ EM_REPOSITORY={"body" : "B",
                "np_portalbox" : "Pnp",
                "ne_portalbox" : "Pne",
                "lt_portalbox" : "Plt",
-               "rt_portalbox" : "Prt"};
+               "rt_portalbox" : "Prt",
+               "search_services": "SER"};
 
 class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
@@ -6319,6 +6320,21 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
                                     p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action,
                                     em
                                     ))
+
+        # WebSearch services
+        if jrec <= 1 and \
+               (em == "" and True or (EM_REPOSITORY["search_services"] in em)):
+            user_info = collect_user_info(req)
+            # display only on first search page, and only if wanted
+            # when 'em' param set.
+            for answer_relevance, answer_html in services.get_answers(
+                    req, user_info, of, cc, colls_to_search, p, f, ln):
+                req.write('<div class="searchservicebox">')
+                req.write(answer_html)
+                if verbose > 8:
+                    write_warning("Service relevance: %i" % answer_relevance, req=req)
+                req.write('</div>')
+
     t1 = os.times()[4]
     results_in_any_collection = intbitset()
     if aas == 1 or (p1 or p2 or p3):
@@ -6396,7 +6412,6 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
 
     # split result set into collections
     (results_final_nb, results_final_nb_total, results_final_for_all_selected_colls) = prs_split_into_collections(kwargs=kwargs, **kwargs)
-
 
     # we continue past this point only if there is a hosted collection that has timed out and might offer potential results
     if results_final_nb_total == 0 and not kwargs['hosted_colls_potential_results_p']:

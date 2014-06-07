@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -99,14 +99,19 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
     """Modify the translations of a collection
     sel_type - the nametype to modify
     trans - the translations in the same order as the languages from get_languages()"""
-
     output = ''
     subtitle = ''
     sitelangs = get_languages()
+    if sel_type in ('r', 'v', 'l'):
+        table = 'collectionbox'
+        identifier_column = "id_collection"
+    else:
+        table = 'collection'
+        identifier_column = None
     if type(trans) is str:
         trans = [trans]
     if confirm in ["2", 2] and colID:
-        finresult = modify_translations(colID, sitelangs, sel_type, trans, "collection")
+        finresult = modify_translations(colID, sitelangs, sel_type, trans, table, identifier_column)
     col_dict = dict(get_def_name('', "collection"))
 
     if colID and int(colID) in col_dict:
@@ -120,6 +125,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
         actions = []
 
         types = get_col_nametypes()
+        types.extend([('v', '"Focus on" box'), ('r', '"Narrow by" box'), ('l', '"Latest additions" box')])
         if len(types) > 1:
             text  = """
             <span class="adminlabel">Name type</span>
@@ -144,7 +150,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
             trans = []
             for (key, value) in sitelangs:
                 try:
-                    trans_names = get_name(colID, key, sel_type, "collection")
+                    trans_names = get_name(colID, key, sel_type, table, identifier_column)
                     trans.append(trans_names[0][0])
                 except StandardError as e:
                     trans.append('')
@@ -2009,7 +2015,7 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     <td>7.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
+    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
 
     if mtype == "":
         fin_output += """<br /><br /><b><span class="info">To manage the collections, select an item from the menu.</span><b><br />"""
@@ -2047,7 +2053,6 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     elif mtype == "perform_checkexternalcollections" or mtype == "perform_showall":
         fin_output += perform_checkexternalcollections(colID, ln, callback='')
 
-    body = [fin_output]
     body = [fin_output]
 
     return addadminbox('<b>Menu</b>', body)
@@ -2872,7 +2877,7 @@ def get_col_nametypes():
     """Return a list of the various translationnames for the collections"""
 
     type = []
-    type.append(('ln', 'Long name'))
+    type.append(('ln', 'Collection name'))
     return type
 
 def find_last(tree, start_son):

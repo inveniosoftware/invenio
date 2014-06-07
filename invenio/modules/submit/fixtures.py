@@ -278,6 +278,10 @@ class SbmALLFUNCDESCRData(DataSet):
         function = u'Withdraw_Approval_Request'
         description = None
 
+    class SbmALLFUNCDESCR_Run_PlotExtractor:
+        function = u'Run_PlotExtractor'
+        description = u'Run PlotExtractor on the current record'
+
 
 class SbmCHECKSData(DataSet):
 
@@ -962,6 +966,22 @@ class SbmFUNDESCData(DataSet):
     class SbmFUNDESC_WithdrawApprovalRequest_categrnseekwithd:
         function = u'Withdraw_Approval_Request'
         param = u'categ_rnseek_withd'
+
+    class SbmFUNDESC_Run_PlotExtractor_with_docname:
+        function = u'Run_PlotExtractor'
+        param = u'with_docname'
+
+    class SbmFUNDESC_Run_PlotExtractor_with_doctype:
+        function = u'Run_PlotExtractor'
+        param = u'with_doctype'
+
+    class SbmFUNDESC_Run_PlotExtractor_with_docformat:
+        function = u'Run_PlotExtractor'
+        param = u'with_docformat'
+
+    class SbmFUNDESC_Run_PlotExtractor_extract_plots_switch_file:
+        function = u'Run_PlotExtractor'
+        param = u'extract_plots_switch_file'
 
 
 class SbmGFILERESULTData(DataSet):

@@ -125,3 +125,10 @@ CFG_WEBSEACH_MATCHING_TYPES = [
         """
         }
     ]
+
+## CFG_WEBSEARCH_COLLECTION_NAMES_SEARCH -- decides whether search for
+## collection name is enabled (1), disabled (-1) or enabled only for
+## the home collection (0), enabled for all collections including
+## those not attached to the collection tree (2). This requires the
+## CollectionNameSearchService search services to be enabled.)
+CFG_WEBSEARCH_COLLECTION_NAMES_SEARCH = 0

@@ -74,6 +74,8 @@ from invenio.utils.html import nmtoken_from_string
 from invenio.ext.legacy.handler import wash_urlargd
 from invenio.legacy.bibrank.citation_searcher import get_cited_by_count
 from invenio.legacy.webuser import session_param_get
+from invenio.modules.search.services import \
+     CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT
 
 from intbitset import intbitset
 
@@ -1273,9 +1275,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = {'r': _("Narrow by collection:"),
-                 'v': _("Focus on:")}[type]
-
+        title = father.get_collectionbox_name(ln, type)
 
         if has_grandchildren:
             style_prolog = "<strong>"
@@ -1468,7 +1468,7 @@ class Template:
         return _("This collection does not contain any document yet.")
 
 
-    def tmpl_instant_browse(self, aas, ln, recids, more_link=None, grid_layout=False):
+    def tmpl_instant_browse(self, aas, ln, recids, more_link=None, grid_layout=False, father=None):
         """
           Formats a list of records (given in the recids list) from the database.
 
@@ -1482,6 +1482,7 @@ class Template:
 
           - 'more_link' *string* - the "More..." link for the record. If not given, will not be displayed
 
+          - 'father' *collection* - The current collection
         """
 
         # load the right message language
@@ -1532,7 +1533,7 @@ class Template:
             <td class="narrowsearchboxbody">%(body)s</td>
             </tr>
           </tbody>
-        </table>''' % {'header' : _("Latest additions:"),
+        </table>''' % {'header' : father.get_collectionbox_name(ln, 'l') ,
                        'body' : body,
                        }
 
@@ -3079,6 +3080,54 @@ class Template:
             return out
         else:
             return ""
+
+    def tmpl_print_service_list_links(self, label, labels_and_urls, ln=CFG_SITE_URL):
+        """
+        Prints service results as list
+
+        @param label: the label to display before the list of links
+        @type label: string
+        @param labels_and_urls: list of tuples (label, url), already translated, not escaped
+        @type labels_and_urls: list(string, string)
+        @param ln: language
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+
+        out = '''
+        <span class="searchservicelabel">%s</span> ''' % cgi.escape(label)
+
+        out += """<script type="text/javascript">
+            $(document).ready(function() {
+                $('a.moreserviceitemslink').click(function() {
+                    $('.moreserviceitemslist', $(this).parent()).show();
+                    $(this).hide();
+                    $('.lessserviceitemslink', $(this).parent()).show();
+                    return false;
+                });
+                $('a.lessserviceitemslink').click(function() {
+                    $('.moreserviceitemslist', $(this).parent()).hide();
+                    $(this).hide();
+                    $('.moreserviceitemslink', $(this).parent()).show();
+                    return false;
+                });
+            });
+            </script>"""
+        count = 0
+        for link_label, link_url in labels_and_urls:
+            count += 1
+            out += """<span %(itemclass)s>%(separator)s <a class="searchserviceitem" href="%(url)s">%(link_label)s</a></span>""" % \
+                   {'itemclass' : count > CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT and 'class="moreserviceitemslist" style="display:none"' or '',
+                    'separator': count > 1 and ', ' or '',
+                    'url' : link_url,
+                    'link_label' : cgi.escape(link_label)}
+
+        if count > CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT:
+            out += """ <a class="lessserviceitemslink" style="display:none;" href="#">%s</a>""" % _("Less suggestions")
+            out += """ <a class="moreserviceitemslink" style="" href="#">%s</a>""" % _("More suggestions")
+
+        return out
 
     def tmpl_print_searchresultbox(self, header, body):
         """print a nicely formatted box for search results """

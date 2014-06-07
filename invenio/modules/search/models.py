@@ -181,6 +181,14 @@ class Collection(db.Model):
     names = association_proxy('_names', 'value',
                 creator=lambda k, v: Collectionname(ln_type=k, value=v))
 
+    _boxes = db.relationship(lambda: Collectionboxname,
+                backref='collection',
+                collection_class=attribute_mapped_collection('ln_type'),
+                cascade="all, delete, delete-orphan")
+
+    boxes = association_proxy('_boxes', 'value',
+                creator=lambda k, v: Collectionboxname(ln_type=k, value=v))
+
     _formatoptions = association_proxy('formats', 'format')
 
     #@cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
@@ -446,6 +454,27 @@ class Collectionname(db.Model):
 #    print initiator.__dict__
 
 #event.listen(Collection.names, 'append', collection_append_listener)
+
+
+class Collectionboxname(db.Model):
+    """Represents a Collectionboxname record."""
+    __tablename__ = 'collectionboxname'
+    id_collection = db.Column(db.MediumInteger(9, unsigned=True),
+                              db.ForeignKey(Collection.id),
+                              nullable=False, primary_key=True)
+    ln = db.Column(db.Char(5), nullable=False, primary_key=True,
+                   server_default='')
+    type = db.Column(db.Char(3), nullable=False, primary_key=True,
+                     server_default='r')
+    value = db.Column(db.String(255), nullable=False)
+
+    @db.hybrid_property
+    def ln_type(self):
+        return (self.ln, self.type)
+
+    @ln_type.setter
+    def set_ln_type(self, value):
+        (self.ln, self.type) = value
 
 
 class Collectiondetailedrecordpagetabs(db.Model):

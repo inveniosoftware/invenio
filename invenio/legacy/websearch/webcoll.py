@@ -200,6 +200,42 @@ class Collection:
         out += epilog
         return out
 
+    def get_collectionbox_name(self, ln=CFG_SITE_LANG, box_type="r"):
+        """
+        Return collection-specific labelling of 'Focus on' (regular
+        collection), 'Narrow by' (virtual collection) and 'Latest
+        addition' boxes.
+
+        If translation for given language does not exist, use label
+        for CFG_SITE_LANG. If no custom label is defined for
+        CFG_SITE_LANG, return default label for the box.
+
+        @param ln: the language of the label
+        @param box_type: can be 'r' (=Narrow by), 'v' (=Focus on), 'l' (=Latest additions)
+        """
+        i18name = ""
+        res = run_sql("SELECT value FROM collectionboxname WHERE id_collection=%s AND ln=%s AND type=%s", (self.id, ln, box_type))
+        try:
+            i18name = res[0][0]
+        except IndexError:
+            res = run_sql("SELECT value FROM collectionboxname WHERE id_collection=%s AND ln=%s AND type=%s", (self.id, CFG_SITE_LANG, box_type))
+            try:
+                i18name = res[0][0]
+            except IndexError:
+                pass
+
+        if not i18name:
+            # load the right message language
+            _ = gettext_set_language(ln)
+            if box_type == "v":
+                i18name = _('Focus on:')
+            elif box_type == "r":
+                i18name = _('Narrow by collection:')
+            elif box_type == "l":
+                i18name = _('Latest additions:')
+
+        return i18name
+
     def get_ancestors(self):
         "Returns list of ancestors of the current collection."
         ancestors = []
@@ -516,10 +552,10 @@ class Collection:
             # CERN hack: display the records in a grid layout
             if CFG_CERN_SITE and self.name in ['Videos']:
                 return websearch_templates.tmpl_instant_browse(
-                    aas=aas, ln=ln, recids=passIDs, more_link=url, grid_layout=True)
+                    aas=aas, ln=ln, recids=passIDs, more_link=url, grid_layout=True, father=self)
 
             return websearch_templates.tmpl_instant_browse(
-                aas=aas, ln=ln, recids=passIDs, more_link=url)
+                aas=aas, ln=ln, recids=passIDs, more_link=url, father=self)
 
         return websearch_templates.tmpl_box_no_records(ln=ln)
 

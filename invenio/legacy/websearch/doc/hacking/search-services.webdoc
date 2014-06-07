@@ -1,0 +1,349 @@
+## -*- mode: html; coding: utf-8; -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: _(Search Services)_ -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> &gt; <a class="navtrail" href="search-engine-internals">WebSearch Internals</a> -->
+<!-- WebDoc-Page-Revision: $Id$ -->
+
+
+<h2>Contents</h2>
+<strong>1. <a href="#1">Overview</a></strong><br />
+<strong>2. <a href="#2">Enable/Disable a search service</a></strong><br />
+<strong>3. <a href="#3">Build a custom search service</a></strong><br />
+<strong>3.1 <a href="#3.1">Search service specifications/requirements</a></strong><br />
+<strong>3.1.1 <a href="#3.1.1">3.1.1 Using SearchService base class</a></strong><br />
+<strong>3.1.2 <a href="#3.1.2">3.1.2 Using ListLinksService class</a></strong><br />
+<strong>3.1.3 <a href="#3.1.3">3.1.3 Using KnowledgeBaseService class</a></strong><br />
+<strong>3.2 <a href="#3.2">Good practices</a></strong><br />
+
+<a name="1"></a><h2>1. Overview</h2>
+
+<p>Search services are meant to display information contextual to a
+search query in very specialized way, in the sense that they can
+search/retrieve/display data beyond the traditional concept of
+records.  Typical search services could for example include:
+
+<ul>
+	<li>Spell-check user queries by calling an external spellchecking library, and offering "<em>Did you mean ...?</em>" options.</li>
+	<li>Parse user input and display an author profile when searching for a well-defined author.</li>
+	<li>Search for submission names matching the user input.</li>
+	<li>Retrieve phone number from the institutional LDAP.</li>
+	<li>Etc.</li>
+</ul>
+ </p>
+
+<p> Search services are displayed (in addition) just before the
+results returned by the standard Invenio search engine. Each service
+is queried with the context, and returns:
+
+<ul>
+<li>A score indicating the relevance of the response, given the context</li>
+<li>An HTML formatted response</li>
+</ul>
+
+The relevance returned by the service is typically a score between 0
+and 100 (see
+<code>websearch_services.CFG_WEBSEARCH_SERVICE_MAX_SERVICE_ANSWER_RELEVANCE</code>
+for details) which indicate how much the service <em>thinks</em> it
+can address the "question" and how much it <em>thinks</em> it was able
+to answer it. Given the wanted simplistic (non-scientific) nature of
+services it is extremely important to consider the score very
+carefully, and compare it with existing services when designing a new
+service. Failing to do so might lead to hide more relevant answers
+provided by other services with non-relevant information.  </p>
+
+<p> Services are designed to provide unobtrusive and useful
+information to the user. To that end some measure are taken to cut
+possible verbosity introduced by the services:
+<ul>
+<li>A maximum number of 2 (most relevant) services is displayed for each query. Defined in <code>websearch_services.CFG_WEBSEARCH_SERVICE_MAX_NB_SERVICE_DISPLAY</code>.</li>
+<li>Service with a too low relevance (<21) are not displayed. Defined in <code>websearch_services.CFG_WEBSEARCH_SERVICE_MIN_RELEVANCE_TO_DISPLAY.</code></li>
+<li>When the distance between the relevance of two services is too great (30), only the most relevant service out of the two is displayed. Defined in <code>websearch_services.CFG_WEBSEARCH_SERVICE_MIN_RELEVANCE_TO_DISPLAY.</code></li>
+<li>When a service replies with too many answers, display only 4 answers of the services. More can be displayed when clicking "more".</li>
+<li>Use a visually light theme.</li>
+</ul>
+
+See also the section <a href="#3.2">3.2 Good practices</a>.
+</p>
+
+<a name="2"></a><h2>2. Enable/Disable a search service</h2>
+
+<p>In order to enable a service, drop its files into the following location: <br/>
+<pre>
+/opt/invenio/lib/python/invenio/search_services/
+</pre>
+</p>
+
+<p>
+To disable a service, remove the file from the above directory.
+</p>
+
+<a name="3"></a><h2>3. Build a custom search service</h2>
+
+<p>Services use the Invenio <code>plugin_utils</code> infrastructure, and
+are self-contained in single Pythonic files that comply with the
+specifications defined in section <a href="#3.1">3.1 Search service
+specifications/requirements</a>.</p>
+
+<a name="3.1"></a><h2>3.1 Search service specifications/requirements</h2>
+
+A search service is a Pythonic file stored
+in <code>/opt/invenio/lib/python/invenio/search_services/</code>,
+which name corresponds to a class defined in the file. <br/>
+
+<p>In order to be valid, your service should inherit from the base
+<code>SearchService</code> class and implement some functions (see
+Section <a href="#3.1.1">3.1.1 Using SearchService base class</a>).
+Other helper, more specialized classes exists to help you build
+services that responds with links of links
+(Section <a href="#3.1.2">3.1.2 Using ListLinksService class</a>) or
+answer based on a BibKnowledge knowledge base (<a href="#3.1.3">3.1.3
+Using KnowledgeBaseService class</a>)</p>
+
+
+<a name="3.1.1"></a><h2>3.1.1 Using SearchService base class</h2>
+
+<p>Start implementing your service by defining a class that inherits from
+the <code>SearchService</code> base class. Choose a class name that
+matches the name of your service file.
+</p>
+
+<p>
+For eg. a spellchecker service could exist
+in <code>/opt/invenio/lib/python/invenio/search_services/SpellCheckerService.py</code>,
+with the following content:
+<pre style="border:1px solid #bbb; overflow-x:auto;padding:5px;">
+from invenio.modules.search.services import SearchService
+
+__plugin_version__ = "Search Service Plugin API 1.0"
+
+class CollectionNameSearchService(SearchService):
+
+    def get_description(self, ln=CFG_SITE_LANG):
+        "Return service description"
+        return "Spell check user input"
+
+
+    def answer(self, req, user_info, of, cc, colls_to_search, p, f, search_units, ln):
+        """
+        Answer question given by context.
+
+        Return (relevance, html_string) where relevance is integer
+        from 0 to 100 indicating how relevant to the question the
+        answer is (see C{CFG_WEBSEARCH_SERVICE_MAX_SERVICE_ANSWER_RELEVANCE} for details) ,
+        and html_string being a formatted answer.
+        """
+
+        [...]
+
+        return (score, html_answer)
+
+</pre>
+</p>
+
+<p>The bare minimum for a search service to be valid is to inherit from
+the abstract base class "<code>SearchService</code>". The service
+must:<br/>
+<ul>
+<li>Override <code>get_description(..)</code> to return a short description of the service.</li>
+<li>Override <code>answer(..)</code> to return an answer (int, html_string).</li>
+<li>Define <code>__plugin_version__</code> for the Search Service plugin version this service is compatible with.</li>
+</ul>
+</p>
+
+
+<p>If your service must pre-process some data and cache it, it can
+override the following helper methods:
+
+<ul>
+<li> <code>prepare_data_cache(..)</code> to prepare some cache needed
+to answer. The returned structure is cached for you and can be
+retrieved later via the <code>self.get_data_cache()</code>
+function. This method is called only when the service is queried and
+the cache has not yet been prepared, or must be refreshed. The
+Invenio <code>DataCacher</code> infrastructure is used, to store the
+cache in memory.</li>
+<li><code>timestamp_verifier(..)</code> to indicate if cache
+must be refreshed, by returning the latest modification timestamp of
+your data.</li>
+</ul>
+</p>
+
+<a name="3.1.2"></a><h2>3.1.2 Using ListLinksService class</h2>
+
+<p>If your service is designed to display list of responses, you can
+inherit from the <code>ListLinksService</code> class instead
+of <code>SearchService</code>, in order to benefit from the following
+additional helper functions:
+
+
+<pre style="border:1px solid #bbb; overflow-x:auto;padding:5px;">
+from invenio.modules.search.services import ListLinksService
+from invenio.base.i18n import gettext_set_language
+
+__plugin_version__ = "Search Service Plugin API 1.0"
+
+class CollectionNameSearchService(ListLinksService):
+
+   [...]
+
+   def get_description(self, ln=CFG_SITE_LANG):
+        "Return service description"
+        return "A foo that answer with list of bars"
+
+
+   def get_label(self, ln=CFG_SITE_LANG):
+        """
+        Return label displayed next to the service responses.
+
+        @rtype: string
+        """
+
+        _ = gettext_set_language(ln)
+        return _("You might be interested in")
+
+
+    def answer(self, req, user_info, of, cc, colls_to_search, p, f, search_units, ln):
+        """
+        Answer question given by context.
+
+        Return (relevance, html_string) where relevance is integer
+        from 0 to 100 indicating how relevant to the question the
+        answer is (see C{CFG_WEBSEARCH_SERVICE_MAX_SERVICE_ANSWER_RELEVANCE} for details) ,
+        and html_string being a formatted answer.
+        """
+
+        [...]
+
+        return (score, self.display_answer_helper(list_of_tuples_labels_urls))
+</pre>
+
+<ul>
+  <li><code>get_label(..)</code> to return the label displayed to the
+  user for the service next to the list of responses.</li>
+  <li><code>display_answer_helper(..)</code> a function to be used as
+  a help to process a list of tuples (label, url) in order to return
+  a nicely formatted list of items from the <code>answer().</code>
+  function</li>
+</ul>
+</p>
+
+<p>The requirements from the base class <code>SearchService</code> are
+still valid when using <code>ListLinksService</code>:
+<ul>
+<li>Override <code>get_description(..)</code> to return a short description of the service.</li>
+<li>Override <code>answer(..)</code> to return an answer (int, html_string).</li>
+<li>Define <code>__plugin_version__</code> for the Search Service plugin version this service is compatible with.</li>
+</ul>
+</p>
+
+
+<a name="3.1.2"></a><h2>3.1.3 Using KnowledgeBaseService class</h2>
+
+<p>
+If you would like to build a service that answers automatically based
+on the values stored in a BibKnowledge knowledge base, use
+the <code>KnowledgeBaseService</code>. In this case you do not need to
+define the <code>answer(..)</code> function, which is already
+implemented for you:
+</p>
+
+<pre style="border:1px solid #bbb; overflow-x:auto;padding:5px;">
+from invenio.modules.search.services import KnowledgeBaseService
+from invenio.base.i18n import gettext_set_language
+
+__plugin_version__ = "Search Service Plugin API 1.0"
+
+class MyKBService(KnowledgeBaseService):
+
+   [...]
+   def get_description(self, ln=CFG_SITE_LANG):
+        "Return service description"
+        return "A foo that answer with list of bars, based on myKB"
+
+
+   def get_label(self, ln=CFG_SITE_LANG):
+        """
+        Return label displayed next to the service responses.
+
+        @rtype: string
+        """
+        _ = gettext_set_language(ln)
+        return _("You might be interested in")
+
+
+    def get_kbname(self):
+        "Load knowledge base with this name"
+        return "myKB"
+</pre>
+
+<p>With the above code, the knowledge base "<em>myKB</em>" will be
+loaded and used to reply to the user. It is expected that the
+knowledge base contains for each mapping a list of
+whitespace-separated as key, and a label + url (separated with a "|")
+as value. For eg:
+<pre style="border:1px solid #bbb; overflow-x:auto;padding:5px;">
+
+help submit thesis   ->     How to submit a thesis|http://localhost/help/how-to-submit-thesis
+Atlantis Times       ->     Atlantis Times journal|http://localhost/journal/AtlantisTimes
+
+</pre>
+</p>
+
+<p>When filling up the knowledge base keys, one should carefully
+select the keywords in order to focus on a very specific subject, and
+avoid too generic terms that would unnecessarily match too many user
+queries. One should also consider the possible clash with other
+services (the first rule of the above KB example might for example
+hide responses from the "<em>SubmissionNameSearchService</em>"
+service </p>
+
+<p>
+A default implementation of a <code>KnowledgeBaseService</code> is
+provided with Invenio: "<em>FAQKBService</em>". This service makes
+use of the demo knowledge base named "FAQ".
+</p>
+
+<a name="3.2"></a><h2>3.2 Good practices</h2>
+
+<ul>
+
+<li>Gradually try to understand if the service can answer the question,
+and exclude it as quickly as possible (avoid heavy computation if
+the service is not concerned by the question).</li>
+
+<li>It would often make sense to exclude the service if a user is
+querying using search field (for eg. author field).</li>
+
+
+<li>Avoid noise and redundancy by providing only services that you
+think will be useful to your users, or make sure that they mutually
+exclude each other in the area they cover.</li>
+
+<li>Be cautious when returning a relevance score, in order to ensure
+that your service will not hide other that might be more
+relevant. Test and consider other services. Follow the guidelines
+regarding the score to return.</li>
+
+<li>Avoid matching too generic terms and stop-words, such as
+"document", "the", "to", etc. Be careful when using some keyword such
+as "how", "search", etc.</li>
+</ul>
+
+<p>See also <a href="#1">1. Overview</a> section.</p>

@@ -68,7 +68,8 @@
 <strong>7. <a href="#7">Check External Collections</a></strong><br />
 <strong>8. <a href="#8">Edit Search Engine Parameters</a></strong><br />
 <strong>9. <a href="#9">Search Engine Cache</a></strong><br />
-<strong>10. <a href="#10">Additional Information</a></strong><br />
+<strong>10. <a href="#10">Search Services</a></strong><br />
+<strong>11. <a href="#11">Additional Information</a></strong><br />
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -326,6 +327,10 @@ of your Invenio installation.  Moreover, a collection name may be
 different in different contexts (e.g. long name, short name, etc), so
 that prior to modifying translations you will be asked to select which
 name type you want to change.
+
+<p>The interface also lets you customize the labelling (and
+translations) of the default collection boxes: "Focus on:", "Narrow
+by:" and "Latest addtions:".
 
 <p>The translations aren't mandatory to define.  If a translation does
 not exist in a language chosen by the end user, the end user will be
@@ -729,6 +734,28 @@ option to fix any potential inconsistencies.
 
 <a name="9"></a><h2>9. Search Engine Cache</h2>
 
-<a name="10"></a><h2>10. Additional Information</h2>
+<a name="10"></a><h2>10. Search Services</h2>
+
+<p>Search services are meant to display information contextual to a
+search query in very specialized way, in the sense that they can
+search/retrieve/display data beyond the traditional concept of
+records.  Typical search services could for example include:
+
+  <ul>
+	<li>Spell-check user queries by calling an external spellchecking library, and offering "<em>Did you mean ...?</em>" options.</li>
+	<li>Parse user input and display an author profile when searching for a well-defined author.</li>
+	<li>Search for submission names matching the user input.</li>
+	<li>Retrieve phone number from the institutional LDAP.</li>
+	<li>Etc.</li>
+  </ul>
+</p>
+
+<p>More information about search services might be found in each
+plug-in file. An
+advanced <a href="/help/hacking/search-services">Search Services hacking guide</a>
+is also available.</p>
+
+
+<a name="11"></a><h2>11. Additional Information</h2>
 
 <a href="<CFG_SITE_URL>/help/hacking/search-engine-internals">WebSearch Internals</a>

@@ -940,6 +940,21 @@ th.youraccountheader a:hover {
    background: #fff;
    padding: 0px;
 }
+.searchservicebox {
+    margin-top: 15px;
+    margin-bottom: 4px;
+    font-size: small;
+}
+.searchservicebox a.searchserviceitem {
+    color: #333;
+}
+.searchservicebox a.searchserviceitem:hover {
+    color: #36c;
+}
+.searchservicebox a.lessserviceitemslink, .searchservicebox a.moreserviceitemslink {
+    font-size: smaller;
+    color: #060;
+}
 a.nearestterms:link {
    color: #603;
    background: transparent;

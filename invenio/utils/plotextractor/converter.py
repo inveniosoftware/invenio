@@ -131,10 +131,10 @@ def check_for_gzip(tfile):
         # we have a gzip!
         # so gzip is retarded and won't accept any file that doesn't end
         # with .gz.  sad.
-        run_shell_command('cp %s %s' % (tfile, tfile + '.tar.gz'))
+        run_shell_command('cp %s %s', (tfile, tfile + '.tar.gz'))
         new_dest = os.path.join(os.path.split(tfile)[0], 'tmp.tar')
-        run_shell_command('touch %s' % (new_dest,))
-        dummy1, cmd_out, cmd_err = run_shell_command('gunzip -c %s' % \
+        run_shell_command('touch %s', (new_dest,))
+        dummy1, cmd_out, cmd_err = run_shell_command('gunzip -c %s',
                                                             (tfile + '.tar.gz',))
         if cmd_err != '':
             write_message('Error while gunzipping ' + tfile)
