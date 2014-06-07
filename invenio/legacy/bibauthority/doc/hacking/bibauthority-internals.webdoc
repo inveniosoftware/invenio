@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -236,19 +236,19 @@ subfield of the same field entry.</P>
 <I>affiliation</I>) are under authority control. In this case we
 would have two '700__0' subfields. Of of them would reference the
 <I>author</I> authority record (for the <I>name</I><SPAN STYLE="font-style: normal">)</SPAN>,
-the other one would reference an <I>institution</I> authority record
+the other one would reference an <I>institute</I> authority record
 (for the <I>affiliation</I><SPAN STYLE="font-style: normal">).
 INVENIO needs some way to know which $0 subfield is associated with
 the $a subfield and which one with the $u subfield.</SPAN></P>
 <P STYLE="font-style: normal">We have chosen to solve this in the
 following way. Every $0 subfield value will not only contain the
 authority record control number, but in addition will be prefixed by
-the type of authority record (e.g. 'AUTHOR', 'INSTITUTION', 'JOURNAL'
+the type of authority record (e.g. 'AUTHOR', 'INSTITUTE', 'JOURNAL'
 or 'SUBJECT), separated from the control number by a separator, e.g. ':' (configurable). A possible
 $0 subfield value could therefore be: “author:(SzGeCERN)abc1234”.
 This will allow INVENIO to know that the $0 subfield containing
 “author:(SzGeCERN)abc1234” is associated with the $a subfield
 (author's name), containing e.g. “Ellis, John”, whereas the $0
-subfield containing “institution:(SzGeCERN)xyz4321” is associated
-with the $u subfield (author's affiliation/institution) of the same
+subfield containing “institute:(SzGeCERN)xyz4321” is associated
+with the $u subfield (author's affiliation/institute) of the same
 field entry, containing e.g. “CERN”.</P>

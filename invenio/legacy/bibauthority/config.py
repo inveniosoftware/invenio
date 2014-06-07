@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD = '035__a'
 
 # Separator to be used in control numbers to separate the authority type
-# PREFIX (e.g. "INSTITUTION") from the control_no (e.g. "(CERN)abc123"
+# PREFIX (e.g. "INSTITUTE") from the control_no (e.g. "(CERN)abc123"
 CFG_BIBAUTHORITY_PREFIX_SEP = '|'
 
 # the ('980__a') string that identifies an authority record
@@ -28,7 +28,7 @@ CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_IDENTIFIER = 'AUTHORITY'
 
 # the name of the authority collection.
 # This is needed for searching within the authority record collection.
-CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME = 'Authority Records'
+CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME = 'Authorities'
 
 # CFG_BIBAUTHORITY_TYPE_NAMES
 # Some administrators may want to be able to change the names used for the
@@ -40,7 +40,7 @@ CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME = 'Authority Records'
 # ... including the 980__a subfields of all authority records
 # ... and the $0 subfields of the bibliographic fields under authority control
 CFG_BIBAUTHORITY_TYPE_NAMES = {
-    'INSTITUTION': 'INSTITUTION',
+    'INSTITUTE': 'INSTITUTE',
     'AUTHOR': 'AUTHOR',
     'JOURNAL': 'JOURNAL',
     'SUBJECT': 'SUBJECT',
@@ -54,13 +54,13 @@ CFG_BIBAUTHORITY_TYPE_NAMES = {
 # to the miscellaneous index on the BibIndex Admin Site
 CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC = {
     '100__a': 'AUTHOR',
-    '100__u': 'INSTITUTION',
-    '110__a': 'INSTITUTION',
+    '100__u': 'INSTITUTE',
+    '110__a': 'INSTITUTE',
     '130__a': 'JOURNAL',
     '150__a': 'SUBJECT',
-    '260__b': 'INSTITUTION',
+    '260__b': 'INSTITUTE',
     '700__a': 'AUTHOR',
-    '700__u': 'INSTITUTION',
+    '700__u': 'INSTITUTE',
 }
 
 # CFG_BIBAUTHORITY_CONTROLLED_FIELDS_AUTHORITY
@@ -69,11 +69,11 @@ CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC = {
 # authority record subfields use the $4 field for the control_no (not $0)
 CFG_BIBAUTHORITY_CONTROLLED_FIELDS_AUTHORITY = {
     '500__a': 'AUTHOR',
-    '510__a': 'INSTITUTION',
+    '510__a': 'INSTITUTE',
     '530__a': 'JOURNAL',
     '550__a': 'SUBJECT',
-    '909C1u': 'INSTITUTION', # used in bfe_affiliation
-    '920__v': 'INSTITUTION', # used by FZ Juelich demo data
+    '909C1u': 'INSTITUTE', # used in bfe_affiliation
+    '920__v': 'INSTITUTE', # used by FZ Juelich demo data
 }
 
 # constants for CFG_BIBEDIT_AUTOSUGGEST_TAGS
@@ -100,8 +100,8 @@ CFG_BIBAUTHORITY_AUTOSUGGEST_CONFIG = {
         'sort_by': CFG_BIBAUTHORITY_AUTOSUGGEST_SORT_POPULAR,
         'disambiguation_fields': ['100__d', '270__m'],
     },
-    'INSTITUTION':{
-        'field': 'authorityinstitution',
+    'INSTITUTE':{
+        'field': 'authorityinstitute',
         'insert_here_field': '110__a',
         'sort_by': CFG_BIBAUTHORITY_AUTOSUGGEST_SORT_ALPHA,
         'disambiguation_fields': ['270__b'],
@@ -130,7 +130,7 @@ CFG_BIBAUTHORITY_AUTHORITY_SUBFIELDS_TO_INDEX = {
         '400__d', #(See From Tracing) (R, NR)
         '400__q', #(See From Tracing) (R, NR)
     ],
-    'INSTITUTION': [
+    'INSTITUTE': [
         '110__a', #(NR, NR)
         '410__a', #(R, NR)
     ],

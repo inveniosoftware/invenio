@@ -35,7 +35,7 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
 
 from invenio.base.globals import cfg
-from invenio.base.i18n import _
+from invenio.base.i18n import _, gettext_set_language
 from invenio.ext.sqlalchemy import db
 
 # Create your models here.
@@ -374,14 +374,56 @@ class Collection(db.Model):
             foreign_keys=lambda: Collectionname.id_collection
             )
 
-    # Gets the translation according to the lang code
     def translation(self, lang):
+        """Get the translation according to the language code."""
         try:
             return db.object_session(self).query(Collectionname).\
                 with_parent(self).filter(db.and_(Collectionname.ln == lang,
                     Collectionname.type == 'ln')).first().value
         except:
             return ""
+
+
+    def get_collectionbox_name(self, ln=None, box_type="r"):
+        """Return collection-specific labelling subtrees.
+
+        - 'Focus on': regular collection
+        - 'Narrow by': virtual collection
+        - 'Latest addition': boxes
+
+        If translation for given language does not exist, use label
+        for CFG_SITE_LANG. If no custom label is defined for
+        CFG_SITE_LANG, return default label for the box.
+
+        :param ln: the language of the label
+        :param box_type: can be 'r' (=Narrow by), 'v' (=Focus on),
+                         'l' (=Latest additions)
+        """
+        if ln is None:
+            ln = g.ln
+        collectionboxnamequery = db.object_session(self).query(
+            Collectionboxname).with_parent(self)
+        try:
+            collectionboxname = collectionboxnamequery.filter(db.and_(
+                Collectionboxname.ln == ln,
+                Collectionboxname.type == box_type,
+            )).one()
+        except:
+            try:
+                collectionboxname = collectionboxnamequery.filter(db.and_(
+                    Collectionboxname.ln == ln,
+                    Collectionboxname.type == box_type,
+                )).one()
+            except:
+                collectionboxname = None
+
+        if collectionboxname is None:
+            # load the right message language
+            _ = gettext_set_language(ln)
+            return _(Collectionboxname.TYPES.get(box_type, ''))
+        else:
+            return collectionboxname.value
+
 
     portal_boxes_ln = db.relationship(
             lambda: CollectionPortalbox,
@@ -459,6 +501,13 @@ class Collectionname(db.Model):
 class Collectionboxname(db.Model):
     """Represents a Collectionboxname record."""
     __tablename__ = 'collectionboxname'
+
+    TYPES = {
+        'v': 'Focus on:',
+        'r': 'Narrow by collection:',
+        'l': 'Latest additions:',
+    }
+
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id),
                               nullable=False, primary_key=True)

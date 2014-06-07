@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,11 +28,11 @@
 <h2><a name="howto-marc">How to MARC authority records</a></h2>
 
 <h3>1. The 980 field</h3>
-<p>When adding an authority record to INVENIO, whether by uploading a MARC record manually or by adding a new record in BibEdit, it is important to add two separate '980' fields to the record. 
-The first field will contain the value “AUTHORITY” in the $a subfield. 
-This is to tell INVENIO that this is an authority record. 
-The second '980' field will likewise contain a value in its $a subfield, only this time you must specify what kind of authority record it is. 
-Typically an author authority record would contain the term “AUTHOR”, an institution would contain “INSTITUTION” etc. 
+<p>When adding an authority record to INVENIO, whether by uploading a MARC record manually or by adding a new record in BibEdit, it is important to add two separate '980' fields to the record.
+The first field will contain the value “AUTHORITY” in the $a subfield.
+This is to tell INVENIO that this is an authority record.
+The second '980' field will likewise contain a value in its $a subfield, only this time you must specify what kind of authority record it is.
+Typically an author authority record would contain the term “AUTHOR”, an institute would contain “INSTITUTE” etc.
 It is important to communicate these exact terms to the INVENIO admin who will configure how INVENIO handles each of these authority record types for the individual INVENIO modules.
 </p>
 
@@ -46,20 +46,20 @@ Cf. <a href="http://www.loc.gov/marc/authority/concise/ad035.html" target="_brie
 
 <h4>3.1 Creating a reference from a bibliographic record</h3>
 <p>Example: You have an article (bibliographic record) with Author "Ellis" in the 100__ $a field and you want to create a reference to the authority record for this author. </p>
-<p>This can be done by inserting the control number of this authority record (as contained in the 035__ $a subfield of the authority record) into the $0 subfield of the same 100__ field of the bibliographic record, prefixed by the type of authority record being referenced and a (configurable) separator. 
+<p>This can be done by inserting the control number of this authority record (as contained in the 035__ $a subfield of the authority record) into the $0 subfield of the same 100__ field of the bibliographic record, prefixed by the type of authority record being referenced and a (configurable) separator.
 </p>
 <p>A 100 field might look like this:</p>
 <pre>
 100__ $a Ellis, J.
       $0 AUTHOR:(CERN)abc123
       $u CERN
-      $0 INSTITUTION:(CERN)xyz789
+      $0 INSTITUTE:(CERN)xyz789
 </pre>
-<p>In this case, since we are referencing an AUTHOR authority record, the 100__ $0 subfield would read, e.g. "AUTHOR:(CERN)abc123". If you want to reference an institution, e.g. SLAC, as affiliation for an author, you would prefix the control number with "INSTITUTION". You would add another 100__ $0 subfield to the same 100 field and add the value "INSTITUTION:(CERN)xyz789".</p>
+<p>In this case, since we are referencing an AUTHOR authority record, the 100__ $0 subfield would read, e.g. "AUTHOR:(CERN)abc123". If you want to reference an institute, e.g. SLAC, as affiliation for an author, you would prefix the control number with "INSTITUTE". You would add another 100__ $0 subfield to the same 100 field and add the value "INSTITUTE:(CERN)xyz789".</p>
 
 <h4>3.2 Creating links between authority records</h3>
-<p>Links between authority records use the 5xx fields. AUTHOR records use the 500 fields, INSTITUTION records the 510 fields and so on, according to the MARC 21 standard.
-</p> 
+<p>Links between authority records use the 5xx fields. AUTHOR records use the 500 fields, INSTITUTE records the 510 fields and so on, according to the MARC 21 standard.
+</p>
 <pre><strong>Subfield codes:</strong></pre>
 <pre>
 $a - Corporate name or jurisdiction name as entry element (NR)
@@ -71,22 +71,22 @@ $w - Control subfield (NR)
      't' - for top / parent
 
 $4 - Relationship code (R)
-     The control number of the referenced authority record, 
+     The control number of the referenced authority record,
      e.g. "(CERN)iii000"
 </pre>
 
-</p><p>Example: You want to add a predecessor to an INSTITUTION authority record. Let's say "Institution A" has control number "(CERN)iii000" and its successor "Institution B" has control number "(CERN)iii001". In order to designate Institution A as predecessor of Institution B, we would add a 510 field to Institution B with a $w value of 'a', a $a value of 'Institution A', and a $4 value of '(CERN)iii000' like this:
+</p><p>Example: You want to add a predecessor to an INSTITUTE authority record. Let's say "Institute A" has control number "(CERN)iii000" and its successor "Institute B" has control number "(CERN)iii001". In order to designate Institute A as predecessor of Institute B, we would add a 510 field to Institute B with a $w value of 'a', a $a value of 'Institute A', and a $4 value of '(CERN)iii000' like this:
 <pre>
-510__ $a Institution A
+510__ $a Institute A
       $w a
-      $4 INSTITUTION:(CERN)iii000
+      $4 INSTITUTE:(CERN)iii000
 </pre>
 
 <h3>4. Other MARC for authority records</h3>
 <p>All other MARC fields should follow the <a href="http://www.loc.gov/marc/authority/" target="_blank">MARC 21 Format for Authority Data</a></p>
 
 <h2>Creating collections of authority records</h2>
-<p>Once the authority records have been given the appropriate '980__a' values (cf. above), creating a collection of authority records is no different from creating any other collection in INVENIO. You can simply define a new collection defined by the usual collection query 'collection:AUTHOR' for author authority records, or 'collection:INSTITUTION' for institutions, etc.</p>
+<p>Once the authority records have been given the appropriate '980__a' values (cf. above), creating a collection of authority records is no different from creating any other collection in INVENIO. You can simply define a new collection defined by the usual collection query 'collection:AUTHOR' for author authority records, or 'collection:INSTITUTE' for institutes, etc.</p>
 <p>The recommended way of creating collections for authority records is to create a “virtual collection” for the main 'collection:AUTHORITY' collection and then add the individual authority record collections as regular children of this collection. This will allow you to browse and search within authority records without making this the default for all INVENIO searches.</p>
 
 <h2>How to use authority control in BibEdit</h2>
@@ -95,5 +95,5 @@ $4 - Relationship code (R)
 <img src="<CFG_SITE_URL>/img/admin/howto-authority-1.png" alt="autosuggest dropdown" border="0" />
 <p>Typing “Elli” into the 100__ $a subfield will present you with a list of authors that contain a word starting with “Elli” somewhere in their name. In case there are multiple authors with similar or identical names (as is the case in the example shown here), you will receive additional information about these authors to help you disambiguate. The fields to be used for disambiguation can be configured by your INVENIO administrator. If such fields have not been configured, or if they are not sufficient for disambiguation, the authority record control number will be used to assure a unique value for each entry in the drop-down list. In the example above, the first author can be uniquely identified by his email address, whereas for the latter we have only the authority record control number as uniquely identifying characteristic.</p>
 <img src="<CFG_SITE_URL>/img/admin/howto-authority-2.png" alt="inserted $0 subfield for authority record" border="0" />
-<p>If in the shown example you click on the first author from the list, this author's name will automatically be inserted into the 100__ $a subfield you were editing, while the authority type and the authority record control number “author:(SzGeCERN)abc123” , is inserted into a new $0 subfield (cf. Illustration 2). This new subfield tells INVENIO that “Ellis, John” is associated with the 'author' authority record containing the authority record control number “(SzGeCERN)abc123”. In this example you can also see that the author's affiliation has been entered in the same way as well, using the auto-complete option for the 100__ $u subfield. In this case the author's affiliation is the “University of Oxford”, which is associated in this INVENIO installation with the 'institution' authority record containing the authority record control number “(SzGeCERN)inst0001”.</p>
+<p>If in the shown example you click on the first author from the list, this author's name will automatically be inserted into the 100__ $a subfield you were editing, while the authority type and the authority record control number “author:(SzGeCERN)abc123” , is inserted into a new $0 subfield (cf. Illustration 2). This new subfield tells INVENIO that “Ellis, John” is associated with the 'author' authority record containing the authority record control number “(SzGeCERN)abc123”. In this example you can also see that the author's affiliation has been entered in the same way as well, using the auto-complete option for the 100__ $u subfield. In this case the author's affiliation is the “University of Oxford”, which is associated in this INVENIO installation with the 'institute' authority record containing the authority record control number “(SzGeCERN)inst0001”.</p>
 <p>If INVENIO has no authority record data to match what you type into the authority-controlled subfield, you still have the possibility to enter a value manually.</p>

@@ -198,7 +198,7 @@ class FieldData(DataSet):
         name = u'authority author'
 
     class Field_34:
-        code = u'authorityinstitution'
+        code = u'authorityinstitute'
         id = 34
         name = u'authority institution'
 
@@ -1308,7 +1308,7 @@ class TagData(DataSet):
     class Tag_217:
         id = 217
         value = u'110__0'
-        name = u'institution control'
+        name = u'institute control'
 
     class Tag_218:
         id = 218
@@ -1323,7 +1323,7 @@ class TagData(DataSet):
     class Tag_220:
         id = 220
         value = u'260__0'
-        name = u'additional institution control'
+        name = u'additional institute control'
 
     class Tag_221:
         id = 221

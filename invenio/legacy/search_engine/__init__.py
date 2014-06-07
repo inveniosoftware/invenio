@@ -4936,9 +4936,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
 
     elif format == "hm":
         if record_exist_p == -1:
-            out += "\n<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"], can_see_hidden)) + "</pre>"
+            out += "\n<pre style=\"margin: 1em 0px;\">" + cgi.escape(get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"], can_see_hidden)) + "</pre>"
         else:
-            out += "\n<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot, can_see_hidden)) + "</pre>"
+            out += "\n<pre style=\"margin: 1em 0px;\">" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot, can_see_hidden)) + "</pre>"
 
     elif format.startswith("h") and ot:
         ## user directly asked for some tags to be displayed only

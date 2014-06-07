@@ -60,7 +60,7 @@ modules/bibformat/lib/bibformatadminlib.py
 modules/bibformat/lib/elements/bfe_aid_authors.py
 modules/bibformat/lib/elements/bfe_authority_author.py
 modules/bibformat/lib/elements/bfe_authority_control_no.py
-modules/bibformat/lib/elements/bfe_authority_institution.py
+modules/bibformat/lib/elements/bfe_authority_institute.py
 modules/bibformat/lib/elements/bfe_authority_journal.py
 modules/bibformat/lib/elements/bfe_authority_subject.py
 modules/bibformat/lib/elements/bfe_authors.py

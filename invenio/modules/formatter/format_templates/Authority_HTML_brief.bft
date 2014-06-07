@@ -2,6 +2,6 @@
 <description>Brief Authority HTML format.</description>
 
 <BFE_AUTHORITY_AUTHOR detail="no"/>
-<BFE_AUTHORITY_INSTITUTION detail="no"/>
+<BFE_AUTHORITY_INSTITUTE detail="no"/>
 <BFE_AUTHORITY_JOURNAL detail="no"/>
 <BFE_AUTHORITY_SUBJECT detail="no"/>
