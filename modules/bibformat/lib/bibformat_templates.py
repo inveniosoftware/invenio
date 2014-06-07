@@ -69,11 +69,11 @@ class Template(object):
             <a href="%(siteurl)s/youraccount/login?referer=%(siteurl)s/admin/bibformat/bibformatadmin.py">login</a> to enter.
          ''' % {'siteurl': CFG_SITE_URL}
 
-        out += '''
+        out += ('''
         </p>
         <dl>
         <dt><a href="%(siteurl)s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%(ln)s">Manage Format Templates</a></dt>
-        <dd>Define how to format a record.</dd>
+        <dd>'''+_("Define how to format a record.")+'''</dd>
         </dl>
         <dl>
         <dt><a href="%(siteurl)s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%(ln)s">Manage Output Formats</a></dt>
@@ -88,7 +88,7 @@ class Template(object):
         <dt><a href="%(siteurl)s/help/admin/bibformat-admin-guide">BibFormat Admin Guide</a></dt>
         <dd>Documentation about BibFormat administration</dd>
         </dl>
-        '''% {'siteurl': CFG_SITE_URL, 'ln': ln}
+        ''') % {'siteurl': CFG_SITE_URL, 'ln': ln}
 
         return out
 
