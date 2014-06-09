@@ -26,6 +26,13 @@ to the source, and happy hacking!
 
 .. _api-reference:
 
+Admins's Guide
+==============
+
+.. toctree::
+
+   admin/index
+
 API Reference
 =============
 
