@@ -35,10 +35,6 @@ OAUTH2_CLIENT_SECRET_SALT_LEN = 60
 OAUTH2_TOKEN_PERSONAL_SALT_LEN = 60
 """ Length of the personal access token """
 
-OAUTH2_DEFAULT_SCOPES = {
-    'user:email': 'Read access to user email only.',
-}
-
 OAUTH2_ALLOWED_GRANT_TYPES = [
     'authorization_code', 'client_credentials', 'refresh_token'
 ]

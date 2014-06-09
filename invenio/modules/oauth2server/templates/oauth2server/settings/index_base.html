@@ -60,7 +60,7 @@
 <ul class="list-group">
     {%- for t in tokens %}
     <li class="list-group-item">
-    <a href="{{url_for('.token_view', token_id=t.id)}}">{{t.client.name}}</a><br/><small class="text-muted">{{t.client.description}}</small>
+    <a href="{{url_for('.token_view', token_id=t.id)}}">{{t.client.name}}</a>{% if t.scopes %} &mdash; <small class="text-muted">{% for s in t.get_visible_scopes() %}{{ s }}{% if not loop.last%}, {% endif%}{% endfor %}</small>{% endif %}<br/><small class="text-muted">{{t.client.description}}</small>
     </li>
     {%- endfor %}
 </ul>

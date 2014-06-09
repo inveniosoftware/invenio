@@ -23,14 +23,13 @@ from flask import current_app
 from flask.ext.login import current_user
 from werkzeug.security import gen_salt
 from wtforms import validators
-from wtforms import widgets
 from sqlalchemy_utils import URLType
 
 from invenio.ext.sqlalchemy import db
 from invenio.ext.login.legacy_user import UserInfo
 
 
-class OAuthUserProxy():
+class OAuthUserProxy(object):
     """
     Proxy object to an Invenio User
     """
@@ -57,6 +56,14 @@ class OAuthUserProxy():
     @classmethod
     def get_current_user(cls):
         return cls(current_user._get_current_object())
+
+
+class Scope(object):
+    def __init__(self, id_, help_text='', group='', internal=False):
+        self.id = id_
+        self.group = group
+        self.help_text = help_text
+        self.is_internal = internal
 
 
 class Client(db.Model):
@@ -245,6 +252,18 @@ class Token(db.Model):
         if self._scopes:
             return self._scopes.split()
         return []
+
+    @scopes.setter
+    def scopes(self, scopes):
+        self._scopes = " ".join(scopes) if scopes else ""
+
+    def scopes_ordered(self, scopes):
+        self._scopes = " ".join(scopes) if scopes else ""
+
+    def get_visible_scopes(self):
+        """ Get list of non-internal scopes for token. """
+        from .registry import scopes as scopes_registry
+        return [k for k, s in scopes_registry.choices() if k in self.scopes]
 
     @classmethod
     def create_personal(cls, name, user_id, scopes=None, is_internal=False):
