@@ -1037,7 +1037,10 @@ def get_cache_last_updated_timestamp():
         return "1970-01-01 00:00:00"
     timestamp = f.read()
     f.close()
-    return timestamp
+
+    # Remove trailing newlines and whitespace.
+    timestamp = timestamp.strip()
+    return timestamp or "1970-01-01 00:00:00"
 
 def set_cache_last_updated_timestamp(timestamp):
     """Set last updated cache timestamp to TIMESTAMP."""
