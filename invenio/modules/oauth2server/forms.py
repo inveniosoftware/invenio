@@ -27,6 +27,45 @@ from .models import Client
 ModelForm = model_form_factory(InvenioBaseForm)
 
 
+#
+# Widget
+#
+def scopes_multi_checkbox(field, **kwargs):
+    """ Render multi checkbox widget. """
+    kwargs.setdefault('type', 'checkbox')
+    field_id = kwargs.pop('id', field.id)
+
+    html = ['<div class="row">']
+
+    for value, label, checked in field.iter_choices():
+        choice_id = u'%s-%s' % (field_id, value)
+
+        options = dict(
+            kwargs,
+            name=field.name,
+            value=value,
+            id=choice_id,
+            class_=' ',
+        )
+
+        if checked:
+            options['checked'] = 'checked'
+
+        html.append(u'<div class="col-md-3">')
+        html.append(u'<label for="%s" class="checkbox-inline">' % field_id)
+        html.append(u'<input %s /> ' % widgets.html_params(**options))
+        html.append("%s <br/><small class='text-muted'>%s</small>" % (
+            value, label.help_text)
+        )
+        html.append(u'</label></div>')
+    html.append(u'</div>')
+
+    return u''.join(html)
+
+
+#
+# Forms
+#
 class ClientForm(ModelForm):
     class Meta:
         model = Client
@@ -47,4 +86,10 @@ class TokenForm(InvenioBaseForm):
         description="Name of personal access token.",
         validators=[validators.Required()],
     )
-    #scopes = fields.SelectMultipleField()
+    scopes = fields.SelectMultipleField(
+        widget=scopes_multi_checkbox,
+        choices=[],  # Must be dynamically provided in view.
+        description="Scopes assigns permissions to your personal access token."
+                    " A personal access token works just like a normal OAuth "
+                    " access token for authentication against the API."
+    )

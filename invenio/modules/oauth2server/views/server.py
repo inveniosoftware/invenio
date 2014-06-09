@@ -31,7 +31,6 @@ from invenio.ext.login import login_user
 
 from ..provider import oauth2
 from ..models import Client, OAuthUserProxy
-from ..registry import scopes
 
 
 blueprint = Blueprint(
@@ -48,11 +47,6 @@ def setup_app():
     """Setup OAuth2 provider."""
     # Initialize OAuth2 provider
     oauth2.init_app(current_app)
-
-    # Register default scopes (note, each module will)
-    for scope, options in current_app.config['OAUTH2_DEFAULT_SCOPES'].items():
-        if scope not in scopes:
-            scopes.register(scope, options)
 
     # Configures the OAuth2 provider to use the SQLALchemy models for getters
     # and setters for user, client and tokens.

@@ -27,6 +27,8 @@ from werkzeug.utils import secure_filename
 
 from invenio.ext.restful import require_api_auth, error_codes, \
     require_oauth_scopes, require_header
+from invenio.modules.oauth2server.registry import scopes
+from invenio.modules.oauth2server.models import Scope
 from invenio.modules.deposit.models import Deposition, \
     DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
     DraftDoesNotExists, FormDoesNotExists, DepositionNotDeletable, \
@@ -617,3 +619,16 @@ def setup_app(app, api):
         DepositionFileResource,
         '/api/deposit/depositions/<string:resource_id>/files/<string:file_id>',
     )
+
+    # Register scopes
+    with app.app_context():
+        scopes.register(Scope(
+            'deposit:write',
+            group='Deposit',
+            help_text='Allow upload (but not publishing).',
+        ))
+        scopes.register(Scope(
+            'deposit:actions',
+            group='Deposit',
+            help_text='Allow publishing of uploads.',
+        ))
