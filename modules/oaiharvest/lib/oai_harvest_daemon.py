@@ -267,7 +267,7 @@ def task_run_core():
             write_message("An error occurred, but task is configured to continue")
             if CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN:
                 try:
-                    raise InvenioOAIHarvestWarning("OAIHarvest (task #%s) failed at fully harvesting source(s) %s. BibSched has NOT been stopped, and OAIHarvest will try to recover at next run" % (task_get_task_param("task_id"), ", ".join([repo[0][6] for repo in reposlist]),))
+                    raise InvenioOAIHarvestWarning("OAIHarvest (task #%s) failed at fully harvesting source(s) %s. BibSched has NOT been stopped, and OAIHarvest will try to recover at next run" % (task_get_task_param("task_id"), ", ".join([repo['name'] for repo in reposlist]),))
                 except InvenioOAIHarvestWarning:
                     register_exception(stream='warning', alert_admin=True)
             return True
