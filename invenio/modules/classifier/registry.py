@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Classifier registries."""
+
 import os
 
 from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
@@ -34,3 +36,16 @@ taxonomies_proxy = RegistryProxy('classifierext.taxonomies',
 
 taxonomies = LazyDict(lambda: dict((os.path.basename(f), f)
                       for f in taxonomies_proxy))
+
+kb = LazyDict(lambda: dict((os.path.basename(f), f)
+              for f in RegistryProxy('converterext.kb',
+                                     PkgResourcesDirDiscoveryRegistry,
+                                     'kb', registry_namespace=classifierext)))
+
+templates = LazyDict(lambda: dict((os.path.basename(f), f)
+                     for f in RegistryProxy('converterext.templates',
+                                            PkgResourcesDirDiscoveryRegistry,
+                                            'templates',
+                                            registry_namespace=classifierext)))
+
+__all__ = ('classfierext', 'taxonomies_proxy', 'taxonomies', 'kb', 'templates')

@@ -17,23 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import os
+"""Classifier module."""
 
-from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
-    ModuleAutoDiscoveryRegistry, RegistryProxy
-from invenio.utils.datastructures import LazyDict
+from .registry import kb, templates, taxonomies
 
-classifierext = RegistryProxy(
-    'classifierext', ModuleAutoDiscoveryRegistry, 'classifierext'
-)
-
-kb = LazyDict(lambda: dict((os.path.basename(f), f)
-              for f in RegistryProxy('converterext.kb',
-                                     PkgResourcesDirDiscoveryRegistry,
-                                     'kb', registry_namespace=classifierext)))
-
-templates = LazyDict(lambda: dict((os.path.basename(f), f)
-                     for f in RegistryProxy('converterext.templates',
-                                            PkgResourcesDirDiscoveryRegistry,
-                                            'templates',
-                                            registry_namespace=classifierext)))
+__all__ = ('kb', 'templates', 'taxonomies')
