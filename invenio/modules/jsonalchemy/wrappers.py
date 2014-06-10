@@ -403,7 +403,7 @@ class SmartJson(SmartDict):
         See: (Cerberus)[http://cerberus.readthedocs.org/en/latest].
 
         :param validator: Validator to be used, if `None`
-            :class:`~.validator:Validator`
+            :class:`~.validator.Validator`
         """
         if validator is None:
             from .validator import Validator as validator

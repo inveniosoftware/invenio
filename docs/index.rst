@@ -11,7 +11,7 @@ Invenio documentation
 
 Welcome to Invenio's documentation.  This documentation is divided into
 different parts.  We recommend that you get started with
-:ref:`installation` and then head over to the :ref:`quickstart`.
+:ref:`first-steps` and then head over to the :ref:`quickstart`.
 Besides the quickstart, there is also a more detailed :ref:`tutorial` that
 shows how to create a complete application with Invenio.  If
 you'd rather dive into the internals of Invenio, check out

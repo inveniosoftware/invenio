@@ -81,8 +81,8 @@ def read_requirements(filename='requirements.txt'):
     dep = []
     with open(filename, 'r') as f:
         for line in f.readlines():
-            line = line.strip('\n')
-            if line.startswith('#'):
+            line = line.strip()
+            if re.match('^(?:#|-r )', line):
                 continue
             if '://' in line:
                 dep.append(str(line))

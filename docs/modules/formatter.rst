@@ -1,5 +1,10 @@
+.. _formatter:
+
 Formatter
 =========
 
-.. automodule:: invenio.modules.formatter
-   :members:
+..
+    Documentation is broken, please fix it.
+
+    .. automodule:: invenio.modules.formatter
+       :members:

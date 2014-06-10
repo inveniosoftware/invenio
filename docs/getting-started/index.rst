@@ -8,6 +8,7 @@ Getting Started
     :maxdepth: 2
 
     introduction
+    quickstart
     demo
     features
     first-steps

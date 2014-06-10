@@ -1,5 +1,10 @@
+.. _api-keys:
+
 API Keys
 ========
 
-.. automodule:: invenio.modules.apikeys
-   :members:
+..
+    Documentation is broken, please fix it.
+
+    .. automodule:: invenio.modules.apikeys
+       :members:

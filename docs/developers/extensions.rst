@@ -50,7 +50,9 @@ First we create the following folder structure::
 
 Here's the contents of the most important files:
 
-* ``__init__.py`` contains :func:`~invenio.ext.login.setup_app` function::
+* ``__init__.py`` contains :py:func:`~invenio.ext.login.setup_app` function:
+
+.. code-block:: python
 
     from .legacy_user import UserInfo
 
@@ -73,12 +75,15 @@ Here's the contents of the most important files:
 
         return app
 
-* ``legacy_user.py`` contains implementation ``UserMixin`` object::
+* ``legacy_user.py`` contains implementation ``UserMixin`` object:
+
+.. code-block:: python
 
     from flask.ext.login import UserMixin
     from werkzeug.datastructures import CallbackDict, CombinedMultiDict
 
     class UserInfo(CombinedMultiDict, UserMixin):
+
         """
         This provides legacy implementations for the methods that Flask-Login
         and Invenio 1.x expects user objects to have.

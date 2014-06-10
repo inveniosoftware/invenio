@@ -17,6 +17,7 @@ Extensions
    ext/assets
    ext/arxiv
    ext/elasticsearch
+   ext/login
    ext/sqlalchemy
 
 Modules
@@ -33,6 +34,7 @@ Modules
    modules/tags
    modules/upgrader
    modules/workflows
+
 
 Legacy
 ------

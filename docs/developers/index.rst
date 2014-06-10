@@ -16,5 +16,7 @@ Developer's Guide
    howtomodulepart2
    howtomodulepart3
    templates
+   tutorial
    git-workflow
    kwalitee
+   patterns

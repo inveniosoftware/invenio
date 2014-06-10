@@ -42,17 +42,15 @@ install:
   - "sudo mkdir /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/apache2/ssl/apache.pem"
   - "travis_retry pip install . --process-dependency-links --allow-all-external --quiet"
-  - "travis_retry pip install -r requirements-mongo.txt --allow-all-external --quiet"
-  - "travis_retry pip install -r requirements-img.txt --quiet"
-  - "travis_retry pip install -r requirements-extras.txt --quiet"
+  - "travis_retry pip install -r requirements-docs.txt --allow-all-external --quiet"
   - "pybabel compile -f -d invenio/base/translations/"
   - "inveniomanage config create secret-key"
   - "inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail"
   - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
   - "inveniomanage config set PACKAGES_EXCLUDE []"  # test all packages
-  - "inveniomanage config set CFG_TMPDIR /tmp"  # test all packages
-  - "sudo su -c \"npm install -g bower grunt-cli\""
-  - "npm install"
+  - "inveniomanage config set CFG_TMPDIR /tmp"
+  - "sudo su -c \"npm install --silent -g bower grunt-cli\""
+  - "npm install --silent"
   - "inveniomanage config set CLEANCSS_BIN `find $PWD/node_modules -iname \"cleancss\" | grep \"\\.bin\" | head -1`"
   - "inveniomanage config set LESS_BIN `find $PWD/node_modules -iname \"lessc\" | grep \"\\.bin\" | head -1`"
   - "bower install"
@@ -75,5 +73,5 @@ before_script:
 #  - "inveniomanage demosite populate"
 
 script:
-  - "python setup.py test"
+  - "python setup.py test && sphinx-build -qnNW docs docs/_build/html"
 #  - "wget -O /dev/null http://localhost"

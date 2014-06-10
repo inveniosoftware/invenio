@@ -19,10 +19,11 @@ Views
 Flask uses a concept of *blueprints* for making application components and
 supporting common patterns within an application or across applications.
 Blueprints can greatly simplify how large applications work and provide a
-central means for Flask extensions to register operations on applications.
-A :class:`Blueprint` object works similarly to a :class:`Flask`
-application object, but it is not actually an application.  Rather it is a
-*blueprint* of how to construct or extend an application.
+central means for Flask extensions to register operations on applications. A
+:py:class:`~flask.Blueprint` object works similarly to a
+:py:class:`~flask.Flask` application object, but it is not actually an
+application.  Rather it is a *blueprint* of how to construct or extend an
+application.
 
 Blueprints in Flask are intended for these cases:
 

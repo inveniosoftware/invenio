@@ -37,7 +37,8 @@ import os
 import sys
 
 requirements = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            "requirements.txt")
+                            os.pardir,
+                            "requirements-docs.txt")
 _html_theme = open(requirements, "r").readline().strip()
 _html_theme_path = []
 try:
@@ -58,9 +59,11 @@ sys.path.append(os.path.abspath('_themes'))
 #sys.path.append(os.path.abspath('.'))
 sys.path.append(os.path.abspath('../invenio'))
 
+
 def setup(app):
     """Custom application tweaks."""
     app.add_stylesheet("theme_overrides.css")
+
 
 # -- General configuration ----------------------------------------------------
 
@@ -309,4 +312,6 @@ intersphinx_mapping = {
     'flaskassets': ('http://flask-assets.readthedocs.org/en/latest/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/latest/', None),
     'jinja': ('http://jinja.pocoo.org/docs/', None),
+    # FIXME not readable due to ValueError: unknown or unsupported inv version
+    #'flasklogin': ('http://flask-login.readthedocs.org/en/latest/')
 }
