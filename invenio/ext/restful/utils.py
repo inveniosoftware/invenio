@@ -17,20 +17,24 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""A class to test Restful APIs."""
+
 import json
+import six
+import warnings
 from flask import url_for
 from invenio.testsuite import InvenioTestCase
-from invenio.ext.sqlalchemy import db
 
 
 class APITestCase(InvenioTestCase):
-    """
-    API unit test base class
-    """
+
+    """API unit test base class."""
+
     apikey = None
-    accesstoken = None
+    accesstoken = dict()
 
     def create_api_key(self, user_id):
+        """Create api-key."""
         from invenio.modules.apikeys import create_new_web_api_key, \
             get_available_web_api_keys
 
@@ -42,12 +46,10 @@ class APITestCase(InvenioTestCase):
         self.apikey = keys[0].id
 
     def create_oauth_token(self, user_id, scopes, is_internal=True):
-        """
-        Create an OAuth personal access_token
-        """
+        """Create an OAuth personal access_token."""
         # Create a personal access token as well.
         from invenio.modules.oauth2server.models import Token
-        self.accesstoken = Token.create_personal(
+        self.accesstoken[user_id] = Token.create_personal(
             'test-personal-%s' % user_id,
             user_id,
             scopes=scopes,
@@ -55,14 +57,19 @@ class APITestCase(InvenioTestCase):
         ).access_token
 
     def remove_oauth_token(self):
-        if self.accesstoken:
-            from invenio.modules.oauth2server.models import Token
-            t = Token.query.filter_by(access_token=self.accesstoken).first()
+        """Remove oauth tokens."""
+        from invenio.ext.sqlalchemy import db
+        for t in six.itervalues(self.accesstoken):
             if t:
-                db.session.delete(t)
-                db.session.commit()
+                from invenio.modules.oauth2server.models import Token
+                t = Token.query.filter_by(access_token=t).first()
+                if t:
+                    db.session.delete(t)
+                    db.session.commit()
 
     def remove_api_key(self):
+        """Remove api key."""
+        from invenio.ext.sqlalchemy import db
         if self.apikey:
             from invenio.modules.apikeys.models import WebAPIKey
             k = WebAPIKey.filter_by(id=self.apikey).first()
@@ -71,43 +78,41 @@ class APITestCase(InvenioTestCase):
                 db.session.commit()
 
     def get(self, *args, **kwargs):
-        """ See ``APITestCase.make_request()'' """
+        """See APITestCase.make_request()."""
         return self.make_request(self.client.get, *args, **kwargs)
 
     def head(self, *args, **kwargs):
-        """ See ``APITestCase.make_request()'' """
+        """See APITestCase.make_request()."""
         return self.make_request(self.client.head, *args, **kwargs)
 
     def patch(self, *args, **kwargs):
-        """ See ``APITestCase.make_request()'' """
+        """See APITestCase.make_request()."""
         return self.make_request(self.client.patch, *args, **kwargs)
 
     def options(self, *args, **kwargs):
-        """ See ``APITestCase.make_request()'' """
+        """See APITestCase.make_request()."""
         return self.make_request(self.client.options, *args, **kwargs)
 
     def post(self, *args, **kwargs):
-        """ See ``APITestCase.make_request()'' """
+        """See APITestCase.make_request()."""
         return self.make_request(self.client.post, *args, **kwargs)
 
     def put(self, *args, **kwargs):
-        """ See ``APITestCase.make_request()'' """
+        """See APITestCase.make_request()."""
         return self.make_request(self.client.put, *args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        """ See ``APITestCase.make_request()'' """
+        """See APITestCase.make_request()."""
         return self.make_request(self.client.delete, *args, **kwargs)
 
     def make_request(self, client_func, endpoint, urlargs={}, data=None,
                      is_json=True, code=None, headers=None,
-                     follow_redirects=False):
-        """
-        Make a request to the API endpoint.
+                     follow_redirects=False, user_id=None):
+        """Make a request to the API endpoint.
 
         Ensures request looks like they arrive on CFG_SITE_SECURE_URL.
-
-        Athat header "Contet-Type: application/json" is added if
-
+        That header "Contet-Type: application/json" is added if the parameter
+        is_json is True
 
         :param endpoint: Endpoint passed to url_for.
         :param urlargs: Keyword args passed to url_for
@@ -128,10 +133,16 @@ class APITestCase(InvenioTestCase):
         else:
             request_args = {}
 
+        if user_id is None:
+            tokens = self.accesstoken.values()
+            if len(tokens) > 1:
+                warnings.warn("Please provide a user_id argument.")
+            user_id = tokens[0]
+
         if self.apikey:
             urlargs['apikey'] = self.apikey,
-        elif self.accesstoken:
-            urlargs['access_token'] = self.accesstoken
+        elif user_id in self.accesstoken:
+            urlargs['access_token'] = self.accesstoken[user_id]
 
         url = url_for(endpoint, **urlargs)
         response = client_func(
