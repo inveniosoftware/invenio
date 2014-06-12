@@ -165,8 +165,16 @@ they are not in the environment ``$PATH`` already.
 
 .. code-block:: console
 
+    # Global installation
+    $ sudo su -c "npm install -g less clean-css requirejs uglifyjs"
+
+    or
+    # Local installation
     (invenio)$ inveniomanage config set LESS_BIN `find $PWD/node_modules -iname lessc | head -1`
     (invenio)$ inveniomanage config set CLEANCSS_BIN `find $PWD/node_modules -iname cleancss | head -1`
+    (invenio)$ inveniomanage config set REQUIREJS_BIN `find $PWD/node_modules -iname r.js | head -1`
+    (invenio)$ inveniomanage config set REQUIREJS_CONFIG js/build.js
+    (invenio)$ inveniomanage config set UGLIFYJS_BIN `find $PWD/node_modules -iname uglifyjs | head -1`
 
 Invenio comes with default demo site configuration examples that you can use
 for quick start.

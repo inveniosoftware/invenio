@@ -435,8 +435,9 @@
 
 {% macro search_form_javascript(collection) %}{% block search_form_javascript %}
   <script>
-  $(function () {
+require(["jquery", "typeahead"], function($){
 
+  $(function () {
     $("form[name=search]").submit(function() {
       $('.add_to_search-form').remove();
       return true; // ensure form still submits
@@ -752,5 +753,6 @@
     // ---------------------------------------------------------------
 
   });
+});
  </script>
 {% endblock search_form_javascript %}{% endmacro %}

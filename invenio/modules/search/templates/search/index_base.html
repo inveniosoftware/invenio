@@ -175,8 +175,9 @@ search_also, with context -%}
 {% block javascript %}
   {{ super() }}
   <script>
-  (function($) {
+{# FIXME: No inline JavaScript! #}
+    require(['jquery', 'bootstrap/tooltip'], function($) {
     $('[rel=tooltip]').tooltip();
-  })(jQuery);
+  });
   </script>
 {% endblock %}

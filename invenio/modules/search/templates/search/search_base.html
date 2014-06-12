@@ -115,7 +115,8 @@
   {{ super() }}
   {% if recids|length %}
     <script>
-    (function($) {
+{# FIXME: No inline JavaScript! #}
+    require(['jquery', 'bootstrap'], function($, _bootstrap) {
 
       var popupTimer // global popup timer
 
@@ -424,8 +425,7 @@
         $('#facet_list').data('facet').filter = filter || []
       }
 
-    })(jQuery);
-
+    });
     </script>
   {% endif %}
 {% endblock %}

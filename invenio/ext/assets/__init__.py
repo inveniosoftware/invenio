@@ -32,31 +32,34 @@ class InvenioResolver(FlaskResolver):
 
     """Custom resource resolver for webassets."""
 
-    def resolve_source(self, item):
+    def resolve_source(self, ctx, item):
         """Return the absolute path of the resource.
 
         .. seealso:: :py:function:`webassets.env.Resolver:resolve_source`
         """
         if not isinstance(item, six.string_types) or is_url(item):
             return item
-        if item.startswith(self.env.url):
-            item = item[len(self.env.url):]
-        return self.search_for_source(item)
+        if item.startswith(ctx.url):
+            item = item[len(ctx.url):]
+        return self.search_for_source(ctx, item)
 
-    def resolve_source_to_url(self, filepath, item):
+    def resolve_source_to_url(self, ctx, filepath, item):
         """Return the url of the resource.
 
         Displaying them as is in debug mode as the webserver knows where to
         search for them.
 
-        .. seealso:: :py:function:`webassets.env.Resolver:resolve_source_to_url`
+        .. seealso::
+
+            :py:function:`webassets.env.Resolver:resolve_source_to_url`
         """
-        if self.env.debug:
+        if ctx.debug:
             return item
-        return super(InvenioResolver, self).resolve_source_to_url(filepath,
+        return super(InvenioResolver, self).resolve_source_to_url(ctx,
+                                                                  filepath,
                                                                   item)
 
-    def search_for_source(self, item):
+    def search_for_source(self, ctx, item):
         """Return absolute path of the resource.
 
         :param item: resource filename
@@ -64,7 +67,7 @@ class InvenioResolver(FlaskResolver):
         .. seealso:: :py:function:`webassets.env.Resolver:search_for_source`
         """
         try:
-            abspath = super(InvenioResolver, self).search_env_directory(item)
+            abspath = super(InvenioResolver, self).search_env_directory(ctx, item)
         except:
             # If a file is missing in production (non-debug mode), we want
             # to not break and will use /dev/null instead. The exception
@@ -83,13 +86,14 @@ Environment.resolver_class = InvenioResolver
 
 def setup_app(app):
     """Initialize Assets extension."""
-    app.config.setdefault("LESS_RUN_IN_DEBUG", False)
     assets = Environment(app)
     assets.url = app.static_url_path + "/"
     assets.directory = app.static_folder
 
     commands = (("LESS_BIN", "lessc"),
-                ("CLEANCSS_BIN", "cleancss"))
+                ("CLEANCSS_BIN", "cleancss"),
+                ("REQUIREJS_BIN", "r.js"),
+                ("UGLIFYJS_BIN", "uglifyjs"))
     import subprocess
     for key, cmd in commands:
         try:
@@ -102,6 +106,8 @@ def setup_app(app):
                              "it via {1}."
                              .format(cmd, key))
             app.config["ASSETS_DEBUG"] = True
+            app.config.setdefault("LESS_RUN_IN_DEBUG", False)
+            app.config.setdefault("REQUIREJS_RUN_IN_DEBUG", False)
             assets.debug = True
 
     def _jinja2_new_bundle(tag, collection, name=None, filters=None):
@@ -117,9 +123,18 @@ def setup_app(app):
             # If LESS_RUN_IN_DEBUG is set to False, then the filters are
             # removed and each less file will be parsed by the less JavaScript
             # library.
-            if assets.debug and not app.config.get("LESS_RUN_IN_DEBUG", True):
+            if tag is "css" and assets.debug and \
+                    not app.config.get("LESS_RUN_IN_DEBUG", True):
                 kwargs["extra"]["rel"] = "stylesheet/less"
                 kwargs["filters"] = None
+            # If REQUIREJS_RUN_IN_DEBUG is set to False, then the filters are
+            # removed and dependencies will be loaded via require.js
+            if tag is "js" and filters and "requirejs" in filters:
+                if not assets.debug or \
+                        app.config.get("REQUIREJS_RUN_IN_DEBUG", True):
+                    collection = [c[1:] for c in collection]
+                else:
+                    kwargs["filters"] = None
 
             return Bundle(*collection, **kwargs)
 
