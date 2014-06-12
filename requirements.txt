@@ -66,9 +66,9 @@ pytz
 #PyLD=0.5.0 + python 2.6 patches
 git+https://github.com/inveniosoftware/pyld.git@python2.6#egg=PyLD-26.0.5.0-dev
 SQLAlchemy-Utils<0.24.0
-wtforms-alchemy==0.12.4
+wtforms-alchemy==0.12.6
 mock==1.0.1
 setuptools>=2.0
 httpretty==0.8.0
 raven==4.2.1
-six==1.6.1
+six>=1.7.2
