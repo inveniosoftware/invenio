@@ -520,11 +520,10 @@ def get_collection_reclist(coll, recreate_cache_if_needed=True):
         reclist = intbitset()
         query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
         res = run_sql(query, (coll, ), 1)
-        if res:
-            try:
-                reclist = intbitset(res[0][1])
-            except IndexError:
-                pass
+        try:
+            reclist = intbitset(res[0][1])
+        except (IndexError, TypeError):
+            pass
         collection_reclist_cache.cache[coll] = reclist
     # finally, return reclist:
     return collection_reclist_cache.cache[coll]
