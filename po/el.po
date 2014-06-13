@@ -28,9 +28,6 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 "X-Generator: Poedit 1.5.4\n"
 
-msgid "Configure BibSort"
-msgstr "Παραμετροποίηση BibSort"
-
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
 #: modules/websearch/doc/search-guide.webdoc:493
@@ -249,6 +246,10 @@ msgstr "θέμα"
 #: modules/websearch/lib/websearch_templates.py:1106
 msgid "Partial phrase:"
 msgstr "Επιμέρους φράση:"
+
+#: modules/bibformat/lib/bibformat_templates.py:76
+msgid "Define how to format a record."
+msgstr "Ορίστε πώς να μορφοποιήσετε μια εγγραφή."
 
 #: modules/websearch/doc/search-guide.webdoc:350
 #: modules/websearch/doc/search-guide.webdoc:385
@@ -1491,6 +1492,10 @@ msgstr "BidFormat Οδηγός για διαχειριστές"
 msgid "Modify Template Attributes"
 msgstr "Τροποποίηση Χαρακτηριστικών Προτύπων"
 
+
+
+
+
 #: modules/bibformat/lib/bibformat_templates.py:319
 #: modules/bibformat/lib/bibformat_templates.py:432
 #: modules/bibformat/lib/bibformat_templates.py:584
@@ -2714,17 +2719,11 @@ msgstr "Παραμετροποίηση WebSearch"
 msgid "Configure WebSubmit"
 msgstr "Παραμετροποίηση WebSubmit"
 
-msgid "Configure WebLinkback"
-msgstr "Παραμετροποίηση WebLinkback"
-
 msgid "Run Author List Manager"
 msgstr "Εκτέλεση Διαχειριστή Λίστας Συγγραφέων"
 
 msgid "Run Info Space Manager"
 msgstr "Εκτέλεση Διαχειριστή Info Space "
-
-msgid "Configure BibSort"
-msgstr "Παραμετροποίηση BibSort"
 
 #: modules/webaccess/lib/access_control_config.py:315
 #: modules/websession/lib/websession_templates.py:1117
@@ -10972,204 +10971,8 @@ msgstr "Αρ. Αντιτύπων"
 msgid "Search user by"
 msgstr "Αναζήτηση προμηθευτή με"
 
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2279
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9725
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10212
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15294
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17176
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17654
-msgid "Select user"
-msgstr "Επιλογή χρήστη"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2304
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2417
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2661
-#: modules/bibcirculation/lib/bibcirculation_templates.py:4393
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5554
-#: modules/bibcirculation/lib/bibcirculation_templates.py:8979
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9112
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11104
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15345
-msgid "CCID"
-msgstr ""
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2321
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2502
-msgid "User information"
-msgstr "Πληροφορίες χρήστη"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2391
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2508
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2740
-#: modules/bibcirculation/lib/bibcirculation_templates.py:3943
-#: modules/bibcirculation/lib/bibcirculation_templates.py:4046
-#: modules/bibcirculation/lib/bibcirculation_templates.py:4269
-#: modules/bibcirculation/lib/bibcirculation_templates.py:4330
-#: modules/bibcirculation/lib/bibcirculation_templates.py:4458
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5606
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6187
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6236
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6537
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6597
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6701
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6930
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7029
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9029
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9274
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9883
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10361
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11225
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14071
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14142
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14391
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14462
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14716
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15519
-msgid "Phone"
-msgstr "Τηλέφωνο"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2392
-msgid "Barcode(s)"
-msgstr "Barcode(s)"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2393
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2573
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6191
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6278
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6539
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6629
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6962
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7032
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7179
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7726
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7817
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8395
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9946
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10430
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10669
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10822
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11238
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11436
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12703
-#: modules/bibcirculation/lib/bibcirculation_templates.py:13518
-#: modules/bibcirculation/lib/bibcirculation_templates.py:13775
-#: modules/bibcirculation/lib/bibcirculation_templates.py:13957
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14072
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14393
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14464
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15015
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15532
-#: modules/bibcirculation/lib/bibcirculation_templates.py:16925
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17387
-msgid "Continue"
-msgstr "Συνέχεια"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2509
-msgid "List of borrowed books"
-msgstr "Λίστα δανεισμένων βιβλίων"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2513
-msgid "Write note(s)"
-msgstr "Γράψτε μια σημείωση"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2639
-msgid "Notification has been sent!"
-msgstr "Η ενημέρωση έχει σταλεί!"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2742
-#: modules/bibcirculation/lib/bibcirculation_templates.py:3095
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7151
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7429
-#: modules/bibcirculation/lib/bibcirculation_templates.py:8081
-#: modules/bibcirculation/lib/bibcirculation_templates.py:8238
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9596
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9835
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10071
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10314
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10523
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10749
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11208
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11351
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11856
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11951
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12064
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12152
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12833
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12935
-#: modules/bibcirculation/lib/bibcirculation_templates.py:13606
-#: modules/bibcirculation/lib/bibcirculation_templates.py:13868
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14921
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15144
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15420
-#: modules/bibcirculation/lib/bibcirculation_templates.py:16840
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17028
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17311
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17509
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17911
-msgid "Author(s)"
-msgstr "Συγγραφέας/εις"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2748
-msgid "Print loan information"
-msgstr "Εκτύπωση πληροφοριών δανεισμού"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2853
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2963
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10917
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11521
-msgid "Option(s)"
-msgstr "Επιλογές"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2889
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2990
-msgid "Cancel hold request"
-msgstr "Ακύρωση αίτησης κράτησης"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:2924
-#: modules/bibcirculation/lib/bibcirculation_templates.py:3479
-#: modules/bibcirculation/lib/bibcirculation_templates.py:3682
-#: modules/bibcirculation/lib/bibcirculation_templates.py:4637
-msgid "There are no requests."
-msgstr "Δεν υπάρχουν αιτήσεις."
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:3093
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7149
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7426
-#: modules/bibcirculation/lib/bibcirculation_templates.py:8078
-#: modules/bibcirculation/lib/bibcirculation_templates.py:8235
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9594
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9833
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10069
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10312
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10519
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10747
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11206
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11347
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11853
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11949
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12061
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12150
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12830
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12933
-#: modules/bibcirculation/lib/bibcirculation_templates.py:13602
-#: modules/bibcirculation/lib/bibcirculation_templates.py:13866
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14864
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15142
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15418
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17025
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17506
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17908
-msgid "Item details"
-msgstr "Λεπτομέρειες τεκμηρίου"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:3100
-msgid "Edit this record"
-msgstr "Επεξεργασία της εγγραφής αυτής"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:3101
-#, fuzzy
-msgid "Book Cover"
-msgstr "Τίτλος βιβλίου"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3102
 msgid "Additional details"
@@ -11479,149 +11282,6 @@ msgstr "δες σημειώσεις"
 msgid "no notes"
 msgstr "δίχως σημειώσεις"
 
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5289
-msgid "CERN Library"
-msgstr "Βιβλιοθήκη του CERN"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5324
-msgid "Message"
-msgstr "Μήνυμα"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5325
-msgid "Choose a template"
-msgstr "Επιλογή προτύπου"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5343
-msgid "Templates"
-msgstr "Πρότυπα"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5344
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5432
-msgid "Overdue letter"
-msgstr "Γράμμα εκπρόθεσμου"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5345
-msgid "Reminder"
-msgstr "Υπενθύμιση"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5346
-msgid "Notification"
-msgstr "Ειδοποίηση"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5348
-msgid "Load"
-msgstr "Φόρτωση"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5367
-msgid "Send"
-msgstr "Αποστολή"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5433
-#: modules/bibcirculation/lib/bibcirculation_templates.py:8854
-msgid "Loan status"
-msgstr "Δανειστική κατάσταση"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5652
-#: modules/bibcirculation/lib/bibcirculation_templates.py:9055
-#: modules/bibcirculation/lib/bibcirculation_templates.py:10428
-msgid "Write notes"
-msgstr "Σύνταξη σημειώσεων"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5713
-msgid "Notes about borrower"
-msgstr "Σημειώσεις σχετικά με τον δανειζόμενο"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5722
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5823
-#: modules/bibcirculation/lib/bibcirculation_templates.py:8732
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11026
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11782
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12760
-#: modules/bibcirculation/lib/bibcirculation_templates.py:13736
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15738
-msgid "[delete]"
-msgstr "[διαγραφή]"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5768
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5870
-#: modules/bibcirculation/lib/bibcirculation_templates.py:8776
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11071
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15785
-msgid "Write new note"
-msgstr "Σύνταξη νέας σημείωσης"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5814
-msgid "Notes about loan"
-msgstr "Σημειώσεις σχετικά με τον δανεισμό"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5990
-msgid "Book Information"
-msgstr "Πληροφορίες Τεκμηρίου"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5994
-msgid "EAN"
-msgstr "ΕΑΝ"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5997
-msgid "Publication date"
-msgstr "Ημ/νία έκδοσης"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5998
-msgid "Publication place"
-msgstr "Τοποθεσία έκδοσης"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:5999
-#: modules/bibcirculation/lib/bibcirculation_templates.py:7155
-#: modules/bibcirculation/lib/bibcirculation_templates.py:11955
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12156
-#: modules/bibcirculation/lib/bibcirculation_templates.py:12939
-#: modules/bibcirculation/lib/bibcirculation_templates.py:14925
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15148
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15424
-#: modules/bibcirculation/lib/bibcirculation_templates.py:16844
-#: modules/bibcirculation/lib/bibcirculation_templates.py:17032
-msgid "Edition"
-msgstr "Έκδοση"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6000
-msgid "Number of pages"
-msgstr "Αριθμός σελίδων"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6001
-msgid "Sub-library"
-msgstr "Υπο-Βιβλιοθήκη"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6002
-msgid "CERN Central Library"
-msgstr "CERN Central Library"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6099
-#, fuzzy
-msgid "Retrieve book information"
-msgstr "Πληροφορίες χρήστη:"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6312
-msgid "A new borrower has been registered."
-msgstr "Έγινε εγγραφή νέου δανειζόμενοι."
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6531
-msgid "Borrower information"
-msgstr "Πληροφορίες δανειζόμενου"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6596
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6698
-msgid "New library information"
-msgstr "Πληροφορίες νέας βιβλιοθήκης"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6739
-msgid "A new library has been registered."
-msgstr "Έγινε εγγραφή νέας βιβλιοθήκης."
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:6775
-#: modules/bibcirculation/lib/bibcirculation_templates.py:8569
-msgid "Search library by"
-msgstr "Αναζήτηση βιβλιοθήκης με"
-
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6927
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7026
 msgid "Library information"
@@ -11630,7 +11290,7 @@ msgstr "Πληροφορίες βιβλιοθήκης"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7071
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14502
 msgid "The information has been updated."
-msgstr "Η πληροδορίες ενημερώθηκαν."
+msgstr "Η πληροφορίες ενημερώθηκαν."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7150
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14920
@@ -14688,3 +14348,4 @@ msgstr "Βήμα 1 - Δημιουργία νέας μεθόδου ταξινόμ
 
 #~ msgid "View all Reported %s"
 #~ msgstr "Επισκόπηση όλων των %s που έχουν αναφερθεί"
+
