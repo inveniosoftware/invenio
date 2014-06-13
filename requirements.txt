@@ -1,74 +1,16 @@
-MySQL-python==1.2.5
-rdflib==2.4.2
-reportlab==2.5
-python-dateutil<=1.9999
-python-magic==0.4.2
-https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP-1.16
-numpy==1.7.0
-lxml==3.1.2
-mechanize==0.2.5
-python-Levenshtein==0.10.2
-http://pybrary.net/pyPdf/pyPdf-1.13.tar.gz#egg=pyPdf-1.13
-PyStemmer==1.3.0
-https://py-editdist.googlecode.com/files/py-editdist-0.3.tar.gz#egg=editdist-0.3
-feedparser==5.1.3
-BeautifulSoup==3.2.1
-beautifulsoup4==4.3.2
-python-twitter==0.8.7
-celery==3.0.17
-msgpack-python==0.3.0
-pyparsing==2.0.1
-git+git://github.com/lnielsen-cern/dictdiffer.git#egg=dictdiffer-0.0.3
-git+git://github.com/romanchyla/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow-1.1.0
-requests==1.2.3
-PyPDF2
-rauth
-unidecode
-https://pyfilesystem.googlecode.com/files/fs-0.4.0.tar.gz#egg=fs-0.4.0
-libmagic==1.0
-Babel==1.3
-git+https://github.com/inveniosoftware/intbitset#egg=intbitset-2.0
-Jinja2==2.7.2
-SQLAlchemy==0.8.3
-Flask==0.10.1
-# Flask-WTF 0.9.5 doesn't support WTForms 2.0 as of yet.
-WTForms>=1.0.5,<2.0
-fixture==1.5
-redis==2.8.0
-unittest2==0.5.1
-git+https://github.com/david-e/flask-admin.git@bootstrap3#egg=Flask-Admin-1.0.7
-Flask-Assets==0.9
-Flask-Babel==0.9
-Flask-Cache==0.12
-Flask-DebugToolbar==0.9.0
-Flask-Email==1.4.4
-Flask-Gravatar==0.4.0
-Flask-Login==0.2.7
-Flask-Principal==0.4.0
-Flask-RESTful==0.2.12
-Flask-OAuthlib==0.4.3
-#Flask-SQLAlchemy==1.0
-git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy-1.99
-git+https://github.com/inveniosoftware/flask-menu.git#egg=Flask-Menu-0.1
-git+https://github.com/inveniosoftware/flask-breadcrumbs.git#egg=Flask-Breadcrumbs-0.1
-git+https://github.com/inveniosoftware/flask-registry.git#egg=Flask-Registry-0.1
-Flask-Script>=2.0.3
-#Flask-Testing==0.4
-https://github.com/jarus/flask-testing/zipball/master#egg=Flask-Testing-0.4.1
-Flask-WTF==0.9.5
-Cerberus==0.5
-#Flask-Collect>=0.2.2
-git+https://github.com/greut/Flask-Collect.git@setup-py-fix#egg=Flask-Collect-0.2.3-dev
-Sphinx
-alembic==0.6.2
-git+https://github.com/lnielsen-cern/setuptools-bower.git#egg=setuptools-bower-0.1
-pytz
-#PyLD=0.5.0 + python 2.6 patches
-git+https://github.com/inveniosoftware/pyld.git@python2.6#egg=PyLD-26.0.5.0-dev
-SQLAlchemy-Utils<0.24.0
-wtforms-alchemy==0.12.6
-mock==1.0.1
-setuptools>=2.0
-httpretty==0.8.0
-raven==4.2.1
-six>=1.7.2
+-e git+git://github.com/lnielsen-cern/dictdiffer.git#egg=dictdiffer
+-e hg+https://code.google.com/p/py-editdist/#egg=editdist
+-e git+https://github.com/david-e/flask-admin.git@bootstrap3#egg=Flask-Admin
+-e git+https://github.com/inveniosoftware/flask-breadcrumbs.git#egg=Flask-Breadcrumbs
+-e git+https://github.com/greut/Flask-Collect.git@setup-py-fix#egg=Flask-Collect-dev
+-e git+https://github.com/inveniosoftware/flask-menu.git#egg=Flask-Menu
+-e git+https://github.com/inveniosoftware/flask-registry.git#egg=Flask-Registry
+-e git+git://github.com/jirikuncar/flask-sso.git#egg=flask-sso
+-e git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy-dev
+# requires numpy before it can be installed
+#-e svn://svn.code.sf.net/p/gnuplot-py/code/trunk#egg=gnuplot-py
+https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
+-e git+https://github.com/lnielsen-cern/setuptools-bower.git#egg=setuptools-bower
+-e git+git://github.com/romanchyla/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow
+
+-e .[development]

@@ -36,18 +36,14 @@ from __future__ import print_function
 import os
 import sys
 
-requirements = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            os.pardir,
-                            "requirements-docs.txt")
-_html_theme = open(requirements, "r").readline().strip()
+
+_html_theme = "sphinx_rtd_theme"
 _html_theme_path = []
 try:
-    theme = __import__(_html_theme, globals(), locals(), [], -1)
-    _html_theme_path = [theme.get_html_theme_path()]
+    import sphinx_rtd_theme
+    _html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 except ImportError:
-    print("Template {0} not found, run:\n\n\tpip install -r {1}\n"
-          .format(_html_theme, requirements),
-          file=sys.stderr)
+    print("Template {0} not found, pip install it", file=sys.stderr)
     _html_theme = "default"
 
 # If extensions (or modules to document with autodoc) are in another directory,

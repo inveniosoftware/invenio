@@ -1,1 +1,0 @@
-git+git://github.com/jirikuncar/flask-sso.git#egg=flask-sso-0.1

@@ -1,6 +1,3 @@
-sphinx_rtd_theme
 -r requirements.txt
--r requirements-elasticsearch.txt
--r requirements-img.txt
--r requirements-sso.txt
--r requirements-mongo.txt
+
+-e .[docs]

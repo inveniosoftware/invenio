@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,12 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Debug Toolbar Extension
-=======================
+Debug Toolbar Extension.
 
 Configuration
 -------------
-The toolbar support several configuration options:
+The toolbar supports several configuration options:
 
 ====================================  =====================================   ==========================
 Name                                  Description                             Default
@@ -39,17 +38,16 @@ Name                                  Description                             De
 For more information see http://flask-debugtoolbar.readthedocs.org/en/latest/
 """
 
-from flask.ext.debugtoolbar import DebugToolbarExtension
-
 
 def setup_app(app):
-    """
-    Setup Flask application
-    """
+    """Setup Flask with the DebugToolbar application."""
     # Enable Flask Debug Toolbar early to also catch HTTPS redirects
     if app.debug:
-        from flask.ext.debugtoolbar import module
-        module.static_folder = 'static'
-        DebugToolbarExtension(app)
+        try:
+            from flask.ext.debugtoolbar import module, DebugToolbarExtension
+            module.static_folder = 'static'
+            DebugToolbarExtension(app)
+        except ImportError:
+            app.logger.exception("Flask-DebugToolbar is missing")
 
     return app

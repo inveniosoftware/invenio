@@ -178,7 +178,7 @@ for quick start.
     (invenio)$ cdvirtualenv src
     (invenio)$ git-new-workdir ~/src/invenio-demosite/ invenio-demosite $BRANCH
     (invenio)$ cd invenio-demosite
-    (invenio)$ pip install -e .
+    (invenio)$ pip install -r requirements.txt
 
 
 c. Development
