@@ -1979,9 +1979,9 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
                         create_related_formats_for_bibdocs[bibdoc_to_rename.get_docname()] = new_filename
                     if create_icons_for_bibdocs.has_key(bibdoc_to_rename.get_docname()):
                         create_icons_for_bibdocs[bibdoc_to_rename.get_docname()] = new_filename
-                    bibdoc_to_rename.change_name(new_filename)
+                    bibdoc_to_rename.change_name(recid, new_filename)
                     new_names.append(new_filename) # keep track of name, or we have to reload bibrecdoc...
-                    _do_log(working_dir, 'Renamed ' + bibdoc_to_rename.get_docname())
+                    _do_log(working_dir, 'Renamed ' + str(bibdoc_to_rename.get_docname()))
 
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files
