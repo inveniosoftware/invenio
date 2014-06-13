@@ -432,7 +432,7 @@ def prepare_sip():
 
 def process_sip_metadata(processor=None):
     """Process metadata in submission information package using a custom processor."""
-    def _prepare_sip(obj, dummy_eng):
+    def _process_sip(obj, dummy_eng):
         d = Deposition(obj)
         metadata = d.get_latest_sip(sealed=False).metadata
 
@@ -442,7 +442,7 @@ def process_sip_metadata(processor=None):
             d.type.process_sip_metadata(d, metadata)
 
         d.update()
-    return _prepare_sip
+    return _process_sip
 
 
 def finalize_record_sip(is_dump=True):
