@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -811,7 +811,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                     body=body,
                     language=ln,
                     metaheaderadd='<link rel="stylesheet" ' \
-                                        'href="%s/img/jquery-ui.css" ' \
+                                        'href="%s/js/jqueryui/jquery-ui.css" ' \
                                         'type="text/css" />' % CFG_SITE_URL,
                     lastupdated=__lastupdated__)
 
@@ -925,7 +925,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \
@@ -1016,7 +1016,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \
@@ -1204,7 +1204,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \

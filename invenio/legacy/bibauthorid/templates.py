@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2013 CERN.
+## Copyright (C) 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -343,7 +343,7 @@ class Template:
                 '<META HTTP-EQUIV="Cache-Directive" CONTENT="no-cache">',
                 '<META HTTP-EQUIV="Expires" CONTENT="0">']
 
-        scripts = ["jquery-ui.min.js",
+        scripts = ["jqueryui/jquery-ui.min.js",
                    "jquery.form.js",
                    "jquery.dataTables.min.js",
                    ]

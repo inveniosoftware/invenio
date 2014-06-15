@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -916,7 +916,7 @@ class Template:
 
         out = """
         <style type="text/css"> @import url("/css/tablesorter.css"); </style>
-        <link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />
+        <link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
             <form name="request_form" action="%s/%s/%s/holdings/send" method="post" >
@@ -11436,7 +11436,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         out += """
         <div class="bibcircbottom">
-        <link rel=\"stylesheet\" href=\"%(site_url)s/img/jquery-ui.css\" type=\"text/css\" />
+        <link rel=\"stylesheet\" href=\"%(site_url)s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />
         <script type="text/javascript" language='JavaScript'
                 src="%(site_url)s/js/ui.datepicker.min.js"></script>
         <form name="search_form"

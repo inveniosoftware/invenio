@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -202,9 +202,9 @@ def perform_request_init(uid, ln, req, lastupdated):
                     req         = req)
 
 
-    body += '<link rel="stylesheet" type="text/css" href="/img/jquery-ui.css" />'
+    body += '<link rel="stylesheet" type="text/css" href="/js/jqueryui/jquery-ui.css" />'
     body += '<link rel="stylesheet" type="text/css" href="%s" />' % (
-        url_for('editor.static', filename='editor/base.css'), )
+        url_for('editor.static', filename='css/editor/base.css'), )
 
     if CFG_CERN_SITE:
         cern_site = 'true'
@@ -254,7 +254,7 @@ def perform_request_init(uid, ln, req, lastupdated):
             "   var fieldTemplates = %s\n" % (json.dumps(fieldTemplates), ) + \
             "</script>\n"
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jquery-ui.min.js',  'jquery.jeditable.mini.js',
+    scripts = ['jqueryui/jquery-ui.min.js',  'jquery.jeditable.mini.js',
                'jquery.hotkeys.js', 'json2.js']
     bibedit_scripts = ['refextract.js', 'display.js', 'engine.js', 'keys.js',
                        'menu.js', 'holdingpen.js', 'marcxml.js',
@@ -1628,7 +1628,7 @@ def perform_request_init_template_interface():
     body += '    </script>\n'
 
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jquery-ui.min.js', 'json2.js']
+    scripts = ['jqueryui/jquery-ui.min.js', 'json2.js']
     bibedit_scripts = ['display.js', 'template_interface.js']
 
     for script in scripts:

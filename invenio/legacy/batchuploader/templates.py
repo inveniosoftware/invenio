@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -143,7 +143,7 @@ class Template:
         """
 
         styles += """
-        <link type="text/css" href="%(site_url)s/img/jquery-ui.css" rel="stylesheet" />
+        <link type="text/css" href="%(site_url)s/js/jqueryui/jquery-ui.css" rel="stylesheet" />
         <script type="text/javascript">
             function clearText(field){
                 if (field.value == field.defaultValue){
@@ -156,7 +156,7 @@ class Template:
                 }
             }
         </script>
-        <script type="text/javascript" src="%(site_url)s/js/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="%(site_url)s/js/jqueryui/jquery-ui.min.js"></script>
         <script type="text/javascript" src="%(site_url)s/%(script)s"></script>
         """ % {'site_url':CFG_SITE_URL,
                'script': auto_version_url(

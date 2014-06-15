@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011, 2013 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -943,9 +943,9 @@ Distribution across %s
             else:
                 s_date = datetime.datetime.today().date().strftime("%m/%d/%Y %H:%M")
                 f_date = datetime.datetime.now().strftime("%m/%d/%Y %H:%M")
-            sel += """<link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui.css"
+            sel += """<link rel="stylesheet" href="%(CFG_SITE_URL)s/js/jqueryui/jquery-ui.css"
                         type="text/css" />
-                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui.min.js"></script>
+                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jqueryui/jquery-ui.min.js"></script>
                       <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-timepicker-addon.js"></script>
 
                       <div id="selectDateTxt" style="position:relative;display:none">
