@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,7 +27,6 @@ import grp
 import sys
 import time
 import tempfile
-import cgi
 import re
 
 from invenio.legacy.dbquery import run_sql, Error
@@ -47,7 +46,7 @@ from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file
 from invenio.utils.shell import run_shell_command
 from invenio.legacy.bibupload.engine import xml_marc_to_records, bibupload
 
-import invenio.legacy.bibupload as bibupload_module
+import invenio.legacy.bibupload.engine as bibupload_module
 
 from invenio.legacy.bibrecord import create_records, \
                               record_strip_empty_volatile_subfields, \
