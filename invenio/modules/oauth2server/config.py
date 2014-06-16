@@ -36,7 +36,7 @@ OAUTH2_TOKEN_PERSONAL_SALT_LEN = 60
 """ Length of the personal access token """
 
 OAUTH2_ALLOWED_GRANT_TYPES = [
-    'authorization_code', 'client_credentials', 'refresh_token'
+    'authorization_code', 'client_credentials', 'refresh_token',
 ]
 """
 A list of allowed grant types - allowed values are `authorization_code`,
@@ -49,6 +49,8 @@ OAUTH2_ALLOWED_RESPONSE_TYPES = [
     "code", "token"
 ]
 """
-A list of allowed grant types - allowed values are `authorization_code`,
-`password`, `client_credentials`, `refresh_token`)
+A list of allowed response types - allowed values are `code` and `token`.
+
+- ``code`` is used for authorization_code grant types
+- ``token`` is used for implicit grant types
 """

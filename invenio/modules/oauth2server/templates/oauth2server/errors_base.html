@@ -17,6 +17,24 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
+{%- import "accounts/settings/helpers.html" as helpers with context %}
 {% extends "page.html" %}
 
-{% block body %}OAuth2 Errors{% endblock %}
+{% block body %}
+<div class="row">
+<div class="col-md-8 col-md-offset-2">
+
+{{helpers.panel_start('Invalid authorization request', icon='fa fa-warning fa-fw')}}
+The service that redirected your here made an invalid authorization request
+(error code: {{error.error}}).
+
+<div class="row">
+<hr />
+<div align="center">
+    <a href="/" class="btn btn-info">Get me out of here!</a>
+</div>
+{{helpers.panel_end()}}
+
+</div>
+</div>
+{% endblock %}
