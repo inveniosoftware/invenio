@@ -31,16 +31,34 @@
 {%- endblock global_css -%}
 {# Global Javascript files #}
 {%- block global_javascript -%}
-  {%- js url_for('static', filename='js/jquery.min.js'), '00-invenio' -%}
-  {%- js url_for('static', filename='js/jquery.jeditable.mini.js'), '10-invenio' -%}
-  {%- js url_for('static', filename='js/bootstrap.js'), '10-invenio' -%}
-  {%- js url_for('static', filename='js/jquery.tokeninput.js'), '10-invenio' -%}
-  {%- js url_for('static', filename='js/hogan.js'), '10-invenio' -%}
-  {%- js url_for('base.static', filename='js/translate.js'), '10-invenio' -%}
-  {%- js url_for('base.static', filename='js/invenio.js'), '90-invenio' -%}
-  {%- if config.get('ASSETS_DEBUG') and not config.get("LESS_RUN_IN_DEBUG", True) -%}
-    {%- js url_for('static', filename='js/less.js'), '99-less' -%}
+  {# jQuery bundle with additional modules. #}
+  {%- js url_for('static', filename='js/jquery.js'), '01-jquery', 'uglifyjs' -%}
+  {%- js url_for('static', filename='js/jquery.jeditable.mini.js'), '01-jquery' -%}
+  {%- js url_for('static', filename='js/jquery.tokeninput.js'), '01-jquery' -%}
+  {%- js url_for('static', filename='js/bootstrap.js'), '01-jquery' -%}
+  {%- js url_for('static', filename='js/hogan.js'), '01-jquery' -%}
+  {%- js url_for('base.static', filename='js/translate.js'), '01-jquery' -%}
+  {# invenio related code. #}
+  {%- js url_for('base.static', filename='js/invenio.js'), '90-invenio', 'requirejs' -%}
+
+  {%- if config.get('ASSETS_DEBUG') -%}
+    {%- if not config.get("LESS_RUN_IN_DEBUG", True) -%}
+      {# less.js will compile less templates on the fly. #}
+      {%- js url_for('static', filename='js/less.js'), '00-less' -%}
+    {%- endif -%}
+    {%- if not config.get("REQUIREJS_RUN_IN_DEBUG", True) -%}
+      {# require.js and settings are defining how are loaded the modules.
+       # build.js is used during the compilation time.
+       #}
+      {%- js url_for('static', filename='js/require.js'), '00-requirejs' -%}
+    {%- endif -%}
   {%- endif -%}
+  {%- if not config.get('ASSETS_DEBUG') or config.get("REQUIREJS_RUN_IN_DEBUG", True) -%}
+    {# Almond is a lighter require.js module for compiled files. #}
+    {%- js url_for('static', filename='js/almond.js'), '09-requirejs' -%}
+  {%- endif -%}
+  {%- js url_for('static', filename='js/settings.js'), '09-requirejs', 'uglifyjs' -%}
+
 {%- endblock global_javascript %}
 {%- block page -%}
 {%- if not no_pageheader -%}

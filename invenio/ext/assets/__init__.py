@@ -86,13 +86,14 @@ Environment.resolver_class = InvenioResolver
 
 def setup_app(app):
     """Initialize Assets extension."""
-    app.config.setdefault("LESS_RUN_IN_DEBUG", False)
     assets = Environment(app)
     assets.url = app.static_url_path + "/"
     assets.directory = app.static_folder
 
     commands = (("LESS_BIN", "lessc"),
-                ("CLEANCSS_BIN", "cleancss"))
+                ("CLEANCSS_BIN", "cleancss"),
+                ("REQUIREJS_BIN", "r.js"),
+                ("UGLIFYJS_BIN", "uglifyjs"))
     import subprocess
     for key, cmd in commands:
         try:
@@ -105,6 +106,8 @@ def setup_app(app):
                              "it via {1}."
                              .format(cmd, key))
             app.config["ASSETS_DEBUG"] = True
+            app.config.setdefault("LESS_RUN_IN_DEBUG", False)
+            app.config.setdefault("REQUIREJS_RUN_IN_DEBUG", False)
             assets.debug = True
 
     def _jinja2_new_bundle(tag, collection, name=None, filters=None):
@@ -120,9 +123,18 @@ def setup_app(app):
             # If LESS_RUN_IN_DEBUG is set to False, then the filters are
             # removed and each less file will be parsed by the less JavaScript
             # library.
-            if assets.debug and not app.config.get("LESS_RUN_IN_DEBUG", True):
+            if tag is "css" and assets.debug and \
+                    not app.config.get("LESS_RUN_IN_DEBUG", True):
                 kwargs["extra"]["rel"] = "stylesheet/less"
                 kwargs["filters"] = None
+            # If REQUIREJS_RUN_IN_DEBUG is set to False, then the filters are
+            # removed and dependencies will be loaded via require.js
+            if tag is "js" and filters and "requirejs" in filters:
+                if not assets.debug or \
+                        app.config.get("REQUIREJS_RUN_IN_DEBUG", True):
+                    collection = [c[1:] for c in collection]
+                else:
+                    kwargs["filters"] = None
 
             return Bundle(*collection, **kwargs)
 

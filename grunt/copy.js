@@ -79,25 +79,36 @@ module.exports = {
         expand: true,
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>/',
-        src: ['bootstrap/dist/js/bootstrap.js'
-             ,'bootstrap/dist/js/bootstrap.min.js'
-             ,'jquery/dist/jquery.min.js'
-             ,'jquery/dist/jquery.min.map'
-             ,'jquery-tokeninput/src/jquery.tokeninput.js'
-             ,'jquery.bookmark/jquery.bookmark.min.js'
-             ,'DataTables/media/js/jquery.dataTables.js'
-             ,'jquery-flot/excanvas.min.js'
-             ,'jquery-flot/jquery.flot.js'
-             ,'jquery-flot/jquery.flot.selection.js'
-             ,'jquery.hotkeys/jquery.hotkeys.js'
-             ,'uploadify/jquery.uploadify.min.js'
-             ,'json2/json2.js'
-             ,'datatables-colvis/js/dataTables.colVis.js'
-             ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js'
-             ,'prism/prism.js'
-             ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js'
-             ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js.map'],
+        src: [
+            'almond/almond.js',
+            'bootstrap/dist/js/bootstrap.js',
+            'bootstrap/dist/js/bootstrap.min.js',
+            'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js',
+            'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js.map',
+            'datatables-colvis/js/dataTables.colVis.js',
+            'DataTables/media/js/jquery.dataTables.js',
+            'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js',
+            'jquery/dist/jquery.js',
+            'jquery/dist/jquery.min.js',
+            'jquery/dist/jquery.min.map',
+            'jquery-tokeninput/src/jquery.tokeninput.js',
+            'jquery.bookmark/jquery.bookmark.min.js',
+            'jquery-flot/excanvas.min.js',
+            'jquery-flot/jquery.flot.js',
+            'jquery-flot/jquery.flot.selection.js',
+            'jquery.hotkeys/jquery.hotkeys.js',
+            'json2/json2.js',
+            'prism/prism.js',
+            'requirejs/require.js',
+            'uploadify/jquery.uploadify.min.js'
+        ],
         dest: '<%= globalConfig.installation_path %>/js/'
+    },
+    js_bootstrap: {
+        expand: true,
+        cwd: '<%= globalConfig.bower_path %>/bootstrap/js',
+        src: ['*.js'],
+        dest: '<%= globalConfig.installation_path %>/js/bootstrap/'
     },
     fonts: {
         expand: true,

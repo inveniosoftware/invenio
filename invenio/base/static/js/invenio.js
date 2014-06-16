@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013 CERN.
+ * Copyright (C) 2013, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-!function ($) {
+require(['jquery', 'bootstrap/tooltip'], function ($) {
 
   "use strict"; // jshint ;_;
 
@@ -197,5 +197,4 @@
       $('.modal').remove();
       $('.modal-backdrop').remove();
   });
-
-}(window.jQuery);
+});

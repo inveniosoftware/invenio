@@ -8,6 +8,7 @@
     "grunt-contrib-clean": "*",
     "grunt-contrib-uglify": "*",
     "grunt-contrib-less": "*",
+    "grunt-contrib-requirejs": "*",
     "load-grunt-config": "*",
     "grunt-newer": "*",
     "grunt-concurrent": "*"

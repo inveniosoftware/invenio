@@ -6,6 +6,8 @@
     "less": "1.7.0",
     "jquery": "2.1.0",
     "font-awesome": "~4.0.3",
+    "requirejs": "latest",
+    "almond": "latest",
     "ckeditor": "latest"
   },
   "devDependencies": {
@@ -30,7 +32,7 @@
     "prism": "gh-pages",
     "swfobject": "https://github.com/swfobject/swfobject/blob/master/swfobject/swfobject.js",
     "datatables-colvis": "*",
-    "typeahead.js-bootstrap3.less": "0.2.2",
+    "typeahead.js-bootstrap3.less": "0.2.3",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
     "plupload": "*",
     "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",
