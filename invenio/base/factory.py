@@ -20,6 +20,7 @@
 
 import os
 import sys
+import urllib
 import warnings
 
 from flask import Blueprint
@@ -72,7 +73,9 @@ class WSGIScriptAliasFix(object):
     def __call__(self, environ, start_response):
         """Parse path from ``REQUEST_URI`` to fix ``PATH_INFO``."""
         if environ.get('WSGI_SCRIPT_ALIAS') == environ['SCRIPT_NAME']:
-            path_info = urlparse(environ.get('REQUEST_URI')).path
+            path_info = urllib.unquote_plus(
+                urlparse(environ.get('REQUEST_URI')).path
+            )  # addresses issue with url encoded arguments in Flask routes
             environ['SCRIPT_NAME'] = ''
             environ['PATH_INFO'] = path_info
         return self.app(environ, start_response)
