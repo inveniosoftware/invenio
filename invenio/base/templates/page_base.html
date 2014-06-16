@@ -55,9 +55,9 @@
   {%- endif -%}
   {%- if not config.get('ASSETS_DEBUG') or config.get("REQUIREJS_RUN_IN_DEBUG", True) -%}
     {# Almond is a lighter require.js module for compiled files. #}
-    {%- js url_for('static', filename='js/almond.js'), '09-requirejs' -%}
+    {%- js url_for('static', filename='js/almond.js'), '00-requirejs' -%}
   {%- endif -%}
-  {%- js url_for('static', filename='js/settings.js'), '09-requirejs', 'uglifyjs' -%}
+  {%- js url_for('static', filename='js/settings.js'), '00-requirejs', 'uglifyjs' -%}
 
 {%- endblock global_javascript %}
 {%- block page -%}
