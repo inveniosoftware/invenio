@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013 CERN.
+ * Copyright (C) 2013, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -43,25 +43,20 @@ function WebTagEditor(element, options)
     // $element should be the modal window
     this.$element = $(element).first();
     // $tokenInput is the input which will be converted to tokenInput
-    this.$tokenInput = this.$element.find('[data-WebTagEditor-element="tokenInput"]').first();
+    this.$tokenInput = this.$element.find('[data-webtageditor-element="tokenInput"]').first();
     // $errorArea is a div which will hold error messages
-    this.$errorArea = this.$element.find('[data-WebTagEditor-element="errorArea"]').first();
+    this.$errorArea = this.$element.find('[data-webtageditor-element="errorArea"]').first();
 
     // Arguments
     this.options = $.extend({}, WebTagEditor.DEFAULTS, options);
 
     // Check for id_bibrec
     // id_bibrec provided in options has precendece over the one provided in html
-    if(this.options.id_bibrec == 0)
-    {
-        var recid = this.$element.attr('data-WebTagEditor-recid');
-
-        if(recid)
-        {
+    if(this.options.id_bibrec == 0) {
+        var recid = this.$element.data('webtageditor-recid');
+        if(recid) {
             this.options.id_bibrec = recid;
-        }
-        else
-        {
+        } else {
             console.log('WebTagEditor: missing id_bibrec');
         }
     }

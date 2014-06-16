@@ -25,6 +25,7 @@
   {{ super() }}
   {%- css url_for('static', filename='css/formatter/templates_brief.css'), '00-search' -%}
   {%- css url_for('static', filename='css/search/search.css'), '00-search' -%}
+  {%- js url_for('webtag.static', filename='js/tags/record_editor.js'), '00-search' -%}
 {% endblock %}
 
 {%- set portalboxes = dict() -%}

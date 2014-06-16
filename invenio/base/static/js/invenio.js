@@ -174,7 +174,7 @@ require(['jquery', 'bootstrap/tooltip'], function ($) {
         e.preventDefault();
         var href = $(this).attr('href');
         if (href.indexOf('#') === 0) {
-            $(href).modal('open');
+            $(href).modal({show: true});
         } else {
             $.get(href, function(data) {
                 $('<div class="modal" >' + data + '</div>').modal();

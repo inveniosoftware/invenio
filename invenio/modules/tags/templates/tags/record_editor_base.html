@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,15 +23,22 @@
 {{ translate(["Create new tag"]) }}
 
 {% block webtag_editor_body %}
-  <p>
-      {{ _('Tags:') }}
-  </p>
-  <p>
-      <input type="text" data-webtageditor-element="tokenInput" />
-  </p>
 
-  {# Error area #}
-  <div data-webtageditor-element="errorArea"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <p> {{ _('Tags:') }} </p>
+    </div>
+    <div class="modal-body">
+      <p>
+      <input type="text" data-webtageditor-element="tokenInput" />
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+  </div>
+
 {% endblock webtag_editor_body %}
 
 {# Javascript: tag editing box #}

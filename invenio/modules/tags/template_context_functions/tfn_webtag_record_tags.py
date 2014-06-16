@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebTag List of tags in document view"""
+"""WebTag List of tags in document view."""
 
 # Flask
 from invenio.ext.template import render_template_to_string
@@ -34,12 +34,12 @@ from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
 
 
 def template_context_function(id_bibrec, id_user):
-    """
+    """Add tag editor.
+
     :param id_bibrec: ID of record
     :param id_user: user viewing the record (and owning the displayed tags)
     :return: HTML containing tag list
     """
-
     if id_user and id_bibrec:
         # Get user settings:
         user = User.query.get(id_user)
@@ -50,7 +50,6 @@ def template_context_function(id_bibrec, id_user):
             # Do not display if user turned off tags in settings
             return ''
 
-
         # Private
         query_results = db.session.query(WtgTAG, WtgTAGRecord.annotation)\
             .filter(WtgTAG.id == WtgTAGRecord.id_tag)\
@@ -58,23 +57,21 @@ def template_context_function(id_bibrec, id_user):
             .filter(WtgTAG.id_user == id_user)\
             .all()
 
-
         # Group tags
         if user_settings.get('display_tags_group', True):
             group_results = db.session.query(WtgTAG, WtgTAGRecord.annotation, Usergroup.name)\
-            .join(UserUsergroup, UserUsergroup.id_user == id_user)\
-            .filter(WtgTAG.id == WtgTAGRecord.id_tag)\
-            .filter(WtgTAGRecord.id_bibrec == id_bibrec)\
-            .filter(WtgTAG.group_access_rights >= WtgTAG.ACCESS_LEVELS['View'])\
-            .filter(WtgTAG.id_usergroup == Usergroup.id)\
-            .filter(WtgTAG.id_user != id_user)\
-            .filter(Usergroup.id == UserUsergroup.id_usergroup)\
-            .all()
+                .join(UserUsergroup, UserUsergroup.id_user == id_user)\
+                .filter(WtgTAG.id == WtgTAGRecord.id_tag)\
+                .filter(WtgTAGRecord.id_bibrec == id_bibrec)\
+                .filter(WtgTAG.group_access_rights >= WtgTAG.ACCESS_LEVELS['View'])\
+                .filter(WtgTAG.id_usergroup == Usergroup.id)\
+                .filter(WtgTAG.id_user != id_user)\
+                .filter(Usergroup.id == UserUsergroup.id_usergroup)\
+                .all()
 
             for (tag, annotation, group_name) in group_results:
                 tag.group_name = group_name
                 query_results.append((tag, annotation))
-
 
         # Public tags
         #if user_settings.get('display_tags_public', True):
@@ -114,7 +111,6 @@ def template_context_function(id_bibrec, id_user):
                 id_bibrec=id_bibrec)
 
             tag_infos.append(tag_info)
-
         return render_template_to_string(
             'tags/record_tags.html',
             tag_infos=tag_infos,
