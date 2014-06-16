@@ -30,7 +30,8 @@ following this tutorial. **Note:** the recommended Python version is 2.7.5+
                            libmysqlclient-dev libxml2-dev libxslt-dev \
                            libjpeg-dev libfreetype6-dev libtiff-dev \
                            software-properties-common python-dev \
-                           virtualenvwrapper build-essential git
+                           virtualenvwrapper build-essential git \
+                           mercurial
     $ sudo pip install -U virtualenvwrapper pip
     $ source .bashrc
 
