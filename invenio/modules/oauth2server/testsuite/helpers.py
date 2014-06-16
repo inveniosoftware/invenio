@@ -26,9 +26,9 @@ from flask_oauthlib.client import OAuth
 def create_client(app, name, **kwargs):
     """Helper function to create a OAuth2 client to test an OAuth2 provider."""
     default = dict(
-        consumer_key='dev',
-        consumer_secret='dev',
-        request_token_params={'scope': 'user'},
+        consumer_key='confidential',
+        consumer_secret='confidential',
+        request_token_params={'scope': 'test:scope'},
         base_url=app.config['CFG_SITE_SECURE_URL'],
         request_token_url=None,
         access_token_method='POST',
@@ -46,7 +46,7 @@ def create_client(app, name, **kwargs):
 
     @app.route('/oauth2test/logout')
     def logout():
-        session.pop('dev_token', None)
+        session.pop('confidential_token', None)
         return "logout"
 
     @app.route('/oauth2test/authorized')
@@ -57,12 +57,12 @@ def create_client(app, name, **kwargs):
                 request.args.get('error', "unknown")
             )
         if isinstance(resp, dict) and 'access_token' in resp:
-            session['dev_token'] = (resp['access_token'], '')
+            session['confidential_token'] = (resp['access_token'], '')
             return jsonify(resp)
         return str(resp)
 
     def get_test(test_url):
-        if 'dev_token' not in session:
+        if 'confidential_token' not in session:
             abort(403)
         else:
             ret = remote.get(test_url)
@@ -72,7 +72,7 @@ def create_client(app, name, **kwargs):
 
     @app.route('/oauth2test/test-ping')
     def test_ping():
-        return get_test("/oauth/ping")
+        return get_test(url_for("oauth2server.ping"))
 
     @app.route('/oauth2test/test-info')
     def test_info():
@@ -84,6 +84,6 @@ def create_client(app, name, **kwargs):
 
     @remote.tokengetter
     def get_oauth_token():
-        return session.get('dev_token')
+        return session.get('confidential_token')
 
     return remote

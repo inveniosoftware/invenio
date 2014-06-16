@@ -17,14 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+""" Forms for generating access tokens and clients. """
 
+from oauthlib.oauth2.rfc6749.errors import InsecureTransportError, \
+    InvalidRedirectURIError
 from wtforms_alchemy import model_form_factory
 from wtforms import fields, validators, widgets
 from invenio.utils.forms import InvenioBaseForm
 
 from .models import Client
-
-ModelForm = model_form_factory(InvenioBaseForm)
 
 
 #
@@ -64,9 +65,47 @@ def scopes_multi_checkbox(field, **kwargs):
 
 
 #
+# Redirect URI field
+#
+class RedirectURIField(fields.TextAreaField):
+
+    """ Process redirect URI field data. """
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = "\n".join([
+                x.strip() for x in
+                filter(lambda x: x, "\n".join(valuelist).splitlines())
+            ])
+
+    def process_data(self, value):
+        self.data = "\n".join(value)
+
+
+class RedirectURIValidator(object):
+
+    """ Validate if redirect URIs. """
+
+    def __call__(self, form, field):
+        errors = []
+        for v in field.data.splitlines():
+            try:
+                Client.validate_redirect_uri(v)
+            except InsecureTransportError:
+                errors.append(v)
+            except InvalidRedirectURIError:
+                errors.append(v)
+
+        if errors:
+            raise validators.ValidationError(
+                "Invalid redirect URIs: %s" % ", ".join(errors)
+            )
+
+
+#
 # Forms
 #
-class ClientForm(ModelForm):
+class ClientFormBase(model_form_factory(InvenioBaseForm)):
     class Meta:
         model = Client
         exclude = [
@@ -79,6 +118,18 @@ class ClientForm(ModelForm):
             validators=[validators.Required(), validators.URL()],
             widget=widgets.TextInput(),
         ))
+
+
+class ClientForm(ClientFormBase):
+    # Trick to make redirect_uris render in the bottom of the form.
+    redirect_uris = RedirectURIField(
+        label="Redirect URIs (one per line)",
+        description="One redirect URI per line. This is your applications"
+                    " authorization callback URLs. HTTPS must be used for all "
+                    "hosts except localhost (for testing purposes).",
+        validators=[RedirectURIValidator(), validators.Required()],
+        default='',
+    )
 
 
 class TokenForm(InvenioBaseForm):

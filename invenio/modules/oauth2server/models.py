@@ -19,25 +19,31 @@
 
 from __future__ import absolute_import
 
+
 from flask import current_app
 from flask.ext.login import current_user
+from oauthlib.oauth2.rfc6749.errors import InsecureTransportError, \
+    InvalidRedirectURIError
 from werkzeug.security import gen_salt
 from wtforms import validators
 from sqlalchemy_utils import URLType
+import six
+from six.moves.urllib_parse import urlparse
+
 
 from invenio.ext.sqlalchemy import db
 from invenio.ext.login.legacy_user import UserInfo
 
 
 class OAuthUserProxy(object):
-    """
-    Proxy object to an Invenio User
-    """
+
+    """ Proxy object to an Invenio User. """
+
     def __init__(self, user):
         self._user = user
 
     def __getattr__(self, name):
-        """ Pass any undefined attribute to the underlying object """
+        """ Pass any undefined attribute to the underlying object. """
         return getattr(self._user, name)
 
     def __getstate__(self):
@@ -67,10 +73,11 @@ class Scope(object):
 
 
 class Client(db.Model):
-    """
-    A client is the app which want to use the resource of a user. It is
-    suggested that the client is registered by a user on your site, but it
-    is not required.
+
+    """A client is the app which want to use the resource of a user.
+
+    It is suggested that the client is registered by a user on your site, but
+    it is not required.
 
     The client should contain at least these information:
 
@@ -86,7 +93,6 @@ class Client(db.Model):
         allowed_grant_types: A list of grant types
         allowed_response_types: A list of response types
         validate_scopes: A function to validate scopes
-
     """
 
     __tablename__ = 'oauth2CLIENT'
@@ -99,7 +105,7 @@ class Client(db.Model):
             validators=[validators.Required()]
         )
     )
-    """ Human readable name of the application """
+    """ Human readable name of the application. """
 
     description = db.Column(
         db.Text(),
@@ -110,7 +116,7 @@ class Client(db.Model):
                         ' (displayed to users).',
         )
     )
-    """ Human readable description """
+    """ Human readable description. """
 
     website = db.Column(
         URLType(),
@@ -122,36 +128,34 @@ class Client(db.Model):
     )
 
     user_id = db.Column(db.ForeignKey('user.id'))
-    """ Creator of the client application """
+    """ Creator of the client application. """
 
     client_id = db.Column(db.String(255), primary_key=True)
-    """ Client application ID """
+    """ Client application ID. """
 
     client_secret = db.Column(
         db.String(255), unique=True, index=True, nullable=False
     )
-    """ Client application secret """
+    """ Client application secret. """
 
     is_confidential = db.Column(db.Boolean, default=True)
     """ Determine if client application is public or not.  """
 
     is_internal = db.Column(db.Boolean, default=False)
-    """ Determins if client application is an internal application """
+    """ Determins if client application is an internal application. """
 
     _redirect_uris = db.Column(db.Text)
-    """
-    A comma-separated list of redirect URIs. First URI is the default URI.
-    """
+    """A newline-separated list of redirect URIs. First is the default URI."""
 
     _default_scopes = db.Column(db.Text)
-    """
-    A comma-separated list of default scopes of the client. The value of the
-    scope parameter is expressed as a list of space-delimited,
+    """A space-separated list of default scopes of the client.
+
+    The value of the scope parameter is expressed as a list of space-delimited,
     case-sensitive strings.
     """
 
     user = db.relationship('User')
-    """ Relationship to user """
+    """ Relationship to user. """
 
     @property
     def allowed_grant_types(self):
@@ -173,8 +177,40 @@ class Client(db.Model):
     @property
     def redirect_uris(self):
         if self._redirect_uris:
-            return self._redirect_uris.split()
+            return self._redirect_uris.splitlines()
         return []
+
+    @redirect_uris.setter
+    def redirect_uris(self, value):
+        """ Validate and store redirect URIs for client. """
+        if isinstance(value, six.text_type):
+            value = value.split("\n")
+
+        value = [v.strip() for v in value]
+
+        for v in value:
+            self.validate_redirect_uri(v)
+
+        self._redirect_uris = "\n".join(value) or ""
+
+    @staticmethod
+    def validate_redirect_uri(value):
+        """ Validate a redirect URI.
+
+        A redirect URL must utilize https or redirect to localhost.
+
+        :param value: Value to validate.
+        :raises: InvalidRedirectURIError, InsecureTransportError
+        """
+        sch, netloc, path, par, query, fra = urlparse(value)
+        if not (sch and netloc):
+            raise InvalidRedirectURIError()
+        if sch != 'https':
+            if ':' in netloc:
+                netloc, port = netloc.split(':', 1)
+            if not (netloc in ('localhost', '127.0.0.1') and sch == 'http'):
+                raise InsecureTransportError()
+        return True
 
     @property
     def default_redirect_uri(self):
@@ -185,9 +221,19 @@ class Client(db.Model):
 
     @property
     def default_scopes(self):
+        """ List of default scopes for client. """
         if self._default_scopes:
-            return self._default_scopes.split()
+            return self._default_scopes.split(" ")
         return []
+
+    def validate_scopes(self, scopes):
+        """ Validate if client is allowed to access scopes. """
+        from .registry import scopes as scopes_registry
+
+        for s in set(scopes):
+            if s not in scopes_registry:
+                return False
+        return True
 
     def gen_salt(self):
         self.reset_client_id()
@@ -205,9 +251,9 @@ class Client(db.Model):
 
 
 class Token(db.Model):
-    """
-    A bearer token is the final token that can be used by the client.
-    """
+
+    """A bearer token is the final token that can be used by the client."""
+
     __tablename__ = 'oauth2TOKEN'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -235,7 +281,7 @@ class Token(db.Model):
 
     access_token = db.Column(db.String(255), unique=True)
 
-    refresh_token = db.Column(db.String(255), unique=True)
+    refresh_token = db.Column(db.String(255), unique=True, nullable=True)
 
     expires = db.Column(db.DateTime, nullable=True)
 
@@ -267,9 +313,10 @@ class Token(db.Model):
 
     @classmethod
     def create_personal(cls, name, user_id, scopes=None, is_internal=False):
-        """
-        Create a personal access token (a token that is bound to a specific
-        user and which doesn't expire).
+        """Create a personal access token.
+
+        A token that is bound to a specific user and which doesn't expire, i.e.
+        similar to the concept of an API key.
         """
         scopes = " ".join(scopes) if scopes else ""
 

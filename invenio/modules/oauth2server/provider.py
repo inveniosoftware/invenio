@@ -17,13 +17,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Configuration of flask-oauthlib provider
-"""
+"""Configuration of flask-oauthlib provider."""
 
 from datetime import datetime, timedelta
 
 from flask import current_app
+from flask.ext.login import current_user
 from flask_oauthlib.provider import OAuth2Provider
 
 from invenio.ext.sqlalchemy import db
@@ -36,7 +35,8 @@ oauth2 = OAuth2Provider()
 
 @oauth2.usergetter
 def get_user(username, password, *args, **kwargs):
-    """
+    """ Get user for grant type password.
+
     Needed for grant type 'password'. Note, grant type password is by default
     disabled.
     """
@@ -47,8 +47,7 @@ def get_user(username, password, *args, **kwargs):
 
 @oauth2.tokengetter
 def get_token(access_token=None, refresh_token=None):
-    """
-    Load an access token
+    """Load an access token.
 
     Add support for personal access tokens compared to flask-oauthlib
     """
@@ -63,7 +62,7 @@ def get_token(access_token=None, refresh_token=None):
         return t
     elif refresh_token:
         return Token.query.filter_by(
-            refresh_token=refresh_token, personal=False
+            refresh_token=refresh_token, is_personal=False,
             ).first()
     else:
         return None
@@ -71,13 +70,13 @@ def get_token(access_token=None, refresh_token=None):
 
 @oauth2.tokensetter
 def save_token(token, request, *args, **kwargs):
-    """
-    Token persistence
-    """
+    """Token persistence."""
     # Exclude the personal access tokens which doesn't expire.
+    uid = request.user.id if request.user else current_user.get_id()
+
     tokens = Token.query.filter_by(
         client_id=request.client.client_id,
-        user_id=request.user.id,
+        user_id=uid,
         is_personal=False,
     )
 
@@ -92,12 +91,12 @@ def save_token(token, request, *args, **kwargs):
 
     tok = Token(
         access_token=token['access_token'],
-        refresh_token=token['refresh_token'],
+        refresh_token=token.get('refresh_token'),
         token_type=token['token_type'],
         _scopes=token['scope'],
         expires=expires,
         client_id=request.client.client_id,
-        user_id=request.user.id,
+        user_id=uid,
         is_personal=False,
     )
     db.session.add(tok)
