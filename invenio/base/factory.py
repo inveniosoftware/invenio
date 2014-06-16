@@ -16,27 +16,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.base.factory
-    --------------------
+"""Implement application factory."""
 
-    Implement application factory.
-"""
-
-import warnings
-import sys
 import os
+import sys
+import warnings
 
+from flask import Blueprint
+from flask.ext.registry import Registry, ExtensionRegistry, \
+    PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
 from pkg_resources import iter_entry_points
 from six.moves.urllib.parse import urlparse
 from werkzeug.local import LocalProxy
 
 from .helpers import with_app_context, unicodifier
-from .wrappers import Flask
 from .utils import captureWarnings
-from flask import Blueprint
-from flask.ext.registry import Registry, ExtensionRegistry, \
-    PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
+from .wrappers import Flask
 
 
 __all__ = ('create_app', 'with_app_context')
@@ -84,20 +79,16 @@ class WSGIScriptAliasFix(object):
 
 
 def cleanup_legacy_configuration(app):
-    """
-    Cleanup legacy issue in configuration
-    """
+    """Cleanup legacy issue in configuration."""
     from .i18n import language_list_long
-    ## Invenio is all using str objects. Let's change them to unicode
+    # Invenio is all using str objects. Let's change them to unicode
     app.config.update(unicodifier(dict(app.config)))
-    ## ... and map certain common parameters
+    # ... and map certain common parameters
     app.config['CFG_LANGUAGE_LIST_LONG'] = LocalProxy(language_list_long)
 
 
 def register_legacy_blueprints(app):
-    """
-    Register some legacy blueprints
-    """
+    """Register some legacy blueprints."""
     @app.route('/testing')
     def testing():
         from flask import render_template
@@ -105,6 +96,7 @@ def register_legacy_blueprints(app):
 
 
 def register_secret_key(app):
+    """Register sercret key in application configuration."""
     SECRET_KEY = app.config.get('SECRET_KEY') or \
         app.config.get('CFG_SITE_SECRET_KEY', 'change_me')
 
@@ -121,9 +113,7 @@ def register_secret_key(app):
 
 
 def load_site_config(app):
-    """
-    Load default site-configuration via entry points.
-    """
+    """Load default site-configuration via entry points."""
     entry_points = list(iter_entry_points("invenio.config"))
     if len(entry_points) > 1:
         warnings.warn(
@@ -137,9 +127,9 @@ def load_site_config(app):
 
 
 def configure_warnings():
-    """
-    Configure warnings by routing warnings to the logging system, as well as
-    unhiding DeprecationWarning.
+    """Configure warnings by routing warnings to the logging system.
+
+    It also unhides DeprecationWarning.
     """
     if not sys.warnoptions:
         # Route warnings through python logging
@@ -152,8 +142,7 @@ def configure_warnings():
 
 
 def create_app(instance_path=None, **kwargs_config):
-    """
-    Prepare Invenio application based on Flask.
+    """Prepare Invenio application based on Flask.
 
     Invenio consists of a new Flask application with legacy support for
     the old WSGI legacy application and the old Python legacy
@@ -179,13 +168,13 @@ def create_app(instance_path=None, **kwargs_config):
     # Create the Flask application instance
     app = Flask(
         app_name,
-        ## Static files are usually handled directly by the webserver (e.g.
-        ## Apache) However in case WSGI is required to handle static files too
-        ## (such as when running simple server), then this flag can be
-        ## turned on (it is done automatically by wsgi_handler_test).
-        ## We assume anything under '/' which is static to be server directly
-        ## by the webserver from CFG_WEBDIR. In order to generate independent
-        ## url for static files use func:`url_for('static', filename='test')`.
+        # Static files are usually handled directly by the webserver (e.g.
+        # Apache) However in case WSGI is required to handle static files too
+        # (such as when running simple server), then this flag can be
+        # turned on (it is done automatically by wsgi_handler_test).
+        # We assume anything under '/' which is static to be server directly
+        # by the webserver from CFG_WEBDIR. In order to generate independent
+        # url for static files use func:`url_for('static', filename='test')`.
         static_url_path='',
         static_folder=os.path.join(instance_path, 'static'),
         template_folder='templates',
@@ -211,7 +200,7 @@ def create_app(instance_path=None, **kwargs_config):
     # Load invenio.cfg from instance folder
     app.config.from_pyfile('invenio.cfg', silent=True)
 
-    ## Update application config from parameters.
+    # Update application config from parameters.
     app.config.update(kwargs_config)
 
     # Ensure SECRET_KEY has a value in the application configuration
@@ -253,12 +242,10 @@ def create_app(instance_path=None, **kwargs_config):
 
 
 def create_wsgi_app(*args, **kwargs):
-    """
-    Create WSGI application
-    """
+    """Create WSGI application."""
     app = create_app(*args, **kwargs)
 
-    ## Start remote debugger if appropriate:
+    # Start remote debugger if appropriate:
     if app.config.get('CFG_REMOTE_DEBUGGER_ENABLED'):
         try:
             from invenio.utils import remote_debugger
@@ -270,13 +257,13 @@ def create_wsgi_app(*args, **kwargs):
 
     @app.before_first_request
     def pre_load():
-        """
-        Pre-load citation dictionaries upon WSGI application start-up (the
-        citation dictionaries are loaded lazily, which is good for CLI
+        """Pre-load citation dictionaries upon WSGI application start-up.
+
+        The citation dictionaries are loaded lazily, which is good for CLI
         processes such as bibsched, but for web user queries we want them to
-        be available right after web server start-up)
+        be available right after web server start-up.
         """
-        #FIXME: move to invenio.modules.ranker.views when its created
+        # FIXME: move to invenio.modules.ranker.views when its created
         try:
             from invenio.legacy.bibrank.citation_searcher import \
                 get_citedby_hitset, \
