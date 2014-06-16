@@ -27,7 +27,8 @@ from flask.ext.login import current_user
 from invenio.base.globals import cfg
 
 from .models import RemoteToken, RemoteAccount
-from .errors import OAuthError, OAuthClientError, OAuthRejectedRequestError
+from .errors import OAuthResponseError, OAuthClientError, \
+    OAuthRejectedRequestError, OAuthError
 from .utils import oauth_authenticate, oauth_get_user, oauth_register
 from .client import oauth, signup_handlers
 from .forms import EmailSignUpForm
@@ -55,9 +56,7 @@ def response_token_setter(remote, resp):
             raise OAuthClientError(
                 'Authorization with remote service failed.', remote, resp,
             )
-    raise OAuthError(
-        "Bad OAuth authorized request", remote=remote, response=resp
-    )
+    raise OAuthResponseError("Bad OAuth authorized request", remote, resp)
 
 
 def oauth1_token_setter(remote, resp, token_type='', extra_data=None):
@@ -303,8 +302,9 @@ def signup_handler(remote, *args, **kwargs):
         form=form,
         remote=remote,
         app_title=cfg['OAUTHCLIENT_REMOTE_APPS'][remote.name].get('title', ''),
-        app_description=
-        cfg['OAUTHCLIENT_REMOTE_APPS'][remote.name].get('description', ''),
+        app_description=cfg['OAUTHCLIENT_REMOTE_APPS'][remote.name].get(
+            'description', ''
+        ),
         app_icon=cfg['OAUTHCLIENT_REMOTE_APPS'][remote.name].get('icon', None),
     )
 
