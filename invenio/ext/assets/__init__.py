@@ -32,31 +32,34 @@ class InvenioResolver(FlaskResolver):
 
     """Custom resource resolver for webassets."""
 
-    def resolve_source(self, item):
+    def resolve_source(self, ctx, item):
         """Return the absolute path of the resource.
 
         .. seealso:: :py:function:`webassets.env.Resolver:resolve_source`
         """
         if not isinstance(item, six.string_types) or is_url(item):
             return item
-        if item.startswith(self.env.url):
-            item = item[len(self.env.url):]
-        return self.search_for_source(item)
+        if item.startswith(ctx.url):
+            item = item[len(ctx.url):]
+        return self.search_for_source(ctx, item)
 
-    def resolve_source_to_url(self, filepath, item):
+    def resolve_source_to_url(self, ctx, filepath, item):
         """Return the url of the resource.
 
         Displaying them as is in debug mode as the webserver knows where to
         search for them.
 
-        .. seealso:: :py:function:`webassets.env.Resolver:resolve_source_to_url`
+        .. seealso::
+
+            :py:function:`webassets.env.Resolver:resolve_source_to_url`
         """
-        if self.env.debug:
+        if ctx.debug:
             return item
-        return super(InvenioResolver, self).resolve_source_to_url(filepath,
+        return super(InvenioResolver, self).resolve_source_to_url(ctx,
+                                                                  filepath,
                                                                   item)
 
-    def search_for_source(self, item):
+    def search_for_source(self, ctx, item):
         """Return absolute path of the resource.
 
         :param item: resource filename
@@ -64,7 +67,7 @@ class InvenioResolver(FlaskResolver):
         .. seealso:: :py:function:`webassets.env.Resolver:search_for_source`
         """
         try:
-            abspath = super(InvenioResolver, self).search_env_directory(item)
+            abspath = super(InvenioResolver, self).search_env_directory(ctx, item)
         except:
             # If a file is missing in production (non-debug mode), we want
             # to not break and will use /dev/null instead. The exception

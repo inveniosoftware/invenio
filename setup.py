@@ -46,7 +46,7 @@ install_requires = [
     "fixture==1.5",
     "Flask==0.10.1",
     "Flask-Admin==1.0.7",
-    "Flask-Assets==0.9",
+    "Flask-Assets==0.10.dev",
     "Flask-Babel==0.9",
     "Flask-Breadcrumbs==0.1",
     "Flask-Cache==0.12",
