@@ -95,7 +95,7 @@ body {
       <tr>
         <td>{{ record[1] }}</td>
         <td>
-          {%- do args.update({'p': f ~ (':' if f) ~ record[0]}) -%}
+          {%- do args.update({'p': (f ~ ':' if f) ~ records[0]}) -%}
           <a href="{{ url_for('search.search',  **args) }}">{{ record[0] }}</a>
         </td>
       </tr>
@@ -104,13 +104,13 @@ body {
 
     <ul class="pager">
       <li class="previous">
-        {%- do args.update({'p': f ~ (':' if f) ~ records[0][0], 'action_browse': ''}) -%}
+        {%- do args.update({'p': (f ~ ':' if f) ~ records[0][0], 'action_browse': ''}) -%}
         <a href="{{ url_for('search.search',  **args) }}">
           &larr; {{ _('Previous') }}
         </a>
       </li>
       <li class="next">
-        {%- do args.update({'p': f ~ (':' if f) ~ records[-1][0], 'action_browse': ''}) -%}
+        {%- do args.update({'p': (f ~ ':' if f) ~ records[-1][0], 'action_browse': ''}) -%}
         <a href="{{ url_for('search.search',  **args) }}">
           {{ _('Next') }} &rarr;
         </a>
