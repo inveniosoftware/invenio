@@ -63,7 +63,7 @@ class InvenioLoader(BaseLoader):
                 self.flask_app = current_app
             else:
                 from invenio.base.factory import create_app
-                self.flask_app = create_app()
+                self.flask_app = create_app(CELERY_CONTEXT=True)
                 from invenio.ext.sqlalchemy import db
                 self.db = db
 
