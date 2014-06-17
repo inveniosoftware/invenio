@@ -25,7 +25,7 @@ python:
 
 install:
   - sudo apt-get update
-  - git clone https://github.com/tiborsimko/invenio-devscripts /tmp/invenio-devscripts
+  - git clone https://github.com/jalavik/invenio-devscripts /tmp/invenio-devscripts
   - CFG_INVENIO_SRCDIR=$(pwd) /tmp/invenio-devscripts/invenio-kickstart --yes-i-know --yes-i-really-know
 
 script:
