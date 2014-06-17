@@ -1926,12 +1926,18 @@ class BibFormatObject:
             # If record is given as parameter
             self.xml_record = xml_record
             self.record = create_record(xml_record)[0]
-            recID = record_get_field_value(self.record, "001")
+            recID = int(record_get_field_value(self.record, "001"))
 
         self.lang = wash_language(ln)
         if search_pattern is None:
             search_pattern = []
         self.search_pattern = search_pattern
+        try:
+            assert isinstance(recID, (int, long)), 'Argument of wrong type!'
+        except AssertionError:
+            register_exception(prefix="recid needs to be an integer in BibFormatObject",
+                               alert_admin=True)
+            recID = int(recID)
         self.recID = recID
         self.output_format = output_format
         self.user_info = user_info
