@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2014 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,13 +17,12 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
-"""
-WTForm filters
---------------
+"""WTForm filters implementation.
+
 Filters can be applied to incoming form data, after process_formdata() has run.
 
 See more information on:
-http://wtforms.simplecodes.com/docs/1.0.4/fields.html#wtforms.fields.Field.__init__
+http://wtforms.simplecodes.com/docs/1.0.4/fields.html#wtforms.fields.Field
 """
 
 import six
@@ -32,9 +31,7 @@ from invenio.utils.html import HTMLWasher
 
 
 def strip_string(value):
-    """
-    Remove leading and trailing spaces from string
-    """
+    """Remove leading and trailing spaces from string."""
     if isinstance(value, six.string_types):
         return value.strip()
     else:
@@ -42,9 +39,7 @@ def strip_string(value):
 
 
 def splitlines_list(value):
-    """
-    Split string per line into a list
-    """
+    """Split string per line into a list."""
     if isinstance(value, six.string_types):
         newdata = []
         for line in value.splitlines():
@@ -56,15 +51,12 @@ def splitlines_list(value):
 
 
 def splitchar_list(c):
-    """
-    Return filter function that split string per char into a list.
+    """Return filter function that split string per char into a list.
 
-    @param c: Character to split on.
+    :param c: Character to split on.
     """
     def _inner(value):
-        """
-        Split string per char into a list
-        """
+        """Split string per char into a list."""
         if isinstance(value, six.string_types):
             newdata = []
             for item in value.split(c):
@@ -77,16 +69,13 @@ def splitchar_list(c):
 
 
 def map_func(func):
-    """
-    Return filter function that map a function to each item of a list
+    """Return filter function that map a function to each item of a list.
 
-    @param func: Function to map.
+    :param func: Function to map.
     """
     # FIXME
     def _mapper(data):
-        """
-        Map a function to each item of a list
-        """
+        """Map a function to each item of a list."""
         if isinstance(data, list):
             return map(func, data)
         else:
@@ -95,13 +84,9 @@ def map_func(func):
 
 
 def strip_prefixes(*prefixes):
-    """
-    Return a filter function that removes leading prefixes from a string
-    """
+    """Return a filter function that removes leading prefixes from a string."""
     def _inner(value):
-        """
-        Remove a leading prefix from string
-        """
+        """Remove a leading prefix from string."""
         if isinstance(value, six.string_types):
             for prefix in prefixes:
                 if value.lower().startswith(prefix):
@@ -111,9 +96,7 @@ def strip_prefixes(*prefixes):
 
 
 def sanitize_html(value):
-    """
-    Sanitize HTML
-    """
+    """Sanitize HTML."""
     if isinstance(value, six.string_types):
         washer = HTMLWasher()
         return washer.wash(value)

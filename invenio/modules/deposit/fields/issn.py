@@ -23,7 +23,11 @@ from invenio.modules.deposit.field_base import WebDepositField
 
 __all__ = ['ISSNField']
 
+
 class ISSNField(WebDepositField, TextField):
+
+    """ISSN Field."""
+
     def __init__(self, **kwargs):
         import warnings
         warnings.warn("Field has been deprecated", PendingDeprecationWarning)

@@ -27,12 +27,13 @@ from wtforms.validators import ValidationError, StopValidation, Regexp
 from invenio.utils import persistentid as pidutils
 from flask import current_app
 
+
 #
 # General purpose validators
 #
 class ListLength(object):
-    """
-    Require number of elements
+
+    """Require number of elements.
 
     :param min_num: Minimum number of elements.
     :param max_num: Maximum number of elements.
@@ -68,11 +69,10 @@ class ListLength(object):
                 )
 
 
-
 class RequiredIf(object):
-    """
-    Require field if value of another field is set to a certain value.
-    """
+
+    """Require field if value of another field is set to a certain value."""
+
     def __init__(self, other_field_name, values, message=None):
         self.other_field_name = other_field_name
         self.values = values
@@ -86,8 +86,9 @@ class RequiredIf(object):
                 # Check if field value is required
                 if (callable(v) and v(other_val)) or (other_val == v):
                     # Field value is required - check the value
-                    if not field.data or isinstance(field.data, six.string_types) \
-                       and not field.data.strip():
+                    if not field.data or \
+                            isinstance(field.data, six.string_types) \
+                            and not field.data.strip():
                         if self.message is None:
                             self.message = 'This field is required.'
                         field.errors[:] = []
@@ -100,6 +101,9 @@ class RequiredIf(object):
 
 
 class NotRequiredIf(RequiredIf):
+
+    """Do not require field if another field contains a certain value."""
+
     def __call__(self, form, field):
         try:
             other_field = getattr(form, self.other_field_name)

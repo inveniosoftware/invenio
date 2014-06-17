@@ -17,16 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Utility functions for field autocomplete feature."""
+
 from invenio.utils.sherpa_romeo import SherpaRomeoSearch
 from invenio.utils.orcid import OrcidSearch
 
 
 def kb_autocomplete(name, mapper=None):
-    """
-    Create a autocomplete function from knowledge base
+    """Create an autocomplete function from knowledge base.
 
-    @param name: Name of knowledge base
-    @param mapper: Function that will map an knowledge base entry to
+    :param name: Name of knowledge base
+    :param mapper: Function that will map an knowledge base entry to
                    autocomplete entry.
     """
     def inner(dummy_form, dummy_field, term, limit=50):
@@ -51,6 +52,7 @@ def kb_dynamic_autocomplete(name, mapper=None):
 
 
 def sherpa_romeo_publishers(dummy_form, dummy_field, term, limit=50):
+    """Autocomplete publishers from SHERPA/RoMEO service."""
     if term:
         sherpa_romeo = SherpaRomeoSearch()
         publishers = sherpa_romeo.search_publisher(term)
@@ -61,9 +63,7 @@ def sherpa_romeo_publishers(dummy_form, dummy_field, term, limit=50):
 
 
 def sherpa_romeo_journals(dummy_form, dummy_field, term, limit=50):
-    """
-    Search SHERPA/RoMEO for journal name
-    """
+    """Search SHERPA/RoMEO for journal name."""
     if term:
         # SherpaRomeoSearch doesnt' like unicode
         if isinstance(term, unicode):
@@ -76,6 +76,7 @@ def sherpa_romeo_journals(dummy_form, dummy_field, term, limit=50):
 
 
 def orcid_authors(dummy_form, dummy_field, term, limit=50):
+    """Autocomplete authors from ORCID service."""
     if term:
         orcid = OrcidSearch()
         orcid.search_authors(term)

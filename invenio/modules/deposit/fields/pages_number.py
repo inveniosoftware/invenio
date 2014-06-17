@@ -19,7 +19,7 @@
 
 from wtforms import TextField
 from invenio.modules.deposit.field_base import WebDepositField
-#from ..validation_utils import number_validate
+# from ..validation_utils import number_validate
 
 __all__ = ['PagesNumberField']
 
@@ -27,11 +27,13 @@ __all__ = ['PagesNumberField']
 class PagesNumberField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         import warnings
-        warnings.warn("Field has been deprecated", PendingDeprecationWarning)
+        warnings.warn("Field has been deprecated",
+                      PendingDeprecationWarning)
         defaults = dict(
             icon='th',
             widget_classes="form-control"
-            #FIXMEvalidators=[number_validate(error_message='Pages must be a number!')] #FIXME
+            # FIXME validators=[
+            # number_validate(error_message='Pages must be a number!')]
         )
         defaults.update(kwargs)
         super(PagesNumberField, self).__init__(**defaults)

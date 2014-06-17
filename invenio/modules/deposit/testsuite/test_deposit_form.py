@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -126,7 +126,8 @@ class WebDepositFormTest(InvenioTestCase):
         )
         self.assertEqual(
             form.autocomplete('related_identifier-0-scheme', 'test', limit=2),
-            ['related_identifier-0-scheme-0', 'related_identifier-0-scheme-1', ]
+            ['related_identifier-0-scheme-0',
+             'related_identifier-0-scheme-1', ]
         )
 
     def test_loading_objectdata(self):
@@ -225,8 +226,10 @@ class WebDepositFormTest(InvenioTestCase):
 
         expected_data = self.object_data
         expected_data['title'] = new_title
-        expected_data['related_identifier'].append({'scheme': None, 'identifier': None})
-        expected_data['related_identifier'].append({'scheme': new_scheme, 'identifier': None})
+        expected_data['related_identifier'].append({'scheme': None,
+                                                    'identifier': None})
+        expected_data['related_identifier'].append({'scheme': new_scheme,
+                                                    'identifier': None})
 
         formdata = self.multidict({
             'title': new_title,
@@ -351,8 +354,10 @@ class WebDepositFormTest(InvenioTestCase):
                 'title': {'state': 'warning', 'messages': ['t1', 't2']},
                 'subtitle': {},
                 'related_identifier': {'state': 'warning', 'messages': ['t3']},
-                'related_identifier-0': {'state': 'warning', 'messages': ['t4']},
-                'related_identifier-0-scheme': {'state': 'warning', 'messages': ['t5']},
+                'related_identifier-0': {'state': 'warning',
+                                         'messages': ['t4']},
+                'related_identifier-0-scheme': {'state': 'warning',
+                                                'messages': ['t5']},
                 'related_identifier-0-identifier': {},
                 'related_identifier-1': {},
                 'related_identifier-1-scheme': {},

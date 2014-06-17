@@ -49,8 +49,8 @@ class Date(WebDepositField, DateField):
             self.object_data = value.date()
         elif isinstance(value, date):
             self.object_data = value
-        # Be sure to set both self.object_data and self.data due to internals of
-        # Field.process() and draft_form_process_and_validate().
+        # Be sure to set both self.object_data and self.data due to internals
+        # of Field.process() and draft_form_process_and_validate().
         self.data = self.object_data
 
     @property
@@ -60,5 +60,5 @@ class Date(WebDepositField, DateField):
         """
         # Just use _value() to format the date into a string.
         if self.data:
-            return self.data.strftime(self.format) #pylint: disable-msg=
+            return self.data.strftime(self.format)  # pylint: disable-msg=
         return None

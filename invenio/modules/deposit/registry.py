@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Implement registries used in deposit module."""
+
 from __future__ import absolute_import, print_function
 
 from flask import current_app
@@ -26,25 +28,33 @@ from invenio.modules.workflows.registry import workflows
 
 
 class DepositSingletonRegistry(SingletonRegistry):
+
+    """Specialized singleton registry for ``deposit_types``."""
+
     def get(self):
-        """ Ensure deposit types are loaded before getting the object """
+        """Ensure deposit types are loaded before getting the object."""
         if 'deposit_types' not in current_app.extensions['registry']:
             list(deposit_types)
         return super(DepositSingletonRegistry, self).get()
 
 
 class DepositionTypeRegistry(ImportPathRegistry):
+
+    """Specialized import path registry.
+
+    It loads deposition types when accessed, and also register the default
+    deposition type.
     """
-    Import path registry, that will load deposition types when accessed, and
-    also register the default deposition type.
-    """
+
     def __init__(self):
+        """Initialize deposity types from application config."""
         super(DepositionTypeRegistry, self).__init__(
             initial=current_app.config['DEPOSIT_TYPES'],
             load_modules=True,
         )
 
     def _load_import_path(self, import_path):
+        """Register default deposit type when it is imported."""
         obj = super(DepositionTypeRegistry, self)._load_import_path(
             import_path
         )
@@ -55,11 +65,10 @@ class DepositionTypeRegistry(ImportPathRegistry):
         return obj
 
     def register(self, import_path_or_type):
-        """
-        Allow registering both import paths or deposition types
+        """Allow registering both import paths or deposition types.
 
-        Note, if you manually register a deposition type instad of using the
-        configuration variable you must also refresh your applications URL
+        .. note:: If you manually register a deposition type instad of using
+        the configuration variable you must also refresh your applications URL
         map using .url_converters.refresh_url_map() method.
         """
         if isinstance(import_path_or_type, type) and \
@@ -74,9 +83,7 @@ class DepositionTypeRegistry(ImportPathRegistry):
             super(DepositionTypeRegistry, self).register(import_path_or_type)
 
     def unregister(self, deposition_type):
-        """
-        Allow unregistering deposition types
-        """
+        """Allow unregistering deposition types."""
         if deposition_type.__name__ not in workflows:
             raise RegistryError("Deposition type not registered")
         # Super call with ImportPathRegistry instead of DepositionTypeRegistry
@@ -85,6 +92,7 @@ class DepositionTypeRegistry(ImportPathRegistry):
         del workflows[deposition_type.__name__]
 
     def mapping(self):
+        """Define deposition type mapping by their ``__name__``."""
         return dict([(x.__name__, x) for x in self])
 
 

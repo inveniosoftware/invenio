@@ -24,7 +24,9 @@ they subclass WebDepositField for added functionality
 
 The code is basically identical to importing all the WTForm fields and for each
 field make a subclass according to the pattern (using FloatField as
-an example)::
+an example):
+
+.. code-block:: python
 
     class FloatField(WebDepositField, wtforms.FloatField):
         pass
@@ -64,22 +66,28 @@ for attr_name in dir(wtforms):
 # Special needs for field enclosures
 #
 class FormField(WebDepositField, wtforms.FormField):
+
+    """Deposition form field."""
+
     def __init__(self, *args, **kwargs):
         if 'autocomplete' in kwargs:
-            raise TypeError('FormField cannot take autocomplete argument. Instead, define it on the enclosed fields.')
+            raise TypeError('FormField cannot take autocomplete argument. '
+                            'Instead, define it on the enclosed fields.')
         if 'placeholder' in kwargs:
-            raise TypeError('FormField cannot take placeholder argument. Instead, define it on the enclosed fields.')
+            raise TypeError('FormField cannot take placeholder argument. '
+                            'Instead, define it on the enclosed fields.')
         if 'processors' in kwargs:
-            raise TypeError('FormField cannot take processors. Instead, define them on the enclosed fields.')
+            raise TypeError('FormField cannot take processors. '
+                            'Instead, define them on the enclosed fields.')
         super(FormField, self).__init__(*args, **kwargs)
 
     def reset_field_data(self, exclude=[]):
-        """
-        Reset the fields.data value to that of field.object_data.
+        """Reset the ``fields.data`` value to that of ``field.object_data``.
 
-        Usually not called directly, but rather through Form.reset_field_data()
+        Usually not called directly, but rather through
+        ``Form.reset_field_data()``.
 
-        @param exclude: List of formfield names to exclude.
+        :param exclude: List of formfield names to exclude.
         """
         self.form.reset_field_data(exclude=exclude)
 
@@ -108,7 +116,7 @@ class FormField(WebDepositField, wtforms.FormField):
         # Ignore extra_processors on purpose (as they are not allowed for
         # field enclosures)
         self.form.post_process(form=self.form, formfields=formfields,
-            submit=submit)
+                               submit=submit)
 
     def perform_autocomplete(self, form, name, term, limit=50):
         """
@@ -141,13 +149,19 @@ class FormField(WebDepositField, wtforms.FormField):
 
 
 class FieldList(WebDepositField, wtforms.FieldList):
+
+    """Deposition field list."""
+
     def __init__(self, *args, **kwargs):
         if 'autocomplete' in kwargs:
-            raise TypeError('FieldList does not accept autocomplete argument. Instead, define it on the enclosed field.')
+            raise TypeError('FieldList does not accept autocomplete argument.'
+                            'Instead, define it on the enclosed field.')
         if 'placeholder' in kwargs:
-            raise TypeError('FieldList does not accept placeholder argument. Instead, define it on the enclosed field.')
+            raise TypeError('FieldList does not accept placeholder argument. '
+                            'Instead, define it on the enclosed field.')
         if 'processors' in kwargs:
-            raise TypeError('FieldList does not accept processors. Instead, define them on the enclosed field.')
+            raise TypeError('FieldList does not accept processors. '
+                            'Instead, define them on the enclosed field.')
         super(FieldList, self).__init__(*args, **kwargs)
 
     def get_entries(self):
@@ -171,7 +185,7 @@ class FieldList(WebDepositField, wtforms.FieldList):
         # Add fix for non-standard separator
         separator = '-'
         if issubclass(self.unbound_field.field_class, FormField):
-            separator = self.unbound_field.kwargs.get('separator','-')
+            separator = self.unbound_field.kwargs.get('separator', '-')
         offset = len(prefix) + 1
         for k in formdata:
             if k.startswith(prefix):
@@ -185,7 +199,7 @@ class FieldList(WebDepositField, wtforms.FieldList):
 
         Usually not called directly, but rather through Form.reset_field_data()
 
-        @param exclude: List of formfield names to exclude.
+        :param exclude: List of formfield names to exclude.
         """
         if self.name not in exclude:
             for subfield in self.get_entries():
@@ -224,9 +238,10 @@ class FieldList(WebDepositField, wtforms.FieldList):
             )
 
     def perform_autocomplete(self, form, name, term, limit=50):
-        """
-        Run auto-complete method for field. This method should not be called
-        directly, instead use Form.autocomplete().
+        """Run auto-complete method for field.
+
+        This method should not be called directly, instead use
+        ``Form.autocomplete()``.
         """
         separator = '-'
         if issubclass(self.unbound_field.field_class, FormField):

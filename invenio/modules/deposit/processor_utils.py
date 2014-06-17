@@ -124,7 +124,9 @@ class DataCiteLookup(object):
                 if self.mapping_func:
                     self.mapping_func(datacite, form, self.mapping)
                     if self.display_info:
-                        field.add_message("DOI metadata successfully imported from DataCite.", state='info')
+                        field.add_message(
+                            "DOI metadata successfully imported from "
+                            "DataCite.", state='info')
             except Exception:
                 # Ignore errors
                 pass
@@ -193,17 +195,21 @@ def sherpa_romeo_publisher_process(form, field, submit=False, fields=None):
         if isinstance(copyright_links, list):
             copyright_links_html = ""
             for copyright_link in copyright_links['copyrightlink']:
-                copyright_links_html += '<a href="' + copyright_link['copyrightlinkurl'] + \
-                                        '">' + copyright_link['copyrightlinktext'] + "</a><br>"
+                copyright_links_html += (
+                    '<a href="' + copyright_link['copyrightlinkurl'] +
+                    '">' + copyright_link['copyrightlinktext'] + "</a><br>")
         elif isinstance(copyright_links, dict):
             if isinstance(copyright_links['copyrightlink'], list):
                 for copyright_link in copyright_links['copyrightlink']:
-                    copyright_links_html = '<a href="' + copyright_link['copyrightlinkurl'] + \
-                                           '">' + copyright_link['copyrightlinktext'] + "</a><br>"
+                    copyright_links_html = (
+                        '<a href="' + copyright_link['copyrightlinkurl'] +
+                        '">' + copyright_link['copyrightlinktext'] +
+                        "</a><br>")
             else:
                 copyright_link = copyright_links['copyrightlink']
-                copyright_links_html = '<a href="' + copyright_link['copyrightlinkurl'] + \
-                                       '">' + copyright_link['copyrightlinktext'] + "</a><br>"
+                copyright_links_html = (
+                    '<a href="' + copyright_link['copyrightlinkurl'] +
+                    '">' + copyright_link['copyrightlinktext'] + "</a><br>")
 
         home_url = s.parser.get_publishers(attribute='homeurl')
         if home_url is not None and home_url != []:

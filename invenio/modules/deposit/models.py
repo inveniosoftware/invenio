@@ -821,8 +821,8 @@ class DepositionDraft(FactoryMixin):
         # Determine changed messages
         changed_msgs = dict(
             (name, messages) for name, messages in post_processed_msgs.items()
-            if validated_msgs.get(name, []) != messages or process_field_names is None
-            or name in process_field_names
+            if validated_msgs.get(name, []) != messages
+            or process_field_names is None or name in process_field_names
         )
 
         result = {}
@@ -1406,8 +1406,8 @@ class Deposition(object):
 
 
 class SubmissionInformationPackage(FactoryMixin):
-    """
-    Submission information package (SIP)
+
+    """Submission information package (SIP).
 
     :param uuid: Unique identifier for this SIP
     :param metadata: Metadata in JSON for this submission information package
@@ -1419,6 +1419,7 @@ class SubmissionInformationPackage(FactoryMixin):
     :param task_ids: List of task ids submitted to ingest this package (may be
         appended to after SIP has been sealed).
     """
+
     def __init__(self, uuid=None, metadata={}):
         self.uuid = uuid or str(uuid4())
         self.metadata = metadata
@@ -1463,7 +1464,7 @@ class SubmissionInformationPackage(FactoryMixin):
 
         class DateTimeEncoder(json.JSONEncoder):
             def default(self, obj):
-                if isinstance(obj, datetime.datetime) or isinstance(obj, datetime.date):
+                if isinstance(obj, (datetime.datetime, datetime.date)):
                     encoded_object = obj.isoformat()
                 else:
                     encoded_object = json.JSONEncoder.default(self, obj)
@@ -1474,6 +1475,9 @@ class SubmissionInformationPackage(FactoryMixin):
 
 
 class Agent(FactoryMixin):
+
+    """Agent."""
+
     def __init__(self, role=None, from_request_context=False):
         self.role = role
         self.user_id = None
