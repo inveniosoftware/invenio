@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,20 +16,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Prints a link to BibEdit
-"""
-__revision__ = "$Id$"
+
+"""BibFormat element to print a link to BibEdit."""
 
 from invenio.utils.url import create_html_link
 from invenio.base.i18n import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_RECORD
 from invenio.legacy.bibedit.utils import user_can_edit_record_collection
 
-def format_element(bfo, style):
-    """
-    Prints a link to BibEdit, if authorization is granted
 
-    @param style: the CSS style to be applied to the link.
+def format_element(bfo, style):
+    """Print a link to BibEdit, if authorization is granted.
+
+    :param style: the CSS style to be applied to the link.
     """
     _ = gettext_set_language(bfo.lang)
 
@@ -40,17 +39,17 @@ def format_element(bfo, style):
         linkattrd = {}
         if style != '':
             linkattrd['style'] = style
-        out += create_html_link(CFG_SITE_URL +
-               '/%s/edit/?ln=%s#state=edit&recid=%s' % (CFG_SITE_RECORD, bfo.lang, str(bfo.recID)),
-               {},
-               link_label=_("Edit This Record"),
-               linkattrd=linkattrd)
+        out += create_html_link(
+            CFG_SITE_SECURE_URL +
+            '/%s/edit/?ln=%s#state=edit&recid=%s' % (CFG_SITE_RECORD, bfo.lang,
+                                                     str(bfo.recID)),
+            {},
+            link_label=_("Edit This Record"),
+            linkattrd=linkattrd)
 
     return out
 
+
 def escape_values(bfo):
-    """
-    Called by BibFormat in order to check if output of this element
-    should be escaped.
-    """
+    """Check if output of this element should be escaped."""
     return 0
