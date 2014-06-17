@@ -48,7 +48,7 @@ are troublesome so we recommend you to install them from Chris Lea's PPA.
     $ sudo apt-get install nodejs
     $ sudo su -c "npm install -g bower grunt-cli"
 
-For futher tutorial you will need to check that you have ``git-new-workdir``.
+For the rest of the tutorial you will need to check that you have ``git-new-workdir``.
 
 .. code-block:: console
 
@@ -77,7 +77,7 @@ Invenio. This development is done in the ``pu`` branch.
 
     $ cd $HOME/src/
     $ export BRANCH=pu
-    $ git clone https://github.com/jirikuncar/invenio.git
+    $ git clone https://github.com/inveniosoftware/invenio.git
 
 We recommend to work using
 `virtual environments <http://www.virtualenv.org/>`_ so packages are installed
@@ -149,7 +149,7 @@ Generate the secret key for your installation.
 
     (invenio)$ inveniomanage config create secret-key
 
-If you are planning to develop localy in multiple environments please run
+If you are planning to develop locally in multiple environments please run
 the following commands.
 
 .. code-block:: console
