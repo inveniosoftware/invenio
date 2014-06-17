@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Perform demosite operations."""
+
 from __future__ import print_function
 
 import os
@@ -25,14 +27,15 @@ import sys
 
 from invenio.ext.script import Manager
 
-manager = Manager(usage="Perform demosite operations")
+manager = Manager(usage=__doc__)
 
 # Shortcuts for manager options to keep code DRY.
 option_yes_i_know = manager.option('--yes-i-know', action='store_true',
                                    dest='yes_i_know', help='use with care!')
 option_default_data = manager.option('--no-data', action='store_false',
                                      dest='default_data',
-                                     help='do not populate tables with default data')
+                                     help='do not populate tables with '
+                                          'default data')
 option_file = manager.option('-f', '--file', dest='files',
                              action='append', help='data file to use')
 option_jobid = manager.option('-j', '--job-id', dest='job_id', type=int,
@@ -69,9 +72,9 @@ def populate(packages=[], default_data=True, files=None,
     db.session.execute("TRUNCATE schTASK")
     db.session.commit()
     if files is None:
-        files = [pkg_resources.resource_filename('invenio.testsuite',
-                                                 os.path.join('data',
-                                                              'demo_record_marc_data.xml'))]
+        files = [pkg_resources.resource_filename(
+            'invenio',
+            os.path.join('testsuite', 'data', 'demo_record_marc_data.xml'))]
 
     for f in files:
         job_id += 1
@@ -80,21 +83,22 @@ def populate(packages=[], default_data=True, files=None,
             if os.system(cmd):
                 print("ERROR: failed execution of", cmd)
                 sys.exit(1)
-    for cmd in ["%s/bin/bibdocfile --textify --with-ocr --recid 97" % CFG_PREFIX,
-                "%s/bin/bibdocfile --textify --all" % CFG_PREFIX,
-                "%s/bin/bibindex -u admin" % CFG_PREFIX,
-                "%s/bin/bibindex %d" % (CFG_PREFIX, job_id + 1),
-                "%s/bin/bibreformat -u admin -o HB" % CFG_PREFIX,
-                "%s/bin/bibreformat %d" % (CFG_PREFIX, job_id + 2),
-                "%s/bin/webcoll -u admin" % CFG_PREFIX,
-                "%s/bin/webcoll %d" % (CFG_PREFIX, job_id + 3),
-                "%s/bin/bibrank -u admin" % CFG_PREFIX,
-                "%s/bin/bibrank %d" % (CFG_PREFIX, job_id + 4),
-                "%s/bin/bibsort -u admin -R" % CFG_PREFIX,
-                "%s/bin/bibsort %d" % (CFG_PREFIX, job_id + 5),
-                "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
-                "%s/bin/oairepositoryupdater %d" % (CFG_PREFIX, job_id + 6),
-                "%s/bin/bibupload %d" % (CFG_PREFIX, job_id + 7)]:
+    for cmd in ["bin/bibdocfile --textify --with-ocr --recid 97",
+                "bin/bibdocfile --textify --all",
+                "bin/bibindex -u admin",
+                "bin/bibindex %d" % (job_id + 1,),
+                "bin/bibreformat -u admin -o HB",
+                "bin/bibreformat %d" % (job_id + 2,),
+                "bin/webcoll -u admin",
+                "bin/webcoll %d" % (job_id + 3,),
+                "bin/bibrank -u admin",
+                "bin/bibrank %d" % (job_id + 4,),
+                "bin/bibsort -u admin -R",
+                "bin/bibsort %d" % (job_id + 5,),
+                "bin/oairepositoryupdater -u admin",
+                "bin/oairepositoryupdater %d" % (job_id + 6,),
+                "bin/bibupload %d" % (job_id + 7,)]:
+        cmd = os.path.join(CFG_PREFIX, cmd)
         if os.system(cmd):
             print("ERROR: failed execution of", cmd)
             sys.exit(1)
@@ -104,7 +108,6 @@ def populate(packages=[], default_data=True, files=None,
 @option_packages
 def create(packages=[]):
     """Populate database with demo site data."""
-
     from invenio.ext.sqlalchemy import db
     from invenio.config import CFG_PREFIX
     from invenio.modules.accounts.models import User
@@ -128,7 +131,9 @@ def create(packages=[]):
     from invenio.base.scripts.database import load_fixtures
     load_fixtures(packages=packages, truncate_tables_first=True)
 
-    db.session.execute("UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext','miscellaneous');")
+    db.session.execute("UPDATE idxINDEX SET stemming_language='en' WHERE name "
+                       "IN ('global','abstract','keyword','title','fulltext'"
+                       ",'miscellaneous')")
     db.session.commit()
 
     conf = get_conf()
@@ -152,6 +157,7 @@ def create(packages=[]):
 
 
 def main():
+    """Start the commandline manager."""
     from invenio.base.factory import create_app
     app = create_app()
     manager.app = app
