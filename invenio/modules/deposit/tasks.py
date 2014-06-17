@@ -498,7 +498,7 @@ def upload_record_sip():
 
         task_id = task_low_level_submission(
             'bibupload', 'webdeposit',
-            '-r' if 'recid' in sip.metadata else '-i', tmp_file_path, '-P5',
+            '-r' if 'recid' in sip.metadata else '-i', tmp_file_path,
             '-I', str(d.workflow_object.task_sequence_id)
         )
 
