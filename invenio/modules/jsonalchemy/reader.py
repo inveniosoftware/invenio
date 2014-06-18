@@ -423,9 +423,10 @@ class Reader(object):  # pylint: disable=R0921
                     field_name, exclude=['decorators', 'extensions'])
                 self._json.__setitem__(field_name, value, extend=False,
                                        exclude=['decorators', 'extensions'])
+                # FIXME: Find a better way to set the default values
                 try:
                     self._json._dict_bson[field_name].update(old_value)
-                except AttributeError:
+                except (AttributeError, ValueError):
                     self._json.__setitem__(
                         field_name, old_value, extend=False,
                         exclude=['decorators', 'extensions'])
