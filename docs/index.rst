@@ -29,13 +29,13 @@ These libraries are not documented here. If you want to dive into their
 documentation, check out the following links:
 
 - `Flask Documentation <http://flask.pocoo.org/documentation/>`_
-- `Jinja2 Documentation <http://jinja.pocoo.org/2/documentation/>`_
+- `Jinja2 Documentation <http://jinja.pocoo.org/docs/>`_
 - `Werkzeug Documentation <http://werkzeug.pocoo.org/documentation/>`_
 - `SQLAlchemy Documentation <http://docs.sqlalchemy.org/en/latest/>`_
 
 
 .. _Flask: http://flask.pocoo.org/
-.. _Jinja2: http://jinja.pocoo.org/2/
+.. _Jinja2: http://jinja.pocoo.org/docs/
 .. _Werkzeug: http://werkzeug.pocoo.org/
 .. _SQLAlchemy: http://www.sqlalchemy.org/
 

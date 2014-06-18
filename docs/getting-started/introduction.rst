@@ -15,11 +15,11 @@ Registries are used as a mechanism to support pluggable architecture
 using Python packages. A registry item is a Python package, class,
 function or file that is registered with application.
 
-Regitries can be configured in several ways. Usually using a config
+Registries can be configured in several ways. Usually using a config
 variable or `entry_points`_.
 
 A Invenio instance can consist of multiple packages, giving way
-to high adaptability and chorizontal scaling.
+to high adaptability and horizontal scaling.
 
 .. _Flask-Registry: http://flask-registry.rtfd.org/
 .. _entry_points: https://pythonhosted.org/setuptools/pkg_resources.html#entry-points
@@ -37,7 +37,7 @@ What do I need?
     The last version to support Python 2.4 was Invenio series 1.2.
 
 *Invenio* requires a relational database backend to store information.
-The MySQL or PostgreSQL (*coming soon*) are required for basic
+MySQL or PostgreSQL (*coming soon*) are required for basic
 functionality, but there's also support for a MongoDB of other
 experimental NoSQL solutions, including using SQLite for local
 development.
