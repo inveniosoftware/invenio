@@ -17,7 +17,28 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebSearch Flask Blueprint"""
+"""
+WebSearch Flask Blueprint.
+
+Template hierarchy.
+-------------------
+
+- ``searchbar_frame_base.html``
+    - ``searchbar_frame.html``
+        - ``collection_base.html``
+            - ``collection.html`` used by ``/collection/<collection>``
+                - ``index_base.html``
+                    - ``index.html`` used by ``/``
+        - ``search_base.html``
+            - ``search.html``
+        - ``browse_base.html``
+            - ``browse.html`` used by ``/browse``
+    - ``results_base.html``
+        - ``results.html``
+- ``helpers_base.html`` macros
+    - ``helpers.html``
+
+"""
 
 import json
 import string
