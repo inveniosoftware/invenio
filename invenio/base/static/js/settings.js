@@ -18,7 +18,7 @@
  */
 
 require.config({
-    baseUrl: '',
+    baseUrl: '/',
     paths: {
         bootstrap: 'js/bootstrap',
         jquery: 'js/jquery',
