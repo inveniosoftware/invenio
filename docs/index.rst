@@ -35,7 +35,7 @@ documentation, check out the following links:
 
 
 .. _Flask: http://flask.pocoo.org/
-.. _Jinja2: http://jinja.pocoo.org/2/
+.. _Jinja2: http://jinja.pocoo.org/docs/
 .. _Werkzeug: http://werkzeug.pocoo.org/
 .. _SQLAlchemy: http://www.sqlalchemy.org/
 
