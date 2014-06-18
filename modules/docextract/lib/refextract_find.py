@@ -62,28 +62,33 @@ def find_reference_section(docbody):
     title_patterns = get_reference_section_title_patterns()
 
     # Try to find refs section title:
-    for reversed_index, line in enumerate(reversed(docbody)):
-        title_match = regex_match_list(line, title_patterns)
-        if title_match:
-            title = title_match.group('title')
-            index = len(docbody) - 1 - reversed_index
-            temp_ref_details, found_title = find_numeration(docbody[index:index+6], title)
-            if temp_ref_details:
-                if ref_details and 'title' in ref_details \
-                               and ref_details['title'] \
-                               and not temp_ref_details['title']:
-                    continue
-                if ref_details and 'marker' in ref_details \
-                               and ref_details['marker'] \
-                               and not temp_ref_details['marker']:
-                    continue
+    for title_pattern in title_patterns:
+        # Look for title pattern in docbody
+        for reversed_index, line in enumerate(reversed(docbody)):
+            title_match = title_pattern.match(line)
+            if title_match:
+                title = title_match.group('title')
+                index = len(docbody) - 1 - reversed_index
+                temp_ref_details, found_title = find_numeration(docbody[index:index+6], title)
+                if temp_ref_details:
+                    if ref_details and 'title' in ref_details \
+                                   and ref_details['title'] \
+                                   and not temp_ref_details['title']:
+                        continue
+                    if ref_details and 'marker' in ref_details \
+                                   and ref_details['marker'] \
+                                   and not temp_ref_details['marker']:
+                        continue
 
-                ref_details = temp_ref_details
-                ref_details['start_line'] = index
-                ref_details['title_string'] = title
+                    ref_details = temp_ref_details
+                    ref_details['start_line'] = index
+                    ref_details['title_string'] = title
 
-            if found_title:
-                break
+                if found_title:
+                    break
+
+        if ref_details:
+            break
 
     return ref_details
 
