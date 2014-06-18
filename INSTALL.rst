@@ -107,6 +107,8 @@ Installing the Python dependencies.
 
 .. code-block:: console
 
+    (invenio)$ pip install pip --upgrade
+    (invenio)$ # the previous command should prevent "no such option: --process-dependency-links" in the following command
     (invenio)$ pip install -e . --process-dependency-links --allow-all-external
 
 Some modules may require specific dependencies listed in the
