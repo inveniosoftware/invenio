@@ -666,27 +666,26 @@ def get_reference_section_title_patterns():
     """
     patterns = []
     titles = [u'references',
-              u'references.',
               u'r\u00C9f\u00E9rences',
               u'r\u00C9f\u00C9rences',
-              u'reference',
-              u'refs',
-              u'r\u00E9f\u00E9rence',
-              u'r\u00C9f\u00C9rence',
               u'r\xb4ef\xb4erences',
-              u'r\u00E9fs',
-              u'r\u00C9fs',
               u'bibliography',
               u'bibliographie',
-              u'citations',
               u'literaturverzeichnis',
-              u'publications']
+              u'citations',
+              u'refs',
+              u'publications'
+              u'r\u00E9fs',
+              u'r\u00C9fs',
+              u'reference',
+              u'r\u00E9f\u00E9rence',
+              u'r\u00C9f\u00C9rence']
     sect_marker = u'^\s*([\[\-\{\(])?\s*' \
                   u'((\w|\d){1,5}([\.\-\,](\w|\d){1,5})?\s*' \
                   u'[\.\-\}\)\]]\s*)?' \
                   u'(?P<title>'
     sect_marker1 = u'^(\d){1,3}\s*(?P<title>'
-    line_end = ur'(\s*s\s*e\s*c\s*t\s*i\s*o\s*n\s*)?)([\)\}\]])?' \
+    line_end = ur'(\s*s\s*e\s*c\s*t\s*i\s*o\s*n\s*)?)\.?([\)\}\]])?' \
         ur'($|\s*[\[\{\(\<]\s*[1a-z]\s*[\}\)\>\]]|\:$)'
 
     for t in titles:
