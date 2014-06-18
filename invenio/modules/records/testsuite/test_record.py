@@ -555,13 +555,10 @@ class TestMarcRecordCreation(InvenioTestCase):
           <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">/path/to</subfield>
             <subfield code="t">Test</subfield>
-            </datafield></record>
+            </record>
         </collection>
         """
-        blob = unicode(blob)
 
-        # Should raise an error that Unicode strings with
-        # encoding declaration are not supported
         self.assertRaises(
             ReaderException,
             Record.create,
