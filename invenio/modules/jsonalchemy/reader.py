@@ -39,13 +39,13 @@ from .registry import functions, readers
 
 
 def split_blob(blob, master_format, slice_size=0, **kwargs):
-    """@todo: Docstring for split_blob.
+    """TODO: Docstring for split_blob.
 
-    :blob: @todo
-    :master_format: @todo
-    :slice_size: @todo
-    :**kwargs: @todo
-    :returns: @todo
+    :params blob: todo
+    :params master_format: todo
+    :params slice_size: todo
+    :params kwargs: todo
+    :returns: todo
 
     """
     def grouper(n, iterable):
@@ -423,9 +423,10 @@ class Reader(object):  # pylint: disable=R0921
                     field_name, exclude=['decorators', 'extensions'])
                 self._json.__setitem__(field_name, value, extend=False,
                                        exclude=['decorators', 'extensions'])
+                # FIXME: Find a better way to set the default values
                 try:
                     self._json._dict_bson[field_name].update(old_value)
-                except AttributeError:
+                except (AttributeError, ValueError):
                     self._json.__setitem__(
                         field_name, old_value, extend=False,
                         exclude=['decorators', 'extensions'])
