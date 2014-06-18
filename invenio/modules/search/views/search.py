@@ -89,6 +89,7 @@ FACETS = FacetLoader()
 
 
 def collection_name_from_request():
+    """TODO."""
     collection = request.values.get('cc')
     if collection is None and len(request.values.getlist('c')) == 1:
         collection = request.values.get('c')
@@ -96,6 +97,7 @@ def collection_name_from_request():
 
 
 def min_length(length, code=406):
+    """TODO."""
     def checker(value):
         if len(value) < 3:
             abort(code)
@@ -125,8 +127,11 @@ def check_collection(method=None, name_getter=collection_name_from_request,
         if collection.is_restricted:
             from invenio.modules.access.engine import acc_authorize_action
             from invenio.modules.access.local_config import VIEWRESTRCOLL
-            (auth_code, auth_msg) = acc_authorize_action(uid, VIEWRESTRCOLL,
-                                                         collection=collection.name)
+            (auth_code, auth_msg) = acc_authorize_action(
+                uid,
+                VIEWRESTRCOLL,
+                collection=collection.name
+            )
             if auth_code:
                 flash(_('This collection is restricted.'), 'error')
             if auth_code and current_user.is_guest:
@@ -140,7 +145,9 @@ def check_collection(method=None, name_getter=collection_name_from_request,
 
 
 def response_formated_records(recids, collection, of, **kwargs):
-    from invenio.modules.formatter import get_output_format_content_type, print_records
+    """TODO."""
+    from invenio.modules.formatter import (get_output_format_content_type,
+                                           print_records)
     response = make_response(print_records(recids, collection=collection,
                                            of=of, **kwargs))
     response.mimetype = get_output_format_content_type(of)
@@ -154,8 +161,7 @@ def response_formated_records(recids, collection, of, **kwargs):
 @register_menu(blueprint, 'main.search', _('Search'), order=1)
 @register_breadcrumb(blueprint, '.', _('Home'))
 def index():
-    """ Renders homepage. """
-
+    """Render the homepage."""
     # legacy app support
     c = request.values.get('c')
     if c == current_app.config['CFG_SITE_NAME']:
@@ -178,19 +184,23 @@ def index():
 @blueprint.route('/collection/<name>', methods=['GET', 'POST'])
 def collection(name):
     """
-    Renders the collection page either with a collection specific template
-    (aka collection_{collection_name}.html) or with the default collection
+    Render the collection page.
+
+    It renders it either with a collection specific template (aka
+    collection_{collection_name}.html) or with the default collection
     template (collection.html)
     """
-    collection = Collection.query.filter(Collection.name == name).first_or_404()
+    collection = Collection.query.filter(Collection.name == name) \
+                                 .first_or_404()
 
     @register_template_context_processor
     def index_context():
+        breadcrumbs = current_breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:]
         return dict(
             of=request.values.get('of', collection.formatoptions[0]['code']),
             format_record=format_record,
             easy_search_form=EasySearchForm(csrf_enabled=False),
-            breadcrumbs=current_breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:])
+            breadcrumbs=breadcrumbs)
 
     return render_template(['search/collection_{0}.html'.format(collection.id),
                             'search/collection_{0}.html'.format(slugify(name,
@@ -200,6 +210,8 @@ def collection(name):
 
 
 class SearchUrlargs(object):
+
+    """TODO."""
 
     DEFAULT_URLARGS = {
         'p': {'title': 'Search', 'store': None},
@@ -213,29 +225,34 @@ class SearchUrlargs(object):
     }
 
     def __init__(self, session=None, user=None, **kwargs):
+        """TODO."""
         self.session = session
         self.user = user
         self._url_args = kwargs
 
     @property
     def args(self):
+        """TODO."""
         out = self.user_args
         out.update(self.url_args)
         return out
 
     @property
     def user_storable_args(self):
+        """TODO."""
         return dict(map(lambda (k, v): (v['store'], k),
                     filter(lambda (k, v): v['store'],
                     iteritems(self.DEFAULT_URLARGS))))
 
     @property
     def url_args(self):
+        """TODO."""
         return filter(lambda (k, v): k in self.DEFAULT_URLARGS.keys(),
                       iteritems(self._url_args))
 
     @property
     def user_args(self):
+        """TODO."""
         if not self.user:
             return {}
 
@@ -252,7 +269,7 @@ def _create_neareset_term_box(argd_orig):
     try:
         p = argd_orig.pop('p', '')
         f = argd_orig.pop('f', '')
-        if 'rg' in argd_orig and not 'rg' in request.values:
+        if 'rg' in argd_orig and 'rg' not in request.values:
             del argd_orig['rg']
         if f == '' and ':' in p:
             fx, px = p.split(':', 1)
@@ -262,12 +279,16 @@ def _create_neareset_term_box(argd_orig):
 
         from invenio.legacy.search_engine import create_nearest_terms_box
         return create_nearest_terms_box(argd_orig,
-            p=p, f=f.lower(), ln=g.ln, intro_text_p=True)
-    except:
-        return '<!-- not found -->'
+                                        p=p,
+                                        f=f.lower(),
+                                        ln=g.ln,
+                                        intro_text_p=True)
+    except:  # FIXME catch all exception is bad
+        return '<!-- not found -->'  # no comments
 
 
 def sort_and_rank_records(recids, so=None, rm=None, p=''):
+    """TODO."""
     output = recids.tolist()
     if so:
         output.reverse()
@@ -285,6 +306,7 @@ def sort_and_rank_records(recids, so=None, rm=None, p=''):
 
 
 def crumb_builder(url):
+    """TODO."""
     def _crumb_builder(collection):
         qargs = request.args.to_dict()
         qargs['cc'] = collection.name
@@ -294,6 +316,7 @@ def crumb_builder(url):
 
 
 def collection_breadcrumbs(collection, endpoint=None):
+    """TODO."""
     b = []
     if endpoint is None:
         endpoint = request.endpoint
@@ -310,15 +333,15 @@ def collection_breadcrumbs(collection, endpoint=None):
 @register_breadcrumb(blueprint, '.browse', _('Browse results'))
 @templated('search/browse.html')
 @wash_arguments({'p': (unicode, ''),
-                                 'f': (unicode, None),
-                                 'of': (unicode, 'hb'),
-                                 'so': (unicode, None),
-                                 'rm': (unicode, None),
-                                 'rg': (int, 10),
-                                 'jrec': (int, 1)})
+                 'f': (unicode, None),
+                 'of': (unicode, 'hb'),
+                 'so': (unicode, None),
+                 'rm': (unicode, None),
+                 'rg': (int, 10),
+                 'jrec': (int, 1)})
 @check_collection(default_collection=True)
 def browse(collection, p, f, of, so, rm, rg, jrec):
-
+    """Render browse page."""
     from invenio.legacy.search_engine import browse_pattern_phrases
     argd = argd_orig = wash_search_urlargd(request.args)
 
@@ -330,19 +353,24 @@ def browse(collection, p, f, of, so, rm, rg, jrec):
 
     websearch_before_browse.send(collection, **argd)
 
-    records = map(lambda (r, h): (r.decode('utf-8'), h),
-                  browse_pattern_phrases(req=request.get_legacy_request(),
-                                         colls=colls, p=p, f=f, rg=rg, ln=g.ln))
+    records = map(
+        lambda (r, h): (r.decode('utf-8'), h),
+        browse_pattern_phrases(req=request.get_legacy_request(),
+                               colls=colls, p=p, f=f, rg=rg, ln=g.ln))
 
     @register_template_context_processor
     def index_context():
-        return dict(collection=collection,
-                    create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
-                    pagination=Pagination(int(ceil(jrec / float(rg))), rg, len(records)),
-                    rg=rg, p=p, f=f,
-                    easy_search_form=EasySearchForm(csrf_enabled=False),
-                    breadcrumbs=current_breadcrumbs+collection_breadcrumbs(collection)
-                    )
+        box = lambda: _create_neareset_term_box(argd_orig)
+        pagination = Pagination(int(ceil(jrec / float(rg))), rg, len(records))
+        breadcrumbs = current_breadcrumbs + collection_breadcrumbs(collection)
+        return dict(
+            collection=collection,
+            create_nearest_terms_box=box,
+            pagination=pagination,
+            rg=rg, p=p, f=f,
+            easy_search_form=EasySearchForm(csrf_enabled=False),
+            breadcrumbs=breadcrumbs
+        )
 
     return dict(records=records)
 
@@ -357,9 +385,10 @@ websearch_before_browse.connect(receivers.websearch_before_browse_handler)
                  'rm': (unicode, None)})
 @check_collection(default_collection=True)
 def rss(collection, p, jrec, so, rm):
+    """Render RSS feed."""
     from invenio.legacy.search_engine import perform_request_search
     of = 'xr'
-    argd =  wash_search_urlargd(request.args)
+    argd = wash_search_urlargd(request.args)
     argd['of'] = 'id'
 
     # update search arguments with the search user preferences
@@ -373,8 +402,11 @@ def rss(collection, p, jrec, so, rm):
     if so or rm:
         recids.reverse()
 
-    ctx = dict(records=len(get_current_user_records_that_can_be_displayed(qid)),
-               qid=qid, rg=rg)
+    ctx = dict(
+        records=len(get_current_user_records_that_can_be_displayed(qid)),
+        qid=qid,
+        rg=rg
+    )
 
     return response_formated_records(recids, collection, of, **ctx)
 
@@ -387,9 +419,7 @@ def rss(collection, p, jrec, so, rm):
                  'rm': (unicode, None)})
 @check_collection(default_collection=True)
 def search(collection, p, of, so, rm):
-    """
-    Renders search pages.
-    """
+    """Render search page."""
     from invenio.legacy.search_engine import perform_request_search
 
     if 'action_browse' in request.args \
@@ -418,10 +448,13 @@ def search(collection, p, of, so, rm):
         recids.reverse()
 
     # back-to-search related code
-    if request and not isinstance(request.get_legacy_request(), cStringIO.OutputType):
+    if request and not isinstance(request.get_legacy_request(),
+                                  cStringIO.OutputType):
         # store the last search results page
-        session['websearch-last-query'] = request.get_legacy_request().unparsed_uri
-        if len(recids) > current_app.config['CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT']:
+        session['websearch-last-query'] = request.get_legacy_request() \
+                                                 .unparsed_uri
+        hit_limit = current_app.config['CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT']
+        if len(recids) > hit_limit:
             last_query_hits = None
         else:
             last_query_hits = recids
@@ -430,11 +463,13 @@ def search(collection, p, of, so, rm):
         # if user displays hits split by collections:
         session["websearch-last-query-hits"] = last_query_hits
 
-    ctx = dict(facets=FACETS.config(collection=collection, qid=qid),
-               records=len(get_current_user_records_that_can_be_displayed(qid)),
-               qid=qid, rg=rg,
-               create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
-               easy_search_form=EasySearchForm(csrf_enabled=False))
+    ctx = dict(
+        facets=FACETS.config(collection=collection, qid=qid),
+        records=len(get_current_user_records_that_can_be_displayed(qid)),
+        qid=qid, rg=rg,
+        create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
+        easy_search_form=EasySearchForm(csrf_enabled=False)
+    )
 
     return response_formated_records(recids, collection, of, **ctx)
 
@@ -442,12 +477,12 @@ def search(collection, p, of, so, rm):
 @blueprint.route('/facet/<name>/<qid>', methods=['GET', 'POST'])
 def facet(name, qid):
     """
-    Creates list of fields specified facet.
+    Create list of fields specified facet.
 
-    @param name: facet identifier
-    @param qid: query identifier
+    :param name: facet identifier
+    :param qid: query identifier
 
-    @return: jsonified facet list sorted by number of records
+    :return: jsonified facet list sorted by number of records
     """
     try:
         out = FACETS[name].get_facets_for_query(
@@ -470,9 +505,9 @@ def facet(name, qid):
                  'rm': (unicode, None)})
 def results(qid, p, of, so, rm):
     """
-    Generates results for cached query using POSTed filter.
+    Generate results for cached query using POSTed filter.
 
-    @param qid: query indentifier
+    :param qid: query indentifier
     """
     try:
         recIDsHitSet = get_current_user_records_that_can_be_displayed(qid)
@@ -489,7 +524,9 @@ def results(qid, p, of, so, rm):
     @check_collection(
         name_getter=functools.partial(get_collection_name_from_cache, qid))
     def make_results(collection):
-        recids = faceted_results_filter(recIDsHitSet, filter_data, FACETS.elements)
+        recids = faceted_results_filter(recIDsHitSet,
+                                        filter_data,
+                                        FACETS.elements)
         recids = sort_and_rank_records(recids, so=so, rm=rm, p=p)
 
         return response_formated_records(
@@ -499,25 +536,28 @@ def results(qid, p, of, so, rm):
     return make_results()
 
 
-@blueprint.route('/list/<any(exactauthor, keyword, affiliation, reportnumber, collaboration):field>', methods=['GET', 'POST'])
+@blueprint.route('/list/<any(exactauthor, keyword, affiliation, reportnumber, '
+                 'collaboration):field>',
+                 methods=['GET', 'POST'])
 @wash_arguments({'q': (min_length(3), '')})
 def autocomplete(field, q):
     """
-    Autocompletes data from indexes.
+    Autocomplete data from indexes.
 
     It uses POSTed arguments with name `q` that has to be longer than 3
     characters in order to returns any results.
 
-    @param field: index name
-    @param q: query string for index term
+    :param field: index name
+    :param q: query string for index term
 
-    @return: list of values matching query.
+    :return: list of values matching query.
     """
     from invenio.legacy.bibindex.engine import get_index_id_from_index_name
     IdxPHRASE = BibIndex.__getattribute__('IdxPHRASE%02dF' %
                                           get_index_id_from_index_name(field))
 
-    results = IdxPHRASE.query.filter(IdxPHRASE.term.contains(q)).limit(20).all()
+    results = IdxPHRASE.query.filter(IdxPHRASE.term.contains(q))\
+                             .limit(20).all()
     results = map(lambda r: {'value': r.term}, results)
 
     return jsonify(results=results)
@@ -525,13 +565,14 @@ def autocomplete(field, q):
 
 @blueprint.route('/search/dispatch', methods=['GET', 'POST'])
 def dispatch():
-    """ Redirects request to appropriate methods from search page. """
+    """Redirect request to appropriate methods from search page."""
     action = request.values.get('action')
     if action not in ['addtobasket', 'export']:
         abort(406)
 
     if action == 'export':
-        return redirect(url_for('.export', **request.values.to_dict(flat=False)))
+        return redirect(url_for('.export',
+                                **request.values.to_dict(flat=False)))
 
     if action == 'addtobasket':
         recids = request.values.getlist('recid', type=int)
@@ -553,7 +594,7 @@ def dispatch():
 @check_collection(default_collection=True)
 def export(collection, of):
     """
-    Exports requested records to defined output format.
+    Export requested records to defined output format.
 
     It uses following request values:
         * of (string): output format
