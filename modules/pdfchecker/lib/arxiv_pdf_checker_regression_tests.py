@@ -41,7 +41,7 @@ EXAMPLE_PDF_URL_2 = "http://invenio-software.org/download/" \
 RECID = 20
 ARXIV_ID = '1005.1481'
 
-ARXIV_OAI_RESPONSE = """<?xml version="1.0" encoding="UTF-8"?>
+ARXIV_OAI_RECORD_INFO = """<?xml version="1.0" encoding="UTF-8"?>
 <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
 <responseDate>2013-04-16T13:50:10Z</responseDate>
 <request verb="GetRecord" identifier="oai:arXiv.org:1304.4214" metadataPrefix="arXivRaw">http://export.arxiv.org/oai2</request>
@@ -74,7 +74,29 @@ La(2-x)Ba(x)CuO(4) family of high-temperature superconductors.
 </OAI-PMH>
 """
 
-
+ARXIV_OAI_IDENTIFIERS = """<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<responseDate>2014-06-19T15:07:18Z</responseDate>
+<request verb="ListIdentifiers" until="2014-05-07" from="2014-05-05" metadataPrefix="arXiv">http://export.arxiv.org/oai2</request>
+<ListIdentifiers>
+<header>
+ <identifier>oai:arXiv.org:0705.1765</identifier>
+ <datestamp>2014-05-06</datestamp>
+ <setSpec>physics:gr-qc</setSpec>
+</header>
+<header>
+ <identifier>oai:arXiv.org:0705.3619</identifier>
+ <datestamp>2014-05-06</datestamp>
+ <setSpec>physics:gr-qc</setSpec>
+</header>
+<header>
+ <identifier>oai:arXiv.org:0705.3623</identifier>
+ <datestamp>2014-05-06</datestamp>
+ <setSpec>physics:gr-qc</setSpec>
+</header>
+</ListIdentifiers>
+</OAI-PMH>
+"""
 
 class TestTask(InvenioTestCase):
     def setUp(self, recid=RECID, arxiv_id=ARXIV_ID):
@@ -98,9 +120,15 @@ class TestTask(InvenioTestCase):
         assert len(get_fieldvalues(recid, '037__a')) == 1
 
         def mocked_oai_harvest_get(prefix, baseurl, harvestpath,
-                                   verb, identifier):
+                                   verb, identifier, fro=None):
             temp_fd, temp_path = mkstemp()
-            os.write(temp_fd, ARXIV_OAI_RESPONSE % self.arxiv_version)
+            if verb == 'GetRecord':
+                content = ARXIV_OAI_RECORD_INFO % self.arxiv_version
+            elif verb == 'ListIdentifiers':
+                content = ARXIV_OAI_IDENTIFIERS
+            else:
+                raise Exception()
+            os.write(temp_fd, content)
             os.close(temp_fd)
             return [temp_path]
 
@@ -136,8 +164,7 @@ class TestTask(InvenioTestCase):
     def test_fetch_records(self):
         from invenio.arxiv_pdf_checker import fetch_updated_arxiv_records
         date = datetime(year=1900, month=1, day=1)
-        records = fetch_updated_arxiv_records(date)
-        self.assert_(records)
+        fetch_updated_arxiv_records(date)
 
     def test_task_run_core(self):
         from invenio.arxiv_pdf_checker import task_run_core
