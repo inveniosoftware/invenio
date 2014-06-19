@@ -209,8 +209,8 @@ def download_one(recid, version):
             raise FoundExistingPdf()
 
 
-def oai_harvest_query(arxiv_id, prefix='arXivRaw', verb='GetRecord',
-                      max_retries=5, repositories=[]):
+def oai_harvest_query(arxiv_id=None, prefix='arXivRaw', verb='GetRecord',
+                      max_retries=5, repositories=[], fro=None):
     """Wrapper of oai_harvest_daemon.oai_harvest_get that handles retries"""
     if not repositories:
         repositories.extend(get_oai_src(params={'name': 'arxiv'}))
@@ -223,12 +223,17 @@ def oai_harvest_query(arxiv_id, prefix='arXivRaw', verb='GetRecord',
     harvestpath = os.path.join(CFG_TMPDIR, "arxiv-pdf-checker-oai-")
 
     def get():
+        if arxiv_id:
+            identifier = 'oai:arXiv.org:%s' % arxiv_id
+        else:
+            identifier = None
         return oai_harvest_daemon.oai_harvest_get(
                                     prefix=prefix,
                                     baseurl=repository['baseurl'],
                                     harvestpath=harvestpath,
                                     verb=verb,
-                                    identifier='oai:arXiv.org:%s' % arxiv_id)
+                                    identifier=identifier,
+                                    fro=fro)
 
     responses = None
     for retry_count in range(1, max_retries + 1):
@@ -367,12 +372,9 @@ _RE_ARXIV_ID = re.compile(re.escape("<identifier>oai:arXiv.org:") + "(.+?)" + re
 def fetch_updated_arxiv_records(date):
     """Fetch all the arxiv records modified since the last run"""
 
-    from invenio.oai_harvest_getter import harvest
-    harvested_files = harvest("export.arxiv.org", "/oai2", {
-        "verb": "ListIdentifiers",
-        "from": date.strftime("%Y-%m-%d"),
-        "metadataPrefix": "arXiv"},
-        output=os.path.join(CFG_TMPDIR, "arxiv-pdf-checker-oai-tmp-"))
+    harvested_files = oai_harvest_query(prefix="arXiv",
+                                        verb="ListIdentifiers",
+                                        fro=date.strftime("%Y-%m-%d"))
     modified_arxiv_ids = []
     for harvested_file in harvested_files:
         modified_arxiv_ids += _RE_ARXIV_ID.findall(open(harvested_file).read())
