@@ -103,19 +103,18 @@ Let's install Invenio in the environment just created.
     (invenio)$ git-new-workdir $HOME/src/invenio/ invenio $BRANCH
     (invenio)$ cd invenio
 
-Installing the Python dependencies.
+Installing Invenio.
 
 .. code-block:: console
 
-    (invenio)$ pip install -e . --process-dependency-links --allow-all-external
+    (invenio)$ pip install -r requirements.txt
 
-Some modules may require specific dependencies listed in the
-``requirements-[dev,img,mongo,...].txt`` files. Pick the ones you need.
-E.g. to add images support, we can do as follow:
+Some modules may require specific dependencies listed as ``extras``. Pick the
+ones you need. E.g. to add images support, we can do as follow:
 
 .. code-block:: console
 
-    (invenio)$ pip install -r requirements-img.txt
+    (invenio)$ pip install -e .[img]
 
 Compiling the translations.
 
@@ -187,7 +186,7 @@ for quick start.
     (invenio)$ cdvirtualenv src
     (invenio)$ git-new-workdir ~/src/invenio-demosite/ invenio-demosite $BRANCH
     (invenio)$ cd invenio-demosite
-    (invenio)$ pip install -r requirements.txt
+    (invenio)$ pip install -r requirements.txt --exists-action i
 
 
 c. Development
