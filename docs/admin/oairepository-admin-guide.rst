@@ -66,7 +66,7 @@ interface </?as=1>`__ of your repostory.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Once the settings of the OAI Repository are defined, the next step is
-to expose corresponding metadata via the OAI Repository Gateway. This is
+to expose the corresponding metadata via the OAI Repository Gateway. This is
 done by launching the ``oairepositoryupdater`` script, that will add the
 OAI identifier and OAI setSpec(s) to the records to be exposed
 (according to the settings defined in the OAI Repository admin
@@ -118,11 +118,11 @@ report:
 
         $ oairepositoryupdater -r
 
-To print out the detailed status of yoyr OAI repository:
+To print out the detailed status of your OAI repository:
 
     ::
 
         $ oairepositoryupdater -d
 
-Please see also invenio.conf for more fine configurations of the OAI
+Please see also invenio.conf for more detailed configuration of the OAI
 Repository.

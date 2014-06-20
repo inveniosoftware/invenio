@@ -3,12 +3,12 @@
 Extensions
 ==========
 
-What are extension and what is their purpose? Small piece of code that
-should ease the integration of a third party library. As such many of
-extensions have been already developed and one can find them in the
-`Flask Extension Registry`_. Everyone should check first if there is
-a usable extensions before developing new one according to
-`Flask Extension Development`_ guideline that will help you get your
+What are extensions and what is their purpose? An extension is a small
+piece of code that should ease the integration of a third party library.
+Many such extensions have been already developed and one can find them in
+the `Flask Extension Registry`_. Everyone should check first if there is
+a usable extension before developing new one. When developing an extension,
+follow the `Flask Extension Development`_ guideline that will help you get your
 extension running.
 
 .. _Flask Extension Registry: http://flask.pocoo.org/extensions/
@@ -17,31 +17,31 @@ extension running.
 Plugging an Existing Extension
 ------------------------------
 
-Extensions are all located in a package called ``flask_something``
+All extensions are located in a package called ``flask_something``
 where "something" is the name of the extension you want to bridge.
 So for example if you plan to add support for an extension named
 `login`, you would name your extension's package ``invenio.ext.login``.
 
-Alternatively, if the extension reads only configuration from
+Alternatively, if the extension only reads configuration from
 ``current_app.config``, you can just list in ``EXTENSIONS`` option
 as ``flask.ext.something:Something``, where ``Something`` has to accept
-application object as first argument::
+an application object as first argument::
 
     class Something(object):
         def __init__(self, app, optional=None):
             pass
 
-But how do extensions look like themselves?  An extension has to ensure
-that it works with multiple Flask application instances at once.
+So what do extensions actually look like?  An extension has to ensure
+that it works with multiple Flask application instances at the same time.
 
 
 Code structure
 --------------
 
-So let's get started with creating such a extension bridge.  The bridge
-we want to create here will provide very basic support for `Flask Login`_.
+So let's get started with creating such an extension bridge.  This example
+bridge will provide very basic support for `Flask Login`_.
 
-First we create the following folder structure::
+First we'll create the following folder structure::
 
     invenio/ext/login/
         __init__.py
@@ -75,7 +75,7 @@ Here's the contents of the most important files:
 
         return app
 
-* ``legacy_user.py`` contains implementation ``UserMixin`` object:
+* ``legacy_user.py`` contains implementation of the ``UserMixin`` object:
 
 .. code-block:: python
 
@@ -85,8 +85,8 @@ Here's the contents of the most important files:
     class UserInfo(CombinedMultiDict, UserMixin):
 
         """
-        This provides legacy implementations for the methods that Flask-Login
-        and Invenio 1.x expects user objects to have.
+        This provides legacy implementations for methods that Flask-Login
+        and Invenio 1.x expect user objects to have.
         """
 
         def __init__(self, uid=None, force=False):

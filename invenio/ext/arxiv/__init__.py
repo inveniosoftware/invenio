@@ -28,7 +28,7 @@ Arxiv extension is initialized like this:
 
 Configuration Settings
 ----------------------
-The details of the ArXiv URL and enpoint can be customized in the application
+The details of the ArXiv URL and endpoint can be customized in the application
 settings.
 
 ================= ============================================================

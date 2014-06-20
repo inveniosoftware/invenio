@@ -41,11 +41,11 @@ You should consider using this solution only in the case where you
 have not installed (or do not want to install) an XSLT processor on your
 machine.
 
-B XML-Oriented Mode
--------------------
+B. XML-Oriented Mode
+--------------------
 
-1 Configuration File Examples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1. Configuration File Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using XSLT
 ^^^^^^^^^^
@@ -78,11 +78,11 @@ If the stylesheet you want to use is installed in the
 you can just refer to it by its filename. Otherwise use the full path to
 the file.
 
-C Plain Text-Oriented Mode
---------------------------
+C. Plain Text-Oriented Mode
+---------------------------
 
-1 Configuration File Examples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1. Configuration File Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OAI DublinCore into MARC21 and OAI MARC into MARC21 configurations will
 be provided as default configuration, ensuring the standard uploading
@@ -171,8 +171,8 @@ Other useful BibConvert configuration examples:
     `bibtex.cfg </static/bibconvert-admin-guide/bibtex.cfg>`__
     -- BibTeX to XML MARC example
 
-3 BibConvert Configuration Guide
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3. BibConvert Configuration Guide
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Conventions
 ^^^^^^^^^^^
@@ -295,8 +295,8 @@ formatting function:
 3.4 Formatting in BibConvert
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
- 3.4.1 Definition of formatting functions
-'''''''''''''''''''''''''''''''''''''''''
+3.4.1 Definition of formatting functions
+''''''''''''''''''''''''''''''''''''''''
 
 Every field can be processed with a variety of functions that
 partially or entirely change the original value.

@@ -28,7 +28,7 @@ from six import iteritems, text_type, string_types
 
 
 def with_app_context(app=None, new_context=False, **kwargs_config):
-    """Run function within application context"""
+    """Run function within the application context"""
 
     def get_application():
         """Returns an application instance."""
@@ -41,7 +41,7 @@ def with_app_context(app=None, new_context=False, **kwargs_config):
     def decorator(f):
         @wraps(f)
         def decorated_func(*args, **kwargs):
-            """This function has to run within application context."""
+            """This function has to run within the application context."""
 
             if not has_app_context() or new_context:
                 with get_application().test_request_context('/'):
@@ -57,7 +57,7 @@ def with_app_context(app=None, new_context=False, **kwargs_config):
 
 def unicodifier(obj):
     """
-    Tries to (recursively) convert the given object into unicode, assuming
+    Tries to (recursively) convert the given object into Unicode, assuming
     a UTF-8 encoding)
 
     :param obj: the object to convert

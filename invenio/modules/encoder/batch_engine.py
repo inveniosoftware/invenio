@@ -96,7 +96,7 @@ def _notify_error_admin(batch_job,
                html_content=html_text)
 
 def _notify_error_user(email_user, original_filename, recid, submission_title, ln=invenio.config.CFG_SITE_LANG):
-    """Sends an error notification to the specified addres of the user.
+    """Sends an error notification to the specified address of the user.
        Is called by process_batch_job() if an error occured during the processing.
     @param email_user: email address of the user
     @type email_user: string
@@ -142,8 +142,8 @@ def _notify_error_user(email_user, original_filename, recid, submission_title, l
                )
 
 def _notify_success_user(email_user, original_filename, recid, submission_title, ln=invenio.config.CFG_SITE_LANG):
-    """Sends an success notification to the specified addres of the user.
-       Is called by process_batch_job() if the processing was successfull.
+    """Sends an success notification to the specified address of the user.
+       Is called by process_batch_job() if the processing was successful.
     @param email_user: email address of the user
     @type email_user: string
     @param email_admin: email address of the admin
@@ -380,7 +380,7 @@ def process_batch_job(batch_job_file):
 
     @param batch_job_file: a fullpath to a batch job file
     @type batch_job_file: string
-    @return: 1 if the process was successfull, 0 if not
+    @return: 1 if the process was successful, 0 if not
     @rtype; int
     """
 

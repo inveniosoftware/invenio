@@ -20,5 +20,5 @@
     invenio.base
     ------------
 
-    Builds Invenio application.
+    Builds the Invenio application.
 """

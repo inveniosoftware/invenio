@@ -199,7 +199,7 @@ class Client(db.Model):
 
 class Token(db.Model):
     """
-    A bearer token is the final token that can be use by the client.
+    A bearer token is the final token that can be used by the client.
     """
     __tablename__ = 'oauth2TOKEN'
 

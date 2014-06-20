@@ -4,13 +4,13 @@ Templates
 =========
 
 `Jinja2`_ is a modern and designer friendly templating language for Python.
-We will summarize adoption of Jinja2 web framework and describe best
+We will summarize the adoption of Jinja2 web framework and describe best
 practices for writing easily reusable and extendable templates.
 
-.. note:: Please follow these simple rules when creating new templates, to
+.. note:: Please follow these simple rules when creating new templates to
     allow different Invenio installations (CDS, Inspire, ZENODO, ...) to
     easily customize templates and keep in sync with updates to templates.
-    Using the rules will greatly reduce the amount of copy/pasting the
+    Using these rules will greatly reduce the amount of copy/pasting the
     installations will have to do.
 
 
@@ -23,8 +23,8 @@ practices for writing easily reusable and extendable templates.
 * ``<module>/templates/<module>/<name>_base.html``::
 
     {#
-     # The base template usually extends from the main Invenio template, or perhaps
-     # from a module specific main template. It contains nearly all the HTML code.
+     # The base template usually extends the main Invenio template, or perhaps
+     # a module-specific main template. It contains nearly all the HTML code.
      #}
     {% extends "page.html" %}
 
@@ -38,13 +38,13 @@ practices for writing easily reusable and extendable templates.
      #  * Macros can be parameterized.
      #}
     {%- macro action_bar(show_delete=True) %}
-        {# Macros can be overwritten in child template, but only calls within the
+        {# Macros can be overwritten in a child template, but only calls within the
          # child template will call the new macro. Hence, if you just want to
          # overwrite the action_bar macro in <module>/<name>.html, you must also
          # copy/paste the form_header and form_footer blocks where it's used,
          # otherwise the old macro will be used. To avoid this problem, please
-         # instead just include a template inside the macro. This allow anther
-         # Invenio installation to overwrite just this part
+         # just include a template inside the macro instead. This will allows another
+         # Invenio installation to overwrite just this part.
          #}
         {% include "<module>/<name>_action_bar.html"%}
     { endmarco %}
@@ -55,7 +55,7 @@ practices for writing easily reusable and extendable templates.
 
     {#
      # Blocks
-     #  * Think of template-blocks, as the API other Invenio installations will
+     #  * Think of template-blocks as the API which other Invenio installations will
      #    use to customize the Invenio layout. An Invenio installation can override
      #    blocks defined in your templates so that they keep their own changes
      #    to a minimum, and don't copy/paste large parts of the template code.
@@ -92,8 +92,8 @@ practices for writing easily reusable and extendable templates.
 
     {#
      # The template actually being rendered by the blueprint. It only extends the
-     # base template. Doing it this way, allow an Invenio installation to overwrite
-     # just the blocks they need, instead of having to implement the entire
+     # base template. Doing it this way allows an Invenio installation to overwrite
+     # just the blocks they need instead of having to implement the entire
      # template.
      #}
     {% extends "<module>/<name>_base.html" %}

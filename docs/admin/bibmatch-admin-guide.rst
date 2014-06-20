@@ -13,7 +13,7 @@ BibMatch Admin Guide
 BibMatch is a tool for matching bibliographic meta-data records against
 a local or remote Invenio repository. The incoming records can be
 matched against zero, one or more then one records. This way, it is
-possible to identify potential duplicate entries, before they are
+possible to identify potential duplicate entries before they are
 uploaded into the repository. This can also be helpful in detecting
 already existing duplicates in the database.
 

@@ -45,7 +45,7 @@ bin/ directory in your path.
 Go to the invenio src directory and run ``honcho start`` or equivalent.
 
 
-Deployement
+Deployment
 ^^^^^^^^^^^
 
 ...
@@ -178,7 +178,7 @@ class ElasticSearch(object):
         See: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/cluster-health.html
         for more.
 
-        TODO: is it usefull?
+        TODO: is it useful?
 
         :return: [string] possible values: green, yellow, red. green means all
           ok including replication, yellow means replication not active, red

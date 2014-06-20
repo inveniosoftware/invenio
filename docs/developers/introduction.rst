@@ -3,20 +3,22 @@
 Introducing Invenio for Developers
 ==================================
 
-This page summarizes adoption of frameworks in used Invenio. It describes
-extensions and module anatomy and concept of pluggable components across
-modules.
+This page summarizes adoption of frameworks used in Invenio. It describes
+the anatomy of extensions and modules and the concept of pluggable
+components across modules.
 
-Before you start reading please
+Invenio development adopts the following principles:
 
 - *Convention over Configuration* means that common building blocks
-  are provided for you, so use them! If you are not sure or you are
-  missing documentation about a feature you can't find as developers
-  at mailing list or IRC.
+  are provided for you, so use them! If you are not sure or documentation 
+  of certain feature is missing, contact the developers at the
+  `mailing list <http://invenio-software.org/wiki/Community/MailingLists>`_
+  or `IRC <http://invenio-software.org/wiki/Community/ChatRooms>`_.
+ 
 
 - *Don't Repeat Yourself (DRY)* to help us keep our software maintainable.
   Duplication of code fragments makes application codebase larger and
-  more importantly it can be source of many errors during future
+  more importantly it can become a source of many errors during future
   development (refactoring).
 
 - *Agile Development* where each iteration should lead to working code
@@ -37,13 +39,13 @@ Before you start reading please
 Extensions
 ----------
 
-There are many of Flask extensions that can extend the functionality of
-your application in various different ways. For instance they add support
+There are many Flask extensions which extend the functionality of
+your application in various ways. For instance they can add support
 for databases, user authentication & authorization, menu & breadcrumbs and
 other common tasks.
 
-Many of Flask extensions can be found in the `Flask Extension Registry`_.
-All extensions are automatically loaded from ``EXTENSIONS`` configuration
+Many Flask extensions can be found in the `Flask Extension Registry`_.
+All extensions are automatically loaded from the ``EXTENSIONS`` configuration
 option list. If they should a function ``setup_app(app)`` or function
 accepting ``app`` needs to be specified (e.g. ``foo.bar:init``,
 ``mymodule:setup``).
@@ -56,13 +58,13 @@ Continue with :ref:`developers-extensions`.
 Modules
 -------
 
-Modules are application components that can be use within an application
-or across applications.  They can contains `SQLAlchemy`_ models, `Flask`_
+Modules are application components that can be used within an application
+or across applications.  They can contain `SQLAlchemy`_ models, `Flask`_
 views, `Jinja2`_ templates and other ref:`pluggable-objects`.
 
-Discovery of modules is done based on configuration parameter called
-``PACKAGES``, where expansion character `*` is supported at the end of
-package path after last dot (e.g. ``foo.bar.something.*``).
+Discovery of modules is done based on a configuration parameter called
+``PACKAGES``, where the expansion character `*` is supported at the end of
+package path after the last dot (e.g. ``foo.bar.something.*``).
 
 Continue with :ref:`developers-modules`.
 

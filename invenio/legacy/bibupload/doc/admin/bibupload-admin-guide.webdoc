@@ -371,9 +371,9 @@ correcting, please use the KEEP-OLD-VALUE special keyword with the
 desired $d and $z subfield.
 </p>
 
-<p>The $r subfield can contain a string that can be use to restrict
+<p>The $r subfield can contain a string that can be used to restrict
 the given document. The same value must be specified for all the
-format of a given document. By default the keyword will be used as the status
+formats of a given document. By default the keyword will be used as the status
 parameter for the "viewrestrdoc" action, which can be used to give
 access right/restriction to desired user. e.g. if you set the keyword
 "thesis", you can the connect the "thesisviewer" to the action

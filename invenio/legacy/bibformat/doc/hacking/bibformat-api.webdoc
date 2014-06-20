@@ -684,7 +684,7 @@ value of the current record that is being displayed is used. To do so,
 you must use a format element brick. Either you know the name of the
 brick by heart, or you look for it in the elements documentation (see
 section 5.3). For example you would find there that you can print the
-title of the record by writting the HTML tag &lt;BFE_TITLE /> in your
+title of the record by writing the HTML tag &lt;BFE_TITLE /> in your
 format template, with parameter 'default' for a default value.
 
   &lt;h1>&lt;BFE_TITLE default="No Title"/>&lt;/h1>

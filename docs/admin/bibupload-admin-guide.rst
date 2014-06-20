@@ -22,16 +22,16 @@ correctness.
 BibUpload takes a MARCXML file as its input. There is nothing to be
 configured for these files. If the files have to be coverted into
 MARCXML from some other format, structured or not, this is usually done
-beforehand via `BibConvert <bibconvert-admin>`__ module.
+beforehand via the `BibConvert <bibconvert-admin>`__ module.
 
 Note that if you are using external system numbers for your records,
 such as when your records are being synchronized from an external
-system, then BibUpload knows about the tag 970 as the one containing
+system, then BibUpload knows about the 970 tag as the one containing
 external system number. (To change this 970 tag into something else, you
 would have to edit BibUpload config source file.)
 
-Note also that in the similar way BibUpload knows about OAI identifiers,
-so that it will refuse to insert the same OAI harvested record twice,
+Note that BibUpload also similarly knows about OAI identifiers,
+so it will refuse to insert the same OAI-harvested record twice,
 for example.
 
 3. Running BibUpload
@@ -76,7 +76,7 @@ call the BibUpload script in the insert mode as follows:
 3.2 Inserting records into the Holding Pen
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A special mode of BibUpload that is thigthly connected with BibEdit
+A special mode of BibUpload that is tigthly connected with BibEdit
 is the *Holding Pen* mode.
 
 When you insert a record using the holding pen mode such as in the
@@ -170,15 +170,15 @@ Note that if you are using the ``--replace`` mode, and you specify
 in the incoming MARCXML a 001 tag with a value representing a record
 ID that does not exist, bibupload will not create the record
 on-the-fly unless the ``--force`` parameter was also passed on the
-command line. This is done in order to avoid creating, by mistake,
-holes in the database list of record identifiers. When you ask, in
-fact, to ``--replace`` a non-existing record imposing a record ID
+command line. This is done in order to avoid accidentally creating
+gaps in the database list of record identifiers. In fact, when you ask
+to ``--replace`` a non-existing record imposing a record ID
 with a value of, say, ``1 000 000`` and, subsequently, you
 ``--insert`` a new record, this will automatically receive an ID
 with the value ``1 000 001``.
 
 If you combine the ``--pretend`` parameter with the above updating
-modes you can actually test what would be executed without modifying
+mode, you can actually test what would be executed without modifying
 the database or altering the system status.
 
 3.4 Inserting and updating at the same time
@@ -253,14 +253,14 @@ you want to specify an icon for a document with two formats (say
 same $x subfield.
 
 The bibupload process, when it encounters FFT tags, will
-automatically populate fulltext storage space
+automatically populate the fulltext storage space
 (``/opt/invenio/var/data/files``) and metadata record associated
 tables (``bibrec_bibdoc``, ``bibdoc``) as appropriate. It will
 also enrich the 856 tags (URL tags) of the MARC metadata of the
 record in question with references to the latest versions of
 each file.
 
-Note that for $a and $x subfields filesystem paths must be
+Note that for the $a and $x subfields, the filesystem paths must be
 absolute (e.g. ``/tmp/icon.gif`` is valid, while
 ``Destkop/icon.gif`` is not) and they must be readable by the
 user/group of the bibupload process that will handle the FFT.
@@ -294,7 +294,7 @@ semantic of the metadata upload:
     delete all existing tag instances
     not supported
 
-Note, in append and insert mode,
+Note that in append and insert mode
 
 ::
 
@@ -365,7 +365,7 @@ In order to preserve previous comments and descriptions when
 correcting, please use the KEEP-OLD-VALUE special keyword with
 the desired $d and $z subfield.
 
-The $r subfield can contain a string that can be use to restrict
+The $r subfield can contain a string that can be used to restrict
 the given document. The same value must be specified for all the
 format of a given document. By default the keyword will be used
 as the status parameter for the "viewrestrdoc" action, which can
@@ -380,7 +380,7 @@ use the keyword "KEEP-OLD-VALUE" the previous restrictions if
 applicable will be kept.
 
 More advanced document-level restriction is indeed possible. If
-the value contains infact:
+the value contains in fact:
 
 -  ``email: john.doe@example.org``: then only the user having
    ``john.doe@example.org`` as email address will be authorized
@@ -438,7 +438,7 @@ current time will be used.
 
 Sometimes, to implement a particular workflow or policy in a
 digital repository, it might be nice to receive an automatic
-machine friendly feedback that aknowledges the outcome of a
+machine-friendly feedback that acknowledges the outcome of a
 bibupload execution. To this aim the ``--callback-url`` command
 line parameter can be used. This parameter expects a *URL* to be
 specified to which a **`JSON <http://json.org/>`__-serialized**
@@ -542,20 +542,20 @@ added to the JSON structure, as in (supposing you specified
         ]
     }
 
-3.8 Assigning additional informations to documents and other entities
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.8 Assigning additional information to documents and other entities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some bits of meta-data should not be viewed by Invenio users
 directly and stored in the MARC format. This includes all types
 of non-standard data related to records and documents, for
-example flags realted to documetns (sepcified inside of a FFT
-tage) or bits of semantic information related to entities
+example flags realted to documents (sepcified inside a FFT
+tag) or bits of semantic information related to entities
 managed in Invenio. This type of data is usually machine
 generated and should be used by modules of Invenio internally.
 
 Invenio provides a general mechanism allowing to store objects
 related to different entities of Invenio. This mechanism is
-called MoreInfo and resembles well known more-info solutions.
+called MoreInfo and resembles well-known more-info solutions.
 Every entity (document, version of a document, format of a
 particular version of a document, relation between documents)
 can be assigned a dictionary of arbitrary values. The dictionary
@@ -650,7 +650,7 @@ follows
             $m  ... Modification of the MoreInfo of the relation
             $d  ... Special field. if value=DELETE, relation is removed
 
-Behavious of BDR tag in different upload modes:
+Behaviour of the BDR tag in different upload modes:
 
 +--------------------------------------+--------------------------------------+
 | insert, append                       | correct, replace                     |
@@ -663,31 +663,31 @@ Behavious of BDR tag in different upload modes:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In many cases, users want to upload large collections of
-documents using single BibUpload tasks. The infrastructure
+documents using a single BibUpload task. The infrastructure
 described in the rest of this manual allows easy upload of
 multiple documents, but lacks facilities for relating them to
 each other. A sample use-case which can not be satisfied by
 simple usage of FFT tags is uploading a document and relating it
 to another which is either already in the database or is being
 uploaded within the same BibUpload task. BibUpload provides a
-mechanism of temportaty identifiers which allows to serve
+mechanism of temporary identifiers which allows to serve
 scenarios similar to the aforementioned.
 
-Temporary identifier is a string (unique in the context of a
-single MARC XML document), which replaces document number or a
+A temporary identifier is a string (unique in the context of a
+single MARC XML document), which replaces the document number or a
 version number. In the context of BibDoc manipulations (FFT, BDR
-and BDM tags), temporary identifeirs can appear everywhere where
+and BDM tags), temporary identifiers can appear everywhere where
 version or numerical id are required. If a temporary identifier
 appears in a context of document already having an ID assigned,
-it will be interpreted as this already existent number. If newly
+it will be interpreted as this already existent number. If a newly
 created document is assigned a temporary identifier, the newly
 generated numerical ID is assigned to the temporary id. In order
 to be recognised as a temporary identifier, a string has to
-begin with a prefix **TMP:**. The mechanism of temporary
-identifiers can not be used in the con text of records, but only
+begin with the **TMP:** prefix. The mechanism of temporary
+identifiers can not be used in the context of records, only
 with BibDocs.
 
-A BibUpload input using temporary identifiers can look like:
+A BibUpload input using temporary identifiers can look like this:
 
 ::
 
@@ -814,11 +814,11 @@ and
 The batchuploader daemon mode is intended to be a bibsched
 task for document or metadata upload. The parent directory
 where the daemon will look for folders ``metadata`` and
-``documents`` must be specified in the invenio configuration
+``documents`` must be specified in the Invenio configuration
 file.
 
 An example of how directories should be arranged,
-considering that invenio was installed in folder
+considering that Invenio was installed in folder
 ``/opt/invenio`` would be:
 
 ::
@@ -843,9 +843,9 @@ execution modes:
             -d,   --documents   Look for documents in folders append and revise. Uploaded files are then
                                 moved to DONE folders if possible.
 
-By default, metadata mode is used.
+By default, the metadata mode is used.
 
-An example of invocation would be:
+An example invocation would be:
 
     ::
 
@@ -853,5 +853,5 @@ An example of invocation would be:
 
 
 
-        It is possible to program batch uploader to run periodically. Read the Howto-run guide to see how.
+        It is possible to program the batch uploader to run periodically. Read the Howto-run guide to see how.
 

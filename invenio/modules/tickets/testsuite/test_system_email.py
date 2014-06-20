@@ -65,7 +65,7 @@ class BibCatalogSystemEmailTest(MailTestCase):
         self.assertTrue(self.email.ticket_set_attribute(uid=1, ticketid='d834bnklca', attribute='priority', new_value='1'))
 
     def test_ckeck_system(self):
-        """bibcatalog_system_email - check_system returns true if succesfull, a message otherwise"""
+        """bibcatalog_system_email - check_system returns true if successful, a message otherwise"""
 
         self.assertEqual(self.email.check_system(), '')
 

@@ -3,15 +3,15 @@
 How to develop a module: Part 2
 ===============================
 
-In part 2 of this guide, we will go into some more advance module structures
+In part 2 of this guide, we will go into more advanced module structures
 and usage.
 
 
 Multiple views
 --------------
 
-If your module have several web interface entry points, such as an admin area and a user area.
-``views`` are defined inside it's own folder::
+If your module has several web interface entry points, such as an admin area and a user area.
+``views`` are defined inside their own folder::
 
     invenio/modules/
         mymodule/

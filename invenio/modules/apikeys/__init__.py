@@ -35,7 +35,7 @@ from .models import WebAPIKey
 
 def create_new_web_api_key(uid, key_description=None):
     """
-    Create a new pair REST API key / secret key for the user.
+    Create a new REST API key / secret key pair for the user.
 
     To do that it uses the uuid4 function.
 
@@ -53,9 +53,9 @@ def show_web_api_keys(uid, diff_status=None):
 
     :param uid: User's id
     :type uid: int
-    :param diff_status: This string indicates if the query will show all the
-                        REST API keys or only the ones that still active
-                        (usefull in the admin part)
+    :param diff_status: This string indicates whether the query will show all the
+                        REST API keys or only those which are still active
+                        (usable in the admin part)
     :type diff_statusparam: string
 
     """

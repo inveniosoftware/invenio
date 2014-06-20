@@ -368,7 +368,7 @@ def convert_record_with_repository(stylesheet="oaidc2marcxml.xsl"):
     into extra data of the object.
 
     The priority is given to the stylesheet into the extra data of the object.
-    The parameter should be use in case the stylesheet is missing from extra data
+    The parameter should be used in case the stylesheet is missing from extra data
     or when you want to do a simple workflow which doesn't need to be dynamic.
 
     :param stylesheet: it is the name of the stylesheet that you want to use

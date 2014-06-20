@@ -28,7 +28,7 @@ These files are:
 
 ``___init__.py``
     (usually) an empty file that tells Python that this directory should be considered a Python package.
-    Sometimes module level documentation are put here.
+    Module level documentation are sometimes located here.
 
 ``models.py``
     contains the data model for the modules (written as SQLAlchemy models). See how (link here)
