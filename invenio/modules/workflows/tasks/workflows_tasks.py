@@ -129,7 +129,7 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
                                     module_name=eng.module_name,
                                     **kwargs)
 
-        eng.log.info("Workflow launched")
+        eng.log.debug("Workflow launched")
         try:
             eng.extra_data["_workflow_ids"].append(workflow_id)
         except KeyError:

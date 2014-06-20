@@ -19,10 +19,7 @@
 """ Implements a workflow for testing."""
 
 from ...tasks.workflows_tasks import (start_workflow, workflows_reviews,
-                                      wait_for_a_workflow_to_complete,
-                                      get_list_of_workflows_to_wait,
-                                      write_something_generic, log_info,
-                                      get_nb_workflow_created)
+                                      wait_for_a_workflow_to_complete)
 
 from invenio.modules.workflows.tasks.logic_tasks import simple_for, end_for
 
@@ -35,15 +32,11 @@ class test_workflow_workflows_errors(object):
         simple_for(0, 5, 1, "X"),
         [
             start_workflow("test_workflow_error", 22),
-            log_info(get_nb_workflow_created),
         ],
         end_for,
 
         simple_for(0, 5, 1),
         [
-            write_something_generic(
-                ["We are waiting for ", get_list_of_workflows_to_wait],
-                [log_info]),
             wait_for_a_workflow_to_complete(0.1),
         ],
         end_for,

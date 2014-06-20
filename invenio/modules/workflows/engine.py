@@ -34,6 +34,7 @@ from .models import (Workflow, BibWorkflowObject, BibWorkflowEngineLog,
 from .utils import dictproperty
 from .logger import get_logger, BibWorkflowLogHandler
 from .errors import WorkflowHalt
+from invenio.ext.sqlalchemy import db
 from invenio.config import CFG_DEVEL_SITE
 DEBUG = CFG_DEVEL_SITE > 0
 
@@ -222,12 +223,12 @@ BibWorkflowEngine
 
     def has_completed(self):
         """Return True if workflow is fully completed."""
-        number_of_objects = BibWorkflowObject.query.filter(
-            BibWorkflowObject.id_workflow == self.uuid,
-            BibWorkflowObject.version.in_([ObjectVersion.HALTED,
-                                           ObjectVersion.RUNNING])
-        ).count()
-        return number_of_objects == 0
+        res = db.session.query(db.func.count(BibWorkflowObject.id)).\
+            filter(BibWorkflowObject.id_workflow == self.uuid).\
+            filter(BibWorkflowObject.version.in_([ObjectVersion.INITIAL, ObjectVersion.FINAL])).\
+            group_by(BibWorkflowObject.version).all()
+        return len(res) == 2 and res[0] == res[1]
+
 
     def save(self, status=None):
         """Save the workflow instance to database."""
@@ -316,7 +317,6 @@ BibWorkflowEngine
             obj.save(version=ObjectVersion.RUNNING,
                      id_workflow=self.db_obj.uuid)
             callbacks = self.callback_chooser(obj, self)
-
             if callbacks:
                 try:
                     self.run_callbacks(callbacks, objects, obj)

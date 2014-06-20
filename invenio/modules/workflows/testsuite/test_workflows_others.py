@@ -50,7 +50,7 @@ class WorkflowOthers(WorkflowTasksTestCase):
         from ..worker_result import AsynchronousResultWrapper
 
         bwoic = BibWorkflowObjectIdContainer(None)
-        self.assertEqual(bwoic.get_object(), None)
+        self.assertEqual(None, bwoic.get_object())
         test_object = BibWorkflowObject()
         test_object.set_data(45)
         test_object.save()
@@ -62,7 +62,7 @@ class WorkflowOthers(WorkflowTasksTestCase):
         try:
             AsynchronousResultWrapper(None)
         except Exception as e:
-            self.assertEqual(isinstance(e, TypeError), True)
+            self.assertTrue(isinstance(e, TypeError))
 
     def test_acces_to_undefineworkflow(self):
         """Test of access to undefined workflow."""
@@ -71,9 +71,8 @@ class WorkflowOthers(WorkflowTasksTestCase):
             start("@thisisnotatrueworkflow@", ["my_false_data"],
                   random_kay_args="value")
         except Exception as e:
-            print e
             from invenio.modules.workflows.errors import WorkflowDefinitionError
-            self.assertEqual(isinstance(e, WorkflowDefinitionError), True)
+            self.assertTrue(isinstance(e, WorkflowDefinitionError))
 
     def test_workflows_exceptions(self):
         """Test for workflows exception."""
@@ -84,11 +83,11 @@ class WorkflowOthers(WorkflowTasksTestCase):
             start("test_workflow_error", [2],
                   module_name="unit_tests")
         except Exception as e:
-            self.assertEqual(isinstance(e, WorkflowError), True)
-            self.assertEqual("ZeroDivisionError" in e.message, True)
-            self.assertEqual("call_a()" in e.message, True)
-            self.assertEqual("call_b()" in e.message, True)
-            self.assertEqual("call_c()" in e.message, True)
+            self.assertTrue(isinstance(e, WorkflowError))
+            self.assertTrue("ZeroDivisionError" in e.message)
+            self.assertTrue("call_a()" in e.message)
+            self.assertTrue("call_b()" in e.message)
+            self.assertTrue("call_c()" in e.message)
 
 
 TEST_SUITE = make_test_suite(WorkflowOthers)

@@ -15,6 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""API for workflow manipulation in the worker."""
 
 from .client import run_workflow, continue_execution
 from .engine import BibWorkflowEngine, WorkflowStatus
@@ -24,7 +25,8 @@ from .errors import WorkflowObjectVersionError
 
 def run_worker(wname, data, **kwargs):
     """
-    Runs workflow with given name and given data.
+    Run workflow with given name and given data.
+
     Data can be specified as list of objects or
     single id of WfeObject/BibWorkflowObjects.
 
@@ -45,8 +47,9 @@ def run_worker(wname, data, **kwargs):
 
 def restart_worker(wid, **kwargs):
     """
-    Restarts workflow with given id (wid) and given data. If data are not
-    specified then it will load all initial data for workflow.
+    Restart workflow with given id (wid) and given data.
+
+    If data are not specified then it will load all initial data for workflow.
 
     The workflow will restart from scratch.
 
@@ -73,13 +76,13 @@ def restart_worker(wid, **kwargs):
             running_object.copy(initial_object)
             running_object.id_parent = initial_object.id
             running_object.save()
+
             data.append(running_object)
     else:
         data = kwargs["data"]
 
     workflow = Workflow.query.get(wid)
     engine = BibWorkflowEngine(workflow.name,
-                               workflow_object=workflow,
                                **kwargs)
     engine.reset_extra_data()
     engine.save(WorkflowStatus.NEW)
@@ -91,7 +94,7 @@ def restart_worker(wid, **kwargs):
 def continue_worker(oid, restart_point="continue_next",
                     task_offset=1, **kwargs):
     """
-    Restarts workflow with given id (wid) at given point.
+    Restart workflow with given id (wid) at given point.
 
     :param oid: object id of the object to process
     :param restart_point: can be one of:
@@ -118,7 +121,9 @@ def continue_worker(oid, restart_point="continue_next",
 
 def get_workflow_object_instances(data, engine):
     """
-    Wraps each item in the given list of data objects into BibWorkflowObject
+    Analyse data and create corresponding BibWorkflowObjects.
+
+    Wrap each item in the given list of data objects into BibWorkflowObject
     instances - creating appropriate versions of objects in the database and
     returning a list of these objects.
 
@@ -138,8 +143,10 @@ def get_workflow_object_instances(data, engine):
     for data_object in data:
         if isinstance(data_object, BibWorkflowObject):
             if data_object.id:
-                data_object.log.critical("Existing workflow object found for " +
-                                         "this object. Saving a snapshot.")
+                data_object.log.debug("Existing workflow object found for "
+                                      "this object. Saving a snapshot.")
+                if data_object.version == ObjectVersion.FINAL:
+                    data_object.version = ObjectVersion.INITIAL
                 workflow_objects.append(
                     generate_snapshot(data_object, engine)
                 )
@@ -161,6 +168,8 @@ def get_workflow_object_instances(data, engine):
 
 def generate_snapshot(workflow_object, engine):
     """
+    Save a version of the BibWorkflowObject passed in parameter.
+
     Given a workflow object, generate a snapshot of it's current state
     and return the given instance to work on.
 
@@ -191,7 +200,7 @@ def generate_snapshot(workflow_object, engine):
     elif workflow_object.version == ObjectVersion.RUNNING:
         # Trying to run an object that is running. Dangerous!
         msg = "Object is already in RUNNING state!"
-        workflow_object.log.critical(msg)
+        workflow_object.log.debug(msg)
         raise WorkflowObjectVersionError(msg,
                                          obj_version=workflow_object.version,
                                          id_object=workflow_object.id)

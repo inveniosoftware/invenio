@@ -47,6 +47,7 @@ class ObjectVersion(object):
     MAPPING = {0: "New,", 1: "Done,", 2: "Need action,",
                              3: "In process,"}
 
+
 def get_default_data():
     """Return the base64 representation of the data default value."""
     data_default = {}
@@ -489,14 +490,15 @@ class BibWorkflowObject(db.Model):
         if formatter:
             # A seperate formatter is supplied
             return formatter(data)
-
+        from invenio.modules.records.api import Record
         if isinstance(data, collections.Mapping):
             # Dicts are cool on its own, but maybe its SmartJson (record)
             try:
-                data = data.legacy_export_as_marc()
+                data = Record(data.dumps()).legacy_export_as_marc()
             except (TypeError, KeyError):
                 # Maybe not, submission?
                 return data
+
         if isinstance(data, string_types):
             # Its a string type, lets try to convert
             if format:
@@ -546,9 +548,6 @@ class BibWorkflowObject(db.Model):
             self.version = version
             if version in (ObjectVersion.FINAL, ObjectVersion.HALTED):
                 redis_create_search_entry(self)
-
-
-
         if id_workflow is not None:
             self.id_workflow = id_workflow
         db.session.add(self)

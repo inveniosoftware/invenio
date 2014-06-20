@@ -56,22 +56,22 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
                                module_name="unit_tests")
         engineb = asyncr.get(uuid_to_workflow)
 
-        self.assertEqual(test_objectb.get_data(), 38)
+        self.assertEqual(38, test_objectb.get_data())
 
         asyncr = start_by_wid_delayed(engineb.uuid)
         asyncr.get(uuid_to_workflow)
-        self.assertEqual(test_objectb.get_data(), 38)
+        self.assertEqual(38, test_objectb.get_data())
         test_objecte = BibWorkflowObject()
         test_objecte.set_data(2)
         test_objecte.save()
         asyncr = start_delayed('test_workflow', [test_objecte],
                                module_name="unit_tests")
         engineb = asyncr.get(uuid_to_workflow)
-        while engineb.status != WorkflowStatus.COMPLETED:
-            asyncr = continue_oid_delayed(test_objecte.id)
-            engineb = asyncr.get(uuid_to_workflow)
-        self.assertEqual(engineb.status, WorkflowStatus.COMPLETED)
-        self.assertEqual(test_objecte.get_data(), 20)
+        asyncr = continue_oid_delayed(test_objecte.id)
+
+        engineb = asyncr.get(uuid_to_workflow)
+        self.assertEqual(WorkflowStatus.COMPLETED, engineb.status)
+        self.assertEqual(20, test_objecte.get_data())
 
     def test_workflows_tasks_chained(self):
         """Test delayed workflows in delayed workflow."""
@@ -87,9 +87,9 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
         engine = async.get(uuid_to_workflow)
         from invenio.modules.workflows.engine import WorkflowStatus
 
-        self.assertEqual(engine.get_extra_data()["_nb_workflow_finish"], 21)
-        self.assertEqual(engine.get_extra_data()["_nb_workflow_failed"], 0)
-        self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
+        self.assertEqual(21, engine.get_extra_data()["_nb_workflow_finish"])
+        self.assertEqual(0, engine.get_extra_data()["_nb_workflow_failed"])
+        self.assertEqual(WorkflowStatus.COMPLETED, engine.status)
 
     def test_dirty_worker(self):
         """Deep test of celery worker."""
@@ -103,7 +103,7 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
         test_objectb.save()
         data = BibWorkflowObjectIdContainer(test_objectb).to_dict()
         celery_run('test_workflow', [data], module_name="unit_tests")
-        self.assertEqual(test_objectb.get_data(), 40)
+        self.assertEqual(40, test_objectb.get_data())
         test_object = BibWorkflowObject()
         test_object.set_data(22)
         test_object.save()
@@ -115,8 +115,8 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
             if isinstance(data[i], BibWorkflowObject):
                 data[i] = BibWorkflowObjectIdContainer(data[i]).to_dict()
         celery_run('test_workflow', data, module_name="unit_tests")
-        self.assertEqual(test_object.get_data(), 40)
-        self.assertEqual(test_objectc.get_data(), 40)
+        self.assertEqual(40, test_object.get_data())
+        self.assertEqual(40, test_objectc.get_data())
 
         test_object = BibWorkflowObject()
         test_object.save()
@@ -126,26 +126,26 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
         engine = uuid_to_workflow(
             celery_run('test_workflow_logic', [test_object],
                        module_name="unit_tests"))
-        self.assertEqual(test_object.get_data(), 5)
-        self.assertEqual(test_object.get_extra_data()["test"], "lt9")
+        self.assertEqual(5, test_object.get_data())
+        self.assertEqual("lt9", test_object.get_extra_data()["test"])
         celery_restart(engine.uuid)
-        self.assertEqual(test_object.get_data(), 5)
-        self.assertEqual(test_object.get_extra_data()["test"], "lt9")
+        self.assertEqual(5, test_object.get_data())
+        self.assertEqual("lt9", test_object.get_extra_data()["test"])
         celery_continue(test_object.id, "continue_next")
-        self.assertEqual(test_object.get_data(), 6)
-        self.assertEqual(test_object.get_extra_data()["test"], "lt9")
+        self.assertEqual(6, test_object.get_data())
+        self.assertEqual("lt9", test_object.get_extra_data()["test"])
         celery_continue(test_object.id, "continue_next")
-        self.assertEqual(test_object.get_data(), 9)
-        self.assertEqual(test_object.get_extra_data()["test"], "gte9")
+        self.assertEqual(9, test_object.get_data())
+        self.assertEqual("gte9", test_object.get_extra_data()["test"])
         celery_continue(test_object.id, "continue_next")
-        self.assertEqual(test_object.get_data(), 15)
-        self.assertEqual(test_object.get_extra_data()["test"], "gte9")
+        self.assertEqual(15, test_object.get_data())
+        self.assertEqual("gte9", test_object.get_extra_data()["test"])
         engine = uuid_to_workflow(
             celery_continue(test_object.id, "continue_next",
                             module_name="unit_tests"))
         from invenio.modules.workflows.engine import WorkflowStatus
 
-        self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
+        self.assertEqual(WorkflowStatus.COMPLETED, engine.status)
 
     def test_workflows_tasks(self):
         """Test delayed workflows in non delayed one."""
@@ -159,12 +159,12 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
                        module_name="unit_tests")
         from invenio.modules.workflows.engine import WorkflowStatus
 
-        self.assertEqual(engine.get_extra_data()["_nb_workflow_failed"], 0)
-        self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
-        self.assertEqual(test_object.get_extra_data()["_tasks_results"][
-                         "_workflows_reviews"][0].result["failed"], 0)
-        self.assertEqual(test_object.get_extra_data()["nbworkflowrunning"], 4)
-        self.assertEqual(engine.get_extra_data()["_nb_workflow_finish"], 21)
+        self.assertEqual(0, engine.get_extra_data()["_nb_workflow_failed"])
+        self.assertEqual(WorkflowStatus.COMPLETED, engine.status)
+        self.assertEqual(0, test_object.get_extra_data()["_tasks_results"][
+                         "_workflows_reviews"][0].result["failed"])
+        self.assertEqual(4, test_object.get_extra_data()["nbworkflowrunning"])
+        self.assertEqual(21, engine.get_extra_data()["_nb_workflow_finish"])
 
 
 TEST_SUITE = make_test_suite(WorkflowDelayedTest)

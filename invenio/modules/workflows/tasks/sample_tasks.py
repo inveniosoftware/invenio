@@ -78,7 +78,6 @@ def reduce_data_by_one(times):
         while a > 0:
             obj.data -= 1
             a -= 1
-        obj.log.info("value is now: " + str(obj.data))
 
     return _reduce_data_by_one
 
@@ -117,7 +116,6 @@ def lower_than_20(obj, eng):
 
 def halt_if_higher_than_20(obj, eng):
     """Function checks if variable is higher than 20."""
-    eng.log.info("value" + str(obj.data))
     if obj.data > 20:
         eng.halt("Value of filed: a in object is higher than 20.")
 
@@ -137,7 +135,6 @@ def halt_whatever(obj, eng):
 
 def task_reduce_and_halt(obj, eng):
     """Task to substract one to data and stop."""
-    eng.log.info("value" + str(obj.data))
     if obj.data > 0:
         obj.data -= 1
         obj.save()

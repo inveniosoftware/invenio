@@ -64,24 +64,19 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
         my_test_obj.data = my_test_obj.get_data()
         my_test_obj_b.data = my_test_obj_b.get_data()
         engine.extra_data = engine.get_extra_data()
-        self.assertEqual(filtering_oai_pmh_identifier(my_test_obj, engine),
-                         True)
+        self.assertTrue(filtering_oai_pmh_identifier(my_test_obj, engine))
         engine.set_extra_data(engine.extra_data)
         engine.extra_data = engine.get_extra_data()
-        self.assertEqual(filtering_oai_pmh_identifier(my_test_obj, engine),
-                         False)
+        self.assertFalse(filtering_oai_pmh_identifier(my_test_obj, engine))
         engine.set_extra_data(engine.extra_data)
         engine.extra_data = engine.get_extra_data()
-        self.assertEqual(filtering_oai_pmh_identifier(my_test_obj_b, engine),
-                         True)
+        self.assertTrue(filtering_oai_pmh_identifier(my_test_obj_b, engine))
         engine.set_extra_data(engine.extra_data)
         engine.extra_data = engine.get_extra_data()
-        self.assertEqual(filtering_oai_pmh_identifier(my_test_obj_b, engine),
-                         False)
+        self.assertFalse(filtering_oai_pmh_identifier(my_test_obj_b, engine))
         engine.set_extra_data(engine.extra_data)
         engine.extra_data = engine.get_extra_data()
-        self.assertEqual(filtering_oai_pmh_identifier(my_test_obj, engine),
-                         False)
+        self.assertFalse(filtering_oai_pmh_identifier(my_test_obj, engine))
         self.objects_to_delete.append(my_test_obj_b)
         self.objects_to_delete.append(my_test_obj)
 
@@ -102,7 +97,7 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
         engine.set_extra_data_params(options={'test': True})
         engine.extra_data = engine.get_extra_data()
         init_harvesting(my_test_obj, engine)
-        self.assertEqual(engine.get_extra_data()["options"]["test"], True)
+        self.assertTrue(engine.get_extra_data()["options"]["test"])
         self.objects_to_delete.append(my_test_obj)
 
 TEST_SUITE = make_test_suite(WorkflowMarcXML)

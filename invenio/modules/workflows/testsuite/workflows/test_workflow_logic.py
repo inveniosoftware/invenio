@@ -39,7 +39,6 @@ class test_workflow_logic(object):
                 add_data(1),
             ],
             end_for,
-
             workflow_if(compare_logic(get_data, 9, "gte")),
             [
                 set_obj_extra_data_key("test", "gte9"),

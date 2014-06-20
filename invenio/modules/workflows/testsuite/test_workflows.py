@@ -149,10 +149,10 @@ distances from it.
         eng = start('halttest', data, module_name="unit_tests")
         idx, obj = list(eng.getObjects())[0]
 
-        self.assertEqual(obj.version, ObjectVersion.HALTED)
-        self.assertEqual(eng.status, WorkflowStatus.HALTED)
-        self.assertEqual(BibWorkflowObjectLog.get(
-            id_object=obj.id, log_type=logging.ERROR).count(), 0)
+        self.assertEqual(ObjectVersion.HALTED, obj.version)
+        self.assertEqual(WorkflowStatus.HALTED, eng.status)
+        self.assertEqual(0, BibWorkflowObjectLog.get(
+            id_object=obj.id, log_type=logging.ERROR).count())
 
     def test_halt_in_branch(self):
         """Test halt task when in conditionnal branch."""
@@ -177,10 +177,10 @@ distances from it.
         eng = start('branchtest', data, module_name="unit_tests")
         idx, obj = list(eng.getObjects())[0]
 
-        self.assertEqual(obj.version, ObjectVersion.HALTED)
-        self.assertEqual(eng.status, WorkflowStatus.HALTED)
-        self.assertEqual(BibWorkflowObjectLog.get(
-            id_object=obj.id, log_type=logging.ERROR).count(), 0)
+        self.assertEqual(ObjectVersion.HALTED, obj.version)
+        self.assertEqual(WorkflowStatus.HALTED, eng.status)
+        self.assertEqual(0, BibWorkflowObjectLog.get(
+            id_object=obj.id, log_type=logging.ERROR).count())
 
     def test_object_creation_complete(self):
         """
@@ -198,17 +198,17 @@ distances from it.
         test_object.set_data(20)
         test_object.save()
 
-        self.assertEqual(test_object.version, ObjectVersion.INITIAL)
-        self.assertEqual(test_object.id_parent, None)
-        self.assertEqual(test_object.get_data(), 20)
+        self.assertEqual(ObjectVersion.INITIAL, test_object.version)
+        self.assertEqual(None, test_object.id_parent)
+        self.assertEqual(20, test_object.get_data())
 
         engine = start('test_workflow', [test_object],
                        module_name="unit_tests")
 
-        self.assertEqual(test_object.get_data(), 38)
-        self.assertEqual(test_object.id_parent, None)
-        self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
-        self.assertEqual(test_object.version, ObjectVersion.FINAL)
+        self.assertEqual(38, test_object.get_data())
+        self.assertEqual(None, test_object.id_parent)
+        self.assertEqual(WorkflowStatus.COMPLETED, engine.status)
+        self.assertEqual(ObjectVersion.FINAL, test_object.version)
 
     def test_object_creation_halt(self):
         """Test status of object before/after workflow.
@@ -225,16 +225,16 @@ distances from it.
         test_object.save()
         test_object.set_data(2)
 
-        self.assertEqual(test_object.version, ObjectVersion.INITIAL)
-        self.assertEqual(test_object.id_parent, None)
-        self.assertEqual(test_object.get_data(), 2)
+        self.assertEqual(ObjectVersion.INITIAL, test_object.version)
+        self.assertEqual(None, test_object.id_parent)
+        self.assertEqual(2, test_object.get_data())
 
         engine = start('test_workflow', [test_object],
                        module_name="unit_tests")
 
-        self.assertEqual(test_object.get_data(), 2)
-        self.assertEqual(test_object.version, ObjectVersion.HALTED)
-        self.assertEqual(engine.status, WorkflowStatus.HALTED)
+        self.assertEqual(2, test_object.get_data())
+        self.assertEqual(ObjectVersion.HALTED, test_object.version)
+        self.assertEqual(WorkflowStatus.HALTED, engine.status)
 
     def test_workflow_engine_instantiation(self):
         """Check the proper init of the Workflow and BibWorkflowEngine."""
@@ -269,9 +269,9 @@ distances from it.
             self.assertEqual(engine.status, WorkflowStatus.HALTED)
             for my_object_b in engine.getObjects():
                 engine = continue_oid(my_object_b[1].id, "restart_task")
-        self.assertEqual(test_object.get_data(), 0)
-        self.assertEqual(test_object.version, ObjectVersion.FINAL)
-        self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
+        self.assertEqual(0, test_object.get_data())
+        self.assertEqual(ObjectVersion.FINAL, test_object.version)
+        self.assertEqual(WorkflowStatus.COMPLETED, engine.status)
 
     def test_workflow_object_creation(self):
         """Test to see if the right snapshots or object versions are created."""
@@ -297,12 +297,12 @@ distances from it.
         ).order_by(BibWorkflowObject.id).all()
 
         # There should only be 2 objects (initial, final)
-        self.assertEqual(len(all_objects), 2)
+        self.assertEqual(2, len(all_objects))
         self.assertEqual(test_object.id, initial_object.id_parent)
-        self.assertEqual(initial_object.version, ObjectVersion.INITIAL)
-        self.assertEqual(initial_object.get_data(), initial_data)
-        self.assertEqual(test_object.get_data(), final_data)
-        self.assertEqual(test_object.version, ObjectVersion.FINAL)
+        self.assertEqual(ObjectVersion.INITIAL, initial_object.version)
+        self.assertEqual(initial_data, initial_object.get_data())
+        self.assertEqual(final_data, test_object.get_data())
+        self.assertEqual(ObjectVersion.FINAL, test_object.version)
 
     def test_workflow_object_creation_simple(self):
         """Test to see if the right snapshots or object versions are created."""
@@ -329,12 +329,12 @@ distances from it.
         ).order_by(BibWorkflowObject.id).all()
 
         # There should only be 2 objects (initial, final)
-        self.assertEqual(len(all_objects), 2)
+        self.assertEqual(2, len(all_objects))
         self.assertEqual(test_object.id_parent, initial_object.id)
-        self.assertEqual(initial_object.version, ObjectVersion.FINAL)
-        self.assertEqual(initial_object.get_data(), final_data)
-        self.assertEqual(test_object.get_data(), initial_data)
-        self.assertEqual(test_object.version, ObjectVersion.INITIAL)
+        self.assertEqual(ObjectVersion.FINAL, initial_object.version)
+        self.assertEqual(final_data, initial_object.get_data())
+        self.assertEqual(initial_data, test_object.get_data())
+        self.assertEqual(ObjectVersion.INITIAL, test_object.version)
 
     def test_workflow_complex_run(self):
         """Test running workflow with several data objects."""
@@ -357,13 +357,13 @@ distances from it.
 
         # Let's check that we found anything.
         # There should only be three objects
-        self.assertEqual(len(objects), 2)
+        self.assertEqual(2, len(objects))
 
         all_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid
         ).order_by(BibWorkflowObject.id).all()
 
-        self.assertEqual(len(all_objects), 4)
+        self.assertEqual(4, len(all_objects))
 
         for obj in objects:
             # The child object should have the final or halted version
@@ -381,8 +381,7 @@ distances from it.
         from invenio.modules.workflows.api import start
 
         initial_data = self.recxml
-        workflow = start(workflow_name="marcxml_workflow",
-                         data=[initial_data],
+        workflow = start(workflow_name="marcxml_workflow", data=[initial_data],
                          module_name="unit_tests")
 
         # Get objects of the workflow we just ran
@@ -391,16 +390,15 @@ distances from it.
             BibWorkflowObject.id_parent == None  # noqa E711
         ).order_by(BibWorkflowObject.id).all()
 
-        self._check_workflow_execution(objects,
-                                       initial_data)
+        self._check_workflow_execution(objects, initial_data)
 
         all_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid
         ).order_by(BibWorkflowObject.id).all()
 
-        self.assertEqual(len(all_objects), 2)
+        self.assertEqual(2, len(all_objects))
 
-        self.assertEqual(workflow.status, WorkflowStatus.HALTED)
+        self.assertEqual(WorkflowStatus.HALTED, workflow.status)
 
         current = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid,
@@ -424,13 +422,13 @@ distances from it.
                          data=[current],
                          module_name="unit_tests")
 
-        self.assertEqual(workflow.status, WorkflowStatus.HALTED)
-        self.assertEqual(current.version, ObjectVersion.HALTED)
+        self.assertEqual(WorkflowStatus.HALTED, workflow.status)
+        self.assertEqual(ObjectVersion.HALTED, current.version)
 
         workflow = continue_oid(current.id,
                                 module_name="unit_tests")
-        self.assertEqual(workflow.status, WorkflowStatus.COMPLETED)
-        self.assertEqual(current.version, ObjectVersion.FINAL)
+        self.assertEqual(WorkflowStatus.COMPLETED, workflow.status)
+        self.assertEqual(ObjectVersion.FINAL, current.version)
 
     def test_workflow_for_finished_object(self):
         """Test starting workflow with finished object given."""
@@ -447,9 +445,9 @@ distances from it.
                          data=[current],
                          module_name="unit_tests")
 
-        self.assertEqual(workflow.status, WorkflowStatus.COMPLETED)
-        self.assertEqual(current.version, ObjectVersion.FINAL)
-        self.assertEqual(current.get_data(), 38)
+        self.assertEqual(WorkflowStatus.COMPLETED, workflow.status)
+        self.assertEqual(ObjectVersion.FINAL, current.version)
+        self.assertEqual(38, current.get_data())
 
         previous = BibWorkflowObject.query.get(current.id)
 
@@ -457,9 +455,9 @@ distances from it.
                            data=[previous],
                            module_name="unit_tests")
 
-        self.assertEqual(workflow_2.status, WorkflowStatus.COMPLETED)
-        self.assertEqual(previous.version, ObjectVersion.FINAL)
-        self.assertEqual(previous.get_data(), 56)
+        self.assertEqual(WorkflowStatus.COMPLETED, workflow_2.status)
+        self.assertEqual(ObjectVersion.FINAL, previous.version)
+        self.assertEqual(56, previous.get_data())
 
     def test_logging_for_workflow_objects_without_workflow(self):
         """Test run a virtual object out of a workflow for test purpose."""
@@ -494,7 +492,7 @@ distances from it.
                 messages_found += 1
             elif current_obj.message == err_msg and messages_found == 1:
                 messages_found += 1
-        self.assertEqual(messages_found, 2)
+        self.assertEqual(2, messages_found)
 
     def test_workflow_for_running_object(self):
         """Test workflow with running object given and watch it fail."""
@@ -510,7 +508,7 @@ distances from it.
         try:
             start_by_oids('test_workflow', [obj_running.id], module_name="unit_tests")
         except Exception as e:
-            self.assertEqual(isinstance(e, WorkflowObjectVersionError), True)
+            self.assertTrue(isinstance(e, WorkflowObjectVersionError))
             obj_running.delete(e.id_object)
         obj_running.delete(obj_running)
         obj_running = BibWorkflowObject()
@@ -519,7 +517,7 @@ distances from it.
         try:
             start_by_oids('test_workflow', [obj_running.id], module_name="unit_tests")
         except Exception as e:
-            self.assertEqual(isinstance(e, WorkflowObjectVersionError), True)
+            self.assertTrue(isinstance(e, WorkflowObjectVersionError))
             obj_running.delete(e.id_object)
         obj_running.delete(obj_running)
 
@@ -527,9 +525,10 @@ distances from it.
         obj_running.set_data(1234)
         obj_running.save(version=5)
         try:
-            start_by_oids('test_workflow', [obj_running.id], module_name="unit_tests")
+            start_by_oids('test_workflow', [obj_running.id],
+                          module_name="unit_tests")
         except Exception as e:
-            self.assertEqual(isinstance(e, WorkflowObjectVersionError), True)
+            self.assertTrue(isinstance(e, WorkflowObjectVersionError))
             obj_running.delete(e.id_object)
         obj_running.delete(obj_running)
 
@@ -552,31 +551,27 @@ distances from it.
         ).first()
 
         self.assertTrue(obj_halted)
-        self.assertEqual(obj_halted.get_data(), 1)
+        self.assertEqual(1, obj_halted.get_data())
 
         # Try to restart, we should halt again actually.
-        continue_oid(oid=obj_halted.id,
-                     start_point="restart_task",
+        continue_oid(oid=obj_halted.id, start_point="restart_task",
                      module_name="unit_tests")
 
-        self.assertEqual(obj_halted.get_data(), 1)
-        self.assertEqual(obj_halted.version, ObjectVersion.HALTED)
+        self.assertEqual(1, obj_halted.get_data())
+        self.assertEqual(ObjectVersion.HALTED, obj_halted.version)
 
         # We skip to next part, this should work
-        continue_oid(oid=obj_halted.id,
-                     start_point="continue_next",
-                     module_name="unit_tests")
+        continue_oid(oid=obj_halted.id, module_name="unit_tests")
 
-        self.assertEqual(obj_halted.get_data(), 19)
-        self.assertEqual(obj_halted.version, ObjectVersion.FINAL)
+        self.assertEqual(19, obj_halted.get_data())
+        self.assertEqual(ObjectVersion.FINAL, obj_halted.version)
 
         # Let's do that last task again, shall we?
-        continue_oid(oid=obj_halted.id,
-                     start_point="restart_prev",
+        continue_oid(oid=obj_halted.id, start_point="restart_prev",
                      module_name="unit_tests")
 
-        self.assertEqual(obj_halted.get_data(), 37)
-        self.assertEqual(obj_halted.version, ObjectVersion.FINAL)
+        self.assertEqual(37, obj_halted.get_data())
+        self.assertEqual(ObjectVersion.FINAL, obj_halted.version)
 
     def test_restart_workflow(self):
         """Test restarting workflow for given workflow id."""
@@ -593,32 +588,23 @@ distances from it.
         init_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == init_workflow.uuid
         ).order_by(BibWorkflowObject.id).all()
-        self.assertEqual(len(init_objects), 2)
-
+        self.assertEqual(2, len(init_objects))
         restarted_workflow = start_by_wid(wid=init_workflow.uuid,
                                           module_name="unit_tests")
+
+        self.assertFalse(init_workflow.uuid == restarted_workflow.uuid)
 
         restarted_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == restarted_workflow.uuid
         ).order_by(BibWorkflowObject.id).all()
-
         # This time we should only have one more initial object
-        self.assertEqual(len(restarted_objects), 3)
+        self.assertEqual(2, len(restarted_objects))
 
-        # First and last object will be INITIAL
-        self.assertEqual(restarted_objects[1].version, ObjectVersion.INITIAL)
-
-        self.assertEqual(restarted_objects[1].version,
-                         restarted_objects[2].version)
+        # Last object will be INITIAL
+        self.assertEqual(ObjectVersion.INITIAL, restarted_objects[1].version)
 
         self.assertEqual(restarted_objects[1].id_parent,
                          restarted_objects[0].id)
-
-        self.assertEqual(restarted_objects[2].id_parent,
-                         restarted_objects[0].id)
-
-        self.assertEqual(restarted_objects[0].get_data(),
-                         restarted_objects[2].get_data())
 
     def _check_workflow_execution(self, objects, initial_data):
         """Test correct workflow execution."""
@@ -630,10 +616,10 @@ distances from it.
 
         # The object should be the inital version
 
-        self.assertEqual(parent_object.version, ObjectVersion.HALTED)
+        self.assertEqual(ObjectVersion.HALTED, parent_object.version)
 
         # The object should have the inital data
-        self.assertEqual(objects[0].child_objects[0].get_data(), initial_data)
+        self.assertEqual(initial_data, objects[0].child_objects[0].get_data())
 
         # Fetch final object which should exist
         final_object = objects[0].child_objects[0]
@@ -657,41 +643,40 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
     def test_logic_tasks(self):
         """Test that the logic tasks work correctly."""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.modules.workflows.api import start, continue_oid, start_by_wid
+        from invenio.modules.workflows.api import (start, continue_oid,
+                                                   start_by_wid)
 
         test_object = BibWorkflowObject()
         test_object.set_data(0)
         test_object.save()
-        workflow = start('test_workflow_logic', [test_object], module_name="unit_tests")
+        workflow = start('test_workflow_logic', [test_object],
+                         module_name="unit_tests")
 
-        self.assertEqual(test_object.get_data(), 5)
-        self.assertEqual(test_object.get_extra_data()["test"], "lt9")
+        self.assertEqual(5, test_object.get_data())
+        self.assertEqual("lt9", test_object.get_extra_data()["test"])
 
         start_by_wid(workflow.uuid)
 
-        self.assertEqual(test_object.get_data(), 5)
-        self.assertEqual(test_object.get_extra_data()["test"], "lt9")
-        continue_oid(test_object.id,
-                     start_point="continue_next")
+        self.assertEqual(5, test_object.get_data())
+        self.assertEqual("lt9", test_object.get_extra_data()["test"])
+        continue_oid(test_object.id)
 
-        self.assertEqual(test_object.get_data(), 6)
-        self.assertEqual(test_object.get_extra_data()["test"], "lt9")
-        continue_oid(test_object.id,
-                     start_point="continue_next")
+        self.assertEqual(6, test_object.get_data())
+        self.assertEqual("lt9", test_object.get_extra_data()["test"])
+        continue_oid(test_object.id)
 
-        self.assertEqual(test_object.get_data(), 9)
-        self.assertEqual(test_object.get_extra_data()["test"], "gte9")
-        continue_oid(test_object.id,
-                     start_point="continue_next")
+        self.assertEqual(9, test_object.get_data())
+        self.assertEqual("gte9", test_object.get_extra_data()["test"])
+        continue_oid(test_object.id)
 
-        self.assertEqual(test_object.get_data(), 15)
-        self.assertEqual(test_object.get_extra_data()["test"], "gte9")
-        engine = continue_oid(test_object.id,
-                              start_point="continue_next")
+        self.assertEqual(15, test_object.get_data())
+        self.assertEqual("gte9", test_object.get_extra_data()["test"])
+        engine = continue_oid(test_object.id)
 
         from invenio.modules.workflows.engine import WorkflowStatus
-
-        self.assertEqual(engine.status, WorkflowStatus.COMPLETED)
+        from invenio.modules.workflows.models import ObjectVersion
+        self.assertEqual(ObjectVersion.FINAL, test_object.version)
+        self.assertEqual(WorkflowStatus.COMPLETED, engine.status)
 
     def test_workflow_without_workflow_object_saved(self):
         """Test that the logic tasks work correctly."""
@@ -703,8 +688,8 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
 
         workflow = start('test_workflow_logic', [test_object], module_name="unit_tests")
 
-        self.assertEqual(test_object.get_data(), 5)
-        self.assertEqual(test_object.get_extra_data()["test"], "lt9")
+        self.assertEqual(5, test_object.get_data())
+        self.assertEqual("lt9", test_object.get_extra_data()["test"])
         start_by_wid(workflow.uuid)
         test_object.delete(test_object.id)
 
