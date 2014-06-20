@@ -35,10 +35,10 @@ Contents
 1. Introduction
 ---------------
 
-This guides shows how you can set up a new journal managed by the
-WebJournal module of Invenio. You should first read the `WebJournal
+This guide shows how you can set up a new journal managed by the
+Invenio WebJournal module. You should first read the `WebJournal
 Editor Guide <webjournal-editor-guide>`__ to get an overview of the main
-concepts of this module
+concepts of this module.
 
 2. Add a Journal
 ----------------
@@ -56,7 +56,7 @@ or give write permission to ``/opt/invenio/etc/webjournal/``
 
 Usually adding a journal also requires to set up a dedicated submission,
 give some access using WebAccess, and can optionally lead to the
-creation of WebSearch collections (you can, but your don't have to, map
+creation of WebSearch collections (you can, but you don't have to, map
 your journal categories to WebSearch collections. You can also simply
 create a generic collection for all articles in all categories of your
 journal, or don't create collections at all). See the section dedicated
@@ -110,8 +110,8 @@ The configuration consists in an XML file with the following nodes:
    -  **issue\_grouping**: the default number of issues that are
       released together when grouping issue. Specify ``1`` if your
       release are not usually grouped.
-   -  **issues\_per\_year**: number of expected issue per year. Help to
-      anticipate next issue dates and number
+   -  **issues\_per\_year**: number of expected issues per year. Helps to
+      anticipate next issue dates and number.
    -  **hide\_unreleased\_issues**: if all unreleased issue should be
       hidden to readers, type "``all``\ " (recommended). If only future
       unreleased issues must be hidden to readers, type "``future``\ ".

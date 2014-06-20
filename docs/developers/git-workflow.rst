@@ -10,19 +10,19 @@ Introduction
 ------------
 
 Our collaboration model is basically a pull-on-demand model similar to
-the one used for the Linux kernel.  You may want to read a chapter in the
-`Mercurial book on this collaboration model
+the one used for the Linux kernel.  You may want to read a
+`chapter on this collaboration model in the Mercurial book 
 <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
 
 In the recipes below you will encounter several personas with
 different roles:
 
 * Joe Bloggs, head developer and system integrator
-* John Doe, developer, maintainer of module *WebFoo*
-* Erika Mustermann, developer, maintainer of module *WebBar*
+* John Doe, developer, maintainer of the *WebFoo* module 
+* Erika Mustermann, developer, maintainer of the *WebBar* module 
 
 
-Setting up things
+Setting things up
 -----------------
 
 S1. Setting up your Git identity
@@ -61,7 +61,7 @@ This is how to set up your private repo (on your laptop).
 S3. Backuping your private repo (only developers at CERN)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is how to mirror your private repo to CERN AFS space.
+This is how to mirror your private repo to the CERN AFS space.
 
 .. code-block:: console
 
@@ -147,7 +147,7 @@ Invenio's `repo web interface <http://invenio-software.org/repo/>`_.
 S7. Using remote repository locally
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you prefer, you can mount the remote afs filesystem in the local drive,  and work
+If you prefer, you can mount the remote afs filesystem in the local drive, and work
 as normal. To accomplish that you need sshfs package installed.
 
 .. code-block:: console
@@ -194,9 +194,9 @@ can be several maintenance branches for every release series
 (**maint-0.99**, **maint-1.0**, **maint-1.1**), but typically we use only
 ``maint`` for the latest stable release.
 
-The code that goes to the maintenance branch is of the bugfix nature
+The code that goes to the maintenance branch is of bugfix nature
 only.  It should not alter DB table schema, Invenio config file
-schema, local configurations in the ``etc`` folder, or template function
+schema, local configurations in the ``etc`` folder or template function
 parameters in a backward-incompatible way.  If it contains any new
 features, then they are switched off in order to be fully compatible
 with the previous releases in this series.  Therefore, for
@@ -232,7 +232,7 @@ goes directly into the ``master`` branch described previously.  If it is
 cleaned, tested and almost stable, but not fully ``master`` worthy yet,
 then it may go to the ``next`` branch.  The ``next`` branch serves as a
 kind of stabilization branch for ``master``.  The features may stay in
-``next`` for a long enough time so as to gets stabilized, and when they
+``next`` for a long enough time to get stabilized, and when they
 are ready, they are promoted to ``master`` (or to ``maint`` in some
 scenarios).  The code in ``next`` may have bugs, may not pass the test
 suite, but anyway should be stable enough so that it is almost never
@@ -246,7 +246,7 @@ Working on new features - overview
 ----------------------------------
 
 Here is a schema summarizing how John Doe would work on new features
-and fixes, and how Joe Bloggs would integrate them.
+and fixes and how Joe Bloggs would integrate them.
 
 .. image:: /_static/invenio-git-workflow.png
    :width: 859
@@ -290,10 +290,10 @@ W2. Working with local topic branches
 You never work on the master branch, you always checkout local *topic
 branches* for every feature you are implementing.  This will permit
 you to switch between topics easily, implement some urgent fixes for
-older releases, publishing some features while retaining features not
+older releases, publish some features while retaining features not
 yet ready for public eyes, etc.
 
-In our workflow example above, we created several branches to tackle
+In our workflow example above we created several branches to tackle
 several different tasks.
 
 .. code-block:: console
@@ -313,7 +313,7 @@ point in the master branch.
 
 Please name your topical branches sensibly, since their names may
 appear in the central repo logs in case of non-trivial merges.
-(Please use a dash rather than underscore in topical branch names.)
+(Please use a dash rather than an underscore in topical branch names.)
 
 W3. Working on new-feature-b
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -338,7 +338,7 @@ various more urgent problems, etc.
 W4. Using temporary stash
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want to switch branches, then you have to commit all the
+If you want to switch branches, you have to commit all the
 stuff you are currently editing, which may not be what you want.  In
 that case you can **stash** your commits into a temporary git stash,
 switch to a branch, do what you want, and when you come back, replay
@@ -375,7 +375,7 @@ W6. Rebasing against latest git/master
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 At this step the new-feature-b code is working both for Atlantis
-and for CDS contexts.  You should now check official repo for any
+and for CDS contexts.  You should now check the official repo for any
 updates to catch any changes that may have been committed to
 origin/master in the meantime.
 
@@ -385,7 +385,7 @@ origin/master in the meantime.
     $ git pull
 
 
-You can then **rebase** your new-feature-b branch again recent master.
+You can then **rebase** your new-feature-b branch against recent master.
 
 .. code-block:: console
 
@@ -417,8 +417,8 @@ unnecessary temporary versions.)
 While rebasing, you may want to squash your commits together, to keep
 the git repo history clean.  See section R4 below for more details.
 
-You should test your code once more to see if it was not broken by
-updates.
+You should test your code once more to verify that it was not broken by
+the updates.
 
 W7. Publishing your work
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -431,8 +431,8 @@ The new-feature-b code is now ready to be pushed into your
 that the test cases are working well, and please check once more the
 basic code kwalitee, as mentioned in the section R3 below.
 
-If the test cases work and the code kwalitee is acceptable, then push
-your branch into your public repo like this.
+If the test cases work and the code kwalitee is acceptable, push
+your branch into your public repo this way:
 
 .. code-block:: console
 
@@ -443,7 +443,7 @@ Then alert Joe Bloggs with a request to review and integrate the
 branch, indicating ``git branch johndoe/new-feature-b`` in the email
 Subject header so that the emails will be threaded properly and given
 special treatment in the haystack of Joe's usual email conversation.
-Please also add any special observations for merge.  Example.
+Please also add any special observations for merge.  Example:
 
 .. code-block:: console
 
@@ -486,31 +486,31 @@ attached ``0001-WebFoo-fixed-bad-problem.patch`` file.
 W7.c Sending patch-suggestions
 ++++++++++++++++++++++++++++++
 
-As we said in the introduction, John usually maintains module !WebFoo
-while Erika usually maintains module !WebBar.  What happens if Erika
+As we said in the introduction, John usually maintains the !WebFoo module 
+while Erika usually maintains the !WebBar module.  What happens if Erika
 spots a problem some !WebFoo feature?
 
-If the problem is clear, and its solution is clear, then Erika can
+If the problem and its solution is clear, Erika can
 simply alert John that she's up to it, fix the problem and publish a
 branch or send an email to Joe asking for integration.
 
-If the problem a little bit more convoluted, or there are several
-possible solutions and it is not clear which one is the best, or the
-solution to the problem requires some deep changes inside !WebFoo
-structures that may affect other things, or the problem requires
+If the problem a little bit more complicated or there are several
+possible solutions and it is not clear which one is the best or the
+solution to the problem requires some deep changes inside the structure 
+of !WebFoo that may affect other things or the problem requires
 optimizations of several pre-existing functions, then it may be best
 if Erika contacts John as the !WebFoo module maintainer about the
-problem.  Maybe John would like to do the changes himself, or John can
+problem.  Maybe John would like to do the changes himself or John can
 advise Erika how to go about the problem, etc.
 
-In the latter case Erika can implemented proposed solution and send
+In the latter case Erika can implement the proposed solution and send
 the patch-suggestion email to John as explained in W7.b.  John can
-than review and okay the change and eventually change what has to be
-change and forward the branch to Joe for integration.
+than review and approve the change and eventually change what has to be
+changed and forward the branch to Joe for integration.
 
 Note that if such a change to !WebFoo may affect other modules and/or
 other APIs, then these have to be usually discussed/reviewed by Joe in
-advance, as the other intra-module vs inter-module questions.
+advance, just like other intra-module vs inter-module issues.
 
 W8. Review process
 ~~~~~~~~~~~~~~~~~~
@@ -520,7 +520,7 @@ W8.a Reviewing and merging branches
 
 Joe now starts to **review and integrate** the new-feature-b branch.
 This usually takes two rounds: 1) pure reading of the patch can
-generate some comments; after the round one is over, 2) testing of the
+generate some comments; after the round one is over, 2) testing the
 patch can generate other comments.
 
 If the changes to be done are rather small, then Joe usually does it
@@ -539,9 +539,9 @@ himself.
 
 
 If the changes to be done are rather important, and may reveal a
-necessity to make some more amendments to the code, this can lead
-eventually to some more lengthy edit/test/commit iterations done in
-your private repos.  If this happens, then, since your code was
+necessity to make some more amendments to the code, this can eventually
+lead to longer edit/test/commit iterations done in
+your private repo.  If this happens, then, since your code was
 already published into a public space (even though as personal only),
 you should not rebase anymore (since rebase rewrites history); you
 should only merge your new amendments.  Or, in case of bigger
@@ -550,7 +550,7 @@ rewrites, you can publish a new branch.
 W8.b Reviewing and committing patches
 +++++++++++++++++++++++++++++++++++++
 
-For patches received by email, similar review procedure takes
+For patches received by email, a similar review procedure takes
 place. To integrate such a patch.
 
 .. code-block:: console
@@ -561,7 +561,7 @@ place. To integrate such a patch.
     $ git commit --amend # to change commit message
 
 
-or, for bigger patches that may require more integration work.
+or, for bigger patches that may require more integration work:
 
 .. code-block:: console
 
@@ -576,16 +576,16 @@ or, for bigger patches that may require more integration work.
 
 
 Although the last process may be evil at times, since Joe kind of
-usurps John's name for the changes, and commits in this name.  Hence
-this method is usually acceptable for tiny commits only
+usurps John's name for the changes, and commits in his name.  Hence
+this method is usually acceptable only for tiny commits
 (e.g. correcting typos).
 
 W8.c Reviewing and cherry-picking commits
 +++++++++++++++++++++++++++++++++++++++++
 
 Instead of integrating branches in full, Joe may want to **cherry-pick**
-some particular commits, or squash branches to keep nice project
-history.  An example.
+some particular commits or squash branches to keep the project
+history clean.  An example:
 
 .. code-block:: console
 
@@ -621,13 +621,13 @@ your new-feature-b branch since you don't need it anymore.
     $ git branch -d new-feature-b
 
 
-If Joe editing something during merge, then the commit SHA1s may not
-match, but you would notice and study differences offered by diff.
+If Joe edits something during merge, then the commit SHA1s may not
+match, but you would notice and study the differences using diff.
 
 W10. Deleting integrated branch
 +++++++++++++++++++++++++++++++
 
-Once new-feature-b is fully okay, you **delete** this branch in your
+Once new-feature-b is fully merged, you **delete** this branch in your
 public repo.
 
 .. code-block:: console
@@ -659,16 +659,16 @@ Consider a topical branch with history like this.
     commit8 WebFoo: amendments of zyxxy
 
 
-This is not too good.  While preserving full commit history in the git
+This is not very good.  While preserving full commit history in the git
 repository would be nice, the problem here is that historical versions
 of the xyzzy facility in the topical branch are not always working
 properly.  The whoops commits are not eliminated.  Keeping
 intermediary commits does not make sense if they are not working
 properly, they would only be making `git bisect` harder in the future.
 
-Ideally, the individual commits should be in an always-working state,
+Ideally, the individual commits should be in an always-working state
 and they should be presented in logical groups.  For example the above
-branch is better to be squashed as follows.
+branch is better to be squashed as follows:
 
 .. code-block:: text
 
@@ -685,12 +685,12 @@ branch is better to be squashed as follows.
 
 
 That is, the initial commit should be without typos and syntax errors,
-should be working on Python-2.4 environment already, and should
+should be working on Python-2.4 environment already and should
 contain respective documentation already.  The speed optimisation is
 an independent improvement, so this would logically constitute our
 second commit.  If the commit6 contained documentation bits about
 optimisations, the should be presented here.  The same is true for the
-next even-more-speedups commit.  Finally, feature amendments come the
+next even-more-speedups commit.  Finally, feature amendments come
 last.
 
 Git has powerful tools to help cleaning topical branches like this.
@@ -698,30 +698,31 @@ Notably, you can run `git rebase master -i` to squash/reorder commits,
 `git gui` to separate various hunks inside commits, etc.
 
 Here is an illustration of a typical thinking process during branch
-clean ups:
+cleanups:
 
 
-* Is the facility fully working now as expected?  If yes, keep the
+* Is the facility fully working now as expected?  If it is, keep the
   commit.
 
 * Is this facility or some related one broken in one of the aspects?
-  If yes, amend and squash.
+  If it is, amend and squash.
 
 * Is this commit an improvement over an already-working facility?  If
-  yes, keep the commit.
+  it is, keep the commit.
 
 * Is this commit intermediary?  Is it worth keeping?  Is there a
   chance that somebody might want to start off a new branch at this
   point in some day?  Does this commit helps some future developer to
-  better understand the branch history?  If not, squash.
+  understand the branch history better?  If not, squash.
 
-* Is the primary author of this commit different?  If yes, keep the
-  commit.  Or squash but use `Co-authored-by` commit log directive.
+* Is the primary author of this commit different?  If he is, keep the
+  commit.  Alternatively, squash it, but use `Co-authored-by` commit
+  log directive.
 
 * Is the same commit addressing more than one logically separate problem?
-  If yes, split.
+  If it is, split.
 
-Having clean branch history helps in providing sensibly working atomic
+Having a clean branch history helps in providing sensibly working atomic
 updates, helps in understanding commits and code, eases eventual
 future bug-hunting via git bisecting, and makes the software generally
 more robust.
@@ -741,7 +742,7 @@ way:
 
 * empty line;
 
-* commit message body with detailed description of what this patch
+* commit message body with a detailed description of what this patch
   does, formatted as a bulletted list, with one empty line between
   items (using present tense).
 
@@ -767,9 +768,9 @@ your ``.bashrc``, ``bash_profile`` or variants.
 
 The short commit logs are easily readable on narrow mobile devices,
 are helpful to quickly localise features, and ease any possible
-hunting for bugs via git bisecting later should the troubles arise.
+hunting for bugs via git bisecting later, should any trouble arise.
 
-Here is an example listing last 15 commits on the master branch.
+Here is an example listing the last 15 commits on the master branch.
 
 .. code-block:: console
 
@@ -858,13 +859,13 @@ Note that a similar system is used in the git world, e.g. Linux kernel
 `https://www.kernel.org/doc/Documentation/SubmittingPatches <https://www.kernel.org/doc/Documentation/SubmittingPatches>`_ or Git
 itself
 `http://git.kernel.org/cgit/git/git.git/plain/Documentation/SubmittingPatches <http://git.kernel.org/cgit/git/git.git/plain/Documentation/SubmittingPatches>`_.
-While we use some tags in similar context, some other tags we use
+While we use some tags in similar context, we use some other tags
 slightly differently.
 
 R3. Remarks on the coding
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a small sample of often-made coding remarks:
+Here is a small sample of often-made code remarks:
 
 
 * Compliance to our `coding standards <http://invenio-demo.cern.ch/help/hacking/coding-style>`_.  Stick to PEP 8, run ``pylint`` often.
@@ -891,7 +892,7 @@ troublesome to implement e.g. due to bad legacy code, then please fix
 at least the recommendations produced by running =--check-some=.)
 
 For more information on the code kwalitee checking, on the
-above-listed problems and on ways how to solve them, as well as some
+above-listed problems and on ways to solve them, as well as some
 other frequently made remarks on the coding, please see the dedicated
 InvenioQualityAssurances wiki page.
 
@@ -899,24 +900,24 @@ R4. Notes on the review process timeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Our pull-on-demand collaboration model enables us to have a *clean*
-development version of Invenio - there are not anymore problems with
+development version of Invenio - there are no problems anymore with
 the CVS HEAD being broken because people were committing things before
 checking etc.
 
-The price for the inherent review process in the pull-on-demand
+The price we pay for the inherent review process in the pull-on-demand
 collaboration model is a certain time delay before the code becomes
 published and visible.  It is normal for John and Erika to have many
 branches sitting around, waiting for Joe to integrate them.  The
-integration delay can very depending on the complexity of the branch.
+integration delay can vary depending on the complexity of the branch.
 
 E.g. it helps to check in advance the list of frequent remarks
 mentioned in the section R3 above.
 
 E.g. it helps to provide test cases for every bigger commit.
-(Especially for deep changes that may affect lots of the codebase, not
+(Especially for deep changes that may affect a lot of the codebase, not
 mentioning changes affecting inter-module relationships.)
 
-E.g. if does not help if a branch combines several different features
+E.g. it does not help if a branch combines several different features
 together.  We should not mix feature A and feature B together in the
 same commit and/or branch that implements some new feature C.  It is
 always better to separate different features into different topical

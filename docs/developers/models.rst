@@ -3,13 +3,13 @@
 Models
 ======
 
-Models define a Python-ic interface to relational databases using
+Models define a Python-ic interface to relational databases using the
 `SQLAlchemy`_ toolkit that *provides a full suite of well
 known enterprise-level persistence patterns, designed for efficient and
 high-performing database access, adapted into a simple and Pythonic domain
 language* [SQLAlchemy2013]_.
 
-In order to add support of SQLAlchemy to our application, the
+In order to add SQLAlchemy support to our application, the
 `Flask-SQLAlchemy`_ extension is used.  It provides useful defaults as
 well as extra declarative base helpers.  We recommend reading
 `Official Tutorial` for a full introduction and `Other Tutorial` for
@@ -19,7 +19,7 @@ better understanding of ORM concepts.
 Code structure
 --------------
 
-Our custom bridge is contains several custom types and driver hacks for
+Our custom bridge contains several custom types and driver hacks for
 smoother integration with multiple database engines. The code structure
 follows::
 
@@ -32,9 +32,9 @@ follows::
         utils.py
 
 
-Before you start writting new model please see
+Before you start writing a new model please take a look at the
 :obj:`~invenio.ext.sqlalchemy.db` object.  It will also make it easier to
-understand following example of simple model written using SQLAlchemy::
+understand the following example of a simple model written using SQLAlchemy::
 
     # General imports.
     from invenio.ext.sqlalchemy import db
@@ -60,7 +60,7 @@ understand following example of simple model written using SQLAlchemy::
         last_login = db.Column(db.DateTime, nullable=True)
 
 
-All your models used in module has to be located in ``models.py`` inside
+All your models used in a module have to be located in ``models.py`` inside
 your module package (see :ref:`developers-modules` for developers).
 
 .. note:: If you have any relations between tables use ``ForeignKey``
@@ -82,8 +82,8 @@ SQL queries::
     # All roads lead to Rome ... however some are slower.
 
 
-We need also a WHERE clause in our SQL statements. Let prepare statement for
-list with all sent messages by user::
+We also need a WHERE clause in our SQL statements. Let's prepare a statement for
+a list with all messages sent by a user::
 
     >>> db.select([User.nickname, MsgMESSAGE.subject]).execute().fetchall()
     [('admin', 'test1'),
@@ -114,7 +114,7 @@ Operators:
     # :subject_1 will be replaced by ': ' during query execution
 
 
-Let use ORM for getting messages sent by "admin"::
+Let's use ORM for getting messages sent by "admin"::
 
     >>> admin = User.query.filter(User.nickname.like('admin')).one()
     >>> admin
@@ -129,7 +129,7 @@ Let use ORM for getting messages sent by "admin"::
 
 
 Which brings us to another example where we create ''reusable'' queries
-using `db.bindparam` instead of actual filter value::
+using `db.bindparam` instead of an actual filter value::
 
     >>> q = User.query.filter(User.nickname.like(db.bindparam('nickname')))
     >>> q.params({'nickname':'admin'}).one()
@@ -148,7 +148,7 @@ Let's start with simple example::
     >>> s = db.session.query(User.id).filter(User.nickname.like("%a%")).subquery()
     >>> MsgMESSAGE.query.filter(MsgMESSAGE.id_user_from.in_(s)).all()
 
-You can combine subqueries with delete statement::
+You can combine subqueries with the delete statement::
 
     >>> sub = db.session.query(UserMsgMESSAGE.id_user_to, UserMsgMESSAGE.id_msgMESSAGE).outerjoin(User, User.id==UserMsgMESSAGE.id_user_to).outerjoin(MsgMESSAGE, UserMsgMESSAGE.id_msgMESSAGE==MsgMESSAGE.id).filter(db.or_(User.id==None, MsgMESSAGE.id==None)).all()
     # Find links to not existing messages or users.
@@ -158,13 +158,13 @@ You can combine subqueries with delete statement::
 Schema
 ------
 
-When you load all models you want it is easy to print create table
+When you load all models, you want it to be easy to print create table
 statements for these models::
 
     >>> for table in db.metadata.tables.values(): print CreateTable(table, on=db.engine.name, bind=db.engine)
 
 
-Similarly we can print relevant create statements for indexes::
+Similarly, we can print relevant create statements for indexes::
 
     >>> [str(CreateIndex(i, on=db.engine.name, bind=db.engine)) for i in table.indexes for table in db.metadata.tables.values() if hasattr(table, 'indexes')]
 

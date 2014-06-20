@@ -192,7 +192,7 @@ side of the entry and clicking "reharvest selected records" button.
 **Harvesting particular records**
 
 This page provides the possibility of harvesting records manually. The
-administrator has to provide internal OAI source identifier. After this,
+administrator has to provide an internal OAI source identifier. After this,
 record will be harvested, converted and filtered according to the source
 settings and scheduled to be uploaded into the database.
 
