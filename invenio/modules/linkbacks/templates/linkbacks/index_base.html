@@ -30,7 +30,7 @@
     <h4>
       {{ _("Traceback URL") }}
       <small>
-        {{ url_for('weblinkback.sendtraceback', _external=True, recid=recid) }}
+        {{ url_for('weblinkback.sendtraceback', recid=recid, _external=True) }}
       </small>
     </h4>
   </div>
