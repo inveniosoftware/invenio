@@ -1403,7 +1403,7 @@ getRecord.clonedRecord = false;
 
 function onGetRecordSuccess(json){
   /*
-   * Handle successfull 'getRecord' requests.
+   * Handle successful 'getRecord' requests.
    */
   cleanUp(!gNavigatingRecordSet);
   // Store record data.

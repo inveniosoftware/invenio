@@ -211,7 +211,7 @@ function onSearchClick(event){
 
 function onSearchForRecordSuccess(json){
   /*
-   * Handle successfull 'searchForRecord' requests (custom search).
+   * Handle successful 'searchForRecord' requests (custom search).
    */
   gResultSet = json['resultSet'];
   if (gResultSet.length == 0){
@@ -288,7 +288,7 @@ function onPrevRecordClick(){
 
 function onGetTicketsSuccess(json){
 /*
- * Handle successfull 'getTickets' requests.
+ * Handle successful 'getTickets' requests.
  */
   var tickets = json['tickets'];
   if (json['resultCode'] == 31 && json['tickets'] && gRecID){

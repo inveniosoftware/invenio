@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Implement the Flask application wrapper.
+Implements the Flask application wrapper.
 
 The function :func:`~flask.url_for` in standard :class:`~flask.Flask`
 application changes only protocol for secure sites from 'http' to 'https'.
@@ -32,16 +32,16 @@ Configuration:
 +-----------------------+-----------------------------------------------------+
 | `CFG_SITE_URL`        | specify URL under which your installation will be   |
 |                       | visible.  For example, use "http://your.site.com".  |
-|                       | Do not leave trailing slash.                        |
+|                       | Do not leave the trailing slash.                    |
 +-----------------------+-----------------------------------------------------+
-| `CFG_SITE_SECURE_URL` | specify secure URL under which your installation    |
+| `CFG_SITE_SECURE_URL` | specify secure URL under which your installation's  |
 |                       | secure pages such as login or registration will be  |
 |                       | visible.  For example, use "https://your.site.com". |
-|                       | Do not leave trailing slash. If you don't plan on   |
+|                       | Do not leave the trailing slash. If you don't plan  |
 |                       | using HTTPS, then you may leave this empty.         |
 +-----------------------+-----------------------------------------------------+
 
-Following example shows how to make http and https url scheme look the
+The following example shows how to make http and https url scheme look the
 same.
 
 .. doctest::

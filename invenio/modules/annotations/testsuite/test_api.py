@@ -73,7 +73,7 @@ class TestJSONLD(AnnotationTestCase):
                 "comment": 1}
         a = API.add_annotation(model='annotation_note', **data)
 
-        # JSONAlchemy issue with overwritting fields
+        # JSONAlchemy issue with overwriting fields
         self.assert_(len(a.validate()) == 0)
 
         ld = a.get_jsonld("oaf",

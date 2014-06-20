@@ -377,7 +377,7 @@ def eval_bibformat_lxml(ctx, recID, template_code):
 
     @param ctx: context as passed by lxml
     @param recID: record ID
-    @param template_code: the code calling a BFE_ as it would be use in format template
+    @param template_code: the code calling a BFE_ as it would be used in format template
     @return: the evalued call to a format template (usually a call to a format element)
     @rtype: string
     """ #'
@@ -426,7 +426,7 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
 
     @param ctx: context as passed by libxslt
     @param recID: record ID
-    @param template_code: the code calling a BFE_ as it would be use in format template
+    @param template_code: the code calling a BFE_ as it would be used in format template
     @return: the evalued call to a format template (usually a call to a format element)
     @rtype: string
     """ #'
@@ -469,7 +469,7 @@ def eval_bibformat_4suite(ctx, recID, template_code):
 
     @param ctx: context as passed by 4suite
     @param recID: record ID
-    @param template_code: the code calling a BFE_ as it would be use in format template
+    @param template_code: the code calling a BFE_ as it would be used in format template
     @return: the evalued call to a format template (usually a call to a format element)
     @rtype: string
     """ #'

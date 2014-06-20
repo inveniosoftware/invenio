@@ -306,7 +306,7 @@ def create_html_mailto(email, subject=None, body=None, cc=None, bcc=None,
     NOTE: there is no ultimate solution to protect against email
     harvesting. All have drawbacks and can more or less be
     circumvented. There are other techniques to protect email
-    adresses. We implement the less annoying one for users.
+    addresses. We implement the less annoying one for users.
 
     @param email: the recipient of the email
     @param subject: a default subject for the email (must not contain

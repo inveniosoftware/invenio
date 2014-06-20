@@ -106,7 +106,7 @@ class WebAPIKey(db.Model):
         @param uid: User's id
         @type uid: int
         @param diff_status: This string indicates if the query will show
-        all the REST API keys or only the ones that still active (usefull in the
+        all the REST API keys or only the ones that still active (usable in the
         admin part)
         @type diff_statusparam: string
 

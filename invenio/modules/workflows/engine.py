@@ -286,8 +286,8 @@ BibWorkflowEngine
     def processing_factory(objects, self):
         """Default processing factory.
 
-        An extended  version of the default processing factory
-        with saving objectsbefore succesful processing.
+        An extended version of the default processing factory
+        with saving objects before successful processing.
 
         Default processing factory, will process objects in order.
 

@@ -313,7 +313,7 @@ def task_submit_check_options():
 
     ## INPUT ##
     ## Check if the input file is given and if it exists
-    ## You should allways use an absolute path to the file
+    ## You should always use an absolute path to the file
     if _topt('mode') in ('encode', 'extract', 'meta', 'batch'):
         if _topt('input') is None:
             write_message('You must specify an input file using \'-i FILE\'')
@@ -325,7 +325,7 @@ def task_submit_check_options():
 
     ## OUTPUT ##
     ## Check if the output file is given and if it exists
-    ## You should allways use an absolute path to the file
+    ## You should always use an absolute path to the file
     if _topt('mode') in ('encode', 'extract', 'meta'):
         if _topt('output') is None:
             write_message('No output file is given. Please specify with'
