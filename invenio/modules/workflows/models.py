@@ -59,7 +59,7 @@ def get_default_extra_data():
     extra_data_default = {"_tasks_results": {},
                           "owner": {},
                           "_task_counter": {},
-                          "error_msg": "",
+                          "_error_msg": None,
                           "_last_task_name": "",
                           "latest_object": -1,
                           "_action": None,
@@ -386,6 +386,27 @@ class BibWorkflowObject(db.Model):
             return self.get_extra_data()["_message"]
         except KeyError:
             # No widget
+            return ""
+
+    def set_error_message(self, msg):
+        """Set an error message."""
+        extra_data = self.get_extra_data()
+        extra_data["_error_msg"] = msg
+        self.set_extra_data(extra_data)
+
+    def get_error_message(self):
+        """Retrieve the error message, if any."""
+        if "error_msg" in self.get_extra_data():
+            # Backwards compatibility
+            extra_data = self.get_extra_data()
+            msg = extra_data["error_msg"]
+            del extra_data["error_msg"]
+            self.set_extra_data(extra_data)
+            self.set_error_message(msg)
+        try:
+            return self.get_extra_data()["_error_msg"]
+        except KeyError:
+            # No message
             return ""
 
     def remove_action(self):
