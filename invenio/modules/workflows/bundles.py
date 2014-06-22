@@ -73,7 +73,7 @@ dataTables_css = Bundle(
     '/dataTables.bootstrap.css',
     'vendors/bootstrap-tagsinput/dist/bootstrap-tagsinput.less',
     filters="less,cleancss",
-    output='dataTables.css',
+    output='datatables.css',
     weight=30
 )
 
@@ -83,7 +83,7 @@ dataTables_js = Bundle(
     'vendors/datatables-plugins/integration/bootstrap/3'
     '/dataTables.bootstrap.js',
     filters="uglifyjs",
-    output='dataTables.js',
+    output='datatables.js',
     weight=30,
     bower={
         "datatables-colvis": "latest",

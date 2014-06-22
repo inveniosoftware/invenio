@@ -21,7 +21,7 @@
 
 {% block header%}
     {{ super() }}
-    {% bundles "workflows.js", "dataTables.css", "dataTables.js", "actions.js", "jquery.js" %}
+    {% bundles "workflows.js", "datatables.css", "datatables.js", "actions.js", "jquery.js" %}
 {% endblock header %}
 
 {% block javascript %}
@@ -86,7 +86,7 @@
         </ul>
       </div>
     </nav>
-    <input class="tags" id="tags" type="text" placeholder="Add tags" value="{{tags}}"/>
+    <input class="tags" id="tags" type="text" placeholder="{{ _("Add to search") }}" value="{{tags}}"/>
     <br>
 
     <div class="container">

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2013, 2014 CERN.
 ##
@@ -30,7 +31,7 @@ import re
 import collections
 
 from six import iteritems, text_type
-from flask import (render_template, Blueprint, request, current_app, jsonify,
+from flask import (render_template, Blueprint, request, jsonify,
                    url_for, flash, session)
 from flask.ext.login import login_required
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
@@ -63,7 +64,7 @@ REG_TD = re.compile("<td title=\"(.+?)\">(.+?)</td>", re.DOTALL)
 @templated('workflows/hp_index.html')
 def index():
     """
-    Displays main interface of Holdingpen.
+    Display main interface of Holdingpen.
 
     Acts as a hub for catalogers (may be removed)
     """
@@ -86,11 +87,31 @@ def maintable():
     for name, action in iteritems(actions):
         if getattr(action, "static", None):
             action_static.extend(action.static)
-    my_tags = current_app.config.get('VERSION_SHOWING', [])
+
+    my_tags = []
+
+    if 'tags' in session:
+        my_tags += session['tags']
+    if 'workflows_version_showing' in session:
+        my_tags += session['workflows_version_showing']
+    if 'version' in request.args:
+        try:
+            if ObjectVersion.MAPPING[int(request.args.get('version'))] not in my_tags:
+                my_tags += [int(request.args.get('version'))]
+            if int(request.args.get('version')) not in session["workflows_version_showing"]:
+                session["workflows_version_showing"] += [int(request.args.get('version'))]
+        except Exception:
+            if request.args.get('version') not in my_tags:
+                my_tags += [request.args.get('version')]
+            if [request.args.get('version')] not in session["tags"]:
+                session["workflows_version_showing"] += [request.args.get('version')]
     tags_to_print = ""
     for tag in my_tags:
+        try:
             tags_to_print += ObjectVersion.MAPPING[tag]
-
+        except:
+            if tag:
+                tags_to_print += tag + ','
     return dict(bwolist=bwolist,
                 action_list=action_list,
                 action_static=action_static,
@@ -154,7 +175,6 @@ def load_table():
     3] then if the user searched for something
     and finally it builds the JSON to send.
     """
-
     version_showing = []
     req = None
     req_search = []
@@ -209,7 +229,7 @@ def load_table():
     if 'iSortCol_0' in session:
         i_sortcol_0 = int(i_sortcol_0)
         if i_sortcol_0 != session['iSortCol_0'] \
-            or s_sortdir_0 != session['sSortDir_0']:
+           or s_sortdir_0 != session['sSortDir_0']:
             bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
     session['iDisplayStart'] = i_display_start
     session['iDisplayLength'] = i_display_length
@@ -276,8 +296,7 @@ def load_table():
              d['pretty_date'],
              d['version'],
              d['type'],
-             d['action']
-            ]
+             d['action']]
         )
     table_data['sEcho'] = sEcho
     table_data['iTotalRecords'] = len(bwolist)
@@ -302,20 +321,20 @@ def details(objectid):
     """Display info about the object."""
     of = "hd"
     bwobject = BibWorkflowObject.query.get(objectid)
-    from sqlalchemy import or_
+    from invenio.ext.sqlalchemy import db
 
     formatted_data = bwobject.get_formatted_data(of)
     extracted_data = extract_data(bwobject)
     if bwobject.id_parent:
         hbwobject_db_request = BibWorkflowObject.query.filter(
-            or_(BibWorkflowObject.id_parent == bwobject.id_parent,
-                BibWorkflowObject.id == bwobject.id_parent,
-                BibWorkflowObject.id == bwobject.id)).all()
+            db.or_(BibWorkflowObject.id_parent == bwobject.id_parent,
+                   BibWorkflowObject.id == bwobject.id_parent,
+                   BibWorkflowObject.id == bwobject.id)).all()
 
     else:
         hbwobject_db_request = BibWorkflowObject.query.filter(
-            or_(BibWorkflowObject.id_parent == bwobject.id,
-                BibWorkflowObject.id == bwobject.id)).all()
+            db.or_(BibWorkflowObject.id_parent == bwobject.id,
+                   BibWorkflowObject.id == bwobject.id)).all()
 
     hbwobject = {ObjectVersion.FINAL: [], ObjectVersion.HALTED: [],
                  ObjectVersion.INITIAL: [], ObjectVersion.RUNNING: []}
@@ -330,14 +349,13 @@ def details(objectid):
         hbwobject[list_of_object].sort(key=lambda x: x["true_date"], reverse=True)
 
     hbwobject_final = hbwobject[ObjectVersion.INITIAL] + \
-                      hbwobject[ObjectVersion.HALTED] + \
-                      hbwobject[ObjectVersion.FINAL]
+        hbwobject[ObjectVersion.HALTED] + \
+        hbwobject[ObjectVersion.FINAL]
 
-    try:
-        edit_record_action = actions['edit_record_action']()
-    except KeyError:
-        # Could not load edit_record_action
-        edit_record_action = []
+    results = []
+    for label, res in bwobject.get_tasks_results().iteritems():
+        res_dicts = [item.to_dict() for item in res]
+        results.append((label, res_dicts))
 
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
@@ -348,7 +366,7 @@ def details(objectid):
                            data_preview=formatted_data,
                            workflow_func=extracted_data['workflow_func'],
                            workflow=extracted_data['w_metadata'],
-                           edit_record_action=edit_record_action)
+                           task_results=results)
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])
@@ -396,7 +414,7 @@ def delete_from_db(objectid):
 @login_required
 @wash_arguments({'bwolist': (text_type, "")})
 def delete_multi(bwolist):
-    """Delete list of objects from the db"""
+    """Delete list of objects from the db."""
     from ..utils import parse_bwids
 
     bwolist = parse_bwids(bwolist)
@@ -410,6 +428,8 @@ def delete_multi(bwolist):
 @login_required
 def show_action(objectid):
     """Render the action assigned to a specific record."""
+    from sqlalchemy import or_
+
     bwobject = BibWorkflowObject.query.filter(
         BibWorkflowObject.id == objectid).first_or_404()
 
@@ -424,9 +444,6 @@ def show_action(objectid):
                                   [extracted_data['w_metadata']],
                                   [extracted_data['workflow_func']])
     url, parameters = result
-
-    #### message
-    from sqlalchemy import or_
 
     if bwobject.id_parent:
         hbwobject_db_request = BibWorkflowObject.query.filter(
@@ -452,11 +469,17 @@ def show_action(objectid):
         hbwobject[list_of_object].sort(key=lambda x: x["true_date"], reverse=True)
 
     hbwobject_final = hbwobject[ObjectVersion.INITIAL] + \
-                      hbwobject[ObjectVersion.HALTED] + \
-                      hbwobject[ObjectVersion.FINAL]
+        hbwobject[ObjectVersion.HALTED] + \
+        hbwobject[ObjectVersion.FINAL]
+
+    results = []
+    for label, res in bwobject.get_tasks_results().iteritems():
+        res_dicts = [item.to_dict() for item in res]
+        results.append((label, res_dicts))
 
     parameters["message"] = bwobject.get_action_message()
     parameters["hbwobject"] = hbwobject_final
+    parameters["task_results"] = results
     return render_template(url, **parameters)
 
 
@@ -549,7 +572,7 @@ def get_info(bwobject):
 
 
 def extract_data(bwobject):
-    """Extracts needed metadata from BibWorkflowObject.
+    """Extract needed metadata from BibWorkflowObject.
 
     Used for rendering the Record's holdingpen table row and
     details and action page.
@@ -566,7 +589,7 @@ def extract_data(bwobject):
     extracted_data['logtext'] = {}
 
     for log in extracted_data['loginfo']:
-        extracted_data['logtext'][log.get_extra_data()['last_task_name']] = \
+        extracted_data['logtext'][log.get_extra_data()['_last_task_name']] = \
             log.message
 
     extracted_data['info'] = get_info(bwobject)
@@ -772,9 +795,8 @@ def get_identifiers(record):
         for i in identifiers:
             final_identifiers.append(i['value'])
         return final_identifiers
-    except Exception as e :
+    except Exception:
         if hasattr(record, "get"):
             return [record.get("system_number_external", {}).get("value", 'No ids')]
         else:
-            return [' No ids']
-
+            return [" No ids"]

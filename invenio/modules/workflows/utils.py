@@ -120,15 +120,16 @@ class BibWorkflowObjectIdContainer(object):
 
 
 class WorkflowsTaskResult(object):
-    """
-    Class to contain the current task results.
-    """
+
+    """The class to contain the current task results."""
 
     def __init__(self, task_name, name, result):
         self.task_name = task_name
         self.name = name
         self.result = result
 
+    def to_dict(self):
+        return {'name': self.name,'task_name': self.task_name, 'result':self.result}
 
 def get_workflow_definition(name):
     """ Tries to load the given workflow from the system. """
