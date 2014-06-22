@@ -34,39 +34,49 @@
             </div>
         </div>
 
-        <div class="well">
-            <div class="muted"><b>Error Message:</b></div>
-             {% if bwobject.get_extra_data()['error_msg'] != "" %}
-                {{ info['last task name'] }} {{ bwobject.get_extra_data()['error_msg'] }}
-                <div class="text-right">
-                    <h6 id="show-more" class="text-right"><a href="#moreinfoModal" role="button" data-toggle="modal" class="float-right">Show More</a>
-                    </h6>
-                </div>
-            {% else %}
-                There were no errors.
-            {% endif %}
+        {% if bwobject.get_error_message() %}
 
-            <div id="moreinfoModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="myModalLabel">Error Log</h3>
-              </div>
-              <div class="modal-body">
-                {% for key, value in log.items() %}
-                {{key}}: {{value}}
-                {% endfor %}
-              </div>
-              <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <div class="panel panel-danger">
+          <div class="panel-heading">
+            <h3 class="panel-title">Problems detected</h3>
+          </div>
+          <div class="panel-body">
+            <h5>{{ bwobject.get_extra_data()['_last_task_name'] }}: {{ bwobject.get_error_message()[0] }}</h5>
+            <div class="text-right">
+                <h6 id="show-more" class="text-right"><a role="button" data-toggle="modal" style="cursor: pointer" data-target="#error_details_modal" class="float-right">Open details</a>
+                </h6>
+            </div>
+
+            <div class="modal fade" id="error_details_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">{{ bwobject.get_error_message()[0] }}</h4>
+                  </div>
+                  <div class="modal-body">
+                    {{ bwobject.get_error_message()[1] }}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
               </div>
             </div>
+
+          </div>
         </div>
 
-        <div class="well">
-            <div class="muted"><b>Record Metadata</b>
-                <span type="button" class="pull-right" style="cursor:pointer" data-toggle="collapse" data-target="#record-metadata-table"><span class="caret"></span></span>
-            </div>
-            </br>
+        {% endif %}
+
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3 class="panel-title">Object details</h3>
+          </div>
+          <div class="panel-body">
+            <h6 class="pull-right">
+            <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#record-metadata-table">Show More<span class="caret"></span></a>
+            </h6>
             <div id="record-metadata-table" class="collapse">
                 <table class="table table-striped">
                     <tbody>
@@ -88,6 +98,7 @@
                     </tbody>
                 </table>
             </div>
+          </div>
         </div>
 
         {% if hbwobject %}
@@ -125,7 +136,7 @@
 {% endblock %}
 
 {% block hp_navbar %}
-    <nav class="navbar navbar-default navbar-static-top" role="navigation">  
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
             <li><a href="{{url_for('holdingpen.maintable')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> Back</a>
@@ -144,7 +155,7 @@
             </li>
 
             <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-              <div class="modal-dialog">  
+              <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>

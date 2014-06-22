@@ -566,7 +566,7 @@ def extract_data(bwobject):
     extracted_data['logtext'] = {}
 
     for log in extracted_data['loginfo']:
-        extracted_data['logtext'][log.get_extra_data()['last_task_name']] = \
+        extracted_data['logtext'][log.get_extra_data()['_last_task_name']] = \
             log.message
 
     extracted_data['info'] = get_info(bwobject)
