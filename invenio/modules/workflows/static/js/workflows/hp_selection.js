@@ -251,8 +251,6 @@ var WORKFLOWS_HP_SELECTION = function ($, holdingpen) {
         }
     });
 
-
-
     return {
         init: init,
         selectRow: selectRow,

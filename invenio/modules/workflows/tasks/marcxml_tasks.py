@@ -97,8 +97,8 @@ def filtering_oai_pmh_identifier(obj, eng):
         delimiter_start = "<identifier>"
         delimiter_end = "</identifier>"
         identifier = record[
-            record.index(delimiter_start) +
-            len(delimiter_start):record.index(delimiter_end)
+                     record.index(delimiter_start) +
+                     len(delimiter_start):record.index(delimiter_end)
         ]
         if identifier in eng.extra_data["oaiharvest"]["identifiers"]:
             return False
@@ -125,7 +125,6 @@ def init_harvesting(obj, eng):
 
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
-
     """
     try:
         obj.extra_data["options"] = eng.extra_data["options"]
@@ -156,7 +155,9 @@ def get_repositories_list(repositories=()):
                     reposlist_temp.append(
                         OaiHARVEST.get(OaiHARVEST.name == reposname).one())
                 except (MultipleResultsFound, NoResultFound):
-                    eng.log.critical("Repository %s doesn't exit into our database", reposname)
+                    eng.log.critical(
+                        "Repository %s doesn't exit into our database",
+                        reposname)
         else:
             reposlist_temp = OaiHARVEST.get(OaiHARVEST.name != "").all()
         true_repo_list = []
@@ -166,8 +167,9 @@ def get_repositories_list(repositories=()):
         if true_repo_list:
             return true_repo_list
         else:
-            eng.halt("No Repository named %s. Impossible to harvest non-existing things."
-                     % repositories_to_harvest)
+            eng.halt(
+                "No Repository named %s. Impossible to harvest non-existing things."
+                % repositories_to_harvest)
 
     return _get_repositories_list
 
@@ -340,6 +342,7 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
     :param stylesheet:
     :return: :raise workflows_error.WorkflowError:
     """
+
     def _convert_record(obj, eng):
 
         from invenio.legacy.bibconvert.xslt_engine import convert
@@ -375,6 +378,7 @@ def convert_record_with_repository(stylesheet="oaidc2marcxml.xsl"):
     to convert a oai record to a marcxml one
     :type stylesheet: str
     """
+
     def _convert_record(obj, eng):
         eng.log.info("my type: %s" % (obj.data_type,))
         try:
@@ -448,8 +452,8 @@ def fulltext_download(obj, eng):
                             "    <subfield code=\"a\">%(url)s</subfield>\n"
                             "    <subfield code=\"t\">%(doctype)s</subfield>\n"
                             "    </datafield>"
-                            ) % {'url': obj.extra_data["_result"]["pdf"],
-                                 'doctype': doctype}
+                           ) % {'url': obj.extra_data["_result"]["pdf"],
+                                'doctype': doctype}
             updated_xml = '<?xml version="1.0"?>\n' \
                           '<collection>\n<record>\n' + fulltext_xml + \
                           '</record>\n</collection>'
@@ -487,35 +491,48 @@ def quick_match_record(obj, eng):
                                                  find_record_from_oaiid,
                                                  find_record_from_doi)
 
-    function_dictionnary = {'recid': find_record_from_recid,
-                            'system_number': find_record_from_sysno,
-                            'oaiid': find_record_from_oaiid,
-                            'system_number_external': find_records_from_extoaiid,
-                            'doi': find_record_from_doi}
+    function_dictionnary_emergency = {'recid': find_record_from_recid,
+                                      'system_number': find_record_from_sysno,
+                                      'oaiid': find_record_from_oaiid,
+                                      'system_number_external': find_records_from_extoaiid,
+                                      'doi': find_record_from_doi}
 
     identifiers = {}
 
     try:
-        #get our persistent identifier safe easy way
+        from invenio.modules.records.api import Record
+        identifiers = Record(obj.data.dumps()).persistent_identifiers
 
-        for key in function_dictionnary.keys():
+        function_dictionnary = []
+        for i in identifiers:
+            function_dictionnary.append(i.keys())
+    except Exception as e:
+        # if anything goes wrong, assume we need to get it manually.
+        eng.log.error("Problem with getting identifiers: %s"
+                      % (str(e), traceback.format_exc()))
+        function_dictionnary = ['recid', 'system_number', 'oaiid', 'system_number_external', 'doi']
+
+        for key in function_dictionnary:
             if key in obj.data:
                 temp_result = obj.data[key]
                 if isinstance(temp_result, dict):
                     temp_result = temp_result["value"]
                 identifiers[key] = temp_result
 
-        if not identifiers:
-            return False
-        else:
-            obj.extra_data["persistent_ids"] = identifiers
-    except KeyError:
-        identifiers = {}
+    if not identifiers:
+        obj.log.info("No identifiers found. Cannot match.")
+        return False
+    else:
+        obj.extra_data["persistent_ids"] = identifiers
+
     if "recid" not in identifiers:
         for identifier in identifiers:
-            recid = function_dictionnary[identifier](
-                identifiers[identifier])
-            print(str(recid))
+            try:
+                recid = function_dictionnary_emergency[identifier](
+                    identifiers[identifier])
+            except:
+                recid = None
+
             if recid:
                 if 'recid' not in obj.data:
                     obj.data['recid'] = {'value': recid}
@@ -530,6 +547,7 @@ def quick_match_record(obj, eng):
 
 def upload_record(mode="ir"):
     """Perform the upload step."""
+
     def _upload_record(obj, eng):
         eng.log_info("Saving data to temporary file for upload")
         filename = obj.save_to_file()
@@ -537,6 +555,7 @@ def upload_record(mode="ir"):
         task_id = bibtask.task_low_level_submission("bibupload", "bibworkflow",
                                                     *tuple(params))
         eng.log_info("Submitted task #%s" % (task_id,))
+
     return _upload_record
 
 
@@ -799,13 +818,13 @@ def upload_step(obj, eng):
     :param eng: BibWorkflowEngine processing the object
     """
     from invenio.legacy.oaiharvest.dblayer import create_oaiharvest_log_str
-
+    from invenio.modules.records.api import Record
     uploaded_task_ids = []
     #Work comment:
     #
     #Prepare in case of filtering the files to up,
     #no filtering, no other things to do
-    marcxml_value = obj.data.legacy_export_as_marc()
+    marcxml_value = Record(obj.data.dumps()).legacy_export_as_marc()
     task_id = None
     # Get a random sequence ID that will allow for the tasks to be
     # run in order, regardless if parallel task execution is activated
@@ -861,7 +880,7 @@ def bibclassify(taxonomy, rebuild_cache=False, no_cache=False,
                 output_limit=20, spires=False, match_mode='full',
                 with_author_keywords=False,
                 extract_acronyms=False, only_core_tags=False):
-    """Extract keywords and core ones."""
+    """Extract keywords and core ones from pdf file if it exists."""
     def _bibclassify(obj, eng):
         import os.path
 
@@ -869,14 +888,14 @@ def bibclassify(taxonomy, rebuild_cache=False, no_cache=False,
             eng.log.error("No RDF found, no bibclassify can run")
             return None
 
-        from invenio.legacy.bibclassify import api
+        from invenio.legacy.bibclassify.api import bibclassify_exhaustive_call
 
         if "_result" not in obj.extra_data:
             obj.extra_data["_result"] = {}
 
         if "pdf" in obj.extra_data["_result"]:
             obj.extra_data["_result"][
-                "bibclassify"] = api.bibclassify_exhaustive_call(
+                "bibclassify"] = bibclassify_exhaustive_call(
                 obj.extra_data["_result"]["pdf"],
                 taxonomy, rebuild_cache,
                 no_cache,
@@ -891,4 +910,41 @@ def bibclassify(taxonomy, rebuild_cache=False, no_cache=False,
             obj.log.error("No classification done due to missing fulltext."
                           "\n You need to get it before! see fulltext task")
 
+    return _bibclassify
+
+
+def bibclassify_fast(taxonomy, rebuild_cache=False, no_cache=False,
+                     output_mode='text',
+                     output_limit=20, spires=False, match_mode='full',
+                     with_author_keywords=False,
+                     extract_acronyms=False, only_core_tags=False):
+    """Extract keywords and core ones from title and abstract."""
+    def _bibclassify(obj, eng):
+        import os.path
+
+        if not os.path.isfile(taxonomy):
+            eng.log.error("No RDF found, no bibclassify can run")
+            return None
+
+        from invenio.legacy.bibclassify.api import bibclassify_exhaustive_call_text
+
+        if "_result" not in obj.extra_data:
+            obj.extra_data["_result"] = {}
+
+        if "title" in obj.data:
+            obj.extra_data["_result"][
+                "bibclassify"] = bibclassify_exhaustive_call_text(
+                obj.extra_data["_result"]["pdf"],
+                taxonomy, rebuild_cache,
+                no_cache,
+                output_mode, output_limit,
+                spires,
+                match_mode, with_author_keywords,
+                extract_acronyms, only_core_tags
+            )
+            obj.add_task_result("bibclassify",
+                                obj.extra_data["_result"]["bibclassify"])
+        else:
+            obj.log.error("No classification done due to missing fulltext."
+                          "\n You need to get it before! see fulltext task")
     return _bibclassify
