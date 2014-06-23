@@ -19,7 +19,10 @@
 
 """ API to fetch metadata in MARCXML format from crossref site using DOI """
 
-import urllib, urllib2
+import sys
+import urllib
+import urllib2
+import datetime
 from xml.dom.minidom import parse
 from time import sleep
 
@@ -27,6 +30,10 @@ from invenio.config import CFG_ETCDIR, CFG_CROSSREF_USERNAME, \
  CFG_CROSSREF_PASSWORD, CFG_CROSSREF_EMAIL
 from invenio.legacy.bibconvert.xslt_engine import convert
 from invenio.legacy.bibrecord import record_get_field_value
+from invenio.utils.url import make_invenio_opener
+from invenio.utils.json import json, json_unicode_to_utf8
+
+CROSSREF_OPENER = make_invenio_opener('crossrefutils')
 
 FIELDS_JOURNAL = 'issn,title,author,volume,issue,page,year,type,doi'.split(',')
 FIELDS_BOOK = ('isbn,ser_title,vol_title,author,volume,edition_number,'
@@ -61,7 +68,7 @@ def get_marcxml_for_doi(doi):
     url = "http://www.crossref.org/openurl/?pid=" +  CFG_CROSSREF_USERNAME \
         + ":" + CFG_CROSSREF_PASSWORD + "&noredirect=tru&id=doi:" + doi
     request = urllib2.Request(url)
-    response = urllib2.urlopen(request)
+    response = CROSSREF_OPENER.open(request)
     header = response.info().getheader('Content-Type')
     content = response.read()
 
@@ -144,7 +151,7 @@ def get_doi_for_records(records):
 
             while retry_attempt < 10:
                 try:
-                    document = parse(urllib2.urlopen(url, data))
+                    document = parse(CROSSREF_OPENER.open(url, data))
                     break
                 except (urllib2.URLError, urllib2.HTTPError):
                     sleep(5)
@@ -181,7 +188,7 @@ def get_metadata_for_dois(dois):
         url = "http://doi.crossref.org/servlet/query"
         data = urllib.urlencode(params)
 
-        for line in urllib2.urlopen(url, data):
+        for line in CROSSREF_OPENER.open(url, data):
             line = line.split("|")
             if len(line) == 1:
                 pass
@@ -198,3 +205,37 @@ def get_metadata_for_dois(dois):
 
     return metadata
 
+
+def get_all_modified_dois(publisher, from_date=None, re_match=None, debug=False):
+    """
+    Get all the DOIs from a given publisher (e.g. Elsevier has 10.1016
+    that were registered or updated in Crossref since from_date.
+    By default from_date is today - 3 days.
+    re_match is an optional argument where a compiled reguar expression
+    can be passed in order to match only given DOI structures.
+    """
+    if from_date is None:
+        from_date = (datetime.datetime.today() - datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+    res = query_fundref_api("/publishers/%s/works" % publisher, rows=0, filter="from-update-date:%s" % from_date)
+    total_results = res['total-results']
+    if debug:
+        print >> sys.stderr, "total modified DOIs for publisher %s since %s: %s" % (publisher, from_date, total_results)
+    ret = {}
+    for offset in range(0, total_results, 1000):
+        if debug:
+            print >> sys.stderr, "Fetching %s/%s..." % (offset, total_results)
+        res = query_fundref_api("/publishers/%s/works" % publisher, rows=1000, offset=offset, filter="from-update-date:%s" % from_date)
+        if re_match:
+            ret.update([(item['DOI'], item) for item in res['items'] if re_match.match(item['DOI'])])
+        else:
+            ret.update([(item['DOI'], item) for item in res['items']])
+    return ret
+
+def query_fundref_api(query, **kwargs):
+    """
+    Perform a request to the Fundref API.
+    """
+    sleep(1)
+    req = urllib2.Request("http://api.crossref.org%s?%s" % (query, urllib.urlencode(kwargs)), headers={'content-type': 'application/vnd.crossref-api-message+json; version=1.0'})
+    res = json_unicode_to_utf8(json.load(CROSSREF_OPENER.open(req)))
+    return res['message']

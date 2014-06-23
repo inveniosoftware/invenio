@@ -1,7 +1,7 @@
 ## $Id: Revise_Files.py,v 1.37 2009/03/26 15:11:05 jerome Exp $
 
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -199,6 +199,17 @@ def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):
       + createRelatedFormats: if uploaded files get converted to
                               whatever format we can (1) or not (0)
 
+
+      + deferRelatedFormatsCreation: if creation of related format is
+                                     scheduled to be run later,
+                                     offline (1, default) or
+                                     immediately/online just after the
+                                     user has uploaded the file
+                                     (0). Setting immediate conversion
+                                     enables workflows to process the
+                                     created files in following
+                                     functions, but "blocks" the user.
+
       + keepDefault: the default behaviour for keeping or not previous
                      version of files when users cannot choose (no
                      value in canKeepDoctypes): keep (1) or not (0)
@@ -243,7 +254,7 @@ def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):
      filename_label, description_label, comment_label, startDoc,
      endDoc, restrictions_and_desc, can_restrict_doctypes,
      restriction_label, doctypes_to_default_filename,
-     max_files_for_doctype) = \
+     max_files_for_doctype, deferRelatedFormatsCreation_p) = \
      wash_function_parameters(parameters, curdir, ln)
 
 
@@ -280,7 +291,8 @@ def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):
                                         doctypes_to_default_filename=doctypes_to_default_filename,
                                         max_files_for_doctype=max_files_for_doctype,
                                         sbm_indir=None, sbm_doctype=None, sbm_access=None,
-                                        uid=None, sbm_curdir=curdir)[1]
+                                        uid=None, sbm_curdir=curdir,
+                                        defer_related_formats_creation=deferRelatedFormatsCreation_p)[1]
     out += endDoc
     out += '</center>'
 
@@ -306,7 +318,8 @@ def wash_function_parameters(parameters, curdir, ln=CFG_SITE_LANG):
         show_links, file_label, filename_label, description_label,
         comment_label, startDoc, endDoc, access_restrictions_and_desc,
         can_restrict_doctypes, restriction_label,
-        doctypes_to_default_filename, max_files_for_doctype)
+        doctypes_to_default_filename, max_files_for_doctype,
+        deferRelatedFormatsCreation_p)
     """
     _ = gettext_set_language(ln)
 
@@ -414,9 +427,16 @@ def wash_function_parameters(parameters, curdir, ln=CFG_SITE_LANG):
     # If we should create additional formats when applicable (1) or
     # not (0)
     try:
-        createRelatedFormats_p = int(parameters['createRelatedFormats'])
+        createRelatedFormats_p = bool(int(parameters['createRelatedFormats']))
     except ValueError as e:
         createRelatedFormats_p = False
+
+    # If we should create additional formats right now (1) or
+    # later (0)
+    try:
+        deferRelatedFormatsCreation_p = bool(int(parameters['deferRelatedFormatsCreation']))
+    except ValueError, e:
+        deferRelatedFormatsCreation_p = True
 
     # If users can name the files they add
     # Value should be 0 (Cannot rename) or 1 (Can rename)
@@ -478,7 +498,8 @@ def wash_function_parameters(parameters, curdir, ln=CFG_SITE_LANG):
             filename_label, description_label, comment_label,
             prefix, suffix, access_restrictions_and_desc,
             can_restrict_doctypes, restriction_label,
-            doctypes_to_default_filename, max_files_for_doctype)
+            doctypes_to_default_filename, max_files_for_doctype,
+            deferRelatedFormatsCreation_p)
 
 def read_file(curdir, filename):
     """

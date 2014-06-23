@@ -111,7 +111,6 @@ from invenio.config import CFG_SITE_URL, \
     CFG_SITE_RECORD, CFG_PYLIBDIR, \
     CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS, \
     CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE, \
-    CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
     CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING, \
     CFG_BIBCATALOG_SYSTEM
@@ -1312,7 +1311,7 @@ class BibRecDocs(object):
                         raise IOError("Error in creating AFS mount point %s with quota %s and volume %s: exit_code=%s. Captured stdout:\n: %s\nCaptured stderr:\n: %s" % (mount_point, quota, volume, exit_code, stdout, stderr))
             for filename in os.listdir(bibdoc.basedir):
                 if filename[0] != '.' and ';' in filename:
-                    name, version = filename.split(';')
+                    name, version = filename.rsplit(';', 1)
                     try:
                         version = int(version)
                     except ValueError:
@@ -1551,12 +1550,9 @@ class BibRecDocs(object):
         for bibdoc in self.list_bibdocs():
             if hasattr(bibdoc, 'has_text'):
                 if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
-                    re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
-                    doc_name = bibdoc.get_docname() or ""
-
-                    perform_ocr = bool(re_perform_ocr.match(doc_name))
-                    from invenio.legacy.bibsched.bibtask import write_message
-                    write_message("... will extract words from %s (docid: %s) %s" % (doc_name, bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
+                    perform_ocr = hasattr(bibdoc, 'is_ocr_required') and bibdoc.is_ocr_required()
+                    from invenio.bibtask import write_message
+                    write_message("... will extract words from %s %s" % (bibdoc, perform_ocr and 'with OCR' or ''), verbose=2)
                     bibdoc.extract_text(perform_ocr=perform_ocr)
                 texts.append(bibdoc.get_text())
 
@@ -2486,7 +2482,7 @@ class BibDoc(object):
         return self.id
 
 
-    def get_file(self, docformat, version=""):
+    def get_file(self, docformat, version="", exact_docformat=False):
         """
         Returns a L{BibDocFile} instance of this document corresponding to the
         specific format and version.
@@ -2496,6 +2492,9 @@ class BibDoc(object):
         @param version: the specific version for which the description should
             be retrieved. If not specified the last version will be used.
         @type version: integer
+        @param exact_docformat: if True, consider always the
+            complete docformat (including subformat if any)
+        @type exact_docformat: bool
         @return: the L{BibDocFile} instance.
         @rtype: BibDocFile
         """
@@ -2513,10 +2512,11 @@ class BibDoc(object):
 
         ## Let's skip the subformat specification and consider just the
         ## superformat
-        superformat = get_superformat_from_format(docformat)
-        for docfile in docfiles:
-            if get_superformat_from_format(docfile.get_format()) == superformat:
-                return docfile
+        if not exact_docformat:
+            superformat = get_superformat_from_format(docformat)
+            for docfile in docfiles:
+                if get_superformat_from_format(docfile.get_format()) == superformat:
+                    return docfile
 
         raise InvenioBibDocFileError("No file for doc %i of format '%s', version '%s'" % (self.id, docformat, version))
 

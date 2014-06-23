@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -121,5 +121,3 @@ def import_related_module(package, pkg_path, related_name, ignore_exceptions=Fal
             register_exception()
         else:
             raise e
-
-

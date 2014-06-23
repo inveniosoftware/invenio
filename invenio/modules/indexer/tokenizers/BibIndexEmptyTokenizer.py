@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,19 +16,24 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibIndexEmptyTokenizer: useful for situations when we want to apply tokenizer
-   for consistency, but we don't want to have any results from it.
+"""
+    BibIndexEmptyTokenizer.
+
+    It's a really lazy tokenizer and doesn't do anything.
 """
 
-
 from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
-from invenio.modules.indexer.tokenizers.BibIndexTokenizer import BibIndexTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexStringTokenizer import BibIndexStringTokenizer
 
 
+class BibIndexEmptyTokenizer(BibIndexStringTokenizer):
+    """
+       BibIndexEmptyTokenizer doesn't do anything.
+       Irrespective of input to tokenizing function it
+       always returns empty list.
 
-class BibIndexEmptyTokenizer(BibIndexTokenizer):
-    """Empty tokenizer do nothing.
-       It returns empty lists for tokenize_for_words, tokenize_for_pairs and tokenize_for_phrases methods.
+       Can be used in some default cases or when we want to
+       turn off specific index.
     """
 
     def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):

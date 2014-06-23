@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -145,6 +145,7 @@ class Template:
             out += """
                     <table>
                     """
+
             for key_info in keys_info:
                 out += """
                         <tr><td>%(key_description)s</td>
@@ -351,7 +352,7 @@ class Template:
                 <tr>
                   <td><input class="formbutton" type="submit" value="%(update_settings)s" /></td>
                 </tr>
-              </table>
+              </table></form>
         """ % {
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'bibcatalog_username' : bibcatalog_username,
@@ -385,6 +386,32 @@ class Template:
             <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
         </table></form>""" % {
             'select_lang' : _('Select desired language of the web interface.'),
+            'update_settings' : _('Update settings')
+        }
+        return out
+
+    def tmpl_user_profiling_settings(self, ln, enable_profiling):
+        _ = gettext_set_language(ln)
+        out = """
+            <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_profiling_settings">
+              <p><big><strong class="headline">%(edit_settings)s</strong></big></p>
+              <table>
+                <tr><td align="right"><select name="profiling">
+        """ % {
+          'sitesecureurl' : CFG_SITE_SECURE_URL,
+          'edit_settings' : _("Edit profiling settings"),
+        }
+        out += """<option %(selected)s value="0">%(desc)s</option>""" % {
+            'selected' : 'selected="selected"' if enable_profiling is False else '',
+            'desc' : _("Disabled")
+        }
+        out += """<option %(selected)s value="1">%(desc)s</option>""" % {
+            'selected' : 'selected="selected"' if enable_profiling is True else '',
+            'desc' : _("Enabled")
+        }
+        out += """</select></td><td valign="top"></td></tr>
+            <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
+        </table></form>""" % {
             'update_settings' : _('Update settings')
         }
         return out

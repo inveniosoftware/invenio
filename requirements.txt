@@ -20,7 +20,7 @@ msgpack-python==0.3.0
 pyparsing==2.0.1
 git+git://github.com/lnielsen-cern/dictdiffer.git#egg=dictdiffer-0.0.3
 git+git://github.com/romanchyla/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow-1.1.0
-requests==1.2.3
+requests==2.2.0
 PyPDF2
 rauth
 unidecode
@@ -34,7 +34,7 @@ Flask==0.10.1
 # Flask-WTF 0.9.5 doesn't support WTForms 2.0 as of yet.
 WTForms>=1.0.5,<2.0
 fixture==1.5
-redis==2.8.0
+redis==2.9.0
 unittest2==0.5.1
 git+https://github.com/david-e/flask-admin.git@bootstrap3#egg=Flask-Admin-1.0.7
 Flask-Assets==0.9
@@ -72,3 +72,5 @@ setuptools>=2.0
 httpretty==0.8.0
 raven==4.2.1
 six
+unidecode==0.04.14
+nydus==0.10.6

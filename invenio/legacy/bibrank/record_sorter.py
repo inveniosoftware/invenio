@@ -454,7 +454,7 @@ def rank_by_citations(hitset, verbose):
         ret.sort(key=itemgetter(1))
 
     if verbose > 0:
-        voutput += "\nhitset %s\nfind_citations ret %s" % (hitset, ret)
+        voutput += "\nhitset %s\nrank_by_citations ret %s" % (hitset, ret)
 
     if ret:
         return ret, "(", ")", voutput

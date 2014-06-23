@@ -57,6 +57,7 @@ from invenio.base.globals import cfg
 from invenio.config import \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
+     CFG_SCOAP3_SITE, \
      CFG_OAI_ID_FIELD, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBSEARCH_CALL_BIBFORMAT, \
@@ -96,9 +97,15 @@ from invenio.modules.search.errors import \
      InvenioWebSearchWildcardLimitError, \
      CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
      CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH
-from invenio.legacy.bibrecord import get_fieldvalues, get_fieldvalues_alephseq_like
+from invenio.legacy.bibrecord import    (get_fieldvalues,
+                                         get_fieldvalues_alephseq_like,
+                                         record_exists)
 from invenio.legacy.bibrecord import create_record, record_xml_output
-from invenio.legacy.bibrank.record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
+from invenio.legacy.bibrank.record_sorter import (
+    get_bibrank_methods,
+    is_method_valid,
+    rank_records as rank_records_bibrank,
+    rank_by_citations)
 from invenio.legacy.bibrank.downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.legacy.bibindex.engine_stemmer import stem
 from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
@@ -940,6 +947,9 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
     elif of == "intbitset":
         req.content_type = "application/octet-stream"
         req.send_http_header()
+    elif of == "recjson":
+        req.content_type = "application/json"
+        req.send_http_header()
     elif of == "id":
         pass # nothing to do, we shall only return list of recIDs
     elif content_type == 'text/html':
@@ -968,7 +978,8 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         # Add metadata in meta tags for Google scholar-esque harvesting...
         # only if we have a detailed meta format and we are looking at a
         # single record
-        if (recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT):
+        if recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT and \
+          record_exists(recID) == 1:
             metaheaderadd += format_record(recID,
                                            CFG_WEBSEARCH_DETAILED_META_FORMAT,
                                            ln=ln)
@@ -1134,11 +1145,11 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
             if c:
                 temp = []
                 temp.append({'value': CFG_SITE_NAME,
-                             'text': '*** %s ***' % _("any public collection")
+                             'text': '*** %s ***' % (CFG_SCOAP3_SITE and _("any publisher or journal") or _("any public collection"))
                             })
                 # this field is used to remove the current collection from the ones to be searched.
                 temp.append({'value': '',
-                             'text': '*** %s ***' % _("remove this collection")
+                             'text': '*** %s ***' % (CFG_SCOAP3_SITE and _("remove this publisher or journal") or _("remove this collection"))
                             })
                 for val in colls_nice:
                     # print collection:
@@ -1149,11 +1160,11 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
                                     })
                 coll_selects.append(temp)
         coll_selects.append([{'value': '',
-                              'text' : '*** %s ***' % _("add another collection")
+                              'text' : '*** %s ***' % (CFG_SCOAP3_SITE and _("add another publisher or journal") or _("add another collection"))
                              }] + colls_nice)
     else: # we searched in CFG_SITE_NAME, so print 'any public collection' heading
         coll_selects.append([{'value': CFG_SITE_NAME,
-                              'text' : '*** %s ***' % _("any public collection")
+                              'text' : '*** %s ***' % (CFG_SCOAP3_SITE and _("any publisher or journal") or _("any public collection"))
                              }] + colls_nice)
 
     ## ranking methods
@@ -4171,15 +4182,17 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
 
     return solution_recs, solution_scores, prefix, suffix, comment
 
+def sort_records_latest(recIDs, jrec, rg, sort_order):
+    if sort_order == 'd':
+        recIDs.reverse()
+    return slice_records(recIDs, jrec, rg)
+
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, sorting_methods=SORTING_METHODS):
     """Initial entry point for sorting records, acts like a dispatcher.
        (i) sort_field is in the bsrMETHOD, and thus, the BibSort has sorted the data for this field, so we can use the cache;
        (ii)sort_field is not in bsrMETHOD, and thus, the cache does not contain any information regarding this sorting method"""
 
     _ = gettext_set_language(ln)
-
-    # Calculate the min index on the reverted list
-    index_min = jrec
 
     #bibsort does not handle sort_pattern for now, use bibxxx
     if sort_pattern:
@@ -4192,9 +4205,9 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         if use_sorting_buckets:
             return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
         else:
-            return recIDs[index_min:]
+            return sort_records_latest(recIDs, jrec, rg, sort_order)
 
-    sort_fields = string.split(sort_field, ",")
+    sort_fields = sort_field.split(",")
     if len(sort_fields) == 1:
         # we have only one sorting_field, check if it is treated by BibSort
         for sort_method in sorting_methods:
@@ -4212,9 +4225,9 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
             return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
         else:
             if of.startswith('h'):
-                write_warning(_("Sorry, %(x_name)s does not seem to be a valid sort option. The records will not be sorted.", x_name=cgi.escape(error_field)), "Error", req=req)
-            return recIDs[index_min:]
-    if tags:
+                write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
+            return slice_records(recIDs, jrec, rg)
+    elif tags:
         for sort_method in sorting_methods:
             definition = sorting_methods[sort_method]
             if definition.startswith('MARC') \
@@ -4224,8 +4237,8 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                 return sort_records_bibsort(req, recIDs, sort_method, sort_field, sort_order, verbose, of, ln, rg, jrec)
         #we do not have this sort_field in BibSort tables -> do the old fashion sorting
         return sort_records_bibxxx(req, recIDs, tags, sort_field, sort_order, sort_pattern, verbose, of, ln, rg, jrec)
-
-    return recIDs[index_min:]
+    else:
+        return slice_records(recIDs, jrec, rg)
 
 
 def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=1, sort_or_rank='s', sorting_methods=SORTING_METHODS):
@@ -4318,6 +4331,15 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
         return solution
 
 
+def slice_records(recIDs, jrec, rg):
+    if not jrec:
+        jrec = 1
+    if rg:
+        recIDs = recIDs[jrec-1:jrec-1+rg]
+    else:
+        recIDs = recIDs[jrec-1:]
+    return recIDs
+
 def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
     """OLD FASHION SORTING WITH NO CACHE, for sort fields that are not run in BibSort
        Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
@@ -4327,34 +4349,33 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
 
     _ = gettext_set_language(ln)
 
-    #we should return sorted records up to irec_max(exclusive)
-    dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
-    #calculate the min index on the reverted list
-    index_min = max(len(recIDs) - irec_max, 0) #just to be sure that the min index is not negative
-
     ## check arguments:
     if not sort_field:
-        return recIDs[index_min:]
+        return slice_records(recIDs, jrec, rg)
+
     if len(recIDs) > CFG_WEBSEARCH_NB_RECORDS_TO_SORT:
         if of.startswith('h'):
             write_warning(_("Sorry, sorting is allowed on sets of up to %(x_name)d records only. Using default sort order.", x_name=CFG_WEBSEARCH_NB_RECORDS_TO_SORT), "Warning", req=req)
-        return recIDs[index_min:]
+        return slice_records(recIDs, jrec, rg)
+
     recIDs_dict = {}
     recIDs_out = []
 
     if not tags:
         # tags have not been camputed yet
-        sort_fields = string.split(sort_field, ",")
+        sort_fields = sort_field.split(',')
         tags, error_field = get_tags_from_sort_fields(sort_fields)
         if error_field:
             if of.startswith('h'):
                 write_warning(_("Sorry, %(x_name)s does not seem to be a valid sort option. The records will not be sorted.", x_name=cgi.escape(error_field)), "Error", req=req)
-            return recIDs[index_min:]
+            return slice_records(recIDs, jrec, rg)
+
     if verbose >= 3 and of.startswith('h'):
         write_warning("Sorting by tags %s." % cgi.escape(repr(tags)), req=req)
         if sort_pattern:
             write_warning("Sorting preferentially by %s." % cgi.escape(sort_pattern), req=req)
-     ## check if we have sorting tag defined:
+
+    ## check if we have sorting tag defined:
     if tags:
         # fetch the necessary field values:
         for recID in recIDs:
@@ -4376,34 +4397,28 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
                         val = v
                         break
                 if not bingo: # sort_pattern not present, so add other vals after spaces
-                    val = sort_pattern + "          " + string.join(vals)
+                    val = sort_pattern + "          " + ''.join(vals)
             else:
                 # no sort pattern defined, so join them all together
-                val = string.join(vals)
+                val = ''.join(vals)
             val = strip_accents(val.lower()) # sort values regardless of accents and case
             if val in recIDs_dict:
                 recIDs_dict[val].append(recID)
             else:
                 recIDs_dict[val] = [recID]
-        # sort them:
-        recIDs_dict_keys = recIDs_dict.keys()
-        recIDs_dict_keys.sort()
-        # now that keys are sorted, create output array:
-        for k in recIDs_dict_keys:
-            for s in recIDs_dict[k]:
-                recIDs_out.append(s)
+
+        # create output array:
+        for k in sorted(recIDs_dict.keys()):
+            recIDs_out.extend(recIDs_dict[k])
+
         # ascending or descending?
-        if sort_order == 'a':
+        if sort_order == 'd':
             recIDs_out.reverse()
-        # okay, we are done
-        # return only up to the maximum that we need to sort
-        if len(recIDs_out) != len(recIDs):
-            dummy, irec_max = get_interval_for_records_to_sort(len(recIDs_out), jrec, rg)
-            index_min = max(len(recIDs_out) - irec_max, 0) #just to be sure that the min index is not negative
-        return recIDs_out[index_min:]
-    else:
-        # good, no sort needed
-        return recIDs[index_min:]
+
+        recIDs = recIDs_out
+
+    # return only up to the maximum that we need
+    return slice_records(recIDs, jrec, rg)
 
 def get_interval_for_records_to_sort(nb_found, jrec=None, rg=None):
     """calculates in which interval should the sorted records be
@@ -4544,6 +4559,17 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                 req.write(x)
                 if x:
                     req.write('\n')
+        elif format.startswith('recjson'):
+            # we are doing recjson output:
+            req.write('[')
+            for idx, recid in enumerate(recIDs):
+                if idx > 0:
+                    req.write(',')
+                req.write(print_record(recid, format, ot, ln,
+                                       search_pattern=search_pattern,
+                                       user_info=user_info, verbose=verbose,
+                                       sf=sf, so=so, sp=sp, rm=rm))
+            req.write(']')
         elif format == 'excel':
             create_excel(recIDs=recIDs, req=req, ot=ot, user_info=user_info)
         else:
@@ -4651,7 +4677,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
                     # load content
                     if tab == 'usage':
-                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
@@ -4698,6 +4724,9 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                                  rm=rm))
                         # Self-cited
                         selfcited = get_self_cited_by(recid)
+                        selfcited = rank_by_citations(get_self_cited_by(recid), verbose=verbose)
+                        selfcited = reversed(selfcited[0])
+                        selfcited = [recid for recid, dummy in selfcited]
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
                                   ln, selfcited=selfcited, citinglist=citinglist))
                         # Co-cited
@@ -4741,47 +4770,9 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
-                        from invenio.bibclassify_webinterface import \
-                            record_get_keywords, write_keywords_body, \
-                            generate_keywords
-                        from invenio.webinterface_handler import wash_urlargd
-                        form = req.form
-                        argd = wash_urlargd(form, {
-                            'generate': (str, 'no'),
-                            'sort': (str, 'occurrences'),
-                            'type': (str, 'tagcloud'),
-                            'numbering': (str, 'off'),
-                            })
-                        recid = recIDs[irec]
-
-                        req.write(webstyle_templates.detailed_record_container_top(recid,
-                                                                                   tabs,
-                                                                                   ln))
-                        content = websearch_templates.tmpl_record_plots(recID=recid,
-                                                                        ln=ln)
-                        req.write(content)
-                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
-                                                                                      tabs,
-                                                                                      ln))
-
-                        req.write(webstyle_templates.detailed_record_container_top(recid,
-                            tabs, ln, citationnum=citedbynum, referencenum=references))
-
-                        if argd['generate'] == 'yes':
-                            # The user asked to generate the keywords.
-                            keywords = generate_keywords(req, recid, argd)
-                        else:
-                            # Get the keywords contained in the MARC.
-                            keywords = record_get_keywords(recid, argd)
-
-                        if argd['sort'] == 'related' and not keywords:
-                            req.write('You may want to run BibIndex.')
-
-                        # Output the keywords or the generate button.
-                        write_keywords_body(keywords, req, recid, argd)
-
-                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
-                            tabs, ln))
+                        from invenio.bibclassify_webinterface import main_page
+                        main_page(req, recid, tabs, ln,
+                                  webstyle_templates)
                     elif tab == 'plots':
                         req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,
@@ -4957,6 +4948,15 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     """
     if format == 'recstruct':
         return get_record(recID)
+
+    if format.startswith('recjson'):
+        import json
+        from invenio.bibfield import get_record as get_recjson
+        if ot:
+            ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
+            return json.dumps(dict(get_recjson(recID, fields=ot)))
+        else:
+            return json.dumps(get_recjson(recID).dumps())
 
     _ = gettext_set_language(ln)
 
@@ -5656,6 +5656,8 @@ def prs_wash_arguments_colls(kwargs=None, of=None, req=None, cc=None, c=None, sc
             return []
         elif of == "intbitset":
             return intbitset()
+        elif of == "recjson":
+            return []
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5835,6 +5837,8 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
             return []
         elif of == "intbitset":
             return intbitset()
+        elif of == "recjson":
+            return []
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5910,6 +5914,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
             return []
         if of == "intbitset":
             return intbitset()
+        elif of == "recjson":
+            return []
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5962,6 +5968,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                     return []
                 elif of == "intbitset":
                     return intbitset()
+                elif of == "recjson":
+                    return []
                 elif of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
@@ -5991,6 +5999,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
             return []
         elif of == "intbitset":
             return intbitset()
+        elif of == "recjson":
+            return []
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -6024,6 +6034,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
                     return []
                 elif of == "intbitset":
                     return intbitset()
+                elif of == "recjson":
+                    return []
                 elif of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
@@ -6416,7 +6428,6 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
             results_final_relevances = []
             results_final_relevances_prologue = ""
             results_final_relevances_epilogue = ""
-
             if rm: # do we have to rank?
                 results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                              rank_records(req, rm, 0, results_final[coll],
@@ -6430,7 +6441,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                     # rank_records failed and returned some error message to display:
                     write_warning(results_final_relevances_prologue, req=req)
                     write_warning(results_final_relevances_epilogue, req=req)
-            elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
+            else:
                 results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
 
 

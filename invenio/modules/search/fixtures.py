@@ -241,8 +241,13 @@ class FieldData(DataSet):
         name = u'cataloguer nickname'
 
     class Field_43:
-        code = u'tag'
+        code = u'filename'
         id = 43
+        name = u'file name'
+
+    class Field_44:
+        code = u'tag'
+        id = 44
         name = u'tag'
 
 

@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+-- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -1798,6 +1798,18 @@ CREATE TABLE IF NOT EXISTS idxWORD01R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxWORD01Q (
+  id mediumint(10) unsigned NOT NULL auto_increment,
+  runtime datetime NOT NULL default '0000-00-00 00:00:00',
+  id_bibrec_low mediumint(9) unsigned NOT NULL,
+  id_bibrec_high mediumint(9) unsigned NOT NULL,
+  index_name varchar(50) NOT NULL default '',
+  mode varchar(50) NOT NULL default 'update',
+  PRIMARY KEY (id),
+  INDEX (index_name),
+  INDEX (runtime)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxWORD02F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(50) default NULL,
@@ -2198,6 +2210,36 @@ CREATE TABLE IF NOT EXISTS idxWORD26R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxWORD27F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD27R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD28F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD28R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPAIR01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(100) default NULL,
@@ -2212,6 +2254,18 @@ CREATE TABLE IF NOT EXISTS idxPAIR01R (
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   KEY type (type),
   PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR01Q (
+  id mediumint(10) unsigned NOT NULL auto_increment,
+  runtime datetime NOT NULL default '0000-00-00 00:00:00',
+  id_bibrec_low mediumint(9) unsigned NOT NULL,
+  id_bibrec_high mediumint(9) unsigned NOT NULL,
+  index_name varchar(50) NOT NULL default '',
+  mode varchar(50) NOT NULL default 'update',
+  PRIMARY KEY (id),
+  INDEX (index_name),
+  INDEX (runtime)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR02F (
@@ -2613,6 +2667,36 @@ CREATE TABLE IF NOT EXISTS idxPAIR26R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxPAIR27F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR27R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR28F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR28R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term text default NULL,
@@ -2635,6 +2719,18 @@ CREATE TABLE IF NOT EXISTS idxPHRASE02F (
   hitlist longblob,
   PRIMARY KEY  (id),
   KEY term (term(50))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE01Q (
+  id mediumint(10) unsigned NOT NULL auto_increment,
+  runtime datetime NOT NULL default '0000-00-00 00:00:00',
+  id_bibrec_low mediumint(9) unsigned NOT NULL,
+  id_bibrec_high mediumint(9) unsigned NOT NULL,
+  index_name varchar(50) NOT NULL default '',
+  mode varchar(50) NOT NULL default 'update',
+  PRIMARY KEY (id),
+  INDEX (index_name),
+  INDEX (runtime)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE02R (
@@ -3005,6 +3101,36 @@ CREATE TABLE IF NOT EXISTS idxPHRASE26F (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE26R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE27F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term text default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  KEY term (term(50))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE27R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE28F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term text default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  KEY term (term(50))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE28R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
@@ -4652,7 +4778,7 @@ CREATE TABLE IF NOT EXISTS collection_bsrMETHOD (
 CREATE TABLE IF NOT EXISTS seqSTORE (
   id int(15) NOT NULL auto_increment,
   seq_name varchar(15),
-  seq_value varchar(60),
+  seq_value varchar(255),
   PRIMARY KEY (id),
   UNIQUE KEY seq_name_value (seq_name, seq_value)
 ) ENGINE=MyISAM;
@@ -4858,6 +4984,9 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_01_lower_user_em
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_21_aiduserinputlog_userid_check',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_hstRECORD_marcxml_longblob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_06_new_citation_dict_table',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_25_new_param_websubmit_function',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_10_new_param_websubmit_function',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_11_12_new_param_websubmit_function',NOW());
 
 -- master upgrade recipes:
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_29_idxINDEX_new_indexer_column',NOW());
@@ -4903,5 +5032,10 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_bibauthorid_s
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_18_wapCACHE_object_value_longblob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_16_aidPERSONIDDATA_datablob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_04_seqSTORE_larger_value',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_redis_sessions',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_24_seqSTORE_larger_value',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_queue_table_virtual_index',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_05_new_index_doi',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_03_13_new_index_filename',NOW());
 
 -- end of file

@@ -263,7 +263,6 @@ def task_low_level_submission(name, user, *argv):
         while True:
             try:
                 opts, dummy_args = getopt.gnu_getopt(argv, '', ['host='])
-            except getopt.GetoptError, err:
             except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:

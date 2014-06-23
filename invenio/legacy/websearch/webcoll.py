@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -43,7 +43,8 @@ from invenio.config import \
      CFG_SITE_LANGS, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
-     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
+     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
+     CFG_SCOAP3_SITE
 from invenio.base.i18n import gettext_set_language, language_list_long
 from invenio.legacy.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
 from invenio.legacy.dbquery import run_sql, Error, get_table_update_time
@@ -232,7 +233,10 @@ class Collection:
             if box_type == "v":
                 i18name = _('Focus on:')
             elif box_type == "r":
-                i18name = _('Narrow by collection:')
+                if CFG_SCOAP3_SITE:
+                    i18name = _('Narrow by publisher/journal:')
+                else:
+                    i18name = _('Narrow by collection:')
             elif box_type == "l":
                 i18name = _('Latest additions:')
 
@@ -492,6 +496,8 @@ class Collection:
                     recIDs = sort_records(None, recIDs, '269__c')
                 elif self.name in ['LHCb Talks']:
                     recIDs = sort_records(None, recIDs, 'reportnumber')
+                elif self.name in ['CERN Yellow Reports']:
+                    recIDs = sort_records(None, recIDs, '084__a')
             # CERN hack ends.
 
             total = len(recIDs)
@@ -660,7 +666,7 @@ class Collection:
                         fieldname = 'sc',
                         css_class = 'address',
                         values = [
-                                  {'value' : '1' , 'text' : _("split by collection")},
+                                  {'value' : '1' , 'text' : CFG_SCOAP3_SITE and _("split by publisher/journal") or _("split by collection")},
                                   {'value' : '0' , 'text' : _("single list")}
                                  ]
                        )
@@ -1008,7 +1014,7 @@ def get_database_last_updated_timestamp():
     database_tables_timestamps.append(get_table_update_time('bibrec'))
     ## In INSPIRE bibfmt is on innodb and there is not such configuration
     bibfmt_last_update = run_sql("SELECT max(last_updated) FROM bibfmt")
-    if bibfmt_last_update:
+    if bibfmt_last_update and bibfmt_last_update[0][0]:
         database_tables_timestamps.append(str(bibfmt_last_update[0][0]))
     try:
         database_tables_timestamps.append(get_table_update_time('idxWORD%'))

@@ -207,20 +207,16 @@ def look_for_books(citation_elements, kbs):
     Create book tags by using the authors and the title to find books
     in our knowledge base
     """
-    authors = None
     title = None
-    for el in citation_elements:
-        if el['type'] == 'AUTH':
-            authors = el
-            break
     for el in citation_elements:
         if el['type'] == 'QUOTED':
             title = el
             break
 
-    if authors and title:
-        if title['title'].upper() in kbs['books']:
-            line = kbs['books'][title['title'].upper()]
+    if title:
+        normalized_title = title['title'].upper()
+        if normalized_title in kbs['books']:
+            line = kbs['books'][normalized_title]
             el = {'type': 'BOOK',
                   'misc_txt': '',
                   'authors': line[0],
@@ -614,9 +610,12 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
 
     # Split the reference in multiple ones if needed
     splitted_citations = split_citations(citation_elements)
+
+    # Look for books in misc field
+    look_for_undetected_books(splitted_citations, kbs)
     # Look for implied ibids
     look_for_implied_ibids(splitted_citations)
-    # Associate recids to the newly added ibids
+    # Associate recids to the newly added ibids/books
     associate_recids_catchup(splitted_citations)
     # Remove references with only misc text
     # splitted_citations = remove_invalid_references(splitted_citations)
@@ -635,6 +634,106 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
 
     return splitted_citations, line_marker, counts, bad_titles_count
 
+
+
+def look_for_undetected_books(splitted_citations, kbs):
+    for citation in splitted_citations:
+        if is_unknown_citation(citation):
+            search_for_book_in_misc(citation, kbs)
+
+
+def search_for_book_in_misc(citation, kbs):
+    """Searches for books in the misc_txt field if the citation is not recognized as anything like a journal, book, etc.
+    """
+    for citation_element in citation:
+        if citation_element['type'] == 'MISC':
+            write_message('* Unknown citation found. Searching for book title in: %s' % citation_element['misc_txt'], verbose=9)
+            for title in kbs['books']:
+                startIndex = find_substring_ignore_special_chars(citation_element['misc_txt'], title)
+                if startIndex != -1:
+                    line = kbs['books'][title.upper()]
+                    book_year = line[2].strip(';')
+                    book_authors = line[0]
+                    book_found = False
+                    if citation_element['misc_txt'].find(book_year) != -1:
+                        # For now consider the citation as valid, we are using
+                        # an exact search, we don't need to check the authors
+                        # However, the code below will be useful if we decide
+                        # to introduce fuzzy matching.
+                        book_found = True
+
+                        for author in get_possible_author_names(citation):
+                            if find_substring_ignore_special_chars(book_authors, author) != -1:
+                                book_found = True
+
+                        for author in re.findall('[a-zA-Z]{4,}', book_authors):
+                            if find_substring_ignore_special_chars(citation_element['misc_txt'], author) != -1:
+                                book_found = True
+
+                        if book_found is True:
+                            write_message('* Book found: %s' % title, verbose=9)
+                            book_element = {'type': 'BOOK',
+                                            'misc_txt': '',
+                                            'authors': book_authors,
+                                            'title': line[1],
+                                            'year': book_year}
+                            citation.append(book_element)
+                            citation_element['misc_txt'] = cut_substring_with_special_chars(citation_element['misc_txt'], title, startIndex)
+                            return True
+
+            write_message('  * Book not found!', verbose=9)
+    return False
+
+def get_possible_author_names(citation):
+    for citation_element in citation:
+        if citation_element['type'] == 'AUTH':
+            return re.findall('[a-zA-Z]{4,}', citation_element['auth_txt'])
+    return []
+
+def find_substring_ignore_special_chars(s, substr):
+    s = s.upper()
+    substr = substr.upper()
+    clean_s, subs_in_s = re.subn('[^A-Z0-9]', '', s)
+    clean_substr, subs_in_substr = re.subn('[^A-Z0-9]', '', substr)
+    startIndex = clean_s.find(clean_substr)
+    if startIndex != -1:
+        i = 0
+        re_alphanum = re.compile('[A-Z0-9]')
+        for real_index, char in enumerate(s):
+            if re_alphanum.match(char):
+                i += 1
+            if i > startIndex:
+                break
+
+        return real_index
+    else:
+        return -1
+
+def cut_substring_with_special_chars(s, sub, startIndex):
+    counter = 0
+    subPosition = 0
+    s_Upper = s.upper()
+    sub = sub.upper()
+    clean_sub = re.sub('[^A-Z0-9]', '', sub)
+    for char in s_Upper[startIndex:]:
+        if char == clean_sub[subPosition]:
+            subPosition += 1
+        counter += 1
+        #end of substrin reached?
+        if subPosition >= len(clean_sub):
+            #include everything till a space, open bracket or a normal character
+            counter += len(re.split('[ [{(a-zA-Z0-9]',s[startIndex+counter:],1)[0])
+
+            return s[0:startIndex].strip()+ ' ' +s[startIndex+counter:].strip()
+
+def is_unknown_citation(citation):
+    """Checks if the citation got recognized as one of the known types.
+    """
+    knownTypes = ['BOOK', 'JOURNAL', 'DOI', 'ISBN', 'RECID']
+    for citation_element in citation:
+        if citation_element['type'] in knownTypes:
+            return False
+    return True
 
 def parse_references_elements(ref_sect, kbs):
     """Passed a complete reference section, process each line and attempt to

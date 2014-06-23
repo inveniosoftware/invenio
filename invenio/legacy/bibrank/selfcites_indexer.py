@@ -105,7 +105,7 @@ def get_authors_from_record(recID, tags,
              get_fieldvalues(recID, tags['first_author']),
              get_fieldvalues(recID, tags['additional_author']),
              get_fieldvalues(recID, tags['alternative_author_name']))
-        authors = set(hash(author) for author in list(authors_list)[:20])
+        authors = set(hash(author) for author in list(authors_list)[:21])
 
     return authors
 

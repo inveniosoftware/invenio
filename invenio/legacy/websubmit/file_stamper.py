@@ -854,7 +854,8 @@ def apply_stamp_to_file(path_workingdir,
                         stamp_file_name,
                         subject_file,
                         output_file,
-                        stamp_layer):
+                        stamp_layer,
+                        skip_metadata):
     """Given a stamp-file, the details of the type of stamp to apply, and the
        details of the file to be stamped, coordinate the process of having
        that stamp applied to the file.
@@ -992,6 +993,26 @@ def apply_stamp_to_file(path_workingdir,
             ## No extension - use the original name with a .pdf suffix:
             output_file = "%s.pdf" % output_file
 
+    if not skip_metadata:
+        ## Get the PDF file metadata
+        # Metadata file name
+        metadata_file = "metadata"
+        # Get metadata command
+        cmd_get_metadata = \
+            "%(pdftk)s %(file-to-stamp-path)s dump_data output \
+             %(metadata-file-path)s 2>/dev/null" % \
+             { 'pdftk'              : CFG_PATH_PDFTK,
+               'file-to-stamp-path' : escape_shell_arg("%s/%s" % \
+                                                           (path_workingdir,
+                                                            subject_file)),
+               'metadata-file-path' : escape_shell_arg("%s/%s" % \
+                                                           (path_workingdir,
+                                                            metadata_file)), }
+        # Get metadata errors
+        err_get_metadata = os.system(cmd_get_metadata) or not \
+                           os.access("%s/%s" % (path_workingdir, metadata_file),
+                                     os.F_OK)
+
     if stamp_type == 'coverpage':
         ## The stamp to be applied to the document is in fact a "cover page".
         ## This means that the entire PDF "stamp" that was created from the
@@ -1020,6 +1041,58 @@ def apply_stamp_to_file(path_workingdir,
         msg = """Error: Unexpected stamping mode [%s]. Stamping has failed.""" \
               % stamp_type
         raise InvenioWebSubmitFileStamperError(msg)
+
+    if not skip_metadata:
+        ## Set the PDF file metadata
+        # Were we able to get the metadata correctly in the first place?
+        if not err_get_metadata:
+            # Output file -with-metadata- name
+            with_metadata_output_file = "with-metadata-" + output_file
+            # Set metadata command
+            cmd_set_metadata = \
+                "%(pdftk)s %(stamped-file-path)s update_info \
+                 %(metadata-file-path)s output \
+                 %(with-metadata-stamped-file-path)s 2>/dev/null" % \
+                 { 'pdftk'              : CFG_PATH_PDFTK,
+                   'stamped-file-path'  : escape_shell_arg("%s/%s" % \
+                                                            (path_workingdir,
+                                                             output_file)),
+                   'metadata-file-path' : escape_shell_arg("%s/%s" % \
+                                                            (path_workingdir,
+                                                             metadata_file)),
+                   'with-metadata-stamped-file-path' : \
+                        escape_shell_arg("%s/%s" % \
+                                          (path_workingdir,
+                                           with_metadata_output_file)), }
+            # Set metadata errors
+            err_set_metadata = os.system(cmd_set_metadata) or not \
+                               os.access("%s/%s" % (path_workingdir,
+                                                   with_metadata_output_file),
+                                         os.F_OK)
+            # Were we able to set the metadata correctly in the output file?
+            if not err_set_metadata:
+                without_metadata_output_file = "without-metadata-" + output_file
+                try:
+                    os.rename("%s/%s" % (path_workingdir, output_file),
+                              "%s/%s" % (path_workingdir,
+                                         without_metadata_output_file))
+                except:
+                    pass
+                else:
+                    try:
+                        os.rename("%s/%s" % (path_workingdir,
+                                             with_metadata_output_file),
+                                  "%s/%s" % (path_workingdir, output_file))
+                    except:
+                        try:
+                            os.rename("%s/%s" % (path_workingdir,
+                                                 without_metadata_output_file),
+                                      "%s/%s" % (path_workingdir, output_file))
+                        except:
+                            msg = "Error: Encoutered problems when renaming " + \
+                                  "the output files after copying the PDF " + \
+                                  "metadata"
+                            raise InvenioWebSubmitFileStamperError(msg)
 
     ## Finally, if the original subject file was a PS, convert the stamped
     ## PDF back to PS:
@@ -1208,6 +1281,11 @@ def usage(wmsg="", err_code=0):
                              omitted, the stamped file will be given
                              the same name as the input file, but will
                              be prefixed by"stamped-";
+   --skip-metadata
+                             Do not copy the PDF metadata of the input file
+                             to the output (stamped) file.
+                             If not specified, the PDF metadata will be
+                             copied by default.
 
   Example:
     python ~invenio/lib/python/invenio/websubmit_file_stamper.py \\
@@ -1273,6 +1351,10 @@ def get_cli_options():
                                        be given the same name as the
                                        input file, but will be
                                        prefixed by"stamped-";
+         --skip-metadata            -> Do not copy the PDF metadata of the
+                                       input file to the output (stamped)
+                                       file. If not specified, the metadata
+                                       will be copied by default.
 
        @return: (dictionary) of input options and flags, set as
         appropriate. The dictionary has the following structure:
@@ -1298,6 +1380,8 @@ def get_cli_options():
                     - "foreground": stamp applied to the foreground layer;
            + verbosity: (integer) - the verbosity level under which the program
               is to run;
+           + skip-metadata: (boolean) - whether to skip copying the metadata
+              or not;
         So, an example of the returned dictionary would be something like:
               { 'latex-template'      : "demo-stamp-left.tex",
                 'latex-template-var'  : { "REPORTNUMBER" : "TEST-2008-001",
@@ -1308,6 +1392,7 @@ def get_cli_options():
                 'stamp'               : "first",
                 'layer'               : "background",
                 'verbosity'           : 0,
+                'skip-metadata'       : False,
               }
     """
     ## dictionary of important values relating to cli call of program:
@@ -1318,6 +1403,7 @@ def get_cli_options():
                 'stamp'              : "first",
                 'layer'              : "background",
                 'verbosity'          : 0,
+                'skip-metadata'      : False,
               }
 
     ## Get the options and arguments provided by the user via the CLI:
@@ -1330,7 +1416,8 @@ def get_cli_options():
                                            "latex-template-var=",
                                            "stamp=",
                                            "layer=",
-                                           "output-file="])
+                                           "output-file=",
+                                           "skip-metadata"])
     except getopt.GetoptError as err:
         ## Invalid option provided - usage message
         usage(wmsg="Error: %(msg)s." % { 'msg' : str(err) })
@@ -1412,7 +1499,8 @@ def get_cli_options():
                     ## The variable name was not empty - keep it:
                     options["latex-template-var"]["%s" % split_varstring[0]] = \
                         "%s" % split_varstring[1]
-
+        elif opt[0] in ("--skip-metadata"):
+            options["skip-metadata"] = True
 
     ## Return the input options:
     return options
@@ -1449,6 +1537,8 @@ def stamp_file(options):
                     - "foreground": stamp the foreground layer;
            + verbosity: (integer) - the verbosity level under which the program
               is to run;
+           + skip-metadata: (boolean) - whether to skip copying the metadata
+              or not;
         So, an example of the returned dictionary would be something like:
               { 'latex-template'      : "demo-stamp-left.tex",
                 'latex-template-var'  : { "REPORTNUMBER" : "TEST-2008-001",
@@ -1459,6 +1549,7 @@ def stamp_file(options):
                 'stamp'               : "first",
                 'layer'               : "background"
                 'verbosity'           : 0,
+                'skip-metadata'       : False,
               }
 
        @return: (tuple) - consisting of two strings:
@@ -1477,9 +1568,10 @@ def stamp_file(options):
                               "latex-template-var", \
                               "input-file", \
                               "output-file"]
-    optional_option_names_and_defaults = {"layer": "background", \
-                                          "verbosity": 0,
-                                          "stamp": "first"}
+    optional_option_names_and_defaults = {"layer"         : "background",
+                                          "verbosity"     : 0,
+                                          "stamp"         : "first",
+                                          "skip-metadata" : False}
 
     ## Are we missing some mandatory parameters?
     received_option_names = options.keys()
@@ -1544,7 +1636,8 @@ def stamp_file(options):
                                             pdf_stamp_name, \
                                             basename_input_file, \
                                             options["output-file"], \
-                                            options["layer"])
+                                            options["layer"], \
+                                            options["skip-metadata"])
 
     ## Return a tuple containing the working directory and the name of the
     ## stamped file to the caller:

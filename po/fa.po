@@ -1,5 +1,5 @@
 # # This file is part of Invenio.
-# # Copyright (C) 2013 CERN.
+# # Copyright (C) 2013, 2014 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
@@ -19,14 +19,16 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2011-12-19 22:12+0100\n"
-"PO-Revision-Date: 2013-10-30 22:17+0100\n"
-"Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
+"PO-Revision-Date: 2014-04-12 06:30+0330\n"
+"Last-Translator: Mehdi Zahedi <mehdizahedin@gmail.com>\n"
 "Language-Team: FA <info@invenio-software.org>\n"
-"Language: \n"
+"Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 1.6.4\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
@@ -39,7 +41,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1200
 #: modules/websearch/lib/websearch_templates.py:1152
 msgid "AND NOT"
-msgstr ""
+msgstr "و نه"
 
 #: modules/webhelp/web/admin/admin.webdoc:18
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
@@ -73,7 +75,7 @@ msgstr ""
 #: modules/bibcheck/web/admin/bibcheckadmin.py:302
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:70
 msgid "Admin Area"
-msgstr ""
+msgstr "ناحیه مدیر"
 
 #: modules/websearch/doc/search-guide.webdoc:427
 #: modules/websearch/doc/search-guide.webdoc:559
@@ -91,7 +93,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2232
 #: modules/websearch/lib/websearch_templates.py:2263
 msgid "Browse"
-msgstr ""
+msgstr "مرور"
 
 #: modules/webhelp/web/help-central.webdoc:50
 #: modules/websearch/doc/search-tips.webdoc:20
@@ -102,7 +104,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2117
 #: modules/websearch/lib/websearch_templates.py:2174
 msgid "Search Tips"
-msgstr ""
+msgstr "نکات جستجو"
 
 #: modules/websearch/doc/search-guide.webdoc:343
 #: modules/websearch/doc/search-guide.webdoc:378
@@ -118,7 +120,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:820
 #: modules/miscutil/lib/inveniocfg.py:482
 msgid "abstract"
-msgstr ""
+msgstr "چکیده"
 
 #: modules/websearch/doc/search-guide.webdoc:348
 #: modules/websearch/doc/search-guide.webdoc:383
@@ -134,7 +136,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:825
 #: modules/miscutil/lib/inveniocfg.py:487
 msgid "fulltext"
-msgstr ""
+msgstr "تمام متن"
 
 #: modules/websearch/doc/search-guide.webdoc:337
 #: modules/websearch/doc/search-guide.webdoc:373
@@ -168,7 +170,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1218
 #: modules/websearch/lib/websearch_templates.py:1100
 msgid "All of the words:"
-msgstr ""
+msgstr "همه کلمات"
 
 #: modules/websearch/doc/search-guide.webdoc:351
 #: modules/websearch/doc/search-guide.webdoc:386
@@ -184,7 +186,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:828
 #: modules/miscutil/lib/inveniocfg.py:484
 msgid "report number"
-msgstr ""
+msgstr "شماره گزارش"
 
 #: modules/websearch/doc/search-tips.webdoc:406
 #: modules/websearch/doc/search-tips.webdoc:413
@@ -209,7 +211,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7218
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7917
 msgid "year"
-msgstr ""
+msgstr "سال"
 
 #: modules/websearch/doc/search-guide.webdoc:352
 #: modules/websearch/doc/search-guide.webdoc:387
@@ -225,7 +227,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:829
 #: modules/miscutil/lib/inveniocfg.py:485
 msgid "subject"
-msgstr ""
+msgstr "موضوع"
 
 #: modules/websearch/doc/search-guide.webdoc:336
 #: modules/websearch/doc/search-guide.webdoc:372
@@ -242,7 +244,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1221
 #: modules/websearch/lib/websearch_templates.py:1106
 msgid "Partial phrase:"
-msgstr ""
+msgstr "عبارت نسبی"
 
 #: modules/websearch/doc/search-guide.webdoc:350
 #: modules/websearch/doc/search-guide.webdoc:385
@@ -258,7 +260,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:827
 #: modules/miscutil/lib/inveniocfg.py:486
 msgid "reference"
-msgstr ""
+msgstr "ارجاع"
 
 #: modules/websearch/doc/search-tips.webdoc:37
 #: modules/websearch/doc/search-tips.webdoc:68
@@ -495,12 +497,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9164
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16025
 msgid "author"
-msgstr ""
+msgstr "نویسنده"
 
 #: modules/webhelp/web/help-central.webdoc:98
 #: modules/websearch/doc/search-guide.webdoc:20
 msgid "Search Guide"
-msgstr ""
+msgstr "راهنمای جستجو"
 
 #: modules/websearch/doc/search-guide.webdoc:347
 #: modules/websearch/doc/search-guide.webdoc:382
@@ -516,7 +518,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:824
 #: modules/miscutil/lib/inveniocfg.py:492
 msgid "experiment"
-msgstr ""
+msgstr "آزمایش"
 
 #: modules/websearch/doc/search-guide.webdoc:334
 #: modules/websearch/doc/search-guide.webdoc:370
@@ -533,7 +535,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1219
 #: modules/websearch/lib/websearch_templates.py:1102
 msgid "Any of the words:"
-msgstr ""
+msgstr "هر کدام از کلمات"
 
 #: modules/websearch/doc/search-guide.webdoc:346
 #: modules/websearch/doc/search-guide.webdoc:381
@@ -549,7 +551,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:823
 #: modules/miscutil/lib/inveniocfg.py:489
 msgid "division"
-msgstr ""
+msgstr "بخش ها"
 
 #: modules/websearch/doc/search-tips.webdoc:39
 #: modules/websearch/doc/search-tips.webdoc:70
@@ -799,11 +801,11 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledge_templates.py:82
 #: modules/bibknowledge/lib/bibknowledge_templates.py:423
 msgid "Search"
-msgstr ""
+msgstr "جستجو"
 
 #: modules/webhelp/web/help-central.webdoc:133
 msgid "Citation Metrics"
-msgstr ""
+msgstr "سنجه های استنادی"
 
 #: modules/websearch/doc/search-tips.webdoc:35
 #: modules/websearch/doc/search-tips.webdoc:66
@@ -1040,7 +1042,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9164
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16024
 msgid "any field"
-msgstr ""
+msgstr "هر فیلد"
 
 #: modules/webhelp/web/help-central.webdoc:20
 #: modules/webhelp/web/help-central.webdoc:25
@@ -1074,7 +1076,7 @@ msgstr ""
 
 #: modules/bibformat/etc/format_templates/Default_HTML_actions.bft:6
 msgid "Export as"
-msgstr ""
+msgstr "خروجی به صورت "
 
 #: modules/websearch/doc/search-guide.webdoc:345
 #: modules/websearch/doc/search-guide.webdoc:380
@@ -1090,7 +1092,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:822
 #: modules/miscutil/lib/inveniocfg.py:488
 msgid "collection"
-msgstr ""
+msgstr "مجموعه"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:20
 msgid "WebSearch Admin Guide"
@@ -1111,12 +1113,12 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1220
 #: modules/websearch/lib/websearch_templates.py:1104
 msgid "Exact phrase:"
-msgstr ""
+msgstr "عبارت دقیق"
 
 #: modules/webhelp/web/help-central.webdoc:108
 #: modules/websubmit/doc/submit-guide.webdoc:20
 msgid "Submit Guide"
-msgstr ""
+msgstr "راهنمای واگذاری"
 
 #: modules/websearch/doc/search-guide.webdoc:360
 #: modules/websearch/doc/search-guide.webdoc:395
@@ -1131,7 +1133,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1151
 #: modules/websearch/lib/websearch_webcoll.py:592
 msgid "OR"
-msgstr ""
+msgstr "یا"
 
 #: modules/websearch/doc/search-guide.webdoc:359
 #: modules/websearch/doc/search-guide.webdoc:394
@@ -1144,7 +1146,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1198
 #: modules/websearch/lib/websearch_templates.py:1150
 msgid "AND"
-msgstr ""
+msgstr "و"
 
 #: modules/websearch/doc/search-guide.webdoc:349
 #: modules/websearch/doc/search-guide.webdoc:384
@@ -1160,7 +1162,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:826
 #: modules/miscutil/lib/inveniocfg.py:483
 msgid "keyword"
-msgstr ""
+msgstr "کلیدواژه"
 
 #: modules/websearch/doc/search-tips.webdoc:36
 #: modules/websearch/doc/search-tips.webdoc:67
@@ -1395,17 +1397,17 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16025
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17724
 msgid "title"
-msgstr ""
+msgstr "عنوان"
 
 #: modules/websearch/doc/search-tips.webdoc:72
 #: modules/websearch/doc/search-tips.webdoc:110
 #: modules/websearch/lib/websearch_templates.py:1264
 msgid "Narrow by collection:"
-msgstr ""
+msgstr "خاص براساس مجموعه"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_actions.bft:5
 msgid "Add to personal basket"
-msgstr ""
+msgstr "اضافه به سبد شخصی"
 
 #: modules/websubmit/doc/admin/websubmit-admin-guide.webdoc:20
 msgid "WebSubmit Admin Guide"
@@ -1418,7 +1420,7 @@ msgstr ""
 #: modules/bibharvest/lib/oai_harvest_admin.py:472
 #: modules/bibharvest/lib/oai_harvest_admin.py:487
 msgid "or"
-msgstr ""
+msgstr "یا"
 
 #: modules/bibedit/lib/bibedit_templates.py:295
 msgid "Comparison of:"
@@ -1426,7 +1428,7 @@ msgstr ""
 
 #: modules/bibedit/lib/bibedit_templates.py:296
 msgid "Revision"
-msgstr ""
+msgstr "بازنگری"
 
 #: modules/bibformat/lib/bibformat_templates.py:315
 #: modules/bibformat/lib/bibformat_templates.py:429
@@ -1446,7 +1448,7 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledge_templates.py:587
 #: modules/bibknowledge/lib/bibknowledge_templates.py:656
 msgid "Menu"
-msgstr ""
+msgstr "فهرست"
 
 #: modules/bibformat/lib/bibformat_templates.py:317
 #: modules/bibformat/lib/bibformat_templates.py:430
@@ -1457,7 +1459,7 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledge_templates.py:586
 #: modules/bibknowledge/lib/bibknowledge_templates.py:655
 msgid "Close Editor"
-msgstr ""
+msgstr "بستن ویرایشگر"
 
 #: modules/bibformat/lib/bibformat_templates.py:318
 #: modules/bibformat/lib/bibformat_templates.py:431
@@ -1551,7 +1553,7 @@ msgstr ""
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:447
 #: modules/bibknowledge/lib/bibknowledge_templates.py:79
 msgid "Name"
-msgstr ""
+msgstr "نام"
 
 #: modules/bibformat/lib/bibformat_templates.py:389
 #: modules/bibformat/lib/bibformat_templates.py:936
@@ -1576,7 +1578,7 @@ msgstr ""
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:451
 #: modules/bibknowledge/lib/bibknowledge_templates.py:80
 msgid "Description"
-msgstr ""
+msgstr "توصیف"
 
 #: modules/bibformat/lib/bibformat_templates.py:390
 msgid "Update Format Attributes"
@@ -1633,12 +1635,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17933
 #: modules/bibcirculation/lib/bibcirculation_templates.py:18037
 msgid "Status"
-msgstr ""
+msgstr "وضعیت"
 
 #: modules/bibformat/lib/bibformat_templates.py:939
 #: modules/bibformat/lib/bibformat_templates.py:1063
 msgid "Last Modification Date"
-msgstr ""
+msgstr "تاریخ آخرین اصلاح"
 
 #: modules/bibformat/lib/bibformat_templates.py:940
 #: modules/bibformat/lib/bibformat_templates.py:1064
@@ -1660,7 +1662,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:384
 #: modules/bibformat/web/admin/bibformatadmin.py:999
 msgid "Manage Output Formats"
-msgstr ""
+msgstr "مدیریت قالب های خروجی"
 
 #: modules/bibformat/lib/bibformat_templates.py:943
 #: modules/bibformat/lib/bibformat_templates.py:1067
@@ -1672,7 +1674,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:694
 #: modules/bibformat/web/admin/bibformatadmin.py:1020
 msgid "Manage Format Templates"
-msgstr ""
+msgstr "مدیریت اگلوهای قالب بندی"
 
 #: modules/bibformat/lib/bibformat_templates.py:944
 #: modules/bibformat/lib/bibformat_templates.py:1068
@@ -1704,11 +1706,11 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:747
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:749
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #: modules/bibformat/lib/bibformat_templates.py:1019
 msgid "Add New Format Template"
-msgstr ""
+msgstr "فزودن الگوی قالب بندی جدید"
 
 #: modules/bibformat/lib/bibformat_templates.py:1020
 msgid "Check Format Templates Extensively"
@@ -1720,23 +1722,23 @@ msgstr ""
 
 #: modules/bibformat/lib/bibformat_templates.py:1142
 msgid "Add New Output Format"
-msgstr ""
+msgstr "افزودن قالب خروجی جدید"
 
 #: modules/bibformat/lib/bibformat_templates.py:1180
 msgid "menu"
-msgstr ""
+msgstr "فهرست"
 
 #: modules/bibformat/lib/bibformat_templates.py:1181
 #: modules/bibformat/lib/bibformat_templates.py:1381
 #: modules/bibformat/lib/bibformat_templates.py:1487
 msgid "Close Output Format"
-msgstr ""
+msgstr "بستن قالب خروجی جدید"
 
 #: modules/bibformat/lib/bibformat_templates.py:1182
 #: modules/bibformat/lib/bibformat_templates.py:1382
 #: modules/bibformat/lib/bibformat_templates.py:1488
 msgid "Rules"
-msgstr ""
+msgstr "قوانین"
 
 #: modules/bibformat/lib/bibformat_templates.py:1183
 #: modules/bibformat/lib/bibformat_templates.py:1383
@@ -1747,18 +1749,18 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1282
 #: modules/bibformat/lib/bibformatadminlib.py:565
 msgid "Remove Rule"
-msgstr ""
+msgstr "حذف قوانین"
 
 #: modules/bibformat/lib/bibformat_templates.py:1335
 #: modules/bibformat/lib/bibformatadminlib.py:572
 msgid "Add New Rule"
-msgstr ""
+msgstr "افزودن قانون جدید"
 
 #: modules/bibformat/lib/bibformat_templates.py:1336
 #: modules/bibformat/lib/bibformatadminlib.py:569
 #: modules/bibcheck/web/admin/bibcheckadmin.py:239
 msgid "Save Changes"
-msgstr ""
+msgstr "ذخیره تغییرات"
 
 #: modules/bibformat/lib/bibformat_templates.py:1910
 msgid "No problem found with format"
@@ -1766,7 +1768,7 @@ msgstr ""
 
 #: modules/bibformat/lib/bibformat_templates.py:1912
 msgid "An error has been found"
-msgstr ""
+msgstr "یک خطا پیدا شده است"
 
 #: modules/bibformat/lib/bibformat_templates.py:1914
 msgid "The following errors have been found"
@@ -1790,7 +1792,7 @@ msgstr ""
 #: modules/bibformat/lib/elements/bfe_aid_authors.py:287
 #: modules/bibformat/lib/elements/bfe_authors.py:127
 msgid "Hide"
-msgstr ""
+msgstr "پنهان"
 
 #: modules/bibformat/lib/elements/bfe_aid_authors.py:288
 #: modules/bibformat/lib/elements/bfe_authors.py:128
@@ -1806,12 +1808,12 @@ msgstr ""
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:133
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:135
 msgid "Download fulltext"
-msgstr ""
+msgstr "دانلود تمام متن"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:87
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:61
 msgid "additional files"
-msgstr ""
+msgstr "فایل های اضافی"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:130
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:120
@@ -1828,26 +1830,26 @@ msgstr ""
 #: modules/bibformat/lib/elements/bfe_fulltext.py:139
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:138
 msgid "external link"
-msgstr ""
+msgstr "پیوند خارجی"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:139
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:138
 msgid "external links"
-msgstr ""
+msgstr "پیوندهای خارجی"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:234
 #: modules/bibformat/lib/elements/bfe_fulltext.py:238
 #: modules/bibformat/lib/elements/bfe_fulltext.py:289
 msgid "Fulltext"
-msgstr ""
+msgstr "متن کامل"
 
 #: modules/bibformat/lib/elements/bfe_edit_files.py:50
 msgid "Manage Files of This Record"
-msgstr ""
+msgstr "مدیریت فایل های این رکورد"
 
 #: modules/bibformat/lib/elements/bfe_edit_record.py:46
 msgid "Edit This Record"
-msgstr ""
+msgstr "ویرایش این رکورد"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:182
 #: modules/bibformat/web/admin/bibformatadmin.py:252
@@ -1860,7 +1862,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:534
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:563
 msgid "Ok"
-msgstr ""
+msgstr "خوب"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:210
 #, python-format
@@ -1879,7 +1881,7 @@ msgstr ""
 
 #: modules/bibformat/web/admin/bibformatadmin.py:384
 msgid "Delete Output Format"
-msgstr ""
+msgstr "حذف قالب  خروجی"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:405
 #: modules/bibformat/web/admin/bibformatadmin.py:714
@@ -1910,11 +1912,11 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4705
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:747
 msgid "Cancel"
-msgstr ""
+msgstr "لغو"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:434
 msgid "Cannot create output format"
-msgstr ""
+msgstr "عدم توانایی ایجاد قالب خروجی"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:513
 #: modules/bibformat/web/admin/bibformatadmin.py:587
@@ -1977,7 +1979,7 @@ msgstr ""
 #: modules/bibharvest/lib/bibharvest_templates.py:53
 #: modules/bibharvest/lib/bibharvest_templates.py:70
 msgid "See Guide"
-msgstr ""
+msgstr "راهنما را ببینید"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:81
 msgid "OAI sources currently present in the database"
@@ -1997,7 +1999,7 @@ msgstr ""
 
 #: modules/bibharvest/lib/bibharvest_templates.py:94
 msgid "current status:"
-msgstr ""
+msgstr "وضعیت جاری:"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:95
 msgid "No oaiharvest task currently scheduled."
@@ -2013,30 +2015,30 @@ msgstr ""
 
 #: modules/bibharvest/lib/bibharvest_templates.py:284
 msgid "View next entries..."
-msgstr ""
+msgstr "مشاهده مدخل های بعدی ..."
 
 #: modules/bibharvest/lib/bibharvest_templates.py:341
 msgid "previous month"
-msgstr ""
+msgstr "ماه پیشین"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:348
 msgid "next month"
-msgstr ""
+msgstr "ماه آینده"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:443
 msgid "main Page"
-msgstr ""
+msgstr "صفحه اصلی"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:450
 #: modules/bibharvest/lib/oai_harvest_admin.py:94
 msgid "edit"
-msgstr ""
+msgstr "ویرایش"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:454
 #: modules/websubmit/lib/websubmit_managedocfiles.py:1037
 #: modules/bibharvest/lib/oai_harvest_admin.py:98
 msgid "delete"
-msgstr ""
+msgstr "حذف"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:458
 #: modules/bibharvest/lib/oai_harvest_admin.py:102
@@ -2046,7 +2048,7 @@ msgstr ""
 #: modules/bibharvest/lib/bibharvest_templates.py:462
 #: modules/bibharvest/lib/oai_harvest_admin.py:106
 msgid "history"
-msgstr ""
+msgstr "تاریخچه"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:466
 #: modules/bibharvest/lib/oai_harvest_admin.py:110
@@ -2055,11 +2057,11 @@ msgstr ""
 
 #: modules/bibrank/lib/bibrank_citation_grapher.py:137
 msgid "Citation history:"
-msgstr ""
+msgstr "تاریخچه استنادی"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:85
 msgid "Download history:"
-msgstr ""
+msgstr "تاریخچه دانلود"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:107
 msgid "Download user distribution:"
@@ -2087,7 +2089,7 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:186
 msgid "File type"
-msgstr ""
+msgstr "نوع فایل"
 
 #: modules/bibupload/lib/batchuploader_templates.py:187
 #: modules/bibupload/lib/batchuploader_templates.py:395
@@ -2104,14 +2106,14 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_templates.py:88
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
 msgid "Date"
-msgstr ""
+msgstr "تاریخ"
 
 #: modules/bibupload/lib/batchuploader_templates.py:190
 #: modules/bibupload/lib/batchuploader_templates.py:398
 #: modules/bibupload/lib/batchuploader_templates.py:464
 #: modules/webstyle/lib/webstyle_templates.py:670
 msgid "Time"
-msgstr ""
+msgstr "زمان"
 
 #: modules/bibupload/lib/batchuploader_templates.py:191
 #: modules/bibupload/lib/batchuploader_templates.py:393
@@ -2260,7 +2262,7 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:464
 msgid "Progress"
-msgstr ""
+msgstr "پیشرفت"
 
 #: modules/bibupload/lib/batchuploader_templates.py:466
 msgid "Last BibSched tasks:"
@@ -2280,7 +2282,7 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:241
 msgid "Upload successful"
-msgstr ""
+msgstr "فراگذاری موفقیت آمیز"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:291
 msgid "Batch Uploader: Daemon monitor"
@@ -2297,183 +2299,183 @@ msgstr ""
 
 #: modules/miscutil/lib/dateutils.py:172
 msgid "Sun"
-msgstr ""
+msgstr "یکشنبه"
 
 #: modules/miscutil/lib/dateutils.py:173
 msgid "Mon"
-msgstr ""
+msgstr "دوشنبه"
 
 #: modules/miscutil/lib/dateutils.py:174
 msgid "Tue"
-msgstr ""
+msgstr "سه شنبه"
 
 #: modules/miscutil/lib/dateutils.py:175
 msgid "Wed"
-msgstr ""
+msgstr "چهارشنبه"
 
 #: modules/miscutil/lib/dateutils.py:176
 msgid "Thu"
-msgstr ""
+msgstr "پنج شنبه"
 
 #: modules/miscutil/lib/dateutils.py:177
 msgid "Fri"
-msgstr ""
+msgstr "جمعه"
 
 #: modules/miscutil/lib/dateutils.py:178
 msgid "Sat"
-msgstr ""
+msgstr "شنبه"
 
 #: modules/miscutil/lib/dateutils.py:180
 msgid "Sunday"
-msgstr ""
+msgstr "یکشنبه"
 
 #: modules/miscutil/lib/dateutils.py:181
 msgid "Monday"
-msgstr ""
+msgstr "دوشنبه"
 
 #: modules/miscutil/lib/dateutils.py:182
 msgid "Tuesday"
-msgstr ""
+msgstr "سه شنبه"
 
 #: modules/miscutil/lib/dateutils.py:183
 msgid "Wednesday"
-msgstr ""
+msgstr "چهارشنبه"
 
 #: modules/miscutil/lib/dateutils.py:184
 msgid "Thursday"
-msgstr ""
+msgstr "پنج شنبه"
 
 #: modules/miscutil/lib/dateutils.py:185
 msgid "Friday"
-msgstr ""
+msgstr "جمعه"
 
 #: modules/miscutil/lib/dateutils.py:186
 msgid "Saturday"
-msgstr ""
+msgstr "شنبه"
 
 #: modules/miscutil/lib/dateutils.py:200 modules/miscutil/lib/dateutils.py:214
 msgid "Month"
-msgstr ""
+msgstr "ماه"
 
 #: modules/miscutil/lib/dateutils.py:201
 msgid "Jan"
-msgstr ""
+msgstr "ژانویه"
 
 #: modules/miscutil/lib/dateutils.py:202
 msgid "Feb"
-msgstr ""
+msgstr "فوریه"
 
 #: modules/miscutil/lib/dateutils.py:203
 msgid "Mar"
-msgstr ""
+msgstr "مارچ"
 
 #: modules/miscutil/lib/dateutils.py:204
 msgid "Apr"
-msgstr ""
+msgstr "آپریل"
 
 #: modules/miscutil/lib/dateutils.py:205 modules/miscutil/lib/dateutils.py:219
 #: modules/websearch/lib/search_engine.py:981
 #: modules/websearch/lib/websearch_templates.py:1190
 msgid "May"
-msgstr ""
+msgstr "مِی"
 
 #: modules/miscutil/lib/dateutils.py:206
 msgid "Jun"
-msgstr ""
+msgstr "ژوئن"
 
 #: modules/miscutil/lib/dateutils.py:207
 msgid "Jul"
-msgstr ""
+msgstr "ژولای"
 
 #: modules/miscutil/lib/dateutils.py:208
 msgid "Aug"
-msgstr ""
+msgstr "آوگوست"
 
 #: modules/miscutil/lib/dateutils.py:209
 msgid "Sep"
-msgstr ""
+msgstr "سپتامبر"
 
 #: modules/miscutil/lib/dateutils.py:210
 msgid "Oct"
-msgstr ""
+msgstr "اکتبر"
 
 #: modules/miscutil/lib/dateutils.py:211
 msgid "Nov"
-msgstr ""
+msgstr "نوامبر"
 
 #: modules/miscutil/lib/dateutils.py:212
 msgid "Dec"
-msgstr ""
+msgstr "دسامبر"
 
 #: modules/miscutil/lib/dateutils.py:215
 #: modules/websearch/lib/search_engine.py:980
 #: modules/websearch/lib/websearch_templates.py:1189
 msgid "January"
-msgstr ""
+msgstr "ژانویه"
 
 #: modules/miscutil/lib/dateutils.py:216
 #: modules/websearch/lib/search_engine.py:980
 #: modules/websearch/lib/websearch_templates.py:1189
 msgid "February"
-msgstr ""
+msgstr "فوریه"
 
 #: modules/miscutil/lib/dateutils.py:217
 #: modules/websearch/lib/search_engine.py:980
 #: modules/websearch/lib/websearch_templates.py:1189
 msgid "March"
-msgstr ""
+msgstr "مارچ"
 
 #: modules/miscutil/lib/dateutils.py:218
 #: modules/websearch/lib/search_engine.py:980
 #: modules/websearch/lib/websearch_templates.py:1189
 msgid "April"
-msgstr ""
+msgstr "آپریل"
 
 #: modules/miscutil/lib/dateutils.py:220
 #: modules/websearch/lib/search_engine.py:981
 #: modules/websearch/lib/websearch_templates.py:1190
 msgid "June"
-msgstr ""
+msgstr "ژوئن"
 
 #: modules/miscutil/lib/dateutils.py:221
 #: modules/websearch/lib/search_engine.py:981
 #: modules/websearch/lib/websearch_templates.py:1190
 msgid "July"
-msgstr ""
+msgstr "زولای"
 
 #: modules/miscutil/lib/dateutils.py:222
 #: modules/websearch/lib/search_engine.py:981
 #: modules/websearch/lib/websearch_templates.py:1190
 msgid "August"
-msgstr ""
+msgstr "آوگوست"
 
 #: modules/miscutil/lib/dateutils.py:223
 #: modules/websearch/lib/search_engine.py:982
 #: modules/websearch/lib/websearch_templates.py:1191
 msgid "September"
-msgstr ""
+msgstr "سپتامبر"
 
 #: modules/miscutil/lib/dateutils.py:224
 #: modules/websearch/lib/search_engine.py:982
 #: modules/websearch/lib/websearch_templates.py:1191
 msgid "October"
-msgstr ""
+msgstr "اکتبر"
 
 #: modules/miscutil/lib/dateutils.py:225
 #: modules/websearch/lib/search_engine.py:982
 #: modules/websearch/lib/websearch_templates.py:1191
 msgid "November"
-msgstr ""
+msgstr "نوامبر"
 
 #: modules/miscutil/lib/dateutils.py:226
 #: modules/websearch/lib/search_engine.py:982
 #: modules/websearch/lib/websearch_templates.py:1191
 msgid "December"
-msgstr ""
+msgstr "دسامبر"
 
 #: modules/miscutil/lib/dateutils.py:244
 msgid "Day"
-msgstr ""
+msgstr "روز"
 
 #: modules/miscutil/lib/dateutils.py:295
 #: modules/bibcirculation/lib/bibcirculation_utils.py:432
@@ -2509,7 +2511,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17514
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17913
 msgid "Year"
-msgstr ""
+msgstr "سال"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:64
 #: modules/miscutil/lib/errorlib_webinterface.py:69
@@ -2540,11 +2542,11 @@ msgstr ""
 
 #: modules/miscutil/lib/errorlib_webinterface.py:103
 msgid "Thank you!"
-msgstr ""
+msgstr "متشکرم!"
 
 #: modules/miscutil/lib/inveniocfg.py:491
 msgid "journal"
-msgstr ""
+msgstr "مجله"
 
 #: modules/miscutil/lib/inveniocfg.py:493
 msgid "record ID"
@@ -2556,11 +2558,11 @@ msgstr ""
 
 #: modules/miscutil/lib/inveniocfg.py:507
 msgid "journal impact factor"
-msgstr ""
+msgstr "ضریب تأثیر مجله"
 
 #: modules/miscutil/lib/inveniocfg.py:508
 msgid "times cited"
-msgstr ""
+msgstr "دفعات استناد شده"
 
 #: modules/miscutil/lib/inveniocfg.py:509
 msgid "time-decay cite count"
@@ -2585,7 +2587,7 @@ msgstr ""
 
 #: modules/miscutil/lib/mailutils.py:243 modules/miscutil/lib/mailutils.py:263
 msgid "Need human intervention?  Contact"
-msgstr ""
+msgstr "نیازمند به مداخله انسانی دارید؟ تماس بگیرید"
 
 #: modules/webaccess/lib/access_control_config.py:300
 #: modules/websession/lib/websession_templates.py:1090
@@ -2698,12 +2700,12 @@ msgstr ""
 #: modules/webaccess/lib/webaccessadmin_lib.py:3719
 #: modules/webaccess/lib/webaccessadmin_lib.py:3745
 msgid "Username/Email:"
-msgstr ""
+msgstr "نام کاربری/ پست الکترونیکی:"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3707
 #: modules/webaccess/lib/webaccessadmin_lib.py:3720
 msgid "Password:"
-msgstr ""
+msgstr "کلمه عبور:"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3717
 #, python-format
@@ -2755,11 +2757,11 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3348
 #: modules/webstyle/lib/webstyle_templates.py:845
 msgid "Similar records"
-msgstr ""
+msgstr "رکوردهای مشابه"
 
 #: modules/webalert/lib/htmlparser.py:188
 msgid "Cited by"
-msgstr ""
+msgstr "استناد داده شده به وسیله"
 
 #: modules/webalert/lib/webalert.py:54
 #, python-format
@@ -2768,7 +2770,7 @@ msgstr ""
 
 #: modules/webalert/lib/webalert.py:111
 msgid "unknown"
-msgstr ""
+msgstr "نامشخص"
 
 #: modules/webalert/lib/webalert.py:163 modules/webalert/lib/webalert.py:217
 #: modules/webalert/lib/webalert.py:303 modules/webalert/lib/webalert.py:341
@@ -2781,11 +2783,11 @@ msgstr ""
 
 #: modules/webalert/lib/webalert.py:221 modules/webalert/lib/webalert.py:345
 msgid "The alert name cannot be empty."
-msgstr ""
+msgstr "نام هشدار نمی تواند خالی باشد."
 
 #: modules/webalert/lib/webalert.py:226
 msgid "You are not the owner of this basket."
-msgstr ""
+msgstr "شما مالک این سبد نیستید."
 
 #: modules/webalert/lib/webalert.py:237
 #, python-format
@@ -2812,7 +2814,7 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:77
 #: modules/bibedit/lib/bibeditmulti_templates.py:556
 msgid "Field"
-msgstr ""
+msgstr "فیلد"
 
 #: modules/webalert/lib/webalert_templates.py:79
 msgid "Pattern 1"
@@ -2840,7 +2842,7 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:91
 msgid "Collections"
-msgstr ""
+msgstr "مجموعه ها"
 
 #: modules/webalert/lib/webalert_templates.py:93
 #: modules/bibcirculation/lib/bibcirculation_templates.py:356
@@ -2856,7 +2858,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17951
 #: modules/bibcirculation/lib/bibcirculation_templates.py:18043
 msgid "Collection"
-msgstr ""
+msgstr "مجموعه"
 
 #: modules/webalert/lib/webalert_templates.py:114
 msgid "You own the following alerts:"
@@ -2892,33 +2894,33 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:338
 #: modules/bibharvest/lib/oai_harvest_admin.py:142
 msgid "monthly"
-msgstr ""
+msgstr "ماهانه"
 
 #: modules/webalert/lib/webalert_templates.py:219
 #: modules/webalert/lib/webalert_templates.py:336
 #: modules/bibharvest/lib/oai_harvest_admin.py:141
 msgid "weekly"
-msgstr ""
+msgstr "هفتگی"
 
 #: modules/webalert/lib/webalert_templates.py:220
 #: modules/webalert/lib/webalert_templates.py:333
 #: modules/bibharvest/lib/oai_harvest_admin.py:140
 msgid "daily"
-msgstr ""
+msgstr "روزانه"
 
 #: modules/webalert/lib/webalert_templates.py:221
 msgid "Send notification email?"
-msgstr ""
+msgstr "ارسال ایمیل اطلاع دهی؟"
 
 #: modules/webalert/lib/webalert_templates.py:224
 #: modules/webalert/lib/webalert_templates.py:341
 msgid "yes"
-msgstr ""
+msgstr "بله"
 
 #: modules/webalert/lib/webalert_templates.py:225
 #: modules/webalert/lib/webalert_templates.py:343
 msgid "no"
-msgstr ""
+msgstr "نه"
 
 #: modules/webalert/lib/webalert_templates.py:226
 #, python-format
@@ -2927,11 +2929,11 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:228
 msgid "Store results in basket?"
-msgstr ""
+msgstr "ذخیره نتایج در سبد؟"
 
 #: modules/webalert/lib/webalert_templates.py:249
 msgid "SET ALERT"
-msgstr ""
+msgstr "تنظیم هشدار"
 
 #: modules/webalert/lib/webalert_templates.py:250
 msgid "CLEAR DATA"
@@ -2954,7 +2956,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2215
 #: modules/websession/lib/websession_templates.py:2255
 msgid "No"
-msgstr ""
+msgstr "نه"
 
 #: modules/webalert/lib/webalert_templates.py:321
 msgid "Search checking frequency"
@@ -2962,11 +2964,11 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:322
 msgid "Notification by email"
-msgstr ""
+msgstr "اطلاع دهی به وسیله پست الکترونیکی"
 
 #: modules/webalert/lib/webalert_templates.py:323
 msgid "Result in basket"
-msgstr ""
+msgstr "نتیجه در سبد"
 
 #: modules/webalert/lib/webalert_templates.py:324
 msgid "Date last run"
@@ -2974,7 +2976,7 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:325
 msgid "Creation date"
-msgstr ""
+msgstr "تاریخ ایجاد"
 
 #: modules/webalert/lib/webalert_templates.py:326
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:346
@@ -2982,27 +2984,27 @@ msgstr ""
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:459
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:632
 msgid "Query"
-msgstr ""
+msgstr "عبارت جستجو"
 
 #: modules/webalert/lib/webalert_templates.py:369
 #: modules/webbasket/lib/webbasket_templates.py:1786
 msgid "no basket"
-msgstr ""
+msgstr "بدون سبد"
 
 #: modules/webalert/lib/webalert_templates.py:386
 msgid "Modify"
-msgstr ""
+msgstr "اصلاح کردن"
 
 #: modules/webalert/lib/webalert_templates.py:392
 #: modules/webjournal/lib/webjournaladminlib.py:231
 #: modules/webjournal/lib/webjournaladminlib.py:237
 msgid "Remove"
-msgstr ""
+msgstr "حذف کردن"
 
 #: modules/webalert/lib/webalert_templates.py:394
 #: modules/webalert/lib/webalert_templates.py:484
 msgid "Execute search"
-msgstr ""
+msgstr "اجرای جستجو"
 
 #: modules/webalert/lib/webalert_templates.py:400
 #, python-format
@@ -3030,7 +3032,7 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:463
 msgid "Question"
-msgstr ""
+msgstr "سؤال"
 
 #: modules/webalert/lib/webalert_templates.py:467
 msgid "Last Run"
@@ -3038,7 +3040,7 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:485
 msgid "Set new alert"
-msgstr ""
+msgstr "تنظیم هشدار جدید"
 
 #: modules/webalert/lib/webalert_webinterface.py:76
 #: modules/webalert/lib/webalert_webinterface.py:139
@@ -3052,13 +3054,13 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_webinterface.py:79
 msgid "Popular Searches"
-msgstr ""
+msgstr "جستجوی های رایج"
 
 #: modules/webalert/lib/webalert_webinterface.py:81
 #: modules/websession/lib/websession_templates.py:457
 #: modules/websession/lib/websession_templates.py:619
 msgid "Your Searches"
-msgstr ""
+msgstr "جستجوهای شما"
 
 #: modules/webalert/lib/webalert_webinterface.py:98
 #: modules/webalert/lib/webalert_webinterface.py:150
@@ -3102,7 +3104,7 @@ msgstr ""
 #: modules/websubmit/web/yourapprovals.py:91
 #: modules/websubmit/web/yoursubmissions.py:163
 msgid "Your Account"
-msgstr ""
+msgstr "حساب شما"
 
 #: modules/webalert/lib/webalert_webinterface.py:100
 #, python-format
@@ -3153,7 +3155,7 @@ msgstr ""
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:559
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:279
 msgid "Error"
-msgstr ""
+msgstr "خطا"
 
 #: modules/webalert/lib/webalert_webinterface.py:152
 #: modules/webalert/lib/webalert_webinterface.py:185
@@ -3167,11 +3169,11 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_webinterface.py:178
 msgid "Set a new alert"
-msgstr ""
+msgstr "تنظیم یک هشدار جدید"
 
 #: modules/webalert/lib/webalert_webinterface.py:263
 msgid "Modify alert settings"
-msgstr ""
+msgstr "اصلاح تنظیمات هشدار"
 
 #: modules/webalert/lib/webalert_webinterface.py:270
 #, python-format
@@ -3181,7 +3183,7 @@ msgstr ""
 #: modules/webalert/lib/webalert_webinterface.py:314
 #: modules/websession/lib/websession_templates.py:474
 msgid "Your Alerts"
-msgstr ""
+msgstr "هشدارهای شما"
 
 #: modules/webalert/lib/webalert_webinterface.py:321
 #: modules/webalert/lib/webalert_webinterface.py:397
@@ -3195,35 +3197,35 @@ msgstr ""
 #: modules/webalert/lib/webalert_webinterface.py:467
 #: modules/webalert/lib/webalert_webinterface.py:543
 msgid "Display alerts"
-msgstr ""
+msgstr "هشدارهای نمایش"
 
 #: modules/webbasket/lib/webbasket.py:104
 #: modules/webbasket/lib/webbasket.py:2151
 #: modules/webbasket/lib/webbasket.py:2181
 msgid ""
 "The selected public basket does not exist or you do not have access to it."
-msgstr ""
+msgstr "سبد عمومی انتخاب شده وجود ندارد یا اینکه شما دسترسی به آن را ندارید."
 
 #: modules/webbasket/lib/webbasket.py:112
 msgid "Please select a valid public basket from the list of public baskets."
-msgstr ""
+msgstr "لطفا یک سبد عمومی درست از سیاهه سبدهای عمومی انتخاب کنید. "
 
 #: modules/webbasket/lib/webbasket.py:135
 #: modules/webbasket/lib/webbasket.py:298
 #: modules/webbasket/lib/webbasket.py:1000
 msgid "The selected item does not exist or you do not have access to it."
-msgstr ""
+msgstr "آیتم انتخاب شده وجود ندارد یا اینکه شما دسترسی به آن را ندارید."
 
 #: modules/webbasket/lib/webbasket.py:141
 msgid "Returning to the public basket view."
-msgstr ""
+msgstr "بازگشت به نمای سبد عمومی."
 
 #: modules/webbasket/lib/webbasket.py:416
 #: modules/webbasket/lib/webbasket.py:474
 #: modules/webbasket/lib/webbasket.py:1419
 #: modules/webbasket/lib/webbasket.py:1483
 msgid "You do not have permission to write notes to this item."
-msgstr ""
+msgstr "شما اجازه نوشتن یادداشت برای این آیتم را ندارید."
 
 #: modules/webbasket/lib/webbasket.py:429
 #: modules/webbasket/lib/webbasket.py:1431
@@ -3257,7 +3259,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1548
 msgid "You do not have permission to delete this note."
-msgstr ""
+msgstr "شما مجوز حذف این یدداشت را ندارید."
 
 #: modules/webbasket/lib/webbasket.py:1559
 msgid ""
@@ -3309,7 +3311,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:1772
 msgid "No records to add."
-msgstr ""
+msgstr "بدون رکوردی برای افزودن"
 
 #: modules/webbasket/lib/webbasket.py:1812
 #: modules/webbasket/lib/webbasket.py:2652
@@ -3324,7 +3326,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:2101
 msgid "Please provide a name for the new basket."
-msgstr ""
+msgstr "لطفا یک نام برای سبد جدید قرار دهید."
 
 #: modules/webbasket/lib/webbasket.py:2107
 msgid "Please select an existing topic or create a new one."
@@ -3350,7 +3352,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:605
 #: modules/webbasket/lib/webbasket_templates.py:657
 msgid "Personal baskets"
-msgstr ""
+msgstr "سبدهای شخصی"
 
 #: modules/webbasket/lib/webbasket.py:2290
 #: modules/webbasket/lib/webbasket.py:2396
@@ -3360,17 +3362,17 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:614
 #: modules/webbasket/lib/webbasket_templates.py:691
 msgid "Group baskets"
-msgstr ""
+msgstr "سبدهای گروهی"
 
 #: modules/webbasket/lib/webbasket.py:2316
 msgid "Others' baskets"
-msgstr ""
+msgstr "سبدهای دیگر"
 
 #: modules/webbasket/lib/webbasket.py:2352
 #: modules/websession/lib/websession_templates.py:465
 #: modules/websession/lib/websession_templates.py:613
 msgid "Your Baskets"
-msgstr ""
+msgstr "سبدهای شما"
 
 #: modules/webbasket/lib/webbasket.py:2357
 #: modules/webbasket/lib/webbasket_webinterface.py:1273
@@ -3378,19 +3380,19 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_webinterface.py:1401
 #: modules/webbasket/lib/webbasket_webinterface.py:1461
 msgid "List of public baskets"
-msgstr ""
+msgstr "سیاهه سبدهای عمومی"
 
 #: modules/webbasket/lib/webbasket.py:2368
 #: modules/webbasket/lib/webbasket_webinterface.py:428
 msgid "Search baskets"
-msgstr ""
+msgstr "جستجوی سبدها"
 
 #: modules/webbasket/lib/webbasket.py:2373
 #: modules/webbasket/lib/webbasket_webinterface.py:738
 #: modules/websearch/lib/websearch_templates.py:2852
 #: modules/websearch/lib/websearch_templates.py:3038
 msgid "Add to basket"
-msgstr ""
+msgstr "افزودن به سبد"
 
 #: modules/webbasket/lib/webbasket.py:2413
 #: modules/webbasket/lib/webbasket_templates.py:218
@@ -3398,7 +3400,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:623
 #: modules/webbasket/lib/webbasket_templates.py:725
 msgid "Public baskets"
-msgstr ""
+msgstr "سبدهای عمومی"
 
 #: modules/webbasket/lib/webbasket.py:2443
 #, python-format
@@ -3437,12 +3439,12 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:112
 #: modules/webbasket/lib/webbasket_templates.py:178
 msgid "Back to Your Baskets"
-msgstr ""
+msgstr "بازگشت به سبدهای شما"
 
 #: modules/webbasket/lib/webbasket_templates.py:118
 #: modules/webbasket/lib/webbasket_webinterface.py:1243
 msgid "Create basket"
-msgstr ""
+msgstr "ایجاد سبد"
 
 #: modules/webbasket/lib/webbasket_templates.py:124
 #: modules/webbasket/lib/webbasket_webinterface.py:1132
@@ -3451,7 +3453,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:559
 msgid "Search baskets for"
-msgstr ""
+msgstr "جستجوی سبدها برای"
 
 #: modules/webbasket/lib/webbasket_templates.py:560
 msgid "Search also in notes (where allowed)"
@@ -3459,7 +3461,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:597
 msgid "Results overview"
-msgstr ""
+msgstr "نمای کلی نتایج"
 
 #: modules/webbasket/lib/webbasket_templates.py:598
 #: modules/webbasket/lib/webbasket_templates.py:607
@@ -3481,11 +3483,11 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:632
 #: modules/webbasket/lib/webbasket_templates.py:758
 msgid "All public baskets"
-msgstr ""
+msgstr "همه سبدهای عمومی"
 
 #: modules/webbasket/lib/webbasket_templates.py:648
 msgid "No items found."
-msgstr ""
+msgstr "هیچ آیتمی یافت نشد."
 
 #: modules/webbasket/lib/webbasket_templates.py:675
 #: modules/webbasket/lib/webbasket_templates.py:709
@@ -3500,20 +3502,20 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_webinterface.py:1416
 #: modules/webbasket/lib/webbasket_webinterface.py:1476
 msgid "Public basket"
-msgstr ""
+msgstr "سبد عمومی"
 
 #: modules/webbasket/lib/webbasket_templates.py:870
 msgid "Owner"
-msgstr ""
+msgstr "مالک"
 
 #: modules/webbasket/lib/webbasket_templates.py:871
 msgid "Last update"
-msgstr ""
+msgstr "آخرین به روز رسانی"
 
 #: modules/webbasket/lib/webbasket_templates.py:872
 #: modules/bibcirculation/lib/bibcirculation_templates.py:113
 msgid "Items"
-msgstr ""
+msgstr "آیتم ها"
 
 #: modules/webbasket/lib/webbasket_templates.py:873
 msgid "Views"
@@ -3565,15 +3567,15 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1145
 #: modules/webbasket/lib/webbasket_templates.py:1538
 msgid "Basket name"
-msgstr ""
+msgstr "نام سبد"
 
 #: modules/webbasket/lib/webbasket_templates.py:1147
 msgid "Create a new basket"
-msgstr ""
+msgstr "ایجاد یک سبد جدید"
 
 #: modules/webbasket/lib/webbasket_templates.py:1199
 msgid "Create new basket"
-msgstr ""
+msgstr "ایجاد سبد جدید"
 
 #: modules/webbasket/lib/webbasket_templates.py:1269
 #: modules/webbasket/lib/webbasket_templates.py:2297
@@ -3581,7 +3583,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:3182
 #: modules/webbasket/lib/webbasket_templates.py:3498
 msgid "External item"
-msgstr ""
+msgstr "آیتم خروجی"
 
 #: modules/webbasket/lib/webbasket_templates.py:1270
 msgid ""
@@ -3605,7 +3607,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16839
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17027
 msgid "Title"
-msgstr ""
+msgstr "عنوان"
 
 #: modules/webbasket/lib/webbasket_templates.py:1275
 msgid "URL"
@@ -3653,11 +3655,11 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1450
 msgid "Add items"
-msgstr ""
+msgstr "افزودن آیتم ها"
 
 #: modules/webbasket/lib/webbasket_templates.py:1474
 msgid "Are you sure you want to delete this basket?"
-msgstr ""
+msgstr "آیا برای حذف این سبد مطمئن هستید؟"
 
 #: modules/webbasket/lib/webbasket_templates.py:1476
 #, python-format
@@ -3684,18 +3686,18 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2214
 #: modules/websession/lib/websession_templates.py:2254
 msgid "Yes"
-msgstr ""
+msgstr "بله"
 
 #: modules/webbasket/lib/webbasket_templates.py:1555
 #: modules/webbasket/lib/webbasket_templates.py:1651
 msgid "General settings"
-msgstr ""
+msgstr "تنظیمات کلی"
 
 #: modules/webbasket/lib/webbasket_templates.py:1570
 #: modules/webbasket/lib/webbasket_templates.py:1745
 #: modules/webbasket/lib/webbasket_templates.py:1772
 msgid "Add group"
-msgstr ""
+msgstr "افزودن گروه"
 
 #: modules/webbasket/lib/webbasket_templates.py:1575
 msgid "Manage group rights"
@@ -3710,7 +3712,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:2006
 #: modules/webbasket/lib/webbasket_templates.py:2085
 msgid "Delete basket"
-msgstr ""
+msgstr "حذف سبد"
 
 #: modules/webbasket/lib/webbasket_templates.py:1616
 #, python-format
@@ -3720,7 +3722,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1625
 #: modules/webbasket/lib/webbasket_templates.py:1680
 msgid "Save changes"
-msgstr ""
+msgstr "ذخیره تغییرات"
 
 #: modules/webbasket/lib/webbasket_templates.py:1646
 msgid "Topic name"
@@ -3734,12 +3736,12 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1692
 #: modules/webbasket/lib/webbasket_templates.py:1707
 msgid "No rights"
-msgstr ""
+msgstr "بدون حقوق"
 
 #: modules/webbasket/lib/webbasket_templates.py:1694
 #: modules/webbasket/lib/webbasket_templates.py:1709
 msgid "View records"
-msgstr ""
+msgstr "دیدن رکوردها"
 
 #: modules/webbasket/lib/webbasket_templates.py:1696
 #: modules/webbasket/lib/webbasket_templates.py:1698
@@ -3750,47 +3752,47 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1719
 #: modules/webbasket/lib/webbasket_templates.py:1721
 msgid "and"
-msgstr ""
+msgstr "و"
 
 #: modules/webbasket/lib/webbasket_templates.py:1696
 msgid "view comments"
-msgstr ""
+msgstr "دیدن نظرها"
 
 #: modules/webbasket/lib/webbasket_templates.py:1698
 msgid "add comments"
-msgstr ""
+msgstr "افزودن نظرها"
 
 #: modules/webbasket/lib/webbasket_templates.py:1711
 msgid "view notes"
-msgstr ""
+msgstr "دیدن یادداشت ها"
 
 #: modules/webbasket/lib/webbasket_templates.py:1713
 msgid "add notes"
-msgstr ""
+msgstr "افزودن یادداشت ها"
 
 #: modules/webbasket/lib/webbasket_templates.py:1715
 msgid "add records"
-msgstr ""
+msgstr "افزودن رکوردها"
 
 #: modules/webbasket/lib/webbasket_templates.py:1717
 msgid "delete notes"
-msgstr ""
+msgstr "پاک کردن یادداشت ها"
 
 #: modules/webbasket/lib/webbasket_templates.py:1719
 msgid "remove records"
-msgstr ""
+msgstr "حذف رکوردها"
 
 #: modules/webbasket/lib/webbasket_templates.py:1721
 msgid "manage sharing rights"
-msgstr ""
+msgstr "مدیریت حقوق اشتراک"
 
 #: modules/webbasket/lib/webbasket_templates.py:1743
 msgid "You are not a member of a group."
-msgstr ""
+msgstr "شما عضوی از یک گروه نیستید"
 
 #: modules/webbasket/lib/webbasket_templates.py:1765
 msgid "Sharing basket to a new group"
-msgstr ""
+msgstr "اشترات سبد برای یک گروه جدید"
 
 #: modules/webbasket/lib/webbasket_templates.py:1794
 #: modules/websession/lib/websession_templates.py:510
@@ -3815,7 +3817,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1862
 #: modules/webcomment/lib/webcomment_templates.py:864
 msgid "Back to search results"
-msgstr ""
+msgstr "بازگشت به نتایج جستجو"
 
 #: modules/webbasket/lib/webbasket_templates.py:1990
 #: modules/webbasket/lib/webbasket_templates.py:3022
@@ -3847,13 +3849,13 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:2000
 #: modules/webbasket/lib/webbasket_templates.py:2079
 msgid "Add item"
-msgstr ""
+msgstr "افزودن آیتم"
 
 #: modules/webbasket/lib/webbasket_templates.py:2003
 #: modules/webbasket/lib/webbasket_templates.py:2082
 #: modules/webbasket/lib/webbasket_webinterface.py:1037
 msgid "Edit basket"
-msgstr ""
+msgstr "ویرایش سبد"
 
 #: modules/webbasket/lib/webbasket_templates.py:2016
 #: modules/webbasket/lib/webbasket_templates.py:2093
@@ -3869,7 +3871,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:2162
 #: modules/webbasket/lib/webbasket_templates.py:3137
 msgid "Basket is empty"
-msgstr ""
+msgstr "سبد خالی است"
 
 #: modules/webbasket/lib/webbasket_templates.py:2196
 msgid "You do not have sufficient rights to view this basket's content."
@@ -3894,11 +3896,11 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:2275
 #: modules/webbasket/lib/webbasket_templates.py:3178
 msgid "Copy item"
-msgstr ""
+msgstr "کپی آیتم"
 
 #: modules/webbasket/lib/webbasket_templates.py:2291
 msgid "Remove item"
-msgstr ""
+msgstr "حذف آیتم"
 
 #: modules/webbasket/lib/webbasket_templates.py:2363
 #: modules/webbasket/lib/webbasket_templates.py:2718
@@ -3929,12 +3931,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14144
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14717
 msgid "Notes"
-msgstr ""
+msgstr "یادداشت ها"
 
 #: modules/webbasket/lib/webbasket_templates.py:2366
 #: modules/webbasket/lib/webbasket_templates.py:3242
 msgid "Add a note..."
-msgstr ""
+msgstr "افزودن یک یادداشت..."
 
 #: modules/webbasket/lib/webbasket_templates.py:2478
 #: modules/webbasket/lib/webbasket_templates.py:3330
@@ -3951,7 +3953,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:3415
 #: modules/webbasket/lib/webbasket_templates.py:3418
 msgid "Previous item"
-msgstr ""
+msgstr "آیتم پیشین"
 
 #: modules/webbasket/lib/webbasket_templates.py:2506
 #: modules/webbasket/lib/webbasket_templates.py:2509
@@ -3962,14 +3964,14 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:3427
 #: modules/webbasket/lib/webbasket_templates.py:3430
 msgid "Next item"
-msgstr ""
+msgstr "آیتم پسین"
 
 #: modules/webbasket/lib/webbasket_templates.py:2519
 #: modules/webbasket/lib/webbasket_templates.py:2606
 #: modules/webbasket/lib/webbasket_templates.py:3362
 #: modules/webbasket/lib/webbasket_templates.py:3437
 msgid "Return to basket"
-msgstr ""
+msgstr "بازگشت به سبد"
 
 #: modules/webbasket/lib/webbasket_templates.py:2666
 #: modules/webbasket/lib/webbasket_templates.py:3491
@@ -3992,19 +3994,19 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_webinterface.py:493
 #: modules/webbasket/lib/webbasket_webinterface.py:1538
 msgid "Add a note"
-msgstr ""
+msgstr "افزودن یک یادداشت"
 
 #: modules/webbasket/lib/webbasket_templates.py:2843
 #: modules/webbasket/lib/webbasket_templates.py:3646
 msgid "Add note"
-msgstr ""
+msgstr "افزودن یادداشت"
 
 #: modules/webbasket/lib/webbasket_templates.py:2889
 #: modules/webbasket/lib/webbasket_templates.py:3692
 #: modules/webcomment/lib/webcomment_templates.py:373
 #: modules/webmessage/lib/webmessage_templates.py:111
 msgid "Reply"
-msgstr ""
+msgstr "پاسخ دادن"
 
 #: modules/webbasket/lib/webbasket_templates.py:2919
 #: modules/webbasket/lib/webbasket_templates.py:3717
@@ -4019,12 +4021,12 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:915
 #: modules/websession/lib/websession_templates.py:1039
 msgid "Note"
-msgstr ""
+msgstr "یادداشت"
 
 #: modules/webbasket/lib/webbasket_templates.py:3031
 #: modules/webbasket/lib/webbasket_templates.py:3084
 msgid "Subscribe to basket"
-msgstr ""
+msgstr "آبونه شدن سبد"
 
 #: modules/webbasket/lib/webbasket_templates.py:3090
 msgid "This public basket belongs to the user "
@@ -4036,25 +4038,25 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:3889
 msgid "All your baskets"
-msgstr ""
+msgstr "همه سبدهای شما"
 
 #: modules/webbasket/lib/webbasket_templates.py:3891
 #: modules/webbasket/lib/webbasket_templates.py:3966
 msgid "Your personal baskets"
-msgstr ""
+msgstr "سبدهای شخصی شما"
 
 #: modules/webbasket/lib/webbasket_templates.py:3897
 #: modules/webbasket/lib/webbasket_templates.py:3977
 msgid "Your group baskets"
-msgstr ""
+msgstr "سبدهای گروهی شما"
 
 #: modules/webbasket/lib/webbasket_templates.py:3903
 msgid "Your public baskets"
-msgstr ""
+msgstr "سبدهای عمومی شما"
 
 #: modules/webbasket/lib/webbasket_templates.py:3904
 msgid "All the public baskets"
-msgstr ""
+msgstr "همه سبدهای عمومی"
 
 #: modules/webbasket/lib/webbasket_templates.py:3961
 msgid "*** basket name ***"
@@ -4077,29 +4079,29 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_webinterface.py:1519
 #: modules/webbasket/lib/webbasket_webinterface.py:1581
 msgid "You are not authorized to use baskets."
-msgstr ""
+msgstr "شما برای استفاده این سبدها اجازه ندارید"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:169
 msgid "You are not authorized to view this attachment"
-msgstr ""
+msgstr "شما برای دیدن این ضمیمه اجازه ندارید"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:361
 msgid "Display baskets"
-msgstr ""
+msgstr "نمایش سبدها"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:564
 #: modules/webbasket/lib/webbasket_webinterface.py:639
 #: modules/webbasket/lib/webbasket_webinterface.py:1604
 msgid "Display item and notes"
-msgstr ""
+msgstr "نمایش آیتم و یادداشت ها"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:821
 msgid "Delete a basket"
-msgstr ""
+msgstr "حذف یک سبد"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:879
 msgid "Copy record to basket"
-msgstr ""
+msgstr "کپی رکورد به سبد"
 
 #: modules/webcomment/lib/webcommentadminlib.py:122
 msgid "Invalid comment ID."
@@ -4121,8 +4123,9 @@ msgid "Bad page number --> showing first page."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:174
+#, fuzzy
 msgid "Bad number of results per page --> showing 10 results per page."
-msgstr ""
+msgstr "تعداد نتایج جستجو در هر صفحه"
 
 #: modules/webcomment/lib/webcomment.py:183
 msgid "Bad display order --> showing most helpful first."
@@ -4203,19 +4206,19 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment.py:1644
 msgid "You must enter a title."
-msgstr ""
+msgstr "شما باید یک عنوان را وارد کنید."
 
 #: modules/webcomment/lib/webcomment.py:1651
 msgid "You must choose a score."
-msgstr ""
+msgstr "شما باید یک نمره را انتخاب کنید."
 
 #: modules/webcomment/lib/webcomment.py:1658
 msgid "You must enter a text."
-msgstr ""
+msgstr "شما باید یک متن را وارد کنید."
 
 #: modules/webcomment/lib/webcomment.py:1675
 msgid "You already wrote a review for this record."
-msgstr ""
+msgstr "شما قبلا یک بررسی برای این رکورد نوشته اید."
 
 #: modules/webcomment/lib/webcomment.py:1693
 msgid "You already posted a comment short ago. Please retry later."
@@ -4252,7 +4255,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:839
 #: modules/websubmit/lib/websubmit_templates.py:2674
 msgid "Write a comment"
-msgstr ""
+msgstr "یک نظر بنویسید"
 
 #: modules/webcomment/lib/webcomment_templates.py:94
 #, python-format
@@ -4279,7 +4282,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:164
 #: modules/webcomment/lib/webcomment_templates.py:849
 msgid "Start a discussion about any aspect of this document."
-msgstr ""
+msgstr "شروع یک بحث درباره هر جنبه ای از این مدرک."
 
 #: modules/webcomment/lib/webcomment_templates.py:180
 #, python-format
@@ -4310,13 +4313,13 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:267
 #: modules/webcomment/lib/webcomment_templates.py:763
 msgid "Was this review helpful?"
-msgstr ""
+msgstr "آیا این بررسی سودمند بود؟"
 
 #: modules/webcomment/lib/webcomment_templates.py:278
 #: modules/webcomment/lib/webcomment_templates.py:315
 #: modules/webcomment/lib/webcomment_templates.py:839
 msgid "Write a review"
-msgstr ""
+msgstr "یک بررسی بنویسید"
 
 #: modules/webcomment/lib/webcomment_templates.py:285
 #: modules/webcomment/lib/webcomment_templates.py:827
@@ -4340,7 +4343,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:332
 #: modules/webcomment/lib/webcomment_templates.py:2077
 msgid "Rate this document"
-msgstr ""
+msgstr "این مدرک را درجه بندی کنید"
 
 #: modules/webcomment/lib/webcomment_templates.py:333
 msgid ""
@@ -4360,12 +4363,12 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:390
 msgid "Undelete comment"
-msgstr ""
+msgstr "بازگرداندن نظر"
 
 #: modules/webcomment/lib/webcomment_templates.py:399
 #: modules/webcomment/lib/webcomment_templates.py:401
 msgid "Delete comment"
-msgstr ""
+msgstr "حذف نظر"
 
 #: modules/webcomment/lib/webcomment_templates.py:407
 msgid "Unreport comment"
@@ -4373,11 +4376,11 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:418
 msgid "Attached file"
-msgstr ""
+msgstr "فایل پیوست شده"
 
 #: modules/webcomment/lib/webcomment_templates.py:418
 msgid "Attached files"
-msgstr ""
+msgstr "فایل های پیوست شده"
 
 #: modules/webcomment/lib/webcomment_templates.py:484
 #, python-format
@@ -4391,15 +4394,15 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:510
 msgid "Undelete review"
-msgstr ""
+msgstr "بازگرداندن بررسی"
 
 #: modules/webcomment/lib/webcomment_templates.py:519
 msgid "Delete review"
-msgstr ""
+msgstr "حذف بررسی"
 
 #: modules/webcomment/lib/webcomment_templates.py:525
 msgid "Unreport review"
-msgstr ""
+msgstr "بررسی گزارش نشده"
 
 #: modules/webcomment/lib/webcomment_templates.py:631
 #: modules/webcomment/lib/webcomment_templates.py:646
@@ -4407,27 +4410,27 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_webinterface.py:429
 #: modules/websubmit/lib/websubmit_templates.py:2672
 msgid "Comments"
-msgstr ""
+msgstr "نظرها"
 
 #: modules/webcomment/lib/webcomment_templates.py:632
 #: modules/webcomment/lib/webcomment_templates.py:647
 #: modules/webcomment/lib/webcomment_webinterface.py:237
 #: modules/webcomment/lib/webcomment_webinterface.py:429
 msgid "Reviews"
-msgstr ""
+msgstr "بررسی ها"
 
 #: modules/webcomment/lib/webcomment_templates.py:802
 #: modules/websearch/lib/websearch_templates.py:1864
 #: modules/bibcatalog/lib/bibcatalog_templates.py:50
 #: modules/bibknowledge/lib/bibknowledge_templates.py:167
 msgid "Previous"
-msgstr ""
+msgstr "قبلی"
 
 #: modules/webcomment/lib/webcomment_templates.py:818
 #: modules/bibcatalog/lib/bibcatalog_templates.py:72
 #: modules/bibknowledge/lib/bibknowledge_templates.py:165
 msgid "Next"
-msgstr ""
+msgstr "بعدی"
 
 #: modules/webcomment/lib/webcomment_templates.py:842
 #, python-format
@@ -4441,28 +4444,28 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:851
 msgid "Be the first to review this document."
-msgstr ""
+msgstr "نخستین فرد بررسی کننده این مدرک باشید."
 
 #: modules/webcomment/lib/webcomment_templates.py:863
 #: modules/webcomment/lib/webcomment_templates.py:1643
 #: modules/websearch/lib/websearch_templates.py:558
 msgid "Record"
-msgstr ""
+msgstr "رکورد"
 
 #: modules/webcomment/lib/webcomment_templates.py:870
 #: modules/webcomment/lib/webcomment_templates.py:929
 msgid "review"
-msgstr ""
+msgstr "بررسی"
 
 #: modules/webcomment/lib/webcomment_templates.py:870
 #: modules/webcomment/lib/webcomment_templates.py:929
 msgid "comment"
-msgstr ""
+msgstr "نظر"
 
 #: modules/webcomment/lib/webcomment_templates.py:871
 #: modules/webcomment/lib/webcomment_templates.py:1879
 msgid "Review"
-msgstr ""
+msgstr "بررسی"
 
 #: modules/webcomment/lib/webcomment_templates.py:871
 #: modules/webcomment/lib/webcomment_templates.py:1202
@@ -4474,23 +4477,23 @@ msgstr ""
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:401
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:455
 msgid "Comment"
-msgstr ""
+msgstr "نظر"
 
 #: modules/webcomment/lib/webcomment_templates.py:927
 msgid "Viewing"
-msgstr ""
+msgstr "دیدن"
 
 #: modules/webcomment/lib/webcomment_templates.py:928
 msgid "Page:"
-msgstr ""
+msgstr "صفحه:"
 
 #: modules/webcomment/lib/webcomment_templates.py:946
 msgid "Subscribe"
-msgstr ""
+msgstr "مشترک شدن"
 
 #: modules/webcomment/lib/webcomment_templates.py:955
 msgid "Unsubscribe"
-msgstr ""
+msgstr "مشترک نشدن"
 
 #: modules/webcomment/lib/webcomment_templates.py:962
 msgid "You are not authorized to comment or review."
@@ -4542,11 +4545,11 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1201
 #: modules/webcomment/lib/webcomment_templates.py:1324
 msgid "Article"
-msgstr ""
+msgstr "مقاله"
 
 #: modules/webcomment/lib/webcomment_templates.py:1203
 msgid "Add comment"
-msgstr ""
+msgstr "افزودن نظر"
 
 #: modules/webcomment/lib/webcomment_templates.py:1248
 #, python-format
@@ -4556,50 +4559,50 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1325
 msgid "Rate this article"
-msgstr ""
+msgstr "این مقاله را درجه بندی کنید"
 
 #: modules/webcomment/lib/webcomment_templates.py:1326
 msgid "Select a score"
-msgstr ""
+msgstr "یک نمره انتخاب کنید"
 
 #: modules/webcomment/lib/webcomment_templates.py:1327
 msgid "Give a title to your review"
-msgstr ""
+msgstr "یک عنوان به بررسی تان بدهید"
 
 #: modules/webcomment/lib/webcomment_templates.py:1328
 msgid "Write your review"
-msgstr ""
+msgstr "بررسی تان را بنویسید"
 
 #: modules/webcomment/lib/webcomment_templates.py:1333
 msgid "Add review"
-msgstr ""
+msgstr "افزودن بررسی"
 
 #: modules/webcomment/lib/webcomment_templates.py:1343
 #: modules/webcomment/lib/webcomment_webinterface.py:474
 msgid "Add Review"
-msgstr ""
+msgstr "افزودن بررسی"
 
 #: modules/webcomment/lib/webcomment_templates.py:1365
 msgid "Your review was successfully added."
-msgstr ""
+msgstr "بررسی شما به صورت موفقیت آمیزی اضافه شد."
 
 #: modules/webcomment/lib/webcomment_templates.py:1367
 msgid "Your comment was successfully added."
-msgstr ""
+msgstr "نظر شما به صورت موفقیت آمیزی اضافه شد."
 
 #: modules/webcomment/lib/webcomment_templates.py:1370
 msgid "Back to record"
-msgstr ""
+msgstr "برگشت به رکورد"
 
 #: modules/webcomment/lib/webcomment_templates.py:1448
 #: modules/webcomment/web/admin/webcommentadmin.py:171
 msgid "View most commented records"
-msgstr ""
+msgstr "دیدن رکوردهای دارای بیشترین نظر"
 
 #: modules/webcomment/lib/webcomment_templates.py:1450
 #: modules/webcomment/web/admin/webcommentadmin.py:207
 msgid "View latest commented records"
-msgstr ""
+msgstr "دیدن آخرین رکوردهای نظرداده شده"
 
 #: modules/webcomment/lib/webcomment_templates.py:1452
 #: modules/webcomment/web/admin/webcommentadmin.py:140
@@ -4609,12 +4612,12 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1456
 #: modules/webcomment/web/admin/webcommentadmin.py:170
 msgid "View most reviewed records"
-msgstr ""
+msgstr "دیدن رکوردهای دارای بیشترین بررسی"
 
 #: modules/webcomment/lib/webcomment_templates.py:1458
 #: modules/webcomment/web/admin/webcommentadmin.py:206
 msgid "View latest reviewed records"
-msgstr ""
+msgstr "دیدن آخرین رکوردهای بررسی شده"
 
 #: modules/webcomment/lib/webcomment_templates.py:1460
 #: modules/webcomment/web/admin/webcommentadmin.py:140
@@ -4627,7 +4630,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1470
 msgid "Guide"
-msgstr ""
+msgstr "راهنما"
 
 #: modules/webcomment/lib/webcomment_templates.py:1472
 msgid "Comments and reviews are disabled"
@@ -4641,7 +4644,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1516
 msgid "Comment ID:"
-msgstr ""
+msgstr "هویت نظر:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1517
 msgid "Or enter a record ID to list all the associated comments/reviews:"
@@ -4649,15 +4652,15 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1518
 msgid "Record ID:"
-msgstr ""
+msgstr "هویت رکورد:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1520
 msgid "View Comment"
-msgstr ""
+msgstr "مشاهده نظر"
 
 #: modules/webcomment/lib/webcomment_templates.py:1541
 msgid "There have been no reports so far."
-msgstr ""
+msgstr "تا کنون هیچ گزارشی وجود نداشته است."
 
 #: modules/webcomment/lib/webcomment_templates.py:1545
 #, python-format
@@ -4715,12 +4718,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14715
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15518
 msgid "Email"
-msgstr ""
+msgstr "ایمیل"
 
 #: modules/webcomment/lib/webcomment_templates.py:1595
 #: modules/webcomment/lib/webcomment_templates.py:1624
 msgid "User ID"
-msgstr ""
+msgstr "هویت کاربر"
 
 #: modules/webcomment/lib/webcomment_templates.py:1597
 msgid "Number positive votes"
@@ -4732,11 +4735,11 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1599
 msgid "Total number votes"
-msgstr ""
+msgstr "کل تعداد رأی ها"
 
 #: modules/webcomment/lib/webcomment_templates.py:1600
 msgid "Total number of reports"
-msgstr ""
+msgstr "کل تعداد گزارش ها"
 
 #: modules/webcomment/lib/webcomment_templates.py:1601
 msgid "View all user's reported comments/reviews"
@@ -4754,20 +4757,20 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1880
 msgid "Written by"
-msgstr ""
+msgstr "نوشته شده به وسیله"
 
 #: modules/webcomment/lib/webcomment_templates.py:1881
 msgid "General informations"
-msgstr ""
+msgstr "اطلاعات کلی"
 
 #: modules/webcomment/lib/webcomment_templates.py:1882
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:652
 msgid "Select"
-msgstr ""
+msgstr "انتخاب"
 
 #: modules/webcomment/lib/webcomment_templates.py:1896
 msgid "Delete selected reviews"
-msgstr ""
+msgstr "حذف بررسی های انتخاب شده"
 
 #: modules/webcomment/lib/webcomment_templates.py:1897
 #: modules/webcomment/lib/webcomment_templates.py:1904
@@ -4776,22 +4779,22 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1898
 msgid "Undelete selected reviews"
-msgstr ""
+msgstr "عدم حذف بررسی های انتخاب شده"
 
 #: modules/webcomment/lib/webcomment_templates.py:1902
 msgid "Undelete selected comments"
-msgstr ""
+msgstr "عدم حذف نظرات انتخاب شده"
 
 #: modules/webcomment/lib/webcomment_templates.py:1903
 msgid "Delete selected comments"
-msgstr ""
+msgstr "حذف نظرات انتخاب شده"
 
 #: modules/webcomment/lib/webcomment_templates.py:1912
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:494
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:557
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1635
 msgid "OK"
-msgstr ""
+msgstr "بسیارخوب"
 
 #: modules/webcomment/lib/webcomment_templates.py:1918
 #, python-format
@@ -4838,7 +4841,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1945
 msgid "Show comments"
-msgstr ""
+msgstr "نمایش نظرها"
 
 #: modules/webcomment/lib/webcomment_templates.py:1947
 #, python-format
@@ -4847,21 +4850,21 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1948
 msgid "Show reviews"
-msgstr ""
+msgstr "نمایش بررسی ها"
 
 #: modules/webcomment/lib/webcomment_templates.py:1973
 #: modules/webcomment/lib/webcomment_templates.py:1997
 #: modules/webcomment/lib/webcomment_templates.py:2023
 msgid "comment ID"
-msgstr ""
+msgstr "هویت نظر"
 
 #: modules/webcomment/lib/webcomment_templates.py:1973
 msgid "successfully deleted"
-msgstr ""
+msgstr "به طور موفقیت آمیزی حذف شد"
 
 #: modules/webcomment/lib/webcomment_templates.py:1997
 msgid "successfully undeleted"
-msgstr ""
+msgstr "به طور موفقیت آمیزی حذف نشد"
 
 #: modules/webcomment/lib/webcomment_templates.py:2023
 msgid "successfully suppressed abuse report"
@@ -4869,7 +4872,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:2040
 msgid "Not yet reviewed"
-msgstr ""
+msgstr "هنوز بررسی نشده است"
 
 #: modules/webcomment/lib/webcomment_templates.py:2108
 #, python-format
@@ -4909,12 +4912,12 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:2219
 msgid "Your comment will be lost."
-msgstr ""
+msgstr "نظر شما گم خواهد شد."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:261
 #: modules/webcomment/lib/webcomment_webinterface.py:493
 msgid "Record Not Found"
-msgstr ""
+msgstr "رکورد یافت نشد"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:394
 #, python-format
@@ -4927,12 +4930,12 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:2668
 #: modules/websubmit/lib/websubmit_templates.py:2669
 msgid "Add Comment"
-msgstr ""
+msgstr "افزودن نظر"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:734
 #: modules/webcomment/lib/webcomment_webinterface.py:768
 msgid "Page Not Found"
-msgstr ""
+msgstr "صفحه پیدا نشد"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:735
 msgid "The requested comment could not be found"
@@ -4940,7 +4943,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:769
 msgid "The requested file could not be found"
-msgstr ""
+msgstr "فایل درخواستی پیدا نشد"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:45
 #: modules/webcomment/web/admin/webcommentadmin.py:59
@@ -4966,15 +4969,15 @@ msgstr ""
 #: modules/webjournal/web/admin/webjournaladmin.py:390
 #: modules/bibcheck/web/admin/bibcheckadmin.py:331
 msgid "Internal Error"
-msgstr ""
+msgstr "خطای درونی"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:102
 msgid "Delete/Undelete Reviews"
-msgstr ""
+msgstr "حذف/ عدم حذف بررسی ها"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:102
 msgid "Delete/Undelete Comments"
-msgstr ""
+msgstr "حذف/ عدم حذف نظرات"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:102
 msgid " or Suppress abuse reports"
@@ -4982,11 +4985,11 @@ msgstr ""
 
 #: modules/webcomment/web/admin/webcommentadmin.py:242
 msgid "View all reported users"
-msgstr ""
+msgstr "نمایش تمام کاربران گزارش شده"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:289
 msgid "Delete comments"
-msgstr ""
+msgstr "حذف نظرها"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:292
 msgid "Suppress abuse reports"
@@ -4994,7 +4997,7 @@ msgstr ""
 
 #: modules/webcomment/web/admin/webcommentadmin.py:295
 msgid "Undelete comments"
-msgstr ""
+msgstr "بازگرداندن نظرها"
 
 #: modules/webmessage/lib/webmessage.py:58
 #: modules/webmessage/lib/webmessage.py:137
@@ -5005,19 +5008,19 @@ msgstr ""
 #: modules/webmessage/lib/webmessage.py:75
 #: modules/webmessage/lib/webmessage.py:219
 msgid "This message does not exist."
-msgstr ""
+msgstr "این پیام وجود ندارد."
 
 #: modules/webmessage/lib/webmessage.py:144
 msgid "The message could not be deleted."
-msgstr ""
+msgstr "این پیام نمی تواند حذف شود."
 
 #: modules/webmessage/lib/webmessage.py:146
 msgid "The message was successfully deleted."
-msgstr ""
+msgstr "پیام به طور موفقیت آمیزی حذف شد."
 
 #: modules/webmessage/lib/webmessage.py:162
 msgid "Your mailbox has been emptied."
-msgstr ""
+msgstr "صندوق پستی شما خالی دشه است."
 
 #: modules/webmessage/lib/webmessage.py:368
 #, python-format
@@ -5026,7 +5029,7 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage.py:377
 msgid "Please enter a user name or a group name."
-msgstr ""
+msgstr "لطفا نام کاربری یا نام یک گروه را وارد کنید"
 
 #: modules/webmessage/lib/webmessage.py:381
 #, python-format
@@ -5049,7 +5052,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_webinterface.py:145
 #: modules/webmessage/lib/webmessage_webinterface.py:242
 msgid "Write a message"
-msgstr ""
+msgstr "نوشتن یک پیام"
 
 #: modules/webmessage/lib/webmessage.py:449
 msgid ""
@@ -5059,7 +5062,7 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage.py:453
 msgid "Your message has been sent."
-msgstr ""
+msgstr "پیام شما ارسال شده است."
 
 #: modules/webmessage/lib/webmessage.py:458
 #: modules/webmessage/lib/webmessage_templates.py:472
@@ -5068,32 +5071,32 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_webinterface.py:357
 #: modules/websession/lib/websession_templates.py:607
 msgid "Your Messages"
-msgstr ""
+msgstr "پیام های شما"
 
 #: modules/webmessage/lib/webmessage_templates.py:86
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5322
 msgid "Subject"
-msgstr ""
+msgstr "موضوع"
 
 #: modules/webmessage/lib/webmessage_templates.py:87
 msgid "Sender"
-msgstr ""
+msgstr "ارسال کننده"
 
 #: modules/webmessage/lib/webmessage_templates.py:96
 msgid "No messages"
-msgstr ""
+msgstr "بدون پیام"
 
 #: modules/webmessage/lib/webmessage_templates.py:100
 msgid "No subject"
-msgstr ""
+msgstr "بدون موضوع"
 
 #: modules/webmessage/lib/webmessage_templates.py:146
 msgid "Write new message"
-msgstr ""
+msgstr "نوشتن پیام جدید"
 
 #: modules/webmessage/lib/webmessage_templates.py:147
 msgid "Delete All"
-msgstr ""
+msgstr "حذف همه"
 
 #: modules/webmessage/lib/webmessage_templates.py:189
 msgid "Re:"
@@ -5101,40 +5104,40 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage_templates.py:281
 msgid "Send later?"
-msgstr ""
+msgstr "بعد ارسال شود؟"
 
 #: modules/webmessage/lib/webmessage_templates.py:282
 #: modules/websubmit/lib/websubmit_templates.py:3080
 msgid "To:"
-msgstr ""
+msgstr "به:"
 
 #: modules/webmessage/lib/webmessage_templates.py:283
 msgid "Users"
-msgstr ""
+msgstr "کاربران"
 
 #: modules/webmessage/lib/webmessage_templates.py:284
 msgid "Groups"
-msgstr ""
+msgstr "گروه ها"
 
 #: modules/webmessage/lib/webmessage_templates.py:285
 #: modules/webmessage/lib/webmessage_templates.py:447
 #: modules/websubmit/lib/websubmit_templates.py:3081
 msgid "Subject:"
-msgstr ""
+msgstr "موضوع:"
 
 #: modules/webmessage/lib/webmessage_templates.py:286
 #: modules/websubmit/lib/websubmit_templates.py:3082
 msgid "Message:"
-msgstr ""
+msgstr "پیام:"
 
 #: modules/webmessage/lib/webmessage_templates.py:287
 #: modules/websubmit/lib/websubmit_templates.py:3083
 msgid "SEND"
-msgstr ""
+msgstr "ارسال"
 
 #: modules/webmessage/lib/webmessage_templates.py:446
 msgid "From:"
-msgstr ""
+msgstr "از:"
 
 #: modules/webmessage/lib/webmessage_templates.py:448
 msgid "Sent on:"
@@ -5146,23 +5149,23 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage_templates.py:450
 msgid "Sent to:"
-msgstr ""
+msgstr "ارسال به:"
 
 #: modules/webmessage/lib/webmessage_templates.py:451
 msgid "Sent to groups:"
-msgstr ""
+msgstr "ارسال به گروه ها:"
 
 #: modules/webmessage/lib/webmessage_templates.py:452
 msgid "REPLY"
-msgstr ""
+msgstr "پاسخ دادن"
 
 #: modules/webmessage/lib/webmessage_templates.py:453
 msgid "DELETE"
-msgstr ""
+msgstr "حذف کردن"
 
 #: modules/webmessage/lib/webmessage_templates.py:506
 msgid "Are you sure you want to empty your whole mailbox?"
-msgstr ""
+msgstr "آیا مطمئن هستید که می خواهید کل صندوق پستی خود را خالی کنید؟"
 
 #: modules/webmessage/lib/webmessage_templates.py:582
 #, python-format
@@ -5171,15 +5174,15 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage_templates.py:600
 msgid "Please select one or more:"
-msgstr ""
+msgstr "لطفا یکی یا بیشتر را انتخاب کنید:"
 
 #: modules/webmessage/lib/webmessage_templates.py:631
 msgid "Add to users"
-msgstr ""
+msgstr "افزودن به کاربران"
 
 #: modules/webmessage/lib/webmessage_templates.py:633
 msgid "Add to groups"
-msgstr ""
+msgstr "افزودن به گروه ها "
 
 #: modules/webmessage/lib/webmessage_templates.py:636
 msgid "No matching user"
@@ -5192,15 +5195,15 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage_templates.py:675
 msgid "Find users or groups:"
-msgstr ""
+msgstr "یافتن کاربران یا گروه ها:"
 
 #: modules/webmessage/lib/webmessage_templates.py:676
 msgid "Find a user"
-msgstr ""
+msgstr "یافتن یک کاربر"
 
 #: modules/webmessage/lib/webmessage_templates.py:677
 msgid "Find a group"
-msgstr ""
+msgstr "یافتن یک گروه"
 
 #: modules/webmessage/lib/webmessage_templates.py:692
 #, python-format
@@ -5218,47 +5221,47 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage_webinterface.py:403
 msgid "Read a message"
-msgstr ""
+msgstr "خواندن یک پیام"
 
 #: modules/websearch/lib/search_engine.py:833
 #: modules/websearch/lib/search_engine.py:860
 #: modules/websearch/lib/search_engine.py:4715
 #: modules/websearch/lib/search_engine.py:4768
 msgid "Search Results"
-msgstr ""
+msgstr "نتایج جستجو"
 
 #: modules/websearch/lib/search_engine.py:973
 #: modules/websearch/lib/websearch_templates.py:1174
 msgid "any day"
-msgstr ""
+msgstr "هر روزی"
 
 #: modules/websearch/lib/search_engine.py:979
 #: modules/websearch/lib/websearch_templates.py:1186
 msgid "any month"
-msgstr ""
+msgstr "هر ماهی"
 
 #: modules/websearch/lib/search_engine.py:987
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "any year"
-msgstr ""
+msgstr "هر سالی"
 
 #: modules/websearch/lib/search_engine.py:1028
 #: modules/websearch/lib/search_engine.py:1047
 msgid "any public collection"
-msgstr ""
+msgstr "هر مجموعه عمومی"
 
 #: modules/websearch/lib/search_engine.py:1032
 msgid "remove this collection"
-msgstr ""
+msgstr "پاک کردن این مجموعه"
 
 #: modules/websearch/lib/search_engine.py:1043
 msgid "add another collection"
-msgstr ""
+msgstr "افزودن مجوعه دیگر"
 
 #: modules/websearch/lib/search_engine.py:1053
 #: modules/websearch/lib/websearch_webcoll.py:592
 msgid "rank by"
-msgstr ""
+msgstr "رتبه بندی به وسیله"
 
 #: modules/websearch/lib/search_engine.py:1177
 #: modules/websearch/lib/websearch_webcoll.py:562
@@ -5267,7 +5270,7 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:1827
 msgid "No values found."
-msgstr ""
+msgstr "هیچ مقداری یافت نشد."
 
 #: modules/websearch/lib/search_engine.py:1945
 msgid ""
@@ -5314,7 +5317,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_webinterface.py:155
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:839
 msgid "Requested record does not seem to exist."
-msgstr ""
+msgstr "رکورد درخواست شده بنظر نمی رسد وجود داشته باشد."
 
 #: modules/websearch/lib/search_engine.py:2148
 msgid ""
@@ -5395,11 +5398,11 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:4276
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:837
 msgid "The record has been deleted."
-msgstr ""
+msgstr "رکورد حذف شده است."
 
 #: modules/websearch/lib/search_engine.py:3901
 msgid "Use different search terms."
-msgstr ""
+msgstr "اصطلاحات جستجوی مختلفی را استفاده کنید."
 
 #: modules/websearch/lib/search_engine.py:4997
 msgid "No match within your time limits, discarding this condition..."
@@ -5411,27 +5414,27 @@ msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3393
 msgid "Information"
-msgstr ""
+msgstr "اطلاعات"
 
 #: modules/websearch/lib/websearchadminlib.py:3394
 msgid "References"
-msgstr ""
+msgstr "ارجاعات"
 
 #: modules/websearch/lib/websearchadminlib.py:3395
 msgid "Citations"
-msgstr ""
+msgstr "استنادها"
 
 #: modules/websearch/lib/websearchadminlib.py:3396
 msgid "Keywords"
-msgstr ""
+msgstr "کلیدواژه ها"
 
 #: modules/websearch/lib/websearchadminlib.py:3397
 msgid "Discussion"
-msgstr ""
+msgstr "بحث"
 
 #: modules/websearch/lib/websearchadminlib.py:3398
 msgid "Usage statistics"
-msgstr ""
+msgstr "آمارهای استفاده"
 
 #: modules/websearch/lib/websearchadminlib.py:3399
 msgid "Files"
@@ -5443,7 +5446,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3401
 msgid "Holdings"
-msgstr ""
+msgstr "موجودی"
 
 #: modules/websearch/lib/websearch_templates.py:458
 #, python-format
@@ -5466,7 +5469,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3970
 #: modules/websearch/lib/websearch_templates.py:4030
 msgid "more"
-msgstr ""
+msgstr "بیشتر"
 
 #: modules/websearch/lib/websearch_templates.py:740
 #, python-format
@@ -5489,7 +5492,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2101
 #: modules/websearch/lib/websearch_templates.py:2159
 msgid "Advanced Search"
-msgstr ""
+msgstr "جستجوی پیشرفته"
 
 #: modules/websearch/lib/websearch_templates.py:928
 #, python-format
@@ -5499,11 +5502,11 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:979
 #: modules/websearch/lib/websearch_templates.py:2017
 msgid "Simple Search"
-msgstr ""
+msgstr "جستجوی ساده"
 
 #: modules/websearch/lib/websearch_templates.py:1012
 msgid "Search options:"
-msgstr ""
+msgstr "گزینه های جستجو"
 
 #: modules/websearch/lib/websearch_templates.py:1059
 #: modules/websearch/lib/websearch_templates.py:2255
@@ -5595,11 +5598,11 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2708
 #: modules/bibedit/lib/bibeditmulti_templates.py:657
 msgid "next"
-msgstr ""
+msgstr "بعدی"
 
 #: modules/websearch/lib/websearch_templates.py:2204
 msgid "collections"
-msgstr ""
+msgstr "مجموعه ها"
 
 #: modules/websearch/lib/websearch_templates.py:2226
 msgid "Limit to:"
@@ -5608,7 +5611,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2268
 #: modules/websearch/lib/websearch_webcoll.py:610
 msgid "results"
-msgstr ""
+msgstr "نتایج"
 
 #: modules/websearch/lib/websearch_templates.py:2304
 #: modules/websearch/lib/websearch_webcoll.py:580
@@ -5632,7 +5635,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:2354
 msgid "MARC tag"
-msgstr ""
+msgstr "برچسب مارک"
 
 #: modules/websearch/lib/websearch_templates.py:2469
 #: modules/websearch/lib/websearch_templates.py:2474
@@ -5648,24 +5651,24 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2691
 #: modules/bibedit/lib/bibeditmulti_templates.py:655
 msgid "begin"
-msgstr ""
+msgstr "شروع"
 
 #: modules/websearch/lib/websearch_templates.py:2506
 #: modules/websearch/lib/websearch_templates.py:2696
 #: modules/websubmit/lib/websubmit_templates.py:1241
 #: modules/bibedit/lib/bibeditmulti_templates.py:656
 msgid "previous"
-msgstr ""
+msgstr "قبلی"
 
 #: modules/websearch/lib/websearch_templates.py:2525
 #: modules/websearch/lib/websearch_templates.py:2715
 msgid "end"
-msgstr ""
+msgstr "پایان"
 
 #: modules/websearch/lib/websearch_templates.py:2545
 #: modules/websearch/lib/websearch_templates.py:2735
 msgid "jump to record:"
-msgstr ""
+msgstr "پرش به رکورد"
 
 #: modules/websearch/lib/websearch_templates.py:2558
 #: modules/websearch/lib/websearch_templates.py:2748
@@ -5694,7 +5697,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3049
 msgid "No results found..."
-msgstr ""
+msgstr "هیچ نتیجه ای یافت نشد ..."
 
 #: modules/websearch/lib/websearch_templates.py:3082
 msgid ""
@@ -5707,7 +5710,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3362
 msgid "Cited by 1 record"
-msgstr ""
+msgstr "به وسیله 1 رکورد استناد شده"
 
 #: modules/websearch/lib/websearch_templates.py:3377
 #, python-format
@@ -5716,7 +5719,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3378
 msgid "1 comment"
-msgstr ""
+msgstr "1 نظر"
 
 #: modules/websearch/lib/websearch_templates.py:3388
 #, python-format
@@ -5725,7 +5728,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3389
 msgid "1 review"
-msgstr ""
+msgstr "1 بررسی"
 
 #: modules/websearch/lib/websearch_templates.py:3602
 #: modules/websearch/lib/websearch_webinterface.py:1580
@@ -5765,7 +5768,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3746
 #: modules/websearch/lib/websearch_templates.py:3796
 msgid "Back to search"
-msgstr ""
+msgstr "بازگشت به جستجو"
 
 #: modules/websearch/lib/websearch_templates.py:3756
 #: modules/websearch/lib/websearch_templates.py:3772
@@ -5777,10 +5780,11 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3886
 msgid "People who downloaded this document also downloaded:"
 msgstr ""
+"افرادی که این مدرک را دانلود کرده اند همچنین موارد زیر را دانلود کرده اند:"
 
 #: modules/websearch/lib/websearch_templates.py:3902
 msgid "People who viewed this page also viewed:"
-msgstr ""
+msgstr "افرادی که این صفحه را دیده اند همچنین صفحه های زیر را دیده اند:"
 
 #: modules/websearch/lib/websearch_templates.py:3956
 #, python-format
@@ -5809,11 +5813,11 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:763
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:920
 msgid "Papers"
-msgstr ""
+msgstr "مقاله ها"
 
 #: modules/websearch/lib/websearch_templates.py:4180
 msgid "downloaded"
-msgstr ""
+msgstr "دانلود شده"
 
 #: modules/websearch/lib/websearch_templates.py:4181
 msgid "times"
@@ -5821,27 +5825,27 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4210
 msgid "No Papers"
-msgstr ""
+msgstr "بدون مقاله ها"
 
 #: modules/websearch/lib/websearch_templates.py:4223
 msgid "unknown affiliation"
-msgstr ""
+msgstr "وابستگی نامشخص"
 
 #: modules/websearch/lib/websearch_templates.py:4230
 msgid "No Affiliations"
-msgstr ""
+msgstr "بدون وابستگی ها"
 
 #: modules/websearch/lib/websearch_templates.py:4232
 msgid "Affiliations"
-msgstr ""
+msgstr "وابستگی ها"
 
 #: modules/websearch/lib/websearch_templates.py:4248
 msgid "No Keywords"
-msgstr ""
+msgstr "بدون کلیدواژه ها"
 
 #: modules/websearch/lib/websearch_templates.py:4251
 msgid "Frequent keywords"
-msgstr ""
+msgstr "کلیدواژه های تکراری"
 
 #: modules/websearch/lib/websearch_templates.py:4256
 msgid "Frequent co-authors"
@@ -5857,11 +5861,11 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4330
 msgid "Citations:"
-msgstr ""
+msgstr "استنادها"
 
 #: modules/websearch/lib/websearch_templates.py:4334
 msgid "No Citation Information available"
-msgstr ""
+msgstr "هیچ اطلاعات استنادی قابل استفاده نیست"
 
 #: modules/websearch/lib/websearch_templates.py:4401
 msgid "Citation summary results"
@@ -5869,15 +5873,15 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4406
 msgid "Total number of citable papers analyzed:"
-msgstr ""
+msgstr "تعداد کل مقالات قابل استناد تحلیل شده:"
 
 #: modules/websearch/lib/websearch_templates.py:4429
 msgid "Total number of citations:"
-msgstr ""
+msgstr "تعداد کل استنادها:"
 
 #: modules/websearch/lib/websearch_templates.py:4434
 msgid "Average citations per paper:"
-msgstr ""
+msgstr "میانگین استنادهای هر مقاله:"
 
 #: modules/websearch/lib/websearch_templates.py:4444
 msgid "Total number of citations excluding self-citations:"
@@ -5893,7 +5897,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4492
 msgid "Additional Citation Metrics"
-msgstr ""
+msgstr "سنجه های استنادی اضافی"
 
 #: modules/websearch/lib/websearch_webinterface.py:735
 #: modules/websearch/lib/websearch_webinterface.py:747
@@ -5914,11 +5918,11 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_webinterface.py:1582
 msgid "Not found"
-msgstr ""
+msgstr "پیدا نشد"
 
 #: modules/websearch/lib/websearch_external_collections.py:145
 msgid "in"
-msgstr ""
+msgstr "در"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:51
 msgid ""
@@ -5943,7 +5947,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_external_collections_templates.py:154
 #: modules/websearch/lib/websearch_external_collections_templates.py:167
 msgid "No results found."
-msgstr ""
+msgstr "نتایج یافت نشد."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:150
 #, python-format
@@ -5957,7 +5961,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_webcoll.py:645
 msgid "brief"
-msgstr ""
+msgstr "خلاصه"
 
 #: modules/websession/lib/webaccount.py:116
 #, python-format
@@ -6002,7 +6006,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:99
 msgid "External user groups"
-msgstr ""
+msgstr "گروه های کاربری بیرونی"
 
 #: modules/websession/lib/websession_templates.py:156
 msgid ""
@@ -6016,17 +6020,17 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:162
 msgid "New email address"
-msgstr ""
+msgstr "نشانی پست الکترونیکی جدید"
 
 #: modules/websession/lib/websession_templates.py:163
 #: modules/websession/lib/websession_templates.py:210
 #: modules/websession/lib/websession_templates.py:1036
 msgid "mandatory"
-msgstr ""
+msgstr "الزامی"
 
 #: modules/websession/lib/websession_templates.py:166
 msgid "Set new values"
-msgstr ""
+msgstr "مقادیر جدید را تنظیم کنید"
 
 #: modules/websession/lib/websession_templates.py:170
 msgid ""
@@ -6042,16 +6046,16 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:211
 msgid "Old password"
-msgstr ""
+msgstr "کلمه عبور قدیم"
 
 #: modules/websession/lib/websession_templates.py:212
 msgid "New password"
-msgstr ""
+msgstr "کلمه عبور جدید"
 
 #: modules/websession/lib/websession_templates.py:213
 #: modules/websession/lib/websession_templates.py:1037
 msgid "optional"
-msgstr ""
+msgstr "انتخابی"
 
 #: modules/websession/lib/websession_templates.py:215
 #: modules/websession/lib/websession_templates.py:1040
@@ -6064,11 +6068,11 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:217
 msgid "Retype password"
-msgstr ""
+msgstr "کلمه عبور را دوباره تایپ کنید"
 
 #: modules/websession/lib/websession_templates.py:218
 msgid "Set new password"
-msgstr ""
+msgstr "کلمه عبور جدید را بگذارید"
 
 #: modules/websession/lib/websession_templates.py:223
 #, python-format
@@ -6091,19 +6095,19 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:254
 #: modules/websession/lib/websession_templates.py:900
 msgid "Username"
-msgstr ""
+msgstr "نام کاربری"
 
 #: modules/websession/lib/websession_templates.py:255
 #: modules/websession/lib/websession_templates.py:901
 #: modules/websession/lib/websession_templates.py:1035
 msgid "Password"
-msgstr ""
+msgstr "کلمه عبور"
 
 #: modules/websession/lib/websession_templates.py:256
 #: modules/websession/lib/websession_templates.py:282
 #: modules/websession/lib/websession_templates.py:316
 msgid "Update settings"
-msgstr ""
+msgstr "بروزرسانی تنظیمات"
 
 #: modules/websession/lib/websession_templates.py:270
 msgid "Edit language-related settings"
@@ -6127,7 +6131,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:317
 msgid "Number of search results per page"
-msgstr ""
+msgstr "تعداد نتایج جستجو در هر صفحه"
 
 #: modules/websession/lib/websession_templates.py:347
 msgid "Edit login method"
@@ -6155,7 +6159,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:403
 #: modules/websession/lib/websession_templates.py:1033
 msgid "Email address"
-msgstr ""
+msgstr "نشانی پست الکترونیکی"
 
 #: modules/websession/lib/websession_templates.py:404
 msgid "Send password reset link"
@@ -6193,7 +6197,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:449
 #: modules/websession/lib/websession_webinterface.py:276
 msgid "Your Settings"
-msgstr ""
+msgstr "تنظیمات شما"
 
 #: modules/websession/lib/websession_templates.py:450
 msgid ""
@@ -6221,7 +6225,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:610
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:126
 msgid "Your Loans"
-msgstr ""
+msgstr "امانت های شما"
 
 #: modules/websession/lib/websession_templates.py:485
 msgid ""
@@ -6258,7 +6262,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2326
 #: modules/websession/lib/websession_webinterface.py:1020
 msgid "Your Groups"
-msgstr ""
+msgstr "گروه های شما"
 
 #: modules/websession/lib/websession_templates.py:628
 #, python-format
@@ -6270,7 +6274,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:631
 #: modules/websubmit/web/yoursubmissions.py:160
 msgid "Your Submissions"
-msgstr ""
+msgstr "واگذاری های شما"
 
 #: modules/websession/lib/websession_templates.py:634
 #, python-format
@@ -6302,7 +6306,7 @@ msgstr ""
 #: modules/bibharvest/lib/oai_harvest_admin.py:470
 #: modules/bibharvest/lib/oai_harvest_admin.py:485
 msgid "Try again"
-msgstr ""
+msgstr "مجدد تلاش کنید"
 
 #: modules/websession/lib/websession_templates.py:695
 #, python-format
@@ -6347,7 +6351,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:781
 msgid "Deleting your account"
-msgstr ""
+msgstr "حذف حساب شما"
 
 #: modules/websession/lib/websession_templates.py:795
 msgid "You are no longer recognized by our system."
@@ -6391,7 +6395,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:873
 msgid "Login method:"
-msgstr ""
+msgstr "روش ورود:"
 
 #: modules/websession/lib/websession_templates.py:902
 msgid "Remember login on this computer."
@@ -6404,12 +6408,12 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:748
 #: modules/websession/lib/websession_webinterface.py:839
 msgid "login"
-msgstr ""
+msgstr "ورود"
 
 #: modules/websession/lib/websession_templates.py:908
 #: modules/websession/lib/websession_webinterface.py:529
 msgid "Lost your password?"
-msgstr ""
+msgstr "کلمه عبورتان را از دست داده اید؟"
 
 #: modules/websession/lib/websession_templates.py:916
 msgid "You can use your nickname or your email address to login."
@@ -6423,19 +6427,19 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:963
 msgid "Set a new password for"
-msgstr ""
+msgstr "تنظیم یک کلمه عبور جدید برای"
 
 #: modules/websession/lib/websession_templates.py:964
 msgid "Type the new password"
-msgstr ""
+msgstr "کلمه عبور جدید را تایپ کنید"
 
 #: modules/websession/lib/websession_templates.py:965
 msgid "Type again the new password"
-msgstr ""
+msgstr "کلمه عبور جدید را دوباره تایپ کنید"
 
 #: modules/websession/lib/websession_templates.py:966
 msgid "Set the new password"
-msgstr ""
+msgstr "تنظیم کلمه عبور جدید"
 
 #: modules/websession/lib/websession_templates.py:988
 msgid "Please enter your email address and desired nickname and password:"
@@ -6449,12 +6453,12 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1041
 msgid "Retype Password"
-msgstr ""
+msgstr "تایپ دوباره کلمه عبور"
 
 #: modules/websession/lib/websession_templates.py:1042
 #: modules/websession/lib/websession_webinterface.py:942
 msgid "register"
-msgstr ""
+msgstr "ثبت"
 
 #: modules/websession/lib/websession_templates.py:1043
 #, python-format
@@ -6507,65 +6511,65 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1180
 msgid "guest"
-msgstr ""
+msgstr "مهمان"
 
 #: modules/websession/lib/websession_templates.py:1194
 msgid "logout"
-msgstr ""
+msgstr "خروج"
 
 #: modules/websession/lib/websession_templates.py:1242
 #: modules/webstyle/lib/webstyle_templates.py:435
 #: modules/webstyle/lib/webstyle_templates.py:504
 msgid "Personalize"
-msgstr ""
+msgstr "شخص کردن"
 
 #: modules/websession/lib/websession_templates.py:1250
 msgid "Your account"
-msgstr ""
+msgstr "حساب شما"
 
 #: modules/websession/lib/websession_templates.py:1256
 msgid "Your alerts"
-msgstr ""
+msgstr "هشدارهای شما"
 
 #: modules/websession/lib/websession_templates.py:1262
 msgid "Your approvals"
-msgstr ""
+msgstr "تأییدهای شما"
 
 #: modules/websession/lib/websession_templates.py:1268
 msgid "Your baskets"
-msgstr ""
+msgstr "سبدهای شما"
 
 #: modules/websession/lib/websession_templates.py:1274
 msgid "Your groups"
-msgstr ""
+msgstr "گروه های شما"
 
 #: modules/websession/lib/websession_templates.py:1280
 msgid "Your loans"
-msgstr ""
+msgstr "امانت های شما"
 
 #: modules/websession/lib/websession_templates.py:1286
 msgid "Your messages"
-msgstr ""
+msgstr "پیام های شما"
 
 #: modules/websession/lib/websession_templates.py:1292
 msgid "Your submissions"
-msgstr ""
+msgstr "واگذاری های شما"
 
 #: modules/websession/lib/websession_templates.py:1298
 msgid "Your searches"
-msgstr ""
+msgstr "جستجوهای شما"
 
 #: modules/websession/lib/websession_templates.py:1351
 msgid "Administration"
-msgstr ""
+msgstr "مدیریت"
 
 #: modules/websession/lib/websession_templates.py:1367
 msgid "Statistics"
-msgstr ""
+msgstr "آمارها"
 
 #: modules/websession/lib/websession_templates.py:1484
 msgid "You are an administrator of the following groups:"
-msgstr ""
+msgstr "شما اداره کننده گروه های ذیل هستید:"
 
 #: modules/websession/lib/websession_templates.py:1504
 #: modules/websession/lib/websession_templates.py:1578
@@ -6573,15 +6577,15 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:3012
 #: modules/websubmit/lib/websubmit_templates.py:3018
 msgid "Group"
-msgstr ""
+msgstr "گروه"
 
 #: modules/websession/lib/websession_templates.py:1511
 msgid "You are not an administrator of any groups."
-msgstr ""
+msgstr "شما اداره کننده هیچ گروهی نیستید"
 
 #: modules/websession/lib/websession_templates.py:1518
 msgid "Edit group"
-msgstr ""
+msgstr "ویرایش گروه"
 
 #: modules/websession/lib/websession_templates.py:1525
 #, python-format
@@ -6593,37 +6597,37 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1690
 #: modules/websession/lib/websession_webinterface.py:1076
 msgid "Create new group"
-msgstr ""
+msgstr "ایجاد گروه جدید"
 
 #: modules/websession/lib/websession_templates.py:1562
 msgid "You are a member of the following groups:"
-msgstr ""
+msgstr "شما عضوی از گروه های ذیل هستید:"
 
 #: modules/websession/lib/websession_templates.py:1585
 msgid "You are not a member of any groups."
-msgstr ""
+msgstr "شما عضو هیچ گروهی نیستید."
 
 #: modules/websession/lib/websession_templates.py:1609
 msgid "Join new group"
-msgstr ""
+msgstr "به گروه جدیدی بپیوندید"
 
 #: modules/websession/lib/websession_templates.py:1610
 #: modules/websession/lib/websession_templates.py:2162
 #: modules/websession/lib/websession_templates.py:2173
 msgid "Leave group"
-msgstr ""
+msgstr "گروه را ترک کنید"
 
 #: modules/websession/lib/websession_templates.py:1625
 msgid "You are a member of the following external groups:"
-msgstr ""
+msgstr "شما عضوی از گروهای بیرونی ذیل هستید:"
 
 #: modules/websession/lib/websession_templates.py:1648
 msgid "You are not a member of any external groups."
-msgstr ""
+msgstr "شما عضو هیچ گروه بیرونی نیستید."
 
 #: modules/websession/lib/websession_templates.py:1696
 msgid "Update group"
-msgstr ""
+msgstr "بروز رسانی گروه"
 
 #: modules/websession/lib/websession_templates.py:1698
 #, python-format
@@ -6632,19 +6636,19 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1700
 msgid "Delete group"
-msgstr ""
+msgstr "حذف گروه"
 
 #: modules/websession/lib/websession_templates.py:1773
 msgid "Group name:"
-msgstr ""
+msgstr "نام گروه:"
 
 #: modules/websession/lib/websession_templates.py:1775
 msgid "Group description:"
-msgstr ""
+msgstr "توصیف گروه:"
 
 #: modules/websession/lib/websession_templates.py:1776
 msgid "Group join policy:"
-msgstr ""
+msgstr "خط مشی پیوستن به گروه:"
 
 #: modules/websession/lib/websession_templates.py:1817
 #: modules/websession/lib/websession_templates.py:1890
@@ -6653,58 +6657,58 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2160
 #: modules/websession/lib/websession_templates.py:2272
 msgid "Please select:"
-msgstr ""
+msgstr "لطفا انتخاب کنید:"
 
 #: modules/websession/lib/websession_templates.py:1883
 msgid "Join group"
-msgstr ""
+msgstr "به گروه بپیوندید"
 
 #: modules/websession/lib/websession_templates.py:1885
 msgid "or find it"
-msgstr ""
+msgstr "یا آن را بیابید"
 
 #: modules/websession/lib/websession_templates.py:1886
 msgid "Choose group:"
-msgstr ""
+msgstr "انتخاب گروه:"
 
 #: modules/websession/lib/websession_templates.py:1888
 msgid "Find group"
-msgstr ""
+msgstr "یافتن گروه"
 
 #: modules/websession/lib/websession_templates.py:2036
 msgid "Remove member"
-msgstr ""
+msgstr "پاک کردن عضو"
 
 #: modules/websession/lib/websession_templates.py:2038
 msgid "No members."
-msgstr ""
+msgstr "بدون اعضاء."
 
 #: modules/websession/lib/websession_templates.py:2048
 msgid "Accept member"
-msgstr ""
+msgstr "پذیرش عضو"
 
 #: modules/websession/lib/websession_templates.py:2048
 msgid "Reject member"
-msgstr ""
+msgstr "رد عضو"
 
 #: modules/websession/lib/websession_templates.py:2050
 msgid "No members awaiting approval."
-msgstr ""
+msgstr "بدون اعضاء منتظر تأیید."
 
 #: modules/websession/lib/websession_templates.py:2052
 #: modules/websession/lib/websession_templates.py:2086
 msgid "Current members"
-msgstr ""
+msgstr "اعضاء جاری"
 
 #: modules/websession/lib/websession_templates.py:2053
 #: modules/websession/lib/websession_templates.py:2087
 msgid "Members awaiting approval"
-msgstr ""
+msgstr "اعضاء منتظر تأیید"
 
 #: modules/websession/lib/websession_templates.py:2054
 #: modules/websession/lib/websession_templates.py:2088
 msgid "Invite new members"
-msgstr ""
+msgstr "دعوت اعضاء جدید"
 
 #: modules/websession/lib/websession_templates.py:2059
 #, python-format
@@ -6736,27 +6740,27 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2161
 msgid "Group list"
-msgstr ""
+msgstr "سیاهه گروه"
 
 #: modules/websession/lib/websession_templates.py:2164
 msgid "You are not member of any group."
-msgstr ""
+msgstr "شما عضو هیچ گروهی نیستید."
 
 #: modules/websession/lib/websession_templates.py:2212
 msgid "Are you sure you want to delete this group?"
-msgstr ""
+msgstr "آیا مطمئن هستند که می خواهید این گروه را حذف کنید؟"
 
 #: modules/websession/lib/websession_templates.py:2252
 msgid "Are you sure you want to leave this group?"
-msgstr ""
+msgstr "آیا مطمئن هستید که می خواهید این گروه را ترک کنید؟"
 
 #: modules/websession/lib/websession_templates.py:2268
 msgid "Visible and open for new members"
-msgstr ""
+msgstr "آشکار و آزاد برای اعضاء جدید"
 
 #: modules/websession/lib/websession_templates.py:2270
 msgid "Visible but new members need approval"
-msgstr ""
+msgstr "آشکار اما اعضاء جدید نیاز به تأیید دارند"
 
 #: modules/websession/lib/websession_templates.py:2355
 #, python-format
@@ -6847,6 +6851,8 @@ msgstr ""
 msgid ""
 "A newer version of Invenio is available for download. You may want to visit  "
 msgstr ""
+"نسخه جدیدتری از اینونیو برای دانلود در دسترس است. شما ممکن است خواهان دیدن "
+"آن باشید."
 
 #: modules/websession/lib/websession_templates.py:2467
 msgid ""
@@ -6856,12 +6862,12 @@ msgstr ""
 
 #: modules/websession/lib/webuser.py:149
 msgid "Database problem"
-msgstr ""
+msgstr "مشکل پایگاه داده"
 
 #: modules/websession/lib/webuser.py:299
 #: modules/websession/lib/webgroup_dblayer.py:314
 msgid "user"
-msgstr ""
+msgstr "کاربر"
 
 #: modules/websession/lib/webuser.py:470
 #, python-format
@@ -6874,7 +6880,7 @@ msgstr ""
 
 #: modules/websession/lib/webuser.py:716
 msgid "PLEASE ACTIVATE"
-msgstr ""
+msgstr "لطفا فعال کنید"
 
 #: modules/websession/lib/webuser.py:717
 msgid "A new account has been created on"
@@ -6882,11 +6888,11 @@ msgstr ""
 
 #: modules/websession/lib/webuser.py:719
 msgid " and is awaiting activation"
-msgstr ""
+msgstr "و منتظر فعال سازی است"
 
 #: modules/websession/lib/webuser.py:721
 msgid "   Username/Email"
-msgstr ""
+msgstr "نام کاربری/ پست الکترونیکی"
 
 #: modules/websession/lib/webuser.py:722
 msgid "You can approve or reject this account request at"
@@ -6930,7 +6936,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:124
 #: modules/websession/lib/websession_webinterface.py:133
 msgid "Email address successfully activated"
-msgstr ""
+msgstr "نشانی پست الکترونیکی به طور موفقیت آمیز فعال شد."
 
 #: modules/websession/lib/websession_webinterface.py:127
 msgid "You have already confirmed the validity of your email address!"
@@ -6947,7 +6953,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:154
 msgid "Reset password"
-msgstr ""
+msgstr "بازتنظیم کلمه عبور"
 
 #: modules/websession/lib/websession_webinterface.py:160
 msgid "This request for resetting a password has already been used."
@@ -6963,7 +6969,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:181
 msgid "The two provided passwords aren't equal."
-msgstr ""
+msgstr "دو کلمه عبور قرار داده شده، یکسان نیستند."
 
 #: modules/websession/lib/websession_webinterface.py:196
 msgid "The password was successfully set! You can now proceed with the login."
@@ -6980,7 +6986,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:477
 #: modules/websession/lib/websession_webinterface.py:490
 msgid "Settings edited"
-msgstr ""
+msgstr "تنظیمات ویرایش شده"
 
 #: modules/websession/lib/websession_webinterface.py:337
 #: modules/websession/lib/websession_webinterface.py:401
@@ -6989,15 +6995,15 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:479
 #: modules/websession/lib/websession_webinterface.py:485
 msgid "Show account"
-msgstr ""
+msgstr "نمایش حساب"
 
 #: modules/websession/lib/websession_webinterface.py:341
 msgid "Unable to change login method."
-msgstr ""
+msgstr "نمی تواند روش ورود را تغییر دهد."
 
 #: modules/websession/lib/websession_webinterface.py:349
 msgid "Switched to internal login method."
-msgstr ""
+msgstr "به روش ورود درونی تعویض شد."
 
 #: modules/websession/lib/websession_webinterface.py:350
 msgid ""
@@ -7009,7 +7015,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:358
 msgid "Send Password"
-msgstr ""
+msgstr "ارسال کلمه عبور"
 
 #: modules/websession/lib/websession_webinterface.py:366
 #, python-format
@@ -7027,7 +7033,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:374
 msgid "Login method successfully selected."
-msgstr ""
+msgstr "روش ورود به طور موفقیت آمیز انتخاب شد."
 
 #: modules/websession/lib/websession_webinterface.py:376
 #, python-format
@@ -7038,7 +7044,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:395
 msgid "Settings successfully edited."
-msgstr ""
+msgstr "تنظیمات به طور موفقیت آمیز ویرایش شد."
 
 #: modules/websession/lib/websession_webinterface.py:396
 #, python-format
@@ -7063,7 +7069,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:913
 #: modules/websession/lib/websession_webinterface.py:924
 msgid "Please try again."
-msgstr ""
+msgstr "لطفا دوباره تلاش کنید."
 
 #: modules/websession/lib/websession_webinterface.py:407
 #: modules/websession/lib/websession_webinterface.py:413
@@ -7073,7 +7079,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:454
 #: modules/websession/lib/websession_webinterface.py:501
 msgid "Edit settings"
-msgstr ""
+msgstr "ویرایش تنظیمات"
 
 #: modules/websession/lib/websession_webinterface.py:408
 #: modules/websession/lib/websession_webinterface.py:414
@@ -7081,7 +7087,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:427
 #: modules/websession/lib/websession_webinterface.py:503
 msgid "Editing settings failed"
-msgstr ""
+msgstr "ویرایش تنظیمات عمل نکرد"
 
 #: modules/websession/lib/websession_webinterface.py:410
 #: modules/websession/lib/websession_webinterface.py:907
@@ -7098,7 +7104,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:418
 #: modules/websession/lib/websession_webinterface.py:919
 msgid "Or please try again."
-msgstr ""
+msgstr "یا لطفا دوباره تلاش کنید."
 
 #: modules/websession/lib/websession_webinterface.py:423
 #, python-format
@@ -7107,35 +7113,35 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:432
 msgid "Users cannot edit passwords on this site."
-msgstr ""
+msgstr "کاربران نمی توانند کلمه های عبور این سایت را ویرایش کنند."
 
 #: modules/websession/lib/websession_webinterface.py:440
 msgid "Password successfully edited."
-msgstr ""
+msgstr "کلمه عبور به طور موفقیت آمیز ویرایش شد."
 
 #: modules/websession/lib/websession_webinterface.py:443
 msgid "Password edited"
-msgstr ""
+msgstr "کلمه عبور ویرایش شد"
 
 #: modules/websession/lib/websession_webinterface.py:445
 #: modules/websession/lib/websession_webinterface.py:902
 msgid "Both passwords must match."
-msgstr ""
+msgstr "هر دو کلمه عبور باید منطبق باشند."
 
 #: modules/websession/lib/websession_webinterface.py:449
 #: modules/websession/lib/websession_webinterface.py:455
 msgid "Editing password failed"
-msgstr ""
+msgstr "ویرایش کلمه عبور عمل نکرد"
 
 #: modules/websession/lib/websession_webinterface.py:451
 msgid "Wrong old password inserted."
-msgstr ""
+msgstr "کلمه عبور قدیمی اشتباه وارد شده است."
 
 #: modules/websession/lib/websession_webinterface.py:467
 #: modules/websession/lib/websession_webinterface.py:480
 #: modules/websession/lib/websession_webinterface.py:494
 msgid "User settings saved correctly."
-msgstr ""
+msgstr "تنظیمات کاربری به طور صحیح ذخیره شد."
 
 #: modules/websession/lib/websession_webinterface.py:487
 msgid "Editing bibcatalog authorization failed"
@@ -7143,11 +7149,11 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:488
 msgid "Empty username or password"
-msgstr ""
+msgstr "خالی کردن نام کاربری یا کلمه عبور"
 
 #: modules/websession/lib/websession_webinterface.py:497
 msgid "Unable to update settings."
-msgstr ""
+msgstr "نمی توان تنظیمات را بروزرسانی کرد."
 
 #: modules/websession/lib/websession_webinterface.py:558
 msgid ""
@@ -7161,7 +7167,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:588
 msgid "Password reset request for"
-msgstr ""
+msgstr "درخواست بازتنظیم کلمه عبور برای"
 
 #: modules/websession/lib/websession_webinterface.py:592
 msgid ""
@@ -7171,29 +7177,29 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:593
 msgid "Incorrect email address"
-msgstr ""
+msgstr "نشانی پست الکترونیکی نادرست"
 
 #: modules/websession/lib/websession_webinterface.py:603
 msgid "Reset password link sent"
-msgstr ""
+msgstr "لینک بازتنظیم کلمه عبور ارسال شد"
 
 #: modules/websession/lib/websession_webinterface.py:648
 msgid "Delete Account"
-msgstr ""
+msgstr "حذف حساب"
 
 #: modules/websession/lib/websession_webinterface.py:674
 msgid "Logout"
-msgstr ""
+msgstr "خروج"
 
 #: modules/websession/lib/websession_webinterface.py:747
 #: modules/websession/lib/websession_webinterface.py:803
 #: modules/websession/lib/websession_webinterface.py:838
 msgid "Login"
-msgstr ""
+msgstr "ورود"
 
 #: modules/websession/lib/websession_webinterface.py:869
 msgid "Register"
-msgstr ""
+msgstr "ثبت"
 
 #: modules/websession/lib/websession_webinterface.py:872
 #: modules/websession/lib/websession_webinterface.py:944
@@ -7203,11 +7209,11 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:889
 msgid "Your account has been successfully created."
-msgstr ""
+msgstr "حساب شما به طور موفقیت آمیزی ایجاد شد."
 
 #: modules/websession/lib/websession_webinterface.py:890
 msgid "Account created"
-msgstr ""
+msgstr "حساب ایجاد شد"
 
 #: modules/websession/lib/websession_webinterface.py:892
 msgid ""
@@ -7241,7 +7247,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:934
 #: modules/websession/lib/websession_webinterface.py:939
 msgid "Registration failure"
-msgstr ""
+msgstr "ثبت نام شکست خورد"
 
 #: modules/websession/lib/websession_webinterface.py:923
 #, python-format
@@ -7283,24 +7289,24 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:1140
 msgid "Join New Group"
-msgstr ""
+msgstr "پیوستن گروه جدید"
 
 #: modules/websession/lib/websession_webinterface.py:1192
 msgid "Leave Group"
-msgstr ""
+msgstr "ترک گروه"
 
 #: modules/websession/lib/websession_webinterface.py:1262
 msgid "Edit Group"
-msgstr ""
+msgstr "ویرایش گروه"
 
 #: modules/websession/lib/websession_webinterface.py:1334
 msgid "Edit group members"
-msgstr ""
+msgstr "ویرایش اعضاء گروه"
 
 #: modules/websession/lib/webgroup.py:158
 #: modules/websession/lib/webgroup.py:432
 msgid "Please enter a group name."
-msgstr ""
+msgstr "لطفا نام یک گروه را وارد کنید."
 
 #: modules/websession/lib/webgroup.py:168
 #: modules/websession/lib/webgroup.py:442
@@ -7319,15 +7325,15 @@ msgstr ""
 
 #: modules/websession/lib/webgroup.py:260
 msgid "You are already member of the group."
-msgstr ""
+msgstr "شما قبلا عضو گروه بوده اید."
 
 #: modules/websession/lib/webgroup.py:302
 msgid "Please select only one group."
-msgstr ""
+msgstr "لطفا تنها یک گروه را انتخاب کنید."
 
 #: modules/websession/lib/webgroup.py:359
 msgid "Please select one group."
-msgstr ""
+msgstr "لطفا یک گروه را انتخاب کنید."
 
 #: modules/websession/lib/webgroup.py:384
 #: modules/websession/lib/webgroup.py:399
@@ -7347,36 +7353,39 @@ msgstr ""
 
 #: modules/websession/lib/webgroup.py:499
 msgid "The group has already been deleted."
-msgstr ""
+msgstr "گروه قبلا حذف شده است."
 
 #: modules/websession/lib/webgroup.py:611
 msgid "Please choose a member if you want to remove him from the group."
-msgstr ""
+msgstr "اگر می خواهید عضوی از گروه را حذف کنید لطفا وی را انتخاب کنید."
 
 #: modules/websession/lib/webgroup.py:651
 msgid ""
 "Please choose a user from the list if you want him to be added to the group."
 msgstr ""
+"اگر می خواهید کاربری را به گروه اضافه کنید لطفا وی را از سیاهه انتخاب کنید."
 
 #: modules/websession/lib/webgroup.py:664
 msgid "The user is already member of the group."
-msgstr ""
+msgstr "کاربر قبلا عضو گروه بوده است."
 
 #: modules/websession/lib/webgroup.py:718
 msgid ""
 "Please choose a user from the list if you want him to be removed from "
 "waiting list."
 msgstr ""
+"اگر می خواهید کاربری را از سیاهه انتظار حذف کنید لطفا وی را از سیاهه انتخاب "
+"کنید."
 
 #: modules/websession/lib/webgroup.py:731
 msgid "The user request for joining group has already been rejected."
-msgstr ""
+msgstr "درخواست کاربر برای پیوستن گروه قبلا رد شده است."
 
 #: modules/webstyle/lib/webstyle_templates.py:86
 #: modules/webstyle/lib/webstyle_templates.py:95
 #: modules/bibcirculation/lib/bibcirculation_templates.py:111
 msgid "Home"
-msgstr ""
+msgstr "خانه"
 
 #: modules/webstyle/lib/webstyle_templates.py:434
 #: modules/webstyle/lib/webstyle_templates.py:503
@@ -7385,17 +7394,17 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_engine.py:1188
 #: modules/websubmit/lib/websubmit_engine.py:1421
 msgid "Submit"
-msgstr ""
+msgstr "واگذاری"
 
 #: modules/webstyle/lib/webstyle_templates.py:436
 #: modules/webstyle/lib/webstyle_templates.py:505
 #: modules/bibcirculation/lib/bibcirculation_templates.py:215
 msgid "Help"
-msgstr ""
+msgstr "راهنما"
 
 #: modules/webstyle/lib/webstyle_templates.py:469
 msgid "Last updated"
-msgstr ""
+msgstr "آخرین بروزرسانی"
 
 #: modules/webstyle/lib/webstyle_templates.py:507
 msgid "Powered by"
@@ -7415,7 +7424,7 @@ msgstr ""
 
 #: modules/webstyle/lib/webstyle_templates.py:609
 msgid "System Error"
-msgstr ""
+msgstr "خطای سیستم"
 
 #: modules/webstyle/lib/webstyle_templates.py:624
 msgid "Traceback"
@@ -7427,11 +7436,11 @@ msgstr ""
 
 #: modules/webstyle/lib/webstyle_templates.py:673
 msgid "Please send an error report to the administrator."
-msgstr ""
+msgstr "لطفا گزارش خطا را به مدیر ارسال کنید."
 
 #: modules/webstyle/lib/webstyle_templates.py:674
 msgid "Send error report"
-msgstr ""
+msgstr "ارسال گزارش خطا"
 
 #: modules/webstyle/lib/webstyle_templates.py:678
 #, python-format
@@ -7519,7 +7528,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_managedocfiles.py:383
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:443
 msgid "Choose a file"
-msgstr ""
+msgstr "انتخاب یک فایل"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:391
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:459
@@ -8434,11 +8443,11 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:418
 msgid "Edit"
-msgstr ""
+msgstr "ویرایش"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:419
 msgid "Edit record"
-msgstr ""
+msgstr "ویرایش رکورد"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:434
 #: modules/websubmit/lib/websubmit_webinterface.py:490
@@ -8453,7 +8462,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:482
 msgid "Cancel all changes"
-msgstr ""
+msgstr "لغو همه تغییرات"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:1171
 msgid "Sorry, 'sub' parameter missing..."
@@ -8638,12 +8647,12 @@ msgstr ""
 #: modules/websubmit/web/publiline.py:1134
 #: modules/websubmit/web/publiline.py:1194
 msgid "Approve"
-msgstr ""
+msgstr "تأیید کردن"
 
 #: modules/websubmit/web/publiline.py:1135
 #: modules/websubmit/web/publiline.py:1195
 msgid "Reject"
-msgstr ""
+msgstr "رد کردن"
 
 #: modules/websubmit/web/publiline.py:1233
 msgid "Wrong action for this document."
@@ -8683,18 +8692,18 @@ msgstr ""
 #: modules/webjournal/lib/webjournaladminlib.py:299
 #: modules/webjournal/lib/webjournaladminlib.py:319
 msgid "Add"
-msgstr ""
+msgstr "افزودن"
 
 #: modules/webjournal/lib/webjournal_templates.py:418
 #: modules/webjournal/lib/webjournaladminlib.py:338
 msgid "Publish"
-msgstr ""
+msgstr "منتشر کردن"
 
 #: modules/webjournal/lib/webjournal_templates.py:419
 #: modules/webjournal/lib/webjournaladminlib.py:299
 #: modules/webjournal/lib/webjournaladminlib.py:316
 msgid "Refresh"
-msgstr ""
+msgstr "تازه کردن"
 
 #: modules/webjournal/lib/webjournal_templates.py:482
 #: modules/webjournal/lib/webjournaladminlib.py:364
@@ -8708,23 +8717,23 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8140
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14718
 msgid "Update"
-msgstr ""
+msgstr "بروز رسانی"
 
 #: modules/webjournal/lib/webjournal_templates.py:661
 msgid "Apply"
-msgstr ""
+msgstr "اجرا کردن"
 
 #: modules/webjournal/lib/webjournal_config.py:64
 msgid "Page not found"
-msgstr ""
+msgstr "صفحه پیدا نشد"
 
 #: modules/webjournal/lib/webjournal_config.py:65
 msgid "The requested page does not exist"
-msgstr ""
+msgstr "صفحه درخواستی وجود ندارد"
 
 #: modules/webjournal/lib/webjournal_config.py:96
 msgid "No journal articles"
-msgstr ""
+msgstr "نبود مقاله های مجله"
 
 #: modules/webjournal/lib/webjournal_config.py:97
 #: modules/webjournal/lib/webjournal_config.py:138
@@ -8733,7 +8742,7 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:137
 msgid "No journal issues"
-msgstr ""
+msgstr "نبود شماره های مجله"
 
 #: modules/webjournal/lib/webjournal_config.py:176
 msgid "Journal article error"
@@ -8773,7 +8782,7 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:268
 msgid "No current issue"
-msgstr ""
+msgstr "نبود شماره جاری"
 
 #: modules/webjournal/lib/webjournal_config.py:269
 msgid "We could not find any informtion on the current issue"
@@ -8811,7 +8820,7 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:399
 msgid "Update error"
-msgstr ""
+msgstr "خطای بروزرسانی"
 
 #: modules/webjournal/lib/webjournal_config.py:400
 #: modules/webjournal/lib/webjournal_config.py:431
@@ -8824,15 +8833,15 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:463
 msgid "Journal issue error"
-msgstr ""
+msgstr "خطای شماره مجله"
 
 #: modules/webjournal/lib/webjournal_config.py:464
 msgid "Issue not found"
-msgstr ""
+msgstr "شماره پیدا نشد"
 
 #: modules/webjournal/lib/webjournal_config.py:494
 msgid "Journal ID error"
-msgstr ""
+msgstr "خطای تعیین هویت مجله"
 
 #: modules/webjournal/lib/webjournal_config.py:495
 msgid "We could not find the id for this journal in the Database"
@@ -8850,7 +8859,7 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournaladminlib.py:350
 msgid "Please select an issue"
-msgstr ""
+msgstr "لطفا یک شماره انتخاب کنید"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:77
 msgid "WebJournal Admin"
@@ -8879,11 +8888,11 @@ msgstr ""
 
 #: modules/webjournal/web/admin/webjournaladmin.py:350
 msgid "Add Journal"
-msgstr ""
+msgstr "افزودن مجله"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:352
 msgid "Edit Settings"
-msgstr ""
+msgstr "ویرایش تنظیمات"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:43
 #, python-format
@@ -8892,18 +8901,18 @@ msgstr ""
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:62
 msgid "show"
-msgstr ""
+msgstr "نمایش"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:63
 msgid "close"
-msgstr ""
+msgstr "بستن"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:68
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:82
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:125
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:140
 msgid "No information available"
-msgstr ""
+msgstr "هیچ اطلاعاتی قابل استفاده نیست"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:86
 msgid "No seminars today"
@@ -8915,7 +8924,7 @@ msgstr ""
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:185
 msgid "Seminars of the week"
-msgstr ""
+msgstr "سمینارهای هفته"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:163
 msgid "There are no new articles for the moment"
@@ -8940,7 +8949,7 @@ msgstr ""
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:221
 msgid "Did you know?"
-msgstr ""
+msgstr "آیا شما می دانید؟"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:253
 #, python-format
@@ -8985,7 +8994,7 @@ msgstr ""
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:96
 msgid "Events"
-msgstr ""
+msgstr "رخدادها"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:97
 msgid "Staff Association"
@@ -8993,19 +9002,19 @@ msgstr ""
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:106
 msgid "Archive"
-msgstr ""
+msgstr "آرشیو"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:133
 msgid "Select Year:"
-msgstr ""
+msgstr "انتخاب سال:"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:139
 msgid "Select Issue:"
-msgstr ""
+msgstr "انتخاب شماره:"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:143
 msgid "Select Date:"
-msgstr ""
+msgstr "انتخاب تاریخ"
 
 #: modules/bibedit/lib/bibedit_webinterface.py:169
 msgid "Comparing two record revisions"
@@ -9673,11 +9682,11 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:154
 #: modules/bibcirculation/lib/bibcirculation_templates.py:208
 msgid "Lists"
-msgstr ""
+msgstr "سیاهه ها"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:155
 msgid "Last loans"
-msgstr ""
+msgstr "آخرین امانت ها"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:156
 msgid "Overdue loans"
@@ -9697,45 +9706,45 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:160
 msgid "Ordered books"
-msgstr ""
+msgstr "کتاب های سفارش شده"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:160
 msgid "Others"
-msgstr ""
+msgstr "دیگران"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:161
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6836
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8643
 msgid "Libraries"
-msgstr ""
+msgstr "کتابخانه ها"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:162
 msgid "Add new library"
-msgstr ""
+msgstr "افزودن کتابخانه جدید"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:163
 msgid "Update info"
-msgstr ""
+msgstr "بروز رسانی اطلاعات"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:164
 msgid "Acquisitions"
-msgstr ""
+msgstr "فراهم آوری"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:165
 msgid "List of ordered books"
-msgstr ""
+msgstr "سیاهه کتاب های سفارش شده"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:166
 msgid "Order new book"
-msgstr ""
+msgstr "سفارش کتاب جدید"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:167
 msgid "Vendors"
-msgstr ""
+msgstr "فروشندگان"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:168
 msgid "Add new vendor"
-msgstr ""
+msgstr "افزودن فروشنده جدید"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:203
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4606
@@ -9745,15 +9754,15 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:204
 msgid "Register Book request"
-msgstr ""
+msgstr "ثبت درخواست کتاب"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:205
 msgid "Register Article"
-msgstr ""
+msgstr "ثبت مقاله"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:209
 msgid "Purchase"
-msgstr ""
+msgstr "خرید"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:216
 msgid "Admin guide"
@@ -10045,11 +10054,13 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:739
 #: modules/bibcirculation/lib/bibcirculation_templates.py:768
 msgid "Your Requests"
-msgstr ""
+msgstr "درخواست های شما"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:740
 msgid "You don't have any request (waiting or pending)."
 msgstr ""
+"شما هیچ درخواستی (در حال انتظار یا در حال بررسی) ندارید.؟؟؟؟؟؟؟؟؟؟؟؟؟؟؟؟؟؟"
+"pending"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:742
 #: modules/bibcirculation/lib/bibcirculation_templates.py:823
@@ -10078,7 +10089,7 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:861
 msgid "Loaned"
-msgstr ""
+msgstr "امانت داده شده"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:862
 msgid "Returned"
@@ -10161,12 +10172,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1799
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4669
 msgid "Request status"
-msgstr ""
+msgstr "وضعیت درخواست"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1528
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1803
 msgid "Request options"
-msgstr ""
+msgstr "گزینه های درخواست"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1558
 msgid "Select hold request"
@@ -10175,7 +10186,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1634
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5366
 msgid "Reset"
-msgstr ""
+msgstr "بازتنطیم"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1680
 #, python-format
@@ -10239,7 +10250,7 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1796
 msgid "Waiting requests"
-msgstr ""
+msgstr "درخواست های در حال انتظار"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1838
 msgid "Select request"
@@ -11319,12 +11330,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17386
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17522
 msgid "Additional comments"
-msgstr ""
+msgstr "نظرهای اضافی"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11218
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15471
 msgid "Only this edition"
-msgstr ""
+msgstr "فقط این ویرایش"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11279
 msgid "A new ILL request has been registered with success."
@@ -11339,7 +11350,7 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11435
 msgid "I want this edition only."
-msgstr ""
+msgstr "من فقط این ویرایش را می خواهم."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11466
 #, python-format
@@ -11354,7 +11365,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11635
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15584
 msgid "Supplier"
-msgstr ""
+msgstr "تأمین کننده"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11518
 msgid "Interest from"
@@ -11371,43 +11382,43 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13461
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13649
 msgid "Cost"
-msgstr ""
+msgstr "هزینه"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11639
 msgid "Date requested"
-msgstr ""
+msgstr "تاریخ درخواست"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12062
 msgid "Periodical Title"
-msgstr ""
+msgstr "عنوان ادواری"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12063
 msgid "Article Title"
-msgstr ""
+msgstr "عنوان مقاله"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12065
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17313
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17511
 msgid "Volume"
-msgstr ""
+msgstr "جلد/ دوره"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12066
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17314
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17512
 msgid "Issue"
-msgstr ""
+msgstr "شماره"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12067
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17315
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17513
 msgid "Page"
-msgstr ""
+msgstr "صفحه"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12069
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17318
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17516
 msgid "ISSN"
-msgstr ""
+msgstr "شماره استاندارد بين المللي پيايندها (شاپا)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12210
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12994
@@ -11431,12 +11442,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12215
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12999
 msgid "Borrower comments"
-msgstr ""
+msgstr "نظرهای امانت گیرنده"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12216
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13000
 msgid "Only this edition?"
-msgstr ""
+msgstr "تنها این ویرایش؟"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12271
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12303
@@ -11464,7 +11475,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13726
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13912
 msgid "Previous notes"
-msgstr ""
+msgstr "یادداشت های قبلی"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12293
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12397
@@ -11478,11 +11489,11 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13495
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15590
 msgid "Library notes"
-msgstr ""
+msgstr "یادداشت های کتابخانه "
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12310
 msgid "Library/Supplier"
-msgstr ""
+msgstr "کتابخانه/ تأمین کننده"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12463
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12564
@@ -11498,13 +11509,13 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16847
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17034
 msgid "Standard number"
-msgstr ""
+msgstr "شماره استاندارد"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13001
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16919
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17035
 msgid "Request details"
-msgstr ""
+msgstr "جزئیات درخواست"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13061
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13172
@@ -11669,7 +11680,7 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17725
 msgid "cost"
-msgstr ""
+msgstr "هزینه"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17725
 msgid "notes"
@@ -11681,11 +11692,11 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17765
 msgid "the beginning"
-msgstr ""
+msgstr "آغاز"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:17766
 msgid "now"
-msgstr ""
+msgstr "اکنون"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:60
 msgid "BibCheck Admin"
@@ -12260,7 +12271,7 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:765
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:922
 msgid "Data"
-msgstr ""
+msgstr "داده"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:665
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:766
@@ -12336,7 +12347,7 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:778
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:954
 msgid "Rejected!"
-msgstr ""
+msgstr "رد شده!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:679
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:779
@@ -12440,20 +12451,20 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:727
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:730
 msgid "Your papers"
-msgstr ""
+msgstr "مقالات شما"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:727
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:731
 msgid "Not your papers"
-msgstr ""
+msgstr "مقالات غیر شما"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:736
 msgid "These are mine!"
-msgstr ""
+msgstr "این ها مال من هستند!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:737
 msgid "These are not mine!"
-msgstr ""
+msgstr "اینها مال من نیستند!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:738
 msgid "It's not mine, but I know whose it is!"
@@ -12462,27 +12473,27 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:740
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:754
 msgid "Mine!"
-msgstr ""
+msgstr "مال من!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:741
 msgid "This is my paper!"
-msgstr ""
+msgstr "این، مقاله من است!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:742
 msgid "Not mine!"
-msgstr ""
+msgstr "مال من نیست!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:743
 msgid "This is not my paper!"
-msgstr ""
+msgstr "این، مقاله من نیست!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:746
 msgid "Not Mine."
-msgstr ""
+msgstr "مال من نیست"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:747
 msgid "Marked as my paper!"
-msgstr ""
+msgstr "نشانه گذاری به عنوان مقاله من"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:749
 msgid "Forget assignment decision"
@@ -12491,15 +12502,15 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:750
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:758
 msgid "Not Mine!"
-msgstr ""
+msgstr "مال من نیست!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:751
 msgid "But this is mine!"
-msgstr ""
+msgstr "اما این مال من است!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:755
 msgid "But this is my paper!"
-msgstr ""
+msgstr "اما این مقاله ام است!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:759
 msgid "Marked as not your paper."
@@ -12554,7 +12565,7 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2379
 msgid "Welcome!"
-msgstr ""
+msgstr "خوش آمدید!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:153
 msgid "Click here to review the transactions."
@@ -12570,7 +12581,7 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:439
 msgid "Info"
-msgstr ""
+msgstr "اطلاعات"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:451
 msgid " Search for a person to attribute the paper to"
@@ -12580,19 +12591,19 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:607
 #: modules/bibauthorid/lib/bibauthorid_templates.py:679
 msgid "Select All"
-msgstr ""
+msgstr "انتخاب همگی"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:513
 #: modules/bibauthorid/lib/bibauthorid_templates.py:608
 #: modules/bibauthorid/lib/bibauthorid_templates.py:680
 msgid "Select None"
-msgstr ""
+msgstr "انتخاب هیچ یک"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:514
 #: modules/bibauthorid/lib/bibauthorid_templates.py:609
 #: modules/bibauthorid/lib/bibauthorid_templates.py:681
 msgid "Invert Selection"
-msgstr ""
+msgstr "انتخاب معکوس"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:516
 #: modules/bibauthorid/lib/bibauthorid_templates.py:611
@@ -12617,7 +12628,7 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:678
 msgid " On all pages: "
-msgstr ""
+msgstr "بر روی همه صفحات"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:714
 msgid "Names variants:"
@@ -12639,15 +12650,15 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:865
 #: modules/bibauthorid/lib/bibauthorid_templates.py:868
 msgid "Not provided"
-msgstr ""
+msgstr "تأمین نشده"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:866
 msgid "Not available"
-msgstr ""
+msgstr "غیرقابل استفاده"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:867
 msgid "No comments"
-msgstr ""
+msgstr "بدون نظر "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:869
 msgid "Not Available"
@@ -12681,7 +12692,7 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:983
 msgid "Select name for"
-msgstr ""
+msgstr "انتخاب نام برای"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:992
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1018
@@ -12888,11 +12899,11 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1503
 msgid "Recent Papers"
-msgstr ""
+msgstr "مقاله های اخیر"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1515
 msgid "YES!"
-msgstr ""
+msgstr "بله!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1516
 msgid " Attribute Papers To "
@@ -12901,7 +12912,7 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1522
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1544
 msgid "Publication List "
-msgstr ""
+msgstr "سیاهه انتشار"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1529
 msgid "Showing the"
@@ -12909,7 +12920,7 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1529
 msgid "most recent documents:"
-msgstr ""
+msgstr "تازه ترین مدارک:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1538
 msgid "Sorry, there are no documents known for this person"

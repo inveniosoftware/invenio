@@ -34,7 +34,7 @@ import gzip
 import time
 
 from invenio.legacy.bibdocfile.api import BibRecDocs
-from invenio.legacy.search_engine import get_collection_reclist
+from invenio.legacy.search_engine import get_collection_reclist, get_all_restricted_recids
 from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR, \
     CFG_SITE_RECORD, CFG_SITE_LANGS, CFG_TMPSHAREDDIR
@@ -84,10 +84,12 @@ def get_all_public_records(collections):
     accessible collection.
     returns list of (recid, last_modification) tuples
     """
+    all_restricted_recids = get_all_restricted_recids()
     recids = intbitset()
     minimum_timestamp = get_minimum_timestamp()
     for collection in collections:
         recids += get_collection_reclist(collection)
+    recids = recids.difference(all_restricted_recids)
     query = 'SELECT id, modification_date FROM bibrec'
     res = run_sql(query)
     return [(recid, max(lastmod, minimum_timestamp)) for (recid, lastmod) in res if recid in recids]
@@ -187,14 +189,21 @@ SITEMAP_FOOTER = '\n</urlset>\n'
 class SitemapWriter(object):
     """ Writer for sitemaps"""
 
-    def __init__(self, sitemap_id):
+    def __init__(self, sitemap_id, base_dir=None, name=None):
         """ Constructor.
         name: path to the sitemap file to be created
         """
         self.header = SITEMAP_HEADER
         self.footer = SITEMAP_FOOTER
         self.sitemap_id = sitemap_id
-        self.name = os.path.join(CFG_WEBDIR, 'sitemap-%02d.xml.gz' % sitemap_id)
+        if name:
+            sitemap_name = name
+        else:
+            sitemap_name = 'sitemap'
+        if base_dir:
+            self.name = os.path.join(base_dir, sitemap_name + '-%02d.xml.gz' % sitemap_id)
+        else:
+            self.name = os.path.join(CFG_WEBDIR, sitemap_name + '-%02d.xml.gz' % sitemap_id)
         self.filedescriptor = gzip.open(self.name + '.part', 'w')
         self.num_urls = 0
         self.file_size = 0
@@ -244,7 +253,7 @@ class SitemapWriter(object):
 
     def get_sitemap_url(self):
         """ Returns the sitemap URL"""
-        return CFG_SITE_URL + '/' + os.path.basename(self.name)
+        return self.name.replace(CFG_WEBDIR, CFG_SITE_URL, 1)
 
     def __del__(self):
         """ Writes the whole sitemap """
@@ -311,7 +320,8 @@ def generate_sitemaps(sitemap_index_writer, collection_names, fulltext_filter=''
         writer.add_url(CFG_SITE_URL + '/?ln=%s' % lang,
                        lastmod=datetime.today(),
                        changefreq=DEFAULT_CHANGEFREQ_HOME,
-                       priority=DEFAULT_PRIORITY_HOME)
+                       priority=DEFAULT_PRIORITY_HOME,
+                       alternate=True)
         nb_urls += 1
     write_message("... Getting all public records...")
     recids = get_all_public_records(collection_names)

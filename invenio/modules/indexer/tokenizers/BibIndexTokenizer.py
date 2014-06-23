@@ -16,15 +16,49 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibIndexTokenizer: generic, not implemented tokenizer for inheritance
+"""
+    BibIndexTokenizer: generic, not implemented tokenizer for inheritance
+
+    Inheritance tree for tokenizers in Invenio:
+
+    BibIndexTokenizer
+    ^
+    |
+    |----BibIndexStringTokenizer<---|
+    |                               |
+    |                       BibIndexDefaultTokenizer<---|
+    |                                                   |
+    |                                       BibIndexAuthorTokenizer
+    |                                       BibIndexExactAuthorTokenizer
+    |                                       (...)
+    |
+    |----BibIndexRecJsonTokenizer<---|
+    |                                |
+    |                        BibIndexFiletypeTokenizer
+    |                        (...)
+    |
+    |----BibIndexMultiFieldTokenizer<---|
+                                        |
+                            BibIndexJournalTokenizer
+                            BibIndexAuthorCountTokenizer
+                            (...)
 """
 
 
 class BibIndexTokenizer(object):
-    """Base class for the tokenizers
+    """
+        Base class for the tokenizers.
 
-    Tokenizers act as filters which turn input strings into lists of strings
-    which represent the idexable components of that string.
+        Tokenizers are components that find terms which need to be
+        indexed and stored in DB.
+        Different types of tokenizers work in different ways.
+        Tokenizers are divided into three groups:
+        - tokenizers that take string as an input and split it into
+          tokens/terms which later are indexed
+        - tokenizers that take recID of the record and find terms
+          by processing many fields/tags from the record
+        - tokenizers that use bibfield module and their functions
+          which precomputes terms to index
     """
     #words part
     def scan_string_for_words(self, s):
@@ -114,3 +148,13 @@ class BibIndexTokenizer(object):
         """Chooses tokenize_for_words, tokenize_for_phrases or tokenize_for_pairs
            depending on type of tokenization we want to perform."""
         raise NotImplementedError
+
+    @property
+    def implemented(self):
+        try:
+            self.get_tokenizing_function("")
+        except NotImplementedError:
+            return False
+        except AttributeError:
+            return False
+        return True

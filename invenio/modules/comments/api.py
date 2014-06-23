@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ __revision__ = "$Id$"
 import time
 import math
 import os
+import shutil
 import cgi
 import re
 from datetime import datetime, timedelta
@@ -1001,9 +1002,15 @@ def move_attached_files_to_storage(attached_files, recID, comid):
     @param comid: the comment ID to which we attach the files
     """
     for filename, filepath in iteritems(attached_files):
-        os.renames(filepath,
-                   os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
-                                str(recID), str(comid), filename))
+        dest_dir = os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
+                                str(recID), str(comid))
+        try:
+            os.makedirs(dest_dir)
+        except:
+            # Dir most probably already existed
+            pass
+        shutil.move(filepath,
+                    os.path.join(dest_dir, filename))
 
 def get_attached_files(recid, comid):
     """
@@ -1850,12 +1857,17 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
                 return (1,"")
             else:
                 try:
-                    raise InvenioWebCommentWarning(_('Record ID %(recid)s does not exist in the database.', recid=recID))
+                    if success == -1:
+                        status = 'deleted'
+                        raise InvenioWebCommentWarning(_('The record has been deleted.'))
+                    else:
+                        status = 'inexistant'
+                        raise InvenioWebCommentWarning(_('Record ID %s does not exist in the database.') % recID)
                 except InvenioWebCommentWarning as exc:
                     register_exception(stream='warning')
                     warnings.append((exc.message, ''))
                 #warnings.append(('ERR_WEBCOMMENT_RECID_INEXISTANT', recID))
-                return (0, webcomment_templates.tmpl_record_not_found(status='inexistant', recID=recID, ln=ln))
+                return (0, webcomment_templates.tmpl_record_not_found(status=status, recID=recID, ln=ln))
         elif recID == 0:
             try:
                 raise InvenioWebCommentWarning(_('No record ID was given.'))

@@ -28,7 +28,6 @@ import sys
 import string
 
 from bs4 import BeautifulSoup
-from flask import g, current_app
 from invenio.ext.template import render_template_to_string
 from invenio.config import \
      CFG_SITE_RECORD, \
@@ -258,7 +257,6 @@ class Template:
             no_pagefooter=True,
             **ctx
         ).encode('utf8')
-        return out
 
     def tmpl_pagefooter(self, req, **kwargs):
         """Creates a page footer

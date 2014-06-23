@@ -354,7 +354,13 @@ def perform_request_compare(ln, recid, rev1, rev2):
         # Create MARC representations of the records
         marc1 = create_marc_record(create_record(xml1)[0], '', {"text-marc": 1, "aleph-marc": 0})
         marc2 = create_marc_record(create_record(xml2)[0], '', {"text-marc": 1, "aleph-marc": 0})
-        comparison = show_diff(marc1, marc2)
+        comparison = show_diff(marc1,
+                               marc2,
+                               prefix="<pre>", suffix="</pre>",
+                               prefix_removed='<strong class="diff_field_deleted">',
+                               suffix_removed='</strong>',
+                               prefix_added='<strong class="diff_field_added">',
+                               suffix_added='</strong>')
         job_date1 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev1).groups()
         job_date2 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev2).groups()
         # Geting the author of each revision

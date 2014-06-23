@@ -37,18 +37,35 @@ CFG_MAX_MYSQL_THREADS = 50 # how many threads (connections) we
 CFG_MYSQL_THREAD_TIMEOUT = 20 # we'll kill threads that were sleeping
                               # for more than X seconds
 
-
-
 CFG_BIBINDEX_SYNONYM_MATCH_TYPE = { 'None': '-None-',
                                     'exact': 'exact',
                                     'leading_to_comma': 'leading_to_comma',
                                     'leading_to_number': 'leading_to_number'}
+
 CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR = ","
-CFG_BIBINDEX_INDEX_TABLE_TYPE = { 'Words': 'Words',
-                                'Pairs': 'Pairs',
-                                'Phrases': 'Phrases' }
+
+CFG_BIBINDEX_INDEX_TABLE_TYPE = { 'Words': 'WORD',
+                                  'Pairs': 'PAIR',
+                                  'Phrases': 'PHRASE' }
+
+CFG_BIBINDEX_WASH_INDEX_TERMS = { 'Words': 50,
+                                  'Pairs': 100,
+                                  'Phrases': 0}
 
 CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR = "%s adding records #%d-#%d started"
 
 CFG_BIBINDEX_UPDATE_MESSAGE = "Searching for records which should be reindexed..."
 
+CFG_BIBINDEX_UPDATE_MODE = { 'Update': 'update',
+							 'Insert': 'insert',
+							 'Remove': 'remove' }
+
+CFG_BIBINDEX_TOKENIZER_TYPE = {"string": "string",
+                               "multifield": "multifield",
+                               "recjson": "recjson",
+                               "unknown": "unknown"}
+
+CFG_BIBINDEX_SPECIAL_TAGS = {'8564_u': {'Words': 'BibIndexFulltextTokenizer',
+                                        'Pairs': 'BibIndexEmptyTokenizer',
+                                        'Phrases': 'BibIndexEmptyTokenizer'}
+                            }

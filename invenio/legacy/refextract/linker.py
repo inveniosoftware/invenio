@@ -23,6 +23,8 @@ from invenio.legacy.bibrank.citation_indexer import \
 from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM
 from invenio.legacy.bibrank.tag_based_indexer import load_config
+from invenio.legacy.search_engine import get_collection_reclist, get_fieldvalues
+from intbitset import intbitset
 
 
 def config_cache(cache={}):
@@ -78,9 +80,34 @@ def find_referenced_recid(citation_element):
         return FINDERS[el_type](citation_element)
     return []
 
+def find_book(citation_element):
+    books_recids = get_collection_reclist('Books')
+    search_string = citation_element['title']
+    recids = intbitset(get_recids_matching_query(search_string, 'title'))
+    recids &= books_recids
+    if len(recids) == 1:
+        return recids
+
+    if 'year' in citation_element:
+        for recid in recids:
+            year_tags = get_fieldvalues(recid, '269__c')
+            for tag in year_tags:
+                if tag == citation_element['year']:
+                    return [recid]
+
+    return []
+
+
+def find_isbn(citation_element):
+    books_recids = get_collection_reclist('Books')
+    recids = intbitset(get_recids_matching_query(citation_element['ISBN'], 'isbn'))
+    return list(recids & books_recids)
+
 
 FINDERS = {
     'JOURNAL': find_journal,
     'REPORTNUMBER': find_reportnumber,
     'DOI': find_doi,
+    'BOOK': find_book,
+    'ISBN': find_isbn,
 }

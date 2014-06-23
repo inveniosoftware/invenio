@@ -37,7 +37,7 @@ INSERT INTO field VALUES (14,'record ID','recid');
 INSERT INTO field VALUES (15,'isbn','isbn');
 INSERT INTO field VALUES (16,'issn','issn');
 INSERT INTO field VALUES (17,'coden','coden');
--- INSERT INTO field VALUES (18,'doi','doi');
+INSERT INTO field VALUES (18,'doi','doi');
 INSERT INTO field VALUES (19,'journal','journal');
 INSERT INTO field VALUES (20,'collaboration','collaboration');
 INSERT INTO field VALUES (21,'affiliation','affiliation');
@@ -62,7 +62,8 @@ INSERT INTO field VALUES (39,'miscellaneous', 'miscellaneous');
 INSERT INTO field VALUES (40,'refers to excluding self cites','referstoexcludingselfcites');
 INSERT INTO field VALUES (41,'cited by excluding self cites','citedbyexcludingselfcites');
 INSERT INTO field VALUES (42,'cataloguer nickname','cataloguer');
-INSERT INTO field VALUES (43,'tag','tag');
+INSERT INTO field VALUES (43,'file name','filename');
+INSERT INTO field VALUES (44,'tag','tag');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
@@ -85,7 +86,6 @@ INSERT INTO field_tag VALUES (14,117,100);
 INSERT INTO field_tag VALUES (15,118,100);
 INSERT INTO field_tag VALUES (16,119,100);
 INSERT INTO field_tag VALUES (17,120,100);
--- INSERT INTO field_tag VALUES (18,121,100);
 INSERT INTO field_tag VALUES (19,131,100);
 INSERT INTO field_tag VALUES (20,132,100);
 INSERT INTO field_tag VALUES (21,133,100);
@@ -430,7 +430,7 @@ INSERT INTO tag VALUES (117,'record ID','001');
 INSERT INTO tag VALUES (118,'isbn','020__a');
 INSERT INTO tag VALUES (119,'issn','022__a');
 INSERT INTO tag VALUES (120,'coden','030__a');
-INSERT INTO tag VALUES (121,'doi','909C4a');
+INSERT INTO tag VALUES (121,'journal doi','909C4a');
 INSERT INTO tag VALUES (122,'850x','850%');
 INSERT INTO tag VALUES (123,'851x','851%');
 INSERT INTO tag VALUES (124,'852x','852%');
@@ -563,6 +563,9 @@ INSERT INTO idxINDEX VALUES (23,'authoritysubject','This index contains words/ph
 INSERT INTO idxINDEX VALUES (24,'itemcount','This index contains number of copies of items in the library.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexItemCountTokenizer');
 INSERT INTO idxINDEX VALUES (25,'filetype','This index contains extensions of files connected to records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexFiletypeTokenizer');
 INSERT INTO idxINDEX VALUES (26,'miscellaneous','This index contains words/phrases from miscellaneous fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDefaultTokenizer');
+INSERT INTO idxINDEX VALUES (27,'doi','This index contains words/phrases from doi fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDOITokenizer');
+INSERT INTO idxINDEX VALUES (28,'filename','This index contains file names of files connected to records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexFilenameTokenizer');
+
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (2,10);
@@ -590,6 +593,8 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (23,36);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (24,37);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (25,38);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (26,39);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (27,18);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (28,43);
 
 
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 2);
@@ -603,6 +608,7 @@ INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 12);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 13);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 19);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 26);
+INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 27);
 
 
 

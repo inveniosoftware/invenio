@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,23 +16,36 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""Redis utils Regression Test Suite."""
 
-"""Unit tests for the search engine."""
+import time
 
-__revision__ = \
-    "$Id$"
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-from itertools import chain
 
-from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
-from invenio.bibauthorid_cluster_set import ClusterSet
-
-class TestProbabilityMatrix(InvenioTestCase):
+class RedisUtilsTest(InvenioTestCase):
 
     def setUp(self):
-        pass
+        from invenio.utils.redis import get_redis
+        self.db = get_redis()
 
-TEST_SUITE = make_test_suite()
+    def test_set(self):
+        from invenio.config import CFG_REDIS_HOSTS
+        self.db.set('hello_test', 'a')
+        if CFG_REDIS_HOSTS:
+            self.assertEqual(self.db.get('hello_test'), 'a')
+        else:
+            self.assertEqual(self.db.get('hello_test'), None)
+        self.db.delete('hello_test')
+
+    def test_expire(self):
+        self.db.set('hello', 'a', 1)
+        time.sleep(2)
+        self.assertEqual(self.db.get('hello'), None)
+
+
+TEST_SUITE = make_test_suite(RedisUtilsTest)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

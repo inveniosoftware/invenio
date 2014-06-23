@@ -2,7 +2,7 @@
 ## Comments and reviews for records.
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -175,6 +175,7 @@ class Template:
         Displays a page when bad or missing record ID was given.
         @param status:  'missing'   : no recID was given
                         'inexistant': recID doesn't have an entry in the database
+                        'deleted':  : recID has been deleted
                         'nan'       : recID is not a number
                         'invalid'   : recID is an error code, i.e. in the interval [-99,-1]
         @param return: body of the page
@@ -182,6 +183,8 @@ class Template:
         _ = gettext_set_language(ln)
         if status == 'inexistant':
             body = _("Sorry, the record %(x_rec)s does not seem to exist.", x_rec=(recID,))
+        elif status in ('deleted'):
+            body = _("The record has been deleted.")
         elif status in ('nan', 'invalid'):
             body = _("Sorry, %(x_rec)s is not a valid ID value.", x_rec=(recID,))
         else:
@@ -2333,6 +2336,8 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        from invenio.search_engine import record_exists
+
         your_comments_order_by_options = (('ocf', _("Oldest comment first")),
                                           ('lcf', _("Latest comment first")),
                                           ('grof', _("Group by record, oldest commented first")),
@@ -2434,14 +2439,17 @@ class Template:
                     # Close previous group
                     out += "</div></div>"
                     nb_record_groups += 1
-                #You might want to hide this information if user does
-                #not have access, though it would make sense that he
-                #can at least know on which page is comment appears..
+                # You might want to hide this information if user does
+                # not have access, though it would make sense that he
+                # can at least know on which page his comment appears..
+                if record_exists(id_bibrec) == -1:
+                    record_info_html = '<em>%s</em>' % _("The record has been deleted.")
+                else:
+                    record_info_html = format_record(id_bibrec, of="HS")
                 out += '''<div class="yourcommentsrecordgroup" id="yourcomments-record-group-%(recid)s">
                 <div class="yourcommentsrecordgroup%(recid)sheader">&#149; ''' % {'recid': id_bibrec} + \
-                       format_record(id_bibrec, of="HS") + '</div><div style="padding-left: 20px;">'
+                       record_info_html + '</div><div style="padding-left: 20px;">'
             if selected_display_format_option != 'ro':
-
                 final_body = email_quoted_txt2html(body)
                 title = '<a name="C%s" id="C%s"></a>' % (comid, comid)
                 if status == "dm":

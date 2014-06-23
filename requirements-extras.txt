@@ -21,3 +21,4 @@ apiclient
 urllib3
 python-onedrive
 python-openid
+raven==4.2.1

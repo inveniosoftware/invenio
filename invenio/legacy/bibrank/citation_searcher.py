@@ -21,12 +21,13 @@ __revision__ = "$Id$"
 
 import re
 
-from operator import itemgetter
-from six import iteritems
-
 from invenio.legacy.dbquery import run_sql
 from intbitset import intbitset
 from invenio.legacy.miscutil.data_cacher import DataCacher
+from invenio.utils.redis import get_redis
+from invenio.legacy.dbquery import deserialize_via_marshal
+from operator import itemgetter
+from six import iteritems
 
 
 class CitationDictsDataCacher(DataCacher):
@@ -35,10 +36,16 @@ class CitationDictsDataCacher(DataCacher):
     reversedict, selfcitdict, selfcitedbydict).
     """
     def __init__(self):
-        def initial_fill():
+
+        def fill():
             alldicts = {}
             from invenio.legacy.bibrank.tag_based_indexer import fromDB
-            weights = fromDB('citation')
+            redis = get_redis()
+            serialized_weights = redis.get('citations_weights')
+            if serialized_weights:
+                weights = deserialize_via_marshal(serialized_weights)
+            else:
+                weights = fromDB('citation')
 
             alldicts['citations_weights'] = weights
             # for cited:M->N queries, it is interesting to cache also
@@ -50,7 +57,11 @@ class CitationDictsDataCacher(DataCacher):
             alldicts['citations_counts'].sort(key=itemgetter(1), reverse=True)
 
             # Self-cites
-            selfcites = fromDB('selfcites')
+            serialized_weights = redis.get('selfcites_weights')
+            if serialized_weights:
+                selfcites = deserialize_via_marshal(serialized_weights)
+            else:
+                selfcites = fromDB('selfcites')
             selfcites_weights = {}
             for recid, counts in alldicts['citations_counts']:
                 selfcites_weights[recid] = counts - selfcites.get(recid, 0)
@@ -60,16 +71,10 @@ class CitationDictsDataCacher(DataCacher):
 
             return alldicts
 
-        def incremental_fill():
-            self.cache = None
-            return initial_fill()
-
         def cache_filler():
-            if self.cache:
-                cache = incremental_fill()
-            else:
-                cache = initial_fill()
-            return cache
+            self.cache = None  # misfire from pylint: disable=W0201
+                               # this is really defined in DataCacher
+            return fill()
 
         from invenio.bibrank_tag_based_indexer import get_lastupdated
 

@@ -42,6 +42,8 @@ import ConfigParser
 import time
 from datetime import datetime
 
+from invenio.utils.redis import get_redis
+from invenio.legacy.dbquery import serialize_via_marshal
 from intbitset import intbitset
 from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
                            CFG_ETCDIR
@@ -230,7 +232,7 @@ def process_updates(rank_method_code):
     recids, end_date = fetch_concerned_records(rank_method_code,
                                                task_get_option("id"))
     citations_fun = get_citations_fun(config['algorithm'])
-    selfcites_dic = fromDB(rank_method_code)
+    weights = fromDB(rank_method_code)
 
     write_message("recids %s" % str(recids))
 
@@ -241,9 +243,10 @@ def process_updates(rank_method_code):
         task_update_progress(msg)
         write_message(msg)
 
-        process_one(recid, tags, citations_fun, selfcites_dic)
+        process_one(recid, tags, citations_fun, weights)
 
-    intoDB(selfcites_dic, end_date, rank_method_code)
+    intoDB(weights, end_date, rank_method_code)
+    store_weights_cache(weights)
 
     write_message("Complete")
     return True
@@ -322,3 +325,10 @@ def fill_self_cites_tables(rank_method_code, config):
                                          citations_fun,
                                          selfcites_dic)
     intoDB(selfcites_dic, begin_date, rank_method_code)
+    store_weights_cache(selfcites_dic)
+
+
+def store_weights_cache(weights):
+    """Store into key/value store"""
+    redis = get_redis()
+    redis.set('selfcites_weights', serialize_via_marshal(weights))

@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,26 +16,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from invenio.bibindex_tokenizers.BibIndexFilteringTokenizer import BibIndexFilteringTokenizer
 
-"""Unit tests for the search engine."""
 
-__revision__ = \
-    "$Id$"
+class BibIndexDOITokenizer(BibIndexFilteringTokenizer):
+    """
+        Filtering tokenizer which tokenizes DOI tag (0247_a)
+        only if "0247_2" tag is present and its value equals "DOI"
+        and 909C4a tag without any constraints.
+    """
 
-from itertools import chain
 
-from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
-from invenio.bibauthorid_cluster_set import ClusterSet
+    def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
+        self.rules = (('0247_a', '2', 'DOI'), ('909C4a', '', ''))
 
-class TestDummy(InvenioTestCase):
 
-    def setUp(self):
-        pass
-
-    def test_one(self):
-        pass
-
-TEST_SUITE = make_test_suite(TestDummy)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE, warn_user=True)
+    def get_tokenizing_function(self, wordtable_type):
+        """Returns proper tokenizing function"""
+        return self.tokenize

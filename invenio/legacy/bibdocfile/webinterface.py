@@ -56,7 +56,7 @@ from invenio.legacy.bibdocfile.api import BibRecDocs, normalize_format, file_str
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
 from invenio.ext.logging import register_exception
-from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 webstyle_templates = invenio.legacy.template.load('webstyle')
@@ -251,15 +251,20 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             link_ln = ''
             if ln != CFG_SITE_LANG:
                 link_ln = '?ln=%s' % ln
-            tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
+            tabs = [(unordered_tabs[tab_id]['label'],
+                     '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln),
                      tab_id == 'files',
-                     unordered_tabs[tab_id]['enabled']) \
+                     unordered_tabs[tab_id]['enabled'])
                     for (tab_id, dummy_order) in ordered_tabs_id
-                    if unordered_tabs[tab_id]['visible'] == True]
+                    if unordered_tabs[tab_id]['visible'] is True]
+
+            tabs_counts = get_detailed_page_tabs_counts(self.recid)
             top = webstyle_templates.detailed_record_container_top(self.recid,
                                                                    tabs,
-                                                                   args['ln'])
+                                                                   args['ln'],
+                                                                   citationnum=tabs_counts['Citations'],
+                                                                   referencenum=tabs_counts['References'],
+                                                                   discussionnum=tabs_counts['Discussions'])
             bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
                                                                          tabs,
                                                                          args['ln'])

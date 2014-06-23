@@ -225,7 +225,7 @@ install-jquery-plugins:
 	rm uploadify.zip && rm -r uploadify && \
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
 	wget http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js -O jquery.hotkeys.js && \
-	wget http://jquery.bassistance.de/treeview/jquery.treeview.zip && \
+	wget http://invenio-software.org/download/jquery/jquery.treeview.zip && \
 	unzip jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
 	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
@@ -233,10 +233,10 @@ install-jquery-plugins:
 	rm -f jquery.bookmark.ext.* bookmarks-big.png bookmarkBasic.html jquery.bookmark.js jquery.bookmark.pack.js && \
 	mv bookmarks.png ../img/ && \
 	mv jquery.bookmark.css ../css/ && \
-	wget --no-check-certificate https://raw.github.com/0x000000/OmniWindow/master/jquery.omniwindow.js && \
-	wget --no-check-certificate http://malsup.github.com/jquery.blockUI.js && \
-	wget --no-check-certificate https://github.com/Darsain/sly/raw/master/dist/sly.min.js &&\
-	wget --no-check-certificate https://raw.github.com/guillaumepotier/Parsley.js/master/parsley.js &&\
+	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.omniwindow.js && \
+	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.blockUI.js && \
+	wget --no-check-certificate http://invenio-software.org/download/jquery/sly.min.js &&\
+	wget --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
 	wget --no-check-certificate http://invenio-software.org/download/jquery/spin.min.js &&\
 	rm -f jquery.bookmark.package-1.4.0.zip && \
 	mkdir -p ${prefix}/var/www/img && \
@@ -590,7 +590,10 @@ update-v0.99.6-tables:
 update-v0.99.7-tables:
 	@echo "Nothing to do; table structure did not change between v0.99.7 and v0.99.8."
 
-update-v0.99.8-tables: # from v0.99.8 to v1.0.0-rc0
+update-v0.99.8-tables:
+	@echo "Nothing to do; table structure did not change between v0.99.8 and v0.99.9."
+
+update-v0.99.9-tables: # from v0.99.9 to v1.0.0-rc0
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
 	cat $(top_srcdir)/invenio/legacy/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
 	echo "INSERT INTO knwKB (id,name,description,kbtype) SELECT id,name,description,'' FROM fmtKNOWLEDGEBASES;" | ${prefix}/bin/dbexec
