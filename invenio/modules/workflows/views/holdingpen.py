@@ -235,8 +235,8 @@ def load_table():
         action_message = bwo.get_action_message()
         if not action_message:
             action_message = ""
-        action = actions.get(action_name, None)
 
+        action = actions.get(action_name, None)
         records_showing += 1
 
         mini_action = getattr(action, "mini_action", None)
@@ -763,9 +763,18 @@ def get_title(record):
 
 def get_identifiers(record):
     """Get record identifiers."""
-    #FIXME: after solving the bibfield problem use the oaiidentifier
-    if hasattr(record, "get"):
-        return [record.get("system_control_number", {}).get("value", 'No ids')]
-    else:
-        return ' No ids'
+
+    from invenio.modules.records.api import Record
+
+    try:
+        identifiers = Record(record.dumps()).persistent_identifiers
+        final_identifiers = []
+        for i in identifiers:
+            final_identifiers.append(i['value'])
+        return final_identifiers
+    except Exception as e :
+        if hasattr(record, "get"):
+            return [record.get("system_number_external", {}).get("value", 'No ids')]
+        else:
+            return [' No ids']
 
