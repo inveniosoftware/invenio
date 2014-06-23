@@ -133,7 +133,8 @@ class InvenioConnector(object):
     Creates an connector to a server running Invenio
     """
 
-    def __init__(self, url=None, user="", password="", login_method="Local", local_import_path="invenio"):
+    def __init__(self, url=None, user="", password="", login_method="Local",
+                 local_import_path="invenio", insecure_login=False):
         """
         Initialize a new instance of the server at given URL.
 
@@ -178,7 +179,7 @@ class InvenioConnector(object):
         self.login_method = login_method
         self.browser = None
         if self.user:
-            if not self.server_url.startswith('https://'):
+            if not insecure_login and not self.server_url.startswith('https://'):
                 raise InvenioConnectorAuthError("You have to use a secure URL (HTTPS) to login")
             if MECHANIZE_AVAILABLE:
                 self._init_browser()

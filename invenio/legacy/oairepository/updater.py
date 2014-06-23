@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,7 +44,7 @@ from invenio.config import \
      CFG_OAI_SET_FIELD, \
      CFG_OAI_PREVIOUS_SET_FIELD, \
      CFG_SITE_NAME, \
-     CFG_TMPDIR
+     CFG_TMPSHAREDDIR
 from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_MARCXML_SIZE, \
      CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 from invenio.legacy.search_engine import perform_request_search, get_record, search_unit_in_bibxxx
@@ -343,7 +343,7 @@ def oairepositoryupdater_task():
         return True
 
     # Prepare to save results in a tmp file
-    (fd, filename) = mkstemp(dir=CFG_TMPDIR,
+    (fd, filename) = mkstemp(dir=CFG_TMPSHAREDDIR,
                                   prefix='oairepository_' + \
                                   time.strftime("%Y%m%d_%H%M%S_",
                                                 time.localtime()))
@@ -421,7 +421,7 @@ def oairepositoryupdater_task():
                 else:
                     task_low_level_submission('bibupload', 'oairepository', '-c', filename)
             # Prepare to save results in a tmp file
-            (fd, filename) = mkstemp(dir=CFG_TMPDIR,
+            (fd, filename) = mkstemp(dir=CFG_TMPSHAREDDIR,
                                         prefix='oairepository_' + \
                                         time.strftime("%Y%m%d_%H%M%S_",
                                                         time.localtime()))

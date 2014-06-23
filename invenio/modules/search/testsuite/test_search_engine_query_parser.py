@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2008, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -836,38 +836,43 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
             inv_search = 'year:1978-10-21->9999'
             self._compare_searches(inv_search, spi_search)
 
+    def test_date_before_1900(self):
+        """SPIRES search syntax - searching by date 1976-04"""
+        spi_search = "find date 1895-04"
+        inv_search = 'year:1895-04'
+        self._compare_searches(inv_search, spi_search)
+
     if DATEUTIL_AVAILABLE:
         def test_date_2_digits_year_month_day(self):
             """SPIRES search syntax - searching by date > 78-10-21"""
-            if cfg['CFG_WEBSEARCH_SPIRES_SYNTAX'] > 0:
-                spi_search = "find date 78-10-21"
-                inv_search = 'year:1978-10-21'
-                self._compare_searches(inv_search, spi_search)
+            spi_search = "find date 78-10-21"
+            inv_search = 'year:1978-10-21'
+            self._compare_searches(inv_search, spi_search)
 
-        def test_date_2_digits_year(self):
-            """SPIRES search syntax - searching by date 78"""
-            if cfg['CFG_WEBSEARCH_SPIRES_SYNTAX'] > 0:
-                spi_search = "find date 78"
-                inv_search = 'year:1978'
-                self._compare_searches(inv_search, spi_search)
+    def test_date_2_digits_year(self):
+        """SPIRES search syntax - searching by date 78"""
+        if cfg['CFG_WEBSEARCH_SPIRES_SYNTAX'] > 0:
+            spi_search = "find date 78"
+            inv_search = 'year:1978'
+            self._compare_searches(inv_search, spi_search)
 
-        def test_date_2_digits_year_future(self):
-            """SPIRES search syntax - searching by date 2 years in the future"""
-            if cfg['CFG_WEBSEARCH_SPIRES_SYNTAX'] > 0:
-                d = datetime.datetime.today() + datetime.timedelta(days=730)
-                spi_search = "find date %s" % d.strftime("%y")
-                inv_search = 'year:%s' % d.strftime("%Y")
-                self._compare_searches(inv_search, spi_search)
+    def test_date_2_digits_year_future(self):
+        """SPIRES search syntax - searching by date 2 years in the future"""
+        if cfg['CFG_WEBSEARCH_SPIRES_SYNTAX'] > 0:
+            d = datetime.datetime.today() + datetime.timedelta(days=730)
+            spi_search = "find date %s" % d.strftime("%y")
+            inv_search = 'year:%s' % d.strftime("%Y")
+            self._compare_searches(inv_search, spi_search)
 
-        def test_date_2_digits_month_year(self):
-            """SPIRES search syntax - searching by date feb 12"""
-            if cfg['CFG_WEBSEARCH_SPIRES_SYNTAX'] > 0:
-                # This should give us "feb 12" with us locale
-                d = datetime.datetime(year=2012, month=2, day=1)
-                date_str = d.strftime('%b %y')
-                spi_search = "find date %s" % date_str
-                inv_search = 'year:2012-02'
-                self._compare_searches(inv_search, spi_search)
+    def test_date_2_digits_month_year(self):
+        """SPIRES search syntax - searching by date feb 12"""
+        if cfg['CFG_WEBSEARCH_SPIRES_SYNTAX'] > 0:
+            # This should give us "feb 12" with us locale
+            d = datetime.datetime(year=2012, month=2, day=1)
+            date_str = d.strftime('%b %y')
+            spi_search = "find date %s" % date_str
+            inv_search = 'year:2012-02'
+            self._compare_searches(inv_search, spi_search)
 
     def test_spires_syntax_trailing_colon(self):
         """SPIRES search syntax - test for blowup with trailing colon"""
@@ -884,12 +889,17 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
                 inv_search = 'year:0->2010-09-23'
                 self._compare_searches(inv_search, spi_search)
 
+        def test_date_before_1900(self):
+            """SPIRES search syntax - searching by date < 23 Sep 1889: will only work with dateutil installed"""
+            spi_search = "find date < 23 Sep 1889"
+            inv_search = 'year:0->1889-09-23'
+            self._compare_searches(inv_search, spi_search)
+
         def test_date_by_gt_d_MO_yr(self):
             """SPIRES search syntax - searching by date > 12 Jun 1960: will only work with dateutil installed"""
-            if cfg['CFG_WEBSEARCH_SPIRES_SYNTAX'] > 0:
-                spi_search = "find date > 12 Jun 1960"
-                inv_search = 'year:1960-06-12->9999'
-                self._compare_searches(inv_search, spi_search)
+            spi_search = "find date > 12 Jun 1960"
+            inv_search = 'year:1960-06-12->9999'
+            self._compare_searches(inv_search, spi_search)
 
         def test_date_accept_today(self):
             """SPIRES search syntax - searching by today"""

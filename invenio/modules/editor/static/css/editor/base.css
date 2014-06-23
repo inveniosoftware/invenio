@@ -26,6 +26,10 @@
 
 /* BibEdit - new interface */
 
+#btnSubmit:not([disabled]) {
+    background: green !important;
+}
+
 .bibEditBtnBold {
   font-weight: bold
 }
@@ -225,15 +229,67 @@
     padding-left: 0;
 }
 
+#bibeditHoldingPenGC {
+    border-top: 1px solid;
+    border-color: #575757;
+    margin: 5px 0px 0px;
+    padding: 5px 0px 0px 0px;
+    background-color: white;
+}
+
+#bibeditHoldingPenGC button {
+    margin-right: 10px;
+}
+
+#bibEditHoldingPenAddedFields {
+    display: block;
+    background-color: rgb(235, 235, 235);
+    border: 1px solid;
+    border-color: #575757;
+    margin: 10px 0px 20px 0px;
+    padding: 5px 0px 5px 5px;
+}
+
+#bibEditHoldingPenAddedFieldsLabel {
+    font-size: 12px;
+    padding-left: 5px;
+}
+
 .bibeditHPCorrection{
     border-width: 1px;
     background-color: #FAEBD7;
-    font-size: smaller;
+    color: #000;
+    font-size: small;
     border-style: groove;
     display: inline-block;
     border-color: RosyBrown;
     margin:5px 3px 3px 5px;
     padding: 2px;
+}
+
+.bibeditHPCorrection span {
+  display: inline-block;
+}
+
+.HPCorrectionButtonWrapper {
+  display: inline-block;
+  margin: 5px 7px 5px 0px;
+}
+
+.bibeditHPSame {
+    border-width: 0px;
+    background-color: inherit;
+    color: green;
+    font-size: smaller;
+    border-style: groove;
+    display: inline-block;
+    border-color: RosyBrown;
+    margin: 0px 3px 3px 5px;
+    padding: 2px;
+}
+
+.bibeditHPSame span {
+  padding-left: 5px;
 }
 
 #bibeditHPChanges{
@@ -258,7 +314,7 @@
 
 .bibeditHPContentPreviewBox {
     position: absolute;
-    z-index:0;
+    z-index:1;
     border-style: dotted;
     border-width: 1px;
     background-color: #fefeff;
@@ -266,6 +322,10 @@
     height: 500px;
     overflow: auto;
     width: 500px;
+}
+
+#bibEditTable .bibeditHPFieldPreview {
+  font-size:1.2em;
 }
 
 .bibeditHPControl{
@@ -529,7 +589,13 @@ div.refextracted {
 
 #bibEditMenu .bibEditMenuSectionHeader {
     font-weight: bold;
+    cursor: pointer;
 }
+
+/*#bibEditTableWrapper {
+  overflow: auto;
+  height: 750px;
+}*/
 
 #bibEditTable {
     background-color: rgb(255, 255, 255);
@@ -708,4 +774,236 @@ label {
   border-radius: 4px;
   background-color: rgba(0,0,0,.5);
   -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
+/* The div containing the tickets
+*/
+
+.bibEditTicketsMenuSection table {
+    max-height: 250px;
+    overflow-y: auto;
+    display: block;
+}
+
+.ticket {
+    position: relative;
+    background-color: #D6D6D6;
+    border-bottom: 1px solid #C7C7C7;
+    min-height: 42px;
+}
+
+.ticketDetails {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 0.85em;
+}
+
+.ticketDetails a {
+    font-weight: bold;
+    font-size: 0.95em!important;
+}
+
+.ticketButtons {
+    display: block;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    padding-left: 13px;
+}
+
+.ticketButtons img {
+    width: 18px;
+    padding-left: 5px;
+}
+
+.ticketButtons a:hover{
+    background-color: inherit;
+}
+
+.ticket span {
+    word-break:break-all;
+}
+
+#newTicketLink {
+    font-weight: bold;
+    position: relative;
+    top: 6px;
+}
+
+.openTicketLink {
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 3px;
+}
+
+/* Tooltip style box containing the content of a ticket
+*/
+#bibEditMenu .bibeditTicketPreviewBox {
+    background-color: rgb(238, 238, 238);
+    border-width: 4px 3px 0px 3px;
+    border-style: solid;
+    border-color: rgb(143, 143, 143);
+    padding: 10px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    box-shadow: rgba(0, 0, 2, 2.2) 3px 5px 10px;
+    position: fixed;
+    width: 400px;
+    min-height: 296px;
+    max-height: 500px;
+    display: none;
+    left: 196px;
+    top: 205px;
+    content: '';
+    overflow: auto;
+    overflow-wrap: break-word;
+    font-size: 1em;
+}
+
+#bibEditMenu .bibeditTicketPreviewBox > h2 {
+    font-size: 1.3em;
+    color: #5B74A8;
+}
+
+#bibEditMenu .bibeditTicketPreviewBox > hr {
+    border: 0;
+    height: 1px;
+    color: blue;
+    background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+}
+
+#bibEditMenu .closePreviewBox {
+    position: absolute;
+    top:10px;
+    right: 15px;
+    font-weight: 700;
+    font-size: 1em !important;
+}
+
+#bibEditMenu .closePreviewBox:hover {
+    color: inherit;
+}
+
+.bibEditRTTicketLink {
+    display: table-cell;
+    border-style: none;
+}
+
+.bibEditPreviewTicketLink {
+    display: table-cell;
+    border-style: none;
+}
+
+.bibEditPreviewTicketLinkImg {
+    border-width: 0px;
+    border-style: none;
+}
+
+.bibEditCloseTicketLink {
+    display: table-cell;
+    border-style: none;
+}
+
+.bibEditCloseTicketLinkImg {
+    border-width: 0px;
+    border-style: none;
+}
+
+.ticketResolved {
+    color: green;
+}
+
+.ticketErrorMsg {
+    color: red;
+}
+
+#loadingTickets {
+    display: none;
+}
+
+#loadingTickets span {
+    position: relative;
+    top: -4px;
+    font-size: 0.9em;
+    color: #5B74A8;
+}
+
+#rtError {
+    font-size: 0.8em;
+    margin-left: 3px;
+    position: relative;
+    background-color: #D6D6D6;
+    border-bottom: 1px solid #C7C7C7;
+    min-height: 34px;
+    padding: 4px 0px 0px 9px;
+}
+
+#retryRtConnection {
+    position: absolute;
+    bottom: 3px;
+    font-weight: bold;
+
+}
+
+#queueError {
+    color: red;
+    font-size: 0.89em;
+}
+
+#previewBoxTriangle {
+    position: fixed;
+    left: 183px;
+    top: 189px;
+    border-color: transparent transparent rgb(143, 143, 143)transparent;
+    border-style: solid;
+    border-width: 16px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    transform: rotate(45deg);
+    width: 0px;
+}
+
+.ajaxLoader {
+    display: none;
+    color: #5B74A8;
+    position: absolute;
+    top: 6px;
+    left: 1px;
+}
+
+.ajaxLoader img {
+    position:relative;
+}
+
+.ajaxLoader span {
+    position: relative;
+    top: 1px!important;
+    font-size: 0.9em;
+}
+
+#queue {
+    position: relative;
+    top: -10px;
+    left: 61px;
+    display: block;
+    width: 70px!important;
+}
+
+.help-text {
+  color: grey;
+  font-size: small;
+  font-style: italic;
+}
+
+.affiliation-guess {
+    background-color: rgb(226, 226, 97);
+    background-image: url('warning.png');
+    background-repeat: no-repeat;
+    background-position: 570px;
 }

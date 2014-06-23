@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2012 CERN.
+ * Copyright (C) 2012, 2013 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -119,11 +119,28 @@ function onFormSubmitClick() {
     }
 }
 
+function onFileTypeChange(event) {
+    if ( $(event.target).val() === 'textmarc' ) {
+        var $select_first_value = $('select[name="mode"]').children().eq(0);
+        if ( $select_first_value.val() === "--insert" ) {
+            $select_first_value.remove();
+        }
+    }
+    else {
+        var $select_first_value = $('select[name="mode"]').children().eq(0);
+        if ( $select_first_value.val() !== "--insert" ) {
+            var insert_option = $("<option>--insert</option>");
+            $select_first_value.parent().prepend(insert_option);
+        }
+    }
+}
+
 function createBindings() {
     /*
      * Bind UI elements to functions
      */
     $('.adminbutton').bind('click', onFormSubmitClick);
+    $('select[name="filetype"]').on("change", onFileTypeChange)
 }
 
 /*

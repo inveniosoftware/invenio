@@ -79,6 +79,7 @@ def setup_app(app):
     return app
 
 
+
 def scheduled_send_email(fromaddr,
                          toaddr,
                          subject="",
@@ -90,7 +91,9 @@ def scheduled_send_email(fromaddr,
                          attempt_sleeptime=10,
                          user=None,
                          other_bibtasklet_arguments=None,
-                         replytoaddr=""):
+                         replytoaddr="",
+                         bccaddr="",
+                        ):
     """
     Like send_email, but send an email via the bibsched
     infrastructure.
@@ -112,6 +115,8 @@ def scheduled_send_email(fromaddr,
     @param replytoaddr: [string or list-of-strings] to be used for the
                         reply-to header of the email (if string, then
                         receivers are separated by ',')
+    @param bccaddr: [string or list-of-strings] to be used for BCC header of the email
+                    (if string, then receivers are separated by ',')
     @return: the scheduled bibtasklet
     """
     from invenio.legacy.bibsched.bibtask import task_low_level_submission
@@ -142,6 +147,7 @@ def scheduled_send_email(fromaddr,
         "-a", "copy_to_admin=%s" % copy_to_admin,
         "-a", "attempt_times=%s" % attempt_times,
         "-a", "attempt_sleeptime=%s" % attempt_sleeptime,
+        "-a", "bccaddr=%s" % bccaddr,
         *other_bibtasklet_arguments)
 
 
@@ -162,13 +168,15 @@ def send_email(fromaddr,
                ln=None,
                charset=None,
                replytoaddr="",
-               attachments=None
+               attachments=None,
+               bccaddr="",
                ):
     """Send a forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
     @param fromaddr: [string] sender
     @param toaddr: [string or list-of-strings] list of receivers (if string, then
-                   receivers are separated by ',')
+                   receivers are separated by ','). BEWARE: If more than once receiptiant is given,
+                   the receivers are put in BCC and To will be "Undisclosed.Recipients:".
     @param subject: [string] subject of the email
     @param content: [string] content of the email
     @param html_content: [string] html version of the email
@@ -189,6 +197,8 @@ def send_email(fromaddr,
                         receivers are separated by ',')
     @param attachments: list of paths of files to be attached. Alternatively,
         every element of the list could be a tuple: (filename, mimetype)
+    @param bccaddr: [string or list-of-strings] to be used for BCC header of the email
+                    (if string, then receivers are separated by ',')
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
@@ -206,18 +216,22 @@ def send_email(fromaddr,
 
     if type(toaddr) is not list:
         toaddr = toaddr.strip().split(',')
-
     toaddr = remove_temporary_emails(toaddr)
 
-    usebcc = len(toaddr.split(',')) > 1  # More than one address, let's use Bcc in place of To
+    usebcc = len(toaddr) > 1  # More than one address, let's use Bcc in place of To
 
     if copy_to_admin:
         if cfg['CFG_SITE_ADMIN_EMAIL'] not in toaddr:
             toaddr.append(cfg['CFG_SITE_ADMIN_EMAIL'])
 
+    if type(bccaddr) is not list:
+        bccaddr = bccaddr.strip().split(',')
+
+
     body = forge_email(fromaddr, toaddr, subject, content, html_content,
                        html_images, usebcc, header, footer, html_header,
-                       html_footer, ln, charset, replytoaddr, attachments)
+                       html_footer, ln, charset, replytoaddr, attachments,
+                       bccaddr)
 
     if attempt_times < 1 or not toaddr:
         try:
@@ -270,7 +284,7 @@ def attach_embed_image(email, image_id, image_path):
 def forge_email(fromaddr, toaddr, subject, content, html_content='',
                 html_images=None, usebcc=False, header=None, footer=None,
                 html_header=None, html_footer=None, ln=None,
-                charset=None, replytoaddr="", attachments=None):
+                charset=None, replytoaddr="", attachments=None, bccaddr=""):
     """Prepare email. Add header and footer if needed.
     @param fromaddr: [string] sender
     @param toaddr: [string or list-of-strings] list of receivers (if string, then
@@ -290,6 +304,8 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
                         receivers are separated by ',')
     @param attachments: list of paths of files to be attached. Alternatively,
         every element of the list could be a tuple: (filename, mimetype)
+    @param bccaddr: [string or list-of-strings] to be used for BCC header of the email
+                    (if string, then receivers are separated by ',')
     @return: forged email as a string"""
     ln = default_ln(ln)
     if html_images is None:
@@ -315,8 +331,8 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     if replytoaddr:
         headers['Reply-To'] = replytoaddr
     if usebcc:
-        headers['Bcc'] = toaddr
-        kwargs['bcc'] = toaddr.split(',')
+        headers['Bcc'] = bccaddr
+        kwargs['bcc'] = bccaddr.split(',')
         kwargs['to'] = ['Undisclosed.Recipients:']
     else:
         kwargs['to'] = toaddr.split(',')
@@ -409,30 +425,29 @@ def remove_temporary_emails(emails):
     address) from an email list.
 
     @param emails: email list (if string, then receivers are separated by ',')
-    @type emails: str|[str]
+    @type emails: [str]|str
 
-    @rtype: str
+    @rtype: list|str
     """
     from invenio.modules.access.local_config import CFG_TEMP_EMAIL_ADDRESS
-    if not isinstance(emails, (str, unicode)):
-        emails = ','.join(emails)
+    _RE_TEMPORARY_EMAIL = re.compile(CFG_TEMP_EMAIL_ADDRESS % r'.+?', re.I)
 
-    # Remove all of the spaces
-    emails = emails.replace(' ', '')
+    if type(emails) in (str, unicode):
+        emails = [email.strip() for email in emails.split(',') if email.strip()]
+        emails = [email for email in emails if not _RE_TEMPORARY_EMAIL.match(email)]
+        return ','.join(emails)
+    else:
+        return [email for email in emails if not _RE_TEMPORARY_EMAIL.match(email)]
 
-    # Remove all of the emails formatted like CFG_TEMP_EMAIL_ADDRESS
-    emails = re.sub((CFG_TEMP_EMAIL_ADDRESS % '\w+') + '(,|$)', '', emails,
-                                                                re.IGNORECASE)
-
-    # Remove all consecutive commas
-    emails = re.sub(',+', ',', emails)
-
-    if emails[0] == ',':
-        # Remove the comma at the beginning of the string
-        emails = emails[1:]
-
-    if emails[-1] == ',':
-        # Remove the comma at the end of the string
-        emails = emails[:-1]
-
-    return emails
+def get_mail_header(value):
+    """
+    Return a MIME-compliant header-string. Will join lists of strings
+    into one string with comma (,) as separator.
+    """
+    if type(value) is not str:
+        value = ','.join(value)
+    try:
+        value = value.encode('ascii')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        value = Header(value, 'utf-8')
+    return value

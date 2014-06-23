@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,6 +20,7 @@
 """Invenio BibMerge Engine."""
 
 import os
+import random
 
 from invenio.legacy.bibmerge.merger import merge_field_group, replace_field, \
                                     add_field, delete_field, merge_field, \
@@ -29,10 +30,10 @@ from invenio.legacy.search_engine import print_record, perform_request_search, \
         record_exists
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.bibedit.utils import cache_exists, cache_expired, \
-    create_cache_file, delete_cache_file, get_cache_file_contents, \
+    create_cache, delete_cache, get_cache_contents, \
     get_cache_mtime, latest_record_revision, record_locked_by_other_user, \
-    record_locked_by_queue, save_xml_record, touch_cache_file, \
-    update_cache_file_contents, _get_file_path, \
+    record_locked_by_queue, save_xml_record, touch_cache, \
+    update_cache_contents, _get_file_path, \
     get_record_revision_ids, revision_format_valid_p, split_revid, \
     get_marcxml_of_revision_id
 from invenio.utils.html import remove_html_markup
@@ -147,30 +148,41 @@ def perform_request_record(requestType, uid, data):
             record_add_field(record2, '980', ' ', ' ', '', [('c', 'DELETED')])
             # mark record2 as duplicate of record1
             record_add_field(record2, '970', ' ', ' ', '', [('d', str(recid1))])
+            # add recid of deleted record to master record
+            record_add_field(record1, '981', ' ', ' ', '', [('a', str(recid2))])
+
+            # To ensure updates happen in order, use a seq id
+            sequence_id = str(random.randrange(1, 4294967296))
 
             # submit record2 to be deleted
             xml_record2 = record_xml_output(record2)
-            save_xml_record(recid2, uid, xml_record2)
+            save_xml_record(recid2, uid, xml_record2, task_name="bibmerge",
+                            sequence_id=sequence_id)
 
-            #submit record1
+            # submit record1
             xml_record1 = record_xml_output(record1)
-            save_xml_record(recid1, uid, xml_record1)
+            save_xml_record(recid1, uid, xml_record1, task_name="bibmerge",
+                            sequence_id=sequence_id)
+
+            # Delete cache file if it exists
+            if cache_exists(recid1, uid):
+                delete_cache(recid1, uid)
 
             result['resultText'] = 'Records submitted'
             return result
 
         #submit record1 from cache
-        save_xml_record(recid1, uid)
+        save_xml_record(recid1, uid, task_name="bibmerge")
 
         # Delete cache file if it exists
         if cache_exists(recid1, uid):
-            delete_cache_file(recid1, uid)
+            delete_cache(recid1, uid)
 
         result['resultText'] = 'Record submitted'
         return result
 
     elif requestType == 'cancel':
-        delete_cache_file(recid1, uid)
+        delete_cache(recid1, uid)
         result['resultText'] = 'Cancelled'
         return result
 
@@ -214,7 +226,7 @@ def perform_request_update_record(requestType, uid, data):
         }
     recid1 = data["recID1"]
     recid2 = data["recID2"]
-    record_content = get_cache_file_contents(recid1, uid)
+    record_content = get_cache_contents(recid1, uid)
     cache_dirty = record_content[0]
     rec_revision = record_content[1]
     record1 = record_content[2]
@@ -286,7 +298,7 @@ def perform_request_update_record(requestType, uid, data):
 
     result['resultHtml'] = bibmerge_templates.BM_html_field_group(record1, record2, data['fieldTag'])
     result['resultText'] = resultText
-    update_cache_file_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes, undo_list, redo_list)
+    update_cache_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes, undo_list, redo_list)
     return result
 
 def perform_small_request_update_record(requestType, uid, data):
@@ -300,7 +312,7 @@ def perform_small_request_update_record(requestType, uid, data):
         }
     recid1 = data["recID1"]
     recid2 = data["recID2"]
-    cache_content = get_cache_file_contents(recid1, uid) #TODO: check mtime, existence
+    cache_content = get_cache_contents(recid1, uid) #TODO: check mtime, existence
     cache_dirty = cache_content[0]
     rec_revision = cache_content[1]
     record1 = cache_content[2]
@@ -331,7 +343,7 @@ def perform_small_request_update_record(requestType, uid, data):
         result['resultHtml'] = bibmerge_templates.BM_html_subfield_row_diffed(record1, record2, fnum, findex1, findex2, sfindex1, sfindex2)
         result['resultText'] = 'Subfields diffed'
 
-    update_cache_file_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes, [], [])
+    update_cache_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes, [], [])
     return result
 
 def _get_record(recid, uid, result, fresh_record=False):
@@ -355,20 +367,21 @@ def _get_record(recid, uid, result, fresh_record=False):
         result['resultCode'], result['resultText'] = 1, 'Record %s locked by queue' % recid
     else:
         if fresh_record:
-            delete_cache_file(recid, uid)
+            delete_cache(recid, uid)
             existing_cache = False
         if not existing_cache:
-            record_revision, record = create_cache_file(recid, uid)
+            record_revision, record = create_cache(recid, uid)
             mtime = get_cache_mtime(recid, uid)
             cache_dirty = False
         else:
-            tmpRes = get_cache_file_contents(recid, uid)
+            tmpRes = get_cache_contents(recid, uid)
             cache_dirty, record_revision, record = tmpRes[0], tmpRes[1], tmpRes[2]
-            touch_cache_file(recid, uid)
+            touch_cache(recid, uid)
             mtime = get_cache_mtime(recid, uid)
             if not latest_record_revision(recid, record_revision):
                 result['cacheOutdated'] = True
         result['resultCode'], result['resultText'], result['cacheDirty'], result['cacheMTime'] = 0, 'Record OK', cache_dirty, mtime
+    record_order_subfields(record)
     return record
 
 def _get_record_slave(recid, result, mode=None, uid=None):
@@ -389,7 +402,6 @@ def _get_record_slave(recid, result, mode=None, uid=None):
             result['resultCode'], result['resultText'] = 1, 'Record %s locked by queue' % recid
         else:
             record = create_record( print_record(recid, 'xm') )[0]
-            record_order_subfields(record)
 
     elif mode == 'tmpfile':
         file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
@@ -416,6 +428,7 @@ def _get_record_slave(recid, result, mode=None, uid=None):
 
     else:
         result['resultCode'], result['resultText'] = 1, 'Invalid record mode for record2'
+    record_order_subfields(record)
     return record
 
 def _field_info(fieldIdCode):
@@ -437,4 +450,3 @@ def _fieldtagNum_and_indicators(fieldTag):
     if ind2 == '_':
         ind2 = ' '
     return (fnum, ind1, ind2)
-

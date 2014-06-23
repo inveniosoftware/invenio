@@ -71,6 +71,7 @@ function onHoldingPenPanelRecordIdChanged(recordId){
   /** function that should be called when the edited record identifier changed
   * the functionality consists of reloading the entries using the Ajax call
   */
+
   holdingPenPanelRemoveEntries();
   createReq({recID: recordId, requestType: 'getHoldingPenUpdates'}, holdingPenPanelSetChanges);
 }
@@ -96,9 +97,9 @@ function holdingPenPanelAddEntry(entry){
 
 function holdingPenPanelSetChanges(data){
   /** Setting the Holding Pen panel content.
-   * 	This function can be utilised as a Javascript callback
+   *	This function can be utilised as a Javascript callback
    *
-   * 	Parameter:
+   *	Parameter:
    *  data - The dictionary containing a 'changes' key under which, a list
    *         of changes is stored
    */
@@ -107,6 +108,7 @@ function holdingPenPanelSetChanges(data){
     for (var i = 0, n=data['changes'].length; i < n; i++) {
       holdingPenPanelAddEntry(data['changes'][i]);
     }
+    adjustHPChangesetsActivity();
   }
 }
 
@@ -130,7 +132,7 @@ function holdingPenPanelRemoveChangeSet(changesNum){
    */
 
   // removing the control
-  holdingPenPanelRemoveEntry(changesNum)
+  holdingPenPanelRemoveEntry(changesNum);
 
   // now removing the changeset from the database
   // This is an operation that can not be undoed !
@@ -142,10 +144,10 @@ function holdingPenPanelRemoveChangeSet(changesNum){
     requestType: "deleteHoldingPenChangeset",
     changesetNumber : changesNum,
     undoRedo : undoHandler
-  }
+  };
 
   createReq(data, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']])});
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);});
 }
 
 function holdingPenPanelRemoveEntries(){
@@ -203,12 +205,13 @@ function onToggleDetailsVisibility(changesetNumber){
     // showing the details -> the preview used to be closed
 
     if (gHoldingPenLoadedChanges[changesetNumber] == undefined) {
-      // start prealoading the data that will be fileld into the
+      // start prealoading the data that will be filled into the
       // preview box
       createReq({
         changesetNumber: changesetNumber,
-        requestType: 'getHoldingPenUpdateDetails'
-      }, onHoldingPenPreviewDataRetreived)
+        requestType: 'getHoldingPenUpdateDetails',
+        recID: gRecID
+      }, onHoldingPenPreviewDataRetreived);
     }
     else {
       // showing the preview based on the precached data
@@ -288,7 +291,7 @@ function prepareUndoVisualizeChangeset(changesetNumber, changesBefore){
 
   // now updating the interface
   for (tag in tagsToRedraw){
-    redrawFields(tag);
+    redrawFields(tag, true);
   }
   for (changeNo in addFieldChangesToRemove){
     removeAddFieldControl(changeNo);
@@ -355,7 +358,7 @@ function prepareVisualizeChangeset(changesetNumber, newChangesList, undoHandler)
   /** Makes the retrieved changeset visible in the main BibEdit editor
    *
    * Parameters:
-   * 	changesetNumber: the internal Holding Pen number of the changeset
+   *	changesetNumber: the internal Holding Pen number of the changeset
    *    newRecordData: the value of a record after changing
    *    undoHandler: the handler passed directly throught the AJAX call
    */
@@ -365,11 +368,26 @@ function prepareVisualizeChangeset(changesetNumber, newChangesList, undoHandler)
 
   $("#holdingPenPreview_" + changesetNumber).remove();
 
+  // add the added fiels div
+  if ( $('#bibEditHoldingPenAddedFields').length < 1 ) {
+      var addedFiedsDivHtml = "<div id=\"bibEditHoldingPenAddedFields\"><div id=\"bibEditHoldingPenAddedFieldsLabel\">" +
+      "<strong>Added fields in Holding Pen</div></strong></div>";
+      $("#bibEditContentTable").append(addedFiedsDivHtml);
+  }
+
+  var showAddedFields = false;
   // now producing the controls allowing to apply the change
   for (change in newChangesList) {
     changePos = gHoldingPenChanges.length;
     gHoldingPenChanges[changePos] = newChangesList[change];
+    if ( newChangesList[change]['change_type'] == "field_added" ) {
+      showAddedFields =true;
+    }
     addChangeControl(changePos);
+  }
+
+  if ( showAddedFields == false ) {
+    $('#bibEditHoldingPenAddedFields').remove();
   }
 
   gDisabledHpEntries[changesetNumber] = true;
@@ -420,10 +438,11 @@ function holdingPenPanelApplyChangeSet(changesNum){
   }
   disableChangesetControls(changesNum);
   if (gHoldingPenLoadedChanges[changesNum] == undefined){
-    createReq({
-      changesetNumber: changesNum,
-      requestType: 'getHoldingPenUpdateDetails'},
-      onHoldingPenChangesetRetrieved);
+      createReq({
+        changesetNumber: changesNum,
+        requestType: 'getHoldingPenUpdateDetails',
+        recID: gRecID},
+        onHoldingPenChangesetRetrieved);
   }else
   {
     // we can apply the changes directly without waiting for them to be retrieved
@@ -494,7 +513,7 @@ function prepareSubfieldRemovedRequest(changeNo){
   toDelete[fieldId][fieldPos] = [sfPos];
 
   gRecord[fieldId][fieldPos][0].splice(sfPos, 1);
-  redrawFields(fieldId);
+  redrawFields(fieldId, true);
 
   return {
     recID: gRecID,
@@ -509,7 +528,7 @@ function prepareHPFieldRemovedUndoHandler(changeNo){
   var fieldPos = gHoldingPenChanges[changeNo].field_position;
 
   var toDelete = {};
-  var fToDelete = {}
+  var fToDelete = {};
   fToDelete[tag] = {};
   fToDelete[tag][fieldPos] = gRecord[tag][fieldPos];
 
@@ -529,7 +548,7 @@ function prepareFieldRemovedRequest(changeNo){
 
 
   gRecord[fieldId].splice(fieldPos, 1);
-  redrawFields(fieldId);
+  redrawFields(fieldId, true);
 
   return {
     recID: gRecID,
@@ -587,8 +606,7 @@ function getFullFieldContentFromHPChange(changeNo){
       content based on the HP change entry.
       The record content might be retrieved from the following
       types of Holdin Pen changes:
-        subfield_changed: a field that contains only one subfield
-                          (the one that has been changed)
+        subfield_changed: a field containing all the new content
         field_changed:    a field containing all the new content
         field_added:      a field containing all the new content
 
@@ -619,11 +637,8 @@ function getFullFieldContentFromHPChange(changeNo){
   result.tag = gHoldingPenChanges[changeNo].tag;
   result.ind1 = (indicators[0] == '_') ? " " : indicators[0];
   result.ind2 = (indicators[1] == '_') ? " " : indicators[1];
-  if (chT == "subfield_changed"){
-    result.subfields = [[gHoldingPenChanges[changeNo].subfield_code,
-                         gHoldingPenChanges[changeNo].subfield_content]];
-  }
-  if (chT == "field_added" || chT == "field_changed"){
+
+  if (chT == "field_added" || chT == "field_changed" || chT == "subfield_changed"){
     result.subfields = subfields = gHoldingPenChanges[changeNo].
       field_content;
   }
@@ -725,7 +740,7 @@ function applySubfieldChanged(changeNo){
     gRecord[tag][fieldPos][0][sfPos][1] = content; // changing the local copy
 
     var modificationUndoHandler = prepareUndoHandlerChangeSubfield(tag, fieldPos,
-      sfPos, oldContent, content, sfCode, sfCode);
+      sfPos, oldContent, content, sfCode, sfCode, "change_content");
     var undoHandler = prepareUndoHandlerApplyHPChange(modificationUndoHandler, changeNo);
 
     addUndoOperation(undoHandler);
@@ -749,9 +764,7 @@ function applySubfieldRemoved(changeNo){
     addUndoOperation(data.undoRedo);
     removeViewedChange(changeNo);
 
-    createReq(data, function(json){
-      updateStatus('report', gRESULT_CODES[json['resultCode']]);
-    });
+    queue_request(data);
   }
 }
 
@@ -769,9 +782,7 @@ function applyFieldRemoved(changeNo){
     data.undoRedo = undoHandler;
     addUndoOperation(undoHandler);
 
-    createReq(data, function(json){
-      updateStatus('report', gRESULT_CODES[json['resultCode']]);
-    });
+    queue_request(data);
 
     // now the position of the fields has changed. We have to fix all teh references inside the gHoldingPenChanges
       for (change in gHoldingPenChanges) {
@@ -803,9 +814,7 @@ function applySubfieldAdded(changeNo){
     var data = prepareSubfieldAddedRequest(changeNo);
     data.undoRedo = undoHandler;
     addUndoOperation(undoHandler);
-    createReq(data, function(json){
-      updateStatus('report', gRESULT_CODES[json['resultCode']])
-    });
+    queue_request(data);
 
     removeViewedChange(changeNo); // automatic redrawing !
   }
@@ -821,9 +830,7 @@ function applyFieldChanged(changeNumber){
     addUndoOperation(undoHandler);
     var data = prepareFieldChangedRequest(changeNumber, undoHandler);
 
-    createReq(data, function(json){
-      updateStatus('report', gRESULT_CODES[json['resultCode']])
-    });
+    queue_request(data);
 
     removeViewedChange(changeNumber); // redrawing included in this call
   }
@@ -840,13 +847,36 @@ function applyFieldAdded(changeNo){
     addUndoOperation(undoHandler);
     data.undoRedo = undoHandler;
 
-    createReq(data, function(json){
-      updateStatus('report', gRESULT_CODES[json['resultCode']])
-    });
+    queue_request(data);
     // now adding appropriate controls to the interface
     removeViewedChange(changeNo);
-    redrawFields(fieldId);
+    redrawFields(fieldId, true);
     reColorFields();
+
+    // if there is a volatile field with same tag and indicators with the field added should be deleted(replaced)
+    // TODO check for indicators
+    var isVolatile = true;
+    for (var fPos in gRecord[data.tag]) {
+      for (var sfPos in gRecord[data.tag][fPos][0]) {
+        if (gRecord[data.tag][fPos][0][sfPos][1].substring(0,9) != "VOLATILE:"){
+          isVolatile = false;
+          break;
+        }
+      }
+      if (isVolatile) {
+        var fieldToDelete = {};
+        fieldToDelete[data.tag] = {};
+        fieldToDelete[data.tag][fPos] = gRecord[data.tag][fPos];
+        var toDelete = {};
+        toDelete.fields = fieldToDelete;
+        toDelete.subfields = {};
+        var urHandler = prepareUndoHandlerDeleteFields(toDelete);
+        addUndoOperation(urHandler);
+        var ajaxData = deleteFields(toDelete, urHandler);
+        queue_request(ajaxData);
+      }
+    }
+
   }
 }
 
@@ -870,6 +900,7 @@ function updateInterfaceAfterChangeModification(changeNo){
   }
   adjustGeneralHPControlsVisibility();
 }
+
 function revertViewedChange(changeNo){
   /** Reverts a Holding Pen change that has been marked as removed before
       Parameters:
@@ -878,6 +909,7 @@ function revertViewedChange(changeNo){
    */
   gHoldingPenChanges[changeNo].applied_change = false;
   updateInterfaceAfterChangeModification(changeNo);
+  adjustGeneralHPControlsVisibility();
 }
 
 
@@ -896,9 +928,10 @@ function addGeneralControls(){
    /** If necessary, creates the panel containing the general controls that allow
     * to accept or reject all teh viewed changes
     */
-  if ($("#bibeditHoldingPenGC").length == 0){
+  if ($("#bibeditHoldingPenGC").length == 0 || $("#acceptReferences").length == 0){
+    $("#bibeditHoldingPenGC").remove();
     panel = createGeneralControlsPanel();
-    $("#bibEditContentTable").prepend(panel);
+    $("#bibEditContentTable").before(panel);
   }
 }
 
@@ -908,15 +941,53 @@ function adjustGeneralHPControlsVisibility(){
       This bar is responsible of applying or rejecting all the visualized
       changes at once */
   var shouldDisplay = false;
+  var shouldDisplayRefs = false;
   for (changeInd in gHoldingPenChanges){
-    if (gHoldingPenChanges[changeInd].applied_change !== true){
+    var changeTag = gHoldingPenChanges[changeInd].tag;
+    var changeIndicators = gHoldingPenChanges[changeInd].indicators;
+    var changeType = gHoldingPenChanges[changeInd].change_type;
+
+    if (gHoldingPenChanges[changeInd].applied_change !== true &&
+        changeType !== "subfield_same"){
+      shouldDisplay = true;
+    }
+    if ( (changeType == "field_added" || changeType == "subfield_changed" ||
+        changeType == "subfield_added" || changeType == "field_changed" ) &&
+        gHoldingPenChanges[changeInd].applied_change !== true && changeTag == "999" &&
+              changeIndicators == "C5" ){
+      shouldDisplayRefs = true;
+    }
+  }
+  if (shouldDisplay){
+    addGeneralControls();
+    if (!shouldDisplayRefs){
+        $("#acceptReferences").remove();
+    }
+  } else {
+    $("#bibeditHoldingPenGC").remove();
+  }
+}
+
+function adjustReferenceHPControlsVisibility(){
+  /** Function adjusting the visibility of the Holding Pen apply all references button.
+      This bar is responsible of applying or rejecting all the visualized reference
+      changes at once */
+  var shouldDisplay = false;
+  for (changeInd in gHoldingPenChanges){
+    var changeTag = gHoldingPenChanges[changeInd].tag;
+    var changeIndicators = gHoldingPenChanges[changeInd].indicators;
+    var changeType = gHoldingPenChanges[changeInd].change_type;
+    if ( (changeType == "field_added" || changeType == "subfield_changed" ||
+        changeType == "subfield_added" || changeType == "field_changed" ) &&
+        gHoldingPenChanges[changeInd].applied_change !== true && changeTag == "999" &&
+              changeIndicators == "C5" ){
       shouldDisplay = true;
     }
   }
   if (shouldDisplay){
     addGeneralControls();
   } else {
-    $("#bibeditHoldingPenGC").remove();
+    $("#acceptReferences").remove();
   }
 }
 
@@ -928,16 +999,18 @@ function refreshChangesControls(){
   var tagsToRedraw = {};
   for (changeInd in gHoldingPenChanges){
     if (gHoldingPenChanges[changeInd].applied_change !== true){
-      addChangeControl(changeInd);
+      addChangeControl(changeInd, true);
       tagsToRedraw[gHoldingPenChanges[changeInd].tag] = true;
     }
   }
 
   for (tag in tagsToRedraw){
-    redrawFields(tag);
+    redrawFields(tag, true);
   }
 
+  reColorFields();
   adjustHPChangesetsActivity();
+  adjustGeneralHPControlsVisibility();
 }
 
 function prepareHPRejectChangeUndoHandler(changeNo){
@@ -951,14 +1024,14 @@ function onRejectChangeClicked(changeNo){
   var undoHandler = prepareHPRejectChangeUndoHandler(changeNo);
   addUndoOperation(undoHandler);
   removeViewedChange(changeNo);
-  createReq({
+  var data = {
     requestType : "otherUpdateRequest",
     hpChanges : { toDisable: [changeNo]},
     recID : gRecID,
     undoRedo: undoHandler
-  }, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']])
-  });
+  };
+
+  queue_request(data);
 }
 
 
@@ -977,21 +1050,49 @@ function aggregateHoldingPenChanges(){
   for (changeNum in gHoldingPenChanges){
     changeNumInt = parseInt(changeNum);
     changeType = gHoldingPenChanges[changeNum].change_type;
-    if ( changeType == "field_added" || changeType == "subfield_changed" ||
-	 changeType == "subfield_added" || changeType == "field_changed"){
-      result.changesAddModify.push(changeNumInt);
-    }
-    if ( changeType == "field_removed"){
-      result.changesRemoveField.push(changeNumInt);
-    }
-    if ( changeType == "subfield_removed"){
-      result.changesRemoveSubfield.push(changeNumInt);
+    if (gHoldingPenChanges[changeNum].applied_change == undefined ||
+        gHoldingPenChanges[changeNum].applied_change !== true) {
+        if ( changeType == "field_added" || changeType == "subfield_changed" ||
+          changeType == "subfield_added" || changeType == "field_changed"){
+          result.changesAddModify.push(changeNumInt);
+        }
+        if ( changeType == "field_removed"){
+          result.changesRemoveField.push(changeNumInt);
+        }
+        if ( changeType == "subfield_removed"){
+          result.changesRemoveSubfield.push(changeNumInt);
+        }
     }
   }
 
   return result;
 }
 
+function aggregateHoldingPenReferenceChanges(){
+  /** Fuction aggregating the Holding Pen Reference changes in different categories.
+      Returns an object with following fields:
+        changesAddModify : a list of numbers of changes of modification or adding fields
+   */
+  var result = {};
+  result.changesAddModify= [];
+
+  for (changeNum in gHoldingPenChanges){
+    changeNumInt = parseInt(changeNum);
+    changeType = gHoldingPenChanges[changeNum].change_type;
+    changeTag = gHoldingPenChanges[changeNum].tag;
+    changeIndicators = gHoldingPenChanges[changeNum].indicators;
+    if (gHoldingPenChanges[changeNum].applied_change == undefined ||
+        gHoldingPenChanges[changeNum].applied_change !== true) {
+        if ( (changeType == "field_added" || changeType == "subfield_changed" ||
+              changeType == "subfield_added" || changeType == "field_changed") && changeTag == "999" &&
+              changeIndicators == "C5" ){
+                  result.changesAddModify.push(changeNumInt);
+        }
+    }
+  }
+
+  return result;
+}
 
 function acceptAddModifyChanges(changeNumbers){
   /** A helper function. Applies a list of add/modify Holding Pen changes
@@ -1029,7 +1130,7 @@ function acceptAddModifyChanges(changeNumbers){
       var oldContent = gRecord[tag][fieldPos][0][sfPos][1];
 
       var modificationUndoHandler = prepareUndoHandlerChangeSubfield(tag,
-        fieldPos, sfPos, oldContent, content, sfCode, sfCode);
+        fieldPos, sfPos, oldContent, content, sfCode, sfCode, "change_content");
       var undoHandler = prepareUndoHandlerApplyHPChange(modificationUndoHandler,
 							changeNum);
 
@@ -1039,7 +1140,7 @@ function acceptAddModifyChanges(changeNumbers){
     }
 
     if ( changeType == "subfield_added"){
-      var undoHandler = prepareHPSubfieldAddedUndoHandler(changeNo);
+      var undoHandler = prepareHPSubfieldAddedUndoHandler(changeNum);
       var changeData = prepareSubfieldAddedRequest(changeNum);
       result.undoHandlers.push(undoHandler);
       result.ajaxData.push(changeData);
@@ -1149,84 +1250,154 @@ function onAcceptAllChanges(){
   /** Applying all the changes visualised in the editor.
    */
 
-  /** Changes have to be ordered by their type. First we process the
-      modifications of the content and adding new fields and subfields.
-      Such changes do not modify the numeration of other fields/subfields
-      and so, the indices of fields/subfields stored in other changes
-      remain valid */
+  save_changes().done(function() {
 
-  var chNumbers = aggregateHoldingPenChanges();
+      /** Changes have to be ordered by their type. First we process the
+          modifications of the content and adding new fields and subfields.
+          Such changes do not modify the numeration of other fields/subfields
+          and so, the indices of fields/subfields stored in other changes
+          remain valid */
 
-  /** First we add the addField requests, as they do not change the numbers
-      of existing fields and subields. Subsequents field/subfield removals
-      will be possible. An opposite order (first removals and then adding,
-      would break the record structure */
+      var chNumbers = aggregateHoldingPenChanges();
 
-  var resAddUpdate = acceptAddModifyChanges(chNumbers.changesAddModify);
+      /** First we add the addField requests, as they do not change the numbers
+          of existing fields and subields. Subsequents field/subfield removals
+          will be possible. An opposite order (first removals and then adding,
+          would break the record structure */
 
-  /** Next we can proceed with the subfields removal. Application of such
-      changes implies modification of the subfield indices. Field positions
-      remain untouched  */
-  var resRemoveSubfields = acceptRemoveSubfieldChanges(
-        chNumbers.changesRemoveSubfield);
+      var resAddUpdate = acceptAddModifyChanges(chNumbers.changesAddModify);
 
-  /** Finally, we can proceed with removal of the fields. Doing so, changes
-      the field numbers */
-  var resRemoveFields = acceptRemoveFieldChanges(
-         chNumbers.changesRemoveSubfield);
+      /** Next we can proceed with the subfields removal. Application of such
+          changes implies modification of the subfield indices. Field positions
+          remain untouched  */
+      var resRemoveSubfields = acceptRemoveSubfieldChanges(
+            chNumbers.changesRemoveSubfield);
 
-  /** Now we remove all the changes visulaized in the interface */
-  var removeAllChangesUndoHandler = prepareUndoHandlerRemoveAllHPChanges(
-                                  gHoldingPenChanges);
-  var removeAllChangesAjaxData = prepareRemoveAllAppliedChanges();
+      /** Finally, we can proceed with removal of the fields. Doing so, changes
+          the field numbers */
+      var resRemoveFields = acceptRemoveFieldChanges(
+             chNumbers.changesRemoveField);
 
-  /** updating the user interface after all the changes being finished in the
-      cliens side model */
-  var collectiveTagsToRedraw = {};
-  for (tag in resAddUpdate.tagsToRedraw){
-    collectiveTagsToRedraw[tag] = true;
-  }
-  for (tag in resRemoveFields.tagsToRedraw){
-    collectiveTagsToRedraw[tag] = true;
-  }
-  for (tag in resRemoveSubfields.tagsToRedraw){
-    collectiveTagsToRedraw[tag] = true;
-  }
-  for (tag in collectiveTagsToRedraw){
-    redrawFields(tag);
-  }
+      /** Now we remove all the changes visulaized in the interface */
+      var removeAllChangesUndoHandler = prepareUndoHandlerRemoveAllHPChanges(
+                                      gHoldingPenChanges);
+      var removeAllChangesAjaxData = prepareRemoveAllAppliedChanges();
 
-  adjustGeneralHPControlsVisibility();
-  reColorFields();
+      /** updating the user interface after all the changes being finished in the
+          cliens side model */
+      var collectiveTagsToRedraw = {};
+      for (tag in resAddUpdate.tagsToRedraw){
+        collectiveTagsToRedraw[tag] = true;
+      }
+      for (tag in resRemoveFields.tagsToRedraw){
+        collectiveTagsToRedraw[tag] = true;
+      }
+      for (tag in resRemoveSubfields.tagsToRedraw){
+        collectiveTagsToRedraw[tag] = true;
+      }
+      for (tag in collectiveTagsToRedraw){
+        redrawFields(tag);
+      }
 
-  /** At this point, all the changes to the browser interface are finished.
-      The only remaining activity is combining the AJAX request into one big,
-      preparing the bulk undo/redo handler and passing the request to the
-      server side of BibEdit  */
+      adjustGeneralHPControlsVisibility();
+      reColorFields();
 
-  var collectiveAjaxData = resAddUpdate.ajaxData.concat(
-    resRemoveSubfields.ajaxData.concat(
-    resRemoveFields.ajaxData.concat(
-    [removeAllChangesAjaxData])));
+      /** At this point, all the changes to the browser interface are finished.
+          The only remaining activity is combining the AJAX request into one big,
+          preparing the bulk undo/redo handler and passing the request to the
+          server side of BibEdit  */
 
-  var collectiveUndoHandlers = resAddUpdate.undoHandlers.concat(
-    resRemoveSubfields.undoHandlers.concat(
-    resRemoveFields.undoHandlers.concat(
-    [removeAllChangesUndoHandler])));
-  collectiveUndoHandlers.reverse();
+      var collectiveAjaxData = resAddUpdate.ajaxData.concat(
+        resRemoveSubfields.ajaxData.concat(
+        resRemoveFields.ajaxData.concat(
+        [removeAllChangesAjaxData])));
 
-  var finalUndoHandler = prepareUndoHandlerBulkOperation(collectiveUndoHandlers,
-							 "apply all changes");
-  addUndoOperation(finalUndoHandler);
+      var collectiveUndoHandlers = resAddUpdate.undoHandlers.concat(
+        resRemoveSubfields.undoHandlers.concat(
+        resRemoveFields.undoHandlers.concat(
+          [removeAllChangesUndoHandler])));
+      collectiveUndoHandlers.reverse();
 
-  var optArgs = {
-      undoRedo: finalUndoHandler
-  };
+      var finalUndoHandler = prepareUndoHandlerBulkOperation(collectiveUndoHandlers,
+        "apply all changes");
+      addUndoOperation(finalUndoHandler);
 
-  createBulkReq(collectiveAjaxData, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']])
-  }, optArgs);
+      var optArgs = {
+          undoRedo: finalUndoHandler
+      };
+
+      createBulkReq(collectiveAjaxData, function(json){
+        updateStatus('report', gRESULT_CODES[json['resultCode']])
+      }, optArgs);
+  });
 }
+
+function onAcceptAllReferences(){
+  /** Applying all the changes visualised in the editor.
+   */
+
+  save_changes().done(function() {
+      /** Changes have to be ordered by their type. First we process the
+          modifications of the content and adding new fields and subfields.
+          Such changes do not modify the numeration of other fields/subfields
+          and so, the indices of fields/subfields stored in other changes
+          remain valid */
+
+      var chNumbers = aggregateHoldingPenReferenceChanges();
+
+      /** First we add the addField requests, as they do not change the numbers
+          of existing fields and subields. Subsequents field/subfield removals
+          will be possible. An opposite order (first removals and then adding,
+          would break the record structure */
+
+      var resAddUpdate = acceptAddModifyChanges(chNumbers.changesAddModify);
+
+      /** Now we remove all the changes visulaized in the interface */
+      var removeAllChangesUndoHandler = prepareUndoHandlerBulkOperation(resAddUpdate.undoHandlers,
+                                         'apply all references');
+      for (var i in chNumbers.changesAddModify) {
+        removeViewedChange(chNumbers.changesAddModify[i]);
+      }
+      /** updating the user interface after all the changes being finished in the
+          cliens side model */
+      var collectiveTagsToRedraw = {};
+      for (tag in resAddUpdate.tagsToRedraw){
+        collectiveTagsToRedraw[tag] = true;
+      }
+      for (tag in collectiveTagsToRedraw){
+        redrawFields(tag, true);
+      }
+
+      adjustGeneralHPControlsVisibility();
+      // adjustReferenceHPControlsVisibility();
+      reColorFields();
+
+      /** At this point, all the changes to the browser interface are finished.
+          The only remaining activity is combining the AJAX request into one big,
+          preparing the bulk undo/redo handler and passing the request to the
+          server side of BibEdit  */
+
+      var collectiveAjaxData = resAddUpdate.ajaxData;
+
+      removeAllChangesUndoHandler.handlers.reverse();
+      var collectiveUndoHandlers = [removeAllChangesUndoHandler];
+      // var collectiveUndoHandlers = resAddUpdate.undoHandlers.concat([removeAllChangesUndoHandler]);
+      collectiveUndoHandlers.reverse();
+
+      var finalUndoHandler = prepareUndoHandlerBulkOperation(collectiveUndoHandlers,
+                   "apply all reference's changes");
+      addUndoOperation(finalUndoHandler);
+
+      var optArgs = {
+          undoRedo: finalUndoHandler
+      };
+
+      createBulkReq(collectiveAjaxData, function(json){
+        updateStatus('report', gRESULT_CODES[json['resultCode']])
+      }, optArgs);
+  });
+}
+
 
 function prepareRemoveAllAppliedChanges(){
   /**Removing all the changes together with their user interface controls.
@@ -1237,17 +1408,19 @@ function prepareRemoveAllAppliedChanges(){
   gHoldingPenChanges = [];
   removeAllChangeControls();
   return {recID: gRecID, requestType: "otherUpdateRequest",
-	  hpChanges: {toOverride : []}};
+          hpChanges: {toOverride : []}};
 }
+
 
 function onRejectAllChanges(){
   /** Rejecting all the considered changes*/
-  var undoHandler = prepareUndoHandlerRemoveAllHPChanges(gHoldingPenChanges);
-  addUndoOperation(undoHandler);
-  var ajaxData = prepareRemoveAllAppliedChanges();
-  ajaxData.undoRedo = undoHandler;
-
-  createReq(ajaxData, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']])});
-  reColorFields();
+  save_changes().done(function() {
+      var undoHandler = prepareUndoHandlerRemoveAllHPChanges(gHoldingPenChanges);
+      addUndoOperation(undoHandler);
+      var ajaxData = prepareRemoveAllAppliedChanges();
+      ajaxData.undoRedo = undoHandler;
+      queue_request(ajaxData);
+      adjustGeneralHPControlsVisibility();
+      reColorFields();
+  });
 }

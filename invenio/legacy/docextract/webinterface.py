@@ -1,7 +1,7 @@
-    # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,6 +33,9 @@ from invenio.legacy.refextract.api import extract_references_from_file_xml, \
                                    extract_references_from_url_xml, \
                                    extract_references_from_string_xml
 from invenio.modules.formatter.engine import format_record
+
+import invenio.legacy.template
+docextract_templates = invenio.legacy.template.load('docextract')
 
 
 def check_login(req):
@@ -120,13 +123,13 @@ class WebInterfaceAPIDocExtract(WebInterfaceDirectory):
 
         txt = form['txt'].stream.read()
 
-        return extract_references_from_string_xml(txt)
+        return extract_references_from_string_xml(txt, is_only_references=False)
 
 
 class WebInterfaceDocExtract(WebInterfaceDirectory):
     """DocExtract API"""
     _exports = ['api',
-        ('extract-references', 'extract_references'),
+        ('', 'extract'),
         ('example.pdf', 'example_pdf'),
     ]
 
@@ -142,21 +145,7 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
         finally:
             f.close()
 
-    def extract_references_template(self):
-        """Template for reference extraction page"""
-        return """Please specify a pdf or a url or some references to parse
-
-        <form action="extract-references" method="post"
-                                            enctype="multipart/form-data">
-            <p>PDF: <input type="file" name="pdf" /></p>
-            <p>arXiv: <input type="text" name="arxiv" /></p>
-            <p>URL: <input type="text" name="url" style="width: 600px;"/></p>
-            <textarea name="txt" style="width: 500px; height: 500px;"></textarea>
-            <p><input type="submit" /></p>
-        </form>
-        """
-
-    def extract_references(self, req, form):
+    def extract(self, req, form):
         """Refrences extraction page
 
         This page can be used for authors to test their pdfs against our
@@ -173,8 +162,8 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
         elif 'url' in form and form['url']:
             url = form['url']
             references_xml = extract_references_from_url_xml(url)
-        elif 'txt' in form and form['txt']:
-            txt = form['txt']
+        elif 'txt' in form and form['txt'].value:
+            txt = form['txt'].value.decode('utf-8', 'ignore')
             references_xml = extract_references_from_string_xml(txt)
         else:
             references_xml = None
@@ -182,17 +171,13 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
         # If we have not uploaded anything yet
         # Display the form that allows us to do so
         if not references_xml:
-            out = self.extract_references_template()
+            out = docextract_templates.tmpl_web_form()
         else:
-            out = """
-            <style type="text/css">
-                #referenceinp_link { display: none; }
-            </style>
-            """
-            out += format_record(0,
-                                'hdref',
-                                xml_record=references_xml.encode('utf-8'),
-                                user_info=user_info)
+            references_html = format_record(0,
+                                           'hdref',
+                                            xml_record=references_xml,
+                                            user_info=user_info)
+            out = docextract_templates.tmpl_web_result(references_html)
 
         # Render the page (including header, footer)
         return page(title='References Extractor',

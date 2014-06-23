@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,6 +21,10 @@
 __revision__ = "$Id"
 
 __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
+
+import cProfile
+import cStringIO
+import pstats
 
 from flask.ext.login import current_user
 
@@ -44,6 +48,32 @@ navtrail_bibedit = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> 
                     ' &gt; <a class="navtrail" href=\"%s/%s/edit\">Record Editor</a>'
             ) % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, CFG_SITE_RECORD)
 
+
+def wrap_json_req_profiler(func):
+
+    def json_req_profiler(self, req, form):
+        if "ajaxProfile" in form:
+            profiler = cProfile.Profile()
+            return_val = profiler.runcall(func, self, req, form)
+
+            results = cStringIO.StringIO()
+            stats = pstats.Stats(profiler, stream=results)
+            stats.sort_stats('cumulative')
+            stats.print_stats(100)
+
+            json_in = json.loads(str(form['jsondata']))
+            # Deunicode all strings (Invenio doesn't have unicode
+            # support).
+            json_in = json_unicode_to_utf8(json_in)
+
+            json_data = json.loads(return_val)
+            json_data.update({"profilerStats": "<pre style='overflow: scroll'>" + json_in['requestType'] + results.getvalue() + "</pre>"})
+            return json.dumps(json_data)
+        else:
+            return func(self, req, form)
+
+    return json_req_profiler
+
 class WebInterfaceEditPages(WebInterfaceDirectory):
     """Defines the set of /edit pages."""
 
@@ -53,6 +83,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         """Initialize."""
         self.recid = recid
 
+    @wrap_json_req_profiler
     def index(self, req, form):
         """Handle all BibEdit requests.
         The responsibilities of this functions is:
@@ -99,8 +130,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             if not ajax_request:
                 # Do not display the introductory recID selection box to guest
                 # users (as it used to be with v0.99.0):
-                dummy_auth_code, auth_message = acc_authorize_action(req,
-                                                                     'runbibedit')
+                auth_code, auth_message = acc_authorize_action(req,
+                                                               'runbibedit')
                 referer = '/edit/'
                 if self.recid:
                     referer = '/%s/%s/edit/' % (CFG_SITE_RECORD, self.recid)
@@ -277,7 +308,6 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Redirect calls without final slash."""
-
         if self.recid:
             redirect_to_url(req, '%s/%s/%s/edit/' % (CFG_SITE_SECURE_URL,
                                                          CFG_SITE_RECORD,

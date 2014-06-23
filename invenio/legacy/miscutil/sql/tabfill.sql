@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+-- Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -19,11 +19,6 @@
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (1,'wrd','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,100);
-
-INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict',NULL,'0000-00-00');
-INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict',NULL,'0000-00-00');
-INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict',NULL,'0000-00-00');
-INSERT INTO rnkCITATIONDATA VALUES (4,'selfcitedbydict',NULL,'0000-00-00');
 
 INSERT INTO field VALUES (1,'any field','anyfield');
 INSERT INTO field VALUES (2,'title','title');
@@ -64,7 +59,10 @@ INSERT INTO field VALUES (36,'authority subject','authoritysubject');
 INSERT INTO field VALUES (37,'item count','itemcount');
 INSERT INTO field VALUES (38,'file type','filetype');
 INSERT INTO field VALUES (39,'miscellaneous', 'miscellaneous');
-INSERT INTO field VALUES (40,'tag','tag');
+INSERT INTO field VALUES (40,'refers to excluding self cites','referstoexcludingselfcites');
+INSERT INTO field VALUES (41,'cited by excluding self cites','citedbyexcludingselfcites');
+INSERT INTO field VALUES (42,'cataloguer nickname','cataloguer');
+INSERT INTO field VALUES (43,'tag','tag');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
@@ -310,6 +308,7 @@ INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (25
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (26,'DataCite','dcite', 'DataCite XML format.', 'text/xml', 0);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (27,'Mobile brief','mobb', 'Mobile brief format.', 'text/html', 0);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (28,'Mobile detailed','mobd', 'Mobile detailed format.', 'text/html', 0);
+INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (29,'WebAuthorProfile data helper','wapdat', 'cPickled dicts', 'text', 0);
 
 INSERT INTO tag VALUES (1,'first author name','100__a');
 INSERT INTO tag VALUES (2,'additional author name','700__a');

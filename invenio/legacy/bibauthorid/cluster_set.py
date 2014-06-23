@@ -19,19 +19,15 @@
 
 from itertools import chain, groupby, izip, cycle
 from operator import itemgetter
-from six.moves import cPickle
 from invenio.legacy.bibauthorid.matrix_optimization import maximized_mapping
 from invenio.legacy.bibauthorid.backinterface import save_cluster
-from invenio.legacy.bibauthorid.backinterface import get_all_papers_of_pids
+from invenio.legacy.bibauthorid.backinterface import get_confirmed_papers_of_authors
 from invenio.legacy.bibauthorid.backinterface import get_bib10x, get_bib70x
-from invenio.legacy.bibauthorid.backinterface import get_all_modified_names_from_personid
+from invenio.legacy.bibauthorid.backinterface import get_author_to_confirmed_names_mapping
 from invenio.legacy.bibauthorid.backinterface import get_signatures_from_bibrefs
 from invenio.legacy.bibauthorid.name_utils import generate_last_name_cluster_str
 from invenio.legacy.bibauthorid.general_utils import  bibauthor_print
 
-
-#python2.4 compatibility
-from invenio.legacy.bibauthorid.general_utils import bai_all as all
 
 class Blob(object):
     def __init__(self, personid_records):
@@ -63,7 +59,7 @@ def create_blobs_by_pids(pids):
     for a bibrefrec in the personid table.
     @type pids: iterable of integers
     '''
-    all_bibs = get_all_papers_of_pids(pids)
+    all_bibs = get_confirmed_papers_of_authors(pids)
     all_bibs = ((x[0], (int(x[1]), x[2], x[3]), x[4]) for x in all_bibs)
     bibs_dict = groupby(sorted(all_bibs, key=itemgetter(1)), key=itemgetter(1))
     blobs = [Blob(list(bibs)) for _, bibs in bibs_dict]
@@ -105,7 +101,7 @@ class ClusterSet(object):
             if hate:
                 self.hate = set(hate)
             else:
-                self.hate = set([])
+                self.hate = set(list())
             self.personid = None
 
         def hates(self, other):
@@ -123,14 +119,15 @@ class ClusterSet(object):
 
     def __init__(self):
         self.clusters = []
-        self.update_bibs()
         self.num_all_bibs = None
         self.last_name = None
 
     def update_bibs(self):
+        '''Updates the number of bibrefrecs held by this clusterset'''
         self.num_all_bibs = sum(len(cl.bibs) for cl in self.clusters)
 
     def all_bibs(self):
+        '''Chain all bibs contained in this clusterset'''
         return chain.from_iterable(cl.bibs for cl in self.clusters)
 
     def create_skeleton(self, personids, last_name):
@@ -166,21 +163,6 @@ class ClusterSet(object):
         self.last_name = last_name
 
         self.clusters = [self.Cluster((blob.bib,)) for blob in blobs]
-        self.update_bibs()
-        return self
-
-    # no longer used
-    def create_body(self, blobs):
-        union, independent = group_blobs(blobs)
-
-        arranged_clusters = {}
-        for cls in chain(union, independent):
-            arranged_clusters[cls[1]] = arranged_clusters.get(cls[1], []) + [cls[0]]
-
-        for pid, bibs in arranged_clusters.items():
-            cl = self.Cluster(bibs)
-            cl.personid = pid
-            self.clusters.append(cl)
         self.update_bibs()
         return self
 
@@ -275,7 +257,7 @@ def create_lastname_list_from_personid(last_modification):
     to list of personids which have this lastname.
     '''
     # ((personid, [full Name1], Nbibs) ... )
-    all_names = get_all_modified_names_from_personid(last_modification)
+    all_names = get_author_to_confirmed_names_mapping(last_modification)
 
     # ((personid, last_name, Nbibs) ... )
     all_names = ((row[0], generate_last_name_cluster_str(iter(row[1]).next()), row[2])

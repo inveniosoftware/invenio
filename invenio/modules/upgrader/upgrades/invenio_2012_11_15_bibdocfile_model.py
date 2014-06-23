@@ -137,11 +137,12 @@ def _fix_recid(recid, logger):
     """Fix a given recid."""
     #logger.info("Upgrading record %s:" % recid)
     # 1) moving docname and type to the relation with bibrec
-    bibrec_docs = run_sql("select id_bibdoc from bibrec_bibdoc where id_bibrec=%s", (recid, ))
+    bibrec_docs = run_sql("select id_bibdoc, type from bibrec_bibdoc where id_bibrec=%s", (recid, ))
     are_equal = True
 
     for docid_str in bibrec_docs:
         docid = str(docid_str[0])
+        doctype = str(docid_str[1])
 
         #logger.info("Upgrading document %s:" % (docid, ))
         res2 = run_sql("select docname, more_info from bibdoc where id=%s", (docid,))
@@ -150,6 +151,7 @@ def _fix_recid(recid, logger):
         else:
             docname = str(res2[0][0])
             run_sql("update bibrec_bibdoc set docname=%%s where id_bibrec=%s and id_bibdoc=%s" % (str(recid), docid), (docname, ))
+            run_sql("update bibdoc set doctype=%%s where id=%s" % (docid,), (doctype, ))
 
         # 2) moving moreinfo to the new moreinfo structures (default namespace)
         if res2[0][1]:

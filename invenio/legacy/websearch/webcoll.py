@@ -139,7 +139,6 @@ class Collection:
         self.update_reclist_run_already = 0 # to speed things up without much refactoring
         self.reclist_updated_since_start = 0 # to check if webpage cache need rebuilding
         self.reclist_with_nonpublic_subcolls = intbitset()
-
         # temporary counters for the number of records in hosted collections
         self.nbrecs_tmp = None # number of records in a hosted collection
         self.nbrecs_from_hosted_collections = 0 # total number of records from
@@ -325,7 +324,6 @@ class Collection:
             sys.exit(1)
         # print user info:
         write_message("... creating %s" % fullfilename, verbose=6)
-        sys.stdout.flush()
         # print page body:
         cPickle.dump(filebody, f, cPickle.HIGHEST_PROTOCOL)
         # close file:
@@ -798,9 +796,10 @@ class Collection:
                     self.nbrecs_from_hosted_collections)
 
         write_message("... calculating reclist of %s" % self.name, verbose=6)
+
         reclist = intbitset() # will hold results for public sons only; good for storing into DB
         reclist_with_nonpublic_subcolls = intbitset() # will hold results for both public and nonpublic sons; good for deducing total
-                                                   # number of documents
+                                                      # number of documents
         nbrecs_from_hosted_collections = 0 # will hold the total number of records from descendant hosted collections
 
         if not self.dbquery:
@@ -920,13 +919,13 @@ def perform_display_collection(colID, colname, aas, ln, em, show_help_boxes):
     em - code to display just part of the page
     show_help_boxes - whether to show the help boxes or not"""
     # check and update cache if necessary
+    cachedfile = open("%s/collections/%s-ln=%s.html" %
+                      (CFG_CACHEDIR, colname, ln), "rb")
     try:
-        cachedfile = open("%s/collections/%s-ln=%s.html" % \
-                        (CFG_CACHEDIR, colname, ln), "rb")
         data = cPickle.load(cachedfile)
-        cachedfile.close()
-    except:
+    except ValueError:
         data = get_collection(colname).update_webpage_cache(ln)
+    cachedfile.close()
     # check em value to return just part of the page
     if em != "":
         if EM_REPOSITORY["search_box"] not in em:
@@ -1007,7 +1006,10 @@ def get_database_last_updated_timestamp():
     """
     database_tables_timestamps = []
     database_tables_timestamps.append(get_table_update_time('bibrec'))
-    database_tables_timestamps.append(get_table_update_time('bibfmt'))
+    ## In INSPIRE bibfmt is on innodb and there is not such configuration
+    bibfmt_last_update = run_sql("SELECT max(last_updated) FROM bibfmt")
+    if bibfmt_last_update:
+        database_tables_timestamps.append(str(bibfmt_last_update[0][0]))
     try:
         database_tables_timestamps.append(get_table_update_time('idxWORD%'))
     except ValueError:

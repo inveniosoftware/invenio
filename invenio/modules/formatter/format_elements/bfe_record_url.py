@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL
 
+
 def format_element(bfo, with_ln="yes"):
     """
     Prints the record URL.

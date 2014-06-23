@@ -64,9 +64,6 @@ CFG_AUTH_FIELD = ''
 CFG_ACRON_FIELD = ''
 
 # ------------ bibclass config -------
-# USER AGENT
-CFG_BIBCLASSIFY_USER_AGENT = ""
-
 
 # PARTIAL_TEXT
 # Marks the part of the fulltext to keep when running a partial match.

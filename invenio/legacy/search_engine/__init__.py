@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# pylint: disable=C0301
+# pylint: disable=C0301,W0703
 
 """Invenio Search Engine in mod_python."""
 
@@ -29,10 +29,10 @@ __revision__ = "$Id$"
 import cgi
 import cStringIO
 import copy
-import string
 import os
 import re
 import time
+import string
 import urllib
 import urlparse
 import zlib
@@ -42,7 +42,7 @@ try:
     ## import optional module:
     import numpy
     CFG_NUMPY_IMPORTABLE = True
-except:
+except ImportError:
     CFG_NUMPY_IMPORTABLE = False
 
 if sys.hexversion < 0x2040000:
@@ -86,12 +86,16 @@ from invenio.config import \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_BIBSORT_BUCKETS, \
+     CFG_BIBSORT_ENABLED, \
      CFG_XAPIAN_ENABLED, \
-     CFG_BIBINDEX_CHARS_PUNCTUATION
+     CFG_BIBINDEX_CHARS_PUNCTUATION, \
+     CFG_BASE_URL
 
 from invenio.modules.search.errors import \
      InvenioWebSearchUnknownCollectionError, \
-     InvenioWebSearchWildcardLimitError
+     InvenioWebSearchWildcardLimitError, \
+     CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
+     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH
 from invenio.legacy.bibrecord import get_fieldvalues, get_fieldvalues_alephseq_like
 from invenio.legacy.bibrecord import create_record, record_xml_output
 from invenio.legacy.bibrank.record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
@@ -104,7 +108,6 @@ from invenio.legacy.bibindex.engine_washer import wash_index_term, lower_index_t
 from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
 from invenio.legacy.bibindex.adminlib import get_idx_indexer
 from invenio.modules.formatter import format_record, format_records, get_output_format_content_type, create_excel
-from invenio.modules.formatter.config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.legacy.bibrank.downloads_grapher import create_download_history_graph_and_box
 from invenio.modules.knowledge.api import get_kbr_values
 from invenio.legacy.miscutil.data_cacher import DataCacher
@@ -122,19 +125,24 @@ from invenio.ext.cache import cache
 from invenio.utils.text import encode_for_xml, wash_for_utf8, strip_accents
 from invenio.utils.html import get_mathjax_header
 from invenio.utils.html import nmtoken_from_string
+from invenio.legacy import bibrecord
 
 import invenio.legacy.template
 webstyle_templates = invenio.legacy.template.load('webstyle')
 webcomment_templates = invenio.legacy.template.load('webcomment')
 
 from invenio.legacy.bibrank.citation_searcher import calculate_cited_by_list, \
-    calculate_co_cited_with_list, get_records_with_num_cites, get_self_cited_by, \
-    get_refersto_hitset, get_citedby_hitset
+    calculate_co_cited_with_list, get_records_with_num_cites, \
+    get_refersto_hitset, get_citedby_hitset, get_cited_by_list, \
+    get_refers_to_list, get_citers_log
+
 from invenio.legacy.bibrank.citation_grapher import create_citation_history_graph_and_box
+from invenio.legacy.bibrank.selfcites_searcher import get_self_cited_by_list, \
+                                                      get_self_cited_by, \
+                                                      get_self_refers_to_list
 
-
-from invenio.legacy.dbquery import run_sql, run_sql_with_limit, wash_table_column_name, \
-                            get_table_update_time
+from invenio.legacy.dbquery import run_sql, run_sql_with_limit, \
+    wash_table_column_name, get_table_update_time
 from invenio.legacy.webuser import getUid, collect_user_info, session_param_set
 from invenio.legacy.webpage import pageheaderonly, pagefooteronly, create_error_box, write_warning
 from invenio.base.i18n import gettext_set_language
@@ -157,6 +165,10 @@ from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLL
 from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
 from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
+from invenio.legacy.bibauthorid.config import LIMIT_TO_COLLECTIONS as BIBAUTHORID_LIMIT_TO_COLLECTIONS
+from .utils import record_exists
+
+websearch_templates = invenio.template.load('websearch')
 VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
 
 ## global vars:
@@ -164,24 +176,24 @@ cfg_nb_browse_seen_records = 100 # limit of the number of records to check when 
 cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely ordered or alphabetical?
 
 ## precompile some often-used regexp for speed reasons:
-re_word = re.compile('[\s]')
+re_word = re.compile(r'[\s]')
 re_quotes = re.compile('[\'\"]')
 re_doublequote = re.compile('\"')
-re_logical_and = re.compile('\sand\s', re.I)
-re_logical_or = re.compile('\sor\s', re.I)
-re_logical_not = re.compile('\snot\s', re.I)
+re_logical_and = re.compile(r'\sand\s', re.I)
+re_logical_or = re.compile(r'\sor\s', re.I)
+re_logical_not = re.compile(r'\snot\s', re.I)
 re_operators = re.compile(r'\s([\+\-\|])\s')
 re_pattern_wildcards_after_spaces = re.compile(r'(\s)[\*\%]+')
 re_pattern_single_quotes = re.compile("'(.*?)'")
 re_pattern_double_quotes = re.compile("\"(.*?)\"")
 re_pattern_parens_quotes = re.compile(r'[\'\"]{1}[^\'\"]*(\([^\'\"]*\))[^\'\"]*[\'\"]{1}')
-re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
+re_pattern_regexp_quotes = re.compile(r"\/(.*?)\/")
 re_pattern_spaces_after_colon = re.compile(r'(:\s+)')
 re_pattern_short_words = re.compile(r'([\s\"]\w{1,3})[\*\%]+')
 re_pattern_space = re.compile("__SPACE__")
-re_pattern_today = re.compile("\$TODAY\$")
+re_pattern_today = re.compile(r"\$TODAY\$")
 re_pattern_parens = re.compile(r'\([^\)]+\s+[^\)]+\)')
-re_punctuation_followed_by_space = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION + '\s')
+re_punctuation_followed_by_space = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION + r'\s')
 
 ## em possible values
 EM_REPOSITORY={"body" : "B",
@@ -206,13 +218,9 @@ class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
         def cache_filler():
             ret = []
-            try:
-                res = run_sql("""SELECT DISTINCT ar.value
-                    FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id
-                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,), run_on_slave=True)
-            except Exception:
-                # database problems, return empty cache
-                return []
+            res = run_sql("""SELECT DISTINCT ar.value
+                FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id
+                WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,), run_on_slave=True)
             for coll in res:
                 ret.append(coll[0])
             return ret
@@ -229,7 +237,7 @@ def collection_restricted_p(collection, recreate_cache_if_needed=True):
 
 try:
     restricted_collection_cache.is_ok_p
-except Exception:
+except NameError:
     restricted_collection_cache = RestrictedCollectionDataCacher()
 
 
@@ -484,11 +492,7 @@ class CollectionRecListDataCacher(DataCacher):
     def __init__(self):
         def cache_filler():
             ret = {}
-            try:
-                res = run_sql("SELECT name FROM collection")
-            except Exception:
-                # database problems, return empty cache
-                return {}
+            res = run_sql("SELECT name FROM collection")
             for name in res:
                 ret[name[0]] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
             return ret
@@ -519,7 +523,7 @@ def get_collection_reclist(coll, recreate_cache_if_needed=True):
         if res:
             try:
                 reclist = intbitset(res[0][1])
-            except:
+            except IndexError:
                 pass
         collection_reclist_cache.cache[coll] = reclist
     # finally, return reclist:
@@ -541,17 +545,18 @@ def get_available_output_formats(visible_only=False):
     if res:
         # propose found formats:
         for code, name in res:
-            formats.append({ 'value' : code,
-                             'text' : name
+            formats.append({'value': code,
+                            'text': name
                            })
     else:
-        formats.append({'value' : 'hb',
-                        'text' : "HTML brief"
+        formats.append({'value': 'hb',
+                        'text': "HTML brief"
                        })
     return formats
 
 # Flask cache for search results.
 from invenio.modules.search.cache import search_results_cache, get_search_results_cache_key
+
 
 class CollectionI18nNameDataCacher(DataCacher):
     """
@@ -735,7 +740,7 @@ def get_words_from_pattern(pattern):
     words = {}
     # clean trailing punctuation signs inside pattern
     pattern = re_punctuation_followed_by_space.sub(' ', pattern)
-    for word in string.split(pattern):
+    for word in pattern.split():
         if word not in words:
             words[word] = 1
     return words.keys()
@@ -806,7 +811,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         elif f and p[0] == "/" and p[-1] == "/":
             ## B0ter - does 'p' start and end by a slash, and is 'f' defined? => doing regexp search
             opfts.append(['+', p[1:-1], f, 'r'])
-        elif f and string.find(p, ',') >= 0:
+        elif f and p.find(',') >= 0:
             ## B1 - does 'p' contain comma, and is 'f' defined? => doing ACC search
             opfts.append(['+', p, f, 'a'])
         elif f and str(f[0:2]).isdigit():
@@ -816,17 +821,17 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
             ## B3 - doing WRD search, but maybe ACC too
             # search units are separated by spaces unless the space is within single or double quotes
             # so, let us replace temporarily any space within quotes by '__SPACE__'
-            p = re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
-            p = re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
-            p = re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
+            p = re_pattern_single_quotes.sub(lambda x: "'"+x.group(1).replace(' ', '__SPACE__')+"'", p)
+            p = re_pattern_double_quotes.sub(lambda x: "\""+x.group(1).replace(' ', '__SPACE__')+"\"", p)
+            p = re_pattern_regexp_quotes.sub(lambda x: "/"+x.group(1).replace(' ', '__SPACE__')+"/", p)
             # and spaces after colon as well:
-            p = re_pattern_spaces_after_colon.sub(lambda x: string.replace(x.group(1), ' ', '__SPACE__'), p)
+            p = re_pattern_spaces_after_colon.sub(lambda x: x.group(1).replace(' ', '__SPACE__'), p)
             # wash argument:
             p = re_logical_and.sub(" ", p)
             p = re_logical_or.sub(" |", p)
             p = re_logical_not.sub(" -", p)
             p = re_operators.sub(r' \1', p)
-            for pi in string.split(p): # iterate through separated units (or items, as "pi" stands for "p item")
+            for pi in p.split(): # iterate through separated units (or items, as "pi" stands for "p item")
                 pi = re_pattern_space.sub(" ", pi) # replace back '__SPACE__' by ' '
                 # firstly, determine set operator
                 if pi[0] == '+' or pi[0] == '-' or pi[0] == '|':
@@ -836,8 +841,8 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                     # okay, there is no operator, so let us decide what to do by default
                     oi = '+' # by default we are doing set intersection...
                 # secondly, determine search pattern and field:
-                if string.find(pi, ":") > 0:
-                    fi, pi = string.split(pi, ":", 1)
+                if pi.find(":") > 0:
+                    fi, pi = pi.split(":", 1)
                     fi = wash_field(fi)
                     # test whether fi is a real index code or a MARC-tag defined code:
                     if fi in get_fieldcodes() or '00' <= fi[:2] <= '99':
@@ -854,10 +859,10 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 if re_quotes.match(pi):
                     # B3a - quotes are found => do ACC search (phrase search)
                     if pi[0] == '"' and pi[-1] == '"':
-                        pi = string.replace(pi, '"', '') # remove quote signs
+                        pi = pi.replace('"', '') # remove quote signs
                         opfts.append([oi, pi, fi, 'a'])
                     elif pi[0] == "'" and pi[-1] == "'":
-                        pi = string.replace(pi, "'", "") # remove quote signs
+                        pi = pi.replace("'", "") # remove quote signs
                         opfts.append([oi, "%" + pi + "%", fi, 'a'])
                     else: # unbalanced quotes, so fall back to WRD query:
                         opfts.append([oi, pi, fi, 'w'])
@@ -964,9 +969,9 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         # only if we have a detailed meta format and we are looking at a
         # single record
         if (recID != -1 and CFG_WEBSEARCH_DETAILED_META_FORMAT):
-            metaheaderadd += format_record(recID, \
-                                           CFG_WEBSEARCH_DETAILED_META_FORMAT, \
-                                           ln = ln)
+            metaheaderadd += format_record(recID,
+                                           CFG_WEBSEARCH_DETAILED_META_FORMAT,
+                                           ln=ln)
 
         ## generate navtrail:
         navtrail = create_navtrail_links(cc, aas, ln)
@@ -979,7 +984,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             # to the way perform_request_search() works, hb
             # (lowercase) is equal to hd)
             navtrail += ' <a class="navtrail" href="%s/%s/%s">%s</a>' % \
-                            (CFG_SITE_URL, CFG_SITE_RECORD, recID, cgi.escape(title_message))
+                            (CFG_BASE_URL, CFG_SITE_RECORD, recID, cgi.escape(title_message))
             if (of != '' or of.lower() != 'hd') and of != 'hb':
                 # Export
                 format_name = of
@@ -1009,7 +1014,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             #however it isn't clear what we should do about cases with
             #numbers, so we leave them to fail.  Everything else becomes "_"
 
-            css = nmtoken_from_string(cc).replace('.','_').replace('-','_').replace(':','_')
+            css = nmtoken_from_string(cc).replace('.', '_').replace('-', '_').replace(':', '_')
             body_css_classes.append(css)
 
         ## finally, print page header:
@@ -1076,8 +1081,8 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
     box += """<select name="%sm">""" % name
     box += """<option value="">%s""" % _("any month")
     # trailing space in May distinguishes short/long form of the month name
-    for mm, month in [(1, _("January")), (2, _("February")), (3, _("March")), (4, _("April")), \
-                      (5, _("May ")), (6, _("June")), (7, _("July")), (8, _("August")), \
+    for mm, month in [(1, _("January")), (2, _("February")), (3, _("March")), (4, _("April")),
+                      (5, _("May ")), (6, _("June")), (7, _("July")), (8, _("August")),
                       (9, _("September")), (10, _("October")), (11, _("November")), (12, _("December"))]:
         box += """<option value="%02d"%s>%s""" % (mm, is_selected(mm, selected_month), month.strip())
     box += """</select>"""
@@ -1118,8 +1123,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
     colls_nice = []
     for (cx, cx_printable) in colls_nicely_ordered:
         if not cx.startswith("Unnamed collection"):
-            colls_nice.append({ 'value' : cx,
-                                'text' : cx_printable
+            colls_nice.append({'value': cx,
+                               'text': cx_printable
                               })
 
     coll_selects = []
@@ -1128,39 +1133,39 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
         for c in colls:
             if c:
                 temp = []
-                temp.append({ 'value' : CFG_SITE_NAME,
-                              'text' : '*** %s ***' % _("any public collection")
+                temp.append({'value': CFG_SITE_NAME,
+                             'text': '*** %s ***' % _("any public collection")
                             })
                 # this field is used to remove the current collection from the ones to be searched.
-                temp.append({ 'value' : '',
-                              'text' : '*** %s ***' % _("remove this collection")
+                temp.append({'value': '',
+                             'text': '*** %s ***' % _("remove this collection")
                             })
                 for val in colls_nice:
                     # print collection:
                     if not cx.startswith("Unnamed collection"):
-                        temp.append({ 'value' : val['value'],
-                                      'text' : val['text'],
-                                      'selected' : (c == re.sub("^[\s\-]*","", val['value']))
+                        temp.append({'value': val['value'],
+                                     'text': val['text'],
+                                     'selected' : (c == re.sub(r"^[\s\-]*", "", val['value']))
                                     })
                 coll_selects.append(temp)
-        coll_selects.append([{ 'value' : '',
-                               'text' : '*** %s ***' % _("add another collection")
+        coll_selects.append([{'value': '',
+                              'text' : '*** %s ***' % _("add another collection")
                              }] + colls_nice)
     else: # we searched in CFG_SITE_NAME, so print 'any public collection' heading
-        coll_selects.append([{ 'value' : CFG_SITE_NAME,
-                               'text' : '*** %s ***' % _("any public collection")
+        coll_selects.append([{'value': CFG_SITE_NAME,
+                              'text' : '*** %s ***' % _("any public collection")
                              }] + colls_nice)
 
     ## ranking methods
     ranks = [{
                'value' : '',
-               'text' : "- %s %s -" % (_("OR").lower (), _("rank by")),
+               'text' : "- %s %s -" % (_("OR").lower(), _("rank by")),
              }]
     for (code, name) in get_bibrank_methods(cc_colID, ln):
         # propose found rank methods:
         ranks.append({
-                       'value' : code,
-                       'text' : name,
+                       'value': code,
+                       'text': name,
                      })
 
     formats = get_available_output_formats(visible_only=True)
@@ -1227,12 +1232,12 @@ def create_exact_author_browse_help_link(p=None, p1=None, p2=None, p3=None, f=No
     """Creates a link to help switch from author to exact author while browsing"""
     if action == 'browse':
         search_fields = (f, f1, f2, f3)
-        if ('author' in search_fields) or ('firstauthor' in search_fields):
+        if 'author' in search_fields or 'firstauthor' in search_fields:
             def add_exact(field):
                 if field == 'author' or field == 'firstauthor':
                     return 'exact' + field
                 return field
-            (fe, f1e, f2e, f3e) = map(add_exact, search_fields)
+            fe, f1e, f2e, f3e = [add_exact(field) for field in search_fields]
             link_name = f or f1
             link_name = (link_name == 'firstauthor' and 'exact first author') or 'exact author'
             return websearch_templates.tmpl_exact_author_browse_help_link(p=p, p1=p1, p2=p2, p3=p3, f=fe, f1=f1e, f2=f2e, f3=f3e,
@@ -1250,7 +1255,7 @@ def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, t
     dads = []
     for dad in get_coll_ancestors(cc):
         if dad != CFG_SITE_NAME: # exclude Home collection
-            dads.append ((dad, get_coll_i18nname(dad, ln, False)))
+            dads.append((dad, get_coll_i18nname(dad, ln, False)))
 
     if self_p and cc != CFG_SITE_NAME:
         dads.append((cc, get_coll_i18nname(cc, ln, False)))
@@ -1273,8 +1278,8 @@ def get_searchwithin_fields(ln='en', colID=None):
               }]
     for field_code, field_name in res:
         if field_code and field_code != "anyfield":
-            fields.append({ 'value' : field_code,
-                            'text' : get_field_i18nname(field_name, ln, False)
+            fields.append({'value': field_code,
+                           'text': get_field_i18nname(field_name, ln, False)
                           })
     return fields
 
@@ -1297,13 +1302,13 @@ def get_sortby_fields(ln='en', colID=None):
                                  WHERE cff.type='soo' AND cff.id_field=f.id
                                  ORDER BY cff.score DESC, f.name ASC""",)
     fields = [{
-                'value' : '',
-                'text' : _("latest first")
+                'value': '',
+                'text': _("latest first")
               }]
     for field_code, field_name in res:
         if field_code and field_code != "anyfield":
-            fields.append({ 'value' : field_code,
-                            'text' : get_field_i18nname(field_name, ln, False)
+            fields.append({'value': field_code,
+                           'text': get_field_i18nname(field_name, ln, False)
                           })
     return fields
 
@@ -1618,7 +1623,7 @@ def get_synonym_terms(term, kbr_name, match_type, use_memoise=False):
             term_remainder = mmm.group(2)
     ## FIXME: workaround: escaping SQL wild-card signs, since KBR's
     ## exact search is doing LIKE query, so would match everything:
-    term_for_lookup = term_for_lookup.replace('%', '\%')
+    term_for_lookup = term_for_lookup.replace('%', '\\%')
     ## OK, now find synonyms:
     for kbr_values in get_kbr_values(kbr_name,
                                      searchkey=term_for_lookup,
@@ -1630,16 +1635,16 @@ def get_synonym_terms(term, kbr_name, match_type, use_memoise=False):
     return dterms.keys()
 
 
-def wash_output_format(format):
+def wash_output_format(ouput_format):
     """Wash output format FORMAT.  Currently only prevents input like
     'of=9' for backwards-compatible format that prints certain fields
     only.  (for this task, 'of=tm' is preferred)"""
-    if str(format[0:3]).isdigit() and len(format) != 6:
+    if str(ouput_format[0:3]).isdigit() and len(ouput_format) != 6:
         # asked to print MARC tags, but not enough digits,
         # so let's switch back to HTML brief default
         return 'hb'
     else:
-        return format
+        return ouput_format
 
 def wash_pattern(p):
     """Wash pattern passed by URL. Check for sanity of the wildcard by
@@ -1652,9 +1657,9 @@ def wash_pattern(p):
     # add leading/trailing whitespace for the two following wildcard-sanity checking regexps:
     p = " " + p + " "
     # replace spaces within quotes by __SPACE__ temporarily:
-    p = re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
-    p = re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
-    p = re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
+    p = re_pattern_single_quotes.sub(lambda x: "'"+x.group(1).replace(' ', '__SPACE__')+"'", p)
+    p = re_pattern_double_quotes.sub(lambda x: "\""+x.group(1).replace(' ', '__SPACE__')+"\"", p)
+    p = re_pattern_regexp_quotes.sub(lambda x: "/"+x.group(1).replace(' ', '__SPACE__')+"/", p)
     # get rid of unquoted wildcards after spaces:
     p = re_pattern_wildcards_after_spaces.sub("\\1", p)
     # get rid of extremely short words (1-3 letters with wildcards):
@@ -1664,7 +1669,7 @@ def wash_pattern(p):
     # replace special terms:
     p = re_pattern_today.sub(time.strftime("%Y-%m-%d", time.localtime()), p)
     # remove unnecessary whitespace:
-    p = string.strip(p)
+    p = p.strip()
     # remove potentially wrong UTF-8 characters:
     p = wash_for_utf8(p)
     return p
@@ -1697,7 +1702,7 @@ def wash_dates(d1="", d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0):
     may be missing and are completed e.g. to 01 or 12 according to
     whether it is the starting or the ending date.
     """
-    datetext1, datetext2 =  "", ""
+    datetext1, datetext2 = "", ""
     # sanity checking:
     if d1 == "" and d1y == 0 and d1m == 0 and d1d == 0 and d2 == "" and d2y == 0 and d2m == 0 and d2d == 0:
         return ("", "") # nothing selected, so return empty values
@@ -1749,9 +1754,11 @@ def is_hosted_collection(coll):
     Returns True if it is, False if it's not or if the result is empty or if the query failed"""
 
     res = run_sql("SELECT dbquery FROM collection WHERE name=%s", (coll, ))
+    if not res[0][0]:
+        return False
     try:
         return res[0][0].startswith("hostedcollection:")
-    except:
+    except IndexError:
         return False
 
 def get_colID(c):
@@ -1766,9 +1773,10 @@ def get_coll_normalised_name(c):
     """Returns normalised collection name (case sensitive) for collection name
        C (case insensitive).
        Returns None if no match found."""
-    try:
-        return run_sql("SELECT name FROM collection WHERE name=%s", (c,))[0][0]
-    except:
+    res = run_sql("SELECT name FROM collection WHERE name=%s", (c,))
+    if res:
+        return res[0][0]
+    else:
         return None
 
 def get_coll_ancestors(coll):
@@ -1791,8 +1799,8 @@ def get_coll_ancestors(coll):
     coll_ancestors.reverse()
     return coll_ancestors
 
-def get_coll_sons(coll, type='r', public_only=1):
-    """Return a list of sons (first-level descendants) of type 'type' for collection 'coll'.
+def get_coll_sons(coll, coll_type='r', public_only=1):
+    """Return a list of sons (first-level descendants) of type 'coll_type' for collection 'coll'.
        If public_only, then return only non-restricted son collections.
     """
     coll_sons = []
@@ -1801,7 +1809,7 @@ def get_coll_sons(coll, type='r', public_only=1):
             "LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad "\
             "WHERE cc.type=%s AND ccc.name=%s"
     query += " ORDER BY cc.score DESC"
-    res = run_sql(query, (type, coll))
+    res = run_sql(query, (coll_type, coll))
     for name in res:
         if not public_only or not collection_restricted_p(name[0]):
             coll_sons.append(name[0])
@@ -1813,19 +1821,19 @@ class CollectionAllChildrenDataCacher(DataCacher):
 
         def cache_filler():
 
-            def get_all_children(coll, type='r', public_only=1):
+            def get_all_children(coll, coll_type='r', public_only=1):
                 """Return a list of all children of type 'type' for collection 'coll'.
                    If public_only, then return only non-restricted child collections.
                    If type='*', then return both regular and virtual collections.
                 """
                 children = []
-                if type == '*':
+                if coll_type == '*':
                     sons = get_coll_sons(coll, 'r', public_only) + get_coll_sons(coll, 'v', public_only)
                 else:
-                    sons = get_coll_sons(coll, type, public_only)
+                    sons = get_coll_sons(coll, coll_type, public_only)
                 for child in sons:
                     children.append(child)
-                    children.extend(get_all_children(child, type, public_only))
+                    children.extend(get_all_children(child, coll_type, public_only))
                 return children
 
             ret = {}
@@ -1854,7 +1862,7 @@ def get_collection_allchildren(coll, recreate_cache_if_needed=True):
     return collection_allchildren_cache.cache[coll]
 
 
-def get_coll_real_descendants(coll, type='_', get_hosted_colls=True):
+def get_coll_real_descendants(coll, coll_type='_', get_hosted_colls=True):
     """Return a list of all descendants of collection 'coll' that are defined by a 'dbquery'.
        IOW, we need to decompose compound collections like "A & B" into "A" and "B" provided
        that "A & B" has no associated database query defined.
@@ -1864,7 +1872,7 @@ def get_coll_real_descendants(coll, type='_', get_hosted_colls=True):
                      LEFT JOIN collection_collection AS cc ON c.id=cc.id_son
                      LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad
                      WHERE ccc.name=%s AND cc.type LIKE %s ORDER BY cc.score DESC""",
-                  (coll, type,))
+                  (coll, coll_type,))
     for name, dbquery in res:
         if dbquery: # this is 'real' collection, so return it:
             if get_hosted_colls:
@@ -1883,12 +1891,11 @@ def browse_pattern_phrases(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     if p.startswith('"') and p.endswith('"'):
         p = p[1:-1]
 
-    p_orig = p
     ## okay, "real browse" follows:
     ## FIXME: the maths in the get_nearest_terms_in_bibxxx is just a test
 
-    if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
-        f, p = string.split(p, ":", 1)
+    if not f and p.find(":") > 0: # does 'p' contain ':'?
+        f, p = p.split(":", 1)
 
     ## do we search in words indexes?
     # FIXME uncomment this
@@ -1910,6 +1917,7 @@ def browse_pattern_phrases(req, colls, p, f, rg, ln=CFG_SITE_LANG):
                 p = p[:-1]
                 browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
             except:
+                register_exception(req=req, alert_admin=True)
                 # probably there are no hits at all:
                 #req.write(_("No values found."))
                 return []
@@ -2048,13 +2056,11 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
     if CFG_INSPIRE_SITE and of.startswith('h'):
         # fulltext/caption search warnings for INSPIRE:
-        fields_to_be_searched = [f for o, p, f, m in basic_search_units]
+        fields_to_be_searched = [f for dummy_o, p, f, m in basic_search_units]
         if 'fulltext' in fields_to_be_searched:
-            write_warning( _("Warning: full-text search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") % \
-                          {'x_range_from_year': '2006',
-                           'x_range_to_year': '2012'}, req=req)
+            write_warning(_("Full-text search is currently available for all arXiv papers, many theses, a few report series and some journal articles"), req=req)
         elif 'caption' in fields_to_be_searched:
-            write_warning(_("Warning: figure caption search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") % \
+            write_warning(_("Warning: figure caption search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") %
                           {'x_range_from_year': '2008',
                            'x_range_to_year': '2012'}, req=req)
 
@@ -2094,7 +2100,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             write_warning("Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset), req=req)
         if len(basic_search_unit_hitset) > 0 or \
            ap<1 or \
-           bsu_o=="|" or \
+           bsu_o in ("|", "-") or \
            ((idx_unit+1)<len(basic_search_units) and basic_search_units[idx_unit+1][0]=="|"):
             # stage 2-1: this basic search unit is retained, since
             # either the hitset is non-empty, or the approximate
@@ -2115,7 +2121,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if len(basic_search_unit_hitset) > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
-                        write_warning(_("No exact match found for %(x_query1)s, using %(x_query2)s instead...") % \
+                        write_warning(_("No exact match found for %(x_query1)s, using %(x_query2)s instead...") %
                                       {'x_query1': "<em>" + cgi.escape(bsu_p) + "</em>",
                                        'x_query2': "<em>" + cgi.escape(bsu_pn) + "</em>"}, req=req)
                     basic_search_units[idx_unit][1] = bsu_pn
@@ -2219,13 +2225,13 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
 
         # parse the query. The result is list of [op1, expr1, op2, expr2, ..., opN, exprN]
         parsing_result = parser.parse_query(p)
-        if verbose  and of.startswith("h"):
+        if verbose and of.startswith("h"):
             write_warning("Search stage 1: search_pattern_parenthesised() searched %s." % repr(p), req=req)
             write_warning("Search stage 1: search_pattern_parenthesised() returned %s." % repr(parsing_result), req=req)
          # go through every pattern
         # calculate hitset for it
         # combine pattern's hitset with the result using the corresponding operator
-        for index in xrange(0, len(parsing_result)-1, 2 ):
+        for index in xrange(0, len(parsing_result)-1, 2):
             current_operator = parsing_result[index]
             current_pattern = parsing_result[index+1]
 
@@ -2301,7 +2307,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
             cjk_tok = BibIndexCJKTokenizer()
             chars = cjk_tok.tokenize_for_words(p)
             for char in chars:
-                hitset_cjk |= search_unit_in_bibwords(char, f, m, wl)
+                hitset_cjk |= search_unit_in_bibwords(char, f, wl)
 
     ## eventually look up runtime synonyms:
     hitset_synonyms = intbitset()
@@ -2347,6 +2353,12 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     elif f == 'refersto':
         # we are doing search by the citation count
         hitset = search_unit_refersto(p)
+    elif f == 'referstoexcludingselfcites':
+        # we are doing search by the citation count
+        hitset = search_unit_refersto_excluding_selfcites(p)
+    elif f == 'cataloguer':
+        # we are doing search by the cataloguer nickname
+        hitset = search_unit_in_record_history(p)
     elif f == 'rawref':
         from invenio.legacy.refextract.api import search_from_reference
         field, pattern = search_from_reference(p)
@@ -2368,8 +2380,10 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
 
         if module_found:
             return search_unit_in_tags(p)
-
-    elif m == 'a' or m == 'r':
+    elif f == 'citedbyexcludingselfcites':
+        # we are doing search by the citation count
+        hitset = search_unit_citedby_excluding_selfcites(p)
+    elif m == 'a' or m == 'r' or f == 'subject':
         # we are doing either phrase search or regexp search
         if f == 'fulltext':
             # FIXME: workaround for not having phrase index yet
@@ -2390,9 +2404,12 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     elif p.startswith("cited:"):
         # we are doing search by the citation count
         hitset = search_unit_by_times_cited(p[6:])
+    elif p.startswith("citedexcludingselfcites:"):
+        # we are doing search by the citation count
+        hitset = search_unit_by_times_cited(p[6:], exclude_selfcites=True)
     else:
         # we are doing bibwords search by default
-        hitset = search_unit_in_bibwords(p, f, m, wl=wl)
+        hitset = search_unit_in_bibwords(p, f, wl=wl)
 
     ## merge synonym results and return total:
     hitset |= hitset_synonyms
@@ -2406,9 +2423,9 @@ def get_idxpair_field_ids():
     return [index_dict[field] for field in index_dict if field in cfg['CFG_WEBSEARCH_IDXPAIRS_FIELDS']]
 
 
-def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
+def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
     """Searches for 'word' inside bibwordsX table for field 'f' and returns hitset of recIDs."""
-    set = intbitset() # will hold output result set
+    hitset = intbitset() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     limit_reached = 0 # flag for knowing if the query limit has been reached
 
@@ -2425,8 +2442,8 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
     if f.endswith('count') and word.endswith('+'):
         # field count query of the form N+ so transform N+ to N->99999:
         word = word[:-1] + '->99999'
-    word = string.replace(word, '*', '%') # we now use '*' as the truncation character
-    words = string.split(word, "->", 1) # check for span query
+    word = word.replace('*', '%') # we now use '*' as the truncation character
+    words = word.split("->", 1) # check for span query
     if len(words) == 2:
         word0 = re_word.sub('', words[0])
         word1 = re_word.sub('', words[1])
@@ -2447,7 +2464,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
                 pass
         try:
             res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
-                          (word0_washed, word1_washed), wildcard_limit = wl)
+                          (word0_washed, word1_washed), wildcard_limit=wl)
         except InvenioDbQueryWildcardLimitError as excp:
             res = excp.res
             limit_reached = 1 # set the limit reached flag to true
@@ -2459,7 +2476,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
         if stemming_language:
             word = lower_index_term(word)
             word = stem(word, stemming_language)
-        if string.find(word, '%') >= 0: # do we have wildcard in the word?
+        if word.find('%') >= 0: # do we have wildcard in the word?
             if f == 'journal':
                 # FIXME: quick hack for the journal index
                 # FIXME: we can run a sanity check here for all indexes
@@ -2479,18 +2496,18 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
         hitset_bibwrd = intbitset(hitlist)
         # add the results:
         if set_used:
-            set.union_update(hitset_bibwrd)
+            hitset.union_update(hitset_bibwrd)
         else:
-            set = hitset_bibwrd
+            hitset = hitset_bibwrd
             set_used = 1
     #check to see if the query limit was reached
     if limit_reached:
         #raise an exception, so we can print a nice message to the user
-        raise InvenioWebSearchWildcardLimitError(set)
+        raise InvenioWebSearchWildcardLimitError(hitset)
     # okay, return result set:
-    return set
+    return hitset
 
-def search_unit_in_idxpairs(p, f, type, wl=0):
+def search_unit_in_idxpairs(p, f, search_type, wl=0):
     """Searches for pair 'p' inside idxPAIR table for field 'f' and
     returns hitset of recIDs found."""
     limit_reached = 0 # flag for knowing if the query limit has been reached
@@ -2511,24 +2528,24 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
     queries_releated_vars = [] # contains tuples of (query_addons, query_params, use_query_limit)
 
     #is it a span query?
-    ps = string.split(p, "->", 1)
+    ps = p.split("->", 1)
     if len(ps) == 2 and not (ps[0].endswith(' ') or ps[1].startswith(' ')):
         #so we are dealing with a span query
         pairs_left = pairs_tokenizer.tokenize_for_pairs(ps[0])
         pairs_right = pairs_tokenizer.tokenize_for_pairs(ps[1])
         if not pairs_left or not pairs_right:
             # we are not actually dealing with pairs but with words
-            return search_unit_in_bibwords(original_pattern, f, type, wl)
+            return search_unit_in_bibwords(original_pattern, f, wl=wl)
         elif len(pairs_left) != len(pairs_right):
             # it is kind of hard to know what the user actually wanted
             # we have to do: foo bar baz -> qux xyz, so let's swith to phrase
-            return search_unit_in_idxphrases(original_pattern, f, type, wl)
+            return search_unit_in_idxphrases(original_pattern, f, search_type, wl)
         elif len(pairs_left) > 1 and \
                 len(pairs_right) > 1 and \
                 pairs_left[:-1] != pairs_right[:-1]:
             # again we have something like: foo bar baz -> abc xyz qux
             # so we'd better switch to phrase
-            return search_unit_in_idxphrases(original_pattern, f, type, wl)
+            return search_unit_in_idxphrases(original_pattern, f, search_type, wl)
         else:
             # finally, we can treat the search using idxPairs
             # at this step we have either: foo bar -> abc xyz
@@ -2537,14 +2554,14 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
             for pair in pairs_left[:-1]:# which should be equal with pairs_right[:-1]
                 queries_releated_vars.append(("= %s", (pair, ), False))
         do_exact_search = False # no exact search for span queries
-    elif string.find(p, '%') > -1:
+    elif p.find('%') > -1:
         #tokenizing p will remove the '%', so we have to make sure it stays
         replacement = 'xxxxxxxxxx' #hopefuly this will not clash with anything in the future
         p = string.replace(p, '%', replacement)
         pairs = pairs_tokenizer.tokenize_for_pairs(p)
         if not pairs:
             # we are not actually dealing with pairs but with words
-            return search_unit_in_bibwords(original_pattern, f, type, wl)
+            return search_unit_in_bibwords(original_pattern, f, wl=wl)
         queries_releated_vars = []
         for pair in pairs:
             if string.find(pair, replacement) > -1:
@@ -2558,7 +2575,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
         pairs = pairs_tokenizer.tokenize_for_pairs(p)
         if not pairs:
             # we are not actually dealing with pairs but with words
-            return search_unit_in_bibwords(original_pattern, f, type, wl)
+            return search_unit_in_bibwords(original_pattern, f, wl=wl)
         queries_releated_vars = []
         for pair in pairs:
             queries_releated_vars.append(("= %s", (pair, ), False))
@@ -2570,13 +2587,13 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
         use_query_limit = query_var[2]
         if use_query_limit:
             try:
-                res = run_sql_with_limit("SELECT term, hitlist FROM %s WHERE term %s" \
+                res = run_sql_with_limit("SELECT term, hitlist FROM %s WHERE term %s"
                                      % (idxpair_table_washed, query_addons), query_params, wildcard_limit=wl) #kwalitee:disable=sql
             except InvenioDbQueryWildcardLimitError as excp:
                 res = excp.res
                 limit_reached = 1 # set the limit reached flag to true
         else:
-            res = run_sql("SELECT term, hitlist FROM %s WHERE term %s" \
+            res = run_sql("SELECT term, hitlist FROM %s WHERE term %s"
                       % (idxpair_table_washed, query_addons), query_params) #kwalitee:disable=sql
         if not res:
             return intbitset()
@@ -2610,13 +2627,13 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
     return result_set
 
 
-def search_unit_in_idxphrases(p, f, type, wl=0):
+def search_unit_in_idxphrases(p, f, search_type, wl=0):
     """Searches for phrase 'p' inside idxPHRASE*F table for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
     # call word search method in some cases:
     if f.endswith('count'):
         return search_unit_in_bibwords(p, f, wl=wl)
-    set = intbitset() # will hold output result set
+    hitset = intbitset() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     limit_reached = 0 # flag for knowing if the query limit has been reached
     use_query_limit = False # flag for knowing if to limit the query results or not
@@ -2629,19 +2646,19 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
         else:
             return intbitset() # phrase index f does not exist
     # detect query type (exact phrase, partial phrase, regexp):
-    if type == 'r':
+    if search_type == 'r':
         query_addons = "REGEXP %s"
         query_params = (p,)
         use_query_limit = True
     else:
-        p = string.replace(p, '*', '%') # we now use '*' as the truncation character
-        ps = string.split(p, "->", 1) # check for span query:
+        p = p.replace('*', '%') # we now use '*' as the truncation character
+        ps = p.split("->", 1) # check for span query:
         if len(ps) == 2 and not (ps[0].endswith(' ') or ps[1].startswith(' ')):
             query_addons = "BETWEEN %s AND %s"
             query_params = (ps[0], ps[1])
             use_query_limit = True
         else:
-            if string.find(p, '%') > -1:
+            if p.find('%') > -1:
                 query_addons = "LIKE %s"
                 query_params = (p,)
                 use_query_limit = True
@@ -2666,20 +2683,20 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
     else:
         res = run_sql("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons), query_params)
     # fill the result set:
-    for word, hitlist in res:
+    for dummy_word, hitlist in res:
         hitset_bibphrase = intbitset(hitlist)
         # add the results:
         if set_used:
-            set.union_update(hitset_bibphrase)
+            hitset.union_update(hitset_bibphrase)
         else:
-            set = hitset_bibphrase
+            hitset = hitset_bibphrase
             set_used = 1
     #check to see if the query limit was reached
     if limit_reached:
         #raise an exception, so we can print a nice message to the user
-        raise InvenioWebSearchWildcardLimitError(set)
+        raise InvenioWebSearchWildcardLimitError(hitset)
     # okay, return result set:
-    return set
+    return hitset
 
 def search_unit_in_bibxxx(p, f, type, wl=0):
     """Searches for pattern 'p' inside bibxxx tables for field 'f' and returns hitset of recIDs found.
@@ -2688,7 +2705,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
     # call word search method in some cases:
     if f == 'journal' or f.endswith('count'):
         return search_unit_in_bibwords(p, f, wl=wl)
-    p_orig = p # saving for eventual future 'no match' reporting
+
     limit_reached = 0 # flag for knowing if the query limit has been reached
     use_query_limit = False  # flag for knowing if to limit the query results or not
     query_addons = "" # will hold additional SQL code for the query
@@ -2776,12 +2793,12 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
     # check no of hits found:
     nb_hits = len(l)
     # okay, return result set:
-    set = intbitset(l)
+    hitset = intbitset(l)
     #check to see if the query limit was reached
     if limit_reached:
         #raise an exception, so we can print a nice message to the user
-        raise InvenioWebSearchWildcardLimitError(set)
-    return set
+        raise InvenioWebSearchWildcardLimitError(hitset)
+    return hitset
 
 def search_unit_in_solr(p, f=None, m=None):
     """
@@ -2807,18 +2824,18 @@ def search_unit_in_xapian(p, f=None, m=None):
     return xapian_get_bitset(f, p)
 
 
-def search_unit_in_bibrec(datetext1, datetext2, type='c'):
+def search_unit_in_bibrec(datetext1, datetext2, search_type='c'):
     """
     Return hitset of recIDs found that were either created or modified
     (according to 'type' arg being 'c' or 'm') from datetext1 until datetext2, inclusive.
     Does not pay attention to pattern, collection, anything.  Useful
     to intersect later on with the 'real' query.
     """
-    set = intbitset()
-    if type and type.startswith("m"):
-        type = "modification_date"
+    hitset = intbitset()
+    if search_type and search_type.startswith("m"):
+        search_type = "modification_date"
     else:
-        type = "creation_date" # by default we are searching for creation dates
+        search_type = "creation_date" # by default we are searching for creation dates
 
     parts = datetext1.split('->')
     if len(parts) > 1 and datetext1 == datetext2:
@@ -2826,16 +2843,16 @@ def search_unit_in_bibrec(datetext1, datetext2, type='c'):
         datetext2 = parts[1]
 
     if datetext1 == datetext2:
-        res = run_sql("SELECT id FROM bibrec WHERE %s LIKE %%s" % (type,),
+        res = run_sql("SELECT id FROM bibrec WHERE %s LIKE %%s" % (search_type,),
                       (datetext1 + '%',))
     else:
-        res = run_sql("SELECT id FROM bibrec WHERE %s>=%%s AND %s<=%%s" % (type, type),
+        res = run_sql("SELECT id FROM bibrec WHERE %s>=%%s AND %s<=%%s" % (search_type, search_type),
                       (datetext1, datetext2))
     for row in res:
-        set += row[0]
-    return set
+        hitset += row[0]
+    return hitset
 
-def search_unit_by_times_cited(p):
+def search_unit_by_times_cited(p, exclude_selfcites=False):
     """
     Return histset of recIDs found that are cited P times.
     Usually P looks like '10->23'.
@@ -2849,7 +2866,8 @@ def search_unit_by_times_cited(p):
     if p == 0 or p == "0" or \
        p.startswith("0->") or p.endswith("->0"):
         allrecs = intbitset(run_sql("SELECT id FROM bibrec"))
-    return get_records_with_num_cites(numstr, allrecs)
+    return get_records_with_num_cites(numstr, allrecs,
+                                      exclude_selfcites=exclude_selfcites)
 
 def search_unit_refersto(query):
     """
@@ -2858,10 +2876,58 @@ def search_unit_refersto(query):
     """
     if query:
         ahitset = search_pattern(p=query)
-        if ahitset:
-            return get_refersto_hitset(ahitset)
+        return get_refersto_hitset(ahitset)
+    else:
+        return intbitset([])
+
+def search_unit_refersto_excluding_selfcites(query):
+    """
+    Search for records satisfying the query (e.g. author:ellis) and
+    return list of records referred to by these records.
+    """
+    if query:
+        ahitset = search_pattern(p=query)
+        citers = intbitset()
+        citations = get_cited_by_list(ahitset)
+        selfcitations = get_self_cited_by_list(ahitset)
+        for cites, selfcites in zip(citations, selfcitations):
+            # cites is in the form [(citee, citers), ...]
+            citers += cites[1] - selfcites[1]
+        return citers
+    else:
+        return intbitset([])
+
+def search_unit_in_record_history(query):
+    """
+    Return hitset of recIDs that were modified by the given cataloguer
+    """
+    if query:
+        try:
+            cataloguer_name, modification_date = query.split(":")
+        except ValueError:
+            cataloguer_name = query
+            modification_date = ""
+
+        if modification_date:
+            spires_syntax_converter = SpiresToInvenioSyntaxConverter()
+            modification_date = spires_syntax_converter.convert_date(modification_date)
+            parts = modification_date.split('->', 1)
+
+            if len(parts) > 1:
+                start_date, end_date = parts
+
+                res = run_sql("SELECT id_bibrec FROM hstRECORD WHERE job_person=%s AND job_date>=%s AND job_date<=%s",
+                      (cataloguer_name, start_date, end_date))
+
+            else:
+                res = run_sql("SELECT id_bibrec FROM hstRECORD WHERE job_person=%s AND job_date LIKE %s",
+                      (cataloguer_name, modification_date + '%',))
+
+            return intbitset(res)
         else:
-            return intbitset([])
+            sql = "SELECT id_bibrec FROM hstRECORD WHERE job_person=%s"
+            res = intbitset(run_sql(sql, (cataloguer_name,)))
+            return res
     else:
         return intbitset([])
 
@@ -2879,6 +2945,7 @@ def search_unit_citedby(query):
     else:
         return intbitset([])
 
+
 def search_unit_collection(query, m, wl=None):
     """
     Search for records satisfying the query (e.g. collection:"BOOK" or
@@ -2889,6 +2956,24 @@ def search_unit_collection(query, m, wl=None):
         if not ahitset:
             return search_unit_in_bibwords(query, 'collection', m, wl=wl)
         return ahitset
+    else:
+        return intbitset([])
+
+
+def search_unit_citedby_excluding_selfcites(query):
+    """
+    Search for records satisfying the query (e.g. author:ellis) and
+    return list of records referred to by these records.
+    """
+    if query:
+        ahitset = search_pattern(p=query)
+        citees = intbitset()
+        references = get_refers_to_list(ahitset)
+        selfreferences = get_self_refers_to_list(ahitset)
+        for refs, selfrefs in zip(references, selfreferences):
+            # refs is in the form [(citer, citees), ...]
+            citees += refs[1] - selfrefs[1]
+        return citees
     else:
         return intbitset([])
 
@@ -2947,7 +3032,7 @@ def get_records_that_can_be_displayed(user_info,
     return records_that_can_be_displayed
 
 
-def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
+def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
 
     _ = gettext_set_language(ln)
@@ -3029,16 +3114,16 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
                 url = websearch_templates.build_search_url(req.argd, cc=CFG_SITE_NAME, c=[])
                 len_colls_to_display = len(colls_to_be_displayed)
                 # trim the list of collections to first two, since it might get very large
-                write_warning(_("No match found in collection %(x_collection)s. Other collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
-                              {'x_collection': '<em>' + \
-                                    string.join([get_coll_i18nname(coll, ln, False) for coll in colls_to_be_displayed[:2]], ', ') + \
+                write_warning(_("No match found in collection %(x_collection)s. Other collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %
+                              {'x_collection': '<em>' +
+                                    string.join([get_coll_i18nname(coll, ln, False) for coll in colls_to_be_displayed[:2]], ', ') +
                                     (len_colls_to_display > 2 and ' et al' or '') + '</em>',
                                'x_url_open': '<a class="nearestterms" href="%s">' % (url),
                                'x_nb_hits': total_results,
                                'x_url_close': '</a>'}, req=req)
                 # display the hole list of collections in a comment
                 if len_colls_to_display > 2:
-                    write_warning("<!--No match found in collection <em>%(x_collection)s</em>.-->" %\
+                    write_warning("<!--No match found in collection <em>%(x_collection)s</em>.-->" %
                                   {'x_collection': string.join([get_coll_i18nname(coll, ln, False) for coll in colls_to_be_displayed], ', ')},
                                   req=req)
         else:
@@ -3113,8 +3198,7 @@ def create_similarly_named_authors_link_box(author_name, ln=CFG_SITE_LANG):
             # deduce into which bibxxx table we will search:
             digit1, digit2 = int(tag[0]), int(tag[1])
             bx = "bib%d%dx" % (digit1, digit2)
-            bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-            if len(tag) != 6 or tag[-1:]=='%':
+            if len(tag) != 6 or tag[-1:] == '%':
                 # only the beginning of field 't' is defined, so add wildcard character:
                 res = run_sql("""SELECT bx.value FROM %s AS bx
                                   WHERE bx.value LIKE %%s AND bx.tag LIKE %%s""" % bx,
@@ -3172,9 +3256,11 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
             # FIXME: workaround for not having native phrase index yet
             t = 'w'
     # special indexes:
-    if f == 'refersto':
+    if f == 'refersto' or f == 'referstoexcludingselfcites':
         return _("There are no records referring to %(x_rec)s.", x_rec=cgi.escape(p))
-    if f == 'citedby':
+    if f == 'cataloguer':
+        return _("There are no records modified by %(x_rec)s.", x_rec=cgi.escape(p))
+    if f == 'citedby' or f == 'citedbyexcludingselfcites':
         return _("There are no records cited by %(x_rec)s.", x_rec=cgi.escape(p))
     # look for nearest terms:
     if t == 'w':
@@ -3210,7 +3296,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         argd.update(urlargd)
 
         # check which fields contained the requested parameter, and replace it.
-        for (px, fx) in ('p', 'f'), ('p1', 'f1'), ('p2', 'f2'), ('p3', 'f3'):
+        for px, dummy_fx in ('p', 'f'), ('p1', 'f1'), ('p2', 'f2'), ('p3', 'f3'):
             if px in argd:
                 argd_px = argd[px]
                 if t == 'w':
@@ -3272,14 +3358,14 @@ def get_nearest_terms_in_idxphrase(p, index_id, n_below, n_above):
        regardless of collection.
        Return list of [phrase1, phrase2, ... , phrase_n]."""
     if CFG_INSPIRE_SITE and index_id in (3, 15): # FIXME: workaround due to new fuzzy index
-        return [p,]
+        return [p]
     idxphraseX = "idxPHRASE%02dF" % index_id
     res_above = run_sql("SELECT term FROM %s WHERE term<%%s ORDER BY term DESC LIMIT %%s" % idxphraseX, (p, n_above))
-    res_above = map(lambda x: x[0], res_above)
+    res_above = [x[0] for x in res_above]
     res_above.reverse()
 
     res_below = run_sql("SELECT term FROM %s WHERE term>=%%s ORDER BY term ASC LIMIT %%s" % idxphraseX, (p, n_below))
-    res_below = map(lambda x: x[0], res_below)
+    res_below = [x[0] for x in res_below]
 
     return res_above + res_below
 
@@ -3339,9 +3425,8 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
         # deduce into which bibxxx table we will search:
         digit1, digit2 = int(t[0]), int(t[1])
         bx = "bib%d%dx" % (digit1, digit2)
-        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
         # firstly try to get `n' closest phrases above `p':
-        if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
+        if len(t) != 6 or t[-1:] == '%': # only the beginning of field 't' is defined, so add wildcard character:
             res = run_sql("""SELECT bx.value FROM %s AS bx
                               WHERE bx.value<%%s AND bx.tag LIKE %%s
                               ORDER BY bx.value DESC LIMIT %%s""" % bx,
@@ -3376,7 +3461,7 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     # find position of self:
     try:
         idx_p = phrases_out.index(p)
-    except:
+    except ValueError:
         idx_p = len(phrases_out)/2
     # return n_above and n_below:
     return phrases_out[max(0, idx_p-n_above):idx_p+n_below]
@@ -3640,6 +3725,97 @@ def get_field_tags(field):
         out.append(val[0])
     return out
 
+def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
+    """Return buffer of ALEPH sequential-like textual format with fields found
+       in the list TAGS_IN for record RECID.
+
+       If can_see_hidden is True, just print everything.  Otherwise hide fields
+       from CFG_BIBFORMAT_HIDDEN_TAGS.
+    """
+
+    out = ""
+    if type(tags_in) is not list:
+        tags_in = [tags_in]
+    if len(tags_in) == 1 and len(tags_in[0]) == 6:
+        ## case A: one concrete subfield asked, so print its value if found
+        ##         (use with care: can mislead if field has multiple occurrences)
+        out += string.join(get_fieldvalues(recID, tags_in[0]), "\n")
+    else:
+        ## case B: print our "text MARC" format; works safely all the time
+        # find out which tags to output:
+        dict_of_tags_out = {}
+        if not tags_in:
+            for i in range(0, 10):
+                for j in range(0, 10):
+                    dict_of_tags_out["%d%d%%" % (i, j)] = 1
+        else:
+            for tag in tags_in:
+                if len(tag) == 0:
+                    for i in range(0, 10):
+                        for j in range(0, 10):
+                            dict_of_tags_out["%d%d%%" % (i, j)] = 1
+                elif len(tag) == 1:
+                    for j in range(0, 10):
+                        dict_of_tags_out["%s%d%%" % (tag, j)] = 1
+                elif len(tag) < 5:
+                    dict_of_tags_out["%s%%" % tag] = 1
+                elif tag >= 6:
+                    dict_of_tags_out[tag[0:5]] = 1
+        tags_out = dict_of_tags_out.keys()
+        tags_out.sort()
+        # search all bibXXx tables as needed:
+        for tag in tags_out:
+            digits = tag[0:2]
+            try:
+                intdigits = int(digits)
+                if intdigits < 0 or intdigits > 99:
+                    raise ValueError
+            except ValueError:
+                # invalid tag value asked for
+                continue
+            if tag.startswith("001") or tag.startswith("00%"):
+                if out:
+                    out += "\n"
+                out += "%09d %s %d" % (recID, "001__", recID)
+            bx = "bib%sx" % digits
+            bibx = "bibrec_bib%sx" % digits
+            query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
+                    "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s"\
+                    "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
+            res = run_sql(query, (recID, str(tag)+'%'))
+            # go through fields:
+            field_number_old = -999
+            field_old = ""
+            for row in res:
+                field, value, field_number = row[0], row[1], row[2]
+                ind1, ind2 = field[3], field[4]
+                printme = True
+                #check the stuff in hiddenfields
+                if not can_see_hidden:
+                    for htag in CFG_BIBFORMAT_HIDDEN_TAGS:
+                        ltag = len(htag)
+                        samelenfield = field[0:ltag]
+                        if samelenfield == htag:
+                            printme = False
+                if ind1 == "_":
+                    ind1 = ""
+                if ind2 == "_":
+                    ind2 = ""
+                # print field tag
+                if printme:
+                    if field_number != field_number_old or field[:-1] != field_old[:-1]:
+                        if out:
+                            out += "\n"
+                        out += "%09d %s " % (recID, field[:5])
+                        field_number_old = field_number
+                        field_old = field
+                    # print subfield value
+                    if field[0:2] == "00" and field[-1:] == "_":
+                        out += value
+                    else:
+                        out += "$$%s%s" % (field[-1:], value)
+    return out
+
 def get_merged_recid(recID):
     """ Return the record ID of the record with
     which the given record has been merged.
@@ -3657,25 +3833,6 @@ def get_merged_recid(recID):
             pass
     return merged_recid
 
-def record_exists(recID):
-    """Return 1 if record RECID exists.
-       Return 0 if it doesn't exist.
-       Return -1 if it exists but is marked as deleted.
-    """
-    out = 0
-    res = run_sql("SELECT id FROM bibrec WHERE id=%s", (recID,), 1)
-    if res:
-        try: # if recid is '123foo', mysql will return id=123, and we don't want that
-            recID = int(recID)
-        except ValueError:
-            return 0
-        # record exists; now check whether it isn't marked as deleted:
-        dbcollids = get_fieldvalues(recID, "980__%")
-        if ("DELETED" in dbcollids) or (CFG_CERN_SITE and "DUMMY" in dbcollids):
-            out = -1 # exists, but marked as deleted
-        else:
-            out = 1 # exists fine
-    return out
 
 def record_empty(recID):
     """
@@ -3686,11 +3843,7 @@ def record_empty(recID):
     @return: 1 if the record is empty, 0 otherwise.
     @rtype: int
     """
-    record = get_record(recID)
-    if record is None or len(record) < 2:
-        return 1
-    else:
-        return 0
+    return bibrecord.record_empty(get_record(recID))
 
 def record_public_p(recID, recreate_cache_if_needed=True):
     """Return 1 if the record is public, i.e. if it can be found in the Home collection.
@@ -3884,10 +4037,7 @@ class BibSortDataCacher(DataCacher):
     def __init__(self, method_name):
         self.method_name = method_name
         self.method_id = 0
-        try:
-            res = run_sql("""SELECT id from bsrMETHOD where name = %s""", (self.method_name,))
-        except:
-            self.method_id = 0
+        res = run_sql("""SELECT id from bsrMETHOD where name = %s""", (self.method_name,))
         if res and res[0]:
             self.method_id = res[0][0]
         else:
@@ -3908,7 +4058,7 @@ class BibSortDataCacher(DataCacher):
                 return {}
             try:
                 data_dict_ordered = deserialize_via_marshal(res_data[0][0])
-            except:
+            except IndexError:
                 data_dict_ordered = {}
             alldicts['data_dict_ordered'] = data_dict_ordered # recid: weight
             if not res_buckets:
@@ -3919,7 +4069,7 @@ class BibSortDataCacher(DataCacher):
                 bucket_no = row[0]
                 try:
                     bucket_data = intbitset(row[1])
-                except:
+                except IndexError:
                     bucket_data = intbitset([])
                 alldicts.setdefault('bucket_data', {})[bucket_no] = bucket_data
 
@@ -3942,21 +4092,18 @@ class BibSortDataCacher(DataCacher):
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
 def get_sorting_methods():
-    if not CFG_BIBSORT_BUCKETS: # we do not want to use buckets
-        return {}
-    try: # make sure the method has some data
-        res = run_sql("""SELECT m.name, m.definition FROM bsrMETHOD m, bsrMETHODDATA md WHERE m.id = md.id_bsrMETHOD""")
-    except:
-        return {}
+    res = run_sql("""SELECT m.name, m.definition
+                     FROM bsrMETHOD m, bsrMETHODDATA md
+                     WHERE m.id = md.id_bsrMETHOD""")
     return dict(res)
 
-sorting_methods = get_sorting_methods()
-cache_sorted_data = {}
-for sorting_method in sorting_methods:
+SORTING_METHODS = get_sorting_methods()
+CACHE_SORTED_DATA = {}
+for sorting_method in SORTING_METHODS:
     try:
-        cache_sorted_data[sorting_method].is_ok_p
-    except Exception:
-        cache_sorted_data[sorting_method] = BibSortDataCacher(sorting_method)
+        CACHE_SORTED_DATA[sorting_method].is_ok_p
+    except KeyError:
+        CACHE_SORTED_DATA[sorting_method] = BibSortDataCacher(sorting_method)
 
 
 def get_tags_from_sort_fields(sort_fields):
@@ -3967,7 +4114,7 @@ def get_tags_from_sort_fields(sort_fields):
     if not sort_fields:
         return [], ''
     for sort_field in sort_fields:
-        if sort_field and str(sort_field[0:2]).isdigit():
+        if sort_field and (len(sort_field) > 1 and str(sort_field[0:2]).isdigit()):
             # sort_field starts by two digits, so this is probably a MARC tag already
             tags.append(sort_field)
         else:
@@ -3980,46 +4127,66 @@ def get_tags_from_sort_fields(sort_fields):
     return tags, ''
 
 
-def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pattern=None, verbose=0, sort_order='d', of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, field=''):
+def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pattern=None, verbose=0, sort_order='d', of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, field='', sorting_methods=SORTING_METHODS):
     """Initial entry point for ranking records, acts like a dispatcher.
        (i) rank_method_code is in bsrMETHOD, bibsort buckets can be used;
        (ii)rank_method_code is not in bsrMETHOD, use bibrank;
     """
-
-    if CFG_BIBSORT_BUCKETS and sorting_methods:
+    # Special case: sorting by citations is fast because we store the
+    # ranking dictionary in memory, so we do not use bibsort buckets.
+    if CFG_BIBSORT_ENABLED and sorting_methods and rank_method_code != 'citation':
         for sort_method in sorting_methods:
             definition = sorting_methods[sort_method]
             if definition.startswith('RNK') and \
-            definition.replace('RNK:','').strip().lower() == string.lower(rank_method_code):
-                (solution_recs, solution_scores) = sort_records_bibsort(req, hitset_global, sort_method, '', sort_order, verbose, of, ln, rg, jrec, 'r')
-                #return (solution_recs, solution_scores, '', '', '')
+                   definition.replace('RNK:', '').strip().lower() == rank_method_code.lower():
+                solution_recs, solution_scores = \
+                        sort_records_bibsort(req, hitset_global, sort_method,
+                                             '', sort_order, verbose, of, ln,
+                                             rg, jrec, 'r')
                 comment = ''
                 if verbose > 0:
                     comment = 'find_citations retlist %s' % [[solution_recs[i], solution_scores[i]] for i in range(len(solution_recs))]
-                return (solution_recs, solution_scores, '(', ')', comment)
-    return rank_records_bibrank(rank_method_code, rank_limit_relevance, hitset_global, pattern, verbose, field, rg, jrec)
+                return solution_recs, solution_scores, '(', ')', comment
 
+    if rank_method_code.lower() == 'citation':
+        related_to = []
+    else:
+        related_to = pattern
 
-def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
+    solution_recs, solution_scores, prefix, suffix, comment = \
+        rank_records_bibrank(rank_method_code=rank_method_code,
+                             rank_limit_relevance=rank_limit_relevance,
+                             hitset=hitset_global,
+                             verbose=verbose,
+                             field=field,
+                             related_to=related_to,
+                             rg=rg,
+                             jrec=jrec)
+
+    # Solution recs can be None, in case of error or other cases
+    # which should be all be changed to return an empty list.
+    if solution_recs and sort_order == 'd':
+        solution_recs.reverse()
+        solution_scores.reverse()
+
+    return solution_recs, solution_scores, prefix, suffix, comment
+
+def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, sorting_methods=SORTING_METHODS):
     """Initial entry point for sorting records, acts like a dispatcher.
        (i) sort_field is in the bsrMETHOD, and thus, the BibSort has sorted the data for this field, so we can use the cache;
        (ii)sort_field is not in bsrMETHOD, and thus, the cache does not contain any information regarding this sorting method"""
 
     _ = gettext_set_language(ln)
 
-    #we should return sorted records up to irec_max(exclusive)
-    dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
-    #calculate the min index on the reverted list
-    index_min = max(len(recIDs) - irec_max, 0) #just to be sure that the min index is not negative
+    # Calculate the min index on the reverted list
+    index_min = jrec
 
     #bibsort does not handle sort_pattern for now, use bibxxx
     if sort_pattern:
         return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, sort_pattern, verbose, of, ln, rg, jrec)
 
-    use_sorting_buckets = True
-
-    if not CFG_BIBSORT_BUCKETS or not sorting_methods: #ignore the use of buckets, use old fashion sorting
-        use_sorting_buckets = False
+    #ignore the use of buckets, use old fashion sorting
+    use_sorting_buckets = CFG_BIBSORT_ENABLED and sorting_methods
 
     if not sort_field:
         if use_sorting_buckets:
@@ -4033,8 +4200,8 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         for sort_method in sorting_methods:
             definition = sorting_methods[sort_method]
             if use_sorting_buckets and \
-               ((definition.startswith('FIELD') and \
-                definition.replace('FIELD:','').strip().lower() == string.lower(sort_fields[0])) or \
+               ((definition.startswith('FIELD') and
+                definition.replace('FIELD:', '').strip().lower() == sort_fields[0].lower()) or
                 sort_method == sort_fields[0]):
                 #use BibSort
                 return sort_records_bibsort(req, recIDs, sort_method, sort_field, sort_order, verbose, of, ln, rg, jrec)
@@ -4051,7 +4218,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         for sort_method in sorting_methods:
             definition = sorting_methods[sort_method]
             if definition.startswith('MARC') \
-                    and definition.replace('MARC:','').strip().split(',') == tags \
+                    and definition.replace('MARC:', '').strip().split(',') == tags \
                     and use_sorting_buckets:
                 #this list of tags have a designated method in BibSort, so use it
                 return sort_records_bibsort(req, recIDs, sort_method, sort_field, sort_order, verbose, of, ln, rg, jrec)
@@ -4061,74 +4228,94 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
     return recIDs[index_min:]
 
 
-def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, sort_or_rank = 's'):
+def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=1, sort_or_rank='s', sorting_methods=SORTING_METHODS):
     """This function orders the recIDs list, based on a sorting method(sort_field) using the BibSortDataCacher for speed"""
-
     _ = gettext_set_language(ln)
+
+    if not jrec:
+        jrec = 1
 
     #sanity check
     if sort_method not in sorting_methods:
         if sort_or_rank == 'r':
-            return rank_records_bibrank(sort_method, 0, recIDs, None, verbose)
+            return rank_records_bibrank(rank_method_code=sort_method,
+                                        rank_limit_relevance=0,
+                                        hitset=recIDs,
+                                        verbose=verbose)
         else:
             return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, '', verbose, of, ln, rg, jrec)
     if verbose >= 3 and of.startswith('h'):
-        write_warning("Sorting (using BibSort cache) by method %s (definition %s)." \
+        write_warning("Sorting (using BibSort cache) by method %s (definition %s)."
                       % (cgi.escape(repr(sort_method)), cgi.escape(repr(sorting_methods[sort_method]))), req=req)
     #we should return sorted records up to irec_max(exclusive)
     dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
-    solution = intbitset([])
+    solution = intbitset()
     input_recids = intbitset(recIDs)
-    cache_sorted_data[sort_method].recreate_cache_if_needed()
-    sort_cache = cache_sorted_data[sort_method].cache
+    CACHE_SORTED_DATA[sort_method].recreate_cache_if_needed()
+    sort_cache = CACHE_SORTED_DATA[sort_method].cache
     bucket_numbers = sort_cache['bucket_data'].keys()
     #check if all buckets have been constructed
     if len(bucket_numbers) != CFG_BIBSORT_BUCKETS:
         if verbose > 3 and of.startswith('h'):
             write_warning("Not all buckets have been constructed.. switching to old fashion sorting.", req=req)
         if sort_or_rank == 'r':
-            return rank_records_bibrank(sort_method, 0, recIDs, None, verbose)
+            return rank_records_bibrank(rank_method_code=sort_method,
+                                        rank_limit_relevance=0,
+                                        hitset=recIDs,
+                                        verbose=verbose)
         else:
-            return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, '', verbose, of, ln, rg, jrec)
+            return sort_records_bibxxx(req, recIDs, None, sort_field,
+                                       sort_order, '', verbose, of, ln, rg,
+                                       jrec)
+
     if sort_order == 'd':
         bucket_numbers.reverse()
     for bucket_no in bucket_numbers:
         solution.union_update(input_recids & sort_cache['bucket_data'][bucket_no])
         if len(solution) >= irec_max:
             break
+
     dict_solution = {}
-    missing_records = []
+    missing_records = intbitset()
     for recid in solution:
         try:
             dict_solution[recid] = sort_cache['data_dict_ordered'][recid]
         except KeyError:
             #recid is in buckets, but not in the bsrMETHODDATA,
             #maybe because the value has been deleted, but the change has not yet been propagated to the buckets
-            missing_records.append(recid)
+            missing_records.add(recid)
     #check if there are recids that are not in any bucket -> to be added at the end/top, ordered by insertion date
     if len(solution) < irec_max:
         #some records have not been yet inserted in the bibsort structures
         #or, some records have no value for the sort_method
-        missing_records = sorted(missing_records + list(input_recids.difference(solution)))
+        missing_records += input_recids - solution
     #the records need to be sorted in reverse order for the print record function
     #the return statement should be equivalent with the following statements
     #(these are clearer, but less efficient, since they revert the same list twice)
     #sorted_solution = (missing_records + sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='d'))[:irec_max]
     #sorted_solution.reverse()
     #return sorted_solution
-    if sort_method.strip().lower().startswith('latest') and sort_order == 'd':
-        # if we want to sort the records on their insertion date, add the mission records at the top
-        solution = sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='a') + missing_records
+    reverse = sort_order == 'd'
+
+    if sort_method.strip().lower().startswith('latest') and reverse:
+        # If we want to sort the records on their insertion date, add the missing records at the top
+        solution = sorted(dict_solution, key=dict_solution.__getitem__, reverse=True) + sorted(missing_records, reverse=True)
     else:
-        solution = missing_records + sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='a')
-    #calculate the min index on the reverted list
-    index_min = max(len(solution) - irec_max, 0) #just to be sure that the min index is not negative
-    #return all the records up to irec_max, but on the reverted list
+        solution = sorted(missing_records) + sorted(dict_solution, key=dict_solution.__getitem__, reverse=reverse)
+
+    # Only keep records, we are going to display
+    index_min = jrec - 1
+    if rg:
+        index_max = index_min + rg
+        solution = solution[index_min:index_max]
+    else:
+        solution = solution[index_min:]
+
     if sort_or_rank == 'r':
-        # we need the recids, with values
-        return (solution[index_min:], [dict_solution.get(record, 0) for record in solution[index_min:]])
+        # We need the recids, with their ranking score
+        return solution, [dict_solution.get(record, 0) for record in solution]
     else:
-        return solution[index_min:]
+        return solution
 
 
 def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
@@ -4294,7 +4481,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
     if len(recIDs):
         nb_found = len(recIDs)
 
-        if rg == -9999: # print all records
+        if not rg or rg == -9999: # print all records
             rg = nb_found
         else:
             rg = abs(rg)
@@ -4319,19 +4506,25 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
             if print_records_prologue_p:
                 print_records_prologue(req, format)
 
-            # print records
-            recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
-
             if ot:
                 # asked to print some filtered fields only, so call print_record() on the fly:
-                for irec in range(irec_max, irec_min, -1):
-                    x = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
-                                    user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
+                for recid in recIDs:
+                    x = print_record(recid,
+                                     format,
+                                     ot=ot,
+                                     ln=ln,
+                                     search_pattern=search_pattern,
+                                     user_info=user_info,
+                                     verbose=verbose,
+                                     sf=sf,
+                                     so=so,
+                                     sp=sp,
+                                     rm=rm)
                     req.write(x)
                     if x:
                         req.write('\n')
             else:
-                format_records(recIDs_to_print,
+                format_records(recIDs,
                                format,
                                ln=ln,
                                search_pattern=search_pattern,
@@ -4345,22 +4538,30 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
         elif format.startswith('t') or str(format[0:3]).isdigit():
             # we are doing plain text output:
-            for irec in range(irec_max, irec_min, -1):
-                x = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
+            for recid in recIDs:
+                x = print_record(recid, format, ot, ln, search_pattern=search_pattern,
                                  user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
                 req.write(x)
                 if x:
                     req.write('\n')
         elif format == 'excel':
-            recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
-            create_excel(recIDs=recIDs_to_print, req=req, ln=ln, ot=ot, user_info=user_info)
+            create_excel(recIDs=recIDs, req=req, ot=ot, user_info=user_info)
         else:
             # we are doing HTML output:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
                 # portfolio and on-the-fly formats:
-                for irec in range(irec_max, irec_min, -1):
-                    req.write(print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
-                                           user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm))
+                for recid in recIDs:
+                    req.write(print_record(recid,
+                                           format,
+                                           ot=ot,
+                                           ln=ln,
+                                           search_pattern=search_pattern,
+                                           user_info=user_info,
+                                           verbose=verbose,
+                                           sf=sf,
+                                           so=so,
+                                           sp=sp,
+                                           rm=rm))
             elif format.startswith("hb"):
                 # HTML brief format:
                 display_add_to_basket = True
@@ -4373,44 +4574,51 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             display_add_to_basket = False
                 if em != "" and EM_REPOSITORY["basket"] not in em:
                     display_add_to_basket = False
-                req.write(websearch_templates.tmpl_record_format_htmlbrief_header(
-                    ln = ln))
-                for irec in range(irec_max, irec_min, -1):
-                    row_number = jrec+irec_max-irec
-                    recid = recIDs[irec]
+                req.write(websearch_templates.tmpl_record_format_htmlbrief_header(ln=ln))
+                for irec, recid in enumerate(recIDs):
+                    row_number = jrec+irec
                     if relevances and relevances[irec]:
                         relevance = relevances[irec]
                     else:
                         relevance = ''
-                    record = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
-                                                  user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
+                    record = print_record(recid,
+                                          format,
+                                          ot=ot,
+                                          ln=ln,
+                                          search_pattern=search_pattern,
+                                          user_info=user_info,
+                                          verbose=verbose,
+                                          sf=sf,
+                                          so=so,
+                                          sp=sp,
+                                          rm=rm)
 
                     req.write(websearch_templates.tmpl_record_format_htmlbrief_body(
-                        ln = ln,
-                        recid = recid,
-                        row_number = row_number,
-                        relevance = relevance,
-                        record = record,
-                        relevances_prologue = relevances_prologue,
-                        relevances_epilogue = relevances_epilogue,
-                        display_add_to_basket = display_add_to_basket
+                        ln=ln,
+                        recid=recid,
+                        row_number=row_number,
+                        relevance=relevance,
+                        record=record,
+                        relevances_prologue=relevances_prologue,
+                        relevances_epilogue=relevances_epilogue,
+                        display_add_to_basket=display_add_to_basket
                         ))
 
                 req.write(websearch_templates.tmpl_record_format_htmlbrief_footer(
-                    ln = ln,
-                    display_add_to_basket = display_add_to_basket))
+                    ln=ln,
+                    display_add_to_basket=display_add_to_basket))
 
             elif format.startswith("hd"):
                 # HTML detailed format:
-                for irec in range(irec_max, irec_min, -1):
-                    if record_exists(recIDs[irec]) == -1:
+                for recid in recIDs:
+                    if record_exists(recid) == -1:
                         write_warning(_("The record has been deleted."), req=req)
-                        merged_recid = get_merged_recid(recIDs[irec])
+                        merged_recid = get_merged_recid(recid)
                         if merged_recid:
                             write_warning(_("The record %(x_rec)d replaces it.", x_rec=merged_recid), req=req)
                         continue
-                    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
-                                                            recIDs[irec], ln=ln)
+                    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recid)),
+                                                            recid, ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
                     ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
 
@@ -4419,7 +4627,6 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                     if ln != CFG_SITE_LANG:
                         link_ln = '?ln=%s' % ln
 
-                    recid = recIDs[irec]
                     recid_to_display = recid  # Record ID used to build the URL.
                     if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
                         try:
@@ -4430,12 +4637,12 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             # internal recid.
                             pass
 
-                    tabs = [(unordered_tabs[tab_id]['label'], \
-                             '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, recid_to_display, tab_id, link_ln), \
+                    tabs = [(unordered_tabs[tab_id]['label'],
+                             '%s/%s/%s/%s%s' % (CFG_BASE_URL, CFG_SITE_RECORD, recid_to_display, tab_id, link_ln),
                              tab_id == tab,
-                             unordered_tabs[tab_id]['enabled']) \
-                            for (tab_id, order) in ordered_tabs_id
-                            if unordered_tabs[tab_id]['visible'] == True]
+                             unordered_tabs[tab_id]['enabled'])
+                            for (tab_id, dummy_order) in ordered_tabs_id
+                            if unordered_tabs[tab_id]['visible'] is True]
 
                     tabs_counts = get_detailed_page_tabs_counts(recid)
                     citedbynum = tabs_counts['Citations']
@@ -4450,28 +4657,28 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                      citationnum=citedbynum,
                                                      referencenum=references,
                                                      discussionnum=discussions))
-                        r = calculate_reading_similarity_list(recIDs[irec], "downloads")
+                        r = calculate_reading_similarity_list(recid, "downloads")
                         downloadsimilarity = None
                         downloadhistory = None
                         #if r:
                         #    downloadsimilarity = r
                         if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS:
-                            downloadhistory = create_download_history_graph_and_box(recIDs[irec], ln)
+                            downloadhistory = create_download_history_graph_and_box(recid, ln)
 
-                        r = calculate_reading_similarity_list(recIDs[irec], "pageviews")
+                        r = calculate_reading_similarity_list(recid, "pageviews")
                         viewsimilarity = None
-                        if r: viewsimilarity = r
-                        content = websearch_templates.tmpl_detailed_record_statistics(recIDs[irec],
+                        if r:
+                            viewsimilarity = r
+                        content = websearch_templates.tmpl_detailed_record_statistics(recid,
                                                                                       ln,
                                                                                       downloadsimilarity=downloadsimilarity,
                                                                                       downloadhistory=downloadhistory,
                                                                                       viewsimilarity=viewsimilarity)
                         req.write(content)
-                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'citations':
-                        recid = recIDs[irec]
                         req.write(webstyle_templates.detailed_record_container_top(recid,
                                                      tabs,
                                                      ln,
@@ -4507,23 +4714,30 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             citationhistory = create_citation_history_graph_and_box(recid, ln)
                         #debug
                         if verbose > 3:
-                            write_warning("Citation graph debug: " + \
+                            write_warning("Citation graph debug: " +
                                           str(len(citationhistory)), req=req)
-                        req.write(websearch_templates.tmpl_detailed_record_citations_citation_history(recid, ln, citationhistory))
+
+                        req.write(websearch_templates.tmpl_detailed_record_citations_citation_history(ln, citationhistory))
+
+                        # Citation log
+                        entries = get_citers_log(recid)
+                        req.write(websearch_templates.tmpl_detailed_record_citations_citation_log(ln, entries))
+
+
                         req.write(websearch_templates.tmpl_detailed_record_citations_epilogue(recid, ln))
                         req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'references':
-                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
                                                      referencenum=references,
                                                      discussionnum=discussions))
 
-                        req.write(format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose))
-                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                        req.write(format_record(recid, 'HDREF', ln=ln, user_info=user_info, verbose=verbose, force_2nd_pass=True))
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
@@ -4544,7 +4758,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                    tabs,
                                                                                    ln))
                         content = websearch_templates.tmpl_record_plots(recID=recid,
-                                                                         ln=ln)
+                                                                        ln=ln)
                         req.write(content)
                         req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
@@ -4569,49 +4783,70 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         req.write(webstyle_templates.detailed_record_container_bottom(recid,
                             tabs, ln))
                     elif tab == 'plots':
-                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,
                                                                                    ln))
-                        content = websearch_templates.tmpl_record_plots(recID=recIDs[irec],
+                        content = websearch_templates.tmpl_record_plots(recID=recid,
                                                                          ln=ln)
                         req.write(content)
-                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln))
 
+                    elif tab == 'hepdata':
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
+                                                                                   tabs,
+                                                                                   ln,
+                                                                                   include_jquery=True,
+                                                                                   include_mathjax=True))
+                        from invenio import hepdatautils
+                        from invenio import hepdatadisplayutils
+                        data = hepdatautils.retrieve_data_for_record(recid)
+
+                        if data:
+                            content = websearch_templates.tmpl_record_hepdata(data, recid, True)
+                        else:
+                            content = websearch_templates.tmpl_record_no_hepdata()
+
+                        req.write(content)
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
+                                                                                      tabs,
+                                                                                      ln))
                     else:
                         # Metadata tab
-                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_top(
+                                                     recid,
                                                      tabs,
                                                      ln,
                                                      show_short_rec_p=False,
-                                                     citationnum=citedbynum, referencenum=references,
+                                                     citationnum=citedbynum,
+                                                     referencenum=references,
                                                      discussionnum=discussions))
 
                         creationdate = None
                         modificationdate = None
-                        if record_exists(recIDs[irec]) == 1:
-                            creationdate = get_creation_date(recIDs[irec])
-                            modificationdate = get_modification_date(recIDs[irec])
+                        if record_exists(recid) == 1:
+                            creationdate = get_creation_date(recid)
+                            modificationdate = get_modification_date(recid)
 
-                        content = print_record(recIDs[irec], format, ot, ln,
+                        content = print_record(recid, format, ot, ln,
                                                search_pattern=search_pattern,
                                                user_info=user_info, verbose=verbose,
                                                sf=sf, so=so, sp=sp, rm=rm)
                         content = websearch_templates.tmpl_detailed_record_metadata(
-                            recID = recIDs[irec],
-                            ln = ln,
-                            format = format,
-                            creationdate = creationdate,
-                            modificationdate = modificationdate,
-                            content = content)
+                            recID=recid,
+                            ln=ln,
+                            format=format,
+                            creationdate=creationdate,
+                            modificationdate=modificationdate,
+                            content=content)
                         # display of the next-hit/previous-hit/back-to-search links
                         # on the detailed record pages
                         content += websearch_templates.tmpl_display_back_to_search(req,
-                                                                                   recIDs[irec],
+                                                                                   recid,
                                                                                    ln)
                         req.write(content)
-                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln,
                                                                                       creationdate=creationdate,
@@ -4622,12 +4857,12 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             # Add the mini box at bottom of the page
                             if CFG_WEBCOMMENT_ALLOW_REVIEWS:
                                 from invenio.modules.comments.api import get_mini_reviews
-                                reviews = get_mini_reviews(recid = recIDs[irec], ln=ln)
+                                reviews = get_mini_reviews(recid=recid, ln=ln)
                             else:
                                 reviews = ''
-                            actions = format_record(recIDs[irec], 'HDACT', ln=ln, user_info=user_info, verbose=verbose)
-                            files = format_record(recIDs[irec], 'HDFILE', ln=ln, user_info=user_info, verbose=verbose)
-                            req.write(webstyle_templates.detailed_record_mini_panel(recIDs[irec],
+                            actions = format_record(recid, 'HDACT', ln=ln, user_info=user_info, verbose=verbose)
+                            files = format_record(recid, 'HDFILE', ln=ln, user_info=user_info, verbose=verbose)
+                            req.write(webstyle_templates.detailed_record_mini_panel(recid,
                                                                                     ln,
                                                                                     format,
                                                                                     files=files,
@@ -4635,8 +4870,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                     actions=actions))
             else:
                 # Other formats
-                for irec in range(irec_max, irec_min, -1):
-                    req.write(print_record(recIDs[irec], format, ot, ln,
+                for recid in recIDs:
+                    req.write(print_record(recid, format, ot, ln,
                                            search_pattern=search_pattern,
                                            user_info=user_info, verbose=verbose,
                                            sf=sf, so=so, sp=sp, rm=rm))
@@ -4701,10 +4936,12 @@ def get_record(recid):
         value = run_sql("SELECT value FROM bibfmt WHERE id_bibrec=%s AND FORMAT='recstruct'",  (recid, ))
         if value:
             try:
-                return deserialize_via_marshal(value[0][0])
-            except:
-                ### In case of corruption, let's rebuild it!
+                val = value[0][0]
+            except IndexError:
+                ### In case it does not exist, let's build it!
                 pass
+            else:
+                return deserialize_via_marshal(val)
     return create_record(print_record(recid, 'xm'))[0]
 
 def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.decompress,
@@ -4723,17 +4960,28 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
 
     _ = gettext_set_language(ln)
 
-    display_claim_this_paper = False
-
-    try:
-        display_claim_this_paper = user_info["precached_viewclaimlink"]
-    except (KeyError, TypeError):
+    # The 'attribute this paper'  link is shown only if the session states it should and
+    # the record is included in the collections to which bibauthorid is limited.
+    if user_info:
+        display_claim_this_paper = (user_info.get("precached_viewclaimlink", False) and
+                                recID in intbitset.union(*[get_collection_reclist(x)
+                                for x in BIBAUTHORID_LIMIT_TO_COLLECTIONS]))
+    else:
         display_claim_this_paper = False
+
+
+
+
     #check from user information if the user has the right to see hidden fields/tags in the
     #records as well
     can_see_hidden = False
     if user_info:
         can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
+
+    can_edit_record = False
+    if check_user_can_edit_record(user_info, recID):
+        can_edit_record = True
+
 
     out = ""
 
@@ -4742,14 +4990,11 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     if record_exist_p == 0: # doesn't exist
         return out
 
-    # New Python BibFormat procedure for formatting
-    # Old procedure follows further below
     # We must still check some special formats, but these
     # should disappear when BibFormat improves.
-    if not (CFG_BIBFORMAT_USE_OLD_BIBFORMAT \
-            or format.lower().startswith('t') \
-            or format.lower().startswith('hm') \
-            or str(format[0:3]).isdigit() \
+    if not (format.lower().startswith('t')
+            or format.lower().startswith('hm')
+            or str(format[0:3]).isdigit()
             or ot):
 
         # Unspecified format is hd
@@ -4777,11 +5022,10 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                                                                          so=so,
                                                                          sp=sp,
                                                                          rm=rm,
-                                                                         display_claim_link=display_claim_this_paper)
+                                                                         display_claim_link=display_claim_this_paper,
+                                                                         display_edit_link=can_edit_record)
         return out
 
-    # Old PHP BibFormat procedure for formatting
-    # print record opening tags, if needed:
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
         out += "   <header>\n"
@@ -5070,7 +5314,8 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                                                                          so=so,
                                                                          sp=sp,
                                                                          rm=rm,
-                                                                         display_claim_link=display_claim_this_paper)
+                                                                         display_claim_link=display_claim_this_paper,
+                                                                         display_edit_link=can_edit_record)
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
@@ -5132,7 +5377,7 @@ def log_query(hostname, query_args, uid=-1):
         res = run_sql("SELECT id FROM query WHERE urlargs=%s", (query_args,), 1)
         try:
             id_query = res[0][0]
-        except:
+        except IndexError:
             id_query = run_sql("INSERT INTO query (type, urlargs) VALUES ('r', %s)", (query_args,))
         if id_query:
             run_sql("INSERT INTO user_query (id_user, id_query, hostname, date) VALUES (%s, %s, %s, %s)",
@@ -5168,7 +5413,7 @@ def clean_dictionary(dictionary, list_of_items):
 
 ### CALLABLES
 
-def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
+def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=None, sf="", so="a", sp="", rm="", of="id", ot="", aas=0,
                         p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                         recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
                         d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab="",
@@ -5489,13 +5734,18 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
 
     _ = gettext_set_language(ln)
 
-    kwargs = {'req':req,'cc':cc, 'c':c, 'p':p, 'f':f, 'rg':rg, 'sf':sf, 'so':so, 'sp':sp, 'rm':rm, 'of':of, 'ot':ot, 'aas':aas,
-              'p1':p1, 'f1':f1, 'm1':m1, 'op1':op1, 'p2':p2, 'f2':f2, 'm2':m2, 'op2':op2, 'p3':p3, 'f3':f3, 'm3':m3, 'sc':sc, 'jrec':jrec,
-              'recid':recid, 'recidb':recidb, 'sysno':sysno, 'id':id, 'idb':idb, 'sysnb':sysnb, 'action':action, 'd1':d1,
-              'd1y':d1y, 'd1m':d1m, 'd1d':d1d, 'd2':d2, 'd2y':d2y, 'd2m':d2m, 'd2d':d2d, 'dt':dt, 'verbose':verbose, 'ap':ap, 'ln':ln, 'ec':ec,
-              'tab':tab, 'wl':wl, 'em': em,
-              'datetext1': datetext1, 'datetext2': datetext2, 'uid': uid, 'cc':cc, 'pl': pl, 'pl_in_url': pl_in_url, '_': _,
-              'selected_external_collections_infos':None,
+    kwargs = {'req': req, 'cc': cc, 'c': c, 'p': p, 'f': f, 'rg': rg, 'sf': sf,
+              'so': so, 'sp': sp, 'rm': rm, 'of': of, 'ot': ot, 'aas': aas,
+              'p1': p1, 'f1': f1, 'm1': m1, 'op1': op1, 'p2': p2, 'f2': f2,
+              'm2': m2, 'op2': op2, 'p3': p3, 'f3': f3, 'm3': m3, 'sc': sc,
+              'jrec': jrec, 'recid': recid, 'recidb': recidb, 'sysno': sysno,
+              'id': id, 'idb': idb, 'sysnb': sysnb, 'action': action, 'd1': d1,
+              'd1y': d1y, 'd1m': d1m, 'd1d': d1d, 'd2': d2, 'd2y': d2y,
+              'd2m': d2m, 'd2d': d2d, 'dt': dt, 'verbose': verbose, 'ap': ap,
+              'ln': ln, 'ec': ec, 'tab': tab, 'wl': wl, 'em': em,
+              'datetext1': datetext1, 'datetext2': datetext2, 'uid': uid,
+              'pl': pl, 'pl_in_url': pl_in_url, '_': _,
+              'selected_external_collections_infos': None,
             }
 
     kwargs.update(**dummy)
@@ -5504,14 +5754,13 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
 
 def prs_search(kwargs=None, recid=0, req=None, cc=None, p=None, p1=None, p2=None, p3=None,
               f=None, ec=None, verbose=None, ln=None, selected_external_collections_infos=None,
-              action=None,rm=None, of=None, em=None,
+              action=None, rm=None, of=None, em=None,
               **dummy):
     """
     This function write various bits into the req object as the search
     proceeds (so that pieces of a page are rendered even before the
     search ended)
     """
-
     ## 0 - start output
     if recid >= 0: # recid can be 0 if deduced from sysno and if such sysno does not exist
         output = prs_detailed_record(kwargs=kwargs, **kwargs)
@@ -5591,8 +5840,8 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
             print_records_prologue(req, of)
             print_records_epilogue(req, of)
         elif of.startswith("h"):
-            if req.method == 'HEAD':
-                raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+            if req.header_only:
+                raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
             else:
                 write_warning(_("Requested record does not seem to exist."), req=req)
 
@@ -5619,6 +5868,10 @@ def prs_browse(kwargs=None, req=None, of=None, cc=None, aas=None, ln=None, uid=N
             browse_pattern(req, colls_to_search, p3, f3, rg, ln)
         else:
             browse_pattern(req, colls_to_search, p, f, rg, ln)
+    except KeyboardInterrupt:
+        # This happens usually from the command line
+        # The error handling we want is different
+        raise
     except:
         register_exception(req=req, alert_admin=True)
         if of.startswith("h"):
@@ -5645,11 +5898,12 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                                     p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action,
                                     em
                                     ))
-    if record_exists(p[6:]) != 1:
+    recid = p[6:]
+    if record_exists(recid) != 1:
         # record does not exist
         if of.startswith("h"):
-            if req.method == 'HEAD':
-                raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+            if req.header_only:
+                raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
             else:
                 write_warning(_("Requested record does not seem to exist."), req=req)
         if of == "id":
@@ -5663,8 +5917,19 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
     else:
         # record well exists, so find similar ones to it
         t1 = os.times()[4]
-        results_similar_recIDs, results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, results_similar_comments = \
-                                rank_records_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose, f, rg, jrec)
+        (results_similar_recIDs,
+         results_similar_relevances,
+         results_similar_relevances_prologue,
+         results_similar_relevances_epilogue,
+         results_similar_comments) = \
+            rank_records_bibrank(rank_method_code=rm,
+                                 rank_limit_relevance=0,
+                                 hitset=get_collection_reclist(cc),
+                                 related_to=[p],
+                                 verbose=verbose,
+                                 field=f,
+                                 rg=rg,
+                                 jrec=jrec)
         if results_similar_recIDs:
             t2 = os.times()[4]
             cpu_time = t2 - t1
@@ -5733,7 +5998,7 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
     else:
         # record well exists, so find co-cited ones:
         t1 = os.times()[4]
-        results_cocited_recIDs = map(lambda x: x[0], calculate_co_cited_with_list(int(recID)))
+        results_cocited_recIDs = [x[0] for x in calculate_co_cited_with_list(int(recID))]
         if results_cocited_recIDs:
             t2 = os.times()[4]
             cpu_time = t2 - t1
@@ -5783,15 +6048,15 @@ def prs_search_hosted_collections(kwargs=None, req=None, of=None, ln=None, _=Non
             hosted_colls_true_results = []
             for result in hosted_colls_results:
                 # if the number of results is None or 0 (or False) then just do nothing
-                    if result[1] == None or result[1] == False:
-                        # these are the searches the returned no or zero results
-                        if verbose:
-                            write_warning("Hosted collections (perform_search_request): %s returned no results" % result[0][1].name, req=req)
-                    else:
-                        # these are the searches that actually returned results on time
-                        hosted_colls_true_results.append(result)
-                        if verbose:
-                            write_warning("Hosted collections (perform_search_request): %s returned %s results in %s seconds" % (result[0][1].name, result[1], result[2]), req=req)
+                if result[1] is None or result[1] is False:
+                    # these are the searches the returned no or zero results
+                    if verbose:
+                        write_warning("Hosted collections (perform_search_request): %s returned no results" % result[0][1].name, req=req)
+                else:
+                    # these are the searches that actually returned results on time
+                    hosted_colls_true_results.append(result)
+                    if verbose:
+                        write_warning("Hosted collections (perform_search_request): %s returned %s results in %s seconds" % (result[0][1].name, result[1], result[2]), req=req)
             else:
                 if verbose:
                     write_warning("Hosted collections (perform_search_request): there were no hosted collections results to be printed at this time", req=req)
@@ -5892,6 +6157,10 @@ def prs_advanced_search(results_in_any_collection, kwargs=None, req=None, of=Non
                     nearestterms.append((p2, len_results_p2, clean_dictionary(nearest_search_args, ['p1', 'f1', 'm1', 'p3', 'f3', 'm3'])))
                 nearestterms.append((p3, len_results_p3, clean_dictionary(nearest_search_args, ['p1', 'f1', 'm1', 'p2', 'f2', 'm2'])))
                 write_warning(websearch_templates.tmpl_search_no_boolean_hits(ln=ln,  nearestterms=nearestterms), req=req)
+    except KeyboardInterrupt:
+        # This happens usually from the command line
+        # The error handling we want is different
+        raise
     except:
         register_exception(req=req, alert_admin=True)
         if of.startswith("h"):
@@ -5940,18 +6209,19 @@ def prs_simple_search(results_in_any_collection, kwargs=None, req=None, of=None,
             return page_end(req, of, ln, em)
 
 
-def prs_intersect_results_with_collrecs(results_final, results_in_any_collection, kwargs=None, colls_to_search=None,
-                                    req=None, ap=None, of=None, ln=None,
-                                    cc=None, p=None, p1=None, p2=None, p3=None, f=None,
-                                    ec=None, verbose=None, selected_external_collections_infos=None, em=None,
-                                    **dummy):
+def prs_intersect_results_with_collrecs(results_final, results_in_any_collection,
+                                        kwargs=None, colls_to_search=None,
+                                        req=None, of=None, ln=None,
+                                        cc=None, p=None, p1=None, p2=None, p3=None, f=None,
+                                        ec=None, verbose=None, selected_external_collections_infos=None,
+                                        em=None, **dummy):
     display_nearest_terms_box=not kwargs['hosted_colls_actual_or_potential_results_p']
     try:
         # added the display_nearest_terms_box parameter to avoid printing out the "Nearest terms in any collection"
         # recommendations when there results only in the hosted collections. Also added the if clause to avoid
         # searching in case we know since the last stage that we have no results in any collection
         if len(results_in_any_collection) != 0:
-            results_final.update(intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of,
+            results_final.update(intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, of,
                                                                  verbose, ln, display_nearest_terms_box=display_nearest_terms_box))
     except:
         register_exception(req=req, alert_admin=True)
@@ -6129,7 +6399,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                     hosted_colls_true_results=None, hosted_colls_timeouts=None, results_final_nb=None,
                     cpu_time=None, verbose=None, em=None, **dummy):
 
-    if len(colls_to_search)>1:
+    if len(colls_to_search) > 1:
         cpu_time = -1 # we do not want to have search time printed on each collection
 
     print_records_prologue(req, of, cc=cc)
@@ -6146,6 +6416,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
             results_final_relevances = []
             results_final_relevances_prologue = ""
             results_final_relevances_epilogue = ""
+
             if rm: # do we have to rank?
                 results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                              rank_records(req, rm, 0, results_final[coll],
@@ -6159,8 +6430,9 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                     # rank_records failed and returned some error message to display:
                     write_warning(results_final_relevances_prologue, req=req)
                     write_warning(results_final_relevances_epilogue, req=req)
-            elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
+            elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
                 results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
+
 
             if len(results_final_recIDs) < CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
                 results_final_colls.append(results_final_recIDs)
@@ -6219,7 +6491,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
             (hosted_colls_timeouts_results, hosted_colls_timeouts_timeouts) = do_calculate_hosted_collections_results(req, ln, None, verbose, None, hosted_colls_timeouts, CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH)
             if hosted_colls_timeouts_results:
                 for result in hosted_colls_timeouts_results:
-                    if result[1] == None or result[1] == False:
+                    if result[1] is None or result[1] is False:
                         ## these are the searches the returned no or zero results
                         ## also print a nearest terms box, in case this is the only
                         ## collection being searched and it returns no results?
@@ -6365,7 +6637,11 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
         output = prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection, kwargs=kwargs, **kwargs)
         if output is not None:
             return output
-    except Exception: # no results to display
+    except KeyboardInterrupt:
+        # This happens usually from the command line
+        # The error handling we want is different
+        raise
+    except:  # no results to display
         return None
 
     t2 = os.times()[4]
@@ -6377,9 +6653,8 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
 
 
 def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
-                                               kwargs=None, req=None, of=None, ln=None, _=None,
-                                               p=None, p1=None, p2=None, p3=None, f=None, cc=None, ec=None,
-                                               verbose=None, em=None, **dummy):
+                                               kwargs=None, req=None, of=None,
+                                               **dummy):
     # search stage 4: intersection with collection universe:
     results_final = {}
     output = prs_intersect_results_with_collrecs(results_final, results_in_any_collection, kwargs, **kwargs)
@@ -6405,9 +6680,8 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
 def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=None,
                         so=None, sp=None, verbose=None, p=None, p1=None, p2=None, p3=None,
                         cc=None, ln=None, _=None, ec=None, colls_to_search=None, rm=None, cpu_time=None,
-                        f=None, em=None, **dummy
+                        f=None, em=None, jrec=0, rg=None, **dummy
                      ):
-
     ## search stage 6: display results:
 
     # split result set into collections
@@ -6438,16 +6712,19 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             recIDs = list(results_final_for_all_selected_colls)
             if rm: # do we have to rank?
                 results_final_for_all_colls_rank_records_output = rank_records(req, rm, 0, results_final_for_all_selected_colls,
-                                                                               string.split(p) + string.split(p1) +
-                                                                               string.split(p2) + string.split(p3), verbose, so, of, ln, kwargs['rg'], kwargs['jrec'], kwargs['f'])
+                                                                               p.split() + p1.split() +
+                                                                               p2.split() + p3.split(), verbose, so, of, ln, kwargs['rg'], kwargs['jrec'], kwargs['f'])
                 if results_final_for_all_colls_rank_records_output[0]:
                     recIDs = results_final_for_all_colls_rank_records_output[0]
-            elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
+            elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
                 recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of, ln)
-            return recIDs
+            if rg:
+                return recIDs[jrec:jrec+rg]
+            else:
+                return recIDs[jrec:]
 
         elif of.startswith("h"):
-            if of not in ['hcs', 'hcs2']:
+            if of not in ['hcs', 'hcs2', 'hcv', 'htcv', 'tlcv']:
                 # added the hosted_colls_potential_results_p parameter to help print out the overview more accurately
                 req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time,
                             ln, ec, hosted_colls_potential_results_p=kwargs['hosted_colls_potential_results_p'], em=em))
@@ -6459,6 +6736,9 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
         # print records:
         if of in ['hcs', 'hcs2']:
             prs_summarize_records(kwargs=kwargs, **kwargs)
+        elif of in ['hcv', 'htcv', 'tlcv'] and CFG_INSPIRE_SITE:
+            from invenio.search_engine_cvifier import cvify_records
+            cvify_records(results_final_for_all_selected_colls, of, req, so)
         else:
             prs_print_records(kwargs=kwargs, **kwargs)
 
@@ -6472,8 +6752,7 @@ def prs_rank_results(kwargs=None, results_final=None, req=None, colls_to_search=
     ## search stage 6: display results:
 
     # split result set into collections
-    (results_final_nb, results_final_nb_total, results_final_for_all_selected_colls) = prs_split_into_collections(kwargs=kwargs, **kwargs)
-
+    dummy_results_final_nb, dummy_results_final_nb_total, results_final_for_all_selected_colls = prs_split_into_collections(kwargs=kwargs, **kwargs)
 
     # yes, some hits found: good!
     # collection list may have changed due to not-exact-match-found policy so check it out:
@@ -6485,11 +6764,11 @@ def prs_rank_results(kwargs=None, results_final=None, req=None, colls_to_search=
     recIDs = list(results_final_for_all_selected_colls)
     if rm: # do we have to rank?
         results_final_for_all_colls_rank_records_output = rank_records(req, rm, 0, results_final_for_all_selected_colls,
-                                                                       string.split(p) + string.split(p1) +
-                                                                       string.split(p2) + string.split(p3), verbose, so, of, field=kwargs['f'])
+                                                                       p.split() + p1.split() +
+                                                                       p2.split() + p3.split(), verbose, so, of, field=kwargs['f'])
         if results_final_for_all_colls_rank_records_output[0]:
             recIDs = results_final_for_all_colls_rank_records_output[0]
-    elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
+    elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
         recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of)
     return recIDs
 
@@ -6557,9 +6836,9 @@ def perform_request_log(req, date=""):
         i = 0
         for line in lines:
             try:
-                datetime, dummy_aas, p, f, c, nbhits = string.split(line,"#")
+                datetime, dummy_aas, p, f, c, nbhits = line.split("#")
                 i += 1
-                req.write("<tr><td align=\"right\">#%d</td><td>%s:%s:%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" \
+                req.write("<tr><td align=\"right\">#%d</td><td>%s:%s:%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"
                           % (i, datetime[8:10], datetime[10:12], datetime[12:], p, f, c, nbhits))
             except:
                 pass # ignore eventual wrong log lines
@@ -6572,7 +6851,7 @@ def perform_request_log(req, date=""):
         for day in range(yyyymm01, yyyymmdd + 1):
             p = os.popen("grep -c ^%d %s/search.log" % (day, CFG_LOGDIR), 'r')
             for line in p.readlines():
-                req.write("""<tr><td>%s</td><td align="right"><a href="%s/search/log?date=%d">%s</a></td></tr>""" % \
+                req.write("""<tr><td>%s</td><td align="right"><a href="%s/search/log?date=%d">%s</a></td></tr>""" %
                           (day, CFG_SITE_URL, day, line))
             p.close()
         req.write("</table>")
@@ -6694,9 +6973,9 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
 
 def profile(p="", f="", c=CFG_SITE_NAME):
     """Profile search time."""
-    import profile
+    import profile as pyprofile
     import pstats
-    profile.run("perform_request_search(p='%s',f='%s', c='%s')" % (p, f, c), "perform_request_search_profile")
+    pyprofile.run("perform_request_search(p='%s',f='%s', c='%s')" % (p, f, c), "perform_request_search_profile")
     p = pstats.Stats("perform_request_search_profile")
     p.strip_dirs().sort_stats("cumulative").print_stats()
     return 0
@@ -6712,6 +6991,7 @@ def perform_external_collection_search_with_em(req, current_collection, pattern_
                             print_see_also_box=em == "" or EM_REPOSITORY["see_also_box"] in em,
                             print_body=em == "" or EM_REPOSITORY["body"] in em)
 
+
 @cache.memoize(timeout=5)
 def get_fulltext_terms_from_search_pattern(search_pattern):
     keywords = []
@@ -6725,3 +7005,23 @@ def get_fulltext_terms_from_search_pattern(search_pattern):
                 else:
                     keywords.append(bsu_p)
     return keywords
+
+
+def check_user_can_edit_record(req, recid):
+    """ Check if user has authorization to modify a collection
+    the recid belongs to
+    """
+    record_collections = get_all_collections_of_a_record(recid)
+    if not record_collections:
+        # Check if user has access to all collections
+        auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+                                                       collection='')
+        if auth_code == 0:
+            return True
+    else:
+        for collection in record_collections:
+            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+                                                           collection=collection)
+            if auth_code == 0:
+                return True
+    return False

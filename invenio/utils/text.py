@@ -111,6 +111,7 @@ re_unicode_lowercase_u = re.compile(unicode(r"(?u)[úùüû]", "utf-8"))
 re_unicode_lowercase_y = re.compile(unicode(r"(?u)[ýÿ]", "utf-8"))
 re_unicode_lowercase_c = re.compile(unicode(r"(?u)[çć]", "utf-8"))
 re_unicode_lowercase_n = re.compile(unicode(r"(?u)[ñ]", "utf-8"))
+re_unicode_lowercase_ss = re.compile(unicode(r"(?u)[ß]", "utf-8"))
 re_unicode_uppercase_a = re.compile(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"))
 re_unicode_uppercase_ae = re.compile(unicode(r"(?u)[Æ]", "utf-8"))
 re_unicode_uppercase_oe = re.compile(unicode(r"(?u)[Œ]", "utf-8"))
@@ -627,8 +628,9 @@ def translate_to_ascii(values):
     @return: sequence with values transformed to ascii
     @rtype: sequence
     """
-    if not values:
+    if not values and not type(values) == str:
         return values
+
     if type(values) == str:
         values = [values]
     for index, value in enumerate(values):
@@ -727,6 +729,7 @@ def strip_accents(x):
     y = re_unicode_lowercase_y.sub("y", y)
     y = re_unicode_lowercase_c.sub("c", y)
     y = re_unicode_lowercase_n.sub("n", y)
+    y = re_unicode_lowercase_ss.sub("ss", y)
     # asciify Latin-1 uppercase characters:
     y = re_unicode_uppercase_a.sub("A", y)
     y = re_unicode_uppercase_ae.sub("AE", y)
@@ -808,3 +811,25 @@ def transliterate_ala_lc(value):
         text = translate_to_ascii(value)
         text = text.pop()
     return text
+
+
+def escape_latex(text):
+    """
+    This function takes the given text and escapes characters
+    that have a special meaning in LaTeX: # $ % ^ & _ { } ~ \
+    """
+    text = unicode(text.decode('utf-8'))
+    CHARS = {
+        '&':  r'\&',
+        '%':  r'\%',
+        '$':  r'\$',
+        '#':  r'\#',
+        '_':  r'\_',
+        '{':  r'\{',
+        '}':  r'\}',
+        '~':  r'\~{}',
+        '^':  r'\^{}',
+        '\\': r'\textbackslash{}',
+    }
+    escaped = "".join([CHARS.get(char, char) for char in text])
+    return escaped.encode('utf-8')

@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -71,14 +71,11 @@ __revision__ = "$Id$"
 
 
 import sys
-import traceback
 import ConfigParser
 
 from invenio.legacy.dbquery import run_sql
-from invenio.ext.logging import register_exception
 from invenio.legacy.bibsched.bibtask import task_init, write_message, task_get_option, \
-    task_set_option, get_datetime, task_update_status, \
-    task_sleep_now_if_required
+    task_set_option, get_datetime, task_sleep_now_if_required
 from invenio.base.factory import with_app_context
 
 # pylint: disable=W0611
@@ -140,37 +137,30 @@ def task_run_core():
     if not task_get_option("run"):
         task_set_option("run", [name[0] for name in run_sql("SELECT name from rnkMETHOD")])
 
-    try:
-        for key in task_get_option("run"):
-            task_sleep_now_if_required(can_stop_too=True)
-            write_message("")
-            filename = configuration.get(key + '.cfg', '')
-            write_message("Getting configuration from file: %s" % filename,
-                verbose=9)
-            config = ConfigParser.ConfigParser()
-            try:
-                config.readfp(open(filename))
-            except StandardError as e:
-                write_message("Cannot find configurationfile: %s. "
-                    "The rankmethod may also not be registered using "
-                    "the BibRank Admin Interface." % filename, sys.stderr)
-                raise StandardError
+    for key in task_get_option("run"):
+        task_sleep_now_if_required(can_stop_too=True)
+        write_message("")
+        filename = configuration.get(key + '.cfg', '')
+        write_message("Getting configuration from file: %s" % filename,
+            verbose=9)
+        config = ConfigParser.ConfigParser()
+        try:
+            config.readfp(open(filename))
+        except StandardError:
+            write_message("Cannot find configuration file: %s. "
+                "The rankmethod may also not be registered using "
+                "the BibRank Admin Interface." % filename, sys.stderr)
+            raise
 
-            #Using the function variable to call the function related to the
-            #rank method
-            cfg_function = config.get("rank_method", "function")
-            func_object = globals().get(cfg_function)
-            if func_object:
-                func_object(key)
-            else:
-                write_message("Cannot run method '%s', no function to call"
-                    % key)
-    except StandardError as e:
-        write_message("\nException caught: %s" % e, sys.stderr)
-        write_message(traceback.format_exc()[:-1])
-        register_exception()
-        task_update_status("ERROR")
-        sys.exit(1)
+        #Using the function variable to call the function related to the
+        #rank method
+        cfg_function = config.get("rank_method", "function")
+        func_object = globals().get(cfg_function)
+        if func_object:
+            func_object(key)
+        else:
+            write_message("Cannot run method '%s', no function to call"
+                % key)
 
     return True
 

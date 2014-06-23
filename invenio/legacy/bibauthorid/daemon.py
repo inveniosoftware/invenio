@@ -26,13 +26,13 @@ import sys
 from invenio.legacy.bibauthorid import config as bconfig
 from invenio.legacy.bibsched import bibtask
 
-from invenio.legacy.bibauthorid.backinterface import get_recently_modified_record_ids
-from invenio.legacy.bibauthorid.backinterface import get_user_log
+from invenio.legacy.bibauthorid.backinterface import get_modified_papers_since
+from invenio.legacy.bibauthorid.backinterface import get_user_logs
 from invenio.legacy.bibauthorid.backinterface import insert_user_log
-from invenio.legacy.bibauthorid.backinterface import get_sql_time
-from invenio.legacy.bibauthorid.backinterface import get_personids_from_bibrec
+from invenio.legacy.bibauthorid.backinterface import get_db_time
+from invenio.legacy.bibauthorid.backinterface import get_authors_of_claimed_paper
 from invenio.legacy.bibauthorid.backinterface import get_claimed_papers_from_papers
-from invenio.legacy.bibauthorid.backinterface import get_all_valid_bibrecs
+from invenio.legacy.bibauthorid.backinterface import get_all_valid_papers
 
 
 #python 2.4 compatibility
@@ -68,6 +68,8 @@ Examples:
       --merge               Updates the personid tables with the results from
                             the --disambiguate algorithm.
 
+      --update-search-index Updates the search engine index.
+
   OPTIONS
     Options for update personid
       (default)             Will update only the modified records since last
@@ -95,6 +97,7 @@ Examples:
              "record-ids=",
              "disambiguate",
              "merge",
+             "update-search-index",
              "all-records",
              "update-personid",
              "from-scratch"
@@ -125,6 +128,8 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
         bibtask.task_set_option("disambiguate", True)
     elif key in ("--merge",):
         bibtask.task_set_option("merge", True)
+    elif key in ("--update-search-index",):
+        bibtask.task_set_option("update_search_index", True)
     elif key in ("--from-scratch",):
         bibtask.task_set_option("from_scratch", True)
     else:
@@ -157,6 +162,11 @@ def _task_run_core():
         run_merge()
         bibtask.task_update_progress('Merging finished!')
 
+    if bibtask.task_get_option("update_search_index"):
+        bibtask.task_update_progress('Indexing...')
+        update_index()
+        bibtask.task_update_progress('Indexing finished!')
+
     return 1
 
 
@@ -167,12 +177,14 @@ def _task_submit_check_options():
     update_personid = bibtask.task_get_option("update_personid")
     disambiguate = bibtask.task_get_option("disambiguate")
     merge = bibtask.task_get_option("merge")
+    update_search_index = bibtask.task_get_option("update_search_index")
 
     record_ids = bibtask.task_get_option("record_ids")
     all_records = bibtask.task_get_option("all_records")
     from_scratch = bibtask.task_get_option("from_scratch")
 
-    commands = bool(update_personid) + bool(disambiguate) + bool(merge)
+    commands =( bool(update_personid) + bool(disambiguate) +
+                bool(merge) + bool(update_search_index) )
 
     if commands == 0:
         bibtask.write_message("ERROR: At least one command should be specified!"
@@ -234,12 +246,12 @@ def _get_personids_to_update_extids(papers=None):
     @return: personids
     @rtype: set
     '''
-    last_log = get_user_log(userinfo='daemon', action='PID_UPDATE', only_most_recent=True)
+    last_log = get_user_logs(userinfo='daemon', action='PID_UPDATE', only_most_recent=True)
     if last_log:
         daemon_last_time_run = last_log[0][2]
-        modified_bibrecs = get_recently_modified_record_ids(daemon_last_time_run)
+        modified_bibrecs = get_modified_papers_since(daemon_last_time_run)
     else:
-        modified_bibrecs = get_all_valid_bibrecs()
+        modified_bibrecs = get_all_valid_papers()
     if papers:
         modified_bibrecs &= set(papers)
     if not modified_bibrecs:
@@ -248,14 +260,14 @@ def _get_personids_to_update_extids(papers=None):
         modified_bibrecs = [rec[0] for rec in get_claimed_papers_from_papers(modified_bibrecs)]
     personids_to_update_extids = set()
     for bibrec in modified_bibrecs:
-        personids_to_update_extids |= set(get_personids_from_bibrec(bibrec))
+        personids_to_update_extids |= set(get_authors_of_claimed_paper(bibrec))
     return personids_to_update_extids
 
 def rabbit_with_log(papers, check_invalid_papers, log_comment, partial=False):
     from invenio.legacy.bibauthorid.rabbit import rabbit
 
     personids_to_update_extids = _get_personids_to_update_extids(papers)
-    starting_time = get_sql_time()
+    starting_time = get_db_time()
     rabbit(papers, check_invalid_papers, personids_to_update_extids)
     if partial:
         action = 'PID_UPDATE_PARTIAL'
@@ -268,11 +280,11 @@ def run_rabbit(paperslist, all_records=False):
     if not paperslist and all_records:
         rabbit_with_log(None, True, 'bibauthorid_daemon, update_personid on all papers')
     elif not paperslist:
-        last_log = get_user_log(userinfo='daemon', action='PID_UPDATE', only_most_recent=True)
+        last_log = get_user_logs(userinfo='daemon', action='PID_UPDATE', only_most_recent=True)
 
         if len(last_log) >= 1:
             #select only the most recent papers
-            recently_modified = get_recently_modified_record_ids(date=last_log[0][2])
+            recently_modified = get_modified_papers_since(since=last_log[0][2])
             if not recently_modified:
                 bibtask.write_message("update_personID_table_from_paper: "
                                       "All person entities up to date.",
@@ -294,12 +306,12 @@ def run_tortoise(from_scratch):
     if from_scratch:
         tortoise_from_scratch()
     else:
-        start_time = get_sql_time()
+        start_time = get_db_time()
         tortoise_db_name = 'tortoise'
 
-        last_run = get_user_log(userinfo=tortoise_db_name, only_most_recent=True)
+        last_run = get_user_logs(userinfo=tortoise_db_name, only_most_recent=True)
         if last_run:
-            modified = get_recently_modified_record_ids(last_run[0][2])
+            modified = get_modified_papers_since(last_run[0][2])
         else:
             modified = []
         tortoise(modified)
@@ -310,3 +322,7 @@ def run_tortoise(from_scratch):
 def run_merge():
     from invenio.legacy.bibauthorid.merge import merge_dynamic
     merge_dynamic()
+
+def update_index():
+    from bibauthorid_search_engine import create_bibauthorid_indexer
+    create_bibauthorid_indexer()

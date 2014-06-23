@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -380,10 +380,9 @@ def eval_bibformat_lxml(ctx, recID, template_code):
     @param template_code: the code calling a BFE_ as it would be use in format template
     @return: the evalued call to a format template (usually a call to a format element)
     @rtype: string
-    """ #'
-    from invenio.modules.formatter.engine import \
-    format_with_format_template, \
-    BibFormatObject
+    """
+    from invenio.modules.formatter.engine import format_with_format_template, \
+        BibFormatObject
     try:
         if isinstance(recID, str):
             recID_int = int(recID)
@@ -409,7 +408,7 @@ def eval_bibformat_lxml(ctx, recID, template_code):
 
         return ''
 
-def eval_bibformat_libxslt(ctx, recID, template_code):
+def eval_bibformat_libxslt(ctx, recid, template_code):
     """
     libxslt extension function:
     Bridge between BibFormat and XSL stylesheets.
@@ -417,39 +416,36 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
 
     Can be used in that way in XSL stylesheet
     (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
-    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')" />
 
-    if recID is string, value is converted to int
-    if recID is Node, first child node (text node) is taken as value
+    if recid is string, value is converted to int
+    if recid is Node, first child node (text node) is taken as value
     template_code is evaluated as a format template piece of code. '<'
     and '"' need to be escaped with '&lt;' and '&quot;'
 
     @param ctx: context as passed by libxslt
-    @param recID: record ID
+    @param recid: record ID
     @param template_code: the code calling a BFE_ as it would be use in format template
     @return: the evalued call to a format template (usually a call to a format element)
     @rtype: string
-    """ #'
-    from invenio.modules.formatter.engine import \
-    format_with_format_template, \
-    BibFormatObject
+    """
+    from invenio.modules.formatter.engine import format_with_format_template, \
+        BibFormatObject
     try:
-        if isinstance(recID, str):
-            recID_int = int(recID)
-        elif isinstance(recID, (int, long)):
-            recID_int = recID
+        if isinstance(recid, str):
+            recid_int = int(recid)
+        elif isinstance(recid, (int, long)):
+            recid_int = recid
         else:
-            recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
+            recid_int = libxml2.xmlNode(_obj=recid[0]).children.content
 
-        bfo = BibFormatObject(recID_int)
+        bfo = BibFormatObject(recid_int)
         return format_with_format_template(None, bfo,
                                            verbose=0,
                                            format_template_code=template_code)
     except Exception as err:
-        sys.stderr.write("Error during formatting function evaluation: " + \
-                         str(err) + \
-                         '\n')
-
+        sys.stderr.write("Error during formatting function evaluation: " +
+                         str(err) + '\n')
         return ''
 
 def eval_bibformat_4suite(ctx, recID, template_code):
@@ -460,7 +456,7 @@ def eval_bibformat_4suite(ctx, recID, template_code):
 
     Can be used in that way in XSL stylesheet
     (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
-    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')" />
 
     if recID is string, value is converted to int
     if recID is Node, first child node (text node) is taken as value

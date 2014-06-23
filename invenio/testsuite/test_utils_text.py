@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -38,6 +38,7 @@ from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 decode_to_unicode = lazy_import('invenio.utils.text:decode_to_unicode')
+escape_latex = lazy_import('invenio.utils.text:escape_latex')
 guess_minimum_encoding = lazy_import('invenio.utils.text:guess_minimum_encoding')
 strip_accents = lazy_import('invenio.utils.text:strip_accents')
 translate_latex2unicode = lazy_import('invenio.utils.text:translate_latex2unicode')
@@ -442,11 +443,13 @@ class TestStripping(InvenioTestCase):
     if UNIDECODE_AVAILABLE:
         def test_text_to_ascii(self):
             """textutils - transliterate to ascii using unidecode"""
-            self.assertEqual(translate_to_ascii(
-                ["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]),
-                ["a i U", "Hohne", "Age Ost Vaer", "normal"]
+            self.assert_(translate_to_ascii(
+                ["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]) in
+                (["a i U", "Hohne", "Age Ost Vaer", "normal"],  ## unidecode < 0.04.13
+                 ['a i U', 'Hoehne', 'Age Ost Vaer', 'normal']) ## unidecode >= 0.04.13
             )
             self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
+            self.assertEqual(translate_to_ascii("ß"), ["ss"])
             self.assertEqual(translate_to_ascii(None), None)
             self.assertEqual(translate_to_ascii([]), [])
             self.assertEqual(translate_to_ascii([None]), [None])
@@ -475,6 +478,16 @@ class TestALALC(InvenioTestCase):
             unicode_text = unicode(encoded_text.decode(encoding))
             self.assertEqual("Zhong Niao Gao Fei Jin ",
                              transliterate_ala_lc(unicode_text))
+
+
+class LatexEscape(InvenioTestCase):
+    """Test for escape latex function"""
+
+    def test_escape_latex(self):
+        unescaped = "this is unescaped latex & % $ # _ { } ~  \ ^ and some multi-byte chars: żółw mémêmëmè"
+        escaped = escape_latex(unescaped)
+        self.assertEqual(escaped,
+                         "this is unescaped latex \\& \\% \\$ \\# \\_ \\{ \\} \\~{}  \\textbackslash{} \\^{} and some multi-byte chars: \xc5\xbc\xc3\xb3\xc5\x82w m\xc3\xa9m\xc3\xaam\xc3\xabm\xc3\xa8")
 
 
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,

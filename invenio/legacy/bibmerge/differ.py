@@ -27,7 +27,6 @@ except ImportError:
 
 def record_diff(rec1, rec2, compare_subfields, ind1='', ind2=''):
     """Compares two given records
-    Considers the change of order of fields as a change
     @param rec1: First record
     @param rec2: Second record
 

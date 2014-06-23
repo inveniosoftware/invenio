@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -345,8 +345,8 @@ CFG_OAUTH1_CONFIGURATIONS = {
 #	for finding where the id, email or nickname is.
 CFG_OAUTH2_CONFIGURATIONS =  {
     'facebook': {
-        'consumer_key': '118319526393',
-        'consumer_secret': '8d675eb0ef89f2f8fbbe4ee56ab473c6',
+        'consumer_key': '',
+        'consumer_secret': '',
         'access_token_url': 'https://graph.facebook.com/oauth/access_token',
         'authorize_url': 'https://www.facebook.com/dialog/oauth',
         'authorize_parameters': {
@@ -400,8 +400,8 @@ CFG_OAUTH2_CONFIGURATIONS =  {
         'nickname': ['user', 'username']
     },
     'orcid': {
-        'consumer_key': '',
-        'consumer_secret': '',
+        'consumer_key': '0000-0002-8651-6707',
+        'consumer_secret': '215e23ca-7421-4543-8306-a105fe0b5688',
         'authorize_url': 'http://sandbox-1.orcid.org/oauth/authorize',
         'access_token_url': 'http://api.sandbox-1.orcid.org/oauth/token',
         'request_url': 'http://api.sandbox-1.orcid.org/{id}/orcid-profile',
@@ -480,6 +480,7 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              ('paperclaimviewers', 'Users who can view "claim my paper" facilities.', 'allow all'),
              ('paperattributionviewers', 'Users who can view "attribute this paper" facilities', 'allow all'),
              ('paperattributionlinkviewers', 'Users who can see attribution links in the search', 'allow all'),
+             ('authorlistusers', 'Users who can user Authorlist tools', 'deny all'),
              )
 
 # Demo site roles
@@ -513,7 +514,8 @@ DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('romeo.montague@cds.cern.ch', 'submit_DEMOJRN_*'),
                        ('juliet.capulet@cds.cern.ch', 'submit_DEMOJRN_*'),
                        ('balthasar.montague@cds.cern.ch', 'atlantiseditor'),
-                       ('romeo.montague@cds.cern.ch', 'poetrycommentreader'))
+                       ('romeo.montague@cds.cern.ch', 'poetrycommentreader'),
+                       ('jekyll@cds.cern.ch', 'authorlistusers'),)
 
 # users
 # list of e-mail addresses
@@ -552,6 +554,7 @@ DEF_ACTIONS = (
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
                ('runbibexport', 'run BibExport', '', 'no'),
+               ('runauthorlist', 'run Authorlist tools', '', 'no'),
                ('referee', 'referee document type doctype/category categ', 'doctype,categ', 'yes'),
                ('submit', 'use webSubmit', 'doctype,act,categ', 'yes'),
                ('viewrestrdoc', 'view restricted document', 'status', 'no'),
@@ -585,7 +588,8 @@ DEF_ACTIONS = (
                ('claimpaper_change_own_data', 'Change data associated to his own person ID', '', 'no'),
                ('claimpaper_change_others_data', 'Change data of any person ID', '', 'no'),
                ('runbibtasklet', 'run BibTaskLet', '', 'no'),
-               ('cfgbibsched', 'configure BibSched', '', 'no')
+               ('cfgbibsched', 'configure BibSched', '', 'no'),
+               ('runinfomanager', 'run Info Space Manager', '', 'no')
               )
 
 # Default authorizations
@@ -597,6 +601,7 @@ DEF_AUTHS = (('basketusers', 'usebaskets', {}),
              ('messageusers', 'usemessages', {}),
              ('holdingsusers', 'viewholdings', {}),
              ('statisticsusers', 'viewstatistics', {}),
+             ('authorlistusers', 'runauthorlist', {}),
              ('claimpaperusers', 'claimpaper_view_pid_universe', {}),
              ('claimpaperoperators', 'claimpaper_view_pid_universe', {}),
              ('claimpaperusers', 'claimpaper_claim_own_papers', {}),
@@ -639,27 +644,28 @@ DEF_DEMO_AUTHS = (
 
 # Activities (i.e. actions) for which exists an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {
-    'runbibedit': (_("Run Record Editor"), "%s/%s/edit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibeditmulti': (_("Run Multi-Record Editor"), "%s/%s/multiedit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibdocfile': (_("Run Document File Manager"), "%s/%s/managedocfiles?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibmerge': (_("Run Record Merger"), "%s/%s/merge/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibswordclient': (_("Run BibSword client"), "%s/bibsword/?ln=%%s" % CFG_SITE_URL),
-    'cfgbibknowledge': (_("Configure BibKnowledge"), "%s/kb?ln=%%s" % CFG_SITE_URL),
-    'cfgbibformat': (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgoaiharvest': (_("Configure OAI Harvest"), "%s/admin/oaiharvest/oaiharvestadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgoairepository': (_("Configure OAI Repository"), "%s/admin/oairepository/oairepositoryadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgbibindex': (_("Configure BibIndex"), "%s/admin/bibindex/bibindexadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgbibrank': (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebaccess': (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebcomment': (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgweblinkback': (_("Configure WebLinkback"), "%s/admin/weblinkback/weblinkbackadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebsearch': (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebsubmit': (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgwebjournal': (_("Configure WebJournal"), "%s/admin/webjournal/webjournaladmin.py?ln=%%s" % CFG_SITE_URL),
-    'cfgbibsort': (_("Configure BibSort"), "%s/admin/bibsort/bibsortadmin.py?ln=%%s" % CFG_SITE_URL),
-    'runbibcirculation': (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
-    'runbatchuploader': (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
-    'claimpaper_claim_others_papers': (_("Run Person/Author Manager"), "%s/person/search?ln=%%s" % CFG_SITE_URL)
+    'runbibedit' : (_("Run Record Editor"), "%s/%s/edit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
+    'runbibeditmulti' : (_("Run Multi-Record Editor"), "%s/%s/multiedit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
+    'runbibdocfile' : (_("Run Document File Manager"), "%s/%s/managedocfiles?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
+    'runbibmerge' : (_("Run Record Merger"), "%s/%s/merge/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
+    'runbibswordclient' : (_("Run BibSword client"), "%s/bibsword/?ln=%%s" % CFG_SITE_URL),
+    'cfgbibknowledge' : (_("Configure BibKnowledge"), "%s/kb?ln=%%s" % CFG_SITE_URL),
+    'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgoaiharvest' : (_("Configure OAI Harvest"), "%s/admin/oaiharvest/oaiharvestadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/oairepository/oairepositoryadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibindex' : (_("Configure BibIndex"), "%s/admin/bibindex/bibindexadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibrank' : (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgweblinkback' : (_("Configure WebLinkback"), "%s/admin/weblinkback/weblinkbackadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebsearch' : (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebsubmit' : (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebjournal' : (_("Configure WebJournal"), "%s/admin/webjournal/webjournaladmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibsort' : (_("Configure BibSort"), "%s/admin/bibsort/bibsortadmin.py?ln=%%s" % CFG_SITE_URL),
+    'runbibcirculation' : (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
+    'runbatchuploader' : (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
+    'runinfomanager' : (_("Run Info Space Manager"), "%s/info/manage?ln=%%s" % CFG_SITE_URL),
+    'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/author/search?ln=%%s" % CFG_SITE_URL)
 }
 
 CFG_WEBACCESS_MSGS = {

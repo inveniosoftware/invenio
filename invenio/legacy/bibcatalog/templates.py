@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 """Invenio BibCatalog HTML generator."""
 
-from invenio.legacy.bibcatalog.api import bibcatalog_system
+from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 from invenio.base.i18n import wash_language, gettext_set_language
 from invenio.config import CFG_SITE_LANG
 from invenio.legacy.webstyle.templates import Template as DefaultTemplate
@@ -31,15 +31,15 @@ class Template(DefaultTemplate):
         """ make a pretty html body of tickets that belong to the user given as param """
         ln = wash_language(ln)
         _ = gettext_set_language(ln)
-        if bibcatalog_system is None:
+        if BIBCATALOG_SYSTEM is None:
             return _("Error: No BibCatalog system configured.")
         #errors? tell what happened and get out
-        bibcat_probs = bibcatalog_system.check_system(uid)
+        bibcat_probs = BIBCATALOG_SYSTEM.check_system(uid)
         if bibcat_probs:
             return _("Error")+" "+bibcat_probs
 
-        tickets = bibcatalog_system.ticket_search(uid, owner=uid) #get ticket id's
-        lines = "" #put result here
+        tickets = BIBCATALOG_SYSTEM.ticket_search(uid, owner=uid) # get ticket id's
+        lines = "" # put result here
         i = 1
 
         lines += (_("You have %(x_num)i tickets.", x_num=len(tickets))) + "<br/>"
@@ -51,11 +51,11 @@ class Template(DefaultTemplate):
                 newstart = 1
             lines += '<a href="/yourtickets/display?start='+str(newstart)+'">'+_("Previous")+'</a>'
         lines += """<table border="1">"""
-        lastshown = len(tickets) #what was the number of the last shown ticket?
+        lastshown = len(tickets) # what was the number of the last shown ticket?
         for ticket in tickets:
             #get info and show only for those that within the show range
             if (i >= start) and (i < start+self.SHOW_MAX_TICKETS):
-                ticket_info = bibcatalog_system.ticket_get_info(uid, ticket)
+                ticket_info = BIBCATALOG_SYSTEM.ticket_get_info(uid, ticket)
                 subject = ticket_info['subject']
                 status = ticket_info['status']
                 text = ""

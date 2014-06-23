@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,7 +32,8 @@ from invenio.legacy.dbquery import Error
 from invenio.legacy.webuser import getUid, page_not_authorized
 from invenio.legacy.bibrank.adminlib import check_user
 from invenio.legacy.oaiharvest.dblayer import get_holdingpen_day_size
-from invenio.legacy.oaiharvest.admin import perform_request_gethpdayfragment
+from invenio.legacy.oaiharvest.config import CFG_OAI_POSSIBLE_POSTMODES
+from invenio.ext.legacy.handler import wash_urlargd
 
 def index(req, ln=CFG_SITE_LANG):
     """Main OAI Harvest admin page"""
@@ -45,23 +46,62 @@ def index(req, ln=CFG_SITE_LANG):
                     body=e,
                     uid=uid,
                     language=ln,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = check_user(req,'cfgoaiharvest')
+    auth = check_user(req, 'cfgoaiharvest')
     if not auth[0]:
         return page(title="OAI Harvest Admin Interface",
                     body=oha.perform_request_index(ln),
                     uid=uid,
                     language=ln,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_config='', oai_src_post='', ln=CFG_SITE_LANG, confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
+def editsource(req, **kwargs):
+    form = dict(req.form)
+    content = {'oai_src_id': (str, None),
+               'oai_src_name': (str, ""),
+               'oai_src_baseurl': (str, ""),
+               'oai_src_prefix': (str, ""),
+               'oai_src_frequency': (str, ""),
+               'oai_src_comment': (str, ""),
+               'oai_src_post': (list, None),
+               'ln': (str, CFG_SITE_LANG),
+               'confirm': (int, -1),
+               'oai_src_sets': (list, None)}
+    # Grab list of defined post-process arguments to select from POST-data. e.g. ('c_cfg-file', str)
+    post_arguments = [("%s_%s" % (mode[0], arg['name']), type(arg['value'])) \
+                      for mode in CFG_OAI_POSSIBLE_POSTMODES \
+                      for arg in mode[2]]
+    for argument_name, argument_type in post_arguments:
+        if argument_type == str:
+            content[argument_name] = (str, "")
+        elif argument_type == list:
+            content[argument_name] = (list, [])
+
+    argd = wash_urlargd(form, content)
+    oai_src_id = argd['oai_src_id']
+    oai_src_name = argd['oai_src_name']
+    oai_src_baseurl = argd['oai_src_baseurl']
+    oai_src_prefix = argd['oai_src_prefix']
+    oai_src_frequency = argd['oai_src_frequency']
+    oai_src_comment = argd['oai_src_comment']
+    oai_src_post = argd['oai_src_post']
+    ln = argd['ln']
+    confirm = argd['confirm']
+    oai_src_sets = argd['oai_src_sets']
+    if oai_src_sets == None:
+        oai_src_sets = []
+
+    oai_src_args = {}
+    for argument_name, dummy in post_arguments:
+        oai_src_args[argument_name] = argd[argument_name]
+
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
 
     try:
@@ -71,34 +111,76 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
                     body=e,
                     uid=uid,
                     language=ln,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = check_user(req,'cfgoaiharvest')
+    auth = check_user(req, 'cfgoaiharvest')
     if not auth[0]:
         if isinstance(oai_src_sets, str):
             oai_src_sets = [oai_src_sets]
         return page(title="Edit OAI Source",
+                    metaheaderadd=oha.getheader(),
                     body=oha.perform_request_editsource(oai_src_id=oai_src_id,
                                                         oai_src_name=oai_src_name,
                                                         oai_src_baseurl=oai_src_baseurl,
                                                         oai_src_prefix=oai_src_prefix,
-                                                        oai_src_config=oai_src_config,
+                                                        oai_src_frequency=oai_src_frequency,
                                                         oai_src_post=oai_src_post,
                                                         oai_src_sets=oai_src_sets,
-                                                        oai_src_bibfilter=oai_src_bibfilter,
+                                                        oai_src_comment=oai_src_comment,
+                                                        oai_src_args=oai_src_args,
                                                         ln=ln,
                                                         confirm=confirm),
                     uid=uid,
                     language=ln,
                     req=req,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addsource(req, ln=CFG_SITE_LANG, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
+def addsource(req, **kwargs):
+    post_arguments = [("%s_%s" % (mode[0], arg['name']), type(arg['value'])) \
+                       for mode in CFG_OAI_POSSIBLE_POSTMODES \
+                       for arg in mode[2]]
+    form = dict(req.form)
+    content = {'ln': (str, "en"),
+               'oai_src_name': (str, ""),
+               'oai_src_baseurl': (str, ""),
+               'oai_src_prefix': (str, ""),
+               'oai_src_frequency': (str, ""),
+               'oai_src_lastrun': (str, ""),
+               'oai_src_comment': (str, ""),
+               'oai_src_post': (list, None),
+               'confirm': (int, -1),
+               'oai_src_sets': (list, None)}
+    for argument_name, argument_type in post_arguments:
+        if argument_type == str:
+            content[argument_name] = (str, "")
+        elif argument_type == list:
+            content[argument_name] = (list, [])
+
+    argd = wash_urlargd(form, content)
+    ln = argd['ln']
+    oai_src_name = argd['oai_src_name']
+    oai_src_baseurl = argd['oai_src_baseurl']
+    oai_src_prefix = argd['oai_src_prefix']
+    oai_src_frequency = argd['oai_src_frequency']
+    oai_src_lastrun = argd['oai_src_lastrun']
+    oai_src_comment = argd['oai_src_comment']
+    oai_src_post = argd['oai_src_post']
+    confirm = argd['confirm']
+    oai_src_sets = argd['oai_src_sets']
+    if oai_src_sets == None:
+        oai_src_sets = []
+    if oai_src_post == None:
+        oai_src_post = []
+
+    oai_src_args = {}
+    for argument_name, dummy in post_arguments:
+        oai_src_args[argument_name] = argd[argument_name]
+
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
 
     try:
@@ -108,28 +190,29 @@ def addsource(req, ln=CFG_SITE_LANG, oai_src_name='', oai_src_baseurl ='', oai_s
                     body=e,
                     uid=uid,
                     language=ln,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = check_user(req,'cfgoaiharvest')
+    auth = check_user(req, 'cfgoaiharvest')
     if not auth[0]:
         if isinstance(oai_src_sets, str):
             oai_src_sets = [oai_src_sets]
         return page(title="Add new OAI Source",
+                    metaheaderadd=oha.getheader(),
                     body=oha.perform_request_addsource(oai_src_name=oai_src_name,
                                                        oai_src_baseurl=oai_src_baseurl,
                                                        oai_src_prefix=oai_src_prefix,
                                                        oai_src_lastrun=oai_src_lastrun,
-                                                       oai_src_config=oai_src_config,
                                                        oai_src_post=oai_src_post,
                                                        oai_src_sets=oai_src_sets,
-                                                       oai_src_bibfilter=oai_src_bibfilter,
+                                                       oai_src_args=oai_src_args,
+                                                       oai_src_comment=oai_src_comment,
                                                        ln=ln,
                                                        confirm=confirm),
                     uid=uid,
                     language=ln,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     req=req,
                     lastupdated=__lastupdated__)
     else:
@@ -296,19 +379,21 @@ def viewtasklogs(req, ln=CFG_SITE_LANG, task_id=0):
                     body=e,
                     uid=uid,
                     language=ln,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
-    auth = check_user(req,'cfgoaiharvest')
+    auth = check_user(req, 'cfgoaiharvest')
     if not auth[0]:
+        # Page refreshes every minute
         return page(title="View bibsched task logs",
                     body=oha.perform_request_viewtasklogs(ln=ln,
-                                                    task_id=int(task_id)),
+                                                          task_id=int(task_id)),
                     uid=uid,
                     language=ln,
                     req=req,
-                    navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)
+                    navtrail=navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    metaheaderadd='<meta http-equiv="refresh" content="60" />')
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
@@ -414,27 +499,40 @@ def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, **records):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def harvest(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id=None):
-    navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
+def harvest(req, oai_src_id=None, ln=CFG_SITE_LANG, record_id=None):
+    form = dict(req.form)
+    content = {
+               'confirm': (int, 0),
+               'enable_reporting': (str, None),
+               'record_id': (str, record_id),
+               'oai_src_id': (str, oai_src_id),
+               'ln': (str, ln),
+               }
+    argd = wash_urlargd(form, content)
+
+    navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' \
+                                              % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
     except Error as e:
         return page(title="OAI Harvest Admin Interface - Error",
                     body=e,
                     uid=uid,
-                    language=ln,
-                    navtrail = navtrail_previous_links,
+                    language=argd['ln'],
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
-    auth = check_user(req,'cfgoaiharvest')
+    auth = check_user(req, 'cfgoaiharvest')
     if not auth[0]:
         return page(title="OAI source - harvesting new records",
-                    body=oha.perform_request_harvest_record(oai_src_id = oai_src_id,
-                                                    ln=ln, record_id = record_id),
+                    body=oha.perform_request_harvest_record(oai_src_id=argd['oai_src_id'],
+                                                            ln=argd['ln'], record_id=argd['record_id'],
+                                                            uid=uid, confirm=argd['confirm'],
+                                                            enable_reporting=argd['enable_reporting']),
                     uid=uid,
-                    language=ln,
+                    language=argd['ln'],
                     req=req,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -527,7 +625,7 @@ def getHoldingPenData(req, elementId):
         filter_key = elements[4]
         daySize = get_holdingpen_day_size(nodeYear, nodeMonth, nodeDay, filter_key)
         urlFilter = urllib.quote(filter_key)
-        resultHtml = perform_request_gethpdayfragment(nodeYear, nodeMonth, nodeDay, daySize, 0, urlFilter)
+        resultHtml = oha.perform_request_gethpdayfragment(nodeYear, nodeMonth, nodeDay, daySize, 0, urlFilter)
     else:
         # nothing of the above. error
         resultHtml = "Wrong request"

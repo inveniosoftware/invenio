@@ -775,7 +775,6 @@ def dialog_box(req, url="", ln=CFG_SITE_LANG, navtrail="",
         options = []
     return page(title="",
                 body = bibformat_templates.tmpl_admin_dialog_box(url,
-                                                                 ln,
                                                                  title,
                                                                  message,
                                                                  options),

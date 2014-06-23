@@ -58,6 +58,9 @@ class Template:
       <td>Record2:</td>
       <td> <input type="text" class="bibMergeRecNumInput" id="bibMergeRecInput2"></input> </td>
       </tr>
+      <tr>
+      <td style="text-align:center;"> <button type="button" id="bibMergeCompare">Compare</button> </td>
+      </tr>
     </table>
   </div>
 

@@ -21,9 +21,8 @@
 __revision__ = "$Id$"
 
 import cgi
-import six
 from urllib import quote
-from invenio.base.globals import cfg
+from invenio.config import CFG_BASE_URL
 
 
 def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ',
@@ -36,20 +35,16 @@ def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ',
     @param separator: a separator between keywords
     @param link: links the keywords if 'yes' (HTML links)
     """
-    CFG_SITE_URL = cfg['CFG_SITE_URL']
-    if isinstance(CFG_SITE_URL, six.text_type):
-        CFG_SITE_URL = CFG_SITE_URL.encode('utf8')
-
     keywords = bfo.fields('6531_a')
 
     if len(keywords) > 0:
         if link == 'yes':
-            keywords = [
-                '<a href="' + CFG_SITE_URL + '/search?f=keyword&amp;p=' +
-                quote('"' + keyword + '"') +
-                '&amp;ln=' + str(bfo.lang) +
-                '">' + cgi.escape(keyword) + '</a>'
-                for keyword in keywords]
+            keywords = ['<a href="' + CFG_BASE_URL +
+                        '/search?f=keyword&amp;p=' +
+                        quote('"' + keyword + '"') +
+                        '&amp;ln=' + str(bfo.lang) +
+                        '">' + cgi.escape(keyword) + '</a>'
+                        for keyword in keywords]
         else:
             keywords = [cgi.escape(keyword)
                         for keyword in keywords]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,12 +30,10 @@ import re
 import os
 import time
 import fnmatch
-import time
 from datetime import datetime
 from logging import getLogger, debug, DEBUG
 from optparse import OptionParser, OptionGroup, OptionValueError
 from six import iteritems
-from tempfile import mkstemp
 
 from invenio.base.factory import with_app_context
 
@@ -45,7 +43,8 @@ from invenio.config import CFG_SITE_URL, CFG_BIBDOCFILE_FILEDIR, \
 from invenio.legacy.bibdocfile.api import BibRecDocs, BibDoc, InvenioBibDocFileError, \
     nice_size, check_valid_url, clean_url, get_docname_from_url, \
     guess_format_from_url, KEEP_OLD_VALUE, decompose_bibdocfile_fullpath, \
-    bibdocfile_url_to_bibdoc, decompose_bibdocfile_url, CFG_BIBDOCFILE_AVAILABLE_FLAGS
+    bibdocfile_url_to_bibdoc, decompose_bibdocfile_url, \
+    CFG_BIBDOCFILE_AVAILABLE_FLAGS
 
 from intbitset import intbitset
 from invenio.legacy.search_engine import perform_request_search
@@ -54,6 +53,7 @@ from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.utils.text import encode_for_xml
 from invenio.legacy.websubmit.file_converter import can_perform_ocr
+from invenio.utils.shell import retry_mkstemp
 
 def _xml_mksubfield(key, subfield, fft):
     return fft.get(key, None) is not None and '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(str(fft[key]))) or ''
@@ -590,7 +590,9 @@ def bibupload_ffts(ffts, append=False, do_debug=False, interactive=True):
     if xml:
         if interactive:
             print(xml)
-        tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPSHAREDDIR)
+        tmp_file_fd, tmp_file_name = retry_mkstemp(suffix='.xml',
+                                                   prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"),
+                                                   directory=CFG_TMPSHAREDDIR)
         os.write(tmp_file_fd, xml)
         os.close(tmp_file_fd)
         os.chmod(tmp_file_name, 0o644)
@@ -913,14 +915,13 @@ def cli_delete(options):
         docname = None
         recid = None
         # retrieve the 1st recid
-        if recid.bibrec_links:
+        if bibdoc.bibrec_links:
             recid = bibdoc.bibrec_links[0]["recid"]
             docname = bibdoc.bibrec_links[0]["docname"]
-
-        if recid not in ffts:
-            ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
-        else:
-            ffts[recid].append({'docname' : docname, 'doctype' : 'DELETE'})
+            ffts.setdefault(recid, []).append(
+                {'docname' : docname,
+                 'doctype' : 'DELETE'}
+            )
     return bibupload_ffts(ffts)
 
 def cli_delete_file(options):

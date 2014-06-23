@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,9 +32,26 @@ compare_fieldvalues_identifier = lazy_import('invenio.legacy.bibmatch.validator:
 compare_fieldvalues_title = lazy_import('invenio.legacy.bibmatch.validator:compare_fieldvalues_title')
 compare_fieldvalues_date = lazy_import('invenio.legacy.bibmatch.validator:compare_fieldvalues_date')
 get_paired_comparisons = lazy_import('invenio.legacy.bibmatch.validator:get_paired_comparisons')
+get_longest_words = lazy_import('invenio.legacy.bibmatch.engine:get_longest_words')
 
 
 class BibMatchTest(InvenioTestCase):
+    """Test functions of Bibmatch."""
+
+    def test_get_longest_words(self):
+        """ Testing get_longest_words function """
+        string_to_check = "This is a string containing some long words"
+        list_expected = ["containing", "string", "words"]
+        self.assertEqual(list_expected,
+                         get_longest_words(string_to_check, limit=3))
+
+        string_to_check = 'This is a "string containing some quoted" long words'
+        list_expected = ['"string containing some quoted"', "words"]
+        self.assertEqual(list_expected,
+                         get_longest_words(string_to_check, limit=2))
+
+
+class BibMatchValidationTest(InvenioTestCase):
     """Test functions to check the validator of Bibmatch."""
 
     def test_validation_get_paired_comparisons(self):
@@ -53,7 +70,7 @@ class BibMatchTest(InvenioTestCase):
         original_record_instances = ['Brodsky, Stanley J.']
         matched_record_instances = ['Brodsky, S.J.', 'Not, M E']
         comparisons = get_paired_comparisons(original_record_instances, matched_record_instances)
-        threshold = 0.8
+        threshold = 0.85
         matches_needed = 1
         result, dummy = compare_fieldvalues_authorname(comparisons, threshold, matches_needed)
         self.assertTrue(result)
@@ -138,7 +155,8 @@ class BibMatchTest(InvenioTestCase):
         self.assertTrue(result)
 
 
-TEST_SUITE = make_test_suite(BibMatchTest)
+TEST_SUITE = make_test_suite(BibMatchTest,
+                             BibMatchValidationTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=False)

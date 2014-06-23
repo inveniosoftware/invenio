@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,16 +31,11 @@ __revision__ = "$Id$"
 import traceback
 import optparse
 import sys
-import os
 
-from invenio.legacy.refextract.config import \
-            CFG_REFEXTRACT_XML_VERSION, \
-            CFG_REFEXTRACT_XML_COLLECTION_OPEN, \
-            CFG_REFEXTRACT_XML_COLLECTION_CLOSE
+from invenio.legacy.docextract.record import print_records
 from invenio.legacy.docextract.utils import write_message, setup_loggers
 from invenio.legacy.bibsched.bibtask import task_update_progress
-from invenio.legacy.refextract.api import extract_references_from_file_xml, \
-                                   extract_references_from_string_xml
+from .api import extract_references_from_file, extract_references_from_string
 
 # Is refextract running standalone? (Default = yes)
 RUNNING_INDEPENDENTLY = False
@@ -49,8 +44,6 @@ DESCRIPTION = ""
 
 # Help message, used by bibtask's 'task_init()' and 'usage()'
 HELP_MESSAGE = """
-  -i, --inspire        Output journal standard reference form in the INSPIRE
-                       recognised format: [series]volume,page.
   --kb-journals        Manually specify the location of a journal title
                        knowledge-base file.
   --kb-journals-re     Manually specify the location of a journal title regexps
@@ -62,7 +55,8 @@ HELP_MESSAGE = """
   --kb-books           Manually specify the location of a book
                        knowledge-base file.
   --no-overwrite       Do not touch record if it already has references
-
+"""
+HELP_STANDALONE_MESSAGE = """
   Standalone Refextract options:
   -o, --out            Write the extracted references, in xml form, to a file
                        rather than standard output.
@@ -78,10 +72,10 @@ HELP_MESSAGE = """
 """
 
 USAGE_MESSAGE = """Usage: docextract [options] file1 [file2 ...]
-Command options: %s
+Command options: %s%s
 Examples:
     docextract -o /home/chayward/refs.xml /home/chayward/thesis.pdf
-""" % HELP_MESSAGE
+""" % (HELP_MESSAGE, HELP_STANDALONE_MESSAGE)
 
 
 def get_cli_options():
@@ -210,17 +204,15 @@ def main(config, args, run):
 
 def extract_one(config, pdf_path):
     """Extract references from one file"""
-
-    # the document body is not empty:
-    # 2. If necessary, locate the reference section:
+    # If necessary, locate the reference section:
     if config.treat_as_reference_section:
         docbody = open(pdf_path).read().decode('utf-8')
-        out = extract_references_from_string_xml(docbody)
+        record = extract_references_from_string(docbody)
     else:
         write_message("* processing pdffile: %s" % pdf_path, verbose=2)
-        out = extract_references_from_file_xml(pdf_path)
+        record = extract_references_from_file(pdf_path)
 
-    return out
+    return record
 
 
 def begin_extraction(config, files):
@@ -231,88 +223,40 @@ def begin_extraction(config, files):
        and values processed by the Refextract Daemon. This is full only when
        called as a scheduled bibtask inside bibsched.
     """
-    # Store xml records here
-    output = []
+    # Store records here
+    records = []
 
     for num, path in enumerate(files):
         # Announce the document extraction number
         write_message("Extracting %d of %d" % (num + 1, len(files)),
                       verbose=1)
-        out = extract_one(config, path)
-        output.append(out)
+        # Parse references
+        rec = extract_one(config, path)
+        records.append(rec)
 
     # Write our references
-    write_references(config, output)
+    write_references(config, records)
 
 
-def write_references(config, xml_references):
-    """Write marcxml to file
-
-    * Output xml header
-    * Output collection opening tag
-    * Output xml for each record
-    * Output collection closing tag
-    """
+def write_references(config, records):
+    """Write in marcxml"""
     if config.xmlfile:
         ofilehdl = open(config.xmlfile, 'w')
     else:
         ofilehdl = sys.stdout
 
-    try:
-        print(CFG_REFEXTRACT_XML_VERSION.encode("utf-8"), file=ofilehdl)
-        print(CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"), file=ofilehdl)
-        for out in xml_references:
-            print(out.encode("utf-8"), file=ofilehdl)
-        print(CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"), file=ofilehdl)
-        ofilehdl.flush()
-    except IOError as err:
-        write_message("%s\n%s\n" % (config.xmlfile, err), \
-                          sys.stderr, verbose=0)
-        halt(err=IOError, msg="Error: Unable to write to '%s'" \
-                 % config.xmlfile, exit_code=1)
-
     if config.xmlfile:
-        ofilehdl.close()
-        # limit m tag data to something less than infinity
-        limit_m_tags(config.xmlfile, 2048)
+        for rec in records:
+            for subfield in rec.find_subfields('999C5m'):
+                if len(subfield.value) > 2048:
+                    subfield.value = subfield.value[:2048]
 
-
-def limit_m_tags(xml_file, length_limit):
-    """Limit size of miscellaneous tags"""
-    temp_xml_file = xml_file + '.temp'
     try:
-        ofilehdl = open(xml_file, 'r')
-    except IOError:
-        write_message("***%s\n" % xml_file, verbose=0)
-        raise IOError("Error: Unable to read from '%s'" % xml_file)
-    try:
-        nfilehdl = open(temp_xml_file, 'w')
-    except IOError:
-        write_message("***%s\n" % temp_xml_file, verbose=0)
-        raise IOError("Error: Unable to write to '%s'" % temp_xml_file)
-
-    for line in ofilehdl:
-        line_dec = line.decode("utf-8")
-        start_ind = line_dec.find('<subfield code="m">')
-        if start_ind != -1:
-            # This line is an "m" line:
-            last_ind = line_dec.find('</subfield>')
-            if last_ind != -1:
-                # This line contains the end-tag for the "m" section
-                leng = last_ind - start_ind - 19
-                if leng > length_limit:
-                    # want to truncate on a blank to avoid problems..
-                    end = start_ind + 19 + length_limit
-                    for lett in range(end - 1, last_ind):
-                        xx = line_dec[lett:lett+1]
-                        if xx == ' ':
-                            break
-                        else:
-                            end += 1
-                    middle = line_dec[start_ind+19:end-1]
-                    line_dec = start_ind * ' ' + '<subfield code="m">' + \
-                              middle + '  !Data truncated! ' + '</subfield>\n'
-        nfilehdl.write("%s" % line_dec.encode("utf-8"))
-    nfilehdl.close()
-    # copy back to original file name
-    os.rename(temp_xml_file, xml_file)
+        xml = print_records(records)
+        print >>ofilehdl, xml
+        ofilehdl.flush()
+    except IOError, err:
+        write_message("%s\n%s\n" % (config.xmlfile, err),
+                          sys.stderr, verbose=0)
+        halt(err=IOError, msg="Error: Unable to write to '%s'"
+                 % config.xmlfile, exit_code=1)

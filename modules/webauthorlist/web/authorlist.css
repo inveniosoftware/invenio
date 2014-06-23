@@ -1,0 +1,229 @@
+/*
+ * This file is part of Invenio.
+ * Copyright (C) 2011, 2012, 2013 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+body.AuthorlistProgress {
+    cursor : progress;
+}
+
+div.AuthorlistLoading {
+    position : fixed;
+    top : 0;
+    left : 50%;
+    margin-top : -1px;
+    padding : 3px 30px 0px 30px;
+}
+
+/*
+* AuthorlistIndex definitions
+*
+*/
+div.AuthorlistIndex {
+    margin-top : 70px;
+}
+
+button.AuthorlistIndexNew {
+    margin-left : 0px !important;
+}
+
+div.AuthorlistIndexPaper {
+    margin-bottom : 10px;
+    padding-bottom : 10px;
+    border-bottom : 1px solid #FFCC99;
+}
+
+a.AuthorlistIndexPaperTitle {
+    display : inline-block;
+    color : #6699CC;
+    margin-bottom : 3px;
+}
+
+a.AuthorlistIndexPaperTitle:hover {
+    background-color : transparent;
+}
+
+span.AuthorlistIndexTimestamp {
+    display : block;
+    float : right;
+    text-align : right;
+    font-weight : bold;
+    font-size : 8pt;
+}
+
+span.AuthorlistIndexURL {
+    display : inline-block;
+    color : #CC9966;
+    font-size : 8pt;
+    margin : 3px 0px;
+}
+
+span.AuthorlistIndexDetailLabel {
+    display : inline-block;
+    font-weight : bold;
+    margin-right : 5px;
+    font-size : 10pt;
+}
+
+span.AuthorlistIndexDetail {
+    font-size : 10pt;
+}
+
+a.AuthorlistIndexEditLink {
+    display : inline-block;
+    color : #6699CC;
+    font-size : 8pt;
+    text-decoration : underline;
+    margin-left : 5px;
+}
+
+a.AuthorlistIndexEditLink:hover {
+    cursor : pointer;
+    background-color : transparent;
+}
+
+span.AuthorlistIndexSeperator {
+    position : relative;
+    display : inline-block;
+    top : -2px;
+    width : 3px;
+    height : 3px;
+    background-color : #6699CC;
+    margin-left : 5px;
+}
+
+/*
+* Authorlist definitions
+*
+*/
+.Authorlist {
+    font-family : Helvetica, Arial, sans-serif;
+}
+
+#AuthorlistPaper {
+    margin-top : 50px;
+}
+
+h2.AuthorlistHeadline {
+    font-size : 16pt;
+    border-bottom : 1px solid #ffcc99;
+}
+
+div.AuthorlistFootnote {
+    font-size : 8pt;
+    font-weight : bold;
+}
+
+span.AuthorlistFootnoteSymbol {
+    display : inline-block;
+    width : 20px;
+}
+
+/* Input field definitions */
+label.AuthorlistLabel {
+    display : inline-block;
+    width : 20%;
+    font-weight : bold;
+    font-size : 10pt;
+}
+
+input.AuthorlistInput {
+    width : 30%;
+    margin : 5px 0px;
+}
+
+/* Buttons definitions */
+button.AuthorlistButton {
+    height : 22px;
+    margin-left : 5px;
+}
+
+button.AuthorlistBack {
+    margin-left : 0px;
+    margin-right : 30px;
+}
+
+button.AuthorlistDelete {
+    margin-right : 30px;
+}
+
+button.AuthorlistExportAPS {
+    margin-right : 30px;
+}
+
+button.AuthorlistAdd {
+    margin-left : 20px;
+}
+
+/* Dialog definitions */
+div.AuthorlistDialog {
+    font-size : 10pt !important;
+}
+
+div.AuthorlistDialog div.ui-dialog-content {
+    margin-bottom : 13px;
+}
+
+div.AuthorlistDialog div.ui-dialog-buttonpane {
+    padding : 5px 1em 3px 0px !important;
+    margin : 0px !important;
+}
+
+div.AuthorlistDialog button {
+    font-size : 8pt !important;
+    padding : 0px !important;
+    margin : 0px !important;
+}
+
+div.AuthorlistDialog button:not(:first-child) {
+    margin-left : 10px !important;
+}
+
+div.AuthorlistDialog .ui-icon {
+    float : left;
+}
+
+span.ui-icon.ui-icon-alert {
+    margin-right : 5px;
+}
+
+span.ui-icon.ui-icon-info {
+    margin-right : 5px;
+}
+
+p.AuthorlistConfirmationTitle {
+    font-weight : bold;
+    margin-bottom : -15px;
+}
+
+p.AuthorlistErrorTitle {
+    font-weight : bold;
+    margin-bottom : 13px;
+}
+
+p.AuthorlistBullet {
+    margin : 5px 0px;
+}
+
+span.AuthorlistBulletText {
+    display : block;
+    padding : 0px 20px;
+}
+
+.AuthorlistErrorMessage {
+    color: #ff0000;
+}

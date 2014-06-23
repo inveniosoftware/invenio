@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,27 +25,36 @@ present here can be considered private by the invenio modules.
 
 
 import os
+import sys
 
 from urllib import urlretrieve
 from tempfile import mkstemp
 
-from .engine import parse_references, get_plaintext_document_body, \
-    parse_reference_line, get_kbs
+from .engine import (parse_references,
+                     get_plaintext_document_body,
+                     parse_reference_line,
+                     get_kbs,
+                     parse_tagged_reference_line)
 from .text import extract_references_from_fulltext
-from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
-    CFG_JOURNAL_TAG
 from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import (
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM, CFG_JOURNAL_TAG)
 from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 from invenio.legacy.search_engine import get_record
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
-from invenio.legacy.bibrecord import record_delete_fields, record_xml_output, \
-    create_record, record_get_field_instances, record_add_fields, \
-    record_has_field
-from .find import get_reference_section_beginning, find_numeration_in_body
+from invenio.legacy.bibrecord import (record_delete_fields,
+                                      record_xml_output,
+                                      create_record,
+                                      record_get_field_instances,
+                                      record_add_fields,
+                                      record_has_field)
+from .find import (get_reference_section_beginning,
+                                     find_numeration_in_body)
 from .text import rebuild_reference_lines
 from .config import CFG_REFEXTRACT_FILENAME
 from invenio.config import CFG_TMPSHAREDDIR
+from .tag import tag_reference_line
+
 
 
 class FullTextNotAvailable(Exception):
@@ -82,12 +91,22 @@ def extract_references_from_url_xml(url):
     return marcxml
 
 
-def extract_references_from_file_xml(path, recid=1):
+def extract_references_from_file_xml(path, recid=None):
     """Extract references from a local pdf file
 
     The single parameter is the path to the file
     It raises FullTextNotAvailable if the file does not exist
     The result is given in marcxml.
+    """
+    return extract_references_from_file(path=path, recid=recid).to_xml()
+
+
+def extract_references_from_file(path, recid=None):
+    """Extract references from a local pdf file
+
+    The single parameter is the path to the file
+    It raises FullTextNotAvailable if the file does not exist
+    The result is given as a bibrecord class.
     """
     if not os.path.isfile(path):
         raise FullTextNotAvailable()
@@ -101,7 +120,23 @@ def extract_references_from_file_xml(path, recid=1):
     return parse_references(reflines, recid=recid)
 
 
-def extract_references_from_string_xml(source, is_only_references=True):
+def extract_references_from_string_xml(source,
+                                       is_only_references=True,
+                                       recid=None):
+    """Extract references from a string
+
+    The single parameter is the document
+    The result is given as a bibrecord class.
+    """
+    r = extract_references_from_string(source=source,
+                                       is_only_references=is_only_references,
+                                       recid=recid)
+    return r.to_xml()
+
+
+def extract_references_from_string(source,
+                                   is_only_references=True,
+                                   recid=None):
     """Extract references from a string
 
     The single parameter is the document
@@ -118,10 +153,10 @@ def extract_references_from_string_xml(source, is_only_references=True):
             refs_info['end_line'] = len(docbody) - 1,
 
         reflines = rebuild_reference_lines(docbody, refs_info['marker_pattern'])
-    return parse_references(reflines)
+    return parse_references(reflines, recid=recid)
 
 
-def extract_references_from_record_xml(recid):
+def extract_references_from_record(recid):
     """Extract references from a record id
 
     The single parameter is the document
@@ -131,7 +166,34 @@ def extract_references_from_record_xml(recid):
     if not path:
         raise FullTextNotAvailable()
 
-    return extract_references_from_file_xml(path, recid=recid)
+    return extract_references_from_file(path, recid=recid)
+
+
+def extract_references_from_record_xml(recid):
+    """Extract references from a record id
+
+    The single parameter is the document
+    The result is given in marcxml.
+    """
+    return extract_references_from_record(recid).to_xml()
+
+
+def extract_journal_reference(line):
+    """Extracts the journal reference from
+    MARC field 773 and parses for specific
+    journal information.
+
+    Parameter: line - field 773__x, the raw journal ref
+    Return: list of tuples with data values"""
+    tagged_line = tag_reference_line(line, get_kbs(), {})[0]
+    if tagged_line is None:
+        return None
+
+    elements, dummy_marker, dummy_stats = parse_tagged_reference_line('', tagged_line, [], [])
+
+    for element in elements:
+        if element['type'] == 'JOURNAL':
+            return element
 
 
 def replace_references(recid):
@@ -145,7 +207,7 @@ def replace_references(recid):
     """
     # Parse references
     references_xml = extract_references_from_record_xml(recid)
-    references = create_record(references_xml.encode('utf-8'))
+    references = create_record(references_xml)
     # Record marc xml
     record = get_record(recid)
 
@@ -180,7 +242,7 @@ def update_references(recid, overwrite=True):
         # Check for references in record
         record = get_record(recid)
         if record and record_has_field(record, '999'):
-            raise RecordHasReferences('Record has references and overwrite ' \
+            raise RecordHasReferences('Record has references and overwrite '
                                       'mode is disabled: %s' % recid)
 
     if get_fieldvalues(recid, '999C59'):
@@ -193,11 +255,11 @@ def update_references(recid, overwrite=True):
     (temp_fd, temp_path) = mkstemp(prefix=CFG_REFEXTRACT_FILENAME,
                                    dir=CFG_TMPSHAREDDIR)
     temp_file = os.fdopen(temp_fd, 'w')
-    temp_file.write(references_xml.encode('utf-8'))
+    temp_file.write(references_xml)
     temp_file.close()
 
     # Update record
-    task_low_level_submission('bibupload', 'refextract', '-P', '5',
+    task_low_level_submission('bibupload', 'refextract', '-P', '4',
                               '-c', temp_path)
 
 
@@ -268,3 +330,25 @@ def search_from_reference(text):
                 break
 
     return field, pattern.encode('utf-8')
+
+
+def check_record_for_refextract(recid):
+    if get_fieldvalues(recid, '999C6v'):
+        # References extracted by refextract
+        if get_fieldvalues(recid, '999C59'):
+            # They have been curated
+            # To put in the HP and create ticket in the future
+            needs_submitting = False
+        else:
+            # They haven't been curated, we safely extract from the new pdf
+            needs_submitting = True
+    elif not get_fieldvalues(recid, '999C5_'):
+        # No references in the record, we can safely extract
+        # new references
+        needs_submitting = True
+    else:
+        # Old record, with either no curated references or references
+        # curated by SLAC. We cannot distinguish, so we do nothing
+        needs_submitting = False
+
+    return needs_submitting

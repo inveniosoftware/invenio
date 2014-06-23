@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,7 +21,9 @@
 
 import cgi
 from invenio.legacy.bibdocfile.api import BibRecDocs
-from invenio.utils.url import create_html_link
+from invenio.utils.url import (create_html_link,
+                              get_relative_url)
+
 
 def format_element(bfo, separator=" ", style='', img_style='', text_style='font-size:small',
                    print_links='yes', max_photos='', show_comment='yes',
@@ -57,9 +59,12 @@ def format_element(bfo, separator=" ", style='', img_style='', text_style='font-
         found_url = ''
         for docfile in doc.list_latest_files():
             if docfile.is_icon():
-                found_icons.append((docfile.get_size(), docfile.get_url()))
+                found_icons.append((
+                                   docfile.get_size(),
+                                   get_relative_url(docfile.get_url())
+                                  ))
             else:
-                found_url = docfile.get_url()
+                found_url = get_relative_url(docfile.get_url())
         found_icons.sort()
 
         if found_icons:
@@ -69,8 +74,8 @@ def format_element(bfo, separator=" ", style='', img_style='', text_style='font-
 
             preview_url = None
             if len(found_icons) > 1:
-                preview_url = found_icons[1][1]
-                additional_urls = [(docfile.get_size(), docfile.get_url(), \
+                preview_url = get_relative_url(found_icons[1][1])
+                additional_urls = [(docfile.get_size(), get_relative_url(docfile.get_url()), \
                                     docfile.get_superformat(), docfile.get_subformat()) \
                                    for docfile in doc.list_latest_files() if not docfile.is_icon()]
                 additional_urls.sort()
@@ -79,7 +84,7 @@ def format_element(bfo, separator=" ", style='', img_style='', text_style='font-
                                                      link_label="%s %s (%s)" % (format.strip('.').upper(), subformat, format_size(size))) \
                                     for (size, url, format, subformat) in additional_urls]
             img = '<img src="%(icon_url)s" alt="%(name)s" style="max-width:%(img_max_width)s;_width:%(img_max_width)s;%(img_style)s" />' % \
-                  {'icon_url': cgi.escape(found_icons[0][1], True),
+                  {'icon_url': cgi.escape(get_relative_url(found_icons[0][1]), True),
                    'name': cgi.escape(name, True),
                    'img_style': img_style,
                    'img_max_width': img_max_width}

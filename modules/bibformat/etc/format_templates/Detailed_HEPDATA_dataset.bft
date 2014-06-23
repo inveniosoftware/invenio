@@ -1,0 +1,33 @@
+<name>Detailed HEPDATA dataset</name>
+<description>This is the default HTML detailed format for HEPData dataset records.</description>
+
+<BFE_TOPBANNER
+prefix='<div style="padding-left:10px;padding-right:10px">'
+suffix='</div><hr/>'/>
+
+<div style="padding-left:10px;padding-right:10px">
+
+<BFE_TITLE prefix="<center><big><big><strong>" separator="<br /><br />" suffix="</strong></big></big></center>" />
+
+<p align="center">
+<BFE_AUTHORS_PARENT suffix="<br />" limit="25" interactive="yes" print_affiliations="yes" affiliation_prefix="<small> (" affiliation_suffix=")</small>"/>
+ </p>
+
+<p style="background-color: #ececec;" align="center" > 
+<BFE_CITATION_SUGGESTION_HEPDATA prefix="" suffix="<br />" default="" escape="" />
+</p> 
+
+</div>
+
+<BFE_HEPDATA_TABLE prefix="" suffix="" default="" escape="" />
+
+<div style="padding-left:30px;padding-right:10px">
+
+<BFE_NOTES
+note_prefix="<br /><strong>Note: </strong>"
+note_suffix=""
+suffix="<br />" />
+
+
+<BFE_DATASET_APPEARS prefix="<br />" suffix="<br /><br />" default="" escape="" />
+</div>

@@ -24,7 +24,7 @@ __revision__ = ""
 import cgi
 from invenio.utils.url import create_html_link
 
-def format_element(bfo, limit, separator=" ", extension=" etc.", link='yes'):
+def format_element(bfo, limit, separator=" ", extension=" etc.", link='yes', just_one='no'):
     """
     Prints the report numbers of the record (037__a and 088__a)
 
@@ -35,6 +35,10 @@ def format_element(bfo, limit, separator=" ", extension=" etc.", link='yes'):
     """
     numbers = bfo.fields("037__a")
     numbers.extend(bfo.fields("088__a"))
+
+    # Only display the first one
+    if just_one == 'yes':
+        numbers = numbers[:1]
 
     if limit.isdigit():
         limit_as_int = int(limit)

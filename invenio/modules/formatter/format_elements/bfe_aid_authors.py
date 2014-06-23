@@ -3,7 +3,7 @@
 ## $Id$
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,7 +20,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """BibFormat element - Prints authors
 """
-__revision__ = "$Id$"
 
 def format_element(bfo, limit, separator='; ',
            extension='[...]',
@@ -63,8 +62,7 @@ def format_element(bfo, limit, separator='; ',
     from urllib import quote
     from cgi import escape
     import re
-    from invenio.config import CFG_SITE_URL
-    from invenio.modules.formatter.format_elements.bfe_server_info import format_element as bfe_server
+    from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD, CFG_SITE_URL
 
     #regex for parsing last and first names and initials
     re_last_first = re.compile('^(?P<last>[^,]+)\s*,\s*(?P<first_names>[^\,]*)(?P<extension>\,?.*)$')
@@ -133,7 +131,7 @@ def format_element(bfo, limit, separator='; ',
                 if id_links == "yes" and 'i' in author:
                     author['i'] = author['i'][0]  #possible to have more IDs?
                     id_link = '<a class="authoridlink" href="' + \
-                              CFG_SITE_URL + \
+                              CFG_BASE_URL + \
                               '/search?' + \
                               'ln=' + bfo.lang + \
                               '&amp;p=100__i' + escape(':' + author['i']) + \
@@ -144,7 +142,7 @@ def format_element(bfo, limit, separator='; ',
                 author['display'] = '<a class="authorlink" target="_blank" ' + \
                                     'href="' + \
                                     CFG_SITE_URL + \
-                                    '/person/search?q=' + bibrec_id + ':' + \
+                                    '/author/search?q=' + bibrec_id + ':' + \
                                     quote(author['a']) + \
                                     '&ln=' + bfo.lang + \
                                     '">' + escape(author['display']) + '</a>' + \
@@ -203,7 +201,7 @@ def format_element(bfo, limit, separator='; ',
     # link the extension to detailed record
     if link_extension == 'yes' and interactive != 'yes':
         extension = '<a class="authorlink" href="' + \
-                    bfe_server(bfo, var="recurl") + '">' + \
+                    CFG_BASE_URL + '/' + CFG_SITE_RECORD + '∕' + str(bfo.recID) + '">' + \
                     extension + '</a>'
 
     # Detect Collaborations:
@@ -216,7 +214,7 @@ def format_element(bfo, limit, separator='; ',
         colls = [re_coll.sub('', coll) for coll in colls]
         if print_links.lower() == "yes":
             colls = ['<a class="authorlink" href="' + \
-                     bfe_server(bfo, var="searchurl") + \
+                     CFG_BASE_URL + '/search' + \
                      '?p=' + quote(coll) + \
                      '&amp;ln=' + bfo.lang + \
                      '&amp;f=collaboration' + \

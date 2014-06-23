@@ -35,8 +35,8 @@ def group_personid(papers_table="aidPERSONID_PAPERS", data_table="aidPERSONID_DA
     '''
     Extracts, groups and returns the whole personid.
     '''
-    papers = dbinter.get_full_personid_papers(papers_table)
-    data = dbinter.get_full_personid_data(data_table)
+    papers = dbinter.get_all_author_paper_associations(papers_table)
+    data = dbinter.get_author_data_associations(data_table)
 
     group = lambda x: groupby(sorted(x, key=itemgetter(0)), key=itemgetter(0))
     to_dict = lambda x: dict((pid, map(itemgetter(slice(1, None)), data)) for pid, data in x)
@@ -111,11 +111,11 @@ def compare_personid_tables_easy(suffix='_copy', filename='/tmp/pid_comparison')
 
 
 def filter_bibrecs_outside(all_papers):
-    all_bibrecs = dbinter.get_all_bibrecs()
+    all_bibrecs = dbinter.get_all_papers()
 
     to_remove = list(frozenset(all_bibrecs) - frozenset(all_papers))
     chunk = 1000
     separated = [to_remove[i: i + chunk] for i in range(0, len(to_remove), chunk)]
 
     for sep in separated:
-        dbinter.remove_all_bibrecs(sep)
+        dbinter.remove_papers(sep)

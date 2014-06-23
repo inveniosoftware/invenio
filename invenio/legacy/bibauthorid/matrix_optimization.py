@@ -24,8 +24,8 @@ def maximized_mapping(matrix):
     Finds nearly maximized sum mapping from a matrix.
     With this matrix
     ((4, 1, 10),
-     (7, 4, 2),
-     (20, 4, 15))
+    (7, 4, 2),
+    (20, 4, 15))
     the function will return ((1, 3), (2, 2), (3, 1)).
     For performance reasons the function will not always return
     the optimal mapping.

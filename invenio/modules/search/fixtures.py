@@ -1,9 +1,7 @@
-
-
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -228,8 +226,23 @@ class FieldData(DataSet):
         name = u'miscellaneous'
 
     class Field_40:
-        code = u'tag'
+        code = u'referstoexcludingselfcites'
         id = 40
+        name = u'refers to excluding self cites'
+
+    class Field_41:
+        code = u'citedbyexcludingselfcites'
+        id = 41
+        name = u'cited by excluding self cites'
+
+    class Field_42:
+        code = u'cataloguer'
+        id = 42
+        name = u'cataloguer nickname'
+
+    class Field_43:
+        code = u'tag'
+        id = 43
         name = u'tag'
 
 

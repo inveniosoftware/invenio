@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,7 +30,7 @@ def format_element(bfo, limit, separator=' ; ', extension='[...]', print_links="
     @param print_links: if yes, print the editors as HTML link to their publications
     """
     from urllib import quote
-    from invenio.config import CFG_SITE_URL
+    from invenio.config import CFG_BASE_URL
     from invenio.legacy import bibrecord
 
     authors = bibrecord.record_get_field_instances(bfo.get_record(), '100')
@@ -39,7 +39,7 @@ def format_element(bfo, limit, separator=' ; ', extension='[...]', print_links="
                for author in authors if len(bibrecord.field_get_subfield_values(author, "e")) > 0 and bibrecord.field_get_subfield_values(author, "e")[0]=="ed." ]
 
     if print_links.lower() == "yes":
-        editors = ['<a href="' + CFG_SITE_URL + '/search?f=author&p=' + \
+        editors = ['<a href="' + CFG_BASE_URL + '/search?f=author&p=' + \
                    quote(editor) + \
                    '&amp;ln='+ bfo.lang + \
                    '">' + editor + '</a>'

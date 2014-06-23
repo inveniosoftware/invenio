@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -166,7 +166,7 @@ def close_connection(dbhost=None):
     except KeyError:
         pass
 
-def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave=False):
+def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave=False, connection=None):
     """Run SQL on the server with PARAM and return result.
     @param param: tuple of string params to insert in the query (see
     notes below)
@@ -175,6 +175,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
     columns in query.
     @param with_dict: if True, will return a list of dictionaries
     composed of column-value pairs
+    @param connection: if provided, uses the given connection.
     @return: If SELECT, SHOW, DESCRIBE statements, return tuples of data,
     followed by description if parameter with_desc is
     provided.
@@ -197,6 +198,10 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
     if cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] == 3:
         # do not connect to the database as the site is closed for maintenance:
         return []
+    elif CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
+        ## Read only website
+        if not sql.upper().startswith("SELECT") and not sql.upper().startswith("SHOW"):
+            return
 
     if param:
         param = tuple(param)
@@ -209,13 +214,15 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
         log_sql_query(dbhost, sql, param)
 
     try:
-        db = _db_login(dbhost)
+        db = connection or _db_login(dbhost)
         cur = db.cursor()
         gc.disable()
         rc = cur.execute(sql, param)
         gc.enable()
     except (OperationalError, InterfaceError): # unexpected disconnect, bad malloc error, etc
         # FIXME: now reconnect is always forced, we may perhaps want to ping() first?
+        if connection is not None:
+            raise
         try:
             db = _db_login(dbhost, relogin=1)
             cur = db.cursor()
@@ -267,6 +274,14 @@ def run_sql_many(query, params, limit=None, run_on_slave=False):
     """
     if limit is None:
         limit = cfg['CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT']
+
+    if cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] == 3:
+        # do not connect to the database as the site is closed for maintenance:
+        return []
+    elif cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] > 0:
+        ## Read only website
+        if not query.upper().startswith("SELECT") and not query.upper().startswith("SHOW"):
+            return
 
     dbhost = cfg['CFG_DATABASE_HOST']
     if run_on_slave and cfg['CFG_DATABASE_SLAVE']:

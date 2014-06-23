@@ -24,12 +24,7 @@ import re
 import six
 from urllib import quote
 from cgi import escape
-from invenio.base.globals import cfg
 from invenio.base.i18n import gettext_set_language
-from invenio.legacy.bibauthority.config import \
-    CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME, \
-    CFG_BIBAUTHORITY_TYPE_NAMES, \
-    CFG_BIBAUTHORITY_PREFIX_SEP
 from invenio.legacy.bibauthority.engine import \
     get_low_level_recIDs_from_control_no
 
@@ -61,9 +56,10 @@ def format_element(bfo, limit, separator=' ; ',
     @param link_mobile_pages: should we link to mobile app pages if print_links in on?
     @param relator_code_pattern: a regular expression to filter authors based on subfield $4 (relator code)
     """
-    CFG_SITE_URL = cfg['CFG_SITE_URL']
-    if isinstance(CFG_SITE_URL, six.text_type):
-        CFG_SITE_URL = CFG_SITE_URL.encode('utf8')
+    from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
+        CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME, \
+        CFG_BIBAUTHORITY_TYPE_NAMES, \
+        CFG_BIBAUTHORITY_PREFIX_SEP
 
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
@@ -107,8 +103,8 @@ def format_element(bfo, limit, separator=' ; ',
 
             if print_links.lower() == "yes":
                 if link_author_pages == "yes":
-                    author['a'] = '<a rel="author" href="' + CFG_SITE_URL + \
-                                  '/author/' + quote(author['a']) + \
+                    author['a'] = '<a rel="author" href="' + CFG_BASE_URL + \
+                                  '/author/profile/' + quote(author['a']) + \
                                   '?recid=' +  bibrec_id + \
                                   '&ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'
@@ -123,7 +119,7 @@ def format_element(bfo, limit, separator=' ; ',
                         if len(recIDs):
                             auth_coll_param = '&amp;c=' + \
                                               CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
-                    author['a'] = '<a href="' + CFG_SITE_URL + \
+                    author['a'] = '<a href="' + CFG_BASE_URL + \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
                                    auth_coll_param + \
                                   '&amp;ln=' + bfo.lang + \
@@ -138,7 +134,7 @@ def format_element(bfo, limit, separator=' ; ',
                     # contain a warning that there are multiple authority
                     # records with the same control number
                     if len(recIDs):
-                        author['u'] = '<a href="' + CFG_SITE_URL + '/record/' + \
+                        author['u'] = '<a href="' + CFG_BASE_URL + '/' + CFG_SITE_RECORD + '/' + \
                                       str(recIDs[0]) + \
                                       '?ln=' + bfo.lang + \
                                       '">' + author['u'] + '</a>'

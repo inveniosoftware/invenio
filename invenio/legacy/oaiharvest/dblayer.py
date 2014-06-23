@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -58,6 +58,37 @@ class HistoryEntry:
                "bibupload_task_id: " + str(self.bibupload_task_id) + ', ' + \
                "inserted_to_db: " + str(self.inserted_to_db) + ', ' + \
                "oai_src_id: " + str(self.oai_src_id) + ', ' + ")"
+
+
+def update_lastrun(index):
+    """ A method that updates the lastrun of a repository
+        successfully harvested """
+    try:
+        today = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        OaiHARVEST.query.filter(OaiHARVEST.id == index).update({"lastrun": today})
+        return 1
+    except StandardError as e:
+        return (0, e)
+
+
+def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
+    """
+    Function which creates the harvesting logs
+    @param task_id bibupload task id
+    """
+    try:
+        records = create_records(xml_content)
+        for record in records:
+            oai_id = record_extract_oai_id(record[0])
+            my_new_harvest_log = OaiHARVESTLOG()
+            my_new_harvest_log.id_oaiHARVEST = oai_src_id
+            my_new_harvest_log.oai_id = oai_id
+            my_new_harvest_log.date_harvested = datetime.datetime.now
+            my_new_harvest_log.bibupload_task_id = task_id
+            db.session.add(my_new_harvest_log)
+            db.session.commit()
+    except Exception as msg:
+        print("Logging exception : %s   " % (str(msg),))
 
 
 def get_history_entries(oai_src_id, oai_date, method="harvested"):
@@ -277,35 +308,3 @@ def get_holdingpen_entry_details(hpupdate_id):
     """
     query = "SELECT oai_id, id_bibrec, changeset_date, changeset_xml FROM bibHOLDINGPEN WHERE changeset_id=%s"
     return run_sql(query, (hpupdate_id,))[0]
-
-
-def update_lastrun(index):
-    """ A method that updates the lastrun of a repository
-        successfully harvested """
-    try:
-        today = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        OaiHARVEST.query.filter(OaiHARVEST.id == index).update({"lastrun": today})
-        return 1
-    except StandardError as e:
-        return (0, e)
-
-
-def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
-    """
-    Function which creates the harvesting logs
-    @param task_id bibupload task id
-    """
-    try:
-        records = create_records(xml_content)
-        for record in records:
-            oai_id = record_extract_oai_id(record[0])
-            my_new_harvest_log = OaiHARVESTLOG()
-            my_new_harvest_log.id_oaiHARVEST = oai_src_id
-            my_new_harvest_log.oai_id = oai_id
-            my_new_harvest_log.date_harvested = datetime.datetime.now
-            my_new_harvest_log.bibupload_task_id = task_id
-            db.session.add(my_new_harvest_log)
-            db.session.commit()
-    except Exception as msg:
-        print("Logging exception : %s   " % (str(msg),))
-

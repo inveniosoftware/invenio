@@ -396,7 +396,7 @@ class InvenioSession(dict):
         """
         Perform the database session cleanup.
         """
-        def session_cleanup():
+        def cb_session_cleanup(data=None):
             """
             Session cleanup procedure which to be executed at the end
             of the request handling.
@@ -405,7 +405,7 @@ class InvenioSession(dict):
                 DELETE LOW_PRIORITY FROM session
                 WHERE session_expiry<=UTC_TIMESTAMP()
             """)
-        self._req.register_cleanup(session_cleanup)
+        self._req.register_cleanup(cb_session_cleanup)
         self._req.log_error("InvenioSession: registered database cleanup.")
 
     def __del__(self):

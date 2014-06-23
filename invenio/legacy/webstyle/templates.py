@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,6 +27,7 @@ import urllib
 import sys
 import string
 
+from bs4 import BeautifulSoup
 from flask import g, current_app
 from invenio.ext.template import render_template_to_string
 from invenio.config import \
@@ -36,6 +37,7 @@ from invenio.config import \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
+     CFG_BASE_URL, \
      CFG_SITE_URL, \
      CFG_VERSION, \
      CFG_WEBSTYLE_TEMPLATE_SKIN, \
@@ -48,8 +50,8 @@ from invenio.utils.url import make_canonical_urlargd, create_html_link, \
 from invenio.utils.date import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.modules.formatter import format_record
-from bs4 import BeautifulSoup
 from invenio.legacy import template
+from invenio.utils.html import get_mathjax_header
 websearch_templates = template.load('websearch')
 
 
@@ -180,7 +182,6 @@ class Template:
 
           - HTML code of the page
         """
-
         ctx = dict(ln=CFG_SITE_LANG, description="",
                    keywords="", userinfobox="", useractivities_menu="",
                    adminactivities_menu="", navtrailbox="",
@@ -257,6 +258,7 @@ class Template:
             no_pagefooter=True,
             **ctx
         ).encode('utf8')
+        return out
 
     def tmpl_pagefooter(self, req, **kwargs):
         """Creates a page footer
@@ -457,7 +459,7 @@ URI: http://%(host)s%(page)s
                 'error'     : cgi.escape(error_s).replace('"', '&quot;'),
                 'traceback' : cgi.escape(traceback_s).replace('"', '&quot;'),
                 'sys_error' : cgi.escape(sys_error_s).replace('"', '&quot;'),
-                'siteurl'    : CFG_SITE_URL,
+                'siteurl'    : CFG_BASE_URL,
                 'referer'   : page_s!=info_not_available and \
                                  ("http://" + host_s + page_s) or \
                                  info_not_available
@@ -468,7 +470,8 @@ URI: http://%(host)s%(page)s
                                       show_similar_rec_p=True,
                                       creationdate=None,
                                       modificationdate=None, show_short_rec_p=True,
-                                      citationnum=-1, referencenum=-1, discussionnum=-1):
+                                      citationnum=-1, referencenum=-1, discussionnum=-1,
+                                      include_jquery = False, include_mathjax = False):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
         Returns content as it is if the number of tabs for this record
@@ -559,9 +562,18 @@ URI: http://%(host)s%(page)s
                          <div style="clear:both;height:1px">&nbsp;</div>
                          ''' % {'record_brief': record_brief}
 
+        additional_scripts = ""
+        if include_jquery:
+            additional_scripts += """<script type="text/javascript" src="%s/js/jquery.min.js">' \
+            '</script>\n""" % (CFG_BASE_URL, )
+        if include_mathjax:
+
+            additional_scripts += get_mathjax_header()
+
+
         # Print the content
         out = """
-    <div class="detailedrecordbox">
+        %(additional_scripts)s<div class="detailedrecordbox">
         %(tabs)s
         <div class="detailedrecordboxcontent">
             <div class="top-left-folded"></div>
@@ -570,7 +582,8 @@ URI: http://%(host)s%(page)s
                 <!--<div style="height:0.1em;">&nbsp;</div>
                 <p class="notopgap">&nbsp;</p>-->
                 %(record_brief)s
-                """ % {'tabs':out_tabs,
+                """ % {'additional_scripts': additional_scripts,
+                       'tabs':out_tabs,
                        'record_brief':record_brief}
 
         out = restriction_flag + out
@@ -672,7 +685,7 @@ URI: http://%(host)s%(page)s
         <div class="bottom-left"></div><div class="bottom-right"></div>
         </div>
         """ % {
-        'siteurl': CFG_SITE_URL,
+        'siteurl': CFG_BASE_URL,
         'ln':ln,
         'recid':recid,
         'files': files,

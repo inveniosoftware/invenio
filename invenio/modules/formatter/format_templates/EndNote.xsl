@@ -77,6 +77,9 @@ exclude-result-prefixes="marc fn">
                     <xsl:value-of select="datafield[@tag='773' and @ind1=' ' and @ind2=' ']/subfield[@code='p']"/>
             </secondary-title>
         </titles>
+        <doi>
+                <xsl:value-of select="datafield[@tag='024' and @ind1='7' and @ind2=' ']/subfield[@code='a']" />
+        </doi>
         <pages>
                 <xsl:value-of select="datafield[@tag='773' and @ind1=' ' and @ind2=' ']/subfield[@code='c']" />
                 <xsl:value-of select="datafield[@tag='909' and @ind1='C' and @ind2='4']/subfield[@code='c']" />

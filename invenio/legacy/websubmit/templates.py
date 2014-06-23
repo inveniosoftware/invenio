@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ import re
 import operator
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD, \
-     CFG_SITE_SECURE_URL
+     CFG_SITE_SECURE_URL, CFG_INSPIRE_SITE
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.date import convert_datetext_to_dategui
 from invenio.utils.url import create_html_link
@@ -545,7 +545,7 @@ class Template:
                  'mainmenu' : cgi.escape(mainmenu),
                  'images' : CFG_SITE_URL + '/img',
                  'take_note' : '(1) ' + _("This is your submission access number. It can be used to continue with an interrupted submission in case of problems."),
-                 'explain_summary' : '(2) ' + _("Mandatory fields appear in red in the SUMMARY window."),
+                 'explain_summary' : not CFG_INSPIRE_SITE and  '(2) ' + _("Mandatory fields appear in red in the SUMMARY window.") or ''
                }
         return out
 

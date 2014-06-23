@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -35,7 +35,6 @@ import select
 from itertools import chain
 from six import StringIO
 import subprocess
-
 
 __all__ = ['run_shell_command',
            'run_process_with_timeout',
@@ -371,6 +370,28 @@ def escape_shell_arg(shell_arg):
         raise TypeError(msg)
 
     return "'%s'" % shell_arg.replace("'", r"'\''")
+
+def retry_mkstemp(suffix='', prefix='tmp', directory=None, max_retries=3):
+    """
+    Make mkstemp more robust against AFS glitches.
+    """
+    if directory is None:
+        from invenio.config import CFG_TMPSHAREDDIR
+        directory = CFG_TMPSHAREDDIR
+    for retry_count in range(1, max_retries + 1):
+        try:
+            tmp_file_fd, tmp_file_name = tempfile.mkstemp(suffix=suffix,
+                                                 prefix=prefix,
+                                                 dir=directory)
+        except OSError, e:
+            if e.errno == 19 and retry_count <= max_retries:
+                # AFS Glitch?
+                time.sleep(10)
+            else:
+                raise
+        else:
+            break
+    return tmp_file_fd, tmp_file_name
 
 
 def mymkdir(newdir, mode=0o777):

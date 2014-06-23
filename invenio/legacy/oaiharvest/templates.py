@@ -33,6 +33,17 @@ oai_harvest_admin_url = CFG_SITE_URL + \
 class Template:
     """ OAIHarvest templates"""
 
+    def tmpl_meta_headers(self):
+        """
+            returning the HTML headers necessary in order to open the view holdingpen page
+        """
+        return """
+    <script type="text/javascript" src="%s/js/jquery.min.js"></script>
+    <script type="text/javascript" src="%s/js/ui.core.js"></script>
+    <script type="text/javascript" src="%s/js/oai_harvest_admin.js"> </script>
+    <link rel="stylesheet" href="%s/img/oai_harvest_admin.css" />
+""" % tuple([CFG_SITE_URL] * 4)
+
     def tmpl_getnavtrail(self, previous="", ln=CFG_SITE_LANG):
         """Get the navigation trail
           - 'previous' *string* - The previous navtrail"""
@@ -110,9 +121,21 @@ class Template:
           - 'suffix' *string* - A value printed after the input box (must be already escaped)
           """
         _ = gettext_set_language(ln)
-        text = """<span class="adminlabel">%s""" % title
+        text = """<span class="admin_label">%s""" % title
         text += """</span><input class="admin_w200" type="text" name="%s" value="%s" /> %s
         """ % (cgi.escape(name, 1), cgi.escape(value, 1), suffix)
+        return text
+
+    def tmpl_admin_w200_text_placeholder(self, ln, placeholder, name, value, suffix="<br/>"):
+        """Draws an html w200 text box
+          - 'placeholder' *string* - Placeholder text for the textbox
+          - 'name' *string* - The name of the value in the textbox
+          - 'value' *string* - The value in the textbox
+          - 'suffix' *string* - A value printed after the input box (must be already escaped)
+          """
+        _ = gettext_set_language(ln)
+        text = """<input class="admin_w200 placeholder placeholder_default_text" placeholder="%s" type="text" name="%s" value="%s" /> %s
+        """ % (cgi.escape(placeholder, 1), cgi.escape(name, 1), cgi.escape(value, 1), suffix)
         return text
 
     def tmpl_admin_checkboxes(self, ln, title, name, values, labels, states, message=""):
@@ -127,7 +150,9 @@ class Template:
           len(values) == len(labels) == len(states)
           """
         _ = gettext_set_language(ln)
-        text = """<div><div style="float:left;"><span class="adminlabel">%s</span></div>""" % title
+        text = ""
+        if title:
+            text += """<div><div style="float:left;"><span class="admin_label">%s</span></div>""" % (title,)
         text += """<table><tr><td>"""
         if message:
             text += '&nbsp;&nbsp; <small><i>(%s)</i></small><br/>' % (message,)
@@ -142,20 +167,80 @@ class Template:
             if state:
                 text += 'checked="checked "'
             text += "/>"
-
             text += """<label for="%s">%s</label><br/>""" % (chk_box_id, label)
+
         text += "</td></tr></table></div>"
         return text
 
-    def tmpl_admin_w200_select(self, ln, title, name, valuenil, values, lastval=""):
+    def tmpl_admin_checkbox_arguments(self, ln, title, name, values, labels, states, message="", arguments=[]):
+        """Draws a list of HTML checkboxes tailored for OAI post-processes as it allows text-input
+        arguments for each checkbox/post-process.
+
+          - 'title' *string* - The name of the list of checkboxes
+          - 'name' *string* - The name for this group of checkboxes
+          - 'values' *list* - The values of the checkboxes
+          - 'labels' *list* - The labels for the checkboxes
+          - 'states' *list* - The previous state of each checkbox 1|0
+          - 'message' *string* - Put a message over the checkboxes. Optional.
+          - 'arguments' *list* - List of argument dictionaries (key => value mappings of argument name etc.
+
+          len(values) == len(labels) == len(states)
+          """
+        _ = gettext_set_language(ln)
+        text = ""
+        if title:
+            text += """<div><div style="float:left;"><span class="admin_label">%s</span></div>""" % (title,)
+        text += """<table><tr><td>"""
+        if message:
+            text += '&nbsp;&nbsp; <small><i>(%s)</i></small><br/>' % (message,)
+
+        for i in range(len(values)):
+            value = values[i]
+            label = labels[i]
+            state = states[i]
+            chk_box_id = value + str(i)
+            text += '&nbsp;&nbsp; <input type="checkbox"' \
+                    'name="%s" id="post_input_%s" value="%s" ' % (name, chk_box_id, value)
+            if state:
+                text += 'checked="checked "'
+            text += "/>"
+            text += """<label for="post_input_%s">%s</label><br/>""" % (chk_box_id, label)
+            if len(arguments) > i:
+                # Arguments given, let us display each argument
+                args = arguments[i]
+                text += """<div id="post_args_%s" class="admin_arguments">""" % (chk_box_id,)
+                for arg_dict in args:
+                    title = arg_dict['name'].title().replace('-', ' ')
+                    if arg_dict['required']:
+                        title += " *"
+                    # To avoid problems with duplicate argument names we prefix with post-mode
+                    arg_name = "%s_%s" % (value, arg_dict['name'])
+                    # Depending on which input type the argument values are given, display it
+                    if arg_dict['input'] == 'text':
+                        text += self.tmpl_admin_w200_text(ln=ln, title=title, \
+                                                          name=arg_name, \
+                                                          value=arg_dict['value'])
+                    elif arg_dict['input'] == 'checkbox':
+                        text += self.tmpl_admin_checkboxes(ln=ln, title=title, name=arg_name, \
+                                                           values=arg_dict['value'], \
+                                                           labels=arg_dict['labels'], \
+                                                           states=arg_dict['states'])
+                text += """</div>"""
+        text += "</td></tr></table></div>"
+        return text
+
+
+    def tmpl_admin_w200_select(self, ln, title, name, valuenil, values, lastval="", suffix="<br />"):
         """Draws an html w200 drop-down box
           - 'title' *string* - The name of the dd box
           - 'name' *string* - The name of the value in the dd box
           - 'value' *list* - The values in the textbox"""
         _ = gettext_set_language(ln)
-        text = """<span class="adminlabel">%s""" % title
-        text += """</span><select name="%s" class="admin_w200">""" % name
-        text += """<option value="">%s</option>""" % valuenil
+        text = ""
+        if title:
+            text += """<span class="admin_label">%s</span>""" % (title,)
+        text += """<select name="%s" class="admin_w200">""" % (name,)
+        text += """<option value="">%s</option>""" % (valuenil,)
         try:
             for val in values:
                 intval = int(lastval)
@@ -163,20 +248,44 @@ class Template:
                     text += """<option value="%s" %s>%s</option>""" % (val[0], 'selected="selected"', str(val[1]))
                 else:
                     text += """<option value="%s">%s</option>""" % (val[0], str(val[1]))
-            text += """</select><br />"""
-        except StandardError:
+        except StandardError, e:
             for val in values:
                 if lastval == val[0]:
                     text += """<option value="%s" %s>%s</option>""" % (val[0], 'selected="selected"', str(val[1]))
                 else:
                     text += """<option value="%s">%s</option>""" % (val[0], str(val[1]))
-            text += """</select><br />"""
+        return """%s</select>%s""" % (text, suffix)
+
+    def tmpl_admin_w200_textarea(self, ln, title, name, value, suffix="<br/>"):
+        """
+        Returns a textarea element with given parameters:
+          - 'ln' *string* - The current language code
+          - 'title' *string* - The label of the textarea
+          - 'name' *string* - The name of the value in the textarea
+          - 'value' *string* - The value in the textarea
+          - 'suffix' *string* - Suffix to be added after the textbox element
+        """
+        _ = gettext_set_language(ln)
+        text = ""
+        if title:
+            text += """<span class="admin_label">%s</span>""" % (title,)
+        if value is None:
+            value= ""
+        text += """<textarea cols="30" rows="5" class="admin_w200" type="text" name="%s">%s</textarea>%s""" % \
+                 (cgi.escape(name), cgi.escape(value), suffix)
         return text
 
     def tmpl_print_info(self, ln, infotext):
         """Outputs some info"""
         _ = gettext_set_language(ln)
         text = """<br /><b><span class="info">%s</span></b>""" % infotext
+        return text
+
+    def tmpl_print_warning(self, ln, warntext, prefix="<br />", suffix=""):
+        """Outputs some info"""
+        _ = gettext_set_language(ln)
+        text = """%s<span class="warning">%s</span>%s""" % \
+                (prefix, warntext, suffix)
         return text
 
     def tmpl_print_brs(self, ln, howmany):
@@ -199,7 +308,7 @@ class Template:
             output = """<br /><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_success)
             return output
         else:
-            output = """<br /><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_nosuccess)
+            output = """<br /><span class="warning">baseURL <strong>%s</strong> %s</span>""" % (base, msg_nosuccess)
             return output
 
     def tmpl_output_error_info(self, ln, base, error):
@@ -213,27 +322,64 @@ class Template:
         output = "<iframe src=\"" + url + "\" width=\"80%\" height=\"400\"></iframe>"
         return output
 
-    def tmpl_output_table(self, title_row=None, data=None):
+    def tmpl_form_vertical(self, action="", text="", button="confirm", cnfrm='', **hidden):
+        """create select with hidden values and submit button
+
+          action - name of the action to perform on submit
+
+            text - additional text, can also be used to add non hidden input
+
+          button - value/caption on the submit button
+
+           cnfrm - if given, must check checkbox to confirm
+
+        **hidden - dictionary with name=value pairs for hidden input 
         """
-           Prints a table of given titles and data
-           @param title_row: is a list of titles of columns
-           @param data: is a list o rows. Each row is a list of string values
+        output  = '<form action="%s" method="post">\n' % (action, )
+        output += '<table width="100%">\n<tr><td style="vertical-align: top">'
+        output += text
+        if cnfrm:
+            output += ' <input type="checkbox" name="confirm" value="1"/>'
+        for key in hidden.keys():
+            if type(hidden[key]) is list:
+                for value in hidden[key]:
+                    output += ' <input type="hidden" name="%s" value="%s"/>\n' % (key, value)
+            else:
+                output += ' <input type="hidden" name="%s" value="%s"/>\n' % (key, hidden[key])
+        output += '</td></tr><tr><td style="vertical-align: bottom">'
+        output += ' <input class="adminbutton" type="submit" value="%s"/>\n' % (button, )
+        output += '</td></tr></table>'
+        output += '</form>\n'
+        return output
+
+    def tmpl_output_table(self, title_row=None, data=None, td_class="", separator_class=""):
         """
-        if title_row is None:
-            title_row = []
+        Prints a table of given titles and data. Adds CSS class to all cells,
+        if specified. Also, if a cell or row value equals "_SEPARATOR_" a simple
+        separator row/column is generated.
+
+        @param title_row: is a list of titles of columns
+        @param data: is a list of rows. Each row is a list of string values
+        @param td_class: specifies the CSS class for each TD.
+
+        @return: string of generated HTML table.
+        """
+        output = [self.tmpl_table_begin(title_row)]
         if data is None:
             data = []
-        result = "<table><tr>"
-        for header in title_row:
-            result += "<td><b>" + header + "</b></td>"
-        result += "</tr>"
         for row in data:
-            result += "<tr>"
-            for item in row:
-                result += "<td>" + item + "</td>"
-            result += "</tr>"
-        result += "</table>"
-        return result
+            if row == "_SEPARATOR_":
+                output.append(self.tmpl_table_separator_column(cssclass=separator_class))
+            else:
+                output.append(self.tmpl_table_row_begin())
+                for item in row:
+                    if item == "_SEPARATOR_":
+                        output.append(self.tmpl_table_output_cell(content="", cssclass=separator_class))
+                    else:
+                        output.append(self.tmpl_table_output_cell(item, cssclass=td_class))
+                output.append(self.tmpl_table_row_end())
+        output.append(self.tmpl_table_end())
+        return "".join(output)
 
     def tmpl_table_begin(self, title_row=None):
         result = "<table class=\"brtable\">"
@@ -256,6 +402,17 @@ class Template:
         if cssclass != None:
             result += " class = \"" + cssclass + "\""
         result += ">" + content + "</td>"
+        return result
+
+    def tmpl_table_separator_column(self, colspan=1, rowspan=1, cssclass=None):
+        result = "<tr"
+        if colspan != 1:
+            result += " colspan=\"" + str(colspan) + "\""
+        if rowspan != 1:
+            result += " rowspan=\"" + str(rowspan) + "\""
+        if cssclass != None:
+            result += " class = \"" + cssclass + "\""
+        result += "></tr>"
         return result
 
     def tmpl_table_row_end(self):
@@ -541,6 +698,7 @@ class Template:
         var serverAddress = '%(baseurl)s';
     </script>
     <script type="text/javascript" src="%(baseurl)s/js/oai_harvest_admin.js"> </script>
+    <script type="text/javascript" src="%(baseurl)s/js/oai_harvest_admin_hp.js"> </script>
 """ % {
             "baseurl" : CFG_SITE_URL,
             "scriptsstring" : jquery_scripts_string

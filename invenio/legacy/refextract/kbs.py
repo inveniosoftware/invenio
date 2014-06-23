@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -36,16 +36,17 @@ from invenio.legacy.refextract.regexs import re_kb_line, \
 from invenio.legacy.docextract.utils import write_message
 from invenio.legacy.docextract.text import re_group_captured_multiple_space
 from invenio.utils.hash import md5
+from invenio.legacy.search_engine import get_collection_reclist
+from invenio.legacy.search_engine.utils import get_fieldvalues
 
-def get_kbs(custom_kbs_files=None, cache=None):
+
+def get_kbs(custom_kbs_files=None, cache={}):
     """Load kbs (with caching)
 
     This function stores the loaded kbs into the cache variable
     For the caching to work, it needs to receive an empty dictionary
     as "cache" paramater.
     """
-    if not cache:
-        cache = {}
 
     cache_key = make_cache_key(custom_kbs_files)
     if cache_key not in cache:
@@ -78,6 +79,7 @@ def load_kbs(kbs_files):
         'books': build_books_kb(kbs_files['books']),
         'publishers': load_kb(kbs_files['publishers'], build_publishers_kb),
         'special_journals': build_special_journals_kb(kbs_files['special-journals']),
+        'collaborations': load_kb(kbs_files['collaborations'], build_collaborations_kb),
     }
 
 
@@ -90,8 +92,11 @@ def load_kb(path, builder):
     else:
         write_message("Loading kb from %s" % path, verbose=3)
         kb_start = 'kb:'
+        records_start = 'records:'
         if path.startswith(kb_start):
             return load_kb_from_db(path[len(kb_start):], builder)
+        elif path.startswith(records_start):
+            return load_kb_from_records(path[len(kb_start):], builder)
         else:
             return load_kb_from_file(path, builder)
 
@@ -156,15 +161,8 @@ def create_institute_numeration_group_regexp_pattern(patterns):
         patterns. E.g.:
            (?P<num>[12]\d{3} \d\d\d|\d\d \d\d\d|[A-Za-z] \d\d\d)
     """
-    grouped_numeration_pattern = u""
-    if len(patterns) > 0:
-        grouped_numeration_pattern = u"(?P<numn>"
-        for pattern in patterns:
-            grouped_numeration_pattern += \
-                  institute_num_pattern_to_regex(pattern[1]) + u"|"
-        grouped_numeration_pattern = \
-              grouped_numeration_pattern[0:len(grouped_numeration_pattern) - 1]
-        grouped_numeration_pattern += u")"
+    patterns_list = [institute_num_pattern_to_regex(p[1]) for p in patterns]
+    grouped_numeration_pattern = u"(?P<numn>%s)" % u'|'.join(patterns_list)
     return grouped_numeration_pattern
 
 
@@ -196,8 +194,7 @@ def institute_num_pattern_to_regex(pattern):
                             ('yyyy', r'[12]\d{3}'),
                             ('yy',   r'\d\d'),
                             ('s',    r'\s*'),
-                            (r'/',   r'\/'),
-                          ]
+                            (r'/',   r'\/')]
     # first, escape certain characters that could be sensitive to a regexp:
     pattern = re_report_num_chars_to_escape.sub(r'\\\g<1>', pattern)
 
@@ -306,9 +303,9 @@ def build_reportnum_kb(fpath):
             # complete regex:
             # will be in the style "(categ)-(numatn1|numatn2|numatn3|...)"
             for classification in preprint_classifications:
-                search_pattern_str = ur'(?:^|[^a-zA-Z0-9\/\.\-])((?P<categ>' \
+                search_pattern_str = ur'(?:^|[^a-zA-Z0-9\/\.\-])([\[\(]?(?P<categ>' \
                                      + classification[0].strip() + u')' \
-                                     + numeration_regexp + u')'
+                                     + numeration_regexp + u'[\]\)]?)'
 
                 re_search_pattern = re.compile(search_pattern_str,
                                                  re.UNICODE)
@@ -368,7 +365,7 @@ def build_reportnum_kb(fpath):
             try:
                 rawline = rawline.decode("utf-8")
             except UnicodeError:
-                write_message("*** Unicode problems in %s for line %e" \
+                write_message("*** Unicode problems in %s for line %e"
                                  % (fpath, kb_line_num), sys.stderr, verbose=0)
                 raise UnicodeError("Error: Unable to parse report number kb (line: %s)" % str(kb_line_num))
 
@@ -434,7 +431,7 @@ def build_reportnum_kb(fpath):
 
     # return the preprint reference patterns and the replacement strings
     # for non-standard categ-strings:
-    return (preprint_reference_search_regexp_patterns, \
+    return (preprint_reference_search_regexp_patterns,
             standardised_preprint_reference_categories)
 
 
@@ -532,7 +529,8 @@ def build_publishers_kb(fpath):
         publishers = {}
         for line in source:
             try:
-                publishers[line[0]] = line[1]
+                pattern = re.compile(ur'(\b|^)%s(\b|$)' % line[0], re.I|re.U)
+                publishers[line[0]] = {'pattern': pattern, 'repl': line[1]}
             except IndexError:
                 write_message('Invalid line in books kb %s' % line, verbose=1)
     finally:
@@ -584,9 +582,9 @@ def build_journals_re_kb(fpath):
     @see build_journals_kb
     """
     def make_tuple(match):
-        regexp = re.compile(match.group('seek'), re.UNICODE)
-        repl = '<cds.JOURNAL>%s</cds.JOURNAL>' % match.group('repl')
-        return (regexp, repl)
+        regexp = match.group('seek')
+        repl = match.group('repl')
+        return regexp, repl
 
     kb = []
 
@@ -632,7 +630,7 @@ def load_kb_from_file(path, builder):
             try:
                 rawline = rawline.decode("utf-8").rstrip("\n")
             except UnicodeError:
-                raise StandardError("Unicode problems in kb %s at line %s" \
+                raise StandardError("Unicode problems in kb %s at line %s"
                                                              % (path, rawline))
 
             # Test line to ensure that it is a correctly formatted
@@ -642,7 +640,7 @@ def load_kb_from_file(path, builder):
             if m_kb_line:  # good KB line
                 yield m_kb_line.group('seek'), m_kb_line.group('repl')
             else:
-                raise StandardError("Badly formatted kb '%s' at line %s" \
+                raise StandardError("Badly formatted kb '%s' at line %s"
                                                             % (path, rawline))
 
     try:
@@ -657,6 +655,35 @@ def load_kb_from_db(kb_name, builder):
             yield mapping['key'], mapping['value']
 
     return builder(lazy_parser(get_kbr_items(kb_name)))
+
+
+def load_kb_from_records(kb_name, builder):
+    def get_tag_values(recid, tags):
+        for tag in tags:
+            for value in get_fieldvalues(recid, tag):
+                yield value
+
+    def lazy_parser(collection, left_tags, right_tags):
+        for recid in get_collection_reclist(collection):
+            try:
+                # Key tag
+                # e.g. for journals database: 711__a
+                left_values = get_tag_values(recid, left_tags)
+            except IndexError:
+                pass
+            else:
+                # Value tags
+                # e.g. for journals database: 130__a, 730__a and 030__a
+                right_values = get_tag_values(recid, right_tags)
+
+                for left_value in set(left_values):
+                    for right_value in set(right_values):
+                        yield left_value, right_value
+
+    dummy, collection, left_str, right_str = kb_name.split(':')
+    left_tags = left_str.split(',')
+    right_tags = right_str.split(',')
+    return builder(lazy_parser(collection, left_tags, right_tags))
 
 
 def build_journals_kb(knowledgebase):
@@ -700,6 +727,10 @@ def build_journals_kb(knowledgebase):
 
     write_message('Processing journals kb', verbose=3)
     for seek_phrase, repl in knowledgebase:
+        # We match on a simplified line, thus dots are replaced
+        # with spaces
+        seek_phrase = seek_phrase.replace('.', ' ').upper()
+
         # good KB line
         # Add the 'replacement term' into the dictionary of
         # replacement terms:
@@ -725,9 +756,8 @@ def build_journals_kb(knowledgebase):
         if raw_repl_phrase not in kb:
             # The replace-phrase was not in the KB as a seek phrase
             # It should be added.
-            seek_ptn = re.compile(r'(?<!\/)\b(' + \
-                                   re.escape(raw_repl_phrase) + \
-                                   r')[^A-Z0-9]', re.UNICODE)
+            pattern = ur'(?<!\/)\b(%s)[^A-Z0-9]' % re.escape(raw_repl_phrase)
+            seek_ptn = re.compile(pattern, re.U)
             kb[raw_repl_phrase] = seek_ptn
             standardised_titles[raw_repl_phrase] = repl_term
             seek_phrases.append(raw_repl_phrase)
@@ -738,4 +768,17 @@ def build_journals_kb(knowledgebase):
     write_message('Processed journals kb', verbose=3)
 
     # return the raw knowledge base:
-    return (kb, standardised_titles, seek_phrases)
+    return kb, standardised_titles, seek_phrases
+
+
+def build_collaborations_kb(knowledgebase):
+    kb = {}
+    for pattern, collab in knowledgebase:
+        prefix = ur"(?:^|[\(\"\[\s]|(?<=\W))\s*(?:(?:the|and)\s+)?"
+        collaboration_pattern = ur"(?:\s*coll(?:aborations?|\.)?)?"
+        suffix = ur"(?=$|[><\]\)\"\s.,:])"
+        pattern = pattern.replace(' ', '\s')
+        pattern = pattern.replace('Collaboration', collaboration_pattern)
+        re_pattern = "%s(%s)%s" % (prefix, pattern, suffix)
+        kb[collab] = re.compile(re_pattern, re.I|re.U)
+    return kb

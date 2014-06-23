@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -89,13 +89,6 @@ from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.modules.records.api import get_record
 from invenio.utils.memoise import Memoise
 
-
-if sys.hexversion < 0x2040000:
-    # pylint: disable=W0622
-    from sets import Set as set
-    # pylint: enable=W0622
-
-
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
 re_datetime_shift = re.compile("([-\+]{0,1})([\d]+)([dhms])")
@@ -178,9 +171,9 @@ def get_author_canonical_ids_for_recid(recID):
     Return list of author canonical IDs (e.g. `J.Ellis.1') for the
     given record.  Done by consulting BibAuthorID module.
     """
-    from invenio.legacy.bibauthorid.dbinterface import get_persons_from_recids
+    from invenio.legacy.bibauthorid.dbinterface import get_data_of_papers
     lwords = []
-    res = get_persons_from_recids([recID])
+    res = get_data_of_papers([recID])
     if res is None:
         ## BibAuthorID is not enabled
         return lwords
@@ -191,7 +184,6 @@ def get_author_canonical_ids_for_recid(recID):
         if author_canonical_id:
             lwords.append(author_canonical_id)
     return lwords
-
 
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Atomically swap reindexed temporary table with the original one.
@@ -1111,6 +1103,14 @@ class WordTable:
         write_message("%s fetching existing words for records #%d-#%d ended" % \
                 (self.tablename, low, high), verbose=3)
 
+    def check_bad_words(self):
+        """
+        Finds bad words in reverse tables. Returns True in case of bad words.
+        """
+        query = """SELECT 1 FROM %sR WHERE type IN ('TEMPORARY','FUTURE') LIMIT 1""" \
+                % (self.tablename[:-1],)
+        res = run_sql(query)
+        return bool(res)
 
     def report_on_table_consistency(self):
         """Check reverse words index tables (e.g. idxWORD01R) for
@@ -1118,53 +1118,30 @@ class WordTable:
         Prints small report (no of words, no of bad words).
         """
         # find number of words:
-        query = """SELECT COUNT(*) FROM %s""" % (self.tablename)
+        query = """SELECT COUNT(1) FROM %s""" % (self.tablename)
         res = run_sql(query, None, 1)
         if res:
             nb_words = res[0][0]
         else:
             nb_words = 0
 
-        # find number of records:
-        query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR""" % (self.tablename[:-1])
-        res = run_sql(query, None, 1)
-        if res:
-            nb_records = res[0][0]
-        else:
-            nb_records = 0
-
         # report stats:
-        write_message("%s contains %d words from %d records" % (self.tablename, nb_words, nb_records))
+        write_message("%s contains %d words" % (self.tablename, nb_words))
 
         # find possible bad states in reverse tables:
-        query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR WHERE type <> 'CURRENT'""" % (self.tablename[:-1])
-        res = run_sql(query)
-        if res:
-            nb_bad_records = res[0][0]
-        else:
-            nb_bad_records = 999999999
-        if nb_bad_records:
-            write_message("EMERGENCY: %s needs to repair %d of %d index records" % \
-                (self.tablename, nb_bad_records, nb_records))
+        if self.check_bad_words():
+            write_message("EMERGENCY: %s needs to be repaired" %
+                          (self.tablename, ))
         else:
             write_message("%s is in consistent state" % (self.tablename))
-
-        return nb_bad_records
 
     def repair(self, opt_flush):
         """Repair the whole table"""
         # find possible bad states in reverse tables:
-        query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR WHERE type <> 'CURRENT'""" % (self.tablename[:-1])
-        res = run_sql(query, None, 1)
-        if res:
-            nb_bad_records = res[0][0]
-        else:
-            nb_bad_records = 0
-
-        if nb_bad_records == 0:
+        if not self.check_bad_words():
             return
 
-        query = """SELECT id_bibrec FROM %sR WHERE type <> 'CURRENT'""" \
+        query = """SELECT id_bibrec FROM %sR WHERE type IN ('TEMPORARY','FUTURE')""" \
                 % (self.tablename[:-1])
         res = intbitset(run_sql(query))
         recIDs = create_range_list(list(res))
@@ -1210,10 +1187,10 @@ class WordTable:
     def chk_recID_range(self, low, high):
         """Check if the reverse index table is in proper state"""
         ## check db
-        query = """SELECT COUNT(*) FROM %sR WHERE type <> 'CURRENT'
-        AND id_bibrec BETWEEN %%s AND %%s""" % self.tablename[:-1]
+        query = """SELECT 1 FROM %sR WHERE type IN ('TEMPORARY','FUTURE')
+        AND id_bibrec BETWEEN %%s AND %%s LIMIT 1""" % self.tablename[:-1]
         res = run_sql(query, (low, high), 1)
-        if res[0][0] == 0:
+        if not res:
             write_message("%s for %d-%d is in consistent state" % (self.tablename, low, high))
             return # okay, words table is consistent
 
@@ -1629,7 +1606,7 @@ def get_recIDs_by_date_authority(dates, index_name, force_all=False):
             # dates[1] is ignored, needs dates[0] to find res
             now = datetime.now()
             auth_recIDs = search_pattern(p='980__a:' + auth_type) \
-                & search_unit_in_bibrec(str(dates[0]), str(now), type='m')
+                & search_unit_in_bibrec(str(dates[0]), str(now), search_type='m')
             # now find dependent bibliographic records
             for auth_recID in auth_recIDs:
                 # get the fix authority identifier of this authority record

@@ -26,7 +26,7 @@ def get_logger(logname, logfile):
     """
     logger = logging.getLogger(logname)
     logger.setLevel(logging.INFO)
-    log_handler = logging.handlers.RotatingFileHandler(logfile, 'a', 1*1024*1024, 10)
+    log_handler = logging.handlers.RotatingFileHandler(logfile, 'a', 10*1024*1024, 100)
     log_formatter = logging.Formatter("%(asctime)s -- [%(levelname)s] %(message)s",
                                       "%Y-%m-%d %H:%M:%S")
     log_handler.setFormatter(log_formatter)

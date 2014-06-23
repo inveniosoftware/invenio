@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,8 +30,11 @@ from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 # Import the minimal necessary methods and variables needed to run Refextract
 refextract_re = lazy_import('invenio.legacy.refextract.regexs')
+tag_arxiv = lazy_import('invenio.legacy.refextract.tag:tag_arxiv')
 setup_loggers = lazy_import('invenio.legacy.docextract.utils:setup_loggers')
 search_from_reference = lazy_import('invenio.legacy.refextract.api:search_from_reference')
+extract_journal_reference = lazy_import('invenio.legacy.refextract.api:extract_journal_reference')
+rebuild_reference_lines = lazy_import('invenio.legacy.refextract.text:rebuild_reference_lines')
 
 
 class ReTest(InvenioTestCase):
@@ -83,32 +86,52 @@ class IbidTest(InvenioTestCase):
     def test_identify_ibids_empty(self):
         from invenio.legacy.refextract.tag import identify_ibids
         r = identify_ibids("")
-        self.assertEqual(r, ({}, {}, ''))
+        self.assertEqual(r, ({}, ''))
 
     def test_identify_ibids_simple(self):
         from invenio.legacy.refextract.tag import identify_ibids
         ref_line = u"""[46] E. Schrodinger, Sitzungsber. Preuss. Akad. Wiss. Phys. Math. Kl. 24, 418(1930); ibid, 3, 1(1931)"""
         r = identify_ibids(ref_line.upper())
-        self.assertEqual(r, ({85: 4}, {85: u'IBID'}, u'[46] E. SCHRODINGER, SITZUNGSBER. PREUSS. AKAD. WISS. PHYS. MATH. KL. 24, 418(1930); ____, 3, 1(1931)'))
+        self.assertEqual(r, ({85: u'IBID'}, u'[46] E. SCHRODINGER, SITZUNGSBER. PREUSS. AKAD. WISS. PHYS. MATH. KL. 24, 418(1930); ____, 3, 1(1931)'))
 
 
-class TagNumerationTest(InvenioTestCase):
+class FindNumerationTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=1)
 
     def test_vol_page_year(self):
         "<vol>, <page> (<year>)"
-        from invenio.legacy.refextract.tag import tag_numeration
+        from invenio.legacy.refextract.tag import find_numeration
         ref_line = u"""24, 418 (1930)"""
-        r = tag_numeration(ref_line)
-        self.assertEqual(r.strip(': '), u"<cds.VOL>24</cds.VOL> <cds.YR>(1930)</cds.YR> <cds.PG>418</cds.PG>")
+        r = find_numeration(ref_line)
+        self.assertEqual(r['volume'], u"24")
+        self.assertEqual(r['year'], u"1930")
+        self.assertEqual(r['page'], u"418")
 
     def test_vol_year_page(self):
         "<vol>, (<year>) <page> "
-        from invenio.legacy.refextract.tag import tag_numeration
+        from invenio.legacy.refextract.tag import find_numeration
         ref_line = u"""24, (1930) 418"""
-        r = tag_numeration(ref_line)
-        self.assertEqual(r.strip(': '), u"<cds.VOL>24</cds.VOL> <cds.YR>(1930)</cds.YR> <cds.PG>418</cds.PG>")
+        r = find_numeration(ref_line)
+        self.assertEqual(r['volume'], u"24")
+        self.assertEqual(r['year'], u"1930")
+        self.assertEqual(r['page'], u"418")
+
+    def test_year_title_volume_page(self):
+        "<year>, <title> <vol> <page> "
+        from invenio.legacy.refextract.tag import find_numeration_more
+        ref_line = u"""1930 <cds.JOURNAL>J.Phys.</cds.JOURNAL> 24, 418"""
+        r = find_numeration_more(ref_line)
+        self.assertEqual(r['volume'], u"24")
+        self.assertEqual(r['year'], u"1930")
+        self.assertEqual(r['page'], u"418")
+
+    def test_journal_extract(self):
+        r = extract_journal_reference("Science Vol. 338 no. 6108 (2012) pp. 773-775")
+        self.assertEqual(r['year'], u'2012')
+        self.assertEqual(r['volume'], u'338')
+        self.assertEqual(r['page'], u'773-775')
+        self.assertEqual(r['title'], u'Science')
 
 
 class FindSectionTest(InvenioTestCase):
@@ -124,7 +147,7 @@ class FindSectionTest(InvenioTestCase):
         ])
         self.assertEqual(sect, {
             'marker': '[1]',
-            'marker_pattern': u'^\\s*(?P<mark>\\[\\s*(?P<marknum>\\d+)\\s*\\])',
+            'marker_pattern': u'\\s*(?P<mark>\\[\\s*(?P<marknum>\\d+)\\s*\\])',
             'start_line': 1,
             'title_string': 'References',
             'title_marker_same_line': False,
@@ -206,7 +229,7 @@ class FindSectionTest(InvenioTestCase):
 
 class SearchTest(InvenioTestCase):
     def setUp(self):
-        setup_loggers(verbosity=9)
+        setup_loggers(verbosity=1)
         from invenio.legacy.refextract import kbs as refextract_kbs
         self.old_override = refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE
         refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE = {}
@@ -232,11 +255,166 @@ class SearchTest(InvenioTestCase):
         self.assert_('B76' in pattern)
         self.assert_('477' in pattern)
 
+
+class RebuildReferencesTest(InvenioTestCase):
+    def setUp(self):
+        setup_loggers(verbosity=1)
+
+    def test_simple(self):
+        marker_pattern = ur"^\s*(?P<mark>\[\s*(?P<marknum>\d+)\s*\])"
+        refs = [
+            u"[1] hello",
+            u"hello2",
+            u"[2] foo",
+        ]
+        rebuilt_refs = rebuild_reference_lines(refs, marker_pattern)
+        self.assertEqual(rebuilt_refs, [
+            u"[1] hello hello2",
+            u"[2] foo",
+        ])
+
+    # def test_pagination_removal(self):
+    #     marker_pattern = ur"^\s*(?P<mark>\[\s*(?P<marknum>\d+)\s*\])"
+    #     refs = [
+    #         u"[1] hello",
+    #         u"hello2",
+    #         u"[42]",
+    #         u"[2] foo",
+    #     ]
+    #     rebuilt_refs = rebuild_reference_lines(refs, marker_pattern)
+    #     self.assertEqual(rebuilt_refs, [
+    #         u"[1] hello hello2",
+    #         u"[2] foo",
+    #     ])
+
+    def test_pagination_non_removal(self):
+        marker_pattern = ur"^\s*(?P<mark>\[\s*(?P<marknum>\d+)\s*\])"
+        refs = [
+            u"[1] hello",
+            u"hello2",
+            u"[2]",
+            u"foo",
+        ]
+        rebuilt_refs = rebuild_reference_lines(refs, marker_pattern)
+        self.assertEqual(rebuilt_refs, [
+            u"[1] hello hello2",
+            u"[2] foo",
+        ])
+
+    def test_2_lines_together(self):
+        marker_pattern = ur"\s*(?P<mark>\[\s*(?P<marknum>\d+)\s*\])"
+        refs = [
+            u"[1] hello",
+            u"hello2 [2] foo",
+        ]
+        rebuilt_refs = rebuild_reference_lines(refs, marker_pattern)
+        self.assertEqual(rebuilt_refs, [
+            u"[1] hello hello2",
+            u"[2] foo",
+        ])
+
+
+class tagArxivTest(InvenioTestCase):
+    def setUp(self):
+        setup_loggers(verbosity=1)
+
+    def test_4_digits(self):
+        ref_line = u"""{any prefix}arXiv:1003.1111{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1003.1111</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_suffix(self):
+        ref_line = u"""{any prefix}arXiv:1104.2222 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1104.2222 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits(self):
+        ref_line = u"""{any prefix}arXiv:1303.33333{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1303.33333</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_2012(self):
+        ref_line = u"""{any prefix}arXiv:1203.33333{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}arXiv:1203.33333{any postfix}")
+
+    def test_5_digits_suffix(self):
+        ref_line = u"""{any prefix}arXiv:1304.44444 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1304.44444 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_version(self):
+        ref_line = u"""{any prefix}arXiv:1003.1111v9{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1003.1111</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_suffix_version(self):
+        ref_line = u"""{any prefix}arXiv:1104.2222v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1104.2222 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_version(self):
+        ref_line = u"""{any prefix}arXiv:1303.33333v9{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1303.33333</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_suffix_version(self):
+        ref_line = u"""{any prefix}arXiv:1304.44444v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1304.44444 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_new(self):
+        ref_line = u"""{any prefix}9910.1234{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:9910.1234</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_suffix_new(self):
+        ref_line = u"""{any prefix}9910.1234 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:9910.1234 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_new(self):
+        ref_line = u"""{any prefix}1310.12345{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1310.12345</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_suffix_new(self):
+        ref_line = u"""{any prefix}1310.12345 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1310.12345 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_version_new(self):
+        ref_line = u"""{any prefix}9910.1234v9{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:9910.1234</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_suffix_version_new(self):
+        ref_line = u"""{any prefix}9910.1234v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:9910.1234 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_version_new(self):
+        ref_line = u"""{any prefix}1310.12345v9{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1310.12345</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_suffix_version_new(self):
+        ref_line = u"""{any prefix}1310.12345v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1310.12345 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_suffix_version_new_2012(self):
+        ref_line = u"""{any prefix}1210.12345v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}1210.12345v9 [physics.ins-det]{any postfix}")
+
+
 TEST_SUITE = make_test_suite(ReTest,
                              IbidTest,
-                             TagNumerationTest,
+                             FindNumerationTest,
                              FindSectionTest,
-                             SearchTest)
+                             SearchTest,
+                             RebuildReferencesTest)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)

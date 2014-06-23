@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,9 +25,9 @@
 
 def initial_disambiguation():
     from invenio.legacy.bibauthorid.tortoise import tortoise_from_scratch
-    from invenio.legacy.bibauthorid.personid_maintenance import check_results
+    from invenio.legacy.bibauthorid.personid_maintenance import duplicated_tortoise_results_exist
     tortoise_from_scratch()
-    assert check_results()
+    assert duplicated_tortoise_results_exist()
 
 
 # This is a super safe call to tortoise.
@@ -36,60 +36,58 @@ def initial_disambiguation():
 def safe_disambiguation_iteration():
     from invenio.legacy.bibauthorid.tortoise import tortoise
     from invenio.legacy.bibauthorid.rabbit import rabbit
-    from invenio.legacy.bibauthorid.personid_maintenance import check_personid_papers \
-                                                 , check_results \
-                                                 , repair_personid
-
-    if not check_personid_papers():
+    from invenio.legacy.bibauthorid.personid_maintenance import check_author_paper_associations \
+                                                 , duplicated_tortoise_results_exist \
+                                                 , repair_author_paper_associations
+    if not check_author_paper_associations():
         rabbit([])
-        repair_personid()
+        repair_author_paper_associations()
         rabbit([])
 
-    assert check_personid_papers()
+    assert check_author_paper_associations()
     tortoise()
-    assert check_results()
+    assert duplicated_tortoise_results_exist()
 
 
 def safe_merger():
     from invenio.legacy.bibauthorid.merge import merge_static
     from invenio.legacy.bibauthorid.rabbit import rabbit
-    from invenio.legacy.bibauthorid.personid_maintenance import check_personid_papers \
-                                                 , check_results \
-                                                 , check_merger \
-                                                 , repair_personid \
-                                                 , copy_personids \
+    from invenio.legacy.bibauthorid.personid_maintenance import check_author_paper_associations \
+                                                 , duplicated_tortoise_results_exist \
+                                                 , merger_errors_exist \
+                                                 , repair_author_paper_associations \
+                                                 , back_up_author_paper_associations \
                                                  , compare_personids
 
-    assert check_results()
-    if not check_personid_papers():
+    assert duplicated_tortoise_results_exist()
+    if not check_author_paper_associations():
         rabbit([])
-        repair_personid()
+        repair_author_paper_associations()
         rabbit([])
 
-    assert check_personid_papers()
-    copy_personids()
+    assert check_author_paper_associations()
+    back_up_author_paper_associations()
     merge_static()
-    assert check_personid_papers()
-    assert check_merger()
+    assert check_author_paper_associations()
+    assert merger_errors_exist()
     compare_personids("/tmp/merge_diff")
 
 
 def test_accuracy():
     from invenio.legacy.bibauthorid.tortoise import tortoise
     from invenio.legacy.bibauthorid.rabbit import rabbit
-    from invenio.legacy.bibauthorid.personid_maintenance import check_personid_papers \
-                                                 , check_results \
-                                                 , repair_personid
+    from invenio.legacy.bibauthorid.personid_maintenance import check_author_paper_associations \
+                                                 , duplicated_tortoise_results_exist \
+                                                 , repair_author_paper_associations
     from invenio.legacy.bibauthorid.merge import matched_claims
 
-    if not check_personid_papers():
+    if not check_author_paper_associations():
         rabbit([])
-        repair_personid()
+        repair_author_paper_associations()
         rabbit([])
 
-    assert check_personid_papers()
+    assert check_author_paper_associations()
     tortoise(pure=True)
-    assert check_results()
+    assert duplicated_tortoise_results_exist()
 
     return matched_claims()
-
