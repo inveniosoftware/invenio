@@ -72,6 +72,7 @@ class approval(Form):
 
         if request.form['decision'] == 'Accept':
             bwobject.remove_action()
+            bwobject.save()
             continue_oid_delayed(objectid)
             flash('Record Accepted')
 

@@ -33,13 +33,19 @@
 {% set action_instance = action() %}
     <a href="{{url_for('holdingpen.show_action', objectid=object.id)}}">
         {% for i in title %}
-            <p>{{i}}<p>
+            <p>{{i}}</p>
         {% endfor %}
     </a>
 {% endif %}
 </td>
 <td title="identifiers">
-{{ ", ".join(identifiers) or "No identifiers" }}
+    {% if identifiers %}
+        {% for i in identifiers %}
+            <p>{{i}}</p>
+        {% endfor %}
+    {% else %}
+        "No identifiers"
+    {% endif %}
 </td>
 <td title="category">
 {{ ", ".join(categories) or "No category" }}

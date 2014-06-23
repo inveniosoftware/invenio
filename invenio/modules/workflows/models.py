@@ -489,6 +489,9 @@ class BibWorkflowObject(db.Model):
         from invenio.modules.formatter.engine import format_record
 
         data = self.get_data()
+        if not data:
+            return ''
+
         if formatter:
             # A seperate formatter is supplied
             return formatter(data)
