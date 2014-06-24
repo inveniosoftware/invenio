@@ -44,15 +44,8 @@
 {{object.data_type}}
 </td>
 <td title="action">
-{% if action != None %}
+{% if mini_action != None %}
     {% set action = action() %}
-    {% if mini_action != None %}
-        {% set mini_action = mini_action() %}
-        {% for field in mini_action %}
-            {{ field(objectid=object.id) }}
-        {% endfor %}
-    {% endif %}
-{% else %}
-N/A
+    {{ action.render_mini(object)|safe }}
 {% endif %}
 </td>

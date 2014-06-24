@@ -342,15 +342,16 @@ class BibWorkflowObject(db.Model):
         return self.get_extra_data()["_tasks_results"]
 
     def add_action(self, action, message):
-        """Save a action for holdingpen.
+        """Save an action for holdingpen for this object.
 
-        Assign a widget to this object for an action to be taken
-        in holdingpen. The widget is reffered to by a string with
-        the filename minus extension. Ex: approval_widget.
+        Assign an special "action" to this object to be taken
+        in consideration in holdingpen. The widget is referred to
+        by a string with the filename minus extension.
 
+        Ex: 'approval' for an action 'approval.py'.
 
         A message is also needed to tell the user the action
-        required.
+        required in a textual way.
 
         :param action: name of the action to add (i.e. "approval")
         :type action: string
@@ -385,7 +386,7 @@ class BibWorkflowObject(db.Model):
             return None
 
     def get_action_message(self):
-        """ Retrive the currently assigned widget, if any."""
+        """ Retrieve the currently assigned widget, if any."""
         try:
             return self.get_extra_data()["_message"]
         except KeyError:

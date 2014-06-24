@@ -65,15 +65,25 @@ dataTables_css = Bundle(
     'css/dataTables.bootstrap.css',
     'css/bootstrap-tagsinput.css',
     filters="cleancss",
-    output='dataTables.css',
-    weight=30
+    output='datatables.css',
+    weight=30,
+    bower={
+        "DataTables-Plugins": "https://github.com/greut/Plugins.git#amdify",
+        "datatables-colvis": "latest",
+        "bootstrap-tagsinput": "latest",
+    }
 )
 
 dataTables_js = Bundle(
-    'js/jquery.dataTables.min.js',
+    'js/jquery.dataTables.js',
     'js/dataTables.colVis.js',
     'js/dataTables.bootstrap.js',
     filters="uglifyjs",
-    output='dataTables.js',
-    weight=30
+    output='datatables.js',
+    weight=30,
+    bower={
+        "DataTables": "~1.10",
+        "DataTables-Plugins": "https://github.com/greut/Plugins.git#amdify",
+        "datatables-colvis": "latest",
+    }
 )

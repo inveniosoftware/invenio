@@ -28,7 +28,8 @@ var WORKFLOWS_HOLDINGPEN = (function ($) {
         context = {},
         datatable = {},
         tag = {},
-        utilities = {};
+        utilities = {},
+        actions = [];
 
     return {
         oTable: oTable,
@@ -41,6 +42,7 @@ var WORKFLOWS_HOLDINGPEN = (function ($) {
         context: context,
         datatable: datatable,
         tag: tag,
+        actions: actions,
         utilities: utilities,
 
         init: function (data) {
