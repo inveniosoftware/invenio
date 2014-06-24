@@ -161,7 +161,7 @@ class TestCitationIndexerWarnings(InvenioTestCase):
 
 
 
-class TestCitationLosses(unittest.TestCase):
+class TestCitationLosses(InvenioTestCase):
     def test_abort_cites(self):
         from invenio.bibrank_citation_indexer import check_citations_losses
         # Hack for tests, the config is a pseudo dictionary.
