@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-  <link href="http://arxiv.org/api/query?search_query%3D1007.5048%26id_list%3D%26start%3D0%26max_results%3D1" rel="self" type="application/atom+xml"/>
-  <title type="html">ArXiv Query: search_query=1007.5048&amp;id_list=&amp;start=0&amp;max_results=1</title>
-  <id>http://arxiv.org/api/p2SgFal3fBfJaSf6SaeQaH4wt7I</id>
-  <updated>2014-06-02T00:00:00-04:00</updated>
-  <opensearch:totalResults xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">1</opensearch:totalResults>
-  <opensearch:startIndex xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">0</opensearch:startIndex>
-  <opensearch:itemsPerPage xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">1</opensearch:itemsPerPage>
-  <entry>
-    <id>http://arxiv.org/abs/1007.5048v2</id>
-    <updated>2011-01-03T20:40:07Z</updated>
-    <published>2010-07-28T19:10:38Z</published>
-    <title>Diffractive W and Z Production at the Fermilab Tevatron</title>
-    <summary>  We report on a measurement of the fraction of events with a W or Z boson
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<responseDate>2014-07-01T17:06:48Z</responseDate>
+<request verb="GetRecord" identifier="oai:arXiv.org:1007.5048" metadataPrefix="arXiv">http://export.arxiv.org/oai2</request>
+<GetRecord>
+<record>
+<header>
+ <identifier>oai:arXiv.org:1007.5048</identifier>
+ <datestamp>2011-01-04</datestamp>
+ <setSpec>physics:hep-ex</setSpec>
+</header>
+<metadata>
+ <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ http://arxiv.org/OAI/arXiv.xsd">
+ <id>1007.5048</id><created>2010-07-28</created><updated>2011-01-03</updated><authors><author><keyname>Aaltonen</keyname><forenames>T.</forenames></author></authors><title>Diffractive W and Z Production at the Fermilab Tevatron</title><categories>hep-ex</categories><comments>10 pages, 6 figures</comments><report-no>FERMILAB-PUB-10-255-E</report-no><journal-ref>Phys.Rev.D82:112004,2010</journal-ref><doi>10.1103/PhysRevD.82.112004</doi><license>http://arxiv.org/licenses/nonexclusive-distrib/1.0/</license><abstract>  We report on a measurement of the fraction of events with a W or Z boson
 which are produced diffractively in antiproton-proton collisions at a center of
 mass energy of 1.96 TeV, using data from 0.6 inverse femtobarns of integrated
 luminosity collected with the CDF-II detector equipped with a Roman-pot
@@ -26,18 +25,8 @@ doubling the measured proton dissociation fraction. We also report on searches
 for W and Z production in double Pomeron exchange, p+pbar --&gt; p+[X+W/Z]+pbar,
 and on exclusive Z production, pbar+p --&gt; pbar+Z+p. No signal is seen above
 background for these processes, and comparisons are made with expectations.
-</summary>
-    <author>
-      <name>T. Aaltonen</name>
-    </author>
-    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1103/PhysRevD.82.112004</arxiv:doi>
-    <link title="doi" href="http://dx.doi.org/10.1103/PhysRevD.82.112004" rel="related"/>
-    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">10 pages, 6 figures</arxiv:comment>
-    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Phys.Rev.D82:112004,2010</arxiv:journal_ref>
-    <link href="http://arxiv.org/abs/1007.5048v2" rel="alternate" type="text/html"/>
-    <link title="pdf" href="http://arxiv.org/pdf/1007.5048v2" rel="related" type="application/pdf"/>
-    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
-    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
-  </entry>
-</feed>
-
+</abstract></arXiv>
+</metadata>
+</record>
+</GetRecord>
+</OAI-PMH>
