@@ -36,6 +36,7 @@ from invenio.redisutils import get_redis
 from invenio.search_engine import search_pattern, \
                                   search_unit, \
                                   get_collection_reclist
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibformat_utils import parse_tag
 from invenio.bibknowledge import get_kb_mappings
 from invenio.bibtask import write_message, task_get_option, \
@@ -619,13 +620,16 @@ def get_citation_informations(recid_list, tags, config,
             # get_fieldvalues() below would return old values)
             continue
 
-        if tags['refs_report_number']:
+        # We ignore all the references of superseeded records
+        superseeded = bool(record['78502'])
+
+        if tags['refs_report_number'] and not superseeded:
             references_info['report-numbers'][recid] = [t.value for t in
                              record.find_subfields(tags['refs_report_number'])]
             msg = "references_info['report-numbers'][%s] = %r" \
                         % (recid, references_info['report-numbers'][recid])
             write_message(msg, verbose=9)
-        if tags['refs_journal']:
+        if tags['refs_journal'] and not superseeded:
             references_info['journals'][recid] = []
             for ref in record.find_subfields(tags['refs_journal']):
                 try:
@@ -642,7 +646,8 @@ def get_citation_informations(recid_list, tags, config,
             msg = "references_info['journals'][%s] = %r" \
                               % (recid, references_info['journals'][recid])
             write_message(msg, verbose=9)
-        if tags['refs_doi']:
+
+        if tags['refs_doi'] and not superseeded:
             references = [t.value for t in
                                        record.find_subfields(tags['refs_doi'])]
             dois = []
@@ -662,14 +667,13 @@ def get_citation_informations(recid_list, tags, config,
             msg = "references_info['hdl'][%s] = %r" % (recid, hdls)
             write_message(msg, verbose=9)
 
-
-        if tags['refs_record_id']:
+        if tags['refs_record_id'] and not superseeded:
             references_info['record_id'][recid] = [t.value for t in
                                  record.find_subfields(tags['refs_record_id'])]
             msg = "references_info['record_id'][%s] = %r" \
                                    % (recid, references_info['record_id'][recid])
             write_message(msg, verbose=9)
-        if tags['refs_isbn']:
+        if tags['refs_isbn'] and not superseeded:
             references_info['isbn'][recid] = [t.value for t in
                                       record.find_subfields(tags['refs_isbn'])]
             msg = "references_info['isbn'][%s] = %r" \
@@ -782,6 +786,10 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
         # Make sure we don't add ourselves
         # Workaround till we know why we are adding ourselves.
         if citer == citee:
+            return
+
+        # Ignore cites from superseeded records
+        if get_fieldvalues(citer, '78502'):
             return
 
         citations[citee].add(citer)
