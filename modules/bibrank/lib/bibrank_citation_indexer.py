@@ -142,7 +142,9 @@ def get_citation_weight(rank_method_code, config, chunk_size=25000):
             config.set(function, 'collections', None)
 
         # Ignore records not in selected collections
-        updated_recids = [recid for recid in updated_recids if recid in recids_cache(collections)]
+        if collections:
+            updated_recids = [recid for recid in updated_recids
+                                         if recid in recids_cache(collections)]
 
         # Process fully the updated records
         weights = process_and_store(updated_recids, config, chunk_size)
