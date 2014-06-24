@@ -250,11 +250,14 @@ class WebSearchTestLegacyURLs(InvenioTestCase):
 
         # Drop unnecessary arguments, like ln and as (when they are
         # the default value)
-        args = {'as': 0}
+        from invenio.config import CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
+                CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
+        args = {'as': CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE}
         check(make_url('/', c='Poetry', **args),
               make_url('/collection/Poetry', ln=CFG_SITE_LANG))
 
         # Otherwise, keep them
+        as_arg = [as_arg for as_arg in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES if as_arg != CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE][0]
         args = {'as': 1, 'ln': CFG_SITE_LANG}
         check(make_url('/', c='Poetry', **args),
               make_url('/collection/Poetry', **args))
@@ -409,14 +412,16 @@ class WebSearchTestCollections(InvenioTestCase):
 
         browser = Browser()
 
+        from invenio.config import CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
+                CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
         try:
-            for aas in (0, 1):
+            for aas in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES:
                 args = {'as': aas}
                 browser.open(make_url('/collection/Preprints', **args))
 
                 for jrec in (11, 21, 11, 27):
                     args = {'jrec': jrec, 'cc': 'Preprints'}
-                    if aas:
+                    if aas != CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE:
                         args['as'] = aas
 
                     url = make_rurl('/search', **args)
@@ -564,7 +569,8 @@ class WebSearchTestBrowse(InvenioTestCase):
         """ websearch - check that browsing works """
 
         browser = Browser()
-        browser.open(make_url('/', ln="en"))
+        args = {'as': 0, 'ln': 'en'}
+        browser.open(make_url('/', **args))
 
         browser.select_form(name='search')
         browser['f'] = ['title']
@@ -718,9 +724,10 @@ class WebSearchTestSearch(InvenioTestCase):
         """ websearch - check extension of a query to the home collection """
 
         browser = Browser()
+        args = {'ln':'en', 'as': 0}
 
         # We do a precise search in an isolated collection
-        browser.open(make_url('/collection/ISOLDE', ln='en'))
+        browser.open(make_url('/collection/ISOLDE', **args))
 
         browser.select_form(name='search')
         browser['f'] = ['author']
@@ -744,7 +751,8 @@ class WebSearchTestSearch(InvenioTestCase):
         """ websearch - provide a list of nearest terms """
 
         browser = Browser()
-        browser.open(make_url(''))
+        args = {'as': 0}
+        browser.open(make_url('', **args))
 
         # Search something weird
         browser.select_form(name='search')
@@ -801,32 +809,12 @@ class WebSearchTestSearch(InvenioTestCase):
                                  'f': ['title'],
                                  'ln': ['en']})
 
-    def test_switch_to_advanced_search(self):
-        """ websearch - switch to advanced search """
-
-        browser = Browser()
-        browser.open(make_url('/collection/ISOLDE'))
-
-        browser.select_form(name='search')
-        browser['p'] = 'tandem'
-        browser['f'] = ['title']
-        browser.submit()
-
-        browser.follow_link(text='Advanced Search')
-
-        dummy, q = parse_url(browser.geturl())
-
-        self.failUnlessEqual(q, {'cc': ['ISOLDE'],
-                                 'p1': ['tandem'],
-                                 'f1': ['title'],
-                                 'as': ['1'],
-                                 'ln' : ['en']})
-
     def test_no_boolean_hits(self):
         """ websearch - check the 'no boolean hits' proposed links """
 
         browser = Browser()
-        browser.open(make_url(''))
+        args = {'as': 0}
+        browser.open(make_url('', **args))
 
         browser.select_form(name='search')
         browser['p'] = 'quasinormal muon'
@@ -849,7 +837,8 @@ class WebSearchTestSearch(InvenioTestCase):
         """ websearch - test similar authors box """
 
         browser = Browser()
-        browser.open(make_url(''))
+        args = {'as': 0}
+        browser.open(make_url('', **args))
 
         browser.select_form(name='search')
         browser['p'] = 'Ellis, R K'

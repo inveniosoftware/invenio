@@ -721,12 +721,24 @@ class Collection:
 
     def create_searchfor(self, aas=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         "Produces either Simple or Advanced 'Search for' box for the current collection."
-        if aas == 1:
+        if aas == 2:
+            return self.create_searchfor_addtosearch(ln)
+        elif aas == 1:
             return self.create_searchfor_advanced(ln)
         elif aas == 0:
             return self.create_searchfor_simple(ln)
         else:
             return self.create_searchfor_light(ln)
+
+    def create_searchfor_addtosearch(self, ln=CFG_SITE_LANG):
+        "Produces add-to-search 'Search for' box for the current collection."
+
+        return websearch_templates.tmpl_searchfor_addtosearch(
+          ln=ln,
+          collection_id=self.name,
+          record_count=self.nbrecs,
+          searchwithin= self.create_searchwithin_selection_box(fieldname='f1', ln=ln),
+        )
 
     def create_searchfor_light(self, ln=CFG_SITE_LANG):
         "Produces light 'Search for' box for the current collection."
