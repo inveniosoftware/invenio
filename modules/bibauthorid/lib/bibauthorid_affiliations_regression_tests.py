@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
+from invenio.testutils import InvenioTestCase
 from datetime import datetime
 
 from invenio.testutils import make_test_suite, run_test_suite
@@ -40,7 +40,7 @@ def compare_aff_dicts(test, aff, expected):
 
 
 
-class TaskTests(unittest.TestCase):
+class TaskTests(InvenioTestCase):
     def setUp(self):
         run_sql("TRUNCATE aidAFFILIATIONS")
 
