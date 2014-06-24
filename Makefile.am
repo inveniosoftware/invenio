@@ -158,7 +158,6 @@ install-jquery-plugins:
 	mkdir -p $(prefix)/var/www/css
 	(cd ${prefix}/var/www/js && \
 	wget http://invenio-software.org/download/jquery/jquery-1.7.1.min.js -O jquery.min.js && \
-	mv jquery-1.7.1.min.js jquery.min.js && \
 	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O jquery-ui.min.js && \
 	wget http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js -O jquery.jeditable.mini.js && \
 	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate -O jquery.form.js && \
