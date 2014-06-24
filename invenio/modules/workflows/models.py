@@ -337,6 +337,10 @@ class BibWorkflowObject(db.Model):
             else:
                 self.extra_data["_tasks_results"][task_name] = [res_obj]
 
+    def get_tasks_results(self):
+        """Return the complete set of tasks results."""
+        return self.get_extra_data()["_tasks_results"]
+
     def add_action(self, action, message):
         """Save a action for holdingpen.
 

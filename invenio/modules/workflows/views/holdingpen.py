@@ -80,17 +80,38 @@ def index():
 @templated('workflows/hp_maintable.html')
 def maintable():
     """Display main table interface of Holdingpen."""
+
     bwolist = get_holdingpen_objects()
     action_list = get_action_list(bwolist)
     action_static = []
     for name, action in iteritems(actions):
         if getattr(action, "static", None):
             action_static.extend(action.static)
-    my_tags = current_app.config.get('VERSION_SHOWING', [])
+
+    my_tags = []
+
+    if 'tags' in session:
+        my_tags += session['tags']
+    if 'workflows_version_showing' in session:
+        my_tags += session['workflows_version_showing']
+    if 'version' in request.args:
+        try:
+            if ObjectVersion.MAPPING[int(request.args.get('version'))] not in my_tags:
+                my_tags += [int(request.args.get('version'))]
+            if int(request.args.get('version')) not in session["workflows_version_showing"]:
+                session["workflows_version_showing"] += [int(request.args.get('version'))]
+        except Exception as e:
+            if request.args.get('version') not in my_tags:
+                my_tags += [request.args.get('version')]
+            if [request.args.get('version')] not in session["tags"]:
+                session["workflows_version_showing"] += [request.args.get('version')]
     tags_to_print = ""
     for tag in my_tags:
+        try:
             tags_to_print += ObjectVersion.MAPPING[tag]
-
+        except:
+            if tag:
+                tags_to_print += tag + ','
     return dict(bwolist=bwolist,
                 action_list=action_list,
                 action_static=action_static,
@@ -333,11 +354,10 @@ def details(objectid):
                       hbwobject[ObjectVersion.HALTED] + \
                       hbwobject[ObjectVersion.FINAL]
 
-    try:
-        edit_record_action = actions['edit_record_action']()
-    except KeyError:
-        # Could not load edit_record_action
-        edit_record_action = []
+    results = []
+    for label, res in bwobject.get_tasks_results().iteritems():
+        res_dicts = [item.to_dict() for item in res]
+        results.append((label, res_dicts))
 
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
@@ -348,7 +368,7 @@ def details(objectid):
                            data_preview=formatted_data,
                            workflow_func=extracted_data['workflow_func'],
                            workflow=extracted_data['w_metadata'],
-                           edit_record_action=edit_record_action)
+                           task_results=results)
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])
@@ -410,6 +430,8 @@ def delete_multi(bwolist):
 @login_required
 def show_action(objectid):
     """Render the action assigned to a specific record."""
+    from sqlalchemy import or_
+
     bwobject = BibWorkflowObject.query.filter(
         BibWorkflowObject.id == objectid).first_or_404()
 
@@ -424,9 +446,6 @@ def show_action(objectid):
                                   [extracted_data['w_metadata']],
                                   [extracted_data['workflow_func']])
     url, parameters = result
-
-    #### message
-    from sqlalchemy import or_
 
     if bwobject.id_parent:
         hbwobject_db_request = BibWorkflowObject.query.filter(
@@ -455,8 +474,14 @@ def show_action(objectid):
                       hbwobject[ObjectVersion.HALTED] + \
                       hbwobject[ObjectVersion.FINAL]
 
+    results = []
+    for label, res in bwobject.get_tasks_results().iteritems():
+        res_dicts = [item.to_dict() for item in res]
+        results.append((label, res_dicts))
+
     parameters["message"] = bwobject.get_action_message()
     parameters["hbwobject"] = hbwobject_final
+    parameters["task_results"] = results
     return render_template(url, **parameters)
 
 

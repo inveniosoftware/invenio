@@ -49,7 +49,7 @@
         <h3 class="panel-title">Problems detected</h3>
       </div>
       <div class="panel-body">
-        <h5>{{ bwobject.get_extra_data()['_last_task_name'] }}: {{ bwobject.get_error_message()[0] }}</h5>
+        <h5>{{ bwobject.get_extra_data()['_last_task_name'] }}</h5>
         <div class="text-right">
             <h6 id="show-more" class="text-right"><a role="button" data-toggle="modal" style="cursor: pointer" data-target="#error_details_modal" class="float-right">Open details</a>
             </h6>
@@ -60,10 +60,11 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">{{ bwobject.get_error_message()[0] }}</h4>
+                <h4 class="modal-title" id="myModalLabel">Problem with {{ bwobject.get_extra_data()['_last_task_name'] }}</h4>
               </div>
               <div class="modal-body">
-                {{ bwobject.get_error_message()[1] }}
+                <p>{{ bwobject.get_error_message()[0] }}</p>
+                <p>{{ bwobject.get_error_message()[1] }}</p>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -211,4 +212,30 @@
         <div id="object_preview_container{{bwobject.id}}" class="object_preview_container">
             {{ data_preview|safe }}
         </div>
+{% endblock %}
+
+{% block hp_task_results %}
+    {% if task_results %}
+
+      {% for label, results in task_results %}
+        <div class="panel panel-default">
+        <div class="panel-heading">
+        {{ label }}
+        </div>
+        <div class="panel-body">
+        {% for result in results %}
+          <div class="list-group">
+              {% for key, value in result.iteritems() %}
+            <li class="list-group-item">
+              <h4 class="list-group-item-heading">{{ key }}</h4>
+              <p class="list-group-item-text">{{ value }}</p>
+            </li>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+
 {% endblock %}

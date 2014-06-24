@@ -74,11 +74,9 @@
                 {% block hpbody_details %}
                     {{ super() }}
                 {% endblock hpbody_details %}
-
             </div>
 
             <div class="col-md-9">
-
                 {% if 'message' in bwobject.get_extra_data() and
                     bwobject.get_action() != None %}
                     <div id="usermessage" class="alert alert-warning alert-dismissable">
@@ -97,7 +95,9 @@
                     {{ super() }}
                 {% endblock %}
 
-
+                {% block hp_task_results %}
+                    {{ super() }}
+                {% endblock %}
             </div>
         </div>
     </div>
