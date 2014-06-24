@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,24 +39,18 @@ from invenio.config import (CFG_CACHEDIR,
                             CFG_HEPDATA_FIELD,
                             CFG_SITE_RECORD,
                             CFG_SITE_SECURE_URL)
-from invenio.jsonutils import json
+from invenio.utils.json import json
 from datetime import datetime
 import time
-from invenio import bibrecord
-
-#raise Exception(str(dir(sys.modules['invenio'])))
-import invenio.webpage as webpage
-
-if "invenio.search_engine" in sys.modules:
-    search_engine = sys.modules["invenio.search_engine"]
-else:
-    from invenio import search_engine
+from invenio.legacy import bibrecord
+from invenio.base.wrappers import lazy_import
+search_engine = lazy_import('invenio.legacy.search_engine')
 
 import cPickle
 
 #imports realted to the harvesting daemon
 
-from invenio.bibtask import task_init, write_message, \
+from invenio.legacy.bibsched.bibtask import task_init, write_message, \
     task_set_option, task_has_option, task_get_option, \
     task_low_level_submission, task_update_progress, \
     task_read_status, task_sleep_now_if_required

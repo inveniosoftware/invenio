@@ -44,7 +44,7 @@ from invenio.config import \
      CFG_BIBSCHED_LOG_PAGER, \
      CFG_BIBSCHED_EDITOR
 from invenio.legacy.dbquery import run_sql
-from invenio.textutils import wrap_text_in_a_box
+from invenio.utils.text import wrap_text_in_a_box
 from invenio.bibsched import bibsched_get_status, \
                              bibsched_set_host, \
                              bibsched_set_progress, \
@@ -62,7 +62,7 @@ from invenio.bibsched import bibsched_get_status, \
                              restore_stdout_and_stderr, \
                              get_task_pid, \
                              fetch_debug_mode
-from invenio.bibtask import (get_sleeptime,
+from invenio.legacy.bibsched.bibtask import (get_sleeptime,
                              task_get_options,
                              task_log_path)
 

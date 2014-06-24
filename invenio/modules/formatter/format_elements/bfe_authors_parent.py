@@ -64,7 +64,7 @@ def format_element(bfo, limit, separator='; ',
     from urllib import quote
     from cgi import escape
     import re
-    from invenio.messages import gettext_set_language
+    from invenio.base.i18n import gettext_set_language
     from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
     from invenio.bibformat_engine import BibFormatObject
 

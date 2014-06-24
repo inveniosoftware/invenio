@@ -45,7 +45,7 @@ from invenio.modules.knowledge.api import get_kb_mappings
 from invenio.legacy.bibsched.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \
                      task_get_task_param
-from invenio.legacy.bibindex.engine import get_field_tags
+from invenio.legacy.bibindex.engine_utils import get_field_tags
 from invenio.legacy.docextract.record import get_record
 from invenio.legacy.dbquery import serialize_via_marshal
 

@@ -26,11 +26,11 @@ try:
     from invenio.config import CFG_ICON_CREATION_FORMAT_MAPPINGS
 except ImportError, e:
     CFG_ICON_CREATION_FORMAT_MAPPINGS = {'*': ['jpg']}
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.websubmit_icon_creator import create_icon, CFG_ALLOWED_FILE_EXTENSIONS
 from invenio.bibdocfilecli import cli_fix_marc
-from invenio.bibtask import write_message, \
+from invenio.legacy.bibsched.bibtask import write_message, \
                             task_update_progress, \
                             task_sleep_now_if_required
 
@@ -195,7 +195,7 @@ def bst_create_icons(recid, icon_sizes, icon_format_mappings=None,
     if recid:
         recids = [int(recid)]
     elif collection:
-        from invenio.search_engine import get_collection_reclist
+        from invenio.legacy.search_engine import get_collection_reclist
         recids = get_collection_reclist(collection)
     else:
         write_message("Error: no recid found.", sys.stderr)

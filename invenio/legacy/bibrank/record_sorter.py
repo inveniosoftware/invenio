@@ -37,7 +37,6 @@ from invenio.legacy.dbquery import run_sql, \
                                    deserialize_via_marshal, \
                                    wash_table_column_name
 from invenio.ext.logging import register_exception
-from invenio.legacy.webpage import adderrorbox
 from invenio.legacy.bibindex.engine_stopwords import is_stopword
 from invenio.legacy.bibrank.citation_searcher import get_cited_by, \
                                                      get_cited_by_weight
@@ -215,7 +214,7 @@ def get_bibrank_methods(colID, ln=CFG_SITE_LANG):
 def citation(rank_method_code, related_to, hitset, rank_limit_relevance, verbose):
     """Sort records by number of citations"""
     if related_to:
-        from invenio.search_engine import search_pattern
+        from invenio.legacy.search_engine import search_pattern
         hits = intbitset()
         for pattern in related_to:
             hits |= hitset & intbitset(search_pattern(p='refersto:%s' % pattern))
@@ -306,6 +305,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset, related_to=[], 
             result = rank_by_method(rank_method_code, related_to, hitset, rank_limit_relevance, verbose)
     except Exception as e:
         register_exception()
+        from invenio.legacy.webpage import adderrorbox
         result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br />" % (e,)]), voutput)
 
     afterfind = time.time() - starttime

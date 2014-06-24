@@ -51,7 +51,7 @@ from invenio.legacy.webuser import get_preferred_user_language, isGuestUser, \
     getUid, isUserSuperAdmin, collect_user_info, setUid
 from invenio.legacy.wsgi.utils import StringField
 from invenio.modules import apikeys as web_api_key
-from invenio.webinterface_handler_wsgi_utils import StringField
+from invenio.legacy.wsgi.utils import StringField
 from invenio.modules.access.engine import acc_authorize_action
 
 

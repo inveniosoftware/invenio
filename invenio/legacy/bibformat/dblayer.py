@@ -28,7 +28,7 @@ import zlib
 import time
 
 from invenio.legacy.dbquery import run_sql
-from invenio.dateutils import localtime_to_utc
+from invenio.utils.date import localtime_to_utc
 
 
 def get_creation_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):

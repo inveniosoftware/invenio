@@ -48,7 +48,7 @@ from invenio.base.globals import cfg
 ##
 def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False,
-                  save_missing=True, force_2nd_pass=False):
+                  save_missing=True, force_2nd_pass=False, **kwargs):
     """
     Format a record in given output format.
 
@@ -106,7 +106,8 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                                         xml_record=xml_record,
                                         user_info=user_info,
                                         on_the_fly=on_the_fly,
-                                        save_missing=save_missing)
+                                        save_missing=save_missing,
+                                        **kwargs)
     if needs_2nd_pass or force_2nd_pass:
         out = bibformat_engine.format_record_2nd_pass(
                                     recID=recID,
@@ -116,7 +117,10 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                                     verbose=verbose,
                                     search_pattern=search_pattern,
                                     xml_record=xml_record,
-                                    user_info=user_info)
+                                    user_info=user_info,
+                                    **kwargs)
+
+    return out
 
 
 def record_get_xml(recID, format='xm', decompress=zlib.decompress):
@@ -494,7 +498,7 @@ def print_records(recIDs, of='hb', ln=None, verbose=0,
     from flask import request
     from invenio.base.i18n import wash_language
     from invenio.ext.template import render_template_to_string
-    from invenio.modules.formatter.engine import format_record
+    #from invenio.modules.formatter.engine import format_record
     from invenio.modules.search.models import Format
     from invenio.utils.pagination import Pagination
     from invenio.modules.formatter.engine import \

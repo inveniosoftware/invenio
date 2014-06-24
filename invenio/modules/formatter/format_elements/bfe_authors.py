@@ -58,7 +58,7 @@ def format_element(bfo, limit, separator=' ; ',
     @param relator_code_pattern: a regular expression to filter authors based on subfield $4 (relator code)
     @param multiple_affiliations: whether all affiliations should be displayed
     """
-    from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
+    from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD, \
         CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME, \
         CFG_BIBAUTHORITY_TYPE_NAMES, \
         CFG_BIBAUTHORITY_PREFIX_SEP

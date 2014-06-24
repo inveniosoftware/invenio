@@ -49,9 +49,9 @@ from invenio.utils.url import make_canonical_urlargd, create_html_link, \
 from invenio.utils.date import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.modules.formatter import format_record
-from invenio.legacy import template
 from invenio.utils.html import get_mathjax_header
-websearch_templates = template.load('websearch')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
 
 
 class Template:

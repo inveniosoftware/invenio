@@ -44,8 +44,8 @@ except ImportError:
     from StringIO import StringIO
 
 from invenio.legacy.bibedit.config import CFG_BIBEDIT_FILENAME, \
-    CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_CACHEDIR
+    CFG_BIBEDIT_TO_MERGE_SUFFIX, \
+    CFG_BIBEDIT_CACHEDIR
 from invenio.legacy.bibedit.db_layer import (get_record_last_modification_date,
     delete_hp_change, cache_exists, update_cache_post_date, get_cache,
     update_cache, get_cache_post_date, uids_with_active_caches,
@@ -599,7 +599,7 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent=Fals
 
     templates = []
     for fname in template_fnames:
-        filepath = '%s%s%s' % (templatesDir, os.sep, fname)
+        filepath = fname
         template_file = open(filepath, 'r')
         template = template_file.read()
         template_file.close()

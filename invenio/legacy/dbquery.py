@@ -198,7 +198,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
     if cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] == 3:
         # do not connect to the database as the site is closed for maintenance:
         return []
-    elif CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
+    elif cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] > 0:
         ## Read only website
         if not sql.upper().startswith("SELECT") and not sql.upper().startswith("SHOW"):
             return

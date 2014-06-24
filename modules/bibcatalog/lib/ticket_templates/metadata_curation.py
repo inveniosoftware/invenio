@@ -21,7 +21,7 @@
 BibCatalog template
 """
 from invenio.config import CFG_SITE_URL
-from invenio.bibrecord import \
+from invenio.legacy.bibrecord import \
     record_get_field_values, \
     record_get_field_value
 from invenio.bibcatalog_utils import \

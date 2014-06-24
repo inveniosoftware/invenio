@@ -258,7 +258,7 @@ except:
     WebInterfaceAuthor = WebInterfaceDumbPages
 
 try:
-    from invenio.bibauthorid_webinterface import WebInterfacePerson
+    from invenio.legacy.bibauthorid.webinterface import WebInterfacePerson
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfacePerson = WebInterfaceDumbPages

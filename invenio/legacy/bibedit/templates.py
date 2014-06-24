@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 from invenio.config import CFG_SITE_URL, CFG_INSPIRE_SITE
 from invenio.base.i18n import gettext_set_language
 
-from invenio.bibcatalog import BIBCATALOG_SYSTEM
+from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 
 try:
     BIBCATALOG_SYSTEM.ticket_search(0)

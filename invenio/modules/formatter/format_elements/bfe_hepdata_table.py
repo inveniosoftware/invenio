@@ -20,8 +20,8 @@
 """
 __revision__ = "$Id$"
 
-from invenio import hepdatadisplayutils
-from invenio import hepdatautils
+from invenio.utils.hepdata import display as hepdatadisplayutils
+from invenio.utils import hepdata as hepdatautils
 def format_element(bfo):
     """
     Prints HEPData table encoded in the record

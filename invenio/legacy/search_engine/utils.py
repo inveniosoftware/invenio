@@ -30,6 +30,7 @@ def record_exists(recID):
        Return 0 if it doesn't exist.
        Return -1 if it exists but is marked as deleted.
     """
+    from invenio.config import CFG_CERN_SITE
     try: # if recid is '123foo', mysql will return id=123, and we don't want that
         recID = int(recID)
     except (ValueError, TypeError):

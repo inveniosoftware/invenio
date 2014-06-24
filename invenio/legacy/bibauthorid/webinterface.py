@@ -74,7 +74,7 @@ from invenio.legacy.bibauthorid.general_utils import is_valid_orcid
 from invenio.legacy.bibauthorid.backinterface import update_external_ids_of_authors, get_orcid_id_of_author, \
             get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author
 from invenio.legacy.bibauthorid.dbinterface import defaultdict, remove_arxiv_papers_of_author
-from invenio.webauthorprofile_orcidutils import get_dois_from_orcid
+from invenio.legacy.webauthorprofile.orcidutils import get_dois_from_orcid
 
 from invenio.legacy.bibauthorid.webauthorprofileinterface import is_valid_canonical_id, get_person_id_from_canonical_id, \
     get_person_redirect_link, author_has_papers
@@ -83,7 +83,7 @@ from invenio.legacy.bibauthorid.templates import WebProfileMenu, WebProfilePage
 
 # Imports related to hepnames update form
 from invenio.bibedit_utils import get_bibrecord
-from invenio.bibrecord import record_get_field_value, record_get_field_values, \
+from invenio.legacy.bibrecord import record_get_field_value, record_get_field_values, \
                               record_get_field_instances, field_get_subfield_values
 
 

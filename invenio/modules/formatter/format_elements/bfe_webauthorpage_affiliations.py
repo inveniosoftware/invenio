@@ -20,7 +20,7 @@
 """
 
 from cgi import escape
-from invenio.webauthorprofile_config import serialize
+from invenio.legacy.webauthorprofile.config import serialize
 
 
 def format_element(bfo):

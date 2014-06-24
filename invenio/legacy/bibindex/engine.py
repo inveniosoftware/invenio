@@ -394,9 +394,9 @@ def detect_tokenizer_type(tokenizer):
         a look at BibIndexTokenizer class.
         @param tokenizer: instance of a tokenizer
     """
-    from invenio.bibindex_tokenizers.BibIndexStringTokenizer import BibIndexStringTokenizer
-    from invenio.bibindex_tokenizers.BibIndexRecJsonTokenizer import BibIndexRecJsonTokenizer
-    from invenio.bibindex_tokenizers.BibIndexMultiFieldTokenizer import BibIndexMultiFieldTokenizer
+    from invenio.modules.indexer.tokenizers.BibIndexStringTokenizer import BibIndexStringTokenizer
+    from invenio.modules.indexer.tokenizers.BibIndexRecJsonTokenizer import BibIndexRecJsonTokenizer
+    from invenio.modules.indexer.tokenizers.BibIndexMultiFieldTokenizer import BibIndexMultiFieldTokenizer
 
     tokenizer_inheritance_tree = inspect.getmro(tokenizer.__class__)
     if BibIndexStringTokenizer in tokenizer_inheritance_tree:

@@ -33,7 +33,7 @@ import json
 from flask import url_for
 from invenio.modules import formatter as bibformat
 
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.utils.json import CFG_JSON_AVAILABLE
 from invenio.utils.url import auto_version_url
 from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
@@ -110,7 +110,7 @@ from invenio.legacy.batchuploader.engine import perform_upload_check
 from invenio.legacy.bibcirculation.db_layer import get_number_copies, has_copies
 from invenio.legacy.bibcirculation.utils import create_item_details_url
 
-from invenio.legacy.refextract.api import FullTextNotAvailable \
+from invenio.legacy.refextract.api import FullTextNotAvailable, \
                                    get_pdf_doc, \
                                    record_has_fulltext
 

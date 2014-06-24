@@ -2336,7 +2336,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        from invenio.search_engine import record_exists
+        from invenio.legacy.search_engine import record_exists
 
         your_comments_order_by_options = (('ocf', _("Oldest comment first")),
                                           ('lcf', _("Latest comment first")),

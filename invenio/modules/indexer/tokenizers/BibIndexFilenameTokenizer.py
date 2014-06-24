@@ -21,7 +21,7 @@
 """
 
 
-from invenio.bibindex_tokenizers.BibIndexRecJsonTokenizer import BibIndexRecJsonTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexRecJsonTokenizer import BibIndexRecJsonTokenizer
 
 
 class BibIndexFilenameTokenizer(BibIndexRecJsonTokenizer):

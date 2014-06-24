@@ -17,7 +17,7 @@
 """BibFormat element - Links to arXiv"""
 
 from cgi import escape
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 def format_element(bfo, tag="037__", target="_blank"):
     """

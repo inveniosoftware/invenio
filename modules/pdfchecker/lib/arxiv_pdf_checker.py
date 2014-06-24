@@ -36,10 +36,10 @@ from invenio.docextract_task import store_last_updated, \
                                     fetch_last_updated
 from invenio.shellutils import split_cli_ids_arg
 from invenio.legacy.dbquery import run_sql
-from invenio.bibtask import task_low_level_submission
+from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.refextract_api import record_has_fulltext, \
                                    check_record_for_refextract
-from invenio.bibtask import task_init, \
+from invenio.legacy.bibsched.bibtask import task_init, \
                             write_message, \
                             task_update_progress, \
                             task_get_option, \
@@ -51,8 +51,8 @@ from invenio.config import CFG_VERSION, \
                            CFG_TMPDIR, \
                            CFG_ARXIV_URL_PATTERN
 # Help message is the usage() print out of how to use Refextract
-from invenio.docextract_record import get_record
-from invenio.bibdocfile import BibRecDocs, \
+from invenio.legacy.docextract.record import get_record
+from invenio.legacy.bibdocfile.api import BibRecDocs, \
                                calculate_md5
 from invenio.oai_harvest_dblayer import get_oai_src
 from invenio import oai_harvest_daemon

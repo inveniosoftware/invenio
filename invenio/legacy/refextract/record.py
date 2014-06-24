@@ -19,9 +19,9 @@
 
 from datetime import datetime
 
-from invenio.docextract_record import BibRecord, \
+from invenio.legacy.docextract.record import BibRecord, \
                                       BibRecordField
-from invenio.refextract_config import \
+from invenio.legacy.refextract.config import \
     CFG_REFEXTRACT_FIELDS, \
     CFG_REFEXTRACT_IND1_REFERENCE, \
     CFG_REFEXTRACT_IND2_REFERENCE, \

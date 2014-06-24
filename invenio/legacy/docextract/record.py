@@ -24,8 +24,8 @@ try:
 except ImportError:
     import elementtree.ElementTree as ET
 
-from invenio.search_engine import get_record as get_record_original
-from invenio.bibrecord import create_record as create_record_original, \
+from invenio.legacy.search_engine import get_record as get_record_original
+from invenio.legacy.bibrecord import create_record as create_record_original, \
                               create_records as create_records_original
 
 

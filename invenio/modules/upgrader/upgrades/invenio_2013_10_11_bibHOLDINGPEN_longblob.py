@@ -59,7 +59,7 @@ def pre_upgrade():
                          SELECT DISTINCT(changeset_id) FROM bibHOLDINGPEN
                          WHERE LENGTH(changeset_xml) =  65535""" % len(res))
 
-        from invenio.textutils import wait_for_user
+        from invenio.utils.text import wait_for_user
         try:
             wait_for_user("\nThis upgrade will delete all the corrupted entries. A backup table bibHOLDINGPEN_backup will be created.\n")
         except SystemExit:

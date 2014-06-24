@@ -44,7 +44,7 @@ from invenio.utils.html import escape_html
 from jinja2 import DictLoader, Environment
 from flask import session
 
-# from invenio.textutils import encode_for_xml
+# from invenio.utils.text import encode_for_xml
 
 
 class WebProfileMenu():

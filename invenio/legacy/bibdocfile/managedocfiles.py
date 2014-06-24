@@ -98,7 +98,7 @@ from invenio.ext.logging import register_exception
 from invenio.legacy.dbquery import run_sql
 from invenio.utils.url import create_html_mailto
 from invenio.utils.html import escape_javascript_string
-from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
+from invenio.legacy.bibsched.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 CFG_ALLOWED_ACTIONS = ['revise', 'delete', 'add', 'addFormat']
 
 params_id = 0

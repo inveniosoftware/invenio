@@ -19,15 +19,15 @@
 
 from invenio.sequtils import SequenceGenerator
 from invenio.bibedit_utils import get_bibrecord
-from invenio.bibrecord import record_get_field_value, create_record
+from invenio.legacy.bibrecord import record_get_field_value, create_record
 
 # Imports related to the texkey generation daemon
-from invenio.search_engine import perform_request_search, get_record
-from invenio.bibrecord import field_get_subfield_values, \
+from invenio.legacy.search_engine import perform_request_search, get_record
+from invenio.legacy.bibrecord import field_get_subfield_values, \
                               record_get_field_instances, \
                               record_add_field, print_rec
 from invenio.config import CFG_TMPSHAREDDIR, CFG_VERSION
-from invenio.bibtask import task_init, write_message, \
+from invenio.legacy.bibsched.bibtask import task_init, write_message, \
     task_low_level_submission, task_update_progress, \
     task_sleep_now_if_required
 from invenio.legacy.dbquery import run_sql

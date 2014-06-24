@@ -30,7 +30,7 @@ from invenio.modules.formatter.format_elements.bfe_server_info import format_ele
 from invenio.modules.formatter.format_elements.bfe_client_info import format_element as client_info
 from invenio.utils.date import get_i18n_month_name
 from invenio.utils.html import create_tag
-from invenio.legacy.bibindex.engine import get_field_tags
+from invenio.legacy.bibindex.engine_utils import get_field_tags
 from invenio.config import \
      CFG_WEBSEARCH_ENABLE_GOOGLESCHOLAR, \
      CFG_WEBSEARCH_ENABLE_OPENGRAPH, \

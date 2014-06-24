@@ -105,18 +105,18 @@ def load(module='', prefix=''):
     if CFG_WEBSTYLE_TEMPLATE_SKIN == "default":
         try:
             mymodule = __import__("invenio.%s_%stemplates" % (module, prefix), local,
-                                  local, ["invenio.templates.%s" % (module)])
+                                  local, ["invenio.legacy.%s.templates" % (module)])
         except ImportError:
             mymodule = __import__("invenio.legacy.%s.%stemplates" % (module, prefix),
                                   local, local,
-                                  ["invenio.templates.%s" % (module)])
+                                  ["invenio.legacy.%s.templates" % (module)])
     else:
         try:
-            mymodule = __import__("invenio.%s_templates_%s" % (module, CFG_WEBSTYLE_TEMPLATE_SKIN), local, local,
-                                  ["invenio.templates.%s_%s" % (module, CFG_WEBSTYLE_TEMPLATE_SKIN)])
+            mymodule = __import__("invenio.legacy.%s.templates_%s" % (module, CFG_WEBSTYLE_TEMPLATE_SKIN), local, local,
+                                  ["invenio.legacy.%s.templates" % (module, CFG_WEBSTYLE_TEMPLATE_SKIN)])
         except ImportError:
-            mymodule = __import__("invenio.%s_templates" % (module), local, local,
-                                  ["invenio.templates.%s" % (module)])
+            mymodule = __import__("invenio.legacy.%s.templates" % (module), local, local,
+                                  ["invenio.legacy.%s.templates" % (module)])
     if 'inspect-templates' in cfg.get('CFG_DEVEL_TOOLS', []):
         for method_name in dir(mymodule.Template):
             if method_name.startswith('tmpl_'):
@@ -312,7 +312,7 @@ def get_default_templates(base_dir=None):
     templates_path = []
     for (dirpath, dirnames, filenames) in os.walk(base_dir):
         for filename in filenames:
-            if filename.endswith("_templates.py"):
+            if filename.endswith("templates.py"):
                 templates_path.append(os.path.join(dirpath, filename))
 
     return templates_path

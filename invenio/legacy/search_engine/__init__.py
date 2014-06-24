@@ -72,6 +72,8 @@ from invenio.config import \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
      CFG_WEBSEARCH_DISPLAY_NEAREST_TERMS, \
      CFG_WEBSEARCH_WILDCARD_LIMIT, \
+     CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
+     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
@@ -94,12 +96,10 @@ from invenio.config import \
 
 from invenio.modules.search.errors import \
      InvenioWebSearchUnknownCollectionError, \
-     InvenioWebSearchWildcardLimitError, \
-     CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
-     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH
-from invenio.legacy.bibrecord import    (get_fieldvalues,
-                                         get_fieldvalues_alephseq_like,
-                                         record_exists)
+     InvenioWebSearchWildcardLimitError
+from invenio.legacy.bibrecord import (get_fieldvalues,
+                                      get_fieldvalues_alephseq_like)
+from .utils import record_exists
 from invenio.legacy.bibrecord import create_record, record_xml_output
 from invenio.legacy.bibrank.record_sorter import (
     get_bibrank_methods,
@@ -137,6 +137,7 @@ from invenio.legacy import bibrecord
 import invenio.legacy.template
 webstyle_templates = invenio.legacy.template.load('webstyle')
 webcomment_templates = invenio.legacy.template.load('webcomment')
+websearch_templates = invenio.legacy.template.load('websearch')
 
 from invenio.legacy.bibrank.citation_searcher import calculate_cited_by_list, \
     calculate_co_cited_with_list, get_records_with_num_cites, \
@@ -161,21 +162,13 @@ from invenio.legacy.miscutil.solrutils_bibindex_searcher import solr_get_bitset
 from invenio.legacy.miscutil.xapianutils_bibindex_searcher import xapian_get_bitset
 from invenio.modules.search import services
 
-try:
-    import invenio.legacy.template
-    websearch_templates = invenio.legacy.template.load('websearch')
-except:
-    pass
-
 from invenio.legacy.websearch_external_collections import calculate_hosted_collections_results, do_calculate_hosted_collections_results
 from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH
 from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
 from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
 from invenio.legacy.bibauthorid.config import LIMIT_TO_COLLECTIONS as BIBAUTHORID_LIMIT_TO_COLLECTIONS
-from .utils import record_exists
 
-websearch_templates = invenio.template.load('websearch')
 VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
 
 ## global vars:
@@ -4790,8 +4783,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                    ln,
                                                                                    include_jquery=True,
                                                                                    include_mathjax=True))
-                        from invenio import hepdatautils
-                        from invenio import hepdatadisplayutils
+                        from invenio.utils import hepdata as hepdatautils
+                        from invenio.utils.hepdata import display as hepdatadisplayutils
                         data = hepdatautils.retrieve_data_for_record(recid)
 
                         if data:

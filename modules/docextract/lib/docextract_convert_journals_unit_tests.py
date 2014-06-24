@@ -23,7 +23,7 @@ import subprocess
 from tempfile import NamedTemporaryFile, mkstemp
 
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.docextract_record import BibRecord
+from invenio.legacy.docextract.record import BibRecord
 from invenio.refextract_kbs import get_kbs
 from invenio.config import CFG_BINDIR, CFG_TMPDIR
 from invenio.testutils import InvenioXmlTestCase

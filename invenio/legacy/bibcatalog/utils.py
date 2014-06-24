@@ -20,10 +20,10 @@
 """
 BibCatalog utility functions
 """
-from invenio.bibrecord import \
+from invenio.legacy.bibrecord import \
     record_get_field_instances, \
     field_get_subfield_values
-from invenio.bibformat_dblayer import get_tag_from_name
+from invenio.legacy.bibformat.dblayer import get_tag_from_name
 
 
 class BibCatalogTagNotFound(Exception):

@@ -24,14 +24,14 @@ import os
 import fcntl
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid, collect_user_info, page_not_authorized
 from invenio.webdoc import get_webdoc_parts, webdoc_dirs
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.bibdocfile import stream_file
+from invenio.legacy.bibdocfile.api import stream_file
 
-from invenio.jsonutils import json, json_unicode_to_utf8
+from invenio.utils.json import json, json_unicode_to_utf8
 
 from invenio.access_control_engine import acc_authorize_action
 

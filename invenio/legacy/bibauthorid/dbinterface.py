@@ -2995,9 +2995,9 @@ def duplicated_tortoise_results_exist():   ### check_results
     for duplicates in duplicated_results:
         duplicated_tortoise_results_not_found = False
         for duplicate in duplicates:
-            print "Duplicated row in aidRESULTS"
-            print "%s %s %s %s" % duplicate
-        print
+            print("Duplicated row in aidRESULTS")
+            print("%s %s %s %s" % duplicate)
+        print()
 
     clusters = dict()
     for name, _, _, rec in disambiguation_results:
@@ -3007,12 +3007,12 @@ def duplicated_tortoise_results_exist():   ### check_results
 
     if faulty_clusters:
         duplicated_tortoise_results_not_found = False
-        print "Recids NOT unique in clusters!"
-        print ("A total of %s clusters hold an average of %.2f duplicates" %
-               (len(faulty_clusters), (sum(faulty_clusters.values()) / float(len(faulty_clusters)))))
+        print("Recids NOT unique in clusters!")
+        print(("A total of %s clusters hold an average of %.2f duplicates" %
+               (len(faulty_clusters), (sum(faulty_clusters.values()) / float(len(faulty_clusters))))))
 
         for name in faulty_clusters:
-            print "Name: %-20s      Size: %4d      Faulty: %2d" % (name, len(clusters[name]), faulty_clusters[name])
+            print("Name: %-20s      Size: %4d      Faulty: %2d" % (name, len(clusters[name]), faulty_clusters[name]))
 
     return duplicated_tortoise_results_not_found
 

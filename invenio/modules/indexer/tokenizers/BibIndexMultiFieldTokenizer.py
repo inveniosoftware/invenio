@@ -23,8 +23,8 @@
 """
 
 
-from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
-from invenio.bibindex_tokenizers.BibIndexTokenizer import BibIndexTokenizer
+from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
+from invenio.modules.indexer.tokenizers.BibIndexTokenizer import BibIndexTokenizer
 
 
 

@@ -602,7 +602,7 @@ def render_hepdata_dataset_html(dataset, recid, seq, display_link=True):
     @param display_link: Indicates if a link to the data record should be displayed
     @type display_link: boolean
     """
-    from invenio.search_engine import get_fieldvalues
+    from invenio.legacy.search_engine import get_fieldvalues
 
     should_expand_table = len(dataset.data) > 0
 
@@ -803,7 +803,7 @@ def render_dataverse_dataset_html(recid, display_link = True):
     @param display_link Indicates if a link to the data record should be displayed
     @type display_link boolean
     """
-    from invenio.search_engine import get_fieldvalues
+    from invenio.legacy.search_engine import get_fieldvalues
 
     # rendering the HTML code
 
@@ -839,7 +839,7 @@ def render_inspire_dataset_html(recid, display_link = True):
     @param display_link Indicates if a link to the data record should be displayed
     @type display_link boolean
     """
-    from invenio.search_engine import get_fieldvalues
+    from invenio.legacy.search_engine import get_fieldvalues
 
     # rendering the HTML code
 
@@ -865,7 +865,7 @@ def render_other_dataset_html(recid, display_link = True):
     @param display_link Indicates if a link to the data record should be displayed
     @type display_link boolean
     """
-    from invenio.search_engine import get_fieldvalues
+    from invenio.legacy.search_engine import get_fieldvalues
 
     c = [] #collecting parts of the output
     c.append("<div style=\"background-color: #ececec; padding:10px;\">")

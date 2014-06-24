@@ -28,7 +28,7 @@ from invenio.config import (CFG_SITE_URL,
                             CFG_WEBDIR,
                             CFG_BIBRANK_SHOW_CITATION_GRAPHS)
 from invenio.base.i18n import gettext_set_language
-from invenio.bibrank_grapher import (create_temporary_image,
+from invenio.legacy.bibrank.grapher import (create_temporary_image,
                                      write_coordinates_in_tmp_file)
 from invenio.legacy.bibrank.citation_searcher import get_cited_by
 from invenio.legacy.search_engine.utils import get_fieldvalues

@@ -23,8 +23,8 @@ Invenio Tasklet.
 Create related formats
 """
 
-from invenio.bibdocfile import BibRecDocs
-from invenio.bibtask import write_message, \
+from invenio.legacy.bibdocfile.api import BibRecDocs
+from invenio.legacy.bibsched.bibtask import write_message, \
      task_sleep_now_if_required, \
      task_update_progress
 from invenio.bibdocfile_managedocfiles import get_description_and_comment

@@ -3506,7 +3506,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
 
 def record_has_hepdata_attached(recID):
     """returns True or False depending if there is HepData attached or not"""
-    from invenio.search_engine import search_pattern
+    from invenio.legacy.search_engine import search_pattern
     return len(search_pattern(p="786__w:%s" % (str(recID)))) > 0
 
 def get_detailed_page_tabs_counts(recID):
@@ -3533,7 +3533,7 @@ def get_detailed_page_tabs_counts(recID):
     from invenio.legacy.search_engine import get_field_tags, get_record
     if CFG_BIBRANK_SHOW_CITATION_LINKS:
         if CFG_INSPIRE_SITE:
-            from invenio.search_engine import search_unit
+            from invenio.legacy.search_engine import search_unit
             citers_recids = intbitset(get_cited_by(recID))
             citeable_recids = search_unit(p='citeable', f='collection')
             tabs_counts['Citations'] = len(citers_recids & citeable_recids)

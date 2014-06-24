@@ -1551,7 +1551,7 @@ class BibRecDocs(object):
             if hasattr(bibdoc, 'has_text'):
                 if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
                     perform_ocr = hasattr(bibdoc, 'is_ocr_required') and bibdoc.is_ocr_required()
-                    from invenio.bibtask import write_message
+                    from invenio.legacy.bibsched.bibtask import write_message
                     write_message("... will extract words from %s %s" % (bibdoc, perform_ocr and 'with OCR' or ''), verbose=2)
                     bibdoc.extract_text(perform_ocr=perform_ocr)
                 texts.append(bibdoc.get_text())

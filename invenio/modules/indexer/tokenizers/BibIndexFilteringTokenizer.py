@@ -16,9 +16,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from invenio.search_engine import get_record
-from invenio.bibrecord import record_get_field_instances
-from invenio.bibindex_tokenizers.BibIndexMultiFieldTokenizer import BibIndexMultiFieldTokenizer
+from invenio.legacy.search_engine import get_record
+from invenio.legacy.bibrecord import record_get_field_instances
+from invenio.modules.indexer.tokenizers.BibIndexMultiFieldTokenizer import BibIndexMultiFieldTokenizer
 
 class BibIndexFilteringTokenizer(BibIndexMultiFieldTokenizer):
     """

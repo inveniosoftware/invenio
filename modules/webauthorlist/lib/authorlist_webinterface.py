@@ -19,10 +19,10 @@
 
 import sys
 from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
-from invenio.webinterface_handler_wsgi_utils import Field
-from invenio.jsonutils import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
+from invenio.legacy.wsgi.utils import Field
+from invenio.utils.json import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
 from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_URL
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid
 from invenio.utils.url import redirect_to_url

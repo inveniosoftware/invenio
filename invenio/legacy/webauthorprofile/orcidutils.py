@@ -24,7 +24,7 @@ try:
     import json
 except ImportError:
     import simplejson as json
-from invenio.webauthorprofile_config import CFG_WEBAUTHORPROFILE_ORCID_ENDPOINT_PUBLIC as ENDPOINT_PUBLIC
+from invenio.legacy.webauthorprofile.config import CFG_WEBAUTHORPROFILE_ORCID_ENDPOINT_PUBLIC as ENDPOINT_PUBLIC
 
 
 def get_dois_from_orcid(orcid_id):

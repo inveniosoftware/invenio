@@ -155,7 +155,7 @@ def get_year(bfo):
 
     @return: integer if the year is found, otherwise None.
     """
-    from invenio.bibformat_elements.bfe_INSPIRE_arxiv import get_arxiv
+    from invenio.modules.formatter.format_elements.bfe_INSPIRE_arxiv import get_arxiv
 
     #true date
     date = bfo.field('269__c')

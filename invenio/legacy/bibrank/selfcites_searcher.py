@@ -20,7 +20,7 @@
 
 """
 from invenio.legacy.dbquery import run_sql
-from invenio.intbitset import intbitset
+from intbitset import intbitset
 
 
 def get_self_cited_by(recid):

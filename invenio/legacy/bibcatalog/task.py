@@ -27,7 +27,7 @@ import getopt
 import os
 import traceback
 
-from invenio.bibtask import \
+from invenio.legacy.bibsched.bibtask import \
     task_init, \
     task_set_option, \
     task_get_option, write_message, \
@@ -40,10 +40,10 @@ from invenio.docextract_task import \
     split_ids, \
     fetch_last_updated, \
     store_last_updated
-from invenio.search_engine import \
+from invenio.legacy.search_engine import \
     get_collection_reclist, \
     perform_request_search
-from invenio.bibcatalog import BIBCATALOG_SYSTEM
+from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 from invenio.bibcatalog_utils import record_id_from_record
 from invenio.bibcatalog_dblayer import \
     get_all_new_records, \

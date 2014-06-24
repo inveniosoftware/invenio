@@ -75,7 +75,7 @@ else:
     except ImportError:
         JSON_OK = False
 
-from webauthorprofile_config import CFG_SITE_LANG, CFG_SITE_URL, \
+from .config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID
 
 RECOMPUTE_ALLOWED_DELAY = timedelta(minutes=30)

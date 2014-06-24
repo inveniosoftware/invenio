@@ -27,7 +27,7 @@ from invenio.legacy.bibauthorid import config as bconfig
 from datetime import datetime
 import sys
 from math import floor
-from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
+from invenio.utils.crossref import get_marcxml_for_doi, CrossrefError
 try:
     import elementtree.ElementTree as ET
 except ImportError:

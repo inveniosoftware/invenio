@@ -30,7 +30,7 @@ record representation.
 If you have a MARCXML representation of the record to be handled, you can use
 the create_record function to obtain a bibrecord internal representation::
 
-    from invenio.bibrecord import create_record
+    from invenio.legacy.bibrecord import create_record
     record = create_record(marcxml)[0]
 
 
@@ -38,7 +38,7 @@ If you want to handle a record stored in the system and you know the record ID,
 then you can easily exploit Invenio search_engine API to obtain the
 corresponding marcxml::
 
-    from invenio.bibrecord import create_record
+    from invenio.legacy.bibrecord import create_record
     from invenio.legacy.search_engine import print_record
     marcxml = print_record(rec_id, 'xm')
     record = create_record(marcxml)[0]
@@ -62,7 +62,7 @@ bibrecord functions like
 At the end, if you want the MARCXML representation of the record you can use
 record_xml_output::
 
-   from invenio.bibrecord import create_record
+   from invenio.legacy.bibrecord import create_record
    from invenio.legacy.search_engine import print_record
    marcxml = print_record(rec_id, 'xm')
    record = create_record(marcxml)[0]

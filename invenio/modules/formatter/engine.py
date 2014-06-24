@@ -52,17 +52,12 @@ from operator import itemgetter
 from six import iteritems, reraise
 from werkzeug.utils import cached_property
 
-from invenio.base.globals import cfg
-from invenio.base.utils import (autodiscover_template_context_functions,
-                                autodiscover_format_elements)
+from invenio.base.utils import autodiscover_template_context_functions
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_BIBFORMAT_CACHED_FORMATS, \
      CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS, \
      CFG_BIBFORMAT_HIDDEN_TAGS
-     CFG_PATH_PHP, \
-     CFG_BINDIR, \
-     CFG_SITE_LANG
 from invenio.ext.logging import \
      register_exception
 from invenio.legacy.bibrecord import \
@@ -74,12 +69,11 @@ from invenio.legacy.bibrecord import \
      record_empty
 from . import registry
 from .engines import xslt
-from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import \
      language_list_long, \
      wash_language, \
      gettext_set_language
-from . import api as bibformat_dblayer
+import invenio.legacy.bibformat.dblayer as bibformat_dblayer
 from .config import \
      CFG_BIBFORMAT_TEMPLATES_DIR, \
      CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
@@ -399,7 +393,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
 def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                            search_pattern=None, xml_record=None,
                            user_info=None, on_the_fly=False,
-                           save_missing=True):
+                           save_missing=True, **kwargs):
     """
     Format a record in given output format.
 
@@ -440,7 +434,7 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
     @return: formatted record
     @rtype: string
     """
-    from invenio.search_engine import record_exists
+    from invenio.legacy.search_engine import record_exists
     if search_pattern is None:
         search_pattern = []
 
@@ -505,7 +499,8 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                                              verbose=verbose,
                                              search_pattern=search_pattern,
                                              xml_record=xml_record,
-                                             user_info=user_info)
+                                             user_info=user_info,
+                                             **kwargs)
         out += out_
 
         if of.lower() in ('xm', 'xoaimarc'):
@@ -552,7 +547,7 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
 
 def format_record_2nd_pass(recID, template, ln=CFG_SITE_LANG,
                            search_pattern=None, xml_record=None,
-                           user_info=None, of=None, verbose=0):
+                           user_info=None, of=None, verbose=0, **kwargs):
     # Create light bfo object
     bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of)
     # Translations
@@ -561,7 +556,8 @@ def format_record_2nd_pass(recID, template, ln=CFG_SITE_LANG,
     r, dummy = format_with_format_template(format_template_filename=None,
                                            format_template_code=template,
                                            bfo=bfo,
-                                           verbose=verbose)
+                                           verbose=verbose,
+                                           extra_context=kwargs)
     return r
 
 
@@ -699,7 +695,7 @@ def format_with_format_template(format_template_filename, bfo,
             format_record=_format_record,
             qid=qid,
             bfo=bfo, **ctx).encode('utf-8')
-
+        needs_2nd_pass = False
     else:
         #.xsl
         if bfo.xml_record:

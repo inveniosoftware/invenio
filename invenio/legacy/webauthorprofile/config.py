@@ -20,7 +20,7 @@
 # Disabling unused import pylint check, since these are needed to get
 # imported here, and are called later dynamically.
 
-from invenio.bibformat_dblayer import get_tag_from_name
+from invenio.legacy.bibformat.dblayer import get_tag_from_name
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBAUTHORPROFILE_CACHE_EXPIRED_DELAY_BIBSCHED, \

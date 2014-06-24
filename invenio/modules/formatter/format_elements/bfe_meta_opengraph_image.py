@@ -86,7 +86,7 @@ def format_element(bfo, max_photos='', one_icon_per_bibdoc='yes', twitter_card_t
         # First look for the prefered image, if available. Note that
         # it might be a remote one.
         try:
-            from invenio.bibformat_elements import bfe_webjournal_articles_overview
+            from invenio.modules.formatter.format_elements import bfe_webjournal_articles_overview
             image_url = bfe_webjournal_articles_overview._get_feature_image(bfo)
             image_secure_url = image_url.replace('http:', 'https:')
             image_size = 500 * 1024 # TODO: check for real image size

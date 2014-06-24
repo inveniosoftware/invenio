@@ -23,7 +23,7 @@ __lastupdated__ = """$Date$"""
 
 from invenio.legacy.bibformat import adminlib as bibformatadminlib
 from invenio.modules.formatter import engine as bibformat_engine
-import invenio.modules.formatter.api as bibformat_dblayer
+import invenio.legacy.bibformat.dblayer as bibformat_dblayer
 from invenio.modules.formatter import format_with_format_template
 from invenio.legacy.bibrank.adminlib import check_user
 from invenio.legacy.webpage import page, error_page

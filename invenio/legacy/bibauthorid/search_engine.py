@@ -19,7 +19,7 @@
 
 """ Author search engine. """
 
-from invenio.bibauthorid_config import QGRAM_LEN, MATCHING_QGRAMS_PERCENTAGE, \
+from invenio.legacy.bibauthorid.config import QGRAM_LEN, MATCHING_QGRAMS_PERCENTAGE, \
         MAX_T_OCCURANCE_RESULT_LIST_CARDINALITY, MIN_T_OCCURANCE_RESULT_LIST_CARDINALITY, \
         NAME_SCORE_COEFFICIENT
 
@@ -29,8 +29,8 @@ from operator import itemgetter
 from msgpack import packb as serialize
 from msgpack import unpackb as deserialize
 
-from invenio.textutils import translate_to_ascii
-from invenio.intbitset import intbitset
+from invenio.utils.text import translate_to_ascii
+from intbitset import intbitset
 from invenio.bibauthorid_name_utils import create_indexable_name, distance, split_name_parts
 from bibauthorid_dbinterface import get_confirmed_name_to_authors_mapping, get_authors_data_from_indexable_name_ids, get_inverted_lists, \
                                     set_inverted_lists_ready, set_dense_index_ready, populate_table, search_engine_is_operating

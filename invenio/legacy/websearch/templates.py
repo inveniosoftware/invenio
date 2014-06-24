@@ -68,12 +68,10 @@ from invenio.config import \
      CFG_HEPDATA_PLOTSIZE, \
      CFG_BASE_URL, \
      CFG_SITE_URL, \
-     CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS
-
-from invenio.legacy.search_engine.config import CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
+     CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS, \
+     CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
 from invenio.modules.search.services import \
      CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT
-
 from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import gettext_set_language
 from invenio.base.globals import cfg
@@ -94,7 +92,7 @@ from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.modules.formatter import format_record
 from invenio.legacy.search_engine.utils import record_exists
 
-from invenio import hepdatadisplayutils
+from invenio.utils.hepdata import display as hepdatadisplayutils
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
@@ -3831,8 +3829,8 @@ class Template:
     def tmpl_record_hepdata(self, data, recid, isLong=True):
         """ Generate a page for HepData records
         """
-        from invenio import hepdatautils
-        from invenio.search_engine import get_fieldvalues
+        from invenio.utils import hepdata as hepdatautils
+        from invenio.legacy.search_engine import get_fieldvalues
 
         c = []
         c.append("<div style=\"background-color: #ececec;\">")

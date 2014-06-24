@@ -39,7 +39,7 @@ from invenio.utils.url import wash_url_argument
 from invenio.ext.logging import register_exception
 from invenio.base.i18n import gettext_set_language, wash_language, language_list_long
 from invenio.legacy.search_engine import perform_request_search
-import invenio.modules.formatter.api as bibformat_dblayer
+import invenio.legacy.bibformat.dblayer as bibformat_dblayer
 from invenio.modules.formatter import engine as bibformat_engine
 from invenio.modules.formatter import registry
 from invenio.utils.text import encode_for_xml
