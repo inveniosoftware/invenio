@@ -3005,7 +3005,7 @@ class TaskTest(InvenioTestCase):
                 self.assertTrue(results[0]['999C5'])
 
 
-class TaskRecordWithRefsTest(unittest.TestCase):
+class TaskRecordWithRefsTest(InvenioTestCase):
     def setUp(self):
         """Setup record needed for tests
 
