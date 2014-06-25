@@ -76,7 +76,7 @@ class CitationDictsDataCacher(DataCacher):
                                # this is really defined in DataCacher
             return fill()
 
-        from invenio.bibrank_tag_based_indexer import get_lastupdated
+        from invenio.legacy.bibrank.tag_based_indexer import get_lastupdated
 
         def timestamp_verifier():
             citation_lastupdate = get_lastupdated('citation')
