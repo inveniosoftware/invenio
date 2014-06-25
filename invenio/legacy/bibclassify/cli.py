@@ -16,17 +16,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-from __future__ import print_function
-
 """
 BibClassify command-line interface.
 
 This modules provides a CLI for BibClassify. It reads the options and calls
 the method output_keywords_for_sources from bibclassify_engine.
 
-This module is STANDALONE safe
+This module is STANDALONE safe.
 """
+from __future__ import print_function
+
 
 import getopt
 import sys
@@ -42,7 +41,7 @@ daemon = None
 
 
 def get_recids_list(recids_string):
-    """Returns a list of recIDs."""
+    """Return a list of recIDs."""
     recids = {}
     elements = recids_string.split(",")
     for element in elements:
@@ -70,7 +69,7 @@ def get_recids_list(recids_string):
 
 
 def main():
-    """Main function """
+    """Main function."""
     arguments = sys.argv
     for index, argument in enumerate(arguments):
         if 'bibclassify' in argument:
@@ -120,7 +119,7 @@ def main():
 
 
 def _display_help():
-    """Prints the help message for this module."""
+    """Print the help message for this module."""
     print("""Usage: bibclassify [OPTION]... [FILE/URL]...
        bibclassify [OPTION]... [DIRECTORY]...
 Searches keywords in FILEs and/or files in DIRECTORY(ies). If a directory is
@@ -196,8 +195,10 @@ def _display_version():
 
 
 def _read_options(options_string):
-    """Reads the options, test if the specified values are consistent and
-    populates the options dictionary."""
+    """Read the options.
+
+    Test if the specified values are consistent and populates the options
+    dictionary."""
     options = {
         "check_taxonomy": False,
         "spires": False,
