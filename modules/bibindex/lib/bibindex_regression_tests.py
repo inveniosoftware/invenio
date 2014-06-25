@@ -1454,10 +1454,11 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         if self.counter == 1:
             self.new_index_name = create_virtual_index(self._id, self.indexes)
             wtabs = get_word_tables(self.indexes)
-            for index_name in self.indexes:
+            for index_id, index_name, index_tags in wtabs:
                 wordTable = WordTable(index_name=index_name,
-                                      table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                      wash_index_terms=50)
+                                    fields_to_index=index_tags,
+                                    table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                    wash_index_terms=50)
                 wordTable.add_recIDs([[1, 113]], 1000)
             vit = VirtualIndexTable(self.new_index_name,
                                     CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
@@ -1468,15 +1469,14 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
 
     @classmethod
     def tearDown(self):
-        if self.counter == 9:
-            remove_virtual_index(self._id)
+        remove_virtual_index(self._id)
 
 
     def test_authorcount_removal_number_of_items(self):
         """bibindex - checks virtual index after authorcount index removal - number of items"""
         query = """SELECT count(*) FROM idxWORD%02dF"""
         res = run_sql(query % self._id)
-        self.assertEqual(157, res[0][0])
+        self.assertEqual(220, res[0][0])
 
     def test_authorcount_removal_common_terms_intact(self):
         """bibindex - checks virtual index after authorcount index removal - common terms"""
@@ -1526,7 +1526,7 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         vit.remove_dependent_index("year")
         query = """SELECT count(*) FROM idxWORD%02dF"""
         res = run_sql(query % self._id)
-        self.assertEqual(134, res[0][0])
+        self.assertEqual(197, res[0][0])
 
     def test_year_removal_record_18_hitlist(self):
         """bibindex - checks virtual index after year removal - termlist for record 18"""
@@ -1535,7 +1535,11 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         res = run_sql(query % self._id)
         terms = deserialize_via_marshal(res[0][0])
         terms = [re.sub(re_prefix, '', term) for term in terms]
-        self.assertEqual(sorted(['151', '357','1985', 'Phys. Lett., B 151 (1985) 357', 'Phys. Lett., B']),
+        self.assertEqual(sorted(['151', '1985', '1985', '357', '357-362',
+                         'Phys. Lett., B',
+                         'Phys. Lett., B 151',
+                         'Phys. Lett., B 151 (1985) 357',
+                         'Phys. Lett., B 151 (1985) 357-362']),
                          sorted(terms))
 
 class BibIndexCLICallTest(InvenioTestCase):
