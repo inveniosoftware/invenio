@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,7 +23,6 @@
 ## Usage:
 ## {% include 'header.html' %}
 #}
-
 
   <nav class="navbar navbar-fixed-top navbar-inverse">
     <div class="container">
@@ -57,34 +56,49 @@
           {%- endif %}
         {%- endfor %}
         </ul>
-
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
-          {% if current_user.is_guest %}
-            <a href="{{ url_for('webaccount.login', referer=request.url) }}" style="display: inline-block; padding-right: 5px;">
-              <i class="glyphicon glyphicon-user"></i> {{ _("guest") }}
+            {% set user_url = url_for('webaccount.login', referer=request.url) if current_user.is_guest else url_for('webaccount.index') %}
+            <a class="dropdown-toggle" data-toggle="dropdown" style="display: inline-block;" href="{{ user_url }}">
+              <i class="glyphicon glyphicon-user"></i>
+              {{ current_user.nickname|default(current_user.email) if not current_user.is_guest else _('guest') }}
+              <b class="caret"></b>
             </a>
-          {% else %}
-            <a href="{{ url_for('webaccount.index') }}" style="display: inline-block; padding-right: 5px;">
-              <i class="glyphicon glyphicon-user"></i> {{ current_user.nickname|default(current_user.email) }}
-            </a>
-          {% endif %}
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="display: inline-block; padding-left: 5px;">
-            <span class="caret"></span>&nbsp;</a>
             <ul class="dropdown-menu">
-              {%- for item in current_menu.submenu('personalize').children if item.visible %}
-              <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
-              {% endfor %}
+              <li>
+                <div class="navbar-content">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <i class="fa fa-user fa-3x"></i>
+                    </div>
+                    <div class="col-md-9">
+                      <strong>
+                        {% if current_user.is_guest %}
+                          {{ _("guest") }}
+                          <p class="text-muted small"> &nbsp; </p>
+                        {% else %}
+                          {{ current_user.nickname|default(current_user.email) }}
+                        {% endif %}
+                      </strong>
+                      <p class="text-muted small"> {{ current_user.email }} </p>
+                    </div>
+                  </div>
+                </div>
+              </li>
               <li class="divider"></li>
               {% if current_user.is_guest %}
-              <li><a href="{{ url_for('webaccount.login', referer=request.url) }}">
-                <i class="glyphicon glyphicon-lock"></i> {{ _("Login") }}
-              </a></li>
+              <li>
+                <a href="{{ url_for('webaccount.login', referer=request.url) }}">
+                  <i class="glyphicon glyphicon-lock"></i> {{ _("Login") }}
+                </a>
+              </li>
               {% else %}
-              <li><a href="{{ url_for('webaccount.logout') }}">
-                <i class="glyphicon glyphicon-off"></i> {{ _("Logout") }}
-              </a></li>
-              {% endif %}
+              <li>
+                <a href="{{ url_for('webaccount.logout') }}">
+                  <i class="glyphicon glyphicon-log-out"></i> {{ _("Logout") }}
+                </a>
+              </li>
+            {% endif %}
             </ul>
           </li>
         </ul>

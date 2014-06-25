@@ -23,7 +23,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 /* Lastly, apply responsive CSS fixes as necessary */
-@media (max-width: 767px) {
+@media (max-width: @screen-sm-min) {
   #footer {
     margin-left: -20px;
     margin-right: -20px;
@@ -47,10 +47,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	display: inline !important; /* to overwrite bootstrap's important */
 }
 
-@media (max-width: 992px) {
+@media (max-width: @screen-md-min) {
 	.btn-inline-icon-hide-sm span {
 		display: none !important; /* to overwrite important above*/
-	}	
+	}
 }
 
 /* to make inline sub-forms fields stick together */
@@ -111,4 +111,52 @@ body {
 /* Set the fixed height of the footer here */
 #footer {
   height: 150px;
+}
+
+/* Special class on .container surrounding .navbar, used for positioning it into place. */
+
+.navbar-wrapper {
+  position:absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin-top: 20px;
+  .container {
+    padding-left:0;
+    padding-right: 0;
+  }
+  .navbar {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+.navbar-content {
+   width: 300px;
+   padding: 15px;
+   padding-bottom: 0;
+
+   &:before, &:after {
+       display: table;
+       content: "";
+       line-height: 0;
+   }
+}
+
+.navbar-nav.navbar-right:last-child {
+  margin-right: 15px !important;
+}
+
+.navbar-footer {
+  background-color:#DDD;
+}
+
+.navbar-footer-content {
+  padding:15px;
+}
+
+.dropdown-menu {
+  padding: 0px;
+  overflow: hidden;
 }
