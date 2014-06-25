@@ -18,6 +18,7 @@
 
 """Tools for working with legacy application."""
 
+import os
 import warnings
 
 ## Import the remote debugger as a first thing, if allowed
@@ -44,6 +45,35 @@ def setup_app(app):
     app.config.setdefault('USE_X_SENDFILE', USE_X_SENDFILE)
     app.config.setdefault('DEBUG', DEBUG)
     app.debug = app.config['DEBUG']
+
+    ## Legacy directory that must exist
+    for cfg_dir in ['CFG_BATCHUPLOADER_DAEMON_DIR',
+                    'CFG_BIBDOCFILE_FILEDIR',
+                    'CFG_BIBENCODE_DAEMON_DIR_NEWJOBS',
+                    'CFG_BIBENCODE_DAEMON_DIR_OLDJOBS',
+                    'CFG_BIBENCODE_TARGET_DIRECTORY',
+                    'CFG_BINDIR',
+                    'CFG_CACHEDIR',
+                    'CFG_ETCDIR',
+                    'CFG_LOCALEDIR',
+                    'CFG_LOGDIR',
+                    'CFG_PYLIBDIR',
+                    'CFG_TMPDIR',
+                    'CFG_TMPSHAREDDIR',
+                    'CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS',
+                    'CFG_WEBDIR',
+                    'CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR',
+                    'CFG_WEBSUBMIT_COUNTERSDIR',
+                    'CFG_WEBSUBMIT_STORAGEDIR']:
+        path = app.config.get(cfg_dir)
+        if path:
+            try:
+                if not os.path.exists(path):
+                    os.makedirs(path)
+            except OSError:
+                app.logger.exception("Cannot property create directory {path} "
+                                     "for legacy variable {cfg_dir}"
+                                     .format(path=path, cfg_dir=cfg_dir))
 
     class LegacyAppMiddleware(object):
         def __init__(self, app):
