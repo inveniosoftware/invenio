@@ -3461,7 +3461,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             'plots'     : {'label': _('Plots'),            'visible': False, 'enabled': True, 'order': 8},
             'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 9},
             'linkbacks' : {'label': _('Linkbacks'),        'visible': False, 'enabled': True, 'order': 10},
-            'hepdata'   : {'label': _('HepData'),         'visible': False, 'enabled': True, 'order': 11}
+            'data'      : {'label': _('Data'),             'visible': False, 'enabled': True, 'order': 11}
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \
@@ -3539,12 +3539,12 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             if recID in get_collection_reclist("Books & Proceedings"):
                 tabs['holdings']['visible'] = True
                 tabs['holdings']['enabled'] = True
-        # now treating the HEP data -> we have to check if there is HepData
+        # now treating the HEP data -> we have to check if there is Data
         # associated with the record and if so, make the tab visible and enabled
 
-        has_hepdata = record_has_hepdata_attached(recID)
-        tabs['hepdata']['visible'] = has_hepdata
-        tabs['hepdata']['enabled'] = has_hepdata
+        has_data = record_has_data_attached(recID)
+        tabs['data']['visible'] = has_data
+        tabs['data']['enabled'] = has_data
 
     tabs[''] = tabs['metadata']
     del tabs['metadata']
@@ -3553,8 +3553,8 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
 
 
 
-def record_has_hepdata_attached(recID):
-    """returns True or False depending if there is HepData attached or not"""
+def record_has_data_attached(recID):
+    """returns True or False depending if there is Data attached or not"""
     from invenio.search_engine import search_pattern
     return len(search_pattern(p="786__w:%s" % (str(recID)))) > 0
 
