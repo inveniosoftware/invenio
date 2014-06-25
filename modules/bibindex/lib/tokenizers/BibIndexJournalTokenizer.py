@@ -103,6 +103,9 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
             # index all journal subfields separately
             for tag, val in dpubinfo.items():
                 lwords.append(val)
+                if tag.endswith('c') and '-' in val:
+                        val = val.split('-')[0]
+                        lwords.append(val)
 
             # Store journal and volume for searches without a page
             # Store J.Phys.,B50
