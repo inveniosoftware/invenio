@@ -41,7 +41,7 @@ from invenio.legacy.bibrecord import (record_get_field_instances,
 from invenio.utils.shell import run_shell_command
 from invenio.utils.text import translate_latex2unicode
 from invenio.legacy.oaiharvest.dblayer import create_oaiharvest_log_str
-from invenio.legacy.bibcatalog.api import bibcatalog_system
+from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 
 from invenio.legacy.bibsched.bibtask import (write_message,
                                              task_low_level_submission)
