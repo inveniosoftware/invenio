@@ -23,21 +23,18 @@ to run in a standalone mode, but always inside invenio."""
 import os
 import six
 from cgi import escape
-
-from invenio.legacy import bibupload
-
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.legacy.search_engine import get_record
 from invenio.legacy.template import load
 from invenio.ext.legacy.handler import wash_urlargd
 import invenio.modules.access.engine as acce
-from invenio.legacy import dbquery
 from invenio.legacy.bibsched import bibtask
-from invenio.legacy import bibrecord
-from invenio.legacy.bibclassify import config as bconfig
-from invenio.legacy.bibclassify import engine as bibclassify_engine
-from invenio.legacy.bibclassify import ontology_reader as bor
+from invenio.legacy.bibupload.engine import open_marc_file, xml_marc_to_records
+from invenio.legacy import bibrecord, dbquery
+from invenio.legacy.bibclassify.engine import get_tmp_file, build_marc, _parse_marc_code
+from invenio.legacy.bibclassify import (config as bconfig,
+                                        ontology_reader as bor)
 
 log = bconfig.get_logger("bibclassify.webinterface")
 
@@ -45,15 +42,16 @@ template = load('bibclassify')
 
 
 def main_page(req, recid, tabs, ln, template):
-    """Generates the main page for the keyword tab - http://url/record/[recid]/keywords
-    @var req: request object
-    @var recid: int docid
-    @var tabs: list of tab links
-    @var ln: language id
-    @var template: template object
-    @return: nothing, writes using req object
-    """
+    """Generate the main page for the keyword tab
 
+    Url style : http://url/record/[recid]/keywords
+    :param req: request object
+    :param recid: int docid
+    :param tabs: list of tab links
+    :param ln: language id
+    :param template: template object
+    :return: nothing, writes using req object
+    """
     form = req.form
     argd = wash_urlargd(form, {
         'generate': (str, 'no'),
@@ -73,7 +71,7 @@ def main_page(req, recid, tabs, ln, template):
 
     if success:
         # check for the cached file and delete it (we don't need it anymore, data are in the DB)
-        tmp_file = bibclassify_engine.get_tmp_file(recid)
+        tmp_file = get_tmp_file(recid)
         if os.path.exists(tmp_file):
             try:
                 os.remove(tmp_file)
@@ -99,8 +97,7 @@ def main_page(req, recid, tabs, ln, template):
 
 
 def write_keywords_body(keywords, req, recid, argd, marcrec=None):
-    """Writes the bibclassify keyword output into req object"""
-
+    """Write the bibclassify keyword output into req object."""
     if not keywords:
         req.write(template.tmpl_page_no_keywords(req=req, **argd))
         return
@@ -108,7 +105,6 @@ def write_keywords_body(keywords, req, recid, argd, marcrec=None):
     # test if more than half of the entries have weight (0,0) - ie. not weighted
     #if argd['type'] == 'tagcloud' and len(filter(lambda x: (0,0) in x[0], keywords.values())) > (len(keywords) * .5):
     #    argd['type'] = 'list'
-
 
     if argd['type'] == 'list':
         # Display keywords as a list.
@@ -120,7 +116,7 @@ def write_keywords_body(keywords, req, recid, argd, marcrec=None):
         if marcrec:
             marcxml = filter_marcrec(marcrec)
         else:
-            marcxml = bibclassify_engine.build_marc(recid, keywords, {})
+            marcxml = build_marc(recid, keywords, {})
         req.write(template.tmpl_page_xml_output(keywords,
                                                 marcxml,
                                                 req=req, **argd))
@@ -131,16 +127,17 @@ def write_keywords_body(keywords, req, recid, argd, marcrec=None):
 
 def record_get_keywords(record, main_field=bconfig.CFG_MAIN_FIELD,
                         others=bconfig.CFG_OTHER_FIELDS):
-    """Returns a dictionary of keywordToken objects from the marc
-    record. Weight is set to (0,0) if no weight can be found.
+    """Return a dictionary of keywordToken objects from the marc record.
+
+     Weight is set to (0,0) if no weight can be found.
 
     This will load keywords from the field 653 and 695__a (which are the
     old 'DESY' keywords)
 
-    @var record: int or marc record, if int - marc record is loaded
+    :param record: int or marc record, if int - marc record is loaded
         from the database. If you pass record instance, keywords are
         extracted from it
-    @return: tuple (found, keywords, marcxml)
+    :return: tuple (found, keywords, marcxml)
         found - int indicating how many main_field keywords were found
             the other fields are not counted
         keywords - standard dictionary of keywordToken objects
@@ -160,7 +157,7 @@ def record_get_keywords(record, main_field=bconfig.CFG_MAIN_FIELD,
 
     found = 0
     for m_field in main_field:
-        tag, ind1, ind2 = bibclassify_engine._parse_marc_code(m_field)
+        tag, ind1, ind2 = _parse_marc_code(m_field)
         for field in rec.get(tag, []):
             keyword = ''
             weight = 0
@@ -179,7 +176,7 @@ def record_get_keywords(record, main_field=bconfig.CFG_MAIN_FIELD,
 
     if others:
         for field_no in others:
-            tag, ind1, ind2 = bibclassify_engine._parse_marc_code(field_no)
+            tag, ind1, ind2 = _parse_marc_code(field_no)
             type = 'f%s' % field_no
             for field in rec.get(tag, []):
                 keyword = ''
@@ -193,26 +190,28 @@ def record_get_keywords(record, main_field=bconfig.CFG_MAIN_FIELD,
 
 
 def generate_keywords(req, recid, argd):
-    """Extracts keywords from the fulltexts (if found) for the
-    given recid. It first checks whether the keywords are not already
-    stored in the temp file (maybe from the previous run).
-    @var req: req object
-    @var recid: record id
-    @var argd: arguments passed from web
-    @keyword store_keywords: boolean, whether to save records in the file
-    @return: standard dictionary of kw objects or {}
-    """
+    """Extract keywords from the fulltexts.
 
+    Do the extraction on the record witth a recid equal to the parameter.
+    It first checks whether the keywords are not already
+    stored in the temp file (maybe from the previous run).
+
+    :param req: req object.
+    :param recid: record id.
+    :param argd: arguments passed from web.
+    :keyword store_keywords: boolean, whether to save records in the file.
+    :return: standard dictionary of kw objects or {}.
+    """
     ln = argd['ln']
     _ = gettext_set_language(ln)
     keywords = {}
 
     # check the files were not already generated
-    abs_path = bibclassify_engine.get_tmp_file(recid)
+    abs_path = get_tmp_file(recid)
     if os.path.exists(abs_path):
         try:
             # Try to load the data from the tmp file
-            recs = bibupload.xml_marc_to_records(bibupload.open_marc_file(abs_path))
+            recs = xml_marc_to_records(open_marc_file(abs_path))
             return record_get_keywords(recs[0])
         except:
             pass
@@ -237,7 +236,7 @@ def generate_keywords(req, recid, argd):
             else:
                 req.write(template.tmpl_page_generate_keywords(req=req, **argd))
             return 0, keywords, None
-        else: # after user clicked on "generate" button
+        else:  # after user clicked on "generate" button
             if inprogress:
                 req.write(template.tmpl_page_msg(msg='<div class="warningbox">%s</div>' % _(msg)))
             else:
@@ -255,20 +254,21 @@ def generate_keywords(req, recid, argd):
 
 
 def upload_keywords(filename, mode='correct', recids=None):
-    """Stores the extracted keywords in the database
-    @var filename: fullpath to the file with marc record
-    @keyword mode: correct|replace|add|delete
+    """Store the extracted keywords in the database.
+
+    :param filename: fullpath to the file with marc record.
+    :keyword mode: correct|replace|add|delete
         use correct to add fields if they are different
         replace all fields with fields from the file
         add - add (even duplicate) fields
-        delete - delete fields which are inside the file
-    @keyword recids: list of record ids, this arg comes from
+        delete - delete fields which are inside the file.
+    :keyword recids: list of record ids, this arg comes from
         the bibclassify daemon and it is used when the recids
         contains one entry (recid) - ie. one individual document
         was processed. We use it to mark the job title so that
         it is possible to query database if the bibclassify
         was run over that document (in case of collections with
-        many recids, we simply construct a general title)
+        many recids, we simply construct a general title).
     """
     if mode == 'correct':
         m = '-c'
@@ -291,7 +291,8 @@ def upload_keywords(filename, mode='correct', recids=None):
 
 def schedule_extraction(recid, taxonomy):
     bibtask.task_low_level_submission('bibclassify',
-                                      'extract:%s' % recid, '-k', taxonomy, '-i', '%s' % recid)
+                                      'extract:%s' % recid, '-k', taxonomy,
+                                      '-i', '%s' % recid)
 
 
 def _doc_already_submitted(recid):
@@ -335,7 +336,7 @@ def _doc_already_submitted(recid):
 
 def filter_marcrec(marcrec, main_field=bconfig.CFG_MAIN_FIELD,
                    others=bconfig.CFG_OTHER_FIELDS):
-    """Removes the unwanted fields and returns xml"""
+    """Remove the unwanted fields and returns xml."""
     if isinstance(main_field, six.string_types):
         main_field = [main_field]
     if isinstance(others, six.string_types):
@@ -343,7 +344,7 @@ def filter_marcrec(marcrec, main_field=bconfig.CFG_MAIN_FIELD,
     key_map = ['001']
 
     for field in main_field + others:
-        tag, ind1, ind2 = bibclassify_engine._parse_marc_code(field)
+        tag, ind1, ind2 = _parse_marc_code(field)
         key_map.append(tag)
 
     return bibrecord.print_rec(marcrec, 1, tags=key_map)

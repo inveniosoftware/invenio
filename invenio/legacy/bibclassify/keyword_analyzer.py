@@ -16,9 +16,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-from __future__ import print_function
-
 """
 BibClassify keyword analyser.
 
@@ -29,6 +26,8 @@ keywords and author keywords.
 This module is STANDALONE safe
 """
 
+from __future__ import print_function
+
 import re
 import time
 
@@ -37,7 +36,8 @@ import config as bconfig
 log = bconfig.get_logger("bibclassify.keyword_analyzer")
 
 _MAXIMUM_SEPARATOR_LENGTH = max([len(_separator)
-                                 for _separator in bconfig.CFG_BIBCLASSIFY_VALID_SEPARATORS])
+                                 for _separator in
+                                 bconfig.CFG_BIBCLASSIFY_VALID_SEPARATORS])
 
 
 # XXX - rebuild this whole thing
@@ -87,7 +87,8 @@ def get_single_keywords(skw_db, fulltext):
         single_keywords[single_keyword][0].append(span)
 
     log.info("Matching single keywords... %d keywords found "
-             "in %.1f sec." % (len(single_keywords), time.clock() - timer_start),
+             "in %.1f sec." % (
+        len(single_keywords), time.clock() - timer_start),
     )
 
     return single_keywords
@@ -197,7 +198,9 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans):
     # Remove the composite keywords that are fully present in
     # longer composite keywords
     _ckw_base = filter(lambda x: len(x.compositeof) == 2, ckw_out.keys())
-    _ckw_extended = sorted(filter(lambda x: len(x.compositeof) > 2, ckw_out.keys()), key=lambda x: len(x.compositeof))
+    _ckw_extended = sorted(
+        filter(lambda x: len(x.compositeof) > 2, ckw_out.keys()),
+        key=lambda x: len(x.compositeof))
     if _ckw_extended:
         max_len = len(_ckw_extended[-1].compositeof)
         candidates = []
@@ -227,7 +230,8 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans):
                     for pos2 in match2[0]:
                         if _span_overlapping(pos1, pos2):
                             del positions1[positions1.index(pos1)]
-                            if len(positions1) == 0: # if we removed all the matches
+                            if len(
+                                    positions1) == 0: # if we removed all the matches
                                 del ckw_out[kw1]  # also delete the keyword
                             break
 
@@ -257,7 +261,8 @@ def get_author_keywords(skw_db, ckw_db, fulltext):
         kw_string = parts[0]
 
     # We separate the keywords.
-    author_keywords = bconfig.CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION.split(kw_string)
+    author_keywords = bconfig.CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION.split(
+        kw_string)
 
     log.info("Matching author keywords... %d keywords found in "
              "%.1f sec." % (len(author_keywords), time.clock() - timer_start))
@@ -301,7 +306,8 @@ def _get_ckw_span(fulltext, spans):
 
     if dist == 0:
         # Two keywords are adjacent. We have a match.
-        return (min(words[0] + words[1]), max(words[0] + words[1])) #FIXME: huh, this is a bug?! a sum???
+        return (min(words[0] + words[1]),
+                max(words[0] + words[1])) #FIXME: huh, this is a bug?! a sum???
     elif dist <= _MAXIMUM_SEPARATOR_LENGTH:
         separator = fulltext[words[0][1]:words[1][0] + 1]
         # Check the separator.
@@ -315,8 +321,8 @@ def _get_ckw_span(fulltext, spans):
 def _contains_span(span0, span1):
     """Return true if span0 contains span1, False otherwise."""
     if (span0 == span1 or
-        span0[0] > span1[0] or
-        span0[1] < span1[1]):
+                span0[0] > span1[0] or
+                span0[1] < span1[1]):
         return False
     return True
 
