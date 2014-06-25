@@ -17,13 +17,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Fields and models configuration loader.
+"""Fields and models configuration loader.
 
 This module uses `pyparsing <http://pyparsing.wikispaces.com/>` to read
 from thedifferent configuration files the field and model definitions.
 
-Extensions to both parsers could be added inside jsonext.parsers
+Default extensions to both parsers could be added inside
+:mod:`~.jsonext.parsers`
 """
 import os
 import six
@@ -52,8 +52,7 @@ PYTHON_ALLOWED_EXPR = (DICT_DEF ^ LIST_DEF ^ DICT_ACCESS ^
 
 
 def indentedBlock(expr, indent_stack, indent=True):
-    """
-    Define space-delimited indentation blocks.
+    """Define space-delimited indentation blocks.
 
     Helper method for defining space-delimited indentation blocks, such as
     those used to define block statements in Python source code.
@@ -61,7 +60,6 @@ def indentedBlock(expr, indent_stack, indent=True):
     There is also a version in pyparsing but doesn't seem to be working fine
     with JSONAlchemy cfg files.
     """
-    #TODO: update this to use indentStact from new versions of pyparsing
     def check_sub_indent(string, location, tokens):
         """Check the indentation."""
         cur_col = col(location, string)
@@ -91,17 +89,32 @@ def indentedBlock(expr, indent_stack, indent=True):
 
 
 def _create_field_parser():
-    """
-    Create a parser that can handle field definitions.
+    """Create a parser that can handle field definitions.
 
     BFN like grammar::
 
-        TODO
+        rule       ::= [pid | extend | override]
+                       json_id ["," aliases]":"
+                           body
+        json_id    ::= (letter|"_") (letter|digit|_)*
+        aliases    ::= json_id ["," aliases]
 
+        pid        ::= @persitent_identifier( level )
+        extend     ::= @extend
+        override   ::= @override
+
+        body       ::=(creator* | derived | calculated) (extensions)*
+
+        creator    ::= [decorators] format "," tag "," expr
+        derived    ::= [decorators] expr
+        calculated ::= [decorators] expr
+
+    To check the syntactics of the parser extensions or decorators please go to
+    :mod:`~.jsonext.parsers`
     """
     indent_stack = [1]
 
-    #Independent/special decorators
+    # Independent/special decorators
     persistent_identifier = (
         Keyword('@persistent_identifier').suppress() + nestedExpr()
     ).setResultsName('pid').setParseAction(lambda toks: int(toks[0][0]))
@@ -430,7 +443,7 @@ class FieldParser(object):
         """
         json_id = rule.field['json_id']
 
-        #TODO: check if pyparsing can handle this!
+        # TODO: check if pyparsing can handle this!
         all_type_def = []
         if rule.creator_def:
             all_type_def.extend(rule.creator_def.asList())
@@ -498,20 +511,23 @@ class FieldParser(object):
         """Extract from the rule all the possible decorators."""
         decorators = {'before': {}, 'on': {}, 'after': {}}
 
-        for name, parser in six.iteritems(self.__class__.decorator_before_extensions()):
+        for name, parser in six.iteritems(
+                self.__class__.decorator_before_extensions()):
             if name in field_def['decorators']:
                 decorators['before'][name] = \
                     parser.create_element(rule, field_def,
                                           field_def['decorators'][name],
                                           self.__namespace)
-        for name, parser in six.iteritems(self.__class__.decorator_on_extensions()):
+        for name, parser in six.iteritems(
+                self.__class__.decorator_on_extensions()):
             if name in field_def['decorators']:
                 decorators['on'][name] = \
                     parser.create_element(rule, field_def,
                                           field_def['decorators'][name],
                                           self.__namespace)
 
-        for name, parser in six.iteritems(self.__class__.decorator_after_extensions()):
+        for name, parser in six.iteritems(
+                self.__class__.decorator_after_extensions()):
             if name in field_def['decorators']:
                 decorators['after'][name] = \
                     parser.create_element(rule, field_def,
@@ -707,11 +723,13 @@ class ModelParser(object):
                     self.__namespace)[inherit_from]
                 fields.update(resolve_field_inheritance(base_model))
             if fields:
-                inverted_fields = dict((v, k) for k, v in six.iteritems(fields))
+                inverted_fields = dict((v, k)
+                                       for k, v in six.iteritems(fields))
                 inverted_model_fields = dict((v, k) for k, v in six.iteritems(
                     model_definition['fields']))
                 inverted_fields.update(inverted_model_fields)
-                fields = dict((v, k) for k, v in six.iteritems(inverted_fields))
+                fields = dict((v, k)
+                              for k, v in six.iteritems(inverted_fields))
             else:
                 fields.update(model_definition['fields'])
             return fields
@@ -783,8 +801,8 @@ def get_producer_rules(field, code, namespace, model=['__default__']):  # pylint
 
     """
     try:
-        return FieldParser.field_definition_model_based(field, model, namespace)\
-            .get('producer', {}).get(code, [])
+        return FieldParser.field_definition_model_based(
+            field, model, namespace).get('producer', {}).get(code, [])
     except AttributeError:
         raise KeyError(field)
 
