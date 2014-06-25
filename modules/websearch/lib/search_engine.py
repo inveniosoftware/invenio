@@ -4942,8 +4942,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     # the record is included in the collections to which bibauthorid is limited.
     if user_info:
         display_claim_this_paper = (user_info.get("precached_viewclaimlink", False) and
+                                (not BIBAUTHORID_LIMIT_TO_COLLECTIONS or
                                 recID in intbitset.union(*[get_collection_reclist(x)
-                                for x in BIBAUTHORID_LIMIT_TO_COLLECTIONS]))
+                                for x in BIBAUTHORID_LIMIT_TO_COLLECTIONS])))
     else:
         display_claim_this_paper = False
 
