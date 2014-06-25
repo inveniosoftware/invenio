@@ -908,7 +908,7 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/oairepositoryupdater 8" % CFG_PREFIX,
                 "%s/bin/bibupload 9" % CFG_PREFIX,
                 "%s/bin/bibauthorid -u admin --update-personid" % CFG_PREFIX,
-                "%s/bin/bibauthorid 10"]:
+                "%s/bin/bibauthorid 10" % CFG_PREFIX]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
