@@ -16,7 +16,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
 """
 BibClassify daemon.
 
@@ -139,12 +138,14 @@ def _get_recids_foreach_ontology(recids=None, collections=None, taxonomy=None):
         records = get_collection_reclist(collection)
         if records:
             if not date_last_run:
-                bibtask.write_message("INFO: Collection %s has not been previously "
-                                      "analyzed." % collection, stream=sys.stderr, verbose=3)
+                bibtask.write_message(
+                    "INFO: Collection %s has not been previously "
+                    "analyzed." % collection, stream=sys.stderr, verbose=3)
                 modified_records = intbitset(run_sql("SELECT id FROM bibrec"))
             elif bibtask.task_get_option('force'):
-                bibtask.write_message("INFO: Analysis is forced for collection %s." %
-                                      collection, stream=sys.stderr, verbose=3)
+                bibtask.write_message(
+                    "INFO: Analysis is forced for collection %s." %
+                    collection, stream=sys.stderr, verbose=3)
                 modified_records = intbitset(run_sql("SELECT id FROM bibrec"))
             else:
                 modified_records = bibtask.get_modified_records_since(date_last_run)
@@ -157,14 +158,16 @@ def _get_recids_foreach_ontology(recids=None, collections=None, taxonomy=None):
                     'recIDs': records
                 })
             else:
-                bibtask.write_message("WARNING: All records from collection '%s' have "
-                                      "already been analyzed for keywords with ontology '%s' "
-                                      "on %s." % (collection, ontology, date_last_run),
-                                      stream=sys.stderr, verbose=2)
+                bibtask.write_message(
+                    "WARNING: All records from collection '%s' have "
+                    "already been analyzed for keywords with ontology '%s' "
+                    "on %s." % (collection, ontology, date_last_run),
+                    stream=sys.stderr, verbose=2)
         else:
-            bibtask.write_message("ERROR: Collection '%s' doesn't contain any record. "
-                                  "Cannot analyse keywords." % (collection,),
-                                  stream=sys.stderr, verbose=0)
+            bibtask.write_message(
+                "ERROR: Collection '%s' doesn't contain any record. "
+                "Cannot analyse keywords." % (collection,),
+                stream=sys.stderr, verbose=0)
 
     return rec_onts
 
@@ -191,11 +194,13 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
             value = int(value)
         except ValueError:
             bibtask.write_message("The value specified for --recid must be a "
-                                  "valid integer, not '%s'." % value, stream=sys.stderr,
+                                  "valid integer, not '%s'." % value,
+                                  stream=sys.stderr,
                                   verbose=0)
         if not _recid_exists(value):
-            bibtask.write_message("ERROR: '%s' is not a valid record ID." % value,
-                                  stream=sys.stderr, verbose=0)
+            bibtask.write_message(
+                "ERROR: '%s' is not a valid record ID." % value,
+                stream=sys.stderr, verbose=0)
             return False
         recids = bibtask.task_get_option('recids')
         if recids is None:
@@ -206,8 +211,9 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
     # Collection option
     elif key in ("-c", "--collection"):
         if not _collection_exists(value):
-            bibtask.write_message("ERROR: '%s' is not a valid collection." % value,
-                                  stream=sys.stderr, verbose=0)
+            bibtask.write_message(
+                "ERROR: '%s' is not a valid collection." % value,
+                stream=sys.stderr, verbose=0)
             return False
         collections = bibtask.task_get_option("collections")
         collections = collections or []
@@ -217,8 +223,9 @@ def _task_submit_elaborate_specific_parameter(key, value, opts, args):
     # Taxonomy option
     elif key in ("-k", "--taxonomy"):
         if not _ontology_exists(value):
-            bibtask.write_message("ERROR: '%s' is not a valid taxonomy name." % value,
-                                  stream=sys.stderr, verbose=0)
+            bibtask.write_message(
+                "ERROR: '%s' is not a valid taxonomy name." % value,
+                stream=sys.stderr, verbose=0)
             return False
         bibtask.task_set_option("taxonomy", value)
     elif key in ("-f", "--force"):
@@ -256,7 +263,8 @@ def _task_run_core():
     if not onto_recids:
         # Nothing to do.
         if automated_daemon_mode_p:
-            _update_date_of_last_run(bibtask.task_get_task_param('task_starting_time'))
+            _update_date_of_last_run(
+                bibtask.task_get_task_param('task_starting_time'))
         return 1
 
     # We will write to a temporary file as we go, because we might be processing
@@ -279,17 +287,21 @@ def _task_run_core():
         bibtask.task_sleep_now_if_required(can_stop_too=False)
 
         if onto_rec['collection'] is not None:
-            bibtask.write_message('INFO: Applying taxonomy %s to collection %s (%s '
-                                  'records)' % (onto_rec['ontology'], onto_rec['collection'],
-                                                len(onto_rec['recIDs'])), stream=sys.stderr, verbose=3)
+            bibtask.write_message(
+                'INFO: Applying taxonomy %s to collection %s (%s '
+                'records)' % (onto_rec['ontology'], onto_rec['collection'],
+                              len(onto_rec['recIDs'])), stream=sys.stderr,
+                verbose=3)
         else:
             bibtask.write_message('INFO: Applying taxonomy %s to recIDs %s. ' %
                                   (onto_rec['ontology'],
-                                   ', '.join([str(recid) for recid in onto_rec['recIDs']])),
+                                   ', '.join([str(recid) for recid in
+                                              onto_rec['recIDs']])),
                                   stream=sys.stderr, verbose=3)
         if onto_rec['recIDs']:
             xml = _analyze_documents(onto_rec['recIDs'],
-                                     onto_rec['ontology'], onto_rec['collection'])
+                                     onto_rec['ontology'],
+                                     onto_rec['collection'])
             if len(xml) > 5:
                 fo.write(xml)
                 rec_added = True
@@ -302,17 +314,20 @@ def _task_run_core():
         if bconfig.CFG_DB_SAVE_KW:
             webinterface.upload_keywords(abs_path)
         else:
-            bibtask.write_message("INFO: CFG_DB_SAVE_KW is false, we don't save results",
-                                  stream=sys.stderr, verbose=0)
+            bibtask.write_message(
+                "INFO: CFG_DB_SAVE_KW is false, we don't save results",
+                stream=sys.stderr, verbose=0)
     else:
-        bibtask.write_message("WARNING: No keywords found, recids: %s" % onto_recids,
-                              stream=sys.stderr, verbose=0)
+        bibtask.write_message(
+            "WARNING: No keywords found, recids: %s" % onto_recids,
+            stream=sys.stderr, verbose=0)
         os.remove(abs_path)
 
     # Update the date of last run in the clsMETHOD table, but only if
     # we were running in an automated mode.
     if automated_daemon_mode_p:
-        _update_date_of_last_run(bibtask.task_get_task_param('task_starting_time'))
+        _update_date_of_last_run(
+            bibtask.task_get_task_param('task_starting_time'))
     return 1
 
 
@@ -330,14 +345,16 @@ def _analyze_documents(records, taxonomy_name, collection,
 
     if not records:
         # No records could be found.
-        bibtask.write_message("WARNING: No records were found in collection %s." %
-                              collection, stream=sys.stderr, verbose=2)
+        bibtask.write_message(
+            "WARNING: No records were found in collection %s." %
+            collection, stream=sys.stderr, verbose=2)
         return False
 
     # Process records:
     output = []
     for record in records:
-        bibdocfiles = BibRecDocs(record).list_latest_files()  # TODO: why this doesn't call list_all_files() ?
+        bibdocfiles = BibRecDocs(
+            record).list_latest_files()  # TODO: why this doesn't call list_all_files() ?
         keywords = {}
         akws = {}
         acro = {}
@@ -346,22 +363,28 @@ def _analyze_documents(records, taxonomy_name, collection,
         for doc in bibdocfiles:
             # Get the keywords for all PDF documents contained in the record.
             if text_extractor.is_pdf(doc.get_full_path()):
-                bibtask.write_message('INFO: Generating keywords for record %d.' %
-                                      record, stream=sys.stderr, verbose=3)
+                bibtask.write_message(
+                    'INFO: Generating keywords for record %d.' %
+                    record, stream=sys.stderr, verbose=3)
                 fulltext = doc.get_path()
 
                 single_keywords, composite_keywords, author_keywords, acronyms = \
                     engine.get_keywords_from_local_file(fulltext,
-                                                        taxonomy_name, with_author_keywords=True, output_mode="raw",
-                                                        output_limit=output_limit, match_mode='partial')
+                                                        taxonomy_name,
+                                                        with_author_keywords=True,
+                                                        output_mode="raw",
+                                                        output_limit=output_limit,
+                                                        match_mode='partial')
             else:
                 bibtask.write_message('WARNING: BibClassify does not know how to process \
                     doc: %s (type: %s) -- ignoring it.' %
-                                      (doc.fullpath, doc.doctype), stream=sys.stderr, verbose=3)
+                                      (doc.fullpath, doc.doctype),
+                                      stream=sys.stderr, verbose=3)
 
             if single_keywords or composite_keywords:
                 cleaned_single = engine.clean_before_output(single_keywords)
-                cleaned_composite = engine.clean_before_output(composite_keywords)
+                cleaned_composite = engine.clean_before_output(
+                    composite_keywords)
                 # merge the groups into one
                 keywords.update(cleaned_single)
                 keywords.update(cleaned_composite)
@@ -380,7 +403,8 @@ def _analyze_documents(records, taxonomy_name, collection,
 
         _INDEX += 1
 
-        bibtask.task_update_progress('Done %d out of %d.' % (_INDEX, _RECIDS_NUMBER))
+        bibtask.task_update_progress(
+            'Done %d out of %d.' % (_INDEX, _RECIDS_NUMBER))
         bibtask.task_sleep_now_if_required(can_stop_too=False)
 
     return '\n'.join(output)
@@ -396,9 +420,10 @@ def _task_submit_check_options():
     # is also specified.
     if (recids is not None or collections is not None) and \
                     taxonomy is None:
-        bibtask.write_message("ERROR: When specifying a record ID or a collection, "
-                              "you have to precise which\ntaxonomy to use.", stream=sys.stderr,
-                              verbose=0)
+        bibtask.write_message(
+            "ERROR: When specifying a record ID or a collection, "
+            "you have to precise which\ntaxonomy to use.", stream=sys.stderr,
+            verbose=0)
         return False
 
     return True
