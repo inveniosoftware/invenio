@@ -166,7 +166,7 @@ they are not in the environment ``$PATH`` already.
 .. code-block:: console
 
     # Global installation
-    $ sudo su -c "npm install -g less clean-css requirejs uglifyjs"
+    $ sudo su -c "npm install -g less clean-css requirejs uglify-js"
 
     or
     # Local installation
