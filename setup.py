@@ -57,7 +57,7 @@ install_requires = [
     "Flask-Menu==0.1",
     "Flask-OAuthlib==0.4.3",
     "Flask-Principal==0.4.0",
-    "Flask-Registry==0.1",
+    "Flask-Registry>0.1",
     "Flask-RESTful==0.2.12",
     "Flask-Script>=2.0.5",
     "Flask-SQLAlchemy>1.9",
