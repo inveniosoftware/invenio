@@ -17,50 +17,40 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{%- from "_macros.html" import flashed_messages, js_bundle, css_bundle with context -%}
+{%- from "_macros.html" import flashed_messages, css_bundle, js_bundle with context -%}
+
+{# List here the required bundles. The ordering will be made using their names.
+ # New bundles should be defined in the bundles.py file of each module.
+ #}
+{%- block global_bundles -%}
+  {%- bundles "10-jquery.js",
+              "90-invenio.js",
+              "50-invenio.css"
+  -%}
+  {# Require.js and LessCSS libraries for both debug and production mode.
+   #}
+  {%- if config.get("ASSETS_DEBUG") -%}
+    {%- if not config.get("LESS_RUN_IN_DEBUG") -%}
+      {% bundle "00-less.js" %}
+    {%- endif -%}
+    {%- if not config.get("REQUIREJS_RUN_IN_DEBUG") -%}
+      {% bundle "00-require.js" %}
+    {%- endif -%}
+  {%- else -%}
+  {%- if not config.get("ASSETS_DEBUG") or config.get("REQUIREJS_RUN_IN_DEBUG") -%}
+    {%- bundle "00-require.almond.js" -%}
+  {%- endif -%}
+{%- endblock -%}
 
 {# Global CSS #}
-{%- block global_css %}
-  {%- css url_for('static', filename="css/token-input.css"), '00-invenio' -%}
-  {%- css url_for('static', filename="css/token-input-facebook.css"), '00-invenio' -%}
-  {%- css url_for('base.static', filename='less/base.less'), '00-invenio', 'less,cleancss' -%}
-  {%- css url_for('webtag.static', filename='css/tags/popover.css'), '00-invenio' -%}
-  {%- if config.CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' %}
-    {%- css url_for('static', filename='css/'+config.CFG_WEBSTYLE_TEMPLATE_SKIN+'.css'), '00-invenio' -%}
-  {%- endif %}
+{%- block global_css -%}
+  {# To be removed #}
 {%- endblock global_css -%}
 {# Global Javascript files #}
 {%- block global_javascript -%}
-  {# jQuery bundle with additional modules. #}
-  {%- js url_for('static', filename='js/jquery.js'), '01-jquery', 'uglifyjs' -%}
-  {%- js url_for('static', filename='js/jquery.jeditable.mini.js'), '01-jquery' -%}
-  {%- js url_for('static', filename='js/jquery.tokeninput.js'), '01-jquery' -%}
-  {%- js url_for('static', filename='js/bootstrap.js'), '01-jquery' -%}
-  {%- js url_for('static', filename='js/hogan.js'), '01-jquery' -%}
-  {%- js url_for('base.static', filename='js/translate.js'), '01-jquery' -%}
-  {# invenio related code. #}
-  {%- js url_for('base.static', filename='js/invenio.js'), '90-invenio', 'requirejs' -%}
-  {%- js url_for('base.static', filename='js/legacy.js'), '91-invenio-legacy', 'requirejs' -%}
+  {# To be removed #}
+{%- endblock global_javascript -%}
 
-  {%- if config.get('ASSETS_DEBUG') -%}
-    {%- if not config.get("LESS_RUN_IN_DEBUG") -%}
-      {# less.js will compile less templates on the fly. #}
-      {%- js url_for('static', filename='js/less.js'), '00-less' -%}
-    {%- endif -%}
-    {%- if not config.get("REQUIREJS_RUN_IN_DEBUG") -%}
-      {# require.js and settings are defining how are loaded the modules.
-       # build.js is used during the compilation time.
-       #}
-      {%- js url_for('static', filename='js/require.js'), '00-requirejs' -%}
-    {%- endif -%}
-  {%- endif -%}
-  {%- if not config.get('ASSETS_DEBUG') or config.get("REQUIREJS_RUN_IN_DEBUG") -%}
-    {# Almond is a lighter require.js module for compiled files. #}
-    {%- js url_for('static', filename='js/almond.js'), '00-requirejs' -%}
-  {%- endif -%}
-  {%- js url_for('static', filename='js/settings.js'), '00-requirejs', 'uglifyjs' -%}
-
-{%- endblock global_javascript %}
 {%- block page -%}
 {%- if not no_pageheader -%}
 {%- block page_top -%}
@@ -104,9 +94,16 @@
   {%- endfor -%}
   {%- endblock head_apple_icons -%}
   {%- endblock head_links %}
+
+  {%- block header %}{{ metaheaderadd|safe }}{%- block metaheader %}{%- endblock metaheader -%}{%- endblock header -%}
+
+  {%- for bundle in get_bundle('css') -%}
+    {%- assets bundle %}
+      <link rel="{{ EXTRA.rel }}" type="text/css" href="{{ ASSET_URL }}"/>
+    {%- endassets %}
+  {%- endfor -%}
   {{ css_bundle() }}
   {%- block _top_assets %}{% endblock _top_assets %}
-  {%- block header %}{{ metaheaderadd|safe }}{%- block metaheader %}{%- endblock metaheader -%}{%- endblock header -%}
   {%- block css %}{% endblock css %}
   {%- endblock head %}
 </head>
@@ -161,7 +158,12 @@
 </footer>
 {%- endblock page_footer %}
 {%- block _bottom_assets %}
-{{ js_bundle() }}
+  {%- for bundle in get_bundle('js') -%}
+    {%- assets bundle %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {%- endassets %}
+  {%- endfor -%}
+  {{ js_bundle() }}
 {%- endblock _bottom_assets %}
 {%- block javascript %}{% endblock javascript %}
 {%- block body_end %}{% endblock body_end %}

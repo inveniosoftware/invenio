@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Invenio signal utilities
+Invenio signal utilities.
 
 This module defines Invenio-wide signals
 """
@@ -76,9 +76,14 @@ pre_command = _signals.signal('pre-command')
 """
 This signal is sent right before any inveniomanage command is executed.
 
-Example subscriber::
+Note that any positional arguments (sometimes called as ``*args``), will be
+received as a keyword argument called ``args``.
 
-    def backup_database(sender, *args, **kwargs):
+Sample subscriber:
+
+.. code-block:: python
+
+    def backup_database(sender, **kwargs):
         pass
 
     from invenio.base.signals import pre_command

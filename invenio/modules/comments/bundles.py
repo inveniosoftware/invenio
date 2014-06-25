@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,3 +16,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""Comments bundles."""
+
+
+from invenio.ext.assets import Bundle
+
+
+js = Bundle(
+    'js/comments/comments.js',
+    'js/comments/collapse.js',
+    output='gen/comments.js',
+    name='10-comments.js',
+)
+
+css = Bundle(
+    'css/comments/comments.css',
+    output='gen/comments.css',
+    name='10-comments.css'
+)

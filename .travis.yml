@@ -54,6 +54,7 @@ install:
   - "bower install"
   - "travis_retry grunt"
   - "inveniomanage collect"
+  - "inveniomanage assets build"
 
 before_script:
   - "inveniomanage apache create-config"

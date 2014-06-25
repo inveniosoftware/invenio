@@ -16,16 +16,40 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Additional extensions and functions for the `flask.ext.assets` module."""
+"""
+Additional extensions and functions for the `flask.ext.assets` module.
+
+.. py:data:: command
+
+    Flask-Script command that deals with assets.
+
+    Documentation is on: `webassets` :ref:`webassets:script-commands`
+
+    .. code-block:: python
+
+        # How to install it
+        from flask.ext.script import Manager
+        manager = Manager()
+        manager.add_command("assets", command)
+
+.. py:data:: registry
+
+    Flask-Registry registry that handles the bundles. Use it directly as it's
+    lazy loaded.
+"""
 
 import six
 from webassets.bundle import is_url
 from flask import current_app
-from flask.ext.assets import Environment, Bundle, FlaskResolver
-from .extensions import CollectionExtension
+from flask.ext.assets import Environment, FlaskResolver
+
+from .extensions import BundleExtension, CollectionExtension
+from .wrappers import Bundle, Command
 
 
-__all__ = ('CollectionExtension', 'setup_app')
+__all__ = ("setup_app", "command", "registry", "Bundle")
+
+command = Command()
 
 
 class InvenioResolver(FlaskResolver):
@@ -67,13 +91,14 @@ class InvenioResolver(FlaskResolver):
         .. seealso:: :py:function:`webassets.env.Resolver:search_for_source`
         """
         try:
-            abspath = super(InvenioResolver, self).search_env_directory(ctx, item)
-        except:
+            abspath = super(InvenioResolver, self).search_env_directory(ctx,
+                                                                        item)
+        except:  # FIXME do not catch all!
             # If a file is missing in production (non-debug mode), we want
             # to not break and will use /dev/null instead. The exception
             # is caught and logged.
             if not current_app.debug:
-                error = "Missing asset file: {0}".format(item)
+                error = "Error loading asset file: {0}".format(item)
                 current_app.logger.exception(error)
                 abspath = "/dev/null"
             else:
@@ -86,32 +111,15 @@ Environment.resolver_class = InvenioResolver
 
 def setup_app(app):
     """Initialize Assets extension."""
-    assets = Environment(app)
-    assets.url = app.static_url_path + "/"
-    assets.directory = app.static_folder
+    env = Environment(app)
+    env.url = app.static_url_path + "/"
+    env.directory = app.static_folder
     # The filters less and requirejs don't have the same behaviour by default.
     # Respecting that.
     app.config.setdefault("LESS_RUN_IN_DEBUG", True)
     app.config.setdefault("REQUIREJS_RUN_IN_DEBUG", False)
 
-    commands = (("LESS_BIN", "lessc"),
-                ("CLEANCSS_BIN", "cleancss"),
-                ("REQUIREJS_BIN", "r.js"),
-                ("UGLIFYJS_BIN", "uglifyjs"))
-    import subprocess
-    for key, cmd in commands:
-        try:
-            command = app.config.get(key, cmd)
-            subprocess.call([command, "--version"],
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
-        except OSError:
-            app.logger.error("Executable `{0}` was not found. You can specify "
-                             "it via {1}."
-                             .format(cmd, key))
-            app.config["ASSETS_DEBUG"] = True
-            assets.debug = True
-
+    # FIXME to be removed
     def _jinja2_new_bundle(tag, collection, name=None, filters=None):
         if len(collection):
             name = "invenio" if name is None else name
@@ -122,13 +130,13 @@ def setup_app(app):
                 "extra": {"rel": "stylesheet"}
             }
 
-            if tag is "css" and assets.debug and \
+            if tag is "css" and env.debug and \
                     not app.config.get("LESS_RUN_IN_DEBUG"):
                 kwargs["extra"]["rel"] = "stylesheet/less"
                 kwargs["filters"] = None
 
             if tag is "js" and filters and "requirejs" in filters:
-                if assets.debug and \
+                if env.debug and \
                         not app.config.get("REQUIREJS_RUN_IN_DEBUG"):
                     # removing the filters to avoid the default "merge" filter.
                     kwargs["filters"] = None
@@ -141,6 +149,9 @@ def setup_app(app):
 
     app.jinja_env.extend(new_bundle=_jinja2_new_bundle,
                          default_bundle_name='90-invenio')
+    app.jinja_env.add_extension(BundleExtension)
+    app.context_processor(BundleExtension.inject)
+    # FIXME: remove me
     app.jinja_env.add_extension(CollectionExtension)
 
     return app

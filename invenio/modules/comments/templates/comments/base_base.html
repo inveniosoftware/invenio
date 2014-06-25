@@ -21,14 +21,12 @@
   {%- extends "records/base.html" -%}
 {%- endif -%}
 
-{%- css url_for('comments.static', filename='css/comments/comments.css'), '10-comments' -%}
+{% bundles "10-comments.js", "10-comments.css" %}
+{# FIXME: This hack should be done from the annotations module itself.
 {%- if config.ANNOTATIONS_NOTES_ENABLED -%}
-  {%- css url_for('annotations.static', filename='css/annotations/annotations.css'), '10-comments' -%}
+  {% css url_for('annotations.static', filename='css/annotations/annotations.css', '10-comments.css') %}
 {%- endif -%}
-
-{%- js url_for('comments.static', filename='js/comments/comments.js'), '10-comments' -%}
-{%- js url_for('comments.static', filename='js/comments/collapse.js'), '10-comments' -%}
-
+#}
 
 {%- macro controls() -%}
   <div class="pull-right">

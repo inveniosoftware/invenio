@@ -308,6 +308,7 @@ intersphinx_mapping = {
     'flaskassets': ('http://flask-assets.readthedocs.org/en/latest/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/latest/', None),
     'jinja': ('http://jinja.pocoo.org/docs/', None),
+    'webassets': ('http://webassets.readthedocs.org/en/latest/', None)
     # FIXME not readable due to ValueError: unknown or unsupported inv version
     #'flasklogin': ('http://flask-login.readthedocs.org/en/latest/')
 }

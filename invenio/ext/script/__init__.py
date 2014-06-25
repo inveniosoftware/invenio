@@ -132,10 +132,10 @@ class Manager(FlaskExtManager):
         f = command.run
 
         @wraps(f)
-        def wrapper(*args, **kwds):
-            pre_command.send(f, *args, **kwds)
-            result = f(*args, **kwds)
-            post_command.send(f, *args, **kwds)
+        def wrapper(*args, **kwargs):
+            pre_command.send(f, args=args, **kwargs)
+            result = f(*args, **kwargs)
+            post_command.send(f, args=args, **kwargs)
             return result
         command.run = wrapper
         return super(Manager, self).add_command(name, command)
@@ -165,5 +165,9 @@ def register_manager(manager):
     host = parsed_url.hostname or '127.0.0.1'
     manager.add_command("runserver", Server(host=host, port=port))
 
+    # FIXME separation of concerns is violated here.
     from invenio.ext.collect import collect
     collect.init_script(manager)
+
+    from invenio.ext.assets import command
+    manager.add_command("assets", command)

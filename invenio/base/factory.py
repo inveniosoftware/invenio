@@ -18,6 +18,8 @@
 
 """Implements the application factory."""
 
+from __future__ import absolute_import
+
 import os
 import sys
 import urllib
@@ -216,11 +218,16 @@ def create_app(instance_path=None, **kwargs_config):
     # configuration, extensions and Invenio packages
     Registry(app=app)
 
-    # Register packages listed in invenio.cfg
-    app.extensions['registry']['packages'] = PackageRegistry(app)
+    app.extensions['registry'].update(
+        # Register packages listed in invenio.cfg
+        packages=PackageRegistry(app))
 
-    # Register extensions listed in invenio.cfg
-    app.extensions['registry']['extensions'] = ExtensionRegistry(app)
+    app.extensions['registry'].update(
+        # Register extensions listed in invenio.cfg
+        extensions=ExtensionRegistry(app),
+        # Register blueprints
+        blueprints=BlueprintAutoDiscoveryRegistry(app=app),
+    )
 
     # Extend application config with configuration from packages (app config
     # takes precedence)
@@ -229,15 +236,20 @@ def create_app(instance_path=None, **kwargs_config):
     # Legacy conf cleanup
     cleanup_legacy_configuration(app)
 
-    # ======================
-    # Blueprint registration
-    # ======================
-    app.extensions['registry']['blueprints'] = BlueprintAutoDiscoveryRegistry(
-        app=app
-    )
-
     # Register base blueprint for the static files
-    app.register_blueprint(Blueprint("base", __name__, static_folder="static"))
+    bp = Blueprint("base", __name__, static_folder="static")
+    app.register_blueprint(bp)
+    app.extensions['registry']['blueprints'].register(bp)
+    # Register the base bundles
+    from . import bundles
+    from ..ext.assets import Bundle, registry
+    with app.app_context():
+        variables = getattr(bundles, "__all__", dir(bundles))
+        for var in variables:
+            if not var.startswith('_'):
+                bundle = getattr(bundles, var)
+                if isinstance(bundle, Bundle):
+                    registry.bundles.register((__name__, bundle))
 
     register_legacy_blueprints(app)
 
