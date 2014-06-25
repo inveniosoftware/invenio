@@ -25,8 +25,6 @@ the affiliations for each author appearing in a paper. This is used later in:
 * Rabbit to use the affiliation to assign papers in a fast way.
 """
 
-import json
-
 from itertools import islice
 from datetime import datetime
 from itertools import chain
@@ -46,14 +44,25 @@ class RecomputeException(Exception):
     pass
 
 def recompute_affiliation(pid):
+    pid_100_rows = run_sql("""SELECT bibrec, bib10x.value as name
+                               FROM aidPERSONIDPAPERS INNER JOIN bib10x
+                               ON aidPERSONIDPAPERS.bibref_value = bib10x.id
+                               WHERE personid = %s and bibref_table = '100'""", [pid])
+    pid_700_rows = run_sql("""SELECT bibrec, bib70x.value as name
+                               FROM aidPERSONIDPAPERS INNER JOIN bib70x
+                               ON aidPERSONIDPAPERS.bibref_value = bib70x.id
+                               WHERE personid = %s and bibref_table = '700'""", [pid])
+
+
+
     author_recids = run_sql("""SELECT bibrec, name FROM aidPERSONIDPAPERS
                                WHERE personid = %s ORDER BY bibrec DESC""", [pid])
-    for recid, name in author_recids:
+    for recid, name in chain(pid_100_rows, pid_700_rows):
         record = get_record(recid)
         for field in chain(record['100'], record['700']):
             try:
                 if field['a'][0] == name and field['u']:
-                    return {'aff': field['u'][0],
+                    return {'aff': field['u'],
                             'last_recid': recid,
                             'last_occurence': get_creation_date(recid)}
             except IndexError, e:
