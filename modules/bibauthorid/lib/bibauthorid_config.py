@@ -92,8 +92,10 @@ else:
 # Special for ADS: Focus on ASTRONOMY collection
 if GLOBAL_CONFIG and CFG_ADS_SITE:
     LIMIT_TO_COLLECTIONS = ["ASTRONOMY"]
-else:
+elif CFG_INSPIRE_SITE:
     LIMIT_TO_COLLECTIONS = ['HEP']
+else:
+    LIMIT_TO_COLLECTIONS = []
 
 # Exclude documents that are visible in a collection mentioned here:
 EXCLUDE_COLLECTIONS = ["HEPDATA","Data", "HEPNAMES", "INST", "Deleted", "DELETED", "deleted"]

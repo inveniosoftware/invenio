@@ -4120,6 +4120,8 @@ def get_all_valid_papers():   ### get_all_valid_bibrecs
     @return: paper identifiers
     @rtype: list [int,]
     '''
+    if not bconfig.LIMIT_TO_COLLECTIONS:
+        return perform_request_search(p="")
     collection_restriction_pattern = " or ".join(["980__a:\"%s\"" % x for x in bconfig.LIMIT_TO_COLLECTIONS])
 
     return perform_request_search(p="%s" % collection_restriction_pattern, rg=0)
