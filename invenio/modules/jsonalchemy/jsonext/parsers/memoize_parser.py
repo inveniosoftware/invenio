@@ -42,31 +42,34 @@ class MemoizeParser(DecoratorAfterEvalBaseExtensionParser):
 
     This decorator works only with calculated fields and it has three different
     ways of doing it:
-        1) No decorator is specified, the value of the field will be calculated
-           every time that somebody asks for it and its value will not be stored
-           in the DB. This way is useful to create fields that return objects
-           that can't be stored in the DB in a JSON friendly manner or a field
-           that changes a lot its value and the calculated function is really
-           light.
-        2) The decorator is used without any time, ``@memoize()``. This means
-           that the value of the field is calculated when the record is created,
-           it is stored in the DB and it is the job of the client that modifies
-           the data, which is used to calculated the field, to update the field
-           value in the DB.
-           This way should be used for fields that are typically updated just by
-           a few clients, like ``bibupload``, ``bibrank``, etc.
-        3) A lifetime is set with the decorator ``@memoize(300)``. In this case
-           the field value is only calculated when somebody asks for it and its
-           value is stored in a general cache (``invenio.ext.cache``) using the
-           timeout from the decorator.
-           This form of the memoize decorator should be used with a field that
-           changes a lot its value and the function to calculate it is not
-           light.
-           Keep in mind that the value that someone might get could be
-           outdated. To avoid this situation the client that modifies the data
-           where the value is calculated from could also invalidate the cache or
-           modify the cached value.
-           One good example of the use of it is the field ``number_of_comments``
+
+    1. No decorator is specified, the value of the field will be calculated
+       every time that somebody asks for it and its value will not be stored
+       in the DB. This way is useful to create fields that return objects
+       that can't be stored in the DB in a JSON friendly manner or a field
+       that changes a lot its value and the calculated function is really
+       light.
+
+    2. The decorator is used without any time, ``@memoize()``. This means
+       that the value of the field is calculated when the record is created,
+       it is stored in the DB and it is the job of the client that modifies
+       the data, which is used to calculated the field, to update the field
+       value in the DB.
+       This way should be used for fields that are typically updated just by
+       a few clients, like ``bibupload``, ``bibrank``, etc.
+
+    3. A lifetime is set with the decorator ``@memoize(300)``. In this case
+       the field value is only calculated when somebody asks for it and its
+       value is stored in a general cache (``invenio.ext.cache``) using the
+       timeout from the decorator.
+       This form of the memoize decorator should be used with a field that
+       changes a lot its value and the function to calculate it is not
+       light.
+       Keep in mind that the value that someone might get could be
+       outdated. To avoid this situation the client that modifies the data
+       where the value is calculated from could also invalidate the cache or
+       modify the cached value.
+       One good example of the use of it is the field ``number_of_comments``
 
     The cache engine used by this decorator could be set using
     ``CFG_JSONALCHEMY_CACHE`` in your instance configuration, by default

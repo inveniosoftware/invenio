@@ -17,22 +17,32 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""JSONAlchemy errors."""
+
 
 class JSONAlchemyException(Exception):
-    """Base exception"""
+
+    """Base exception."""
+
     pass
 
 
 class FieldParserException(JSONAlchemyException):
-    """Exception raised when some error happens parsing field definitions"""
+
+    """Raised when some error happens parsing field definitions."""
+
     pass
 
 
 class ModelParserException(JSONAlchemyException):
-    """Exception raised when some error happens parsing model definitions"""
+
+    """Raised when some error happens parsing model definitions."""
+
     pass
 
 
 class ReaderException(JSONAlchemyException):
-    """Exception raised when some error happens reading a blob"""
+
+    """Raised when some error happens reading a blob."""
+
     pass

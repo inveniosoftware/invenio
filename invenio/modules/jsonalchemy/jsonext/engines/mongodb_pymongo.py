@@ -17,21 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.jsonalchemy.engines.mongo_pymongo
-    ------------------------------------------
-
-"""
+"""MongoDB Storage engine implementation."""
 
 import pymongo
 from itertools import imap
 
 from invenio.modules.jsonalchemy.storage import Storage
 
+
 class MongoDBStorage(Storage):
-    """
-    Implements storage engine for MongoDB using the driver pymongo
-    """
+
+    """Storage engine for MongoDB using the driver pymongo."""
 
     def __init__(self, model, **kwards):
         """
@@ -41,7 +37,7 @@ class MongoDBStorage(Storage):
         host = kwards.get('host', 'localhost')
         port = kwards.get('port', 27017)
         database = kwards.get('database', 'invenio')
-        self.__connection = pymongo.MongoClient(host=host,port=port)
+        self.__connection = pymongo.MongoClient(host=host, port=port)
         self.__database = self.__connection[database]
         self.__collection = self.__database[model]
 
