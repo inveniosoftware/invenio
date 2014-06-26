@@ -31,9 +31,47 @@ from ..tasks.workflows_tasks import (start_workflow, workflows_reviews,
 from ..tasks.logic_tasks import (foreach, end_for, workflow_if, workflow_else,
                                  simple_for)
 
+from invenio.modules.workflows.utils import WorkflowBase
 
-class generic_harvesting_workflow(object):
-    object_type = "harvest"
+class generic_harvesting_workflow(WorkflowBase):
+
+    object_type = "Supervising Workflow"
+
+    def get_description(obj):
+        from flask import render_template
+
+        identifiers = None
+
+        extra_data = obj.get_extra_data()
+        if 'options' in extra_data and 'identifiers' in extra_data["options"]:
+            identifiers = extra_data["options"]["identifiers"]
+
+        if '_task_results' in extra_data and '_workflows_reviews' in extra_data['_task_results']:
+            result_temp = extra_data["_tasks_results"]["_workflows_reviews"][0].to_dict()['result']
+            result_progress = {
+                'success': (result_temp['total'] - result_temp['failed']),
+                'failed': result_temp['failed'],
+                'success_per': (result_temp['total'] - result_temp['failed']) /
+                          result_temp['total'],
+                'failed_per': result_temp['failed'] / result_temp['total'],
+                'total': result_temp['total']}
+        else:
+            result_progress = {'success_per': 0,  'failed_per': 0, 'success': 0, 'failed': 0, 'total': 0}
+
+        current_task = extra_data['_last_task_name']
+
+        render_template("workflows/styles/harvesting_description.html",
+                        identifiers=identifiers,
+                        result_progress=result_progress,
+                        current_task=current_task)
+
+    def get_title(obj):
+        return "Supervising harvesting of {0}".format(
+            obj.get_extra_data()["_repository"]["name"])
+
+    def formatter(obj, **kwargs):
+        return ""
+
     workflow = [
         init_harvesting,
         foreach(get_repositories_list(), "repository"),

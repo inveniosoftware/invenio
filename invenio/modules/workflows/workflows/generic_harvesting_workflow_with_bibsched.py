@@ -18,11 +18,11 @@
 """Implements an example of a typical ingestion workflow for MARCXML records"""
 
 from ..tasks.marcxml_tasks import (get_repositories_list, harvest_records,
-                                   init_harvesting,get_records_from_file,
-                                   get_obj_extra_data_key,  update_last_update,
+                                   init_harvesting, get_records_from_file,
+                                   get_obj_extra_data_key, update_last_update,
                                    filtering_oai_pmh_identifier)
 
-from ..tasks.workflows_tasks import (start_workflow,  workflows_reviews,
+from ..tasks.workflows_tasks import (start_workflow, workflows_reviews,
                                      wait_for_a_workflow_to_complete,
                                      get_nb_workflow_created,
                                      get_workflows_progress,
@@ -34,7 +34,80 @@ from ..tasks.logic_tasks import (foreach, end_for, simple_for, workflow_if,
 
 from invenio.legacy.bibsched.bibtask import task_update_progress, write_message
 
-class generic_harvesting_workflow_with_bibsched(object):
+from invenio.modules.workflows.utils import WorkflowBase
+
+
+class generic_harvesting_workflow_with_bibsched(WorkflowBase):
+    object_type = "Supervising Workflow"
+
+    @staticmethod
+    def get_description(bwo):
+        from flask import render_template
+
+        identifiers = None
+
+        extra_data = bwo.get_extra_data()
+        try:
+            if 'options' in extra_data and 'identifiers' in extra_data["options"]:
+                identifiers = extra_data["options"]["identifiers"]
+
+            if '_tasks_results' in extra_data and '_workflows_reviews' in \
+                    extra_data['_tasks_results']:
+                result_temp = \
+                    extra_data["_tasks_results"]["_workflows_reviews"][0].to_dict()[
+                        'result']
+                result_progress = {
+                     'success': (result_temp['finished'] - result_temp['failed']),
+                    'failed': result_temp['failed'],
+                    'success_per': (result_temp['finished'] - result_temp[
+                        'failed']) * 100 /
+                                   result_temp['total'],
+                    'failed_per': result_temp['failed'] * 100 / result_temp[
+                        'total'],
+                    'total': result_temp['total']}
+            elif '_tasks_results' in extra_data and '_wait_for_a_workflow_to_complete' in \
+                    extra_data['_tasks_results']:
+                result_temp = \
+                    extra_data["_tasks_results"]["_wait_for_a_workflow_to_complete"][
+                        0].to_dict()['result']
+                result_progress = {
+                    'success': (result_temp['finished'] - result_temp['failed']),
+                    'failed': result_temp['failed'],
+                    'success_per': (result_temp['finished'] - result_temp[
+                        'failed']) * 100 /
+                                   result_temp['total'],
+                    'failed_per': result_temp['failed'] * 100 / result_temp[
+                        'total'],
+                    'total': result_temp['total']}
+            else:
+                result_progress = {'success_per': 0, 'failed_per': 0, 'success': 0,
+                                   'failed': 0, 'total': 0}
+
+            current_task = extra_data['_last_task_name']
+        except Exception as e:
+            result_progress = {'success_per': 0, 'failed_per': 0, 'success': 0,
+                               'failed': 0, 'total': 0}
+            identifiers = None
+            from invenio.modules.workflows.models import ObjectVersion
+            if bwo.version == ObjectVersion.INITIAL:
+                current_task = "The process has not started!!!"
+            else:
+                current_task = "The process CRASHED!!! \n {0}".format(str(e.message))
+
+        return render_template("workflows/styles/harvesting_description.html",
+                               identifiers=identifiers,
+                               result_progress=result_progress,
+                               current_task=current_task)
+
+    @staticmethod
+    def get_title(bwo):
+        return "Supervising harvesting of {0}".format(
+            bwo.get_extra_data()["_repository"]["name"])
+
+    @staticmethod
+    def formatter(bwo, **kwargs):
+        return ""
+
     workflow = [
         write_something_generic("Initialisation", [task_update_progress,
                                                    write_message]),
@@ -70,9 +143,9 @@ class generic_harvesting_workflow_with_bibsched(object):
                         [
                             write_something_generic(["Max Simultaneous Workflow"
                                                      ", Wait for one to finish"]
-                                                    ,
+                                ,
                                                     [task_update_progress,
-                                  write_message]),
+                                                     write_message]),
                             wait_for_a_workflow_to_complete(0.05),
                             start_workflow("full_doc_process", None),
                             write_something_generic(["Workflow started :",

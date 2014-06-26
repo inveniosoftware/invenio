@@ -1,0 +1,25 @@
+<h4><b>Harvesting process summary:</b></h4><br>
+
+
+<p><b>Progress</b>:
+
+<div class="progress">
+  <div class="progress-bar progress-bar-success" style="width: {{result_progress['success_per']}}%">
+    <span class="sr-only">Succeed</span>
+  </div>
+  <div class="progress-bar progress-bar-danger" style="width: {{result_progress['failed_per']}}%">
+    <span class="sr-only">Failed</span>
+  </div>
+</div>
+Success:{{result_progress['success']}} Failed:{{result_progress['failed']}} Total:{{result_progress['total']}}</p>
+
+<p><b>Current task</b>: {{current_task}}</p>
+
+
+{% if identifiers %}
+    <p><b>Identifiers</b> :
+        {% for identifier in identifiers %}
+            {{identifier}}
+        {% endfor %}
+    </p>
+{% endif %}

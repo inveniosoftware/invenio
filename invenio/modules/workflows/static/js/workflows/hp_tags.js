@@ -40,7 +40,6 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
         }
     });
 
-
     var init = function () {
         $('.task-btn').on('click', function () {
             if ($.inArray($(this)[0].name, tagList) <= -1) {
@@ -54,6 +53,14 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
             }
         });
 
+        $('#option-autorefresh').on('click', function () {
+             console.log($('#option-autorefresh').hasClass("btn-danger"));
+             if($('#option-autorefresh').hasClass("btn-danger")) {
+                $('#option-autorefresh').removeClass("btn-danger");
+             } else {
+                $('#option-autorefresh').addClass("btn-danger");
+             }
+        });
 
         $('.version-selection').on('click', function () {
             if ($.inArray($(this)[0].name, tagList) <= -1) {

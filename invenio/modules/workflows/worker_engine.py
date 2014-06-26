@@ -142,6 +142,7 @@ def get_workflow_object_instances(data, engine):
     data_type = None
     for data_object in data:
         if isinstance(data_object, BibWorkflowObject):
+            data_object.data_type = data_type = data_type or engine.get_default_data_type()
             if data_object.id:
                 data_object.log.debug("Existing workflow object found for "
                                       "this object. Saving a snapshot.")
@@ -163,6 +164,7 @@ def get_workflow_object_instances(data, engine):
                 data_type
             )
             workflow_objects.append(current_obj)
+
     return workflow_objects
 
 

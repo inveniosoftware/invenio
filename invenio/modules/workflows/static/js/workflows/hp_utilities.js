@@ -31,8 +31,9 @@ var WORKFLOWS_HP_UTILITIES = function ($, holdingpen) {
     var _requestNewObjects = function () {
         var version_showing = [],
             i,
-            search_tags = []
-            tempTagList = holdingpen.tag.tagList();
+            search_tags = [];
+            console.log(holdingpen);
+        var tempTagList = holdingpen.tag.tagList();
         for(i = 0 ; i< tempTagList.length; i++)
         {
             if ("Completed" == tempTagList[i]) {
@@ -46,7 +47,6 @@ var WORKFLOWS_HP_UTILITIES = function ($, holdingpen) {
             } else {
                 search_tags.push(tempTagList[i]);
             }
-
         }
         my_data = JSON.stringify({'version':version_showing, 'tags':search_tags});
         $.ajax({
@@ -109,6 +109,13 @@ var WORKFLOWS_HP_UTILITIES = function ($, holdingpen) {
         emptyLists: function () {
             holdingpen.rowList = [];
             holdingpen.rowIndexList = [];
+        },
+
+        autorefresh: function () {
+            window.setInterval( function() {
+                if($('#option-autorefresh').hasClass("btn-danger")) {
+                    WORKFLOWS_HP_UTILITIES.requestNewObjects();
+                }}, 3000);
         },
     };
 
