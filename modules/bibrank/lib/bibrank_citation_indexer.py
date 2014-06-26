@@ -791,7 +791,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
             return
 
         # Ignore cites from superseeded records
-        if get_fieldvalues(citer, '78502'):
+        if get_fieldvalues(citer, '78502w'):
             return
 
         citations[citee].add(citer)
