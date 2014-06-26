@@ -320,6 +320,9 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     if type(toaddr) is list:
         toaddr = ','.join(toaddr)
 
+    if type(bccaddr) is list:
+        bccaddr = ','.join(bccaddr)
+
     if type(replytoaddr) is list:
         replytoaddr = ','.join(replytoaddr)
 

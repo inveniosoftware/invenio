@@ -365,10 +365,9 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0,
     out += "</select>\n"
     return out
 
-
-_RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>[a-z]+)?\s*((?P<begin>\d\d?"
-                                   r"(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?",
-                                   re.I)
+_RE_RUNTIMELIMIT_FULL = re.compile(
+    r"(?:(?P<weekday_begin>[a-z]+)(?:-(?P<weekday_end>[a-z]+))?)?\s*"
+    r"((?P<hour_begin>\d\d?(:\d\d?)?)(-(?P<hour_end>\d\d?(:\d\d?)?))?)?", re.I)
 _RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hours>\d\d?)(:(?P<minutes>\d\d?))?')
 
 

@@ -93,7 +93,7 @@ def register_emergency(msg, recipients=None):
         )
 
 
-def get_emergency_recipients(recipient_cfg=None):
+def get_emergency_recipients(recipient_cfg=None, now=None):
     """
     Parse a list of appropriate emergency email recipients from
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, or from a provided dictionary
@@ -113,15 +113,18 @@ def get_emergency_recipients(recipient_cfg=None):
     if recipient_cfg is None:
         recipient_cfg = cfg['CFG_SITE_EMERGENCY_EMAIL_ADDRESSES']
 
+    if now is None:
+        now = datetime.datetime.now()
+
     recipients = set()
     for time_condition, address_str in recipient_cfg.items():
         if time_condition and time_condition is not '*':
-            (current_range, future_range) = parse_runtime_limit(time_condition)
-            if not current_range[0] \
-               <= datetime.datetime.now() <= current_range[1]:
+            current_range, dummy_range = parse_runtime_limit(time_condition,
+                                                             now=now)
+            if not current_range[0] <= now <= current_range[1]:
                 continue
 
-        recipients.update([address_str])
+        recipients.add(address_str)
     return list(recipients)
 
 
@@ -131,7 +134,7 @@ def get_pager():
     """
     paths = (
         os.environ.get('PAGER', ''),
-        CFG_BIBSCHED_LOG_PAGER,
+        cfg['CFG_BIBSCHED_LOG_PAGER'],
         '/usr/bin/less',
         '/bin/more'
     )

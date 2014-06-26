@@ -1279,7 +1279,9 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False,
             register_exception()
             return None
         else:
-            raise InvenioBibFormatError(_('Format element %s could not be found.') % element_name)
+            raise InvenioBibFormatError(
+                _('Format element %{x_element_name} could not be found.',
+                  x_element_name=element_name))
 
     else:
         format_element = {}

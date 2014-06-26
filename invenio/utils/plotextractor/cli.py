@@ -31,7 +31,8 @@ from invenio.config import CFG_TMPSHAREDDIR, CFG_SITE_URL, \
                            CFG_PLOTEXTRACTOR_DISALLOWED_TEX, \
                            CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT, \
                            CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT, \
-                           CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT
+                           CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT, \
+                           CFG_TMPSHAREDIR
 
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
 
@@ -181,6 +182,7 @@ def main():
             os.makedirs(sdir)
         except:
             write_message('Error: We can\'t use this sdir.  using ' +
+                          'CFG_TMPSHAREDDIR')
             sdir = CFG_TMPSHAREDDIR
 
     if skip_refno:

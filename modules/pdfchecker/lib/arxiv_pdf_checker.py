@@ -56,7 +56,7 @@ from invenio.legacy.bibdocfile.api import BibRecDocs, \
                                calculate_md5
 from invenio.oai_harvest_dblayer import get_oai_src
 from invenio import oai_harvest_daemon
-from invenio.filedownloadutils import (download_external_url,
+from invenio.utils.filedownload import (download_external_url,
                                        InvenioFileDownloadError)
 
 
