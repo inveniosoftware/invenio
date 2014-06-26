@@ -63,6 +63,8 @@ class Record(SmartJson):
         if not reset_cache:
             try:
                 json = cls.storage_engine.get_one(recid)
+                if json is None:
+                    raise NoResultFound
                 return Record(json)
             except (NoResultFound, AttributeError):
                 pass
