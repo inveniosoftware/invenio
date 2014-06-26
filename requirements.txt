@@ -3,7 +3,6 @@
 -e git+https://github.com/david-e/flask-admin.git@bootstrap3#egg=Flask-Admin
 -e git+https://github.com/miracle2k/flask-assets.git#egg=Flask-Assets-dev
 -e git+https://github.com/inveniosoftware/flask-breadcrumbs.git#egg=Flask-Breadcrumbs
--e git+https://github.com/greut/Flask-Collect.git@setup-py-fix#egg=Flask-Collect-dev
 -e git+https://github.com/inveniosoftware/flask-menu.git#egg=Flask-Menu
 -e git+https://github.com/inveniosoftware/flask-registry.git#egg=Flask-Registry
 -e git+git://github.com/jirikuncar/flask-sso.git#egg=flask-sso

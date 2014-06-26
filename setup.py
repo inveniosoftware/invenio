@@ -50,7 +50,7 @@ install_requires = [
     "Flask-Babel==0.9",
     "Flask-Breadcrumbs==0.1",
     "Flask-Cache==0.12",
-    "Flask-Collect>0.2.2",
+    "Flask-Collect>=0.2.3",
     "Flask-Email==1.4.4",
     "Flask-Gravatar==0.4.0",
     "Flask-Login==0.2.7",
