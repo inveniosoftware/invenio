@@ -23,32 +23,12 @@
 <input type="checkbox" class="hp-check">
 </td>
 <td title="title">
-{% if action == None %}
     <a href="{{url_for('holdingpen.details', objectid=object.id)}}">
-        {% for i in title %}
-            <p>{{i}}<p>
-        {% endfor %}
+        {{title}}
     </a>
-{% else %}
-{% set action_instance = action() %}
-    <a href="{{url_for('holdingpen.show_action', objectid=object.id)}}">
-        {% for i in title %}
-            <p>{{i}}</p>
-        {% endfor %}
-    </a>
-{% endif %}
 </td>
-<td title="identifiers">
-    {% if identifiers %}
-        {% for i in identifiers %}
-            <p>{{i}}</p>
-        {% endfor %}
-    {% else %}
-        "No identifiers"
-    {% endif %}
-</td>
-<td title="category">
-{{ ", ".join(categories) or "No category" }}
+<td title="description">
+{{description|safe}}
 </td>
 <td title="pretty_date">
 {{ pretty_date(object.created)}}
