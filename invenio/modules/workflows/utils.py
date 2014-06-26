@@ -233,11 +233,10 @@ def empty_redis():
 
 
 def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
-    from invenio.modules.workflows.views.holdingpen import (get_title,
-                                                            get_identifiers,
-                                                            get_subject_categories
-
-    )
+    #from invenio.modules.workflows.views.holdingpen import (get_title,
+    #                                                        get_identifiers,
+    #                                                        get_subject_categories
+    #)
     should_we_reverse = False
     if sSortDir_0 == 'desc':
         should_we_reverse = True
@@ -246,21 +245,21 @@ def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
         bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
     elif iSortCol_0 == 1:
         bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
-    elif iSortCol_0 == 2:
-        bwolist.sort(key=lambda x: get_title(x.get_data()), reverse=should_we_reverse)
-    elif iSortCol_0 == 3:
-        bwolist.sort(key=lambda x: get_identifiers(x.get_data()), reverse=should_we_reverse)
+    #elif iSortCol_0 == 2:
+    #    bwolist.sort(key=lambda x: get_title(x.get_data()), reverse=should_we_reverse)
+    #elif iSortCol_0 == 3:
+    #    bwolist.sort(key=lambda x: get_identifiers(x.get_data()), reverse=should_we_reverse)
+    #elif iSortCol_0 == 4:
+    #    bwolist.sort(key=lambda x: get_subject_categories(x.get_data()), reverse=should_we_reverse)
     elif iSortCol_0 == 4:
-        bwolist.sort(key=lambda x: get_subject_categories(x.get_data()), reverse=should_we_reverse)
-    elif iSortCol_0 == 5:
         bwolist.sort(key=lambda x: x.created, reverse=should_we_reverse)
+    elif iSortCol_0 == 5:
+        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
     elif iSortCol_0 == 6:
-        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
-    elif iSortCol_0 == 7:
         bwolist.sort(key=lambda x: x.data_type, reverse=should_we_reverse)
-    elif iSortCol_0 == 8:
+    elif iSortCol_0 == 7:
         bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
-    elif iSortCol_0 == 9:
+    elif iSortCol_0 == 8:
         bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
     return bwolist
 
@@ -277,5 +276,30 @@ def dummy_function(obj, eng):
 
 
 class WorkflowMissing(object):
+
     """ Workflow is missing """
+
     workflow = [dummy_function]
+
+
+class WorkflowBase(object):
+
+    """Base class for workflow.
+
+    Interface to define which functions should be imperatively implemented,
+    All workflows shoud inherit from this class.
+    """
+
+    @staticmethod
+    def get_title(bwo, **kwargs):
+        """Return the value to put in the title column of HoldingPen."""
+        return "No title"
+
+    @staticmethod
+    def get_description(bwo, **kwargs):
+        """Return the value to put in the title  column of HoldingPen."""
+        return "No description"
+
+    @staticmethod
+    def formatter(obj, **kwargs):
+        raise NotImplementedError

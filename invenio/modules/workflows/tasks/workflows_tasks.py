@@ -114,8 +114,7 @@ def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
 
         if copy:
             myobject = BibWorkflowObject.create_object_revision(obj,
-                                                                version=ObjectVersion.INITIAL,
-                                                                data_type="record")
+                                                                version=ObjectVersion.INITIAL)
         else:
             myobject = BibWorkflowObject()
 
@@ -217,11 +216,18 @@ def wait_for_a_workflow_to_complete(scanning_time=0.5):
             workflow_result_management(to_wait, eng)
 
             del eng.extra_data["_workflow_ids"][i]
-
         else:
             eng.extra_data["_nb_workflow"] = 0
             eng.extra_data["_nb_workflow_failed"] = 0
             eng.extra_data["_nb_workflow_finish"] = 0
+
+        if '_tasks_results' in obj.extra_data and '_wait_for_a_workflow_to_complete' in obj.extra_data['_tasks_results']:
+            del obj.extra_data['_tasks_results']['_wait_for_a_workflow_to_complete']
+
+        obj.add_task_result("review_workflow",
+                            {"finished": eng.extra_data["_nb_workflow_finish"],
+                             "failed": eng.extra_data["_nb_workflow_failed"],
+                             "total": eng.extra_data["_nb_workflow"]})
 
     return _wait_for_a_workflow_to_complete
 
@@ -374,7 +380,9 @@ def workflows_reviews(stop_if_error=False, clean=True):
                 "%s / %s failed" % (eng.extra_data["_nb_workflow_failed"], eng.extra_data["_nb_workflow"]),
                 eng.uuid, obj.id, payload=eng.extra_data["_uuid_workflow_crashed"])
         obj.add_task_result("review_workflow",
-                            {"failed": eng.extra_data["_nb_workflow_failed"], "total": eng.extra_data["_nb_workflow"]})
+                            {"finished": eng.extra_data["_nb_workflow_finish"],
+                             "failed": eng.extra_data["_nb_workflow_failed"],
+                             "total": eng.extra_data["_nb_workflow"]})
         if clean:
             eng.extra_data["_nb_workflow_failed"] = 0
             eng.extra_data["_nb_workflow"] = 0

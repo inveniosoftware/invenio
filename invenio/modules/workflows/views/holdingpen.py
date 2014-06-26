@@ -42,8 +42,8 @@ from invenio.base.i18n import _
 from invenio.utils.date import pretty_date
 
 from ..models import BibWorkflowObject, Workflow, ObjectVersion
-from ..registry import actions
-from ..utils import get_workflow_definition, sort_bwolist
+from ..registry import actions, workflows
+from ..utils import get_workflow_definition, sort_bwolist, WorkflowBase
 from ..api import continue_oid_delayed, start_delayed
 
 
@@ -175,6 +175,7 @@ def load_table():
     3] then if the user searched for something
     and finally it builds the JSON to send.
     """
+    workflows_cache = {}
     version_showing = []
     req = None
     req_search = []
@@ -223,7 +224,6 @@ def load_table():
             s_search = session["tags"]
         else:
             s_search = []
-
     bwolist = get_holdingpen_objects(ssearch=s_search,
                                      version_showing=version_showing)
     if 'iSortCol_0' in session:
@@ -258,7 +258,9 @@ def load_table():
 
         action = actions.get(action_name, None)
         records_showing += 1
-
+        workflows_uuid = bwo.id_workflow
+        if workflows_uuid and workflows_uuid not in workflows_cache:
+            workflows_cache[workflows_uuid] = workflows[Workflow.query.filter(Workflow.uuid == workflows_uuid).one().name]()
         mini_action = getattr(action, "mini_action", None)
         record = bwo.get_data()
         if not hasattr(record, "get"):
@@ -267,32 +269,36 @@ def load_table():
             except:
                 record = {}
 
-        categories = get_subject_categories(record)
-        title = get_title(record)
-        identifiers = get_identifiers(record)
+        if not workflows_uuid:
+            title = "No title"
+            description = "No description"
+            extra_data = bwo.get_extra_data()
+        else:
+            title = workflows_cache[workflows_uuid].get_title(bwo)
+            description = workflows_cache[workflows_uuid].get_description(bwo)
+            extra_data = bwo.get_extra_data()
 
-        extra_data = bwo.get_extra_data()
         row = render_template('workflows/row_formatter.html',
                               title=title,
                               object=bwo,
                               record=record,
                               extra_data=extra_data,
-                              categories=categories,
+                              description=description,
                               action=action,
                               mini_action=mini_action,
                               action_message=action_message,
                               pretty_date=pretty_date,
-                              identifiers=identifiers)
+                              )
         d = {}
         for key, value in REG_TD.findall(row):
             d[key] = value.strip()
+
 
         table_data['aaData'].append(
             [d['id'],
              d['checkbox'],
              d['title'],
-             d['identifiers'],
-             d['category'],
+             d['description'],
              d['pretty_date'],
              d['version'],
              d['type'],
@@ -302,7 +308,6 @@ def load_table():
     table_data['iTotalRecords'] = len(bwolist)
     table_data['iTotalDisplayRecords'] = len(bwolist)
     return jsonify(table_data)
-
 
 @blueprint.route('/get_version_showing', methods=['GET', 'POST'])
 @login_required
@@ -323,7 +328,13 @@ def details(objectid):
     bwobject = BibWorkflowObject.query.get(objectid)
     from invenio.ext.sqlalchemy import db
 
-    formatted_data = bwobject.get_formatted_data(of)
+    #formatted_data = bwobject.get_formatted_data(of)
+    workflows_uuid = bwobject.id_workflow
+    if workflows_uuid:
+        formatted_data = workflows[Workflow.query.filter(Workflow.uuid == workflows_uuid).one().name]().formatter(bwobject, formatter=None, format=of)
+    else:
+        formatted_data = ""
+
     extracted_data = extract_data(bwobject)
     if bwobject.id_parent:
         hbwobject_db_request = BibWorkflowObject.query.filter(
@@ -523,7 +534,11 @@ def entry_data_preview(objectid, of):
         flash("No object found for %s" % (objectid,))
         return jsonify(data={})
 
-    formatted_data = bwobject.get_formatted_data(of)
+    workflows_uuid = bwobject.id_workflow
+    if workflows_uuid:
+        formatted_data = workflows[Workflow.query.filter(Workflow.uuid == workflows_uuid).one().name]().formatter(bwobject, formatter=None, format=of)
+    else:
+        formatted_data = ""
     if isinstance(formatted_data, dict):
         formatted_data = pformat(formatted_data)
     if of and of in ("xm", "xml", "marcxml"):
@@ -600,10 +615,13 @@ def extract_data(bwobject):
 
     extracted_data['w_metadata'] = \
         Workflow.query.filter(Workflow.uuid == bwobject.id_workflow).first()
-
-    workflow_def = get_workflow_definition(extracted_data['w_metadata'].name)
-    extracted_data['workflow_func'] = workflow_def
+    if extracted_data['w_metadata']:
+        workflow_def = get_workflow_definition(extracted_data['w_metadata'].name)
+        extracted_data['workflow_func'] = workflow_def
+    else:
+        extracted_data['workflow_func'] = [None]
     return extracted_data
+
 
 
 def edit_record(form):
@@ -647,6 +665,8 @@ def get_holdingpen_objects(isortcol_0=None,
 
     Uses DataTable naming for filtering/sorting. Work in progress.
     """
+    workflows_cache = {}
+
     if isortcol_0:
         isortcol_0 = int(isortcol_0)
 
@@ -661,7 +681,9 @@ def get_holdingpen_objects(isortcol_0=None,
             data = bwo.get_data()
             if not isinstance(data, collections.Mapping):
                 data = {}
-
+            workflows_uuid = bwo.id_workflow
+            if workflows_uuid and workflows_uuid not in workflows_cache:
+                workflows_cache[workflows_uuid] = workflows[Workflow.query.filter(Workflow.uuid == workflows_uuid).one().name]()
             all_parameters = {"record": data, "extra_data": extra_data,
                               "bwo": bwo}
             if not isinstance(ssearch, list):
@@ -669,16 +691,21 @@ def get_holdingpen_objects(isortcol_0=None,
                     ssearch = ssearch.split(",")
                 else:
                     ssearch = [ssearch]
-
-            checking_functions = {"title": get_title,
-                                  "category": get_subject_categories,
-                                  "identifiers": get_identifiers,
-                                  "created": get_pretty_date,
-                                  "type": get_type
-                                  }
-
+            if workflows_uuid:
+                checking_functions = {"title": workflows_cache[workflows_uuid].get_title,
+                                      "description": workflows_cache[workflows_uuid].get_description,
+                                      "created": get_pretty_date,
+                                      "type": get_type
+                                      }
+            else:
+                checking_functions = {"title": WorkflowBase.get_title,
+                                      "description": WorkflowBase.get_description,
+                                      "created": get_pretty_date,
+                                      "type": get_type
+                                      }
             confirm = 0
             to_add = True
+
             for term in ssearch:
                 for function in checking_functions:
                     if check_ssearch_over_data(term, checking_functions[function](
@@ -696,7 +723,6 @@ def get_holdingpen_objects(isortcol_0=None,
     if isortcol_0 == -6:
         if ssortdir_0 == 'desc':
             bwobject_list.reverse()
-
     return bwobject_list
 
 
@@ -726,40 +752,6 @@ def check_ssearch_over_data(ssearch, data):
         return False
 
 
-def get_subject_categories(record):
-    """Get the subject categories."""
-    if hasattr(record, "get"):
-        if 'subject' in record:
-            lookup = ["subject", "term"]
-        elif "subject_term":
-            lookup = ["subject_term", "term"]
-        else:
-            lookup = None
-        categories = []
-        if lookup:
-            primary, secondary = lookup
-            category_list = record.get(primary, [])
-            if isinstance(category_list, dict):
-                category_list = [category_list]
-            for subject in category_list:
-                category = subject[secondary]
-                if len(subject) == 2:
-                    if subject.keys()[1] == secondary:
-                        source_list = subject[subject.keys()[0]]
-                    else:
-                        source_list = subject[subject.keys()[1]]
-                else:
-                    try:
-                        source_list = subject['source']
-                    except KeyError:
-                        source_list = ""
-                categories.append(category + "(" + source_list + ")")
-        else:
-            categories = [" No categories"]
-        return categories
-    return [" No categories"]
-
-
 def get_pretty_date(bwo):
     return pretty_date(bwo.created)
 
@@ -767,36 +759,3 @@ def get_pretty_date(bwo):
 def get_type(bwo):
     """Get the type of the Object."""
     return bwo.data_type
-
-
-def get_title(record):
-    """Get the title."""
-    extracted_title = []
-
-    if hasattr(record, "get") and "title" in record:
-        if isinstance(record["title"], str):
-            extracted_title = [record["title"]]
-        else:
-            for a_title in record["title"]:
-                extracted_title.append(record["title"][a_title])
-    else:
-        extracted_title = [" No title"]
-    return extracted_title
-
-
-def get_identifiers(record):
-    """Get record identifiers."""
-
-    from invenio.modules.records.api import Record
-
-    try:
-        identifiers = Record(record.dumps()).persistent_identifiers
-        final_identifiers = []
-        for i in identifiers:
-            final_identifiers.append(i['value'])
-        return final_identifiers
-    except Exception:
-        if hasattr(record, "get"):
-            return [record.get("system_number_external", {}).get("value", 'No ids')]
-        else:
-            return [" No ids"]

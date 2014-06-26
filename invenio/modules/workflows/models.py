@@ -509,60 +509,6 @@ class BibWorkflowObject(db.Model):
         self.data_type = other.data_type
         self.uri = other.uri
 
-    def get_formatted_data(self, format=None, formatter=None):
-        """Return the data in some chewable format."""
-        from invenio.modules.formatter.engine import format_record
-
-        data = self.get_data()
-        if not data:
-            return ''
-
-        if formatter:
-            # A seperate formatter is supplied
-            return formatter(data)
-        from invenio.modules.records.api import Record
-        if isinstance(data, collections.Mapping):
-            # Dicts are cool on its own, but maybe its SmartJson (record)
-            try:
-                data = Record(data.dumps()).legacy_export_as_marc()
-            except (TypeError, KeyError):
-                # Maybe not, submission?
-                return data
-
-        if isinstance(data, string_types):
-            # Its a string type, lets try to convert
-            if format:
-                # We can try formatter!
-                # If already XML, format_record does not like it.
-                if format != 'xm':
-                    try:
-                        return format_record(recID=None,
-                                             of=format,
-                                             xml_record=data)
-                    except TypeError:
-                        # Wrong kind of type
-                        pass
-                else:
-                    # So, XML then
-                    from xml.dom.minidom import parseString
-
-                    try:
-                        pretty_data = parseString(data)
-                        return pretty_data.toprettyxml()
-                    except TypeError:
-                        # Probably not proper XML string then
-                        return "Data cannot be parsed: %s" % (data,)
-                    except Exception:
-                        # Some other parsing error
-                        pass
-
-            # Just return raw string
-            return data
-        if isinstance(data, set):
-            return list(data)
-        # Not any of the above types. How juicy!
-        return data
-
     @session_manager
     def save(self, version=None, task_counter=None, id_workflow=None):
         """Save object to persistent storage."""
