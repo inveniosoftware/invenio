@@ -17,17 +17,39 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-notifications:
-  email: false
+language: python
 
 python:
   - "2.6"
+  - "2.7"
+
+services:
+ - mysql
+
+notifications:
+  email: false
+
+before_install:
+ - sudo apt-get update
 
 install:
-  - sudo apt-get update
-  - git clone https://github.com/tiborsimko/invenio-devscripts /tmp/invenio-devscripts
-  - CFG_INVENIO_SRCDIR=$(pwd) /tmp/invenio-devscripts/invenio-kickstart --yes-i-know --yes-i-really-know
+  - travis_retry pip install -U nose
+  # Fix for being in a virtualenv.
+  - |
+      ln -s /opt/invenio/lib/python/invenio \
+        `python -c "import sys; print sys.path[-1]"`/invenio
+  # Installing the devscripts and invenio through them.
+  - |
+      git clone --depth=1 \
+      https://github.com/tiborsimko/invenio-devscripts ../invenio-devscripts
+  - |
+      CFG_INVENIO_SRCDIR=$(pwd) \
+      ../invenio-devscripts/invenio-kickstart --yes-i-know --yes-i-really-know
 
 script:
-  - sudo -u www-data nosetests /opt/invenio/lib/python/invenio/*_unit_tests.py
-  - sudo -u www-data nosetests /opt/invenio/lib/python/invenio/*_regression_tests.py
+  - |
+      sudo -u www-data /bin/bash -c ". $VIRTUAL_ENV/bin/activate && \
+        nosetests /opt/invenio/lib/python/invenio/*_unit_tests.py"
+  - |
+      sudo -u www-data /bin/bash -c ". $VIRTUAL_ENV/bin/activate && \
+        nosetests /opt/invenio/lib/python/invenio/*_regression_tests.py"
