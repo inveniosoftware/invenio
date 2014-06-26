@@ -89,6 +89,10 @@ def setup_app(app):
     assets = Environment(app)
     assets.url = app.static_url_path + "/"
     assets.directory = app.static_folder
+    # The filters less and requirejs don't have the same behaviour by default.
+    # Respecting that.
+    app.config.setdefault("LESS_RUN_IN_DEBUG", True)
+    app.config.setdefault("REQUIREJS_RUN_IN_DEBUG", False)
 
     commands = (("LESS_BIN", "lessc"),
                 ("CLEANCSS_BIN", "cleancss"),
@@ -106,8 +110,6 @@ def setup_app(app):
                              "it via {1}."
                              .format(cmd, key))
             app.config["ASSETS_DEBUG"] = True
-            app.config.setdefault("LESS_RUN_IN_DEBUG", False)
-            app.config.setdefault("REQUIREJS_RUN_IN_DEBUG", False)
             assets.debug = True
 
     def _jinja2_new_bundle(tag, collection, name=None, filters=None):
@@ -120,21 +122,20 @@ def setup_app(app):
                 "extra": {"rel": "stylesheet"}
             }
 
-            # If LESS_RUN_IN_DEBUG is set to False, then the filters are
-            # removed and each less file will be parsed by the less JavaScript
-            # library.
             if tag is "css" and assets.debug and \
-                    not app.config.get("LESS_RUN_IN_DEBUG", True):
+                    not app.config.get("LESS_RUN_IN_DEBUG"):
                 kwargs["extra"]["rel"] = "stylesheet/less"
                 kwargs["filters"] = None
-            # If REQUIREJS_RUN_IN_DEBUG is set to False, then the filters are
-            # removed and dependencies will be loaded via require.js
+
             if tag is "js" and filters and "requirejs" in filters:
-                if not assets.debug or \
-                        app.config.get("REQUIREJS_RUN_IN_DEBUG", True):
-                    collection = [c[1:] for c in collection]
-                else:
+                if assets.debug and \
+                        not app.config.get("REQUIREJS_RUN_IN_DEBUG"):
+                    # removing the filters to avoid the default "merge" filter.
                     kwargs["filters"] = None
+                else:
+                    # removing the initial "/", r.js would get confused
+                    # otherwise
+                    collection = [c[1:] for c in collection]
 
             return Bundle(*collection, **kwargs)
 

@@ -42,18 +42,18 @@
   {%- js url_for('base.static', filename='js/invenio.js'), '90-invenio', 'requirejs' -%}
 
   {%- if config.get('ASSETS_DEBUG') -%}
-    {%- if not config.get("LESS_RUN_IN_DEBUG", True) -%}
+    {%- if not config.get("LESS_RUN_IN_DEBUG") -%}
       {# less.js will compile less templates on the fly. #}
       {%- js url_for('static', filename='js/less.js'), '00-less' -%}
     {%- endif -%}
-    {%- if not config.get("REQUIREJS_RUN_IN_DEBUG", True) -%}
+    {%- if not config.get("REQUIREJS_RUN_IN_DEBUG") -%}
       {# require.js and settings are defining how are loaded the modules.
        # build.js is used during the compilation time.
        #}
       {%- js url_for('static', filename='js/require.js'), '00-requirejs' -%}
     {%- endif -%}
   {%- endif -%}
-  {%- if not config.get('ASSETS_DEBUG') or config.get("REQUIREJS_RUN_IN_DEBUG", True) -%}
+  {%- if not config.get('ASSETS_DEBUG') or config.get("REQUIREJS_RUN_IN_DEBUG") -%}
     {# Almond is a lighter require.js module for compiled files. #}
     {%- js url_for('static', filename='js/almond.js'), '00-requirejs' -%}
   {%- endif -%}
