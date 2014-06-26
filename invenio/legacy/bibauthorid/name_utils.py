@@ -32,37 +32,7 @@ from .string_utils import string_partition
 from .general_utils import name_comparison_print
 
 from invenio.utils.text import translate_to_ascii
-
-try:
-    from editdist import distance
-except ImportError:
-    try:
-        from Levenshtein import distance
-    except ImportError:
-        name_comparison_print("Levenshtein Module not available!")
-        def distance(s1, s2):
-            d = {}
-            lenstr1 = len(s1)
-            lenstr2 = len(s2)
-            for i in xrange(-1, lenstr1 + 1):
-                d[(i, -1)] = i + 1
-            for j in xrange(-1, lenstr2 + 1):
-                d[(-1, j)] = j + 1
-
-            for i in xrange(0, lenstr1):
-                for j in xrange(0, lenstr2):
-                    if s1[i] == s2[j]:
-                        cost = 0
-                    else:
-                        cost = 1
-                    d[(i, j)] = min(
-                                   d[(i - 1, j)] + 1, # deletion
-                                   d[(i, j - 1)] + 1, # insertion
-                                   d[(i - 1, j - 1)] + cost, # substitution
-                                  )
-                    if i > 1 and j > 1 and s1[i] == s2[j - 1] and s1[i - 1] == s2[j]:
-                        d[(i, j)] = min (d[(i, j)], d[i - 2, j - 2] + cost) # transposition
-            return d[lenstr1 - 1, lenstr2 - 1]
+from jellyfish import levenshtein_distance as distance
 
 artifact_removal = re.compile("[^a-zA-Z0-9]")
 
@@ -272,12 +242,6 @@ def soft_compare_names(origin_name, target_name):
     all depending on average compatibility of names and initials.
     '''
     jaro_fctn = distance
-
-#    try:
-#        from Levenshtein import jaro_winkler
-#        jaro_fctn = jaro_winkler
-#    except ImportError:
-#        jaro_fctn = jaro_winkler_str_similarity
 
     score = 0.0
     oname = deepcopy(origin_name)

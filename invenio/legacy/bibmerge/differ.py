@@ -16,14 +16,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable=C0103
-is_editdist_loaded = False
-try:
-    import editdist
-    is_editdist_loaded = True
-except ImportError:
-    # Okay, diffing will not be possible, but continue anyway,
-    # since this package is only recommended, not mandatory.
-    pass
+
+import jellyfish
+
 
 def record_diff(rec1, rec2, compare_subfields, ind1='', ind2=''):
     """Compares two given records
@@ -153,18 +148,13 @@ def compare_strings(str1, str2):
     """Compares 2 strings with the Levenshtein distance and returns a normalized
     value between 0.0 and 1.0 (meaning totally different and exactly the same
     respectively."""
-    if is_editdist_loaded:
-        if str1 == str2:
-            return 1.0
-        max_len = max(len(str1), len(str2))
-        if max_len == 0:
-            return 0.0
-        distance = editdist.distance(str1, str2)
-        return (max_len - distance) / float(max_len)
-    else:
-        # the edit distance module is not loadable, we have to fail the comparison
-        # all the strings will be treated as completely different
+    if str1 == str2:
+        return 1.0
+    max_len = max(len(str1), len(str2))
+    if max_len == 0:
         return 0.0
+    distance = jellyfish.levenshtein_distance(str1, str2)
+    return (max_len - distance) / float(max_len)
 
 def compare_subfields(subfield1, subfield2):
     """Compare two subfields taking into account the subfield code and the

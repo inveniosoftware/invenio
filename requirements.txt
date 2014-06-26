@@ -1,5 +1,4 @@
 -e git+git://github.com/lnielsen-cern/dictdiffer.git#egg=dictdiffer
--e hg+https://code.google.com/p/py-editdist/#egg=editdist
 -e git+https://github.com/david-e/flask-admin.git@bootstrap3#egg=Flask-Admin
 -e git+https://github.com/miracle2k/flask-assets.git#egg=Flask-Assets-dev
 -e git+https://github.com/inveniosoftware/flask-breadcrumbs.git#egg=Flask-Breadcrumbs
