@@ -49,9 +49,10 @@ import cgi
 import types
 from flask import has_app_context, current_app
 from operator import itemgetter
-from six import iteritems, reraise
+from six import iteritems
 from werkzeug.utils import cached_property
 
+from invenio.base.globals import cfg
 from invenio.base.utils import autodiscover_template_context_functions
 from invenio.config import \
      CFG_SITE_LANG, \
@@ -508,8 +509,9 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
 
         # We have spent time computing this format
         # We want to save this effort if the format is cached
-        if save_missing and recID and ln == CFG_SITE_LANG \
-           and of.lower() in CFG_BIBFORMAT_CACHED_FORMATS and verbose == 0:
+        if save_missing and recID and ln == cfg['CFG_SITE_LANG'] \
+                and of.lower() in cfg['CFG_BIBFORMAT_CACHED_FORMATS'] \
+                and verbose == 0:
             bibformat_dblayer.save_preformatted_record(recID,
                                                        of,
                                                        out,
@@ -868,7 +870,10 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
             register_exception(req=bfo.req)
             name = format_element['attrs']['name']
             try:
-                raise InvenioBibFormatError(_('Error when evaluating format element %s with parameters %s.') % (name, str(params)))
+                raise InvenioBibFormatError(
+                    _('Error when evaluating format element %(x_name)s '
+                      'with parameters %(x_params)s.',
+                      x_name=name, x_params=str(params)))
             except InvenioBibFormatError, exc:
                 errors.append(exc.message)
 
@@ -1280,7 +1285,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False,
             return None
         else:
             raise InvenioBibFormatError(
-                _('Format element %{x_element_name} could not be found.',
+                _('Format element %(x_element_name)s could not be found.',
                   x_element_name=element_name))
 
     else:
