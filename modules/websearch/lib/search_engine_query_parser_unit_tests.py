@@ -737,7 +737,7 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
         def test_date_by_gt_yr(self):
             """SPIRES search syntax - searching by date > year"""
             spi_search = "find date > 1980"
-            inv_search = 'year:1980->9999 AND NOT year:1980'
+            inv_search = 'year:1980->9999-01-01 AND NOT year:1980'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_yr_mo(self):
@@ -773,7 +773,7 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
         def test_date_by_gt_yr_mo(self):
             """SPIRES search syntax - searching by date > 1978-10"""
             spi_search = "find date > 1978-10"
-            inv_search = 'year:1978-10->9999 AND NOT year:1978-10'
+            inv_search = 'year:1978-10->9999-01-01 AND NOT year:1978-10'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_lt_yr_mo_d(self):
@@ -785,7 +785,7 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
         def test_date_by_gt_yr_mo_d(self):
             """SPIRES search syntax - searching by date > 1978-10-21"""
             spi_search = "find date > 1978-10-21"
-            inv_search = 'year:1978-10-21->9999 AND NOT year:1978-10-21'
+            inv_search = 'year:1978-10-21->9999-01-01 AND NOT year:1978-10-21'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_before_1900(self):
@@ -860,7 +860,7 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
             def test_date_by_gt_d_MO_yr(self):
                 """SPIRES search syntax - searching by date > 12 Jun 1960: will only work with dateutil installed"""
                 spi_search = "find date > 12 Jun 1960"
-                inv_search = 'year:1960-06-12->9999 AND NOT year:1960-06-12'
+                inv_search = 'year:1960-06-12->9999-01-01 AND NOT year:1960-06-12'
                 self._compare_searches(inv_search, spi_search)
 
             def test_date_accept_today(self):
